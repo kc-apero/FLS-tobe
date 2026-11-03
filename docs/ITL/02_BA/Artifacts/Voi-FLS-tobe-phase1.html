@@ -1,0 +1,395 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Voi FLS-tobe-phase1</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Serif:wght@500;600&display=swap">
+<style>
+/* Bố cục: một cột đọc; sơ đồ và bảng rộng có khung cuộn ngang riêng. Sơ đồ = 2 vùng (nơi sinh dữ liệu / FLS) × 6 dải theo đời sống của dữ liệu. */
+:root{
+  --bg:#f7f8f6; --paper:#ffffff; --fg:#1d2420; --muted:#5b665f; --line:#d6dcd7;
+  --accent:#1f4e79; --accent-soft:#e3ecf5;
+  --ok:#2e7d4f; --ok-soft:#dcefe3; --mid:#b7791f; --mid-soft:#fff1d1; --no:#8a918c; --no-soft:#eceeec;
+  --zoneA:#f1ece2; --zoneB:#e9f0f6; --proc:#ffffff; --data:#f3f6f3; --gate:#e8f3ec; --fps:#fbf1dc;
+  --sans:"IBM Plex Sans",system-ui,"Segoe UI",Arial,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+  --serif:"IBM Plex Serif",Georgia,serif;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#151916; --paper:#1d2320; --fg:#e6ebe7; --muted:#a2aca5; --line:#343c37;
+  --accent:#8fb8e0; --accent-soft:#223243;
+  --ok:#6fcf97; --ok-soft:#1f3a2b; --mid:#e2b45a; --mid-soft:#3d3119; --no:#8d968f; --no-soft:#272c29;
+  --zoneA:#2a2620; --zoneB:#1b232b; --proc:#232a27; --data:#1f2622; --gate:#1c2f24; --fps:#352c1a; color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#151916; --paper:#1d2320; --fg:#e6ebe7; --muted:#a2aca5; --line:#343c37;
+  --accent:#8fb8e0; --accent-soft:#223243;
+  --ok:#6fcf97; --ok-soft:#1f3a2b; --mid:#e2b45a; --mid-soft:#3d3119; --no:#8d968f; --no-soft:#272c29;
+  --zoneA:#2a2620; --zoneB:#1b232b; --proc:#232a27; --data:#1f2622; --gate:#1c2f24; --fps:#352c1a; color-scheme:dark }
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--fg);font:15px/1.55 var(--sans);
+  padding-block:0 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+main{max-width:1180px;margin:0 auto}
+header.top{padding:28px 0 12px;border-bottom:2px solid var(--accent)}
+h1{font:600 30px/1.2 var(--serif);margin:0 0 8px;text-wrap:balance}
+h2{font:600 21px/1.25 var(--serif);margin:40px 0 10px;text-wrap:balance}
+h3{font:600 16px/1.3 var(--sans);margin:22px 0 8px}
+p{max-width:80ch}
+.meta{color:var(--muted);font-size:13.5px;max-width:none}
+.meta b{color:var(--fg)}
+code{font-family:var(--mono);font-size:.92em;background:var(--accent-soft);padding:0 .3em;border-radius:3px}
+.mono{font-family:var(--mono);font-size:.92em}
+.scroll{overflow-x:auto;border:1px solid var(--line);border-radius:4px;background:var(--paper)}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th,td{border-bottom:1px solid var(--line);padding:7px 9px;vertical-align:top;text-align:left}
+th{background:var(--accent-soft);font-weight:600;font-size:12.5px;letter-spacing:.02em;text-transform:uppercase}
+tr.band th{background:var(--band-c,var(--data));text-transform:none;font-size:13.5px;letter-spacing:0}
+td.id{font-family:var(--mono);white-space:nowrap;font-weight:500}
+.pill{display:inline-block;font:500 12px/1 var(--mono);padding:4px 7px;border-radius:3px;white-space:nowrap}
+.ok{background:var(--ok-soft);color:var(--ok)} .mid{background:var(--mid-soft);color:var(--mid)} .no{background:var(--no-soft);color:var(--no)}
+.legend{display:flex;flex-wrap:wrap;gap:10px 18px;font-size:13px;color:var(--muted);margin:10px 0}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{width:14px;height:14px;border-radius:3px;border:1px solid var(--line)}
+.diagram{overflow-x:auto;background:var(--paper);border:1px solid var(--line);border-radius:4px;padding:8px}
+.diagram svg{display:block;min-width:980px;width:100%;height:auto;font-family:var(--sans)}
+figcaption{font-size:13px;color:var(--muted);margin:8px 2px 0;max-width:none}
+.note{border-left:3px solid var(--mid);background:var(--mid-soft);padding:8px 12px;max-width:90ch;font-size:14px}
+ul.terms{max-width:90ch;padding-left:1.2em} ul.terms li{margin:4px 0}
+footer{margin-top:48px;color:var(--muted);font-size:12.5px;border-top:1px solid var(--line);padding-top:10px}
+@media (max-width:640px){ h1{font-size:24px} body{font-size:14px} }
+</style>
+</head>
+<body>
+<main>
+<header class="top">
+  <h1>Voi FLS-tobe-phase1</h1>
+  <p class="meta"><b>v0.1 · 2026-11-03</b> · Giai đoạn 1 vẽ chi tiết: đi hết INPUT → một sổ ITL duy nhất, mọi dòng chi phí có pháp nhân. Nguồn phiếu chi là <b>FPS</b> (hệ thanh toán), nối bằng <b>hợp đồng dữ liệu FPS → FLS</b>.<br>
+  Bản gốc tham chiếu: bảng <i>PD Now</i> (chỉ mượn <b>thuật ngữ</b>: PE · PI · PM · PC · LE · CDT · HD/KRF · Reference No · General Trustest · CFA1; <b>không</b> mượn tên sheet, tên file hay bước tính). Mã FLS @ <code>2d1b710</code>; cấu trúc bảng FPS theo đối chiếu code đã ghi ở <code>FLS-vs-FPS-Compare-Audit.md</code> §3–§4 và <code>FLS-ERD-Full-Detail.md</code> §0.4.</p>
+</header>
+
+<h2>§1 · Con voi giai đoạn 1 — 2 vùng × 6 dải, mũi tên chỉ đi giữa hai dải kề nhau</h2>
+<div class="legend">
+  <span><i class="sw" style="background:var(--fps);border-color:var(--mid)"></i>từ FPS (hợp đồng dữ liệu)</span>
+  <span><i class="sw" style="background:var(--data)"></i>hộp dữ liệu (tên của vật)</span>
+  <span><i class="sw" style="background:var(--proc);border-color:var(--accent)"></i>hộp xử lý (ĐỘNG TỪ + danh từ)</span>
+  <span><i class="sw" style="background:var(--gate);border-color:var(--ok)"></i>cổng ra, khai <code>mong</code></span>
+  <span>Mũi tên <span class="mono">a1…g5</span> giải nghĩa ở §2. Nét liền = đã có mã; nét đứt = GĐ1 phải dựng.</span>
+</div>
+<figure class="diagram" style="margin:0">
+<svg viewBox="0 0 1180 912" role="img" aria-label="Voi FLS-tobe-phase1: nguồn → ảnh chụp → dựng → nối & gắn chiều → sổ ITL duy nhất → cổng ra">
+  <defs>
+    <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10z" fill="var(--muted)"/></marker>
+  </defs>
+  <style>
+    .zone{stroke:var(--line);stroke-width:1}
+    .zt{font:600 12px var(--mono);fill:var(--muted);letter-spacing:.04em}
+    .bt{font:600 13px var(--sans);fill:var(--fg)}
+    .bs{font:11.5px var(--mono);fill:var(--muted)}
+    .bx{stroke-width:1.3}
+    .d{fill:var(--data);stroke:var(--line)} .f{fill:var(--fps);stroke:var(--mid)} .p{fill:var(--proc);stroke:var(--accent)} .g{fill:var(--gate);stroke:var(--ok)}
+    .new{stroke-dasharray:5 3}
+    .t1{font:600 12.5px var(--sans);fill:var(--fg)} .t2{font:11.5px var(--sans);fill:var(--fg)} .t3{font:11px var(--mono);fill:var(--muted)}
+    .ar{stroke:var(--muted);stroke-width:1.6;fill:none;marker-end:url(#ah)}
+    .al{font:500 10.5px var(--mono);fill:var(--accent)}
+  </style>
+
+  <!-- VÙNG A: nơi dữ liệu sinh ra -->
+  <rect class="zone" x="28" y="14" width="1140" height="124" rx="5" fill="var(--zoneA)"/>
+  <text class="zt" x="40" y="32">VÙNG A · NƠI DỮ LIỆU SINH RA (ngoài FLS, chỉ-đọc)</text>
+  <g class="bx">
+    <rect class="f" x="52" y="42" width="448" height="84" rx="3"/>
+    <text class="t1" x="62" y="60">FPS — hệ thanh toán: bốn loại phiếu + danh mục</text>
+    <text class="t2" x="62" y="78">PE dự toán · PI hoá đơn · PM lệnh chi · PC quyết toán — mỗi loại = slip + line</text>
+    <text class="t2" x="62" y="94">Danh mục: LE · CDT · HD/KRF · ngân sách · đối tác · tài khoản NH · tỷ giá</text>
+    <text class="t3" x="62" y="114">hợp đồng dữ liệu §3 · FLS chỉ ĐỌC (QĐ-ITL-45)</text>
+
+    <rect class="d" x="512" y="42" width="218" height="84" rx="3"/>
+    <text class="t1" x="522" y="60">Ngân hàng — sao kê</text>
+    <text class="t2" x="522" y="78">60 dòng chảy · 19 bố cục cột</text>
+    <text class="t2" x="522" y="94">mỗi dòng = General Trustest</text>
+    <text class="t3" x="522" y="114">Ngày · Tiền · Tiền tệ · LE</text>
+
+    <rect class="d" x="742" y="42" width="218" height="84" rx="3"/>
+    <text class="t1" x="752" y="60">Quỹ — sổ thu chi</text>
+    <text class="t2" x="752" y="78">8 dòng chảy, kế toán ghi tay</text>
+    <text class="t2" x="752" y="94">cùng khuôn General Trustest</text>
+    <text class="t3" x="752" y="114">chưa chảy vào FLS</text>
+
+    <rect class="d" x="972" y="42" width="188" height="84" rx="3"/>
+    <text class="t1" x="982" y="60">HR · Nền tảng (gộp vẽ)</text>
+    <text class="t2" x="982" y="78">HR: 4 sổ lương đã tách HD/KRF</text>
+    <text class="t2" x="982" y="94">Nền tảng: chi phí DV · thanh toán</text>
+    <text class="t3" x="982" y="114">GI/OMC: khoá phân bổ, GĐ3</text>
+  </g>
+  <!-- a: A → ảnh chụp -->
+  <path class="ar" d="M161 138 v30"/><text class="al" x="166" y="158">a1</text>
+  <path class="ar" d="M391 138 v30"/><text class="al" x="396" y="158">a2</text>
+  <path class="ar" d="M621 138 v30"/><text class="al" x="626" y="158">a3</text>
+  <path class="ar" d="M851 138 v30"/><text class="al" x="856" y="158">a4</text>
+  <path class="ar" d="M1066 138 v30"/><text class="al" x="1071" y="158">a5</text>
+
+  <!-- VÙNG B: FLS -->
+  <rect class="zone" x="28" y="170" width="1140" height="728" rx="5" fill="var(--zoneB)"/>
+  <text class="zt" x="40" y="188">VÙNG B · FLS (PostgreSQL · chỉ-thêm · mọi dòng có run_id)</text>
+
+  <!-- dải 1: ẢNH CHỤP -->
+  <text class="bt" x="40" y="212">Dải ① · ẢNH CHỤP — đóng băng, có run_id, không sửa</text>
+  <g class="bx">
+    <rect class="f new" x="52" y="222" width="218" height="80" rx="3"/>
+    <text class="t1" x="62" y="240">ảnh phiếu FPS</text>
+    <text class="t2" x="62" y="258">PE · PI · PM · PC, slip + line</text>
+    <text class="t2" x="62" y="274">hôm nay: chỉ PM (3.772 dòng)</text>
+    <text class="t3" x="62" y="292">fls_{pe,pi,pm,pc}_line / _slip</text>
+
+    <rect class="f new" x="282" y="222" width="218" height="80" rx="3"/>
+    <text class="t1" x="292" y="240">ảnh danh mục FPS</text>
+    <text class="t2" x="292" y="258">LE · CDT · HD/KRF · ngân sách</text>
+    <text class="t2" x="292" y="274">đối tác · tài khoản NH · tỷ giá</text>
+    <text class="t3" x="292" y="292">fls_le 29 mã · 24 thiếu tên</text>
+
+    <rect class="d" x="512" y="222" width="218" height="80" rx="3"/>
+    <text class="t1" x="522" y="240">ảnh sao kê ngân hàng</text>
+    <text class="t2" x="522" y="258">5/6 trường chuẩn, theo bản khai cột</text>
+    <text class="t2" x="522" y="274">mỗi giờ 8h–19h · 182 ảnh</text>
+    <text class="t3" x="522" y="292">fls_chup · fls_khai_cot 408</text>
+
+    <rect class="d new" x="742" y="222" width="218" height="80" rx="3"/>
+    <text class="t1" x="752" y="240">ảnh sổ quỹ</text>
+    <text class="t2" x="752" y="258">8 dòng chảy đã khai cột</text>
+    <text class="t2" x="752" y="274">lằn Cash chưa bật</text>
+    <text class="t3" x="752" y="292">fls_chup lằn 'Cash'</text>
+
+    <rect class="d new" x="972" y="222" width="188" height="80" rx="3"/>
+    <text class="t1" x="982" y="240">ảnh sổ ngoài</text>
+    <text class="t2" x="982" y="258">HR 4 sổ · nền tảng 2 sổ</text>
+    <text class="t2" x="982" y="274">đã mang HD/KRF ở nguồn</text>
+    <text class="t3" x="982" y="292">lằn 'HR' · 'Platform'</text>
+  </g>
+  <!-- b: ảnh → dựng -->
+  <path class="ar" d="M161 302 v30"/><text class="al" x="166" y="322">b1</text>
+  <path class="ar" d="M391 302 v30"/><text class="al" x="396" y="322">b2</text>
+  <path class="ar" d="M621 302 v30"/><text class="al" x="626" y="322">b3</text>
+  <path class="ar" d="M851 302 v30"/><text class="al" x="856" y="322">b4</text>
+  <path class="ar" d="M1066 302 v30"/><text class="al" x="1071" y="322">b5</text>
+
+  <!-- dải 2: DỰNG -->
+  <text class="bt" x="40" y="352">Dải ② · DỰNG — mỗi họ nguồn một bộ đọc, ra cùng khuôn canon 36 trường</text>
+  <g class="bx">
+    <rect class="p new" x="52" y="362" width="218" height="80" rx="3"/>
+    <text class="t1" x="62" y="380">DỰNG chuỗi phiếu</text>
+    <text class="t2" x="62" y="398">PM line → PI line → PE line → PE slip</text>
+    <text class="t2" x="62" y="414">PC gắn vào PM/PE</text>
+    <text class="t3" x="62" y="432">khoá: pm/pi/pe_line_id</text>
+
+    <rect class="p new" x="282" y="362" width="218" height="80" rx="3"/>
+    <text class="t1" x="292" y="380">TRA danh mục</text>
+    <text class="t2" x="292" y="398">mã → tên, hiệu lực tại ngày</text>
+    <text class="t2" x="292" y="414">LE đủ tên · CDT · HD/KRF · đối tác</text>
+    <text class="t3" x="292" y="432">mã lạ ⇒ hàng chờ, không tự bịa</text>
+
+    <rect class="p" x="512" y="362" width="448" height="80" rx="3"/>
+    <text class="t1" x="522" y="380">DỰNG dòng tiền (ngân hàng + quỹ)</text>
+    <text class="t2" x="522" y="398">ảnh → General Trustest: ngày · chứng từ · tiền tệ · Nợ · Có · tài khoản</text>
+    <text class="t2" x="522" y="414">9 luật soát (CHẶN / CỜ) · chống trùng theo content_key · thứ tự ngày do nguồn khai</text>
+    <text class="t3" x="522" y="432">bank: 8.338/8.338 đã đo · quỹ: cùng đường, chưa chạy</text>
+
+    <rect class="p new" x="972" y="362" width="188" height="80" rx="3"/>
+    <text class="t1" x="982" y="380">DỰNG dòng chi phí</text>
+    <text class="t2" x="982" y="398">HR · nền tảng → canon</text>
+    <text class="t2" x="982" y="414">giữ HD/KRF nguồn đã tách</text>
+    <text class="t3" x="982" y="432">không phân bổ lại</text>
+  </g>
+  <!-- c: dựng → nối & gắn -->
+  <path class="ar" d="M161 442 v30"/><text class="al" x="166" y="462">c1</text>
+  <path class="ar" d="M391 442 v30"/><text class="al" x="396" y="462">c2</text>
+  <path class="ar" d="M736 442 v30"/><text class="al" x="741" y="462">c3</text>
+  <path class="ar" d="M1066 442 v30"/><text class="al" x="1071" y="462">c4</text>
+
+  <!-- dải 3: NỐI & GẮN CHIỀU -->
+  <text class="bt" x="40" y="492">Dải ③ · NỐI &amp; GẮN CHIỀU — mỗi dòng có pháp nhân; dòng tiền có lệnh chi thì có đủ chiều phiếu</text>
+  <g class="bx">
+    <rect class="p" x="52" y="502" width="440" height="92" rx="3"/>
+    <text class="t1" x="62" y="520">NỐI lệnh chi ↔ dòng tiền · GẮN chiều phiếu</text>
+    <text class="t2" x="62" y="538">Reference No (PM slip) → chia tiền theo line; Σ line = tiền dòng, lệch ⇒ chặn</text>
+    <text class="t2" x="62" y="554">gắn từ chuỗi: HD/KRF · CDT1 · đối tác · kỳ dịch vụ · pháp nhân trả (le_payer)</text>
+    <text class="t3" x="62" y="572">có: ghép theo dòng 26,79% · thiếu: chuỗi PI/PE (trỏ rỗng 100%)</text>
+    <text class="t3" x="62" y="586">máy gợi ý ≠ số chốt: hd/cdt1 chờ người gật</text>
+
+    <rect class="p new" x="512" y="502" width="448" height="92" rx="3"/>
+    <text class="t1" x="522" y="520">GẮN pháp nhân chịu chi phí (LE) cho dòng tiền</text>
+    <text class="t2" x="522" y="538">tách tài khoản nguồn → số TK · ngân hàng · tiền tệ · LE (8.387/8.387, 49 nguồn)</text>
+    <text class="t2" x="522" y="554">TK không tự nói LE (14 TK · 211 dòng) ⇒ bảng TK → LE owner ký, không regex</text>
+    <text class="t3" x="522" y="572">luật tách chưa thành mã (GAP-SPEC-04) — rẻ nhất, làm đầu tiên</text>
+    <text class="t3" x="522" y="586">kết quả: le ≠ NULL hoặc nằm trong danh sách rỗng-có-tên</text>
+
+    <rect class="p new" x="972" y="502" width="188" height="92" rx="3"/>
+    <text class="t1" x="982" y="520">GẮN LE dòng chi phí</text>
+    <text class="t2" x="982" y="538">HR: LE theo sổ lương</text>
+    <text class="t2" x="982" y="554">nền tảng: LE theo sổ nguồn</text>
+    <text class="t3" x="982" y="572">tra danh mục ② (không vẽ</text>
+    <text class="t3" x="982" y="586">mũi tên — xem §2 ghi chú)</text>
+  </g>
+  <!-- ngang trong dải 3: dòng tiền có LE → NỐI -->
+  <path class="ar" d="M512 548 h-20"/><text class="al" x="494" y="543">c5</text>
+  <!-- d: nối & gắn → sổ -->
+  <path class="ar" d="M276 594 v30"/><text class="al" x="281" y="614">d1</text>
+  <path class="ar" d="M736 594 v30"/><text class="al" x="741" y="614">d2</text>
+  <path class="ar" d="M1066 594 v30"/><text class="al" x="1071" y="614">d3</text>
+
+  <!-- dải 4: SỔ -->
+  <text class="bt" x="40" y="644">Dải ④ · SỔ — một bảng ITL duy nhất + bảng vệ tinh, chỉ-thêm</text>
+  <g class="bx">
+    <rect class="d" x="52" y="654" width="440" height="92" rx="3"/>
+    <text class="t1" x="62" y="672">mối nối lệnh chi &amp; chiều phiếu</text>
+    <text class="t2" x="62" y="690">itl_id ↔ pm_line_id (+ pi_line_id · pe_line_id), tiền chia, hình nối</text>
+    <text class="t2" x="62" y="706">bút toán chỉ-thêm: hd · cdt1 · kỳ DV · le_payer (người / máy gợi ý)</text>
+    <text class="t3" x="62" y="724">fls_pm_link 2.263 · fls_adjustment 4.428 · fls_journal</text>
+    <text class="t3" x="62" y="738">bỏ nối = thêm dòng, không xoá</text>
+
+    <rect class="d" x="512" y="654" width="648" height="92" rx="3"/>
+    <text class="t1" x="522" y="672">SỔ ITL DUY NHẤT — fls_itl</text>
+    <text class="t2" x="522" y="690">một bảng, bốn họ nguồn (Bank · Cash · HR · Platform), 36 trường canon + 14 trường hợp đồng</text>
+    <text class="t2" x="522" y="706">mỗi dòng: General Trustest + tài khoản + LE + run_id + content_key; kèm hàng chờ có lý do có tên</text>
+    <text class="t3" x="522" y="724">hôm nay 8.387 dòng, 1 họ nguồn · le 0/8.387 · chỉ-thêm (INV-I08), 0 cửa PUT/DELETE</text>
+    <text class="t3" x="522" y="738">GĐ1 xong: 4 họ nguồn trong cùng bảng, một SELECT trả đủ</text>
+  </g>
+  <!-- ngang trong dải 4: mối nối → sổ -->
+  <path class="ar" d="M492 700 h20"/><text class="al" x="494" y="695">d4</text>
+  <!-- e: sổ → cổng -->
+  <path class="ar" d="M161 746 v30"/><text class="al" x="166" y="766">e1</text>
+  <path class="ar" d="M391 746 v30"/><text class="al" x="396" y="766">e2</text>
+  <path class="ar" d="M621 746 v30"/><text class="al" x="626" y="766">e3</text>
+  <path class="ar" d="M851 746 v30"/><text class="al" x="856" y="766">e4</text>
+  <path class="ar" d="M1066 746 v30"/><text class="al" x="1071" y="766">e5</text>
+
+  <!-- dải 5: CỔNG RA -->
+  <text class="bt" x="40" y="796">Dải ⑤ · CỔNG RA GĐ1 — mỗi cổng khai <tspan class="bs">mong</tspan>, đỏ khi khác, cả hai chiều</text>
+  <g class="bx">
+    <rect class="g" x="52" y="806" width="218" height="80" rx="3"/>
+    <text class="t1" x="62" y="824">0 khoá phiếu trỏ rỗng</text>
+    <text class="t2" x="62" y="842">mọi pm/pi/pe_line_id trong mối nối</text>
+    <text class="t2" x="62" y="858">tìm thấy dòng trong ảnh phiếu</text>
+    <text class="t3" x="62" y="876">hôm nay: pe/pi trỏ rỗng 100%</text>
+
+    <rect class="g" x="282" y="806" width="218" height="80" rx="3"/>
+    <text class="t1" x="292" y="824">Σ tiền nối = tiền dòng</text>
+    <text class="t2" x="292" y="842">dòng có nối: Σ line = Nợ/Có</text>
+    <text class="t2" x="292" y="858">lệch ⇒ chặn, không chia bừa</text>
+    <text class="t3" x="292" y="876">INV-I16 · đã có cổng Σ</text>
+
+    <rect class="g" x="512" y="806" width="218" height="80" rx="3"/>
+    <text class="t1" x="522" y="824">le NULL = 0 / N</text>
+    <text class="t2" x="522" y="842">hoặc danh sách rỗng có tên TK</text>
+    <text class="t2" x="522" y="858">và owner ký · đếm mẫu số trước</text>
+    <text class="t3" x="522" y="876">hôm nay: 0/8.387 có le</text>
+
+    <rect class="g" x="742" y="806" width="218" height="80" rx="3"/>
+    <text class="t1" x="752" y="824">Σ theo LE = Σ theo nguồn</text>
+    <text class="t2" x="752" y="842">2 cách đếm, 1 tổng, từng tiền tệ</text>
+    <text class="t2" x="752" y="858">nạp lại cùng ảnh ⇒ 0 nhân đôi</text>
+    <text class="t3" x="752" y="876">vào = sổ + loại + rỗng + trùng</text>
+
+    <rect class="g" x="972" y="806" width="188" height="80" rx="3"/>
+    <text class="t1" x="982" y="824">xuất đối chiếu sổ gốc</text>
+    <text class="t2" x="982" y="842">bộ xuất khuôn sổ đang chạy</text>
+    <text class="t2" x="982" y="858">chênh liệt kê từng dòng</text>
+    <text class="t3" x="982" y="876">bộ xuất chưa tồn tại</text>
+  </g>
+</svg>
+<figcaption>Hình 1 — Voi FLS-tobe-phase1. Kiểm cạnh: 2 vùng · 6 dải · 22 hộp · 24 mũi tên, tất cả thẳng và chỉ nối hai dải kề nhau hoặc hai hộp cùng dải (c5, d4); 1 phép tra danh mục (ảnh danh mục ② → GẮN LE dòng chi phí) <b>không vẽ</b> vì nó phải băng qua hai hộp — ghi ở §2. Hộp "HR · Nền tảng" và "ảnh sổ ngoài" là hai nguồn <b>gộp vẽ</b> để giữ ≤ 5 hộp/dải; bảng §2 tách lại.</figcaption>
+</figure>
+
+<h2>§2 · Mũi tên nói gì — 24 mũi tên, 7 nhóm</h2>
+<p>Mỗi mũi tên là một <b>dòng dữ liệu</b> có khoá, bản số và cổng. Cột "có mã" nói mũi tên ấy hôm nay đã chảy chưa.</p>
+<div class="scroll"><table>
+<thead><tr><th>#</th><th>Từ → tới</th><th>Cái gì chảy</th><th>Khoá / định danh</th><th>Bản số</th><th>Cổng trên mũi tên</th><th>Có mã</th></tr></thead>
+<tbody>
+<tr class="band" style="--band-c:var(--zoneA)"><th colspan="7">a · Nơi sinh → ảnh chụp (5) — chỉ-đọc, mỗi lần chụp một <code>chup_id</code>, ảnh cũ không đổi một ô</th></tr>
+<tr><td class="id">a1</td><td>FPS phiếu → ảnh phiếu FPS</td><td>4 loại phiếu, cả slip lẫn line, trạng thái duyệt, tệp đính kèm (chỉ đường dẫn)</td><td><code>pe_id · pi_id · pm_id · pc_id</code> (slip) · <code>line_id</code> (line)</td><td>1 phiếu – n dòng</td><td>chụp hai lần ⇒ hai <code>chup_id</code>, checksum ảnh cũ không đổi; cột riêng tư (email) không vào kho</td><td><span class="pill mid">◐</span> PM có; PE/PI/PC chưa</td></tr>
+<tr><td class="id">a2</td><td>FPS danh mục → ảnh danh mục FPS</td><td>LE (mã + tên + nước + hiệu lực) · CDT · HD/KRF · ngân sách · đối tác (+ khối đối tác) · tài khoản ngân hàng · tỷ giá</td><td><code>le_code · cdt_code · kr_code · bgc_code · vendor_id · bank_account_id · (tiền tệ, ngày hiệu lực)</code></td><td>mã – 1 bản ghi hiệu lực</td><td>mã trùng ⇒ chặn; tên rỗng ⇒ cờ (hôm nay 24/29 LE thiếu tên)</td><td><span class="pill no">⛔</span> chỉ <code>fls_le</code> suy từ giá trị</td></tr>
+<tr><td class="id">a3</td><td>Ngân hàng → ảnh sao kê</td><td>5/6 trường chuẩn theo bản khai cột của từng dòng chảy (ngày · tiền tệ · nợ · có · tham chiếu; diễn giải không đọc)</td><td>(dòng chảy, số thứ tự dòng) · bản khai <code>khai_id</code></td><td>1 dòng chảy – n dòng</td><td>thiếu bản khai ⇒ nổ, nêu tên dòng chảy; nguồn 0 dòng vẫn có mặt trong ảnh</td><td><span class="pill ok">✅</span> 60 dòng chảy, 182 ảnh</td></tr>
+<tr><td class="id">a4</td><td>Quỹ → ảnh sổ quỹ</td><td>cùng khuôn a3, thêm số dư từng ngày nếu nguồn có</td><td>(dòng chảy quỹ, số thứ tự)</td><td>1 quỹ – n dòng</td><td>như a3</td><td><span class="pill no">⛔</span> khai xong, lằn chưa bật</td></tr>
+<tr><td class="id">a5</td><td>HR · nền tảng → ảnh sổ ngoài</td><td>HR: 4 sổ lương đã tách HD/KRF theo năm · nền tảng: sổ chi phí dịch vụ, sổ thanh toán</td><td>(sổ, năm, số thứ tự dòng)</td><td>1 sổ – n dòng</td><td>bề rộng cột đổi ⇒ nổ, không đoán</td><td><span class="pill no">⛔</span></td></tr>
+
+<tr class="band" style="--band-c:var(--zoneB)"><th colspan="7">b · Ảnh chụp → dựng (5) — bộ đọc theo TÊN cột, không theo vị trí; ra canon 36 trường</th></tr>
+<tr><td class="id">b1</td><td>ảnh phiếu → DỰNG chuỗi phiếu</td><td>dòng PM mang <code>pi_line_id</code>; dòng PI mang <code>pe_line_id</code>; dòng PE mang HD/KRF + ngân sách; slip mang CDT · đối tác · kỳ dịch vụ · pháp nhân trả · Reference No</td><td><code>pm_line_id → pi_line_id → pe_line_id → pe_id</code></td><td>n – 1 mỗi bậc</td><td>khoá trỏ rỗng ⇒ cờ "chuỗi đứt", dòng vẫn vào kho kèm lý do</td><td><span class="pill no">⛔</span></td></tr>
+<tr><td class="id">b2</td><td>ảnh danh mục → TRA danh mục</td><td>bảng mã → tên, hiệu lực tại ngày chứng từ</td><td>mã + ngày</td><td>1 – 1 tại một ngày</td><td>mã không có trong danh mục ⇒ hàng chờ "mã lạ", không tự thêm vào danh mục</td><td><span class="pill no">⛔</span></td></tr>
+<tr><td class="id">b3</td><td>ảnh sao kê → DỰNG dòng tiền</td><td>General Trustest + tài khoản nguồn + tham chiếu</td><td><code>content_key</code> = hàm của (nguồn, ngày, tiền, tham chiếu, thứ tự xuất hiện)</td><td>1 – 1</td><td>9 luật soát: hạng CHẶN ⇒ 0 dòng; hạng CỜ ⇒ vẫn ghi + hàng chờ nêu tên luật</td><td><span class="pill ok">✅</span> 8.338/8.338</td></tr>
+<tr><td class="id">b4</td><td>ảnh sổ quỹ → DỰNG dòng tiền</td><td>như b3 (cùng bộ đọc, khác bản khai)</td><td>như b3</td><td>1 – 1</td><td>như b3 + số dư theo ngày khớp sổ quỹ, lệch liệt kê từng ngày</td><td><span class="pill no">⛔</span></td></tr>
+<tr><td class="id">b5</td><td>ảnh sổ ngoài → DỰNG dòng chi phí</td><td>dòng chi phí đã mang HD/KRF, kỳ, pháp nhân của sổ nguồn</td><td>(sổ, năm, thứ tự) → <code>content_key</code></td><td>1 – 1</td><td>Σ Nợ/Có từng sổ từng năm = sổ nguồn; dòng thiếu HD ⇒ hàng chờ (mong 0)</td><td><span class="pill no">⛔</span></td></tr>
+
+<tr class="band" style="--band-c:var(--zoneB)"><th colspan="7">c · Dựng → nối &amp; gắn chiều (4 dọc + 1 ngang)</th></tr>
+<tr><td class="id">c1</td><td>chuỗi phiếu → NỐI &amp; GẮN</td><td>với mỗi PM line: HD/KRF · CDT1 · đối tác · kỳ dịch vụ · pháp nhân trả · tiền · tiền tệ</td><td><code>pm_line_id</code></td><td>1 – 1</td><td>N line của một phiếu nói N giá trị khác nhau ⇒ khai "không suy được", không lấy dòng đầu</td><td><span class="pill mid">◐</span> chỉ từ PM</td></tr>
+<tr><td class="id">c2</td><td>TRA danh mục → NỐI &amp; GẮN</td><td>tên và hiệu lực của LE · CDT · HD/KRF · đối tác gắn lên dòng</td><td>mã + ngày chứng từ</td><td>1 – 1</td><td>mã hết hiệu lực tại ngày ⇒ cờ</td><td><span class="pill no">⛔</span></td></tr>
+<tr><td class="id">c3</td><td>DỰNG dòng tiền → GẮN LE dòng tiền</td><td>dòng tiền canon kèm tài khoản nguồn</td><td><code>content_key</code></td><td>1 – 1</td><td>—</td><td><span class="pill ok">✅</span></td></tr>
+<tr><td class="id">c4</td><td>DỰNG dòng chi phí → GẮN LE dòng chi phí</td><td>dòng chi phí canon kèm sổ nguồn</td><td><code>content_key</code></td><td>1 – 1</td><td>—</td><td><span class="pill no">⛔</span></td></tr>
+<tr><td class="id">c5</td><td>GẮN LE dòng tiền → NỐI &amp; GẮN (ngang)</td><td>dòng tiền đã có LE, sẵn sàng ghép lệnh chi</td><td>Reference No của dòng tiền ↔ Reference No ở PM slip</td><td>1 dòng tiền – n PM line (chia tiền)</td><td>Σ tiền các line = tiền dòng; lệch ⇒ chặn; khác tiền tệ ⇒ để người (chờ tỷ giá, GĐ2)</td><td><span class="pill ok">✅</span> ghép theo dòng</td></tr>
+
+<tr class="band" style="--band-c:var(--zoneB)"><th colspan="7">d · Nối &amp; gắn → sổ (3 dọc + 1 ngang) — chỉ-thêm, một giao dịch cho mối nối + sự kiện + bút toán</th></tr>
+<tr><td class="id">d1</td><td>NỐI &amp; GẮN → mối nối &amp; chiều phiếu</td><td>mối nối (itl ↔ pm_line, tiền chia, hình nối) + bút toán hd · cdt1 · kỳ dịch vụ · le_payer với nguồn "người" hoặc "máy gợi ý"</td><td><code>itl_id + pm_line_id</code></td><td>1 – n</td><td>sau mọi phép ghi, không một ô nào của sổ đổi; bỏ nối = thêm dòng</td><td><span class="pill ok">✅</span></td></tr>
+<tr><td class="id">d2</td><td>GẮN LE dòng tiền → SỔ ITL</td><td>dòng tiền canon + LE + run_id</td><td><code>content_key</code> UNIQUE</td><td>1 – 1</td><td>trùng ⇒ không ghi, đếm vào vế "trùng"; 4 vế vào = sổ + loại + rỗng + trùng</td><td><span class="pill ok">✅</span> (le còn rỗng)</td></tr>
+<tr><td class="id">d3</td><td>GẮN LE dòng chi phí → SỔ ITL</td><td>dòng chi phí canon + LE + run_id, <code>source_system</code> = HR / Platform</td><td><code>content_key</code></td><td>1 – 1</td><td>như d2</td><td><span class="pill no">⛔</span></td></tr>
+<tr><td class="id">d4</td><td>mối nối → SỔ ITL (ngang)</td><td>tham chiếu <code>itl_id</code>; giá trị hiệu lực của hd · cdt1 · svc · le_payer đọc qua view, sổ gốc không đổi</td><td><code>itl_id</code></td><td>n – 1</td><td>itl_id không tồn tại ⇒ ghi bị từ chối</td><td><span class="pill ok">✅</span></td></tr>
+
+<tr class="band" style="--band-c:var(--gate)"><th colspan="7">e · Sổ → cổng ra (5) — cổng mới phải được chứng minh ĐỎ trước khi tin</th></tr>
+<tr><td class="id">e1</td><td>mối nối → cổng "0 khoá phiếu trỏ rỗng"</td><td>đếm mối nối có <code>pm/pi/pe_line_id</code> không tìm thấy trong ảnh phiếu</td><td>line_id</td><td>—</td><td>mong = 0 trên mẫu số đã in (hôm nay: pe/pi trỏ rỗng 100%)</td><td><span class="pill no">⛔</span></td></tr>
+<tr><td class="id">e2</td><td>mối nối → cổng "Σ tiền nối = tiền dòng"</td><td>từng dòng tiền có nối: Σ tiền chia so với Nợ/Có</td><td>itl_id</td><td>—</td><td>mong = 0 dòng lệch, từng tiền tệ</td><td><span class="pill ok">✅</span></td></tr>
+<tr><td class="id">e3</td><td>SỔ ITL → cổng "le NULL"</td><td>đếm dòng le rỗng, kèm tên tài khoản</td><td>le</td><td>—</td><td>mong = 0, hoặc danh sách rỗng có tên tài khoản và chữ ký owner</td><td><span class="pill no">⛔</span></td></tr>
+<tr><td class="id">e4</td><td>SỔ ITL → cổng "Σ theo LE = Σ theo nguồn · nạp lại = 0 trùng"</td><td>hai cách cộng cùng một bảng, từng tiền tệ; nạp lại cùng ảnh</td><td>le · source_system · curr</td><td>—</td><td>mong: hai tổng bằng nhau; vào sổ = 0 khi nạp lại</td><td><span class="pill mid">◐</span> chống trùng có; Σ theo LE chưa</td></tr>
+<tr><td class="id">e5</td><td>SỔ ITL → cổng "xuất đối chiếu sổ gốc"</td><td>bộ xuất theo khuôn sổ đang chạy, so từng dòng với sổ thật</td><td>số chứng từ + ngày + tài khoản</td><td>—</td><td>mong: mọi chênh đều có tên lý do, không phần trăm</td><td><span class="pill no">⛔</span> bộ xuất chưa có</td></tr>
+</tbody></table></div>
+<p class="note"><b>Một đường không vẽ:</b> ảnh danh mục ② cũng được <i>GẮN LE dòng chi phí</i> (cột 5) tra tới. Vẽ nó phải băng qua hai hộp ở dải ②–③ nên bỏ; về bản chất nó là b2/c2 áp cho dòng chi phí. <b>Hai hộp gộp vẽ:</b> "HR · Nền tảng" (hai nơi sinh) và "ảnh sổ ngoài" (hai lằn chụp <code>HR</code>, <code>Platform</code>) — bảng a5/b5 vẫn tách.</p>
+
+<h2>§3 · Hợp đồng dữ liệu FPS → FLS — trường nào phải sang, để thoả nhóm khoá nào</h2>
+<p>Khoá cần có lấy từ bảy nhóm khoá của bản gốc (General Trustest · Reference No · khoá PE · khoá PI · khoá PM · khoá PC · CDT). Cấu trúc FPS theo đối chiếu code đã ghi: dòng (line) giữ <i>tiền + khoá chuỗi</i>; phiếu (slip) giữ <i>mô tả · ngân hàng · kỳ dịch vụ · Reference No · pháp nhân trả · CDT</i>. Cột "ở FPS" = đã thấy trong code FPS theo tài liệu đối chiếu; "hỏi FPS" = chưa thấy, phải xác nhận hoặc mở CR.</p>
+<div class="scroll"><table>
+<thead><tr><th>Thực thể FPS</th><th>Mức</th><th>Trường cần sang</th><th>Thoả nhóm khoá</th><th>Đích trong FLS</th><th>Ở FPS</th></tr></thead>
+<tbody>
+<tr class="band" style="--band-c:var(--fps)"><th colspan="6">PE — dự toán</th></tr>
+<tr><td><code>fps_pe_slip</code></td><td>slip</td><td><code>pe_id</code> · <code>cdt_code</code> · đối tác <code>vendor_id</code> · loại chi (đơn lẻ / tạm ứng) · ngày hành động (duyệt) · <code>service_start_date</code>/<code>end_date</code> · pháp nhân chịu chi phí · trạng thái</td><td>khoá PE: CDT CFA1 ID · Vendor ID · Singular/Advance · Action Date</td><td>ảnh phiếu <code>fls_pe_slip</code>; canon: đối tác (Y), kỳ dịch vụ (W/X), CDT1</td><td>cdt_code · service dates: <b>ở FPS</b> (slip) · loại chi, ngày duyệt, LE: <b>hỏi FPS</b></td></tr>
+<tr><td><code>fps_pe_line</code></td><td>line</td><td><code>line_id</code> · <code>pe_id</code> · <code>bgc_code</code> (ngân sách) · <code>kr_code</code> (HD/KRF) · <code>amount</code> · <code>pe_date</code> · <code>note</code></td><td>khoá PE: Budget/KRF/HD Code</td><td>ảnh phiếu <code>fls_pe_line</code>; canon: Budget Code (S) ← qua chuỗi</td><td><b>ở FPS</b> (9 cột ghi ở đối chiếu §3) · tiền tệ của line: <b>hỏi FPS</b></td></tr>
+<tr class="band" style="--band-c:var(--fps)"><th colspan="6">PI — hoá đơn</th></tr>
+<tr><td><code>fps_pi_slip</code></td><td>slip</td><td><code>pi_id</code> · số hoá đơn · tệp hoá đơn (đường dẫn) · <code>service_start/end_date</code> · đối tác · ghi chú</td><td>khoá PI: Invoice</td><td>ảnh phiếu <code>fls_pi_slip</code>; canon: hoá đơn (AD), kỳ dịch vụ (AB/AC), ghi chú (AF)</td><td>service dates: <b>ở FPS</b> · số hoá đơn, tệp: <b>hỏi FPS</b></td></tr>
+<tr><td><code>fps_pi_line</code></td><td>line</td><td><code>line_id</code> · <code>pi_id</code> · <code>pe_line_id</code> · <code>amount</code></td><td>khoá PI: PE ID</td><td>ảnh phiếu <code>fls_pi_line</code>; chuỗi PI → PE</td><td><code>pe_line_id</code> trên PI line: <b>hỏi FPS</b> (đối chiếu chỉ ghi PM line có <code>pi_line_id</code>)</td></tr>
+<tr class="band" style="--band-c:var(--fps)"><th colspan="6">PM — lệnh chi (mắt xích nối với tiền)</th></tr>
+<tr><td><code>fps_pm_slip</code></td><td>slip</td><td><code>pm_id</code> · <b><code>reference_number</code></b> · <b><code>payer_id</code></b> (pháp nhân trả) · <code>bank_account_id</code> · loại giao dịch (payment type) · <code>service_start/end_date</code> · trạng thái cuối</td><td>Reference No · General Trustest (LE trả)</td><td>ảnh phiếu <code>fls_pm_slip</code>; canon: Payment Type (H), Pháp nhân thanh toán (L) → <code>fls_itl.le_payer</code></td><td>reference_number, payer_id, bank_account_id, service dates: <b>ở FPS</b> (slip)</td></tr>
+<tr><td><code>fps_pm_line</code></td><td>line</td><td><code>line_id</code> · <code>pm_id</code> · <b><code>pi_line_id</code></b> · <code>pe_line_id</code> (nếu PM đi thẳng từ PE) · <code>amount</code> · tiền tệ · <code>pm_date</code></td><td>khoá PM: PI ID · PE ID · General Trustest (Tiền · Tiền tệ)</td><td><code>fls_pm_line</code> (đã có 3.772 dòng, 13 cột có kiểu) → mối nối <code>fls_pm_link</code></td><td>line_id, pm_id, pi_line_id, amount, pm_date: <b>ở FPS</b> · pe_line_id trực tiếp, tiền tệ line: <b>hỏi FPS</b></td></tr>
+<tr class="band" style="--band-c:var(--fps)"><th colspan="6">PC — quyết toán</th></tr>
+<tr><td><code>fps_pc_slip</code> · <code>fps_pc_line</code></td><td>slip + line</td><td><code>pc_id</code> · <code>line_id</code> · phiếu gốc (PM/PE) · <code>amount</code> · ngày</td><td>khoá PC: bản gốc để <b>trống</b> ⇒ GĐ1 chỉ chụp, không gắn chiều</td><td>ảnh phiếu <code>fls_pc_*</code>; không vào canon ở GĐ1</td><td>10 bảng slip/line: <b>ở FPS</b> · cột cụ thể: <b>hỏi FPS</b></td></tr>
+<tr class="band" style="--band-c:var(--fps)"><th colspan="6">Danh mục — nguồn của "tên" và "hiệu lực"</th></tr>
+<tr><td><code>fps_le</code></td><td>danh mục</td><td><code>le_code</code> · <code>le_name</code> · <code>country</code> · <code>is_active</code> (+ hiệu lực từ/đến nếu có)</td><td>General Trustest: LE</td><td><code>fls_le</code> (thay bản suy từ giá trị; hết 24/29 thiếu tên)</td><td><b>ở FPS</b>; <code>is_entity</code>/<code>accr_code</code> là CR FLS → FPS</td></tr>
+<tr><td><code>fps_cdt</code> · <code>fps_kr</code> · <code>fps_bgc</code></td><td>danh mục</td><td>mã · tên · cha (ngân sách) · hiệu lực</td><td>CDT · khoá PE (HD/KRF · Budget)</td><td>danh mục FLS tra tên; hôm nay HD/KRF chỉ có 73 mã trong bảng phân bổ</td><td><b>ở FPS</b>; <code>parent_budget_code + level</code> là CR</td></tr>
+<tr><td><code>fps_ven</code> (+ <code>fps_vendor_block</code>)</td><td>danh mục</td><td><code>vendor_id</code> · tên · <code>block_code</code> · tiền tệ thanh toán · kênh</td><td>khoá PE: Vendor ID</td><td>đối tác (canon Y); khối đối tác giữ sẵn cho GĐ3</td><td>vendor: <b>ở FPS</b> · 5 cột khối/kênh: CR</td></tr>
+<tr><td><code>fps_bank_account</code></td><td>danh mục</td><td><code>bank_account_id</code> · số TK · ngân hàng · tiền tệ · <b>pháp nhân chủ TK</b></td><td>General Trustest: LE (qua tài khoản)</td><td>bảng TK → LE do owner ký (thay regex); nối ảnh sao kê ↔ PM slip</td><td>bảng: <b>ở FPS</b> · cột LE chủ TK, dải sheet: CR</td></tr>
+<tr><td><code>fps_exchange_rate</code></td><td>danh mục</td><td><code>currency_from</code> · <code>currency_to</code> · <code>rate</code> · <code>effective_date</code></td><td>(GĐ2) quy đổi</td><td>chụp sẵn ở GĐ1, dùng ở GĐ2; GĐ1 không quy đổi</td><td><b>ở FPS</b></td></tr>
+</tbody></table></div>
+<p class="note"><b>Ba điểm phải chốt với FPS trước khi viết bộ đọc:</b> ① <code>reference_number</code> nằm ở <b>slip</b> ⇒ một PM nhiều line chỉ có một Reference No; FLS chia tiền theo line và đòi Σ line = tiền dòng (không có luật 1 line – 1 Reference). ② Kỳ dịch vụ nằm ở <b>slip</b> của cả PE/PI/PM, không ở line ⇒ hai nhánh kỳ dịch vụ (theo PE, theo PI) đều đọc từ slip. ③ CDT canonical ở <b>PE slip</b>; line chỉ giữ ngân sách/HD denorm ⇒ CDT1 lấy qua chuỗi PM → PI → PE → PE slip, không lấy ở PM.</p>
+
+<h2>§4 · Thứ tự làm trong GĐ1 — theo mũi tên, không theo số</h2>
+<div class="scroll"><table>
+<thead><tr><th>Bước</th><th>Mũi tên dựng</th><th>Vì sao đứng đây</th><th>Cổng đóng bước</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>GẮN LE dòng tiền (hộp dải ③, cột 3–4) + <span class="mono">e3</span></td><td>Rẻ nhất, đã đo tách được 8.387/8.387, và đổi ngay con số pháp nhân của sổ đang có mà không cần nguồn mới</td><td><span class="mono">e3</span>: le NULL từ 8.387 về danh sách có tên; bảng TK → LE có chữ ký owner cho 14 TK</td></tr>
+<tr><td>2</td><td><span class="mono">a4 · b4</span> (quỹ) rồi <span class="mono">d2</span> cho Cash</td><td>Cùng bộ đọc với sao kê, chỉ bật lằn và khuôn 11 cột; đóng họ nguồn "tiền" trước khi mở họ mới</td><td>số dòng = sổ quỹ từng quỹ; nạp lại = 0 trùng; số dư theo ngày khớp</td></tr>
+<tr><td>3</td><td><span class="mono">a1 · a2</span> cho PE/PI/PC + danh mục, rồi <span class="mono">b1 · b2 · c1 · c2</span></td><td>Hợp đồng FPS §3 phải chốt trước; ảnh phiếu dùng lại lằn ảnh chụp + bản khai cột, không dựng hệ thứ hai</td><td><span class="mono">e1</span>: 0 khoá trỏ rỗng; parity chiều phiếu với sổ gốc 100% từng ô</td></tr>
+<tr><td>4</td><td><span class="mono">a5 · b5 · c4 · d3</span> cho HR</td><td>HR đã tách HD/KRF ở nguồn nên không có bước phân bổ; chỉ đọc đầu ra 4 sổ, không mở hộp đen lương</td><td>Σ từng sổ từng năm = nguồn; 0 dòng thiếu HD</td></tr>
+<tr><td>5</td><td><span class="mono">a5 · b5 · c4 · d3</span> cho nền tảng (SC · PS)</td><td>Chờ owner chốt phạm vi (GI/OMC bảng riêng, AP/AR lùi)</td><td>số dòng = sổ nguồn; GI/OMC có bảng riêng khoá (đối tác, tháng, network)</td></tr>
+<tr><td>6</td><td><span class="mono">e4 · e5</span></td><td>Hợp nhất chỉ chứng minh được khi cả 4 họ đã vào cùng bảng</td><td>Σ theo LE = Σ theo nguồn từng tiền tệ; bộ xuất đối chiếu từng dòng, mọi chênh có tên</td></tr>
+</tbody></table></div>
+
+<h2>§5 · Thuật ngữ dùng trong trang (mượn từ bản gốc)</h2>
+<ul class="terms">
+<li><b>PE · PI · PM · PC</b> — dự toán · hoá đơn · lệnh chi · quyết toán; <b>slip</b> = phiếu, <b>line</b> = dòng tiền trong phiếu.</li>
+<li><b>General Trustest</b> — bộ trường tối thiểu của một dòng tiền: ngày · số tiền · tiền tệ · LE.</li>
+<li><b>Reference No</b> — mã tham chiếu ngân hàng cấp, nằm trên sao kê và được ghi vào PM slip; là khoá nối tiền ↔ lệnh chi.</li>
+<li><b>LE</b> — pháp nhân; <b>le</b> = pháp nhân chịu chi phí, <b>le_payer</b> = pháp nhân trả tiền; khác nhau ⇒ giao dịch nội bộ.</li>
+<li><b>CDT / CDT1</b> — chủ dự toán; <b>HD/KRF</b> — mã hạng mục / kết quả then chốt; <b>Budget Code</b> — mã ngân sách.</li>
+<li><b>CFA1</b> — mức sổ ITL theo pháp nhân (GĐ1 dừng ở đây); <b>CFA2</b> là cờ có-dòng-tiền-thật / nội-bộ, luật ở FPS, không phải bậc phân bổ.</li>
+<li><b>canon 36 trường</b> — khuôn dòng chuẩn của FLS (38 vị trí, 2 trống); <b>content_key</b> — khoá chống trùng nội dung; <b>run_id · chup_id</b> — vết lần nạp / lần chụp.</li>
+</ul>
+
+<footer>Voi FLS-tobe-phase1 v0.1 · 2026-11-03 · cùng bộ với <code>_PD_NOW_VOI_VA_GIAI_DOAN.md</code> và <code>PD-Now-Con-Voi-va-Giai-Doan.html</code>. Trang tự chứa, chỉ gọi mạng cho font.</footer>
+</main>
+</body>
+</html>
