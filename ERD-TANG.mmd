@@ -1,0 +1,74 @@
+flowchart TB
+  subgraph 1_anh["① ẢNH CHỤP — tờ giấy lúc ấy ghi gì — chỉ-THÊM, ⛔ không ai sửa"]
+    direction LR
+    fls_chup["fls_chup"]
+    fls_chup_dong["fls_chup_dong"]
+    fls_chup_nguon["fls_chup_nguon"]
+    fls_dien_giai["fls_dien_giai<br><i>khung xem</i>"]:::view
+    fls_khai_cot["fls_khai_cot"]
+    fls_nguon_dai["fls_nguon_dai"]
+    fls_source["fls_source"]
+  end
+  subgraph 2_nap["② NẠP — dòng nào vào sổ, dòng nào BỊ LOẠI và vì sao"]
+    direction LR
+    fls_reject["fls_reject"]
+    fls_run["fls_run"]
+  end
+  subgraph 3_so["③ SỔ KẾ TOÁN — append-only (INV-I08) + hai danh mục nó tra tới"]
+    direction LR
+    fls_itl["fls_itl"]
+    fls_le["fls_le"]
+    fls_mapping_master["fls_mapping_master"]
+  end
+  subgraph 4_ghep["④ GHÉP LỆNH CHI — dòng tiền này chi theo lệnh nào"]
+    direction LR
+    fls_moi_noi["fls_moi_noi<br><i>khung xem</i>"]:::view
+    fls_pm_line["fls_pm_line"]
+    fls_pm_link["fls_pm_link"]
+    fls_pm_unlink["fls_pm_unlink"]
+  end
+  subgraph 5_viec["⑤ VIỆC CỦA NGƯỜI — người còn phải làm gì"]
+    direction LR
+    fls_da_xong["fls_da_xong<br><i>khung xem</i>"]:::view
+    fls_queue_event["fls_queue_event"]
+    fls_queue_reason_weekly["fls_queue_reason_weekly<br><i>khung xem</i>"]:::view
+    fls_queue_state["fls_queue_state<br><i>khung xem</i>"]:::view
+  end
+  subgraph 6_sua["⑥ SỬA & VẾT — ai đã gõ gì, lúc nào, vì sao"]
+    direction LR
+    fls_adjustment["fls_adjustment"]
+    fls_journal["fls_journal"]
+    fls_may_goi_y["fls_may_goi_y<br><i>khung xem</i>"]:::view
+    fls_sua_tay["fls_sua_tay<br><i>khung xem</i>"]:::view
+  end
+  subgraph 7_ha_tang["⑦ HẠ TẦNG — sổ di trú"]
+    direction LR
+    fls_migration["fls_migration"]
+  end
+
+  fls_adjustment -->|itl_id| fls_itl
+  fls_adjustment -->|reversal_of| fls_adjustment
+  fls_adjustment -->|evt_id| fls_queue_event
+  fls_chup_dong -->|chup_id| fls_chup
+  fls_chup_dong -->|source_id| fls_source
+  fls_chup_nguon -->|chup_id| fls_chup
+  fls_chup_nguon -->|source_id| fls_source
+  fls_itl -->|run_id| fls_run
+  fls_itl -->|le| fls_le
+  fls_itl -->|le_payer| fls_le
+  fls_journal -->|itl_id| fls_itl
+  fls_khai_cot -->|source_id| fls_source
+  fls_nguon_dai -->|source_id| fls_source
+  fls_pm_line -->|run_id| fls_run
+  fls_pm_link -->|itl_id| fls_itl
+  fls_pm_link -->|run_id| fls_run
+  fls_pm_link -->|run_pm| fls_run
+  fls_pm_unlink -->|link_id| fls_pm_link
+  fls_pm_unlink -->|itl_id| fls_itl
+  fls_pm_unlink -->|evt_id| fls_queue_event
+  fls_queue_event -->|itl_id| fls_itl
+  fls_reject -->|run_id| fls_run
+  fls_run -->|khai_id| fls_khai_cot
+  fls_run -->|chup_id| fls_chup
+
+  classDef view stroke-dasharray: 5 3;

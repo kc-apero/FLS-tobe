@@ -180,8 +180,19 @@ def _chuoi_trong(ham: ast.FunctionDef, m: Module) -> list[str]:
 
 
 def sql_cua_tuyen(ten_ham: str) -> tuple[set[str], set[str], list[str]]:
-    """`(bang cham, bang GHI, duong da bam)` cho mot ham xu ly."""
-    dau = ("fls.api.xu_ly", ten_ham)
+    """`(bang cham, bang GHI, duong da bam)` cho mot ham xu ly.
+
+    ⛔⛔ **Bat dau tu DUNG TEP ham that su o** (`__module__`), ⛔ khong neo cung
+    vao `fls.api.xu_ly`.
+
+    Ban truoc neo cung — dung, cho toi 08/09 khi nhom NAP ra doi o
+    `fls/api/nap_cua.py`. Luc do phep bam **⛔ khong tim thay ham** va lang le
+    tra ve *"cham 0 bang"*: mot tuyen ghi vao `fls_itl` se duoc do la **⛔ khong
+    cham gi**, va cong — cai cong sinh ra de bat dung chuyen do — se **im**.
+    ⇒ Mot phep do ⛔ khong tim thay thu can do phai **NO**, ⛔ khong duoc tra ve
+      tap rong; xem `vet` rong o cong ⓓ.
+    """
+    dau = (getattr(HAM.get(ten_ham), "__module__", "fls.api.xu_ly"), ten_ham)
     da: set[tuple[str, str]] = set()
     hang_doi = [dau]
     cham: set[str] = set()

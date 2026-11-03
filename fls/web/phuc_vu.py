@@ -74,8 +74,33 @@ BANG_TEP: tuple[Tep, ...] = (
         mo_ta="hop xac nhan + drawer — dung chung F01/F02"),
     Tep("/man_f01.js", "man_f01.js",
         mo_ta="man F01 hang cho — 5 hanh dong moi dong (B4)"),
+    # ⭐⭐⭐ `GAP-SCR-14` — lan LENH CHI cua man hang cho. ⛔ Phai KHAI
+    #    o day: ban khai la ban TRANG hai chieu, nen mot tep tren dia
+    #    ⛔ chua khai se **⛔ khong duoc phuc vu**, va man hinh se
+    #    ⛔ khong bao loi — no chi **thieu mot lan**.
+    Tep("/man_f01_lenh.js", "man_f01_lenh.js",
+        mo_ta="man F01 · lan LENH CHI: dong lenh ⛔ chua tim duoc tien (QĐ-ITL-122)"),
+    # ⭐⭐⭐ `QĐ-ITL-148` · chang `B3` — man GAN LENH CHI theo HOP DONG THIET KE
+    #    (`Artifacts/Thiet-ke-Man-Gan-Lenh-Chi.md` + `BA-06 §4.5`/`§4.6`).
+    # ⛔ Co cong RIENG canh do bam sat: `tests/web/test_b3_fe_bam_thiet_ke.py`
+    #   — vi mot loi nhac ⛔ khong giu duoc gi (do: `339 → 735` dong qua 7 lan
+    #   sua, ⛔ khong lan nao tong di xuong).
+    Tep("/man_f01_ghep.js", "man_f01_ghep.js",
+        mo_ta="man F01 · GAN LENH CHI ↔ GIAO DICH — 4 chip (dich cuoi TACH "
+              "rieng, INV-I20) · 4 bac ①②③④ · Enter KHOA o ca lech tien · "
+              "dien giai la cot ⛔ KHONG BAO GIO bi hy sinh"),
     Tep("/man_f02.js", "man_f02.js",
         mo_ta="man F02 so ITL — luoi 8 hanh vi + drawer doi soat (B5)"),
+    # ⭐⭐⭐ `P7` task `6` — man NAP SAO KE.
+    #
+    # ⛔⛔ Man nay ⛔ **KHONG PHAI MAN DAN** (`QĐ-ITL-109`): FLS doc **vung
+    # CHUAN** cua sheet `R |`, cu chi `Ctrl+V` **o lai Google Sheets**, va man
+    # ⛔ khong co mot o nhap nao cho du lieu giao dich. Ly do duoc ky thanh
+    # quyet dinh: **23/60** nguon **DOI DAU** khi chuan hoa, cho 60 phep bien
+    # doi ay sang FLS la mo mot cho de **SAI DAU TIEN**.
+    Tep("/man_f04.js", "man_f04.js",
+        mo_ta="man F04 nap sao ke — 5 trang thai, bien ban 9 luat, "
+              "`CHAN` thi nut Nhan TAT (task `6`)"),
     Tep("/ung_dung.js", "ung_dung.js", mo_ta="khoi dong vo + chon man"),
     Tep("/danh_muc.js", "danh_muc.js", sinh=True,
         mo_ta="⛔ SINH LUC KHOI DONG tu `fls_mapping_master`: danh muc "

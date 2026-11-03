@@ -26,6 +26,11 @@ from typing import Any
 # `BA-07` §5 — ma loi. Them ma moi thi them o day, ⛔ khong go chuoi tai cho.
 MA_LOI: dict[str, tuple[int, str]] = {
     "FLS-CONFLICT-SOURCE": (409, "gia tri go khac nguon, chua `force`"),
+    # ⭐ `WO-023` `(d)` *(`BA-07` v3.5 §5)*: ba ca tung muon ma tren nay — moi
+    #   chuyen mot ma, van `409`. `CONFLICT-SOURCE` **chi** con cho `US-025`.
+    "FLS-DA-GHEP": (409, "dong DA co moi noi hieu luc — ⛔ ghep chong"),
+    "FLS-KHONG-CON-MOI-NOI": (409, "dong ⛔ con moi noi hieu luc de bo"),
+    "FLS-CHUA-XONG": (409, "dong chua tung bam xong — ⛔ co gi de mo lai"),
     "FLS-LOCKED-PERIOD": (409, "ghi vao ky da chot"),
     "FLS-CONTRACT-DRIFT": (500, "reader lech ITL-CONTRACT"),
     "FLS-DQ-FAILED": (422, "cong ACC-1…4 khong dat"),
@@ -38,6 +43,37 @@ MA_LOI: dict[str, tuple[int, str]] = {
     "FLS-METHOD": (405, "duong nay khong nhan phuong thuc do"),
     "FLS-TOO-LARGE": (413, "than yeu cau qua to"),
     "FLS-INTERNAL": (500, "loi trong may"),
+    # ⭐ `CR#11` §4b ⓺ — nhom NAP.
+    #
+    # ⚠ `FLS-KHAI-KHONG-CO` la **409 ⛔ KHONG phai 404**: nguon **co ton
+    #   tai**, chi la ⛔ chua ai khai cach doc no. Hai cau tra loi khac
+    #   nhau dan nguoi dung di **hai duong sua khac nhau** — mot ben la
+    #   "go lai `source_id`", ben kia la "khai cot cho nguon nay".
+    "FLS-KHAI-KHONG-CO": (409, "nguon CO nhung ⛔ chua ai khai cach doc no"),
+    "FLS-KHAI-THIEU": (422, "ban khai thieu truong trong 6 — ⛔ khong nap mot phan"),
+    "FLS-SOAT-CHAN": (422, "co luat hang CHAN do ⇒ ⛔ khong ghi dong nao"),
+    "FLS-NGUON-LA": (404, "source_id ⛔ khong co trong fls_source"),
+    # ⭐⭐ `QĐ-ITL-110` — lan ANH CHUP. HAI ma, ⛔ KHONG mot, va cung ly do da
+    #    tach `FLS-NGUON-LA` (404) khoi `FLS-KHAI-KHONG-CO` (409):
+    #      · ⛔ khong co anh chup ay          → **404**, di sua `chup_id`;
+    #      · anh CO nhung ⛔ khong doc nguon  → **409**, di CHUP LAI.
+    #    Gop chung lai thi nguoi dung doc "khong tim thay" roi go lai dung cai
+    #    `chup_id` ay lan nua — mot cua bat nguoi ta thu lai cai vua that bai.
+    "FLS-CHUP-KHONG-CO": (404, "⛔ khong co anh chup `chup_id` ay"),
+    "FLS-CHUP-KHONG-NGUON": (409, "anh chup CO nhung no ⛔ khong doc nguon nay"),
+    # ⭐⭐ `QĐ-ITL-117` — khai thu tu CA LO. **422 ⛔ khong 409**: than yeu cau
+    #    doc duoc va nguon co that; cai ⛔ khong dat la **BANG CHUNG**. Cung
+    #    hang voi `FLS-SOAT-CHAN`, va cung mot hau qua: **⛔ 0 ban khai moi**.
+    "FLS-THU-TU-KHONG-TU-CHUNG": (
+        422, "co nguon ⛔ KHONG tu chung thu tu ngay (hay BAT DONG voi ban "
+             "khai cua nguoi) ⇒ TU CHOI CA LO, ⛔ 0 ban khai moi"),
+    # ⭐⭐ `QĐ-ITL-118` — ghep CA LO. Cung khuon `422` voi cu tren, va cung mot
+    #    hau qua: **⛔ 0 moi noi moi**. ⚠ `ly_do` cua tung dong noi ro no vuong
+    #    cong NAO cua `ghep_lenh` — mot cau chi noi *"khong tu chung"* se lam
+    #    nguoi ta di sua dung sai trong khi dong ay khac TIEN TE.
+    "FLS-GHEP-KHONG-TU-CHUNG": (
+        422, "co dong ⛔ KHONG tu chung (khac tien te / da bi ghep / chua "
+             "duyet / lech tien) ⇒ TU CHOI CA LO, ⛔ 0 moi noi moi"),
 }
 
 TRANG_THAI = ("flash", "reconciled", "signed")
@@ -93,7 +129,19 @@ def dong_goi(data: Any, m: Meta) -> bytes:
 # ngoai HTTP: mot ma loi vo tinh mang theo mot truong noi bo la mot cho ro.
 # ⭐ `khac` la cho `409 FLS-CONFLICT-SOURCE` noi *"nguon dang la X"* — thieu no
 # thi man hinh khong the hoi *"ghi de khong?"* mot cach tu te (`US-025`).
-KHOA_THEM: frozenset[str] = frozenset({"khac", "gia_tri_go"})
+# ⛔⛔ `bien_ban` (08/09) — **mot lo tiem an, lo ra vi mot thay doi KHAC.**
+#    `nap_cua.nap()` da nem `LoiCua("FLS-SOAT-CHAN", …, bien_ban=…)` tu luc
+#    tuyen nay ra doi, va cau ay **dung**: noi *"bi chan"* ma ⛔ khong noi
+#    **chan vi luat nao** la bat nguoi dung doan. Nhung `bien_ban` ⛔ chua
+#    bao gio duoc khai o day ⇒ duong `422` se **NO KeyError** ngay khi co
+#    mot lo that bi chan.
+#
+# ⭐ Vi sao no song sot: ⛔ **khong bai nao tung lam do mot luat hang
+#    `CHAN`** — moi bai deu dung du lieu sach nen `S1` luon dat. Lo chi lo
+#    ra khi `S10` (`GAP-KHAI-01`) them mot luat `CHAN` co the do tren kho
+#    TRONG. ⇒ Bai hoc: mot nhanh loi ⛔ chua ai di qua la mot nhanh **chua
+#    biet co chay**, du no da nam trong ma nhieu ngay.
+KHOA_THEM: frozenset[str] = frozenset({"khac", "gia_tri_go", "bien_ban"})
 
 
 def dong_goi_loi(ma: str, m: Meta, chi_tiet: str = "",

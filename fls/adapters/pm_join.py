@@ -52,6 +52,7 @@ from decimal import Decimal
 from typing import Any, Iterable, Sequence
 
 from fls.canon.o_loi import la_o_loi
+from fls.canon.tien_te import ma_tien_te
 
 # ---- vi tri cot cua `[Importrange]PM_Unpivot` ------------------------------
 # ⚠ Tieu de o dong **2**, du lieu tu dong **3**. Doc lech mot dong thi mat dong
@@ -61,17 +62,156 @@ PM_DONG_DAU = 3
 PM_COT: dict[str, int] = {
     "cur": 8, "tien": 9, "slip": 15, "line": 16,
     "hd": 21, "cdt1": 22, "status": 24, "ref": 25,
+    # ⭐⭐⭐ Them 2026-09-17 — owner chot: *"PE/PI cot CO KIEU trong
+    #   `fls_pm_line`, chua can lam bang rieng"*.
+    #
+    # ⛔⛔ **Duong VAO ≠ THUC THE.** Ca ba di nho MOT duong nap
+    #   (`PM_Unpivot`), nhung `PE` · `PI` · `PM` la **ba thuc the khac
+    #   nhau** — owner `Q2` 17/09. Truoc hom nay bay khoa nay chi song
+    #   trong `tho` (JSON), tuc **co du lieu ma ⛔ khong co KIEU**.
+    "pe_adv": 3, "pe_urg": 4,
+    "pe_slip": 17, "pe_line": 18, "pi_slip": 19, "pi_line": 20,
 }
 PM_TIEU_DE_MONG_DOI: dict[int, str] = {
+    3: "ID PELine - Nội dung PE (Advance)",
+    4: "ID PELine - Nội dung PE (Urgent)",
     8: "Đơn vị tiền tệ (Currency)",
     9: "Tổng số tiền thanh toán (Transaction Amount)",
     15: "ID PMSlip",
     16: "ID PMLine",
+    17: "ID PESlip",
+    18: "ID PELine",
+    19: "ID PISlip",
+    20: "ID PILine",
     21: "Budget Code (HDCode)",
     22: "Chủ dự toán (CDT1)",
     24: "Status_Final",
     25: "Reference number",
 }
+
+# ⭐⭐ VERSION cua BAN KHAI COT lan `PM` — them 09/09 *(`QĐ-ITL-119`, moc `A3`)*.
+#
+# ⛔⛔ **Vi sao lan `PM` ⛔ KHONG dung `fls_khai_cot` nhu 68 nguon kia.** Ban
+# khai cua nguon sao ke la **du lieu** *(ke toan doi cot duoc, nen no phai o
+# trong kho, co `version` + `actor`)*. Con bo tri cot cua `PM_Unpivot` la mot
+# **HOP DONG MA NGUON**: no duoc kiem bang `kiem_tieu_de_pm` — so **tung vi
+# tri** voi `PM_TIEU_DE_MONG_DOI` va **NO TO** khi lech. Dua no vao kho la mo
+# duong cho ai do "sua ban khai cho khop" thay vi doi mat voi viec nguon da
+# doi hinh.
+#
+# ⇒ Nhung `fls_chup_nguon.khai_version` la `NOT NULL`, va no PHAI tra loi duoc
+#   cau *"anh chup nay doc theo bo tri cot NAO"*. ⇒ Con so nay la cau tra loi,
+#   va **bump khi `PM_COT` doi** — co cong ghim bang bam noi dung, nen quen
+#   bump la **DO**, ⛔ khong im lang.
+# ⛔⛔⛔ **BAN DEN RIENG TU — cot ⛔ KHONG BAO GIO vao kho.**
+#
+# `tools/nap_that.doc_pm` tu dau da khai: *"⛔ KHONG doc cot co the chua ten
+# nguoi (`Ten tai khoan` · `Email Address`)"*. Luu ca hang tho lam lai cau hoi
+# ay, nen no phai duoc tra loi **o day**, mot cho, ⛔ khong rai rac.
+#
+# ★ Va hai cot ay ⛔ **khong cung mot loai**, nen chung ⛔ khong cung mot
+#   so phan:
+#
+#   · `Email Address` — email cua **nguoi lap lenh**. ⛔ Viec ghep tien
+#     ⛔ khong dung den no mot lan nao ⇒ **CAM**, va cam la mien phi.
+#   · `Ten tai khoan` — ten **nguoi/don vi NHAN tien**. Day dung la mot trong
+#     hai thu ke toan dung de nhan ra khoan tien *(cai kia la "Noi dung nhap o
+#     bank")*, va 535 dong ⛔ khong co so chung tu **chi tra duoc bang no**.
+#     ⇒ **GIU**, va owner la nguoi quyet dieu do (11/09).
+#
+# ⚠ Doi lai: `sao_luu/` va `hien_vat/` da bi `gitignore` **dung vi ly do nay**
+#   — xem `.gitignore`. Bo mot trong hai cho ay ra khoi `gitignore` la lam
+#   ro ten nguoi len origin.
+PM_COT_RIENG_TU: frozenset[str] = frozenset({"Email Address"})
+
+
+# ⭐⭐⭐ `G-MOD-3` — PHEP TRU TAP HOP, them 2026-09-17.
+#
+# Owner doi *"du cac truong nhu trong ggsheet"*. Cau ay chi do duoc khi ta
+# khai **VU TRU** roi **tru** di. `PM_Unpivot` co **28** cot co ten *(do tren
+# `A _ PAY100 _ PM11 Entry Data` tab `PM_Unpivot` hang 2)*, va moi cot phai
+# roi vao **DUNG MOT** trong ba ro:
+#
+#     PM_COT              14  — da DAT KIEU
+#     PM_COT_RIENG_TU      1  — CAM vao kho
+#     PM_COT_CHUA_DAT_KIEU 13 — con trong `tho`, CHUA co kieu
+#     ─────────────────────────────────────────────────────
+#                         28  = dung vu tru
+#
+# ⛔⛔ **Mot cot ⛔ khong nam trong ro nao la mot LO IM LANG** — no vao `tho`
+#   roi nam do, va ⛔ khong ai biet no ton tai. Do dung cai da xay ra: `tho`
+#   moi them 11/09, truoc do **20 cot bien mat ngay luc doc**.
+#
+# ⇒ Cong `test_G_MOD_3_*` doi ba ro **phan hoach dung** vu tru do tu KHO.
+#   Nguon them mot cot ⇒ cong **DO** cho den khi co nguoi **phan loai va ghi
+#   ly do**. ⛔ Day ⛔ khong phai danh sach "se lam sau" — no la danh sach
+#   **da nhin thay va da quyet**, va ly do la phan bat buoc.
+PM_COT_CHUA_DAT_KIEU: dict[str, str] = {
+    # ── nhan dang khoan tien (owner quyet theo NHOM) ─────────────────────
+    "Nội dung giao dịch nhập khi lập lệnh ở bank":
+        "⭐⭐ 5.901/26.404 = 22,3% dong mang ma `PI…`/`PE…` ngay trong noi "
+        "dung ⇒ day la nua con thieu cua `US-KT-037`. ⛔ Nua kia CHAN o "
+        "`fls_itl.memo` RONG (0/8.387), nen dat kieu bay gio cung chua "
+        "ghep duoc gi",
+    "Ngân hàng": "nhan dang khoan tien. Cho owner quyet theo nhom",
+    "Chi nhánh": "nhan dang khoan tien. 3.080/26.404 co gia tri",
+    "Số tài khoản":
+        "⚠ MANG DU LIEU NGUOI. Dat kieu = dua len be mat TRA CUU ⇒ phai "
+        "co owner quyet, ⛔ khong phai mot buoc ky thuat",
+    "Tên tài khoản":
+        "⚠ MANG TEN NGUOI THAT (do: 861 gia tri khac nhau). Owner da chot "
+        "GIU trong kho 11/09 vi 535 dong ⛔ khong co so chung tu chi tra "
+        "duoc bang no — ⛔ nhung GIU ≠ DUA LEN BE MAT",
+    "Ghi chú (nếu có)": "chu tu do, 4.382/26.404 co gia tri",
+    # ── doi soat ────────────────────────────────────────────────────────
+    "Pháp nhân thanh toán":
+        "⭐ Dung cai `06_SCREEN_SPEC` §3 goi la *doi soat LE-vs-phap-nhan-"
+        "tra*. Cho owner",
+    # ── da co MOT BAN o cho khac ⇒ ⛔ dung tao BAN THU HAI ───────────────
+    "Loại giao dịch (Payment Type)":
+        "⛔ Da la cot `H` cua khuon canon (tu `Transaction Mapping L1`). "
+        "Dat kieu o day la HAI BAN cua mot su that ⇒ can biet ban nao "
+        "chuan TRUOC",
+    "ID PILine - Nội dung PI":
+        "chuoi HIEN THI (`id` + noi dung) — khoa SACH da co o `pi_line`. "
+        "Chi dung de HIEN, ⛔ khong phai de tra",
+    "Chủ dự toán *":
+        "⛔ Bien the cua `cdt1` (da dat kieu). Hai ban cua mot su that — "
+        "⛔ dung dat kieu cho den khi biet cai nao chuan",
+    # ── vet & kiem cua NGUON, ⛔ khong phai du lieu nghiep vu ────────────
+    "Timestamp": "dau thoi diem NGUOI lap lenh go. ⛔ Chua buoc nao dung",
+    "Status_Log": "vet trang thai; `Status_Final` da dat kieu",
+    "Check trùng ID PMLine":
+        "⛔ O CONG THUC KIEM cua chinh to giay, ⛔ khong phai du lieu. "
+        "Dat kieu la cheo mot ket qua kiem cua nguon vao kho cua ta",
+}
+
+
+def loc_tho(ten_cot: Sequence[Any], hang: Sequence[Any]) -> dict[str, Any]:
+    """Ca hang tho -> `{ten cot: gia tri}`, **tru** ban den rieng tu.
+
+    ⛔ Khoa theo **TEN**, ⛔ khong theo vi tri: cot xe dich thi mot ban khai
+      vi tri lech **im lang**, con ten thi ⛔ khong.
+
+    ⛔ O rong bi **bo han** khoi tra ve — giu chung lam `tho` phinh gap doi ma
+      ⛔ khong them mot chu nao: `Chi nhanh` chi dien **11,7%**, `Ghi chu`
+      **16,6%** (do 11/09 tren 3.772 dong).
+    """
+    ra: dict[str, Any] = {}
+    for i, ten in enumerate(ten_cot):
+        k = " ".join(str(ten or "").split())
+        if not k or k in PM_COT_RIENG_TU:
+            continue
+        v = hang[i] if i < len(hang) else None
+        if v is None or str(v).strip() == "":
+            continue
+        ra[k] = v
+    return ra
+
+
+# ⭐ `2` tu 2026-09-17: hop dong cot mo tu **8** len **13** vi tri
+#   *(them bay khoa `PE`/`PI` — owner chot cot CO KIEU)*.
+PM_KHAI_VERSION = 2
 
 _BO = re.compile(r"[\s\-_.,/\\]+")
 _KHOA_HOC = re.compile(r"^\d(?:\.\d+)?E\+\d+$", re.I)
@@ -128,6 +268,36 @@ class DongPM:
     # van XANH — dung cai bay da mac mot lan voi hien vat `Classifying`.
     # Mac dinh `None` de moi cho dung `DongPM` san khong phai sua.
     ref_tho: str | None = None
+    # ⭐⭐⭐ Them 2026-09-17 — bay khoa `PE`/`PI` len KIEU (owner chot).
+    #
+    # ⛔ Do truoc khi khai, tren 26.404 dong co `tho`:
+    #     PE slip+line di CAP     3.500 · lech 0
+    #     PI slip+line di CAP    22.904 · lech 0
+    #     Advance 3.381 + Urgent 119 = 3.500 · trung 0 · sot 0
+    #     mot dong co DUNG MOT cha  ⇒ ngoai le **0**
+    #
+    # ⛔⛔ **Ba bat bien ay ⛔ KHONG duoc dung lam `CHECK` cua kho** — tru
+    #   `pe_loai`. Phep chen chay TRONG MOT GIAO DICH cho ca lan nap
+    #   (`chay_nap.chen_anh_pm`), va chinh no da ghi: *"nem loi la huy ca lan
+    #   nap chi vi mot dong"*. ⇒ Mot `CHECK` o day bien **mot dong la** thanh
+    #   **do ca luot nap** — tin tuc thanh su co. Chung duoc **DEM va NEU TEN**
+    #   luc nap (`INV-I16`), va co bai ghim do tren kho.
+    #   ★ Rieng `pe_loai` thi an toan: gia tri ay do **MA NAY sinh ra**, ⛔
+    #     khong phai do nguon, nen nguon ⛔ khong the lam no vo.
+    pe_slip: str | None = None
+    pe_line: str | None = None
+    pe_loai: str | None = None      # 'Advance' | 'Urgent' — ⛔ chi khi co `pe_line`
+    pi_slip: str | None = None
+    pi_line: str | None = None
+    # ⭐⭐ Them 2026-09-11 — **ca hang tho**, khoa theo TEN COT. Owner chot
+    #   "co luu dong tho" sau khi do duoc: `PM_Unpivot` co **28 cot**, FLS doc
+    #   **8**, va 20 cot con lai bien mat ngay luc doc ⇒ them mot truong hien
+    #   thi ve sau thi ⛔ khong bu nguoc duoc cho 3.772 dong dang co.
+    #
+    # ⛔ `None` co nghia THAT: *"ban doc nay ⛔ khong giu tho"* — ⛔ khong phai
+    #   *"doc duoc 0 cot"*. Mac dinh `None` de moi cho dung `DongPM` san
+    #   ⛔ khong phai sua.
+    tho: dict | None = None
 
 
 @dataclass(frozen=True)
@@ -263,7 +433,10 @@ class Nhom:
 
 
 def _cur(xs: Iterable[str]) -> set[str]:
-    return {x.strip().upper() for x in xs if x and x.strip()}
+    # ⭐ `WO-042 (c)` *(`BA-07` v3.11)*: **cùng** `ma_tien_te` *(tập 30 ký tự
+    #   `TAP_TRANG_TIEN_TE`)* — trước: `x.strip().upper()` viết tay *(29, thiếu
+    #   `U+FEFF`)*. Giữ đúng nghĩa cũ: chuỗi rỗng sau chuẩn hoá ⛔ là một tiền tệ.
+    return {m for m in (ma_tien_te(x) for x in xs) if m}
 
 
 def xep_hinh(ref: str, bank: Sequence[DongBank], pm: Sequence[DongPM]) -> Nhom:

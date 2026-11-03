@@ -29,7 +29,7 @@ def test_erd_json_co_quan_he_fk():
 
 import re
 
-from fls.db.erd_policy import BA_ERD_DOC, ERD_ISLANDS
+from fls.db.erd_policy import BA_ERD_DOC, ERD_ISLANDS, bang_mo_coi
 
 
 def _entity_trong_doc_BA() -> set[str]:
@@ -53,26 +53,13 @@ def test_g_erd_2_moi_entity_tren_ERD_BA_deu_ton_tai_trong_code():
 
 
 def test_g_erd_3_moi_bang_toi_duoc_fls_itl_hoac_khai_island():
-    """G-ERD-3: khong co bang mo coi lang le."""
-    canh: dict[str, set[str]] = {}
-    for n, t in TABLES.items():
-        if t.kind == "view":
-            continue
-        canh[n] = {c.fk.split(".")[0] for c in t.columns if c.fk} | {n}
-    ke: dict[str, set[str]] = {n: set() for n in canh}
-    for n, ds in canh.items():
-        for d in ds:
-            if d in ke:
-                ke[n].add(d)
-                ke[d].add(n)
-    toi_duoc, hang_doi = set(), ["fls_itl"]
-    while hang_doi:
-        cur = hang_doi.pop()
-        if cur in toi_duoc:
-            continue
-        toi_duoc.add(cur)
-        hang_doi.extend(ke.get(cur, ()))
-    mo_coi = set(canh) - toi_duoc
+    """G-ERD-3: khong co bang mo coi lang le.
+
+    ⚠ 2026-09-07: phep tinh kha-nang-toi chuyen sang `erd_policy.bang_mo_coi()`.
+    Cau khang dinh KHONG doi mot chu — no doi cho o vi tu nay co cong CHIEU
+    NGUOC doc cung mot phep tinh, va hai ban ma se troi khoi nhau.
+    """
+    mo_coi = bang_mo_coi(TABLES)
     assert mo_coi <= ERD_ISLANDS, (
         f"bang khong noi voi fls_itl va chua khai island: {sorted(mo_coi - ERD_ISLANDS)}")
 
@@ -80,6 +67,109 @@ def test_g_erd_3_moi_bang_toi_duoc_fls_itl_hoac_khai_island():
 def test_g_erd_3_moi_island_phai_co_ly_do_bang_chu():
     for n in ERD_ISLANDS:
         assert TABLES[n].island_reason.strip(), f"{n} khai island nhung khong co ly do"
+
+
+def test_g_erd_3_khai_island_ma_THUC_TE_noi_duoc_thi_DO():
+    """⭐⭐ CHIEU NGUOC — moi 2026-09-07 (`CR#11`).
+
+    ⛔⛔ Cong `G-ERD-3` cu chi hoi MOT chieu: *"co bang nao mo coi ma CHUA khai
+    khong?"*. No ⛔ khong bao gio hoi chieu con lai: *"co ten nao DA khai la dao
+    ma thuc te da noi duoc roi khong?"* ⇒ mot ngoai le co the **song sot qua ca
+    cai ly do sinh ra no**, va ⛔ khong cong nao do.
+
+    Chuyen do vua xay ra that: `fls_source` khai dao voi ly do *"manifest
+    pipeline, khong gan dong nao"*. Dung — cho toi khi `fls_khai_cot` ra doi va
+    mo duong `fls_itl → fls_run → fls_khai_cot → fls_source`. Neu ⛔ khong co
+    cong nay, loi khai **da thoi dung** ay se nam lai trong `ERD_ISLANDS`, va
+    ERD sinh ra se ke mot cau sai ve chinh no.
+
+    ⭐ Day la **that chat** mot cong, ⛔ khong phai noi long (`R-A5`): tap hop
+      duoc mien tru chi co the NHO di, ⛔ khong to ra.
+    """
+    mo_coi = bang_mo_coi(TABLES)
+    assert mo_coi, "⛔ do duoc 0 thu — cong nay dang xanh vi CHUA DO"
+    thua = ERD_ISLANDS - mo_coi
+    assert not thua, (
+        f"⛔ khai island ma THUC TE noi duoc toi fls_itl: {sorted(thua)}. "
+        f"Go ten do khoi ERD_ISLANDS va xoa `island_reason` — mot ngoai le het "
+        f"ly do la mot cau da thoi dung.")
+
+
+def test_cong_CHIEU_NGUOC_that_su_CAN_duoc_fls_source():
+    """⛔⛔ Chung minh cong tren **can that**, ⛔ khong xanh vi khong do gi.
+
+    Mot cong moi viet bao gio cung xanh — cau hoi la no xanh vi **DUNG** hay
+    xanh vi **CHUA DO**. Bai nay dung lai dung hien truong cua sang 07/09: coi
+    nhu `fls_source` van con trong `ERD_ISLANDS`, va doi hoi cong PHAI do.
+    """
+    islands_cu = ERD_ISLANDS | {"fls_source"}          # ban khai TRUOC `CR#11`
+    thua = islands_cu - bang_mo_coi(TABLES)
+    assert thua == {"fls_source"}, (
+        "⛔ cong chieu nguoc ⛔ KHONG bat duoc `fls_source` — no dang xanh gia. "
+        f"do duoc: {sorted(thua)}")
+
+
+def _bo_bang(bo: set[str]) -> dict:
+    """`TABLES` bo mot so bang, **va bo luon canh FK tro toi chung**.
+
+    ⛔ Bo bang ma de canh lai thi phep do noi mot dieu khac: canh tro toi mot
+    bang ⛔ khong con van bi `bang_mo_coi` dem nhu mot duong di duoc.
+    """
+    from fls.db.model import Table
+
+    con = {n: t for n, t in TABLES.items() if n not in bo}
+    for n, t in list(con.items()):
+        moi = tuple(c for c in t.columns
+                    if not (c.fk and c.fk.split(".")[0] in bo))
+        if moi != t.columns:
+            con[n] = Table(
+                name=t.name, kind=t.kind, erd_entity=t.erd_entity,
+                island_reason=t.island_reason, view_sql=t.view_sql,
+                pk_cols=t.pk_cols, unique_keys=t.unique_keys, columns=moi)
+    return con
+
+
+# ⭐⭐ **Sua 2026-09-08 (`QĐ-ITL-110`) — va no la mot SU THAT DOI, ⛔ khong phai
+#    mot cong bi noi long.**
+#
+# Ban truoc cua bai nay ten la `..._qua_DUNG_duong_khai_cot` va doi hoi: bo
+# `fls_khai_cot` thi `fls_source` **phai tro lai la dao**. Cau ay dung cho tan
+# 08/09 sang — luc `fls_khai_cot` la duong DUY NHAT.
+#
+# Migration `0018` mo **duong THU HAI**, va no la mot duong THAT, di bo duoc:
+#
+#     fls_itl.run_id → fls_run.chup_id → fls_chup ← fls_chup_dong → fls_source
+#
+# doc ra tieng Viet: *"dong so nay den tu lo nay, lo doc ANH CHUP nay, anh chup
+# nay doc NGUON nay"*. ⇒ Cai sai ⛔ khong phai duong moi, ma la **cau khang
+# dinh "DUNG mot duong"** trong ten bai cu.
+#
+# ⛔⛔ **Nen bai nay ⛔ KHONG duoc chi doi thanh "toi duoc la du".** Nhu thi no
+#    thanh mot ban sao cua `test_g_erd_3_khai_island_ma_THUC_TE_noi_duoc_thi_DO`
+#    va ⛔ khong con canh **LY DO** nua. ⇒ Do **ba** dieu, va dieu thu ba moi
+#    la cai can:
+#      ⓐ bo `khai_cot` ⇒ **VAN toi duoc** (con lan anh chup);
+#      ⓑ bo lan anh chup ⇒ **VAN toi duoc** (con `khai_cot`);
+#      ⓒ bo **CA HAI** ⇒ **PHAI tro lai la dao**.
+#    Thieu ⓒ thi mot ngay nao do ca hai duong bi go ma cong van xanh.
+_LAN_CHUP = {"fls_chup", "fls_chup_nguon", "fls_chup_dong"}
+
+
+def test_fls_source_toi_fls_itl_qua_HAI_duong_va_CHI_hai_duong_do():
+    # ⓐ ⛔ khong con `khai_cot` — lan anh chup con giu duoc lineage.
+    assert "fls_source" not in bang_mo_coi(_bo_bang({"fls_khai_cot"})), (
+        "⛔ bo `fls_khai_cot` ma `fls_source` thanh dao — vay lan ANH CHUP "
+        "⛔ khong noi toi `fls_itl`, tuc `fls_run.chup_id` dut o dau do")
+
+    # ⓑ ⛔ khong con lan anh chup — `khai_cot` con giu duoc lineage.
+    assert "fls_source" not in bang_mo_coi(_bo_bang(set(_LAN_CHUP))), (
+        "⛔ bo lan anh chup ma `fls_source` thanh dao — duong `khai_cot` da dut")
+
+    # ⓒ ⛔⛔ CAI CAN: bo CA HAI thi no PHAI tro lai la dao.
+    assert "fls_source" in bang_mo_coi(_bo_bang(_LAN_CHUP | {"fls_khai_cot"})), (
+        "⛔ bo CA `fls_khai_cot` LAN lan anh chup ma `fls_source` VAN toi duoc "
+        "fls_itl — vay con mot duong THU BA ma ⛔ khong ai khai, va ca doan ly "
+        "do o `erd_policy` sai cho.")
 
 
 def test_G_ERD_2_doc_BA_THAT_nam_TRONG_repo_va_KHONG_co_nhanh_bo_qua():

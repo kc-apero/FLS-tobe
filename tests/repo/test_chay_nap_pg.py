@@ -110,6 +110,96 @@ def test_seq_trung_on_dinh_theo_thu_tu_doc():
     assert danh_seq_trung(h, nc) == [0, 1, 0]        # chay lai y het
 
 
+# ── ⛔⛔ `QĐ-ITL-113` · mot o rac ⛔ KHONG duoc giet ca lo ──────────────────
+#
+# Do duoc 08/09 tren anh chup THAT (`chup_id 23719`, 8.368 dong): **1.894 dong
+# (22,6%)** co ngay mo ho *(`08/03/2026` — ca hai phan <= 12)*, trai **29/60
+# nguon**. Truoc va, `danh_seq_trung` goi `parse_ngay` **⛔ khong chan** va no
+# chay **TRUOC** vong `validate()`, nen mot o ay lam ca lan nap `NO` bang mot
+# `400` va `fls_reject` thi **TRONG** ⇒ ⛔ khong ai biet vi sao.
+
+def _canon(**kw):
+    from fls.canon.row import CanonRow
+    return CanonRow.from_list(_hang(**kw))
+
+
+def test_seq_trung_KHONG_NO_khi_ngay_mo_ho__va_dong_hong_VAN_CHIEM_CHO():
+    """⭐⭐ Cau nang hon *"⛔ khong no"*: dong hong **van chiem mot cho**.
+
+    ⛔⛔ Neu ta chua dong bi loai ra khoi phep dem *(tuc chuyen `validate()`
+       len truoc)* thi dong con lai tut `seq_trung` tu `1` xuong `0` ⇒ **doi
+       `content_key`** ⇒ lan nap sau **chen lai** dong ma lan truoc da bo qua
+       vi trung. Bai nay ghim rang ta ⛔ **KHONG** lam the.
+    """
+    nc = _nc("x")
+    h = [(5, _canon(A="03/01/2026", ct="A")),        # ⛔ mo ho
+         (6, _canon(A="03/01/2026", ct="A")),        # ⛔ mo ho, Y HET
+         (7, _canon(ct="A"))]                        # doc duoc
+    # ⇒ hai dong mo ho y het nhau **chiem hai cho** (0, 1), ⛔ khong bi dồn
+    #   het vao mot xo; dong doc duoc co khoa KHAC nen lai ve 0.
+    assert danh_seq_trung(h, nc) == [0, 1, 0]
+
+
+def test_hai_ngay_mo_ho_KHAC_NHAU_thi_KHAC_KHOA__khong_bi_gop_mot_xo():
+    """⛔ Mot sentinel dung chung cho **moi** loai rac se gop chung lai.
+
+    Luc ay hai dong rac khac nhau se ra `[0, 1]` — tuc may **bao** rang dong
+    thu hai la mot ban trung cua dong thu nhat, ⛔ khong dung. ⇒ Sentinel phai
+    mang theo **gia tri goc**.
+    """
+    nc = _nc("x")
+    h = [(5, _canon(A="03/01/2026", ct="A")),
+         (6, _canon(A="04/02/2026", ct="A"))]
+    assert danh_seq_trung(h, nc) == [0, 0]
+
+
+def test_MOT_dong_ngay_mo_ho_KHONG_giet_lo__dong_con_lai_VAO_SO(conn):
+    """⭐⭐⭐ Cong ra cua `QĐ-ITL-113`, do bang **bon duong**.
+
+    Truoc va: ca lo `NO` `400`, `fls_reject` **TRONG**. Sau va: dong hong vao
+    `fls_reject` **kem ly do co ten cot**, dong con lai **vao so**.
+    """
+    lo = "T-" + uuid.uuid4().hex[:8]
+    tho = [_hang(A="03/01/2026"),                    # ⛔ mo ho -> fls_reject
+           _hang(),                                  # -> vao so
+           _hang()]                                  # -> vao so
+    kq = chay(conn, tho, _nc(lo))
+    assert kq.can(), kq.bao()
+    assert (kq.vao, kq.vao_so, kq.loai, kq.rong) == (3, 2, 1, 0), kq.bao()
+    with conn.cursor() as cur:
+        cur.execute("SELECT source_row, reason FROM fls_reject "
+                    "WHERE run_id = %s", (lo,))
+        r = cur.fetchall()
+    # ⛔ ⛔ Ly do phai NEU RA ngay mo ho — mot `fls_reject` co dong ma ly do
+    #    rong thi vẫn ⛔ khong ai biet vi sao.
+    assert len(r) == 1 and r[0][0] == 5, r
+    assert "mo ho" in r[0][1], r[0][1]
+
+
+def test_NGUON_KHAI_thu_tu_thi_dong_mo_ho_VAO_SO__va_dung_ngay(conn):
+    """⭐⭐⭐ Cong ra thu hai: khai `thu_tu` **cuu** 1.894 dong, ⛔ khong loai.
+
+    ⛔⛔ Va bai nay do ca **chieu nguoc**: cung mot chuoi `03/01/2026`, hai
+       ban khai cho **HAI ngay khac nhau**. Neu bai chi kiem *"vao so duoc"*
+       thi no se xanh ca khi may **doan bua** — tinh chat that phai kiem la
+       *"ban khai QUYET DINH ket qua"*.
+    """
+    ra = {}
+    for tt, mong in (("mdy", "2026-03-01"), ("dmy", "2026-01-03")):
+        lo = "T-" + uuid.uuid4().hex[:8]
+        nc = NgucCanh(lo, "v1.0", "v1.0", "v1.0", "RAW",
+                      "Transaction Mapping L1", thu_tu=tt)
+        kq = chay(conn, [_hang(A="03/01/2026")], nc)
+        assert (kq.vao, kq.vao_so, kq.loai) == (1, 1, 0), kq.bao()
+        with conn.cursor() as cur:
+            cur.execute("SELECT doc_date FROM fls_itl WHERE run_id = %s", (lo,))
+            ra[tt] = cur.fetchone()[0].isoformat()
+        assert ra[tt] == mong, (tt, ra[tt], mong)
+    # ⭐ Hai ban khai ⇒ HAI ngay. Day la ca ly do `None` ⛔ khong duoc mac dinh
+    #   thanh `dmy`: do duoc 29/29 nguon that la `mdy`.
+    assert ra["mdy"] != ra["dmy"], ra
+
+
 def test_dong_bi_loai_vao_fls_reject_voi_LY_DO_CO_TEN(conn):
     lo = "T-" + uuid.uuid4().hex[:8]
     chay(conn, [_hang(AG="#N/A")], _nc(lo))
@@ -146,6 +236,38 @@ def test_chay_LAI_khong_nhan_doi_dong_bi_loai_trong_fls_reject(conn):
     with conn.cursor() as cur:
         cur.execute("SELECT count(*) FROM fls_reject WHERE run_id = %s", (lo,))
         assert cur.fetchone()[0] == 2, "fls_reject bi nhan ban moi lan chay lai"
+
+
+def test_MOT_LO_NHIEU_NGUON__dong_loai_cua_CA_HAI_deu_duoc_ghi(conn):
+    """⛔⛔⛔ Lo do duoc 2026-09-10 tren anh THAT `chup_id 24033`: **646 dong bi
+    loai ma ⛔ KHONG co ban ghi nao**, trai tren **23 nguon**.
+
+    Nguyen nhan: dieu kien chan trung so `(run_id, source_row)`, dung khi **mot
+    lan nap = MOT nguon**. `QĐ-ITL-111` dung cua nap CA LO — *mot* `run_id` cho
+    **59 nguon** — con `source_row` chi la chi so dong **TRONG MOT SHEET** ⇒
+    dong 0 cua 59 sheet dung chung mot gia tri, nen chi nguon **den truoc** duoc
+    ghi va 58 nguon con lai bi **nuot trong im lang** *(`rowcount` 0, ⛔ khong
+    mot loi nao)*.
+
+    ⭐ Bai nay la bai DUY NHAT bat duoc no: moi bai cu chay **mot nguon**, nen
+      chung xanh voi ca khoa sai. Do la ly do no song sot 2 ngay.
+    """
+    lo = "T-" + uuid.uuid4().hex[:8]
+    tien = 1000 + int(uuid.uuid4().hex[:6], 16)
+    # HAI nguon, CUNG mot `run_id`, va dong bi loai o CUNG mot `source_row`.
+    for sheet in ("R | nguon-A", "R | nguon-B"):
+        nc = NgucCanh(lo, "v1.0", "v1.0", "v1.0", "RAW", sheet)
+        chay(conn, [_hang(F=tien, AG="#N/A")], nc)
+
+    with conn.cursor() as cur:
+        cur.execute("SELECT source_sheet, source_row FROM fls_reject"
+                    " WHERE run_id = %s ORDER BY source_sheet", (lo,))
+        r = cur.fetchall()
+    assert len(r) == 2, (
+        f"chi ghi duoc {len(r)}/2 dong loai — nguon thu hai bi NUOT im lang: "
+        f"{r}")
+    assert [x[0] for x in r] == ["R | nguon-A", "R | nguon-B"]
+    assert r[0][1] == r[1][1], "hai dong nay PHAI cung `source_row` moi la bai do"
 
 
 def test_KHONG_co_duong_XOA_fls_reject(conn):

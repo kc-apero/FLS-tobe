@@ -87,7 +87,7 @@ không**.
 |---|---|
 | Phép thử | **1024** *(+8)* · **5 đỏ có sẵn** *(đều `GAP-KHO-02`, kho test phình)* |
 | Chứng-minh-đỏ | **13** phép, **tất cả đỏ thật** trước khi tin |
-| Ranh giới tầng | `import-linter` **8 kept · 0 broken** |
+| Ranh giới tầng | `import-linter` **9 kept · 0 broken** *(~~8~~ — đo lại 17/09)* |
 | Số sống | `tools/kiem_so_song.py` — **66 phép so**, đạt |
 | Cửa | `127.0.0.1:8088` chạy mã mới, `window.FLS_LE_CHUNG` = **12 mã** |
 | ⛔ **Chưa đo được** | **`B7 · UAT`** — cảm giác khi gõ · `430px` panel có đủ. **Máy ⛔ không đóng được** |

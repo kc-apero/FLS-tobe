@@ -234,7 +234,12 @@ def test_force_KEM_ly_do_thi_ghi_duoc_va_gia_tri_cu_VAN_doc_lai_duoc(
     # ⭐ So la **chi them**: gia tri cu ⛔ khong mat.
     ma, n = _goi(may, f"{V}/journal?itl_id={itl}")
     assert n["data"]["rows"][0]["value_before"] == "HD-SO-GOC"
-    assert n["data"]["rows"][0]["value_source"] == "nguon"
+    # ⭐ `WO-018` (`BA-05` v0.34 `DD-I15 ⓓe`): nhat ky mang LOP CUA CHINH DONG
+    #   (nguoi go ⇒ `sua_tay`). ⛔ Truoc 02/10 dong nay ghim `"nguon"` — nguon
+    #   cua gia tri TRUOC khi go, nghia cu (`HOI-016` ⓑ). Gia tri cu doc lai
+    #   duoc qua `value_before` (dong tren — lo goc cua bai, ⛔ doi); lop cua no
+    #   ⇒ sang than tra `/adjust` (`tests/api/test_cua_ghi_pg.py`).
+    assert n["data"]["rows"][0]["value_source"] == "sua_tay"
 
 
 # ══ ⓒ DAO BUT TOAN — gia tri LUI VE ══════════════════════════════════════

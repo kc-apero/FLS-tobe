@@ -296,7 +296,10 @@ class _Tay(BaseHTTPRequestHandler):
             mo = self.server.mo_doc
 
         try:
-            than = self._doc_than() if tuyen.ghi else {}
+            # ⭐ `can_than` ⛔ KHONG phai `ghi`: `POST /nap/xem-truoc`
+            #    doc ca mot lo trong than ma ⛔ khong ghi mot dong nao
+            #    — va no van chay tren ket noi **bi kho chan ghi**.
+            than = self._doc_than() if tuyen.can_than else {}
         except LoiCua as e:
             return self._loi(e.ma, pv.mo_ta(), e.chi_tiet)
 

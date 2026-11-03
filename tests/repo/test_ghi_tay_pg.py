@@ -133,7 +133,14 @@ def test_nhat_ky_du_BAY_truong(conn, lat):
     for k in gt.BAY_TRUONG:
         assert d[k] is not None or k == "value_before", f"thieu truong {k}"
     assert d["actor"] == AI and d["reason"]
-    assert d["value_source"] == gt.NGUON_TRONG   # cdt1 rong ca ba nguon
+    # ⭐ `WO-018` (`BA-05` v0.34 `DD-I15 ⓓe`): nhat ky ghi LOP CUA CHINH DONG —
+    #   nguoi go ⇒ `sua_tay`. ⛔ Truoc 02/10 dong nay ghim `NGUON_TRONG` (o
+    #   `cdt1` rong ca ba lop TRUOC khi go) — nghia cu "nguon truoc khi go", da
+    #   chuyen ve than tra `/adjust` (`KetQuaGhi.value_source`, ghim o
+    #   `test_o_TRONG_thi_khong_KEU_va_nguon_ghi_la_UNMAPPED` ben duoi va
+    #   `tests/api/test_cua_ghi_pg.py`).
+    #   Lo goc cua bai GIU: `value_source` ⛔ bao gio rong.
+    assert d["value_source"] == gt.NGUON_TAY
 
 
 # ── luat 3: he KEU khi go khac nguon (US-025) ────────────────────────────
@@ -162,8 +169,13 @@ def test_force_thi_ghi_duoc_va_nhat_ky_giu_gia_tri_CU(conn, lat):
 
 
 def test_o_TRONG_thi_khong_KEU_va_nguon_ghi_la_UNMAPPED(conn, lat):
-    """⛔ `INV-I16`: may khong suy duoc thi nhat ky noi thang **UNMAPPED**,
-    ⛔ khong de trong de sau nay ai doc cung tuong la co nguon."""
+    """⛔ `INV-I16`: may khong suy duoc thi cua noi thang **UNMAPPED**,
+    ⛔ khong de trong de sau nay ai doc cung tuong la co nguon.
+
+    ⚠ `WO-018` (02/10): cau *"nguon truoc khi go"* nay song o **THAN TRA**
+    (`KetQuaGhi.value_source` — cua `/adjust`, `US-025`), ⛔ con o nhat ky:
+    dong nhat ky cua cu go nay mang `sua_tay` (lop cua chinh dong, `BA-05`
+    v0.34 `DD-I15 ⓓe`). Assert duoi ⛔ doi — no vua dung than tra."""
     k = gt.ghi_but_toan(conn, mot_lan_nap(lat["run"]), lat["trong"], "hd",
                         "HD-NGUOI", actor=AI, reason="tra cuu hop dong")
     assert k.value_source == gt.NGUON_TRONG and k.value_before is None

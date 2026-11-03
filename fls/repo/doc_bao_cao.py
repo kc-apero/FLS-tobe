@@ -38,6 +38,7 @@ from typing import Any
 
 from fls.adapters.mapping_master import TRUONG as TRUONG_MM
 from fls.adapters.pm_join import canon_ref, dung_sai_ghep_tay
+from fls.canon.tien_te import ma_tien_te
 # ⭐ Luat suy vung PHAN BO. ⛔ Mot BAN DUY NHAT, va no o `fls/ledger/` — tang
 # doc chi **goi** no. ⛔ Man hinh ⛔ KHONG duoc tu tinh lai: `suy_allocate` co
 # hai bay ngu nghia cua Sheets *(o `Method` rong that ⇒ `VLOOKUP` cho **`0`**;
@@ -47,6 +48,7 @@ from fls.canon.spec import CANON_COLS
 from fls.ledger.allocate import suy_allocate
 # ⚠ Chi lay HANG SO (`TRUONG_HOP_DONG`), ⛔ khong ham ghi nao — luat
 # ranh gioi cua `import-linter`: tang doc ⛔ khong duoc goi tang ghi.
+from fls.repo.anh_pm import anh_pm_hieu_luc
 from fls.repo.ghi_tay import TRUONG_HOP_DONG
 from fls.repo.pham_vi import PhamVi
 
@@ -278,6 +280,18 @@ def _canh_bao(status: str | None) -> str:
 #
 # ⚠ Bac tinh MOT LAN trong `q`, roi moi xep o ngoai. Viet lai ca khoi `CASE` lan
 # thu hai trong `ORDER BY` la **hai cho khai cung mot luat** — chung se lech.
+# ⭐⭐ MENH DE bac `ma` — khai **MOT LAN**, dung o **BA cho**: hai lan trong
+# cau duoi day (`CASE` va `WHERE`) va mot lan o `do_mau_so._SQL_UNG_VIEN_LO`
+# *(cua ghep LO, `B2`)*.
+#
+# ⛔⛔ **Vi sao no phai la mot hang so chu ⛔ khong phai ba lan go giong nhau.**
+# Cua ghep LO nhan tap *"tu chung"* — dong co **dung mot** ung vien bac `ma` —
+# va no ghep **⛔ khong hoi nguoi mot cau nao**. Neu ban khai bac `ma` o cua lo
+# lech mot chut so voi ban o day, thi man hinh se hien mot danh sach ung vien
+# **khac** cai ma cu bam LO thuc su ghep: mot cau tra loi sai ma ⛔ khong bao
+# loi. Cung lop loi voi *"hai ban chuan hoa la hai ban su that"* ngay ben duoi.
+DK_BAC_MA = "{s}.ma IS NOT NULL AND {l}.ref_canon = {s}.ma"
+
 _SQL_UNG_VIEN = """
 WITH s AS (
   SELECT %(ma)s::text AS ma, %(cur)s::text AS cur,
@@ -291,7 +305,7 @@ WITH s AS (
          (SELECT count(*) FROM fls_moi_noi k
            WHERE k.pm_line_id = l.pm_line_id) AS da_ghep,
          CASE
-           WHEN s.ma IS NOT NULL AND l.ref_canon = s.ma            THEN 'ma'
+           WHEN {bac_ma}                                           THEN 'ma'
            WHEN upper(l.curr) = s.cur AND l.amount = s.tien         THEN 'tien'
            WHEN upper(l.curr) = s.cur
                 AND abs(l.amount - s.tien) <= s.ds                 THEN 'gan_tien'
@@ -299,7 +313,7 @@ WITH s AS (
          abs(COALESCE(l.amount, 0) - s.tien) AS lech_tuyet_doi
   FROM fls_pm_line l CROSS JOIN s
   WHERE l.run_id = %(run)s
-    AND ((s.ma IS NOT NULL AND l.ref_canon = s.ma)
+    AND (({bac_ma})
          OR upper(l.curr) = s.cur)
 )
 SELECT * FROM q
@@ -315,9 +329,23 @@ def ung_vien_pm(conn, pv: PhamVi, itl_id: int, n: int = UNG_VIEN_MAC_DINH
     di thi sao"* ⛔ khong phai *"no khong gia"* — ma la **noi ra no gia bao nhieu**,
     de nguoi go tu quyet. Man hinh PHAI hien con so nay.
 
-    ⛔ Anh chup lay theo **lan nap CUA CHINH DONG SO do** (`i.run_id`), ⛔ khong
-    phai "anh chup moi nhat": mot dong so cua lan nap thang truoc phai duoc ghep
-    voi dong lenh **nhu no da la luc do**, khong thi lineage `INV-I05` dut.
+    ⛔⛔ **Anh chup lay theo `anh_pm_hieu_luc` — ANH DOC GAN NHAT, ⛔ KHONG con
+    theo `i.run_id`** *(sua 2026-09-09, `QĐ-ITL-119`)*.
+
+    ⚠ Ban truoc lay theo **lan nap cua chinh dong so** voi ly le: *"mot dong so
+    cua lan nap thang truoc phai duoc ghep voi dong lenh nhu no da la luc do,
+    khong thi lineage `INV-I05` dut"*. Ly le ay **nghe dung** va no da song 13
+    ngay — nhung no co mot he qua ⛔ **khong ai viet ra**: **du lieu lenh chi
+    MOI ⛔ KHONG BAO GIO giup duoc dong tien CU**. Va dong tien cu chinh la
+    **6.577 dong** ma moc `A3` duoc dat ra de go.
+
+    ⭐ Do that 09/09: nap mot dong lenh mang **dung ma** vao mot `run_id` moi ⇒
+    ham nay tra **0 ung vien**. ⇒ `A3` se chay xong, bao thanh cong, va
+    ⛔ **khong dich mot dong nao**. Ca doan ly le + phep do: `fls/repo/anh_pm.py`.
+
+    ⇒ Vet truy ⛔ khong dut ma **RO HON**: `fls_pm_link.run_id` nay mang **chinh
+      anh PM da dung**, thay vi de nguoi doc **suy** rang no bang `run_id` cua
+      dong tien *(dung, nhung chi vi hom nay ITL va PM duoc nap cung mot lan)*.
     """
     n = max(1, min(int(n), UNG_VIEN_TOI_DA))
     dk, ts = pv.dieu_kien("i.run_id")
@@ -331,9 +359,11 @@ def ung_vien_pm(conn, pv: PhamVi, itl_id: int, n: int = UNG_VIEN_MAC_DINH
             return None
         so = d[0]
 
+    run_pm = anh_pm_hieu_luc(conn, pv)
+    with conn.cursor() as cur:
         cur.execute(
             "SELECT count(*), min(read_at), max(read_at)"
-            " FROM fls_pm_line WHERE run_id = %s", (so["run_id"],))
+            " FROM fls_pm_line WHERE run_id = %s", (run_pm,))
         sl, som, muon = cur.fetchone()
 
         # ⚠ Ma tham chieu duoc chuan hoa BEN PYTHON roi moi so — ⛔ khong viet lai
@@ -341,7 +371,10 @@ def ung_vien_pm(conn, pv: PhamVi, itl_id: int, n: int = UNG_VIEN_MAC_DINH
         # se lech dan trong im lang.
         ma = canon_ref(so["doc_no"])
         tien = so["tien"]
-        cur_so = (so["curr"] or "").strip().upper()
+        # ⭐ `WO-042 (c)` *(`BA-07` v3.11)*: **cùng** `ma_tien_te` *(tập 30 ký tự
+        #   `TAP_TRANG_TIEN_TE`)* — trước: `strip().upper()` viết tay *(29, thiếu
+        #   `U+FEFF`)*: cửa ghi coi ``U+FEFF`+`VND`` là một mã **khác** VND.
+        cur_so = ma_tien_te(so["curr"])
         # ⛔ Phai dung dung sai cua cua GHEP TAY (`QĐ-ITL-63`), ⛔ khong
         # phai cua ghep tu dong: danh sach nay la danh sach cho NGUOI ghep tay.
         # Neu o day noi `1.000` ma cua chi cho `0,5%` thi man hinh xep mot ung
@@ -349,9 +382,10 @@ def ung_vien_pm(conn, pv: PhamVi, itl_id: int, n: int = UNG_VIEN_MAC_DINH
         ds = (dung_sai_ghep_tay({cur_so}, Decimal(str(so["tien"] or 0)))
               if cur_so else Decimal(0))
 
-        cur.execute(_SQL_UNG_VIEN.format(cot=", ".join(_COT_UV)),
+        cur.execute(_SQL_UNG_VIEN.format(cot=", ".join(_COT_UV),
+                                         bac_ma=DK_BAC_MA.format(s="s", l="l")),
                     {"ma": ma, "cur": cur_so, "tien": tien, "ds": ds,
-                     "run": so["run_id"], "bac": list(BAC_UNG_VIEN), "n": n})
+                     "run": run_pm, "bac": list(BAC_UNG_VIEN), "n": n})
         uv = _dong(cur)
 
     for x in uv:
@@ -364,8 +398,18 @@ def ung_vien_pm(conn, pv: PhamVi, itl_id: int, n: int = UNG_VIEN_MAC_DINH
         "dung_sai": ds,
         "ung_vien": uv,
         # ★ Luat ⓑ: TUOI cua anh chup di kem moi danh sach.
-        "anh_chup": {"run_id": so["run_id"], "so_dong": int(sl or 0),
-                     "doc_luc_som_nhat": som, "doc_luc_muon_nhat": muon},
+        #
+        # ⭐⭐ `run_id` o day nay la anh **PM** dang hieu luc, ⛔ khong con la
+        #    lan nap cua dong tien. Va do la mot con so man hinh PHAI hien:
+        #    hai anh khac nhau cho **hai danh sach ung vien khac nhau**, nen
+        #    mot man ⛔ khong noi no dang nhin anh nao la mot man ⛔ khong giai
+        #    thich duoc vi sao danh sach doi.
+        # ⛔ `co_anh = False` ⛔ KHONG duoc doc thanh "0 ung vien": no nghia la
+        #    **⛔ chua ai nap dong lenh nao**, mot cau tra loi KHAC han.
+        "anh_chup": {"run_id": run_pm, "co_anh": run_pm is not None,
+                     "so_dong": int(sl or 0),
+                     "doc_luc_som_nhat": som, "doc_luc_muon_nhat": muon,
+                     "run_dong_tien": so["run_id"]},
         # ⛔ Khai thang thu KHONG do duoc, ⛔ khong de man hinh tu suy.
         "khong_xep_duoc_theo": ["ngay", "payee"],
         "vi_sao": ("anh chup ⛔ khong mang PII va ⛔ khong mang ngay "
@@ -426,8 +470,14 @@ def doc_mot_dong(conn, pv: PhamVi, itl_id: int) -> dict[str, Any] | None:
         x = _dong(cur)
         ra["da_xong"] = x[0] if x else None
         # Ca lich su but toan (ke ca ban dao) — de drawer dao dung but toan nao.
+        # ⭐ `WO-023` `(g)` *(`BA-07` v3.6 · `BA-06` v4.12 dong "F02 · hoan
+        #   tac")*: `nguon` = LOP cua **chinh** but toan *(`may_goi_y` · `sua_tay`)*
+        #   ⇒ hop `Dao` noi dung hau qua. ⛔⛔ Truoc: hop hua *"gia tri lui ve…"*
+        #   cho **moi** but toan — ke ca goi y may, noi dao **⛔ doi Final**
+        #   *(`QĐ-ITL-149`; tam **4.424** nut tren so that)*.
         cur.execute(
-            "SELECT adj_id, field, value_after, state, reversal_of, actor, at"
+            "SELECT adj_id, field, value_after, state, reversal_of, actor, at,"
+            " nguon"
             " FROM fls_adjustment WHERE itl_id = %s ORDER BY adj_id", (itl_id,))
         ra["but_toan"] = _dong(cur)
     return ra
@@ -470,14 +520,90 @@ WITH q AS (
 )
 """
 
+# ⛔⛔⛔ **CHỐT TRANG TRƯỚC · TÍNH `fls_queue_state` ĐÚNG MỘT LẦN · NỐI SAU.**
+#    *(`WO-051`, `KQ-050 F-1` · `BA-08` v1.4 `NFR-I30`: một trang ≤ `2 s`)*
+#
+#    Bản trước *(đến `9af99c4`)* viết `FROM x LEFT JOIN fls_queue_state s …
+#    WHERE TRUE {them} ORDER BY … LIMIT` — nối **trước**, cắt trang **sau**.
+#    Sổ thật 05–06/10: trang 2 `VND` *(`cursor=VND:50`)* mất **104,33 s**
+#    *(`fls-ba`)* · **89,15 s** · **97,98 s** *(`fls-dev`, hàm thật, kết nối
+#    mới)*; 18 trang khác **0,07–0,74 s**. `EXPLAIN (ANALYZE, BUFFERS)` 06/10
+#    *(`BG-064` dán trọn)*:
+#      · bộ lập kế hoạch ước `ROW(x.curr, x.hang) > ROW('VND', 50)` còn
+#        **`rows=1`** *(thật **4.192**)* — `VND` là tiền tệ **cuối** theo thứ
+#        tự chữ nên giá trị con trỏ nằm ở **mép trên** biểu đồ thống kê;
+#      · ⇒ chọn `Nested Loop Left Join` với view `fls_queue_state` *(một
+#        `GroupAggregate` + `Incremental Sort` trên **110.349** dòng
+#        `fls_queue_event`)* làm vế **trong** ⇒ view bị tính lại
+#        **`loops=4192`** lần × **26,5 ms** = **111,9 s**, `Buffers: shared
+#        hit=182.573.086`. Con trỏ `USD:50` ước `rows=2013` ⇒ `Hash Right
+#        Join`, view tính **một** lần ⇒ **0,10 s**.
+#    ⇒ Lỗi ⛔ phải của riêng `VND`: **mọi** con trỏ mà ước ra nhỏ đều dính
+#      *(`curr=None` gãy ở trang **84**, con trỏ `VND:5`)*, và nó **chậm thêm**
+#      theo mỗi `fls_queue_event` mới *(mỗi cú ghép / lý do / hoãn)*.
+#
+#    ⭐ Cách sửa **⛔ phụ thuộc ước lượng hàng** *(`WO-051` Rủi ro 3 — một cách
+#    sửa "nhờ may" ước lượng hôm nay sẽ hỏng lại khi dữ liệu trôi)*:
+#      ⓐ `st` = **toàn bộ** view, `MATERIALIZED` ⇒ PostgreSQL tính nó **đúng
+#         một lần** mỗi câu *(CTE vật chất hoá ⛔ bị tính lại theo vòng nối —
+#         đó là **lời hứa của ngữ nghĩa**, ⛔ phải của bộ ước lượng)*. Giá:
+#         **~60 ms** mỗi trang trên 110.349 sự kiện, tăng **tuyến tính** theo
+#         `fls_queue_event` *(chạm `2 s` ở cỡ ~3,6 triệu sự kiện — ⛔ phải
+#         nhân theo số hàng ngoài như lỗi cũ)*.
+#      ⓑ `trang` = lọc + xếp + `LIMIT` **trên `x` một mình** — tập hàng của
+#         trang **chốt xong** *(≤ `limit + 1` hàng)* trước khi chạm `st`.
+#      ⓒ nối `trang ⟕ st` theo `itl_id` — vòng nối nào cũng chỉ quét **bảng
+#         tạm** `st` *(8.387 hàng)*, ⛔ gom lại `fls_queue_event`.
+#    Đo sau sửa *(06/10, `tools/do_trang_hang_cho.py`, kết nối mới mỗi trang)*:
+#    trang chậm nhất **~0,1 s** mọi tiền tệ; oracle lệch **0 / 8.387** — xem
+#    `BG-064`.
+#
+#    ⛔⛔ **Vì sao ⛔ dùng cách nhanh hơn — `LEFT JOIN LATERAL (… WHERE v.itl_id
+#    = t.itl_id OFFSET 0)` — dù nó đo được 0,021 s/trang.** Cách ấy đẩy điều
+#    kiện xuống **dưới** `GROUP BY` của view ⇒ mỗi `itl_id` gom **riêng** ⇒
+#    **đổi cột `reason`** ở **398 / 8.387** hàng *(đo 06/10 — oracle của
+#    `tools/do_trang_hang_cho.py`)*. Gốc **⛔ ở cách nối** mà ở **view**:
+#    `fls_queue_state.reason` = `(ARRAY_AGG(reason ORDER BY at DESC))[1]`, và
+#    lần dựng lại sổ 10/09 chèn ~13 sự kiện `reason` **cùng một `at`** cho
+#    **8.387 / 8.387** dòng *(một giao dịch ⇒ `now()` trùng)* ⇒ "lý do mới
+#    nhất" **⛔ xác định** — nó là phần tử nào kế hoạch gom đưa ra trước.
+#    Gom **toàn bảng** *(như mã cũ ở mọi trang **nhanh**, như oracle)* cho
+#    **cùng** câu trả lời; gom **từng `itl_id`** cho câu khác. `WO-051` đòi
+#    kết quả **⛔ đổi một byte** ⇒ giữ cách gom của mã cũ. Sửa thật là cho view
+#    một **khoá phụ** *(`at DESC, evt_id DESC`)* — đổi view = migration =
+#    **NGOÀI** phiếu ⇒ **`HOI-063`**. Sau khi view xác định, `LATERAL` là
+#    đường O(một trang) ⛔ phụ thuộc cỡ `fls_queue_event`.
+#    ⛔ Và **`OFFSET 0` trong `LATERAL` ⛔ phải trang trí** *(bia cho người thử
+#    lại)*: thiếu nó, câu con bị **kéo phẳng** thành `LEFT JOIN` thường ⇒ điều
+#    kiện thành `Join Filter` ⇒ view gom **cả bảng** cho mỗi hàng, `loops=51`
+#    ⇒ **1,05–1,31 s** — **dưới** `2 s` nên bài ngân sách vẫn **XANH**.
+#
+#    ⛔ **Kết quả ⛔ đổi một byte** *(`WO-051` `AC-4`)*: view gom `GROUP BY
+#      itl_id` ⇒ **≤ 1** hàng mỗi `itl_id` ⇒ `LEFT JOIN` trước hay sau `LIMIT`
+#      cho **cùng** tập hàng; `(curr, hang)` duy nhất *(`hang` = `row_number()`
+#      trong `PARTITION BY curr`)* ⇒ thứ tự xác định. Tập bảng chạm ⛔ đổi
+#      *(`fls_itl` · `fls_da_xong` · `fls_queue_state`)* ⇒ `soi_bang_tuyen` giữ
+#      khớp. `_CTE_HANG_CHO` ⛔ đổi ⇒ `do_phu_hang_cho` ra **cùng** số.
+#    ⚠ Bẫy đo *(bia cho lượt sau)*: đo nhiều trang trên **một** kết nối là đo
+#      **sai** — `psycopg` tự `prepare` câu sau 5 lần cùng chữ ⇒ kế hoạch chung
+#      ⇒ trang 2 `VND` mã cũ báo **0,088 s** *(xanh giả)*; cửa thật mở kết nối
+#      mới mỗi lượt. Xem `tools/do_trang_hang_cho.py::ket_noi_moi`.
 _SQL_HANG_CHO = _CTE_HANG_CHO + """
-SELECT x.itl_id, x.doc_date, x.doc_no, x.curr, x.le, x.memo, x.tien,
-       x.hang, x.luy_ke_pct,
+, st AS MATERIALIZED (
+  SELECT v.itl_id, v.reason, v.defer_until, v.defer_count
+  FROM fls_queue_state v
+), trang AS MATERIALIZED (
+  SELECT x.* FROM x
+  WHERE TRUE {them}
+  ORDER BY x.curr, x.hang
+  LIMIT %s
+)
+SELECT t.itl_id, t.doc_date, t.doc_no, t.curr, t.le, t.memo, t.tien,
+       t.hang, t.luy_ke_pct,
        s.reason, s.defer_until, s.defer_count
-FROM x LEFT JOIN fls_queue_state s ON s.itl_id = x.itl_id
-WHERE TRUE {them}
-ORDER BY x.curr, x.hang
-LIMIT %s
+FROM trang t
+LEFT JOIN st s ON s.itl_id = t.itl_id
+ORDER BY t.curr, t.hang
 """
 
 # ⭐⭐ DO PHU — *"xem toi day la phu bao nhieu phan tram TIEN"*.
@@ -652,12 +778,33 @@ def doc_nhat_ky(conn, pv: PhamVi, itl_id: int) -> list[dict[str, Any]]:
 
     ⚠ Cau nay **noi qua `fls_itl`** chu khong doc thang `fls_journal`: nhat ky
     khong mang `run_id`, nen doc thang la mot duong khac vong pham vi.
+
+    ⭐⭐ `WO-023` `(f)` *(`BA-07` v3.6 · `BA-06` v4.12 dong "F02 · nhat ky",
+    `KQ-025 F-3`)*: moi dong mang `la_ban_dao` = **co** mot `fls_adjustment`
+    cung `(itl_id, field, at, actor)` voi `reversal_of IS NOT NULL`. ⛔⛔ Truoc:
+    man ⑦ in ban dao gia tri NGUOI `X → (trong) · nguoi sua` — **y het** cu
+    nguoi xoa o, trong khi sau dao Final lui ve lop duoi.
+    ⭐ Vi sao khoa **bon** cot ⛔ nhap nhang: `fls_journal` ⛔ co cot tro but
+    toan *(⛔ migration — `WO-023` NGOAI)*, nhung `_them` chen **hai** dong
+    trong **mot** giao dich ⇒ `at` (`now()` = gio BAT DAU giao dich) trung
+    nhau. Ke ca duong ghi chen nhieu dong mot giao dich *(`ghep_lenh` →
+    `ghi_goi_y` ×2 · `bo_moi_noi` dao moi lop)* thi cac dong **cung**
+    `(itl_id, field, actor)` trong mot giao dich deu **cung loai** *(`ghep`:
+    hai `field` khac nhau, ⛔ ban dao · `bo_moi_noi`: **toan** ban dao)* ⇒
+    ⛔ duong ghi nao chen ca ban dao lan but toan thuong cung khoa *(liet ke
+    `BG-057`; so that 02/10: nhap nhang **0** / 4.428)*. ⛔⛔ Thieu `at` *(chi
+    `itl_id, field, actor`)* ⇒ ca *dao roi xoa cung o* in *"dao"* cho cu xoa
+    *(bai `test_AC8_DAO_roi_XOA_cung_o…`)*.
     """
     dk, ts = pv.dieu_kien("i.run_id")
     with conn.cursor() as cur:
         cur.execute(
             "SELECT j.jrn_id, j.itl_id, j.field, j.value_before, j.value_after,"
-            " j.actor, j.at, j.value_source, j.reason"
+            " j.actor, j.at, j.value_source, j.reason,"
+            " EXISTS (SELECT 1 FROM fls_adjustment a"
+            "         WHERE a.itl_id = j.itl_id AND a.field = j.field"
+            "           AND a.at = j.at AND a.actor = j.actor"
+            "           AND a.reversal_of IS NOT NULL) AS la_ban_dao"
             " FROM fls_journal j JOIN fls_itl i USING (itl_id)"
             f" WHERE j.itl_id = %s AND {dk} ORDER BY j.at, j.jrn_id",
             [itl_id, *ts])
@@ -783,13 +930,35 @@ def doc_cong(conn, pv: PhamVi) -> list[Cong]:
     # *"bon duong can nhau"*. Lan chay that dau tien (27/08) no **DO** — va do
     # la **do GIA**: 10.030 vs 10.030 + 19. Cong thuc tu suy ra tu chu "bon
     # duong" trong tai lieu ma ⛔ khong doc xem cot do THUC SU chua gi.
+    # ⛔⛔⛔ **Va cong nay tung DEM SAI BANG — bat 11/09, tren MAN HINH.**
+    #
+    # ⚠ Ban truoc do `count(fls_itl)` cho **moi** lan nap. Nhung mot lan chup
+    #   `PM` ⛔ **khong ghi mot dong nao** vao `fls_itl` — no ghi vao
+    #   `fls_pm_line`. ⇒ Moi lan chup PM deu bi cong nay to la *"co ai doi so"*.
+    #   Do that: **13/16** lan nap bi bao oan *(`chot 3772 != nay 0`)*, va no
+    #   sai nhu the tu lan chup PM dau tien **09/09**.
+    #
+    # ⛔ Cai hong **⛔ khong phai** con so — no la **cau hoi**: cong hoi *"so co
+    #   bi doi khong"* nhung do **mot bang duy nhat**, trong khi `fls_run` chua
+    #   **hai lan** ghi vao **hai bang**. Dung lop loi voi `GAP-NAP-01` *(cau
+    #   ly do dung cho ca lo)* va voi `su_kien_cho` *(dem ca dong MAY ghi)*:
+    #   **mot phep do dung, dat tren mot tap sai**.
+    #
+    # ⇒ Phan biet bang `fls_chup.lan` — **da khai**, ⛔ khong suy tu hinh chuoi
+    #   `run_id`. Do 11/09: `16/16` lan nap deu co `chup_id` ⇒ ⛔ khong lan nao
+    #   roi vao nhanh `NULL`. Nhanh `NULL` van giu va van dem `fls_itl`, vi mot
+    #   lan nap ⛔ khong biet lan nao la mot lan nap ⛔ khong ai giai thich duoc.
     dkr, tsr = pv.dieu_kien("r.run_id")
     with conn.cursor() as cur:
         cur.execute(
-            "SELECT r.run_id, r.row_count,"
-            " (SELECT count(*) FROM fls_itl i WHERE i.run_id=r.run_id)::int"
-            "   AS trong_so"
-            f" FROM fls_run r WHERE {dkr} ORDER BY r.started_at DESC", tsr)
+            "SELECT r.run_id, r.row_count, coalesce(c.lan,'?') AS lan,"
+            " CASE WHEN c.lan = 'PM'"
+            "      THEN (SELECT count(*) FROM fls_pm_line p"
+            "             WHERE p.run_id = r.run_id)"
+            "      ELSE (SELECT count(*) FROM fls_itl i"
+            "             WHERE i.run_id = r.run_id) END::int AS trong_so"
+            "  FROM fls_run r LEFT JOIN fls_chup c ON c.chup_id = r.chup_id"
+            f" WHERE {dkr} ORDER BY r.started_at DESC", tsr)
         runs = _dong(cur)
     if not runs:
         ra.append(Cong(ma="RUN_DEM_KHOP", ten="So dong moi lan nap khong bi doi",
@@ -803,7 +972,8 @@ def doc_cong(conn, pv: PhamVi) -> list[Cong]:
             ma="RUN_DEM_KHOP", ten="So dong moi lan nap khong bi doi",
             dat=not xau, da_do=f"{len(runs)} lan nap",
             ly_do="; ".join(
-                f"{r['run_id']}: chot {r['row_count']} != nay {r['trong_so']}"
+                f"{r['run_id']} (lan {r['lan']}): chot {r['row_count']}"
+                f" != nay {r['trong_so']}"
                 f" — co ai doi so sau khi nap (`INV-I08`)" for r in xau)))
 
     ra += [Cong(ma=m, ten=t, dat=None, ly_do=l) for m, t, l in _CHUA_DO_DUOC]

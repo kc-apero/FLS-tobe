@@ -25,6 +25,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from fls.api import cua                                          # noqa: E402
 from fls.api.the import dong_the, khoa                           # noqa: E402
 from fls.db.kho import dsn_that, noi_chi_doc                     # noqa: E402
+from fls.repo.danh_muc_actor import ACTOR_CHAY_CUA               # noqa: E402
 
 
 def _mo_ket_noi(dsn: str):
@@ -131,7 +132,7 @@ def main() -> int:
                     help="⛔ mac dinh chi nghe may nay")
     ap.add_argument("--the-tam", type=int, metavar="GIAY",
                     help="in mot the song GIAY giay roi thoat (de thu bang curl)")
-    ap.add_argument("--actor", default="thu@apero.vn")
+    ap.add_argument("--actor", default=ACTOR_CHAY_CUA)
     ap.add_argument("--in-bang-tuyen", action="store_true")
     ap.add_argument("--cho-ghi", action="store_true",
                     help="⛔ MO NHOM GHI (P5). Mac dinh TAT: cua chay o che do "

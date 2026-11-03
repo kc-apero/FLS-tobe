@@ -108,6 +108,26 @@ forbidden_modules =
 # `tests/web/test_web_khong_biet_tang_duoi.py` ghim moc **chat hon** ay; rang
 # buoc duoi day la moc **noi long** ma `DEV-12` §3 khai. Neu bai kia do thi
 # nguoi sua phai doc lai vi sao tang nay tung ⛔ khong can gi ca.
+# ⛔⛔ `fls.xuat` — tang DUA SO RA NGOAI (ghi nguoc len Google Sheets; sau nay
+# ca bo xuat 64 cot). No ⛔ khong duoc biet tang kho.
+#
+# ⚠ Vi sao rang buoc nay quan trong: mot bo ghi ra ngoai ma doc duoc kho se de
+# tu **tu di lay so** — va luc do ⛔ khong con cho nao chan duoc *"xuat mot con
+# so ⛔ khong ai duyet"*. So phai duoc **truyen vao**, de ban chay kho va ban
+# ghi that nhin cung mot tap du lieu.
+#
+# ⛔ Va no ⛔ khong nam trong `fls.oracle` (xem `fls/xuat/__init__.py`): mot cai
+# thuoc ma ghi duoc thi khong con dung de do.
+[importlinter:contract:9]
+name = fls.xuat khong duoc biet tang kho (so phai duoc truyen vao)
+type = forbidden
+source_modules =
+    fls.xuat
+forbidden_modules =
+    fls.db
+    fls.repo
+    psycopg
+
 [importlinter:contract:8]
 name = fls.web chi duoc goi fls.api, khong duoc voi xuong tang duoi
 type = forbidden

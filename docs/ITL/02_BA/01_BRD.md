@@ -1,6 +1,6 @@
 # 01 — BRD: Business Requirements Document (dự án ITL)
 
-**Version:** v0.6 *(⛔ header từng đứng ở v0.2 trong khi changelog đã tới v0.4 — sửa 27/08)* | **Chủ sở hữu:** COO-CFO | **Nguồn:** `NGUỒN-ASIS`, `NGUỒN-BUILD`, `NGUỒN-FILES` (đọc cấu trúc thật 2026-08-18)
+**Version:** v0.8 *(⛔ header từng đứng ở v0.2 trong khi changelog đã tới v0.4 — sửa 27/08)* | **Chủ sở hữu:** COO-CFO | **Nguồn:** `NGUỒN-ASIS`, `NGUỒN-BUILD`, `NGUỒN-FILES` (đọc cấu trúc thật 2026-08-18)
 
 > ⚠ **Đính chính framing (2026-08-24)** — con số **"6.843 ô nhập tay"** trong file này là số ô cột `Final` của 7 khối `Classifying→Manual→MID→Final` *(AS-IS)*, **không** = 6.843 lần người thật gõ; ô còn cờ `Input here` thật ≈ **5.018**, và engine P&L chỉ đọc **5 trường trong hợp đồng**. **TO-BE (`QĐ-owner-0820`):** bỏ tầng `MID`; `Final` = **kế toán nhập/sửa trực tiếp** *(không phải công thức)*; hợp đồng ra = **14 trường theo TÊN** *(`le`=`P`, không phải "13 cột theo vị trí"/`BL`)*. Số đo bên dưới giữ nguyên làm bằng chứng; chỉ **cách gọi tên** được đính chính. Chi tiết: [`_BA_UPDATE_ROADMAP §3c`](_BA_UPDATE_ROADMAP.md).
 
@@ -92,7 +92,7 @@ Chuỗi truy ngược lên chương trình FIN ERP: `G-I01..G-I05` phục vụ *
 | Dây chuyền S1–S5 | adapters → `Transaction Original` → `Transaction Mapping L1` → `ITL RAW` → `ITL Ledge` |
 | 3 hợp đồng dữ liệu | `ITL-CONTRACT` · `ITL-CANON` (36 cột) · `MAPPING-MASTER` |
 | 4 vùng của `ITL Ledge` | BASE+IMPORT · ADJUSTMENT · ALLOCATE · AUDIT |
-| ⭐ **Hai màn NHẬP sổ nguồn** *(`QĐ-ITL-90`, 2026-09-07)* | **`F04`** `P100 \| Bank Transactions` ▸ `Bank Transactions` *(**7.715 dòng × 10 cột**, hdr dòng **2**, dữ liệu từ dòng **4**)* — ⚠ **sửa 07/09:** `7.484` là sheet **TRÙNG TÊN** bên `A-CCR_V2_Working`. ⭐ Tầng kế toán **GÕ VÀO** là **67 sheet `R \|`** *(**16.625 dòng**)*; sheet này là **đầu ra của máy** · **`F05`** `P100 \| Cash Ledger` ▸ `Cash Ledger Transactions` *(**1.847 dòng**, hdr dòng 2)* — *"như trên ggsheet"*. ⛔⛔ **Lật 2/4 nhóm của `QĐ-ITL-23`**; xem ghi chú dưới bảng |
+| ⭐ **Cửa NHẬN sổ nguồn** *(`QĐ-ITL-90` · **hẹp lại** bởi `QĐ-ITL-105`/`109`, 08/09)* ⚠ **§4 SỬA 08/09 — đọc khối bên dưới bảng TRƯỚC** | **`F04`** `P100 \| Bank Transactions` ▸ `Bank Transactions` *(**7.715 dòng × 10 cột**, hdr dòng **2**, dữ liệu từ dòng **4**)* — ⚠ **sửa 07/09:** `7.484` là sheet **TRÙNG TÊN** bên `A-CCR_V2_Working`. ⭐ Tầng kế toán **GÕ VÀO** là **67 sheet `R \|`** *(**16.625 dòng**)*; sheet này là **đầu ra của máy** · **`F05`** `P100 \| Cash Ledger` ▸ `Cash Ledger Transactions` *(**1.847 dòng**, hdr dòng 2)* — *"như trên ggsheet"*. ⛔⛔ **Lật 2/4 nhóm của `QĐ-ITL-23`**; xem ghi chú dưới bảng |
 | ⭐ **Ghép `PM ↔ Transaction`** *(`QĐ-ITL-48`)* | ⚠ **Đã có, ⛔ không phải việc mới:** `POST /match` + `/pm-candidates` chạy thật trên sổ thật *(`QĐ-ITL-61`)*, màn `F01` xong *(`QĐ-ITL-80`)*, đường **bỏ ghép** có *(`QĐ-ITL-69`)* |
 | Hạ tầng | orchestration (DAG) · DQ gate · lineage · versioning/snapshot |
 
@@ -103,6 +103,16 @@ Chuỗi truy ngược lên chương trình FIN ERP: `G-I01..G-I05` phục vụ *
 > ⛔ **Lý do gốc của `T4` ⛔ KHÔNG biến mất:** *60+ ngân hàng, mỗi bank một định dạng, chưa có API*. Nó ⛔ không chặn quyết định này vì đây là **hai tầng khác nhau** — 60+ sheet `R \| <tài khoản>` là nơi **sao kê thô** rơi xuống, còn `Bank Transactions` là **bảng đã gộp, một khuôn duy nhất**. `QĐ-ITL-90` lấy **tầng đã gộp**. ⇒ Tầng thô **chưa được quyết**: `GAP-SCOPE-01`.
 >
 > ⛔⛔ **Và một câu phải trả lời TRƯỚC khi gõ dòng code nào — `GAP-SCOPE-02`:** kế toán gõ vào FLS rồi thì **sheet trên P100 còn được ghi nữa không?** *Không* ⇒ P100 mất một nguồn đang chảy. *Có* ⇒ ta vừa dựng lại đúng **"ghi đôi"** mà `QĐ-ITL-32` đã bỏ. ⛔ ⛔ Không tự chọn (`R-A4`).
+
+> ⛔⛔ **SỬA 2026-09-08 — dòng *“Hai màn NHẬP”* ở trên đã CŨ ở HAI chỗ, giữ nguyên văn làm bia.**
+>
+> ⓐ **Mức nhận ⛔ không phải `Bank Transactions`.** `QĐ-ITL-105` dời khuôn nhận xuống **mức SAO KÊ THÔ — 6 trường**; `Bank Transactions` là **đầu ra của máy** *(`OP-09` bấm `Run`)*, ⛔ không phải mặt nhập liệu. Con số `7.715 dòng × 10 cột` vẫn đúng **về sheet ấy**, nhưng nó ⛔ không còn là *phạm vi của `F04`*.
+>
+> ⓑ ⛔⛔ **`F04` ⛔ KHÔNG PHẢI MÀN NHẬP.** `QĐ-ITL-109` chốt FLS **đọc vùng CHUẨN** của sheet `R |`, ⛔ **không** thay phép chuẩn hoá — vì đo sống 60 nguồn bank thì **36** nguồn bóc ngày bằng công thức riêng và **23** nguồn **ĐỔI DẤU** *(`Credit = <cột thô> × (−1)`, kèm hoán vế)*. ⇒ Cử chỉ nhập **ở lại Google Sheets**; thứ FLS thay là **nút `Run` + cú chép tay sang `A-CCR`** *(đo 07/09: **trễ 19 ngày, thiếu 377 dòng**)*.
+>
+> ⇒ **Tên đúng của `F04` là *cửa ĐỌC & SOÁT*, ⛔ không phải *màn nhập*.** Đặc tả đã theo: `BA-06` **v2.6**.
+>
+> ⚠ **Và `F05` đang là một câu HỎI, ⛔ không phải một hạng mục đã chốt** *(`GAP-SCR-13`)*: bản vẽ 08/09 **gộp** quỹ vào `F04` thành một bộ lọc, vì cả hai lằn dùng **cùng 6 trường** và **cùng một cửa dữ liệu**. Nhưng đó là **đề xuất của Dev**, ⛔ **chưa ai chốt**, và §4 của bản rà đo được **5 khác biệt** giữa hai lằn — trong đó **khuôn RA khác số cột** *(bank 10, quỹ 11)*. ⇒ Lộ trình **giữ nguyên “6 màn”** cho tới khi owner quyết.
 
 **OUT**
 
@@ -146,15 +156,17 @@ Quyết định chương trình kế thừa (ghim program `BA-01` v0.2) có liê
 | ID | Câu hỏi | Ai đóng |
 |---|---|---|
 | **`GAP-SCOPE-01`** ⛔⛔ | **Tầng sao kê THÔ có vào phạm vi không?** `QĐ-ITL-90` lấy **tầng đã gộp** *(`Bank Transactions`, một khuôn)*; còn **60+ sheet `R \| <tài khoản>`** — mỗi bank một định dạng, ⛔ chưa có API — **⛔ chưa ai quyết**. Đây chính là lý do gốc của luật `T4`, và nó ⛔ **không biến mất** | COO-CFO |
-| **`GAP-SCOPE-02`** ⛔⛔ | **Gõ vào FLS rồi thì P100 còn được ghi nữa không?** *Không* ⇒ `QĐ-ITL-38` *(Postgres = bản ghi chính)* nay áp cả cho `STM`, và **P100 mất một nguồn đang chảy**. *Có* ⇒ ta vừa dựng lại đúng **"ghi đôi"** mà `QĐ-ITL-32` đã bỏ. ⛔ **Chặn việc code** `F04`/`F05` | COO-CFO + Kế toán |
-| **`GAP-SCR-10`** ⛔ | **`F04`/`F05` ⛔ chưa có `SCREEN_SPEC`.** `BA-06` mới có `F01`·`F02`·`F03`·`F06`. ⛔ Tôi ⛔ không bịa hình dạng một màn rồi gọi đó là đặc tả *(`R-A1`)* | BA |
+| ~~`GAP-SCOPE-02`~~ ✅ | ⭐ **ĐÓNG 2026-09-07 — `QĐ-ITL-100`.** ~~*Gõ vào FLS rồi thì P100 còn được ghi nữa không?*~~ Owner chốt: **FLS thay CÚ ĐẨY, ⛔ không thay `P100`.** ⇒ kế toán **vẫn dán sao kê vào `P100`** như hôm nay *(⛔ không ghi đôi)*; FLS chỉ thế chỗ khâu **`P100` → `A-CCR`** — khâu đang **trễ 19 ngày / 377 dòng** *(`QĐ-ITL-99`)*. Hạ nguồn ⛔ **không đổi một dòng nào** | ✅ COO-CFO |
+| **`GAP-SCR-10`** ◐ | ⭐ **NỬA ĐÓNG 2026-09-07 (`CR#11`)** — `SCR-F04` **đã có đặc tả** *(`BA-06` §7, 5 trạng thái + biên bản soát **9** luật — `S1`…`S8` + `S10`; ~~8~~ sửa 08/09)*, và nó ⛔ **không bịa**: hình dạng lấy từ **bản khai dòng 1** kế toán đã tự duy trì *(**68/68** sheet)* + **3 quyết định owner** *(`QĐ-ITL-105`)*. ⛔ **Còn `F05` (sổ quỹ) chưa có.** ⚠ ⛔ Không đóng hẳn GAP này chỉ vì một nửa đã xong — đó là **nói quá** | BA |
 | `GAP-ITL-10` | Đích cho `KPI-I01`/`KPI-I04`: giảm thủ công xuống bao nhiêu % là "đạt"? | COO-CFO |
 | ~~`GAP-ITL-17`~~ | ~~Mở phạm vi sang 4 ledger nền tảng?~~ | **CLOSED** 2026-08-18 — `QĐ-ITL-05` **CÓ** |
 | `GAP-ITL-18` | `QĐ-ITL-05` đưa L4 (phân bổ venture) vào phạm vi ⇒ ranh giới ITL ↔ engine ACA v2 (đang làm phân bổ trên BigQuery) ở đâu? | COO-CFO + Tech Lead |
 | `GAP-ITL-11` | **6.711 dòng lệch audit** là lỗi dữ liệu cũ hay lỗi công thức audit? Nếu là lỗi dữ liệu, oracle không sạch ⇒ phải chọn kỳ chuẩn khác để đối chiếu | Kế toán trưởng + PIC ADJUSTMENT |
 
 ## Changelog
+- **v0.7** *(2026-09-07, đồng bộ tiến độ)*: ⭐ **`GAP-SCOPE-02` ĐÓNG** *(`QĐ-ITL-100` — FLS thay **CÚ ĐẨY**, ⛔ không thay `P100`)*. ⛔⛔ **Đây là một MÂU THUẪN GIỮA HAI FILE, ⛔ không phải một mục quên cập nhật:** dashboard §4b và `MASTER` §3 đã ghi ĐÓNG từ hôm 07/09, còn file này **vẫn nói nó ⛔ chặn việc code** — hai tài liệu trục nói ngược nhau về **cùng một quyết định owner đã ra**. ⚠ **Cổng số sống ⛔ không thấy được lớp lệch này** *(nó so **con số**, mà đây là **trạng thái**)* ⇒ ghi lại như một lỗ đo, ⛔ không lặng lẽ vá.
 - **v0.6** *(2026-09-07, rà AS-IS)*: ⛔ **Sửa con số `F04` trong §4** — `7.484` là sheet **TRÙNG TÊN** bên `A-CCR_V2_Working`; bản `P100` là **7.715 dòng × 10 cột** *(hdr dòng 2, dữ liệu dòng 4)*. ⭐ Ghi thêm: tầng kế toán **gõ vào** là **67 sheet `R \|`** *(**16.625 dòng**)*, sheet `Bank Transactions` là **đầu ra của máy**.
+- **v0.8** *(2026-09-08, `QĐ-ITL-105`/`107`/`108`/`109`)*: ⛔⛔ **§4 — dòng *“Hai màn NHẬP sổ nguồn”* đã CŨ ở HAI chỗ**, thêm khối đính chính ngay dưới bảng `IN`, ⛔ **không xoá nguyên văn** *(giữ làm bia)*. ⓐ Mức nhận là **sao kê THÔ 6 trường**, ⛔ không phải `Bank Transactions`. ⓑ **`F04` ⛔ không phải màn nhập** mà là **cửa ĐỌC & SOÁT** — cử chỉ nhập **ở lại Google Sheets**, vì **23/60** nguồn **đổi dấu** khi chuẩn hoá và chở 60 phép biến đổi sang FLS là mở chỗ để **sai DẤU tiền**. ⚠ **`F05` hạ từ *hạng mục đã chốt* xuống *câu hỏi*** *(`GAP-SCR-13`)* — bản vẽ gộp vào `F04`, nhưng đó là **đề xuất của Dev**, ⛔ chưa ai chốt; lộ trình giữ **6 màn**.
 - **v0.5** *(2026-09-07, `QĐ-ITL-90` / `CR#10`)*: ⭐⭐⭐ **MỞ PHẠM VI — FLS cầm luôn hai màn NHẬP `Bank Transaction` + `Cash Ledger`.** §4 thêm hai hạng mục `IN` *(`F04` **7.715** dòng · `F05` 1.847 dòng)* + một hạng mục **xác nhận** *(ghép `PM ↔ Transaction` đã có từ `QĐ-ITL-48`, ⛔ không phải việc mới)*. ⛔⛔ **Nó lật `QĐ-ITL-23`** — quyết định 22/08 chốt Google Sheets giữ vai nhập liệu thô **VĨNH VIỄN** cho 4 nhóm; nay **2/4 bị lấy lại**. Hẹp luật **`T4`**, hồi sinh màn **`S4`** đã BỎI. ⛔ **Ba câu chưa ai trả lời**, ghi ra chứ ⛔ không tự chọn *(`R-A4`)*: `GAP-SCOPE-01` *(tầng sao kê thô 60+ định dạng)* · `GAP-SCOPE-02` *(P100 còn được ghi nữa không — nếu có thì đó là **ghi đôi**)* · `GAP-SCR-10` *(⛔ chưa có `SCREEN_SPEC`)*
 - v0.4 (2026-08-18): Thêm §2c — sau khi đọc reader thật: **75% ô nhập tay (5.113) KHÔNG tới engine**, chỉ 1.730 ô ảnh hưởng P&L ⇒ đổi cách ưu tiên tự động hoá.
 - v0.3 (2026-08-18): Owner phê **`QĐ-ITL-05` mở phạm vi** — đóng `GAP-ITL-17`, `KPI-I02b` thành đích chính thức, mở `GAP-ITL-18` (ranh giới với engine ACA v2 ở tầng L4).

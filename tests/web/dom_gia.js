@@ -40,6 +40,22 @@ function lam_dom() {
       disabled: false,
       value: '',
       placeholder: '',
+      // ⭐⭐ Hai so DAN TRANG — mac dinh `0` ca hai, tuc *"⛔ khong bi cat"*.
+      //
+      // ⛔⛔ Mot DOM gia ⛔ khong dan trang duoc, nen no ⛔ **KHONG** the tu
+      //    sinh hai so nay. Bai thu phai **tu dat** *(`e._scrollHeight = 40`)*
+      //    — va do la mot gioi han **phai noi ra**, ⛔ khong phai mot phep do.
+      // ⭐ Cai do duoc o day la **LUAT**: *"chi moi `đủ ↓` khi
+      //   `scrollHeight > clientHeight`"*. Con **con so that** thi chi trinh
+      //   duyet that tra loi duoc (`NFR-I10`).
+      // ⭐ `scrollTop` la mot so GHI DUOC that — khac hai so tren. Man
+      //   phai **nho va tra lai** no qua moi lan `ve()`, va do la mot luat
+      //   do duoc bang DOM gia: dung `ve()` xoa het cay thi no ve `0`.
+      scrollTop: 0,
+      _scrollHeight: 0,
+      _clientHeight: 0,
+      get scrollHeight() { return e._scrollHeight; },
+      get clientHeight() { return e._clientHeight; },
       scrollIntoView() { },
       focus() { e._focus = true; },
       setSelectionRange() { },
@@ -56,8 +72,34 @@ function lam_dom() {
       setAttribute(k, v) { e[k] = v; },
       getAttribute(k) { return e[k]; },
       querySelector(s) { return tim(e, s)[0] || null; },
-      querySelectorAll(s) { return tim(e, s); }
+      querySelectorAll(s) { return tim(e, s); },
+      // ⭐ `addEventListener` tren TUNG the — them 09/09.
+      //
+      // ⛔⛔ Truoc no, `hop_thoai.js` NO ngay dong dau (`s.addEventListener is
+      // not a function`) ⇒ **⛔ khong bai nao thu duoc mot hop thoai**, ke ca
+      // hop thoai cua mot cu bam GHI. Do ⛔ khong phai mot han che co chu y —
+      // `document` da co ham nay, chi TUNG THE la thieu.
+      // ⚠ Ghi vao mot so ghi RIENG cua the (⛔ khong noi bot lan len cay): bo
+      //    bai goi tay `_nghe` khi can, va mot phep noi bot GIA se lam bai tin
+      //    rang mot cu bam **da lan** trong khi that ra ⛔ khong.
+      addEventListener(ten, f) {
+        (e._nghe[ten] = e._nghe[ten] || []).push(f);
+      },
+      removeEventListener(ten, f) {
+        e._nghe[ten] = (e._nghe[ten] || []).filter(x => x !== f);
+      },
+      // ⭐ `insertAdjacentHTML` — them 05/10 *(`WO-045`)*. `man_f01.js` goi
+      // no o **hai** cho *(`_thanh_loc` khi CHI DOC · chan luoi khi het
+      // trang)* ⇒ truoc no, **⛔ bai nao** ve duoc lan tien o che do chi doc
+      // — dung che do `ⓦ` ② doi kiem. ⛔ Van ⛔ phan tich HTML *(luat dau
+      // tep)*: chuoi vao MOT the con, giu nguyen van de doi chieu chuoi.
+      insertAdjacentHTML(_vi_tri, html) {
+        const c = tao('span');
+        c.innerHTML = html;
+        e.appendChild(c);
+      }
     };
+    e._nghe = {};
     e.classList = {
       add(...c) {
         const l = _lop(e);
@@ -139,6 +181,11 @@ function lam_dom() {
         return false;
       }
       if (p.startsWith('#')) return e.id === p.slice(1);
+      /* ⚠⚠ Chi `[a-z-]` — mot khoa `data-` co **gach duoi** se ⛔
+         KHONG khop mau nay, roi roi xuong nhanh tag/lop va khop **⛔
+         khong gi**. ⛔ Va no ⛔ khong bao loi: bai kiem nhan `[]` va
+         doc thanh *"man hinh ⛔ khong ve"*. Da can that 08/09
+         (`[data-sid_bb]`). ⇒ Dat ten neo bang **mot tu**. */
       const m = p.match(/^\[([a-z-]+)\]$/);
       if (m) {
         const k = m[1].replace(/^data-/, '')

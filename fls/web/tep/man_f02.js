@@ -460,7 +460,7 @@ const F02 = (function () {
         td.appendChild(TP.el('span', 'chip ' + (xong ? 'ok' : 'lock'),
           xong ? '✓ đã phân loại' : 'chưa phân loại'));
       } else {
-        td.textContent = _hien(k, v);
+        td.textContent = _hien(k, v, r.curr);
       }
       if (k.kieu === 'tien' && Number(v) < 0) td.classList.add('neg');
       if (k.khoa === 2) {
@@ -543,9 +543,11 @@ const F02 = (function () {
              + 'Người không gõ được ô này (QĐ-ITL-64).';
   }
 
-  function _hien(k, v) {
+  /* ⭐ `curr` = tien te CUA CHINH DONG ay *(`WO-022` §5b ⓔ)* — o tien in
+     theo so le cua no, ⛔ doan. */
+  function _hien(k, v, curr) {
     if (v === null || v === undefined || v === '') return '—';
-    if (k.kieu === 'tien') return TP.tien(v);
+    if (k.kieu === 'tien') return TP.tien(v, curr);
     if (k.kieu === 'so') return TP.so(v);
     if (k.truong === 'is_flash') return v ? 'nháp' : 'đã đối soát';
     return String(v);
@@ -580,8 +582,9 @@ const F02 = (function () {
        xay ra" van phai co cau tra loi, ⛔ khong duoc de roi xuong nhanh khac. */
     if (no && co) {
       return { tri: null, am: false,
-               canh: 'CẢ HAI vế khác 0 — Nợ ' + TP.tien(r.ps_no) + ' Có '
-                     + TP.tien(r.ps_co) + '. Máy không chọn hộ' };
+               canh: 'CẢ HAI vế khác 0 — Nợ ' + TP.tien(r.ps_no, r.curr)
+                     + ' Có ' + TP.tien(r.ps_co, r.curr)
+                     + '. Máy không chọn hộ' };
     }
     if (no) return { tri: r.ps_no, am: false, canh: '' };
     if (co) return { tri: r.ps_co, am: true, canh: '' };
@@ -713,6 +716,11 @@ const F02 = (function () {
     });
 
     document.addEventListener('keydown', function (e) {
+      // ⛔⛔ `WO-023` `(a)` *(`BA-06` v4.11 `ⓕ1`)*: hop `HT` dang mo ⇒ phim
+      //    ⛔ thuoc ve luoi sau lung. Ban truoc: `Ctrl+Z` hoan tac mot o luoi
+      //    trong khi nguoi dang doc hop *"Ô này đã vào sổ rồi"* — chinh hop ma
+      //    `Ctrl+Z` vua mo. Xem luat ⓓ dau `hop_thoai.js`.
+      if (typeof HT !== 'undefined' && HT.nuot_phim && HT.nuot_phim(e)) return;
       const td = ST.o;
       if (!td || !document.body.contains(td)) return;
       if (!TP.$('#man-f02').classList.contains('on')) return;
@@ -1124,10 +1132,10 @@ const F02 = (function () {
        **cho xem ca hai**, ⛔ khong bang mot dau gach. */
     if (t.canh) {
       st.appendChild(TP.el('span', 'amt doi',
-        'Nợ ' + TP.tien(r.ps_no) + ' Có ' + TP.tien(r.ps_co)));
+        'Nợ ' + TP.tien(r.ps_no, r.curr) + ' Có ' + TP.tien(r.ps_co, r.curr)));
     } else {
       st.appendChild(TP.el('span', 'amt' + (t.am ? ' neg' : ''),
-        t.tri === null ? '0' : (t.am ? '−' : '+') + TP.tien(t.tri)));
+        t.tri === null ? '0' : (t.am ? '−' : '+') + TP.tien(t.tri, r.curr)));
     }
     st.appendChild(TP.el('span', 'muted', TP.chu(r ? (r.curr || '') : '')));
     /* ⭐ Chip HUONG tien — chu, ⛔ khong chi dau `+`/`−`. Rang buoc #9 cua ban
@@ -1486,6 +1494,66 @@ const F02 = (function () {
     return b;
   }
 
+  /* ═══ ⑦ Nhật ký — ô THÀNH + ô NGUỒN đọc theo `value_source` ═══════════
+     ⭐ `BA-06` v4.8 dòng *"F02 · nhật ký trong drawer"* · `BA-10` v0.8
+       `DT-I14` *"Nhật ký của bản đảo — đọc thế nào"* · `KQ-007 F-1`.
+
+     ⛔⛔ **Lỗi đã đo, ⛔ lo xa** *(`KQ-007`, kho TEST, dòng `P1`)*: bỏ ghép
+       đảo **mọi** lớp gợi ý máy, và bản đảo ghi nhật ký `value_after = NULL`
+       *(luật GHI ⛔ đổi — `NULL` nghĩa "lớp này hết hiệu lực")*. Bảng cũ in
+       nguyên ô **trống** ⇒ dòng cuối của ô `hd` đọc thành *"HD-A → (trống)"*
+       ngay dưới dòng người vừa gõ `HD-NGUOI` ⇒ người đọc từ trên xuống
+       **tưởng giá trị mình gõ đã mất**. Thật ra gợi ý máy **⛔ bao giờ** là
+       Final *(`QĐ-ITL-149`)* nên rút nó ⛔ đổi Final.
+       ⇒ Màn nói đúng điều ấy: *"rút gợi ý"*, ⛔ một ô trống.
+
+     ⛔ Nhãn nguồn: chỉ **hai** mã có nhãn người đọc. Mã khác *(hay rỗng)* ⇒
+       in **nguyên mã** — ⛔ đoán nhãn cho một mã chưa ai khai *(spec nói thẳng)*.
+     ⚠ Spec viết *"máy gợi ý · ⛔ đổi Final"*; tệp này nằm trong luật ký hiệu
+       *(`test_luat_ky_hieu_man_hinh.py` — `⛔` cấm trong VĂN BẢN)* ⇒ chữ trơn
+       *"không đổi Final"* *(`WO-008` Rủi ro 1)*.
+     ⚠ ~~Ca **nhánh 8** *(`sua_tay` cũ dưới giá trị người)* vẫn in trống với
+       nguồn *"người sửa"* — spec v4.8 **chấp nhận** *(sổ thật 0, tập đóng)*.~~
+       ⛔⛔ *(đính chính `WO-023` `(f)` — `BA-06` v4.12, `KQ-025 F-3`)* câu
+       *"chấp nhận · tập đóng"* **sai**: nút `Đảo` ở ⑥ có trên **mọi** bút toán
+       ⛔ phải bản đảo ⇒ tập **mở**; đo `KQ-025` *(8099, chuột thật)*: người gõ
+       `HD-NGUOI-C` rồi `Đảo` ⇒ ⑦ in `HD-NGUOI-C → (trống) · người sửa` —
+       **y hệt** một cú người xoá ô, trong khi Final lùi về lớp dưới.
+     ⭐ v4.12: cửa `GET /journal` trả `la_ban_dao` *(`BA-07` v3.6)* ⇒ ô
+       **thành** theo bảng ⓐ…ⓔ *(xem `_nk_thanh`)*; cột **nguồn** ⛔ đổi. */
+  const NHAN_NGUON_NK = { may_goi_y: 'máy gợi ý · không đổi Final',
+                          sua_tay: 'người sửa' };
+
+  function _nk_nguon(ma) {
+    return Object.prototype.hasOwnProperty.call(NHAN_NGUON_NK, ma)
+      ? NHAN_NGUON_NK[ma] : TP.chu(ma);
+  }
+
+  /* ⭐ `BA-06` v4.12 dòng *"F02 · nhật ký"* — bảng ⓐ…ⓔ:
+       ⓐ bản đảo ∧ `may_goi_y` ⇒ *"rút gợi ý"* *(như v4.8 — ⛔ đổi)*
+       ⓑ bản đảo ∧ `sua_tay`   ⇒ chữ mờ *"đảo — giá trị này hết hiệu lực"*
+       ⓒ ⛔ bản đảo ∧ `sua_tay` ∧ `value_after` rỗng ⇒ chữ mờ *"xoá ô"*
+       ⓓ còn lại ⇒ như v4.8 *(giá trị đậm / *"gợi ý: X"*)*
+       ⓔ cửa ⛔ trả `la_ban_dao` *(thiếu / `null`)* ⇒ như hôm nay — ⛔ đoán.
+     ⚠ ⛔ in *"Final về <giá trị>"*: đảo một giá trị người **⛔ nằm trên cùng**
+       *(gõ A rồi B, đảo A)* thì Final **⛔ đổi** — câu *"hết hiệu lực"* luôn
+       đúng, câu về Final thì ⛔. ⛔ So `value_after` rỗng để đoán bản đảo: cú
+       xoá ô **cũng** rỗng — đúng lỗi `KQ-025 F-3`. */
+  function _nk_thanh(x) {
+    const v = x.value_after;
+    const rong = v === null || v === undefined || v === '';
+    const dao = x.la_ban_dao;
+    if (x.value_source === 'may_goi_y') {
+      return rong || dao === true ? '<span class="muted">rút gợi ý</span>'
+                                  : 'gợi ý: <b>' + TP.chu(v) + '</b>';
+    }
+    if (x.value_source === 'sua_tay' && dao === true)
+      return '<span class="muted">đảo — giá trị này hết hiệu lực</span>';
+    if (x.value_source === 'sua_tay' && dao === false && rong)
+      return '<span class="muted">xoá ô</span>';
+    return '<b>' + TP.chu(v) + '</b>';
+  }
+
   function _nhom(ten, html) {
     return '<div class="grp"><div class="t">' + ten + '</div>' + html + '</div>';
   }
@@ -1654,7 +1722,7 @@ const F02 = (function () {
     const g1 = ['doc_date', 'doc_no', 'memo', 'curr', 'ps_no', 'ps_co',
                 'acct', 'le', 'le_payer'].map(function (f) {
       const k = tat_ca.find(x => x.truong === f) || { kieu: 'chu' };
-      return [ten[f] || f, _hien(k, d[f]), '', k.van];
+      return [ten[f] || f, _hien(k, d[f], d.curr), '', k.van];
     });
 
     // ② Bay o SUA — nguon noi gi vs nguoi go gi. ⇒ dung `_nhom_go` (the THAT,
@@ -1734,7 +1802,9 @@ const F02 = (function () {
       ? '<table><thead><tr><th>lệnh chi</th><th class="r">tiền</th>'
         + '<th>hình</th><th class="r">lần</th></tr></thead><tbody>'
         + mn.map(x => '<tr><td class="mono">' + TP.chu(x.pm_line_id)
-            + '</td><td class="r">' + TP.tien(x.amount) + '</td><td>'
+            /* ⭐ Moi noi CUNG tien te voi dong so: cua ghep tu choi khac
+               tien te *(`ghi_tay.ghep_lenh` ⓔ `KhacTienTe`)* ⇒ `d.curr`. */
+            + '</td><td class="r">' + TP.tien(x.amount, d.curr) + '</td><td>'
             + TP.chu(x.hinh) + '</td><td class="r">' + TP.so(x.lan)
             + '</td></tr>').join('') + '</tbody></table>'
       : '<span class="muted">chưa ghép lệnh chi nào</span>';
@@ -1756,6 +1826,9 @@ const F02 = (function () {
             + (x.reversal_of ? '<span class="chip lock">bản đảo của #'
                  + x.reversal_of + '</span>'
                : '<button class="b tiny" data-dao="' + x.adj_id
+                 /* ⭐ `WO-023` `(g)`: lớp của **chính** bút toán *(⛔ suy theo
+                    ô — ô có thể mang gợi ý máy **dưới** giá trị người)* */
+                 + '" data-nguon="' + TP.chu(x.nguon == null ? '' : x.nguon)
                  + '">Đảo</button>')
             + '</td></tr>').join('') + '</tbody></table>'
       : '<span class="muted">chưa ai gõ tay ô nào của dòng này</span>';
@@ -1769,9 +1842,9 @@ const F02 = (function () {
         + nk.map(x => '<tr><td class="mono">'
             + TP.chu(String(x.at).slice(0, 16)) + '</td><td>'
             + TP.chu(x.field) + '</td><td class="muted">'
-            + TP.chu(x.value_before) + '</td><td><b>'
-            + TP.chu(x.value_after) + '</b></td><td>' + TP.chu(x.actor)
-            + '</td><td class="muted">' + TP.chu(x.value_source)
+            + TP.chu(x.value_before) + '</td><td>'
+            + _nk_thanh(x) + '</td><td>' + TP.chu(x.actor)
+            + '</td><td class="muted">' + _nk_nguon(x.value_source)
             + '</td><td>' + TP.chu(x.reason) + '</td></tr>').join('')
         + '</tbody></table>'
       : '<span class="muted">nhật ký trống — chưa ai sửa dòng này</span>';
@@ -1785,7 +1858,7 @@ const F02 = (function () {
 
     setTimeout(function () {
       document.querySelectorAll('[data-dao]').forEach(function (b) {
-        b.onclick = () => _dao(Number(b.dataset.dao), d.itl_id);
+        b.onclick = () => _dao(Number(b.dataset.dao), d.itl_id, b.dataset.nguon);
       });
     }, 0);
 
@@ -2145,13 +2218,33 @@ const F02 = (function () {
     return true;
   }
 
-  function _dao(adj_id, itl_id) {
-    HT.mo('Đảo bút toán #' + adj_id,
+  /* ⭐⭐ `WO-023` `(g)` *(`BA-06` v4.12 dòng *"F02 · hoàn tác"*, `KQ-025
+     F-4`)* — hộp nói hậu quả theo **LỚP** của bút toán bị đảo *(`nguon` của
+     **chính** bút toán, `GET /ledger/{itl_id}` `but_toan[].nguon` — `BA-07`
+     v3.6)*. ⛔⛔ Bản trước nói *"Sau khi đảo, giá trị lùi về bút toán trước
+     đó, hay về giá trị của sổ gốc…"* cho **mọi** bút toán — kể cả gợi ý
+     máy, nơi đảo **⛔ đổi Final** *(`QĐ-ITL-149`; tầm **4.424** nút trên sổ
+     thật)*. Chữ **nguyên văn** bảng ⓐ…ⓒ; mã lạ ⇒ in mã, ⛔ đoán. */
+  function _hau_qua_dao(adj_id, nguon) {
+    if (nguon === 'may_goi_y') return ['Rút gợi ý máy #' + adj_id,
+      'Đây là gợi ý của máy, không phải giá trị người đã chốt. Rút nó '
+      + '<b>không đổi Final</b> — Final vẫn là giá trị người đã gõ, hay giá '
+      + 'trị của sổ gốc.'];
+    if (nguon === 'sua_tay') return ['Đảo bút toán #' + adj_id,
+      'Giá trị này hết hiệu lực. Nếu nó đang là Final thì Final lùi về giá '
+      + 'trị người gõ trước đó, hay về giá trị của sổ gốc nếu không còn.'];
+    return ['Đảo bút toán #' + adj_id,
+      'Bút toán này hết hiệu lực. Máy chưa biết nó thuộc lớp nào ('
+      + TP.chu(nguon ? nguon : '—') + ') nên không nói trước Final sẽ ra sao '
+      + '— mở nhật ký sau khi đảo để xem.'];
+  }
+
+  function _dao(adj_id, itl_id, nguon) {
+    const [tieu_de, hau_qua] = _hau_qua_dao(adj_id, nguon);
+    HT.mo(tieu_de,
       '<div class="note">Đảo <b>không xoá</b> gì cả — nó <b>thêm một dòng '
       + 'nữa</b> trỏ ngược lại (<span class="mono">SM-I03</span> · '
-      + '<span class="mono">INV-I08</span>). Sau khi đảo, giá trị lùi về bút '
-      + 'toán trước đó, hay về giá trị của sổ gốc nếu không còn bút toán '
-      + 'nào.</div>'
+      + '<span class="mono">INV-I08</span>). ' + hau_qua + '</div>'
       + '<div style="margin-top:8px"><input class="inp" id="so-dao" '
       + 'style="width:100%" placeholder="vì sao đảo…"></div>',
       [['Đảo', async function () {
@@ -2190,5 +2283,9 @@ const F02 = (function () {
   // ⚠ `_lam_moi` lo ra CHO BO TEST: canh huong *"lo bay xong trong luc
   //   nguoi ta dang go"* la mot canh huong **thoi gian**, va cach duy
   //   nhat de do no ma ⛔ khong phai cho 2,5 giay that la goi thang.
-  return { ve, mo_drawer, dong_drawer, _bay, _loc, _dat, _lam_moi, ST };
+  // ⚠ `_dao` lo ra CHO BO TEST *(`WO-023` `(g)`)*: nut `Đảo` dung tu
+  //   `innerHTML` + gan `onclick` trong `setTimeout` ⇒ DOM gia ⛔ phan tich
+  //   HTML nen ⛔ bam duoc. Bai doc `data-nguon` cua tung nut trong HTML ⑥
+  //   roi goi `_dao` voi **dung** ba tham so nut se goi; Chrome bam nut that.
+  return { ve, mo_drawer, dong_drawer, _bay, _loc, _dat, _lam_moi, _dao, ST };
 })();

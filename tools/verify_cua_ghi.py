@@ -38,6 +38,7 @@ from fls.api import cua, the                                     # noqa: E402
 from fls.api.bang_tuyen import TIEN_TO                           # noqa: E402
 from fls.db.kho import dsn_test, dsn_that, noi_chi_doc           # noqa: E402
 from fls.repo import ghi_tay as gt                               # noqa: E402
+from fls.repo.danh_muc_actor import ACTOR_VERIFY_CUA_GHI         # noqa: E402
 
 # Cac cot cua `fls_itl` PHAI khong doi sau ca vong ghi (`INV-I08`+`QĐ-ITL-35`).
 COT_PHAI_GIU = ("hd", "hd_thyt", "pay_type", "pay_type_thyt", "cdt1",
@@ -119,7 +120,7 @@ def main() -> int:
     may = cua.dung_may(_mo_doc(dsn), cong=0, mo_ghi=_mo_ghi(dsn))
     threading.Thread(target=may.serve_forever, daemon=True).start()
     the_thu = the.dong_the(
-        {"sub": "cong-ghi@apero.vn", "exp": int(time.time()) + 120}, the.khoa())
+        {"sub": ACTOR_VERIFY_CUA_GHI, "exp": int(time.time()) + 120}, the.khoa())
 
     def goi(pt, duong, than=None):
         cl = http.client.HTTPConnection(*may.server_address, timeout=30)

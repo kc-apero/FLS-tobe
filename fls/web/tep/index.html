@@ -43,17 +43,14 @@
   <div class="tabs">
     <button data-s="man-f03" aria-pressed="true">① Cổng hôm nay · F03</button>
     <button data-s="man-f01">② Hàng chờ · F01</button>
+    <!-- ⭐⭐ `QĐ-ITL-148` · chặng `B3` — màn GÁN LỆNH CHI theo HỢP ĐỒNG
+         THIẾT KẾ. ⛔ Lằn `F01` cũ **⛔ không bị xoá**: nó còn giữ ghi lý do ·
+         hoãn · bấm xong, và bỏ nó lúc này là bỏ bốn việc chưa ai thay. -->
+    <button data-s="man-ghep">②b Gán lệnh chi</button>
     <button data-s="man-f02">③ Sổ ITL · F02</button>
-    <button data-s="man-f06" disabled>④ Danh mục · F06 <span class="faint">(B6)</span></button>
+    <button data-s="man-f04">④ Nạp sao kê · F04</button>
+    <button data-s="man-f06" disabled>⑤ Danh mục · F06 <span class="faint">(B6)</span></button>
   </div>
-
-  <p class="hint">
-    ⚠ <b>Cổng hôm nay</b>, <b>Hàng chờ</b> và <b>Sổ ITL</b> đã nối cửa thật.
-    Màn <b>Danh mục</b> mờ đi <b>⛔ không phải vì hỏng</b>, mà vì
-    <b>chưa tới lượt</b> — và nó đang <b>bị chặn</b>: cửa
-    <span class="mono">GET /catalog</span> mà đặc tả bảo “đã khai” thì
-    <b>⛔ không hề có</b> (<span class="mono">GAP-SPEC-01</span>).
-  </p>
 
   <section class="screen on" id="man-f03">
     <div class="stack">
@@ -65,6 +62,22 @@
             <span class="mono">GET /gates</span></span>
         </header>
         <div class="pad stack" id="than-f03"></div>
+      </div>
+
+      <!-- ⭐⭐⭐ B0 · MAU SO cua tac vu ① (`QĐ-ITL-118`).
+           ⛔⛔ Dat TREN "do phu hang cho" **co y**: moi ty le do phu tu 27/08
+           den 09/09 deu chia cho **10.030** (ca so), va phep do `B0` noi mau
+           so that la **8.246** (ve `PS Co`). Mot con so dung chia cho mot mau
+           so sai la mot con so ⛔ khong ai kiem duoc — nen mau so phai duoc
+           doc TRUOC cac ty le duoi no. -->
+      <div class="card">
+        <header>
+          <h3>Mẫu số của việc ghép lệnh chi</h3>
+          <span class="spacer"></span>
+          <span class="muted" style="font-size:12px">
+            <span class="mono">GET /queue/mau-so</span></span>
+        </header>
+        <div class="pad stack" id="than-mau-so"></div>
       </div>
 
       <div class="row">
@@ -106,9 +119,136 @@
   <section class="screen" id="man-f01">
     <div class="stack" id="than-f01"></div>
   </section>
+  <section class="screen" id="man-ghep">
+    <div class="dai-tim"><input id="ghep-tim" placeholder="Tìm giao dịch (/)"></div>
+    <div id="ghep-goc"></div>
+  </section>
   <section class="screen" id="man-f02">
     <div class="stack" id="than-f02"></div>
   </section>
+
+  <!-- ⭐⭐⭐ F04 · NAP SAO KE (`P7` task `6`, `BA-06` §7 v2.7)
+       ⛔⛔ **⛔ KHONG PHAI MAN DAN** (`QĐ-ITL-109`). FLS doc **vung CHUAN**
+       cua sheet `R |`; cu chi `Ctrl+V` **o lai Google Sheets**; man nay ⛔
+       khong co MOT O NHAP NAO cho du lieu giao dich. Nam khoi = nam trang
+       thai cua `BA-06` §7 ⓶. -->
+  <section class="screen" id="man-f04">
+    <div class="stack">
+
+      <div class="note">
+        <b>Màn này thay đúng một việc: nút Run và cú chép tay sang A-CCR.</b>
+        Kế toán vẫn dán sao kê vào sheet <span class="mono">R |</span> như cũ,
+        công thức chuẩn hoá vẫn ở lại đó. FLS chỉ đọc 6 cột đã chuẩn, soát 9
+        luật, rồi nhận. Không có ô nhập nào cho dữ liệu giao dịch ở đây.
+      </div>
+
+      <div class="card">
+        <header>
+          <h3>Bước 1 · Chọn phạm vi</h3>
+          <span class="spacer"></span>
+          <span class="muted" style="font-size:12px">
+            <span class="mono">GET /sources</span></span>
+        </header>
+        <div class="pad stack" id="nap-chon"></div>
+      </div>
+
+      <section class="card" id="nap-khai" hidden>
+        <header>
+          <h3>Bản khai cột của nguồn</h3>
+          <span class="spacer"></span>
+          <span class="muted" style="font-size:12px">
+            <span class="mono">GET /sources/{id}/khai-cot</span></span>
+        </header>
+        <div class="pad stack"></div>
+      </section>
+
+      <div class="card">
+        <header>
+          <h3>Bước 2 · FLS đọc vùng chuẩn</h3>
+          <span class="spacer"></span>
+          <span class="muted" style="font-size:12px">
+            <span class="mono">GET /chup</span></span>
+        </header>
+        <div class="pad stack" id="nap-doc"></div>
+      </div>
+
+      <section class="card" id="nap-xem" hidden>
+        <header>
+          <h3>Xem trước sáu cột của vùng chuẩn</h3>
+          <span class="spacer"></span>
+          <span class="muted" style="font-size:12px">
+            <span class="mono">GET /chup/{id}</span></span>
+        </header>
+        <div class="pad stack"></div>
+      </section>
+
+      <!-- ⭐⭐ `QĐ-ITL-113` — THU TU NGAY do NGUON khai.
+           ⛔ Do tren anh chup THAT: 1.894/8.368 dong (22,6%) co ngay doc duoc
+           HAI cach, trai 29/60 nguon — va 29/29 nguon ay la `mdy`, 0 nguon
+           `dmy`. Nen man ⛔ KHONG duoc dat `dmy` lam mac dinh "vi day la Viet
+           Nam": lam the la hoan ngay<->thang tren 1.894 dong (QĐ-ITL-17).
+           ⛔ May DE XUAT kem bang chung; NGUOI bam khai. -->
+      <section class="card" id="nap-thu-tu-khung" hidden>
+        <header>
+          <h3>Cách đọc ngày của từng nguồn</h3>
+          <span class="spacer"></span>
+          <span class="muted" style="font-size:12px">
+            <span class="mono">GET /chup/{id}/thu-tu</span></span>
+        </header>
+        <div class="pad stack" id="nap-thu-tu"></div>
+      </section>
+
+      <!-- ⭐ `Soát` dứng ở đây vì nó **sinh ra** Bước 3. -->
+      <div class="ctl">
+        <button class="b" id="nap-nut-soat" disabled>Soát</button>
+        <span class="muted" style="font-size:12.5px" id="nap-vi-sao"></span>
+      </div>
+
+      <section class="card" id="nap-bb" hidden>
+        <header>
+          <h3>Bước 3 · Biên bản soát chín luật</h3>
+          <span class="spacer"></span>
+          <span class="muted" style="font-size:12px">
+            <span class="mono">POST /nap/xem-truoc</span></span>
+        </header>
+        <div class="pad stack"></div>
+      </section>
+
+      <!-- ⭐⭐ `Nhận` dứng SAU biên bản, vì nó **tiêu thụ** biên bản.
+           ⛔ Trước 08/09 hai nút nằm cạnh nhau **trên** Bước 3, nên muốn
+           Nhận thì phải cuộn xuống đọc biên bản rồi cuộn NGƯỢC LÊN để bấm —
+           với 60 nguồn đó là một cuộn dài, và cú bấm phải cuộn ngược lại
+           đúng là **cú ghi vào sổ**. -->
+      <div class="ctl">
+        <button class="b pri" id="nap-nut-nhan" disabled>Nhận</button>
+        <span class="muted" style="font-size:12.5px" id="nap-vi-sao-2"></span>
+      </div>
+
+      <section class="card" id="nap-nhan" hidden>
+        <header>
+          <h3>Bước 4 · Đã nhận</h3>
+          <span class="spacer"></span>
+          <span class="muted" style="font-size:12px">
+            <span class="mono">POST /nap</span></span>
+        </header>
+        <div class="pad stack"></div>
+      </section>
+
+      <!-- ⛔ Man nay CO Y ⛔ khong co ba thu (`BA-06` §7 ⓺). Khai RA tren man
+           chu ⛔ khong de trong: mot cho trong doc thanh "chua lam", con mot
+           cau khai thang doc thanh "co ly do". -->
+      <div class="note warn">
+        <b>Ba thứ màn này cố ý không có.</b>
+        Nút đẩy sang A-CCR: đó là khâu sau, và nó còn chờ chủ sổ cho phép
+        (<span class="mono">GAP-PLAN-05</span>). Sửa giá trị ô ngay lúc nạp:
+        sửa là thêm một bút toán, và chỗ sửa là màn Sổ ITL. Bước duyệt của
+        người thứ hai: vận hành thật chỉ có 2 đến 3 kế toán, nên kiểm soát
+        nằm ở máy, tức ở biên bản chín luật trên.
+      </div>
+
+    </div>
+  </section>
+
   <section class="screen" id="man-f06"></section>
 
 </div>
@@ -122,8 +262,12 @@
 <script src="/trang_thai.js"></script>
 <script src="/hop_thoai.js"></script>
 <script src="/man_f03.js"></script>
+<!-- ⛔ TRUOC `man_f01.js`: `F01.ve_man` goi `F01L.ve` -->
+<script src="/man_f01_lenh.js"></script>
 <script src="/man_f01.js"></script>
+<script src="/man_f01_ghep.js"></script>
 <script src="/man_f02.js"></script>
+<script src="/man_f04.js"></script>
 <script src="/ung_dung.js"></script>
 </body>
 </html>

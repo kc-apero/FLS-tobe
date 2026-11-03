@@ -256,6 +256,58 @@ def k5_khong_ngay_tuong_lai(files: list[pathlib.Path]) -> tuple[list[str], int]:
     return loi, dem
 
 
+# ---------------------------------------------------------------- K6
+# ⛔⛔⛔ **K6 sinh ra tu MOT LOI THAT, va loi ay SONG 7 NGAY ma khong ai thay.**
+#
+# Do 17/09: `QĐ-ITL-128` duoc khai o **HAI** dong, cho **HAI** quyet dinh khac
+# han nhau *(17/09 mo lai `QĐ-ITL-92` · 10/09 soi ba lop)*. Ca sổ chỉ **mot** ma
+# bi trung — nhung mot ma trung la du: tu do tro di, cau *"theo `QĐ-ITL-128`"*
+# co **hai** cau tra loi, va nguoi doc ⛔ khong co cach nao biet minh dang doc
+# cai nao.
+#
+# ⭐ Va phep do nay chay trong **mot giay**. No ⛔ khong ton tai suot 7 ngay
+#   ⛔ khong phai vi kho, ma vi ⛔ khong ai nghi den — dung ly do ma moi cong
+#   trong repo nay duoc dung.
+#
+# ⛔ K6 soi **dong KHAI** *(dong bang bat dau bang `| **\`QĐ-ITL-N\`**`)*, ⛔
+#   khong soi moi lan **TRICH**. Mot ma duoc trich 5 cho la binh thuong; duoc
+#   **khai** 2 lan moi la loi. Nham hai thu nay se cho ra mot cong do GIA
+#   thuong truc.
+RE_KHAI_QD = re.compile(r"^\|\s*\*\*`(QĐ-ITL-\d+)`\*\*")
+
+
+def k6_ma_quyet_dinh_khong_trung(md: list[pathlib.Path]) -> tuple[list[str], int]:
+    """⛔ MOT ma quyet dinh ⛔ khong duoc khai hai lan **trong SO QUYET DINH**.
+
+    ⛔⛔ **CHI soi `00_MASTER_INDEX.md`, va do la mot su THU HEP CO Y — lan
+    chay dau K6 quet moi `.md` va DO ngay: 3 loi, va **ca 3 la oan**.**
+    Chung nam o `Ra-soat-Cau-truc-R-va-ERD.md`, trong mot bang **TRICH DAN**
+    *(`| Quyet dinh | Noi dung | He qua |`)* tinh co dung **cung khuon dong**
+    voi so quyet dinh.
+
+    ⭐ Trich mot ma o nhieu cho la **viec binh thuong va DANG KHUYEN KHICH**;
+      chi **KHAI** hai lan moi la loi. Nham hai thu ay cho ra mot cong keu sai
+      **thuong truc** — va mot cong keu sai la mot cong nguoi ta se **go ra**.
+
+    ⇒ So quyet dinh la **MOT cho duy nhat**: `00_MASTER_INDEX.md`. Neu mai sau
+      co so thu hai, them no vao day **co y thuc**, ⛔ dung noi rong ra ca kho.
+    """
+    thay: dict[str, list[str]] = {}
+    so = [p for p in md if p.name == "00_MASTER_INDEX.md"]
+    if not so:
+        return ["⛔ ⛔ khong tim thay `00_MASTER_INDEX.md` — K6 ⛔ KHONG do duoc "
+                "gi, va 'khong do duoc' la DO, ⛔ khong phai 'khong thay loi'"], 0
+    for p in so:
+        for i, dong in enumerate(p.read_text(encoding="utf-8").splitlines(), 1):
+            m = RE_KHAI_QD.match(dong)
+            if m:
+                thay.setdefault(m.group(1), []).append(
+                    f"{p.relative_to(GOC)}:{i}")
+    loi = [f"{ma} duoc KHAI {len(cho)} lan: {' · '.join(cho)}"
+           for ma, cho in sorted(thay.items()) if len(cho) > 1]
+    return loi, len(thay)
+
+
 def main() -> int:
     md = sorted(GOC.rglob("*.md"))
     if not md:
@@ -268,6 +320,7 @@ def main() -> int:
     e4 = k4_cr_dong_co_chung_cu()
     # K5 soi ca .html: ban ve kien truc cung mang ngay, va no cung bi dan sai.
     e5, so_ngay = k5_khong_ngay_tuong_lai(md + sorted(GOC.rglob("*.html")))
+    e6, so_qd = k6_ma_quyet_dinh_khong_trung(md)
 
     print(f"quet {len(md)} file .md · {so_bang} bang markdown\n")
     for ten, loi, do_duoc in (
@@ -276,19 +329,20 @@ def main() -> int:
         ("K3 bang markdown khong lech   ", e3, f"{so_bang} bang"),
         ("K4 CR dong co chung cu do duoc", e4, "07 §5"),
         ("K5 khong ngay CHUA XAY RA     ", e5, f"{so_ngay} o ngay"),
+        ("K6 ma QD khong bi cap hai lan ", e6, f"{so_qd} ma"),
     ):
         dau = "OK " if not loi else "⛔ "
         print(f"{dau}{ten}  (da do: {do_duoc})")
         for x in loi:
             print(f"     - {x}")
 
-    tong = len(e1) + len(e2) + len(e3) + len(e4) + len(e5)
+    tong = len(e1) + len(e2) + len(e3) + len(e4) + len(e5) + len(e6)
     print()
     if tong:
         print(f"⛔ CONG TAI LIEU KHONG DAT — {tong} loi")
         return 1
     print("✅ cong tai lieu DAT — va no da do duoc that "
-          f"({len(md)} file, {so_bang} bang, {so_ngay} o ngay), "
+          f"({len(md)} file, {so_bang} bang, {so_ngay} o ngay, {so_qd} ma QD), "
           "khong chi 'khong thay loi'")
     return 0
 

@@ -84,17 +84,26 @@ const TT = (function () {
   /* ── ⭐ ep ca bon trang thai ──────────────────────────────────────────
      `lay`    : ham async tra `{data, meta}`
      `ve`     : ham ve du lieu that vao `o`
-     `la_rong`: ham noi du lieu co rong khong (mac dinh: mang do dai 0)      */
+     `la_rong`: ham noi du lieu co rong khong (mac dinh: mang do dai 0)
+     `con_hieu_luc`: ⭐ `WO-045` — ham tra `false` khi luot nay **da bi thay**
+                (`BA-06` v4.19 `§4.5 ⓦ` ①). Luc ay `chay` ⛔ ve **gi ca** —
+                ⛔ du lieu, ⛔ rong, ⛔ loi — va ⛔ goi `ve`: mot luot cu ve
+                sau ma `_sach(o)` thi **xoa** luot moi da ve tren CUNG o
+                (`F04` `#nap-xem` — bai `test_AC8_…` do tren `db0adae`: anh
+                **truoc** thang). Tuy chon: man cu ⛔ truyen van chay y nguyen. */
   async function chay(o, lay, ve, tuy) {
     const t = tuy || {};
+    const con = () => !t.con_hieu_luc || t.con_hieu_luc();
     tai(o, t.so_dong);
     let kq;
     try {
       kq = await lay();
     } catch (e) {
+      if (!con()) return null;
       loi(o, e, function () { chay(o, lay, ve, tuy); });
       return null;
     }
+    if (!con()) return null;
     const la_rong = t.la_rong
       ? t.la_rong(kq.data)
       : (Array.isArray(kq.data) ? kq.data.length === 0 : !kq.data);

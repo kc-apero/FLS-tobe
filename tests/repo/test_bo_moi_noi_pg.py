@@ -13,7 +13,9 @@ mot cai nut ⛔ khong co duong lui.
     ⓒ dao dung but toan cua CHINH phep ghep — va ⛔ KHONG dao cai NGUOI da go
     ⓓ ⛔ khong co moi noi thi ⛔ khong bo (`KhongCoMoiNoi`, ⛔ khac `DaGhep`)
     ⓔ ky da CHOT thi ⛔ khong bo
-    ⓕ ⛔ khong co ly do thi ⛔ khong bo (`ThieuLyDo`)
+    ⓕ ~~⛔ khong co ly do thi ⛔ khong bo (`ThieuLyDo`)~~ — ⛔ LAT 01/10
+       (`QĐ-ITL-149`, `BA-07 §4h ⓼`): thieu ly do ⇒ BO DUOC, vet mang ly do
+       mac dinh `(may dien)` — lo goc *"vet ⛔ rong"* van giu
     ⓖ `fls_itl` ⛔ KHONG doi mot o nao — ca luc ghep lan luc bo
 """
 from __future__ import annotations
@@ -83,6 +85,12 @@ def _anh_so(conn, itl_id: int) -> tuple:
 def _dem(conn, bang: str, itl_id: int) -> int:
     return conn.execute(f"select count(*) from {bang} where itl_id=%s",
                         (itl_id,)).fetchone()[0]
+
+
+def _adj_nguoi(conn, itl_id: int) -> int | None:
+    r = conn.execute("select adj_id from fls_sua_tay where itl_id=%s"
+                     " and field='hd'", (itl_id,)).fetchone()
+    return r[0] if r else None
 
 
 def _mot_ca_ghep(conn, tien: str = "20957000.00") -> tuple[str, int]:
@@ -189,19 +197,26 @@ def test_dong_lenh_vua_go_hien_lai_la_CHUA_ghep_o_danh_sach_ung_vien(conn):
 # ─────────────────────────────── ⓒ dao dung but toan, va CHI cai cua may
 def test_dao_but_toan_do_CHINH_phep_ghep_suy_ra(conn):
     """Phep ghep tu suy `hd`/`cdt1` tu dong lenh. Bo moi noi thi **can cu cua
-    phep suy mat** ⇒ de nguyen la de lai mot gia tri ⛔ khong con nguon."""
+    phep suy mat** ⇒ de nguyen la de lai mot gia tri ⛔ khong con nguon.
+
+    ⚠ Viet lai 01/10 (`WO-003`, `QĐ-ITL-149` — owner: *"Máy gợi ý"*): hai o
+      suy ra nay song o **`fls_may_goi_y`**, ⛔ `fls_sua_tay` *(ban cu doc
+      `fls_sua_tay` vi cu ghep tung ghi `sua_tay`)*. Lo goc giu nguyen: bo
+      moi noi ⇒ **⛔ con gia tri nao song ma mat can cu**."""
     _run_id, i = _mot_ca_ghep(conn)
     hieu_luc = dict(conn.execute(
-        "select field, value_after from fls_sua_tay where itl_id=%s",
+        "select field, value_after from fls_may_goi_y where itl_id=%s",
         (i,)).fetchall())
     assert hieu_luc == {"hd": "FNS | Facilities", "cdt1": "SHQ2 | HQ2"}
 
     ra = gt.bo_moi_noi(conn, chi_nap_that(), i, actor=ACTOR, reason=LY_DO_BO)
     assert {x["field"] for x in ra["but_toan_dao"]} == {"hd", "cdt1"}
     assert ra["bo_qua"] == []
-    # ⭐ Sau khi dao, ⛔ khong con gia tri nguoi-go nao co hieu luc.
-    assert conn.execute("select count(*) from fls_sua_tay where itl_id=%s",
-                        (i,)).fetchone()[0] == 0
+    # ⭐ Sau khi dao, ⛔ khong con gia tri nao suy tu phep ghep co hieu luc —
+    #   ca o lan MAY lan lan NGUOI.
+    for khung in ("fls_may_goi_y", "fls_sua_tay"):
+        assert conn.execute(f"select count(*) from {khung} where itl_id=%s",
+                            (i,)).fetchone()[0] == 0, khung
     # ⛔ Va dao cung la THEM dong: but toan cu VAN nam trong so.
     assert _dem(conn, "fls_adjustment", i) == 4   # 2 suy + 2 dao
 
@@ -220,8 +235,13 @@ def test_KHONG_dao_o_ma_NGUOI_da_go_tay__va_KHAI_RA(conn):
 
     ra = gt.bo_moi_noi(conn, chi_nap_that(), i, actor=ACTOR, reason=LY_DO_BO)
 
-    assert {x["field"] for x in ra["but_toan_dao"]} == {"cdt1"}, (
-        "⛔ chi `cdt1` con la cua phep ghep — `hd` da la cua NGUOI")
+    # ⚠ Viet lai 01/10 (`WO-003`, `DT-I14`): truoc day goi y `hd` cua phep
+    #   ghep la but toan `sua_tay`, bi gia tri NGUOI che ⇒ ⛔ dao. Nay no la
+    #   GOI Y o lan may — van con hieu luc o do ⇒ **DAO** (can cu mat). Lo goc
+    #   cua bai KHONG doi: gia tri NGUOI ⛔ bi cham va **duoc khai ra**.
+    assert {x["field"] for x in ra["but_toan_dao"]} == {"hd", "cdt1"}, (
+        "goi y cua phep ghep (ca hai o) phai bi dao khi can cu mat")
+    assert all(x["dao_cua"] != _adj_nguoi(conn, i) for x in ra["but_toan_dao"]),         "⛔⛔ da DAO but toan cua NGUOI"
     assert [x["field"] for x in ra["bo_qua"]] == ["hd"]
     assert "NGUOI da go tay" in ra["bo_qua"][0]["vi_sao"]
     # ⭐ Gia tri cua NGUOI PHAI con nguyen.
@@ -264,14 +284,24 @@ def test_ky_DA_CHOT_thi_KHONG_bo(conn):
     assert _dem(conn, "fls_moi_noi", i) == 1, "⛔ da bo du ky chot"
 
 
-def test_KHONG_ly_do_thi_KHONG_bo(conn):
-    """`INV-I16`: go mot moi noi ma khong noi vi sao thi ⛔ khong ai biet lan
-    ghep nao dung."""
+@pytest.mark.parametrize("xau", ["", "   ", None])
+def test_KHONG_ly_do_van_BO_duoc__vet_mang_ly_do_MAC_DINH(conn, xau):
+    """⛔⛔ **Bai nay tung ghim luat KHAC** — ten cu `test_KHONG_ly_do_thi_KHONG_bo`
+    (*"`INV-I16`: go mot moi noi ma khong noi vi sao thi ⛔ khong ai biet lan
+    ghep nao dung"*). Luat ay lat 01/10: `BA-07 §4h ⓻ⓑ` da khai `reason` tuy
+    chon tu v3.0, `§4h ⓼` v3.4 thong nhat (`QĐ-ITL-149`) — vi nut `Bo gan` gui
+    `{}` va bi **400** tren may that (`KQ-002 F-1`).
+
+    ⭐ Lo goc giu: *"⛔ khong ai biet vi sao"* = vet RONG. Nay vet ⛔ bao gio
+      rong — thieu thi mang `LY_DO_MAC_DINH_BO_GHEP` co nhan `(may dien)`.
+    """
     _run_id, i = _mot_ca_ghep(conn)
-    for xau in ("", "   ", None):
-        with pytest.raises(gt.ThieuLyDo):
-            gt.bo_moi_noi(conn, chi_nap_that(), i, actor=ACTOR, reason=xau)
-    assert _dem(conn, "fls_pm_unlink", i) == 0
+    ra = gt.bo_moi_noi(conn, chi_nap_that(), i, actor=ACTOR, reason=xau)
+    assert _dem(conn, "fls_pm_unlink", i) == 1
+    vet = conn.execute("select reason, actor from fls_queue_event"
+                       " where evt_id=%s", (ra["evt_id"],)).fetchone()
+    assert vet[0].startswith(gt.LY_DO_MAC_DINH_BO_GHEP), vet
+    assert vet[1] == ACTOR
 
 
 def test_ngoai_pham_vi_thi_KHONG_bo(conn):

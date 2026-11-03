@@ -284,10 +284,27 @@ def test_ghep_LAN_HAI_thi_409_kem_moi_noi_dang_co(may, du_lieu):
     assert r["error"]["khac"]["moi_noi"][0]["pm_line_id"] == "PMS1-1"
 
 
-def test_thieu_ly_do_thi_400(may, du_lieu):
-    ma, _ = _goi(may, f"{V}/queue/{du_lieu['itl']}/match", pt="POST",
-                 than={"pm_line_ids": ["PMS1-1"]})
-    assert ma == 400
+@pytest.mark.parametrize("than_ly_do", [{}, {"reason": ""}, {"reason": "  "}])
+def test_thieu_ly_do_van_GHEP_duoc__vet_mang_ly_do_MAC_DINH(may, du_lieu,
+                                                           than_ly_do):
+    """⛔⛔ **Bai nay tung ghim luat KHAC** — ten cu `test_thieu_ly_do_thi_400`.
+    Luat ay lat 01/10 (`QĐ-ITL-149`, owner: *"bo yeu cau ly do cho cu Ghep"*;
+    `BA-07` v3.4 `§4h ⓼`): man ghep ⛔ co o ly do nen gui `{pm_line_ids}` —
+    chinh than nay bi **400** tren may that (`KQ-002 F-1`).
+
+    ⭐ Lo goc cua bai *(cua HTTP ⛔ duoc de lot mot cu ghep **⛔ truy duoc**)*
+      giu: thieu ly do ⇒ **200**, va vet mang ly do mac dinh co nhan
+      `(may dien)` + `actor` TU THE — ⛔ bao gio rong.
+    """
+    ma, r = _goi(may, f"{V}/queue/{du_lieu['itl']}/match", pt="POST",
+                 than={"pm_line_ids": ["PMS1-1"], **than_ly_do})
+    assert ma == 200, r
+    with psycopg.connect(dsn_test(), autocommit=True) as c:
+        vet = c.execute("SELECT actor, reason FROM fls_queue_event"
+                        " WHERE itl_id=%s AND evt_type='match'",
+                        (du_lieu["itl"],)).fetchall()
+    assert len(vet) == 1 and vet[0][0] == AI, vet
+    assert vet[0][1].startswith("(may dien) ghep tren man"), vet
 
 
 def test_khong_co_THE_thi_401(may, du_lieu):

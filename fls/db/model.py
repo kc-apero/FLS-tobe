@@ -19,6 +19,16 @@ class Column:
     pk: bool = False
     unique: bool = False
     generated: str | None = None   # biểu thức của GENERATED ALWAYS AS ... STORED
+    # ⭐⭐ `CHECK` mức cột — thêm 2026-09-08 *(`QĐ-ITL-113`, cột
+    # `fls_khai_cot.thu_tu`)*. Sinh ra một ràng buộc **CÓ TÊN** ở mức bảng
+    # *(`<bảng>_<cột>_ck`)*, ⛔ không phải một `CHECK` nội dòng khuyết danh —
+    # vì `pg_verify` đối chiếu **theo tên**, và một ràng buộc Postgres tự đặt
+    # tên là một ràng buộc ⛔ không cổng nào gọi đúng được.
+    #
+    # ⚠ Đo 08/09 trước khi thêm: kho THẬT có **0** ràng buộc `CHECK` ⇒ đây là
+    #   cái đầu tiên, và `pg_verify` được mở rộng **cùng lượt** để canh nó.
+    #   ⛔ Một trường khai mà cổng ⛔ không đọc là một dòng khai vô hình.
+    check: str | None = None
     comment: str = ""
 
 
@@ -28,6 +38,41 @@ class Table:
     columns: tuple[Column, ...]
     kind: str = "table"            # "table" | "view"
     erd_entity: str = ""           # tên entity tương ứng trên ERD của BA
+    # ⭐⭐⭐ `tang` — TẦNG KIẾN TRÚC, thêm 2026-09-15.
+    #
+    # ⛔⛔ **Vì sao nó nằm ở ĐÂY chứ ⛔ không ở một bản vẽ riêng.** `ERD-CONTRACT.mmd`
+    # sinh từ chính tệp này và có cổng `G-ERD-1` canh — nên nó ⛔ **không bao giờ
+    # già**. Một bản đồ tầng vẽ tay trong một tệp `.html` thì ⛔ **không có cổng
+    # nào**, và nó sẽ già **im lặng** đúng như `BA-03` đã già ba lần.
+    #
+    # ⇒ Tầng là **một trường của bản khai**, và `tools/sinh_ban_do_tang.py` sinh
+    #   bản vẽ ra từ đó. Thêm một bảng mà quên khai tầng ⇒ cổng **NO**.
+    #
+    # ⚠ `tang` ⛔ **không** đổi một dòng DDL nào — nó thuần tuý là cách **đọc**
+    #   kho. Hai bảng cùng tầng ⛔ không có gì chung ở Postgres; chúng chung
+    #   **câu hỏi mà chúng trả lời**.
+    tang: str = ""
+    # ⭐⭐⭐ `khau` — KHÂU NGHIỆP VỤ, thêm 2026-09-17 *(owner: "sắp xếp theo
+    # flow chính: nạp data → ghép lệnh chi → adjust ITL. Tôi muốn biết các
+    # entity thuộc các module nghiệp vụ nào")*.
+    #
+    # ⛔⛔ **`khau` ⛔ KHÔNG phải `tang` đổi tên.** Hai trục trả lời hai câu:
+    #     `tang` → *"nó nằm ở đâu trong đường đi của DỮ LIỆU"*
+    #     `khau` → *"nó phục vụ VIỆC nào của người"*
+    #   Chúng **giao nhau chứ ⛔ không lồng nhau**, và chỗ hai trục **lệch**
+    #   nhau là chỗ đáng nhìn nhất — ví dụ `fls_pm_line` do khâu `A` **GHI**
+    #   nhưng tồn tại để khâu `B` **DÙNG**.
+    #
+    # ⭐ **Luật gán: theo VIỆC NÓ PHỤC VỤ, ⛔ không theo ai ghi nó.** Thiếu
+    #   luật này thì phép gán thành cảm tính — `fls_queue_event` sẽ rơi vào
+    #   `A` *(máy ghi `108.128` sự kiện lúc nạp)* trong khi nó là **bảng việc
+    #   của NGƯỜI**.
+    #
+    # ⛔ Tên khâu **lấy lại từ bộ tài liệu**, ⛔ không đặt tên mới: mốc `A`
+    #   *(đường LẤY dữ liệu)* · tác vụ ① *(mapping PM ↔ Transaction)* · tác vụ
+    #   ② *(adjust thông tin ITL)* — `01_Orchestrator/09_MILESTONES_HAI_TAC_VU`.
+    #   Đặt tên thứ tư cho một thứ đã có tên là cách đẻ ra `GAP-ITL-02`.
+    khau: str = ""
     island_reason: str = ""        # lý do KHÔNG có FK về fls_itl (G-ERD-3)
     view_sql: str = ""
     # Khoá NHIỀU CỘT — thêm 2026-08-27, đóng `GAP-DB-P0-03`.

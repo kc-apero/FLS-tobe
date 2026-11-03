@@ -29,6 +29,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from fls.api import cua, the                                     # noqa: E402
 from fls.api.bang_tuyen import TIEN_TO                           # noqa: E402
 from fls.db.kho import dsn_that, noi_chi_doc                     # noqa: E402
+from fls.repo.danh_muc_actor import ACTOR_VERIFY_CUA_THAT        # noqa: E402
 from fls.repo.kho_sach import la_run_that                        # noqa: E402
 
 DONG_TOI_THIEU = 1_000     # duoi nguong nay ⇒ chua do duoc gi, ⛔ khong phai "sach"
@@ -51,7 +52,7 @@ def main() -> int:
     may = cua.dung_may(_mo(dsn), cong=0)
     threading.Thread(target=may.serve_forever, daemon=True).start()
     the_thu = the.dong_the(
-        {"sub": "cong@apero.vn", "exp": int(time.time()) + 120}, the.khoa())
+        {"sub": ACTOR_VERIFY_CUA_THAT, "exp": int(time.time()) + 120}, the.khoa())
 
     def goi(duong: str) -> tuple[int, dict]:
         c = http.client.HTTPConnection(*may.server_address, timeout=30)

@@ -1,0 +1,719 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Gán lệnh chi với giao dịch</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+/* Màu lấy NGUYÊN VĂN từ fls/web/tep/tokens.css.
+   TOKEN ĐỀ XUẤT THÊM (chỉ 2, khai báo ở đây, không rải mã màu trong component):
+     --bac-1 … --bac-4 : trọng lượng thị giác của bốn bậc ứng viên — KHÔNG phải màu mới,
+                          chúng trỏ lại good/info/warn/line đã có.
+     --evi-bg          : nền đánh dấu bằng chứng trong diễn giải (accent 14%).            */
+:root{
+  --sans:'IBM Plex Sans','Segoe UI',system-ui,-apple-system,sans-serif;
+  --mono:'IBM Plex Mono','Cascadia Mono',Consolas,ui-monospace,monospace;
+  --ink:#14201e; --muted:#5c6b68; --faint:#9aa8a5;
+  --line:#dde4e3; --surface:#fff; --alt:#f6f8f8; --page:#eef1f1;
+  --row-hover:#fafcfc; --label-bg:#fcfdfd;
+  --accent:#0e7570; --accent-hi:#0a5c58; --focus-ring:#0e757022;
+  --crit:#c73a3a; --crit-bg:#fbeaea; --crit-line:#f3cdcd;
+  --warn:#c07414; --warn-bg:#fdf4e7; --warn-line:#f0dcbe;
+  --good:#2c7a4b; --good-bg:#e8f4ec; --good-line:#bcdcc8;
+  --info:#2563eb; --info-bg:#e9effd; --info-line:#b9cdf7;
+  --on-ink:#fff; --on-ink-muted:#cfd8d6;
+  --shadow-the:0 1px 2px rgba(20,32,30,.05), 0 4px 14px rgba(20,32,30,.05);
+  --bo-nho:4px; --bo:6px; --bo-the:8px; --bo-tron:999px;
+  --panel-san:430px; --panel-tran:640px;
+  --bac-1:var(--good); --bac-2:var(--info); --bac-3:var(--warn); --bac-4:var(--line);
+  --evi-bg:#0e757024;
+}
+:root[data-theme="dark"], :root:not([data-theme="light"]){
+  @media (prefers-color-scheme: dark){
+    --ink:#e7eeec; --muted:#9dadaa; --faint:#6d7b78;
+    --line:#2b3a37; --surface:#16211f; --alt:#1b2725; --page:#0e1716;
+    --row-hover:#1c2826; --label-bg:#1a2523;
+    --accent:#4bb5ad; --accent-hi:#6ccbc3; --focus-ring:#4bb5ad33;
+    --crit:#e97676; --crit-bg:#33201f; --crit-line:#4d2b2a;
+    --warn:#dfa451; --warn-bg:#2e2416; --warn-line:#4a3a21;
+    --good:#66bd86; --good-bg:#17291e; --good-line:#27412f;
+    --info:#7ba4f5; --info-bg:#1a2338; --info-line:#2b3a5c;
+    --on-ink:#0e1716; --on-ink-muted:#7e8c89;
+    --shadow-the:0 1px 2px rgba(0,0,0,.3), 0 4px 14px rgba(0,0,0,.25);
+    --evi-bg:#4bb5ad33;
+  }
+}
+:root[data-theme="dark"]{
+  --ink:#e7eeec; --muted:#9dadaa; --faint:#6d7b78;
+  --line:#2b3a37; --surface:#16211f; --alt:#1b2725; --page:#0e1716;
+  --row-hover:#1c2826; --label-bg:#1a2523;
+  --accent:#4bb5ad; --accent-hi:#6ccbc3; --focus-ring:#4bb5ad33;
+  --crit:#e97676; --crit-bg:#33201f; --crit-line:#4d2b2a;
+  --warn:#dfa451; --warn-bg:#2e2416; --warn-line:#4a3a21;
+  --good:#66bd86; --good-bg:#17291e; --good-line:#27412f;
+  --info:#7ba4f5; --info-bg:#1a2338; --info-line:#2b3a5c;
+  --on-ink:#0e1716; --on-ink-muted:#7e8c89;
+  --shadow-the:0 1px 2px rgba(0,0,0,.3), 0 4px 14px rgba(0,0,0,.25);
+  --evi-bg:#4bb5ad33;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:var(--sans);background:var(--page);color:var(--ink);
+     font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+
+.top{background:var(--ink);color:var(--on-ink);padding:13px 20px}
+.top-in{max-width:1500px;margin:0 auto;display:flex;flex-wrap:wrap;gap:16px;
+        align-items:center;justify-content:space-between}
+.top h1{margin:0;font-size:16px;font-weight:600;letter-spacing:-.01em}
+.top .sub{color:var(--on-ink-muted);font-size:12.5px;margin-top:3px}
+.top .right{display:flex;align-items:center;gap:14px}
+.top .meta{color:var(--on-ink-muted);font-size:11.5px;text-align:right}
+.tbtn{font:inherit;font-size:12px;font-weight:500;color:var(--on-ink);cursor:pointer;
+      background:transparent;border:1px solid var(--on-ink-muted);
+      border-radius:var(--bo-tron);padding:5px 13px}
+.tbtn:hover{border-color:var(--on-ink)}
+.tbtn:focus-visible{outline:2px solid var(--on-ink);outline-offset:2px}
+.wrap{max-width:1500px;margin:0 auto;padding:16px 20px 26px}
+
+.bang-viec{display:flex;flex-wrap:wrap;gap:10px}
+.viec{flex:1 1 160px;background:var(--surface);border:1px solid var(--line);
+      border-radius:var(--bo-the);padding:11px 14px;box-shadow:var(--shadow-the)}
+.viec .v{font-family:var(--mono);font-size:22px;font-weight:600;line-height:1.1}
+.viec .k{font-size:12px;color:var(--muted);margin-top:2px}
+.viec .h{font-size:11px;color:var(--faint);margin-top:3px}
+.viec.dagan{border-color:var(--good-line);background:var(--good-bg)}
+.viec.dagan .v{color:var(--good)}
+.viec.dexuat{border-color:var(--warn-line);background:var(--warn-bg)}
+.viec.dexuat .v{color:var(--warn)}
+
+.co2{display:grid;
+     grid-template-columns:minmax(0,1fr) clamp(var(--panel-san),34vw,var(--panel-tran));
+     gap:14px;margin-top:14px;align-items:start}
+@media (max-width:1040px){.co2{grid-template-columns:minmax(0,1fr)}}
+.hop{background:var(--surface);border:1px solid var(--line);
+     border-radius:var(--bo-the);box-shadow:var(--shadow-the);overflow:hidden}
+.hop-h{display:flex;justify-content:space-between;align-items:center;gap:12px;
+       padding:10px 14px;border-bottom:1px solid var(--line);background:var(--alt)}
+.hop-h h2{margin:0;font-size:13.5px;font-weight:600}
+.hop-h .p{font-size:11.5px;color:var(--muted);display:flex;align-items:center;gap:7px}
+
+.loc{display:flex;gap:2px}
+.loc button{font:inherit;font-size:12px;font-weight:500;color:var(--muted);
+  background:var(--surface);border:1px solid var(--line);cursor:pointer;
+  padding:4px 11px;border-radius:var(--bo-tron)}
+.loc button:hover{color:var(--ink);border-color:var(--faint)}
+.loc button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);
+  color:var(--on-ink)}
+.loc button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.loc b{font-family:var(--mono);font-weight:600;margin-left:5px}
+
+/* ── C1 · dòng lệnh chi ────────────────────────────────────── */
+#ds{max-height:calc(100vh - 232px);overflow:auto}
+.ngay-dau{padding:6px 14px;background:var(--label-bg);
+          border-bottom:1px solid var(--line);font-family:var(--mono);
+          font-size:11.5px;color:var(--muted);position:sticky;top:0;z-index:2}
+.lenh{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:11px;
+      align-items:baseline;width:100%;text-align:left;font:inherit;
+      background:var(--surface);border:0;border-bottom:1px solid var(--line);
+      padding:9px 14px 9px 13px;cursor:pointer;color:inherit;
+      box-shadow:inset 3px 0 0 var(--line)}
+.lenh.s-da{box-shadow:inset 3px 0 0 var(--good)}
+.lenh.s-dexuat{box-shadow:inset 3px 0 0 var(--warn)}
+.lenh.s-khong{box-shadow:inset 3px 0 0 var(--crit)}
+.lenh:hover{background:var(--row-hover)}
+.lenh[aria-current="true"]{background:var(--focus-ring)}
+.lenh[aria-current="true"] .pm{color:var(--ink);font-weight:600}
+.lenh:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.lenh .pm{font-family:var(--mono);font-size:11.5px;color:var(--muted);white-space:nowrap}
+.lenh .who{font-size:13px;font-weight:500;white-space:nowrap;overflow:hidden;
+           text-overflow:ellipsis;display:block}
+.lenh .nd{font-size:11.5px;color:var(--muted);white-space:nowrap;
+          overflow:hidden;text-overflow:ellipsis;display:block}
+.lenh .t{font-family:var(--mono);font-variant-numeric:tabular-nums;
+         font-size:13px;text-align:right;white-space:nowrap}
+.lenh .t .u{color:var(--faint);font-size:10.5px}
+.lenh .t .chip{display:block;margin-top:3px}
+
+.chip{font-size:10.5px;font-weight:500;padding:2px 8px;border:1px solid var(--line);
+      border-radius:var(--bo-tron);white-space:nowrap;display:inline-block}
+.chip.dagan{color:var(--good);background:var(--good-bg);border-color:var(--good-line)}
+.chip.dexuat{color:var(--warn);background:var(--warn-bg);border:1px dashed var(--warn)}
+.chip.chua{color:var(--muted);background:var(--alt)}
+.chip.khong{color:var(--crit);background:var(--crit-bg);border-color:var(--crit-line)}
+
+/* ── C2 · thẻ lệnh chi ─────────────────────────────────────── */
+.panel{position:sticky;top:12px;max-height:calc(100vh - 24px);
+       display:flex;flex-direction:column}
+.p-body{overflow:auto;flex:1}
+.pm-the{padding:12px 14px;border-bottom:1px solid var(--line)}
+.pm-1{display:flex;align-items:center;gap:9px;justify-content:space-between}
+.pm-id{font-family:var(--mono);font-size:14px;font-weight:600;letter-spacing:-.01em}
+.pm-2{margin-top:7px;display:flex;align-items:baseline;gap:10px;
+      justify-content:space-between;flex-wrap:wrap}
+.pm-who{font-size:15px;font-weight:600;min-width:0;overflow-wrap:anywhere}
+.pm-tien{font-family:var(--mono);font-variant-numeric:tabular-nums;
+         font-size:20px;font-weight:600;white-space:nowrap}
+.pm-tien small{font-size:12px;color:var(--faint);font-weight:400;margin-left:3px}
+.pm-nd{font-size:12.5px;color:var(--muted);margin-top:5px;overflow-wrap:anywhere}
+.pm-3{margin-top:10px;padding-top:9px;border-top:1px dashed var(--line);
+      font-family:var(--mono);font-size:11.5px;color:var(--muted)}
+.pm-3 .d{margin-top:3px}
+.pm-3 b{color:var(--ink);font-weight:500}
+.pm-3 .nh{color:var(--faint)}
+
+/* ── C4 · đang gán với ─────────────────────────────────────── */
+.dang{padding:11px 14px;background:var(--good-bg);border-bottom:1px solid var(--good-line)}
+.dang .t1{font-size:11.5px;color:var(--good);font-weight:600;
+          display:flex;gap:8px;align-items:center;justify-content:space-between}
+.dang .gd{margin-top:6px;background:var(--surface);border:1px solid var(--good-line);
+          border-radius:var(--bo);overflow:hidden}
+.dang .uv{border-bottom:0;cursor:default}
+
+/* ── C3 · dòng giao dịch ứng viên ──────────────────────────── */
+.uv-h{padding:8px 14px;background:var(--alt);border-bottom:1px solid var(--line);
+      font-size:11.5px;color:var(--muted);display:flex;
+      justify-content:space-between;gap:10px;align-items:baseline}
+.uv-h b{color:var(--ink);font-weight:600;font-size:12.5px}
+.bac-h{position:sticky;top:0;z-index:1;display:flex;align-items:baseline;gap:8px;
+       padding:7px 14px;background:var(--label-bg);
+       border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.bac-h .n{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--on-ink);
+          background:var(--b);border-radius:var(--bo-nho);padding:0 5px;line-height:17px}
+.bac-h.b4 .n{color:var(--muted);background:var(--alt);border:1px solid var(--line);
+             line-height:15px}
+.bac-h .l{font-size:12px;font-weight:600;color:var(--ink)}
+.bac-h .c{font-family:var(--mono);font-size:11px;color:var(--faint);margin-left:auto}
+.bac-h .mo{font:inherit;font-size:11.5px;color:var(--accent);background:none;border:0;
+           cursor:pointer;text-decoration:underline;text-underline-offset:2px;padding:0}
+.bac-h .mo:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+.uv{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:11px;
+    width:100%;text-align:left;font:inherit;background:var(--surface);
+    border:0;border-bottom:1px solid var(--line);padding:10px 14px 10px 13px;
+    cursor:pointer;color:inherit;align-items:start;box-shadow:inset 3px 0 0 var(--b)}
+.uv:hover{background:var(--row-hover)}
+.uv[aria-pressed="true"]{background:var(--focus-ring)}
+.uv:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.uv .rad{width:14px;height:14px;border-radius:50%;border:1.5px solid var(--faint);
+         flex:none;margin-top:3px}
+.uv[aria-pressed="true"] .rad{border-color:var(--accent);border-width:4.5px}
+.uv.dexuat{background:var(--warn-bg)}
+.uv.dexuat:hover{background:var(--warn-bg)}
+.uv .dg{font-size:13px;line-height:1.42;overflow-wrap:anywhere;display:block}
+.uv .dg.clamp{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;
+              overflow:hidden}
+.uv.b4 .dg{font-size:12.5px;color:var(--muted)}
+.uv .dg.trong{color:var(--warn);font-style:italic}
+.uv .dg mark{background:var(--evi-bg);color:inherit;font-weight:600;
+             border-radius:2px;padding:0 1px}
+.uv .mo{display:inline-block;margin-top:2px;font-size:11px;color:var(--accent);
+        text-decoration:underline;text-underline-offset:2px;cursor:pointer}
+.uv .mo:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.uv .meta mark{background:var(--evi-bg);color:var(--ink);font-weight:600;border-radius:2px;padding:0 2px}
+.uv .t .v mark{background:var(--evi-bg);color:inherit;border-radius:2px;padding:0 2px}
+.uv.b4 .t .v mark{background:none;padding:0}
+.uv .meta{font-family:var(--mono);font-size:11px;color:var(--faint);margin-top:4px;
+          white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:block}
+.uv .t{text-align:right;white-space:nowrap}
+.uv .t .v{font-family:var(--mono);font-variant-numeric:tabular-nums;
+          font-size:14px;font-weight:600}
+.uv.b4 .t .v{font-weight:500;color:var(--muted)}
+.uv .t .u{font-size:10.5px;color:var(--faint);display:block;margin-top:1px}
+.uv .t .lech{font-family:var(--mono);font-size:11px;color:var(--warn);font-weight:600;
+             display:block;margin-top:4px}
+.uv .t .dau{font-size:10.5px;color:var(--warn);display:block;margin-top:4px;
+            font-weight:600}
+.uv .t .dau.good{color:var(--good)}
+
+/* ── C8 · thanh hành động ──────────────────────────────────── */
+.day{padding:11px 14px;display:flex;gap:9px;align-items:center;flex-wrap:wrap;
+     border-top:1px solid var(--line);background:var(--alt)}
+.day.canhbao{background:var(--warn-bg);border-top-color:var(--warn-line)}
+button.act{font:inherit;font-size:13px;font-weight:500;padding:7px 15px;
+  border-radius:var(--bo);cursor:pointer;border:1px solid var(--line);
+  background:var(--surface);color:var(--ink)}
+button.act:hover{border-color:var(--accent);color:var(--accent)}
+button.act.chinh{background:var(--accent);border-color:var(--accent);color:#fff}
+button.act.chinh:hover{background:var(--accent-hi);border-color:var(--accent-hi);color:#fff}
+button.act.canh{background:var(--surface);border-color:var(--warn);color:var(--warn)}
+button.act.canh:hover{background:var(--warn);border-color:var(--warn);color:#fff}
+button.act.nho{font-size:11.5px;padding:3px 9px}
+button.act:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+button.act[disabled]{opacity:.4;cursor:default}
+button.act[disabled]:hover{border-color:var(--line);color:var(--ink)}
+.day .gt{font-size:11.5px;color:var(--muted);margin-left:auto;text-align:right;max-width:60%}
+.day.canhbao .gt{color:var(--warn)}
+
+.trong{padding:26px 16px;text-align:center;color:var(--muted);font-size:13px}
+.trong .big{display:block;font-size:15px;color:var(--ink);font-weight:600;margin-bottom:4px}
+.canh{margin:0;padding:9px 14px;font-size:11.5px;background:var(--warn-bg);
+      color:var(--warn);border-bottom:1px solid var(--warn-line);
+      display:flex;gap:8px;align-items:baseline}
+.canh.kh{background:var(--crit-bg);color:var(--crit);border-color:var(--crit-line)}
+.canh.info{background:var(--info-bg);color:var(--info);border-color:var(--info-line)}
+.canh b{font-weight:600}
+kbd{font-family:var(--mono);font-size:11px;background:var(--alt);
+    border:1px solid var(--line);border-bottom-width:2px;
+    border-radius:var(--bo-nho);padding:0 5px}
+.chan{margin-top:20px;padding-top:13px;border-top:1px solid var(--line);
+      font-size:11.5px;color:var(--muted);max-width:92ch}
+.chan b{color:var(--ink)}
+.chan details{margin-top:12px}
+.chan summary{cursor:pointer;color:var(--accent);font-weight:500}
+.chan summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.chan dl{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 14px;margin:9px 0 0}
+.chan dt{color:var(--ink);font-weight:600}
+.chan dd{margin:0}
+</style>
+</head>
+<body>
+
+<div class="top"><div class="top-in">
+  <div>
+    <h1>Gán lệnh chi với giao dịch</h1>
+    <div class="sub">FLS · bản dựng thử trên dữ liệu thật · xếp theo <b>thời gian</b></div>
+  </div>
+  <div class="right">
+    <div class="meta">đo <span class="num">18/09/2026</span> · tên cá nhân <b>đã che</b><br>
+      <span class="num" id="n-mau">0</span> lệnh chi trong bản dựng</div>
+    <button class="tbtn" id="nut-nen" type="button">Nền tối</button>
+  </div>
+</div></div>
+
+<div class="wrap">
+  <div class="bang-viec">
+    <div class="viec dagan"><div class="v" id="d-dagan">0</div>
+      <div class="k"><b>đã gán</b></div>
+      <div class="h">trên tổng <span class="num" id="d-tong">0</span> lệnh chi</div></div>
+    <div class="viec"><div class="v" id="d-chua">0</div>
+      <div class="k">chưa gán</div>
+      <div class="h">việc còn lại</div></div>
+    <div class="viec dexuat"><div class="v" id="d-dexuat">47</div>
+      <div class="k">máy <b>đề xuất gán</b></div>
+      <div class="h">khớp cả số chứng từ lẫn số tiền</div></div>
+    <div class="viec"><div class="v" id="d-khong">768</div>
+      <div class="k">không gán được</div>
+      <div class="h">sổ không có đồng tiền nào mang số ấy</div></div>
+  </div>
+
+  <div class="co2">
+    <div class="hop">
+      <div class="hop-h">
+        <div class="loc" id="loc">
+          <button data-l="chua" aria-pressed="true">Chưa gán<b id="l-chua"></b></button>
+          <button data-l="da" aria-pressed="false">Đã gán<b id="l-da"></b></button>
+          <button data-l="tat" aria-pressed="false">Tất cả<b id="l-tat"></b></button>
+        </div>
+        <span class="p"><button class="act nho" id="nut-du">Xem đủ trường ↗</button>
+          <span><kbd>↑</kbd><kbd>↓</kbd> chọn lệnh</span></span>
+      </div>
+      <div id="ds"></div>
+    </div>
+
+    <div class="hop panel">
+      <div class="hop-h">
+        <h2>Giao dịch tương ứng</h2>
+        <span class="p" id="p-dem">chọn một lệnh chi</span>
+      </div>
+      <div class="p-body" id="panel"></div>
+      <div id="day"></div>
+    </div>
+  </div>
+
+  <div class="chan">
+    <b>Bản dựng thử, chưa phải màn thật.</b> Lệnh chi và giao dịch lấy thật từ kho
+    <span class="num">fls</span> ngày <span class="num">18/09/2026</span>; ứng viên do
+    <b>chính hàm mà cửa API gọi</b> sinh ra. Bản dựng lấy <b>40 lệnh chi</b>
+    (<b>26</b> chưa gán + <b>14</b> đã gán), không phải toàn bộ
+    <span class="num">3.772</span>. Bấm “Gán” <b>không ghi gì vào kho</b>.
+    <br><br>
+    ⚠ <b>Bốn bậc ứng viên không phải luật ghép của kế toán.</b> Máy xếp theo
+    <i>khớp số chứng từ › đúng số tiền › gần đúng › cùng đơn vị tiền</i> — thứ tự suy từ
+    dữ liệu, có trước buổi BA. Luật thật (<span class="num">DT-I13</span>) chia
+    <b>Việt Nam</b> / <b>nước ngoài</b> và chưa được cài.
+
+    <details>
+      <summary>Ghi chú thiết kế — bốn quyết định khó của bản này</summary>
+      <dl>
+        <dt>Bốn bậc</dt>
+        <dd>Phân bằng <b>nhóm có tiêu đề ＋ thứ tự</b>, không phải bốn cái nhãn cùng cỡ.
+          Mỗi bậc chỉ được tô màu <b>một lần</b> — ở tiêu đề nhóm và vạch trái 3px.
+          Bậc ④ (149/226 ứng viên) <b>không có màu</b> và <b>gấp lại</b> khi quá 5 dòng:
+          bậc yếu nhất không được chiếm màu lẫn diện tích.</dd>
+        <dt>Diễn giải 189 ký tự</dt>
+        <dd>Cắt <b>2 dòng</b> tại chỗ ＋ liên kết <i>đủ ↓</i> mở rộng ngay trong dòng
+          (không tooltip — tooltip không đọc được bằng mắt lướt, không copy được).
+          Phần trùng với lệnh chi — <b>số chứng từ, số tiền, tên người nhận</b> — được
+          <mark>đánh dấu</mark>, nên mắt bắt bằng chứng trước khi đọc chữ.</dd>
+        <dt>“Đề xuất” ≠ “đã gán”</dt>
+        <dd>Khác <b>hình</b>, không khác chữ: đề xuất = viền <b>đứt</b> ＋ nền cảnh báo ＋
+          <b>không</b> được chọn sẵn (máy không bấm hộ); đã gán = khối xanh riêng
+          <b>trên</b> danh sách ＋ vạch liền. Dòng đang gán cũng được đánh dấu
+          <i>đang gán</i> ngay trong danh sách để thấy mình đang đổi từ cái gì.</dd>
+        <dt>Chống gật phản xạ</dt>
+        <dd>Khi <b>không</b> có ứng viên nào đúng số tiền, thanh hành động
+          <b>đổi màu sang cảnh báo</b>, nút chính <b>bỏ nền đặc</b>, phím
+          <kbd>Enter</kbd> bị <b>khoá</b>, và phải bấm <b>hai lần</b> (lần đầu hiện
+          “Xác nhận gán lệch …”). Ca an toàn thì Enter vẫn gán một nhịp.</dd>
+      </dl>
+    </details>
+  </div>
+</div>
+
+<script>
+const D = {"tk":{"tu_dong":47,"thu_cong":738,"khong":768,"tong_pm":3772,"da_gan":2219,"chua_gan":1553,"nguoi_gan":0},"lenh":[{"ma":"PM02398-1","phieu":"PM02398","ngay":"2026-08-28","tien":"1000.00","curr":"USD","nguoi_nhan":"Thanh toán thẻ","ngan_hang":"Thanh toán thẻ","phap_nhan":"SGO2","noi_dung":"Thanh toán chi phí Fal.ai 27/08/2026","ref":"1026946429","cdt1":"CVL | VisionLab","hd":"LC | License Cost","trang_thai":"chua","ro":"may","tu_chung":false,"vi_sao":"","uv":[{"id":"96060","ngay":"2026-08-24","so_ct":"1026946429","curr":"USD","tien":"1000.00","chieu":"Có","tk":"PO2","bank":"OCBC","le":"SGO2","dg":"Card charge (OPENAI *CHATGPT SUBSCR)","bac":"ma","lech":"0"},{"id":"40309","ngay":"2026-06-16","so_ct":"202606160843332","curr":"USD","tien":"1000.00","chieu":"Có","tk":"3759017445","bank":"UOB","le":"TPCI","dg":"FUNDS TRF - \nTT 1OR606160155C01 \n1OR606160155C01 \nSENSORTOWER, INC.","bac":"tien","lech":"0"},{"id":"95145","ngay":"2025-11-15","so_ct":"944409663","curr":"USD","tien":"1000.00","chieu":"Có","tk":"PO2","bank":"OCBC","le":"SGO2","dg":"Card charge (HAILUOAI.VIDEO)","bac":"tien","lech":"0"},{"id":"95201","ngay":"2025-11-25","so_ct":"947654220","curr":"USD","tien":"1000.00","chieu":"Có","tk":"PO2","bank":"OCBC","le":"SGO2","dg":"Card charge (APPLEADS/APPLE164)","bac":"tien","lech":"0"},{"id":"95211","ngay":"2025-11-27","so_ct":"948274162","curr":"USD","tien":"1000.00","chieu":"Có","tk":"PO2","bank":"OCBC","le":"SGO2","dg":"Card charge (CLAUDE.AI SUBSCRIPTION)","bac":"tien","lech":"0"},{"id":"96090","ngay":"2026-08-29","so_ct":"1028249786","curr":"USD","tien":"1000.00","chieu":"Có","tk":"PO2","bank":"OCBC","le":"SGO2","dg":"Card charge (FAL FEATURES LABELS)","bac":"tien","lech":"0"}],"bi_cat":true,"tong_cung_tt":3766,"da_noi":null},{"ma":"PM02392-6","phieu":"PM02392","ngay":"2026-08-27","tien":"3900000.00","curr":"VND","nguoi_nhan":"B. C. S. C. G.","ngan_hang":"BIDV","phap_nhan":"VVOH - Astronex","noi_dung":"NNN_Astronex_Thanh toán chi phí BHXH T08.2026","ref":"FT26239380590019","cdt1":"SHQ2 | Headquarters2","hd":"HCC | HR Culture Activities Cost","trang_thai":"da","ro":"","tu_chung":false,"vi_sao":"","da_noi":{"id":"33278","ngay":"2026-08-27","so_ct":"FT26239380590019","curr":"VND","tien":"3900000.00","chieu":"Có","tk":"363969186","bank":"VPB","le":"ASTRONEX","dg":"TE06039 CONG TY CO PHAN ASTRONEX ID PM02392-5","bac":null,"lech":"0"},"hinh":"A","uv":[{"id":"25587","ngay":"2025-05-07","so_ct":"20250507115018","curr":"VND","tien":"3900000.00","chieu":"Có","tk":"03088010516666","bank":"MSB","le":"CN","dg":"03088010516666-135598-CK 24/7 cho 1590052779- Apero TT loi nhuan t03 2025","bac":"tien","lech":"0"},{"id":"26583","ngay":"2025-05-07","so_ct":"2025050711501","curr":"VND","tien":"3900000.00","chieu":"Nợ","tk":"03501011740127","bank":"MSB","le":"CN","dg":"RRN512707149083 Thanh toan truc tuy en + Adobe","bac":"tien","lech":"0"},{"id":"40638","ngay":"2025-09-13","so_ct":"IBSML247/FT25256NNL2L","curr":"VND","tien":"3896132.00","chieu":"Nợ","tk":"39928888","bank":"MSB","le":"VGOH","dg":"Apero HQ TT LamLT PM01077 1","bac":"cung_tien_te","lech":"3868.00"},{"id":"29788","ngay":"2026-06-29","so_ct":"FT26180655405521","curr":"VND","tien":"3878724.00","chieu":"Có","tk":"358468128","bank":"VPB","le":"VGOH","dg":"Nhan lai tu tai khoan 358468128-20260630","bac":"cung_tien_te","lech":"21276.00"},{"id":"29354","ngay":"2025-01-15","so_ct":"FT25015102770008","curr":"VND","tien":"3923820.00","chieu":"Có","tk":"358468128","bank":"VPB","le":"VGOH","dg":"Apero HQ TT bo ghe Sofa L2 ID: 179","bac":"cung_tien_te","lech":"23820.00"}],"bi_cat":true,"tong_cung_tt":2239},{"ma":"PM02392-5","phieu":"PM02392","ngay":"2026-08-27","tien":"51680000.00","curr":"VND","nguoi_nhan":"B. C. S. C. G.","ngan_hang":"BIDV","phap_nhan":"VVOH - Astronex","noi_dung":"Astronex_Thanh toán chi phí BHXH T08.2026","ref":"FT26239856206551","cdt1":"SHQ2 | Headquarters2","hd":"HCC | HR Culture Activities Cost","trang_thai":"da","ro":"","tu_chung":false,"vi_sao":"","da_noi":{"id":"33279","ngay":"2026-08-27","so_ct":"FT26239856206551","curr":"VND","tien":"51680000.00","chieu":"Có","tk":"363969186","bank":"VPB","le":"ASTRONEX","dg":"ASTRONEX thuong 2.9","bac":null,"lech":"0"},"hinh":"A","uv":[{"id":"25084","ngay":"2025-01-21","so_ct":"20250121175546","curr":"VND","tien":"51959387.00","chieu":"Có","tk":"03088010516666","bank":"MSB","le":"CN","dg":"03088010516666-186498-CK\n24/7 cho 1590052779- Apero TT t12 2024 cho top rate","bac":"cung_tien_te","lech":"279387.00"},{"id":"26466","ngay":"2025-01-15","so_ct":"20250115091835","curr":"VND","tien":"50809385.00","chieu":"Có","tk":"03501011740127","bank":"MSB","le":"CN","dg":"RRN011321412796 Thanh toan truc tuy en + POE.COM","bac":"cung_tien_te","lech":"870615.00"},{"id":"25466","ngay":"2025-02-20","so_ct":"2025022017044","curr":"VND","tien":"50000000.00","chieu":"Nợ","tk":"03088010516666","bank":"MSB","le":"CN","dg":"03088010516666-065728-TRAN\nHUONG GIANG transfer","bac":"cung_tien_te","lech":"1680000.00"},{"id":"25477","ngay":"2025-02-11","so_ct":"20250211153215","curr":"VND","tien":"50000000.00","chieu":"Có","tk":"03088010516666","bank":"MSB","le":"CN","dg":"03088010516666-168596-CK\n24/7 cho 94087643- APR CHUYEN TIEN THANG 1","bac":"cung_tien_te","lech":"1680000.00"},{"id":"25509","ngay":"2025-03-14","so_ct":"2025031415006","curr":"VND","tien":"50000000.00","chieu":"Nợ","tk":"03088010516666","bank":"MSB","le":"CN","dg":"LE KHANH HUYEN nộp tiền thu vé giải chạy ngày 08/03/2025","bac":"cung_tien_te","lech":"1680000.00"}],"bi_cat":true,"tong_cung_tt":2239},{"ma":"PM02392-1","phieu":"PM02392","ngay":"2026-08-27","tien":"169452500.00","curr":"VND","nguoi_nhan":"B. C. S. D. D.","ngan_hang":"BIDV","phap_nhan":"VGOH - APERO HQ","noi_dung":"Apero HQ_Thanh toán chi phí BHXH T08.2026","ref":"FT2623954S9Z","cdt1":"SHQ2 | Headquarters2","hd":"HCC | HR Culture Activities Cost","trang_thai":"da","ro":"","tu_chung":false,"vi_sao":"","da_noi":{"id":"41209","ngay":"2026-08-27","so_ct":"FT2623954S9Z","curr":"VND","tien":"169452500.00","chieu":"Có","tk":"39928888","bank":"MSB","le":"VGOH","dg":"39928888-Ref 6239MCOBQ2MJL1YV-CK 24/7 cho 0869369924-APERO HQ TT CP 08.2026 PM023661","bac":null,"lech":"0"},"hinh":"A","uv":[{"id":"33212","ngay":"2026-07-06","so_ct":"FT26187999319281","curr":"VND","tien":"168611570.00","chieu":"Có","tk":"363969186","bank":"VPB","le":"ASTRONEX","dg":"TE06039 CONG TY CO PHAN ASTRONEX TT BHNH T06.26 NVN ID PM02040-5","bac":"cung_tien_te","lech":"840930.00"},{"id":"33283","ngay":"2026-09-07","so_ct":"FT26250984307285","curr":"VND","tien":"170845238.00","chieu":"Có","tk":"363969186","bank":"VPB","le":"ASTRONEX","dg":"Astronex_Chi phí lương T08.2026_Đợt 02 PM02418-10","bac":"cung_tien_te","lech":"1392738.00"},{"id":"33119","ngay":"2026-04-06","so_ct":"FT26096194172990","curr":"VND","tien":"167727273.00","chieu":"Có","tk":"363969186","bank":"VPB","le":"ASTRONEX","dg":"46869999 CTY CO PHAN ASTRONEX CHUYEN KHOAN TU TCB SANG VPBANK","bac":"cung_tien_te","lech":"1725227.00"},{"id":"28605","ngay":"2026-07-31","so_ct":"FT26213538542417","curr":"VND","tien":"175187404.00","chieu":"Có","tk":"358460305","bank":"VPB","le":"VISIONLAB","dg":"VISIONLAB TT CP bao hiem PTI thang 07.26 PM02178-6","bac":"cung_tien_te","lech":"5734904.00"},{"id":"28090","ngay":"2026-07-31","so_ct":"FT26213034034026","curr":"VND","tien":"175544076.00","chieu":"Có","tk":"355483193","bank":"VPB","le":"TERASOFTS","dg":"Nhan lai tu tai khoan 355483193-20260731","bac":"cung_tien_te","lech":"6091576.00"}],"bi_cat":true,"tong_cung_tt":2239},{"ma":"PM02366-1","phieu":"PM02366","ngay":"2026-08-27","tien":"4106001.00","curr":"VND","nguoi_nhan":"N. T. T. T.","ngan_hang":"VPBank","phap_nhan":"VGOH - APERO HQ","noi_dung":"Thanh toán chi phí chương trình Fipo 2026","ref":"FT26239F9JKX","cdt1":"SHQ2 | Headquarters2","hd":"REC | Recruitment Cost","trang_thai":"da","ro":"","tu_chung":false,"vi_sao":"","da_noi":{"id":"41210","ngay":"2026-08-27","so_ct":"FT26239F9JKX","curr":"VND","tien":"4106001.00","chieu":"Có","tk":"39928888","bank":"MSB","le":"VGOH","dg":"APERO HQ TT chi phi PTI T08.2026 Dot 2 PM023145","bac":null,"lech":"0"},"hinh":"A","uv":[{"id":"40980","ngay":"2026-03-31","so_ct":"IB20SML247/FT26090Q48JV","curr":"VND","tien":"4102491.00","chieu":"Nợ","tk":"39928888","bank":"MSB","le":"VGOH","dg":"Credit Interest Tra lai tai khoan","bac":"cung_tien_te","lech":"3510.00"},{"id":"88554","ngay":"2026-08-27","so_ct":"FT26239930082350","curr":"VND","tien":"4050000.00","chieu":"Có","tk":"86933888","bank":"TCB","le":"VOOA","dg":"Tra lai so du tren tai khoan - thang 08/2026","bac":"cung_tien_te","lech":"56001.00"},{"id":"40944","ngay":"2026-03-10","so_ct":"IB20SML247/FT26069J5WNX","curr":"VND","tien":"4047009.00","chieu":"Nợ","tk":"39928888","bank":"MSB","le":"VGOH","dg":"APERO HQ TT CPin li xi Tet PM01644-1","bac":"cung_tien_te","lech":"58992.00"},{"id":"46906","ngay":"2026-07-20","so_ct":"2502","curr":"VND","tien":"4167200.00","chieu":"Có","tk":"621336","bank":"ACB","le":"VOON","dg":"0111541011 - TT CP MUA PHAN MEM KE TOAN AMIS 3 NAM PM022021","bac":"cung_tien_te","lech":"61199.00"},{"id":"27616","ngay":"2026-08-24","so_ct":"FT26236741434167","curr":"VND","tien":"4171500.00","chieu":"Có","tk":"19040237397013","bank":"TCB","le":"VOOL","dg":"NPH Lab Thanh toan luong T07.2026","bac":"cung_tien_te","lech":"65499.00"}],"bi_cat":true,"tong_cung_tt":2239},{"ma":"PM02365-1","phieu":"PM02365","ngay":"2026-08-27","tien":"1768200.00","curr":"VND","nguoi_nhan":"N. T. T. T.","ngan_hang":"VPBank","phap_nhan":"VGOH - APERO HQ","noi_dung":"Thanh toán chi phí chương trình Fime 2026","ref":"FT26239ZJVG9","cdt1":"SHQ2 | Headquarters2","hd":"REC | Recruitment Cost","trang_thai":"da","ro":"","tu_chung":false,"vi_sao":"","da_noi":{"id":"41206","ngay":"2026-08-27","so_ct":"FT26239ZJVG9","curr":"VND","tien":"1768200.00","chieu":"Có","tk":"39928888","bank":"MSB","le":"VGOH","dg":"39928888-Ref 6239MCOBQ2MJYQXA-CK 24/7 cho 63186868686-APERO HQ TT dat HF 28.8.2026 PM022662","bac":null,"lech":"0"},"hinh":"A","uv":[{"id":"25063","ngay":"2025-01-23","so_ct":"20250123174225","curr":"VND","tien":"1800000.00","chieu":"Có","tk":"03088010516666","bank":"MSB","le":"CN","dg":"03088010516666-128529-CK\n24/7 cho 02336458302- Chuyen t ien li xi menh gia 500 va 50","bac":"cung_tien_te","lech":"31800.00"},{"id":"25625","ngay":"2025-06-05","so_ct":"2025060511061","curr":"VND","tien":"1800000.00","chieu":"Có","tk":"03088010516666","bank":"MSB","le":"CN","dg":"03088010516666-187110-CK 24/7 cho 228292796- TT clb\r","bac":"cung_tien_te","lech":"31800.00"},{"id":"26638","ngay":"2025-06-05","so_ct":"2025060511061","curr":"VND","tien":"1800000.00","chieu":"Nợ","tk":"03501011740127","bank":"MSB","le":"CN","dg":"RRN515604153470 Thanh toan truc tuy en + Adobe","bac":"cung_tien_te","lech":"31800.00"},{"id":"28464","ngay":"2025-12-15","so_ct":"FT25349682179495","curr":"VND","tien":"1728000.00","chieu":"Có","tk":"358460305","bank":"VPB","le":"VISIONLAB","dg":"VISIONLAB TT BHXH tháng 12.2025 PM01372-4","bac":"cung_tien_te","lech":"40200.00"},{"id":"29682","ngay":"2026-02-19","so_ct":"FT26050657907052","curr":"VND","tien":"1834714.00","chieu":"Có","tk":"358468128","bank":"VPB","le":"VGOH","dg":"APERO HQ_So the 5223xxxx1948 GD thanh toan tai Adobe Saggart DublIE_2.3","bac":"cung_tien_te","lech":"66514.00"}],"bi_cat":true,"tong_cung_tt":2239},{"ma":"PM02317-5","phieu":"PM02317","ngay":"2026-08-26","tien":"3450000.00","curr":"VND","nguoi_nhan":"C. D. V. N.","ngan_hang":"Vietcombank","phap_nhan":"VVOH - Astronex","noi_dung":"Astronex_Thanh toán KPCĐ T07.2026","ref":"FT26239160554131","cdt1":"SHQ2 | Headquarters2","hd":"INT | Insurance Total","trang_thai":"da","ro":"","tu_chung":false,"vi_sao":"","da_noi":{"id":"33277","ngay":"2026-08-27","so_ct":"FT26239160554131","curr":"VND","tien":"3450000.00","chieu":"Có","tk":"363969186","bank":"VPB","le":"ASTRONEX","dg":"IC1301E CONG TY CO PHAN ASTRONEX IDPM02392-6","bac":null,"lech":"0"},"hinh":"A","uv":[{"id":"29758","ngay":"2026-05-19","so_ct":"FT26139996382589","curr":"VND","tien":"3452454.00","chieu":"Có","tk":"358468128","bank":"VPB","le":"VGOH","dg":"So the 5223xxxx1948 GD thanh toan tai Adobe com Saggart DublIE","bac":"cung_tien_te","lech":"2454.00"},{"id":"25468","ngay":"2025-02-20","so_ct":"2025022010466","curr":"VND","tien":"3500000.00","chieu":"Nợ","tk":"03088010516666","bank":"MSB","le":"CN","dg":"Chu Thi Thuong chuyen tien","bac":"cung_tien_te","lech":"50000.00"},{"id":"26483","ngay":"2025-02-20","so_ct":"2025022010466","curr":"VND","tien":"3500000.00","chieu":"Có","tk":"03501011740127","bank":"MSB","le":"CN","dg":"AC-VND1755200011000","bac":"cung_tien_te","lech":"50000.00"},{"id":"25474","ngay":"2025-02-18","so_ct":"20250218092812","curr":"VND","tien":"3396152.00","chieu":"Nợ","tk":"03088010516666","bank":"MSB","le":"CN","dg":"NTT Ck phi dv va app fee","bac":"cung_tien_te","lech":"53848.00"},{"id":"28934","ngay":"2025-10-31","so_ct":"FT25304505917070","curr":"VND","tien":"3520000.00","chieu":"Có","tk":"358465978","bank":"VPB","le":"SUPERMINDS","dg":"SUPERMINDS nộp thuế TNCN Q3.2025 PM01178-3","bac":"cung_tien_te","lech":"70000.00"}],"bi_cat":true,"tong_cung_tt":2239},{"ma":"PM02317-1","phieu":"PM02317","ngay":"2026-08-26","tien":"11000000.00","curr":"VND","nguoi_nhan":"C. D. V. N.","ngan_hang":"Vietcombank","phap_nhan":"VGOH - APERO HQ","noi_dung":"Apero HQ_Thanh toán KĐCĐ T07.2026","ref":"FT26239WTJGP","cdt1":"SHQ2 | Headquarters2","hd":"INT | Insurance Total","trang_thai":"da","ro":"","tu_chung":false,"vi_sao":"","da_noi":{"id":"41208","ngay":"2026-08-27","so_ct":"FT26239WTJGP","curr":"VND","tien":"11000000.00","chieu":"Có","tk":"39928888","bank":"MSB","le":"VGOH","dg":"39928888-Ref 6239MCOBQ2MJYQKH-CK 24/7 cho 1229801040-TF03897 CONG TY CO PHAN APERO HQ PM023921","bac":null,"lech":"0"},"hinh":"A","uv":[{"id":"25469","ngay":"2025-02-20","so_ct":"2025022009317","curr":"VND","tien":"11000000.00","chieu":"Có","tk":"03088010516666","bank":"MSB","le":"CN","dg":"Chu Thi Thuong chuyen tien","bac":"tien","lech":"0"},{"id":"26500","ngay":"2025-02-20","so_ct":"20250220093123","curr":"VND","tien":"11000000.00","chieu":"Nợ","tk":"03501011740127","bank":"MSB","le":"CN","dg":"Chu Thi Thuong chuyen tien","bac":"tien","lech":"0"},{"id":"28057","ngay":"2026-06-24","so_ct":"FT26175740783698","curr":"VND","tien":"10829000.00","chieu":"Có","tk":"355483193","bank":"VPB","le":"TERASOFTS","dg":"TERASOFTS TT CP bao hiem PTI thang 06.26 ID PM02044-3","bac":"cung_tien_te","lech":"171000.00"},{"id":"28058","ngay":"2026-06-24","so_ct":"FT26175740783698","curr":"VND","tien":"10829000.00","chieu":"Nợ","tk":"355483193","bank":"VPB","le":"TERASOFTS","dg":"TERASOFTS TT CP mua phan mem ke toan misa 3 nam PM02060-2","bac":"cung_tien_te","lech":"171000.00"},{"id":"88540","ngay":"2026-06-29","so_ct":"FT26180880520800","curr":"VND","tien":"10829000.00","chieu":"Có","tk":"86933888","bank":"TCB","le":"VOOA","dg":"The Arrow thanh toan luong T04.26 L2 MinhLT PM01914-1","bac":"cung_tien_te","lech":"171000.00"}],"bi_cat":true,"tong_cung_tt":2239},{"ma":"PM02303-1","phieu":"PM02303","ngay":"2026-08-26","tien":"1368.00","curr":"SGD","nguoi_nhan":"Gateway Of Asia Pte Ltd","ngan_hang":"UOB","phap_nhan":"SGO1","noi_dung":"Thanh toan INV 6792 202608 PI02303","ref":"","cdt1":"SHQ2 | Headquarters2","hd":"CXB | Biz Development","trang_thai":"chua","ro":"nguoi","tu_chung":false,"vi_sao":"⛔ chưa có số chứng từ ⇒ phải tra bằng TIỀN + NGÀY","uv":[{"id":"42344","ngay":"2026-07-20","so_ct":"202607200000","curr":"SGD","tien":"1320.66","chieu":"Nợ","tk":"604046904001","bank":"OCBC","le":"SGO2","dg":"PAYMENT/TRANSFER\nCSDB\nSTRIPE PAYMENTS SIN\nSTRIPE LKuWsFH5A","bac":"cung_tien_te","lech":"47.34"},{"id":"42340","ngay":"2026-07-14","so_ct":"CSDB","curr":"SGD","tien":"1243.17","chieu":"Nợ","tk":"604046904001","bank":"OCBC","le":"SGO2","dg":"PAYMENT/TRANSFER\r\nPAYMENT/TRANSFER\r\nCSDB\r\nSTRIPE PAYMENTS SIN\r\nSTRIPE imbRT4V7E\r\nSTRIPE imbRT4V7E","bac":"cung_tien_te","lech":"124.83"},{"id":"134554","ngay":"2025-08-01","so_ct":"281475390911820","curr":"SGD","tien":"1500.00","chieu":"Nợ","tk":"604749168001","bank":"OCBC","le":"BGO2","dg":"OTHR IBG GIRO","bac":"cung_tien_te","lech":"132.00"},{"id":"36779","ngay":"2026-05-28","so_ct":"202605281640","curr":"SGD","tien":"1090.00","chieu":"Có","tk":"3753083292","bank":"UOB","le":"TPCI","dg":"Inward CR - GIRO\r\nIRAS\r\nREFU Refund\r\nGST 201737030R","bac":"cung_tien_te","lech":"278.00"},{"id":"42328","ngay":"2026-06-15","so_ct":"CT0039243127M001","curr":"SGD","tien":"1075.49","chieu":"Có","tk":"604046904001","bank":"OCBC","le":"SGO2","dg":"BANK FEE","bac":"cung_tien_te","lech":"292.51"},{"id":"134233","ngay":"2026-05-12","so_ct":"CT0038872543M001","curr":"SGD","tien":"1695.00","chieu":"Có","tk":"604046904001","bank":"OCBC","le":"SGO2","dg":"BANK FEE","bac":"cung_tien_te","lech":"327.00"}],"bi_cat":true,"tong_cung_tt":140,"da_noi":null},{"ma":"PM02266-2","phieu":"PM02266","ngay":"2026-08-26","tien":"8147250.00","curr":"VND","nguoi_nhan":"CÔNG TY TNHH CẢM XÚC","ngan_hang":"TPBank","phap_nhan":"VGOH - APERO HQ","noi_dung":"Đặt happy friday vp HN ngày 28.8.2026","ref":"FT26239J3HQQ","cdt1":"SHQ2 | Headquarters2","hd":"OGA | GAC - Other","trang_thai":"da","ro":"","tu_chung":false,"vi_sao":"","da_noi":{"id":"41207","ngay":"2026-08-27","so_ct":"FT26239J3HQQ","curr":"VND","tien":"8147250.00","chieu":"Có","tk":"39928888","bank":"MSB","le":"VGOH","dg":"39928888-Ref 6239MCOBQ2MJL1Q7-CK 24/7 cho VCBTLD0110872412-CONG TY CO PHAN APERO HQ DONG KPCD THANG 07.2026 PM023171","bac":null,"lech":"0"},"hinh":"A","uv":[{"id":"28108","ngay":"2026-08-28","so_ct":"FT26240015081936","curr":"VND","tien":"8056000.00","chieu":"Có","tk":"355483193","bank":"VPB","le":"TERASOFTS","dg":"TERASOFTS TT CP server T06.2026 - PM02279-1 - CONG TY TNHH ECV TECHNOLOGY","bac":"cung_tien_te","lech":"91250.00"},{"id":"27598","ngay":"2026-07-31","so_ct":"FT26212150014994","curr":"VND","tien":"8010000.00","chieu":"Có","tk":"19040237397013","bank":"TCB","le":"VOOL","dg":"NPH Lab Thanh toan luong T062026","bac":"cung_tien_te","lech":"137250.00"},{"id":"27613","ngay":"2026-08-24","so_ct":"FT26236563091437","curr":"VND","tien":"7983250.00","chieu":"Có","tk":"19040237397013","bank":"TCB","le":"VOOL","dg":"NPH LAB TT CP BHXH 07.2026 PM02337-1","bac":"cung_tien_te","lech":"164000.00"},{"id":"33114","ngay":"2026-03-26","so_ct":"FT26085991385691","curr":"VND","tien":"8313024.00","chieu":"Có","tk":"363969186","bank":"VPB","le":"ASTRONEX","dg":"ASTRONEX TT CP T3.26 PM01519-3","bac":"cung_tien_te","lech":"165774.00"},{"id":"27600","ngay":"2026-07-31","so_ct":"FT26212922674680","curr":"VND","tien":"8314550.00","chieu":"Có","tk":"19040237397013","bank":"TCB","le":"VOOL","dg":"NPH Lab Thanh toan luong T062026","bac":"cung_tien_te","lech":"167300.00"}],"bi_cat":true,"tong_cung_tt":2239},{"ma":"PM02379-1","phieu":"PM02379","ngay":"2026-08-25","tien":"50.00","curr":"USD","nguoi_nhan":"Thanh toán thẻ","ngan_hang":"Thanh toán thẻ","phap_nhan":"SGO2","noi_dung":"Thanh toán chi phí Fal.ai cho Web Genius","ref":"1027278343","cdt1":"CVL | VisionLab","hd":"LC | License Cost","trang_thai":"da","ro":"","tu_chung":false,"vi_sao":"","da_noi":{"id":"96068","ngay":"2026-08-25","so_ct":"1027278343","curr":"USD","tien":"50.00","chieu":"Có","tk":"PO2","bank":"OCBC","le":"SGO2","dg":"Card charge (FAL FEATURES LABELS)","bac":null,"lech":"0"},"hinh":"A","uv":[{"id":"88240","ngay":"2026-08-15","so_ct":"8f10fe9d-fa47-3f4d-9b04-8ca2b88d0465","curr":"USD","tien":"50.00","chieu":"Có","tk":"7950136222","bank":"Airwallex","le":"HGO1","dg":"","bac":"tien","lech":"0"},{"id":"88346","ngay":"2026-08-28","so_ct":"746fc5df-f7bc-46f9-8b05-a8f248b731c2","curr":"USD","tien":"50.00","chieu":"Có","tk":"7950162651","bank":"Airwallex","le":"HGO2","dg":"Purchase for -8,000,000 VND from Google ADS8902329488, Singapore, SGP (LUMINEX SOFTWARE LIMITED, ************4389)","bac":"tien","lech":"0"},{"id":"94872","ngay":"2025-06-25","so_ct":"898440199","curr":"USD","tien":"50.00","chieu":"Có","tk":"PO2","bank":"OCBC","le":"SGO2","dg":"Card charge (SUNO INC.) - 202506 PM00754-1","bac":"tien","lech":"0"},{"id":"94890","ngay":"2025-07-23","so_ct":"907492384","curr":"USD","tien":"50.00","chieu":"Có","tk":"PO2","bank":"OCBC","le":"SGO2","dg":"Card charge (CURSOR, AI POWERED IDE)","bac":"tien","lech":"0"},{"id":"94904","ngay":"2025-07-29","so_ct":"909603046","curr":"USD","tien":"50.00","chieu":"Có","tk":"PO2","bank":"OCBC","le":"SGO2","dg":"Card charge (OPENAI *CHATGPT SUBSCR)","bac":"tien","lech":"0"}],"bi_cat":true,"tong_cung_tt":3766},{"ma":"PM02378-1","phieu":"PM02378","ngay":"2026-08-25","tien":"500.00","curr":"USD","nguoi_nhan":"Thanh toán thẻ","ngan_hang":"Thanh toán thẻ","phap_nhan":"SGO2","noi_dung":"Thanh toán chi phí Fal.ai 25/08/2026","ref":"1027278304","cdt1":"CVL | VisionLab","hd":"LC | License Cost","trang_thai":"da","ro":"","tu_chung":false,"vi_sao":"","da_noi":{"id":"96067","ngay":"2026-08-25","so_ct":"1027278304","curr":"USD","tien":"500.00","chieu":"Có","tk":"PO2","bank":"OCBC","le":"SGO2","dg":"Card charge (FAL FEATURES LABELS)","bac":null,"lech":"0"},"hinh":"A","uv":[{"id":"47294","ngay":"2025-09-29","so_ct":"CT0036468532M001135","curr":"USD","tien":"500.00","chieu":"Có","tk":"687160325201","bank":"OCBC","le":"SGO2","dg":"BANK FEE","bac":"tien","lech":"0"},{"id":"94902","ngay":"2025-07-28","so_ct":"909222936","curr":"USD","tien":"500.00","chieu":"Có","tk":"PO2","bank":"OCBC","le":"SGO2","dg":"Card charge (MIXMAX, INC.)","bac":"tien","lech":"0"},{"id":"95510","ngay":"2026-03-19","so_ct":"980593924","curr":"USD","tien":"500.00","chieu":"Có","tk":"PO2","bank":"OCBC","le":"SGO2","dg":"Card charge (FAL FEATURES LABELS)","bac":"tien","lech":"0"},{"id":"95511","ngay":"2026-03-19","so_ct":"980593927","curr":"USD","tien":"500.00","chieu":"Có","tk":"PO2","bank":"OCBC","le":"SGO2","dg":"Card charge (CLAUDE.AI SUBSCRIPTION)","bac":"tien","lech":"0"},{"id":"95592","ngay":"2026-03-30","so_ct":"983763303","curr":"USD","tien":"500.00","chieu":"Có","tk":"PO2","bank":"OCBC","le":"SGO2","dg":"Card charge (FAL FEATURES LABELS)","bac":"tien","lech":"0"}],"bi_cat":true,"tong_cung_tt":3766},{"ma":"PM02326-1","phieu":"PM02326","ngay":"2026-08-25","tien":"265250000.00","curr":"VND","nguoi_nhan":"C. T. C. E. V.","ngan_hang":"Vietcombank","phap_nhan":"VGOH - APERO HQ","noi_dung":"Thanh toán phí thường niên năm 2026 cộng đồng Endeavor Vietnam","ref":"FT26239F00K9","cdt1":"SHQ2 | Headquarters2","hd":"OGA | GAC - Other","trang_thai":"da","ro":"","tu_chung":false,"vi_sao":"","da_noi":{"id":"41212","ngay":"2026-08-27","so_ct":"FT26239F00K9","curr":"VND","tien":"265250000.00","chieu":"Có","tk":"39928888","bank":"MSB","le":"VGOH","dg":"39928888-Ref 6239MCOBQ2MJL1L4-CK 24/7 cho 88079079-APERO HQ THANH TOAN CHI PHI DANG KY THAM GIA GIAI VIETNAM HIGHLANDS TRAIL BY UTMB 2027 PM022344","bac":null,"lech":"0"},"hinh":"A","uv":[{"id":"28344","ngay":"2025-02-11","so_ct":"FT25042010022650","curr":"VND","tien":"275000000.00","chieu":"Nợ","tk":"358460305","bank":"VPB","le":"VISIONLAB","dg":"Visionlab thanh toán lương tháng 01.2025 lần 1 - PM00024-4","bac":"cung_tien_te","lech":"9750000.00"},{"id":"134107","ngay":"2025-02-11","so_ct":"FT25042104478332","curr":"VND","tien":"275000000.00","chieu":"Có","tk":"542888","bank":"TCB","le":"VISIONLAB","dg":"17392422391392YZp6oV NH MUA CUA KH KHACH HANG 40042082 10957.7 USD TG 25330 BAN NGOAI TE","bac":"cung_tien_te","lech":"9750000.00"},{"id":"29055","ngay":"2026-07-07","so_ct":"FT26188159953341","curr":"VND","tien":"253672314.00","chieu":"Có","tk":"358465978","bank":"VPB","le":"SUPERMINDS","dg":"SUPERMINDS TT tien thue van phong Taisei Q3. 2026 PM02157 - APERO HQ","bac":"cung_tien_te","lech":"11577686.00"},{"id":"134108","ngay":"2025-02-11","so_ct":"FT25042584867753","curr":"VND","tien":"277558541.00","chieu":"Nợ","tk":"542888","bank":"TCB","le":"VISIONLAB","dg":"Dieu chuyen sang VP bank","bac":"cung_tien_te","lech":"12308541.00"},{"id":"26398","ngay":"2025-03-07","so_ct":"IBDN247/FT25066G 1PVN","curr":"VND","tien":"279000000.00","chieu":"Có","tk":"03501011292886","bank":"MSB","le":"VGO1","dg":"03501011292886-165143-CK\n24/7 cho 228292796- Apero chuyen tra tien vay","bac":"cung_tien_te","lech":"13750000.00"}],"bi_cat":true,"tong_cung_tt":2239},{"ma":"PM02314-5","phieu":"PM02314","ngay":"2026-08-25","tien":"701726.00","curr":"VND","nguoi_nhan":"C. T. B. H. B. D. T. D. S.","ngan_hang":"MSB","phap_nhan":"VGOH - APERO HQ","noi_dung":"Apero HQ_Thanh toán chi phí PTI T08.2026_Đợt 02","ref":"FT26239TXKRF","cdt1":"SHQ2 | Headquarters2","hd":"HCC | HR Culture Activities Cost","trang_thai":"da","ro":"","tu_chung":false,"vi_sao":"","da_noi":{"id":"41211","ngay":"2026-08-27","so_ct":"FT26239TXKRF","curr":"VND","tien":"701726.00","chieu":"Có","tk":"39928888","bank":"MSB","le":"VGOH","dg":"39928888-Ref 6239MCOBQ2MJYQEK-CK 24/7 cho 0071001276633-APERO HQ TT hop dong ho tro tu van PM023261","bac":null,"lech":"0"},"hinh":"A","uv":[{"id":"29480","ngay":"2025-04-30","so_ct":"358468128-202504","curr":"VND","tien":"715516.00","chieu":"Nợ","tk":"358468128","bank":"VPB","le":"VGOH","dg":"APERO HQ TT CP bonding ID PM PM00444","bac":"cung_tien_te","lech":"13790.00"},{"id":"133935","ngay":"2025-01-03","so_ct":"FT25003377938817","curr":"VND","tien":"668000.00","chieu":"Nợ","tk":"46869999","bank":"TCB","le":"ASTRONEX","dg":"Tra lai so du tren tai khoan - thang 02/2025","bac":"cung_tien_te","lech":"33726.00"},{"id":"29663","ngay":"2026-02-03","so_ct":"FT26034960008342","curr":"VND","tien":"746118.00","chieu":"Có","tk":"358468128","bank":"VPB","le":"VGOH","dg":"APERO HQ_So the 5223xxxx1948 GD thanh toan tai JETPAY hanoi VN","bac":"cung_tien_te","lech":"44392.00"},{"id":"25641","ngay":"2025-06-12","so_ct":"20250612184317","curr":"VND","tien":"754000.00","chieu":"Có","tk":"03088010516666","bank":"MSB","le":"CN","dg":"Thanh toán tiền CHAT GPT cho team Product Tera 202505 PI00587","bac":"cung_tien_te","lech":"52274.00"},{"id":"29564","ngay":"2025-09-19","so_ct":"FT25262384945862","curr":"VND","tien":"756162.00","chieu":"Có","tk":"358468128","bank":"VPB","le":"VGOH","dg":"Apero HQ thanh toan tai Adobe com Saggart DublIE","bac":"cung_tien_te","lech":"54436.00"}],"bi_cat":true,"tong_cung_tt":2239},{"ma":"PM02274-3","phieu":"PM02274","ngay":"2026-08-25","tien":"20000.00","curr":"USD","nguoi_nhan":"thanh toán thẻ","ngan_hang":"Thanh toán thẻ","phap_nhan":"VVOS - SuperMinds","noi_dung":"TT ReelMe Fal Thang 8","ref":"1022244833","cdt1":"CSM | SuperMinds","hd":"API | API","trang_thai":"chua","ro":"may","tu_chung":false,"vi_sao":"","uv":[{"id":"143220","ngay":"2026-08-08","so_ct":"1022244833","curr":"USD","tien":"20000.00","chieu":"Có","tk":"PO2","bank":"OCBC","le":"SGO2","dg":"Card charge (ANTHROPIC* CLAUDE SUB)","bac":"ma","lech":"0"},{"id":"40203","ngay":"2025-12-05","so_ct":"202512051452225","curr":"USD","tien":"20000.00","chieu":"Có","tk":"3759017445","bank":"UOB","le":"TPCI","dg":"SERV CHARGE\r\n1OR512053342C01\r\n1OR512053342C01\r\nASTRONEX JOINT STOCK\r\nCOMPANY","bac":"tien","lech":"0"},{"id":"134658","ngay":"2025-08-01","so_ct":"CT003587340766","curr":"USD","tien":"20000.00","chieu":"Có","tk":"687160325201","bank":"OCBC","le":"SGO2","dg":"Chi phí Bigo tháng 06/2025 - PM00894-1","bac":"tien","lech":"0"},{"id":"140088","ngay":"2026-08-11","so_ct":"9f6cfd41-b2aa-4070-95b6-6e16c8d021a3","curr":"USD","tien":"20000.00","chieu":"Nợ","tk":"7950162651","bank":"Airwallex","le":"HGO2","dg":"BANK FEE","bac":"tien","lech":"0"},{"id":"88635","ngay":"2026-07-27","so_ct":"1015876281","curr":"USD","tien":"19992.29","chieu":"Nợ","tk":"PO1","bank":"UOB","le":"TPCI","dg":"TPCI payment expense Meta Jun 2026\n","bac":"cung_tien_te","lech":"7.71"},{"id":"145236","ngay":"2026-08-11","so_ct":"1022459545","curr":"USD","tien":"20060.18","chieu":"Có","tk":"PO3","bank":"PO","le":"BGO2","dg":"Payment from Digital Turbine - XX-729972 (ABGO LTD)","bac":"cung_tien_te","lech":"60.18"}],"bi_cat":true,"tong_cung_tt":3766,"da_noi":null},{"ma":"PM02234-4","phieu":"PM02234","ngay":"2026-08-25","tien":"23202800.00","curr":"VND","nguoi_nhan":"C. C. T. T. N.","ngan_hang":"Techcombank","phap_nhan":"VGOH - APERO HQ","noi_dung":"THANH TOAN CHI PHI DANG KY THAM GIA GIAI VIETNAM HIGHLANDS TRAIL BY UTMB 2027","ref":"FT26239CJFRG","cdt1":"SHQ1 | Headquarters1","hd":"HCC | HR Culture Activities Cost","trang_thai":"da","ro":"","tu_chung":false,"vi_sao":"","da_noi":{"id":"41213","ngay":"2026-08-27","so_ct":"FT26239CJFRG","curr":"VND","tien":"23202800.00","chieu":"Có","tk":"39928888","bank":"MSB","le":"VGOH","dg":"39928888-Ref 6243MCOBQ2M4MBLB-CK 24/7 cho 9595686886-APERO HQ chuyen tien HF 03.09.26 PM022663","bac":null,"lech":"0"},"hinh":"A","uv":[{"id":"25563","ngay":"2025-04-23","so_ct":"20250423181717","curr":"VND","tien":"22770000.00","chieu":"Nợ","tk":"03088010516666","bank":"MSB","le":"CN","dg":"03088010516666-777806-tra lai tien thua mua ipad air 4","bac":"cung_tien_te","lech":"432800.00"},{"id":"27604","ngay":"2026-07-31","so_ct":"FT26212904248054","curr":"VND","tien":"24000000.00","chieu":"Có","tk":"19040237397013","bank":"TCB","le":"VOOL","dg":"Tra lai so du tren tai khoan - thang 07/2026","bac":"cung_tien_te","lech":"797200.00"},{"id":"27621","ngay":"2026-08-24","so_ct":"FT26236032185103","curr":"VND","tien":"24000000.00","chieu":"Có","tk":"19040237397013","bank":"TCB","le":"VOOL","dg":"NGUYEN THE PHUOC hoan tien","bac":"cung_tien_te","lech":"797200.00"},{"id":"25540","ngay":"2025-04-01","so_ct":"2025040116542","curr":"VND","tien":"24228570.00","chieu":"Có","tk":"03088010516666","bank":"MSB","le":"CN","dg":"03088010516666-133177-CK 24/7 cho 28910000445128- PI 00 0368","bac":"cung_tien_te","lech":"1025770.00"},{"id":"29727","ngay":"2026-04-15","so_ct":"FT26105402784001","curr":"VND","tien":"22117375.00","chieu":"Nợ","tk":"358468128","bank":"VPB","le":"VGOH","dg":"SUPERMINDS TT CP thue van phong Q2.2026 PM01812-1","bac":"cung_tien_te","lech":"1085425.00"}],"bi_cat":true,"tong_cung_tt":2239},{"ma":"PM02361-1","phieu":"PM02361","ngay":"2026-08-24","tien":"3000.00","curr":"USD","nguoi_nhan":"Thanh toán thẻ","ngan_hang":"Thanh toán thẻ","phap_nhan":"SGO2","noi_dung":"Thanh toán chi phí Funnelfox tháng 06/2026","ref":"","cdt1":"CVL | VisionLab","hd":"SC | Server Cost","trang_thai":"chua","ro":"nguoi","tu_chung":false,"vi_sao":"⛔ chưa có số chứng từ ⇒ phải tra bằng TIỀN + NGÀY","uv":[{"id":"94950","ngay":"2025-08-25","so_ct":"918214910","curr":"USD","tien":"3000.00","chieu":"Có","tk":"PO2","bank":"OCBC","le":"SGO2","dg":"Card charge (SEARCHADS/APPLE164)","bac":"tien","lech":"0"},{"id":"95515","ngay":"2026-03-19","so_ct":"980744127","curr":"USD","tien":"3000.00","chieu":"Có","tk":"PO2","bank":"OCBC","le":"SGO2","dg":"Card charge (FAL FEATURES LABELS)","bac":"tien","lech":"0"},{"id":"95668","ngay":"2026-04-21","so_ct":"990053964","curr":"USD","tien":"3000.00","chieu":"Có","tk":"PO2","bank":"OCBC","le":"SGO2","dg":"Card charge (ANTHROPIC: CLAUDE TEAM)","bac":"tien","lech":"0"},{"id":"146996","ngay":"2026-09-08","so_ct":"1033895913","curr":"USD","tien":"3000.00","chieu":"Nợ","tk":"PO5","bank":"PO","le":"UGO2","dg":"Payment to Chase JP Morgan (3199) - Trademark Wandura","bac":"tien","lech":"0"},{"id":"135181","ngay":"2026-07-08","so_ct":"CT0039528303M001589","curr":"USD","tien":"3108.36","chieu":"Có","tk":"687160325201","bank":"OCBC","le":"SGO2","dg":"BANK FEE","bac":"cung_tien_te","lech":"108.36"},{"id":"42132","ngay":"2025-11-28","so_ct":"05018108994010000039","curr":"USD","tien":"2856.00","chieu":"Nợ","tk":"501810899401","bank":"OCBC","le":"SGO2","dg":"Internal transfer OCBC Deposit to OCBC USD","bac":"cung_tien_te","lech":"144.00"}],"bi_cat":true,"tong_cung_tt":3766,"da_noi":null},{"ma":"PM02271-6","phieu":"PM02271","ngay":"2026-08-24","tien":"2440000.00","curr":"VND","nguoi_nhan":"C. C. T. V. D. K. T. D. P.","ngan_hang":"VietinBank","phap_nhan":"VVOH - Astronex","noi_dung":"Mua màn hình cho Võ Mạnh Tâm - ASO Astronex (màn hỏng, sọc ngang)","ref":"FT26237416598870","cdt1":"SHQ2 | Headquarters2","hd":"FNS | Facilities for New Staff","trang_thai":"da","ro":"","tu_chung":false,"vi_sao":"","da_noi":{"id":"33274","ngay":"2026-08-25","so_ct":"FT26237416598870","curr":"VND","tien":"2440000.00","chieu":"Có","tk":"363969186","bank":"VPB","le":"ASTRONEX","dg":"ASTRONEX TT CP KS CT Singapore 22-24.07.26 HoangDNH PM02218-2","bac":null,"lech":"0"},"hinh":"A","uv":[{"id":"41914","ngay":"2025-07-03","so_ct":"2616","curr":"VND","tien":"2438894.00","chieu":"Có","tk":"41694657","bank":"ACB","le":"CN","dg":"","bac":"cung_tien_te","lech":"1106.00"},{"id":"29639","ngay":"2026-01-06","so_ct":"FT26006900441306","curr":"VND","tien":"2448000.00","chieu":"Nợ","tk":"358468128","bank":"VPB","le":"VGOH","dg":"854888 CONG TY CO PHAN APERO HQ CHUYEN KHOAN TU TCB SANG VPBANK","bac":"cung_tien_te","lech":"8000.00"},{"id":"26469","ngay":"2025-01-13","so_ct":"20250113143938","curr":"VND","tien":"2422350.00","chieu":"Có","tk":"03501011740127","bank":"MSB","le":"CN","dg":"RRN011355631786 Thanh toan\ntruc tuy en + INVIDEO INNOVATION","bac":"cung_tien_te","lech":"17650.00"},{"id":"40856","ngay":"2026-01-14","so_ct":"IBDN247/FT253421CZWM","curr":"VND","tien":"2484185.00","chieu":"Nợ","tk":"39928888","bank":"MSB","le":"VGOH","dg":"Apero HQ TT chi phi sinh nhat T12 PM01434 1","bac":"cung_tien_te","lech":"44185.00"},{"id":"32958","ngay":"2025-10-28","so_ct":"FT25301393880810","curr":"VND","tien":"2500000.00","chieu":"Có","tk":"363969186","bank":"VPB","le":"ASTRONEX","dg":"ASTRONEX TT chi phi T10.2025 PM01165-4","bac":"cung_tien_te","lech":"60000.00"}],"bi_cat":true,"tong_cung_tt":2239},{"ma":"PM02364-1","phieu":"PM02364","ngay":"2026-08-22","tien":"3000.00","curr":"USD","nguoi_nhan":"APERO TECHNOLOGIES GROUP, INC.","ngan_hang":"Danh sách đính kèm","phap_nhan":"UGO","noi_dung":"Disbursement for Agreement No.300626/LA/TiepTA-Apero","ref":"","cdt1":"SHQ2 | Headquarters2","hd":"LMN | Loan/Borrowing","trang_thai":"chua","ro":"nguoi","tu_chung":false,"vi_sao":"⛔ chưa có số chứng từ ⇒ phải tra bằng TIỀN + NGÀY","uv":[{"id":"94950","ngay":"2025-08-25","so_ct":"918214910","curr":"USD","tien":"3000.00","chieu":"Có","tk":"PO2","bank":"OCBC","le":"SGO2","dg":"Card charge (SEARCHADS/APPLE164)","bac":"tien","lech":"0"},{"id":"95515","ngay":"2026-03-19","so_ct":"980744127","curr":"USD","tien":"3000.00","chieu":"Có","tk":"PO2","bank":"OCBC","le":"SGO2","dg":"Card charge (FAL FEATURES LABELS)","bac":"tien","lech":"0"},{"id":"95668","ngay":"2026-04-21","so_ct":"990053964","curr":"USD","tien":"3000.00","chieu":"Có","tk":"PO2","bank":"OCBC","le":"SGO2","dg":"Card charge (ANTHROPIC: CLAUDE TEAM)","bac":"tien","lech":"0"},{"id":"146996","ngay":"2026-09-08","so_ct":"1033895913","curr":"USD","tien":"3000.00","chieu":"Nợ","tk":"PO5","bank":"PO","le":"UGO2","dg":"Payment to Chase JP Morgan (3199) - Trademark Wandura","bac":"tien","lech":"0"},{"id":"135181","ngay":"2026-07-08","so_ct":"CT0039528303M001589","curr":"USD","tien":"3108.36","chieu":"Có","tk":"687160325201","bank":"OCBC","le":"SGO2","dg":"BANK FEE","bac":"cung_tien_te","lech":"108.36"},{"id":"42132","ngay":"2025-11-28","so_ct":"05018108994010000039","curr":"USD","tien":"2856.00","chieu":"Nợ","tk":"501810899401","bank":"OCBC","le":"SGO2","dg":"Internal transfer OCBC Deposit to OCBC USD","bac":"cung_tien_te","lech":"144.00"}],"bi_cat":true,"tong_cung_tt":3766,"da_noi":null},{"ma":"PM02358-1","phieu":"PM02358","ngay":"2026-08-22","tien":"163.50","curr":"SGD","nguoi_nhan":"Gateway Of Asia Pte Ltd","ngan_hang":"UOB","phap_nhan":"SGO1","noi_dung":"Submitting Withholding tax TPCI 202608 PI02358","ref":"","cdt1":"SHQ2 | Headquarters2","hd":"CXB | Biz Development","trang_thai":"chua","ro":"nguoi","tu_chung":false,"vi_sao":"⛔ chưa có số chứng từ ⇒ phải tra bằng TIỀN + NGÀY","uv":[{"id":"36768","ngay":"2025-12-20","so_ct":"202512201725","curr":"SGD","tien":"150.70","chieu":"Có","tk":"3753083292","bank":"UOB","le":"TPCI","dg":"Misc Debit\r\nPMRSG24012026096219\r\nPMRACCASC/0126\r\n0000000000\r\nPM10\r\nAccount Annual Service\r\nFee\r","bac":"cung_tien_te","lech":"12.80"},{"id":"134218","ngay":"2025-12-02","so_ct":"202512020000","curr":"SGD","tien":"150.70","chieu":"Có","tk":"604046904001","bank":"OCBC","le":"SGO2","dg":"DEBIT PURCHASE\r\nxx-3728 APPLEADS-USD CUP\r\nDEBIT PURCHASE\r\nxx-3728 APPLEADS-USD CUP","bac":"cung_tien_te","lech":"12.80"},{"id":"42349","ngay":"2026-08-31","so_ct":"202608310000","curr":"SGD","tien":"177.93","chieu":"Có","tk":"604046904001","bank":"OCBC","le":"SGO2","dg":"FUND TRANSFER to 584531859001 SALARY FROM APR 2026 TO AUG 2026","bac":"cung_tien_te","lech":"14.43"},{"id":"42346","ngay":"2026-07-31","so_ct":"202607310000","curr":"SGD","tien":"179.02","chieu":"Có","tk":"604046904001","bank":"OCBC","le":"SGO2","dg":"REFUND IRAS\nIBG GIRO\nGST 202440316W\nIBG GIRO\nGST 202440316W","bac":"cung_tien_te","lech":"15.52"},{"id":"42342","ngay":"2026-07-15","so_ct":"202607150000","curr":"SGD","tien":"196.73","chieu":"Nợ","tk":"604046904001","bank":"OCBC","le":"SGO2","dg":"PAYMENT/TRANSFER\nSTRIPE Tlua9I3IA\nSTRIPE Tlua9I3IA","bac":"cung_tien_te","lech":"33.23"},{"id":"134248","ngay":"2026-07-08","so_ct":"CSDB","curr":"SGD","tien":"125.21","chieu":"Nợ","tk":"604046904001","bank":"OCBC","le":"SGO2","dg":"Apero payment expense Meta Jun 2026","bac":"cung_tien_te","lech":"38.29"}],"bi_cat":true,"tong_cung_tt":140,"da_noi":null},{"ma":"PM02344-1","phieu":"PM02344","ngay":"2026-08-22","tien":"1000.00","curr":"USD","nguoi_nhan":"Thanh toán thẻ","ngan_hang":"Thanh toán thẻ","phap_nhan":"VVOS - SuperMinds","noi_dung":"Thanh toán chi phí sử dụng FAL   202608 PI02344","ref":"1026946429","cdt1":"CSM | SuperMinds","hd":"SC | Server Cost","trang_thai":"chua","ro":"may","tu_chung":false,"vi_sao":"","uv":[{"id":"96060","ngay":"2026-08-24","so_ct":"1026946429","curr":"USD","tien":"1000.00","chieu":"Có","tk":"PO2","bank":"OCBC","le":"SGO2","dg":"Card charge (OPENAI *CHATGPT SUBSCR)","bac":"ma","lech":"0"},{"id":"40309","ngay":"2026-06-16","so_ct":"202606160843332","curr":"USD","tien":"1000.00","chieu":"Có","tk":"3759017445","bank":"UOB","le":"TPCI","dg":"FUNDS TRF - \nTT 1OR606160155C01 \n1OR606160155C01 \nSENSORTOWER, INC.","bac":"tien","lech":"0"},{"id":"95145","ngay":"2025-11-15","so_ct":"944409663","curr":"USD","tien":"1000.00","chieu":"Có","tk":"PO2","bank":"OCBC","le":"SGO2","dg":"Card charge (HAILUOAI.VIDEO)","bac":"tien","lech":"0"},{"id":"95201","ngay":"2025-11-25","so_ct":"947654220","curr":"USD","tien":"1000.00","chieu":"Có","tk":"PO2","bank":"OCBC","le":"SGO2","dg":"Card charge (APPLEADS/APPLE164)","bac":"tien","lech":"0"},{"id":"95211","ngay":"2025-11-27","so_ct":"948274162","curr":"USD","tien":"1000.00","chieu":"Có","tk":"PO2","bank":"OCBC","le":"SGO2","dg":"Card charge (CLAUDE.AI SUBSCRIPTION)","bac":"tien","lech":"0"},{"id":"96090","ngay":"2026-08-29","so_ct":"1028249786","curr":"USD","tien":"1000.00","chieu":"Có","tk":"PO2","bank":"OCBC","le":"SGO2","dg":"Card charge (FAL FEATURES LABELS)","bac":"tien","lech":"0"}],"bi_cat":true,"tong_cung_tt":3766,"da_noi":null},{"ma":"PM02293-1","phieu":"PM02293","ngay":"2026-08-19","tien":"1035.50","curr":"SGD","nguoi_nhan":"Gateway Of Asia Pte Ltd","ngan_hang":"UOB","phap_nhan":"SGO2","noi_dung":"Quarterly GST review and submission - April to June 2026 Apero PI02293","ref":"","cdt1":"SHQ2 | Headquarters2","hd":"CXB | Biz Development","trang_thai":"chua","ro":"nguoi","tu_chung":false,"vi_sao":"⛔ chưa có số chứng từ ⇒ phải tra bằng TIỀN + NGÀY","uv":[{"id":"42320","ngay":"2025-11-28","so_ct":"CT0037103043M001","curr":"SGD","tien":"1035.50","chieu":"Có","tk":"604046904001","bank":"OCBC","le":"SGO2","dg":"Bank fee","bac":"tien","lech":"0"},{"id":"134224","ngay":"2026-02-09","so_ct":"CT0037897872M001","curr":"SGD","tien":"1035.50","chieu":"Có","tk":"604046904001","bank":"OCBC","le":"SGO2","dg":"Bank fee","bac":"tien","lech":"0"},{"id":"42328","ngay":"2026-06-15","so_ct":"CT0039243127M001","curr":"SGD","tien":"1075.49","chieu":"Có","tk":"604046904001","bank":"OCBC","le":"SGO2","dg":"BANK FEE","bac":"cung_tien_te","lech":"39.99"},{"id":"36779","ngay":"2026-05-28","so_ct":"202605281640","curr":"SGD","tien":"1090.00","chieu":"Có","tk":"3753083292","bank":"UOB","le":"TPCI","dg":"Inward CR - GIRO\r\nIRAS\r\nREFU Refund\r\nGST 201737030R","bac":"cung_tien_te","lech":"54.50"},{"id":"134206","ngay":"2025-08-11","so_ct":"CT0035962318M001","curr":"SGD","tien":"944.39","chieu":"Có","tk":"604046904001","bank":"OCBC","le":"SGO2","dg":"Bank fee","bac":"cung_tien_te","lech":"91.11"},{"id":"42340","ngay":"2026-07-14","so_ct":"CSDB","curr":"SGD","tien":"1243.17","chieu":"Nợ","tk":"604046904001","bank":"OCBC","le":"SGO2","dg":"PAYMENT/TRANSFER\r\nPAYMENT/TRANSFER\r\nCSDB\r\nSTRIPE PAYMENTS SIN\r\nSTRIPE imbRT4V7E\r\nSTRIPE imbRT4V7E","bac":"cung_tien_te","lech":"207.67"}],"bi_cat":true,"tong_cung_tt":140,"da_noi":null},{"ma":"PM02292-1","phieu":"PM02292","ngay":"2026-08-19","tien":"1035.50","curr":"SGD","nguoi_nhan":"Gateway Of Asia Pte Ltd","ngan_hang":"UOB","phap_nhan":"SGO1","noi_dung":"Quarterly GST review and submission - April to June 2026 TPCI PI02292","ref":"","cdt1":"SHQ2 | Headquarters2","hd":"CXB | Biz Development","trang_thai":"chua","ro":"nguoi","tu_chung":false,"vi_sao":"⛔ chưa có số chứng từ ⇒ phải tra bằng TIỀN + NGÀY","uv":[{"id":"42320","ngay":"2025-11-28","so_ct":"CT0037103043M001","curr":"SGD","tien":"1035.50","chieu":"Có","tk":"604046904001","bank":"OCBC","le":"SGO2","dg":"Bank fee","bac":"tien","lech":"0"},{"id":"134224","ngay":"2026-02-09","so_ct":"CT0037897872M001","curr":"SGD","tien":"1035.50","chieu":"Có","tk":"604046904001","bank":"OCBC","le":"SGO2","dg":"Bank fee","bac":"tien","lech":"0"},{"id":"42328","ngay":"2026-06-15","so_ct":"CT0039243127M001","curr":"SGD","tien":"1075.49","chieu":"Có","tk":"604046904001","bank":"OCBC","le":"SGO2","dg":"BANK FEE","bac":"cung_tien_te","lech":"39.99"},{"id":"36779","ngay":"2026-05-28","so_ct":"202605281640","curr":"SGD","tien":"1090.00","chieu":"Có","tk":"3753083292","bank":"UOB","le":"TPCI","dg":"Inward CR - GIRO\r\nIRAS\r\nREFU Refund\r\nGST 201737030R","bac":"cung_tien_te","lech":"54.50"},{"id":"134206","ngay":"2025-08-11","so_ct":"CT0035962318M001","curr":"SGD","tien":"944.39","chieu":"Có","tk":"604046904001","bank":"OCBC","le":"SGO2","dg":"Bank fee","bac":"cung_tien_te","lech":"91.11"},{"id":"42340","ngay":"2026-07-14","so_ct":"CSDB","curr":"SGD","tien":"1243.17","chieu":"Nợ","tk":"604046904001","bank":"OCBC","le":"SGO2","dg":"PAYMENT/TRANSFER\r\nPAYMENT/TRANSFER\r\nCSDB\r\nSTRIPE PAYMENTS SIN\r\nSTRIPE imbRT4V7E\r\nSTRIPE imbRT4V7E","bac":"cung_tien_te","lech":"207.67"}],"bi_cat":true,"tong_cung_tt":140,"da_noi":null},{"ma":"PM02207-2","phieu":"PM02207","ngay":"2026-08-18","tien":"11.00","curr":"SGD","nguoi_nhan":"Gateway Of Asia Pte Ltd","ngan_hang":"UOB","phap_nhan":"SGO1","noi_dung":"Purchase of Certificate of Good Standing TPCI 202607 PI02207","ref":"","cdt1":"SHQ2 | Headquarters2","hd":"CXB | Biz Development","trang_thai":"chua","ro":"nguoi","tu_chung":false,"vi_sao":"⛔ chưa có số chứng từ ⇒ phải tra bằng TIỀN + NGÀY","uv":[{"id":"42319","ngay":"2025-08-27","so_ct":"CT0036136197M001","curr":"SGD","tien":"10.00","chieu":"Có","tk":"604046904001","bank":"OCBC","le":"SGO2","dg":"REFU IBG GIRO\nGST 202440316W\nIBG GIRO\nGST 202440316W","bac":"cung_tien_te","lech":"1.00"},{"id":"42322","ngay":"2025-11-28","so_ct":"CT0037103043M001","curr":"SGD","tien":"10.00","chieu":"Có","tk":"604046904001","bank":"OCBC","le":"SGO2","dg":"DEBIT PURCHASE\r\nxx-3728 APPLE.COM/SG SIN\r\nDEBIT PURCHASE\r\nxx-3728 APPLE.COM/SG","bac":"cung_tien_te","lech":"1.00"},{"id":"42330","ngay":"2026-06-15","so_ct":"CT0039243127M001","curr":"SGD","tien":"10.00","chieu":"Có","tk":"604046904001","bank":"OCBC","le":"SGO2","dg":"REFU\nIBG GIRO\r\nGST 202440316W\r\nIBG GIRO\r\nGST 202440316W","bac":"cung_tien_te","lech":"1.00"},{"id":"42335","ngay":"2026-06-26","so_ct":"CT0039376526M001","curr":"SGD","tien":"10.00","chieu":"Có","tk":"604046904001","bank":"OCBC","le":"SGO2","dg":"Pay for Courier/Delivery of Documents\nTT PURCHASE\nTT PURCHASE\nCHARGES DETAILS: (SGD)\nCommission: 30.00\nCommission in lieu: 0.00\nCable charges: 0.00\nAgent Bank's Charges: 10.00 Postage: 0.00","bac":"cung_tien_te","lech":"1.00"},{"id":"42338","ngay":"2026-06-26","so_ct":"CT0039376527M001","curr":"SGD","tien":"10.00","chieu":"Có","tk":"604046904001","bank":"OCBC","le":"SGO2","dg":"PAYMENT/TRANSFER\nCSDB\nSTRIPE PAYMENTS SIN\nSTRIPE utZx6O20","bac":"cung_tien_te","lech":"1.00"},{"id":"134189","ngay":"2025-01-06","so_ct":"CT0033852749M001","curr":"SGD","tien":"10.00","chieu":"Có","tk":"604046904001","bank":"OCBC","le":"SGO2","dg":"COMM/COMM IN LIEU","bac":"cung_tien_te","lech":"1.00"}],"bi_cat":true,"tong_cung_tt":140,"da_noi":null},{"ma":"PM02206-2","phieu":"PM02206","ngay":"2026-08-18","tien":"11.00","curr":"SGD","nguoi_nhan":"Gateway Of Asia Pte Ltd","ngan_hang":"UOB","phap_nhan":"SGO2","noi_dung":"Purchase of Certificate of Good Standing Apero 202607 PI02206","ref":"","cdt1":"SHQ2 | Headquarters2","hd":"CXB | Biz Development","trang_thai":"chua","ro":"nguoi","tu_chung":false,"vi_sao":"⛔ chưa có số chứng từ ⇒ phải tra bằng TIỀN + NGÀY","uv":[{"id":"42319","ngay":"2025-08-27","so_ct":"CT0036136197M001","curr":"SGD","tien":"10.00","chieu":"Có","tk":"604046904001","bank":"OCBC","le":"SGO2","dg":"REFU IBG GIRO\nGST 202440316W\nIBG GIRO\nGST 202440316W","bac":"cung_tien_te","lech":"1.00"},{"id":"42322","ngay":"2025-11-28","so_ct":"CT0037103043M001","curr":"SGD","tien":"10.00","chieu":"Có","tk":"604046904001","bank":"OCBC","le":"SGO2","dg":"DEBIT PURCHASE\r\nxx-3728 APPLE.COM/SG SIN\r\nDEBIT PURCHASE\r\nxx-3728 APPLE.COM/SG","bac":"cung_tien_te","lech":"1.00"},{"id":"42330","ngay":"2026-06-15","so_ct":"CT0039243127M001","curr":"SGD","tien":"10.00","chieu":"Có","tk":"604046904001","bank":"OCBC","le":"SGO2","dg":"REFU\nIBG GIRO\r\nGST 202440316W\r\nIBG GIRO\r\nGST 202440316W","bac":"cung_tien_te","lech":"1.00"},{"id":"42335","ngay":"2026-06-26","so_ct":"CT0039376526M001","curr":"SGD","tien":"10.00","chieu":"Có","tk":"604046904001","bank":"OCBC","le":"SGO2","dg":"Pay for Courier/Delivery of Documents\nTT PURCHASE\nTT PURCHASE\nCHARGES DETAILS: (SGD)\nCommission: 30.00\nCommission in lieu: 0.00\nCable charges: 0.00\nAgent Bank's Charges: 10.00 Postage: 0.00","bac":"cung_tien_te","lech":"1.00"},{"id":"42338","ngay":"2026-06-26","so_ct":"CT0039376527M001","curr":"SGD","tien":"10.00","chieu":"Có","tk":"604046904001","bank":"OCBC","le":"SGO2","dg":"PAYMENT/TRANSFER\nCSDB\nSTRIPE PAYMENTS SIN\nSTRIPE utZx6O20","bac":"cung_tien_te","lech":"1.00"},{"id":"134189","ngay":"2025-01-06","so_ct":"CT0033852749M001","curr":"SGD","tien":"10.00","chieu":"Có","tk":"604046904001","bank":"OCBC","le":"SGO2","dg":"COMM/COMM IN LIEU","bac":"cung_tien_te","lech":"1.00"}],"bi_cat":true,"tong_cung_tt":140,"da_noi":null},{"ma":"PM02289-1","phieu":"PM02289","ngay":"2026-08-14","tien":"1180000.00","curr":"USD","nguoi_nhan":" APERO TECHNOLOGIES GROUP PTE. LTD.","ngan_hang":"OCBC","phap_nhan":"BGO2","noi_dung":"Payment under Agreement No.2407/2026/LA/AB-AT","ref":"1015934789","cdt1":"SHQ2 | Headquarters2","hd":"OGA | GAC - Other","trang_thai":"chua","ro":"may","tu_chung":false,"vi_sao":"","uv":[{"id":"88636","ngay":"2026-07-27","so_ct":"1015934789","curr":"USD","tien":"1213525.27","chieu":"Có","tk":"PO1","bank":"UOB","le":"TPCI","dg":"Transfer PO SGO1 to UOB SGO1\r\n","bac":"ma","lech":"0"},{"id":"88610","ngay":"2026-05-21","so_ct":"989831984","curr":"USD","tien":"1160310.16","chieu":"Nợ","tk":"PO1","bank":"UOB","le":"TPCI","dg":"Payment from Google - XX-745242  (TPC INVEST PTE  LTD)","bac":"cung_tien_te","lech":"19689.84"},{"id":"40126","ngay":"2025-08-25","so_ct":"202508260033148","curr":"USD","tien":"1141098.47","chieu":"Nợ","tk":"3759017445","bank":"UOB","le":"TPCI","dg":"Thanh toán chi phí sử dụng hạ tầng byteplus short drama - 5 project đợt 1 VSL - PM01034-1","bac":"cung_tien_te","lech":"38901.53"},{"id":"40125","ngay":"2025-08-25","so_ct":"202508260033147","curr":"USD","tien":"1141098.46","chieu":"Nợ","tk":"3759017445","bank":"UOB","le":"TPCI","dg":"INWARD TRF - TT\r\n2025082500292692\r\n1IR508258789C01\r\n1/META PLATFORMS\r\nIRELAND LIMITED","bac":"cung_tien_te","lech":"38901.54"},{"id":"40233","ngay":"2026-01-23","so_ct":"202601232035255","curr":"USD","tien":"1135619.34","chieu":"Nợ","tk":"3759017445","bank":"UOB","le":"TPCI","dg":"INWARD TRF - TT\r\n2026012300271187\r\n1IR601262643C01\r\n0000000000\r\nTRME\r\n1/META PLATFORMS\r\nIRELAND LIMITED","bac":"cung_tien_te","lech":"44380.66"},{"id":"40248","ngay":"2026-01-29","so_ct":"202601291752270","curr":"USD","tien":"1127508.51","chieu":"Có","tk":"3759017445","bank":"UOB","le":"TPCI","dg":"SERV CHARGE\r\n1OR601290678C01\r\n1OR601290678C01\r\nMeta Platforms Ireland\r\nLimited\r\n","bac":"cung_tien_te","lech":"52491.49"}],"bi_cat":true,"tong_cung_tt":3766,"da_noi":null},{"ma":"PM01698-6","phieu":"PM01698","ngay":"2026-08-13","tien":"54.00","curr":"SGD","nguoi_nhan":"Thanh toán thẻ","ngan_hang":"Thanh toán thẻ","phap_nhan":"VGO2 - TeraSofts","noi_dung":"Dang ky freepik goi premium+ - 202608 - PE01698","ref":"","cdt1":"COR | TeraSofts","hd":"LC | License Cost","trang_thai":"chua","ro":"nguoi","tu_chung":false,"vi_sao":"⛔ chưa có số chứng từ ⇒ phải tra bằng TIỀN + NGÀY","uv":[{"id":"46900","ngay":"2026-05-30","so_ct":"202605300000","curr":"SGD","tien":"50.00","chieu":"Có","tk":"604749168001","bank":"OCBC","le":"BGO2","dg":"SERVICE CHARGE","bac":"cung_tien_te","lech":"4.00"},{"id":"46901","ngay":"2026-06-30","so_ct":"202606300000","curr":"SGD","tien":"50.00","chieu":"Có","tk":"604749168001","bank":"OCBC","le":"BGO2","dg":"SERVICE CHARGE","bac":"cung_tien_te","lech":"4.00"},{"id":"46902","ngay":"2026-07-31","so_ct":"202607310000","curr":"SGD","tien":"50.00","chieu":"Có","tk":"604749168001","bank":"OCBC","le":"BGO2","dg":"TT chi phí Dịch vụ giám đốc danh nghĩa 19/06/2026 - 18/06/2027 cho ABGO","bac":"cung_tien_te","lech":"4.00"},{"id":"46903","ngay":"2026-08-31","so_ct":"SC20260831001","curr":"SGD","tien":"50.00","chieu":"Có","tk":"604749168001","bank":"OCBC","le":"BGO2","dg":"","bac":"cung_tien_te","lech":"4.00"},{"id":"52753","ngay":"2026-08-31","so_ct":"202608310000","curr":"SGD","tien":"50.00","chieu":"Có","tk":"702113416001","bank":"OCBC","le":"TPCI","dg":"","bac":"cung_tien_te","lech":"4.00"},{"id":"36781","ngay":"2026-06-16","so_ct":"202606161631","curr":"SGD","tien":"48.37","chieu":"Nợ","tk":"3753083292","bank":"UOB","le":"TPCI","dg":"Misc DR-Debit Card\r\n16 JUN 2545 4734157\r\nINTUIT *QBooks Online\r\nSAN DIEGO US","bac":"cung_tien_te","lech":"5.63"}],"bi_cat":true,"tong_cung_tt":140,"da_noi":null},{"ma":"PM02244-1","phieu":"PM02244","ngay":"2026-08-12","tien":"2035.00","curr":"USD","nguoi_nhan":"I. L.","ngan_hang":"Chase Bank","phap_nhan":"SGO2","noi_dung":"Payment under invoice APERO-080726TMREUS","ref":"","cdt1":"SHQ2 | Headquarters2","hd":"CXB | Biz Development","trang_thai":"chua","ro":"nguoi","tu_chung":false,"vi_sao":"⛔ chưa có số chứng từ ⇒ phải tra bằng TIỀN + NGÀY","uv":[{"id":"146997","ngay":"2026-09-09","so_ct":"1034393232","curr":"USD","tien":"2036.80","chieu":"Có","tk":"PO5","bank":"PO","le":"UGO2","dg":"","bac":"cung_tien_te","lech":"1.80"},{"id":"135122","ngay":"2026-06-12","so_ct":"CT0039224390M001530","curr":"USD","tien":"2024.27","chieu":"Có","tk":"687160325201","bank":"OCBC","le":"SGO2","dg":"Apero payment for Apr 26 revenue  Zoobi","bac":"cung_tien_te","lech":"10.73"},{"id":"95679","ngay":"2026-04-22","so_ct":"990570364","curr":"USD","tien":"2016.00","chieu":"Có","tk":"PO2","bank":"OCBC","le":"SGO2","dg":"Card charge (APPLEADS/APPLE170)","bac":"cung_tien_te","lech":"19.00"},{"id":"109340","ngay":"2026-07-15","so_ct":"1011290777","curr":"USD","tien":"2007.69","chieu":"Có","tk":"PO5","bank":"PO","le":"UGO2","dg":"Payment from STRIPE - XX-187306 (APERO TECHNOLOGIES GRO)","bac":"cung_tien_te","lech":"27.31"},{"id":"102729","ngay":"2025-07-30","so_ct":"869994261","curr":"USD","tien":"2005.35","chieu":"Nợ","tk":"PO3","bank":"PO","le":"BGO2","dg":"Payment from Air Smart Advertising Solutions FZ-LLC - XX-729972  (APERO TECHNOLOGIES GROUP CORP)","bac":"cung_tien_te","lech":"29.65"},{"id":"88303","ngay":"2026-07-29","so_ct":"35acfc3a-faea-4bc0-9e0b-492b8ff7fe58","curr":"USD","tien":"2000.25","chieu":"Có","tk":"7950162651","bank":"Airwallex","le":"HGO2","dg":"\nPurchase from BlueVision Interactive Limited (Bluevision) - Topup Meta Project A","bac":"cung_tien_te","lech":"34.75"}],"bi_cat":true,"tong_cung_tt":3766,"da_noi":null},{"ma":"PM02275-1","phieu":"PM02275","ngay":"2026-08-11","tien":"6516.80","curr":"USD","nguoi_nhan":"T. T. T. L. P. H.","ngan_hang":"BoA Europe DAC","phap_nhan":"SGO2","noi_dung":"Thanh toán mua Toàn khoản App growng từ T8/2026 đến T8/2027","ref":"","cdt1":"SHQ2 | Headquarters2","hd":"LC | License Cost","trang_thai":"chua","ro":"nguoi","tu_chung":false,"vi_sao":"⛔ chưa có số chứng từ ⇒ phải tra bằng TIỀN + NGÀY","uv":[{"id":"135256","ngay":"2026-08-12","so_ct":"CT0039946480M001664","curr":"USD","tien":"6516.80","chieu":"Có","tk":"687160325201","bank":"OCBC","le":"SGO2","dg":"BANK FEE","bac":"tien","lech":"0"},{"id":"39984","ngay":"2025-01-06","so_ct":"2025010613466","curr":"USD","tien":"6480.00","chieu":"Có","tk":"3759017445","bank":"UOB","le":"TPCI","dg":"FUNDS TRF - TT\t\r\nFT25010385623811\t\r\n1OR501081541C01\t\r\nCTCP APERO VIET NAM\t\r\nGROUP\t\r","bac":"cung_tien_te","lech":"36.80"},{"id":"102748","ngay":"2026-06-16","so_ct":"999934340","curr":"USD","tien":"6583.63","chieu":"Nợ","tk":"PO3","bank":"PO","le":"BGO2","dg":"Payment from BIGO TECHNOLOGY PTE LTD - XX-763507  (PAYONEER HONG KONG LIMITED) from Jul 2023 -Dec 2025","bac":"cung_tien_te","lech":"66.83"},{"id":"145187","ngay":"2025-09-02","so_ct":"884286593","curr":"USD","tien":"6599.98","chieu":"Nợ","tk":"PO3","bank":"PO","le":"BGO2","dg":"Payment from INMOBI PTE LTD - XX-729972  (ABGO LTD)","bac":"cung_tien_te","lech":"83.18"},{"id":"134978","ngay":"2026-04-09","so_ct":"CT0038512895M001386","curr":"USD","tien":"6613.09","chieu":"Có","tk":"687160325201","bank":"OCBC","le":"SGO2","dg":"Payment for Feb 26 Profit share  Dzinemedia\nALL A/C WDL\nCALL A/C WDL\nCHARGES DETAILS: (USD)\nCommission: 23.73\nCommission in lieu: 0.00\nCable charges: 0.00\nAgent Bank's Charges: 0.00","bac":"cung_tien_te","lech":"96.29"},{"id":"135109","ngay":"2026-06-10","so_ct":"CT0039193241M001517","curr":"USD","tien":"6640.62","chieu":"Có","tk":"687160325201","bank":"OCBC","le":"SGO2","dg":"Apero payment for Apr 26 revenue Supermeo","bac":"cung_tien_te","lech":"123.82"}],"bi_cat":true,"tong_cung_tt":3766,"da_noi":null},{"ma":"PM02295-5","phieu":"PM02295","ngay":"2026-08-07","tien":"65000.00","curr":"USD","nguoi_nhan":"ASTRONEX JOINT STOCK COMPANY","ngan_hang":"Techcombank","phap_nhan":"VVOH - Astronex","noi_dung":"Bán ngoại tệ USD trên TCB - ASTRONEX","ref":"FT26217464207004","cdt1":"SHQ2 | Headquarters2","hd":"NB | Lưu chuyển nội bộ","trang_thai":"chua","ro":"may","tu_chung":false,"vi_sao":"","uv":[{"id":"27782","ngay":"2026-08-05","so_ct":"FT26217464207004","curr":"USD","tien":"64975.00","chieu":"Có","tk":"24159999","bank":"TCB","le":"ASTRONEX","dg":"3759017445 TPC INVEST PTE LTD 114 L AVENDER STREET HEX 11-83 CT HUB 2 S INGAPORE 338729.Payment Contract No 3008/2026/TPCI-A STRONEX.. NGAN HAN G NUOC NGOAI THU PHI USD0 ..","bac":"ma","lech":"0"},{"id":"27780","ngay":"2026-08-04","so_ct":"FT26216405140986","curr":"USD","tien":"65000.00","chieu":"Nợ","tk":"24159999","bank":"TCB","le":"ASTRONEX","dg":"BANK FEE","bac":"tien","lech":"0"},{"id":"140454","ngay":"2026-08-04","so_ct":"1019484437","curr":"USD","tien":"65195.59","chieu":"Có","tk":"PO1","bank":"UOB","le":"TPCI","dg":"Payment Contract No 0108/2026/TPCI-SUPERMINDS","bac":"cung_tien_te","lech":"195.59"},{"id":"47391","ngay":"2026-01-22","so_ct":"S0660221081D01277","curr":"USD","tien":"65231.28","chieu":"Nợ","tk":"687160325201","bank":"OCBC","le":"SGO2","dg":"BANK FEE","bac":"cung_tien_te","lech":"231.28"},{"id":"40141","ngay":"2025-09-05","so_ct":"202509051548163","curr":"USD","tien":"64000.00","chieu":"Có","tk":"3759017445","bank":"UOB","le":"TPCI","dg":"SERV CHARGE  FT25090466179738  1OR509183131C01  SENSORTOWER, INC.","bac":"cung_tien_te","lech":"1000.00"},{"id":"134079","ngay":"2026-06-05","so_ct":"FT26156985433100","curr":"USD","tien":"66000.00","chieu":"Nợ","tk":"542666","bank":"TCB","le":"VISIONLAB","dg":"1780629957427KrKEyml NH MUA CUA KH KHACH HANG 40042082 66000 USD TG 26208 BAN NGOAI TE","bac":"cung_tien_te","lech":"1000.00"}],"bi_cat":true,"tong_cung_tt":3766,"da_noi":null},{"ma":"PM02295-4","phieu":"PM02295","ngay":"2026-08-07","tien":"100000.00","curr":"USD","nguoi_nhan":"VISIONLAB JOINT STOCK COMPANY","ngan_hang":"Techcombank","phap_nhan":"VVOV - VisionLab","noi_dung":"Bán ngoại tệ USD trên TCB -VISIONLAB","ref":"FT26217280636069","cdt1":"SHQ2 | Headquarters2","hd":"NB | Lưu chuyển nội bộ","trang_thai":"chua","ro":"may","tu_chung":false,"vi_sao":"","uv":[{"id":"134085","ngay":"2026-08-05","so_ct":"FT26217280636069","curr":"USD","tien":"99975.00","chieu":"Có","tk":"542666","bank":"TCB","le":"VISIONLAB","dg":"3759017445 TPC INVEST PTE LTD 114 L AVENDER STREET HEX 11-83 CT HUB 2 S INGAPORE 338729.Payment Contract No 3008/2026/TPCI-V ISIONLAB.. NGAN HA NG NUOC NGOAI THU PHI USD0 ..","bac":"ma","lech":"0"},{"id":"32700","ngay":"2025-01-18","so_ct":"FT25018005135086","curr":"USD","tien":"100000.00","chieu":"Nợ","tk":"35999666","bank":"TCB","le":"TERASOFTS","dg":"Bank fee - PAYMENT CONTRACT NO 201 0/2024/TPCI- TERASOFTS BNY CUST","bac":"tien","lech":"0"},{"id":"32740","ngay":"2026-02-06","so_ct":"FT26037974691902","curr":"USD","tien":"100000.00","chieu":"Nợ","tk":"35999666","bank":"TCB","le":"TERASOFTS","dg":"1770353273984hFNg8of NH MUA CUA KH KHACH HANG 40036935 100000 USD TG 25855 BAN NGOAI TE","bac":"tien","lech":"0"},{"id":"32741","ngay":"2026-02-06","so_ct":"FT26037585000305","curr":"USD","tien":"100000.00","chieu":"Có","tk":"35999666","bank":"TCB","le":"TERASOFTS","dg":"3759017445 TPC INVEST PTE LTD 114 L AVENDER STREET HEX 11-83 CT HUB 2 S INGAPORE 338729.Payment Contract No 0103/2026/TPCI-T ERASOFTS.. NGAN","bac":"tien","lech":"0"},{"id":"39990","ngay":"2025-01-17","so_ct":"20250117174512","curr":"USD","tien":"100000.00","chieu":"Có","tk":"3759017445","bank":"UOB","le":"TPCI","dg":"FUNDS TRF - TT FT25010388639412 1OR501173213C01\nCONG TY CO PHAN APERO HQ","bac":"tien","lech":"0"},{"id":"40255","ngay":"2026-02-05","so_ct":"202602051200277","curr":"USD","tien":"100000.00","chieu":"Có","tk":"3759017445","bank":"UOB","le":"TPCI","dg":"SERV CHARGE\r\n1OR602052101C01\r\n1OR602052101C01\r\nASTRONEX JOINT STOCK\r\nCOMPANY","bac":"tien","lech":"0"}],"bi_cat":true,"tong_cung_tt":3766,"da_noi":null},{"ma":"PM02295-3","phieu":"PM02295","ngay":"2026-08-07","tien":"90000.00","curr":"USD","nguoi_nhan":"SUPERMINDS JOINT STOCK COMPANY","ngan_hang":"Techcombank","phap_nhan":"VVOS - SuperMinds","noi_dung":"Bán ngoại tệ USD trên TCB - SUPERMINDS","ref":"FT26217060967984","cdt1":"SHQ2 | Headquarters2","hd":"NB | Lưu chuyển nội bộ","trang_thai":"chua","ro":"may","tu_chung":false,"vi_sao":"","uv":[{"id":"140206","ngay":"2026-08-05","so_ct":"FT26217060967984","curr":"USD","tien":"290000.00","chieu":"Có","tk":"854666","bank":"TCB","le":"VGOH","dg":"4366184689198642 TPC INVEST PTE LTD 114 LAVENDER STREET SINGAPORE SG.PAYMENT CONTRACT NO 01082026TPCIHQ./INS/PAYONEER INC. NGAN HANG NUOC NGOAI THU PHI USD0 ..","bac":"ma","lech":"0"},{"id":"40257","ngay":"2026-02-05","so_ct":"202602051200279","curr":"USD","tien":"90000.00","chieu":"Có","tk":"3759017445","bank":"UOB","le":"TPCI","dg":"FUNDS TRF - TT\r\n1OR602052101C01\r\n1OR602052101C01\r\nASTRONEX JOINT STOCK\r\nCOMPANY","bac":"tien","lech":"0"},{"id":"133814","ngay":"2026-02-06","so_ct":"FT26037640600552","curr":"USD","tien":"90000.00","chieu":"Nợ","tk":"435666","bank":"TCB","le":"SUPERMINDS","dg":"1770354132809kXJOGA9 NH MUA CUA KH KHACH HANG 40042023 90000 USD TG 25819 BAN NGOAI TE","bac":"tien","lech":"0"},{"id":"133815","ngay":"2026-02-09","so_ct":"FT26040282508503","curr":"USD","tien":"90000.00","chieu":"Có","tk":"435666","bank":"TCB","le":"SUPERMINDS","dg":"3759017445 TPC INVEST PTE LTD 114 L AVENDER STREET HEX 11-83 CT HUB 2 S INGAPORE 338729.Payment Contract No 0103/2026/TPCI-S UPERMINDS.. NGA","bac":"tien","lech":"0"},{"id":"133827","ngay":"2026-08-04","so_ct":"FT26216106970850","curr":"USD","tien":"90000.00","chieu":"Nợ","tk":"435666","bank":"TCB","le":"SUPERMINDS","dg":"BANK FEE","bac":"tien","lech":"0"},{"id":"133829","ngay":"2026-08-05","so_ct":"FT26217659227810","curr":"USD","tien":"89975.00","chieu":"Có","tk":"435666","bank":"TCB","le":"SUPERMINDS","dg":"3759017445 TPC INVEST PTE LTD 114 L AVENDER STREET HEX 11-83 CT HUB 2 S INGAPORE 338729.Payment Contract No 3008/2026/TPCI-S UPERMINDS.. NGAN H ANG NUOC NGOAI THU PHI USD0 ..","bac":"cung_tien_te","lech":"25.00"}],"bi_cat":true,"tong_cung_tt":3766,"da_noi":null},{"ma":"PM02295-2","phieu":"PM02295","ngay":"2026-08-07","tien":"168000.00","curr":"USD","nguoi_nhan":"TERASOFTS JOINT STOCK COMPANY","ngan_hang":"Techcombank","phap_nhan":"VGO2 - TeraSofts","noi_dung":"Bán ngoại tệ USD trên TCB  - TERASOFTS","ref":"FT26217267833234","cdt1":"SHQ2 | Headquarters2","hd":"NB | Lưu chuyển nội bộ","trang_thai":"chua","ro":"may","tu_chung":false,"vi_sao":"","uv":[{"id":"32752","ngay":"2026-08-05","so_ct":"FT26217267833234","curr":"USD","tien":"167990.00","chieu":"Có","tk":"35999666","bank":"TCB","le":"TERASOFTS","dg":"PAYMENT CONTRACT NO 01082026TPCITERASOFTS /ROC/4366185630028948./INS/CITI IE2X. NGAN HANG NUOC NGOAI THU PHI USD10.00 ..","bac":"ma","lech":"0"},{"id":"32753","ngay":"2026-08-05","so_ct":"FT26217524463111","curr":"USD","tien":"167990.00","chieu":"Nợ","tk":"35999666","bank":"TCB","le":"TERASOFTS","dg":"3759017445 TPC INVEST PTE LTD 114 L AVENDER STREET HEX 11-83 CT HUB 2 S INGAPORE 338729.Payment Contract No 30082026/TPCI-TE RASOFTS.. NGAN HAN G NUOC NGOAI THU PHI USD0 ..","bac":"cung_tien_te","lech":"10.00"},{"id":"109355","ngay":"2025-11-28","so_ct":"919060026","curr":"USD","tien":"168359.65","chieu":"Có","tk":"PO6","bank":"PO","le":"HGO6","dg":"Payment to GG ASIA 1063","bac":"cung_tien_te","lech":"359.65"},{"id":"140452","ngay":"2026-08-04","so_ct":"1019484584","curr":"USD","tien":"168505.52","chieu":"Có","tk":"PO1","bank":"UOB","le":"TPCI","dg":"First payment under Contract No. 2107/2026/HD-DVTV/DAITHANH-TPCI","bac":"cung_tien_te","lech":"505.52"},{"id":"40234","ngay":"2026-01-26","so_ct":"202601260908256","curr":"USD","tien":"166413.35","chieu":"Nợ","tk":"3759017445","bank":"UOB","le":"TPCI","dg":"INWARD TRF - TT\r\nS0660264D06401\r\n1IR601274844C01\r\n1/Google Asia Pacific Pte\r\nLimited","bac":"cung_tien_te","lech":"1586.65"},{"id":"47477","ngay":"2026-04-24","so_ct":"CT0038671726M001416","curr":"USD","tien":"166298.33","chieu":"Có","tk":"687160325201","bank":"OCBC","le":"SGO2","dg":"BANK FEE","bac":"cung_tien_te","lech":"1701.67"}],"bi_cat":true,"tong_cung_tt":3766,"da_noi":null},{"ma":"PM02295-1","phieu":"PM02295","ngay":"2026-08-07","tien":"290000.00","curr":"USD","nguoi_nhan":"APERO HQ JOINT STOCK COMPANY","ngan_hang":"Techcombank","phap_nhan":"VGOH - APERO HQ","noi_dung":"Bán ngoại tệ USD trên TCB - APERO HQ","ref":"FT26217060967984","cdt1":"SHQ2 | Headquarters2","hd":"NB | Lưu chuyển nội bộ","trang_thai":"chua","ro":"may","tu_chung":false,"vi_sao":"","uv":[{"id":"140206","ngay":"2026-08-05","so_ct":"FT26217060967984","curr":"USD","tien":"290000.00","chieu":"Có","tk":"854666","bank":"TCB","le":"VGOH","dg":"4366184689198642 TPC INVEST PTE LTD 114 LAVENDER STREET SINGAPORE SG.PAYMENT CONTRACT NO 01082026TPCIHQ./INS/PAYONEER INC. NGAN HANG NUOC NGOAI THU PHI USD0 ..","bac":"ma","lech":"0"},{"id":"109373","ngay":"2026-08-28","so_ct":"1029449672","curr":"USD","tien":"289637.90","chieu":"Có","tk":"PO6","bank":"PO","le":"HGO6","dg":"Payment from STRIPE - XX-763544  (PAYONEER HONG KONG LIMITED)","bac":"cung_tien_te","lech":"362.10"},{"id":"140451","ngay":"2026-08-04","so_ct":"1019484486","curr":"USD","tien":"290872.62","chieu":"Có","tk":"PO1","bank":"UOB","le":"TPCI","dg":"Payment Contract No 01082026/TPCI-TERASOFTS","bac":"cung_tien_te","lech":"872.62"},{"id":"147004","ngay":"2026-01-01","so_ct":"933748386","curr":"USD","tien":"288685.16","chieu":"Có","tk":"PO6","bank":"PO","le":"HGO6","dg":"Payment to GG ASIA 1063 (Chi phí Google tháng 12/2025)","bac":"cung_tien_te","lech":"1314.84"},{"id":"52742","ngay":"2026-08-24","so_ct":"S0662362CB9D013","curr":"USD","tien":"292173.39","chieu":"Nợ","tk":"687566398201","bank":"OCBC","le":"TPCI","dg":"Bank fee","bac":"cung_tien_te","lech":"2173.39"},{"id":"88638","ngay":"2026-07-30","so_ct":"1017588408","curr":"USD","tien":"287355.50","chieu":"Nợ","tk":"PO1","bank":"UOB","le":"TPCI","dg":"Payment Contract No 01082026/TPCI-HQ","bac":"cung_tien_te","lech":"2644.50"}],"bi_cat":true,"tong_cung_tt":3766,"da_noi":null},{"ma":"PM02294-8","phieu":"PM02294","ngay":"2026-08-07","tien":"65000.00","curr":"USD","nguoi_nhan":"ASTRONEX JOINT STOCK COMPANY","ngan_hang":"Techcombank","phap_nhan":"VVOH - Astronex","noi_dung":"PAYMENT CONTRACT NO  01082026/TPCI-ASTRONEX","ref":"FT26216405140986","cdt1":"SHQ2 | Headquarters2","hd":"NB | Lưu chuyển nội bộ","trang_thai":"chua","ro":"may","tu_chung":true,"vi_sao":"","uv":[{"id":"27780","ngay":"2026-08-04","so_ct":"FT26216405140986","curr":"USD","tien":"65000.00","chieu":"Nợ","tk":"24159999","bank":"TCB","le":"ASTRONEX","dg":"BANK FEE","bac":"ma","lech":"0"},{"id":"27781","ngay":"2026-08-04","so_ct":"FT26216405140986","curr":"USD","tien":"25.00","chieu":"Có","tk":"24159999","bank":"TCB","le":"ASTRONEX","dg":"1785904882513XZP3moI NH MUA CUA KH KHACH HANG 40049832 64975 USD TG 26136 BAN NGOAI TE","bac":"ma","lech":"0"},{"id":"27782","ngay":"2026-08-05","so_ct":"FT26217464207004","curr":"USD","tien":"64975.00","chieu":"Có","tk":"24159999","bank":"TCB","le":"ASTRONEX","dg":"3759017445 TPC INVEST PTE LTD 114 L AVENDER STREET HEX 11-83 CT HUB 2 S INGAPORE 338729.Payment Contract No 3008/2026/TPCI-A STRONEX.. NGAN HAN G NUOC NGOAI THU PHI USD0 ..","bac":"cung_tien_te","lech":"25.00"},{"id":"140454","ngay":"2026-08-04","so_ct":"1019484437","curr":"USD","tien":"65195.59","chieu":"Có","tk":"PO1","bank":"UOB","le":"TPCI","dg":"Payment Contract No 0108/2026/TPCI-SUPERMINDS","bac":"cung_tien_te","lech":"195.59"},{"id":"47391","ngay":"2026-01-22","so_ct":"S0660221081D01277","curr":"USD","tien":"65231.28","chieu":"Nợ","tk":"687160325201","bank":"OCBC","le":"SGO2","dg":"BANK FEE","bac":"cung_tien_te","lech":"231.28"},{"id":"40141","ngay":"2025-09-05","so_ct":"202509051548163","curr":"USD","tien":"64000.00","chieu":"Có","tk":"3759017445","bank":"UOB","le":"TPCI","dg":"SERV CHARGE  FT25090466179738  1OR509183131C01  SENSORTOWER, INC.","bac":"cung_tien_te","lech":"1000.00"}],"bi_cat":true,"tong_cung_tt":3766,"da_noi":null},{"ma":"PM02294-7","phieu":"PM02294","ngay":"2026-08-07","tien":"100000.00","curr":"USD","nguoi_nhan":"VISIONLAB JOINT STOCK COMPANY","ngan_hang":"Techcombank","phap_nhan":"VVOV - VisionLab","noi_dung":"PAYMENT CONTRACT NO  01082026/TPCI-VISIONLAB","ref":"FT26216200970686","cdt1":"SHQ2 | Headquarters2","hd":"NB | Lưu chuyển nội bộ","trang_thai":"chua","ro":"may","tu_chung":true,"vi_sao":"","uv":[{"id":"134083","ngay":"2026-08-04","so_ct":"FT26216200970686","curr":"USD","tien":"100000.00","chieu":"Nợ","tk":"542666","bank":"TCB","le":"VISIONLAB","dg":"BANK FEE","bac":"ma","lech":"0"},{"id":"134084","ngay":"2026-08-04","so_ct":"FT26216200970686","curr":"USD","tien":"25.00","chieu":"Có","tk":"542666","bank":"TCB","le":"VISIONLAB","dg":"1785905012863dyR6VZQ NH MUA CUA KH KHACH HANG 40042082 99975 USD TG 26116 BAN NGOAI TE","bac":"ma","lech":"0"},{"id":"32700","ngay":"2025-01-18","so_ct":"FT25018005135086","curr":"USD","tien":"100000.00","chieu":"Nợ","tk":"35999666","bank":"TCB","le":"TERASOFTS","dg":"Bank fee - PAYMENT CONTRACT NO 201 0/2024/TPCI- TERASOFTS BNY CUST","bac":"tien","lech":"0"},{"id":"32740","ngay":"2026-02-06","so_ct":"FT26037974691902","curr":"USD","tien":"100000.00","chieu":"Nợ","tk":"35999666","bank":"TCB","le":"TERASOFTS","dg":"1770353273984hFNg8of NH MUA CUA KH KHACH HANG 40036935 100000 USD TG 25855 BAN NGOAI TE","bac":"tien","lech":"0"},{"id":"32741","ngay":"2026-02-06","so_ct":"FT26037585000305","curr":"USD","tien":"100000.00","chieu":"Có","tk":"35999666","bank":"TCB","le":"TERASOFTS","dg":"3759017445 TPC INVEST PTE LTD 114 L AVENDER STREET HEX 11-83 CT HUB 2 S INGAPORE 338729.Payment Contract No 0103/2026/TPCI-T ERASOFTS.. NGAN","bac":"tien","lech":"0"},{"id":"39990","ngay":"2025-01-17","so_ct":"20250117174512","curr":"USD","tien":"100000.00","chieu":"Có","tk":"3759017445","bank":"UOB","le":"TPCI","dg":"FUNDS TRF - TT FT25010388639412 1OR501173213C01\nCONG TY CO PHAN APERO HQ","bac":"tien","lech":"0"}],"bi_cat":true,"tong_cung_tt":3766,"da_noi":null},{"ma":"PM02294-6","phieu":"PM02294","ngay":"2026-08-07","tien":"90000.00","curr":"USD","nguoi_nhan":"SUPERMINDS JOINT STOCK COMPANY","ngan_hang":"Techcombank","phap_nhan":"VVOS - SuperMinds","noi_dung":"PAYMENT CONTRACT NO  01082026/TPCI-SUPERMINDS","ref":"FT26216106970850","cdt1":"SHQ2 | Headquarters2","hd":"NB | Lưu chuyển nội bộ","trang_thai":"chua","ro":"may","tu_chung":true,"vi_sao":"","uv":[{"id":"133827","ngay":"2026-08-04","so_ct":"FT26216106970850","curr":"USD","tien":"90000.00","chieu":"Nợ","tk":"435666","bank":"TCB","le":"SUPERMINDS","dg":"BANK FEE","bac":"ma","lech":"0"},{"id":"133828","ngay":"2026-08-04","so_ct":"FT26216106970850","curr":"USD","tien":"25.00","chieu":"Có","tk":"435666","bank":"TCB","le":"SUPERMINDS","dg":"17859047376476w3dTnP NH MUA CUA KH KHACH HANG 40042023 89975 USD TG 26136 BAN NGOAI TE","bac":"ma","lech":"0"},{"id":"40257","ngay":"2026-02-05","so_ct":"202602051200279","curr":"USD","tien":"90000.00","chieu":"Có","tk":"3759017445","bank":"UOB","le":"TPCI","dg":"FUNDS TRF - TT\r\n1OR602052101C01\r\n1OR602052101C01\r\nASTRONEX JOINT STOCK\r\nCOMPANY","bac":"tien","lech":"0"},{"id":"133814","ngay":"2026-02-06","so_ct":"FT26037640600552","curr":"USD","tien":"90000.00","chieu":"Nợ","tk":"435666","bank":"TCB","le":"SUPERMINDS","dg":"1770354132809kXJOGA9 NH MUA CUA KH KHACH HANG 40042023 90000 USD TG 25819 BAN NGOAI TE","bac":"tien","lech":"0"},{"id":"133815","ngay":"2026-02-09","so_ct":"FT26040282508503","curr":"USD","tien":"90000.00","chieu":"Có","tk":"435666","bank":"TCB","le":"SUPERMINDS","dg":"3759017445 TPC INVEST PTE LTD 114 L AVENDER STREET HEX 11-83 CT HUB 2 S INGAPORE 338729.Payment Contract No 0103/2026/TPCI-S UPERMINDS.. NGA","bac":"tien","lech":"0"},{"id":"133829","ngay":"2026-08-05","so_ct":"FT26217659227810","curr":"USD","tien":"89975.00","chieu":"Có","tk":"435666","bank":"TCB","le":"SUPERMINDS","dg":"3759017445 TPC INVEST PTE LTD 114 L AVENDER STREET HEX 11-83 CT HUB 2 S INGAPORE 338729.Payment Contract No 3008/2026/TPCI-S UPERMINDS.. NGAN H ANG NUOC NGOAI THU PHI USD0 ..","bac":"cung_tien_te","lech":"25.00"}],"bi_cat":true,"tong_cung_tt":3766,"da_noi":null},{"ma":"PM02294-5","phieu":"PM02294","ngay":"2026-08-07","tien":"168000.00","curr":"USD","nguoi_nhan":"TERASOFTS JOINT STOCK COMPANY","ngan_hang":"Techcombank","phap_nhan":"VGO2 - TeraSofts","noi_dung":"PAYMENT CONTRACT NO  01082026/TPCI-TERASOFTS","ref":"FT26217524463111","cdt1":"SHQ2 | Headquarters2","hd":"NB | Lưu chuyển nội bộ","trang_thai":"chua","ro":"may","tu_chung":false,"vi_sao":"","uv":[{"id":"32753","ngay":"2026-08-05","so_ct":"FT26217524463111","curr":"USD","tien":"167990.00","chieu":"Nợ","tk":"35999666","bank":"TCB","le":"TERASOFTS","dg":"3759017445 TPC INVEST PTE LTD 114 L AVENDER STREET HEX 11-83 CT HUB 2 S INGAPORE 338729.Payment Contract No 30082026/TPCI-TE RASOFTS.. NGAN HAN G NUOC NGOAI THU PHI USD0 ..","bac":"ma","lech":"0"},{"id":"32752","ngay":"2026-08-05","so_ct":"FT26217267833234","curr":"USD","tien":"167990.00","chieu":"Có","tk":"35999666","bank":"TCB","le":"TERASOFTS","dg":"PAYMENT CONTRACT NO 01082026TPCITERASOFTS /ROC/4366185630028948./INS/CITI IE2X. NGAN HANG NUOC NGOAI THU PHI USD10.00 ..","bac":"cung_tien_te","lech":"10.00"},{"id":"109355","ngay":"2025-11-28","so_ct":"919060026","curr":"USD","tien":"168359.65","chieu":"Có","tk":"PO6","bank":"PO","le":"HGO6","dg":"Payment to GG ASIA 1063","bac":"cung_tien_te","lech":"359.65"},{"id":"140452","ngay":"2026-08-04","so_ct":"1019484584","curr":"USD","tien":"168505.52","chieu":"Có","tk":"PO1","bank":"UOB","le":"TPCI","dg":"First payment under Contract No. 2107/2026/HD-DVTV/DAITHANH-TPCI","bac":"cung_tien_te","lech":"505.52"},{"id":"40234","ngay":"2026-01-26","so_ct":"202601260908256","curr":"USD","tien":"166413.35","chieu":"Nợ","tk":"3759017445","bank":"UOB","le":"TPCI","dg":"INWARD TRF - TT\r\nS0660264D06401\r\n1IR601274844C01\r\n1/Google Asia Pacific Pte\r\nLimited","bac":"cung_tien_te","lech":"1586.65"},{"id":"47477","ngay":"2026-04-24","so_ct":"CT0038671726M001416","curr":"USD","tien":"166298.33","chieu":"Có","tk":"687160325201","bank":"OCBC","le":"SGO2","dg":"BANK FEE","bac":"cung_tien_te","lech":"1701.67"}],"bi_cat":true,"tong_cung_tt":3766,"da_noi":null},{"ma":"PM02294-3","phieu":"PM02294","ngay":"2026-08-07","tien":"90000.00","curr":"USD","nguoi_nhan":"SUPERMINDS JOINT STOCK COMPANY","ngan_hang":"Techcombank","phap_nhan":"VVOS - SuperMinds","noi_dung":"PAYMENT CONTRACT NO  01082026/TPCI-SUPERMINDS","ref":"Reject","cdt1":"SHQ2 | Headquarters2","hd":"NB | Lưu chuyển nội bộ","trang_thai":"chua","ro":"khong","tu_chung":false,"vi_sao":"có số chứng từ nhưng ⛔ KHÔNG dòng tiền nào trong sổ mang số ấy — tiền chưa về, hay nằm trên sheet đã bị xoá khỏi workbook","uv":[{"id":"40257","ngay":"2026-02-05","so_ct":"202602051200279","curr":"USD","tien":"90000.00","chieu":"Có","tk":"3759017445","bank":"UOB","le":"TPCI","dg":"FUNDS TRF - TT\r\n1OR602052101C01\r\n1OR602052101C01\r\nASTRONEX JOINT STOCK\r\nCOMPANY","bac":"tien","lech":"0"},{"id":"133814","ngay":"2026-02-06","so_ct":"FT26037640600552","curr":"USD","tien":"90000.00","chieu":"Nợ","tk":"435666","bank":"TCB","le":"SUPERMINDS","dg":"1770354132809kXJOGA9 NH MUA CUA KH KHACH HANG 40042023 90000 USD TG 25819 BAN NGOAI TE","bac":"tien","lech":"0"},{"id":"133815","ngay":"2026-02-09","so_ct":"FT26040282508503","curr":"USD","tien":"90000.00","chieu":"Có","tk":"435666","bank":"TCB","le":"SUPERMINDS","dg":"3759017445 TPC INVEST PTE LTD 114 L AVENDER STREET HEX 11-83 CT HUB 2 S INGAPORE 338729.Payment Contract No 0103/2026/TPCI-S UPERMINDS.. NGA","bac":"tien","lech":"0"},{"id":"133827","ngay":"2026-08-04","so_ct":"FT26216106970850","curr":"USD","tien":"90000.00","chieu":"Nợ","tk":"435666","bank":"TCB","le":"SUPERMINDS","dg":"BANK FEE","bac":"tien","lech":"0"},{"id":"133829","ngay":"2026-08-05","so_ct":"FT26217659227810","curr":"USD","tien":"89975.00","chieu":"Có","tk":"435666","bank":"TCB","le":"SUPERMINDS","dg":"3759017445 TPC INVEST PTE LTD 114 L AVENDER STREET HEX 11-83 CT HUB 2 S INGAPORE 338729.Payment Contract No 3008/2026/TPCI-S UPERMINDS.. NGAN H ANG NUOC NGOAI THU PHI USD0 ..","bac":"cung_tien_te","lech":"25.00"},{"id":"140455","ngay":"2026-08-04","so_ct":"1019484611","curr":"USD","tien":"90270.81","chieu":"Có","tk":"PO1","bank":"UOB","le":"TPCI","dg":"Payment Contract No 0108/2026/TPCI-VISIONLAB","bac":"cung_tien_te","lech":"270.81"}],"bi_cat":true,"tong_cung_tt":3766,"da_noi":null},{"ma":"PM02294-2","phieu":"PM02294","ngay":"2026-08-07","tien":"168000.00","curr":"USD","nguoi_nhan":"TERASOFTS JOINT STOCK COMPANY","ngan_hang":"Techcombank","phap_nhan":"VGO2 - TeraSofts","noi_dung":"PAYMENT CONTRACT NO  01082026/TPCI-TERASOFTS","ref":"Reject","cdt1":"SHQ2 | Headquarters2","hd":"NB | Lưu chuyển nội bộ","trang_thai":"chua","ro":"khong","tu_chung":false,"vi_sao":"có số chứng từ nhưng ⛔ KHÔNG dòng tiền nào trong sổ mang số ấy — tiền chưa về, hay nằm trên sheet đã bị xoá khỏi workbook","uv":[{"id":"32752","ngay":"2026-08-05","so_ct":"FT26217267833234","curr":"USD","tien":"167990.00","chieu":"Có","tk":"35999666","bank":"TCB","le":"TERASOFTS","dg":"PAYMENT CONTRACT NO 01082026TPCITERASOFTS /ROC/4366185630028948./INS/CITI IE2X. NGAN HANG NUOC NGOAI THU PHI USD10.00 ..","bac":"cung_tien_te","lech":"10.00"},{"id":"32753","ngay":"2026-08-05","so_ct":"FT26217524463111","curr":"USD","tien":"167990.00","chieu":"Nợ","tk":"35999666","bank":"TCB","le":"TERASOFTS","dg":"3759017445 TPC INVEST PTE LTD 114 L AVENDER STREET HEX 11-83 CT HUB 2 S INGAPORE 338729.Payment Contract No 30082026/TPCI-TE RASOFTS.. NGAN HAN G NUOC NGOAI THU PHI USD0 ..","bac":"cung_tien_te","lech":"10.00"},{"id":"109355","ngay":"2025-11-28","so_ct":"919060026","curr":"USD","tien":"168359.65","chieu":"Có","tk":"PO6","bank":"PO","le":"HGO6","dg":"Payment to GG ASIA 1063","bac":"cung_tien_te","lech":"359.65"},{"id":"140452","ngay":"2026-08-04","so_ct":"1019484584","curr":"USD","tien":"168505.52","chieu":"Có","tk":"PO1","bank":"UOB","le":"TPCI","dg":"First payment under Contract No. 2107/2026/HD-DVTV/DAITHANH-TPCI","bac":"cung_tien_te","lech":"505.52"},{"id":"40234","ngay":"2026-01-26","so_ct":"202601260908256","curr":"USD","tien":"166413.35","chieu":"Nợ","tk":"3759017445","bank":"UOB","le":"TPCI","dg":"INWARD TRF - TT\r\nS0660264D06401\r\n1IR601274844C01\r\n1/Google Asia Pacific Pte\r\nLimited","bac":"cung_tien_te","lech":"1586.65"},{"id":"47477","ngay":"2026-04-24","so_ct":"CT0038671726M001416","curr":"USD","tien":"166298.33","chieu":"Có","tk":"687160325201","bank":"OCBC","le":"SGO2","dg":"BANK FEE","bac":"cung_tien_te","lech":"1701.67"}],"bi_cat":true,"tong_cung_tt":3766,"da_noi":null}]};
+
+const nf = (v, c) => new Intl.NumberFormat('vi-VN',
+  {maximumFractionDigits: c === 'VND' ? 0 : 2}).format(+v);
+const esc = s => String(s == null ? '' : s)
+  .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+const gon = t => String(t).split(/\s+/).filter(Boolean).join(' ');
+const duoi = t => String(t || '').slice(-4);
+
+/* bốn bậc: nhãn · biến màu · vạch trái */
+const BAC = {
+  ma:           {n:'①', l:'Khớp số chứng từ',   g:'Cùng số chứng từ với lệnh chi', b:'var(--bac-1)', k:'b1'},
+  tien:         {n:'②', l:'Đúng số tiền',       g:'Cùng số tiền và đơn vị tiền',    b:'var(--bac-2)', k:'b2'},
+  gan_tien:     {n:'③', l:'Gần đúng số tiền',   g:'Lệch trong ngưỡng cho phép',     b:'var(--bac-3)', k:'b3'},
+  cung_tien_te: {n:'④', l:'Chỉ cùng đơn vị tiền', g:'Không có bằng chứng nào khác', b:'var(--bac-4)', k:'b4'}
+};
+const THU_TU = ['ma','tien','gan_tien','cung_tien_te'];
+
+let loc = 'chua', iChon = -1, uvChon = null, xacNhan = false;
+const doi = {};                 // mã lệnh -> id giao dịch · thay đổi trong phiên
+const moRong = new Set();       // id giao dịch đang mở hết diễn giải
+const moBac  = new Set();       // bậc ④ đang mở của lệnh đang xem
+
+const trangThai = L => doi[L.ma] ? 'da' : L.trang_thai;
+const dsHien = () => D.lenh.filter(L => loc === 'tat' ? true : trangThai(L) === loc);
+const noiHienTai = L => doi[L.ma] ? (L.uv.find(u => u.id === doi[L.ma]) || L.da_noi) : L.da_noi;
+/* ca rủi ro: không có ứng viên nào đúng y số tiền */
+const coKhopTien = L => L.uv.some(u => +u.lech === 0);
+
+function demLai(){
+  const them = Object.keys(doi).filter(m =>
+    D.lenh.find(L => L.ma === m && L.trang_thai === 'chua')).length;
+  document.getElementById('d-dagan').textContent = nf(D.tk.da_gan + them, 'VND');
+  document.getElementById('d-chua').textContent = nf(D.tk.chua_gan - them, 'VND');
+  document.getElementById('d-tong').textContent = nf(D.tk.tong_pm, 'VND');
+  document.getElementById('d-khong').textContent = nf(D.tk.khong, 'VND');
+  document.getElementById('d-dexuat').textContent = nf(D.tk.tu_dong, 'VND');
+  for (const [k, v] of [['chua','chua'], ['da','da'], ['tat',null]]){
+    const n = v ? D.lenh.filter(L => trangThai(L) === v).length : D.lenh.length;
+    document.getElementById('l-' + k).textContent = n;
+  }
+}
+
+/* ── C1 ─────────────────────────────────────────────────────── */
+function veDanhSach(){
+  const goc = document.getElementById('ds');
+  const ds = dsHien();
+  if (!ds.length){
+    goc.innerHTML = loc === 'chua'
+      ? '<p class="trong"><span class="big">Hàng chờ đã sạch.</span>Không còn lệnh chi nào đợi gán.</p>'
+      : '<p class="trong">Không có lệnh chi nào ở nhóm này.</p>';
+    return;
+  }
+  let ngayCu = null, h = '';
+  ds.forEach(L => {
+    if (L.ngay !== ngayCu){ ngayCu = L.ngay; h += `<div class="ngay-dau">${esc(L.ngay)}</div>`; }
+    const tt = trangThai(L);
+    const cls = tt === 'da' ? 's-da'
+      : (L.ro === 'khong' ? 's-khong' : (L.tu_chung ? 's-dexuat' : ''));
+    const chip = tt === 'da' ? '<span class="chip dagan">✓ đã gán</span>'
+      : (L.ro === 'khong' ? '<span class="chip khong">không gán được</span>'
+      : (L.tu_chung ? '<span class="chip dexuat">◇ đề xuất gán</span>'
+                    : '<span class="chip chua">chưa gán</span>'));
+    h += `<button class="lenh ${cls}" data-ma="${esc(L.ma)}"
+        aria-current="${D.lenh.indexOf(L) === iChon}">
+      <span class="pm">${esc(L.ma)}</span>
+      <span style="min-width:0">
+        <span class="who">${esc(L.nguoi_nhan)}</span>
+        <span class="nd">${L.noi_dung ? esc(L.noi_dung) : '<i>— không có nội dung —</i>'}</span>
+      </span>
+      <span class="t">${nf(L.tien, L.curr)} <span class="u">${esc(L.curr)}</span>${chip}</span>
+    </button>`;
+  });
+  goc.innerHTML = h;
+}
+
+/* ── đánh dấu bằng chứng ───────────────────────────────────── */
+/* Từ pháp lý / từ đệm: có mặt ở hầu hết tên người nhận ⇒ KHÔNG phải bằng chứng. */
+const RAC = new Set(('thanh toan toán công ty tnhh cong cty chi phi phí joint stock company '
+  + 'corp corporation inc incorporated ltd limited pte plc llc gmbh group holding holdings '
+  + 'services service trading trade quoc te quốc tế viet nam việt và and the for').split(' '));
+const thoat = s => String(s).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+
+function khoa(L){
+  const ks = [];
+  if (L.ref && L.ref !== '—') ks.push(String(L.ref));
+  ks.push(nf(L.tien, L.curr));
+  const tron = String(Math.round(+L.tien));
+  if (tron.length >= 4) ks.push(tron);
+  String(L.nguoi_nhan || '').split(/[\s,._\-/()]+/)
+    .filter(w => w.length >= 4 && !RAC.has(w.toLowerCase()))
+    .forEach(w => ks.push(w));
+  /* bỏ trùng, ưu tiên khoá dài hơn ⇒ một lượt quét, không lồng <mark> */
+  const seen = new Set();
+  return ks.filter(k => k && k.length >= 3 &&
+      !seen.has(k.toLowerCase()) && seen.add(k.toLowerCase()))
+    .sort((a, b) => b.length - a.length);
+}
+
+function danhDau(txt, L){
+  const s = esc(gon(txt));
+  const ks = khoa(L);
+  if (!ks.length) return s;
+  const re = new RegExp('(' + ks.map(thoat).join('|') + ')', 'gi');
+  return s.replace(re, '<mark>$&</mark>');
+}
+
+/* Dòng phụ: chỉ đánh dấu số chứng từ khi nó ĐÚNG là số của lệnh chi —
+   với ứng viên bậc ① đây mới là lý do nó nằm trong danh sách. */
+function danhDauMeta(s, L, u){
+  let out = esc(s);
+  if (L.ref && L.ref !== '—' && u.so_ct && String(u.so_ct) === String(L.ref))
+    out = out.replace(new RegExp('(' + thoat(L.ref) + ')'), '<mark>$&</mark>');
+  return out;
+}
+
+/* ── C3 ─────────────────────────────────────────────────────── */
+function veGiaoDich(u, L, j, chon, opt){
+  opt = opt || {};
+  const B = BAC[u.bac] || BAC.ma;
+  const dai = u.dg && gon(u.dg).length > 96;
+  const mo = moRong.has(u.id);
+  const khop = (+u.lech === 0);
+  const dexuat = opt.dexuat ? ' dexuat' : '';
+  return `<button class="uv ${B.k}${dexuat}" style="--b:${B.b}" data-j="${j}"
+      aria-pressed="${chon}" ${opt.ro ? 'tabindex="-1"' : ''}>
+    <span class="rad" ${opt.ro ? 'style="visibility:hidden"' : ''}></span>
+    <span style="min-width:0">
+      <span class="dg${u.dg ? (dai && !mo ? ' clamp' : '') : ' trong'}">${
+        u.dg ? danhDau(u.dg, L) : 'diễn giải: chưa đọc được'}</span>
+      ${dai ? `<span class="mo" role="button" tabindex="0" data-mo="${esc(u.id)}"
+        >${mo ? 'thu gọn ↑' : 'đủ ↓'}</span>` : ''}
+      <span class="meta">${danhDauMeta(u.ngay + ' · ' + u.bank + ' · ••' + duoi(u.tk) + ' · ' + u.le +
+        (u.so_ct && u.so_ct !== '—' ? ' · ct ' + u.so_ct : ''), L, u)}</span>
+    </span>
+    <span class="t">
+      <span class="v">${khop ? '<mark>' + nf(u.tien, u.curr) + '</mark>' : nf(u.tien, u.curr)}</span>
+      <span class="u">${esc(u.curr)} · ${esc(u.chieu)}</span>
+      ${khop ? '' : `<span class="lech">lệch ${nf(u.lech, u.curr)}</span>`}
+      ${opt.dangGan ? '<span class="dau good">đang gán</span>' : ''}
+      ${opt.dexuat ? '<span class="dau">◇ máy đề xuất</span>' : ''}
+    </span>
+  </button>`;
+}
+
+function veNhom(L, daCo){
+  if (!L.uv.length)
+    return '<p class="trong">Sổ không có giao dịch nào để đối chiếu với lệnh chi này.</p>';
+  let h = '';
+  THU_TU.forEach(bac => {
+    const ds = L.uv.map((u, j) => [u, j]).filter(([u]) => (u.bac || 'ma') === bac);
+    if (!ds.length) return;
+    const B = BAC[bac];
+    const gap = bac === 'cung_tien_te' && ds.length > 5 && !moBac.has(bac);
+    h += `<div class="bac-h ${B.k}" style="--b:${B.b}">
+        <span class="n">${B.n}</span><span class="l">${B.l}</span>
+        <span class="c">${ds.length} giao dịch</span>
+        ${gap || (bac === 'cung_tien_te' && ds.length > 5)
+          ? `<button class="mo" data-bac="${bac}">${gap ? 'hiện' : 'gấp lại'}</button>` : ''}
+      </div>`;
+    if (gap) return;
+    ds.forEach(([u, j]) => {
+      h += veGiaoDich(u, L, j, uvChon === j, {
+        dangGan: !!(daCo && daCo.id === u.id),
+        dexuat: !!(L.tu_chung && bac === 'ma' && !daCo)
+      });
+    });
+  });
+  return h;
+}
+
+/* ── C2 · C4 · C7 · C8 ─────────────────────────────────────── */
+function vePanel(){
+  const el = document.getElementById('panel');
+  const day = document.getElementById('day');
+  const dem = document.getElementById('p-dem');
+  if (iChon < 0){
+    el.innerHTML = '<p class="trong">Chọn một lệnh chi bên trái để xem các giao dịch tương ứng.</p>';
+    day.innerHTML = ''; dem.textContent = 'chọn một lệnh chi';
+    return;
+  }
+  const L = D.lenh[iChon];
+  const daCo = noiHienTai(L);
+  const rui = !coKhopTien(L) && L.uv.length > 0;
+  dem.textContent = `${L.uv.length} giao dịch tương ứng`;
+
+  const canh = L.ro === 'khong'
+    ? `<p class="canh kh">⛔ <span><b>Không gán được.</b> Sổ không có đồng tiền nào mang số chứng từ này — ${esc(L.vi_sao)}</span></p>` : '';
+  const rieng = rui
+    ? `<p class="canh">⚠ <span><b>Không ứng viên nào đúng số tiền.</b>
+         Diễn giải sao kê là bằng chứng duy nhất ở đây — đọc trước khi gán.</span></p>` : '';
+  const cat = L.bi_cat
+    ? `<p class="canh info">⋯ <span>Còn <b>${nf(L.tong_cung_tt,'VND')}</b> giao dịch cùng đơn vị tiền nữa —
+         danh sách <b>đã cắt bớt</b>, không phải hết ứng viên.</span></p>` : '';
+
+  el.innerHTML = canh + rieng + cat + `
+    <div class="pm-the">
+      <div class="pm-1">
+        <span class="pm-id">${esc(L.ma)}</span>
+        ${daCo ? '<span class="chip dagan">✓ đã gán</span>'
+          : (L.ro === 'khong' ? '<span class="chip khong">không gán được</span>'
+          : (L.tu_chung ? '<span class="chip dexuat">◇ máy đề xuất gán</span>'
+                        : '<span class="chip chua">chưa gán</span>'))}
+      </div>
+      <div class="pm-2">
+        <span class="pm-who">${esc(L.nguoi_nhan)}</span>
+        <span class="pm-tien">${nf(L.tien, L.curr)}<small>${esc(L.curr)}</small></span>
+      </div>
+      <div class="pm-nd">${L.noi_dung ? esc(L.noi_dung) : '<i>— không có nội dung —</i>'}</div>
+      <div class="pm-3">
+        <div><b>${esc(L.ngay)}</b> · ${esc(L.ngan_hang)} · ${esc(L.phap_nhan)}</div>
+        <div class="d"><span class="nh">CDT</span> ${esc(L.cdt1) || '— chưa có —'}</div>
+        <div class="d"><span class="nh">chứng từ</span> ${
+          L.ref ? esc(L.ref) : '<span style="color:var(--warn)">— lệnh chi này không có số chứng từ —</span>'}</div>
+      </div>
+    </div>` +
+    (daCo ? `<div class="dang">
+        <div class="t1"><span>✓ Đang gán với giao dịch này</span>
+          <button class="act nho" id="nut-bo">Bỏ gán</button></div>
+        <div class="gd">${veGiaoDich(daCo, L, -1, false, {ro: true})}</div>
+      </div>` : '') + `
+    <p class="uv-h"><b>${daCo ? 'Đổi sang giao dịch khác' : 'Chọn giao dịch đã chi khoản này'}</b>
+      <span>${L.uv.length} ứng viên · xếp theo bằng chứng</span></p>
+    <div id="ds-uv">${veNhom(L, daCo)}</div>`;
+
+  const u = uvChon === null ? null : L.uv[uvChon];
+  const lech = u && +u.lech !== 0;
+  const nhan = daCo ? 'Đổi sang giao dịch đã chọn' : 'Gán';
+  day.innerHTML = `<div class="day${rui ? ' canhbao' : ''}">
+    <button class="act ${rui || lech ? 'canh' : 'chinh'}" id="nut-gan"
+      ${u ? '' : 'disabled'}>${
+        xacNhan && u ? `Xác nhận gán lệch ${nf(u.lech, u.curr)} ${esc(u.curr)}?` : nhan}</button>
+    ${xacNhan ? '<button class="act" id="nut-huy">Huỷ</button>' : ''}
+    <span class="gt">${!u
+      ? (daCo ? 'chọn một giao dịch khác để đổi' : 'chọn một giao dịch để gán')
+      : (lech
+        ? `số tiền lệch ${nf(u.lech, u.curr)} — bấm hai lần để xác nhận, <kbd>Enter</kbd> không gán`
+        : 'sẵn sàng · <kbd>Enter</kbd> để gán · sổ giữ cả lịch sử, bỏ gán chỉ là thêm một dòng')}</span>
+  </div>`;
+}
+
+function chon(ma){
+  const i = D.lenh.findIndex(L => L.ma === ma);
+  if (i < 0) return;
+  iChon = i; uvChon = null; xacNhan = false; moBac.clear();
+  veDanhSach(); vePanel();
+  const el = document.querySelector('.lenh[aria-current="true"]');
+  const box = document.getElementById('ds');
+  if (el){
+    const t = el.offsetTop, b = t + el.offsetHeight;
+    if (t < box.scrollTop + 26) box.scrollTop = t - 26;
+    else if (b > box.scrollTop + box.clientHeight) box.scrollTop = b - box.clientHeight;
+  }
+}
+
+function gan(){
+  const L = D.lenh[iChon];
+  const u = L.uv[uvChon];
+  if (!u) return;
+  if (+u.lech !== 0 && !xacNhan){ xacNhan = true; vePanel(); return; }
+  doi[L.ma] = u.id;
+  uvChon = null; xacNhan = false;
+  veDanhSach(); vePanel(); demLai();
+}
+
+document.getElementById('ds').addEventListener('click', e => {
+  const b = e.target.closest('.lenh');
+  if (b) chon(b.dataset.ma);
+});
+
+document.getElementById('loc').addEventListener('click', e => {
+  const b = e.target.closest('button[data-l]');
+  if (!b) return;
+  loc = b.dataset.l;
+  document.querySelectorAll('#loc button').forEach(x =>
+    x.setAttribute('aria-pressed', String(x === b)));
+  iChon = -1; uvChon = null; xacNhan = false;
+  veDanhSach(); vePanel();
+});
+
+function panelClick(e){
+  const mo = e.target.closest('[data-mo]');
+  if (mo){
+    const id = mo.dataset.mo;
+    moRong.has(id) ? moRong.delete(id) : moRong.add(id);
+    vePanel(); return;
+  }
+  const bh = e.target.closest('[data-bac]');
+  if (bh){
+    const k = bh.dataset.bac;
+    moBac.has(k) ? moBac.delete(k) : moBac.add(k);
+    vePanel(); return;
+  }
+  const u = e.target.closest('.uv');
+  if (u && +u.dataset.j >= 0){ uvChon = +u.dataset.j; xacNhan = false; vePanel(); return; }
+  if (e.target.id === 'nut-bo'){
+    const L = D.lenh[iChon];
+    delete doi[L.ma];
+    if (L.trang_thai === 'da') L.trang_thai = 'chua';
+    L.da_noi = null;
+    uvChon = null; xacNhan = false;
+    veDanhSach(); vePanel(); demLai();
+  }
+}
+document.getElementById('panel').addEventListener('click', panelClick);
+document.getElementById('panel').addEventListener('keydown', e => {
+  if ((e.key === 'Enter' || e.key === ' ') && e.target.hasAttribute('data-mo')){
+    e.preventDefault(); panelClick(e);
+  }
+});
+document.getElementById('day').addEventListener('click', e => {
+  if (e.target.id === 'nut-gan' && uvChon !== null) gan();
+  if (e.target.id === 'nut-huy'){ xacNhan = false; vePanel(); }
+});
+
+document.getElementById('nut-du').addEventListener('click', () => {
+  alert('Bản dựng thử: nút này mở màn Sổ ITL (SCR-F02) — lưới đủ 52 cột, chỉ-đọc, '
+      + 'đã lọc sẵn đúng các dòng đang xem. Kế toán cần nó để YÊN TÂM VỀ DATA, '
+      + 'không phải để ghép (BA-06 §4.4 ⓐ).');
+});
+
+const nen = document.getElementById('nut-nen');
+nen.addEventListener('click', () => {
+  const toi = document.documentElement.getAttribute('data-theme') === 'dark';
+  document.documentElement.setAttribute('data-theme', toi ? 'light' : 'dark');
+  nen.textContent = toi ? 'Nền tối' : 'Nền sáng';
+});
+
+document.addEventListener('keydown', e => {
+  if (/^(INPUT|TEXTAREA)$/.test(document.activeElement.tagName)) return;
+  if (e.key === 'ArrowDown' || e.key === 'ArrowUp'){
+    e.preventDefault();
+    const ds = dsHien();
+    if (!ds.length) return;
+    const cur = ds.findIndex(L => D.lenh.indexOf(L) === iChon);
+    const k = Math.max(0, Math.min(ds.length - 1, cur + (e.key === 'ArrowDown' ? 1 : -1)));
+    chon(ds[k].ma);
+    return;
+  }
+  if (iChon < 0) return;
+  const L = D.lenh[iChon];
+  if (e.key === 'Escape'){ uvChon = null; xacNhan = false; vePanel(); return; }
+  /* Enter chỉ gán ở ca an toàn — ca lệch tiền phải bấm chuột hai lần */
+  if (e.key === 'Enter' && uvChon !== null && +L.uv[uvChon].lech === 0){
+    e.preventDefault(); gan();
+  }
+});
+
+document.getElementById('n-mau').textContent = D.lenh.length;
+veDanhSach(); vePanel(); demLai();
+</script>
+</body>
+</html>

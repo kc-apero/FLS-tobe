@@ -694,7 +694,7 @@ function bamXong(r) {{
     return s ? !String((ST.sua[r.itl_id] || {{}})[f] || s[f] || '').trim() : true;
   }});
   log('ghi', `POST /queue/${{r.itl_id}}/done`);
-  log('ghi', `  → fls_queue_event: evt_type='done' · actor='ke-toan@apero.vn' · reason=NULL`);
+  log('ghi', `  → fls_queue_event: evt_type='done' · actor='<email người bấm>' · reason=NULL`);
   log('canh', `  ⚠ reason RỖNG là ĐÚNG — QĐ-ITL-72: bấm xong ⛔ không cần lý do`);
   log('doc', `  → fls_itl: ⛔ KHÔNG một ô nào đổi (INV-I08)`);
   log('doc', `  → hàng chờ trừ dòng này qua khung xem fls_da_xong (phép TÍNH, ⛔ không phải cột)`);
@@ -881,7 +881,11 @@ function goO(i, r) {{
       }} else {{
         log('ghi', `POST /ledger/${{c.dataset.id}}/adjust {{field:'${{c.dataset.f}}', value:'${{moi}}'}}`);
         log('ghi', `  → fls_adjustment: THÊM một dòng (⛔ không UPDATE dòng cũ)`);
-        log('ghi', `  → fls_journal: 7 trường AUD-1 · value_source='${{cu ? 'nguon' : 'UNMAPPED'}}'`);
+        // ⭐ `WO-018` (`BA-05` v0.34 `DD-I15 ⓓe`): nhật ký mang LỚP CỦA CHÍNH DÒNG —
+        //   người gõ ⇒ `sua_tay`. ⛔ Trước 02/10 dòng log này in `nguon`/`UNMAPPED`
+        //   (nguồn TRƯỚC khi gõ) — câu ấy nay là của thân trả `/adjust`.
+        log('ghi', `  → fls_journal: 7 trường AUD-1 · value_source='sua_tay' (lớp của chính dòng = fls_adjustment.nguon)`);
+        log('doc', `  → thân trả /adjust: value_source='${{cu ? 'nguon' : 'UNMAPPED'}}' (nguồn đang có TRƯỚC khi gõ — US-025)`);
         log('doc', `  → fls_itl: ⛔ KHÔNG đổi. "Giá trị hiện tại" là khung xem fls_sua_tay`);
       }}
     }});

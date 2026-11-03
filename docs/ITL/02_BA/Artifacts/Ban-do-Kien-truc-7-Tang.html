@@ -1,0 +1,878 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bản đồ kiến trúc — 7 tầng · 3 khâu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bitter:wght@600;700&family=Be+Vietnam+Pro:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>:root{--paper:#F7F8F5;--surface:#fff;--ink:#1B2420;--ink-2:#5A6661;
+ --ink-3:#84908A;--rule:#D2DAD3;--accent:#0F5C4A;--accent-soft:#E1EDE7;
+ --amber:#87680F;--amber-soft:#F5EEDA;--plate:#F1F4EE;--plate-rule:#C7D1C6}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]){
+ --paper:#0F1412;--surface:#161C18;--ink:#E7EDE5;--ink-2:#AAB6AF;
+ --ink-3:#77837C;--rule:#2A332C;--accent:#66C4A4;--accent-soft:#17271F;
+ --amber:#D9B455;--amber-soft:#2A2213;--plate:#1B221D;--plate-rule:#2A332C}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);
+ font:400 15px/1.6 "Be Vietnam Pro",system-ui,sans-serif}
+.wrap{max-width:1180px;margin:0 auto;padding:38px 24px 80px}
+h1{font:700 28px/1.22 Bitter,serif;margin:0 0 6px;letter-spacing:-.015em}
+.lede{color:var(--ink-2);font:400 18.5px/1.5 Bitter,serif;margin:0 0 4px}
+.meta{color:var(--ink-3);font:12.5px/1.5 "IBM Plex Mono",monospace}
+code,.mono{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.9em}
+.note{border:1px solid var(--rule);background:var(--surface);border-radius:7px;
+ padding:11px 14px;margin:18px 0;font-size:13.5px}
+.note.amb{border-color:var(--amber);background:var(--amber-soft)}
+/* mot TANG = mot bang ngang */
+.tang{display:grid;grid-template-columns:210px minmax(0,1fr);gap:0;
+ border:1px solid var(--plate-rule);border-radius:10px;margin:0 0 14px;
+ overflow:hidden;background:var(--plate)}
+@media(max-width:820px){.tang{grid-template-columns:1fr}}
+.tang>.dau{padding:13px 15px;background:var(--surface);
+ border-right:1px solid var(--plate-rule)}
+.tang>.dau b{font:600 14px/1.3 Bitter,serif;display:block;margin-bottom:3px}
+.tang>.dau span{font-size:12px;color:var(--ink-2);line-height:1.45}
+.tang>.than{padding:12px 14px;display:flex;flex-wrap:wrap;gap:8px;
+ align-items:flex-start;align-content:flex-start}
+.o{border:1px solid var(--plate-rule);background:var(--surface);
+ border-radius:6px;padding:6px 10px;font:500 12px/1.4 "IBM Plex Mono",monospace}
+.o.view{border-style:dashed;color:var(--ink-2)}
+.o em{display:block;font:400 10.5px/1.3 "Be Vietnam Pro",sans-serif;
+ color:var(--ink-3);font-style:normal}
+.mui{text-align:center;color:var(--ink-3);font-size:18px;margin:-6px 0 8px}
+table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13.5px}
+th,td{text-align:left;padding:7px 9px;border-bottom:1px solid var(--rule);
+ vertical-align:top}
+th{font:600 12.5px/1.4 "Be Vietnam Pro",sans-serif;color:var(--ink-2);
+ background:var(--accent-soft)}
+td.c{text-align:center}
+.scroll{overflow-x:auto}
+h2{font:600 21px/1.3 Bitter,serif;margin:44px 0 12px;padding-top:18px;
+ border-top:1px solid var(--rule)}
+h3{font:600 12.5px/1.4 "IBM Plex Mono",monospace;margin:26px 0 8px;
+ text-transform:uppercase;letter-spacing:.08em;color:var(--accent)}
+/* mot THUC THE = mot the */
+.tt{border:1px solid var(--rule);border-radius:9px;background:var(--surface);
+ margin:14px 0;overflow:hidden}
+.tt>.dau{padding:10px 14px;background:var(--accent-soft);
+ border-bottom:1px solid var(--rule);display:flex;gap:10px;
+ align-items:baseline;flex-wrap:wrap}
+.tt>.dau b{font:600 14px/1.3 "IBM Plex Mono",monospace;color:var(--accent)}
+.tt>.dau .vt{font-size:12px;color:var(--ink-2)}
+.tt table{margin:0;font-size:12.5px}
+.tt th{background:transparent;border-bottom:1px solid var(--rule)}
+.tt td{border-bottom:1px solid var(--rule);padding:6px 10px}
+.tt tr:last-child td{border-bottom:0}
+.k{display:inline-block;font:600 10px/1.5 "IBM Plex Mono",monospace;
+ padding:0 5px;border-radius:3px;border:1px solid;margin-right:4px;
+ white-space:nowrap}
+.k.pk{color:#8A5A00;background:var(--amber-soft);border-color:var(--amber)}
+.k.fk{color:var(--accent);background:var(--accent-soft);border-color:var(--accent)}
+.k.u{color:var(--ink-2);border-color:var(--rule)}
+.k.bb{color:var(--ink-2);border-color:var(--rule)}
+.vs{color:var(--ink-2);font-size:12px;line-height:1.5}
+.ty{font:500 11.5px/1.5 "IBM Plex Mono",monospace;color:var(--ink-3)}
+/* ── mau cua BAN VE SVG ────────────────────────────────────────────── */
+.ve{--nen:var(--paper);--vien:var(--plate-rule);--nhan:var(--ink);
+ --phu:var(--ink-2);--o:var(--surface);--o-vien:var(--plate-rule);
+ --o-dau:var(--accent-soft);--o-chu:var(--accent);--pk:#8A5A00;
+ --fk:var(--accent);--ten:var(--ink-3);--tenx:#A32B23;
+ --dai0:var(--plate);--dai1:transparent;
+ margin:18px 0;overflow-x:auto}
+@media(prefers-color-scheme:dark){:root:not([data-theme=light]) .ve{
+ --pk:#D9B455;--tenx:#E9897C}}
+.chu-giai{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;
+ color:var(--ink-2);margin:8px 0 0}
+.chu-giai i{font-style:normal;font-family:"IBM Plex Mono",monospace;
+ font-weight:600}</style>
+</head><body><div class="wrap">
+<h1>Bản đồ kiến trúc kho <span class="mono">FLS</span> — 7 tầng</h1>
+<p class="lede">Mỗi tầng trả lời <strong>một câu</strong>. Mũi tên là <strong>khoá ngoại thật</strong>, đọc từ bản khai.</p>
+<p class="meta">Trang này do <code>tools/sinh_ban_do_tang.py</code> SINH RA từ <code>fls/db/schema.py</code> — ⛔ đừng sửa tay. 25 bảng · 24 khoá ngoại.</p>
+<div class="note amb">⛔⛔ <strong>Vì sao trang này được SINH chứ ⛔ không vẽ tay.</strong> Một bản đồ vẽ tay ⛔ không có cổng nào canh, và nó sẽ già <strong>im lặng</strong>. Ở đây <code>tầng</code> là <strong>một trường của bản khai</strong>; thêm một bảng mà quên khai tầng thì cổng <code>--kiem</code> <strong>NO</strong>.<br>⚠ <code>tầng</code> ⛔ <strong>không</strong> đổi một dòng <code>DDL</code> nào — hai bảng cùng tầng ⛔ không có gì chung ở PostgreSQL; chúng chung <strong>câu hỏi mà chúng trả lời</strong>.</div>
+<div class="ve">
+<svg viewBox="0 0 1320 934" width="100%" style="max-width:1320px" xmlns="http://www.w3.org/2000/svg" font-family="ui-monospace,'IBM Plex Mono',monospace" role="img" aria-label="Bản đồ kiến trúc kho FLS theo 7 tầng">
+<defs>
+<marker id="mt" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--ten)"/></marker>
+<marker id="mtx" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--tenx)"/></marker>
+</defs>
+<rect x="10" y="45" width="1300" height="176" rx="10" fill="var(--dai0)" stroke="var(--vien)"/>
+<text x="26" y="70" font-size="13" font-weight="700" fill="var(--nhan)">① ẢNH CHỤP</text>
+<text x="26" y="87" font-size="10" fill="var(--phu)">tờ giấy lúc ấy ghi gì</text>
+<text x="26" y="100" font-size="10" fill="var(--phu)">— chỉ-THÊM, ⛔ không</text>
+<text x="26" y="113" font-size="10" fill="var(--phu)">ai sửa</text>
+<rect x="10" y="235" width="1300" height="103" rx="10" fill="var(--dai1)" stroke="var(--vien)"/>
+<text x="26" y="260" font-size="13" font-weight="700" fill="var(--nhan)">② NẠP</text>
+<text x="26" y="277" font-size="10" fill="var(--phu)">dòng nào vào sổ, dòng</text>
+<text x="26" y="290" font-size="10" fill="var(--phu)">nào BỊ LOẠI và vì sao</text>
+<rect x="10" y="352" width="1300" height="118" rx="10" fill="var(--dai0)" stroke="var(--vien)"/>
+<text x="26" y="377" font-size="13" font-weight="700" fill="var(--nhan)">③ SỔ KẾ TOÁN</text>
+<text x="26" y="394" font-size="10" fill="var(--phu)">append-only (INV-I08)</text>
+<text x="26" y="407" font-size="10" fill="var(--phu)">+ hai danh mục nó tra</text>
+<text x="26" y="420" font-size="10" fill="var(--phu)">tới</text>
+<rect x="10" y="484" width="1300" height="118" rx="10" fill="var(--dai1)" stroke="var(--vien)"/>
+<text x="26" y="509" font-size="13" font-weight="700" fill="var(--nhan)">④ GHÉP LỆNH CHI</text>
+<text x="26" y="526" font-size="10" fill="var(--phu)">dòng tiền này chi</text>
+<text x="26" y="539" font-size="10" fill="var(--phu)">theo lệnh nào</text>
+<rect x="10" y="616" width="1300" height="88" rx="10" fill="var(--dai0)" stroke="var(--vien)"/>
+<text x="26" y="641" font-size="13" font-weight="700" fill="var(--nhan)">⑤ VIỆC CỦA NGƯỜI</text>
+<text x="26" y="658" font-size="10" fill="var(--phu)">người còn phải làm gì</text>
+<rect x="10" y="718" width="1300" height="118" rx="10" fill="var(--dai1)" stroke="var(--vien)"/>
+<text x="26" y="743" font-size="13" font-weight="700" fill="var(--nhan)">⑥ SỬA &amp; VẾT</text>
+<text x="26" y="760" font-size="10" fill="var(--phu)">ai đã gõ gì, lúc nào,</text>
+<text x="26" y="773" font-size="10" fill="var(--phu)">vì sao</text>
+<rect x="10" y="850" width="1300" height="73" rx="10" fill="var(--dai0)" stroke="var(--vien)"/>
+<text x="26" y="875" font-size="13" font-weight="700" fill="var(--nhan)">⑦ HẠ TẦNG</text>
+<text x="26" y="892" font-size="10" fill="var(--phu)">sổ di trú</text>
+<path d="M489 731 Q553 602 552 457" fill="none" stroke="var(--ten)" stroke-width="1.5" opacity=".8" marker-end="url(#mt)"/>
+<text x="553" y="598" font-size="9.5" text-anchor="middle" fill="var(--ten)" style="paint-order:stroke;stroke:var(--nen);stroke-width:3px">itl_id</text>
+<path d="M552 743 c 26 -13 26 26 0 13" fill="none" stroke="var(--tenx)" stroke-width="1.6" marker-end="url(#mtx)"/>
+<text x="583" y="753" font-size="9.5" fill="var(--tenx)">reversal_of</text>
+<path d="M538 731 Q571 719 591 691" fill="none" stroke="var(--ten)" stroke-width="1.5" opacity=".8" marker-end="url(#mt)"/>
+<text x="571" y="715" font-size="9.5" text-anchor="middle" fill="var(--ten)" style="paint-order:stroke;stroke:var(--nen);stroke-width:3px">evt_id</text>
+<path d="M404 96 Q391 92 378 96" fill="none" stroke="var(--ten)" stroke-width="1.5" opacity=".8" marker-end="url(#mt)"/>
+<text x="391" y="88" font-size="9.5" text-anchor="middle" fill="var(--ten)" style="paint-order:stroke;stroke:var(--nen);stroke-width:3px">chup_id</text>
+<path d="M552 121 Q604 160 669 161" fill="none" stroke="var(--ten)" stroke-width="1.5" opacity=".8" marker-end="url(#mt)"/>
+<text x="604" y="156" font-size="9.5" text-anchor="middle" fill="var(--ten)" style="paint-order:stroke;stroke:var(--nen);stroke-width:3px">source_id</text>
+<path d="M578 96 Q478 64 378 96" fill="none" stroke="var(--ten)" stroke-width="1.5" opacity=".8" marker-end="url(#mt)"/>
+<text x="478" y="60" font-size="9.5" text-anchor="middle" fill="var(--ten)" style="paint-order:stroke;stroke:var(--nen);stroke-width:3px">chup_id</text>
+<path d="M683 128 Q694 150 716 161" fill="none" stroke="var(--ten)" stroke-width="1.5" opacity=".8" marker-end="url(#mt)"/>
+<text x="694" y="146" font-size="9.5" text-anchor="middle" fill="var(--ten)" style="paint-order:stroke;stroke:var(--nen);stroke-width:3px">source_id</text>
+<path d="M636 376 Q703 367 752 321" fill="none" stroke="var(--ten)" stroke-width="1.5" opacity=".8" marker-end="url(#mt)"/>
+<text x="703" y="363" font-size="9.5" text-anchor="middle" fill="var(--ten)" style="paint-order:stroke;stroke:var(--nen);stroke-width:3px">run_id</text>
+<path d="M636 411 Q649 415 662 411" fill="none" stroke="var(--ten)" stroke-width="1.5" opacity=".8" marker-end="url(#mt)"/>
+<text x="649" y="411" font-size="9.5" text-anchor="middle" fill="var(--ten)" style="paint-order:stroke;stroke:var(--nen);stroke-width:3px">le</text>
+<path d="M636 411 Q649 415 662 411" fill="none" stroke="var(--ten)" stroke-width="1.5" opacity=".8" marker-end="url(#mt)"/>
+<text x="649" y="411" font-size="9.5" text-anchor="middle" fill="var(--ten)" style="paint-order:stroke;stroke:var(--nen);stroke-width:3px">le_payer</text>
+<path d="M644 746 Q642 593 573 457" fill="none" stroke="var(--ten)" stroke-width="1.5" opacity=".8" marker-end="url(#mt)"/>
+<text x="642" y="589" font-size="9.5" text-anchor="middle" fill="var(--ten)" style="paint-order:stroke;stroke:var(--nen);stroke-width:3px">itl_id</text>
+<path d="M926 121 Q861 122 809 161" fill="none" stroke="var(--ten)" stroke-width="1.5" opacity=".8" marker-end="url(#mt)"/>
+<text x="861" y="118" font-size="9.5" text-anchor="middle" fill="var(--ten)" style="paint-order:stroke;stroke:var(--nen);stroke-width:3px">source_id</text>
+<path d="M1100 111 Q950 107 813 170" fill="none" stroke="var(--ten)" stroke-width="1.5" opacity=".8" marker-end="url(#mt)"/>
+<text x="950" y="103" font-size="9.5" text-anchor="middle" fill="var(--ten)" style="paint-order:stroke;stroke:var(--nen);stroke-width:3px">source_id</text>
+<path d="M673 512 Q765 438 800 325" fill="none" stroke="var(--ten)" stroke-width="1.5" opacity=".8" marker-end="url(#mt)"/>
+<text x="765" y="434" font-size="9.5" text-anchor="middle" fill="var(--ten)" style="paint-order:stroke;stroke:var(--nen);stroke-width:3px">run_id</text>
+<path d="M752 506 Q703 458 636 448" fill="none" stroke="var(--ten)" stroke-width="1.5" opacity=".8" marker-end="url(#mt)"/>
+<text x="703" y="454" font-size="9.5" text-anchor="middle" fill="var(--ten)" style="paint-order:stroke;stroke:var(--nen);stroke-width:3px">itl_id</text>
+<path d="M826 497 Q854 411 826 325" fill="none" stroke="var(--ten)" stroke-width="1.5" opacity=".8" marker-end="url(#mt)"/>
+<text x="854" y="407" font-size="9.5" text-anchor="middle" fill="var(--ten)" style="paint-order:stroke;stroke:var(--nen);stroke-width:3px">run_id</text>
+<path d="M826 497 Q854 411 826 325" fill="none" stroke="var(--ten)" stroke-width="1.5" opacity=".8" marker-end="url(#mt)"/>
+<text x="854" y="407" font-size="9.5" text-anchor="middle" fill="var(--ten)" style="paint-order:stroke;stroke:var(--nen);stroke-width:3px">run_pm</text>
+<path d="M926 543 Q913 539 900 543" fill="none" stroke="var(--ten)" stroke-width="1.5" opacity=".8" marker-end="url(#mt)"/>
+<text x="913" y="535" font-size="9.5" text-anchor="middle" fill="var(--ten)" style="paint-order:stroke;stroke:var(--nen);stroke-width:3px">link_id</text>
+<path d="M926 521 Q791 444 636 433" fill="none" stroke="var(--ten)" stroke-width="1.5" opacity=".8" marker-end="url(#mt)"/>
+<text x="791" y="440" font-size="9.5" text-anchor="middle" fill="var(--ten)" style="paint-order:stroke;stroke:var(--nen);stroke-width:3px">itl_id</text>
+<path d="M926 566 Q805 569 705 637" fill="none" stroke="var(--tenx)" stroke-width="1.5" opacity=".8" marker-end="url(#mtx)"/>
+<text x="805" y="565" font-size="9.5" text-anchor="middle" fill="var(--tenx)" style="paint-order:stroke;stroke:var(--nen);stroke-width:3px">evt_id</text>
+<path d="M623 629 Q626 535 575 457" fill="none" stroke="var(--ten)" stroke-width="1.5" opacity=".8" marker-end="url(#mt)"/>
+<text x="626" y="531" font-size="9.5" text-anchor="middle" fill="var(--ten)" style="paint-order:stroke;stroke:var(--nen);stroke-width:3px">itl_id</text>
+<path d="M726 286 Q739 291 752 286" fill="none" stroke="var(--ten)" stroke-width="1.5" opacity=".8" marker-end="url(#mt)"/>
+<text x="739" y="287" font-size="9.5" text-anchor="middle" fill="var(--ten)" style="paint-order:stroke;stroke:var(--nen);stroke-width:3px">run_id</text>
+<path d="M861 248 Q936 205 972 128" fill="none" stroke="var(--ten)" stroke-width="1.5" opacity=".8" marker-end="url(#mt)"/>
+<text x="936" y="201" font-size="9.5" text-anchor="middle" fill="var(--ten)" style="paint-order:stroke;stroke:var(--nen);stroke-width:3px">khai_id</text>
+<path d="M752 260 Q572 158 369 120" fill="none" stroke="var(--ten)" stroke-width="1.5" opacity=".8" marker-end="url(#mt)"/>
+<text x="572" y="154" font-size="9.5" text-anchor="middle" fill="var(--ten)" style="paint-order:stroke;stroke:var(--nen);stroke-width:3px">chup_id</text>
+<rect x="404" y="731" width="148" height="92" rx="7" fill="var(--o)" stroke="var(--o-vien)" stroke-width="1.3"/>
+<rect x="404" y="731" width="148" height="25" rx="7" fill="var(--o-dau)"/>
+<rect x="404" y="749" width="148" height="7" fill="var(--o-dau)"/>
+<text x="414" y="748" font-size="11.5" font-weight="600" fill="var(--o-chu)">fls_adjustment</text>
+<text x="414" y="767" font-size="9.5" fill="var(--pk)">PK</text>
+<text x="434" y="767" font-size="9.5" fill="var(--phu)">adj_id</text>
+<text x="414" y="782" font-size="9.5" fill="var(--fk)">FK</text>
+<text x="434" y="782" font-size="9.5" fill="var(--phu)">itl_id</text>
+<text x="414" y="797" font-size="9.5" fill="var(--fk)">FK</text>
+<text x="434" y="797" font-size="9.5" fill="var(--phu)">reversal_of</text>
+<text x="414" y="812" font-size="9.5" fill="var(--fk)">FK</text>
+<text x="434" y="812" font-size="9.5" fill="var(--phu)">evt_id</text>
+<rect x="230" y="73" width="148" height="47" rx="7" fill="var(--o)" stroke="var(--o-vien)" stroke-width="1.3"/>
+<rect x="230" y="73" width="148" height="25" rx="7" fill="var(--o-dau)"/>
+<rect x="230" y="91" width="148" height="7" fill="var(--o-dau)"/>
+<text x="240" y="90" font-size="11.5" font-weight="600" fill="var(--o-chu)">fls_chup</text>
+<text x="240" y="109" font-size="9.5" fill="var(--pk)">PK</text>
+<text x="260" y="109" font-size="9.5" fill="var(--phu)">chup_id</text>
+<rect x="404" y="58" width="148" height="77" rx="7" fill="var(--o)" stroke="var(--o-vien)" stroke-width="1.3"/>
+<rect x="404" y="58" width="148" height="25" rx="7" fill="var(--o-dau)"/>
+<rect x="404" y="76" width="148" height="7" fill="var(--o-dau)"/>
+<text x="414" y="75" font-size="11.5" font-weight="600" fill="var(--o-chu)">fls_chup_dong</text>
+<text x="414" y="94" font-size="9.5" fill="var(--pk)">PK</text>
+<text x="434" y="94" font-size="9.5" fill="var(--phu)">chup_id</text>
+<text x="414" y="109" font-size="9.5" fill="var(--pk)">PK</text>
+<text x="434" y="109" font-size="9.5" fill="var(--phu)">source_id</text>
+<text x="414" y="124" font-size="9.5" fill="var(--pk)">PK</text>
+<text x="434" y="124" font-size="9.5" fill="var(--phu)">dong_so</text>
+<rect x="578" y="66" width="148" height="62" rx="7" fill="var(--o)" stroke="var(--o-vien)" stroke-width="1.3"/>
+<rect x="578" y="66" width="148" height="25" rx="7" fill="var(--o-dau)"/>
+<rect x="578" y="84" width="148" height="7" fill="var(--o-dau)"/>
+<text x="588" y="82" font-size="11.5" font-weight="600" fill="var(--o-chu)">fls_chup_nguon</text>
+<text x="588" y="102" font-size="9.5" fill="var(--pk)">PK</text>
+<text x="608" y="102" font-size="9.5" fill="var(--phu)">chup_id</text>
+<text x="588" y="116" font-size="9.5" fill="var(--pk)">PK</text>
+<text x="608" y="116" font-size="9.5" fill="var(--phu)">source_id</text>
+<rect x="383" y="644" width="148" height="32" rx="7" fill="var(--o)" stroke="var(--o-vien)" stroke-width="1.3" stroke-dasharray="5 3"/>
+<rect x="383" y="644" width="148" height="25" rx="7" fill="var(--o-dau)"/>
+<rect x="383" y="662" width="148" height="7" fill="var(--o-dau)"/>
+<text x="393" y="661" font-size="11.5" font-weight="600" fill="var(--o-chu)">fls_da_xong  ◇</text>
+<rect x="752" y="80" width="148" height="32" rx="7" fill="var(--o)" stroke="var(--o-vien)" stroke-width="1.3" stroke-dasharray="5 3"/>
+<rect x="752" y="80" width="148" height="25" rx="7" fill="var(--o-dau)"/>
+<rect x="752" y="98" width="148" height="7" fill="var(--o-dau)"/>
+<text x="762" y="98" font-size="11.5" font-weight="600" fill="var(--o-chu)">fls_dien_giai  ◇</text>
+<rect x="488" y="365" width="148" height="92" rx="7" fill="var(--o)" stroke="var(--o-vien)" stroke-width="1.3"/>
+<rect x="488" y="365" width="148" height="25" rx="7" fill="var(--o-dau)"/>
+<rect x="488" y="383" width="148" height="7" fill="var(--o-dau)"/>
+<text x="498" y="382" font-size="11.5" font-weight="600" fill="var(--o-chu)">fls_itl</text>
+<text x="498" y="401" font-size="9.5" fill="var(--pk)">PK</text>
+<text x="518" y="401" font-size="9.5" fill="var(--phu)">itl_id</text>
+<text x="498" y="416" font-size="9.5" fill="var(--fk)">FK</text>
+<text x="518" y="416" font-size="9.5" fill="var(--phu)">run_id</text>
+<text x="498" y="431" font-size="9.5" fill="var(--fk)">FK</text>
+<text x="518" y="431" font-size="9.5" fill="var(--phu)">le</text>
+<text x="498" y="446" font-size="9.5" fill="var(--fk)">FK</text>
+<text x="518" y="446" font-size="9.5" fill="var(--phu)">le_payer</text>
+<rect x="578" y="746" width="148" height="62" rx="7" fill="var(--o)" stroke="var(--o-vien)" stroke-width="1.3"/>
+<rect x="578" y="746" width="148" height="25" rx="7" fill="var(--o-dau)"/>
+<rect x="578" y="764" width="148" height="7" fill="var(--o-dau)"/>
+<text x="588" y="763" font-size="11.5" font-weight="600" fill="var(--o-chu)">fls_journal</text>
+<text x="588" y="782" font-size="9.5" fill="var(--pk)">PK</text>
+<text x="608" y="782" font-size="9.5" fill="var(--phu)">jrn_id</text>
+<text x="588" y="797" font-size="9.5" fill="var(--fk)">FK</text>
+<text x="608" y="797" font-size="9.5" fill="var(--phu)">itl_id</text>
+<rect x="926" y="66" width="148" height="62" rx="7" fill="var(--o)" stroke="var(--o-vien)" stroke-width="1.3"/>
+<rect x="926" y="66" width="148" height="25" rx="7" fill="var(--o-dau)"/>
+<rect x="926" y="84" width="148" height="7" fill="var(--o-dau)"/>
+<text x="936" y="82" font-size="11.5" font-weight="600" fill="var(--o-chu)">fls_khai_cot</text>
+<text x="936" y="102" font-size="9.5" fill="var(--pk)">PK</text>
+<text x="956" y="102" font-size="9.5" fill="var(--phu)">khai_id</text>
+<text x="936" y="116" font-size="9.5" fill="var(--fk)">FK</text>
+<text x="956" y="116" font-size="9.5" fill="var(--phu)">source_id</text>
+<rect x="662" y="388" width="148" height="47" rx="7" fill="var(--o)" stroke="var(--o-vien)" stroke-width="1.3"/>
+<rect x="662" y="388" width="148" height="25" rx="7" fill="var(--o-dau)"/>
+<rect x="662" y="406" width="148" height="7" fill="var(--o-dau)"/>
+<text x="672" y="404" font-size="11.5" font-weight="600" fill="var(--o-chu)">fls_le</text>
+<text x="672" y="424" font-size="9.5" fill="var(--pk)">PK</text>
+<text x="692" y="424" font-size="9.5" fill="var(--phu)">le_code</text>
+<rect x="836" y="388" width="154" height="47" rx="7" fill="var(--o)" stroke="var(--o-vien)" stroke-width="1.3"/>
+<rect x="836" y="388" width="154" height="25" rx="7" fill="var(--o-dau)"/>
+<rect x="836" y="406" width="154" height="7" fill="var(--o-dau)"/>
+<text x="846" y="404" font-size="11.5" font-weight="600" fill="var(--o-chu)">fls_mapping_master</text>
+<text x="846" y="424" font-size="9.5" fill="var(--pk)">PK</text>
+<text x="866" y="424" font-size="9.5" fill="var(--phu)">hd_code</text>
+<rect x="752" y="761" width="148" height="32" rx="7" fill="var(--o)" stroke="var(--o-vien)" stroke-width="1.3" stroke-dasharray="5 3"/>
+<rect x="752" y="761" width="148" height="25" rx="7" fill="var(--o-dau)"/>
+<rect x="752" y="779" width="148" height="7" fill="var(--o-dau)"/>
+<text x="762" y="778" font-size="11.5" font-weight="600" fill="var(--o-chu)">fls_may_goi_y  ◇</text>
+<rect x="665" y="863" width="148" height="47" rx="7" fill="var(--o)" stroke="var(--o-vien)" stroke-width="1.3"/>
+<rect x="665" y="863" width="148" height="25" rx="7" fill="var(--o-dau)"/>
+<rect x="665" y="881" width="148" height="7" fill="var(--o-dau)"/>
+<text x="675" y="880" font-size="11.5" font-weight="600" fill="var(--o-chu)">fls_migration</text>
+<text x="675" y="899" font-size="9.5" fill="var(--pk)">PK</text>
+<text x="695" y="899" font-size="9.5" fill="var(--phu)">version</text>
+<rect x="404" y="527" width="148" height="32" rx="7" fill="var(--o)" stroke="var(--o-vien)" stroke-width="1.3" stroke-dasharray="5 3"/>
+<rect x="404" y="527" width="148" height="25" rx="7" fill="var(--o-dau)"/>
+<rect x="404" y="545" width="148" height="7" fill="var(--o-dau)"/>
+<text x="414" y="544" font-size="11.5" font-weight="600" fill="var(--o-chu)">fls_moi_noi  ◇</text>
+<rect x="1100" y="66" width="148" height="62" rx="7" fill="var(--o)" stroke="var(--o-vien)" stroke-width="1.3"/>
+<rect x="1100" y="66" width="148" height="25" rx="7" fill="var(--o-dau)"/>
+<rect x="1100" y="84" width="148" height="7" fill="var(--o-dau)"/>
+<text x="1110" y="82" font-size="11.5" font-weight="600" fill="var(--o-chu)">fls_nguon_dai</text>
+<text x="1110" y="102" font-size="9.5" fill="var(--pk)">PK</text>
+<text x="1130" y="102" font-size="9.5" fill="var(--phu)">dai_id</text>
+<text x="1110" y="116" font-size="9.5" fill="var(--fk)">FK</text>
+<text x="1130" y="116" font-size="9.5" fill="var(--phu)">source_id</text>
+<rect x="578" y="512" width="148" height="62" rx="7" fill="var(--o)" stroke="var(--o-vien)" stroke-width="1.3"/>
+<rect x="578" y="512" width="148" height="25" rx="7" fill="var(--o-dau)"/>
+<rect x="578" y="530" width="148" height="7" fill="var(--o-dau)"/>
+<text x="588" y="529" font-size="11.5" font-weight="600" fill="var(--o-chu)">fls_pm_line</text>
+<text x="588" y="548" font-size="9.5" fill="var(--pk)">PK</text>
+<text x="608" y="548" font-size="9.5" fill="var(--phu)">run_id</text>
+<text x="588" y="563" font-size="9.5" fill="var(--pk)">PK</text>
+<text x="608" y="563" font-size="9.5" fill="var(--phu)">pm_line_id</text>
+<rect x="752" y="497" width="148" height="92" rx="7" fill="var(--o)" stroke="var(--o-vien)" stroke-width="1.3"/>
+<rect x="752" y="497" width="148" height="25" rx="7" fill="var(--o-dau)"/>
+<rect x="752" y="515" width="148" height="7" fill="var(--o-dau)"/>
+<text x="762" y="514" font-size="11.5" font-weight="600" fill="var(--o-chu)">fls_pm_link</text>
+<text x="762" y="533" font-size="9.5" fill="var(--fk)">FK</text>
+<text x="782" y="533" font-size="9.5" fill="var(--phu)">itl_id</text>
+<text x="762" y="548" font-size="9.5" fill="var(--fk)">FK</text>
+<text x="782" y="548" font-size="9.5" fill="var(--phu)">run_id</text>
+<text x="762" y="563" font-size="9.5" fill="var(--fk)">FK</text>
+<text x="782" y="563" font-size="9.5" fill="var(--phu)">run_pm</text>
+<text x="762" y="578" font-size="9.5" fill="var(--pk)">PK</text>
+<text x="782" y="578" font-size="9.5" fill="var(--phu)">link_id</text>
+<rect x="926" y="497" width="148" height="92" rx="7" fill="var(--o)" stroke="var(--o-vien)" stroke-width="1.3"/>
+<rect x="926" y="497" width="148" height="25" rx="7" fill="var(--o-dau)"/>
+<rect x="926" y="515" width="148" height="7" fill="var(--o-dau)"/>
+<text x="936" y="514" font-size="11.5" font-weight="600" fill="var(--o-chu)">fls_pm_unlink</text>
+<text x="936" y="533" font-size="9.5" fill="var(--pk)">PK</text>
+<text x="956" y="533" font-size="9.5" fill="var(--phu)">unlink_id</text>
+<text x="936" y="548" font-size="9.5" fill="var(--fk)">FK</text>
+<text x="956" y="548" font-size="9.5" fill="var(--phu)">link_id</text>
+<text x="936" y="563" font-size="9.5" fill="var(--fk)">FK</text>
+<text x="956" y="563" font-size="9.5" fill="var(--phu)">itl_id</text>
+<text x="936" y="578" font-size="9.5" fill="var(--fk)">FK</text>
+<text x="956" y="578" font-size="9.5" fill="var(--phu)">evt_id</text>
+<rect x="557" y="629" width="148" height="62" rx="7" fill="var(--o)" stroke="var(--o-vien)" stroke-width="1.3"/>
+<rect x="557" y="629" width="148" height="25" rx="7" fill="var(--o-dau)"/>
+<rect x="557" y="647" width="148" height="7" fill="var(--o-dau)"/>
+<text x="567" y="646" font-size="11.5" font-weight="600" fill="var(--o-chu)">fls_queue_event</text>
+<text x="567" y="665" font-size="9.5" fill="var(--pk)">PK</text>
+<text x="587" y="665" font-size="9.5" fill="var(--phu)">evt_id</text>
+<text x="567" y="680" font-size="9.5" fill="var(--fk)">FK</text>
+<text x="587" y="680" font-size="9.5" fill="var(--phu)">itl_id</text>
+<rect x="731" y="644" width="189" height="32" rx="7" fill="var(--o)" stroke="var(--o-vien)" stroke-width="1.3" stroke-dasharray="5 3"/>
+<rect x="731" y="644" width="189" height="25" rx="7" fill="var(--o-dau)"/>
+<rect x="731" y="662" width="189" height="7" fill="var(--o-dau)"/>
+<text x="741" y="661" font-size="11.5" font-weight="600" fill="var(--o-chu)">fls_queue_reason_weekly  ◇</text>
+<rect x="947" y="644" width="148" height="32" rx="7" fill="var(--o)" stroke="var(--o-vien)" stroke-width="1.3" stroke-dasharray="5 3"/>
+<rect x="947" y="644" width="148" height="25" rx="7" fill="var(--o-dau)"/>
+<rect x="947" y="662" width="148" height="7" fill="var(--o-dau)"/>
+<text x="957" y="661" font-size="11.5" font-weight="600" fill="var(--o-chu)">fls_queue_state  ◇</text>
+<rect x="578" y="256" width="148" height="62" rx="7" fill="var(--o)" stroke="var(--o-vien)" stroke-width="1.3"/>
+<rect x="578" y="256" width="148" height="25" rx="7" fill="var(--o-dau)"/>
+<rect x="578" y="274" width="148" height="7" fill="var(--o-dau)"/>
+<text x="588" y="272" font-size="11.5" font-weight="600" fill="var(--o-chu)">fls_reject</text>
+<text x="588" y="292" font-size="9.5" fill="var(--pk)">PK</text>
+<text x="608" y="292" font-size="9.5" fill="var(--phu)">rej_id</text>
+<text x="588" y="306" font-size="9.5" fill="var(--fk)">FK</text>
+<text x="608" y="306" font-size="9.5" fill="var(--phu)">run_id</text>
+<rect x="752" y="248" width="148" height="77" rx="7" fill="var(--o)" stroke="var(--o-vien)" stroke-width="1.3"/>
+<rect x="752" y="248" width="148" height="25" rx="7" fill="var(--o-dau)"/>
+<rect x="752" y="266" width="148" height="7" fill="var(--o-dau)"/>
+<text x="762" y="265" font-size="11.5" font-weight="600" fill="var(--o-chu)">fls_run</text>
+<text x="762" y="284" font-size="9.5" fill="var(--pk)">PK</text>
+<text x="782" y="284" font-size="9.5" fill="var(--phu)">run_id</text>
+<text x="762" y="299" font-size="9.5" fill="var(--fk)">FK</text>
+<text x="782" y="299" font-size="9.5" fill="var(--phu)">khai_id</text>
+<text x="762" y="314" font-size="9.5" fill="var(--fk)">FK</text>
+<text x="782" y="314" font-size="9.5" fill="var(--phu)">chup_id</text>
+<rect x="665" y="161" width="148" height="47" rx="7" fill="var(--o)" stroke="var(--o-vien)" stroke-width="1.3"/>
+<rect x="665" y="161" width="148" height="25" rx="7" fill="var(--o-dau)"/>
+<rect x="665" y="179" width="148" height="7" fill="var(--o-dau)"/>
+<text x="675" y="178" font-size="11.5" font-weight="600" fill="var(--o-chu)">fls_source</text>
+<text x="675" y="197" font-size="9.5" fill="var(--pk)">PK</text>
+<text x="695" y="197" font-size="9.5" fill="var(--phu)">source_id</text>
+<rect x="926" y="761" width="148" height="32" rx="7" fill="var(--o)" stroke="var(--o-vien)" stroke-width="1.3" stroke-dasharray="5 3"/>
+<rect x="926" y="761" width="148" height="25" rx="7" fill="var(--o-dau)"/>
+<rect x="926" y="779" width="148" height="7" fill="var(--o-dau)"/>
+<text x="936" y="778" font-size="11.5" font-weight="600" fill="var(--o-chu)">fls_sua_tay  ◇</text>
+</svg>
+</div>
+<div class="chu-giai"><span><i style="color:#8A5A00">PK</i> khoá chính</span><span><i style="color:var(--accent)">FK</i> khoá ngoại</span><span><i>◇</i> khung xem — ⛔ không lưu gì</span><span><i style="color:var(--ink-3)">→</i> trỏ LÊN tầng trên <em>(hay cùng tầng)</em></span><span><i style="color:#A32B23">→</i> trỏ XUỐNG · tự tham chiếu</span></div>
+<div class="note">⭐ <strong>Hai mũi tên ĐỎ là hai chỗ đáng nhìn nhất của cả bản đồ:</strong><br>ⓐ <code>fls_adjustment.reversal_of → fls_adjustment</code> — một bút toán <strong>ĐẢO</strong> trỏ về bút toán nó đảo. Đó là cơ chế thay cho <code>DELETE</code>: <code>INV-I08</code> nói sổ <strong>chỉ THÊM</strong>, nên «xoá» trong TO-BE là «thêm một dòng trỏ ngược lại».<br>ⓑ <code>fls_pm_unlink.evt_id → fls_queue_event</code> — mũi tên <strong>duy nhất đi XUỐNG</strong>. <em>Ai bỏ ghép và vì sao</em> sống ở tầng <strong>VIỆC</strong>, ⛔ <strong>không</strong> nhân bản sang tầng ghép — <strong>một chỗ, ⛔ không hai</strong>.</div>
+<h2>Trục thứ hai — <strong>ba khâu nghiệp vụ</strong></h2>
+<p class="lede">Bản đồ trên trả lời <em>«nó nằm ở đâu trên đường đi của <strong>dữ liệu</strong>»</em>. Bản đồ dưới trả lời một câu khác: <em>«nó phục vụ <strong>việc</strong> nào của người»</em>.</p>
+<div class="note amb">⛔⛔ <strong><code>khâu</code> ⛔ KHÔNG phải <code>tầng</code> đổi tên.</strong> Hai trục <strong>giao nhau chứ ⛔ không lồng nhau</strong> — và chỗ chúng <strong>lệch</strong> là chỗ đáng nhìn nhất.<br>⭐ <strong>Luật gán: theo VIỆC NÓ PHỤC VỤ, ⛔ không theo ai ghi nó.</strong> Thiếu luật ấy thì <code>fls_queue_event</code> rơi vào khâu Ⓐ <em>(máy ghi 108.128 sự kiện lúc nạp)</em> trong khi nó là <strong>bảng việc của NGƯỜI</strong>.<br>⛔ Tên ba khâu <strong>lấy lại</strong> từ <code>ORC-09</code> <em>(mốc <code>A</code> · tác vụ ① · tác vụ ②)</em> — ⛔ không đặt tên thứ tư cho một thứ đã có tên.</div>
+<div class="ve">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1320 732" width="100%" role="img" aria-label="Bản đồ ba khâu nghiệp vụ theo dòng chảy"><defs><marker id="mk" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,1 L9,5 L0,9 z" fill="#A34E1E"/></marker></defs><rect width="1320" height="732" fill="#FFFFFF"/><text x="24" y="30" font-family="Bitter,serif" font-size="15" font-weight="700" fill="#1B2420">DÒNG CHẢY CHÍNH — nạp data ⇒ ghép lệnh chi ⇒ adjust ITL</text><text x="24" y="48" font-family="Be Vietnam Pro,sans-serif" font-size="10.5" fill="#5A6661">Bề rộng dải = phạm vi. Hai dải dưới KHÔNG nằm trong chuỗi — chúng cắt ngang.</text><rect x="24" y="64" width="385" height="336" rx="10" fill="#F7F8F5" stroke="#C7D0CB"/><text x="38" y="86" font-family="Bitter,serif" font-size="13" font-weight="700" fill="#1B2420">Ⓐ NẠP DATA</text><text x="38" y="98" font-family="Be Vietnam Pro,sans-serif" font-size="9.5" fill="#5A6661">sao kê · lệnh chi vào kho — mốc `A`, đường LẤY dữ liệu</text><g><rect x="38" y="102" width="74" height="24" rx="5" fill="#EEF2EF" stroke="#5A6661"/><text x="75" y="118" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="11" fill="#1B2420">fls_chup</text></g><g><rect x="38" y="134" width="109" height="24" rx="5" fill="#EEF2EF" stroke="#5A6661"/><text x="92" y="150" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="11" fill="#1B2420">fls_chup_dong</text></g><g><rect x="38" y="166" width="116" height="24" rx="5" fill="#EEF2EF" stroke="#5A6661"/><text x="96" y="182" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="11" fill="#1B2420">fls_chup_nguon</text></g><g><rect x="38" y="198" width="109" height="24" rx="5" fill="#FFFFFF" stroke="#9AA6A1" stroke-dasharray="4 3"/><text x="92" y="214" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="11" fill="#1B2420">fls_dien_giai</text></g><g><rect x="38" y="230" width="102" height="24" rx="5" fill="#EEF2EF" stroke="#5A6661"/><text x="89" y="246" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="11" fill="#1B2420">fls_khai_cot</text></g><g><rect x="38" y="262" width="109" height="24" rx="5" fill="#EEF2EF" stroke="#5A6661"/><text x="92" y="278" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="11" fill="#1B2420">fls_nguon_dai</text></g><g><rect x="38" y="294" width="88" height="24" rx="5" fill="#EEF2EF" stroke="#5A6661"/><text x="82" y="310" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="11" fill="#1B2420">fls_reject</text></g><g><rect x="38" y="326" width="67" height="24" rx="5" fill="#EEF2EF" stroke="#5A6661"/><text x="72" y="342" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="11" fill="#1B2420">fls_run</text></g><g><rect x="38" y="358" width="88" height="24" rx="5" fill="#EEF2EF" stroke="#5A6661"/><text x="82" y="374" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="11" fill="#1B2420">fls_source</text></g><rect x="467" y="64" width="385" height="336" rx="10" fill="#F7F8F5" stroke="#C7D0CB"/><text x="481" y="86" font-family="Bitter,serif" font-size="13" font-weight="700" fill="#1B2420">Ⓑ GHÉP LỆNH CHI</text><text x="481" y="98" font-family="Be Vietnam Pro,sans-serif" font-size="9.5" fill="#5A6661">dòng tiền này chi theo lệnh nào — tác vụ ①</text><g><rect x="481" y="102" width="95" height="24" rx="5" fill="#FFFFFF" stroke="#9AA6A1" stroke-dasharray="4 3"/><text x="528" y="118" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="11" fill="#1B2420">fls_moi_noi</text></g><g><rect x="481" y="134" width="95" height="24" rx="5" fill="#EEF2EF" stroke="#5A6661"/><text x="528" y="150" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="11" fill="#1B2420">fls_pm_line</text></g><g><rect x="481" y="166" width="95" height="24" rx="5" fill="#EEF2EF" stroke="#5A6661"/><text x="528" y="182" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="11" fill="#1B2420">fls_pm_link</text></g><g><rect x="481" y="198" width="109" height="24" rx="5" fill="#EEF2EF" stroke="#5A6661"/><text x="536" y="214" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="11" fill="#1B2420">fls_pm_unlink</text></g><rect x="910" y="64" width="385" height="336" rx="10" fill="#F7F8F5" stroke="#C7D0CB"/><text x="924" y="86" font-family="Bitter,serif" font-size="13" font-weight="700" fill="#1B2420">Ⓒ SỬA ITL</text><text x="924" y="98" font-family="Be Vietnam Pro,sans-serif" font-size="9.5" fill="#5A6661">kế toán gõ 7 trường, máy giữ vết — tác vụ ②</text><g><rect x="924" y="102" width="116" height="24" rx="5" fill="#EEF2EF" stroke="#5A6661"/><text x="982" y="118" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="11" fill="#1B2420">fls_adjustment</text></g><g><rect x="924" y="134" width="95" height="24" rx="5" fill="#EEF2EF" stroke="#5A6661"/><text x="972" y="150" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="11" fill="#1B2420">fls_journal</text></g><g><rect x="924" y="166" width="109" height="24" rx="5" fill="#FFFFFF" stroke="#9AA6A1" stroke-dasharray="4 3"/><text x="978" y="182" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="11" fill="#1B2420">fls_may_goi_y</text></g><g><rect x="924" y="198" width="95" height="24" rx="5" fill="#FFFFFF" stroke="#9AA6A1" stroke-dasharray="4 3"/><text x="972" y="214" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="11" fill="#1B2420">fls_sua_tay</text></g><line x1="419" y1="232" x2="457" y2="232" stroke="#A34E1E" stroke-width="3" marker-end="url(#mk)"/><line x1="862" y1="232" x2="900" y2="232" stroke="#A34E1E" stroke-width="3" marker-end="url(#mk)"/><rect x="467" y="434" width="828" height="76" rx="10" fill="#F7F8F5" stroke="#C7D0CB"/><text x="481" y="456" font-family="Bitter,serif" font-size="13" font-weight="700" fill="#1B2420">VIỆC CỦA NGƯỜI</text><text x="481" y="468" font-family="Be Vietnam Pro,sans-serif" font-size="9.5" fill="#5A6661">cắt ngang Ⓑ và Ⓒ — người còn phải làm gì · dải chỉ trải dưới Ⓑ và Ⓒ</text><g><rect x="481" y="472" width="95" height="24" rx="5" fill="#FFFFFF" stroke="#9AA6A1" stroke-dasharray="4 3"/><text x="528" y="488" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="11" fill="#1B2420">fls_da_xong</text></g><g><rect x="588" y="472" width="123" height="24" rx="5" fill="#EEF2EF" stroke="#5A6661"/><text x="650" y="488" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="11" fill="#1B2420">fls_queue_event</text></g><g><rect x="723" y="472" width="179" height="24" rx="5" fill="#FFFFFF" stroke="#9AA6A1" stroke-dasharray="4 3"/><text x="812" y="488" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="11" fill="#1B2420">fls_queue_reason_weekly</text></g><g><rect x="914" y="472" width="123" height="24" rx="5" fill="#FFFFFF" stroke="#9AA6A1" stroke-dasharray="4 3"/><text x="976" y="488" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="11" fill="#1B2420">fls_queue_state</text></g><rect x="24" y="532" width="1271" height="76" rx="10" fill="#F7F8F5" stroke="#C7D0CB"/><text x="38" y="554" font-family="Bitter,serif" font-size="13" font-weight="700" fill="#1B2420">SỔ &amp; DANH MỤC</text><text x="38" y="566" font-family="Be Vietnam Pro,sans-serif" font-size="9.5" fill="#5A6661">trục chung — cả ba khâu đều chạm · dải trải dưới CẢ BA khâu</text><g><rect x="38" y="570" width="67" height="24" rx="5" fill="#EEF2EF" stroke="#5A6661"/><text x="72" y="586" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="11" fill="#1B2420">fls_itl</text></g><g><rect x="117" y="570" width="60" height="24" rx="5" fill="#EEF2EF" stroke="#5A6661"/><text x="147" y="586" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="11" fill="#1B2420">fls_le</text></g><g><rect x="189" y="570" width="144" height="24" rx="5" fill="#EEF2EF" stroke="#5A6661"/><text x="261" y="586" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="11" fill="#1B2420">fls_mapping_master</text></g><rect x="24" y="630" width="300" height="76" rx="10" fill="#F7F8F5" stroke="#C7D0CB"/><text x="38" y="652" font-family="Bitter,serif" font-size="13" font-weight="700" fill="#1B2420">HẠ TẦNG</text><text x="38" y="664" font-family="Be Vietnam Pro,sans-serif" font-size="9.5" fill="#5A6661">sổ di trú</text><g><rect x="38" y="668" width="109" height="24" rx="5" fill="#EEF2EF" stroke="#5A6661"/><text x="92" y="684" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="11" fill="#1B2420">fls_migration</text></g><text x="344" y="656" font-family="Be Vietnam Pro,sans-serif" font-size="10.5" fill="#5A6661">⛔ Không nằm trong chuỗi nghiệp vụ — và đó là đúng.</text></svg>
+</div>
+<div class="chu-giai"><span><i>Ⓐ NẠP DATA</i> 9 thực thể</span><span><i>Ⓑ GHÉP LỆNH CHI</i> 4 thực thể</span><span><i>Ⓒ SỬA ITL</i> 4 thực thể</span><span><i>SỔ &amp; DANH MỤC</i> 3 thực thể</span><span><i>VIỆC CỦA NGƯỜI</i> 4 thực thể</span><span><i>HẠ TẦNG</i> 1 thực thể</span></div>
+<div class="note">⭐⭐ <strong>Ba chỗ hai trục ⛔ không trùng — đọc ba dòng này là hiểu cả bản đồ:</strong><br>ⓐ <code>fls_pm_line</code> — tầng <strong>④ GHÉP</strong>, khâu <strong>Ⓑ</strong>, ⛔ <strong>nhưng khâu Ⓐ là thứ GHI nó</strong>. Sửa đường nạp mà quên rằng người hưởng là màn ghép là cách làm hỏng Ⓑ <em>từ</em> Ⓐ.<br>ⓑ <code>fls_queue_event</code> — một bảng phục vụ <strong>hai việc</strong> ⇒ mọi phép đếm phải nói rõ <strong>đang đếm việc nào</strong>. Đây đúng là <code>GAP-ERD-30</code> nhìn từ trục khâu.<br>ⓒ <code>fls_itl</code> — <strong>trục chung</strong>, ⛔ không thuộc riêng khâu nào. Gán nó vào Ⓐ <em>(vì Ⓐ ghi)</em> hay Ⓒ <em>(vì Ⓒ sửa)</em> đều làm mất một nửa sự thật.</div>
+<h2>Tóm tắt theo tầng</h2>
+<div class="tang"><div class="dau"><b>① ẢNH CHỤP</b><span>tờ giấy lúc ấy ghi gì — chỉ-THÊM, ⛔ không ai sửa</span></div><div class="than">
+<div class="o">fls_chup<em>6 cột</em></div>
+<div class="o">fls_chup_dong<em>4 cột</em></div>
+<div class="o">fls_chup_nguon<em>3 cột</em></div>
+<div class="o view">fls_dien_giai<em>khung xem</em></div>
+<div class="o">fls_khai_cot<em>8 cột</em></div>
+<div class="o">fls_nguon_dai<em>7 cột</em></div>
+<div class="o">fls_source<em>7 cột</em></div>
+</div></div>
+<div class="mui">↓</div>
+<div class="tang"><div class="dau"><b>② NẠP</b><span>dòng nào vào sổ, dòng nào BỊ LOẠI và vì sao</span></div><div class="than">
+<div class="o">fls_reject<em>6 cột</em></div>
+<div class="o">fls_run<em>9 cột</em></div>
+</div></div>
+<div class="mui">↓</div>
+<div class="tang"><div class="dau"><b>③ SỔ KẾ TOÁN</b><span>append-only (INV-I08) + hai danh mục nó tra tới</span></div><div class="than">
+<div class="o">fls_itl<em>43 cột</em></div>
+<div class="o">fls_le<em>3 cột</em></div>
+<div class="o">fls_mapping_master<em>6 cột</em></div>
+</div></div>
+<div class="mui">↓</div>
+<div class="tang"><div class="dau"><b>④ GHÉP LỆNH CHI</b><span>dòng tiền này chi theo lệnh nào</span></div><div class="than">
+<div class="o view">fls_moi_noi<em>khung xem</em></div>
+<div class="o">fls_pm_line<em>18 cột</em></div>
+<div class="o">fls_pm_link<em>9 cột</em></div>
+<div class="o">fls_pm_unlink<em>5 cột</em></div>
+</div></div>
+<div class="mui">↓</div>
+<div class="tang"><div class="dau"><b>⑤ VIỆC CỦA NGƯỜI</b><span>người còn phải làm gì</span></div><div class="than">
+<div class="o view">fls_da_xong<em>khung xem</em></div>
+<div class="o">fls_queue_event<em>7 cột</em></div>
+<div class="o view">fls_queue_reason_weekly<em>khung xem</em></div>
+<div class="o view">fls_queue_state<em>khung xem</em></div>
+</div></div>
+<div class="mui">↓</div>
+<div class="tang"><div class="dau"><b>⑥ SỬA &amp; VẾT</b><span>ai đã gõ gì, lúc nào, vì sao</span></div><div class="than">
+<div class="o">fls_adjustment<em>10 cột</em></div>
+<div class="o">fls_journal<em>9 cột</em></div>
+<div class="o view">fls_may_goi_y<em>khung xem</em></div>
+<div class="o view">fls_sua_tay<em>khung xem</em></div>
+</div></div>
+<div class="mui">↓</div>
+<div class="tang"><div class="dau"><b>⑦ HẠ TẦNG</b><span>sổ di trú</span></div><div class="than">
+<div class="o">fls_migration<em>4 cột</em></div>
+</div></div>
+<h2 style="font:600 20px/1.3 Bitter,serif;margin:34px 0 10px">Mũi tên — khoá ngoại thật</h2>
+<div class="scroll"><table>
+<tr><th>Từ</th><th>Cột</th><th>Tới</th><th class="c">Vượt tầng</th></tr>
+<tr><td class="mono">fls_adjustment</td><td class="mono">itl_id</td><td class="mono">fls_itl</td><td class="c">⑥ → ③</td></tr>
+<tr><td class="mono">fls_adjustment</td><td class="mono">reversal_of</td><td class="mono">fls_adjustment</td><td class="c">—</td></tr>
+<tr><td class="mono">fls_adjustment</td><td class="mono">evt_id</td><td class="mono">fls_queue_event</td><td class="c">⑥ → ⑤</td></tr>
+<tr><td class="mono">fls_chup_dong</td><td class="mono">chup_id</td><td class="mono">fls_chup</td><td class="c">—</td></tr>
+<tr><td class="mono">fls_chup_dong</td><td class="mono">source_id</td><td class="mono">fls_source</td><td class="c">—</td></tr>
+<tr><td class="mono">fls_chup_nguon</td><td class="mono">chup_id</td><td class="mono">fls_chup</td><td class="c">—</td></tr>
+<tr><td class="mono">fls_chup_nguon</td><td class="mono">source_id</td><td class="mono">fls_source</td><td class="c">—</td></tr>
+<tr><td class="mono">fls_itl</td><td class="mono">run_id</td><td class="mono">fls_run</td><td class="c">③ → ②</td></tr>
+<tr><td class="mono">fls_itl</td><td class="mono">le</td><td class="mono">fls_le</td><td class="c">—</td></tr>
+<tr><td class="mono">fls_itl</td><td class="mono">le_payer</td><td class="mono">fls_le</td><td class="c">—</td></tr>
+<tr><td class="mono">fls_journal</td><td class="mono">itl_id</td><td class="mono">fls_itl</td><td class="c">⑥ → ③</td></tr>
+<tr><td class="mono">fls_khai_cot</td><td class="mono">source_id</td><td class="mono">fls_source</td><td class="c">—</td></tr>
+<tr><td class="mono">fls_nguon_dai</td><td class="mono">source_id</td><td class="mono">fls_source</td><td class="c">—</td></tr>
+<tr><td class="mono">fls_pm_line</td><td class="mono">run_id</td><td class="mono">fls_run</td><td class="c">④ → ②</td></tr>
+<tr><td class="mono">fls_pm_link</td><td class="mono">itl_id</td><td class="mono">fls_itl</td><td class="c">④ → ③</td></tr>
+<tr><td class="mono">fls_pm_link</td><td class="mono">run_id</td><td class="mono">fls_run</td><td class="c">④ → ②</td></tr>
+<tr><td class="mono">fls_pm_link</td><td class="mono">run_pm</td><td class="mono">fls_run</td><td class="c">④ → ②</td></tr>
+<tr><td class="mono">fls_pm_unlink</td><td class="mono">link_id</td><td class="mono">fls_pm_link</td><td class="c">—</td></tr>
+<tr><td class="mono">fls_pm_unlink</td><td class="mono">itl_id</td><td class="mono">fls_itl</td><td class="c">④ → ③</td></tr>
+<tr><td class="mono">fls_pm_unlink</td><td class="mono">evt_id</td><td class="mono">fls_queue_event</td><td class="c">④ → ⑤</td></tr>
+<tr><td class="mono">fls_queue_event</td><td class="mono">itl_id</td><td class="mono">fls_itl</td><td class="c">⑤ → ③</td></tr>
+<tr><td class="mono">fls_reject</td><td class="mono">run_id</td><td class="mono">fls_run</td><td class="c">—</td></tr>
+<tr><td class="mono">fls_run</td><td class="mono">khai_id</td><td class="mono">fls_khai_cot</td><td class="c">② → ①</td></tr>
+<tr><td class="mono">fls_run</td><td class="mono">chup_id</td><td class="mono">fls_chup</td><td class="c">② → ①</td></tr>
+</table></div>
+<h2>Quan hệ giữa các thực thể — đọc thành câu</h2>
+<p class="vs">⛔ Bảng dưới đọc <strong>ngược chiều mũi tên</strong>: một dòng ở bảng <em>bên phải</em> có <strong>nhiều</strong> dòng ở bảng <em>bên trái</em>. Cột <strong>Bắt buộc</strong> nói khoá ấy có được để rỗng ⛔ không — và một khoá <strong>được phép rỗng</strong> là một quan hệ <strong>có thể ⛔ không tồn tại</strong>.</p>
+<div class="scroll"><table>
+<tr><th style="width:44%">Câu</th><th style="width:16%">Qua cột</th><th class="c" style="width:12%">Bắt buộc</th><th class="c">Vượt tầng</th></tr>
+<tr><td>một <code>fls_itl</code> có <strong>nhiều</strong> <code>fls_adjustment</code></td><td class="mono">itl_id</td><td class="c">có</td><td class="c">⑥ → ③</td></tr>
+<tr><td>⭐ một <code>fls_adjustment</code> trỏ về <strong>một <code>fls_adjustment</code> KHÁC</strong> — <em>tự tham chiếu</em></td><td class="mono">reversal_of</td><td class="c">⛔ không</td><td class="c">—</td></tr>
+<tr><td>một <code>fls_queue_event</code> có <strong>nhiều</strong> <code>fls_adjustment</code></td><td class="mono">evt_id</td><td class="c">⛔ không</td><td class="c">⑥ → ⑤</td></tr>
+<tr><td>một <code>fls_chup</code> có <strong>nhiều</strong> <code>fls_chup_dong</code></td><td class="mono">chup_id</td><td class="c">có</td><td class="c">—</td></tr>
+<tr><td>một <code>fls_source</code> có <strong>nhiều</strong> <code>fls_chup_dong</code></td><td class="mono">source_id</td><td class="c">có</td><td class="c">—</td></tr>
+<tr><td>một <code>fls_chup</code> có <strong>nhiều</strong> <code>fls_chup_nguon</code></td><td class="mono">chup_id</td><td class="c">có</td><td class="c">—</td></tr>
+<tr><td>một <code>fls_source</code> có <strong>nhiều</strong> <code>fls_chup_nguon</code></td><td class="mono">source_id</td><td class="c">có</td><td class="c">—</td></tr>
+<tr><td>một <code>fls_run</code> có <strong>nhiều</strong> <code>fls_itl</code></td><td class="mono">run_id</td><td class="c">có</td><td class="c">③ → ②</td></tr>
+<tr><td>một <code>fls_le</code> có <strong>nhiều</strong> <code>fls_itl</code></td><td class="mono">le</td><td class="c">⛔ không</td><td class="c">—</td></tr>
+<tr><td>một <code>fls_le</code> có <strong>nhiều</strong> <code>fls_itl</code></td><td class="mono">le_payer</td><td class="c">⛔ không</td><td class="c">—</td></tr>
+<tr><td>một <code>fls_itl</code> có <strong>nhiều</strong> <code>fls_journal</code></td><td class="mono">itl_id</td><td class="c">có</td><td class="c">⑥ → ③</td></tr>
+<tr><td>một <code>fls_source</code> có <strong>nhiều</strong> <code>fls_khai_cot</code></td><td class="mono">source_id</td><td class="c">có</td><td class="c">—</td></tr>
+<tr><td>một <code>fls_source</code> có <strong>nhiều</strong> <code>fls_nguon_dai</code></td><td class="mono">source_id</td><td class="c">có</td><td class="c">—</td></tr>
+<tr><td>một <code>fls_run</code> có <strong>nhiều</strong> <code>fls_pm_line</code></td><td class="mono">run_id</td><td class="c">có</td><td class="c">④ → ②</td></tr>
+<tr><td>một <code>fls_itl</code> có <strong>nhiều</strong> <code>fls_pm_link</code></td><td class="mono">itl_id</td><td class="c">có</td><td class="c">④ → ③</td></tr>
+<tr><td>một <code>fls_run</code> có <strong>nhiều</strong> <code>fls_pm_link</code></td><td class="mono">run_id</td><td class="c">có</td><td class="c">④ → ②</td></tr>
+<tr><td>một <code>fls_run</code> có <strong>nhiều</strong> <code>fls_pm_link</code></td><td class="mono">run_pm</td><td class="c">⛔ không</td><td class="c">④ → ②</td></tr>
+<tr><td>một <code>fls_pm_link</code> có <strong>nhiều</strong> <code>fls_pm_unlink</code></td><td class="mono">link_id</td><td class="c">có</td><td class="c">—</td></tr>
+<tr><td>một <code>fls_itl</code> có <strong>nhiều</strong> <code>fls_pm_unlink</code></td><td class="mono">itl_id</td><td class="c">có</td><td class="c">④ → ③</td></tr>
+<tr><td>một <code>fls_queue_event</code> có <strong>nhiều</strong> <code>fls_pm_unlink</code></td><td class="mono">evt_id</td><td class="c">có</td><td class="c">④ → ⑤</td></tr>
+<tr><td>một <code>fls_itl</code> có <strong>nhiều</strong> <code>fls_queue_event</code></td><td class="mono">itl_id</td><td class="c">có</td><td class="c">⑤ → ③</td></tr>
+<tr><td>một <code>fls_run</code> có <strong>nhiều</strong> <code>fls_reject</code></td><td class="mono">run_id</td><td class="c">có</td><td class="c">—</td></tr>
+<tr><td>một <code>fls_khai_cot</code> có <strong>nhiều</strong> <code>fls_run</code></td><td class="mono">khai_id</td><td class="c">⛔ không</td><td class="c">② → ①</td></tr>
+<tr><td>một <code>fls_chup</code> có <strong>nhiều</strong> <code>fls_run</code></td><td class="mono">chup_id</td><td class="c">⛔ không</td><td class="c">② → ①</td></tr>
+</table></div>
+<h2>Chi tiết từng thực thể — khoá, cột, và <em>vì sao</em></h2>
+<p class="vs">⭐ Cột <strong>«Vì sao nó tồn tại»</strong> là phần đắt nhất: nó lấy thẳng <code>comment</code> của bản khai, nơi mỗi cột nói ra <strong>bất biến nào</strong> hay <strong>sự cố nào</strong> đã sinh ra nó. <strong>99/197</strong> cột có câu ấy.</p>
+<h3>① ẢNH CHỤP — tờ giấy lúc ấy ghi gì — chỉ-THÊM, ⛔ không ai sửa</h3>
+<div class="tt"><div class="dau"><b>fls_chup</b>
+<span class="vt">CHUP</span>
+<span class="vt">6 cột</span>
+<span class="vt">khâu Ⓐ NẠP DATA</span>
+<span class="vt">⛔ ⛔ không có FK về <code>fls_itl</code>: dau anh chup — `fls_run.chup_id` tro NGUOC ve day; ⛔ khong dong so nao tro toi no truc tiep</span>
+</div><div class="scroll"><table>
+<tr><th style="width:21%">Cột</th><th style="width:12%">Kiểu</th><th style="width:26%">Khoá · ràng buộc</th><th>Vì sao nó tồn tại</th></tr>
+<tr><td class="mono">chup_id</td><td class="ty">bigint</td><td><span class="k pk">PK</span><span class="k bb">bắt buộc</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">doc_luc</td><td class="ty">timestamptz</td><td><span class="k bb">bắt buộc</span></td><td class="vs">★ DAU THOI DIEM — trang thai ② hien con so nay. ⛔ KHONG phai &#x27;tuoi&#x27;: tuoi la mot phep tru, dau thoi diem la mot su that</td></tr>
+<tr><td class="mono">spreadsheet_id</td><td class="ty">text</td><td><span class="k bb">bắt buộc</span></td><td class="vs">doc workbook NAO — hai lan chup tu hai file la hai thu khac nhau</td></tr>
+<tr><td class="mono">lan</td><td class="ty">text</td><td><span class="k bb">bắt buộc</span></td><td class="vs">Bank | Cash — hai lan khac khuon RA (GAP-CANON-02: bank 10 cot, quy 11) nen ⛔ khong duoc lan vao nhau</td></tr>
+<tr><td class="mono">giay</td><td class="ty">numeric(8,2)</td><td><span class="ty">—</span></td><td class="vs">phep doc mat bao lau. ⛔ KHONG suy duoc tu dau nen phai luu; do that 08/09: 4,4s cho 60 sheet</td></tr>
+<tr><td class="mono">actor</td><td class="ty">text</td><td><span class="k bb">bắt buộc</span></td><td class="vs">chup la HANH VI, phai co ten — cung luat `fls_khai_cot.actor`</td></tr>
+</table></div></div>
+<div class="tt"><div class="dau"><b>fls_chup_dong</b>
+<span class="vt">CHUP_DONG</span>
+<span class="vt">4 cột</span>
+<span class="vt">khâu Ⓐ NẠP DATA</span>
+<span class="k pk">PK GHÉP (chup_id + source_id + dong_so)</span>
+</div><div class="scroll"><table>
+<tr><th style="width:21%">Cột</th><th style="width:12%">Kiểu</th><th style="width:26%">Khoá · ràng buộc</th><th>Vì sao nó tồn tại</th></tr>
+<tr><td class="mono">chup_id</td><td class="ty">bigint</td><td><span class="k pk">PK</span><span class="k fk">FK → fls_chup.chup_id</span><span class="k bb">bắt buộc</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">source_id</td><td class="ty">bigint</td><td><span class="k pk">PK</span><span class="k fk">FK → fls_source.source_id</span><span class="k bb">bắt buộc</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">dong_so</td><td class="ty">int</td><td><span class="k pk">PK</span><span class="k bb">bắt buộc</span></td><td class="vs">thu tu dong TRONG VUNG DOC (0-based) — de truy nguoc ve sheet</td></tr>
+<tr><td class="mono">o</td><td class="ty">jsonb</td><td><span class="k bb">bắt buộc</span></td><td class="vs">{ten truong: gia tri NGUYEN VAN}, 5/6 truong (⛔ khong Description). ⛔ KHONG `text`: ep ve chuoi la dung lai cai bay lam se-ri ngay thanh &quot;45586&quot;</td></tr>
+</table></div></div>
+<div class="tt"><div class="dau"><b>fls_chup_nguon</b>
+<span class="vt">CHUP_NGUON</span>
+<span class="vt">3 cột</span>
+<span class="vt">khâu Ⓐ NẠP DATA</span>
+<span class="k pk">PK GHÉP (chup_id + source_id)</span>
+</div><div class="scroll"><table>
+<tr><th style="width:21%">Cột</th><th style="width:12%">Kiểu</th><th style="width:26%">Khoá · ràng buộc</th><th>Vì sao nó tồn tại</th></tr>
+<tr><td class="mono">chup_id</td><td class="ty">bigint</td><td><span class="k pk">PK</span><span class="k fk">FK → fls_chup.chup_id</span><span class="k bb">bắt buộc</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">source_id</td><td class="ty">bigint</td><td><span class="k pk">PK</span><span class="k fk">FK → fls_source.source_id</span><span class="k bb">bắt buộc</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">khai_version</td><td class="ty">int</td><td><span class="k bb">bắt buộc</span></td><td class="vs">ban khai DA DUNG de doc nguon nay trong lan chup nay — ghim ket qua `doc_khai(tai=doc_luc)` de doi chieu duoc</td></tr>
+</table></div></div>
+<div class="tt"><div class="dau"><b>fls_dien_giai</b>
+<span class="vt">STATEMENT_MEMO</span>
+<span class="vt">3 cột</span>
+<span class="vt">khâu Ⓐ NẠP DATA</span>
+<span class="k u">KHUNG XEM — ⛔ không lưu gì</span>
+<span class="vt">⛔ ⛔ không có FK về <code>fls_itl</code>: khung xem noi fls_itl voi anh chup moi nhat — khong luu gi</span>
+</div><div class="scroll"><table>
+<tr><th style="width:21%">Cột</th><th style="width:12%">Kiểu</th><th style="width:26%">Khoá · ràng buộc</th><th>Vì sao nó tồn tại</th></tr>
+<tr><td class="mono">itl_id</td><td class="ty">bigint</td><td><span class="ty">—</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">dien_giai</td><td class="ty">text</td><td><span class="ty">—</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">chup_id</td><td class="ty">bigint</td><td><span class="ty">—</span></td><td class="vs">TUOI cua cau chu — doc luc nao</td></tr>
+</table></div></div>
+<div class="tt"><div class="dau"><b>fls_khai_cot</b>
+<span class="vt">KHAI_COT</span>
+<span class="vt">8 cột</span>
+<span class="vt">khâu Ⓐ NẠP DATA</span>
+<span class="k u">DUY NHẤT (source_id + version + truong)</span>
+</div><div class="scroll"><table>
+<tr><th style="width:21%">Cột</th><th style="width:12%">Kiểu</th><th style="width:26%">Khoá · ràng buộc</th><th>Vì sao nó tồn tại</th></tr>
+<tr><td class="mono">khai_id</td><td class="ty">bigint</td><td><span class="k pk">PK</span><span class="k bb">bắt buộc</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">source_id</td><td class="ty">bigint</td><td><span class="k fk">FK → fls_source.source_id</span><span class="k bb">bắt buộc</span></td><td class="vs">khai nay cua NGUON nao</td></tr>
+<tr><td class="mono">version</td><td class="ty">int</td><td><span class="k bb">bắt buộc</span></td><td class="vs">ngan hang doi mau sao ke ⇒ khai MOI, ⛔ khong sua khai cu</td></tr>
+<tr><td class="mono">truong</td><td class="ty">text</td><td><span class="k bb">bắt buộc</span></td><td class="vs">mot trong 6 ten cua `sao_ke.SAU_TRUONG` — doc theo TEN</td></tr>
+<tr><td class="mono">cot</td><td class="ty">int</td><td><span class="k bb">bắt buộc</span></td><td class="vs">chi so cot 0-based trong tep nguon</td></tr>
+<tr><td class="mono">thu_tu</td><td class="ty">text</td><td><span class="k u">CHECK</span></td><td class="vs">QĐ-ITL-113: `dmy`|`mdy`, CHI tren dong `Date`. NULL = nguon chua khai ⇒ ngay mo ho van BI LOAI kem ly do</td></tr>
+<tr><td class="mono">hieu_luc_tu</td><td class="ty">timestamptz</td><td><span class="k bb">bắt buộc</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">actor</td><td class="ty">text</td><td><span class="k bb">bắt buộc</span></td><td class="vs">ban khai la HANH VI CUA NGUOI, phai co ten</td></tr>
+</table></div></div>
+<div class="tt"><div class="dau"><b>fls_nguon_dai</b>
+<span class="vt">NGUON_DAI</span>
+<span class="vt">7 cột</span>
+<span class="vt">khâu Ⓐ NẠP DATA</span>
+</div><div class="scroll"><table>
+<tr><th style="width:21%">Cột</th><th style="width:12%">Kiểu</th><th style="width:26%">Khoá · ràng buộc</th><th>Vì sao nó tồn tại</th></tr>
+<tr><td class="mono">dai_id</td><td class="ty">bigint</td><td><span class="k pk">PK</span><span class="k bb">bắt buộc</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">source_id</td><td class="ty">bigint</td><td><span class="k fk">FK → fls_source.source_id</span><span class="k bb">bắt buộc</span></td><td class="vs">dai nay cua NGUON nao</td></tr>
+<tr><td class="mono">truong</td><td class="ty">text</td><td><span class="k bb">bắt buộc</span></td><td class="vs">Date | Debit | Credit — danh muc chi khai BA truong</td></tr>
+<tr><td class="mono">cot</td><td class="ty">int</td><td><span class="ty">—</span></td><td class="vs">0-based, suy tu `dai_tho`. NULL = ⛔ KHONG suy duoc ⇒ S10 bao CHUA DO</td></tr>
+<tr><td class="mono">dai_tho</td><td class="ty">text</td><td><span class="k bb">bắt buộc</span></td><td class="vs">nguyen van o danh muc, vd `!L3:L` — giu de mat nguoi doi chieu duoc</td></tr>
+<tr><td class="mono">danh_muc</td><td class="ty">text</td><td><span class="k bb">bắt buộc</span></td><td class="vs">BankAccountList | Cash Ledger List</td></tr>
+<tr><td class="mono">doc_luc</td><td class="ty">timestamptz</td><td><span class="k bb">bắt buộc</span></td><td class="vs">—</td></tr>
+</table></div></div>
+<div class="tt"><div class="dau"><b>fls_source</b>
+<span class="vt">SOURCE</span>
+<span class="vt">7 cột</span>
+<span class="vt">khâu Ⓐ NẠP DATA</span>
+</div><div class="scroll"><table>
+<tr><th style="width:21%">Cột</th><th style="width:12%">Kiểu</th><th style="width:26%">Khoá · ràng buộc</th><th>Vì sao nó tồn tại</th></tr>
+<tr><td class="mono">source_id</td><td class="ty">bigint</td><td><span class="k pk">PK</span><span class="k bb">bắt buộc</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">source_key</td><td class="ty">text</td><td><span class="k u">DUY NHẤT</span><span class="k bb">bắt buộc</span></td><td class="vs">&#x27;R | HoangACB&#x27; | &#x27;file&gt;sheet&#x27;</td></tr>
+<tr><td class="mono">src_type</td><td class="ty">text</td><td><span class="k bb">bắt buộc</span></td><td class="vs">Bank|Cash|CCR|Platform|Mapping</td></tr>
+<tr><td class="mono">last_seen_at</td><td class="ty">timestamptz</td><td><span class="ty">—</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">lag_days</td><td class="ty">int</td><td><span class="ty">—</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">cutoff_date</td><td class="ty">date</td><td><span class="ty">—</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">txn_count</td><td class="ty">int</td><td><span class="ty">—</span></td><td class="vs">—</td></tr>
+</table></div></div>
+<h3>② NẠP — dòng nào vào sổ, dòng nào BỊ LOẠI và vì sao</h3>
+<div class="tt"><div class="dau"><b>fls_reject</b>
+<span class="vt">REJECT</span>
+<span class="vt">6 cột</span>
+<span class="vt">khâu Ⓐ NẠP DATA</span>
+<span class="k u">DUY NHẤT (run_id + source_sheet + source_row)</span>
+</div><div class="scroll"><table>
+<tr><th style="width:21%">Cột</th><th style="width:12%">Kiểu</th><th style="width:26%">Khoá · ràng buộc</th><th>Vì sao nó tồn tại</th></tr>
+<tr><td class="mono">rej_id</td><td class="ty">bigint</td><td><span class="k pk">PK</span><span class="k bb">bắt buộc</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">run_id</td><td class="ty">text</td><td><span class="k fk">FK → fls_run.run_id</span><span class="k bb">bắt buộc</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">source_system</td><td class="ty">text</td><td><span class="k bb">bắt buộc</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">source_sheet</td><td class="ty">text</td><td><span class="k bb">bắt buộc</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">source_row</td><td class="ty">int</td><td><span class="k bb">bắt buộc</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">reason</td><td class="ty">text</td><td><span class="k bb">bắt buộc</span></td><td class="vs">ACC-4: ly do CO TEN, khong duoc rong</td></tr>
+</table></div></div>
+<div class="tt"><div class="dau"><b>fls_run</b>
+<span class="vt">RUN</span>
+<span class="vt">9 cột</span>
+<span class="vt">khâu Ⓐ NẠP DATA</span>
+</div><div class="scroll"><table>
+<tr><th style="width:21%">Cột</th><th style="width:12%">Kiểu</th><th style="width:26%">Khoá · ràng buộc</th><th>Vì sao nó tồn tại</th></tr>
+<tr><td class="mono">run_id</td><td class="ty">text</td><td><span class="k pk">PK</span><span class="k bb">bắt buộc</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">contract_version</td><td class="ty">text</td><td><span class="k bb">bắt buộc</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">canon_version</td><td class="ty">text</td><td><span class="k bb">bắt buộc</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">mapping_version</td><td class="ty">text</td><td><span class="k bb">bắt buộc</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">started_at</td><td class="ty">timestamptz</td><td><span class="k bb">bắt buộc</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">row_count</td><td class="ty">int</td><td><span class="ty">—</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">state</td><td class="ty">text</td><td><span class="k bb">bắt buộc</span></td><td class="vs">SM-I04</td></tr>
+<tr><td class="mono">khai_id</td><td class="ty">bigint</td><td><span class="k fk">FK → fls_khai_cot.khai_id</span></td><td class="vs">DD-I10: ban khai anh xa cot dung cho lo nay. NULL = lo co TRUOC khi bang khai ton tai (⛔ khong bia — R-A1)</td></tr>
+<tr><td class="mono">chup_id</td><td class="ty">bigint</td><td><span class="k fk">FK → fls_chup.chup_id</span></td><td class="vs">QĐ-ITL-110: anh chup vung CHUAN ma lo nay doc. NULL = lo vao bang duong `dong` (test/doi chung), ⛔ KHONG co anh chup dung sau — ⛔ khong bia (R-A1)</td></tr>
+</table></div></div>
+<h3>③ SỔ KẾ TOÁN — append-only (INV-I08) + hai danh mục nó tra tới</h3>
+<div class="tt"><div class="dau"><b>fls_itl</b>
+<span class="vt">ITL_ROW</span>
+<span class="vt">43 cột</span>
+<span class="vt">khâu SỔ &amp; DANH MỤC</span>
+</div><div class="scroll"><table>
+<tr><th style="width:21%">Cột</th><th style="width:12%">Kiểu</th><th style="width:26%">Khoá · ràng buộc</th><th>Vì sao nó tồn tại</th></tr>
+<tr><td class="mono">itl_id</td><td class="ty">bigint</td><td><span class="k pk">PK</span><span class="k bb">bắt buộc</span></td><td class="vs">cap luc staged roi DONG BANG; KHONG theo vi tri dong</td></tr>
+<tr><td class="mono">content_key</td><td class="ty">text</td><td><span class="k u">DUY NHẤT</span><span class="k bb">bắt buộc</span></td><td class="vs">INV-I04b: hash(source_system,source_sheet,doc_date,ps_no,ps_co,doc_no,seq_trung)</td></tr>
+<tr><td class="mono">source_system</td><td class="ty">text</td><td><span class="k bb">bắt buộc</span></td><td class="vs">P100|Cash|A-CCR|HR|Platform</td></tr>
+<tr><td class="mono">source_sheet</td><td class="ty">text</td><td><span class="k bb">bắt buộc</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">source_row</td><td class="ty">int</td><td><span class="k bb">bắt buộc</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">run_id</td><td class="ty">text</td><td><span class="k fk">FK → fls_run.run_id</span><span class="k bb">bắt buộc</span></td><td class="vs">GAP-ERD-P0-01 (owner chot 26/08): FK de go sai run_id bi CHAN, khong de dong so mat lineage trong im lang (INV-I05)</td></tr>
+<tr><td class="mono">contract_version</td><td class="ty">text</td><td><span class="k bb">bắt buộc</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">canon_version</td><td class="ty">text</td><td><span class="k bb">bắt buộc</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">mapping_version</td><td class="ty">text</td><td><span class="k bb">bắt buộc</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">raw_frozen</td><td class="ty">boolean</td><td><span class="k bb">bắt buộc</span></td><td class="vs">INV-I03: true =&gt; trigger cam UPDATE/DELETE</td></tr>
+<tr><td class="mono">is_flash</td><td class="ty">boolean</td><td><span class="k bb">bắt buộc</span></td><td class="vs">INV-I14</td></tr>
+<tr><td class="mono">period_state</td><td class="ty">text</td><td><span class="k bb">bắt buộc</span></td><td class="vs">INV-I13: open|locked</td></tr>
+<tr><td class="mono">created_at</td><td class="ty">timestamptz</td><td><span class="k bb">bắt buộc</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">doc_date</td><td class="ty">date</td><td><span class="ty">—</span></td><td class="vs">A(0) Ngay chung tu. INV-I11: date khong phai chuoi</td></tr>
+<tr><td class="mono">doc_no</td><td class="ty">text</td><td><span class="ty">—</span></td><td class="vs">B(1) So chung tu. AUD-12: KHONG mang nghia thoi gian</td></tr>
+<tr><td class="mono">memo</td><td class="ty">text</td><td><span class="ty">—</span></td><td class="vs">C(2) Dien giai</td></tr>
+<tr><td class="mono">curr</td><td class="ty">text</td><td><span class="ty">—</span></td><td class="vs">D(3) Don vi tien te</td></tr>
+<tr><td class="mono">ps_no</td><td class="ty">numeric(20,2)</td><td><span class="ty">—</span></td><td class="vs">E(4) PS No</td></tr>
+<tr><td class="mono">ps_co</td><td class="ty">numeric(20,2)</td><td><span class="ty">—</span></td><td class="vs">F(5) PS Co</td></tr>
+<tr><td class="mono">acct</td><td class="ty">text</td><td><span class="ty">—</span></td><td class="vs">G(6) Tai khoan</td></tr>
+<tr><td class="mono">le</td><td class="ty">text</td><td><span class="k fk">FK → fls_le.le_code</span></td><td class="vs">P(15) SSOT phap nhan — KHONG dung BL</td></tr>
+<tr><td class="mono">hd</td><td class="ty">text</td><td><span class="ty">—</span></td><td class="vs">V(21) Final khoi 1 — Budget Code</td></tr>
+<tr><td class="mono">pay_type</td><td class="ty">text</td><td><span class="ty">—</span></td><td class="vs">Z(25) Final khoi 2 — Loai giao dich</td></tr>
+<tr><td class="mono">cdt1</td><td class="ty">text</td><td><span class="ty">—</span></td><td class="vs">AD(29) Final khoi 3 — Chu du toan</td></tr>
+<tr><td class="mono">svc_start</td><td class="ty">text</td><td><span class="ty">—</span></td><td class="vs">AH(33) Final khoi 4 — KY do nguoi go. ⛔ KHONG phai date: do tren 9.967 dong co &#x27;thang 5&#x27; &#x27;2025.07&#x27; &#x27;TPCI&#x27; &#x27;252512&#x27;… va khong he co ngay trong thang (migration 0005)</td></tr>
+<tr><td class="mono">svc_end</td><td class="ty">text</td><td><span class="ty">—</span></td><td class="vs">AL(37) Final khoi 5 — xem svc_start</td></tr>
+<tr><td class="mono">hd_thyt</td><td class="ty">text</td><td><span class="ty">—</span></td><td class="vs">NULL o cho may tu bia. KHONG vao parity</td></tr>
+<tr><td class="mono">pay_type_thyt</td><td class="ty">text</td><td><span class="ty">—</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">cdt1_thyt</td><td class="ty">text</td><td><span class="ty">—</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">svc_start_thyt</td><td class="ty">text</td><td><span class="ty">—</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">svc_end_thyt</td><td class="ty">text</td><td><span class="ty">—</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">work_status</td><td class="ty">text</td><td><span class="k bb">bắt buộc</span></td><td class="vs">INV-I16: ok|UNMAPPED|rejected</td></tr>
+<tr><td class="mono">id_payee</td><td class="ty">text</td><td><span class="ty">—</span></td><td class="vs">AP Final khoi 6 — goi y doc tu canon[Y]</td></tr>
+<tr><td class="mono">invoice</td><td class="ty">text</td><td><span class="ty">—</span></td><td class="vs">AT Final khoi 7 — link hoa don</td></tr>
+<tr><td class="mono">id_payee_thyt</td><td class="ty">text</td><td><span class="ty">—</span></td><td class="vs">NULL o cho may tu bia (mac dinh VD0). KHONG vao parity</td></tr>
+<tr><td class="mono">invoice_thyt</td><td class="ty">text</td><td><span class="ty">—</span></td><td class="vs">NULL o cho may tu bia (mac dinh &#x27;No hoa don&#x27;). KHONG vao parity</td></tr>
+<tr><td class="mono">le_payer</td><td class="ty">text</td><td><span class="k fk">FK → fls_le.le_code</span></td><td class="vs">ai THUC tra; NULL neu nguon thieu</td></tr>
+<tr><td class="mono">is_intercompany</td><td class="ty">boolean</td><td><span class="k u">máy tính</span></td><td class="vs">cam nhap tay — may suy</td></tr>
+<tr><td class="mono">pic</td><td class="ty">text</td><td><span class="ty">—</span></td><td class="vs">BJ giu cot, CHUA len UI</td></tr>
+<tr><td class="mono">audit_status</td><td class="ty">text</td><td><span class="ty">—</span></td><td class="vs">BK khac work_status</td></tr>
+<tr><td class="mono">pm_hinh</td><td class="ty">text</td><td><span class="ty">—</span></td><td class="vs">ghep BANG CACH NAO: A 1x1 · B 1 bank x N PM (chia tien) · C N bank x 1 PM (tra nhieu lan). Khong luu thi ve sau khong ai tra loi duoc &#x27;dong nay ghep kieu gi&#x27;</td></tr>
+<tr><td class="mono">itl_id_sheet</td><td class="ty">text</td><td><span class="ty">—</span></td><td class="vs">ITL# cua so cu — CHI de doi soat, ⛔ KHONG phai danh tinh</td></tr>
+<tr><td class="mono">canon</td><td class="ty">jsonb</td><td><span class="k bb">bắt buộc</span></td><td class="vs">36 cot nguyen van theo VI TRI — 4 cot AH-AK trung ten, luu theo key la mat cot</td></tr>
+</table></div></div>
+<div class="tt"><div class="dau"><b>fls_le</b>
+<span class="vt">LEGAL_ENTITY</span>
+<span class="vt">3 cột</span>
+<span class="vt">khâu SỔ &amp; DANH MỤC</span>
+<span class="vt">⛔ ⛔ không có FK về <code>fls_itl</code>: danh muc phap nhan — fls_itl tro TOI no, khong nguoc lai</span>
+</div><div class="scroll"><table>
+<tr><th style="width:21%">Cột</th><th style="width:12%">Kiểu</th><th style="width:26%">Khoá · ràng buộc</th><th>Vì sao nó tồn tại</th></tr>
+<tr><td class="mono">le_code</td><td class="ty">text</td><td><span class="k pk">PK</span><span class="k bb">bắt buộc</span></td><td class="vs">ma phap nhan</td></tr>
+<tr><td class="mono">le_name</td><td class="ty">text</td><td><span class="ty">—</span></td><td class="vs">GAP-LE-01: nguon khong co ten cho 24/29 ma. ⛔ KHONG lay ma lam ten — NULL trung thuc hon (INV-I16)</td></tr>
+<tr><td class="mono">is_entity</td><td class="ty">boolean</td><td><span class="k bb">bắt buộc</span></td><td class="vs">INV-I10: nhan khong-phai-phap-nhan (USD, HotBonus) =&gt; false</td></tr>
+</table></div></div>
+<div class="tt"><div class="dau"><b>fls_mapping_master</b>
+<span class="vt">MAPPING_MASTER</span>
+<span class="vt">6 cột</span>
+<span class="vt">khâu SỔ &amp; DANH MỤC</span>
+<span class="vt">⛔ ⛔ không có FK về <code>fls_itl</code>: danh muc HD — tra theo gia tri hd, khong FK vi hd co the UNMAPPED</span>
+</div><div class="scroll"><table>
+<tr><th style="width:21%">Cột</th><th style="width:12%">Kiểu</th><th style="width:26%">Khoá · ràng buộc</th><th>Vì sao nó tồn tại</th></tr>
+<tr><td class="mono">hd_code</td><td class="ty">text</td><td><span class="k pk">PK</span><span class="k bb">bắt buộc</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">need_cfa2</td><td class="ty">text</td><td><span class="ty">—</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">method_cfa2</td><td class="ty">text</td><td><span class="ty">—</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">code_hr</td><td class="ty">text</td><td><span class="ty">—</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">coa1</td><td class="ty">text</td><td><span class="ty">—</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">coa2</td><td class="ty">text</td><td><span class="ty">—</span></td><td class="vs">—</td></tr>
+</table></div></div>
+<h3>④ GHÉP LỆNH CHI — dòng tiền này chi theo lệnh nào</h3>
+<div class="tt"><div class="dau"><b>fls_moi_noi</b>
+<span class="vt">PM_LINK_EFFECTIVE</span>
+<span class="vt">8 cột</span>
+<span class="vt">khâu Ⓑ GHÉP LỆNH CHI</span>
+<span class="k u">KHUNG XEM — ⛔ không lưu gì</span>
+<span class="vt">⛔ ⛔ không có FK về <code>fls_itl</code>: khung xem doc tu fls_pm_link tru fls_pm_unlink — moi noi dang co hieu luc, khong luu gi</span>
+</div><div class="scroll"><table>
+<tr><th style="width:21%">Cột</th><th style="width:12%">Kiểu</th><th style="width:26%">Khoá · ràng buộc</th><th>Vì sao nó tồn tại</th></tr>
+<tr><td class="mono">link_id</td><td class="ty">bigint</td><td><span class="ty">—</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">itl_id</td><td class="ty">bigint</td><td><span class="ty">—</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">pm_line_id</td><td class="ty">text</td><td><span class="ty">—</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">amount</td><td class="ty">numeric(20,2)</td><td><span class="ty">—</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">hinh</td><td class="ty">text</td><td><span class="ty">—</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">lan</td><td class="ty">smallint</td><td><span class="ty">—</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">run_id</td><td class="ty">text</td><td><span class="ty">—</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">created_at</td><td class="ty">timestamptz</td><td><span class="ty">—</span></td><td class="vs">—</td></tr>
+</table></div></div>
+<div class="tt"><div class="dau"><b>fls_pm_line</b>
+<span class="vt">PM_LINE_SNAP</span>
+<span class="vt">18 cột</span>
+<span class="vt">khâu Ⓑ GHÉP LỆNH CHI</span>
+<span class="k pk">PK GHÉP (run_id + pm_line_id)</span>
+<span class="k u">DUY NHẤT (run_id + source_row)</span>
+</div><div class="scroll"><table>
+<tr><th style="width:21%">Cột</th><th style="width:12%">Kiểu</th><th style="width:26%">Khoá · ràng buộc</th><th>Vì sao nó tồn tại</th></tr>
+<tr><td class="mono">run_id</td><td class="ty">text</td><td><span class="k pk">PK</span><span class="k fk">FK → fls_run.run_id</span><span class="k bb">bắt buộc</span></td><td class="vs">lan nap da DOC anh chup nay (INV-I05 lineage)</td></tr>
+<tr><td class="mono">pm_line_id</td><td class="ty">text</td><td><span class="k pk">PK</span><span class="k bb">bắt buộc</span></td><td class="vs">&#x27;ID PMLine&#x27; — dinh danh muc DONG. Do tren 3.703 dong: DUY NHAT toan lat. ⛔ KHONG FK (QĐ-ITL-45)</td></tr>
+<tr><td class="mono">pm_slip_id</td><td class="ty">text</td><td><span class="k bb">bắt buộc</span></td><td class="vs">&#x27;ID PMSlip&#x27; — 1.468 phieu / 3.703 dong. Chi de GOM khi hien, ⛔ khong phai truc ghep: do ra `reference` song o DONG</td></tr>
+<tr><td class="mono">ref_tho</td><td class="ty">text</td><td><span class="ty">—</span></td><td class="vs">ma tham chieu NGUYEN VAN. 530/3.703 dong RONG</td></tr>
+<tr><td class="mono">ref_canon</td><td class="ty">text</td><td><span class="ty">—</span></td><td class="vs">ma da chuan hoa qua `canon_ref` — cot de TRA. NULL neu ma rong hay la o loi: ⛔ o loi khong bao gio thanh khoa</td></tr>
+<tr><td class="mono">amount</td><td class="ty">numeric(20,2)</td><td><span class="ty">—</span></td><td class="vs">&#x27;Tong so tien thanh toan&#x27; cua DONG nay. ⛔ KHONG phai can cu ghi so — luc ghep phai cong Σ va so voi tien bank THAT</td></tr>
+<tr><td class="mono">curr</td><td class="ty">text</td><td><span class="k bb">bắt buộc</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">status</td><td class="ty">text</td><td><span class="ty">—</span></td><td class="vs">Status_Final. Do: Approve 3.347 · RONG 251 · Reject 105. ⛔ RONG la KHONG BIET, ⛔ khong phai &#x27;da duyet&#x27; (INV-I16)</td></tr>
+<tr><td class="mono">pe_slip</td><td class="ty">text</td><td><span class="ty">—</span></td><td class="vs">&#x27;ID PESlip&#x27;. Do: 3.500/26.404 dong</td></tr>
+<tr><td class="mono">pe_line</td><td class="ty">text</td><td><span class="ty">—</span></td><td class="vs">&#x27;ID PELine&#x27;. ⛔ Di CAP voi `pe_slip` — do 26.404 dong: 0 lech</td></tr>
+<tr><td class="mono">pe_loai</td><td class="ty">text</td><td><span class="k u">CHECK</span></td><td class="vs">⭐ MA SINH RA, ⛔ khong doc thang: nguon de o HAI cot rieng (&#x27;(Advance)&#x27; 3.381 · &#x27;(Urgent)&#x27; 119 = 3.500, trung 0). ⛔ Day la `CHECK` DUY NHAT trong nhom nay — xem `pm_join`</td></tr>
+<tr><td class="mono">pi_slip</td><td class="ty">text</td><td><span class="ty">—</span></td><td class="vs">&#x27;ID PISlip&#x27;. Do: 22.904/26.404 dong</td></tr>
+<tr><td class="mono">pi_line</td><td class="ty">text</td><td><span class="ty">—</span></td><td class="vs">&#x27;ID PILine&#x27;. ⛔ Di CAP voi `pi_slip` — do 26.404 dong: 0 lech. ⭐ Mot dong co DUNG MOT cha: chi PI 22.904 · chi PE 3.500 · ca hai 0 · khong cha 0. ⛔ ⛔ Bat bien ay CO Y ⛔ KHONG thanh `CHECK`: phep chen chay trong MOT giao dich cho ca lan nap, nen mot dong la se DO CA LUOT thay vi thanh tin tuc</td></tr>
+<tr><td class="mono">tho</td><td class="ty">json</td><td><span class="ty">—</span></td><td class="vs">ca hang tho cua PM_Unpivot, khoa theo TEN COT, GIU DUNG THU TU COT cua to giay. NULL = anh chup TRUOC 11/09 (⛔ khong phai &#x27;doc duoc 0 cot&#x27;). ⛔ KHONG chua `Email Address` — xem PM_COT_RIENG_TU</td></tr>
+<tr><td class="mono">hd</td><td class="ty">text</td><td><span class="ty">—</span></td><td class="vs">Budget Code (HDCode) — RONG 7/3.703</td></tr>
+<tr><td class="mono">cdt1</td><td class="ty">text</td><td><span class="ty">—</span></td><td class="vs">Chu du toan (CDT1) — RONG 12/3.703</td></tr>
+<tr><td class="mono">source_row</td><td class="ty">integer</td><td><span class="k bb">bắt buộc</span></td><td class="vs">so dong tren sheet nguon — de truy nguoc (tieu de dong 2, du lieu tu dong 3)</td></tr>
+<tr><td class="mono">read_at</td><td class="ty">timestamptz</td><td><span class="k bb">bắt buộc</span></td><td class="vs">★ TUOI cua anh chup. Cua doc PHAI tra con so nay cung moi danh sach ung vien — xem luat ⓑ o tren</td></tr>
+</table></div></div>
+<div class="tt"><div class="dau"><b>fls_pm_link</b>
+<span class="vt">PM_LINK</span>
+<span class="vt">9 cột</span>
+<span class="vt">khâu Ⓑ GHÉP LỆNH CHI</span>
+<span class="k pk">PK (link_id)</span>
+<span class="k u">DUY NHẤT (itl_id + pm_line_id + lan)</span>
+</div><div class="scroll"><table>
+<tr><th style="width:21%">Cột</th><th style="width:12%">Kiểu</th><th style="width:26%">Khoá · ràng buộc</th><th>Vì sao nó tồn tại</th></tr>
+<tr><td class="mono">itl_id</td><td class="ty">bigint</td><td><span class="k fk">FK → fls_itl.itl_id</span><span class="k bb">bắt buộc</span></td><td class="vs">dong so. ⛔ KHONG cascade — so la append-only (INV-I08)</td></tr>
+<tr><td class="mono">pm_line_id</td><td class="ty">text</td><td><span class="k bb">bắt buộc</span></td><td class="vs">fps_pm_line.line_id — dinh danh muc DONG. ⛔ KHONG cot &#x27;ID PMLine&#x27; go tay (day #N/A). ⛔ KHONG FK (QĐ-ITL-45)</td></tr>
+<tr><td class="mono">amount</td><td class="ty">numeric(20,2)</td><td><span class="k bb">bắt buộc</span></td><td class="vs">PHAN tien cua dong so nay quy cho dong lenh nay. Σ theo itl_id PHAI bang tien cua dong bank — cong `kiem_tong_moi_noi`</td></tr>
+<tr><td class="mono">hinh</td><td class="ty">text</td><td><span class="k bb">bắt buộc</span></td><td class="vs">A|B|C — ghep BANG CACH NAO. Khong luu thi ve sau khong ai tra loi duoc &#x27;dong nay ghep kieu gi&#x27;</td></tr>
+<tr><td class="mono">run_id</td><td class="ty">text</td><td><span class="k fk">FK → fls_run.run_id</span><span class="k bb">bắt buộc</span></td><td class="vs">lan nap sinh ra moi noi nay (INV-I05 lineage)</td></tr>
+<tr><td class="mono">run_pm</td><td class="ty">text</td><td><span class="k fk">FK → fls_run.run_id</span></td><td class="vs">ANH LENH CHI da dung luc ghep. NULL = moi noi sinh truoc 2026-09-18. ⛔ KHONG lay `run_id` thay: cot do mang hai nghia</td></tr>
+<tr><td class="mono">created_at</td><td class="ty">timestamptz</td><td><span class="k bb">bắt buộc</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">link_id</td><td class="ty">bigint</td><td><span class="k pk">PK</span><span class="k bb">bắt buộc</span></td><td class="vs">danh tinh cua MOT LAN ghep — co no thi BO duoc mot moi noi ma ⛔ khong xoa dong nao (INV-I08)</td></tr>
+<tr><td class="mono">lan</td><td class="ty">smallint</td><td><span class="k bb">bắt buộc</span></td><td class="vs">lan ghep thu may cua cap (dong so, dong lenh). Bo roi ghep lai dung dong lenh ay =&gt; lan+1</td></tr>
+</table></div></div>
+<div class="tt"><div class="dau"><b>fls_pm_unlink</b>
+<span class="vt">PM_UNLINK</span>
+<span class="vt">5 cột</span>
+<span class="vt">khâu Ⓑ GHÉP LỆNH CHI</span>
+</div><div class="scroll"><table>
+<tr><th style="width:21%">Cột</th><th style="width:12%">Kiểu</th><th style="width:26%">Khoá · ràng buộc</th><th>Vì sao nó tồn tại</th></tr>
+<tr><td class="mono">unlink_id</td><td class="ty">bigint</td><td><span class="k pk">PK</span><span class="k bb">bắt buộc</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">link_id</td><td class="ty">bigint</td><td><span class="k fk">FK → fls_pm_link.link_id</span><span class="k u">DUY NHẤT</span><span class="k bb">bắt buộc</span></td><td class="vs">moi noi bi bo. UNIQUE: bo duoc DUNG MOT lan — bo hai lan la mot lo dem, ⛔ khong phai mot thao tac</td></tr>
+<tr><td class="mono">itl_id</td><td class="ty">bigint</td><td><span class="k fk">FK → fls_itl.itl_id</span><span class="k bb">bắt buộc</span></td><td class="vs">dong so — de tra &#x27;dong nay tung bo bao nhieu lan&#x27; ma khong join</td></tr>
+<tr><td class="mono">evt_id</td><td class="ty">bigint</td><td><span class="k fk">FK → fls_queue_event.evt_id</span><span class="k bb">bắt buộc</span></td><td class="vs">thao tac bo (evt_type=unmatch) — AI bo va VI SAO song o do, MOT cho</td></tr>
+<tr><td class="mono">at</td><td class="ty">timestamptz</td><td><span class="k bb">bắt buộc</span></td><td class="vs">—</td></tr>
+</table></div></div>
+<h3>⑤ VIỆC CỦA NGƯỜI — người còn phải làm gì</h3>
+<div class="tt"><div class="dau"><b>fls_da_xong</b>
+<span class="vt">QUEUE_DONE</span>
+<span class="vt">5 cột</span>
+<span class="vt">khâu VIỆC CỦA NGƯỜI</span>
+<span class="k u">KHUNG XEM — ⛔ không lưu gì</span>
+<span class="vt">⛔ ⛔ không có FK về <code>fls_itl</code>: khung xem doc tu fls_queue_event — dong da duoc NGUOI bam xong, khong luu gi</span>
+</div><div class="scroll"><table>
+<tr><th style="width:21%">Cột</th><th style="width:12%">Kiểu</th><th style="width:26%">Khoá · ràng buộc</th><th>Vì sao nó tồn tại</th></tr>
+<tr><td class="mono">itl_id</td><td class="ty">bigint</td><td><span class="ty">—</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">evt_id</td><td class="ty">bigint</td><td><span class="ty">—</span></td><td class="vs">su kien `done` dang co hieu luc</td></tr>
+<tr><td class="mono">actor</td><td class="ty">text</td><td><span class="ty">—</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">at</td><td class="ty">timestamptz</td><td><span class="ty">—</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">reason</td><td class="ty">text</td><td><span class="ty">—</span></td><td class="vs">—</td></tr>
+</table></div></div>
+<div class="tt"><div class="dau"><b>fls_queue_event</b>
+<span class="vt">QUEUE_EVENT</span>
+<span class="vt">7 cột</span>
+<span class="vt">khâu VIỆC CỦA NGƯỜI</span>
+</div><div class="scroll"><table>
+<tr><th style="width:21%">Cột</th><th style="width:12%">Kiểu</th><th style="width:26%">Khoá · ràng buộc</th><th>Vì sao nó tồn tại</th></tr>
+<tr><td class="mono">evt_id</td><td class="ty">bigint</td><td><span class="k pk">PK</span><span class="k bb">bắt buộc</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">itl_id</td><td class="ty">bigint</td><td><span class="k fk">FK → fls_itl.itl_id</span><span class="k bb">bắt buộc</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">evt_type</td><td class="ty">text</td><td><span class="k bb">bắt buộc</span></td><td class="vs">reason|defer|match|unmatch|done|reopen — `match`/`unmatch` la vet cua phep GHEP va phep BO ghep (QĐ-ITL-48, QĐ-ITL-69); `done`/`reopen` la NGUOI bam xong / mo lai (QĐ-ITL-71)</td></tr>
+<tr><td class="mono">reason</td><td class="ty">text</td><td><span class="ty">—</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">defer_until</td><td class="ty">date</td><td><span class="ty">—</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">actor</td><td class="ty">text</td><td><span class="k bb">bắt buộc</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">at</td><td class="ty">timestamptz</td><td><span class="k bb">bắt buộc</span></td><td class="vs">—</td></tr>
+</table></div></div>
+<div class="tt"><div class="dau"><b>fls_queue_reason_weekly</b>
+<span class="vt">QUEUE_REASON_WEEKLY</span>
+<span class="vt">2 cột</span>
+<span class="vt">khâu VIỆC CỦA NGƯỜI</span>
+<span class="k u">KHUNG XEM — ⛔ không lưu gì</span>
+</div><div class="scroll"><table>
+<tr><th style="width:21%">Cột</th><th style="width:12%">Kiểu</th><th style="width:26%">Khoá · ràng buộc</th><th>Vì sao nó tồn tại</th></tr>
+<tr><td class="mono">tuan</td><td class="ty">date</td><td><span class="ty">—</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">so_lan</td><td class="ty">int</td><td><span class="ty">—</span></td><td class="vs">—</td></tr>
+</table></div></div>
+<div class="tt"><div class="dau"><b>fls_queue_state</b>
+<span class="vt">QUEUE_STATE</span>
+<span class="vt">4 cột</span>
+<span class="vt">khâu VIỆC CỦA NGƯỜI</span>
+<span class="k u">KHUNG XEM — ⛔ không lưu gì</span>
+</div><div class="scroll"><table>
+<tr><th style="width:21%">Cột</th><th style="width:12%">Kiểu</th><th style="width:26%">Khoá · ràng buộc</th><th>Vì sao nó tồn tại</th></tr>
+<tr><td class="mono">itl_id</td><td class="ty">bigint</td><td><span class="ty">—</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">reason</td><td class="ty">text</td><td><span class="ty">—</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">defer_until</td><td class="ty">date</td><td><span class="ty">—</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">defer_count</td><td class="ty">int</td><td><span class="ty">—</span></td><td class="vs">—</td></tr>
+</table></div></div>
+<h3>⑥ SỬA &amp; VẾT — ai đã gõ gì, lúc nào, vì sao</h3>
+<div class="tt"><div class="dau"><b>fls_adjustment</b>
+<span class="vt">ADJUSTMENT_ENTRY</span>
+<span class="vt">10 cột</span>
+<span class="vt">khâu Ⓒ SỬA ITL</span>
+</div><div class="scroll"><table>
+<tr><th style="width:21%">Cột</th><th style="width:12%">Kiểu</th><th style="width:26%">Khoá · ràng buộc</th><th>Vì sao nó tồn tại</th></tr>
+<tr><td class="mono">adj_id</td><td class="ty">bigint</td><td><span class="k pk">PK</span><span class="k bb">bắt buộc</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">itl_id</td><td class="ty">bigint</td><td><span class="k fk">FK → fls_itl.itl_id</span><span class="k bb">bắt buộc</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">field</td><td class="ty">text</td><td><span class="k bb">bắt buộc</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">value_after</td><td class="ty">text</td><td><span class="ty">—</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">state</td><td class="ty">text</td><td><span class="k bb">bắt buộc</span></td><td class="vs">SM-I03: posted|reversed. KHONG co deleted</td></tr>
+<tr><td class="mono">reversal_of</td><td class="ty">bigint</td><td><span class="k fk">FK → fls_adjustment.adj_id</span></td><td class="vs">dao chi bang but toan moi (INV-I08)</td></tr>
+<tr><td class="mono">actor</td><td class="ty">text</td><td><span class="k bb">bắt buộc</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">at</td><td class="ty">timestamptz</td><td><span class="k bb">bắt buộc</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">evt_id</td><td class="ty">bigint</td><td><span class="k fk">FK → fls_queue_event.evt_id</span></td><td class="vs">thao tac sinh ra but toan nay (vd phep ghep suy hd/cdt1)</td></tr>
+<tr><td class="mono">nguon</td><td class="ty">text</td><td><span class="k bb">bắt buộc</span><span class="k u">CHECK</span></td><td class="vs">sua_tay = NGUOI chot · may_goi_y = MAY suy tu dong lenh. ⛔ fls_sua_tay CHI lay `sua_tay` (INV-I16)</td></tr>
+</table></div></div>
+<div class="tt"><div class="dau"><b>fls_journal</b>
+<span class="vt">JOURNAL</span>
+<span class="vt">9 cột</span>
+<span class="vt">khâu Ⓒ SỬA ITL</span>
+</div><div class="scroll"><table>
+<tr><th style="width:21%">Cột</th><th style="width:12%">Kiểu</th><th style="width:26%">Khoá · ràng buộc</th><th>Vì sao nó tồn tại</th></tr>
+<tr><td class="mono">jrn_id</td><td class="ty">bigint</td><td><span class="k pk">PK</span><span class="k bb">bắt buộc</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">itl_id</td><td class="ty">bigint</td><td><span class="k fk">FK → fls_itl.itl_id</span><span class="k bb">bắt buộc</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">field</td><td class="ty">text</td><td><span class="k bb">bắt buộc</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">value_before</td><td class="ty">text</td><td><span class="ty">—</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">value_after</td><td class="ty">text</td><td><span class="ty">—</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">actor</td><td class="ty">text</td><td><span class="k bb">bắt buộc</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">at</td><td class="ty">timestamptz</td><td><span class="k bb">bắt buộc</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">value_source</td><td class="ty">text</td><td><span class="k bb">bắt buộc</span></td><td class="vs">lop cua chinh dong: sua_tay = NGUOI · may_goi_y = MAY; = fls_adjustment.nguon cung giao dich (DD-I15 ⓓe)</td></tr>
+<tr><td class="mono">reason</td><td class="ty">text</td><td><span class="ty">—</span></td><td class="vs">—</td></tr>
+</table></div></div>
+<div class="tt"><div class="dau"><b>fls_may_goi_y</b>
+<span class="vt">MACHINE_SUGGESTION</span>
+<span class="vt">5 cột</span>
+<span class="vt">khâu Ⓒ SỬA ITL</span>
+<span class="k u">KHUNG XEM — ⛔ không lưu gì</span>
+<span class="vt">⛔ ⛔ không có FK về <code>fls_itl</code>: khung xem doc tu fls_adjustment — goi y cua may dang co hieu luc, khong luu gi</span>
+</div><div class="scroll"><table>
+<tr><th style="width:21%">Cột</th><th style="width:12%">Kiểu</th><th style="width:26%">Khoá · ràng buộc</th><th>Vì sao nó tồn tại</th></tr>
+<tr><td class="mono">itl_id</td><td class="ty">bigint</td><td><span class="ty">—</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">field</td><td class="ty">text</td><td><span class="ty">—</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">value_after</td><td class="ty">text</td><td><span class="ty">—</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">adj_id</td><td class="ty">bigint</td><td><span class="ty">—</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">at</td><td class="ty">timestamptz</td><td><span class="ty">—</span></td><td class="vs">—</td></tr>
+</table></div></div>
+<div class="tt"><div class="dau"><b>fls_sua_tay</b>
+<span class="vt">MANUAL_EFFECTIVE</span>
+<span class="vt">6 cột</span>
+<span class="vt">khâu Ⓒ SỬA ITL</span>
+<span class="k u">KHUNG XEM — ⛔ không lưu gì</span>
+<span class="vt">⛔ ⛔ không có FK về <code>fls_itl</code>: khung xem doc tu fls_adjustment — tinh gia tri nguoi go dang co hieu luc, khong luu gi</span>
+</div><div class="scroll"><table>
+<tr><th style="width:21%">Cột</th><th style="width:12%">Kiểu</th><th style="width:26%">Khoá · ràng buộc</th><th>Vì sao nó tồn tại</th></tr>
+<tr><td class="mono">itl_id</td><td class="ty">bigint</td><td><span class="ty">—</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">field</td><td class="ty">text</td><td><span class="ty">—</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">value_after</td><td class="ty">text</td><td><span class="ty">—</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">adj_id</td><td class="ty">bigint</td><td><span class="ty">—</span></td><td class="vs">de man hinh dao dung but toan nao</td></tr>
+<tr><td class="mono">actor</td><td class="ty">text</td><td><span class="ty">—</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">at</td><td class="ty">timestamptz</td><td><span class="ty">—</span></td><td class="vs">—</td></tr>
+</table></div></div>
+<h3>⑦ HẠ TẦNG — sổ di trú</h3>
+<div class="tt"><div class="dau"><b>fls_migration</b>
+<span class="vt">MIGRATION</span>
+<span class="vt">4 cột</span>
+<span class="vt">khâu HẠ TẦNG</span>
+<span class="vt">⛔ ⛔ không có FK về <code>fls_itl</code>: so ghi cac lan di tru — ha tang, khong gan dong so nao</span>
+</div><div class="scroll"><table>
+<tr><th style="width:21%">Cột</th><th style="width:12%">Kiểu</th><th style="width:26%">Khoá · ràng buộc</th><th>Vì sao nó tồn tại</th></tr>
+<tr><td class="mono">version</td><td class="ty">int</td><td><span class="k pk">PK</span><span class="k bb">bắt buộc</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">name</td><td class="ty">text</td><td><span class="k bb">bắt buộc</span></td><td class="vs">—</td></tr>
+<tr><td class="mono">checksum</td><td class="ty">text</td><td><span class="k bb">bắt buộc</span></td><td class="vs">sha256 file .sql — sua sau khi ap la NO</td></tr>
+<tr><td class="mono">applied_at</td><td class="ty">timestamptz</td><td><span class="k bb">bắt buộc</span></td><td class="vs">—</td></tr>
+</table></div></div>
+</div></body></html>

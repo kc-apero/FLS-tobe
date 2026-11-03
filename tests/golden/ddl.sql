@@ -6,6 +6,63 @@ CREATE TABLE IF NOT EXISTS fls_le (
   is_entity boolean NOT NULL DEFAULT true
 );
 
+CREATE TABLE IF NOT EXISTS fls_source (
+  source_id bigint NOT NULL DEFAULT nextval('seq_itl_id') PRIMARY KEY,
+  source_key text NOT NULL UNIQUE,
+  src_type text NOT NULL,
+  last_seen_at timestamptz,
+  lag_days int,
+  cutoff_date date,
+  txn_count int
+);
+
+CREATE TABLE IF NOT EXISTS fls_khai_cot (
+  khai_id bigint NOT NULL DEFAULT nextval('seq_itl_id') PRIMARY KEY,
+  source_id bigint NOT NULL REFERENCES fls_source(source_id),
+  version int NOT NULL,
+  truong text NOT NULL,
+  cot int NOT NULL,
+  thu_tu text,
+  hieu_luc_tu timestamptz NOT NULL DEFAULT now(),
+  actor text NOT NULL,
+  CONSTRAINT fls_khai_cot_source_id_version_truong_uq UNIQUE (source_id, version, truong),
+  CONSTRAINT fls_khai_cot_thu_tu_ck CHECK (thu_tu IS NULL OR (truong = 'Date' AND thu_tu IN ('dmy', 'mdy')))
+);
+
+CREATE TABLE IF NOT EXISTS fls_nguon_dai (
+  dai_id bigint NOT NULL DEFAULT nextval('seq_itl_id') PRIMARY KEY,
+  source_id bigint NOT NULL REFERENCES fls_source(source_id),
+  truong text NOT NULL,
+  cot int,
+  dai_tho text NOT NULL,
+  danh_muc text NOT NULL,
+  doc_luc timestamptz NOT NULL DEFAULT now()
+);
+
+CREATE TABLE IF NOT EXISTS fls_chup (
+  chup_id bigint NOT NULL DEFAULT nextval('seq_itl_id') PRIMARY KEY,
+  doc_luc timestamptz NOT NULL DEFAULT now(),
+  spreadsheet_id text NOT NULL,
+  lan text NOT NULL,
+  giay numeric(8,2),
+  actor text NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS fls_chup_nguon (
+  chup_id bigint NOT NULL REFERENCES fls_chup(chup_id),
+  source_id bigint NOT NULL REFERENCES fls_source(source_id),
+  khai_version int NOT NULL,
+  CONSTRAINT fls_chup_nguon_pk PRIMARY KEY (chup_id, source_id)
+);
+
+CREATE TABLE IF NOT EXISTS fls_chup_dong (
+  chup_id bigint NOT NULL REFERENCES fls_chup(chup_id),
+  source_id bigint NOT NULL REFERENCES fls_source(source_id),
+  dong_so int NOT NULL,
+  o jsonb NOT NULL,
+  CONSTRAINT fls_chup_dong_pk PRIMARY KEY (chup_id, source_id, dong_so)
+);
+
 CREATE TABLE IF NOT EXISTS fls_run (
   run_id text NOT NULL PRIMARY KEY,
   contract_version text NOT NULL,
@@ -13,7 +70,9 @@ CREATE TABLE IF NOT EXISTS fls_run (
   mapping_version text NOT NULL,
   started_at timestamptz NOT NULL DEFAULT now(),
   row_count int,
-  state text NOT NULL DEFAULT 'queued'
+  state text NOT NULL DEFAULT 'queued',
+  khai_id bigint REFERENCES fls_khai_cot(khai_id),
+  chup_id bigint REFERENCES fls_chup(chup_id)
 );
 
 CREATE TABLE IF NOT EXISTS fls_itl (
@@ -68,6 +127,7 @@ CREATE TABLE IF NOT EXISTS fls_pm_link (
   amount numeric(20,2) NOT NULL,
   hinh text NOT NULL,
   run_id text NOT NULL REFERENCES fls_run(run_id),
+  run_pm text REFERENCES fls_run(run_id),
   created_at timestamptz NOT NULL DEFAULT now(),
   link_id bigint NOT NULL DEFAULT nextval('seq_itl_id'),
   lan smallint NOT NULL DEFAULT 1,
@@ -84,12 +144,19 @@ CREATE TABLE IF NOT EXISTS fls_pm_line (
   amount numeric(20,2),
   curr text NOT NULL,
   status text,
+  pe_slip text,
+  pe_line text,
+  pe_loai text,
+  pi_slip text,
+  pi_line text,
+  tho json,
   hd text,
   cdt1 text,
   source_row integer NOT NULL,
   read_at timestamptz NOT NULL DEFAULT now(),
   CONSTRAINT fls_pm_line_pk PRIMARY KEY (run_id, pm_line_id),
-  CONSTRAINT fls_pm_line_run_id_source_row_uq UNIQUE (run_id, source_row)
+  CONSTRAINT fls_pm_line_run_id_source_row_uq UNIQUE (run_id, source_row),
+  CONSTRAINT fls_pm_line_pe_loai_ck CHECK (pe_loai IS NULL OR (pe_line IS NOT NULL AND pe_loai IN ('Advance', 'Urgent')))
 );
 
 CREATE TABLE IF NOT EXISTS fls_queue_event (
@@ -119,7 +186,9 @@ CREATE TABLE IF NOT EXISTS fls_adjustment (
   reversal_of bigint REFERENCES fls_adjustment(adj_id),
   actor text NOT NULL,
   at timestamptz NOT NULL DEFAULT now(),
-  evt_id bigint REFERENCES fls_queue_event(evt_id)
+  evt_id bigint REFERENCES fls_queue_event(evt_id),
+  nguon text NOT NULL DEFAULT 'sua_tay',
+  CONSTRAINT fls_adjustment_nguon_ck CHECK (nguon IN ('sua_tay', 'may_goi_y'))
 );
 
 CREATE TABLE IF NOT EXISTS fls_journal (
@@ -141,7 +210,7 @@ CREATE TABLE IF NOT EXISTS fls_reject (
   source_sheet text NOT NULL,
   source_row int NOT NULL,
   reason text NOT NULL,
-  CONSTRAINT fls_reject_run_id_source_row_uq UNIQUE (run_id, source_row)
+  CONSTRAINT fls_reject_run_id_source_sheet_source_row_uq UNIQUE (run_id, source_sheet, source_row)
 );
 
 CREATE TABLE IF NOT EXISTS fls_mapping_master (
@@ -151,16 +220,6 @@ CREATE TABLE IF NOT EXISTS fls_mapping_master (
   code_hr text,
   coa1 text,
   coa2 text
-);
-
-CREATE TABLE IF NOT EXISTS fls_source (
-  source_id bigint NOT NULL DEFAULT nextval('seq_itl_id') PRIMARY KEY,
-  source_key text NOT NULL UNIQUE,
-  src_type text NOT NULL,
-  last_seen_at timestamptz,
-  lag_days int,
-  cutoff_date date,
-  txn_count int
 );
 
 CREATE OR REPLACE VIEW fls_queue_state AS SELECT itl_id,
@@ -184,9 +243,36 @@ FROM (SELECT a.itl_id, a.field, a.value_after, a.adj_id, a.actor, a.at,
                                 ORDER BY a.adj_id DESC) AS rn
       FROM fls_adjustment a
       WHERE a.reversal_of IS NULL
+        AND a.nguon = 'sua_tay'
         AND NOT EXISTS (SELECT 1 FROM fls_adjustment d
                         WHERE d.reversal_of = a.adj_id)) z
 WHERE z.rn = 1;
+
+CREATE OR REPLACE VIEW fls_may_goi_y AS SELECT z.itl_id, z.field, z.value_after, z.adj_id, z.at
+FROM (SELECT a.itl_id, a.field, a.value_after, a.adj_id, a.at,
+             row_number() OVER (PARTITION BY a.itl_id, a.field
+                                ORDER BY a.adj_id DESC) AS rn
+      FROM fls_adjustment a
+      WHERE a.reversal_of IS NULL
+        AND a.nguon = 'may_goi_y'
+        AND NOT EXISTS (SELECT 1 FROM fls_adjustment d
+                        WHERE d.reversal_of = a.adj_id)) z
+WHERE z.rn = 1;
+
+CREATE OR REPLACE VIEW fls_dien_giai AS SELECT i.itl_id,
+       btrim(d.o ->> 'Description') AS dien_giai,
+       d.chup_id
+FROM fls_itl i
+JOIN fls_source s ON s.source_key = i.source_sheet
+JOIN LATERAL (
+  SELECT dd.o, dd.chup_id
+    FROM fls_chup_dong dd
+   WHERE dd.source_id = s.source_id
+     AND dd.dong_so   = i.source_row
+   ORDER BY dd.chup_id DESC
+   LIMIT 1
+) d ON true
+WHERE btrim(coalesce(d.o ->> 'Description', '')) <> '';
 
 CREATE OR REPLACE VIEW fls_moi_noi AS SELECT l.link_id, l.itl_id, l.pm_line_id, l.amount, l.hinh, l.lan, l.run_id,
        l.created_at

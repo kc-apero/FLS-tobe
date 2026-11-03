@@ -1,0 +1,1194 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TO-BE · Màn ghép PM ↔ Giao dịch</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bitter:wght@500;600;700&family=Be+Vietnam+Pro:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root{
+    --paper:#F7F8F5; --surface:#FFFFFF; --bar:#EAF0E8;
+    --ink:#1B2420; --ink-2:#5A6661; --ink-3:#84908A;
+    --rule:#D2DAD3; --rule-2:#E4EAE3;
+    --accent:#0F5C4A; --accent-soft:#E1EDE7;
+    --red:#A32B23; --red-soft:#F7E6E3;
+    --amber:#87680F; --amber-soft:#F5EEDA;
+    --plate:#F1F4EE; --plate-rule:#C7D1C6; --plate-band:#E2E9DF;
+    --shadow:0 1px 2px rgba(27,36,32,.06), 0 8px 24px -16px rgba(27,36,32,.18);
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#0F1412; --surface:#161C18; --bar:#1B221D;
+      --ink:#E7EDE5; --ink-2:#AAB6AF; --ink-3:#77837C;
+      --rule:#2A332C; --rule-2:#212a23;
+      --accent:#66C4A4; --accent-soft:#17271F;
+      --red:#E9897C; --red-soft:#2B1A17;
+      --amber:#D9B455; --amber-soft:#2A2213;
+    }
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--paper);color:var(--ink);
+       font:400 15px/1.6 "Be Vietnam Pro",system-ui,sans-serif}
+  .wrap{max-width:1500px;margin:0 auto;padding:38px 24px 80px}
+  h1{font:700 28px/1.22 Bitter,serif;margin:0 0 6px;letter-spacing:-.015em}
+  h2{font:600 21px/1.3 Bitter,serif;margin:46px 0 14px;
+     padding-top:18px;border-top:1px solid var(--rule)}
+  h3{font:600 12.5px/1.4 "IBM Plex Mono",monospace;margin:26px 0 8px;
+     text-transform:uppercase;letter-spacing:.08em;color:var(--accent)}
+  p{margin:10px 0}
+  code,.mono{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.9em}
+  code{background:var(--bar);padding:1px 5px;border-radius:4px}
+  .lede{color:var(--ink-2);font:400 18.5px/1.5 Bitter,serif;margin-bottom:4px}
+  .meta{color:var(--ink-3);font-size:12.5px;font-family:"IBM Plex Mono",monospace}
+  .doc{max-width:78ch}
+
+  /* ══ BỐ CỤC HAI CỘT — bản vẽ bên trái, thuyết minh bên phải ═══════════
+     ⛔⛔ Vì sao song song chứ ⛔ không phải "vẽ trước, giải thích sau":
+     một bản vẽ và lời giải thích của nó cách nhau **một cú cuộn** thì người
+     đọc phải **giữ hình trong đầu** khi đọc chữ. Đặt cạnh nhau thì mắt
+     nhảy qua lại được, và ⛔ không ai phải nhớ gì.                      */
+  .doi{display:grid;grid-template-columns:minmax(0,1.02fr) minmax(0,1fr);
+       gap:20px;align-items:start;margin:16px 0 26px}
+  /* ⛔ Dưới 1040px thì hai cột thành hai cột HẸP — tệ hơn xếp chồng. */
+  @media (max-width:1040px){ .doi{grid-template-columns:1fr} }
+  .doi>.tm{background:var(--surface);border:1px solid var(--rule);
+           border-radius:10px;padding:14px 16px;font-size:13.5px}
+  .tm>h4{font:600 13px/1.4 "Be Vietnam Pro",sans-serif;margin:0 0 8px;
+         color:var(--ink);display:flex;gap:8px;align-items:baseline}
+  .tm table{margin:0}
+  .tm p:first-of-type{margin-top:0}
+  .tm p:last-child{margin-bottom:0}
+
+  .b{display:inline-block;font:600 11px/1.5 "IBM Plex Mono",monospace;
+     padding:1px 7px;border-radius:4px;border:1px solid;white-space:nowrap;
+     vertical-align:2px}
+  .b.ok{color:var(--accent);background:var(--accent-soft);border-color:var(--accent)}
+  .b.no{color:var(--red);background:var(--red-soft);border-color:var(--red)}
+  .b.q{color:var(--amber);background:var(--amber-soft);border-color:var(--amber)}
+
+  table{width:100%;border-collapse:collapse;margin:14px 0;font-size:13.5px}
+  th,td{text-align:left;padding:7px 9px;border-bottom:1px solid var(--rule-2);
+        vertical-align:top}
+  th{font:600 12.5px/1.4 "Be Vietnam Pro",sans-serif;color:var(--ink-2);
+     background:var(--bar);border-bottom:1px solid var(--rule)}
+  td.c,th.c{text-align:center}
+  td.n{background:var(--red-soft);color:var(--red)}
+  .scroll{overflow-x:auto}
+
+  .note{border:1px solid var(--rule);padding:11px 14px;margin:16px 0;
+        background:var(--surface);border-radius:7px;font-size:13.5px}
+  .note.red{border-color:var(--red);background:var(--red-soft)}
+  .note.amb{border-color:var(--amber);background:var(--amber-soft)}
+  .note.acc{border-color:var(--accent);background:var(--accent-soft)}
+  .tm .note{margin:10px 0}
+
+  /* ══ bản vẽ màn hình ════════════════════════════════════════════════ */
+  .plate{background:var(--plate);color:#1B2420;border:1px solid var(--plate-rule);
+         border-radius:10px;padding:15px;box-shadow:var(--shadow)}
+  .plate .cap{font:600 11.5px/1.4 "IBM Plex Mono",monospace;color:#5A6661;
+              text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px}
+  .box{background:#fff;border:1px solid var(--plate-rule);border-radius:7px;
+       padding:11px 13px;margin:9px 0}
+  .box.new{border-style:dashed;border-color:#A32B23;background:#FFF9F8}
+  .box>.t{font:600 12.5px/1.4 "Be Vietnam Pro",sans-serif;margin-bottom:4px;
+          display:flex;gap:8px;align-items:baseline;flex-wrap:wrap}
+  .box>.d{font-size:12.5px;color:#5A6661;line-height:1.55}
+  .row{display:flex;gap:9px;align-items:center;padding:6px 9px;
+       border:1px solid var(--plate-rule);border-radius:5px;background:#fff;
+       margin:5px 0;font-size:12.5px;flex-wrap:wrap;color:#1B2420}
+  .pill{font:600 11px/1.5 "IBM Plex Mono",monospace;padding:1px 8px;
+        border-radius:999px;border:1px solid var(--plate-rule);
+        background:var(--plate-band);color:#1B2420;white-space:nowrap}
+  .pill.g{background:#E1EDE7;border-color:#0F5C4A;color:#0F5C4A}
+  .pill.a{background:#F5EEDA;border-color:#87680F;color:#87680F}
+  .pill.r{background:#F7E6E3;border-color:#A32B23;color:#A32B23}
+  .btn{display:inline-block;font:600 11.5px/1.5 "Be Vietnam Pro",sans-serif;
+       padding:3px 10px;border-radius:5px;border:1px solid #0F5C4A;
+       color:#0F5C4A;background:#fff;white-space:nowrap}
+  .btn.k{border-color:var(--plate-rule);color:#5A6661}
+  .btn.n{border-style:dashed;border-color:#A32B23;color:#A32B23}
+  .grow{flex:1 1 auto;min-width:0}
+  .gr{font:500 11.5px/1.5 "IBM Plex Mono",monospace;color:#84908A}
+  .plate .gr{color:#7C8983}
+
+  .g{width:100%;border-collapse:collapse;font-size:11px;
+     font-family:"IBM Plex Mono",monospace;background:#fff}
+  .g th,.g td{border:1px solid var(--plate-rule);padding:4px 5px;
+              white-space:nowrap;color:#1B2420}
+  .g th{background:var(--plate-band);font-weight:600;font-size:11px}
+  .g td.n,.g th.n{background:#FFF9F8;border-color:#A32B23;color:#A32B23}
+  .g .pin{background:#E9EFE7}
+  ul,ol{margin:8px 0;padding-left:20px}
+  li{margin:5px 0}
+  .kk{display:flex;gap:14px;flex-wrap:wrap;margin:12px 0;font-size:13.5px}
+  .kk>div{display:flex;gap:6px;align-items:baseline}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>TO-BE · Màn ghép <span class="mono">PM ↔ Giao dịch</span></h1>
+<p class="lede">Bản vẽ <strong>bên trái</strong>, thuyết minh <strong>bên phải</strong> — từng nút,
+từng ô, và <span class="mono">US</span> nào đứng sau.</p>
+<p class="meta">v0.3 · 2026-09-14 · đo trên kho <code>fls</code> cùng ngày · nhãn nút trích thẳng từ <code>fls/web/tep/man_f0*.js</code> · <span class="mono">QĐ-ITL-122/124/131</span></p>
+
+<div class="note red doc">
+<strong>⛔ Bản vẽ này ⛔ KHÔNG vẽ một màn hình mới.</strong> Phần lớn màn
+<strong>đã chạy thật</strong> từ <span class="mono">11/09</span>. Cái nó làm là
+<strong>chỉ ra chỗ còn thiếu</strong>, và thiếu ấy hoá ra ⛔ không phải chuyện
+giao diện — nó là một <strong>ranh giới trong kho</strong>. Xem <a href="#quyet">§2</a>.
+</div>
+
+<h2>§0 · Đọc trang này thế nào</h2>
+<div class="kk">
+  <div><span class="b ok">ĐÃ CHẠY</span> mã có thật, bấm được hôm nay</div>
+  <div><span class="b no">⛔ CHƯA CÓ</span> phải code mới</div>
+  <div><span class="b q">CẦN QUYẾT</span> ⛔ không code được tới khi bạn chốt</div>
+</div>
+<p class="doc">Mỗi khối vẽ nằm <strong>bên trái</strong>; ngay <strong>bên phải</strong> nó là lời
+giải thích của <em>đúng khối ấy</em>. ⛔ Một bản vẽ và lời giải thích cách nhau
+<strong>một cú cuộn</strong> thì người đọc phải <strong>giữ hình trong đầu</strong> khi đọc chữ.</p>
+<p class="doc">⭐⭐ Cột <strong>«nếu bỏ đi thì sao»</strong> là cột đắt nhất. Một thứ mà câu trả
+lời là <em>«⛔ không sao cả»</em> là một thứ <strong>⛔ không ai cần</strong> — và đó là câu
+đáng hỏi hơn <em>«nó làm gì»</em>.</p>
+
+<h2>§1 · <span class="mono">SCR-F01</span> lằn LỆNH CHI — màn MẶC ĐỊNH</h2>
+<div class="note doc"><strong>Câu màn này hỏi:</strong> <em>«Lệnh chi nào <strong>chưa tìm được
+tiền</strong>?»</em> ⛔ <strong>Không phải</strong> <em>«dòng tiền nào chưa có lệnh»</em> — đó là lằn kia.
+<br>⭐ Vì sao chiều này: cùng một kho, hỏi phía <strong>TIỀN</strong> cần xem <strong>799</strong> dòng
+để phủ 90% tiền; hỏi phía <strong>LỆNH</strong> chỉ cần <strong>69</strong>. Chênh <strong>11,6 lần</strong>.</div>
+
+<div class="doi">
+<div class="plate">
+<div class="cap">⓪ · Việc của bạn hôm nay — luôn đứng đầu</div>
+<div class="row"><span class="pill g">250 dòng</span>
+  <span class="grow"><strong>máy ghép được — bạn chỉ DUYỆT</strong><br>
+  <span class="gr">Cửa ghi ĐÃ soi cả bốn cổng và nhận.</span></span>
+  <span class="btn">Duyệt cả 47 dòng</span></div>
+<div class="row"><span class="pill a">535 dòng</span>
+  <span class="grow"><strong>CẦN BẠN tra bằng tiền + ngày</strong><br>
+  <span class="gr">⛔ Chưa có số chứng từ. Việc thật của kế toán.</span></span>
+  <span class="btn">Bắt đầu tra</span></div>
+<div class="row"><span class="pill r">768 dòng</span>
+  <span class="grow"><strong>⛔ KHÔNG làm được — đừng động vào</strong><br>
+  <span class="gr">⛔ Không dòng tiền nào mang số ấy.</span></span>
+  <span class="btn k">Xem vì sao</span></div>
+<div class="row" style="border-color:#87680F;background:#FFFDF5">
+  <span class="grow">⚠ Còn <strong>203 dòng</strong> khớp số chứng từ nhưng <strong>lệch tiền</strong>
+  — ⛔ không ghép lô được.</span><span class="btn k">Xem 203 dòng</span></div>
+<div class="box new"><div class="t">⛔ CHƯA CÓ · chân băng <span class="b no">US-045</span></div>
+  <div class="d"><em>«cột lý do đã được gõ: <strong>N</strong> lần trong 4 tuần»</em></div></div>
+</div>
+
+<div class="tm">
+<h4>Thuyết minh · băng ⓪ <span class="b ok">ĐÃ CHẠY</span></h4>
+<p>⛔⛔ <strong>Băng này ra đời vì một lời chê.</strong> Owner mở màn và nói <em>«tôi ⛔ không
+hiểu ý nghĩa của những bảng thông tin này»</em>. Ba bảng đầu màn khi ấy là thứ
+<strong>tôi</strong> dựng để <strong>tự chứng minh phép chia đúng</strong> — việc của tôi, ⛔ không phải
+của kế toán, mà chiếm hai phần ba màn và <strong>đứng TRÊN</strong> chỗ có việc.</p>
+<table>
+<tr><th style="width:30%">Dòng · nút</th><th>Nghĩa · nếu bỏ đi</th><th style="width:14%" class="c">US</th></tr>
+<tr><td><strong>250</strong> máy ghép được<br><span class="gr">nút <strong>Duyệt cả 47 dòng</strong></span></td>
+  <td>Số chứng từ khớp <strong>đúng một</strong> dòng tiền. Bỏ đi ⇒ kế toán ngồi tra lại thứ máy <strong>đã biết</strong>.
+  <br>⛔ Nút <strong>dùng lại</strong> khối duyệt lô của lằn TIỀN ⇒ ⛔ không mở đường ghi thứ hai</td>
+  <td class="c mono">053<br>054</td></tr>
+<tr><td><strong>535</strong> cần bạn tra<br><span class="gr">nút <strong>Bắt đầu tra</strong></span></td>
+  <td>⛔ Chưa có số chứng từ ⇒ <strong>việc thật</strong>. Bỏ đi ⇒ việc thật lẫn vào việc giả</td>
+  <td class="c mono">039<br>053</td></tr>
+<tr><td><strong>768</strong> ⛔ không làm được<br><span class="gr">nút <strong>Xem vì sao</strong></span></td>
+  <td>Có số chứng từ nhưng ⛔ <strong>không dòng tiền nào</strong> mang số ấy. Bỏ đi ⇒ kế toán tìm <strong>mãi mãi</strong>.
+  Nút mở ra để <strong>thấy ⛔ không có ứng viên nào</strong> — ⛔ không mời đi tìm</td>
+  <td class="c mono">053</td></tr>
+<tr><td><strong>203</strong> lệch tiền</td>
+  <td>Trả nhiều đợt, hay một giao dịch gánh nhiều lệnh. Bỏ đi ⇒ chúng <strong>biến mất giữa hai nhóm</strong>:
+  ⛔ không phải «bấm duyệt», cũng ⛔ không phải «⛔ không làm được»</td>
+  <td class="c mono">054</td></tr>
+<tr><td class="n">chân băng ⛔ <strong>CHƯA CÓ</strong></td>
+  <td class="n">⭐ <strong>Thước của COO-CFO</strong>: 4 tuần ⛔ không ai gõ = <strong>cổng đã chết</strong>.
+  Bỏ đi ⇒ ⛔ <strong>không ai biết hệ kiểm soát còn sống hay đã chết</strong></td>
+  <td class="c mono n">045</td></tr>
+</table>
+<div class="note amb"><strong>⭐ 250 = 47 tự chứng + 203 lệch tiền</strong>, và hai nhóm ấy ⛔ <strong>KHÔNG
+được gộp vào một nút</strong>: nhóm 47 máy ghép được, người chỉ <strong>duyệt</strong>; nhóm 203 là chỗ máy
+<strong>phải hỏi</strong> <em>«lệnh này ăn bao nhiêu của giao dịch kia»</em> — gộp lại là để
+<strong>máy quyết thay người</strong> <span class="mono">(INV-I16)</span>.</div>
+<div class="note red"><strong>⛔ Con số 47 là CỬA GHI nói thế</strong> <em>(<code>ds_tu_chung</code>)</em>,
+⛔ không phải phép đo của màn. Bản trước tôi tự tính ra <strong>90</strong> trong khi cửa ghi chỉ nhận
+<strong>47</strong> ⇒ nút <em>«Duyệt cả 90»</em> sẽ bị <strong>từ chối CẢ LÔ</strong>.
+<br>⇒ <strong><em>Một con số hứa nhiều hơn cái bấm được là một con số nói dối.</em></strong></div>
+</div>
+</div>
+
+<div class="doi">
+<div class="plate">
+<div class="cap">① · Số liệu kiểm chứng — gấp lại, đóng sẵn</div>
+<div class="box"><div class="t">▸ Số liệu kiểm chứng
+  <span class="gr">(ba rổ có khép không · từng tiền tệ · phủ 90%)</span></div>
+  <div class="d">Đóng sẵn. Người cần kiểm thì mở; người đi làm thì ⛔ không phải cuộn qua.</div></div>
+<table class="g" style="margin-top:8px">
+<tr><th>Rổ</th><th>Dòng</th><th>Nghĩa là gì</th></tr>
+<tr><td>máy trả lời được</td><td>250</td><td>người chỉ DUYỆT</td></tr>
+<tr><td>cần người tra</td><td>535</td><td>tra bằng TIỀN + NGÀY</td></tr>
+<tr><td>⛔ không ai trả lời</td><td>768</td><td>xem cột «vì sao»</td></tr>
+</table>
+<div class="gr" style="margin-top:6px">✓ 250 + 535 + 768 = 1.553 — ba rổ khép.</div>
+<table class="g" style="margin-top:10px">
+<tr><th>Tiền tệ</th><th>Dòng chờ</th><th>Phiếu</th><th>Tiền</th><th>Đã duyệt</th><th>⛔ Chưa duyệt</th><th>Phủ 90% tiền</th></tr>
+<tr><td>USD</td><td>808</td><td>314</td><td>133.538.092</td><td>538</td><td>162</td><td><b>4</b> ⇒ 90,00%</td></tr>
+<tr><td>VND</td><td>682</td><td>365</td><td>62.008.251.838</td><td>484</td><td>106</td><td><b>60</b> ⇒ 90,06%</td></tr>
+<tr><td>HKD</td><td>10</td><td>2</td><td>0</td><td>2</td><td>0</td><td class="n">⛔ không đo được</td></tr>
+</table>
+</div>
+
+<div class="tm">
+<h4>Thuyết minh · khối kiểm chứng <span class="b ok">ĐÃ CHẠY</span></h4>
+<table>
+<tr><th style="width:30%">Hiển thị</th><th>Nghĩa · nếu bỏ đi</th><th style="width:12%" class="c">US</th></tr>
+<tr><td>Bảng <strong>ba rổ</strong> + dòng tự kiểm</td>
+  <td>Màn <strong>tự kiểm</strong>: <code>250+535+768</code> có <code>= 1.553</code> ⛔ không.
+  ⭐ Một bảng phân loại ⛔ không cộng về tổng là một bảng <strong>⛔ không kiểm được</strong></td>
+  <td class="c mono">053</td></tr>
+<tr><td>Bảng <strong>theo tiền tệ</strong></td>
+  <td>⛔ <strong>⛔ KHÔNG có dòng «tổng»</strong> — cộng hai đơn vị tiền ra một con số là <strong>vô nghĩa</strong>,
+  và nó từng đẻ ra <em>«310 dòng phủ 90%»</em> trong khi thật là <strong>799</strong></td>
+  <td class="c mono">039</td></tr>
+<tr><td>Ô <code>⛔ không đo được</code></td>
+  <td>⭐⭐ Khi <code>Σ</code> tiền <code>= 0</code> thì câu <em>«xem mấy dòng là phủ 90%»</em>
+  <strong>⛔ không có nghĩa</strong>. Vẽ <code>0</code> ở đây nói <em>«xem 0 dòng là đủ»</em> — một câu
+  <strong>sai theo hướng nguy hiểm</strong>: kế toán bỏ qua cả đơn vị tiền ấy</td>
+  <td class="c mono">039</td></tr>
+</table>
+<div class="note"><strong>Vì sao khối này GẤP LẠI mà ⛔ không XOÁ:</strong> cổng của dự án là
+⛔ <strong>không giấu con số</strong>. Nhưng chúng ⛔ <strong>không được đứng trước việc</strong> —
+người cần kiểm thì mở ra.</div>
+</div>
+</div>
+
+<div class="doi">
+<div class="plate">
+<div class="cap">② · Lưới dòng lệnh — <span style="color:#A32B23">ô viền đỏ = chưa có</span></div>
+<div class="row"><span class="gr">Tiền tệ</span><span class="pill">VND ▾</span>
+  <span class="gr">Trạng thái</span><span class="pill">tất cả ▾</span>
+  <span class="btn k">Hiện ĐỦ các cột của GGSheet</span></div>
+<div class="scroll" style="margin-top:8px">
+<table class="g">
+<tr><th class="pin">#·phủ</th><th class="pin">Số chứng từ</th><th>Phiếu</th>
+  <th>Tiền lệnh</th><th>Trạng thái</th><th>HĐ</th><th>CĐT</th>
+  <th>Nội dung (bank)</th><th>Người nhận</th><th>…21 cột</th>
+  <th class="n">Tuổi việc</th><th>Ai trả lời được</th><th>Việc</th></tr>
+<tr><td class="pin">1 <span style="color:#84908A">62%</span></td><td class="pin">FT2519001</td>
+  <td>PM01698 <span class="pill" style="font-size:10px">6/6</span></td>
+  <td>50.000.000</td><td>Approve</td><td>HCC</td><td>CSM</td>
+  <td>THANH TOAN NCC…</td><td>CTY TNHH …</td><td>…</td>
+  <td class="n">treo 47 ngày</td><td>máy trả lời được</td><td><span class="btn">Duyệt</span></td></tr>
+<tr><td class="pin">2 <span style="color:#84908A">100%</span></td><td class="pin">—</td>
+  <td>PM00576 <span class="pill" style="font-size:10px">2/2</span></td>
+  <td>30.000.000</td><td>Reject</td><td>OGA</td><td>NB</td>
+  <td>CHUYEN KHOAN …</td><td>NGUYEN …</td><td>…</td>
+  <td class="n">treo 3 ngày</td><td>cần người tra</td><td><span class="btn">Tra tiền</span></td></tr>
+</table>
+</div>
+<div class="gr" style="margin-top:7px">Hai cột đầu <strong>ghim trái</strong>, cột <strong>Việc</strong>
+ghim phải · <span class="btn k">← Chỉ 2 cột nhận diện</span> <span class="btn k">Xem thêm</span>
+<span class="btn k">← Quay lại toàn bộ</span> <span class="btn k">← Quay lại</span></div>
+</div>
+
+<div class="tm">
+<h4>Thuyết minh · từng ô trên lưới</h4>
+<div class="scroll">
+<table>
+<tr><th style="width:22%">Ô</th><th>Nghĩa · nếu bỏ đi</th><th style="width:11%" class="c">US</th></tr>
+<tr><td><code># · phủ</code></td>
+  <td>Hạng + <em>«đọc tới đây là phủ bao nhiêu % tiền»</em>. ⭐ Gộp vì cả hai đều là
+  <strong>vị trí trong danh sách</strong>. Tách ra thì <code>Luỹ kế %</code> đứng cạnh
+  <code>Tiền lệnh</code> và <strong>đọc như một con số tiền</strong></td><td class="c mono">039</td></tr>
+<tr><td><code>Số chứng từ</code></td>
+  <td><code>Reference number</code> — <strong>một tên duy nhất</strong>. Trước <span class="mono">G1</span>
+  trường này có <strong>NĂM</strong> tên, <span class="mono">F01</span> và <span class="mono">F02</span>
+  gọi <strong>khác nhau</strong> ⇒ người đọc kết luận là hai thứ</td><td class="c mono">013</td></tr>
+<tr><td><code>Phiếu</code> + <code>còn chờ/tổng</code></td>
+  <td>⭐ <strong>1.088/1.553 = 70,1%</strong> dòng chờ nằm trong phiếu nhiều dòng, phiếu to nhất
+  <strong>44</strong> dòng ⇒ nhìn một dòng lẻ mà quyết là <strong>nhìn một mảnh của tờ giấy</strong>.
+  ⛔ Phiếu <strong>một dòng</strong> ⛔ không đeo huy hiệu: dấu hiệu có trên <em>mọi</em> dòng
+  thì ⛔ không còn là dấu hiệu</td><td class="c mono">055</td></tr>
+<tr><td><code>Tiền lệnh</code></td>
+  <td>Xếp giảm dần <strong>TRONG TỪNG</strong> đơn vị tiền. Gộp lại thì vế <strong>USD</strong> bị dìm xuống dưới</td>
+  <td class="c mono">039</td></tr>
+<tr><td><code>Trạng thái</code></td>
+  <td>⭐ Rỗng vẽ <strong>«⛔ RỖNG = không biết»</strong>, ⛔ <strong>không</strong> vẽ <em>«đã duyệt»</em></td>
+  <td class="c mono">039</td></tr>
+<tr><td><code>HĐ</code> · <code>CĐT</code></td>
+  <td>Chỉ <strong>MÃ</strong>, 4 ký tự. Rút gọn hợp lệ vì <strong>song ánh</strong>: <code>hd</code> 31 mã ↔ 31 tên,
+  <code>cdt1</code> 9 ↔ 9 ⇒ ⛔ <strong>không mất thông tin</strong>, tên đầy đủ ở <code>title</code>.
+  9 dòng ⛔ không có dấu <code>|</code> giữ <strong>nguyên văn</strong></td><td class="c mono">055</td></tr>
+<tr><td>2 hay <strong>28</strong> cột GGSheet</td>
+  <td>⭐ <strong>535</strong> dòng ⛔ không có số chứng từ <strong>chỉ tra được</strong> bằng
+  <em>Nội dung ghi ở bank</em> + <em>Người nhận</em>. ⛔ Cột <code>Email Address</code>
+  <strong>⛔ không bao giờ</strong> vào kho.
+  <br>⚠ <strong>Xem đính chính ngay dưới</strong> — hai cột ấy ⛔ <strong>không</strong> giúp được như nhau</td>
+  <td class="c mono">055</td></tr>
+<tr><td><code>Ai trả lời được</code></td>
+  <td>Rổ + <strong>câu vì sao</strong> ngay trên dòng. Bỏ đi ⇒ rổ <em>«⛔ không bao giờ»</em>
+  thành một danh sách kế toán tìm <strong>mãi mãi</strong></td><td class="c mono">053</td></tr>
+<tr><td class="n"><code>Tuổi việc</code></td>
+  <td class="n">⛔ <strong>CHƯA CÓ.</strong> <span class="mono">US-KT-039</span> đòi <em>«in rõ tuổi việc»</em>
+  <em>(vd «treo 47 ngày»)</em>. Bỏ qua ⇒ ⛔ không ai biết việc nào đang mục ra ở đáy</td>
+  <td class="c mono n">039</td></tr>
+<tr><td><code>Việc</code></td>
+  <td><strong>Ghim phải.</strong> Với 28 cột, cuộn ngang đẩy nút <strong>ra khỏi tầm nhìn</strong> —
+  phải cuộn hết chiều ngang rồi cuộn ngược lại cho <em>mỗi</em> dòng</td><td class="c">—</td></tr>
+</table>
+</div>
+</div>
+</div>
+
+<div class="doi">
+<div class="plate">
+<div class="cap">②b · Năm hành động mỗi dòng — <span class="mono">BA-06 §4</span></div>
+<div class="row"><span class="grow gr">rổ máy · tự chứng</span><span class="btn">Duyệt</span></div>
+<div class="row"><span class="grow gr">rổ máy · lệch tiền</span><span class="btn">Mở để chia</span></div>
+<div class="row"><span class="grow gr">rổ người</span><span class="btn">Tra tiền</span></div>
+<div class="row"><span class="grow gr">rổ ⛔ không</span><span class="btn k">Xem vì sao</span></div>
+<div class="row" style="border-style:dashed;border-color:#A32B23;background:#FFF9F8">
+  <span class="grow" style="color:#A32B23">⛔ CHƯA CÓ ở lằn này</span>
+  <span class="btn n">Lý do</span><span class="btn n">Hoãn</span>
+  <span class="btn n">Bỏ ghép</span><span class="btn n">Xong</span><span class="btn n">Mở lại</span></div>
+</div>
+
+<div class="tm">
+<h4>Thuyết minh · nút trên mỗi dòng</h4>
+<p>⭐⭐ Một nút <strong>giống hệt nhau</strong> trên 1.553 dòng mang <strong>0</strong> thông tin.
+Cùng một ngăn kéo mở ra — đổi là <strong>chữ trên nút</strong>, và chữ ấy nói đúng việc sắp làm.</p>
+<table>
+<tr><th style="width:26%">Nút</th><th>Nghĩa</th><th style="width:12%" class="c">US</th></tr>
+<tr><td><strong>Duyệt</strong></td><td>Khớp cả mã · tiền · đơn vị ⇒ chỉ xác nhận</td><td class="c mono">054</td></tr>
+<tr><td><strong>Mở để chia</strong></td><td>Phải mở từng dòng: <em>«lệnh này ăn bao nhiêu của giao dịch kia»</em></td><td class="c mono">054</td></tr>
+<tr><td><strong>Tra tiền</strong></td><td>Việc thật — tra bằng tiền + ngày</td><td class="c mono">039</td></tr>
+<tr><td><strong>Xem vì sao</strong></td><td>Mở ra để <strong>thấy ⛔ không có ứng viên nào</strong></td><td class="c mono">053</td></tr>
+</table>
+<div class="note red"><strong>⛔⛔⛔ Bốn nút đỏ thiếu ⛔ KHÔNG phải vì ai quên vẽ.</strong>
+<code>fls_queue_event</code> và <code>fls_da_xong</code> <strong>chỉ treo được vào <code>itl_id</code></strong>
+— dòng <strong>TIỀN</strong>. Một dòng <strong>LỆNH</strong> ⛔ <strong>không có chỗ nào</strong> để mang lý do,
+hạn hoãn, hay dấu <em>«xong»</em>. ⇒ ⛔ <strong>Không có gì để ghi vào.</strong>
+Ba đường xử ở <a href="#quyet">§2</a> — <strong>chờ bạn quyết</strong>.</div>
+</div>
+</div>
+
+<div class="doi">
+<div class="plate">
+<div class="cap">③ · Ngăn kéo «Tìm tiền» — nơi cú ghép xảy ra</div>
+<div class="box"><div class="t">Dòng lệnh (ghim)</div>
+  <div class="d"><strong>50.000.000</strong> VND · mã <code>FT2519001</code> · phiếu <code>PM01698</code></div></div>
+<div class="box"><div class="t">Bảng PM — <strong>20/28 cột</strong> có dữ liệu
+  <span class="gr">⛔ cột <code>Email Address</code> ⛔ không bao giờ vào kho</span></div></div>
+<table class="g">
+<tr><td style="color:#0F5C4A">Nội dung giao dịch nhập khi lập lệnh ở bank</td>
+  <td>Dang ky Freepik goi Premium Plus…</td></tr>
+<tr><td style="color:#0F5C4A">Tên tài khoản</td><td>Thanh toán thẻ</td></tr>
+<tr><td style="color:#0F5C4A">Số tài khoản</td><td>Thanh toán thẻ</td></tr>
+<tr><td style="color:#0F5C4A">Ngân hàng</td><td>Thanh toán thẻ</td></tr>
+<tr><td style="color:#0F5C4A">Pháp nhân thanh toán</td><td>VGO2 - TeraSofts</td></tr>
+<tr><td style="color:#0F5C4A">Loại giao dịch (Payment Type)</td><td>Thanh toán (Regular)</td></tr>
+<tr><td colspan="2" style="text-align:center;color:#84908A;background:#F6F8F6">
+  — các cột còn lại —</td></tr>
+<tr><td>Timestamp</td><td>46091.42265217593</td></tr>
+<tr><td>ID PILine - Nội dung PI</td><td>PI01698-1 - Đăng ký Freepik…</td></tr>
+<tr><td>Đơn vị tiền tệ (Currency)</td><td>EUR</td></tr>
+<tr><td>Tổng số tiền thanh toán</td><td>40</td></tr>
+<tr><td>ID PMSlip · ID PMLine · ID PISlip · …</td><td>PM01698 · PM01698-1 · …</td></tr>
+</table>
+<div class="box"><div class="t">Phiếu <code>PM01698</code> có <strong>6 dòng</strong></div>
+  <div class="d"><span class="pill">PML-1 · 50.000.000</span> <span class="pill g">PML-2 ✓</span>
+  <span class="pill">PML-3</span> …</div></div>
+<table class="g" style="margin-top:8px">
+<tr><th></th><th>Dòng tiền</th><th>Độ khớp</th><th>Ngày</th><th>Số chứng từ</th><th>Tiền</th><th>Lệch</th></tr>
+<tr><td>◉</td><td>9001</td><td>mã khớp</td><td>2026-08-03</td><td>FT2519001</td><td>50.000.000</td><td>—</td></tr>
+<tr><td>○</td><td>9002</td><td>tiền khớp</td><td>2026-08-04</td><td>FT2519999</td><td>50.000.000</td><td>0</td></tr>
+</table>
+<div class="box" style="margin-top:8px"><div class="d">
+  dung sai Σ: <strong>1.000</strong> · tiền lệnh <strong>50.000.000</strong> ↔ bank
+  <strong>50.000.000</strong> · lệch <strong>0</strong> ⇒ trong dung sai</div></div>
+<div class="row"><span class="grow gr">vì sao ghép cặp này — BẮT BUỘC…</span>
+  <span class="btn">Ghép</span><span class="btn k">Thôi</span><span class="btn k">Đóng</span></div>
+</div>
+
+<div class="tm">
+<h4>Thuyết minh · ngăn kéo</h4>
+<table>
+<tr><th style="width:28%">Phần</th><th>Nghĩa · và vì sao phải có</th><th style="width:11%" class="c">US</th></tr>
+<tr><td>Dòng lệnh <strong>ghim</strong></td>
+  <td>Để ⛔ <strong>không quyết trong trí nhớ</strong></td><td class="c mono">013</td></tr>
+<tr><td><strong>Bảng PM đủ 28 cột</strong> — <strong>hai tầng</strong></td>
+  <td><code>n/28</code> cột có dữ liệu, <strong>đúng thứ tự tờ giấy</strong> <em>(cột kho kiểu <code>json</code>,
+  ⛔ không <code>jsonb</code> — <code>jsonb</code> <strong>sắp lại khoá</strong>)</em>.
+  <br>⭐ <strong>Sáu cột ƯU TIÊN</strong> lên trước <em>(nội dung ghi ở bank · tên·số tài khoản · ngân hàng
+  · pháp nhân · loại giao dịch)</em>, rồi một vạch <strong>«— các cột còn lại —»</strong>, rồi phần còn lại
+  <strong>theo thứ tự tờ giấy</strong>. ⛔ Vạch ấy ⛔ không phải trang trí: nó nói <em>«từ đây trở xuống
+  máy ⛔ không sắp theo mức quan trọng nữa»</em></td><td class="c mono">055</td></tr>
+<tr><td><strong>Cả phiếu</strong></td>
+  <td>⚠ <strong>526</strong> phiếu mang <strong>2–36</strong> số chứng từ khác nhau</td><td class="c mono">055</td></tr>
+<tr><td>Bảng ứng viên</td>
+  <td>Bốn bậc khớp <em>(mã khớp · tiền khớp · gần tiền · cùng tiền tệ)</em> dùng <strong>cùng bộ từ</strong>
+  với lằn TIỀN — đổi tên một phía làm người đọc tưởng là hai thang đo</td><td class="c mono">013</td></tr>
+<tr><td><strong>dung sai Σ</strong> · <strong>Σ hai con số</strong></td>
+  <td>Cùng phép dung sai mà <strong>cửa GHI</strong> dùng. Người biết <strong>trước khi bấm</strong>,
+  ⛔ không phải sau khi bị từ chối</td><td class="c mono">013</td></tr>
+<tr><td>Ô <strong>vì sao</strong> — <strong>BẮT BUỘC</strong></td>
+  <td>Vào nhật ký 7 trường</td><td class="c mono">030</td></tr>
+<tr><td>Khai <em>«bị CẮT»</em></td>
+  <td>⭐ Cắt mà im là <strong>mặc định im lặng</strong> <span class="mono">(INV-I16)</span>: người gõ
+  tưởng danh sách đầy đủ rồi kết luận <em>«⛔ không có dòng tiền nào khớp»</em></td><td class="c mono">039</td></tr>
+<tr><td>Nút <strong>Ghép</strong> · <strong>Thôi</strong> · <strong>Đóng</strong></td>
+  <td><code>POST /queue/{itl_id}/match</code> — ⛔ <strong>đúng cửa ghi cũ</strong>, ⛔ không có
+  đường thứ hai. Lằn này chỉ <strong>đổi thứ tự hỏi</strong></td><td class="c mono">013</td></tr>
+</table>
+</div>
+</div>
+
+<div class="note red doc"><strong>⚠⚠ ĐÍNH CHÍNH 14/09 — một con số tôi đưa ngày 11/09 ĐÚNG mà
+VẪN gây hiểu sai.</strong>
+<p style="margin:8px 0 0">Tôi nói: <em>«hai cột <strong>Nội dung ghi ở bank</strong> và
+<strong>Tên tài khoản</strong> điền <strong>100%</strong> ⇒ đó là hai thứ giúp nhận ra khoản tiền,
+và <strong>535</strong> dòng ⛔ không có số chứng từ <strong>chỉ tra được</strong> bằng chúng»</em>.
+Tỷ lệ điền ấy <strong>đúng</strong>. ⛔ Nhưng <strong>«có điền» ⛔ KHÔNG phải «có nghĩa»</strong>.</p>
+<p style="margin:8px 0 0">Đo lại hôm nay trên <strong>đủ cả 535 dòng</strong> của rổ
+<em>«cần người tra»</em>:</p>
+<table style="margin:8px 0 0">
+<tr><th>Cột</th><th class="c">Điền</th><th class="c">Thật sự dùng được</th><th>Vì sao</th></tr>
+<tr><td><strong>Nội dung ghi ở bank</strong></td><td class="c">100%</td>
+  <td class="c" style="color:var(--accent)"><strong>100%</strong></td>
+  <td>Luôn là <strong>nội dung thật</strong> người lập lệnh gõ vào bank</td></tr>
+<tr><td><strong>Tên tài khoản</strong></td><td class="c">99,8%</td>
+  <td class="c" style="color:var(--red)"><strong>52,7%</strong> <span class="gr">(282/535)</span></td>
+  <td>⛔ <strong>252 dòng (47,1%)</strong> giữ một <strong>CHỖ ĐIỀN</strong>, ⛔ không phải tên ai:
+  <code>Thanh toán thẻ</code> · <code>Tiền mặt</code> · <code>STK CBNV</code> · <code>Ghi chú</code> ·
+  <code>Danh sách đính kèm</code></td></tr>
+</table>
+<p style="margin:10px 0 0">⇒ ⭐ <strong>Gần một nửa số dòng cần tra thì cột ấy ⛔ không nói được
+người nhận là ai.</strong> Ví dụ ngay trong ảnh owner gửi: <code>PM01698-1</code> có
+<strong>ba</strong> ô <em>Ngân hàng</em> · <em>Số tài khoản</em> · <em>Tên tài khoản</em> cùng mang
+<strong><code>Thanh toán thẻ</code></strong> — <strong>294 dòng (7,8%)</strong> của cả ảnh chụp như vậy.
+⛔ Đó ⛔ <strong>không</strong> phải lỗi đọc cột: hàng thô lưu <strong>đúng</strong> cái tờ giấy ghi.</p>
+<p style="margin:10px 0 0">⚠ Và nó ⛔ <strong>không</strong> lật quyết định giữ cột — cột vẫn cứu được
+<strong>282</strong> dòng, và nó vẫn <strong>có thể mang tên người</strong> <em>(giá trị hay gặp thứ hai là
+một tên người thật, <strong>128</strong> dòng)</em>. Nó chỉ đổi <strong>cái bạn nên trông đợi</strong>:
+⛔ <strong>không phải một lời giải cho cả 535</strong>.</p></div>
+
+<h2 id="quyet">§2 · ⛔ Vì sao chúng thiếu — và đây ⛔ KHÔNG phải lỗi giao diện</h2>
+
+<div class="doi">
+<div class="plate">
+<div class="cap">Ranh giới trong KHO</div>
+<table class="g">
+<tr><th>Bảng</th><th>Khoá công việc</th><th>Mô tả được gì</th></tr>
+<tr><td>fls_queue_event <span class="gr">lý do · hoãn</span></td><td>itl_id</td><td>chỉ dòng <b>TIỀN</b></td></tr>
+<tr><td>fls_da_xong <span class="gr">xong · mở lại</span></td><td>itl_id</td><td>chỉ dòng <b>TIỀN</b></td></tr>
+<tr><td>fls_moi_noi</td><td>itl_id + pm_line_id</td><td>⭐ bảng <b>duy nhất</b> biết cả hai</td></tr>
+<tr><td class="n">fls_pm_line</td><td class="n">pm_line_id</td><td class="n">⛔ <b>không có chỗ</b> mang trạng thái</td></tr>
+</table>
+</div>
+<div class="tm">
+<h4>Thuyết minh · gốc rễ <span class="b q">CẦN QUYẾT</span></h4>
+<p>⇒ Một dòng <strong>LỆNH CHI</strong> ⛔ <strong>không có chỗ để mang</strong> lý do, hạn hoãn,
+hay dấu «xong». Nút ⛔ không thiếu vì ai quên vẽ — nó thiếu vì
+<strong>⛔ không có gì để ghi vào</strong>.</p>
+<div class="note red"><strong>⭐⭐ Và đây là một mâu thuẫn với chính quyết định của bạn.</strong>
+<span class="mono">QĐ-ITL-122</span> chốt công việc đo <strong>từ phía PM</strong>. Nhưng lớp
+trạng thái công việc lại <strong>neo vào phía TIỀN</strong>. Hai thứ ấy ⛔ không gặp nhau,
+và ⛔ không ai đối chất tới hôm nay.</div>
+</div>
+</div>
+
+<h3>Ba đường đi — và chúng ⛔ không tương đương</h3>
+<div class="scroll">
+<table>
+<tr><th style="width:6%" class="c">#</th><th style="width:24%">Cách</th><th>Đổi gì</th><th style="width:30%">Cái giá</th></tr>
+<tr><td class="c"><strong>Ⓐ</strong></td>
+  <td><strong>Thêm khoá <code>pm_line_id</code></strong> vào <code>fls_queue_event</code>
+      <span class="gr">(cho phép NULL một trong hai)</span></td>
+  <td>Một dòng lệnh mang được trạng thái riêng. Cả 5 hành động lên thẳng lằn mặc định.</td>
+  <td>⭐ <strong>RẺ HƠN tôi nói hôm 14/09</strong> — xem khung ngay dưới.
+      <strong>1 cột mới</strong> + <strong>sinh lại 3 khung xem</strong>. ⛔ Cái giá thật nằm chỗ khác:
+      mọi phép đếm phải nói rõ <strong>đang đếm phía nào</strong> — nếu không sẽ ra đúng lớp lỗi
+      <em>«hai vế sai cùng chiều»</em></td></tr>
+<tr><td class="c"><strong>Ⓑ</strong></td>
+  <td><strong>Đi vòng qua <code>fls_moi_noi</code></strong> — dòng lệnh đã ghép thì mượn
+      <code>itl_id</code> của bạn đời</td>
+  <td>⛔ Không đổi kho. Nhưng <strong>chỉ chạy được với dòng ĐÃ ghép</strong>.</td>
+  <td>⛔ <strong>1.553 dòng đang chờ đều CHƯA ghép</strong> ⇒ đúng tập cần nhất thì
+      ⛔ <strong>không dùng được</strong>. Thực chất ⛔ không giải quyết gì</td></tr>
+<tr><td class="c"><strong>Ⓒ</strong></td>
+  <td><strong>⛔ Không làm</strong> — lằn mặc định chỉ để <em>ghép</em>, còn lý do·hoãn·xong ở lằn TIỀN</td>
+  <td>⛔ Không code gì.</td>
+  <td>⛔ <span class="mono">US-039·040·045·046·047</span> <strong>⛔ không bao giờ</strong> đúng trên
+      lằn mặc định. Và <span class="mono">US-045</span> — thước của bạn — <strong>đo một lằn ⛔ không ai dùng</strong></td></tr>
+</table>
+</div>
+<div class="note amb doc"><strong>⚠⚠ ĐÍNH CHÍNH 15/09 — giá của Ⓐ, tôi nói ĐẮT HƠN sự thật.</strong>
+<p style="margin:8px 0 0">Hôm <span class="mono">14/09</span> tôi ghi Ⓐ tốn <em>«<strong>2 migration</strong>
+· sửa <code>fls_queue_state</code>»</em>, vì tôi tưởng <code>fls_queue_event</code> và
+<code>fls_da_xong</code> là <strong>hai bảng</strong>.</p>
+<p style="margin:8px 0 0">⛔ <strong>Sai.</strong> Dựng bản đồ tầng hôm nay mới lộ ra:
+<code>fls_da_xong</code> · <code>fls_queue_state</code> · <code>fls_queue_reason_weekly</code>
+đều là <strong>KHUNG XEM</strong> đọc từ <code>fls_queue_event</code>. ⇒ <strong>Cả tầng ⑤ đứng trên
+ĐÚNG MỘT bảng thật.</strong></p>
+<table style="margin:8px 0 0">
+<tr><th>Tôi nói 14/09</th><th>Sự thật 15/09</th></tr>
+<tr><td>2 migration trên 2 bảng</td>
+  <td><strong>1 cột mới</strong> trên <code>fls_queue_event</code> + <strong>sinh lại 3 khung xem</strong></td></tr>
+</table>
+<p style="margin:10px 0 0">⇒ ⭐ <strong>Ⓐ rẻ hơn tôi trình bày</strong>, và điều đó <strong>đổi cán cân</strong>
+của một quyết định bạn <strong>chưa</strong> đưa ra. ⛔ Cái giá thật của Ⓐ ⛔ không nằm ở migration —
+nó nằm ở chỗ <strong>mọi phép đếm phải khai rõ đang đếm phía nào</strong>.
+<br>⚠ Đã ghim bằng <code>test_TANG_5_chi_co_MOT_bang_that__ba_cai_kia_la_KHUNG_XEM</code>:
+nếu một ngày <code>fls_da_xong</code> thành bảng thật thì phép tính giá ấy <strong>đổi</strong>,
+và bài thử đỏ ngay.</p></div>
+
+<div class="note acc doc"><strong>Tôi nghiêng về Ⓐ</strong>, và lý do là một con số:
+<strong>1.553/1.553</strong> dòng đang chờ đều <strong>chưa ghép</strong>, nên Ⓑ ⛔ không chạm được
+dòng nào. Ⓒ thì rẻ, nhưng nó biến <span class="mono">US-045</span> thành một cái thước
+<strong>gắn nhầm lằn</strong> — mà đó đúng là story bạn dựng ra để biết hệ còn sống hay đã chết.
+⛔ Tôi ⛔ không tự chọn: Ⓐ đụng vào <strong>schema của sổ</strong>.</div>
+
+<h2>§3 · <span class="mono">SCR-F01</span> lằn TIỀN — lằn cũ, ⛔ KHÔNG bị xoá</h2>
+<div class="doi">
+<div class="plate">
+<div class="cap">Lưới + năm hành động mỗi dòng</div>
+<div class="scroll">
+<table class="g">
+<tr><th>Hạng</th><th>Mã dòng</th><th>Số chứng từ</th><th>Diễn giải</th><th>Tiền</th><th>% luỹ kế</th><th>Pháp nhân</th><th>Việc</th></tr>
+<tr><td>1</td><td>ITL-9001</td><td>FT2519001</td><td>THANH TOAN NCC…</td><td>50.000.000</td><td>62,5%</td><td>APR</td><td>…</td></tr>
+</table>
+</div>
+<div class="row" style="margin-top:8px"><span class="grow gr">mỗi dòng</span>
+  <span class="btn k">Lý do</span><span class="btn k">Hoãn</span><span class="btn">Ghép</span>
+  <span class="btn k">Bỏ ghép</span><span class="btn k">Xong</span><span class="btn k">Mở lại</span></div>
+<div class="row"><span class="grow gr">trong hộp thoại</span>
+  <span class="btn k">Ghi lý do</span><span class="btn k">Ghép cả lô</span>
+  <span class="btn k">Bỏ cả chùm</span><span class="btn k">Đã hiểu</span></div>
+<div class="box" style="margin-top:8px"><div class="t">Dòng CÓ mã mà ⛔ không tự chứng</div>
+  <div class="d"><code>Số dòng</code> · <code>Vì sao — và sửa ở đâu</code></div></div>
+</div>
+
+<div class="tm">
+<h4>Thuyết minh · lằn TIỀN <span class="b ok">ĐÃ CHẠY</span></h4>
+<p><strong>Câu màn hỏi:</strong> <em>«Dòng tiền nào chưa ghép được lệnh?»</em> Nó ⛔ <strong>không</strong>
+bị bỏ, vì nó là đường <strong>duy nhất</strong> để làm <strong>bốn việc</strong>
+<span class="mono">QĐ-ITL-71/72</span> đã chốt.</p>
+<div class="scroll">
+<table>
+<tr><th style="width:22%">Nút · ô</th><th>Nghĩa · nếu bỏ đi</th><th style="width:11%" class="c">US</th></tr>
+<tr><td><code>Mã dòng</code></td><td><code>itl_id</code>, <strong>⛔ không bao giờ đổi</strong>
+  <span class="mono">(INV-I04a)</span>. ⚠ <code>Diễn giải</code> có thể mang <strong>tên người</strong></td>
+  <td class="c mono">023</td></tr>
+<tr><td><strong>Lý do</strong> → <strong>Ghi lý do</strong></td>
+  <td>⭐⭐ <strong>Đây là ô <span class="mono">US-045</span> đếm.</strong> Bỏ đi ⇒ mất
+  <strong>thước đo duy nhất</strong> của cả hệ kiểm soát</td><td class="c mono">039<br>045</td></tr>
+<tr><td><strong>Hoãn</strong></td>
+  <td><strong>Bắt buộc có hạn</strong> — hoãn vô hạn là <strong>bỏ qua</strong>, ⛔ không phải hoãn.
+  Lần thứ 3 <strong>tự đổi màu</strong>, ⛔ <strong>không leo cấp</strong> <em>(⛔ không có ai ở trên)</em></td>
+  <td class="c mono">040</td></tr>
+<tr><td><strong>Ghép</strong> · <strong>Ghép cả lô</strong></td><td>Nối dòng tiền với dòng lệnh</td>
+  <td class="c mono">013<br>054</td></tr>
+<tr><td><strong>Bỏ ghép</strong> → <strong>Bỏ cả chùm</strong></td>
+  <td>⭐ Bỏ <strong>CẢ CHÙM</strong>, ⛔ không bỏ lẻ — bỏ lẻ làm <code>Σ ≠ tiền bank</code>, tức
+  <strong>tạo ra đúng trạng thái sai mà cổng dựng ra để bắt</strong>. Sổ <strong>THÊM</strong> dòng,
+  ⛔ <strong>không <code>DELETE</code></strong>. Máy <strong>đảo</strong> bút toán nó tự suy ra,
+  ⛔ <strong>KHÔNG</strong> đảo ô <strong>người</strong> gõ tay — và <strong>khai ra</strong> thứ nó ⛔ không đảo.
+  Bỏ đi ⇒ một dòng ghép sai thành <strong>dòng chết cứng</strong></td><td class="c mono">046</td></tr>
+<tr><td><strong>Xong</strong></td>
+  <td>Dòng rời hàng chờ ngay, <code>fls_itl</code> ⛔ <strong>không đổi một ô nào</strong>
+  <em>(«xong chưa» là một <strong>phép tính</strong>)</em>. ⛔ <strong>KHÔNG đòi lý do</strong> — một ô lý do
+  <strong>bắt buộc</strong> thì nó thành ô <strong>rác</strong>. Bỏ đi ⇒ hàng chờ thành danh sách
+  <strong>máy tự quản</strong></td><td class="c mono">047</td></tr>
+<tr><td><strong>Mở lại</strong></td><td><strong>Đòi lý do</strong> — vì nó <strong>lật kết luận của người khác</strong></td>
+  <td class="c mono">047</td></tr>
+<tr><td><strong>Đã hiểu</strong></td>
+  <td>Nút đóng hai hộp thoại — <strong>nội dung</strong> mới là thứ đáng kể, xem khung dưới</td>
+  <td class="c mono">047<br>054</td></tr>
+<tr><td>Bảng <em>«CÓ mã mà ⛔ không tự chứng»</em></td>
+  <td>Cột <strong><code>Vì sao — và sửa ở đâu</code></strong>. Bỏ đi ⇒ kế toán ⛔ không biết đi sửa ở đâu</td>
+  <td class="c mono">053</td></tr>
+</table>
+</div>
+<div class="note amb"><strong>⭐⭐ Hai câu mà nút «Đã hiểu» đóng lại</strong> — chỗ máy
+<strong>TỰ KHAI</strong> một điều dễ bị đọc nhầm thành lỗi:
+<p style="margin:8px 0 0"><strong>Sau ghép cả lô:</strong> <em>«Những dòng này rời hàng chờ ⛔ không phải
+vì ai bấm “xong” — nhãn <code>work_status</code> bị <strong>đóng băng lúc nạp</strong>
+<span class="mono">(INV-I08)</span> nên nó <strong>vẫn nói <code>UNMAPPED</code></strong>.»</em>
+⇒ ⛔ Kế toán vừa ghép xong mà thấy <code>UNMAPPED</code> sẽ tưởng <strong>cú ghép hỏng</strong>.
+Sự thật: nhãn trả lời câu <em>phân loại</em>, mối nối trả lời câu <em>đã nối lệnh chi</em> —
+<strong>hai câu hỏi khác nhau</strong>.</p>
+<p style="margin:8px 0 0"><strong>Sau Xong:</strong> ⓐ <em>«đã bấm xong từ trước bởi X lúc Y»</em>
+· ⓑ <em>«<strong>Xong mà còn thiếu</strong>… ⛔ Máy ⛔ không chặn — <strong>nhưng nó đếm riêng</strong>»</em>
+· ⓒ <em>«<strong>Kỳ đã chốt</strong> — vẫn bấm xong được, và đó là <strong>cố ý</strong>»</em>.
+⇒ ⓑ đặc biệt: ⛔ không chặn <strong>nhưng ⛔ không im lặng</strong>, để nút <em>Xong</em> ⛔ <strong>không
+thành đường tắt làm sạch hàng chờ</strong>.</p></div>
+</div>
+</div>
+
+<h2>§4 · <span class="mono">SCR-F02</span> Sổ ITL</h2>
+<div class="doi">
+<div class="plate">
+<div class="cap">Lưới + ngăn kéo đối soát</div>
+<div class="row"><span class="grow gr">bộ lọc</span><span class="btn k">chỉ UNMAPPED</span>
+  <span class="btn k">Xem thêm</span><span class="btn k">Đóng</span><span class="btn k">Thử lại</span></div>
+<table class="g" style="margin-top:8px">
+<tr><th>lệnh chi</th><th>tiền</th><th>hình</th><th>lần</th></tr>
+<tr><td>PML-1</td><td>50.000.000</td><td><b>A</b> 1×1</td><td>1</td></tr>
+</table>
+<table class="g" style="margin-top:8px">
+<tr><th>#</th><th>ô</th><th>giá trị</th><th>ai</th></tr>
+<tr><td>1</td><td>hd</td><td>HCC</td><td>nguồn</td></tr>
+<tr><td>2</td><td>cdt1</td><td>—</td><td class="n">UNMAPPED</td></tr>
+</table>
+<div class="row" style="margin-top:8px;border-color:#87680F;background:#FFFDF5">
+  <span class="grow"><strong>409</strong> · nguồn đang có <code>OGA</code></span>
+  <span class="btn k">Ghi đè</span><span class="btn k">Lấy giá trị của họ</span></div>
+<div class="row"><span class="grow gr"></span>
+  <span class="btn k">Giữ số của tôi, để tôi hỏi lại họ</span></div>
+<div class="row"><span class="grow gr">đảo bút toán</span><span class="btn k">Đảo</span>
+  <span class="btn k">Để nguyên, không ghi</span><span class="btn k">Thử lại ngay</span></div>
+<table class="g" style="margin-top:8px">
+<tr><th>lúc</th><th>ô</th><th>từ</th><th>thành</th><th>ai</th><th>nguồn</th><th>vì sao</th></tr>
+<tr><td>14/09 10:02</td><td>hd</td><td>—</td><td>HCC</td><td>lan@</td><td>sửa tay</td><td>…</td></tr>
+</table>
+</div>
+
+<div class="tm">
+<h4>Thuyết minh · Sổ ITL <span class="b ok">ĐÃ CHẠY</span></h4>
+<p><strong>Câu màn hỏi:</strong> <em>«Dòng này đang mang giá trị gì, <strong>từ đâu ra</strong>,
+và tôi sửa được gì?»</em></p>
+<div class="scroll">
+<table>
+<tr><th style="width:24%">Nút · ô</th><th>Nghĩa</th><th style="width:11%" class="c">US</th></tr>
+<tr><td>Mối nối · cột <code>hình</code></td>
+  <td><strong>Hình dạng ghép</strong> <code>A</code>–<code>F</code>: <code>A</code>=1×1 · <code>B</code>=1×N ·
+  <code>C</code>=N×1 · <code>D</code>=N×N <strong>máy TỪ CHỐI</strong> <em>(nhiều cách chia đều đúng như nhau
+  ⇒ chọn hộ là quyết thay người)</em> · <code>E</code>=<strong>khác đơn vị tiền</strong> ·
+  <code>F</code>=lệch tổng quá dung sai. ⭐ Tiền tệ kiểm <strong>TRƯỚC</strong> tổng, cố ý</td>
+  <td class="c mono">046</td></tr>
+<tr><td>7 ô sửa · cột <code>ai</code></td>
+  <td>⭐⭐ <strong>Cột đắt nhất</strong>: <code>nguồn</code> / <code>máy gợi ý</code> / <code>sửa tay</code> /
+  <code>UNMAPPED</code>. ⛔ Một giá trị ⛔ không nói mình <strong>từ đâu ra</strong> thì ⛔ không ai kiểm được nó</td>
+  <td class="c mono">025<br>026</td></tr>
+<tr><td>Nhật ký 7 trường</td>
+  <td>Chỉ-THÊM. ⭐ Giữ lại ⛔ <strong>không phải</strong> vì có người soi — <strong>⛔ không có ai soi
+  và sẽ ⛔ không có</strong>. Giữ vì <strong>rủi ro thật là một người rời đi</strong>: 2 người đang giữ
+  <strong>6.843</strong> quyết định trong đầu</td><td class="c mono">030</td></tr>
+<tr><td><strong>chỉ UNMAPPED</strong></td>
+  <td><code>UNMAPPED</code> là trạng thái <strong>tường minh</strong>, ⛔ không phải một ô trống</td>
+  <td class="c mono">026</td></tr>
+<tr><td><strong>Ghi đè</strong> · <strong>Lấy giá trị của họ</strong> ·
+    <strong>Giữ số của tôi, để tôi hỏi lại họ</strong></td>
+  <td>⭐⭐ Ba nút của cú <strong><code>409</code></strong> khi bạn gõ <strong>khác nguồn</strong>.
+  <span class="mono">QĐ-ITL-29</span>: <strong>nguồn vẫn thắng</strong> <em>(để lỗi được sửa
+  <strong>tận gốc</strong>, chỉ một lần)</em> — ⛔ <strong>nhưng ⛔ không được im lặng</strong>. Ghi đè
+  <strong>bắt buộc lý do</strong>. Số lần <em>«nguồn ≠ người gõ»</em> là <strong>thước chất lượng của PM</strong></td>
+  <td class="c mono">025</td></tr>
+<tr><td><strong>Đảo</strong> · <strong>Để nguyên, không ghi</strong></td>
+  <td>⛔ <strong>⛔ KHÔNG có thao tác XOÁ</strong> trong TO-BE <span class="mono">(INV-I08)</span> —
+  <span class="mono">UC-KT-21</span> hỏi <em>«xoá thì ghi nhật ký thế nào»</em>, và câu đúng của
+  TO-BE là <strong><em>«đảo thế nào»</em></strong>, với <strong>người + lý do bắt buộc</strong></td>
+  <td class="c mono">033</td></tr>
+<tr><td><strong>Thử lại</strong> · <strong>Thử lại ngay</strong> · <strong>Xem thêm</strong> · <strong>Đóng</strong></td>
+  <td>Gọi lại cửa khi lỗi mạng · phân trang · đóng ngăn kéo — ⛔ <strong>không</strong> phải thao tác nghiệp vụ</td>
+  <td class="c">—</td></tr>
+</table>
+</div>
+</div>
+</div>
+
+<h2>§5 · <span class="mono">SCR-F03</span> Cổng hôm nay · <span class="mono">SCR-F04</span> Nạp sao kê</h2>
+<div class="doi">
+<div class="plate">
+<div class="cap">F03 · Cổng hôm nay — ⛔ KHÔNG có nút nào</div>
+<div class="row"><span class="pill g">✓ ĐẠT</span><span class="pill r">✗ KHÔNG ĐẠT</span>
+  <span class="pill">— ⛔ KHÔNG ĐO ĐƯỢC</span></div>
+<div class="box"><div class="t">Độ tin của số trên màn: <strong>68%</strong></div>
+  <div class="d">4 cổng chưa từng đo · Hàng chờ rỗng</div></div>
+<div class="box new"><div class="t">⛔ CHƯA CÓ</div>
+  <div class="d">Độ phủ theo nhóm × ngày · nút <em>Xuất báo cáo tuần</em></div></div>
+</div>
+<div class="tm">
+<h4>Thuyết minh · F03 <span class="b ok">chỉ ĐỌC, có chủ ý</span></h4>
+<p><strong>Câu màn hỏi:</strong> <em>«Số trên màn hôm nay <strong>tin được đến đâu</strong>?»</em>
+Đây là chỗ <strong>máy báo cáo về chính nó</strong> ⇒ ⛔ <strong>không</strong> có nút nào.</p>
+<table>
+<tr><th style="width:34%">Hiển thị</th><th>Nghĩa</th><th style="width:11%" class="c">US</th></tr>
+<tr><td><code>✓ ĐẠT</code> · <code>✗ KHÔNG ĐẠT</code> · <strong><code>— ⛔ KHÔNG ĐO ĐƯỢC</code></strong></td>
+  <td>⭐⭐⭐ <strong>Ba trạng thái, ⛔ không hai.</strong> Một cổng ⛔ chưa đo được mà vẽ thành
+  <em>«đạt»</em> là <strong>con số nói dối thô nhất của cả hệ</strong></td><td class="c mono">008<br>029</td></tr>
+<tr><td><em>«N cổng chưa từng đo»</em></td><td>Khai <strong>tường minh</strong>, ⛔ không giấu trong một %</td>
+  <td class="c mono">008</td></tr>
+<tr><td><em>«Độ tin: N%»</em></td><td>⛔ Nhãn <strong>⛔ không thể nói quá</strong>: suy từ số dòng đã đối soát</td>
+  <td class="c mono">034</td></tr>
+<tr><td><em>«Máy ⛔ không khai một cổng nào canh sổ. Báo người dựng hệ»</em></td>
+  <td>⭐ Màn <strong>⛔ không tự bịa</strong> một câu trấn an khi cửa trả rỗng</td><td class="c mono">008</td></tr>
+<tr><td><em>«Hàng chờ rỗng»</em></td><td>Rỗng là một <strong>tin</strong>, ⛔ không phải một ô trắng</td>
+  <td class="c mono">039</td></tr>
+<tr><td class="n">Độ phủ · Xuất báo cáo tuần</td>
+  <td class="n">⛔ <strong>CHƯA CÓ</strong> — cửa <code>/queue/coverage</code> và <code>/weekly</code> ⛔ chưa dựng.
+  <span class="mono">SCR-F05</span> được <strong>gấp vào đây</strong> có chủ ý</td>
+  <td class="c mono n">038<br>034 043</td></tr>
+</table>
+</div>
+</div>
+
+<div class="doi">
+<div class="plate">
+<div class="cap">F04 · Nạp sao kê</div>
+<div class="row"><span class="grow gr">bước ①</span><span class="btn">Xem trước</span>
+  <span class="gr">9 luật soát · biên bản GỘP</span></div>
+<div class="row" style="border-color:#87680F;background:#FFFDF5">
+  <span class="grow"><strong>1.894/8.368</strong> dòng có ngày đọc được <strong>HAI</strong> cách</span>
+  <span class="btn k">Khai theo bằng chứng · dmy</span></div>
+<div class="row"><span class="grow gr">34/34 nguồn tự chứng</span>
+  <span class="btn k">Khai cả lô</span><span class="btn k">Bỏ qua vì trùng</span></div>
+<div class="box"><div class="t">Nhận được 8.377 dòng</div>
+  <div class="d">→ <span class="btn k">Mở hàng chờ để xử 1.553</span></div></div>
+<div class="box new"><div class="t">⛔ CHƯA CÓ</div>
+  <div class="d">Xem <strong>cả dãy <code>version</code></strong> bản khai cột</div></div>
+</div>
+<div class="tm">
+<h4>Thuyết minh · F04 <span class="b ok">ĐÃ CHẠY</span></h4>
+<p><strong>Câu màn hỏi:</strong> <em>«Lô này có <strong>nhận được</strong> ⛔ không, và nếu ⛔ không
+thì <strong>vì sao</strong>?»</em></p>
+<table>
+<tr><th style="width:26%">Nút · hiển thị</th><th>Nghĩa</th><th style="width:11%" class="c">US</th></tr>
+<tr><td><strong>Xem trước</strong></td>
+  <td>Chạy <strong>9 luật soát</strong> rồi trả <strong>biên bản GỘP</strong> — ⛔ không phải nạp 60 lượt
+  rồi tự cộng</td><td class="c mono">048</td></tr>
+<tr><td><strong>Khai theo bằng chứng</strong></td>
+  <td>⭐⭐ <strong>22,6%</strong> dòng có ngày đọc được <strong>HAI</strong> cách. ⛔ <strong>Máy ⛔ KHÔNG được
+  quyết</strong> — đây là <strong>kỳ kế toán của một bút toán</strong>. Nút trả <strong>bằng chứng có con số</strong>,
+  người ấn định</td><td class="c mono">049</td></tr>
+<tr><td>Khai <strong>cả lô</strong></td>
+  <td><strong>34/34</strong> nguồn tự chứng, <code>chac_dmy</code> = <strong>0</strong> ⇒ <strong>27</strong> cú bấm
+  cho <strong>một</strong> đáp án là <em>«bấm theo phản xạ»</em>. ⛔ Nguồn ⛔ <strong>không</strong> tự chứng
+  <strong>vẫn phải</strong> bấm riêng</td><td class="c mono">050</td></tr>
+<tr><td><strong>Bỏ qua vì trùng</strong></td>
+  <td><code>content_key</code> <strong>tự chống trùng</strong> — nạp lại cùng tầng là <strong>hợp lệ</strong></td>
+  <td class="c mono">048</td></tr>
+<tr><td><strong>Nhận được N</strong> · <strong>Mở hàng chờ để xử N</strong></td>
+  <td>Số dòng <strong>vào sổ</strong> và số dòng <strong>vào hàng chờ</strong> — rồi liên kết thẳng sang
+  <span class="mono">SCR-F01</span></td><td class="c mono">048<br>039</td></tr>
+<tr><td class="n">Cả dãy <code>version</code> bản khai</td>
+  <td class="n">⛔ <strong>CHƯA CÓ.</strong> Câu <em>«vì sao lô tháng trước đọc cột khác»</em> chỉ trả lời
+  được nếu <strong>thấy được bản cũ</strong> — đó là cả lý do bảng khai là <strong>chỉ-THÊM</strong></td>
+  <td class="c mono n">051</td></tr>
+</table>
+</div>
+</div>
+
+<h2>§6 · Nội dung CÁC HỘP THOẠI hiện ra</h2>
+<div class="note doc"><strong>18 hộp thoại</strong> trong bốn màn. ⛔ Trích <strong>nguyên văn</strong>
+từ mã — mỗi câu dưới đây là câu kế toán <strong>thật sự đọc</strong> khi bấm.
+<br>⭐⭐ <strong>Chỗ đáng nhìn nhất ⛔ không phải cái hộp hỏi, mà cái hộp BÁO LẠI.</strong>
+Bốn hộp <em>«Đã …»</em> tồn tại để nói ra thứ máy <strong>⛔ KHÔNG làm</strong> — và nếu chúng im,
+kế toán sẽ tưởng máy đã dọn sạch mọi thứ.</div>
+
+<h3>F01 lằn TIỀN · hộp HỎI</h3>
+<div class="doi">
+<div class="plate">
+<div class="cap">Hộp «Lý do · dòng ITL-9001»</div>
+<div class="box"><div class="d">Vì sao dòng này còn nằm trong hàng chờ? Câu trả lời vào
+  <strong>nhật ký</strong> và vào <strong>bộ đếm tuần</strong>.</div></div>
+<div class="box" style="border-color:#87680F;background:#FFFDF5"><div class="d">
+  ⚠ Đây là thước của <code>US-045</code>: <strong>4 tuần ⛔ không ai gõ = cổng đã chết</strong>.
+  ⛔ Gõ bừa một chữ làm hỏng đúng cái thước ấy.</div></div>
+<div class="row"><span class="grow gr">vì sao dòng này chưa xong…</span></div>
+<div class="row"><span class="grow"></span><span class="btn k">Thôi</span><span class="btn">Ghi lý do</span></div>
+
+<div class="cap" style="margin-top:14px">Hộp «Hoãn · dòng ITL-9001»</div>
+<div class="box"><div class="d">Hoãn <strong>CÓ HẠN</strong>: đến ngày ấy dòng quay lại hàng chờ.
+  ⛔ Không phải cách để bỏ qua một dòng.</div></div>
+<div class="box" style="border-color:#A32B23;background:#FFF9F8"><div class="d">
+  ⚠ Dòng này đã hoãn <strong>2 lần</strong>. Lần thứ ba <strong>đổi màu</strong> để nhìn thấy
+  — và ⛔ <strong>không báo cho ai</strong>, vì ⛔ không có vai nào nhận báo <code>(QĐ-ITL-27)</code>.</div></div>
+<div class="row"><span class="gr">Hoãn đến ngày</span><span class="pill">2026-09-30</span>
+  <span class="grow gr">vì sao hoãn — BẮT BUỘC…</span></div>
+<div class="row"><span class="grow"></span><span class="btn k">Thôi</span><span class="btn">Hoãn</span></div>
+</div>
+
+<div class="tm">
+<h4>Thuyết minh · hai hộp hỏi <span class="b ok">ĐÃ CHẠY</span></h4>
+<table>
+<tr><th style="width:24%">Chi tiết</th><th>Nghĩa</th><th style="width:11%" class="c">US</th></tr>
+<tr><td>Hộp <strong>Lý do</strong> tự nói mình là <strong>thước</strong></td>
+  <td>⭐⭐ Hiếm: một ô nhập <strong>tự khai</strong> rằng gõ bừa sẽ <strong>làm hỏng phép đo</strong>.
+  ⛔ Nếu ⛔ không nói, ô này thành chỗ gõ cho xong — và <code>US-045</code> sẽ báo
+  <em>«có người đọc»</em> trong khi thật ra ⛔ không ai đọc</td><td class="c mono">039<br>045</td></tr>
+<tr><td>Nút <strong>Ghi lý do</strong> — ô rỗng thì ⛔ không đóng hộp</td>
+  <td>Bắt buộc, vì một sự kiện lý do <strong>rỗng</strong> vẫn cộng vào bộ đếm ⇒ nó
+  <strong>làm loãng chính cái thước</strong></td><td class="c mono">045</td></tr>
+<tr><td>Hộp <strong>Hoãn</strong> đòi <strong>ngày</strong></td>
+  <td><strong>Hoãn vô hạn là BỎ QUA</strong>, ⛔ không phải hoãn. Thiếu ngày ⇒ ⛔ không lưu</td>
+  <td class="c mono">040</td></tr>
+<tr><td>Cảnh báo <strong>lần thứ 3</strong></td>
+  <td>⭐ Câu <em>«⛔ không báo cho ai, vì ⛔ không có vai nào nhận báo»</em> là chỗ màn
+  <strong>⛔ từ chối giả vờ có quy trình leo cấp</strong>. Vận hành thật <strong>2–3 người</strong>
+  <code>(QĐ-ITL-27)</code> ⇒ đổi màu là <strong>tất cả</strong> những gì làm được, và nói thẳng</td>
+  <td class="c mono">040</td></tr>
+<tr><td><strong>Hoãn</strong> đòi lý do, <strong>Xong</strong> thì ⛔ KHÔNG</td>
+  <td>⭐⭐ ⛔ Đây ⛔ không phải bất nhất. <em>Hoãn</em> = <strong>hoãn một việc chưa xử</strong> ⇒ phải
+  nói chờ gì. <em>Xong</em> = <strong>việc đã xử</strong> ⇒ một ô lý do <strong>bắt buộc</strong> ở đó
+  chỉ đẻ ra chữ <strong>rác</strong> <code>(QĐ-ITL-72)</code></td><td class="c mono">040<br>047</td></tr>
+</table>
+</div>
+</div>
+
+<div class="doi">
+<div class="plate">
+<div class="cap">Hộp «Ghép lệnh · dòng ITL-9001»</div>
+<div class="box"><div class="t">Dòng tiền (ghim)</div>
+  <div class="d"><strong>50.000.000</strong> VND — THANH TOAN NCC…</div></div>
+<div class="gr">ảnh chụp lệnh chi: 4 giờ trước</div>
+<div class="box" style="border-color:#87680F;background:#FFFDF5"><div class="d">
+  ⛔ <strong>Máy ⛔ không xếp được theo: ngày, người nhận</strong><br>
+  Ảnh chụp lệnh chi ⛔ không mang hai trường ấy.</div></div>
+<table class="g" style="margin-top:8px">
+<tr><th></th><th>Dòng lệnh</th><th>Độ khớp</th><th>Tiền lệnh</th><th>Trạng thái</th><th></th></tr>
+<tr><td>☑</td><td>PML-1</td><td>mã khớp</td><td>50.000.000</td><td>Approve</td><td></td></tr>
+<tr><td>☐</td><td>PML-9</td><td>cùng tiền tệ</td><td>12.000.000</td><td>Approve</td>
+  <td><span class="pill a">đã ghép nơi khác</span></td></tr>
+</table>
+<div class="row"><span class="grow gr">vì sao ghép cặp này — BẮT BUỘC, vào nhật ký…</span></div>
+<div class="row" style="border-color:#0F5C4A;background:#F3F9F6">
+  <span class="grow">Σ lệnh <strong>50.000.000</strong> ↔ tiền bank <strong>50.000.000</strong>
+  · lệch <strong>0</strong> ⇒ trong dung sai</span></div>
+<div class="row"><span class="grow"></span><span class="btn k">Thôi</span><span class="btn">Ghép</span></div>
+</div>
+
+<div class="tm">
+<h4>Thuyết minh · hộp Ghép <span class="b ok">ĐÃ CHẠY</span></h4>
+<table>
+<tr><th style="width:26%">Chi tiết</th><th>Nghĩa</th><th style="width:11%" class="c">US</th></tr>
+<tr><td>Dòng tiền <strong>ghim</strong> + <strong>tuổi ảnh chụp</strong></td>
+  <td>⭐ <em>«ảnh chụp 4 giờ trước»</em> — con số này là <strong>một BẢN SAO</strong>, ⛔ không phải
+  sổ sống. Kế toán phải biết mình đang quyết trên dữ liệu <strong>cũ bao nhiêu</strong></td>
+  <td class="c mono">013</td></tr>
+<tr><td>⭐⭐ <em>«Máy ⛔ không xếp được theo: ngày, người nhận»</em></td>
+  <td><strong>Đây là câu quan trọng nhất của cả hộp.</strong> Máy <strong>KHAI RA hai trục nó
+  ⛔ không cân nhắc được</strong>. ⛔ Im lặng ở đây thì người dùng tưởng thứ tự ứng viên
+  <strong>đã tính cả ngày và người nhận</strong> — và tin một xếp hạng ⛔ không tồn tại</td>
+  <td class="c mono">013</td></tr>
+<tr><td><span class="pill a">đã ghép nơi khác</span></td>
+  <td>Ứng viên <strong>⛔ không bị giấu đi</strong> — người vẫn thấy nó, kèm cảnh báo. Giấu ⇒
+  kế toán tìm mãi một dòng lệnh mà màn đã lặng lẽ bỏ ra</td><td class="c mono">015</td></tr>
+<tr><td><strong>Σ hai con số</strong> tính lại mỗi lần tích</td>
+  <td>Người biết <strong>trước khi bấm</strong> là cửa ghi sẽ nhận hay từ chối — ⛔ không phải
+  biết sau khi bị từ chối</td><td class="c mono">013</td></tr>
+<tr><td>⛔ Rỗng ứng viên</td>
+  <td><em>«Ảnh chụp dòng lệnh ⛔ không có dòng nào cùng tiền tệ»</em> — nói <strong>vì sao rỗng</strong>,
+  ⛔ không để một bảng trắng</td><td class="c mono">039</td></tr>
+</table>
+</div>
+</div>
+
+<h3>F01 lằn TIỀN · bốn hộp BÁO LẠI — nơi máy tự khai thứ nó ⛔ KHÔNG làm</h3>
+<div class="doi">
+<div class="plate">
+<div class="cap">① «Đã ghép · nhưng máy ⛔ KHÔNG tự điền được»</div>
+<div class="box" style="border-color:#87680F;background:#FFFDF5"><div class="d">
+  ⛔ <strong>Các dòng lệnh nói nhiều giá trị khác nhau</strong> cho: <strong>hd, cdt1</strong><br>
+  Máy ⛔ <strong>không tự chọn</strong> — chọn thay người là máy quyết định thay người
+  <code>(INV-I16)</code>.</div></div>
+<div class="box"><div class="d">⇒ Mở màn <strong>Sổ ITL</strong> và gõ tay ô ấy.</div></div>
+<div class="row"><span class="grow"></span><span class="btn">Đã hiểu</span></div>
+
+<div class="cap" style="margin-top:14px">② «Đã bỏ ghép»</div>
+<div class="box" style="border-color:#0F5C4A;background:#F3F9F6"><div class="d">
+  Đã bỏ <strong>3</strong> mối nối. Sổ giữ nguyên lịch sử. Dòng <strong>quay về hàng chờ</strong>.</div></div>
+<div class="box"><div class="d">↩ <strong>Đã đảo 2 bút toán</strong> mà chính phép ghép suy ra:
+  <code>hd, cdt1</code></div></div>
+<div class="box" style="border-color:#87680F;background:#FFFDF5"><div class="d">
+  ⚠ <strong>⛔ KHÔNG đảo 1 ô</strong> — <strong>người</strong> đã gõ tay lên đó sau khi ghép:
+  <code>pay_type</code><br>Máy ⛔ không rút lại thứ người đã quyết.</div></div>
+<div class="row"><span class="grow"></span><span class="btn">Đã hiểu</span></div>
+</div>
+
+<div class="tm">
+<h4>Thuyết minh · hộp báo ① ②</h4>
+<table>
+<tr><th style="width:22%">Hộp</th><th>Vì sao nó PHẢI hiện</th><th style="width:11%" class="c">US</th></tr>
+<tr><td>① sau khi <strong>Ghép</strong></td>
+  <td>Cú ghép <strong>thành công</strong>, nhưng máy ⛔ <strong>không suy ra được</strong> <code>hd</code>/<code>cdt1</code>
+  vì các dòng lệnh trong chùm <strong>nói khác nhau</strong>. ⛔ Im lặng ⇒ kế toán tưởng dòng
+  đã đầy đủ và <strong>bỏ qua hai ô trống</strong> — chúng sẽ đi thẳng vào P&amp;L dưới dạng
+  <code>UNMAPPED</code></td><td class="c mono">026<br>046</td></tr>
+<tr><td>② sau khi <strong>Bỏ cả chùm</strong></td>
+  <td>⭐⭐ <strong>Ba câu, ba việc khác nhau:</strong> ⓐ đã bỏ mấy mối nối · ⓑ đã <strong>đảo</strong>
+  bút toán nào <em>(thứ máy tự suy ra thì máy rút lại được)</em> · ⓒ ⭐ <strong>⛔ KHÔNG đảo</strong>
+  ô nào <em>(người đã gõ tay lên đó)</em>.
+  <br>⇒ Bỏ ⓒ đi là để kế toán tưởng <em>«bỏ ghép đã dọn sạch mọi thứ»</em> — và một ô
+  <code>pay_type</code> còn sót sẽ sống tiếp <strong>⛔ không ai biết</strong></td><td class="c mono">046</td></tr>
+</table>
+<div class="note acc"><strong>⭐ Luật chung của cả bốn hộp báo:</strong> máy <strong>rút lại được</strong>
+thứ <strong>chính nó</strong> suy ra; nó ⛔ <strong>không rút lại</strong> thứ <strong>người</strong> đã quyết —
+và nó <strong>nói ra ranh giới ấy</strong> mỗi lần.</div>
+</div>
+</div>
+
+<div class="doi">
+<div class="plate">
+<div class="cap">③ «Đã ghi» — sau nút Xong</div>
+<div class="box"><div class="d">⭐ Dòng này <strong>đã được bấm xong từ trước</strong> — bởi
+  <strong>lan@apero.vn</strong> lúc <strong>2026-09-12 09:41</strong>. Bấm lại ⛔ không tạo thêm sự kiện.</div></div>
+<div class="box" style="border-color:#87680F;background:#FFFDF5"><div class="d">
+  ⚠ <strong>Xong mà còn thiếu: <code>hd, cdt1</code></strong><br>
+  ⛔ Máy ⛔ không chặn — nhưng nó <strong>đếm riêng</strong> những dòng như thế, để nút này
+  ⛔ không thành đường tắt làm sạch hàng chờ.</div></div>
+<div class="box"><div class="d">⭐ <strong>Kỳ đã chốt</strong> — vẫn bấm xong được, và đó là
+  <strong>cố ý</strong>: kỳ chốt thì ⛔ không sửa được giá trị nào, nếu cũng ⛔ không đánh dấu
+  xong được thì hàng chờ <strong>tự biến thành rác</strong>.</div></div>
+<div class="row"><span class="grow"></span><span class="btn">Đã hiểu</span></div>
+
+<div class="cap" style="margin-top:14px">④ «Đã ghép cả lô»</div>
+<div class="box" style="border-color:#0F5C4A;background:#F3F9F6"><div class="d">
+  ✓ <strong>47 dòng</strong> · <strong>47 mối nối</strong>. Mỗi dòng có một sự kiện riêng trong
+  nhật ký ⇒ bỏ ghép được từng dòng.</div></div>
+<div class="box"><div class="d">⭐ Những dòng này rời hàng chờ <strong>⛔ không phải</strong> vì
+  ai bấm «xong» — nhãn <code>work_status</code> bị <strong>đóng băng lúc nạp</strong>
+  <code>(INV-I08)</code> nên nó vẫn nói <code>UNMAPPED</code>. Đó ⛔ không phải lỗi: nhãn trả lời
+  <em>phân loại</em>, mối nối trả lời <em>đã nối lệnh chi</em> — <strong>hai câu hỏi khác nhau</strong>.</div></div>
+<div class="row"><span class="grow"></span><span class="btn">Đã hiểu</span></div>
+</div>
+
+<div class="tm">
+<h4>Thuyết minh · hộp báo ③ ④</h4>
+<table>
+<tr><th style="width:22%">Câu</th><th>Vì sao nó PHẢI hiện</th><th style="width:11%" class="c">US</th></tr>
+<tr><td>③ⓐ <em>«đã bấm xong từ trước bởi X lúc Y»</em></td>
+  <td>Bấm hai lần ⛔ <strong>không</strong> thành hai sự kiện. ⛔ Nhưng cũng ⛔ <strong>không báo lỗi</strong>
+  — nó trả <strong>ai đã bấm · lúc nào</strong>, vì câu đúng ở đây là <em>«có người làm rồi»</em>,
+  ⛔ không phải <em>«bạn làm sai»</em></td><td class="c mono">047</td></tr>
+<tr><td>③ⓑ ⭐⭐ <em>«Xong mà còn thiếu»</em></td>
+  <td><strong>⛔ Không chặn, nhưng ⛔ không im lặng.</strong> Chặn thì kế toán ⛔ không đánh dấu
+  được việc đang làm dở; im thì nút <em>Xong</em> thành <strong>đường tắt làm sạch hàng chờ</strong>.
+  ⇒ Máy <strong>đếm riêng</strong> — <code>dem_xong_du_thieu()</code></td><td class="c mono">047</td></tr>
+<tr><td>③ⓒ <em>«Kỳ đã chốt — vẫn bấm được»</em></td>
+  <td>⭐ <strong>Cố ý khác <code>INV-I13</code></strong>. Kỳ chốt thì kế toán ⛔ không sửa được gì;
+  nếu cũng ⛔ không đánh dấu xong được thì hàng chờ <strong>tự biến thành rác</strong></td>
+  <td class="c mono">047</td></tr>
+<tr><td>④ <em>«vẫn nói <code>UNMAPPED</code>»</em></td>
+  <td>⭐⭐⭐ <strong>Hộp đắt nhất trong cả bốn.</strong> ⛔ Kế toán vừa ghép <strong>47 dòng</strong> mà
+  nhìn thấy <code>UNMAPPED</code> sẽ kết luận <strong>cú ghép hỏng</strong> — rồi bấm lại, rồi báo lỗi.
+  Sự thật: nhãn là <strong>phân loại</strong>, mối nối là <strong>đã nối lệnh chi</strong>, và nhãn bị
+  <strong>đóng băng lúc nạp</strong> theo đúng <code>INV-I08</code></td><td class="c mono">054</td></tr>
+</table>
+</div>
+</div>
+
+<h3>F02 Sổ ITL · panel phải và ba hộp xung đột</h3>
+<div class="doi">
+<div class="plate">
+<div class="cap">Panel BÊN PHẢI — ⛔ không phải hộp che màn</div>
+<div class="box"><div class="t">⛔ KHÔNG cuộn · vẽ NGAY</div>
+  <div class="d"><strong>50.000.000</strong> VND · THANH TOAN NCC…
+  <br><span class="gr">để lúc nào cũng thấy đang xem dòng nào</span></div></div>
+<div class="box"><div class="t">vùng cuộn — bảy nhóm</div>
+  <div class="d">mối nối · 7 ô sửa · phân bổ 🔒 · nhật ký · …</div></div>
+
+<div class="cap" style="margin-top:14px">Hộp «Giá trị bạn gõ KHÁC cái đang có»</div>
+<div class="box" style="border-color:#87680F;background:#FFFDF5"><div class="d">
+  Dòng <strong>ITL-9001</strong> · ô <strong>hd</strong></div></div>
+<table class="g">
+<tr><td>nguồn đang có</td><td><b>OGA</b></td></tr>
+<tr><td>bạn gõ</td><td><b>HCC</b></td></tr>
+</table>
+<div class="box" style="margin-top:8px"><div class="d">Ghi đè ⛔ không xoá gì cả — sổ
+  <strong>chỉ thêm</strong>, giá trị cũ vẫn đọc lại được trong nhật ký. Nhưng <strong>phải nói vì sao</strong>
+  bạn tin số của mình hơn <code>(US-025)</code>.</div></div>
+<div class="row"><span class="grow gr">vì sao ghi đè…</span></div>
+<div class="row"><span class="grow"></span><span class="btn k">Để nguyên, không ghi</span>
+  <span class="btn">Ghi đè</span></div>
+</div>
+
+<div class="tm">
+<h4>Thuyết minh · panel + hộp <code>409</code></h4>
+<table>
+<tr><th style="width:24%">Chi tiết</th><th>Nghĩa</th><th style="width:11%" class="c">US</th></tr>
+<tr><td>Panel <strong>bên phải</strong>, ⛔ không che màn</td>
+  <td>⭐ Dòng đang xem <strong>vẫn trong tầm mắt</strong> — cả ý đồ của bố cục
+  <em>master–detail</em>. Một hộp che màn buộc người đóng nó lại mới xem được dòng kế</td>
+  <td class="c">—</td></tr>
+<tr><td>Vùng trên <strong>⛔ KHÔNG cuộn</strong> và <strong>vẽ NGAY</strong></td>
+  <td>⭐ Số tiền + diễn giải vẽ <strong>ngay lập tức</strong> từ dữ liệu đã có trên lưới ⇒ panel
+  ⛔ <strong>không bao giờ là một khung trống</strong> trong lúc đợi cửa trả lời</td><td class="c">—</td></tr>
+<tr><td>Bảng <strong>hai dòng</strong>: nguồn / bạn gõ</td>
+  <td>⭐⭐ Đặt <strong>cạnh nhau</strong>, ⛔ không bắt nhớ. Câu hỏi <em>«ghi đè ⛔ không»</em> chỉ có
+  nội dung khi người thấy <strong>cả hai giá trị</strong></td><td class="c mono">025</td></tr>
+<tr><td><em>«Ghi đè ⛔ không xoá gì cả»</em></td>
+  <td>Hạ nhiệt đúng chỗ: sổ <strong>chỉ thêm</strong> <code>(INV-I08)</code>. ⛔ Người ngại bấm vì sợ
+  mất dữ liệu sẽ <strong>để nguyên một giá trị họ biết là sai</strong></td><td class="c mono">025</td></tr>
+<tr><td>Nút <strong>Để nguyên, không ghi</strong></td>
+  <td>⭐ Chữ dài mà <strong>cố ý</strong>: nó nói đúng hệ quả. Một nút ghi <em>«Huỷ»</em> ⛔ không cho
+  biết <strong>số của bạn sẽ ⛔ không vào sổ</strong></td><td class="c mono">025</td></tr>
+<tr><td>Nút <strong>Ghi đè</strong> mang màu <em>nguy hiểm</em></td>
+  <td><code>QĐ-ITL-29</code>: <strong>nguồn vẫn thắng</strong> — ghi đè là lối <strong>ngoại lệ</strong>,
+  ⛔ không phải lối thường. Số lần <em>«nguồn ≠ người gõ»</em> là <strong>thước chất lượng PM</strong></td>
+  <td class="c mono">025</td></tr>
+</table>
+</div>
+</div>
+
+<div class="doi">
+<div class="plate">
+<div class="cap">Hộp «Ô này đã có NGƯỜI KHÁC gõ»</div>
+<div class="box" style="border-color:#87680F;background:#FFFDF5"><div class="d">
+  Dòng <strong>ITL-9001</strong> · ô <strong>cdt1</strong> — người khác vừa ghi giá trị khác.</div></div>
+
+<div class="cap" style="margin-top:14px">Hộp «Lô lưu DỪNG giữa chừng»</div>
+<div class="box" style="border-color:#A32B23;background:#FFF9F8"><div class="d">
+  <strong>Cửa từ chối ô thứ 3</strong><br>Kiểm lại mã HĐ rồi thử lại.</div></div>
+<div class="box"><div class="d"><strong>4 ô dưới đây CHƯA vào sổ</strong> — chúng vẫn
+  <strong>viền vàng</strong> trên lưới:
+  <br><code>ITL-9004·hd</code> · <code>ITL-9005·cdt1</code> · …</div></div>
+<div class="box"><div class="d">Chúng ⛔ không mất: bấm <strong>Thử lại</strong>, hay gõ tiếp rồi
+  để máy tự lưu sau 2,5 giây.</div></div>
+<div class="row"><span class="grow"></span><span class="btn k">Đóng</span>
+  <span class="btn">Thử lại ngay</span></div>
+
+<div class="cap" style="margin-top:14px">Hộp «Đảo bút toán #128»</div>
+<div class="box"><div class="d">Đảo <strong>⛔ không xoá</strong> gì cả — nó <strong>thêm một dòng nữa</strong>
+  trỏ ngược lại <code>(SM-I03 · INV-I08)</code>. Sau khi đảo, giá trị lùi về bút toán trước đó,
+  hay về giá trị của sổ gốc nếu ⛔ không còn bút toán nào.</div></div>
+<div class="row"><span class="grow gr">vì sao đảo…</span></div>
+<div class="row"><span class="grow"></span><span class="btn k">Thôi</span><span class="btn">Đảo</span></div>
+</div>
+
+<div class="tm">
+<h4>Thuyết minh · ba hộp còn lại</h4>
+<table>
+<tr><th style="width:24%">Hộp</th><th>Nghĩa</th><th style="width:11%" class="c">US</th></tr>
+<tr><td><strong>Ô này đã có NGƯỜI KHÁC gõ</strong></td>
+  <td>⭐ Hộp <strong>RIÊNG</strong>, cố ý ⛔ không gộp vào hộp báo hỏng: ở đây ⛔ <strong>không có gì
+  hỏng</strong> — chỉ là <strong>hai người cùng làm một việc</strong>, và câu trả lời là
+  <strong>một cuộc nói chuyện</strong>, ⛔ không phải một lần bấm <em>«Thử lại»</em>.
+  <br>⚠ Màn <strong>tự khai</strong> ở chân trang: cửa ghi <strong>⛔ không phát hiện được</strong>
+  ca này <code>(GAP-SCR-09)</code>; màn có hỏi lại ngay trước khi ghi, nhưng đó là một phép
+  <strong>KIỂM</strong>, ⛔ không phải một <strong>BẢO ĐẢM</strong></td><td class="c mono">025<br>030</td></tr>
+<tr><td><strong>Lô lưu DỪNG giữa chừng</strong></td>
+  <td>⭐⭐ Liệt kê <strong>đúng những ô CHƯA vào sổ</strong> và nói chúng <strong>vẫn viền vàng</strong>
+  trên lưới. ⛔ Một câu <em>«lưu thất bại»</em> trống rỗng để kế toán ⛔ không biết
+  <strong>ô nào đã vào, ô nào chưa</strong> — và đó là lúc người ta gõ lại thứ đã lưu rồi</td>
+  <td class="c mono">030</td></tr>
+<tr><td><strong>Đảo bút toán</strong></td>
+  <td>Nói rõ <strong>giá trị lùi về đâu</strong>: bút toán trước đó, hay sổ gốc. ⛔ Thiếu câu ấy thì
+  <em>«đảo»</em> đọc như <em>«xoá»</em> — mà <strong>⛔ KHÔNG có thao tác xoá</strong> nào trong TO-BE
+  <code>(INV-I08)</code></td><td class="c mono">033</td></tr>
+</table>
+<div class="note"><strong>⭐ Và màn F02 tự khai HAI chỗ nó CỐ Ý ⛔ không vẽ</strong> ở chân trang:
+ⓐ <em>hai người sửa một ô</em> — cửa ghi ⛔ không phát hiện được <code>(GAP-SCR-09)</code>;
+ⓑ hai trường ⛔ <strong>không có trên lưới</strong> vì cửa <code>GET /ledger</code> ⛔ không trả chúng —
+chúng gõ ở <strong>ngăn kéo</strong>.
+<br>⇒ <strong><em>Khai ra một chỗ trống còn tốt hơn để nó trông như một chỗ đã đầy.</em></strong></div>
+</div>
+</div>
+
+<h2>§7 · <span class="mono">SCR-F06</span> Danh mục · Nguồn — ⛔ CHƯA DỰNG</h2>
+<div class="scroll">
+<table>
+<tr><th style="width:8%" class="c">US</th><th style="width:28%">Nội dung</th><th>Hậu quả của việc thiếu — đo được</th></tr>
+<tr><td class="c mono">001</td><td>Manifest nguồn — trạng thái · độ trễ · cut-off</td>
+  <td><strong>2</strong> nguồn trễ <strong>407</strong> và <strong>264 ngày</strong> vẫn nằm trong danh mục đang đo</td></tr>
+<tr><td class="c mono">018</td><td><code>Mapping Master</code> + cảnh báo <strong>mã trùng</strong></td>
+  <td><strong>75</strong> mã bị dùng lại ⇒ <strong>289</strong> dòng PM bị <code>VLOOKUP</code> bỏ <strong>im lặng</strong></td></tr>
+<tr><td class="c mono">031</td><td>Danh mục pháp nhân</td>
+  <td>Bảng <code>Tài khoản → Pháp nhân</code> nằm trong sheet tên <strong><code>Daily RP test</code></strong>
+  — ⛔ không chủ, ⛔ không ai soát</td></tr>
+<tr><td class="c mono">045</td><td>Cửa <code>/queue/reason-weekly</code></td>
+  <td>⭐ <strong>Thước của chính bạn.</strong> Bảng <code>fls_queue_reason_weekly</code>
+  <strong>đã có trong kho</strong>, cửa ⛔ chưa mở</td></tr>
+</table>
+</div>
+<p class="gr doc"><code>SCR-F05</code> <em>(một trang tuần)</em> và <code>SCR-F07</code>
+<em>(chạy · kiểm tra)</em> ⛔ <strong>không</strong> tính là thiếu — chúng đã được
+<strong>gấp vào chỗ khác có chủ ý</strong> <span class="mono">(BA-06 §2)</span>.</p>
+
+<h2>§8 · Ma trận phủ — <span class="mono">UC/US</span> vùng Hàng chờ</h2>
+<div class="scroll">
+<table>
+<tr><th style="width:11%">US</th><th style="width:28%">Nội dung</th><th style="width:7%" class="c">UC</th>
+    <th style="width:13%" class="c">Trạng thái</th><th>Ở đâu trên màn TO-BE</th></tr>
+<tr><td class="mono">US-KT-013 ★</td><td>Gõ số chứng từ vào dòng PM</td><td class="c">10</td>
+    <td class="c"><span class="b ok">ĐÃ CHẠY</span></td><td>Ngăn kéo <em>Tìm tiền</em> · nút <em>Ghép</em></td></tr>
+<tr><td class="mono">US-KT-014</td><td>Danh sách dòng còn thiếu mã</td><td class="c">10</td>
+    <td class="c"><span class="b ok">ĐÃ CHẠY</span></td><td>Rổ <strong>cần người tra</strong> — 535 dòng</td></tr>
+<tr><td class="mono">US-KT-015</td><td>⛔ Chặn TẠI CHỖ khi gõ mã đã dùng</td><td class="c">11</td>
+    <td class="c"><span class="b no">⛔ CHƯA CÓ</span></td><td>⛔ Chưa có phép chặn nào ở cửa ghép</td></tr>
+<tr><td class="mono">US-KT-016</td><td>Thấy dòng tiền chưa ghép được lệnh</td><td class="c">11</td>
+    <td class="c"><span class="b ok">ĐÃ CHẠY</span></td><td>Lằn <strong>TIỀN</strong> <span class="gr">(⛔ không phải lằn mặc định)</span></td></tr>
+<tr><td class="mono">US-KT-039 ★★</td><td>Một bảng việc · xếp theo tiền · <strong>tuổi việc</strong> · cột lý do</td><td class="c">17</td>
+    <td class="c">◐ <span class="b no">một phần</span></td><td>Bảng ✔ · xếp tiền ✔ · <strong>tuổi việc ⛔</strong> · <strong>cột lý do ⛔</strong></td></tr>
+<tr><td class="mono">US-KT-040</td><td>Hoãn có hạn · lần 3 đổi màu</td><td class="c">17</td>
+    <td class="c"><span class="b no">⛔ CHƯA CÓ</span></td><td>Có ở lằn TIỀN · ⛔ <strong>không</strong> ở lằn mặc định → <a href="#quyet">§2</a></td></tr>
+<tr><td class="mono">US-KT-045 ★</td><td>COO-CFO đo <em>có ai đọc hàng chờ ⛔ không</em></td><td class="c">19</td>
+    <td class="c"><span class="b no">⛔ CHƯA CÓ</span></td><td>Cửa <code>/queue/reason-weekly</code> ⛔ chưa tồn tại</td></tr>
+<tr><td class="mono">US-KT-046 ⭐⭐</td><td>Gỡ mối nối để ghép lại</td><td class="c">10</td>
+    <td class="c"><span class="b no">⛔ CHƯA CÓ</span></td><td>Có ở lằn TIỀN · ⛔ <strong>không</strong> ở lằn mặc định → <a href="#quyet">§2</a></td></tr>
+<tr><td class="mono">US-KT-047 ⭐⭐</td><td>Bấm «xong» · mở lại</td><td class="c">17</td>
+    <td class="c"><span class="b no">⛔ CHƯA CÓ</span></td><td>Có ở lằn TIỀN · ⛔ <strong>không</strong> ở lằn mặc định → <a href="#quyet">§2</a></td></tr>
+<tr><td class="mono">US-KT-044</td><td>⛔ Không gõ lại lần hai khi chạy song song</td><td class="c">17</td>
+    <td class="c"><span class="b ok">ĐÃ CHẠY</span></td><td>⛔ Không có pha «ghi đôi» <span class="gr">(QĐ-ITL-32)</span></td></tr>
+<tr><td class="mono">US-KT-023 · 026 · 030</td><td><code>itl_id</code> bền · <code>UNMAPPED</code> tường minh · nhật ký 7 trường</td><td class="c">17·19</td>
+    <td class="c"><span class="b ok">ĐÃ CHẠY</span></td><td><span class="mono">SCR-F02</span> — §4</td></tr>
+<tr><td class="mono">US-KT-025 · 033</td><td>Máy KÊU khi gõ khác nguồn · đảo bút toán</td><td class="c">17·21</td>
+    <td class="c"><span class="b ok">ĐÃ CHẠY</span></td><td><span class="mono">SCR-F02</span> — §4</td></tr>
+<tr><td class="mono">US-KT-048…051</td><td>Nạp cả lô · ấn định cách đọc ngày · khai cả lô · xem dãy version</td><td class="c">—</td>
+    <td class="c">◐ <span class="b no">051 ⛔</span></td><td><span class="mono">SCR-F04</span> — §5</td></tr>
+<tr><td class="mono">US-KT-017</td><td>Máy tách dòng tiền RA thành 3 nhóm</td><td class="c">12</td>
+    <td class="c"><span class="b q">KHAI TỬ</span></td>
+    <td>⛔ Theo <span class="mono">UC-KT-12</span> — <span class="mono">QĐ-ITL-131</span></td></tr>
+<tr><td class="mono" style="text-decoration:line-through">US-KT-036 · 041</td><td>Máy dán 6 nhãn «⛔ không cần lệnh chi» · xu hướng nhãn</td><td class="c">12</td>
+    <td class="c"><span class="b q">KHAI TỬ</span></td><td>27/08 · <span class="mono">QĐ-ITL-56</span> — ⛔ không có quy định nào để máy dán</td></tr>
+<tr><td class="mono">US-KT-037 ★</td><td>Máy đọc mã lệnh <strong>trong diễn giải</strong></td><td class="c">12</td>
+    <td class="c"><span class="b q">CẦN QUYẾT</span></td><td>⭐ <strong>70 hay 158 dòng</strong> — <strong>19,57 tỷ</strong> phụ thuộc</td></tr>
+<tr><td colspan="5" style="background:var(--bar);font-weight:600;font-size:12.5px">
+  ⭐ Năm <span class="mono">US</span> ĐỀ XUẤT — đã chạy, chờ bạn duyệt để ghi vào tài liệu</td></tr>
+<tr><td class="mono">US-KT-052 ⭐⭐⭐</td><td>Hỏi từ phía LỆNH CHI <span class="gr">(69 dòng thay 799 — chênh 11,6 lần)</span></td><td class="c">17</td>
+    <td class="c"><span class="b ok">ĐÃ CHẠY</span></td><td>Cả lằn — <span class="mono">QĐ-ITL-122/124</span></td></tr>
+<tr><td class="mono">US-KT-053 ⭐⭐</td><td>Chia BA RỔ theo <em>«ai trả lời được»</em></td><td class="c">17</td>
+    <td class="c"><span class="b ok">ĐÃ CHẠY</span></td><td>Băng ⓪ · <strong>1.018/1.553 = 65,6%</strong> ⛔ không phải việc ghép</td></tr>
+<tr><td class="mono">US-KT-054 ⭐⭐</td><td>Duyệt CẢ LÔ dòng tự chứng · ⛔ <strong>không</strong> duyệt lô dòng lệch tiền</td><td class="c">17</td>
+    <td class="c"><span class="b ok">ĐÃ CHẠY</span></td><td>Nút <em>Duyệt cả 47 dòng</em> · 203 dòng lệch tách riêng</td></tr>
+<tr><td class="mono">US-KT-055 ⭐⭐</td><td>Nhìn đủ 28 cột GGSheet của dòng PM</td><td class="c">10</td>
+    <td class="c"><span class="b ok">ĐÃ CHẠY</span></td><td>Lưới + ngăn kéo · <code>Email Address</code> ⛔ <strong>không bao giờ</strong> vào kho</td></tr>
+<tr><td class="mono">US-KT-056 ⭐</td><td>Sửa / map lại ngay trên lằn LỆNH CHI</td><td class="c">10</td>
+    <td class="c"><span class="b no">⛔ CHƯA CÓ</span></td><td>→ <a href="#quyet">§2</a> · chính là <span class="mono">US-046</span> trên lằn mặc định</td></tr>
+</table>
+</div>
+
+<h2>§9 · Ba câu tôi cần bạn trả lời trước khi code</h2>
+<ol class="doc">
+<li><strong>Ⓐ · Ⓑ · Ⓒ</strong> ở <a href="#quyet">§2</a> — lớp trạng thái công việc có được
+    treo vào dòng LỆNH ⛔ không. <em>Đây là câu chặn 5 story và nó đụng schema của sổ.</em></li>
+<li><strong>Năm <span class="mono">US</span> mới</strong> <span class="mono">052…056</span> —
+    duyệt để tôi ghi vào <span class="mono">BA-03</span> + <span class="mono">UC-US</span>?</li>
+<li><strong><span class="mono">US-KT-037</span></strong> — <strong>70 hay 158 dòng</strong>.
+    <strong>19,57 tỷ</strong> phụ thuộc, và nó đã treo từ <span class="mono">27/08</span>.</li>
+</ol>
+
+<div class="note acc doc"><strong>⭐⭐ Cái giữ cho trang này ⛔ không già đi:</strong>
+cổng <code>tools/kiem_thuyet_minh.py</code> quét <strong>mọi nhãn nút</strong> trong
+<code>fls/web/tep/man_*.js</code> và <strong>NO</strong> nếu một nhãn ⛔ không có dòng thuyết minh
+— ở <strong>CẢ HAI</strong> bản <em>(tệp <span class="mono">.md</span> và trang này)</em>.
+<em>(<span class="mono">31/31</span> ngày 14/09.)</em>
+<br>⭐ Nó bắt thật ngay lần chạy đầu sau khi trang này ra đời: <strong>4</strong> nhãn bị tôi viết
+<strong>rút gọn</strong> ở đây.
+<br>⚠ Cổng ấy biết một nút <strong>có</strong> được nhắc đến; nó ⛔ <strong>không</strong> biết dòng ấy
+có <strong>đúng</strong> hay ⛔ không — cùng lớp với cổng số sống canh <strong>SỐ</strong> mà ⛔ không canh <strong>CÂU</strong>.</div>
+
+<div class="note doc">
+<strong>Con số trong trang này đo ngày <span class="mono">2026-09-14</span></strong> trên kho
+<code>fls</code>: <code>fls_itl</code> = <strong>8.387</strong> dòng · mối nối = <strong>2.262</strong> ·
+hàng chờ lệnh = <strong>1.553</strong> <span class="gr">(250 · 535 · 768)</span> ·
+tự chứng = <strong>47</strong> · người gõ lý do = <strong>0</strong> · người bấm xong = <strong>0</strong>.
+</div>
+
+</div>
+</body>
+</html>

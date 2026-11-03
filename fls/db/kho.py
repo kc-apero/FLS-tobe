@@ -123,3 +123,45 @@ def tao_kho_test(dsn: str | None = None) -> tuple[str, bool]:
     with psycopg.connect(dsn, autocommit=True) as c:
         pg_migrate.ap(c)
     return dsn, vua_tao
+
+
+def dung_lai_kho_test(dsn: str | None = None) -> str:
+    """DUNG LAI kho test tu con so 0: DROP DATABASE roi tao + ap di tru.
+
+    ⛔ **Vi sao ⛔ KHONG dung DELETE hay TRUNCATE.**
+      · `DELETE` bi `INV-I03` chan (dung nhu thiet ke — so chi-THEM).
+      · `TRUNCATE` tung ⛔ KHONG bi chan, nhung tu di tru `0015` thi bi chan —
+        va do la CHU Y: mot duong xoa sach so ⛔ khong duoc ton tai.
+      ⇒ Duong hop le duy nhat la bo ca kho roi dung lai. Co tien le: owner da
+        `DROP DATABASE` + `CREATE DATABASE` kho THAT ngay 27/08, may chay tiep
+        **7/7 di tru tu kho rong**, `pg_verify` khop (`GAP-KHO-01` dong).
+
+    ⛔ Tu choi neu dsn tro vao kho THAT — cung mot chot voi `tao_kho_test`.
+
+    ★ Vi sao can: kho test **phinh khong gioi han**. Do 2026-09-07:
+      `fls_itl` **56.323** dong, trong do **43.573 (77,4%)** la rac cua chinh
+      bo test (`run_id LIKE 'NAP-2000-%'`) — tang **+22.831 dong trong 4 ngay**.
+      Hau qua ⛔ khong phai "ton dia": `GET /gates` cham toi **16,1s** trong khi
+      client cho **10s** ⇒ **5 bai DO ma ⛔ khong phai loi code** (`GAP-KHO-02`).
+      Mot bo test co 5 bai do thuong truc la mot bo test ⛔ khong con ai doc.
+    """
+    import psycopg
+
+    dsn = dsn or dsn_test()
+    ten = ten_kho(dsn)
+    if ten == TEN_THAT:
+        raise RuntimeError(f"⛔ tu choi DUNG LAI kho THAT ({ten!r})")
+
+    with psycopg.connect(dsn_quan_tri(dsn), autocommit=True) as qt:
+        # cat moi ket noi con bam vao kho — neu khong thi DROP se treo
+        qt.execute(
+            "select pg_terminate_backend(pid) from pg_stat_activity "
+            "where datname = %s and pid <> pg_backend_pid()", (ten,))
+        qt.execute(f'DROP DATABASE IF EXISTS "{ten}"')
+        qt.execute(f'CREATE DATABASE "{ten}"')
+
+    from fls.db import pg_migrate
+
+    with psycopg.connect(dsn, autocommit=True) as c:
+        pg_migrate.ap(c)
+    return dsn

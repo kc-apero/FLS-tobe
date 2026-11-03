@@ -1,6 +1,6 @@
 # Lộ trình chuyển đổi Google Sheets → màn hình mới (dần dần, không big-bang)
 
-**Version:** v0.6 | **Ngày:** 2026-09-07 | **Chủ sở hữu:** COO-CFO
+**Version:** v0.7 | **Ngày:** 2026-09-07 | **Chủ sở hữu:** COO-CFO
 **Căn cứ:** `QĐ-ITL-15` (owner chốt 2026-08-19: Google Sheets **thay bằng màn hình mới**, chuyển đổi dần) — đóng `GAP-ITL-02`
 **Nguyên tắc nền:** `P-ITL-02` strangler-fig · `P-ITL-03` oracle-first · `P-02` người vận hành nghiệm thu
 
@@ -283,8 +283,8 @@ Nghĩa là **nhật ký thay đổi là kiểm soát duy nhất còn lại**. Kh
 |---|---|---|---|
 | `GAP-ITL-22` | Ngưỡng tỷ lệ khớp ở **pha B** là bao nhiêu thì được sang pha C? (khác `GAP-ITL-07` — cái kia là ngưỡng dừng pipeline) | Kế toán trưởng | Đợt 1 pha B |
 | `GAP-ITL-23` ⛔ **MỞ LẠI MỘT NỬA** | Google Sheets còn giữ vai nhập liệu thô? | ~~**CLOSED** 2026-08-22 — **có, vĩnh viễn** cho 4 nhóm ở §0b~~ ⇒ ⛔⛔ **`QĐ-ITL-90` (2026-09-07) lật 2/4 nhóm**: *nạp sao kê* + *nhập số dư* về FLS *(`F04`/`F05`)*; *lệnh chi* + *danh mục* ở lại. ⛔ **Còn mở:** tầng sao kê **thô 60+ định dạng** ⛔ chưa ai quyết ⇒ `GAP-SCOPE-01` | `CR#10` |
-| **`GAP-SCOPE-02`** ⛔⛔ | **Gõ vào FLS rồi thì P100 còn được ghi nữa không?** *Không* ⇒ P100 mất một nguồn đang chảy. *Có* ⇒ đó là **ghi đôi**, thứ `QĐ-ITL-32` đã bỏ | COO-CFO + Kế toán | ⛔ **chặn việc code `F04`/`F05`** |
-| **`GAP-SCR-10`** ⛔ | `F04`/`F05` ⛔ **chưa có `SCREEN_SPEC`** — `BA-06` mới có `F01`·`F02`·`F03`·`F06`. ⛔ Không bịa *(`R-A1`)* | BA | ⛔ chặn `F04`/`F05` |
+| ~~`GAP-SCOPE-02`~~ ✅ | ⭐ **ĐÓNG 2026-09-07 *(`QĐ-ITL-100`)*** — owner chốt **FLS thay CÚ ĐẨY `P100` → `A-CCR`**, ⛔ không thay `P100`. ⇒ ⛔ **không ghi đôi**: kế toán vẫn dán sao kê vào `P100`, FLS chỉ thế chỗ khâu chép tay **đang trễ 19 ngày / 377 dòng** | ✅ COO-CFO + Kế toán | ⛔ **chặn việc code `F04`/`F05`** |
+| **`GAP-SCR-10`** ◐ | ⭐ **NỬA ĐÓNG 2026-09-07 (`CR#11`)** — `SCR-F04` **đã có đặc tả** *(`BA-06` §7, 5 trạng thái + biên bản soát 8 luật)*, và nó ⛔ **không bịa**: hình dạng lấy từ **bản khai dòng 1** kế toán đã tự duy trì *(**68/68** sheet)* + **3 quyết định owner** *(`QĐ-ITL-105`)*. ⛔ **Còn `F05` (sổ quỹ) chưa có.** ⚠ ⛔ Không đóng hẳn GAP này chỉ vì một nửa đã xong — đó là **nói quá** | BA | ⛔ chỉ chặn `F05` |
 | ~~`GAP-ITL-24`~~ | ~~Ai xem nhật ký thay đổi?~~ | **ĐÓNG THEO CÁCH KHÁC** 2026-08-22 — **không có ai**, và sẽ không có. Nhật ký giữ lại **không để ai soi** mà để (1) chính người làm tra lại sau, (2) **việc sống sót khi người rời đi**. Kiểm soát chuyển sang **máy** (`QĐ-ITL-27`) | — |
 | `GAP-ITL-35` ⭐ | **Không chặn + không chuông ⇒ việc đọc bảng việc dựa hoàn toàn vào thói quen.** Phải **đo chính việc đó**: 4 tuần không ai gõ cột lý do = cổng đã chết | COO-CFO | chặng 1 |
 | ~~`GAP-ITL-36`~~ | ~~Bản copy file `ITL ADJUSTED`~~ | ⛔ **ĐÓNG 2026-08-22 — bản copy KHÔNG giải được** (cột `Final` là `#REF!`; cột `P` lẫn `#REF!` với giá-trị-cũ = bẫy đo) | — |
@@ -292,6 +292,7 @@ Nghĩa là **nhật ký thay đổi là kiểm soát duy nhất còn lại**. Kh
 | `GAP-ITL-18` | Ranh giới ITL ↔ engine ACA v2 ở tầng phân bổ | COO-CFO + Tech Lead | **Đợt 4** |
 
 ## Changelog
+- **v0.7** *(2026-09-07, đồng bộ tiến độ)*: ⭐ **`GAP-SCOPE-02` ĐÓNG** *(`QĐ-ITL-100`)* — cùng lớp lệch đã ghi ở `BA-01` v0.7: **hai file trục nói ngược nhau về một quyết định owner đã ra**, và ⛔ **⛔ không cổng nào bắt được** *(cổng số sống so **số**, đây là **trạng thái**)*. ⇒ Mở `GAP-DOC-08`: **trạng thái GAP phải có một chỗ SSOT** thay vì chép ở 4 file.
 - **v0.6** *(2026-09-07, rà AS-IS)*: ⛔ **Sửa hai chỗ của v0.5 vừa viết cùng ngày** — dòng `S4` §3 và dòng *Nạp sao kê* §0b đều ghi phạm vi `F04` là *“chỉ tầng đã gộp”*. **Ngược.** Tầng gõ vào là **67 sheet `R |`** *(16.625 dòng)*; `Bank Transactions` **7.715 dòng** là **đầu ra `OP-09`**. ⭐ *“60+ định dạng”* = 60+ **tài khoản**, ⛔ không phải 60+ **lược đồ**. ⛔ Chặn thật đổi từ `GAP-SCOPE-01` sang **`GAP-ASIS-01`**: `_GUIDE_08` ⛔ **không tồn tại**.
 - **v0.5** *(2026-09-07, `QĐ-ITL-90` / `CR#10`)*: ⭐⭐⭐ **Owner đưa hai màn NHẬP vào FLS** — `F04` `Bank Transaction` + `F05` `Cash Ledger`, *"như trên ggsheet"*. ⛔⛔ **Nó lật một nửa bảng *Ở lại Google Sheets* của §0b** *(2/4 nhóm)*, **hẹp luật `T4`**, và **hồi sinh màn `S4`** đã bị BỎI 22/08 — ⛔ bảng cũ **giữ nguyên làm biên bản**, ⛔ không xoá. §7 **4 màn → 6 màn**. ⚠ **Từ *"vĩnh viễn"* trong câu chốt `GAP-ITL-23` sống được **16 ngày*** — ghi lại để lần sau đừng dán nhãn *vĩnh viễn* cho một ranh giới ⛔ chưa ai thử đẩy. ⛔ **Ba GAP mở, chưa ai trả lời:** `GAP-SCOPE-01` · `GAP-SCOPE-02` · `GAP-SCR-10`
 - **v0.4** (2026-08-24): **`QĐ-ITL-34` — owner đặt giới hạn: KHÔNG đụng vào sheet hiện có, KHÔNG động vào file của kế toán.** Hai hệ quả ghi vào §00: ⑴ **chặng máng không làm sổ cũ nhanh hơn** — tốc độ chỉ hiện trên **sheet gương do máy sở hữu**; ba việc rẻ nhất ⇒ ⏸ chờ uỷ quyền · ⑵ **pha D (CẮT) cần uỷ quyền riêng từng khối**, vì cắt = sửa file kế toán; pha A/B/C không vướng.

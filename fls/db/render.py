@@ -36,6 +36,13 @@ def _render_rang_buoc(t: Table) -> list[str]:
         ra.append(f"CONSTRAINT {t.name}_pk PRIMARY KEY ({', '.join(t.pk_cols)})")
     for k in t.unique_keys:
         ra.append(f"CONSTRAINT {t.name}_{'_'.join(k)}_uq UNIQUE ({', '.join(k)})")
+    # ⭐ `CHECK` khai o muc COT nhung SINH ra o muc BANG, **co ten** — de
+    #   `pg_verify` doi chieu duoc theo ten. Mot `CHECK` noi dong khuyet danh
+    #   thi Postgres tu dat ten (`fls_x_check`, `fls_x_check1`, …) va cong ⛔
+    #   khong con cach nao noi *"rang buoc NAY khai ma chua ap"*.
+    for c in t.columns:
+        if c.check:
+            ra.append(f"CONSTRAINT {t.name}_{c.name}_ck CHECK ({c.check})")
     return ra
 
 

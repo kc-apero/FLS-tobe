@@ -462,3 +462,663 @@ section.screen.on{display:block}
 /* ── ⚠ thanh CANH BAO GIA LAP — chi hien khi man dang chay so GIA ────── */
 .gia-lap{background:var(--crit-bg);border-bottom:2px solid var(--crit);
          color:var(--crit-ink);padding:9px 20px;font:700 12.5px/1.4 var(--sans)}
+
+/* ⓪ VIỆC CỦA BẠN HÔM NAY — `BA-12`, sau phản hồi owner 11/09:
+   *"tôi ⛔ không hiểu ý nghĩa của những bảng thông tin này"*.
+   ⛔ Ba dòng, mỗi dòng MỘT việc và MỘT nút. ⛔ Không cột, ⛔ không bảng —
+   một bảng mời người đọc so sánh các ô, mà ở đây ⛔ không có gì để so. */
+.viec{display:flex;align-items:center;gap:12px;padding:10px 12px;
+      border-bottom:1px solid var(--line)}
+.viec:last-child{border-bottom:0}
+.viec .chip{flex:0 0 auto;min-width:92px;justify-content:center;
+            font-variant-numeric:tabular-nums}
+.viec-ten{flex:1 1 auto;min-width:0}
+.viec button{flex:0 0 auto}
+
+/* Khối SỐ LIỆU KIỂM CHỨNG — vẫn còn, nhưng gấp lại. ⛔ Không xoá: cổng của
+   dự án là ⛔ không giấu con số. */
+.gop{margin:12px 0;border:1px solid var(--line);border-radius:8px;
+     background:var(--surface)}
+.gop>summary{cursor:pointer;padding:9px 12px;color:var(--muted);
+             font-size:12.5px;user-select:none}
+.gop>summary::marker{color:var(--faint)}
+.gop[open]>summary{border-bottom:1px solid var(--line)}
+
+/* Bảng PM "nhìn đủ" — `BA-12`, owner 11/09. 28 cột, ưu tiên 6 cột dùng để
+   NHẬN RA khoản tiền lên trên. */
+.pm-du{width:100%;border-collapse:collapse;font-size:12.5px;margin:4px 0}
+.pm-du th{text-align:left;width:38%;padding:4px 8px;color:var(--muted);
+          font-weight:500;vertical-align:top;border-bottom:1px solid var(--line)}
+.pm-du td{padding:4px 8px;border-bottom:1px solid var(--line);
+          word-break:break-word}
+.pm-du tr.pm-ngan th{color:var(--faint);text-align:center;padding-top:10px;
+                     font-size:11.5px}
+
+/* Cột lấy từ hàng thô GGSheet — `BA-12`. Cắt bề ngang để lưới ⛔ không nổ,
+   nhưng ⛔ KHÔNG cắt nội dung: `title` giữ nguyên văn. */
+.o-tho{display:inline-block;max-width:230px;overflow:hidden;
+       text-overflow:ellipsis;white-space:nowrap;vertical-align:bottom}
+
+/* Cuộn NGANG cho lưới nhiều cột. ⛔ Thanh cuộn thuộc về BẢNG, ⛔ không phải
+   trang — nếu không thì bật "đủ 28 cột" sẽ làm cả màn trôi ngang. */
+.ngang{overflow-x:auto;max-width:100%}
+
+/* ══ G5 · LAYOUT lưới ghép lệnh chi ═══════════════════════════════════════
+   Bốn khuyết tật `BA-12 §4`, và mỗi cái sửa ở đây đều có một con số đo được
+   đứng sau — ⛔ không cái nào là sở thích.                                  */
+
+/* ① Hai cột ghim hẹp hơn `F02`. ⛔ ĐỪNG sửa `tokens.css`: `346px` ở đó là
+   con số **đã đo ở mũi thử** cho lưới `F02`. Ở màn này `#` chỉ chở một số
+   hạng + phần trăm, và `Số chứng từ` dài nhất **33** ký tự (p95 = **20**). */
+table.g.lenh{--khoa-1:88px;--khoa-2:212px}
+
+/* ② `CODE | Tên dài` ⇒ chỉ CODE. Đo: `hd` **31** mã ↔ **31** tên, `cdt1`
+   **9** ↔ **9** — song ánh, nên mã ⛔ không mất một thông tin nào; tên đầy
+   đủ nằm ở `title`. Cột từ **55** ký tự còn **4**.                        */
+.ma-goi{display:inline-block;font:600 11px/1 var(--mono);
+        color:var(--muted);background:var(--alt);
+        border:1px solid var(--line);border-radius:var(--bo-nho);
+        padding:3px 6px;cursor:help}
+tbody tr:hover .ma-goi{color:var(--ink);border-color:var(--faint)}
+
+/* ③ Cột VIỆC ghim bên PHẢI. Với 28 cột bật lên, nút hành động trôi ra khỏi
+   tầm nhìn và kế toán phải cuộn hết chiều ngang **rồi cuộn ngược lại** cho
+   mỗi dòng. Ghim nó là giữ đúng thứ duy nhất người ta tới đây để bấm.     */
+table.g.lenh td.lam,table.g.lenh th:last-child{
+  position:sticky;right:0;z-index:3;background:var(--alt);
+  border-left:2px solid var(--line);text-align:right}
+table.g.lenh th:last-child{z-index:4}
+tbody tr:hover td.lam{background:var(--row-hover)}
+
+/* ══ ⭐⭐⭐ MAN GAN LENH CHI (`SCR-F01`) — `B3`, 22/09 ══════════════════════
+   Hop dong hinh dang: `Artifacts/Thiet-ke-Man-Gan-Lenh-Chi.md` §4-§6
+   ＋ `BA-06 §4.5`. Moi con so o duoi deu tro ve mot muc cua hop dong ay hoac
+   mot phep do — ⛔ khong cai nao la so thich.
+
+   ⛔⛔ **Mot dieu cua hop dong ⛔ KHONG duoc lam o day**: *"khung ung dung cao
+      bang man hinh, trang ⛔ khong cuon"*. Vo `index.html` la mot trang CUON
+      va **bon man khac** dang song trong no; doi kieu cuon la doi ca bon man
+      trong mot cu — mot quyet dinh rieng, ⛔ khong phai mot dong CSS. ⇒ O day
+      dung dung khuon `F02` **da chung minh**: rail `sticky` tu cuon, phan con
+      lai cuon theo trang. Khoang no ghi o `GAP-SCR-24`.                    */
+
+/* ── dai tim + dai loc ────────────────────────────────────────────────── */
+.dai-tim{padding:0 0 10px}
+.dai-tim input{width:100%;max-width:420px;font:400 var(--fs-than)/1.3 var(--sans);
+  border:1px solid var(--line);border-radius:var(--bo);padding:7px 10px;
+  background:var(--surface);color:var(--ink)}
+.dai-tim input:focus{outline:0;border-color:var(--accent);
+  box-shadow:0 0 0 3px var(--focus-ring)}
+
+.dai-loc{display:flex;flex-wrap:wrap;gap:6px;align-items:center;
+  padding:0 0 12px}
+.chip-loc{font:600 var(--fs-than)/1 var(--sans);border-radius:var(--bo-tron);
+  border:1px solid var(--line);background:var(--surface);color:var(--muted);
+  padding:6px 13px;cursor:pointer}
+.chip-loc:hover{border-color:var(--accent);color:var(--accent)}
+.chip-loc[aria-pressed=true]{background:var(--accent);border-color:var(--accent);
+  color:var(--on-ink)}
+/* ⭐ Chip ⛔ CHUA co cua: vien **dut** — cung dau hieu thi giac voi `td.na`
+   (*"may da cham vao va ⛔ khong co ket qua"*), ⛔ khong phai mau bao dong. */
+.chip-loc.chua_cua{border-style:dashed;color:var(--faint)}
+.dai-loc .dem{font:500 var(--fs-phu)/1 var(--mono);color:var(--muted);margin-left:4px}
+
+/* ── than: rail ＋ ban lam viec ───────────────────────────────────────── */
+/* ⭐ `--rail-w` la `clamp(300px,26vw,380px)`; `minmax(0,1fr)` chu ⛔ KHONG `1fr`
+   — cung cai bay da vap o `.f02-wrap`: voi `1fr`, bang ben trong keu to hon
+   o luoi cho phep va **day rail ra khoi man**. */
+/* ⭐ Tay keo ghi de `--rail-w` **tren chinh
+   `.than`**, nen mot lan `ve()` dung lai cay DOM van giu duoc be rong
+   (gia tri song trong `ST.rail_w`, ⛔ khong trong DOM). */
+.than{display:grid;
+  grid-template-columns:var(--rail-w) 7px minmax(0,1fr);
+  gap:0 7px;align-items:start}
+/* ⭐⭐ Owner `2.3`. Noi dung lenh chi dai ngan **rat khac nhau** giua cac
+   ro; mot be rong cham chet dung cho ro nay se cat cut ro kia.
+   ⛔ `separator` ＋ `tabindex` — ⛔ khong thi nguoi dung ban phim
+     ⛔ khong biet no ton tai. */
+.keo{align-self:stretch;min-height:120px;position:sticky;top:12px;
+  height:calc(100vh - 24px);
+  cursor:col-resize;border-radius:var(--bo-nho);
+  background:transparent;border:0;padding:0;
+  display:flex;align-items:center;justify-content:center}
+.keo::before{content:'';width:3px;height:36px;border-radius:2px;
+  background:var(--line)}
+.keo:hover::before,.keo.dang-keo::before{background:var(--accent);
+  height:72px}
+.keo:focus-visible{outline:2px solid var(--accent);outline-offset:-1px}
+/* ⚠ Dang keo: khoa boi chu toan trang — ⛔ khong thi mot cu keo nhanh se
+   **boi den** ca bang ben canh. */
+body.dang-keo{user-select:none;cursor:col-resize}
+@media (max-width:1000px){.keo{display:none}}
+
+.rail{position:sticky;top:12px;align-self:start;
+  max-height:calc(100vh - 24px);overflow:auto;
+  border:1px solid var(--line);border-radius:var(--bo-the);
+  background:var(--surface);box-shadow:var(--shadow-card)}
+
+/* ── `C1` dong so (`.mrow`) — trang thai doc bang **vach trai 3px** ────── */
+/* ⭐ `3px` + mot chip, ⛔ KHONG mot nen mau: do that **76,6%** dong dang o
+   `UNMAPPED` ⇒ to nen cho *"chua gan"* lam man **luc nao cung dang keu**, va
+   khi co chuyen THAT thi ⛔ khong con nac nao cao hon de dung. */
+/* ⛔⛔ `.mrow` nay gio **CHI** dung o BANG SO — rail da doi sang `.rrow`
+   *(ba dong, dung ban dung)*. Giu ca hai khuon cho cung mot y *"mot dong
+   danh sach"* la giu **hai ban su that**, va chung se lech. */
+
+/* ⭐ Noi dung **⛔ khong bao gio** bi day ra ngoai: no chiem ca hai cot o
+   hang thu hai, va cat bang `ellipsis` chu ⛔ khong xuong dong tran lan. */
+
+/* ⭐ Con tro **BAN PHIM** phai khac con tro **CHUOT** va khac ca dong dang mo
+   — ba thu, ba hinh (`NFR-I26`). */
+
+/* ── ban lam viec ─────────────────────────────────────────────────────── */
+/* ⭐⭐ `container-type` — bang ung vien do theo **be rong cua `.work`**,
+   ⛔ KHONG theo viewport: rail an cho **truoc**, nen mot `@media` se bo bot
+   cot khi man con rong va giu cot khi man da chat. Do la ly do hop dong noi
+   *"do theo `@container` cua `.work`"*. */
+/* ⭐⭐ Owner `2`: *"khi scroll, khu vuc thong tin PM co dinh, chi scroll
+   danh sach transaction"*. Rail **da** lam dung the nay tu truoc
+   (`sticky` ＋ cuon rieng); ban lam viec thi ⛔ chua — nen cuon xuong
+   dong thu `40` la the PM **bien mat**, va nguoi ta ⛔ khong con biet
+   minh dang ghep cho lenh nao.
+   ⭐ Cung khuon voi `.rail` — ⛔ khong bia mot cach thu hai cho cung
+     mot y *"dinh lai va tu cuon"*. */
+.work{container-type:inline-size;container-name:work;min-width:0;
+  position:sticky;top:12px;max-height:calc(100vh - 24px);
+  display:flex;flex-direction:column;gap:12px}
+.work p.trong{padding:26px 18px;text-align:center;color:var(--muted);
+  border:1px dashed var(--line);border-radius:var(--bo-the);
+  background:var(--surface);font-size:var(--fs-than)}
+
+/* ── `C2` the lenh chi (`.wh`) — **11** truong ─────────────────────────── */
+/* ⭐ `flex:none` — the PM giu nguyen chieu cao that cua no; chi danh sach
+   giao dich duoc co lai. ⭐ `position:relative` la **moc neo** cho lop
+   phu *"Xem du truong"*. */
+.wh{flex:none;position:relative;
+  border:1px solid var(--line);border-radius:var(--bo-the);
+  background:var(--surface);box-shadow:var(--shadow-card);padding:12px 14px}
+.wh1{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:baseline}
+.wh1 .id{font:700 var(--fs-manh)/1.2 var(--mono)}
+.wh1 .pt{background:var(--alt);color:var(--muted);border-color:var(--line)}
+/* ⭐ **Noi dung** la thu duy nhat ke toan doc de nhan ra khoan chi ⇒ no an
+   het cho thua cua dong dau, va so tien bi day ve cuoi. */
+.wh1 .nd{flex:1 1 220px;min-width:0;font-size:var(--fs-than);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wh1 .tien{font:700 var(--fs-to)/1.1 var(--mono);font-variant-numeric:tabular-nums;
+  white-space:nowrap}
+
+.wh2{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));
+  gap:8px 14px;margin-top:11px;padding-top:11px;
+  border-top:1px solid var(--hair)}
+.fact{min-width:0}
+.fact .l{display:block;font:500 var(--fs-nhan)/1.4 var(--sans);letter-spacing:.04em;
+  color:var(--muted)}
+.fact .v{font:400 var(--fs-than)/1.4 var(--sans);color:var(--ink);
+  overflow-wrap:anywhere}
+/* ⭐⭐ Truong VANG: **nghieng ＋ mo**, cung mot hinh voi `.pb-rong` da co.
+   ⛔ Hai hinh cho cung mot nghia la hai ban su that. */
+.fact .v.vang,.more dd.vang{color:var(--faint);font-style:italic}
+
+/* ── khoi "Xem du truong" ─────────────────────────────────────────────── */
+.wh>button.b.wide{margin-top:11px;width:100%;text-align:left;
+  color:var(--muted);background:var(--alt)}
+/* ⛔⛔ Ban `22/09` xep **doc**: `h4` roi `dl`, roi `h4` roi `dl`… ⇒ bam
+   *"Xem du truong"* la day toan bo phan duoi man xuong gan **mot man
+   hinh**, va nguoi ta mat dau vet cho minh dang lam.
+   ⭐ Ban dung: `repeat(auto-fit,minmax(…))` — moi nhom la mot **khoi
+     rieng**, xep canh nhau, so cot tu do theo be rong THAT cua ban lam
+     viec (rail da an mat mot phan roi, nen mot so cot cung se vo). */
+/* ⭐⭐⭐ Owner `1`: khoi nay **chiem het man** ⇒ ⛔ khong con nhin thay
+   danh sach giao dich. Ma no phuc vu **NIEM TIN VAO DU LIEU**
+   (`QĐ-ITL-144 ⓐ`), ⛔ **khong** phuc vu viec ghep.
+   ⇒ Mot phep **TRA CUU** ⛔ khong duoc doi cho voi cong viec chinh: no
+     **NOI LEN TREN**, va dong lai la moi thu ve dung cho cu — ⛔ khong
+     mot pixel nao dich. So voi mot hop cuon trong the, cach nay ⛔ khong
+     an mot chut chieu cao nao cua danh sach.
+   ⛔ `max-height` ＋ `overflow:auto`: mot the `27` truong se chay **qua
+     day man hinh**, va phan cuoi ⛔ khong ai voi toi duoc. */
+.more{position:absolute;z-index:20;left:0;right:0;top:calc(100% - 6px);
+  max-height:min(62vh,440px);overflow:auto;
+  padding:12px 14px 14px;
+  background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--bo-the);box-shadow:var(--shadow-drawer)}
+/* ⭐ Nut dong — `Esc` la duong ra cua nguoi **biet** no ton tai. */
+.more .dong{position:sticky;top:-12px;float:right;margin:-4px -4px 0 8px;
+  z-index:1;
+  width:24px;height:24px;display:flex;align-items:center;
+  justify-content:center;cursor:pointer;
+  border:1px solid var(--line);border-radius:var(--bo-tron);
+  background:var(--surface);color:var(--muted);
+  font:500 var(--fs-than)/1 var(--sans)}
+.more .dong:hover{border-color:var(--accent);color:var(--accent)}
+.more .dong:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.more .cols{display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(248px,1fr));
+  gap:4px 18px;align-items:start}
+/* ⛔ `break-inside` ⛔ KHONG du: tieu de va bang cua no phai nam trong
+   **cung mot khoi con**, ⛔ khong chi "gan nhau" — neu roi nhau thi
+   `auto-fit` tach ten nhom sang cot nay, gia tri sang cot kia. */
+.more .cols>div{min-width:0}
+.more h4{font:600 var(--fs-nhan)/1 var(--sans);letter-spacing:.09em;
+  color:var(--muted);text-transform:uppercase;margin:12px 0 6px}
+.more .cols>div:first-child h4{margin-top:0}
+.more .kv{display:grid;grid-template-columns:minmax(104px,40%) 1fr;
+  gap:0;margin:0;font-size:var(--fs-than)}
+.more dt{padding:5px 9px;color:var(--muted);background:var(--label-bg);
+  border-bottom:1px solid var(--hair)}
+.more dd{padding:5px 9px;margin:0;font-family:var(--sans);
+  font-variant-numeric:tabular-nums;
+  border-bottom:1px solid var(--hair);overflow-wrap:anywhere}
+
+/* ── chu giai bac (`.tlegend`) — `WO-032` vong 2 `(j)`, `BA-06` v4.15 §4.5 ⓒ ① ──
+   ⭐ Lop lay tu ban dung da duyet `fls-gan-lenh-chi_10.html:287` — ngoai le
+     **co ten** cua `TL-033 ⓑ` cho dong *"⛔ lop CSS moi"*. Chi token co san
+     *(`--fs-nhan` thay `10.5px` go tay cua ban dung — cung gia tri)*.
+   ⛔ `nowrap` o **tung muc**, ⛔ o ca dong: khung hep thi dong **gay giua hai
+     muc**, ⛔ bi cat — mot chu giai bi cat la mot chu giai **noi thieu im
+     lang** dung o bac cuoi *(`≠`, bac moi nhat)*. */
+/* ⭐ `WO-037` *(`KQ-036 F-4`, `BA-06` v4.16 · `BA-08` `NFR-I29`)*: chu NGHIA
+   ⇒ `--muted` **4,92 : 1** tren `--page`. ⛔ Truoc `--faint` **2,17 : 1** *(do
+   bang may 8088 + 8099, 5 / 5 muc)* — chu giai la loi doc nghia bac **⛔ can
+   chuot** duy nhat, ma no mo nhat dung o phan CHU. */
+.tlegend{font-size:var(--fs-nhan);color:var(--muted)}
+.tlegend>span{white-space:nowrap}
+.tlegend b{font-family:var(--mono);color:var(--muted);font-weight:600}
+
+/* ── `C3` dong ung vien (`.cand`) — cao **36px**, vach trai **3px** ────── */
+/* ⛔⛔ `min-height:0` la dong QUAN TRONG NHAT o day. Mot muc flex mac
+   dinh **⛔ khong co nho hon noi dung cua no** (`min-height:auto`), nen
+   thieu dong ay thi `overflow:auto` **⛔ khong bao gio kich hoat**: hop
+   cu phinh ra bang `50` dong, `.work` tran khoi `max-height`, va ca
+   trang lai cuon — tuc ⛔ khong sua duoc gi. */
+.cands{flex:1 1 auto;min-height:0;overflow:auto;
+  border:1px solid var(--line);border-radius:var(--bo-the);
+  background:var(--surface);box-shadow:var(--shadow-card)}
+/* ⭐⭐ MOT ban khai luoi, hai noi doc: hang tieu de ＋ tung dong. Neu
+   tieu de khai luoi rieng, hai ban su that ve *"bang nay co may cot"*
+   se lech — va khi lech thi **moi nhan doc sang cot ben canh**, mot loi
+   doc rat thuyet phuc vi no ⛔ khong trong nhu mot loi. */
+/* ⛔⛔⛔ Vet cuoi tung la `auto` — va do la **goc that su** cua *"cac cot
+   ⛔ khong thang hang"* (owner `23/09`).
+   `.chead` va **moi** `.cand` la nhung **luoi RIENG BIET**. Mot vet
+   `auto` tinh theo noi dung cua **chinh luoi ay** ⇒ dong `2.037 USD Co`
+   ra mot be rong, dong `19 USD Co` ra be rong khac, phan du don nguoc
+   vao `1fr` ⇒ **moi dong lech mot chut**. Mot ban khai, `14` ket qua.
+   ⭐ Chua duy nhat: **moi vet phai tien doan duoc** — mot con so co dinh
+     hoac mot phan `fr`. Luc ay `14` luoi rieng cho ra `14` ket qua y
+     het nhau, va do chinh la dinh nghia cua *"thang hang"*. */
+/* ⭐⭐⭐ Be rong o day den tu **SO DO**, ⛔ khong tu mot con so *"trong
+   cho vua"*. Do `23/09` tren cua that (`200` ung vien mot lenh ＋
+   `1.761` ung vien cua `30` lenh), tinh bang **so ky tu**:
+     `doc_no`     p50 **12** · max **36** *(co ca UUID)*
+     `nguon` ghep p50 **19** · max **25**  `Airwallex · ••2651 · HGO2`
+     `so tien`    p50  **7** · max **17**  `1.150.000.000 VND`
+   Mot ky tu `--mono` o `--fs-than` ~ `7.5px` ⇒ `Nguon` can `~188px`,
+   `So tien` can `~128px` ＋ o `No/Co`.
+   ⛔⛔ Vong truoc toi co dinh be rong **de cot thang hang** va ⛔ **khong
+      do thu phai nam vua trong do** ⇒ `SUPE…` · `15.000.000…`. Thang
+      hang ma ⛔ khong doc duoc thi chi la doi mot loi lay mot loi. */
+.cand-cols{display:grid;
+  grid-template-columns:16px 22px 132px minmax(180px,1fr) 88px 196px 160px;
+  align-items:center;gap:0 10px}
+/* ⭐ Ten cot — sau cot truoc `23/09` ⛔ khong mot cai ten nao. `CT88210`
+   la so chung tu hay ma gi? `OCBC · ••4001 · SGO2` la cai gi? Ke toan
+   **doan** — va doan thi co luc doan sai. */
+.cands .chead{position:sticky;top:0;z-index:2;background:var(--alt);
+  color:var(--muted);font:600 var(--fs-nhan)/1 var(--sans);
+  letter-spacing:.05em;text-transform:uppercase;
+  padding:7px 11px;border-bottom:1px solid var(--line)}
+/* Mep phai cua tieu de phai trung mep phai cua **CON SO**, khong phai
+   mep o: o `.amt` co `18px` cho `No/Co` va `5px` khe => lui `23px`. */
+.cands .chead .r{text-align:right;padding-right:23px}
+.cands .chead .tg{text-align:center}
+.cand{
+  width:100%;height:var(--row-ghep);text-align:left;cursor:pointer;
+  border:0;border-left:3px solid transparent;
+  border-bottom:1px solid var(--hair);
+  background:var(--surface);color:var(--ink);padding:0 11px;
+  font:400 var(--fs-than)/1.2 var(--sans)}
+.cand:last-child{border-bottom:0}
+.cand:hover{background:var(--row-hover)}
+.cand:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+/* ⭐ Bac ⇒ **vach trai** ＋ mau cua ky hieu `①②③④`. Bac ④ (`149/226` ung vien)
+   co y **⛔ KHONG mau** — to no len la nhuom het man. */
+.cand.good{border-left-color:var(--good)} .cand.good .tg{color:var(--good)}
+.cand.info{border-left-color:var(--info)} .cand.info .tg{color:var(--info)}
+/* ⭐⭐ Bac ③ *(gan dung tien)* = **de xuat**: vien **dut** ＋ nen `warn` nhat.
+   Hop dong `§6.3`: *"de xuat ≠ da gan"* phai doc duoc bang **hinh**. */
+.cand.warn{border-left-color:var(--warn);border-left-style:dashed;
+  background:var(--warn-bg)} .cand.warn .tg{color:var(--warn)}
+.cand.chon{background:var(--alt);border-left-color:var(--accent);
+  border-left-style:solid;box-shadow:inset 0 0 0 1px var(--accent)}
+
+.cand .rad{width:11px;height:11px;border-radius:var(--bo-tron);
+  border:1px solid var(--faint);display:inline-block}
+.cand.chon .rad{border-color:var(--accent);
+  box-shadow:inset 0 0 0 3px var(--accent)}
+/* ⭐ `WO-037` *(`KQ-036 F-4`, `NFR-I29` — ky hieu mot ky tu co chu giai cung
+   man ≥ `3 : 1`)*: mau GOC *(bac ⛔ tong: ④ · `≠` "cua ghi se tu choi")* ⇒
+   `--muted` **5,59 : 1** tren `--surface`. ⛔ Truoc `--faint` **2,47 : 1**.
+   Tong `good`/`info`/`warn` cua ①②③ ⛔ doi *(`.cand.good .tg` … phia tren).* */
+.cand .tg{font-size:var(--fs-manh);text-align:center;color:var(--muted);cursor:help}
+.cand .ct,.cand .ngay,.cand .nguon{color:var(--muted);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* ⭐⭐ Owner `23/09`: *"ke toan can nhin ro… cac thong tin trong cot
+   nguon"*. `bank · tk · le` la **ba manh cua MOT cau tra loi** — *"dong
+   tien nay tu dau"*; cat mat mot manh thi hai manh con lai ⛔ khong con
+   tra loi duoc gi. Nen no dam hon mot bac so voi `ngay`/`so CT`. */
+.cand .nguon{color:var(--ink)}
+/* ⭐⭐⭐ **Dien giai** — cot ⛔ KHONG BAO GIO bi hy sinh: no la bang chung duy
+   nhat cua **49%** cuon so. Cat mot dong ＋ `title` doc nguyen van. */
+.cand .dg{min-width:0;color:var(--ink);overflow:hidden}
+/* ⭐ `null` mang HAI nghia, va chung phai trong **khac nhau**:
+     `.chua_doc` = FLS ⛔ chua noi duoc — mot **thieu sot cua may**;
+     `.trong`    = giao dich that su ⛔ khong co noi dung. */
+.cand .dg.chua_doc{color:var(--warn);font-style:italic}
+.cand .dg.trong{color:var(--faint);font-style:italic}
+/* ⛔⛔ `flex` ＋ `justify-content:flex-end` can theo **chu `Co`** ⇒ cac
+   CON SO le tung bac: `2.037 USD Co` / `106 USD Co` / `19 USD Co`. Ma
+   con so moi la thu nguoi ta so.
+   ⭐ Ba o **co dinh**: `Δ` ｜ so ｜ `No/Co`. O `Δ` giu cho ca khi
+     ⛔ khong co Δ — neu no co lai thi con so se **nhay sang trai** o
+     dung nhung dong co lech, tuc lai le lan nua. */
+/* ⭐⭐⭐ O `Δ` **da bo** — xem khoi chu thich o `ve_ung_vien`. No tung
+   giu `34px` tren **moi** dong cho mot thu la **ham cua bac**, va lay
+   dung cua cot con so ma ke toan phai doc. */
+.cand .amt{display:grid;grid-template-columns:minmax(0,1fr) 18px;
+  align-items:baseline;gap:0 5px;
+  font-family:var(--mono);font-variant-numeric:tabular-nums;
+  white-space:nowrap}
+.cand .amt>span{grid-column:1;text-align:right;
+  overflow:hidden;text-overflow:ellipsis}
+.cand .amt .chieu{grid-column:2;justify-self:start;
+  font:500 var(--fs-nhan)/1 var(--sans);color:var(--muted)}
+/* ⭐ Do lech = mot **vien** nen `warn`, ⛔ khong mot chu do: no la mot con so
+   can doc, ⛔ khong phai mot bao dong. */
+.cand .amt .lech{grid-column:1;justify-self:start;
+  font:600 var(--fs-nhan)/1 var(--mono);color:var(--warn);
+  background:var(--warn-bg);border:1px solid var(--warn-line);
+  border-radius:var(--bo-nho);padding:1px 4px;
+  overflow:hidden;text-overflow:ellipsis;max-width:100%}
+
+/* ══ ⭐⭐⭐ HAI VIEW cua `SCR-F01` — dung hop dong `§4` ═══════════════════
+   *"Chua mo lenh nao: mot BANG SO day du chiem toan bo be ngang. Da mo:
+   bang thu ve rail, phan con lai la ban lam viec."*
+
+   ⛔⛔ Man `21/09`→`22/09` **chi co MOT view** — luon la rail ＋ ban lam viec,
+      ke ca khi ⛔ chua chon gi. Tuc luc mo man, **~70% be ngang** la mot cau
+      *"Chon mot lenh chi ben trai"*, con danh sach bi nen vao mot cot `380px`
+      **⛔ khong du cho** cho `Ngay`·`Loai`·`CDT`·`So CT`.
+   ⭐ Bang cho nguoi **QUET** ca tram dong; rail cho nguoi **dang lam mot
+     dong**. Hai viec khac nhau ⇒ hai hinh.                                */
+
+/* ⭐ Cau huong dan ⇒ `--sans`. `--mono` danh cho thu can **so cot theo
+   ky tu**: ma, so tien, ngay, so chung tu. Mot CAU trong mono doc nhu
+   mot ban in may — owner goi dung ten no: *"roi mat"*. */
+.goi-phim{font:500 var(--fs-phu)/1.4 var(--sans);color:var(--muted);
+  padding:0 0 10px;margin:0}
+
+/* ── VIEW ① · BANG SO ─────────────────────────────────────────────────── */
+.tablescroll{overflow:auto;background:var(--surface);
+  border:1px solid var(--line);border-radius:var(--bo-the);
+  box-shadow:var(--shadow-card);max-height:calc(100vh - 150px)}
+.mtable{min-width:1100px}
+/* ⭐ MUOI HAI cot — nguyen van ban dung. ⛔ Cot `→` (20px) la mot cot THAT:
+   no chia bang thanh **ben lenh chi** ＋ **ben giao dich**, va do la toan bo
+   cau hoi cua man nay. */
+/* ⛔ `23/09` owner bo cot `Bac` khoi bang (`12`⇒`11`). Bac ⛔ **khong mat
+   khoi man**: no van la `①②③④` tren tung dong ung vien — dung cho
+   nguoi **dang chon**. O bang so no chiem mot cot ma ⛔ khong ai quet. */
+/* ⭐⭐ `WO-022` vong 2 *(`BA-06` v4.13 §5b ⓘ — `HOI-026`/`TL-026`)*: hai cot
+   tien `So tien` *(vet 6)* va `So tien GD` *(vet 11)* rong theo **NGAN SACH
+   KY TU do tren so that**, ⛔ theo mat:
+     · chuoi o in dai nhat hom nay **18** ky tu *(`TP.tien(v, curr) + ' ' +
+       curr` — lenh `103.950.000,00 USD` · so `11.742.361.787 VND`)*;
+     · mot ky tu `--mono` o `--fs-than` `12.5px` rong toi da **7,5px**
+       *(`IBM Plex Mono` 0,600em — `fls/web` ⛔ co `@font-face` ⇒ chu ra phong
+       CAI TREN MAY: `Cascadia Mono` 7,32 · `Consolas` 6,88)*;
+     ⇒ `ceil(18 × 0,6 × 12.5) = 135` ⇒ **`136px`**.
+   ⛔⛔ Truoc: `108px` / `116px`. Chrome 1440×900 do: `11.742.361.787 VND` chu
+      **131,8px** > o `108px` ⇒ in `11.742.361.78…` — **426 / 2.721** lenh VND
+      cat **tu truoc** `WO-022`, **27** lenh ngoai te cat **vi** `WO-022`
+      *(`2.259.942,94 US`)*; cot GD `116px` cat **383 / 8.387** gia tri so. ⛔
+      Dat `132px` *(theo may do — Cascadia)* thi may co `IBM Plex Mono` lai cat
+      dung 2 ky tu cuoi.
+   ⚠ Doi `--fs-than` hay phong `--mono` ⇒ tinh lai *(bai `AC-10` doc ca hai
+     tep, ⛔ ghim)*. Du lieu vuot 18 ⇒ bai `AC-11` do ⇒ viec cua `fls-ba`.
+   ⭐ +48px lay tu hai cot co gian *(`Noi dung` · `Giao dich da gan`)* — o
+     1440 con ≈ 197 / 217px, tren san cua ca hai. */
+.mcols{grid-template-columns:62px 92px 96px minmax(160px,1fr) 104px 136px
+  100px 92px 20px minmax(190px,1.1fr) 136px}
+.mhead,.mtable .mrow{display:grid;gap:11px;align-items:center;
+  padding:5px 14px 5px 15px}
+.mhead{position:sticky;top:0;z-index:2;background:var(--alt);
+  border-bottom:1px solid var(--line);font:600 var(--fs-nhan)/1.4 var(--sans);
+  letter-spacing:.04em;color:var(--muted);text-transform:uppercase}
+.mhead .mr{text-align:right}
+.mtable .mrow{border:0;border-bottom:1px solid var(--hair);width:100%;
+  text-align:left;font:400 var(--fs-than)/1.35 var(--sans);
+  background:var(--surface);color:var(--ink);cursor:pointer;border-left:0}
+.mtable .mtable .mtable /* ⭐ Con tro BAN PHIM — nen nhat, ⛔ khong mot vien: o bang day dac mot vien
+   se doc nhu mot o dang sua. */
+.mtable .mrow[aria-current=true]{background:var(--focus-ring)}
+.mtable .mrow[aria-current=true] .pm{font-weight:600}
+.mcell{min-width:0;overflow:hidden}
+.mcell.r{text-align:right}
+/* ⭐ LUOI AN TOAN cua hai o tien *(§5b ⓘ — chi hai o `So tien`/`So tien GD`
+   dung `oc('r', …)`)*: chuoi **vuot** ngan sach 18 ky tu ⇒ `…` cuoi + `title`
+   = chuoi du *(`man_f01_ghep.js` `ve_bang`)*, ⛔ cat IM LANG. ⛔ Cach hien
+   thi thuong: hom nay **0** chuoi vuot. */
+.mtable .mcell.r{white-space:nowrap;text-overflow:ellipsis}
+.mcell.arr{color:var(--faint);text-align:center}
+.mtable .desc,.mtable .cdt{overflow:hidden;text-overflow:ellipsis;
+  white-space:nowrap}
+.mtable .cdt{color:var(--muted);font-size:var(--fs-phu)}
+.mtable .pm{font-family:var(--mono);font-size:var(--fs-phu);
+  color:var(--accent)}
+/* ⛔ Cot `So CT` cung dung lop `.pm` nhung no ⛔ KHONG phai ma de quet
+   — no la bang chung. Giu mau chu, ⛔ khong to accent. */
+.mtable .mcell:nth-child(8) .pm{color:var(--muted)}
+.mtable .num{font-family:var(--mono);font-variant-numeric:tabular-nums;
+  white-space:nowrap}
+.mcell .none{color:var(--faint);font-style:italic;font-size:var(--fs-phu)}
+.mcell .none.crit{color:var(--crit);font-style:normal}
+
+/* ⭐⭐ O `Giao dich da gan` — **de xuat** ⛔ KHONG duoc trong giong **da chot**
+   (`§6.3` cua hop dong). De xuat: vien **dut** ＋ nen warn nhat. */
+.mtable .gd{min-width:0;line-height:1.25}
+.mtable .gd .gdchu{display:block;overflow:hidden;text-overflow:ellipsis;
+  white-space:nowrap}
+.mtable .gd .gdmeta{display:block;font:500 var(--fs-nhan)/1.3 var(--mono);
+  color:var(--faint);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mtable .gd.de-xuat{border-left:3px dashed var(--warn);padding-left:6px;
+  background:var(--warn-bg);border-radius:var(--bo-nho)}
+.mtable .gd.de-xuat .gdchu{color:var(--warn)}
+
+.mtable .empty{padding:34px 18px;text-align:center;color:var(--muted);
+  display:flex;flex-direction:column;gap:5px}
+.mtable .empty .big{font:600 var(--fs-to)/1.3 var(--sans);color:var(--ink)}
+
+/* ── VIEW ② · RAIL **ba dong** ────────────────────────────────────────── */
+/* ⛔ Ban `22/09` chi co `3` muc tren MOT dong (ma · noi dung · tien) ⇒ mat
+   `Ngay`, `Loai`, **chip trang thai** va `CDT`. Nguoi dang ghep can chung de
+   ⛔ khong phai mo tung dong ra moi biet dong nao dang mo. */
+.railhead{position:sticky;top:0;z-index:2;background:var(--alt);
+  display:flex;justify-content:space-between;align-items:center;
+  padding:7px 11px;border-bottom:1px solid var(--line);
+  font:600 var(--fs-nhan)/1 var(--sans);letter-spacing:.04em;color:var(--muted);
+  text-transform:uppercase}
+.rrow{display:block;width:100%;text-align:left;cursor:pointer;
+  border:0;border-left:3px solid transparent;
+  border-bottom:1px solid var(--hair);
+  background:var(--surface);color:var(--ink);padding:7px 11px;
+  font:400 var(--fs-than)/1.35 var(--sans)}
+.rrow:last-child{border-bottom:0}
+.rrow:hover{background:var(--row-hover)}
+.rrow:focus-visible{outline:2px solid var(--accent);outline-offset:-2px}
+.rrow[aria-current=true]{background:var(--focus-ring)}
+.rrow[aria-current=true] .pm{font-weight:600}
+.rrow.da_gan{border-left-color:var(--good)}
+.rrow.khong_gan_duoc{border-left-color:var(--faint);border-left-style:dashed}
+.rrow.mo{border-left-color:var(--accent);background:var(--alt)}
+.rrow .l0{display:flex;justify-content:space-between;align-items:center;
+  gap:6px;margin-bottom:3px}
+.rrow .l0 .left{display:flex;align-items:center;gap:6px;min-width:0}
+/* ⭐⭐ Owner `2.2`: *"text toan mau den"*. Ma `PM…` la thu nguoi ta
+   **quet mat doc qua** de tim dong — no phai BAT RA khoi cau noi dung.
+   ⛔ Va chi MOT muc duoc to: to ca ba thi ⛔ khong con muc nao noi. */
+.rrow .d{font:500 var(--fs-nhan)/1 var(--mono);color:var(--faint)}
+.rrow .pm{font:600 var(--fs-phu)/1 var(--mono);color:var(--accent)}
+.rrow .amt{color:var(--ink);font-weight:600}
+/* ⭐ Dong dang mo: ma doi sang mau chu tren nen dam — ⛔ khong giu mau
+   accent tren mot nen da accent nhat, no se chim. */
+.rrow[aria-current=true] .pm,.rrow.mo .pm{color:var(--accent-hi)}
+.rrow .l1{display:flex;justify-content:space-between;align-items:baseline;
+  gap:8px;min-width:0}
+/* ⭐ Noi dung an het cho thua; so tien bi day ve cuoi va ⛔ khong bao gio
+   xuong hang — hai con so xuong hang o mot rail hep la hai dong rac. */
+.rrow .nd{flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;
+  white-space:nowrap}
+.rrow .amt{flex:none;font-family:var(--mono);font-variant-numeric:tabular-nums;
+  white-space:nowrap}
+.rrow .cdt{display:block;margin-top:2px;font-size:var(--fs-phu);color:var(--muted);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* ⚠ Man hep: **giau rail**, ⛔ khong bop no — dung cach ban dung lam. Mot
+   rail `300px` bop con `150px` thi ⛔ khong con doc duoc ma lenh nao. */
+@media (max-width:1000px){
+  .rail{display:none}
+  .than{grid-template-columns:minmax(0,1fr)}
+}
+
+/* ── ⭐⭐⭐ Dien giai: kep MOT dong ＋ loi mo `đủ ↓` ────────────────────── */
+/* ⭐ `-webkit-line-clamp` chu ⛔ KHONG `nowrap`: khi mo rong, dong phai cao
+   them va chu phai **xuong hang** — `nowrap` thi no ⛔ khong bao gio xuong. */
+.cand .dgw{min-width:0;display:flex;align-items:baseline;gap:6px}
+.cand .dg.clamp{display:-webkit-box;-webkit-line-clamp:1;-webkit-box-orient:vertical;
+  overflow:hidden;white-space:normal}
+/* ⭐ `span`, ⛔ KHONG `button` — `.cand` DA la mot `<button>`, va nut long nut
+   la HTML ⛔ khong hop le. Xem ghi chu o `ve_ung_vien`. */
+.cand .doc-du{flex:none;cursor:pointer;font:600 var(--fs-nhan)/1 var(--sans);
+  color:var(--accent);padding:1px 3px;white-space:nowrap}
+.cand .doc-du:hover{color:var(--accent-hi);text-decoration:underline}
+.cand .doc-du:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+/* ⭐ Cao **36px co dinh**, **mo rong moi cao them** — hop dong `C3`. */
+.cand.rong{height:auto;min-height:var(--row-ghep);
+  padding-top:7px;padding-bottom:7px;align-items:start}
+.cand.rong .dgw{align-items:flex-start}
+
+/* ── ⭐⭐ BANG CHUNG duoc danh dau ──────────────────────────────────────── */
+/* ⛔⛔ To **BA** thu va chi ba: so CT **khi trung dung** · so tien **khi khop
+   tuyet doi** · ten ben nhan **sau khi loc tu rac**. To rong hon thi mau
+   **thoi mang nghia** — mot nen mau o cot nay co nghia *"day dung la khoan
+   cua ban"*, va neu no sang o MOI dong thi no ⛔ khong con noi gi.
+   ⭐ Cot nay la bang chung duy nhat cua **49%** cuon so. */
+.cand mark{background:var(--evi-bg);color:inherit;font-weight:600;
+  border-radius:2px;padding:0 1px}
+
+/* ⭐⭐⭐ THU TU HY SINH COT — `Nguon` → `So CT` → **⛔ het**.
+   ⛔ `Dien giai` ⛔ KHONG BAO GIO nam trong day. Nguong do theo `.work`. */
+/* ⛔⛔⛔ Hai khoi nay tung khai luoi tren **`.cand`** voi ban **CU** —
+   con ve `auto`. Hai bo chon cung do dac hieu, ma `@container` nam
+   **sau** trong tep ⇒ no **THANG**: o moi man hep hon `860px` thi ve
+   `auto` **quay lai** va moi cot lai lech — im lang, ⛔ khong mot loi.
+   ⛔⛔ Te hon: no `display:none` dung cot **`Nguon`**.
+   ⭐ Thu tu hy sinh la mot **quyet dinh ve thong tin**, ⛔ khong phai
+     mot tien nghi CSS: `Nguon` ＋ `So tien` ＋ `Dien giai` la ba thu ke
+     toan doi chieu. `Ngay` di truoc (no co tren the PM va thuong co ca
+     trong dien giai); `So CT` di sau (co khi la mot **UUID 36 ky tu**
+     ⛔ khong ai doc). `Nguon` ⛔ **KHONG BAO GIO**. */
+@container work (max-width:900px){
+  .cand-cols{grid-template-columns:16px 22px 132px minmax(170px,1fr)
+    196px 160px}
+  .cand .ngay,.cands .chead .ngay{display:none}
+}
+@container work (max-width:700px){
+  .cand-cols{grid-template-columns:16px 22px minmax(150px,1fr)
+    196px 160px}
+  .cand .ct,.cands .chead .ct{display:none}
+}
+
+/* ── `C7` dai canh bao ────────────────────────────────────────────────── */
+.banner{border:1px solid var(--line);border-radius:var(--bo);
+  padding:9px 12px;font-size:var(--fs-than);background:var(--alt);color:var(--ink)}
+.banner.info{background:var(--info-bg);border-color:var(--info-line);
+  color:var(--info)}
+.banner.warn{background:var(--warn-bg);border-color:var(--warn-line);
+  color:var(--warn)}
+.banner.crit{background:var(--crit-bg);border-color:var(--crit-line);
+  color:var(--crit)}
+
+/* ── `C8` thanh hanh dong ─────────────────────────────────────────────── */
+.act{flex:none;display:flex;flex-wrap:wrap;gap:8px;align-items:center;
+  border:1px solid var(--line);border-radius:var(--bo-the);
+  background:var(--surface);padding:10px 12px;
+  position:sticky;bottom:0;box-shadow:var(--shadow-card)}
+/* ⭐⭐ Ca **LECH TIEN**: ca thanh doi nen, va nut chinh **bo nen dac**. Do la
+   mot nac **cham tay lai** — `45%` ca ⛔ khong co ung vien khop dung tien, nen
+   mot nut xanh day dan o day **day nguoi ta gat bua** (`NFR-I25`). */
+.act.lech{background:var(--warn-bg);border-color:var(--warn-line)}
+.act .goi{font-size:var(--fs-than);color:var(--muted);flex:1 1 220px}
+.act.lech .goi{color:var(--warn)}
+button.b.chinh{background:var(--accent);border-color:var(--accent);
+  color:var(--on-ink)}
+button.b.chinh:hover{background:var(--accent-hi);color:var(--on-ink)}
+button.b.warn{background:var(--surface);border-color:var(--warn);
+  color:var(--warn)}
+button.b.warn:hover{background:var(--warn-bg);border-color:var(--warn);
+  color:var(--warn)}
+
+/* ⚠ Man hep: rail xuong **DUOI** ban lam viec, ⛔ khong bop no con mot nua.
+   ⚠ Nguong `980` = `380` (tran rail) ＋ `560` (cho du cho 5 cot ung vien). */
+@media (max-width:980px){
+  .than{grid-template-columns:1fr}
+  .rail{position:static;max-height:340px;order:2}
+  .work{order:1}
+}
+
+/* ══ ⭐⭐⭐ `C4` · KHOI DANG GAN — owner 23/09 ════════════════════════════
+   *"Toi muon cac PM da gan khi bam vao co hien thong tin Transaction da
+   map"*. Day la `C4` cua hop dong (`BA-06 §4`), va no ⛔ **chua bao gio
+   duoc lam**.
+
+   ⛔⛔ Truoc do man chi hien chip `Da gan` tren the — tuc no noi *"viec nay
+      xong roi"* ma ⛔ **khong noi xong bang gi**. Ke toan mo mot lenh da gan
+      ra thi thay mot danh sach `20` ung vien **do may de xuat**, va ⛔ khong
+      mot dau hieu nao chi ra dong nao dang duoc gan.
+   ⭐ Nen `good` — day la *"da chot"*. Man da co mot luat mau cho *"da
+     chot"* ／ *"de xuat"* (`§6.3`); bia them mau thu ba la lam moi cai cu
+     mat nghia.                                                           */
+.mblock{flex:none;padding:9px 13px;
+  background:var(--good-bg);border:1px solid var(--good-line);
+  border-radius:var(--bo-the)}
+.mblock .mh{display:flex;align-items:center;gap:8px;
+  font:600 var(--fs-phu)/1.2 var(--sans);color:var(--good)}
+.mblock .mh .sp{flex:1}
+/* ⭐ Nut `bo gan` o day la mot **duong ra tai cho** — ⛔ khong bat nguoi ta
+   di tim no o thanh duoi cung. */
+.mblock .mh button.b{font:500 var(--fs-phu)/1 var(--sans);color:var(--good);
+  background:var(--surface);border:1px solid var(--good-line);
+  border-radius:var(--bo-tron);padding:2px 10px}
+.mblock .mh button.b:hover{background:var(--good);color:var(--on-ink);
+  border-color:var(--good)}
+.mblock .mdg{margin-top:5px;font-size:var(--fs-than);color:var(--ink);
+  overflow-wrap:anywhere}
+/* ⛔ Cung mot *"bang chung"* thi phai trong giong nhau o MOI cho no xuat
+   hien — day dung mot luat to voi `.cand mark`. */
+.mblock .mdg mark{background:var(--evi-bg);font-weight:600;
+  border-radius:var(--bo-nho);padding:0 1px;color:inherit}
+.mblock .mfoot{display:flex;flex-wrap:wrap;gap:3px 16px;margin-top:5px;
+  font:400 var(--fs-phu)/1.4 var(--mono);color:var(--muted)}
+.mblock .mfoot b{color:var(--ink);font-weight:600}
+.mblock .mfoot .lech{color:var(--warn)}
+/* ⭐ Dong TONG chi xuat hien o **1,0%** lenh (chum) — no la mot cau tra loi
+   ma bac tung dong ⛔ khong noi duoc, nen no duoc to. `khop` = `good`,
+   `lech` = `warn`: dung hai mau man da dung, ⛔ khong bia mau thu ba. */
+.mtong{flex:none;padding:7px 13px;border-radius:var(--bo-the);
+  font:400 var(--fs-than)/1.4 var(--sans)}
+.mtong b{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.mtong.khop{background:var(--good-bg);border:1px solid var(--good-line);
+  color:var(--good)}
+.mtong.lech{background:var(--warn-bg);border:1px solid var(--warn-line);
+  color:var(--warn)}

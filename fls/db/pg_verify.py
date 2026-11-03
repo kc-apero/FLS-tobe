@@ -48,6 +48,47 @@ ORDER BY tc.constraint_name, kcu.ordinal_position
 """
 
 
+# ⭐⭐ Them 2026-09-08 (`QĐ-ITL-113`): truoc day `pg_verify` so **FK · khoa
+# chinh · UNIQUE** — va ⛔ **KHONG so `CHECK`**. Nen mot `CHECK` khai trong
+# `schema.py` ma ⛔ chua ai `ALTER TABLE` se di qua **im lang**: dung ho voi hai
+# lo da sinh ra cong nay.
+#
+# ⚠ Do 08/09 truoc khi mo: kho THAT co **0** rang buoc `CHECK` ⇒ mo cong nay ⛔
+#   khong phai hoa giai no cu, va no **do duoc ngay** cot dau tien (`thu_tu`).
+#
+# ⛔ Dung `pg_constraint`, ⛔ khong `information_schema`: view chuan ⛔ khong
+#   cho ra **bieu thuc** cua `CHECK`, ma khai bao thi chinh la bieu thuc.
+_Q_CHECK = """
+SELECT con.conname, pg_get_constraintdef(con.oid)
+FROM pg_constraint con
+JOIN pg_class c ON c.oid = con.conrelid
+JOIN pg_namespace n ON n.oid = c.relnamespace
+WHERE con.contype = 'c' AND n.nspname = %s AND c.relname = %s
+ORDER BY con.conname
+"""
+
+
+def _lech_check(cur, t: Table, schema: str) -> list[str]:
+    """So `CHECK` KHAI voi `CHECK` AP — doi chieu theo **TEN**.
+
+    ⛔ ⛔ **⛔ Khong so BIEU THUC.** Postgres chuan hoa lai bieu thuc khi luu
+       *(`thu_tu IN ('dmy','mdy')` thanh `thu_tu = ANY (ARRAY[...])`)*, nen so
+       chuoi se **do vinh vien** va lop sau se hoc cach lam ngo cong. ⇒ So
+       **su co mat theo ten** — dung cau ma cong nay tra loi duoc:
+       *"rang buoc nay khai ma da ap chua?"*
+    """
+    cur.execute(_Q_CHECK, (schema, t.name))
+    # ⛔ `NOT NULL` cung hien ra la `contype='c'` o mot so ban PG ⇒ chi lay
+    #    rang buoc mang **hau to cua ta**, ⛔ khong bat ca cai ta khong dat.
+    ten_db = {n for n, _ in cur.fetchall() if n.endswith("_ck")}
+    ten_khai = {f"{t.name}_{c.name}_ck" for c in t.columns if c.check}
+    ra = [f"{t.name}: CHECK khai bao co, DB THIEU  ({n})"
+          for n in sorted(ten_khai - ten_db)]
+    ra += [f"{t.name}: CHECK trong DB, khai bao KHONG co  ({n})"
+           for n in sorted(ten_db - ten_khai)]
+    return ra
+
+
 def _khoa_trong_db(cur, ten_bang: str, schema: str
                    ) -> tuple[tuple[str, ...], set[tuple[str, ...]]]:
     """Tra (cac cot khoa chinh, tap cac khoa UNIQUE) — theo DUNG THU TU cot.
@@ -112,6 +153,7 @@ def _lech_mot_bang(cur, t: Table, schema: str) -> list[str]:
         for f in fk_that - fk_khai:
             ra.append(f"{t.name}: FK trong DB, khai bao KHONG co  ({f})")
         ra += _lech_khoa(cur, t, schema)
+        ra += _lech_check(cur, t, schema)
     return ra
 
 

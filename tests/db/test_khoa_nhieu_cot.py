@@ -109,9 +109,24 @@ def test_fls_pm_link_khoa_BA_cot_va_LY_DO_doi_khoa():
     assert {c.name for c in t.columns} >= {"link_id", "lan"}
 
 
-def test_fls_reject_co_UNIQUE_run_source_row():
-    """Dong `GAP-DB-P0-03`: chan trung o TANG KHO, khong chi trong cau INSERT."""
-    assert ("run_id", "source_row") in TABLES["fls_reject"].unique_keys
+def test_fls_reject_khoa_PHAI_mang_source_sheet():
+    """⛔⛔ Khoa `(run_id, source_row)` la mot DUONG MAT DU LIEU tu 08/09.
+
+    `GAP-DB-P0-03` (27/08) dat khoa nay khi **mot lan nap = MOT nguon**.
+    `QĐ-ITL-111` (08/09) dung cua nap CA LO — *mot* `run_id` cho **59 nguon** —
+    va `source_row` chi la chi so dong **TRONG MOT SHEET** ⇒ dong 0 cua 59
+    sheet dung chung mot gia tri, nen chi nguon **den truoc** duoc ghi.
+
+    Do that 10/09 tren anh `chup_id 24033`: **646 dong bi loai ma ⛔ KHONG co
+    ban ghi nao**, trai tren **23 nguon**. Bai nay ghim chieu sua
+    (migration `0020`) va ghim luon **cai khoa cu ⛔ khong duoc quay lai**.
+    """
+    t = TABLES["fls_reject"]
+    assert ("run_id", "source_sheet", "source_row") in t.unique_keys, (
+        "thieu `source_sheet` trong khoa: mot lo nhieu nguon se lam dong bi "
+        "loai cua nguon thu hai tro di ⛔ KHONG duoc ghi lai o dau")
+    assert ("run_id", "source_row") not in t.unique_keys, (
+        "khoa cu quay lai: no CHAN dong loai cua 58/59 nguon trong mot lo")
 
 
 # ------------------------------------------------------------------ cong doi chieu
@@ -140,11 +155,15 @@ def test_pg_verify_BAT_DUOC_khoa_bi_bo():
 
 @pytest.mark.pg
 def test_pg_verify_BAT_DUOC_unique_bi_bo():
+    # ⚠ Ten khoa DOI 2026-09-10 (migration `0020`): them `source_sheet`. Bai nay
+    #   neo vao TEN, nen no do khi khoa doi — va do la **dung**: mot bai pha khoa
+    #   phai biet chinh xac no dang pha cai gi.
+    ten = "fls_reject_run_id_source_sheet_source_row_uq"
     with psycopg.connect(dsn_test(), autocommit=True) as c:
-        c.execute("ALTER TABLE fls_reject DROP CONSTRAINT fls_reject_run_id_source_row_uq")
+        c.execute(f"ALTER TABLE fls_reject DROP CONSTRAINT {ten}")
         try:
             lech = so_sanh_voi_db(c)
             assert any("UNIQUE khai bao co, DB THIEU" in m for m in lech), lech
         finally:
-            c.execute("ALTER TABLE fls_reject ADD CONSTRAINT "
-                      "fls_reject_run_id_source_row_uq UNIQUE (run_id, source_row)")
+            c.execute(f"ALTER TABLE fls_reject ADD CONSTRAINT {ten}"
+                      " UNIQUE (run_id, source_sheet, source_row)")

@@ -43,8 +43,11 @@ chia tien cua hinh `B` co the bia ra hay lam mat tien ma khong ai thay — va
 
 from __future__ import annotations
 
+import json
+import uuid
 from collections import Counter
 from dataclasses import dataclass, field
+from datetime import datetime, timezone
 from decimal import Decimal
 from typing import Any, Sequence
 
@@ -77,6 +80,15 @@ class KetQuaNap:
     # duong: no dem ben PM, con bon duong dem ben BANK. Gop hai truc vao mot
     # phep can la lam phep can do thu ma no khong do.
     dong_pm: int = 0
+    # ⭐⭐ Goi y cua MAY sau khi tu ghep (`QĐ-ITL-143`). ⛔ CUNG khong nam
+    # trong phep can bon duong: mot goi y ⛔ khong them mot dong nao vao so,
+    # no **them mot dong but toan**. Gop vao la lam phep can do thu khac.
+    # ⚠ `may_khong_suy_duoc` PHAI duoc bao ra: do `18/09` co **10** dong so
+    # mang N dong lenh noi HAI `hd` khac nhau — im lang o day la giau dung
+    # cho may ⛔ khong tra loi duoc (`INV-I16`).
+    may_goi_y_dong: int = 0
+    may_goi_y_but_toan: int = 0
+    may_khong_suy_duoc: int = 0
     ly_do_loai: dict[str, int] = field(default_factory=dict)
 
     def tong(self) -> int:
@@ -93,17 +105,63 @@ class KetQuaNap:
                 f"  ·  trong so: ok {self.ok} · UNMAPPED {self.unmapped}{g}")
 
 
+# ⛔⛔ Ba `parse_*` cua `danh_seq_trung` CHAY TRUOC vong loai, nen mot o rac
+#    o bat ky dong nao **giet ca lo** — xem docstring ham. Sentinel nay phai
+#    la thu ⛔ KHONG THE bang mot gia tri doc duoc: mot `date`, mot `int`, mot
+#    `float` hay `None` deu ⛔ khong bang mot `tuple` 2 phan tu.
+_KHONG_DOC_DUOC = "⛔KHONG-DOC-DUOC"
+
+
+def _khoa_khong_no(v: Any, phep, *dt) -> Any:
+    """`phep(v, *dt)` — rac thi tra SENTINEL thay vi `NO`.
+
+    ⛔ Dong co o rac **van bi loai** o `validate()` ngay ben duoi, **kem ly
+      do**, va van vao `fls_reject`. Ham nay ⛔ KHONG tha dong nao vao so — no
+      chi thoi cho dong ay mot cho trong phep dem `seq_trung`.
+    """
+    try:
+        return phep(v, *dt)
+    except ValueError:
+        return (_KHONG_DOC_DUOC, repr(v))
+
+
 def danh_seq_trung(hang: Sequence[tuple[int, CanonRow]], nc: NgucCanh) -> list[int]:
     """Danh `seq_trung` cho tung dong theo dung bo khoa cua `content_key`.
 
     Thu tu la thu tu DOC — nen chay lai cung lat cho cung ket qua (cong #4).
+
+    ⛔⛔ **Ham nay tung giet CA LO vi mot o, va `fls_reject` thi TRONG.**
+       `chay()` goi no o **dong 360**, con vong `validate()` — thu biet cach
+       day dong hong sang `fls_reject` **kem ly do** — nam o **dong ~373**,
+       tuc **SAU**. Nen mot o ngay khong doc duoc lam ca lan nap `NO` bang mot
+       `400`, va ⛔ **khong dong nao vao `fls_reject`** ⇒ ⛔ khong ai biet vi
+       sao. Do duoc 08/09 tren anh chup that: **1.894/8.368 dong (22,6%)** co
+       ngay mo ho, trai **29/60 nguon** ⇒ ⛔ **khong phai ca le, la phan lon**.
+       *(Tien thi sach: `Debit`/`Credit` NO **0** dong.)*
+
+    ⭐⭐ **Vi sao vá o DAY chu ⛔ KHONG doi thu tu hai buoc.** Chuyen
+      `validate()` len truoc thi dong bi loai **⛔ khong con chiem cho** trong
+      phep dem, nen dong con lai tut `seq_trung` tu `1` xuong `0` ⇒ **doi
+      `content_key`** ⇒ lan nap sau **chen lai** dong ma lan truoc da bo qua vi
+      trung. Mot cu va chong `400` ma sinh ra **dem trung tien** la mot cu va
+      te hon benh.
+
+    ⇒ Nen: **⛔ khong doi thu tu, ⛔ khong doi phep dem** — chi khien ba
+      `parse_*` **⛔ thoi NO**. Lo nao chay duoc hom nay thi khoa ra **y
+      nguyen tung byte** *(moi `parse_*` deu thanh cong ⇒ ⛔ khong sentinel
+      nao xuat hien)*; lo nao chet hom nay thi nay **chay**, va dong hong di
+      dung cho cua no: `fls_reject`, kem ly do.
     """
     dem: Counter = Counter()
     ra: list[int] = []
     for _dong, row in hang:
         k = (nc.source_system, nc.source_sheet,
-             parse_ngay(row.at(_NGAY)), parse_so(row.at(_NO)),
-             parse_so(row.at(_CO)), row.at(_SO_CT))
+             # ⭐ `nc.thu_tu` — nguon khai thu tu ngay (`QĐ-ITL-113`). Khoa
+             #   phai dung **cung** phep doc voi `dung_dong`, ⛔ khong thi mot
+             #   dong se co hai `content_key` khac nhau o hai buoc.
+             _khoa_khong_no(row.at(_NGAY), parse_ngay, nc.thu_tu),
+             _khoa_khong_no(row.at(_NO), parse_so),
+             _khoa_khong_no(row.at(_CO), parse_so), row.at(_SO_CT))
         ra.append(dem[k])
         dem[k] += 1
     return ra
@@ -170,6 +228,41 @@ def kiem_tong_moi_noi(noi: dict[int, list[tuple[str, Decimal, str]]],
     return ra
 
 
+def _goi_y_sau_ghep(conn, can_chen: list[tuple[int, str, Decimal, str]],
+                    pm: Sequence[Any], *, run_pm: str) -> dict[str, int]:
+    """MAY vua ghep xong ⇒ goi y `hd`/`cdt1` cho tung dong so. `QĐ-ITL-143`.
+
+    Tra ba con so de bao cao lan nap **noi ra** minh da lam gi:
+    `dong` (so dong so duoc goi y) · `but_toan` · ⚠ `khong_suy_duoc`.
+
+    ⛔ Chay TRONG giao dich cua lan nap — xem `ghi_goi_y_may`.
+    """
+    if not can_chen:
+        return {"dong": 0, "but_toan": 0, "khong_suy_duoc": 0}
+    from fls.repo.may_ghep import ghi_goi_y_may     # repo → repo, hop le
+
+    # ⛔ Ban do `pm_line_id -> (hd, cdt1)` lay tu **chinh cac dong lenh vua
+    #   doc**, ⛔ khong doc lai kho: doc lai la mo cua cho hai ban tra loi khac
+    #   nhau trong cung mot lan nap.
+    theo_ma = {x.line: x for x in pm if getattr(x, "line", None)}
+    gom: dict[int, list[dict[str, Any]]] = {}
+    for itl_id, line, _tien, _hinh in can_chen:
+        d = theo_ma.get(line)
+        if d is None:
+            continue
+        gom.setdefault(itl_id, []).append(
+            {"pm_line_id": line, "hd": d.hd, "cdt1": d.cdt1})
+
+    dem = {"dong": 0, "but_toan": 0, "khong_suy_duoc": 0}
+    for itl_id, lenh in sorted(gom.items()):
+        ra = ghi_goi_y_may(conn, itl_id=itl_id, lenh=lenh, run_pm=run_pm)
+        if ra["but_toan"]:
+            dem["dong"] += 1
+            dem["but_toan"] += len(ra["but_toan"])
+        dem["khong_suy_duoc"] += len(ra["khong_suy_duoc"])
+    return dem
+
+
 def chen_moi_noi(conn, nc: NgucCanh,
                  moi: list[tuple[int, str, Decimal, str]]) -> int:
     """Chen vao `fls_pm_link`. Tra so moi noi THUC SU chen.
@@ -216,28 +309,155 @@ def chen_dong_pm(conn, nc: NgucCanh, pm: Sequence[DongPM]) -> int:
         # nem loi la huy ca lan nap chi vi mot dong lenh thieu ma.
         print(f"⚠ anh chup PM: BO {len(pm) - len(tot)} dong khong co `ID PMLine` "
               f"(⛔ khong ghep vao dau duoc)")
+    # ⭐⭐⭐ HAI BAT BIEN cua nhom khoa `PE`/`PI` — DEM va NEU TEN, ⛔ KHONG
+    #   chan. Ly do day du o `migrations/0023`: phep chen nay chay trong MOT
+    #   giao dich cho ca lan nap, nen mot `CHECK` bien **mot dong la** thanh
+    #   **do ca luot nap**. ⛔ Im lang cung ⛔ khong duoc (`INV-I16`) ⇒ dem,
+    #   va NEU TEN vai dong dau de nguoi con biet di hoi ai.
+    hai_cha = [x.line for x in tot if x.pe_line and x.pi_line]
+    khong_cha = [x.line for x in tot if not x.pe_line and not x.pi_line]
+    lech_cap = [x.line for x in tot
+                if bool(x.pe_slip) != bool(x.pe_line)
+                or bool(x.pi_slip) != bool(x.pi_line)]
+    for ten, ds in (("co CA HAI cha PE va PI", hai_cha),
+                    ("⛔ KHONG co cha nao (PE lan PI)", khong_cha),
+                    ("lech CAP slip/line", lech_cap)):
+        if ds:
+            print(f"⚠ anh chup PM: {len(ds)} dong {ten} — "
+                  f"{', '.join(ds[:5])}{' …' if len(ds) > 5 else ''}")
     with conn.cursor() as cur:
         cur.executemany(
             "INSERT INTO fls_pm_line (run_id, pm_line_id, pm_slip_id, ref_tho,"
-            " ref_canon, amount, curr, status, hd, cdt1, source_row)"
-            " VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"
+            " ref_canon, amount, curr, status, hd, cdt1, source_row,"
+            # ⭐ Bay khoa PE/PI (migration `0023`). ⛔ Bo chung o day thi
+            #   moi lan nap SAU se de trong cot vua khai — mot lo im lang.
+            " pe_slip, pe_line, pe_loai, pi_slip, pi_line, tho)"
+            # ⛔⛔⛔ `::json` chu ⛔ KHONG `::jsonb` — va day la mot loi toi
+            #    da mac 11/09: migration `0022` doi COT sang `json` de giu thu
+            #    tu, nhung cau nay van ep `::jsonb`, nen thu tu **chet ngay
+            #    trong phep ep** roi moi cham cot. Do lai sau khi chup: khoa
+            #    van sap theo do dai — **doi kieu cot la chua du**.
+            # ⛔⛔ `%s::json` chu ⛔ KHONG `psycopg.types.json.Json`.
+            #    Import `Json` o day keo **driver DB** vao chuoi
+            #    `fls.api → nap_cua → nap_lo → chay_nap`, va `lint-imports`
+            #    do NGAY *(8 kept 1 broken)* — dung nhu no phai do: tang cua
+            #    ⛔ khong duoc biet ta dang noi voi kho NAO.
+            " VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s::json)"
             " ON CONFLICT (run_id, pm_line_id) DO NOTHING",
+            # ⭐ `tho` — ca hang, khoa theo TEN COT (migration `0021`).
+            #   ⛔ `None` giu nguyen `None`: no co nghia *"ban doc nay ⛔ khong
+            #   giu tho"*, ⛔ khong phai *"doc duoc 0 cot"* (`INV-I16`).
             [(nc.run_id, x.line.strip(), (x.slip or "").strip(), x.ref_tho,
               x.ref, x.tien, x.cur, x.status or None, x.hd, x.cdt1,
-              x.dong_sheet) for x in tot])
+              x.dong_sheet,
+              x.pe_slip, x.pe_line, x.pe_loai, x.pi_slip, x.pi_line,
+              json.dumps(x.tho, ensure_ascii=False)
+              if x.tho else None) for x in tot])
     return int(conn.execute(
         "select count(*) from fls_pm_line where run_id=%s",
         (nc.run_id,)).fetchone()[0])
 
 
+def nap_anh_pm(conn, pm: Sequence[DongPM], *, spreadsheet_id: str, actor: str,
+               source_id: int, giay: float | None = None,
+               ngay: str | None = None) -> dict[str, Any]:
+    """⭐⭐⭐ Mốc `A3` — nạp **một ảnh lệnh chi mới** vào kho. Một giao dịch.
+
+    ⛔⛔ **Vì sao hàm này tồn tại, và vì sao nó ⛔ KHÔNG phải một `INSERT` gọn.**
+
+    Trước 09/09 lệnh chi vào kho bằng **một lệnh dòng lệnh của Dev**
+    *(`tools/nap_that.py`)*. Đo thật ngày 09/09: **3.703 dòng, tất cả từ MỘT
+    lượt ngày 27/08** — đóng băng **13 ngày**, và ⛔ **không cổng nào** nói lên
+    điều đó, vì ⛔ không gì trong kho ghi *"ảnh này đọc lúc nào, ai đọc"*.
+
+    ⇒ Ba việc, **một giao dịch**:
+      ⓐ `ghi_chup_pm` — dấu xuất xứ *(`doc_luc` · `actor` · `giay` ·
+         `spreadsheet_id` · `khai_version`)*. ⛔ ⛔ Không một dòng nào vào
+         `fls_chup_dong`: `fls_pm_line` **chính là** bảng dòng của lằn này.
+      ⓑ `mo_run` — một `run_id` mới, `chup_id` trỏ về ảnh ⇒ **vết truy
+         ⛔ không đứt** *(`QĐ-ITL-115` đòi đúng điều này)*.
+      ⓒ `chen_dong_pm` — các dòng lệnh.
+
+    ★ **Và đây là chỗ `QĐ-ITL-119` làm nó có nghĩa:** phép ghép nhìn **ảnh PM
+      đọc gần nhất** *(`anh_pm_hieu_luc`)*, nên ảnh mới này **lập tức** thành
+      ứng viên cho **cả 10.030 dòng tiền cũ**. Trước quyết định ấy, hàm này sẽ
+      chạy xong, báo *"nạp 3.703 dòng"*, và ⛔ **không dịch một dòng nào**.
+
+    Trả về: `chup_id` · `run_id` · `so_dong_doc` *(người gọi đọc được bao
+    nhiêu)* · `so_dong_vao` *(có thật trong kho của lần nạp này)* ·
+    `so_dong_bo_qua` *(thiếu `ID PMLine`)* · `so_ma_moi_so_voi_anh_truoc`.
+
+    ⚠ `so_ma_moi_so_voi_anh_truoc` là con số **duy nhất** trả lời câu *"lần nạp
+      này có mang gì MỚI ⛔ không"*. Nạp lại **cùng** một tệp là chuyện thường
+      *(nhịp mỗi giờ, `QĐ-ITL-114`)*, và nó **phải** cho `0` — một ảnh mới
+      giống hệt ảnh cũ là một ảnh **đúng**, ⛔ không phải một lỗi. Nhưng nếu
+      con số ấy `0` **mãi mãi** thì lằn nạp đang **⛔ không mang về gì**, và đó
+      là thứ ⛔ không cổng nào thấy nếu ⛔ không ai đo.
+    """
+    from fls.adapters.pm_join import PM_KHAI_VERSION       # noqa: PLC0415
+    from fls.repo.chup import ghi_chup_pm                  # noqa: PLC0415
+
+    if not pm:
+        raise ValueError(
+            "⛔ ⛔ KHÔNG ghi một ảnh lệnh chi RỖNG. Nó sẽ hiện ra như một dấu "
+            "thời điểm thật trong khi nó ⛔ không đo được gì — *đo được 0 thứ "
+            "⇒ ⛔ KHÔNG ĐẠT*. Nguồn đọc ra 0 dòng là một CHUYỆN KHÁC, và nó "
+            "phải nổ ở tầng đọc chứ ⛔ không lặng lẽ thành một ảnh rỗng")
+
+    ngay = ngay or datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    run_id = f"NAP-{ngay}-PM{uuid.uuid4().hex[:8].upper()}"
+
+    # ⭐ Mã của ảnh TRƯỚC — đọc **trước** khi ghi, để so được *"lần này mang
+    #   về gì mới"*. ⛔ Đọc sau thì ảnh vừa ghi đã thành "ảnh trước".
+    from fls.repo.anh_pm import anh_pm_hieu_luc            # noqa: PLC0415
+    from fls.repo.pham_vi import chi_nap_that              # noqa: PLC0415
+
+    run_truoc = anh_pm_hieu_luc(conn, chi_nap_that())
+    ma_truoc: set[str] = set()
+    if run_truoc:
+        with conn.cursor() as cur:
+            cur.execute("SELECT ref_canon FROM fls_pm_line"
+                        " WHERE run_id = %s AND ref_canon IS NOT NULL",
+                        (run_truoc,))
+            ma_truoc = {r[0] for r in cur.fetchall()}
+
+    with conn.transaction():
+        anh = ghi_chup_pm(conn, spreadsheet_id=spreadsheet_id, actor=actor,
+                          source_id=source_id,
+                          khai_version=PM_KHAI_VERSION, giay=giay)
+        nc = NgucCanh(run_id, "v1.0", "v1.0", "v1.0", "PM", "PM_Unpivot",
+                      chup_id=anh.chup_id)
+        mo_run(conn, nc, len(pm))
+        vao = chen_dong_pm(conn, nc, pm)
+
+    ma_moi = {x.ref for x in pm if (x.ref or "").strip()} - ma_truoc
+    return {
+        "chup_id": anh.chup_id, "run_id": run_id,
+        "so_dong_doc": len(pm), "so_dong_vao": vao,
+        "so_dong_bo_qua": len(pm) - sum(
+            1 for x in pm if (x.line or "").strip()),
+        "anh_truoc": run_truoc,
+        "so_ma_moi_so_voi_anh_truoc": len(ma_moi),
+    }
+
+
 def mo_run(conn, nc: NgucCanh, tong_dong: int | None = None) -> None:
     with conn.cursor() as cur:
+        # ⭐⭐ `chup_id` — LINEAGE, nối dây 2026-09-08 (`QĐ-ITL-110`).
+        #
+        # ⛔⛔ `khai_id` **CO Y ⛔ khong duoc ghi o day**, va do ⛔ khong phai
+        #    mot cho bo sot: `fls_khai_cot` giu MOT DONG MOI TRUONG (6 dong/ban
+        #    khai) nen `khai_id` la danh tinh cua **mot truong**, ⛔ khong cua
+        #    **mot ban khai** ⇒ ⛔ khong ton tai gia tri dung de dat vao day.
+        #    Ca doan ly do + duong lineage THAT: `ledger.build.NgucCanh`.
+        #    `GAP-CHUP-04`.
         cur.execute(
             "INSERT INTO fls_run (run_id, contract_version, canon_version,"
-            " mapping_version, row_count, state) VALUES (%s,%s,%s,%s,%s,'staged')"
+            " mapping_version, row_count, state, chup_id)"
+            " VALUES (%s,%s,%s,%s,%s,'staged',%s)"
             " ON CONFLICT (run_id) DO NOTHING",
             (nc.run_id, nc.contract_version, nc.canon_version,
-             nc.mapping_version, tong_dong))
+             nc.mapping_version, tong_dong, nc.chup_id))
 
 
 def dong_run(conn, run_id: str, trang_thai: str = "mapped") -> int:
@@ -303,9 +523,18 @@ def _chen_reject(conn, nc: NgucCanh, loai: list[tuple[int, list[str]]]) -> int:
     ⛔ KHONG dung DELETE de "don truoc khi ghi": mot ham don duoc `fls_reject`
     la mot ham co the xoa bang chung. Chan bang dieu kien, khong bang xoa.
 
-    ⚠ CHUA CO rang buoc UNIQUE(run_id, source_row) o tang DB (`fls/db/model.py`
-    chua ho tro khoa nhieu cot) ⇒ `GAP-DB-P0-03`. Dieu kien nay la lop chan duy
-    nhat, nen no co test.
+    ⛔⛔⛔ **SUA 10/09 — dieu kien PHAI mang `source_sheet`.** Ban cu so
+    `(run_id, source_row)`, va no dung khi **mot lan nap = MOT nguon**.
+    `QĐ-ITL-111` dung cua nap CA LO: *mot* `run_id` cho **59 nguon**, con
+    `source_row` chi la chi so dong **TRONG MOT SHEET** ⇒ dong 0 cua 59 sheet
+    la 59 lan cung mot gia tri, nen chi nguon **den truoc** duoc ghi va 58
+    nguon con lai bi dieu kien nay **nuot trong im lang** *(`rowcount` 0, ⛔
+    khong mot loi nao)*.
+
+    Do that 10/09 tren anh `chup_id 24033`: **646 dong bi loai ma ⛔ KHONG co
+    ban ghi nao**, trai tren **23 nguon** — dung thu ma cong chung #3 (*"0 dong
+    roi im lang"*) sinh ra de chan. Rang buoc DB da doi cung luot
+    (migration `0020`), nen tang kho nay **⛔ khong con la lop chan duy nhat**.
     """
     if not loai:
         return 0
@@ -316,20 +545,38 @@ def _chen_reject(conn, nc: NgucCanh, loai: list[tuple[int, list[str]]]) -> int:
                 "INSERT INTO fls_reject (run_id, source_system, source_sheet,"
                 " source_row, reason)"
                 " SELECT %s,%s,%s,%s,%s WHERE NOT EXISTS ("
-                "   SELECT 1 FROM fls_reject WHERE run_id = %s AND source_row = %s)",
+                "   SELECT 1 FROM fls_reject WHERE run_id = %s"
+                "     AND source_sheet = %s AND source_row = %s)",
                 (nc.run_id, nc.source_system, nc.source_sheet, dong,
-                 " | ".join(ly_do), nc.run_id, dong))
+                 " | ".join(ly_do), nc.run_id, nc.source_sheet, dong))
             n += cur.rowcount
     return n
 
 
 def chay(conn, tho: Sequence[Sequence[Any]], nc: NgucCanh,
          header: Sequence[Any] | None = None,
-         pm: Sequence[DongPM] | None = None) -> KetQuaNap:
-    """Nap ca lat vao so. ⛔ Ba duong khong can thi NO va khong ghi gi."""
+         pm: Sequence[DongPM] | None = None,
+         pm_trong_kho: bool = False,
+         bo_nap=None) -> KetQuaNap:
+    """Nap ca lat vao so. ⛔ Ba duong khong can thi NO va khong ghi gi.
+
+    ⭐⭐ `bo_nap` — **bo doc lat tho -> canon**. Mac dinh `adapters.bank.nap`
+      (lan cu). Lan `F04` truyen `adapters.sao_ke_canon.nap` (`CR#11` task `5`).
+
+      ⛔⛔ **Vi sao TIEM vao day chu khong viet mot ham `chay()` thu hai.** Ham
+      nay dang giu **ba thu ⛔ khong duoc co ban sao**: chong trung bang
+      `content_key` · cong **bon duong** kiem TRUOC khi ghi · **MOT giao dich**
+      cho ca lan nap. Mot ban thu hai la ba co hoi de chung lech nhau — va
+      `BA-07` §4b ⓹ noi thang: *"⛔ khong dung co che chong trung thu hai —
+      hai co che la hai cho de chung lech nhau"*.
+
+      ⇒ Cai KHAC giua hai lan chi la **hinh dang dong vao**. Nen thu duoc thay
+        la **dung bo doc**, ⛔ khong phai ca phep ghi.
+    """
     so_moi_noi = 0
     so_dong_pm = 0
-    hang, loai, tk = nap(tho, header=header)
+    goi_y = {"dong": 0, "but_toan": 0, "khong_suy_duoc": 0}
+    hang, loai, tk = (bo_nap or nap)(tho, header=header)
     if not tk.can():
         raise AssertionError("adapter tra ba duong khong can: " + str(tk))
 
@@ -348,7 +595,7 @@ def chay(conn, tho: Sequence[Sequence[Any]], nc: NgucCanh,
     tai: list[dict[str, Any]] = []
     them_loai: list[tuple[int, list[str]]] = []
     for (dong, row), s in zip(hang, seq):
-        kq = validate(row)
+        kq = validate(row, nc.thu_tu)
         if kq.loai:                       # lop so tu choi -> fls_reject, CO LY DO
             them_loai.append((dong, kq.loai))
             continue
@@ -388,11 +635,37 @@ def chay(conn, tho: Sequence[Sequence[Any]], nc: NgucCanh,
             for line, tien, hinh in noi_pm.get(p["source_row"], ()):
                 can_chen.append((itl_id, line, tien, hinh))
         so_moi_noi = chen_moi_noi(conn, nc, can_chen)
+        # ⭐⭐⭐ MAY ghep xong thi GOI Y `hd`/`cdt1` — `QĐ-ITL-143`, owner chot
+        #    **phuong an B** `18/09`. Truoc do duong nay dung o `chen_moi_noi`:
+        #    moi noi co, ma hai truong ma dong lenh **dang cam san** thi ⛔ khong
+        #    ai bac cau. Do `18/09`: `fls_itl.hd` **0/8.387** trong khi
+        #    **3.767/3.772** dong lenh co `hd`, va **2.219** dong so da ghep suy
+        #    duoc ngay.
+        #
+        # ⛔⛔ But toan o day mang `nguon='may_goi_y'` nen `fls_sua_tay`
+        #    ⛔ **khong thay** chung (migration `0025`) — may **goi y**, ⛔ khong
+        #    **quyet** (`INV-I16`). Va no ⛔ khong de len o NGUOI da chot: lan nap
+        #    chay theo nhip gio, ⛔ khong ai ngoi xem, nen ghi de la lat ket luan
+        #    cua nguoi **hang loat trong im lang**.
+        goi_y = _goi_y_sau_ghep(conn, can_chen, pm or (), run_pm=nc.run_id)
         # ★ Anh chup dong lenh chi ghi TRONG cung giao dich voi moi noi. Neu
         # tach ra ngoai thi co the ket thuc o trang thai "co moi noi ma khong co
         # dong lenh nao de tra" — dung cai trang thai lam man `F01` khong the
         # ghep tay, tuc dung cai lo `GAP-API-04` sinh ra de bit.
-        so_dong_pm = chen_dong_pm(conn, nc, pm or ())
+        # ⛔⛔⛔ **`pm_trong_kho` — them 10/09, va no va mot lo TOI vua gay ra.**
+        #
+        #   Ham nay chep anh PM vao `fls_pm_line` duoi `run_id` cua LUOT NAP.
+        #   Dung khi nguoi goi doc PM **SONG tu Sheets** (`nap_that.py`) — luc
+        #   ay ban chep ay la **ban ghi duy nhat**.
+        #
+        #   Nhung `lo_nap` doc PM **TU KHO** (`anh_pm.doc_dong_pm`), nen chep
+        #   lai la: ⓐ nhan 3.772 dong moi luot nap, va ⓑ **pha tin hieu
+        #   `read_at`** — `anh_pm_hieu_luc` xep theo `max(read_at)` nen no bat
+        #   dau tra ve **ban chep cua SO** thay vi anh cua lan PM, tuc no noi
+        #   "dong lenh doc luc 11:54" trong khi that ra la 11:14.
+        #   ⇒ Dung cai `anh_pm.py` sinh ra de chan, tai lap tu phia ben kia.
+        so_dong_pm = (0 if pm_trong_kho
+                      else chen_dong_pm(conn, nc, pm or ()))
 
     # ⚠ Dem `work_status` CHI tren dong THUC SU vao so. Dem tren `tai` thi moi
     # lan nap lai (bo qua het) se bao "9.000 dong UNMAPPED" ma so khong tang.
@@ -402,7 +675,10 @@ def chay(conn, tho: Sequence[Sequence[Any]], nc: NgucCanh,
         run_id=nc.run_id, vao=tk.vao, vao_so=len(da_vao), loai=len(loai),
         rong=tk.rong, bo_qua_trung=len(tai) - len(da_vao),
         unmapped=unmapped, ok=len(da_vao) - unmapped, ly_do_loai=ly_do,
-        ghep_pm=so_moi_noi if pm else 0, dong_pm=so_dong_pm)
+        ghep_pm=so_moi_noi if pm else 0, dong_pm=so_dong_pm,
+        may_goi_y_dong=goi_y["dong"],
+        may_goi_y_but_toan=goi_y["but_toan"],
+        may_khong_suy_duoc=goi_y["khong_suy_duoc"])
     if not kq.can():
         raise AssertionError("⛔ bon duong khong can sau khi ghi: " + kq.bao())
     dong_run(conn, nc.run_id)

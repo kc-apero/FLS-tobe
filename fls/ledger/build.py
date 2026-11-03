@@ -36,6 +36,56 @@ class NgucCanh:
     mapping_version: str
     source_system: str
     source_sheet: str
+    # ⭐⭐⭐ LINEAGE của lần nạp — thêm 2026-09-08 *(`QĐ-ITL-110`)*.
+    #
+    # ⛔ `None` được, và đó là `R-A1`: lô `NAP-2026-08-27-RAW` *(10.030 dòng
+    #   đang nằm trong kho)* có **TRƯỚC** bảng ảnh chụp ⇒ một lô đi đường
+    #   `dong` *(test/đối chứng)* **phải hiện ra** là `chup_id = NULL`.
+    #
+    # ⛔⛔ **VÀ ĐÂY LÀ CHỖ PHẢI ĐỌC KỸ — vì sao ⛔ KHÔNG có `khai_id` ở đây.**
+    #
+    # Cột `fls_run.khai_id` sinh ra ở task `1` *(migration `0016`)*, và
+    # `fls/db/erd_policy.py` khai hẳn một **đường lineage** dựa vào nó:
+    #
+    #     fls_itl.run_id → fls_run.khai_id → fls_khai_cot.source_id → fls_source
+    #
+    # Quét mã ngày 08/09: **⛔ KHÔNG một câu `INSERT`/`UPDATE` nào set cột
+    # ấy** — nó `NULL` ở **100%** dòng. Phản xạ đầu tiên của tôi là *"quên nối
+    # dây, nối vào"*. ⛔ **Sai.**
+    #
+    # ⭐ Đo tiếp thì lý do sâu hơn: `fls_khai_cot` giữ **MỘT DÒNG MỖI TRƯỜNG**
+    #   *(khoá `(source_id, version, truong)` — **6 dòng** cho một bản khai)*.
+    #   Nên `khai_id` là danh tính của **một trường**, ⛔ không của **một bản
+    #   khai**. ⇒ ⛔ **Không tồn tại** một `khai_id` mang nghĩa *"bản khai mà
+    #   lô này đã dùng"*; chọn bừa một trong 6 là **bịa một nghĩa**.
+    #
+    # ⇒ Cột ấy **⛔ không phải quên nối — nó SAI MÔ HÌNH** *(`GAP-CHUP-04`)*, và
+    #   ⛔ tôi ⛔ không vá bằng cách nhồi một giá trị trông có nghĩa vào.
+    #
+    # ⭐⭐ Lineage THẬT đi qua ảnh chụp, và nó **đủ**:
+    #
+    #     fls_itl.run_id → fls_run.chup_id → fls_chup_nguon
+    #                    (source_id, khai_version) → fls_khai_cot
+    #
+    #   đọc ra tiếng Việt: *"dòng sổ này thuộc lô này, lô đọc ảnh chụp này, ảnh
+    #   chụp đọc nguồn này bằng bản khai `version` này"* — và nó neo vào
+    #   **`(source_id, version)`**, đúng thứ định danh một bản khai.
+    chup_id: int | None = None
+
+    # ⭐⭐ `QĐ-ITL-113` — THỨ TỰ NGÀY do nguồn khai (`fls_khai_cot.thu_tu`).
+    #
+    # ⛔⛔ **Vì sao ở đây chứ ⛔ không ở adapter.** Cả `sao_ke.chuyen()` lẫn
+    #    `sao_ke_canon.dung_canon()` khai thẳng trong mã: *"⛔ KHÔNG làm sạch
+    #    giá trị"* — vì mọi phép đổi ở tầng ấy là một chỗ đối soát có thể đỏ
+    #    vì **lỗi của ta**, ⛔ không phải lỗi của sổ. ⇒ Ngày trở thành `date`
+    #    ở **tầng sổ**, đúng nơi `parse_ngay` sống.
+    #
+    # ⭐ Và chính `parse_ngay` đã viết sẵn cách vá trong thông điệp lỗi của
+    #   nó: *"Gọi `parse_ngay(..., thu_tu='dmy'|'mdy')` theo khai báo của
+    #   nguồn"* — thiết kế lường trước, ⛔ tôi ⛔ không phát minh đường mới.
+    #
+    # ⛔ `None` = *"nguồn ⛔ chưa khai"*, ⛔ **không** = *"coi như `dmy`"*.
+    thu_tu: str | None = None
 
 
 def content_key(source_system: str, source_sheet: str, doc_date: date | None,
@@ -63,7 +113,7 @@ def dung_dong(row: CanonRow, source_row: int, nc: NgucCanh,
               seq_trung: int = 0,
               pm: str | None = None) -> dict[str, Any]:
     """Dung payload mot dong fls_itl. Dong bi LOAI thi NO, khong am tham dung."""
-    kq = validate(row)
+    kq = validate(row, nc.thu_tu)
     if kq.loai:
         raise ValueError("khong the dung dong, phai vao fls_reject: "
                          + " | ".join(kq.loai))
@@ -72,7 +122,7 @@ def dung_dong(row: CanonRow, source_row: int, nc: NgucCanh,
     if sai:
         raise ValueError(f"khoi khong thuoc 7 khoi cua so: {sorted(sai)}")
 
-    ngay = parse_ngay(row.at(_NGAY))
+    ngay = parse_ngay(row.at(_NGAY), nc.thu_tu)
     ps_no, ps_co = parse_so(row.at(_NO)), parse_so(row.at(_CO))
 
     d: dict[str, Any] = {

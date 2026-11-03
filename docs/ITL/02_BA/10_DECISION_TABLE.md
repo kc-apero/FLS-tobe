@@ -1,8 +1,104 @@
 # 10 — DECISION TABLE: quy tắc nghiệp vụ
 
-**Version:** v0.4 | **Chủ sở hữu:** COO-CFO | **Nguồn:** sheet `Mapping Master` thật (ITL RAW), `NGUỒN-BUILD` §4, nợ dữ liệu ở `ORC-06` §3
+**Version:** v0.8 | **Chủ sở hữu:** COO-CFO | **Nguồn:** sheet `Mapping Master` thật (ITL RAW), `NGUỒN-BUILD` §4, nợ dữ liệu ở `ORC-06` §3
 
 Mỗi bảng là *điều kiện → hành động*. **Quy tắc là dữ liệu, không phải code** (`P-05`): giá trị sống trong `MAPPING-MASTER` có version; file này mô tả **cấu trúc** và **thứ tự áp**.
+
+---
+
+## ⭐⭐⭐ DT-I13 · LUẬT GHÉP — **hai nhánh, và kế toán chia theo VN / NƯỚC NGOÀI** *(`QĐ-ITL-144`, 2026-09-18)*
+
+> ⭐ **Nguồn: owner BA màn hình **cùng kế toán** rồi mang luật về.** Đây là **lần đầu** dự án có một luật ghép **do người làm phát biểu**; trước đó máy ghép theo `reference` ＋ bốn bậc tiền — một luật **tôi suy từ dữ liệu**, ⛔ không ai ký.
+
+| # | Điều kiện | Khoá ghép | FLS chạy được ⛔ không |
+|:-:|---|---|---|
+| ⓐ | Giao dịch **Việt Nam**, giao dịch **có PM code** | `PM code` ＋ `số tiền` ＋ ⭐ `pháp nhân` | ⚠ **gần đủ** — xem `ⓐ‑1` |
+| ⓑ | Giao dịch **nước ngoài** | `từ khoá trong nội dung CK` ＋ `tên vendor` ＋ `số tiền` | ⛔ **KHÔNG** — xem `ⓑ‑1` |
+
+### ⓐ‑1 · Nhánh VN — thiếu đúng **một** mắt xích, và nó **nối được**
+
+⭐ **`pháp nhân` là thứ luật mới thêm so với máy hiện nay** — máy đang ghép **⛔ không** dùng pháp nhân, tức nó **lỏng hơn** luật của kế toán. Thêm vào là **chặt lại**, ⛔ không phải nới ra.
+
+⛔⛔ **Nhưng hai bên gọi cùng một pháp nhân bằng HAI mã khác nhau** *(đo `18/09`, `pm_line_id` phân biệt)*:
+
+| Phía | Nói thế nào | Ví dụ |
+|---|---|---|
+| Lệnh chi | `tho['Pháp nhân thanh toán']` — **mã ＋ tên** | `VVOH - Astronex` · `VGO2 - TeraSofts` |
+| Giao dịch | ⛔ cột `le` **rỗng 0/8.387**; suy từ `source_sheet` — **mã HOẶC tên** | `ASTRONEX` · `TERASOFTS` · `VGOH` |
+
+⭐ **Cứu được, vì chuỗi bên lệnh chi mang CẢ HAI nửa.** Khớp *"mã **hoặc** tên"*:
+
+| Kết quả | Dòng lệnh | % |
+|---|--:|--:|
+| ⭐ nối được pháp nhân | **3.120** | **82,7%** |
+| ⛔ phải hỏi người | **652** | **17,3%** |
+
+⛔⛔ **`652` dòng ấy ⛔ KHÔNG được đoán** *(`INV-I16`)*, và dòng lớn nhất là một cặp **trông rất giống nhau**: lệnh chi nói **`CNC`** *(522 dòng)*, giao dịch nói **`CN`** *(906 dòng)*. Giống nhau ⛔ không phải bằng chứng — **phải hỏi**. Còn lại: `SGO1` **68** · `BGO1` **54** · `UGO` **4** · `MGO1` **4**.
+
+⇒ Cần một **bảng bắc cầu** *(`fls_le` đã có chỗ: cột `le_name`, hiện **chỉ 2/20 mã** có tên)*. ⚠ `GAP-LE-01`.
+
+### ⓑ‑1 · Nhánh nước ngoài — ⛔ **KHÔNG chạy được, và nó là NỬA công việc**
+
+> ⭐⭐⭐ **ĐÍNH CHÍNH cùng ngày — `QĐ-ITL-145`.** Câu *"⛔ không chạy được"* dưới đây **đúng lúc viết** và **sai sau đó vài giờ**. Diễn giải sao kê ⛔ **chưa bao giờ thiếu**: nó nằm sẵn trong **ảnh chụp theo nhịp giờ** *(`8.589/8.592` dòng có `Description`)*, chỉ là ⛔ **không đường nào nối nó với một dòng sổ**. Khung xem `fls_dien_giai` *(migration `0026`)* nối được **`8.358/8.387` = 99,7%**. ⇒ Nhánh ⓑ nay thiếu **phép TÌM**, ⛔ không thiếu **dữ liệu**: đo mẫu `180` ứng viên thì **`177` có chữ**, và **tên vendor nằm ngay trong đó** *(`SENSORTOWER, INC.` · `OPENAI *CHATGPT SUBSCR` · `HAILUOAI.VIDEO`)*. ⛔ Bảng dưới **giữ nguyên chữ** làm bản ghi của phép đo lúc `0/8.387`.
+
+⛔⛔ **Cả hai vế đầu của luật đều ⛔ KHÔNG có trong sổ** *(đo `18/09` trên `8.387` dòng)*:
+
+| Luật cần | Cột | Có |
+|---|---|--:|
+| từ khoá trong **nội dung chuyển khoản** | `memo` | ⛔ **0 / 8.387** |
+| **tên vendor** | `acct` | ⛔ **0 / 8.387** |
+| số tiền | `ps_no` ／ `ps_co` | ✅ |
+| ngày | `doc_date` | ✅ 8.387 |
+
+⛔ **Quy mô:** giao dịch ⛔ không phải `VND` = **4.145 / 8.387 = 49%**. ⇒ Luật ⓑ phủ **gần một nửa** cuốn sổ, và hôm nay ⛔ **không một dòng nào** chạy được.
+
+⭐ **Vì sao rỗng — nó ⛔ không phải lỗi nạp.** Tầng `R |` của bảng tính nguồn **chỉ có 5 cột**; cột diễn giải của sao kê **⛔ chưa bao giờ được đưa vào phạm vi**. ⇒ Đây là việc **NẠP**, ⛔ không phải việc **GHÉP**. ⚠ `GAP-NAP-04`.
+
+> ⛔⛔⛔ **Và đây là điều phải nói thẳng: bốn bậc ứng viên hiện nay ⛔ KHÔNG PHẢI luật này.**
+> Máy đang xếp theo `mã` › `tiền` › `gần tiền` › `cùng tiền tệ` — một thứ tự **tôi suy từ dữ liệu**.
+> Nó **trùng một phần** nhánh ⓐ *(mã ＋ tiền)* và ⛔ **không có gì** của nhánh ⓑ.
+> ⇒ ⛔ Đừng đọc *"máy đã ghép 2.222 dòng"* thành *"máy đã chạy luật của kế toán"*.
+
+---
+
+## ⭐⭐ DT-I14 · Ghép xong — ô `hd`/`cdt1` được ghi **gì, vào đâu** *(`QĐ-ITL-149`, 2026-10-01)*
+
+Owner 01/10 *(câu `WO-001 Q3`)*: giá trị máy suy từ dòng lệnh khi ghép là **"Máy gợi ý"**. Bảng áp cho **mọi** đường ghép — tay *(`match`)*, lô *(`match-lo`)*, máy *(lúc nạp)* — vì cả ba dùng **một** phép suy *(`may_ghep.suy_hd_cdt1`)*. Áp **riêng từng ô** `hd`, `cdt1`. Chi tiết kho: `BA-05 DD-I15 ⓓd`.
+
+| # | N dòng lệnh của cú ghép | Ô đã có giá trị **NGƯỜI** chốt *(`fls_sua_tay`)* | Gợi ý máy đang có *(`fls_may_goi_y`)* | ⇒ Hành động | Final của ô |
+|:-:|---|---|---|---|---|
+| 1 | **đồng ý** một giá trị `v` | có | — | ⛔ ghi; khai `nguoi_da_chot` | ⛔ đổi *(giữ giá trị người)* |
+| 2 | đồng ý `v` | ⛔ | = `v` | ⛔ ghi *(⛔ thêm dòng rỗng)* | ⛔ đổi |
+| 3 | đồng ý `v` | ⛔ | ⛔ có, hay ≠ `v` | **ghi gợi ý** `v`: `nguon='may_goi_y'`, `actor` = người bấm *(hay `may@fls` ở đường nạp)*, `evt_id` = sự kiện `match` | ⛔ đổi *(= cột nguồn, thường rỗng)* |
+| 4 | nói **≥ 2** giá trị khác nhau | — | — | ⛔ ghi; khai `khong_suy_duoc` *(`INV-I16`)* | ⛔ đổi |
+| 5 | mọi dòng **rỗng** ô ấy | — | — | ⛔ ghi gì | ⛔ đổi |
+| ⭐ 5a *(v0.7)* | **TRỘN**: ≥ 1 dòng **rỗng** ô ấy, mọi dòng **có** giá trị đều nói **cùng** `v` | *(như 1–3)* | *(như 1–3)* | xử **như "đồng ý `v`"** ⇒ đi tiếp nhánh 1 / 2 / 3 | ⛔ đổi |
+
+⭐ **Nhánh 5a — vì sao ô RỖNG tính là "⛔ lên tiếng", ⛔ phải "bất đồng"** *(v0.7, `fls-ba` trong thẩm quyền spec — `KQ-005 F-3`)*:
+- Luật *"chỉ suy khi **cả N dòng đồng ý**"* *(`INV-I16 ⓒ`)* tồn tại để **máy ⛔ CHỌN** giữa hai câu trả lời khác nhau *(đo 18/09: **10** dòng sổ nói ≥ 2 mã `hd`)*. Ở ca trộn ⛔ có lựa chọn nào: chỉ **một** giá trị được nói ra, các dòng kia **im**.
+- Cùng nghĩa với hai chỗ đã có: nhánh **5** *(mọi dòng rỗng ⇒ rỗng ⛔ phải một giá trị để suy)* và `DT-I09` nhánh 1 *(ô rỗng ⛔ phải giá trị sai)*. Đếm rỗng là "phiếu chống" thì nhánh 5 phải đổi theo — ⛔ ai muốn thế.
+- Cái giá được chặn bởi `QĐ-ITL-149`: kết quả chỉ là **gợi ý**, Final ⛔ đổi, người vẫn phải gõ. Nếu dòng rỗng thật ra thuộc hợp đồng khác thì gợi ý **sai cho phần tiền của dòng ấy** — người gõ đè là xong, ⛔ mất gì.
+- ⭐ **Đo 01/10 tối** *(sổ thật, chỉ `SELECT`; ảnh PM mới nhất mỗi `pm_line_id` — cách `tools/goi_y_lai.py:42`–`48` đọc)*: dòng tiền có **≥ 2** mối nối hiệu lực = **25** *(mẫu số ≠ 0, `Đ3`)*, nối đủ 25/25 vào ảnh PM ⇒ ca trộn `hd` **0/25** · `cdt1` **0/25** *(đồng ý đủ `hd` 15 · lệch `hd` 10 · đồng ý đủ `cdt1` 23 · lệch `cdt1` 2)*. Ảnh PM: dòng lệnh rỗng `hd` **4/3.820**, rỗng `cdt1` **7/3.820** ⇒ ca trộn **hiếm**, hôm nay ⛔ chạm dòng nào.
+- Mã **đã** làm đúng nhánh này *(`fls/repo/may_ghep.py:68`–`69` `gt.discard("")`)* ⇒ ⛔ đổi mã, chỉ **ghim bằng bài** *(`WO-003` vòng 2 ~~`AC-15`~~ **`AC-16`** — đính chính v0.8, `KQ-007 F-4`)*. ⚠ Owner muốn ngược lại *(rỗng = bất đồng ⇒ `khong_suy_duoc`)* thì đổi đúng một dòng ấy + bài ghim.
+
+**Bỏ ghép** *(`unmatch`)* — áp cho từng bút toán gắn sự kiện `match` của dòng. ⭐⭐ **v0.7 *(`KQ-005 F-1`)*: xét MỌI LỚP, ⛔ chỉ lớp khung xem đang trả.**
+
+| # | Bút toán ấy hôm nay | ⇒ Hành động |
+|:-:|---|---|
+| 6 | `nguon='may_goi_y'` và **⛔ có bản đảo nào** trỏ về nó *(⛔ dòng `fls_adjustment` nào có `reversal_of` = nó)* — ⭐ **bất kể lớp**: kể cả khi nó đã bị một gợi ý mới hơn **đè** nên khung xem `fls_may_goi_y` ⛔ còn trả nó | **ĐẢO** *(thêm dòng `reversal_of`, `nguon='may_goi_y'`)* |
+| 7 | ⭐ *(v0.7)* **đã có bản đảo** | ⛔ làm gì · ⛔ khai vào `bo_qua` *(nó ⛔ phải giá trị người — xem định nghĩa dưới)*. ~~v0.6: *"đã bị đảo / **bị gợi ý mới hơn đè** ⇒ ⛔ làm gì"*~~ — vế *"bị đè"* **SAI**, rút: lớp bị đè vẫn **chưa đảo**, nên khi lớp trên bị đảo nó **nổi lên lại** thành gợi ý **mồ côi** *(`KQ-005 F-1`, 2/2 kịch bản)* ⇒ nay thuộc nhánh **6** |
+| 8 | `nguon='sua_tay'` **cũ** *(trước `WO-003`)*, **⛔ có bản đảo** — bất kể lớp | ĐẢO, bản đảo mang `nguon='sua_tay'` *(luật cũ — đo 01/10: **0** dòng như thế chưa đảo; 2 dòng UAT đã đảo)* |
+| — | giá trị **người** gõ *(`/adjust`)* — bút toán ⛔ gắn sự kiện `match` | ⛔ **chạm**; khai `bo_qua` nếu nó nằm trên một ô mà dòng từng có bút toán gắn `match` |
+
+⭐⭐ **Luật một câu thay nhánh 7 cũ:** *bỏ ghép đảo **mọi** bút toán gắn sự kiện `match` của dòng mà **chưa có bản đảo** — mọi lớp, mọi vòng ghép trước — và ⛔ chạm bút toán nào ⛔ gắn `match`.* Vì sao *mọi* lớp: `unmatch` gỡ **cả chùm** mối nối *(`QĐ-ITL-69`)* ⇒ sau nó dòng có **0** mối nối, nên **⛔ gợi ý nào** từ sự kiện `match` còn căn cứ — lớp trên hay lớp dưới đều vậy. Khung xem `fls_may_goi_y`/`fls_sua_tay` *(migration `0025`)* trả lời *"ô này **đang** là gì"* = **lớp trên cùng**; dùng nó để chọn thứ cần đảo là hỏi **sai câu** *(luật `Đ3` họ hàng: đo trên tập của câu hỏi khác)*. Giá trị người ⛔ bao giờ bị đảo vì bút toán của nó gắn sự kiện `adjust`, ⛔ `match`.
+
+⭐ **Bất biến đo được** *(`INV-I22`, `BA-11` v0.15)*: sau một cú bỏ ghép, dòng ấy có **0** bút toán `nguon='may_goi_y'` gắn sự kiện `match` mà chưa có bản đảo *(⇒ `fls_may_goi_y` của dòng = **0**, kể cả **lớp dưới**)*. Toàn sổ: **0** gợi ý máy chưa đảo trên dòng **không còn** mối nối hiệu lực nào. Đo 01/10 tối *(sổ thật)*: **4.424** bút toán gợi ý chưa đảo *(mọi lớp; mẫu số ≠ 0)* · trong đó nằm trên dòng **0** mối nối: **0** · ô có **≥ 2** lớp chưa đảo **0** ⇒ hôm nay ⛔ dòng thật nào dính; sẽ dính lần đầu `tools/goi_y_lai.py` chồng lớp rồi có người bỏ ghép.
+
+⭐⭐ **Định nghĩa `bo_qua`** *(`KQ-005 F-2` — `BA-06` v4.7 `:1174` **đúng**, ⛔ đổi: *"`bo_qua` = cái máy ⛔ KHÔNG rút **(người đã gõ tay)**"*)*: **một mục `bo_qua` = một giá trị NGƯỜI** — dòng của khung xem `fls_sua_tay` *(`nguon='sua_tay'`, bút toán ⛔ gắn sự kiện `match`)* nằm trên ô mà dòng **từng** có bút toán gắn `match` *(vòng ghép nào cũng được)*. Mỗi ô **nhiều nhất một** mục; mục mang `nguon='sua_tay'`. ⛔⛔ Bút toán **máy** — đã đảo ở lượt trước *(nhánh 7)*, vừa đảo ở lượt này *(nhánh 6/8, đã nằm trong `but_toan_dao`)* — **⛔ BAO GIỜ** vào `bo_qua`: màn `F01` in mảng ấy dưới câu *"người đã gõ tay lên đó"*, nên một mục máy là **bịa về việc người làm**. Đo `KQ-005 F-2`: ghép → bỏ → ghép lại → bỏ, ⛔ ai gõ ⇒ mã hôm nay trả **2** mục *(phải **0**)*.
+
+⭐ **Nhật ký của bản đảo — đọc thế nào** *(v0.8, `KQ-007 F-1`)*: bản đảo mang `value_before` = giá trị **của chính lớp** bị rút và `value_after` = `NULL` *(`WO-003` vòng 2 Rủi ro 2 — nhật ký đọc được *"rút HD-A"*, *"rút HD-B"* riêng)*; luật **ghi** ⛔ đổi. `NULL` ở đây nghĩa *"lớp này hết hiệu lực"*, ⛔ *"ô bị xoá"*: ở nhánh 6 *(`may_goi_y`)* Final ⛔ bao giờ đổi vì gợi ý ⛔ bao giờ là Final *(`QĐ-ITL-149`)*. Màn đọc theo `value_source` ⇒ `BA-06` v4.8 dòng *"F02 · nhật ký trong drawer"*. Nhánh 8 *(`sua_tay` cũ dưới giá trị người)* là phần còn lại **chấp nhận**: sổ thật **0** dòng và tập **đóng** *(sau `WO-003` cú ghép ⛔ còn ghi `sua_tay` — đo 01/10 tối: bút toán `sua_tay` gắn `match` chưa đảo **0**)*.
+
+⛔ **Final chỉ đổi khi NGƯỜI gõ** *(`/adjust` ⇒ `fls_sua_tay`)*. ⚠ Hôm nay ⛔ màn nào hiện gợi ý để gật *(`GAP-SCR-33`)*.
 
 ---
 
@@ -234,6 +330,10 @@ DT-I05 (ngày)  →  DT-I01 (LE)  →  DT-I06 (khử trùng)  →  DT-I09 (nội
 | `GAP-ITL-07` | Ngưỡng khớp tối thiểu để một đường suy được phép thành luật tự động | Diễn đàn QT |
 
 ## Changelog
+- **v0.8** *(2026-10-01 tối, `fls-ba`, `KQ-007`)*: `F-4 ⓐ` đính chính tham chiếu bài ghim nhánh `5a` — ~~`AC-15`~~ ⇒ **`AC-16`** *(`WO-003` vòng 2: ca trộn = `AC-16`; `AC-15` là `bo_qua`)*; `F-1` thêm đoạn *Nhật ký của bản đảo — đọc thế nào* *(luật ghi ⛔ đổi; cách màn đọc ⇒ `BA-06` v4.8)*.
+- **v0.7** *(2026-10-01 tối, `fls-ba`, `KQ-005` — `fls-test` TRƯỢT `WO-003 AC-7`)*: ⭐⭐ **`DT-I14` nhánh 7 SAI một vế, rút:** *"bị gợi ý mới hơn đè ⇒ ⛔ làm gì"* làm lớp gợi ý bị đè **⛔ bao giờ đảo** ⇒ bỏ ghép xong nó **nổi lên lại** thành gợi ý mồ côi trên dòng **0** mối nối *(`F-1`, 2/2 kịch bản trên kho TEST)*. Luật mới: bỏ ghép đảo **mọi** bút toán gắn `match` **chưa có bản đảo** — **mọi lớp**; nhánh 7 chỉ còn *"đã có bản đảo"*; nhánh 8 cũng xét mọi lớp. Thêm **bất biến đo được** ⇒ `INV-I22` *(`BA-11` v0.15)*. ⭐ **Định nghĩa `bo_qua`** = chỉ giá trị **người** *(`F-2`; `BA-06:1174` đúng, ⛔ đổi)*. ⭐ **Thêm nhánh `5a` — ca TRỘN** *(một dòng lệnh rỗng ô, dòng kia có `v`)* ⇒ rỗng = **⛔ lên tiếng** ⇒ gợi ý `v` *(`F-3`; đo 01/10: **0/25** dòng ≥ 2 mối nối rơi vào ca này; mã đã làm vậy — chỉ ghim bài)*.
+- **v0.6** *(2026-10-01, `fls-ba`, `QĐ-ITL-149` — owner: *"Máy gợi ý"*)*: ⭐⭐ **Thêm `DT-I14` — ô `hd`/`cdt1` sau ghép:** 5 nhánh ghép + 3 nhánh bỏ ghép; **Final chỉ đổi khi người gõ**. Một bảng cho cả ba đường ghép *(tay · lô · máy)* vì cả ba dùng **một** phép suy.
+- **v0.5** *(2026-09-18, `QĐ-ITL-144` — owner BA màn hình **cùng kế toán** rồi mang luật về)*: ⭐⭐⭐ **Thêm `DT-I13` — LUẬT GHÉP, và đây là lần ĐẦU dự án có một luật ghép do NGƯỜI LÀM phát biểu.** Trước đó máy ghép theo `reference` ＋ bốn bậc tiền — một thứ tự **tôi suy từ dữ liệu**, ⛔ không ai ký. ⭐ Luật thật có **hai nhánh**: **VN** *(PM code ＋ số tiền ＋ **pháp nhân**)* và **nước ngoài** *(từ khoá nội dung CK ＋ tên vendor ＋ số tiền)*. ⛔⛔ **Đo ngay: một nhánh gần đủ, một nhánh KHÔNG chạy được.** Nhánh VN thiếu `pháp nhân` — cột `le` **rỗng 0/8.387**, nhưng suy được từ `source_sheet`; trở ngại thật là **hai bên gọi cùng một pháp nhân bằng hai mã khác nhau** *(`VVOH - Astronex` ↔ `ASTRONEX`)*. Khớp *mã HOẶC tên* được **3.120/3.772 = 82,7%**; **652 dòng (17,3%) phải hỏi người**, lớn nhất là cặp **`CNC` (522) ↔ `CN` (906)** — giống nhau ⛔ **không phải bằng chứng** *(`INV-I16`)*. ⛔ Nhánh nước ngoài thiếu **cả hai** vế đầu *(`memo` **0/8.387** · `acct` **0/8.387**)* và nó phủ **49%** cuốn sổ ⇒ ⛔ **không một dòng nào** chạy được; gốc là tầng `R |` chỉ có **5 cột**, tức việc **NẠP**, ⛔ không phải việc **GHÉP**. ⚠ Mở `GAP-LE-01` *(bảng bắc cầu pháp nhân)* ＋ `GAP-NAP-04` *(nạp cột diễn giải sao kê)*.
 - **v0.4** *(2026-09-04, `QĐ-ITL-88·89`)*: ⭐⭐ Thêm **`DT-I11`** *(khi nào bật bảng báo `KIỂM TRA` — **ba** việc, và **chỉ** ba; `chưa phân loại` **⛔ KHÔNG** thuộc nhóm đó vì nó là trạng thái của **76,6%** cuốn sổ)* và **`DT-I12`** *(so hai cột thì phải hỏi **CÓ SO SÁNH ĐƯỢC KHÔNG** trước — `US-032` viết là `le != le_payer` thì báo trên **13,0%** sổ, mà **90%** trong số đó là so **táo với cam**: hai cột chỉ trùng từ vựng **44%**)*.
 - **v0.3** *(2026-09-04, `QĐ-ITL-83·86·87`)*: ⭐ Thêm **`DT-I09`** *(kiểm giá trị ở cửa ghi — 7 nhánh, gồm cả nhánh **rỗng** và nhánh **danh mục `0` dòng**)* và **`DT-I10`** *(số tiền của một dòng sổ: `Nợ`=vào(+) · `Có`=ra(−), và một vế **có tiền** khi nó ⛔ không rỗng **VÀ khác 0**)*. ⛔ Phép đo cũ *"ô nào không rỗng"* làm **3.630/10.030 dòng (36%)** hiện sai, và nó ⛔ **không nhìn thấy được**.
 - v0.2 (2026-08-18): Thêm `DT-I10` — 4 loại giao dịch hay bị bỏ sót, dẫn xuất từ sổ sự cố `Check list mapping` (kế toán tự ghi).

@@ -69,6 +69,32 @@
     if (c) c.textContent = p.cho_ghi ? 'cửa: ĐỌC + GHI' : 'cửa: CHỈ ĐỌC';
   }
 
+  // ⭐ Ve LUC MO, ⛔ khong ve san ca sau man luc khoi dong: moi man la mot
+  //   phep doc THAT tren kho, va mot man ⛔ chua ai mo ⛔ khong nen ton mot
+  //   luot hoi kho. ⚠ Ban khai o MOT cho — them man moi thi them **mot dong**,
+  //   ⛔ khong them mot nhanh `if` nua *(bon nhanh `if` la bon cho de quen)*.
+  const VE_KHI_MO = {
+    // ⭐ `ve_man` chu ⛔ khong `ve`: man `F01` nay co HAI LAN
+    //   (`GAP-SCR-14`), va `ve_man` la cho ve thanh chuyen lan.
+    'man-f01': { than: '#than-f01', ve: () => F01.ve_man() },
+    // ⭐ Man GAN LENH CHI (`QĐ-ITL-148`) — neo vao `#ghep-goc`.
+    /* ⭐ `mo_man` chứ ⛔ KHÔNG `ve`: `ve()` chỉ **vẽ lại thứ đang cầm**, nên
+       gọi nó ở đây làm màn hiện *"Hàng chờ đã sạch."* trước khi hỏi sổ một
+       câu nào. Đúng lỗi đã sống suốt `B3` mà cả hai cổng ⛔ không thấy. */
+    'man-ghep': { than: '#ghep-goc', ve: () => F01G.mo_man() },
+    'man-f02': { than: '#than-f02', ve: () => F02.ve() },
+    // ⭐ `F04` neo vao `#f04-chon` *(o cua trang thai ①)*, ⛔ khong mot the
+    //   `#than-f04` — man nay co **nam khoi**, ⛔ khong phai mot than duy nhat.
+    'man-f04': { than: '#nap-chon', ve: () => F04.ve() }
+  };
+
+  /* ⭐ Mo mot man **tu ma khac** — `F04` bam *"Mo hang cho"* thi phai sang
+     `F01` that, ⛔ khong chep lai logic doi tab o hai cho. */
+  function mo(id) {
+    const b = document.querySelector('.tabs button[data-s="' + id + '"]');
+    if (b) b.click();
+  }
+
   function chon_man() {
     const nut = document.querySelectorAll('.tabs button');
     nut.forEach(function (b) {
@@ -78,16 +104,13 @@
         document.querySelectorAll('section.screen').forEach(
           s => s.classList.toggle('on', s.id === b.dataset.s));
         window.scrollTo({ top: 0 });
-        // ⛔ Vẽ LÚC MỞ, ⛔ không vẽ sẵn cả bốn màn lúc khởi động: hàng chờ là
-        // một phép đọc thật trên kho, và một màn ⛔ chưa ai mở ⛔ không nên tốn
-        // một lượt hỏi kho.
-        if (b.dataset.s === 'man-f01' && !TP.$('#than-f01').textContent.trim())
-          F01.ve();
-        if (b.dataset.s === 'man-f02' && !TP.$('#than-f02').textContent.trim())
-          F02.ve();
+        const m = VE_KHI_MO[b.dataset.s];
+        if (m && !TP.$(m.than).textContent.trim()) m.ve();
       };
     });
   }
+
+  window.UD = { mo: mo };
 
   function khoi_dong() {
     const q = new URLSearchParams(window.location.search);

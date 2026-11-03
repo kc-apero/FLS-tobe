@@ -1,0 +1,54 @@
+flowchart LR
+  subgraph A_nap["Ⓐ NẠP DATA — sao kê · lệnh chi vào kho — mốc `A`, đường LẤY dữ liệu"]
+    direction TB
+    fls_chup["fls_chup"]
+    fls_chup_dong["fls_chup_dong"]
+    fls_chup_nguon["fls_chup_nguon"]
+    fls_dien_giai["fls_dien_giai<br><i>khung xem</i>"]:::view
+    fls_khai_cot["fls_khai_cot"]
+    fls_nguon_dai["fls_nguon_dai"]
+    fls_reject["fls_reject"]
+    fls_run["fls_run"]
+    fls_source["fls_source"]
+  end
+  subgraph B_ghep["Ⓑ GHÉP LỆNH CHI — dòng tiền này chi theo lệnh nào — tác vụ ①"]
+    direction TB
+    fls_moi_noi["fls_moi_noi<br><i>khung xem</i>"]:::view
+    fls_pm_line["fls_pm_line"]
+    fls_pm_link["fls_pm_link"]
+    fls_pm_unlink["fls_pm_unlink"]
+  end
+  subgraph C_sua["Ⓒ SỬA ITL — kế toán gõ 7 trường, máy giữ vết — tác vụ ②"]
+    direction TB
+    fls_adjustment["fls_adjustment"]
+    fls_journal["fls_journal"]
+    fls_may_goi_y["fls_may_goi_y<br><i>khung xem</i>"]:::view
+    fls_sua_tay["fls_sua_tay<br><i>khung xem</i>"]:::view
+  end
+  subgraph S_so["SỔ & DANH MỤC — trục chung — cả ba khâu đều chạm"]
+    direction TB
+    fls_itl["fls_itl"]
+    fls_le["fls_le"]
+    fls_mapping_master["fls_mapping_master"]
+  end
+  subgraph V_viec["VIỆC CỦA NGƯỜI — cắt ngang Ⓑ và Ⓒ — người còn phải làm gì"]
+    direction TB
+    fls_da_xong["fls_da_xong<br><i>khung xem</i>"]:::view
+    fls_queue_event["fls_queue_event"]
+    fls_queue_reason_weekly["fls_queue_reason_weekly<br><i>khung xem</i>"]:::view
+    fls_queue_state["fls_queue_state<br><i>khung xem</i>"]:::view
+  end
+  subgraph H_ha_tang["HẠ TẦNG — sổ di trú"]
+    direction TB
+    fls_migration["fls_migration"]
+  end
+
+  A_nap ==> B_ghep
+  B_ghep ==> C_sua
+  A_nap -.-> S_so
+  B_ghep -.-> S_so
+  C_sua -.-> S_so
+  B_ghep -.-> V_viec
+  C_sua -.-> V_viec
+
+  classDef view stroke-dasharray: 5 3;

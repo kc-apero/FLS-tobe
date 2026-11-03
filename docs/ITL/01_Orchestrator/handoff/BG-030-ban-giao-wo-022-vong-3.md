@@ -1,0 +1,59 @@
+# BG-030 — bàn giao `WO-022` **vòng 3** *(hộp "Tìm tiền" `F01L` đọc khuôn `⓵` của cửa thật · cổng quét khoá màn ⊆ khoá cửa)*
+
+| | |
+|---|---|
+| **Thuộc** | [`WO-022`](WO-022-in-tien-theo-tien-te.md) — ⭐ **vòng 3 của `WO-022`** *(`AC-16`…`AC-19`; căn cứ [`KQ-029`](KQ-029-kiem-bg-027-bg-028.md) `F-1` `NANG`. Vòng 1 = [`BG-027`](BG-027-ban-giao-wo-022.md) @ `7746e48`, vòng 2 = [`BG-028`](BG-028-ban-giao-wo-022-vong-2.md) @ `3173d7f` — `KQ-029` đã cho `AC-1`…`AC-15` ĐẠT)* |
+| **Phát bởi** | `fls-dev` · 2026-10-02 |
+| **Nhận** | `fls-test` |
+| **Commit** | `feat/p2-oracle-parity` @ **`e0d2a96`** *(đã đẩy — mã + bài + tài liệu Dev + `WO` mục Vòng 3)*; tờ này + `WO`→`CHO_TEST` + README + dashboard ở commit giấy ngay sau |
+| **Spec** | ⛔ đổi: `BA-06` **v4.13** *(header ✔)* · `BA-07 §4h ⓵` *(khuôn ứng viên — đo thật trên kho TEST: `itl_id · doc_date · doc_no · dien_giai · amount · chieu · curr · nguon · bac · lech · khoa_to` + khi có: `loi_nguon` · `dien_giai_vi_sao`)* |
+| **Cổng vào** | git `a69ee92` = `origin/feat/p2-oracle-parity` ✔ *(`git fetch` + `status -sb`)* · nền `kiem_so_song` **44** *(`KQ-029`; tên đối chiếu với bản sau vòng 2 của Dev)* |
+| **HOI mở kèm** | **không** |
+
+## Đã đổi
+| Tệp | Vì sao |
+|---|---|
+| `fls/web/tep/man_f01_lenh.js` | ⓘ `_drawer_tim_tien`: cột `Tiền` `TP.tien(u.amount, u.curr)` · cột `Lệch` `u.lech == null ? '—' : TP.tien(u.lech, u.curr)` *(`null` = bậc `ma` ⛔ tính lệch — chú thích tại chỗ)* · cột `Diễn giải` `u.dien_giai` · `_tinh` `TP.xu(u.amount)` + câu `#sig-l` `tiền bank` = `TP.tien(u.amount, …)`. ⛔ Trước *(`a69ee92` `:586`–`:589` · `:662` · `:669`)*: `u.tien` · `u.lech_tuyet_doi` · `u.memo`. Chú thích dài ghi lỗi + cổng canh nó. **4** chỗ đọc đổi, ⛔ chỗ nào khác của tệp |
+| `tests/web/test_wo022_v3_tim_tien_cua_that.py` *(mới)* | ⓐ khuôn dựng chung `ca_cua_that`: kho **TEST** *(assert `current_database() = 'fls_test'`)* — run `NAP-2000-01-01-W…`, nguồn `R \| WO022V3 …` + `fls_chup` + `fls_chup_dong` mang `Description` *(để cửa nối ra `dien_giai` **thật** qua khung xem `fls_dien_giai`)*, hai dòng tiền USD `<N>.56`/`<N>.16`, hai lệnh cùng phiếu `<N>.56`/`10.00`; gọi **cửa thật qua HTTP** cho **4** đường màn đọc *(tóm tắt · danh sách lệnh `curr=USD` · ứng viên · nhìn đủ PM)*. `<N>` **ngẫu nhiên** mỗi lần *(kho TEST phình — một số cố định sẽ bị đẩy ra ngoài `limit=50`)*. ⓑ **4** bài: khớp đúng xu ⇒ *"trong dung sai"* · ⭐ **cổng quét khoá** · bản đồ đủ hàm · khuôn tự nhét ⊆ cửa thật |
+| `tests/web/test_wo022_tien_theo_tien_te.py` | ⭐ `AC-17`: `test_AC6_man_f01_lenh_CHAN_MAN_va_hop_TIM_TIEN_lech_0_40` **viết lại** — dựng **mọi** thân từ `ca_cua_that` *(⛔ một khoá nào do bài đặt)*, mang dấu `pg`. **Lo gốc giữ nguyên** *(chân màn USD có lẻ · lệch `0,40` in `0,40` + `VƯỢT`, ⛔ `0`)*; docstring ghi lý do viết lại *(`KQ-019`-kiểu: khuôn tự nhét che chỗ màn đọc sai cửa)* |
+| `tests/web/test_man_f01_lenh_dom.py` | `_UV.ung_vien` đổi sang khuôn `⓵` *(`amount`/`lech`/`dien_giai`/`chieu`/`nguon`; bỏ `tien`/`lech_tuyet_doi`/`memo`/`le`/`work_status` cửa ⛔ trả)*. Bài dùng nó *(`test_drawer_KHAI_RA_da_CAT_danh_sach` · `test_drawer_ghim_TIEN_LENH_va_DUNG_SAI`)* ⛔ đổi một dòng assert, vẫn xanh |
+| `tests/web/test_wo022_v2_o_tien_va_mot_luat_so_le.py` | thân ứng viên của `_hop_tim_tien` *(bài `AC-14` — chỉ hỏi dòng *"dung sai Σ"*)* tách thành hằng `UV_V2` khuôn `⓵`, **có canh** ở tệp v3. ⛔ đổi assert nào |
+| `docs/ITL/03_Dev/08_CHANGELOG_RELEASE.md` · `12_P6_WEB_PLAN.md` *(v0.11 → **v0.12**)* | dòng changelog vòng 3; **quy ước thứ năm** *(thân cửa trong bài màn lấy từ cửa thật, hoặc khuôn tự nhét **có canh**; cổng quét khoá)* |
+| `docs/ITL/01_Orchestrator/handoff/WO-022-…md` | mục **Vòng 3** *(căn cứ `KQ-029` `F-1`; TRONG (i)(j)(k) · `AC-16`…`AC-19`)* + trạng thái + changelog |
+
+## Cổng *(kết quả nguyên văn — `PG_DSN=postgresql://fls:fls@localhost:5433/fls`, `PYTHONUTF8=1`, chạy **tuần tự** trên cây `e0d2a96`)*
+| Lệnh | Kết quả |
+|---|---|
+| `python -m pytest` | `2 failed, 2183 passed, 3 xfailed in 311.84s (0:05:11)` — **2 failed = đúng 2 `XPASS(strict)`** của `tests/nghiem_thu/test_kq029_tim_tien_khuon_cua_that.py` *(`test_F1_…lech_0_40_in_ra_va_VUOT` · `test_F1_…khop_DUNG_tien_la_TRONG_dung_sai`)* — **đúng ý**: `F-1` đã vá ⇒ `fls-test` gỡ dấu ở `KQ` vòng sau *(Dev ⛔ sửa tệp ấy)*. `3 xfailed` = 3 `xfail(strict)` `kq021` *(`WO-023`)*. Mong: `2179` *(`KQ-029`)* `+ 4` bài mới = **2183** ✔ |
+| `python tools/kiem_so_song.py` | `⛔ CONG SO SONG KHONG DAT — 44 lech/khong-do-duoc` — so **tên** 44 dòng *(bỏ giá trị trong backtick)* với bản sau vòng 2 của Dev ⇒ **trùng 44/44** *(`diff` rỗng)*: nền, đỏ **mới** **0** |
+| `python docs/ITL/_tools/kiem_tai_lieu.py` | `✅ cong tai lieu DAT — va no da do duoc that (120 file, 1377 bang, 664 o ngay, 104 ma QD), khong chi 'khong thay loi'` *(đo lại SAU khi thêm tờ này + `WO`/README/dashboard; trước đó `119 file, 1373 bang`)* |
+| `python docs/ITL/_tools/khop_owner.py --kiem` | `⇒ 17/20 khop · 3 lech   (da do 20/20 phep)` · `✅ cong C1 DAT — bang khop ban khai, va no da do duoc that (20 phep tren 3 nguon)` |
+| `python tools/soi_bang_tuyen.py` | `✅ ban khai KHOP SQL that o ca 40 tuyen` |
+| `python tools/kiem_thuyet_minh.py` | `✅ CONG THUYET MINH DAT — 31/31 nut co mat trong CA 2 ban` |
+| `.venv/Scripts/lint-imports.exe` | `Contracts: 9 kept, 0 broken.` |
+| `python -m fls.db.pg_migrate` | ⛔ **CHƯA CHẠY** — phiếu ⛔ chạm schema *(`schema.py` / migration ⛔ đổi)* |
+
+## Bằng chứng từng AC
+| AC | Bằng chứng của Dev |
+|---|---|
+| AC-16 | `pytest --runxfail tests/nghiem_thu/test_kq029_tim_tien_khuon_cua_that.py` ⇒ **`3 passed in 2.52s`**; chạy thường ⇒ `[XPASS(strict)]` ×2 + `test_khuon_CUA_THAT_…` PASSED ⇒ `2 failed, 1 passed`. Trên mã `a69ee92` *(trước vá, cùng lượt)*: `XFAIL` ×2 + 1 PASSED. ⭐ Bài **của Dev** cùng ý: `test_AC16_tim_tien_THAN_CUA_THAT_khop_DUNG_xu_la_TRONG_dung_sai` *(cũng đòi cột `Tiền` `<N>,56` + **cả hai** diễn giải sao kê trong hộp)* — trên `a69ee92` **ĐỎ**: `tiền lệnh <b>102.105,56</b> ↔ tiền bank <b>—</b> · lệch <b>⛔ không tính được</b> ⇒ ⛔ <b>VƯỢT dung sai</b> — cửa ghi sẽ TỪ CHỐI` |
+| AC-17 | `test_wo022_tien_theo_tien_te.py::test_AC6_man_f01_lenh_CHAN_MAN_va_hop_TIM_TIEN_lech_0_40` — thân **4** đường lấy từ cửa thật *(`goi_cua` gọi `_goi(may, …)` HTTP; kịch bản node chỉ chép thân vào `_TRA`)*; hộp mở bằng **chính dòng** cửa danh sách lệnh trả. **Trên JS `a69ee92` ĐỎ** đúng lý do: cột `Tiền` `<td class="r num">—</td>` · `Lệch` `—` · `Diễn giải` trống ⇒ `assert "0,40" in r["hop"]` hỏng. Sau vá: xanh |
+| AC-18 | **Chrome thật** headless `1440×900` *(CDP)*, máy **8099** `tools/chay_cua.py --cho-web` **chỉ đọc** với `PG_DSN=…/fls_test` *(đã tắt sau đo; 8088 ⛔ chạm — vẫn nghe)*. Ca dựng bằng `dung_ca` trên kho TEST: lệnh `PWF664A8-1` `438.325,56 USD`. Hộp mở bằng `F01L._drawer_tim_tien(dòng cửa danh sách lệnh)` *(nút `Duyệt` bị `_chan_ghi` khoá ở máy chỉ đọc — như `KQ-029`)*; **chọn bằng chuột thật** *(`Input.dispatchMouseEvent` vào tâm ô radio)*. Hàng đo: `15 · tiền khớp · FT-V3 · 438.325,56 · 0,00 · CK khop dung tung xu WO022V3` · `16 · cùng tiền tệ · FT-V3 · 438.325,16 · 0,40 · CK lech bon muoi xu WO022V3`. Chọn `15` ⇒ `#sig-l` lớp `note ok`: *"tiền lệnh 438.325,56 ↔ tiền bank 438.325,56 · lệch 0,00 ⇒ trong dung sai"* ⇒ ⛔ còn câu `VƯỢT`. Chọn `16` ⇒ `note crit`: *"… tiền bank 438.325,16 · lệch 0,40 ⇒ ⛔ VƯỢT dung sai — cửa ghi sẽ TỪ CHỐI"* *(đúng `QĐ-ITL-62` — USD dung sai 0)*. Console **0** lỗi. **Chiều ĐỎ, cùng máy cùng ca**: đặt tạm JS `a69ee92` *(`git show a69ee92:…`)* ⇒ hàng `15` in `— · — · ` *(trống)*, chọn `15` **và** `16` đều *"tiền bank — · lệch ⛔ không tính được ⇒ ⛔ VƯỢT dung sai — cửa ghi sẽ TỪ CHỐI"*; trả JS mới, `git diff` xác nhận. Ảnh *(⛔ lên git)*: `scratchpad/wo022v3_8099_{khop,lech}.png` · `wo022v3_8099_CU_{khop,lech}.png` |
+| AC-19 | bảng Cổng trên. ⭐ **Cổng quét mới** `test_AC16_MOI_khoa_F01L_doc_tu_than_cua_DEU_CO_trong_CUA_THAT` — gom **26** khoá / **5** biến / **2** hàm *(`_drawer_tim_tien`: `d.` 5 · `u.` 8 · `r.` 5; `_panel_pm`: `d.` 3 · `x.` 5)* ⊆ khoá **3** cửa thật *(ứng viên · nhìn đủ PM · danh sách lệnh)*. **Chứng minh ĐỎ** *(`Đ5`)*: trên `a69ee92` ⇒ `_drawer_tim_tien: u.lech_tuyet_doi` · `u.memo` · `u.tien` *(đúng ba khoá `KQ-029`)*; **5/5 đột biến** *(sửa tệp → chạy → trả nguyên, `bytes ==` xác nhận)*: thêm `u.so_tien` ⇒ ĐỎ · `x.da_noi`→`x.noi` ⇒ ĐỎ · `r.ref_tho`→`r.ma_tho` ⇒ ĐỎ · `d.bi_cat`→`d.cat` ⇒ ĐỎ · thêm hàm `_ham_moi` gọi `FLS.doc('/queue/lenh/' …)` ⇒ `test_AC16_moi_ham_goi_cua_theo_MOT_lenh_DA_CO_ban_do` ĐỎ. `test_AC16_KHUON_THU_…` trên `a69ee92` ĐỎ: `{'test_man_f01_lenh_dom._UV': ['le', 'lech_tuyet_doi', 'memo', 'tien', 'work_status'], 'UV_V2': ['lech_tuyet_doi', 'memo', 'tien']}` |
+
+**Lượt đỏ trên `a69ee92`** *(JS cũ, bài mới — nguyên văn `-rA`)*: `4 failed, 2 passed, 2 xfailed` — FAILED: `test_AC16_tim_tien_…khop_DUNG_xu…` · `test_AC16_MOI_khoa_F01L…` · `test_AC16_KHUON_THU…` · `test_AC6_man_f01_lenh_CHAN_MAN…`; PASSED: `test_AC16_moi_ham_goi_cua…` *(bài cấu trúc — đỏ chứng bằng đột biến trên)* · `kq029::test_khuon_CUA_THAT…`; XFAIL ×2 `kq029`.
+
+## Kho thật
+- `KHONG_CHAM`. Mọi phép ghi chỉ ở **kho TEST** `fls_test` *(run `NAP-2000-01-01-W…`, nguồn `R | WO022V3 …`, `fls_chup` `SS-WO022V3` actor `fls-dev@apero.vn`)*. Máy 8088 *(sổ thật, chỉ đọc)* ⛔ chạm — vẫn nghe sau phiếu.
+
+## Cách chạy để xem *(chạm UI)*
+- `PG_DSN=postgresql://fls:fls@localhost:5433/fls_test FLS_JWT_SECRET=<≥32 ký tự> python tools/chay_cua.py --cong 8099 --cho-web` · chế độ **chỉ đọc**. Dựng ca: gọi `tests.web.test_wo022_v3_tim_tien_cua_that.dung_ca(conn)` trên kho TEST *(trả `ma`, `khop`, `lech`, `n`)*; trong trang: `F01L._drawer_tim_tien((await FLS.doc('/queue/lenh-cho?limit=50&curr=USD')).data.rows.find(x => x.pm_line_id === MA))`.
+
+## Dev tự thấy còn yếu
+1. ⭐ **Cổng quét chỉ phủ HAI hàm của `F01L`** — hai hàm đọc thân cửa **theo một lệnh**. Các hàm vẽ qua `TT.chay` *(`_ve_tom` · `_ve_viec` · `_ve_ro` · `_ve_luoi`)* đọc thân `/queue/lenh-cho/summary` · `/ro` · `/queue/lenh-cho?…` **⛔ có** trong `BAN_DO`, và bài của chúng *(`test_man_f01_lenh_dom._TOM`/`_LUOI`)* vẫn **tự nhét**. Cũng ⛔ phủ `man_f01_ghep.js` *(`F01G.mo_lenh` đọc **cùng** cửa `itl-candidates`)* và `man_f01.js`. Lớp lỗi này có thể còn sống ở đó — mở rộng bản đồ là việc nhỏ *(một hàng / hàm)* nhưng ngoài phạm vi vòng 3.
+2. **Quét bằng regex trên tên biến** — mù với: gán bí danh *(`const v = u; v.tien`)*, phân rã *(`const {tien} = u`)*, khoá tính *(`u[k]`)*, và **khoá lồng** *(`u.nguon.tk` chỉ được đo tới `u.nguon`)*. Bài ⛔ bắt các dạng ấy; hôm nay tệp ⛔ dùng dạng nào *(đã đọc)*, nhưng ⛔ có ràng buộc máy cấm chúng.
+3. **Tập khoá cửa đo trên MỘT ca dựng.** Khoá có-điều-kiện phụ thuộc ca: nguồn của ca `R | WO022V3 …` ⛔ đúng khuôn `<tk>_<bank> <curr>_<le>` ⇒ cửa trả `nguon = null` **kèm** `loi_nguon`; diễn giải có ⇒ ⛔ có `dien_giai_vi_sao`. Hệ quả: màn đọc `u.loi_nguon` thì cổng xanh dù dòng có nguồn hợp lệ ⛔ trả khoá ấy *(đúng hợp đồng — khoá có điều kiện)*; màn đọc `u.dien_giai_vi_sao` thì cổng **ĐỎ oan**. Cổng nói *"khoá có trong cửa ở ca này"*, ⛔ nói *"khoá luôn có"*.
+4. **`dien_giai = null` vẫn in ô trống**, ⛔ phân biệt *"giao dịch ⛔ có nội dung"* với *"FLS chưa nối được"* dù cửa trả `dien_giai_vi_sao` *(`INV-I16` nói hai câu khác nhau)*. Ngoài phạm vi vòng 3 *(spec hộp ⛔ đòi)* — nêu để `fls-ba` cân.
+5. **Bài `AC-6` hộp *Tìm tiền* nay cần PostgreSQL** *(dấu `pg`)* — máy ⛔ có kho thì bài ⛔ chạy; trước đây nó chạy chỉ với `node`. Đổi lấy việc ⛔ còn đặt câu trả lời cho chính mình.
+6. **AC-18 mở hộp bằng lời gọi hàm, ⛔ bằng nút `Duyệt`** — máy chỉ đọc khoá nút *(`_chan_ghi`)*; chuỗi *"bấm nút → hộp"* trên Chrome ⛔ được đo ở vòng này *(cùng giới hạn `KQ-029` mục 2)*. Chọn ứng viên là chuột thật.
+7. Ghi cho `fls-test` *(⛔ việc Dev)*: `kq029` dựng tiền **cố định** `1234.56`/`1234.16`; kho TEST phình thì dòng của lần chạy mới *(`itl_id` lớn)* có thể rơi ngoài `limit=50` ⇒ bài ĐỎ *"không đo được"* *(đúng `Đ3`, nhưng đỏ vì kho, ⛔ vì mã)*. Bài Dev tránh bằng `<N>` ngẫu nhiên.
