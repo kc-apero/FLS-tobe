@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FLS · Sổ ITL</title>
+<!--
+  ⛔⛔ VO MAN HINH — `B2` cua `DEV-12`. ⛔ Khong mot ma mau nao trong tep nay:
+  hinh dang o `hinh.css`, mau o `tokens.css`. Xem
+  `tests/web/test_khong_ma_mau_go_tay.py`.
+
+  ★ Hinh dang lay tu `docs/ITL/02_BA/Artifacts/FLS-Design-P6.html`
+    (owner chot 2026-09-03: uu tien asset cua ban ve nay).
+-->
+<link rel="stylesheet" href="/tokens.css">
+<link rel="stylesheet" href="/hinh.css">
+</head>
+<body>
+
+<!-- ⭐ SINH TRONG BO NHO — cho cai the cua phien. ⛔ Khong co tep nay tren dia. -->
+<script src="/phien.js"></script>
+
+<div class="top">
+  <span class="brand">FLS · Sổ ITL</span>
+  <span class="sub" id="p-nap">…</span>
+  <span class="spacer"></span>
+  <span class="pill" id="p-cua">…</span>
+  <span class="pill" id="p-nguoi">…</span>
+</div>
+
+<div class="ctl">
+  <strong style="font-size:12.5px">Phạm vi</strong>
+  <span class="muted">lần nạp thật — ⛔ máy ⛔ không nhận phạm vi “cả kho”
+    từ người gọi</span>
+  <span class="spacer"></span>
+  <span class="muted" style="font-size:12px">Đã nối
+    <span class="mono">/gates</span> ·
+    <span class="mono">/queue*</span></span>
+</div>
+
+<div class="wrap">
+
+  <div class="tabs">
+    <button data-s="man-f03" aria-pressed="true">① Cổng hôm nay · F03</button>
+    <button data-s="man-f01">② Hàng chờ · F01</button>
+    <button data-s="man-f02">③ Sổ ITL · F02</button>
+    <button data-s="man-f06" disabled>④ Danh mục · F06 <span class="faint">(B6)</span></button>
+  </div>
+
+  <p class="hint">
+    ⚠ <b>Cổng hôm nay</b>, <b>Hàng chờ</b> và <b>Sổ ITL</b> đã nối cửa thật.
+    Màn <b>Danh mục</b> mờ đi <b>⛔ không phải vì hỏng</b>, mà vì
+    <b>chưa tới lượt</b> — và nó đang <b>bị chặn</b>: cửa
+    <span class="mono">GET /catalog</span> mà đặc tả bảo “đã khai” thì
+    <b>⛔ không hề có</b> (<span class="mono">GAP-SPEC-01</span>).
+  </p>
+
+  <section class="screen on" id="man-f03">
+    <div class="stack">
+      <div class="card">
+        <header>
+          <h3>Cổng hôm nay</h3>
+          <span class="spacer"></span>
+          <span class="muted" style="font-size:12px">
+            <span class="mono">GET /gates</span></span>
+        </header>
+        <div class="pad stack" id="than-f03"></div>
+      </div>
+
+      <div class="row">
+        <div class="col card">
+          <header>
+            <h3>Độ phủ hàng chờ theo tiền tệ</h3>
+            <span class="spacer"></span>
+            <span class="muted" style="font-size:12px">
+              <span class="mono">GET /queue/coverage</span></span>
+          </header>
+          <div class="pad stack" id="than-phu"></div>
+        </div>
+
+        <div class="col card">
+          <header><h3>Báo cáo tuần</h3></header>
+          <div class="pad stack">
+            <div class="muted" style="font-size:12.5px">Màn “Một trang tuần” đã
+              bỏ khỏi thanh bên — nó là tổng quan để <b>đọc</b>, ⛔ không phải
+              việc kế toán làm. Thông tin ⛔ không mất: gấp vào đây.</div>
+            <div><button class="b pri" disabled>Xuất báo cáo tuần</button></div>
+            <div class="note warn" style="margin:0">
+              ⚠ <b>Nút này đang MỜ vì cửa <span class="mono">GET /weekly</span>
+              ⛔ chưa có</b> — nó nằm trong <b>6 đường đọc còn thiếu</b> của
+              <span class="mono">BA-07</span> §2. ⛔ Không vẽ một nút bấm được
+              rồi để nó ⛔ không làm gì: một nút im lặng là một nút người ta
+              bấm lại lần nữa.
+            </div>
+            <div class="note warn" style="margin:0">
+              ⚠ <b>⛔ Chưa có nút “chốt kỳ”</b> — chốt kỳ ⛔ chưa có đặc tả
+              (<span class="mono">GAP-PLAN-04</span>). Màn phải <b>nói ra</b>
+              điều đó, ⛔ không để trống cho người tưởng là quên.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="screen" id="man-f01">
+    <div class="stack" id="than-f01"></div>
+  </section>
+  <section class="screen" id="man-f02">
+    <div class="stack" id="than-f02"></div>
+  </section>
+  <section class="screen" id="man-f06"></section>
+
+</div>
+
+<!-- ⭐ SINH TU `fls/api/cot_so.py` — 23 tieu de luoi + 38 vi tri canon.
+     ⛔ Khong mot ten cot tieng Viet nao go tay trong `man_f02.js`. -->
+<script src="/cot.js"></script>
+<script src="/danh_muc.js"></script>
+<script src="/thanh_phan.js"></script>
+<script src="/goi_cua.js"></script>
+<script src="/trang_thai.js"></script>
+<script src="/hop_thoai.js"></script>
+<script src="/man_f03.js"></script>
+<script src="/man_f01.js"></script>
+<script src="/man_f02.js"></script>
+<script src="/ung_dung.js"></script>
+</body>
+</html>

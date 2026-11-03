@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FLS · Thiết kế bốn màn (P6) — bước 1</title>
+<!--
+  ═══════════════════════════════════════════════════════════════════════════
+  BƯỚC 1 của `DEV-12` — MỘT LƯỢT THIẾT KẾ. ⛔ CHƯA NỐI CỬA DỮ LIỆU.
+
+  ⚠ Tệp này CỐ Ý tự chứa: ⛔ không thư viện, ⛔ không cần mạng. Mở bằng cách
+    bấm đúp là xem được trên máy kế toán.
+
+  ⭐ Token màu/chữ LẤY NGUYÊN từ `A-CCR` (Foundation Tokens) — ⛔ không mã màu
+    nào tự bịa. `BA-06` §7: vẽ một hệ thị giác thứ hai là tạo HAI BẢN SỰ THẬT
+    về màu và khoảng cách.
+
+  ⭐ Mọi con số có dấu ✓ là SỐ ĐO THẬT trên kho (10.030 dòng sổ, 2026-08-28).
+    Các DÒNG dữ liệu là minh hoạ — chúng để xem HÌNH, ⛔ không để đối chiếu.
+  ═══════════════════════════════════════════════════════════════════════════
+-->
+<style>
+/* ── token: lấy nguyên từ A-CCR Foundation Tokens ───────────────────────── */
+:root{
+  --ink:#14201e; --muted:#5c6b68; --faint:#9aa8a5;
+  --line:#dde4e3; --surface:#fff; --alt:#f6f8f8; --page:#eef1f1;
+  --accent:#0e7570; --accent-hi:#0a5c58;
+  --crit:#c73a3a; --crit-bg:#fbeaea;
+  --warn:#c07414; --warn-bg:#fdf4e7;
+  --good:#2c7a4b; --good-bg:#e8f4ec; --good-line:#bcdcc8;
+  --info:#2563eb; --info-bg:#e9effd; --info-line:#b9cdf7;
+  /* ⭐ MẬT ĐỘ: dày hơn A-CCR. A-CCR là màn ĐỌC cho CFO; đây là màn LÀM,
+     kế toán quét hàng trăm dòng (BA-06 §7 "khác biệt vai phải giữ"). */
+  --row:30px; --grid-fs:12.5px;
+  --sans:'IBM Plex Sans','Segoe UI',system-ui,-apple-system,sans-serif;
+  --mono:'IBM Plex Mono','Cascadia Mono',Consolas,ui-monospace,monospace;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font:400 13.5px/1.5 var(--sans)}
+h1,h2,h3{margin:0;letter-spacing:-.01em}
+.wrap{max-width:1440px;margin:0 auto;padding:0 20px 72px}
+.mono{font-family:var(--mono)}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.neg{color:var(--crit)}
+.muted{color:var(--muted)}
+.faint{color:var(--faint)}
+hr{border:0;border-top:1px solid var(--line);margin:0}
+
+/* ── shell: top bar + control bar (hình lấy từ A-CCR Global Shell) ─────── */
+.top{background:var(--ink);color:#fff;padding:10px 20px;display:flex;
+     align-items:center;gap:14px;flex-wrap:wrap}
+.top .brand{font:700 15px/1 var(--sans)}
+.top .sub{font:500 11.5px/1 var(--mono);color:#9aa8a5}
+.spacer{flex:1}
+.pill{border:1px solid #3a4a47;border-radius:999px;padding:4px 10px;
+      font:500 11.5px/1 var(--mono);color:#cfd8d6}
+.ctl{background:var(--surface);border-bottom:1px solid var(--line);
+     padding:8px 20px;display:flex;align-items:center;gap:18px;flex-wrap:wrap;
+     font-size:12.5px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.seg button{border:0;background:var(--surface);padding:5px 11px;font:500 12.5px/1 var(--sans);
+            color:var(--muted);cursor:pointer}
+.seg button[aria-pressed=true]{background:var(--accent);color:#fff}
+
+/* ── chip niềm tin: component TÁI DÙNG từ A-CCR ───────────────────────── */
+.chip{display:inline-flex;align-items:center;gap:5px;border-radius:999px;
+      padding:2px 9px;font:600 11px/1.5 var(--sans);border:1px solid transparent;
+      white-space:nowrap}
+.chip.flash{background:var(--alt);color:var(--muted);border-color:var(--line);
+            font-style:italic}
+.chip.recon{background:var(--info-bg);color:var(--info);border-color:var(--info-line)}
+.chip.signed{background:var(--good-bg);color:var(--good);border-color:var(--good-line)}
+.chip.warn{background:var(--warn-bg);color:var(--warn);border-color:#f0dcbe}
+.chip.crit{background:var(--crit-bg);color:var(--crit);border-color:#f3cdcd}
+.chip.lock{background:var(--alt);color:var(--faint);border-color:var(--line)}
+
+/* ── nút ──────────────────────────────────────────────────────────────── */
+button.b{font:600 12.5px/1 var(--sans);border-radius:6px;padding:6px 11px;
+         cursor:pointer;border:1px solid var(--line);background:var(--surface);
+         color:var(--ink)}
+button.b:hover{border-color:var(--accent);color:var(--accent)}
+button.b.pri{background:var(--accent);border-color:var(--accent);color:#fff}
+button.b.pri:hover{background:var(--accent-hi)}
+button.b.danger:hover{border-color:var(--crit);color:var(--crit)}
+button.b[disabled]{opacity:.45;cursor:not-allowed;border-color:var(--line);
+                   color:var(--faint)}
+button.b[disabled]:hover{border-color:var(--line);color:var(--faint)}
+.tiny{font:600 11px/1 var(--sans);padding:4px 7px}
+
+/* ── thẻ / khối ───────────────────────────────────────────────────────── */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:8px}
+.card>header{padding:11px 14px;border-bottom:1px solid var(--line);
+             display:flex;align-items:center;gap:10px}
+.card>header h3{font:600 13.5px/1 var(--sans)}
+.pad{padding:14px}
+.grid4{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px}
+.k{font:600 10.5px/1 var(--mono);letter-spacing:.12em;color:var(--muted);
+   text-transform:uppercase}
+.v{font:700 26px/1.1 var(--mono);font-variant-numeric:tabular-nums;margin:6px 0 4px}
+
+/* ── bảng chung ───────────────────────────────────────────────────────── */
+table{border-collapse:separate;border-spacing:0;width:100%;font-size:12.5px}
+th,td{text-align:left;padding:0 9px;height:var(--row);border-bottom:1px solid var(--line);
+      white-space:nowrap}
+th{background:var(--alt);font:600 11.5px/1 var(--sans);color:var(--muted);
+   position:sticky;top:0;z-index:2}
+td.r,th.r{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums}
+tbody tr:hover td{background:#fafcfc}
+.scroll{overflow:auto;max-height:420px;border-radius:0 0 8px 8px}
+
+/* ── LƯỚI F02: cơ chế đã chứng minh ở mũi thử (QĐ-ITL-66) ─────────────── */
+.gwrap{overflow:auto;max-height:460px;border-top:1px solid var(--line)}
+table.g{font-size:var(--grid-fs)}
+table.g th,table.g td{height:var(--row);border-right:1px solid var(--line)}
+/* ⭐ Đông cứng tiêu đề + HAI cột khoá (hành vi §1-6). 346px = tổng bề rộng
+   hai cột khoá đã đo ở mũi thử — con số này chờ UAT xác nhận có đủ. */
+table.g th.f1,table.g td.f1{position:sticky;left:0;z-index:3;width:96px;
+  background:var(--alt);border-right:2px solid var(--line)}
+table.g th.f2,table.g td.f2{position:sticky;left:96px;z-index:3;width:250px;
+  background:var(--alt);border-right:2px solid var(--ink)}
+table.g th.f1,table.g th.f2{z-index:4}
+/* ⭐ Ô GÕ ĐƯỢC phải trông KHÁC ô chỉ-đọc — đây đúng chỗ mũi thử 27/08 sai:
+   nó để 38 tiêu đề là chữ cái và mọi ô chỉ-đọc, owner thấy trong 30 giây. */
+td.edit{background:#fff;box-shadow:inset 0 0 0 1px var(--info-line)}
+td.edit:focus-within,td.edit:hover{box-shadow:inset 0 0 0 2px var(--accent)}
+td.edit input{width:100%;border:0;outline:0;background:transparent;
+  font:inherit;font-family:inherit;color:var(--ink);padding:0}
+td.ro{color:var(--muted);background:var(--alt)}
+td.unmapped{background:var(--warn-bg);color:var(--warn);font-style:italic}
+th.edit-h{background:#eef6f6;color:var(--accent)}
+.badge-lock{font:600 10px/1 var(--mono);color:var(--faint)}
+
+/* ── drawer ───────────────────────────────────────────────────────────── */
+.drawer{background:var(--surface);border:1px solid var(--line);border-radius:8px;
+        box-shadow:0 8px 28px rgba(20,32,30,.10)}
+.drawer>header{padding:12px 14px;border-bottom:1px solid var(--line);
+               display:flex;align-items:center;gap:10px}
+.grp{border-top:1px solid var(--line)}
+.grp>div.t{padding:9px 14px;background:var(--alt);font:600 11.5px/1 var(--sans);
+           color:var(--muted);display:flex;align-items:center;gap:8px}
+.fld{display:grid;grid-template-columns:190px 1fr;gap:0;border-top:1px solid var(--line)}
+.fld>div{padding:8px 14px}
+.fld>div:first-child{color:var(--muted);background:#fcfdfd}
+.inp{border:1px solid var(--info-line);border-radius:5px;padding:5px 8px;
+     font:inherit;width:100%;max-width:340px}
+.inp:focus{outline:0;border-color:var(--accent);box-shadow:0 0 0 2px #0e757022}
+.src{font:500 11px/1.4 var(--mono);color:var(--muted);margin-top:3px}
+.src.need{color:var(--warn)}
+
+/* ── hộp thoại xác nhận ───────────────────────────────────────────────── */
+.dlg{max-width:520px;border:1px solid var(--line);border-radius:8px;
+     background:var(--surface);box-shadow:0 10px 34px rgba(20,32,30,.14)}
+.dlg>header{padding:13px 16px;border-bottom:1px solid var(--line);
+            font:700 14px/1 var(--sans)}
+.dlg .body{padding:14px 16px;font-size:13px}
+.dlg .foot{padding:12px 16px;border-top:1px solid var(--line);display:flex;
+           gap:9px;justify-content:flex-end}
+/* Khối chú ý: viền MỎNG ĐỦ VÒNG + nền nhạt, cùng khuôn thẻ của A-CCR
+   (`background:#fff; border:1px solid`). ⛔ KHÔNG dùng một vạch màu dày một
+   bên: A-CCR ⛔ không có hình đó, và một vạch dày làm khối ghi chú trông
+   nặng hơn thẻ dữ liệu bên cạnh, trong khi nó chỉ là ghi chú. */
+.note{background:var(--alt);border:1px solid var(--line);padding:9px 12px;
+      font-size:12.5px;border-radius:6px;margin:9px 0}
+.note.warn{background:var(--warn-bg);border-color:#f0dcbe}
+.note.crit{background:var(--crit-bg);border-color:#f3cdcd}
+
+/* ── tab chọn màn (chỉ có trong tệp thiết kế này) ─────────────────────── */
+.tabs{display:flex;gap:6px;flex-wrap:wrap;padding:16px 0 0}
+.tabs button{border:1px solid var(--line);background:var(--surface);border-radius:7px;
+  padding:8px 13px;font:600 12.5px/1 var(--sans);color:var(--muted);cursor:pointer}
+.tabs button[aria-pressed=true]{background:var(--ink);color:#fff;border-color:var(--ink)}
+section.screen{display:none;padding-top:16px}
+section.screen.on{display:block}
+.hint{font-size:12px;color:var(--muted);padding:8px 0 0}
+.meas{font:600 10.5px/1 var(--mono);color:var(--good);
+      background:var(--good-bg);border:1px solid var(--good-line);
+      border-radius:4px;padding:2px 6px}
+.stack{display:flex;flex-direction:column;gap:14px}
+.row{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-start}
+.col{flex:1;min-width:320px}
+.sk{background:linear-gradient(90deg,#e9eeee 25%,#f4f7f7 50%,#e9eeee 75%);
+    background-size:200% 100%;animation:sh 1.2s infinite;border-radius:4px;height:12px}
+@keyframes sh{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.gate{border-radius:8px;border:1px solid var(--line);padding:13px 14px;background:var(--surface)}
+.gate .st{font:700 15px/1.2 var(--sans);margin:5px 0 3px}
+.gate.pass{border-color:var(--good-line);background:var(--good-bg)}
+.gate.pass .st{color:var(--good)}
+.gate.fail{border-color:#f3cdcd;background:var(--crit-bg)}
+.gate.fail .st{color:var(--crit)}
+/* ⭐⭐ `dat = null` PHẢI trông KHÁC HẲN cả xanh lẫn đỏ — luật số 1 của dự án
+   đặt vào một pixel: cổng chưa từng thấy đỏ là cổng chưa biết có sống. */
+.gate.unk{border:2px dashed var(--faint);background:repeating-linear-gradient(
+   45deg,#f6f8f8,#f6f8f8 7px,#eef1f1 7px,#eef1f1 14px)}
+.gate.unk .st{color:var(--muted)}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <span class="brand">FLS · Sổ ITL</span>
+  <span class="sub">lần nạp NAP-2026-08-27-RAW</span>
+  <span class="chip flash">flash · chưa chốt</span>
+  <span class="spacer"></span>
+  <span class="pill">kế toán · Lan</span>
+  <span class="pill">bản sao nạp 27/08 13:42</span>
+</div>
+
+<div class="ctl">
+  <strong style="font-size:12.5px">Kỳ</strong>
+  <span class="seg"><button aria-pressed="true">2026-07</button><button>2026-06</button><button>2026-05</button></span>
+  <strong style="font-size:12.5px">Tiền tệ</strong>
+  <span class="seg"><button aria-pressed="true">Tất cả</button><button>VND</button><button>USD</button></span>
+  <span class="spacer"></span>
+  <span class="muted" style="font-size:12px">Dữ liệu tới <b>27/08</b> · DQ ✓ · <span class="mono">10.030 dòng</span></span>
+</div>
+
+<div class="wrap">
+
+<div class="tabs">
+  <button data-s="f03" aria-pressed="true">① Cổng hôm nay · F03</button>
+  <button data-s="f01">② Hàng chờ · F01</button>
+  <button data-s="f02">③ Sổ ITL · F02</button>
+  <button data-s="f06">④ Danh mục · F06</button>
+  <button data-s="st">⑤ Bốn trạng thái</button>
+</div>
+<p class="hint">⚠ Tệp <b>thiết kế</b>, ⛔ chưa nối dữ liệu. Số có nhãn <span class="meas">ĐO ĐƯỢC</span> là số thật trên kho ngày 28/08; các <b>dòng</b> là minh hoạ để xem hình.</p>
+
+<!-- ══════════════════════════════════ ① F03 ══════════════════════════════ -->
+<section class="screen on" id="f03">
+  <div class="stack">
+
+    <div class="grid4">
+      <div class="gate pass">
+        <div class="k">Kho chỉ chứa dòng nạp thật</div>
+        <div class="st">✓ ĐẠT</div>
+        <div class="muted" style="font-size:12px">đã đo: <span class="num">10.030</span> dòng · <span class="num">19</span> dòng loại · <span class="num">1</span> lần nạp</div>
+      </div>
+      <div class="gate pass">
+        <div class="k">Σ mối nối = tiền dòng bank</div>
+        <div class="st">✓ ĐẠT</div>
+        <div class="muted" style="font-size:12px">đã đo: <span class="num">2.701</span> dòng có mối nối · lệch <span class="num">0</span></div>
+      </div>
+      <div class="gate fail">
+        <div class="k">Ngày chứng từ không hoán ngày↔tháng</div>
+        <div class="st">✗ KHÔNG ĐẠT</div>
+        <div class="muted" style="font-size:12px">93% dòng hoán · ~181 tỷ sai kỳ — <a href="#">xem 9.312 dòng</a></div>
+      </div>
+      <!-- ⭐⭐ Ô QUAN TRỌNG NHẤT CỦA MÀN NÀY -->
+      <div class="gate unk">
+        <div class="k">Đối soát ITL ↔ 4 lằn lương</div>
+        <div class="st">— ⛔ KHÔNG ĐO ĐƯỢC</div>
+        <div class="muted" style="font-size:12px">⛔ không lằn nào có khoá ITL ⇒ chỉ đối soát được TỔNG</div>
+      </div>
+    </div>
+
+    <div class="note">
+      ⭐⭐ <b>Ba màu, và màu thứ ba là màu quan trọng nhất.</b> Ô gạch chéo
+      <b>⛔ KHÔNG ĐO ĐƯỢC</b> ⛔ không được trông giống ĐẠT — nó là luật số một
+      của dự án đặt vào một pixel: <i>cổng chưa từng thấy đỏ là cổng chưa biết
+      có sống</i>. Một cổng xanh vì <b>không đo gì</b> là cái nguy hơn một cổng đỏ.
+    </div>
+
+    <div class="row">
+      <div class="col card">
+        <header><h3>Độ phủ hàng chờ theo tiền tệ</h3><span class="spacer"></span><span class="meas">ĐO ĐƯỢC</span></header>
+        <table>
+          <thead><tr><th>Tiền tệ</th><th class="r">Dòng chờ</th><th class="r">% tổng dòng</th><th class="r">Xem tới đây phủ 90% tiền</th></tr></thead>
+          <tbody>
+            <tr><td>USD</td><td class="r">4.492</td><td class="r">58,0%</td><td class="r">444 dòng</td></tr>
+            <tr><td>VND</td><td class="r">2.987</td><td class="r">38,6%</td><td class="r">310 dòng</td></tr>
+            <tr><td>SGD</td><td class="r">— </td><td class="r">—</td><td class="r">13 dòng</td></tr>
+            <tr><td>HKD</td><td class="r">—</td><td class="r">—</td><td class="r">32 dòng</td></tr>
+          </tbody>
+        </table>
+        <div class="pad" style="border-top:1px solid var(--line)">
+          <span class="chip recon">799 dòng = 10,4% phủ 90% tiền</span>
+          <span class="muted" style="font-size:12px">⛔ Không có dòng “tổng” — cộng hai đơn vị tiền ra một con số là vô nghĩa.</span>
+        </div>
+      </div>
+      <div class="col card">
+        <header><h3>Báo cáo tuần</h3></header>
+        <div class="pad stack">
+          <div class="muted" style="font-size:12.5px">Màn “Một trang tuần” đã bỏ khỏi thanh bên — nó là tổng quan để <b>đọc</b>, ⛔ không phải việc kế toán làm. Thông tin ⛔ không mất: gấp vào đây.</div>
+          <div><button class="b pri">Xuất báo cáo tuần</button></div>
+          <div class="note warn" style="margin:0">⚠ <b>⛔ Chưa có nút “chốt kỳ”</b> — chốt kỳ ⛔ chưa có đặc tả (<span class="mono">GAP-PLAN-04</span>). Màn phải <b>nói ra</b> điều đó, ⛔ không để trống cho người tưởng là quên.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════ ② F01 ══════════════════════════════ -->
+<section class="screen" id="f01">
+  <div class="stack">
+    <div class="row">
+      <div class="card" style="flex:1;min-width:260px">
+        <div class="pad"><div class="k">Hàng chờ</div><div class="v">7.682</div>
+        <div class="muted" style="font-size:12px">dòng chưa ai trả lời <span class="meas">ĐO ĐƯỢC</span></div></div>
+      </div>
+      <div class="card" style="flex:1;min-width:260px">
+        <div class="pad"><div class="k">Xem tới đây phủ 90% tiền</div><div class="v">799</div>
+        <div class="muted" style="font-size:12px">10,4% số dòng · xếp <b>trong từng tiền tệ</b></div></div>
+      </div>
+      <div class="card" style="flex:1;min-width:260px">
+        <div class="pad"><div class="k">Cột lý do đã được gõ</div><div class="v" style="color:var(--crit)">0</div>
+        <div class="muted" style="font-size:12px">4 tuần không ai gõ = <b>cổng đã chết</b></div></div>
+      </div>
+    </div>
+
+    <div class="note crit">
+      ⛔⛔ <b>Xếp TRONG TỪNG tiền tệ, ⛔ không gộp.</b> Gộp lại rồi xếp theo con số
+      thì một khoản <b>300.000 USD</b> nằm <b>sau</b> một khoản <b>400.000 đồng</b> —
+      và toàn bộ <span class="num">4.492</span> dòng USD (58%) bị dìm xuống dưới.
+    </div>
+
+    <div class="card">
+      <header>
+        <h3>Hàng chờ · VND</h3>
+        <span class="chip warn">xếp theo tiền giảm</span>
+        <span class="spacer"></span>
+        <span class="muted" style="font-size:12px">xem tới <b>90%</b> tiền</span>
+        <span class="seg"><button aria-pressed="true">90%</button><button>100%</button></span>
+      </header>
+      <div class="scroll">
+      <table>
+        <thead><tr>
+          <th style="width:52px">Hạng</th><th style="width:82px">itl_id</th>
+          <th style="width:86px">Ngày CT</th><th>Diễn giải</th>
+          <th class="r" style="width:130px">Tiền</th><th class="r" style="width:62px">% luỹ kế</th>
+          <th style="width:74px">Tuổi việc</th><th style="width:150px">Lý do</th>
+          <th style="width:320px">Việc</th>
+        </tr></thead>
+        <tbody>
+          <tr>
+            <td class="r">1</td><td class="mono">31174</td><td class="mono">04/07</td>
+            <td>THANH TOAN HD DICH VU T6 — CTY ABC</td>
+            <td class="r">1.894.982.832</td><td class="r">21,4%</td>
+            <td><span class="chip crit">9 ngày</span></td>
+            <td class="faint">—</td>
+            <td>
+              <button class="b tiny">Lý do</button>
+              <button class="b tiny">Hoãn</button>
+              <button class="b tiny pri">Ghép</button>
+              <button class="b tiny">Xong</button>
+            </td>
+          </tr>
+          <tr>
+            <td class="r">2</td><td class="mono">31208</td><td class="mono">02/07</td>
+            <td>PHI DICH VU NEN TANG — DEEPGRAM</td>
+            <td class="r">490.117.000</td><td class="r">27,0%</td>
+            <td><span class="chip warn">4 ngày</span></td>
+            <td class="muted" style="font-size:12px">chờ hoá đơn</td>
+            <td>
+              <button class="b tiny">Lý do</button>
+              <button class="b tiny">Hoãn</button>
+              <button class="b tiny pri">Ghép</button>
+              <button class="b tiny">Xong</button>
+            </td>
+          </tr>
+          <!-- ⭐ Dòng ĐÃ GHÉP: hiện mối nối + nút BỎ GHÉP -->
+          <tr>
+            <td class="r">3</td><td class="mono">31240</td><td class="mono">01/07</td>
+            <td>CHI LUONG T6 — DOT 2
+              <span class="chip recon">đã ghép 2 dòng lệnh · lần 1</span></td>
+            <td class="r">318.400.000</td><td class="r">30,6%</td>
+            <td><span class="chip">2 ngày</span></td>
+            <td class="faint">—</td>
+            <td>
+              <button class="b tiny">Lý do</button>
+              <button class="b tiny">Hoãn</button>
+              <button class="b tiny danger">Bỏ ghép</button>
+              <button class="b tiny">Xong</button>
+            </td>
+          </tr>
+          <!-- ⭐ Dòng ĐÃ XONG nhưng CÒN THIẾU trường — phải NÓI RA -->
+          <tr style="opacity:.72">
+            <td class="r">—</td><td class="mono">31255</td><td class="mono">30/06</td>
+            <td>PHI CHUYEN TIEN NGAN HANG
+              <span class="chip signed">xong · Lan · 28/08 14:02</span>
+              <span class="chip warn">⚠ còn thiếu hd, cdt1</span></td>
+            <td class="r">1.650.000</td><td class="r">—</td>
+            <td class="faint">—</td><td class="faint">—</td>
+            <td><button class="b tiny">Mở lại</button></td>
+          </tr>
+        </tbody>
+      </table>
+      </div>
+      <div class="pad" style="border-top:1px solid var(--line);display:flex;gap:16px;flex-wrap:wrap">
+        <span><b>VND</b> · <span class="num">2.987</span> dòng · Σ <span class="num">8.842.117.994</span></span>
+        <span class="faint">|</span>
+        <span><b>USD</b> · <span class="num">4.492</span> dòng · Σ <span class="num">3.117.402,55</span></span>
+        <span class="spacer"></span>
+        <span class="muted" style="font-size:12px">⛔ Không có dòng “tổng”.</span>
+      </div>
+    </div>
+
+    <div class="row">
+      <!-- ⭐ Drawer GHÉP LỆNH -->
+      <div class="col drawer" style="min-width:520px">
+        <header>
+          <h3>Ghép lệnh · itl_id 31208</h3>
+          <span class="chip flash">ảnh chụp dòng lệnh đọc 27/08 19:07</span>
+        </header>
+        <div class="pad" style="background:var(--alt);border-bottom:1px solid var(--line)">
+          <b>Dòng tiền (ghim):</b> 02/07 · <span class="num">490.117.000</span> VND ·
+          <span class="mono">FT26183A9K1</span>
+        </div>
+        <div class="scroll" style="max-height:210px">
+        <table>
+          <thead><tr><th style="width:26px"></th><th>Dòng lệnh</th><th>Độ khớp</th>
+            <th class="r">Tiền lệnh</th><th>Trạng thái</th></tr></thead>
+          <tbody>
+            <tr><td><input type="checkbox" checked></td><td class="mono">PM02279-1</td>
+              <td><span class="chip signed">mã khớp</span></td><td class="r">300.117.000</td>
+              <td><span class="chip recon">Approve</span></td></tr>
+            <tr><td><input type="checkbox" checked></td><td class="mono">PM02279-2</td>
+              <td><span class="chip signed">mã khớp</span></td><td class="r">190.000.000</td>
+              <td><span class="chip recon">Approve</span></td></tr>
+            <tr><td><input type="checkbox"></td><td class="mono">PM02301-1</td>
+              <td><span class="chip recon">tiền khớp</span></td><td class="r">490.117.000</td>
+              <td><span class="chip warn">Pending</span></td></tr>
+            <tr><td><input type="checkbox"></td><td class="mono">PM02288-4</td>
+              <td><span class="chip warn">gần tiền</span></td><td class="r">489.900.000</td>
+              <td><span class="chip recon">Approve</span></td></tr>
+            <tr><td><input type="checkbox"></td><td class="mono">PM02150-2</td>
+              <td><span class="chip">cùng tiền tệ</span></td><td class="r">12.400.000</td>
+              <td><span class="chip recon">Approve</span></td></tr>
+          </tbody>
+        </table>
+        </div>
+        <div class="pad" style="border-top:1px solid var(--line);display:flex;
+             align-items:center;gap:14px;flex-wrap:wrap">
+          <span>Σ dòng lệnh <b class="num">490.117.000</b></span>
+          <span class="faint">/</span>
+          <span>tiền bank <b class="num">490.117.000</b></span>
+          <span class="chip signed">lệch 0 · khớp</span>
+          <span class="spacer"></span>
+          <button class="b pri">Ghép 2 dòng lệnh</button>
+        </div>
+        <div class="pad" style="border-top:1px solid var(--line)">
+          <div class="note crit" style="margin:0">
+            ⛔ <b>Ca LỆCH — nút phải MỜ, ⛔ không cho bấm.</b> Ví dụ Σ = 489.900.000 /
+            bank 490.117.000 · lệch <b>217.000</b> · dung sai
+            <b class="mono">min(1.000 đ, 0,5%) = 1.000 đ</b> ⇒
+            <button class="b tiny" disabled>Ghép</button>
+            <div style="margin-top:6px">Câu giải thích phải <b>hiện sẵn</b>, ⛔ không nằm trong tooltip: <i>“giữ UNMAPPED, ⛔ không chia bừa”</i>.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ⭐ Hộp xác nhận BỎ GHÉP -->
+      <div class="col" style="min-width:400px">
+        <div class="dlg">
+          <header>Bỏ ghép · itl_id 31240</header>
+          <div class="body">
+            <p style="margin:0 0 9px">Bỏ <b>cả chùm</b> 2 mối nối của dòng này?</p>
+            <table style="border:1px solid var(--line);border-radius:6px">
+              <tbody>
+                <tr><td class="mono">PM02100-1</td><td class="r">218.400.000</td></tr>
+                <tr><td class="mono">PM02100-3</td><td class="r">100.000.000</td></tr>
+              </tbody>
+            </table>
+            <div class="note" style="margin-top:10px">
+              ⭐ <b>Sổ ⛔ không mất gì.</b> Bỏ mối nối là <b>thêm một dòng</b> —
+              lịch sử mọi lần ghép vẫn đọc lại được. Bỏ rồi <b>ghép lại được</b>,
+              kể cả đúng dòng lệnh cũ (sẽ là <i>lần 2</i>).
+            </div>
+            <div class="note warn" style="margin-top:8px">
+              ⚠ <b>Bỏ CẢ CHÙM, ⛔ không bỏ lẻ.</b> Bỏ lẻ một mối nối làm
+              Σ ≠ tiền bank, tức tạo ra đúng cái trạng thái sai mà cổng dựng ra để bắt.
+            </div>
+            <div style="margin-top:10px;font-size:12.5px">
+              <b>Máy sẽ rút lại:</b> <span class="chip recon">hd</span>
+              <span class="chip recon">cdt1</span> <span class="faint">(suy từ dòng lệnh)</span><br>
+              <b style="color:var(--warn)">⛔ Máy KHÔNG rút:</b>
+              <span class="chip warn">pay_type — Thương đã gõ tay 27/08</span>
+            </div>
+          </div>
+          <div class="foot"><button class="b">Thôi</button><button class="b pri">Bỏ ghép</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════ ③ F02 ══════════════════════════════ -->
+<section class="screen" id="f02">
+  <div class="stack">
+    <div class="note">
+      ⭐ Lưới <b>52 cột</b> <span class="meas">ĐO ĐƯỢC</span> — 38 cột sổ gốc + 14 cột hợp đồng —
+      trong đó <b>7 cột gõ được</b> (13%). Dưới đây vẽ <b>10 cột đại diện</b> để xem
+      <b>cách phân biệt</b> ô gõ được với ô chỉ-đọc; bản thật cuộn ngang đủ 52 cột.
+      <div style="margin-top:6px">⛔ <b>Tiêu đề in TÊN TIẾNG VIỆT</b>, ⛔ không phải chữ cái
+      <span class="mono">Y / AD / AL</span> — đây đúng chỗ mũi thử 27/08 sai, và owner
+      thấy trong <b>30 giây</b>.</div>
+    </div>
+
+    <div class="card">
+      <header>
+        <h3>Sổ ITL · kỳ 2026-07</h3>
+        <span class="chip flash">flash · chưa chốt</span>
+        <span class="spacer"></span>
+        <label style="font-size:12.5px"><input type="checkbox" checked> chỉ dòng chưa gán</label>
+        <span class="muted" style="font-size:12px"><span class="num">682</span> dòng · <span class="num">52</span> cột</span>
+      </header>
+      <div class="gwrap">
+      <table class="g">
+        <thead><tr>
+          <th class="f1">itl_id</th>
+          <th class="f2">Diễn giải</th>
+          <th style="width:86px">Ngày CT</th>
+          <th class="r" style="width:130px">PS Nợ</th>
+          <th style="width:64px">Tiền tệ</th>
+          <th class="edit-h" style="width:170px">Mã hợp đồng ✎</th>
+          <th class="edit-h" style="width:150px">Chủ dự toán ✎</th>
+          <th class="edit-h" style="width:118px">Loại giao dịch ✎</th>
+          <th style="width:150px">Phân bổ CFA2 🔒</th>
+          <th style="width:120px">Cách phân bổ 🔒</th>
+          <th style="width:120px">Hoá đơn ✎</th>
+        </tr></thead>
+        <tbody>
+          <tr>
+            <td class="f1 mono">31174</td>
+            <td class="f2">THANH TOAN HD DICH VU T6 — CTY ABC</td>
+            <td class="ro mono">04/07/2026</td>
+            <td class="ro r">1.894.982.832</td>
+            <td class="ro">VND</td>
+            <td class="edit"><input value="FNS | Facilities"></td>
+            <td class="edit"><input value="SHQ2 | HQ2"></td>
+            <td class="edit"><input value="Transfer"></td>
+            <td class="ro">SHQ2 | HQ2</td>
+            <td class="ro"><span class="badge-lock">0</span></td>
+            <td class="edit"><span class="chip recon">1 tệp</span></td>
+          </tr>
+          <tr>
+            <td class="f1 mono">31208</td>
+            <td class="f2">PHI DICH VU NEN TANG — DEEPGRAM</td>
+            <td class="ro mono">02/07/2026</td>
+            <td class="ro r">490.117.000</td>
+            <td class="ro">VND</td>
+            <td class="edit unmapped"><input value="" placeholder="chưa gán"></td>
+            <td class="edit unmapped"><input value="" placeholder="chưa gán"></td>
+            <td class="edit"><input value="Transfer"></td>
+            <td class="ro faint">#N/A</td>
+            <td class="ro faint">#N/A</td>
+            <td class="edit"><span class="chip recon">3 tệp</span></td>
+          </tr>
+          <tr>
+            <td class="f1 mono">31240</td>
+            <td class="f2">CHI LUONG T6 — DOT 2</td>
+            <td class="ro mono">01/07/2026</td>
+            <td class="ro r">318.400.000</td>
+            <td class="ro">VND</td>
+            <td class="edit"><input value="GI | Gross Inflow"></td>
+            <td class="edit"><input value="SHQ1 | HQ1"></td>
+            <td class="edit"><input value="Transfer"></td>
+            <td class="ro" style="color:var(--info)">Need to Allocate to CFA2</td>
+            <td class="ro">GI Ledger</td>
+            <td class="edit"><span class="chip warn">tên tệp trơ</span></td>
+          </tr>
+          <tr>
+            <td class="f1 mono">31255</td>
+            <td class="f2">PHI CHUYEN TIEN NGAN HANG</td>
+            <td class="ro mono">30/06/2026</td>
+            <td class="ro r">1.650.000</td>
+            <td class="ro">VND</td>
+            <td class="edit unmapped"><input value="" placeholder="chưa gán"></td>
+            <td class="edit unmapped"><input value="" placeholder="chưa gán"></td>
+            <td class="edit unmapped"><input value="" placeholder="chưa gán"></td>
+            <td class="ro faint">#N/A</td>
+            <td class="ro faint">#N/A</td>
+            <td class="edit faint">—</td>
+          </tr>
+        </tbody>
+      </table>
+      </div>
+      <div class="pad" style="border-top:1px solid var(--line);display:flex;gap:14px;flex-wrap:wrap;align-items:center">
+        <span class="chip signed">tự lưu · đã lưu 14:03:22</span>
+        <span class="muted" style="font-size:12px">⛔ ⛔ Không có nút “Lưu” — app có nút Lưu là đã thua Sheets (§1-8).</span>
+        <span class="spacer"></span>
+        <span class="muted" style="font-size:12px">Ô viền xanh = <b>gõ được</b> · ô nền xám = <b>chỉ đọc</b> · 🔒 = <b>máy suy</b></span>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col drawer" style="min-width:560px">
+        <header><h3>Đối soát · itl_id 31208</h3>
+          <span class="chip flash">flash</span><span class="spacer"></span>
+          <button class="b tiny">Xong</button></header>
+
+        <div class="grp"><div class="t">① Giao dịch gốc <span class="chip lock">chỉ đọc</span></div>
+          <div class="fld"><div>Ngày CT · Số CT</div><div class="mono">02/07/2026 · FT26183A9K1</div></div>
+          <div class="fld"><div>PS Nợ · Tiền tệ</div><div><span class="num">490.117.000</span> VND</div></div>
+          <div class="fld"><div>Diễn giải</div><div>PHI DICH VU NEN TANG — DEEPGRAM</div></div>
+        </div>
+
+        <div class="grp"><div class="t">② Chuỗi lệnh — vì sao gán được <span class="chip lock">chỉ đọc</span></div>
+          <div class="fld"><div>ID PMSlip · PMLine</div><div class="mono">PM02279 · <span class="chip warn">#N/A — chưa ghép</span></div></div>
+        </div>
+
+        <div class="grp"><div class="t">③ Đối soát pháp nhân <span class="chip lock">chỉ đọc</span></div>
+          <div class="fld"><div>LE (cột P) vs bên trả</div><div>APERO VN · APERO VN <span class="chip signed">khớp</span></div></div>
+        </div>
+
+        <div class="grp"><div class="t" style="background:#eef6f6;color:var(--accent)">
+          Ⓐ 5 trường vào hợp đồng P&amp;L <span class="chip recon">gõ được</span></div>
+          <div class="fld"><div>Mã hợp đồng</div><div>
+            <input class="inp" placeholder="chưa gán">
+            <div class="src need">⚠ máy ⛔ không suy được — cần người điền</div></div></div>
+          <div class="fld"><div>Chủ dự toán</div><div>
+            <input class="inp" placeholder="chưa gán">
+            <div class="src need">⚠ máy ⛔ không suy được — cần người điền</div></div></div>
+          <div class="fld"><div>Loại giao dịch</div><div>
+            <input class="inp" value="Transfer">
+            <div class="src">nguồn nói: <b>Transfer</b></div></div></div>
+          <div class="fld"><div>Bắt đầu · kết thúc DV</div><div>
+            <input class="inp" value="2026-07" style="max-width:150px">
+            <input class="inp" value="2026-07" style="max-width:150px">
+            <div class="src">nguồn nói: <b>2026-07 → 2026-07</b></div></div></div>
+        </div>
+
+        <div class="grp"><div class="t" style="background:#eef6f6;color:var(--accent)">
+          Ⓑ 2 trường ngoài P&amp;L <span class="chip recon">gõ được</span></div>
+          <div class="fld"><div>Mã đối tác</div><div><input class="inp" value="VD0341"></div></div>
+          <div class="fld"><div>Hoá đơn</div><div>
+            <span class="chip recon">HD-2026-07-118.pdf ↗</span>
+            <span class="chip recon">bien-nhan.pdf ↗</span>
+            <span class="chip recon">phu-luc.pdf ↗</span>
+            <button class="b tiny" style="margin-left:5px">+ dán link</button>
+            <div class="src">⭐ <b>422 ô</b> chứa nhiều link, nhiều nhất <b>10 link/ô</b>
+              <span class="meas">ĐO ĐƯỢC</span> ⇒ vẽ <b>N chip</b>, ⛔ không một chuỗi cắt cụt.
+              Tệp giữ ở <b>Drive</b>, FLS chỉ chở đường dẫn.</div></div></div>
+        </div>
+
+        <div class="grp"><div class="t">Ⓒ Vùng PHÂN BỔ <span class="chip lock">🔒 máy suy — ⛔ KHÔNG có ô gõ</span></div>
+          <div class="fld"><div>CFA1</div><div class="muted">= Chủ dự toán</div></div>
+          <div class="fld"><div>CFA2</div><div class="faint mono">#N/A</div></div>
+          <div class="fld"><div>Cách phân bổ</div><div class="faint mono">#N/A</div></div>
+          <div class="fld"><div></div><div class="note warn" style="margin:0">
+            ⚠ <b>Ba ca phải vẽ khác nhau:</b>
+            <div style="margin-top:5px">① tra được &amp; có cờ → <span class="chip recon">Need to Allocate to CFA2</span> <span class="meas">2.922 dòng</span></div>
+            <div>② ô <i>Method</i> của danh mục rỗng → hiện <b class="mono">0</b>
+              <span class="meas">547 dòng</span> — ⚠ đây là <b>bẫy công thức của Sheets</b>,
+              ⛔ không phải lỗi; hiện <b>đúng số 0</b> để khớp sổ, ⛔ đừng “chữa cho đẹp”</div>
+            <div>③ mã hợp đồng còn trống → <b class="mono">#N/A</b> ở <b>cả hai</b> ô
+              <span class="meas">6.691 dòng</span> — ⛔ không bịa, ⛔ không để trống trông như “chưa ai điền”</div>
+          </div></div>
+        </div>
+
+        <div class="grp"><div class="t">Nhật ký — 7 trường</div>
+          <div class="scroll" style="max-height:130px">
+          <table><thead><tr><th>Lúc</th><th>Ai</th><th>Trường</th><th>Từ</th><th>Thành</th><th>Nguồn</th><th>Vì sao</th></tr></thead>
+            <tbody>
+              <tr><td class="mono">28/08 14:02</td><td>Lan</td><td>hd</td><td class="faint">—</td><td>FNS | Facilities</td><td>UNMAPPED</td><td>đối chiếu hoá đơn</td></tr>
+              <tr><td class="mono">27/08 16:41</td><td>Thương</td><td>pay_type</td><td>Cash</td><td>Transfer</td><td>nguồn</td><td>sao kê là chuyển khoản</td></tr>
+            </tbody></table>
+          </div>
+        </div>
+      </div>
+
+      <div class="col" style="min-width:380px">
+        <div class="dlg">
+          <header>Giá trị này khác nguồn</header>
+          <div class="body">
+            <p style="margin:0 0 8px">Ô <b>Mã hợp đồng</b> — nguồn đang có:</p>
+            <p class="mono" style="background:var(--alt);padding:9px 11px;border-radius:6px;margin:0">FNS | Facilities</p>
+            <p style="margin:9px 0 0">Bạn gõ: <b class="mono">GAC | Other</b></p>
+            <div class="note warn">⚠ <b>Ghi đè thì phải nói vì sao</b> — bắt buộc, và nó vào nhật ký.</div>
+            <input class="inp" placeholder="Vì sao ghi đè…" style="max-width:none">
+            <div class="note" style="margin-top:9px">⚠ Nút <b>[Sửa ở PM]</b> ⛔ <b>không</b> sửa gì trong FLS — FLS chỉ <b>đọc</b> hệ lệnh chi. Nó chỉ <b>nhắc mở hệ PM</b>. <span class="mono">GAP-SCR-05</span> còn mở: là deep-link hay chỉ chỉ dẫn.</div>
+          </div>
+          <div class="foot"><button class="b">Thôi</button><button class="b">Sửa ở PM ↗</button><button class="b pri">Ghi đè</button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════ ④ F06 ══════════════════════════════ -->
+<section class="screen" id="f06">
+  <div class="stack">
+    <div class="note warn">
+      ⚠ <b>Hai cửa dữ liệu của màn này ⛔ CHƯA CÓ</b> — <span class="mono">GET /catalog</span>
+      và <span class="mono">GET /mapping-master</span>. Bảng nối ở <span class="mono">BA-06 §8</span>
+      khai ra đúng hai chỗ ấy ⇒ <b>việc thật của chặng 6</b>, ⛔ không phải thứ để tự bịa một cửa mới.
+    </div>
+
+    <div class="row">
+      <div class="col card" style="min-width:520px">
+        <header><h3>Danh mục quyết định phân bổ</h3>
+          <span class="chip signed">73 mã · nạp 28/08</span>
+          <span class="spacer"></span><span class="meas">ĐO ĐƯỢC</span></header>
+        <div class="scroll">
+        <table>
+          <thead><tr><th>Mã hợp đồng</th><th>Cần phân bổ CFA2</th><th>Cách phân bổ</th><th>Mã HR</th></tr></thead>
+          <tbody>
+            <tr><td>GI | Gross Inflow</td><td><span class="chip recon">có</span></td><td>GI Ledger</td><td class="faint">—</td></tr>
+            <tr><td>OMC | Online Marketing Cost</td><td><span class="chip recon">có</span></td><td>OMC Ledger</td><td class="faint">—</td></tr>
+            <tr><td>MC | Maketer Cost</td><td class="faint">—</td><td class="faint">— <span class="badge-lock">sổ hiện 0</span></td><td>MC</td></tr>
+            <tr><td>OPC | Operating Cost</td><td class="faint">—</td><td class="faint">— <span class="badge-lock">sổ hiện 0</span></td><td class="faint">—</td></tr>
+            <tr><td>CAC | Customer Acquisition Cost</td><td class="faint">—</td><td class="faint">— <span class="badge-lock">sổ hiện 0</span></td><td class="faint">—</td></tr>
+          </tbody>
+        </table>
+        </div>
+        <div class="pad" style="border-top:1px solid var(--line)">
+          <div class="note" style="margin:0">
+            ⭐ <b>52 trong 73 mã</b> <span class="meas">ĐO ĐƯỢC</span> có ô <i>Cách phân bổ</i>
+            <b>rỗng</b> ⇒ trên sổ Sheets ô ấy hiện <b class="mono">0</b>, ⛔ không hiện
+            <i>“No need”</i>. Màn này phải <b>nói ra</b>, ⛔ không ẩn — nếu ẩn thì người
+            dùng thấy sổ ra <b>0</b> mà màn hình ra <i>trống</i> và ⛔ không ai biết tin cái nào.
+          </div>
+        </div>
+      </div>
+
+      <div class="col card" style="min-width:340px">
+        <header><h3>Nguồn dữ liệu</h3></header>
+        <table>
+          <thead><tr><th>Nguồn</th><th>Lần cuối thấy</th><th>Trạng thái</th></tr></thead>
+          <tbody>
+            <tr><td>Transaction Mapping L1</td><td class="mono">27/08 13:42</td><td><span class="chip signed">ok</span></td></tr>
+            <tr><td>Ảnh chụp dòng lệnh</td><td class="mono">27/08 19:07</td><td><span class="chip warn">1 ngày</span></td></tr>
+            <tr><td>Mapping Master</td><td class="mono">28/08 16:30</td><td><span class="chip signed">ok</span></td></tr>
+            <tr><td>4 lằn lương</td><td class="faint">—</td><td><span class="chip lock">⛔ không đo được</span></td></tr>
+          </tbody>
+        </table>
+        <div class="pad" style="border-top:1px solid var(--line)">
+          <div class="muted" style="font-size:12.5px">⭐ Mỗi nguồn mang <b>dấu thời điểm</b>, ⛔ không mang “tuổi” — tuổi nhích từng phút nên chép ra là sai ngay hôm sau; dấu thời điểm là một <b>sự kiện</b>, nó ⛔ không già đi.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════ ⑤ trạng thái ═══════════════════════ -->
+<section class="screen" id="st">
+  <div class="stack">
+    <div class="note">
+      ⭐⭐ <b>Bốn trạng thái là một phần của thiết kế, ⛔ không phải “việc dev tự lo”.</b>
+      Trạng thái <b>rỗng</b> và <b>lỗi</b> là hai chỗ hay bị bỏ nhất, và chúng là hai chỗ
+      kế toán gặp <b>đúng lúc đang bối rối</b>.
+    </div>
+    <div class="grid4">
+      <div class="card"><header><h3>① Mặc định</h3></header><div class="pad">
+        <div class="k">Hàng chờ</div><div class="v">7.682</div>
+        <div class="muted" style="font-size:12px">dòng chưa ai trả lời</div></div></div>
+
+      <div class="card"><header><h3>② Rỗng — <span style="color:var(--good)">là màn ĐẸP nhất</span></h3></header>
+        <div class="pad" style="text-align:center;padding:26px 14px">
+          <div style="font-size:30px">✓</div>
+          <div style="font:600 14px/1.4 var(--sans);margin-top:6px">Hàng chờ trống</div>
+          <div class="muted" style="font-size:12.5px;margin-top:4px">⛔ Không có việc gì cần làm. Đây là trạng thái <b>khoẻ</b> — màn chỉ hiện việc cần làm.</div>
+        </div></div>
+
+      <div class="card"><header><h3>③ Đang tải</h3></header><div class="pad">
+        <div class="sk" style="width:40%"></div>
+        <div class="sk" style="width:72%;margin-top:9px;height:26px"></div>
+        <div class="sk" style="width:56%;margin-top:9px"></div>
+        <div class="muted" style="font-size:12px;margin-top:10px">⛔ Không quay vòng vô nghĩa — vẽ đúng hình sắp hiện.</div></div></div>
+
+      <div class="card" style="border-color:#f3cdcd"><header style="background:var(--crit-bg)">
+        <h3 style="color:var(--crit)">④ Lỗi</h3></header><div class="pad">
+        <div style="font:600 13.5px/1.4 var(--sans);color:var(--crit)">⛔ Không đọc được hàng chờ</div>
+        <div class="muted" style="font-size:12.5px;margin-top:6px">Máy chủ trả <span class="mono">503</span> lúc <span class="mono">14:07:11</span>.</div>
+        <div class="note crit" style="margin-top:9px">⭐ <b>⛔ Không nói “đã xảy ra lỗi”.</b> Nói <b>cái gì</b> hỏng, <b>lúc nào</b>, và <b>làm gì tiếp</b> — kế toán ⛔ không đọc mã lỗi.</div>
+        <button class="b" style="margin-top:9px">Thử lại</button></div></div>
+    </div>
+
+    <div class="card">
+      <header><h3>Trạng thái riêng của lưới — mất mạng giữa lúc tự lưu</h3></header>
+      <div class="pad stack">
+        <div>
+          <span class="chip crit">⛔ 3 ô chưa lưu</span>
+          <span class="chip warn">đang thử lại… lần 2</span>
+          <span class="muted" style="font-size:12.5px">itl_id 31208 · <b>Mã hợp đồng</b>, <b>Chủ dự toán</b> · itl_id 31240 · <b>Loại giao dịch</b></span>
+        </div>
+        <div class="note crit" style="margin:0">
+          ⛔⛔ <b>Đây là ca lỗi nguy nhất của cả màn `F02`</b>, và nó là việc còn mở
+          (<span class="mono">GAP-SCR-07</span>): <i>gõ tiếp khi lô trước đang bay ·
+          mạng đứt giữa chừng · hai người sửa một ô</i>. Màn hình <b>PHẢI nói rõ ô nào
+          chưa lưu</b> — im lặng ở đây là mất số liệu mà ⛔ không ai biết.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr style="margin:26px 0 14px">
+<p class="muted" style="font-size:12px">
+  <b>Bước 1 của <span class="mono">DEV-12</span></b> · vẽ 2026-08-28 · token lấy nguyên từ
+  <span class="mono">A-CCR</span> Foundation Tokens · ⛔ chưa nối cửa dữ liệu ·
+  ⛔ không thư viện, ⛔ không cần mạng.
+  Ba thứ tệp này <b>⛔ không trả lời được</b>: <b>cảm giác khi gõ thật</b> ·
+  <b>thời gian vẽ trên máy kế toán</b> · <b>bề rộng cột khoá có đủ</b> —
+  chúng cần <b>UAT tuần đầu</b> (<span class="mono">GAP-SCR-03</span>).
+</p>
+</div>
+
+<script>
+// Chuyển màn — chỉ có trong tệp thiết kế này, ⛔ không phải một phần của app.
+document.querySelectorAll('.tabs button').forEach(function (b) {
+  b.addEventListener('click', function () {
+    document.querySelectorAll('.tabs button').forEach(function (x) {
+      x.setAttribute('aria-pressed', x === b ? 'true' : 'false');
+    });
+    document.querySelectorAll('section.screen').forEach(function (s) {
+      s.classList.toggle('on', s.id === b.dataset.s);
+    });
+    window.scrollTo({ top: 0 });
+  });
+});
+</script>
+</body>
+</html>

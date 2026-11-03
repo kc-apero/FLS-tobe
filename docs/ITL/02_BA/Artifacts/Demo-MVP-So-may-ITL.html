@@ -1,0 +1,816 @@
+<title>Sổ máy ITL</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bitter:wght@500;600;700&family=Be+Vietnam+Pro:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+
+<style>
+:root{
+  --paper:#F5F7F2; --plate:#FFFFFF; --plate-2:#F0F3EC;
+  --ink:#1B1F1A; --ink-2:#4C5349; --ink-3:#7E857B;
+  --line:#DCE1D6; --line-2:#C6CDBE;
+  --accent:#0F5C4A; --accent-soft:#E2EDE7;
+  --bad:#A32B23; --bad-soft:#F7E4E1;
+  --warn:#87680F; --warn-soft:#F7EFDA;
+  --ok:#3F7D20; --ok-soft:#EBF3E2;
+  --unk:#5A6370; --unk-soft:#ECEEF1;
+  --shadow:0 1px 2px rgba(27,31,26,.06);
+  --f-disp:"Bitter",Georgia,"Times New Roman",serif;
+  --f-body:"Be Vietnam Pro","Segoe UI",Roboto,system-ui,sans-serif;
+  --f-mono:"IBM Plex Mono","Cascadia Mono",Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#12150F; --plate:#1A1E17; --plate-2:#20251D;
+    --ink:#E9ECE3; --ink-2:#B5BCAE; --ink-3:#878E80;
+    --line:#2E3429; --line-2:#3D4437;
+    --accent:#6FBFA3; --accent-soft:#1D2C26;
+    --bad:#E4877E; --bad-soft:#34211F;
+    --warn:#D9B451; --warn-soft:#312B19;
+    --ok:#95C96F; --ok-soft:#222C1C;
+    --unk:#9AA3AE; --unk-soft:#232830;
+    --shadow:0 1px 2px rgba(0,0,0,.35);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#12150F; --plate:#1A1E17; --plate-2:#20251D;
+  --ink:#E9ECE3; --ink-2:#B5BCAE; --ink-3:#878E80;
+  --line:#2E3429; --line-2:#3D4437;
+  --accent:#6FBFA3; --accent-soft:#1D2C26;
+  --bad:#E4877E; --bad-soft:#34211F;
+  --warn:#D9B451; --warn-soft:#312B19;
+  --ok:#95C96F; --ok-soft:#222C1C;
+  --unk:#9AA3AE; --unk-soft:#232830;
+  --shadow:0 1px 2px rgba(0,0,0,.35);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font-family:var(--f-body); font-size:15px; line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:1180px; margin:0 auto; padding:28px 20px 72px}
+.num{font-family:var(--f-mono); font-variant-numeric:tabular-nums}
+
+header.top{
+  display:flex; flex-wrap:wrap; align-items:flex-end; gap:16px 24px;
+  border-bottom:2px solid var(--ink); padding-bottom:14px;
+}
+.brand h1{font-family:var(--f-disp); font-weight:700; font-size:30px; line-height:1.1; margin:0; letter-spacing:-.01em}
+.brand p{margin:6px 0 0; color:var(--ink-2); font-size:13.5px; max-width:58ch}
+.stamp-date{
+  margin-left:auto; font-family:var(--f-mono); font-size:12px; color:var(--ink-2);
+  border:1px solid var(--line-2); padding:6px 10px; white-space:nowrap;
+}
+.stamp-date b{color:var(--ink); font-weight:600}
+
+.note{
+  border:1px solid var(--line-2); background:var(--plate); box-shadow:var(--shadow);
+  padding:14px 16px; margin:20px 0 24px; display:flex; flex-wrap:wrap; gap:12px 20px; align-items:center;
+}
+.note .tag{
+  font-family:var(--f-mono); font-size:10.5px; font-weight:600; letter-spacing:.14em;
+  text-transform:uppercase; border:1px solid var(--ink-3); color:var(--ink-2);
+  padding:4px 8px; white-space:nowrap; align-self:flex-start;
+}
+.note p{margin:0; font-size:13.5px; color:var(--ink-2); flex:1 1 340px}
+.note p+p{margin-top:6px}
+.chip{
+  display:inline-block; font-family:var(--f-mono); font-size:10.5px; font-weight:600;
+  letter-spacing:.08em; text-transform:uppercase; padding:2px 6px; border:1px solid; vertical-align:.1em;
+}
+.chip.do{color:var(--accent); border-color:var(--accent); background:var(--accent-soft)}
+.chip.mau{color:var(--ink-3); border-color:var(--line-2); background:var(--plate-2)}
+.chip.chua{color:var(--unk); border-color:var(--unk); background:var(--unk-soft)}
+
+.stats{display:grid; grid-template-columns:repeat(auto-fit,minmax(194px,1fr)); gap:1px; background:var(--line); border:1px solid var(--line); margin-bottom:28px}
+.stat{background:var(--plate); padding:16px 18px}
+.stat .lab{font-family:var(--f-mono); font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3)}
+.stat .val{font-family:var(--f-mono); font-size:27px; font-weight:600; line-height:1.15; margin:6px 0 2px; font-variant-numeric:tabular-nums}
+.stat .sub{font-size:12.5px; color:var(--ink-2)}
+.stat.bad .val{color:var(--bad)} .stat.ok .val{color:var(--ok)} .stat.warn .val{color:var(--warn)}
+
+nav.tabs{display:flex; flex-wrap:wrap; gap:2px; border-bottom:1px solid var(--line-2); margin-bottom:24px}
+nav.tabs button{
+  font-family:var(--f-body); font-size:14px; font-weight:500; color:var(--ink-2);
+  background:transparent; border:0; border-bottom:2px solid transparent;
+  padding:10px 13px; cursor:pointer; margin-bottom:-1px;
+}
+nav.tabs button:hover{color:var(--ink); background:var(--plate-2)}
+nav.tabs button[aria-selected="true"]{color:var(--ink); border-bottom-color:var(--accent); font-weight:600}
+nav.tabs button .n{font-family:var(--f-mono); font-size:11px; color:var(--ink-3); margin-left:6px}
+nav.tabs button:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+section.panel[hidden]{display:none}
+
+h2.sec{font-family:var(--f-disp); font-size:17px; font-weight:600; margin:0 0 4px}
+p.lede{margin:0 0 16px; color:var(--ink-2); font-size:13.5px; max-width:80ch}
+.card{border:1px solid var(--line); background:var(--plate); box-shadow:var(--shadow); padding:18px; margin-bottom:20px}
+.band{
+  border-bottom:1px solid var(--line); margin:-18px -18px 16px; padding:10px 18px;
+  background:var(--plate-2); font-family:var(--f-mono); font-size:10.5px;
+  letter-spacing:.12em; text-transform:uppercase; color:var(--ink-2);
+  display:flex; gap:10px; align-items:center; flex-wrap:wrap;
+}
+.band .grow{flex:1}
+
+.funnel{display:grid; gap:10px}
+.fr{display:grid; grid-template-columns:minmax(150px,auto) 1fr minmax(96px,auto); gap:14px; align-items:center}
+.fr .fl{font-size:13px; color:var(--ink-2)}
+.fr .bar{height:22px; background:var(--plate-2); border:1px solid var(--line); position:relative}
+.fr .bar i{position:absolute; inset:0 auto 0 0; display:block; background:var(--accent); opacity:.85}
+.fr .fv{font-family:var(--f-mono); font-size:14px; font-weight:600; text-align:right; font-variant-numeric:tabular-nums}
+.aside{border:1px solid var(--line-2); padding:12px 14px; margin-top:16px; font-size:13.5px; color:var(--ink-2); background:var(--plate-2)}
+.aside b{color:var(--ink)}
+.aside+.aside{margin-top:10px}
+
+.six{display:grid; grid-template-columns:repeat(auto-fit,minmax(196px,1fr)); gap:10px; margin-top:4px}
+.six .lt{border:1px solid var(--line-2); background:var(--plate-2); padding:9px 11px}
+.six .lt b{display:block; font-size:13px; color:var(--ink); font-weight:600}
+.six .lt span{font-family:var(--f-mono); font-size:10.5px; color:var(--unk); letter-spacing:.06em; text-transform:uppercase}
+
+.scroll{overflow-x:auto}
+table{border-collapse:collapse; width:100%; font-size:13.5px}
+th{
+  font-family:var(--f-mono); font-size:10.5px; letter-spacing:.1em; text-transform:uppercase;
+  color:var(--ink-3); text-align:left; font-weight:600;
+  border-bottom:1px solid var(--line-2); padding:8px 10px; white-space:nowrap;
+}
+th.r,td.r{text-align:right}
+td{border-bottom:1px solid var(--line); padding:9px 10px; vertical-align:top}
+tbody tr:hover{background:var(--plate-2)}
+tfoot td{border-bottom:0; border-top:2px solid var(--line-2); font-weight:600; padding-top:10px}
+.pill{
+  display:inline-block; font-family:var(--f-mono); font-size:11px; font-weight:600;
+  letter-spacing:.04em; padding:2px 7px; border:1px solid; white-space:nowrap;
+}
+.pill.bad{color:var(--bad); border-color:var(--bad); background:var(--bad-soft)}
+.pill.warn{color:var(--warn); border-color:var(--warn); background:var(--warn-soft)}
+.pill.ok{color:var(--ok); border-color:var(--ok); background:var(--ok-soft)}
+.pill.unk{color:var(--unk); border-color:var(--unk); background:var(--unk-soft)}
+.pill.mut{color:var(--ink-2); border-color:var(--line-2); background:var(--plate-2)}
+.age{display:inline-flex; align-items:center; gap:7px; justify-content:flex-end}
+.age .track{width:48px; height:6px; background:var(--plate-2); border:1px solid var(--line)}
+.age .track i{display:block; height:100%; background:var(--warn)}
+.age .track.hot i{background:var(--bad)}
+.why{color:var(--ink-2); font-size:12.5px; display:block; max-width:40ch}
+input.reason{
+  font-family:var(--f-body); font-size:12.5px; color:var(--ink);
+  background:var(--paper); border:1px solid var(--line-2); padding:5px 8px; width:100%; min-width:150px;
+}
+input.reason::placeholder{color:var(--ink-3)}
+input.reason:focus{outline:2px solid var(--accent); outline-offset:1px; background:var(--plate)}
+input.reason.filled{background:var(--ok-soft); border-color:var(--ok)}
+.done{font-family:var(--f-mono); font-size:11px; color:var(--ok); white-space:nowrap}
+.tfoot{display:flex; flex-wrap:wrap; gap:8px 20px; margin-top:14px; font-size:13px; color:var(--ink-2)}
+.tfoot b{font-family:var(--f-mono); color:var(--ink); font-variant-numeric:tabular-nums}
+
+.gates{display:grid; grid-template-columns:repeat(auto-fit,minmax(258px,1fr)); gap:16px}
+.gate{border:1px solid var(--line); background:var(--plate); box-shadow:var(--shadow); display:flex; flex-direction:column}
+.gate .gh{padding:9px 14px; border-bottom:1px solid var(--line); display:flex; align-items:center; gap:8px; flex-wrap:wrap; font-family:var(--f-mono); font-size:10.5px; letter-spacing:.1em; text-transform:uppercase}
+.gate.bad .gh{background:var(--bad-soft); color:var(--bad)}
+.gate.warn .gh{background:var(--warn-soft); color:var(--warn)}
+.gate.ok .gh{background:var(--ok-soft); color:var(--ok)}
+.gate.unk .gh{background:var(--unk-soft); color:var(--unk)}
+.gate .gb{padding:14px}
+.gate .gv{font-family:var(--f-mono); font-size:22px; font-weight:600; font-variant-numeric:tabular-nums; line-height:1.2}
+.gate.bad .gv{color:var(--bad)} .gate.ok .gv{color:var(--ok)} .gate.warn .gv{color:var(--warn)} .gate.unk .gv{color:var(--unk); font-size:17px}
+.gate .gn{font-size:13px; color:var(--ink-2); margin-top:8px}
+.gate .gm{margin-top:10px; font-family:var(--f-mono); font-size:11px; color:var(--ink-3)}
+
+.cov{border-collapse:separate; border-spacing:2px; font-size:12px}
+.cov th{border:0; padding:2px 3px; font-size:9.5px; letter-spacing:.04em; text-align:center}
+.cov th.w{text-align:left; padding-right:10px; text-transform:none; letter-spacing:0; font-family:var(--f-body); font-size:12.5px; color:var(--ink-2); white-space:nowrap}
+.cov td{border:0; padding:0}
+.cov .c{width:20px; height:20px; border:1px solid var(--line); display:block; font-family:var(--f-mono); font-size:10px; text-align:center; line-height:18px; color:var(--ink-3)}
+.cov .c.g{background:var(--ok-soft); border-color:var(--ok); color:var(--ok)}
+.cov .c.m{background:var(--warn-soft); border-color:var(--warn); color:var(--warn)}
+.legend{display:flex; flex-wrap:wrap; gap:8px 18px; margin-top:14px; font-size:12.5px; color:var(--ink-2); align-items:center}
+.legend span.k{display:inline-flex; align-items:center; gap:7px}
+.legend i{width:16px; height:16px; border:1px solid var(--line); display:inline-block}
+.legend i.g{background:var(--ok-soft); border-color:var(--ok)}
+.legend i.m{background:var(--warn-soft); border-color:var(--warn)}
+
+.cost{display:grid; gap:9px}
+.cr{display:grid; grid-template-columns:minmax(190px,auto) 1fr minmax(78px,auto); gap:14px; align-items:center; font-size:13px}
+.cr .cb{height:20px; background:var(--plate-2); border:1px solid var(--line); position:relative}
+.cr .cb i{position:absolute; inset:0 auto 0 0; background:var(--bad); opacity:.8}
+.cr .cb i.cool{background:var(--accent); opacity:.75}
+.cr .cv{font-family:var(--f-mono); font-size:13px; font-weight:600; text-align:right; font-variant-numeric:tabular-nums}
+
+.trend{display:grid; gap:12px}
+.tl{display:grid; grid-template-columns:minmax(200px,auto) 1fr minmax(120px,auto); gap:14px; align-items:end}
+.tl .tn{font-size:13px; color:var(--ink-2); padding-bottom:4px}
+.tl .tb{display:flex; align-items:flex-end; gap:5px; height:52px}
+.tl .tb i{flex:1; background:var(--accent); opacity:.55; min-height:2px; display:block}
+.tl .tb i.hot{background:var(--bad); opacity:.9}
+.tl .ts{font-family:var(--f-mono); font-size:11px; text-align:right; padding-bottom:4px}
+.tl .ts.hot{color:var(--bad); font-weight:600}
+.tl .ts.calm{color:var(--ink-3)}
+.months{display:grid; grid-template-columns:minmax(200px,auto) 1fr minmax(120px,auto); gap:14px; font-family:var(--f-mono); font-size:10px; color:var(--ink-3); letter-spacing:.06em}
+.months .mm{display:flex; gap:5px}
+.months .mm span{flex:1; text-align:center}
+
+.week{display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:16px}
+.wk{border:1px solid var(--line); background:var(--plate); box-shadow:var(--shadow)}
+.wk .wh{padding:10px 15px; border-bottom:1px solid var(--line); background:var(--plate-2); font-family:var(--f-mono); font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-2); display:flex; gap:8px; align-items:baseline}
+.wk .wh b{font-size:14px; color:var(--ink); font-family:var(--f-disp); letter-spacing:0; text-transform:none}
+.wk .wb{padding:15px}
+.wk .big{font-family:var(--f-mono); font-size:24px; font-weight:600; font-variant-numeric:tabular-nums; line-height:1.15}
+.wk .big.bad{color:var(--bad)} .wk .big.warn{color:var(--warn)} .wk .big.ok{color:var(--ok)}
+.wk p{margin:9px 0 0; font-size:13px; color:var(--ink-2)}
+.unrec{
+  border-bottom:1px dotted var(--warn); font-style:italic; color:var(--warn);
+  font-family:var(--f-mono); font-variant-numeric:tabular-nums;
+}
+.rec{font-family:var(--f-mono); font-variant-numeric:tabular-nums; color:var(--ink)}
+.noact{border:1px solid var(--accent); background:var(--accent-soft); padding:12px 14px; margin-top:18px; font-size:13.5px; color:var(--ink)}
+
+footer{margin-top:36px; border-top:1px solid var(--line-2); padding-top:16px; color:var(--ink-3); font-size:12.5px; max-width:92ch}
+footer b{color:var(--ink-2)}
+@media (max-width:700px){
+  .brand h1{font-size:24px}
+  .stamp-date{margin-left:0}
+  .fr,.cr,.tl,.months{grid-template-columns:1fr; gap:6px}
+  .fr .fv,.cr .cv,.tl .ts{text-align:left}
+  .months{display:none}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+
+<header class="top">
+  <div class="brand">
+    <h1>Sổ máy ITL</h1>
+    <p>Bản demo MVP của hệ thống đích. Máy đọc <b>một chiều</b> từ 13 bảng tính, tự dựng sổ riêng — <b>không ghi một ô nào vào file kế toán</b>.</p>
+  </div>
+  <div class="stamp-date">ngày chạy <b>24/08/2026</b><br>bản <b>v2</b> · 6 tab</div>
+</header>
+
+<div class="note">
+  <span class="tag">hai dấu · một luật</span>
+  <div style="flex:1 1 340px">
+    <p>Mỗi con số có một dấu. <span class="chip do">đo</span> đã đọc từ file thật, có ngày đo. <span class="chip mau">mẫu</span> chỉ để xem hình dạng. <span class="chip chua">chưa đo</span> máy không biết, và nói thẳng là không biết.</p>
+    <p>★ <b>Luật mới của bản v2:</b> chỉ tiêu nào <b>đã có số đo</b> thì <b>không được phép có ô <span class="chip mau">mẫu</span></b>. Bản v1 để nhãn <em>chưa ghép được lệnh</em> ghi 12 dòng trong khi số đã đo là <b>1.478</b> — thấp hơn sự thật hơn 100 lần. Dấu <span class="chip mau">mẫu</span> nay chỉ dùng cho chỉ tiêu <b>chưa đo lần nào</b>.</p>
+  </div>
+</div>
+
+<div class="stats">
+  <div class="stat">
+    <div class="lab">dòng tiền thật · 22/08</div>
+    <div class="val">9.892</div>
+    <div class="sub">toàn bộ dòng có tiền <span class="chip do">đo</span></div>
+  </div>
+  <div class="stat ok">
+    <div class="lab">cần mắt người</div>
+    <div class="val">~50</div>
+    <div class="sub">gánh 89,3% tiền <span class="chip do">đo</span></div>
+  </div>
+  <div class="stat bad">
+    <div class="lab">cổng ngân hàng · DIF</div>
+    <div class="val">−9,53 tỷ</div>
+    <div class="sub">đỏ liên tục từ 20/08 <span class="chip do">đo</span></div>
+  </div>
+  <div class="stat warn">
+    <div class="lab">ô máy tự điền</div>
+    <div class="val">6.843</div>
+    <div class="sub">trên 7 trường <span class="chip do">đo</span></div>
+  </div>
+</div>
+
+<nav class="tabs" role="tablist">
+  <button role="tab" id="t1" aria-controls="p1" aria-selected="true">Hàng chờ<span class="n">theo tiền</span></button>
+  <button role="tab" id="t2" aria-controls="p2" aria-selected="false">Cổng hôm nay<span class="n">5</span></button>
+  <button role="tab" id="t3" aria-controls="p3" aria-selected="false">Xu hướng nhãn</button>
+  <button role="tab" id="t4" aria-controls="p4" aria-selected="false">Máy tự điền</button>
+  <button role="tab" id="t5" aria-controls="p5" aria-selected="false">Một trang tuần</button>
+  <button role="tab" id="t6" aria-controls="p6" aria-selected="false">Nhật ký<span class="n">7 trường</span></button>
+</nav>
+
+<!-- ============================= TAB 1 ============================= -->
+<section class="panel" id="p1" role="tabpanel" aria-labelledby="t1">
+
+  <div class="card">
+    <div class="band"><span class="grow">việc thật còn lại sau khi máy làm hết phần máy làm được</span><span class="chip do">đo 22/08</span></div>
+    <h2 class="sec">9.892 dòng vào, khoảng 50 dòng ra</h2>
+    <p class="lede">Máy không sáng tác, máy chỉ <em>dán nhãn</em> và <em>xếp theo tiền</em>.</p>
+    <div class="funnel">
+      <div class="fr"><span class="fl">Dòng có tiền, ngày 22/08</span><span class="bar"><i style="width:100%"></i></span><span class="fv">9.892</span></div>
+      <div class="fr"><span class="fl">Có lệnh chi</span><span class="bar"><i style="width:33.8%"></i></span><span class="fv">3.344</span></div>
+      <div class="fr"><span class="fl"><b>KHÔNG CẦN</b> lệnh chi</span><span class="bar"><i style="width:35.2%"></i></span><span class="fv">3.480</span></div>
+      <div class="fr"><span class="fl">Tiền vào</span><span class="bar"><i style="width:16.1%"></i></span><span class="fv">1.590</span></div>
+      <div class="fr"><span class="fl"><b>Chưa biết</b> — phần vào hàng chờ</span><span class="bar"><i style="width:14.9%"></i></span><span class="fv">1.478</span></div>
+      <div class="fr"><span class="fl">Trong đó máy tự vá được</span><span class="bar"><i style="width:.7%; min-width:3px"></i></span><span class="fv">70</span></div>
+      <div class="fr"><span class="fl">50 dòng lớn nhất gánh</span><span class="bar"><i style="width:89.3%"></i></span><span class="fv">89,3%</span></div>
+    </div>
+    <div class="aside">★ <b>3.480 dòng "không cần lệnh chi" gánh 92% tổng tiền.</b> Nếu không dán nhãn cho chúng thì hàng chờ có <b>4.919 dòng, 70% là rác</b> — tuần thứ hai không ai mở nữa.</div>
+  </div>
+
+  <div class="card">
+    <div class="band"><span class="grow">sáu nhãn "không cần lệnh chi" · đã tách được</span><span class="chip do">đo 24/08 · 5.020 dòng</span></div>
+    <h2 class="sec">Sáu loại tiền vốn không đi qua lệnh chi</h2>
+    <p class="lede">Đo trên <b>5.020 dòng tiền RA chưa ghép được lệnh</b>, tổng <b>231,19 tỷ</b> nguyên tệ. Máy đọc <b>cột Diễn giải</b> và dán nhãn theo luật khớp chữ nêu ở dưới bảng.</p>
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Nhãn máy dán</th><th class="r">Dòng</th><th class="r">% dòng</th><th class="r">Tiền (nguyên tệ)</th><th class="r">% tiền</th></tr></thead>
+        <tbody>
+          <tr><td><span class="pill ok">CÓ LỆNH — mã trong diễn giải</span></td><td class="r num">158</td><td class="r num">3,1%</td><td class="r num">19.571.487.967</td><td class="r num">8,5%</td></tr>
+          <tr><td>Lãi &amp; phí bank</td><td class="r num">501</td><td class="r num">10,0%</td><td class="r num">8.497.494</td><td class="r num">0,0%</td></tr>
+          <tr><td><b>Điều chuyển nội bộ &amp; đổi tệ</b></td><td class="r num">184</td><td class="r num">3,7%</td><td class="r num" style="font-weight:600">179.286.150.309</td><td class="r num" style="font-weight:600">77,6%</td></tr>
+          <tr><td>Lương &amp; thưởng</td><td class="r num">98</td><td class="r num">2,0%</td><td class="r num">11.868.250.807</td><td class="r num">5,1%</td></tr>
+          <tr><td>Thuế</td><td class="r num">107</td><td class="r num">2,1%</td><td class="r num">4.341.891.639</td><td class="r num">1,9%</td></tr>
+          <tr><td>Doanh thu nền tảng</td><td class="r num">914</td><td class="r num">18,2%</td><td class="r num">45.562.344</td><td class="r num">0,0%</td></tr>
+          <tr><td>Quẹt thẻ</td><td class="r num">10</td><td class="r num">0,2%</td><td class="r num">45.089.735</td><td class="r num">0,0%</td></tr>
+          <tr><td><span class="pill unk">CHƯA BIẾT — việc của người</span></td><td class="r num">3.048</td><td class="r num">60,7%</td><td class="r num">16.019.159.794</td><td class="r num">6,9%</td></tr>
+        </tbody>
+        <tfoot><tr><td>TỔNG 6 nhãn KHÔNG CẦN LỆNH</td><td class="r num">1.814</td><td class="r num">36,1%</td><td class="r num">195.595.442.331</td><td class="r num">84,6%</td></tr></tfoot>
+      </table>
+    </div>
+    <div class="aside">★★ <b>Một nhãn gánh gần hết tiền.</b> <b>Điều chuyển nội bộ &amp; đổi tệ</b> chỉ <b>184 dòng — 3,7%</b> số dòng, nhưng <b>77,6% tiền</b>: gần như toàn bộ là <em>"Chuyển khoản từ TCB sang VPbank"</em>, tiền đi từ túi này sang túi khác của chính mình. Ngược lại <b>Doanh thu nền tảng</b> có <b>914 dòng mà 0,0% tiền</b> — nhiều việc, không đáng tiền. Đây chính là lý do hàng chờ phải <b>xếp theo TIỀN</b> chứ không theo số dòng.</div>
+    <div class="aside">⚠ <b>Luật khớp chữ này là của tôi, không phải của kế toán.</b> Tài liệu ghi <b>3.480 dòng · 92% tiền</b>; luật của tôi ra <b>1.814 dòng · 84,6% tiền</b>. <b>Kết luận về TIỀN vẫn đứng</b> (84,6% ≈ 92%), nhưng <b>số dòng thì không lặp lại được</b> — và <b>luật sinh ra con số 3.480 không được ghi ở tài liệu nào, không script nào tạo ra nó</b>. Cần kế toán chốt luật trước khi tin số dòng.</div>
+  </div>
+
+  <div class="card">
+    <div class="band">
+      <span class="grow">hàng chờ · một bảng duy nhất, nhóm theo nhãn máy dán</span>
+      <button class="act" id="sortBtn" type="button" style="font-family:var(--f-mono); font-size:11px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; background:transparent; color:var(--accent); border:1px solid var(--accent); padding:4px 9px; cursor:pointer">xếp theo: tiền</button>
+    </div>
+    <div class="scroll">
+      <table id="queue">
+        <thead><tr>
+          <th>Nhãn máy dán</th><th>Trạng thái</th><th class="r">Số lượng</th><th class="r">Tiền</th>
+          <th class="r">Tuổi việc</th><th>Vì sao vào hàng chờ</th><th style="min-width:170px">Lý do — bạn gõ</th>
+        </tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <div class="tfoot">
+      <span>Tổng tiền đang chờ: <b id="sumMoney">—</b></span>
+      <span>Nhãn quá <b>3 ngày</b>: <b id="sumOld">—</b></span>
+      <span>★ Cột lý do đã được gõ: <b id="sumReason">0</b> lần</span>
+    </div>
+    <div class="aside">★ <b>Cột lý do là cột duy nhất người gõ ở đây</b> — và nó là thước đo của chính hệ kiểm soát. Cổng này <b>không chặn ai</b>, nên nó chỉ sống nhờ có người đọc. <b>Bốn tuần liền không ai gõ cột này = cổng đã chết</b>, phải đổi cách. Không có nút xoá trắng, không có bước duyệt, không có cấp trên để leo thang.</div>
+  </div>
+
+</section>
+
+<!-- ============================= TAB 2 ============================= -->
+<section class="panel" id="p2" role="tabpanel" aria-labelledby="t2" hidden>
+
+  <h2 class="sec">Năm cổng — và cổng nào đang nói thật</h2>
+  <p class="lede">Cổng là chỗ máy trả lời một câu: <em>sổ và thực tế có khớp không</em>. Điều đo được là <b>không phải cổng nào cũng đang đo đúng cái ghi trên nhãn của nó</b> — và một cổng thì máy <b>chưa được phép đo</b>.</p>
+
+  <div class="gates">
+    <div class="gate bad">
+      <div class="gh">cổng ngân hàng · dòng 226 <span class="chip do">đo</span></div>
+      <div class="gb">
+        <div class="gv">−9.530.000.000</div>
+        <div class="gn"><b>DIF = Treasury − Accounting.</b> Đỏ liên tục từ 20/08/2026 — tuổi việc <b>4 ngày</b>. Đây là con số cổng thật của lằn ngân hàng.</div>
+        <div class="gm">nguồn: 2. CCR · dòng 226</div>
+      </div>
+    </div>
+
+    <div class="gate warn">
+      <div class="gh">cổng ví · chưa kết luận được <span class="chip do">đo</span></div>
+      <div class="gb">
+        <div class="gv">0</div>
+        <div class="gn"><b>Bằng 0 nhưng chưa tin được.</b> Vế Treasury hút <span class="num">IMPORTRANGE</span> <em>sống</em> (tới 23/08), vế Accounting tính từ bản riêng đang <em>trễ</em> (tới 19/08). Vậy các ngày 20–23/08 lẽ ra <b>phải khác 0</b>, cỡ 500 triệu.</div>
+        <div class="gm">việc 6d gửi A-CCR</div>
+      </div>
+    </div>
+
+    <div class="gate ok">
+      <div class="gh">đồng bộ hai bản sổ quỹ <span class="chip do">đo 24/08</span></div>
+      <div class="gb">
+        <div class="gv">0 / 1.911</div>
+        <div class="gn"><b>Hai bản gõ tay khớp tuyệt đối</b> trong khoảng cùng phủ, tới 19/08. Chênh duy nhất: <b>4 dòng trễ 2–4 ngày</b>.</div>
+        <div class="gm">P100 1.915 dòng · A-CCR 1.911 dòng</div>
+      </div>
+    </div>
+
+    <div class="gate warn">
+      <div class="gh">độ phủ số dư ví <span class="chip do">đo</span></div>
+      <div class="gb">
+        <div class="gv">28%</div>
+        <div class="gn"><b>Kế toán CÓ kiểm số dư ví bằng mắt</b> — nhưng ô để ghi lại điều họ thấy đang bị công thức gương <span class="num">=L130</span> chiếm. Nên phần lớn lần kiểm <b>không để lại dấu</b>.</div>
+        <div class="gm">4.744 ô =L130 · 635 ô sum() · 427 ô người gõ</div>
+      </div>
+    </div>
+
+    <div class="gate bad">
+      <div class="gh">★ cổng hậu kiểm <span class="num">Final</span> <span class="chip do">đo 24/08 · file GỐC · 4/7 khối</span></div>
+      <div class="gb">
+        <div class="gv">73,4%</div>
+        <div class="gn"><b>29.137 / 39.692 ô có <span class="num">Classifying</span> ≠ <span class="num">Final</span></b>, đo trên 4 khối. Cột <span class="num">Classifying</span> nói thẳng <em>"Need to manual input"</em>; cột <span class="num">Final</span> — cái engine P&amp;L thật sự đọc — <b>vẫn có giá trị cụ thể</b>. ★★ Và <b>chỉ 13 ô trên 39.692 (0,033%)</b> là hai bên đều có giá trị mà khác nhau ⇒ <b>máy gần như KHÔNG BAO GIỜ ghi đè công người gõ; máy điền vào chỗ không ai điền.</b></div>
+        <div class="gm">4/7 khối · 3 khối còn lại timeout cả 3 lần thử
+      </div>
+    </div>
+  </div>
+
+  <div class="aside" style="margin-top:16px">★★ <b>Thẻ thứ năm vừa đổi từ "không biết" thành một con số — và con số đó xấu hơn dự đoán.</b> Vùng AUDIT của sổ hiện báo <b>6.711 dòng <span class="num">FALSE</span></b> chia 6 cột <span class="num">1.356 · 552 · 146 · 2.310 · 2.308 · 39</span>. Nhưng nó so cột <span class="num">Classifying</span>. Đo trên <b>file GỐC</b> cho thấy <span class="num">Classifying</span> chủ yếu chỉ đang nói <em>"cần người điền"</em> ⇒ <b>6.711 con số ấy không phải "lệch đối soát", chúng là "chưa ai điền"</b>. Và chỗ chưa ai điền thì <span class="num">Final</span> đã tự có đáp án.</div>
+  <div class="aside">Đọc được thẻ này là nhờ một điều bị ghi sai trong hồ sơ dự án: file GỐC <span class="num">ADJUSTED</span> từng bị ghi là <b>404 / mất quyền</b>. Thật ra <b>quyền vẫn có</b> — bảng quá nặng nên đọc hay timeout, và <b>timeout giả dạng thành mất quyền</b>. Đó là lý do 5/7 khối còn lại vẫn chưa đọc xong.</div>
+
+  <div class="card" style="margin-top:20px">
+    <div class="band"><span class="grow">độ phủ số dư ví theo ngày</span><span class="chip mau">hình dạng mẫu</span></div>
+    <h2 class="sec">Thứ máy công bố được mà không ai phải gõ thêm một ô nào</h2>
+    <p class="lede">Máy không biết số dư ví thật — không có kết nối tự động, và mật khẩu nằm trong bảng tính <b>không phải đường tôi dùng</b>. Nhưng máy biết chắc một điều: <b>ngày nào đã có người ghi, ngày nào chưa</b>.</p>
+    <div class="scroll">
+      <table class="cov" id="cov"><thead></thead><tbody></tbody></table>
+    </div>
+    <div class="legend">
+      <span class="k"><i class="g"></i> người đã ghi số nhìn thấy</span>
+      <span class="k"><i class="m"></i> công thức gương — <b>không phải điều ai nhìn thấy</b></span>
+      <span class="k"><i></i> trống</span>
+    </div>
+    <div class="aside">Bản thật xếp ví <b>theo tiền đang gánh</b>. Con số tiền từng ví <b>chưa đo</b> — việc còn mở, tôi không điền thay.</div>
+  </div>
+
+</section>
+
+<!-- ============================= TAB 3 ============================= -->
+<section class="panel" id="p3" role="tabpanel" aria-labelledby="t3" hidden>
+
+  <div class="card">
+    <div class="band"><span class="grow">xu hướng sáu nhãn theo tháng · để cái nhãn không thành cửa sau</span><span class="chip do">đo 24/08</span></div>
+    <h2 class="sec">Nhãn "không cần lệnh chi" phải bị theo dõi</h2>
+    <p class="lede">Dán nhãn là cách giảm hàng chờ từ 4.919 xuống ~50 dòng. Nhưng nó cũng là <b>một cửa</b>: gọi một khoản là *"điều chuyển nội bộ"* thì nó ra khỏi tầm mắt. Nên máy phải đếm từng nhãn theo tháng, và <b>báo khi một loại phình bất thường</b>.</p>
+    <div class="months"><span></span><span class="mm"><span>03</span><span>04</span><span>05</span><span>06</span><span>07</span><span>08</span></span><span></span></div>
+    <div class="trend" id="trend"></div>
+    <div class="aside">★ <b>Máy đã bắt được một cái phình thật.</b> <b>Lương &amp; thưởng</b> tháng 8 là <b>13 dòng</b> so với mức thường <b>4 dòng</b> — <b>hơn 3 lần</b>. Máy không phán khoản đó sai; máy nói <em>"chỗ này đang phình, đi xem"</em>. Luật báo: một tháng cao hơn 3 lần mức thường của chính nhãn đó thì đổi đỏ.</div>
+    <div class="aside">Hai hình dạng đáng để ý nữa: <b>Doanh thu nền tảng</b> tăng đều <b>56 → 108</b> trong 6 tháng — tăng thật, không phải phình. <b>Quẹt thẻ</b> <b>0 dòng cả 6 tháng</b> trong khi tổng cộng có 10 dòng ⇒ 10 dòng đó đều <b>cũ hơn tháng 3</b>: nhãn này gần như không còn dùng, đáng hỏi lại có nên giữ.</div>
+    <div class="aside">⚠ Số theo tháng là <span class="chip do">đo</span>, nhưng <b>theo luật khớp chữ của tôi</b> — cùng cảnh báo như bảng ở tab Hàng chờ. Kế toán chốt luật thì con số mới thành số chính thức.</div>
+  </div>
+
+</section>
+
+<!-- ============================= TAB 4 ============================= -->
+<section class="panel" id="p4" role="tabpanel" aria-labelledby="t4" hidden>
+
+  <div class="card">
+    <div class="band"><span class="grow">bảy trường máy đang tự điền thay người</span><span class="chip do">đo · ITL Ledge R1/R3/R7/R8</span></div>
+    <h2 class="sec">6.843 ô — và giá trị máy tự bịa vào đó</h2>
+    <p class="lede">"Máy tự bịa" là ô có sẵn một con số trong khi <b>đúng ra phải trống</b>. Trống mới là sự thật: <em>"chỗ này chưa ai quyết"</em>.</p>
+    <div class="scroll">
+      <table>
+        <thead><tr><th>#</th><th>Cột</th><th>Trường nhập tay</th><th class="r">Số ô</th><th>Giá trị máy tự gán</th><th>Người giữ</th></tr></thead>
+        <tbody>
+          <tr><td class="num">1</td><td class="num">S–V</td><td>Budget Code (HDCode)</td><td class="r num">297</td><td><span class="pill warn">GAC - Other</span></td><td>LAN + THƯƠNG</td></tr>
+          <tr><td class="num">2</td><td class="num">W–Z</td><td>Loại giao dịch (Payment Type)</td><td class="r num">179</td><td><span class="pill unk">chưa nêu</span></td><td>THƯƠNG</td></tr>
+          <tr><td class="num">3</td><td class="num">AA–AD</td><td>Chủ dự toán (CDT1)</td><td class="r num">1.210</td><td><span class="pill warn">Headquarters2</span></td><td>THƯƠNG</td></tr>
+          <tr><td class="num">4</td><td class="num">AE–AH</td><td>Thời điểm bắt đầu dùng dịch vụ</td><td class="r num">22</td><td><span class="pill unk">chưa nêu</span></td><td>THƯƠNG</td></tr>
+          <tr><td class="num">5</td><td class="num">AI–AL</td><td>Thời điểm kết thúc dùng dịch vụ</td><td class="r num">22</td><td><span class="pill unk">chưa nêu</span></td><td>THƯƠNG</td></tr>
+          <tr><td class="num">6</td><td class="num">AM–AP</td><td>Mã đối tác (ID Payee)</td><td class="r num">1.624</td><td><span class="pill warn">VD0</span></td><td>THƯƠNG</td></tr>
+          <tr><td class="num">7</td><td class="num">AQ–AT</td><td>File đính kèm: Hoá đơn</td><td class="r num">3.489</td><td><span class="pill warn">Nợ hoá đơn</span></td><td>THƯƠNG</td></tr>
+        </tbody>
+        <tfoot><tr><td colspan="3">Tổng</td><td class="r num">6.843</td><td colspan="2" style="font-weight:400; color:var(--ink-2); font-size:12.5px">4 trường có giá trị mặc định đã biết · 3 trường (223 ô) chưa nêu giá trị nào</td></tr></tfoot>
+      </table>
+    </div>
+    <div class="aside">★★ <b>Rủi ro số một của dự án nằm gọn trong cột cuối.</b> <b>THƯƠNG</b> giữ <b>6/7 trường = 6.546 ô, tức 95,7%</b>. Không phải rủi ro gian lận — là rủi ro <b>một người rời đi</b>, mang theo lý do của 6.843 quyết định.</div>
+    <div class="aside">Cách chữa <b>không phải thêm người duyệt</b> — không có người. Cách chữa là: mỗi ô máy không suy được thì mang trạng thái <span class="pill unk">UNMAPPED</span> tường minh và <b>có mặt trong hàng chờ</b>, thay vì im lặng nhận một giá trị mặc định.</div>
+  </div>
+
+  <div class="card">
+    <div class="band"><span class="grow">bằng chứng trên file GỐC · máy trả lời thay người bao nhiêu lần</span><span class="chip do">đo 24/08 · 4/7 khối</span></div>
+    <h2 class="sec">Chỗ nào không ai trả lời, máy vẫn có đáp án</h2>
+    <p class="lede">Mỗi trường có 4 cột: <span class="num">Classifying → Manual input → MID → Final</span>. <b>Vùng AUDIT của sổ so cột <span class="num">Classifying</span>. Engine P&amp;L đọc cột <span class="num">Final</span>.</b> Đây là phép so hai cột đó, trên file gốc.</p>
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Trường</th><th class="r">Máy trả lời thay</th><th class="r">Khớp</th><th class="r"><span class="num">Final</span> trống</th><th class="r">Cả hai có, khác nhau</th></tr></thead>
+        <tbody>
+          <tr><td>Budget Code (HDCode) · <span class="num">S→V</span></td><td class="r num" style="color:var(--bad); font-weight:600">6.558 · 66%</td><td class="r num">3.328</td><td class="r num">34</td><td class="r num">13</td></tr>
+          <tr><td>Chủ dự toán (CDT1) · <span class="num">AA→AD</span></td><td class="r num" style="color:var(--bad); font-weight:600">6.589 · 66%</td><td class="r num">3.337</td><td class="r num">7</td><td class="r num">0</td></tr>
+          <tr><td>Thời điểm kết thúc DV · <span class="num">AI→AL</span></td><td class="r num" style="color:var(--bad); font-weight:600">7.562 · 76%</td><td class="r num">2.364</td><td class="r num">7</td><td class="r num">0</td></tr>
+          <tr><td><b>File đính kèm: Hoá đơn</b> · <span class="num">AQ→AT</span></td><td class="r num" style="color:var(--bad); font-weight:600">8.428 · 85%</td><td class="r num">1.424</td><td class="r num">41</td><td class="r num">0</td></tr>
+          <tr><td colspan="5" style="color:var(--ink-2); font-size:12.5px">3 khối còn lại — Payment Type · Thời điểm bắt đầu DV · Mã đối tác: <span class="pill unk">timeout cả 3 lần thử</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="aside">★★ <b>Cột cuối là điều quan trọng nhất: 13 · 0 · 0 · 0 — tổng 13 trên 39.692 ô, tức 0,033%.</b> Qua bốn khối độc lập, kết luận không đổi: vấn đề <b>không phải máy ghi đè công người gõ</b> — mà là <b>máy điền vào chỗ không ai điền</b>, <b>29.137 ô</b>. Giá trị máy tự đặt vào: <span class="num">Nợ hoá đơn</span> <b>7.189</b> · <span class="num">SHQ2 | Headquarters2</span> <b>5.545</b> · <span class="num">OGA | GAC - Other</span> <b>1.704</b> · <span class="num">NB | Lưu chuyển nội bộ</span> <b>1.225</b>.</div>
+    <div class="aside">⚠ <b>Khối "File đính kèm: Hoá đơn" nặng nhất — 85%.</b> Máy nói <span class="num">Nợ hoá đơn</span> trên <b>7.189 dòng</b>, trong khi cả trường này chỉ có <b>3.489 ô người từng gõ</b>. Kể cả nếu mọi ô người gõ đều nói <em>Nợ hoá đơn</em>, vẫn còn <b>hơn 3.700 dòng mang nhãn đó mà chưa ai gõ</b>.</div>
+    <div class="aside">⇒ Cách chữa vẫn là cách cũ, nay có số đỡ: <b>để trống là trống</b>. Ô nào máy không suy được thì mang trạng thái <span class="pill unk">UNMAPPED</span> và <b>có mặt trong hàng chờ</b> — chứ không nhận một cái tên nghe hợp lý rồi đi thẳng vào báo cáo.</div>
+  </div>
+
+  <div class="card">
+    <div class="band"><span class="grow">đích của chặng</span><span class="chip do">mốc hôm nay</span><span class="chip mau">hai mốc sau</span></div>
+    <h2 class="sec">6.843 tiến về 0</h2>
+    <div class="cost">
+      <div class="cr"><span>Hôm nay <span class="chip do">đo</span></span><span class="cb"><i style="width:100%"></i></span><span class="cv">6.843</span></div>
+      <div class="cr"><span>Sau khi bỏ công thức gương</span><span class="cb"><i style="width:22%"></i></span><span class="cv">mẫu</span></div>
+      <div class="cr"><span>Đích chặng</span><span class="cb"><i class="cool" style="width:2px"></i></span><span class="cv">0</span></div>
+    </div>
+    <div class="aside">⏸ Bước bỏ công thức gương <b>đang chờ uỷ quyền riêng</b>, theo quyết định 24/08: không đụng sheet hiện có, không động file kế toán.</div>
+  </div>
+
+  <div class="card">
+    <div class="band"><span class="grow">phụ lục · phương pháp code hoá</span><span class="chip do">đo</span></div>
+    <h2 class="sec">Chậm không phải vì nhiều dữ liệu</h2>
+    <p class="lede"><b>40.000 ô nhanh hơn 3 ô</b> hơn hai mươi lần. Chậm không do lượng, do <em>chuỗi phụ thuộc vượt file</em>.</p>
+    <div class="cost">
+      <div class="cr"><span>3 ô, bảng còn nguội</span><span class="cb"><i style="width:100%"></i></span><span class="cv">33,2 s</span></div>
+      <div class="cr"><span>lần đọc thứ hai</span><span class="cb"><i style="width:25.6%"></i></span><span class="cv">8,5 s</span></div>
+      <div class="cr"><span>đọc ngược thứ tự · đối chứng</span><span class="cb"><i class="cool" style="width:6.3%"></i></span><span class="cv">2,1 s</span></div>
+      <div class="cr"><span>40.000 ô</span><span class="cb"><i class="cool" style="width:4.5%"></i></span><span class="cv">1,5 s</span></div>
+    </div>
+    <div class="aside">Bốn loại ô: <b>1 hằng</b> (người gõ — ở lại Google Sheets vĩnh viễn) · <b>2 chở</b> + <b>3 tính</b> (<b>1.755 cột</b> — máy làm) · <b>4 xem</b> (thay bằng màn hình). ⚠ <b>Chưa phân được</b> 1.755 cột theo phụ thuộc vượt file — điều kiện vào của mọi việc code, vì thước nghiệm thu mỗi loại một khác.</div>
+  </div>
+
+</section>
+
+<!-- ============================= TAB 5 ============================= -->
+<section class="panel" id="p5" role="tabpanel" aria-labelledby="t5" hidden>
+
+  <h2 class="sec">Một trang mỗi tuần · CFO &amp; COO</h2>
+  <p class="lede">Đúng <b>ba việc</b>, không hơn. Vai này <b>chỉ đọc</b> — không có nút nào trên trang này.</p>
+
+  <div class="week">
+    <div class="wk">
+      <div class="wh">① <b>Tiền khớp chưa</b></div>
+      <div class="wb">
+        <div class="big bad">−9,53 tỷ</div>
+        <p>Lằn <b>ngân hàng</b> lệch, đỏ liên tục <b>4 ngày</b> kể từ 20/08.</p>
+        <p>Lằn <b>ví</b> báo <span class="rec">0</span> nhưng <b>chưa kết luận được</b> — hai vế của phép so lấy dữ liệu ở hai thời điểm khác nhau.</p>
+      </div>
+    </div>
+    <div class="wk">
+      <div class="wh">② <b>Còn bao nhiêu dòng chưa biết</b></div>
+      <div class="wb">
+        <div class="big warn">1.478</div>
+        <p>Trong đó <b>70 dòng máy tự vá được</b> ⇒ còn <b>1.408</b> cần người.</p>
+        <p><b>50 dòng lớn nhất gánh 89,3% tiền</b> — nên việc thật là <b>~50 dòng</b>, không phải 6.843.</p>
+      </div>
+    </div>
+    <div class="wk">
+      <div class="wh">③ <b>Việc gì treo lâu</b></div>
+      <div class="wb">
+        <div class="big bad">6 ngày</div>
+        <p>Việc treo lâu nhất: <b>máy vá được từ mã trong diễn giải</b> — 70 dòng, gồm một dòng <b>1,89 tỷ</b>.</p>
+        <p>Kế đó: cổng ngân hàng <b>4 ngày</b> · lệch đồng bộ sổ quỹ <b>3 ngày</b>.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:20px">
+    <div class="band"><span class="grow">nhãn kỳ · số chưa đối soát phải NHÌN KHÁC số đã đối soát</span></div>
+    <div class="scroll">
+      <table>
+        <thead><tr><th>Kỳ</th><th>Nhãn máy tự dán</th><th class="r">Tổng chi (tỷ)</th><th class="r">Tiền khớp</th><th>Cách đọc</th></tr></thead>
+        <tbody>
+          <tr><td class="num">07/2026</td><td><span class="pill ok">đã đối soát</span></td><td class="r"><span class="rec">241,7</span></td><td class="r"><span class="rec">0</span></td><td>tin được</td></tr>
+          <tr><td class="num">08/2026</td><td><span class="pill warn">chưa đối soát</span></td><td class="r"><span class="unrec">198,4</span></td><td class="r"><span class="unrec">−9,53 tỷ</span></td><td>còn lệch — <b>số in nghiêng gạch chấm</b></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="aside">Nhãn do <b>máy tự dán</b>, không ai ký. Bản v1 của tài liệu đòi kế toán trưởng ký ba điều kiện — nhưng kế toán trưởng <b>không tham gia luồng này</b>, nên chữ ký đó sẽ là chữ ký giả. Người liên quan chỉ bấm <em>"đã đọc"</em>.</div>
+    <div class="noact">★ <b>Trang này không đòi anh làm gì.</b> Không có nút duyệt, không có việc gán cho ai, không có chỗ leo thang. Vận hành thật chỉ có 2–3 kế toán — mọi thứ giống "đốc việc" đều leo vào chỗ trống.</div>
+  </div>
+
+</section>
+
+<!-- ============================= TAB 6 ============================= -->
+<section class="panel" id="p6" role="tabpanel" aria-labelledby="t6" hidden>
+  <div class="card">
+    <div class="band"><span class="grow">nhật ký · bảy trường bắt buộc theo AUD-1 · chỉ thêm, không sửa</span></div>
+    <h2 class="sec">Không thêm bước duyệt. Chỉ thêm dấu vết.</h2>
+    <p class="lede">Vận hành thật chỉ có <b>2–3 kế toán</b>, không có người thứ hai để hậu kiểm. Nhật ký giữ lại <b>không để ai soi</b> — mà để (1) chính người làm tra lại được, (2) <b>việc sống sót khi người rời đi</b>.</p>
+    <div class="scroll">
+      <table>
+        <thead><tr>
+          <th>Thời điểm</th><th>Người</th><th><span class="num">itl_id</span></th><th>Trường</th>
+          <th>Trước → sau</th><th>Nguồn giá trị</th><th>Lý do</th>
+        </tr></thead>
+        <tbody id="journal"></tbody>
+      </table>
+    </div>
+    <div class="aside">Bảy trường của <b><span class="num">AUD-1</span></b>: <span class="num">itl_id</span> · trường · giá trị <b>trước → sau</b> · người · thời điểm · <b>nguồn giá trị</b> <em>(máy suy / người nhập / sửa lại)</em> · <b>lý do</b> — bắt buộc khi sửa lại một giá trị đã có. Bản v1 chỉ có 3 trường và thiếu hẳn <em>trước → sau</em>.</div>
+    <div class="aside">★ Gõ vào <b>cột lý do ở tab Hàng chờ</b> rồi quay lại đây: dòng mới xuất hiện với đủ bảy trường. Đó là toàn bộ cơ chế kiểm soát của hệ này — <b>không duyệt, chỉ ghi</b>.</div>
+  </div>
+</section>
+
+<footer>
+  <b>Phạm vi bản demo v2.</b> Đây là <b>màn hình</b>, chưa nối vào máy quét chạy theo nhịp; số liệu nằm cứng trong trang. Đã đối chiếu với <b>22 UC / 45 US</b> của tài liệu <span class="num">UC-US-Ke-toan-PM-den-ITL</span> v0.3. Máy chỉ có quyền <b>đọc</b>, không ghi vào file của kế toán — theo quyết định 24/08.
+</footer>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------------- tabs ---------------- */
+  var tabs=[].slice.call(document.querySelectorAll('nav.tabs button'));
+  tabs.forEach(function(b){
+    b.addEventListener('click',function(){
+      tabs.forEach(function(x){
+        var on=x===b;
+        x.setAttribute('aria-selected',on?'true':'false');
+        document.getElementById(x.getAttribute('aria-controls')).hidden=!on;
+      });
+    });
+  });
+
+  /* ---------------- hàng chờ ---------------- */
+  var Q=[
+    {lab:'CỔNG NGÂN HÀNG LỆCH',sev:'bad',st:'CHƯA BIẾT',stc:'unk',n:1,u:'cổng',
+     money:-9530000000,age:4,real:true,
+     why:'DIF dòng 226 khác 0 liên tục từ 20/08. Máy không đoán nguyên nhân — chỉ nói cổng nào đỏ, bao nhiêu tiền, mấy ngày.'},
+    {lab:'MÁY VÁ ĐƯỢC — mã nằm trong diễn giải',sev:'ok',st:'CÓ LỆNH',stc:'ok',n:158,u:'dòng',
+     money:19571487967,age:6,real:true,
+     why:'Mã lệnh có sẵn trong diễn giải mà phép ghép cũ không đọc. Đo 24/08 bằng mẫu PM+số: 158 dòng, 19,57 tỷ — gồm dòng 1,89 tỷ TERASOFTS … PM02279-1. Tài liệu ghi 70 dòng bằng một luật khác; cần chốt luật nào đúng.'},
+    {lab:'CHƯA GHÉP ĐƯỢC LỆNH',sev:'warn',st:'CHƯA BIẾT',stc:'unk',n:3048,u:'dòng',
+     money:16019159794,age:5,real:true,
+     why:'Phần máy thật sự không biết, sau khi dán 6 nhãn. Đo 24/08: 3.048 dòng, 16,02 tỷ — chỉ 6,9% tiền. 50 dòng lớn nhất trong đây gánh 89,8% tiền của nhóm (tài liệu ghi 89,3% — lặp lại được).'},
+    {lab:'CHUỖI CHUYỂN CHIA NHỎ',sev:'bad',st:'CHƯA BIẾT',stc:'unk',n:12,u:'dòng',
+     money:5880000000,age:5,real:true,
+     why:'12 dòng ĐÚNG BẰNG NHAU 490.000.000, cùng đi tới một tài khoản 01100018000784, diễn giải ghi Lần 1…12, KHÔNG dòng nào có lệnh chi. Máy không phán đây là sai — máy chỉ nói: quy trình phải giải thích được chuyện này, và hiện không.'},
+    {lab:'UNMAPPED — máy đang tự điền',sev:'warn',st:'UNMAPPED',stc:'unk',n:6843,u:'ô',
+     money:null,age:null,real:true,
+     why:'6.843 ô trên 7 trường đang nhận giá trị mặc định im lặng. Đúng ra phải để trống và vào hàng chờ. Chi tiết ở tab Máy tự điền.'},
+    {lab:'LỆCH ĐỒNG BỘ SỔ QUỸ',sev:'warn',st:'CHƯA BIẾT',stc:'unk',n:4,u:'dòng',
+     money:550000001,age:3,real:true,
+     why:'4 dòng có ở bản P100 mà bản A-CCR chưa có: PT00054CNCT, PT00055CNCT, PC00146CNCT, 1027403402. 1.911 dòng còn lại khớp tuyệt đối.'},
+    {lab:'THIẾU MÃ LỆNH TRÊN PM',sev:'warn',st:'CHƯA BIẾT',stc:'unk',n:509,u:'dòng',
+     money:null,age:null,real:true,
+     why:'509 / 3.674 dòng PM đã chi mà chưa có Reference number — 13,9%. Bảng đo cũ báo 100% Yes, sai khoảng 3 lần.'},
+    {lab:'MÃ TRÙNG — 1 khoá 2 lệnh',sev:'bad',st:'CHƯA BIẾT',stc:'unk',n:75,u:'mã',
+     money:null,age:null,real:true,
+     why:'75 mã bị dùng lại ⇒ 289 dòng PM bị VLOOKUP bỏ im lặng. Vi phạm chính luật 1 khoá = 1 mã.'},
+    {lab:'THIẾU HD CODE',sev:'warn',st:'UNMAPPED',stc:'unk',n:297,u:'ô',
+     money:null,age:null,real:true,
+     why:'Ô Budget Code trống, đang nhận mặc định GAC - Other. Chưa điền thì đáng nằm lại hàng chờ, không được tự nhận mặc định.'},
+    {lab:'THIẾU PHÁP NHÂN',sev:'warn',st:'UNMAPPED',stc:'unk',n:211,u:'dòng',
+     money:null,age:null,real:true,
+     why:'211 dòng vẫn chảy vào P&L với ô pháp nhân để trống. Tiền của nhóm này chưa đo — tôi không điền số thay.'},
+    {lab:'LỆCH PHÁP NHÂN · P ≠ BL',sev:'bad',st:'CHƯA ĐO ĐƯỢC',stc:'unk',n:null,u:'',
+     money:null,age:null,real:null,
+     why:'Engine chỉ đọc cột BL. Nếu BL khác P thì P&L sai pháp nhân mà không ai thấy. Chưa đo được: bản copy trả #REF!, cần quyền file GỐC.'}
+  ];
+
+  function vnd(n){
+    if(n===null) return '<span style="color:var(--ink-3)">chưa đo</span>';
+    return (n<0?'−':'')+Math.abs(n).toLocaleString('vi-VN');
+  }
+  function qty(r){
+    if(r.n===null) return '<span style="color:var(--ink-3)">—</span>';
+    return '<span class="num">'+r.n.toLocaleString('vi-VN')+'</span> <span style="color:var(--ink-3); font-size:11.5px">'+r.u+'</span>';
+  }
+  function stampOf(r){
+    if(r.real===true) return '<span class="chip do">đo</span>';
+    if(r.real===null) return '<span class="chip chua">chưa đo</span>';
+    return '<span class="chip mau">mẫu</span>';
+  }
+
+  var sortBy='money', sortBtn=document.getElementById('sortBtn');
+  var tbody=document.querySelector('#queue tbody');
+  var reasonCount=0;
+
+  function render(){
+    var list=Q.slice().sort(function(a,b){
+      if(sortBy==='money') return Math.abs(b.money||0)-Math.abs(a.money||0);
+      return (b.age||0)-(a.age||0);
+    });
+    tbody.innerHTML=list.map(function(r){
+      var i=Q.indexOf(r);
+      var age = r.age===null
+        ? '<span style="color:var(--ink-3)">—</span>'
+        : '<span class="age"><span class="track'+(r.age>3?' hot':'')+'"><i style="width:'+Math.min(100,r.age*16)+'%"></i></span><span class="num">'+r.age+'n</span></span>';
+      var cell = r.reason
+        ? '<span class="done">✓ '+r.reason+'</span>'
+        : '<input class="reason" type="text" data-i="'+i+'" placeholder="vì sao…" aria-label="Lý do cho nhãn '+r.lab+'">';
+      return '<tr>'+
+        '<td><span class="pill '+r.sev+'">'+r.lab+'</span><br>'+stampOf(r)+'</td>'+
+        '<td><span class="pill '+r.stc+'">'+r.st+'</span></td>'+
+        '<td class="r">'+qty(r)+'</td>'+
+        '<td class="r num" style="font-weight:600'+(r.money<0?';color:var(--bad)':'')+'">'+vnd(r.money)+'</td>'+
+        '<td class="r">'+age+'</td>'+
+        '<td><span class="why">'+r.why+'</span></td>'+
+        '<td>'+cell+'</td>'+
+      '</tr>';
+    }).join('');
+
+    document.getElementById('sumMoney').textContent=
+      Q.reduce(function(s,r){return s+Math.abs(r.money||0);},0).toLocaleString('vi-VN')+' đ';
+    document.getElementById('sumOld').textContent=Q.filter(function(r){return (r.age||0)>3;}).length;
+    document.getElementById('sumReason').textContent=reasonCount;
+  }
+
+  sortBtn.addEventListener('click',function(){
+    sortBy = sortBy==='money' ? 'age' : 'money';
+    sortBtn.textContent = 'xếp theo: ' + (sortBy==='money'?'tiền':'tuổi việc');
+    render();
+  });
+
+  function commit(inp){
+    var v=(inp.value||'').trim();
+    if(!v) return;
+    var r=Q[+inp.getAttribute('data-i')];
+    if(r.reason) return;
+    r.reason=v; reasonCount++;
+    addJournal({who:'kế toán', id:'—', field:'Lý do · '+r.lab,
+                before:'(trống)', after:'đã ghi', src:'người nhập', why:v});
+    render();
+  }
+  tbody.addEventListener('change',function(e){
+    if(e.target.classList && e.target.classList.contains('reason')) commit(e.target);
+  });
+  tbody.addEventListener('keydown',function(e){
+    if(e.key==='Enter' && e.target.classList && e.target.classList.contains('reason')) commit(e.target);
+  });
+
+  /* ---------------- lưới độ phủ ví ---------------- */
+  var W=[
+    ['CNC · Cash · VND',       'gggggmgggggmgg'],
+    ['Hotbonus · Cash · VND',  'ggmmggmmggmmgg'],
+    ['Pingpong · USD',         'gmmggmmggmmggm'],
+    ['BGO1 · PO · USD',        'gmmmgmmmgmmmgm'],
+    ['CN02 · PO · USD',        'gmmmmgmmmmgmmm'],
+    ['CN03 · ACB · USD',       'gmmmmmgmmmmmgm'],
+    ['PO · HKD',               'mmmmmmmmmmmmmm'],
+    ['Pingpong · HKD',         'mmmmmmmmmmmmmb'],
+    ['Cash · Non VND',         'mmmmmmmmmmmmmm']
+  ];
+  var days=[]; for(var d=10; d<=23; d++) days.push(d);
+  var cov=document.getElementById('cov');
+  cov.querySelector('thead').innerHTML='<tr><th class="w">ví / tài khoản · tháng 8</th>'+
+    days.map(function(x){return '<th>'+x+'</th>';}).join('')+'<th style="padding-left:8px">phủ</th></tr>';
+  cov.querySelector('tbody').innerHTML=W.map(function(w){
+    var g=(w[1].match(/g/g)||[]).length;
+    var col = g>8 ? 'var(--ok)' : (g>3 ? 'var(--warn)' : 'var(--bad)');
+    return '<tr><th class="w">'+w[0]+'</th>'+
+      w[1].split('').map(function(c){
+        return '<td><span class="c '+c+'">'+(c==='g'?'●':(c==='m'?'≡':''))+'</span></td>';
+      }).join('')+
+      '<td style="padding-left:8px"><span class="num" style="font-size:12px;color:'+col+'">'+
+      Math.round(g/14*100)+'%</span></td></tr>';
+  }).join('');
+
+  /* ---------------- xu hướng nhãn ---------------- */
+  var T=[
+    ['Lãi & phí bank',                [30,36,35,47,47,23]],
+    ['Điều chuyển nội bộ & đổi tệ',   [13,17,12,16,5,3]],
+    ['Lương & thưởng',                [2,4,4,2,8,13]],
+    ['Thuế',                          [6,23,5,2,10,14]],
+    ['Doanh thu nền tảng',            [56,57,66,85,98,108]],
+    ['Quẹt thẻ',                      [0,0,0,0,0,0]]
+  ];
+  document.getElementById('trend').innerHTML=T.map(function(t){
+    var v=t[1], mx=Math.max.apply(null,v)||1;
+    var head=v.slice(0,5).sort(function(a,b){return a-b;});
+    var med=head[2], last=v[5], hot=last>=med*3;
+    return '<div class="tl">'+
+      '<span class="tn">'+t[0]+'</span>'+
+      '<span class="tb">'+v.map(function(x,i){
+        return '<i class="'+(hot&&i===5?'hot':'')+'" style="height:'+Math.max(2,Math.round(x/mx*52))+'px"></i>';
+      }).join('')+'</span>'+
+      '<span class="ts '+(hot?'hot':'calm')+'">'+(hot
+        ? 'gấp '+(last/med).toFixed(1)+' lần — đi xem'
+        : 'trong mức thường')+'</span>'+
+    '</div>';
+  }).join('');
+
+  /* ---------------- nhật ký 7 trường ---------------- */
+  var J=[
+    {t:'22/08 · 09:14',who:'máy',id:'—',field:'Phân loại 3 trạng thái',
+     before:'9.892 dòng chưa nhãn',after:'3.344 có lệnh · 3.480 không cần · 1.590 tiền vào · 1.478 chưa biết',
+     src:'máy suy',why:'Quét toàn sổ, dán nhãn theo luật'},
+    {t:'22/08 · 09:22',who:'máy',id:'ITL#4471',field:'Mã lệnh chi',
+     before:'(trống)',after:'PM02279-1',src:'máy suy',
+     why:'Mã có sẵn trong diễn giải TERASOFTS — dòng 1,89 tỷ'},
+    {t:'22/08 · 11:02',who:'máy',id:'—',field:'Diff After Adjuts',
+     before:'hiểu là khoản lệch',after:'là SỐ DƯ TIỀN của pháp nhân',src:'máy suy',
+     why:'Chứng minh 645/645 ngày — dừng việc truy 4,09 tỷ'},
+    {t:'23/08 · 16:40',who:'lanptn',id:'—',field:'Index!E12 · nguồn sheet',
+     before:'R | VND_CNC',after:'Copy of R | VND_CNC',src:'người nhập',
+     why:'(không có lý do — nhật ký cũ không đòi trường này)'},
+    {t:'24/08 · 08:40',who:'chủ sở hữu',id:'—',field:'Phạm vi ghi của máy',
+     before:'đọc và ghi',after:'CHỈ ĐỌC',src:'người nhập',
+     why:'Không đụng sheet hiện có, không động file kế toán'},
+    {t:'24/08 · 14:07',who:'máy',id:'—',field:'Đồng bộ hai bản sổ quỹ',
+     before:'chưa đo',after:'lệch 0 / 1.911 dòng',src:'máy suy',
+     why:'Chỉ trễ 4 dòng — 500.000.001 Nợ, 50.010.000 Có'},
+    {t:'24/08 · 14:31',who:'máy',id:'—',field:'Cách so số của chính máy',
+     before:'so chuỗi hiển thị',after:'so bằng số',src:'sửa lại',
+     why:'Lỗi của chính tôi: báo 8 dòng lệch trong khi thật là 4'}
+  ];
+  var jbody=document.getElementById('journal');
+  function paint(){
+    jbody.innerHTML=J.map(function(e){
+      return '<tr'+(e.isNew?' style="background:var(--accent-soft)"':'')+'>'+
+        '<td class="num" style="white-space:nowrap; font-size:12px; color:var(--ink-2)">'+e.t+'</td>'+
+        '<td style="white-space:nowrap"><span class="pill '+(e.who==='máy'?'mut':'ok')+'">'+e.who+'</span></td>'+
+        '<td class="num" style="font-size:12px">'+e.id+'</td>'+
+        '<td>'+e.field+'</td>'+
+        '<td style="font-size:12.5px; color:var(--ink-2)"><span style="color:var(--ink-3)">'+e.before+'</span> → <b style="color:var(--ink)">'+e.after+'</b></td>'+
+        '<td><span class="pill '+(e.src==='máy suy'?'mut':(e.src==='sửa lại'?'warn':'ok'))+'">'+e.src+'</span></td>'+
+        '<td style="font-size:12.5px; color:var(--ink-2)">'+e.why+'</td>'+
+      '</tr>';
+    }).join('');
+  }
+  function addJournal(o){
+    var n=new Date(), p=function(v){return (v<10?'0':'')+v;};
+    J.push({t:p(n.getDate())+'/'+p(n.getMonth()+1)+' · '+p(n.getHours())+':'+p(n.getMinutes()),
+            who:o.who,id:o.id,field:o.field,before:o.before,after:o.after,src:o.src,why:o.why,isNew:true});
+    paint();
+  }
+
+  paint(); render();
+})();
+</script>

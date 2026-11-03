@@ -1,0 +1,203 @@
+erDiagram
+    fls_adjustment {
+        bigint adj_id PK
+        bigint itl_id FK
+        text field
+        text value_after
+        text state
+        bigint reversal_of FK
+        text actor
+        timestamptz at
+        bigint evt_id FK
+    }
+    fls_da_xong {
+        bigint itl_id
+        bigint evt_id
+        text actor
+        timestamptz at
+        text reason
+    }
+    fls_itl {
+        bigint itl_id PK
+        text content_key
+        text source_system
+        text source_sheet
+        int source_row
+        text run_id FK
+        text contract_version
+        text canon_version
+        text mapping_version
+        boolean raw_frozen
+        boolean is_flash
+        text period_state
+        timestamptz created_at
+        date doc_date
+        text doc_no
+        text memo
+        text curr
+        numeric ps_no
+        numeric ps_co
+        text acct
+        text le FK
+        text hd
+        text pay_type
+        text cdt1
+        text svc_start
+        text svc_end
+        text hd_thyt
+        text pay_type_thyt
+        text cdt1_thyt
+        text svc_start_thyt
+        text svc_end_thyt
+        text work_status
+        text id_payee
+        text invoice
+        text id_payee_thyt
+        text invoice_thyt
+        text le_payer FK
+        boolean is_intercompany
+        text pic
+        text audit_status
+        text pm_hinh
+        text itl_id_sheet
+        jsonb canon
+    }
+    fls_journal {
+        bigint jrn_id PK
+        bigint itl_id FK
+        text field
+        text value_before
+        text value_after
+        text actor
+        timestamptz at
+        text value_source
+        text reason
+    }
+    fls_le {
+        text le_code PK
+        text le_name
+        boolean is_entity
+    }
+    fls_mapping_master {
+        text hd_code PK
+        text need_cfa2
+        text method_cfa2
+        text code_hr
+        text coa1
+        text coa2
+    }
+    fls_migration {
+        int version PK
+        text name
+        text checksum
+        timestamptz applied_at
+    }
+    fls_moi_noi {
+        bigint link_id
+        bigint itl_id
+        text pm_line_id
+        numeric amount
+        text hinh
+        smallint lan
+        text run_id
+        timestamptz created_at
+    }
+    fls_pm_line {
+        text run_id PK
+        text pm_line_id PK
+        text pm_slip_id
+        text ref_tho
+        text ref_canon
+        numeric amount
+        text curr
+        text status
+        text hd
+        text cdt1
+        integer source_row
+        timestamptz read_at
+    }
+    fls_pm_link {
+        bigint itl_id FK
+        text pm_line_id
+        numeric amount
+        text hinh
+        text run_id FK
+        timestamptz created_at
+        bigint link_id PK
+        smallint lan
+    }
+    fls_pm_unlink {
+        bigint unlink_id PK
+        bigint link_id FK
+        bigint itl_id FK
+        bigint evt_id FK
+        timestamptz at
+    }
+    fls_queue_event {
+        bigint evt_id PK
+        bigint itl_id FK
+        text evt_type
+        text reason
+        date defer_until
+        text actor
+        timestamptz at
+    }
+    fls_queue_reason_weekly {
+        date tuan
+        int so_lan
+    }
+    fls_queue_state {
+        bigint itl_id
+        text reason
+        date defer_until
+        int defer_count
+    }
+    fls_reject {
+        bigint rej_id PK
+        text run_id FK
+        text source_system
+        text source_sheet
+        int source_row
+        text reason
+    }
+    fls_run {
+        text run_id PK
+        text contract_version
+        text canon_version
+        text mapping_version
+        timestamptz started_at
+        int row_count
+        text state
+    }
+    fls_source {
+        bigint source_id PK
+        text source_key
+        text src_type
+        timestamptz last_seen_at
+        int lag_days
+        date cutoff_date
+        int txn_count
+    }
+    fls_sua_tay {
+        bigint itl_id
+        text field
+        text value_after
+        bigint adj_id
+        text actor
+        timestamptz at
+    }
+    fls_itl ||--o{ fls_adjustment : "itl_id"
+    fls_adjustment ||--o{ fls_adjustment : "reversal_of"
+    fls_queue_event ||--o{ fls_adjustment : "evt_id"
+    fls_run ||--o{ fls_itl : "run_id"
+    fls_le ||--o{ fls_itl : "le"
+    fls_le ||--o{ fls_itl : "le_payer"
+    fls_itl ||--o{ fls_journal : "itl_id"
+    fls_run ||--o{ fls_pm_line : "run_id"
+    fls_itl ||--o{ fls_pm_link : "itl_id"
+    fls_run ||--o{ fls_pm_link : "run_id"
+    fls_pm_link ||--o{ fls_pm_unlink : "link_id"
+    fls_itl ||--o{ fls_pm_unlink : "itl_id"
+    fls_queue_event ||--o{ fls_pm_unlink : "evt_id"
+    fls_itl ||--o{ fls_queue_event : "itl_id"
+    fls_run ||--o{ fls_reject : "run_id"

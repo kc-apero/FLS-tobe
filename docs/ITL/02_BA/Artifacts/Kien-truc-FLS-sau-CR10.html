@@ -1,0 +1,728 @@
+<meta charset="utf-8">
+<title>Kiến trúc FLS sau CR#10</title>
+<style>
+/* ══════════════════════════════════════════════════════════════════════
+   Hệ thị giác lấy NGUYÊN từ `fls/web/tep/tokens.css` (QĐ-ITL-77 — một bản
+   sự thật về màu). Bộ TỐI là dẫn xuất, khai ở đây vì tokens.css chỉ có
+   bộ sáng; ⛔ không mã màu nào bịa ra ngoài hai bộ ấy.
+   ⛔ Không tải font qua mạng — luật hiện vật: bấm đúp là xem.
+   ══════════════════════════════════════════════════════════════════════ */
+:root{
+  --sans:'IBM Plex Sans','Segoe UI',system-ui,-apple-system,sans-serif;
+  --mono:'IBM Plex Mono','Cascadia Mono',Consolas,ui-monospace,monospace;
+  --ink:#14201e; --muted:#5c6b68; --faint:#9aa8a5;
+  --line:#dde4e3; --surface:#fff; --alt:#f6f8f8; --page:#eef1f1;
+  --label-bg:#fcfdfd;
+  --accent:#0e7570; --accent-hi:#0a5c58;
+  --crit:#c73a3a; --crit-bg:#fbeaea; --crit-line:#f3cdcd;
+  --warn:#c07414; --warn-bg:#fdf4e7; --warn-line:#f0dcbe;
+  --good:#2c7a4b; --good-bg:#e8f4ec; --good-line:#bcdcc8;
+  --info:#2563eb; --info-bg:#e9effd; --info-line:#b9cdf7;
+  --shadow:0 1px 2px rgba(20,32,30,.05),0 8px 28px rgba(20,32,30,.06);
+  --bo-nho:4px; --bo:6px; --bo-the:8px; --bo-tron:999px;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --ink:#e4ecea; --muted:#96a6a3; --faint:#6a7c78;
+    --line:#2b3937; --surface:#161f1e; --alt:#1c2625; --page:#0f1817;
+    --label-bg:#1a2423;
+    --accent:#43b7af; --accent-hi:#63cdc5;
+    --crit:#f08a8a; --crit-bg:#2a1a1a; --crit-line:#4a2828;
+    --warn:#e0a659; --warn-bg:#291f12; --warn-line:#4a3a1e;
+    --good:#6fc48f; --good-bg:#152519; --good-line:#28452f;
+    --info:#84a9f5; --info-bg:#151d2e; --info-line:#2b3a60;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 28px rgba(0,0,0,.28);
+  }
+}
+:root[data-theme="dark"]{
+  --ink:#e4ecea; --muted:#96a6a3; --faint:#6a7c78;
+  --line:#2b3937; --surface:#161f1e; --alt:#1c2625; --page:#0f1817;
+  --label-bg:#1a2423;
+  --accent:#43b7af; --accent-hi:#63cdc5;
+  --crit:#f08a8a; --crit-bg:#2a1a1a; --crit-line:#4a2828;
+  --warn:#e0a659; --warn-bg:#291f12; --warn-line:#4a3a1e;
+  --good:#6fc48f; --good-bg:#152519; --good-line:#28452f;
+  --info:#84a9f5; --info-bg:#151d2e; --info-line:#2b3a60;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 8px 28px rgba(0,0,0,.28);
+}
+
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:var(--sans);
+     font-size:15px;line-height:1.62;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px 96px}
+.col{max-width:70ch}
+
+/* ── thanh đầu ─────────────────────────────────────────────────────── */
+header.top{background:var(--ink);color:#fff;padding:44px 0 38px;margin-bottom:40px}
+:root[data-theme="dark"] header.top,
+:root:not([data-theme="light"]) header.top{background:#0b1211}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]) header.top{background:var(--ink)}}
+header.top .wrap{padding-bottom:0}
+.eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.13em;
+         text-transform:uppercase;color:#8fc4c0;margin:0 0 14px}
+header.top h1{font-size:clamp(30px,4.6vw,46px);line-height:1.1;margin:0 0 16px;
+              font-weight:650;letter-spacing:-.022em;text-wrap:balance;color:#fff}
+header.top .lede{font-size:17px;line-height:1.55;color:#cfdbd9;margin:0;max-width:64ch}
+.meta{display:flex;flex-wrap:wrap;gap:8px 22px;margin-top:26px;
+      font-family:var(--mono);font-size:11.5px;color:#93a5a2}
+.meta b{color:#cfe3e0;font-weight:500}
+
+/* ── phần ──────────────────────────────────────────────────────────── */
+section{margin:0 0 52px}
+h2{font-size:23px;line-height:1.25;letter-spacing:-.012em;font-weight:640;
+   margin:0 0 6px;text-wrap:balance}
+h2 .num{font-family:var(--mono);font-size:13px;font-weight:500;color:var(--accent);
+        margin-right:10px;letter-spacing:.04em}
+.sub{color:var(--muted);margin:0 0 22px;max-width:70ch}
+h3{font-size:16.5px;font-weight:620;margin:30px 0 8px;letter-spacing:-.005em}
+p{margin:0 0 14px}
+strong{font-weight:620}
+code{font-family:var(--mono);font-size:.88em;background:var(--alt);
+     border:1px solid var(--line);border-radius:var(--bo-nho);padding:.08em .34em}
+
+/* ── chip chứng cứ ─────────────────────────────────────────────────── */
+.ev{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);
+    font-size:10.5px;letter-spacing:.02em;color:var(--muted);
+    background:var(--label-bg);border:1px solid var(--line);
+    border-radius:var(--bo-tron);padding:1px 9px;white-space:nowrap;
+    vertical-align:1px}
+.ev::before{content:"";width:5px;height:5px;border-radius:50%;
+            background:var(--good);flex:none}
+.ev.doan::before{background:var(--warn)}
+.ev.thieu::before{background:var(--crit)}
+.evrow{display:flex;flex-wrap:wrap;gap:7px;margin:0 0 18px}
+
+/* ── khối nhấn ─────────────────────────────────────────────────────── */
+/* Khối nhấn dùng ĐÚNG cách `tokens.css` khai màu ngữ nghĩa: từng cặp
+   `--x-bg` + `--x-line` ⇒ nền pha nhạt + viền hairline CÙNG TÔNG, viền đều
+   bốn cạnh. ⛔ Không thanh màu ở cạnh trái. Tín hiệu ngữ nghĩa nằm ở nhãn
+   mono viết hoa, ⛔ không nằm ở một dải trang trí. */
+.call{background:var(--alt);border:1px solid var(--line);
+      border-radius:var(--bo);padding:17px 20px;margin:0 0 22px}
+.call.bad{background:var(--crit-bg);border-color:var(--crit-line)}
+.call.warn{background:var(--warn-bg);border-color:var(--warn-line)}
+.call.good{background:var(--good-bg);border-color:var(--good-line)}
+.call p:last-child{margin-bottom:0}
+.call ul:last-child,.call ol:last-child{margin-bottom:0}
+.call .lbl{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.1em;
+           text-transform:uppercase;margin:0 0 8px;color:var(--accent)}
+.call.bad .lbl{color:var(--crit)} .call.warn .lbl{color:var(--warn)} .call.good .lbl{color:var(--good)}
+
+/* ── số lớn ────────────────────────────────────────────────────────── */
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
+       gap:1px;background:var(--line);border:1px solid var(--line);
+       border-radius:var(--bo-the);overflow:hidden;margin:0 0 24px}
+.tile{background:var(--surface);padding:18px 20px}
+.tile .n{font-family:var(--mono);font-size:27px;font-weight:600;letter-spacing:-.02em;
+         font-variant-numeric:tabular-nums;display:block;line-height:1.15}
+.tile .k{display:block;font-size:12.5px;color:var(--muted);margin-top:5px;line-height:1.4}
+.tile.is-crit .n{color:var(--crit)} .tile.is-good .n{color:var(--good)}
+.tile.is-warn .n{color:var(--warn)} .tile.is-acc .n{color:var(--accent)}
+
+/* ── sơ đồ tầng ────────────────────────────────────────────────────── */
+.diag{background:var(--surface);border:1px solid var(--line);
+      border-radius:var(--bo-the);padding:22px;margin:0 0 10px;overflow-x:auto}
+/* Ống dẫn + dải "ai cầm phần nào" dùng CHUNG một lưới, nên mỗi đoạn dải
+   nằm đúng trên cột nó đang chỉ vào. ⛔ Trước đó tôi ước bằng `calc(60%+26px)`
+   — một con số đoán, và nó sẽ lệch ở mọi bề rộng khác. */
+.pipe,.band{display:grid;gap:0;min-width:940px;align-items:stretch}
+.p5{grid-template-columns:1fr 26px 1fr 26px 1fr 26px 1fr 26px 1fr}
+.p4{grid-template-columns:1fr 26px 1fr 26px 1fr 26px 1fr}
+.stage{min-width:0;display:flex;flex-direction:column;gap:6px}
+.box{background:var(--alt);border:1px solid var(--line);border-radius:var(--bo);
+     padding:11px 13px;height:100%;display:flex;flex-direction:column;gap:4px}
+.box .t{font-size:13px;font-weight:600;line-height:1.3}
+.box .d{font-size:11.5px;color:var(--muted);line-height:1.42}
+.box .n{font-family:var(--mono);font-size:11px;color:var(--faint);
+        font-variant-numeric:tabular-nums}
+.box.human{background:var(--warn-bg);border-color:var(--warn-line)}
+.box.mach{background:var(--info-bg);border-color:var(--info-line)}
+.box.fls{background:var(--good-bg);border-color:var(--good-line)}
+.box.moi{background:var(--surface);border:1.5px dashed var(--accent)}
+.arw{flex:none;width:26px;display:flex;align-items:center;justify-content:center;
+     color:var(--faint);font-size:15px}
+.band{margin-top:10px}
+.band .seg{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;
+           text-transform:uppercase;padding:5px 10px;border-radius:var(--bo-nho);
+           text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.band .seg.off{color:var(--faint)}
+.band .seg.on{background:var(--good-bg);color:var(--good);border:1px solid var(--good-line)}
+.band .seg.new{background:var(--surface);color:var(--accent);border:1.5px dashed var(--accent)}
+.cap{font-size:12.5px;color:var(--muted);margin:0 0 26px;line-height:1.5}
+.cap b{color:var(--ink);font-weight:600}
+
+/* ── chú giải ──────────────────────────────────────────────────────── */
+.key{display:flex;flex-wrap:wrap;gap:6px 18px;margin:0 0 14px;font-size:12px;color:var(--muted)}
+.key span{display:inline-flex;align-items:center;gap:6px}
+.key i{width:11px;height:11px;border-radius:3px;display:inline-block;flex:none}
+.key i.h{background:var(--warn-bg);border:1px solid var(--warn-line)}
+.key i.m{background:var(--info-bg);border:1px solid var(--info-line)}
+.key i.f{background:var(--good-bg);border:1px solid var(--good-line)}
+.key i.x{background:var(--surface);border:1.5px dashed var(--accent)}
+
+/* ── bảng ──────────────────────────────────────────────────────────── */
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:var(--bo-the);
+    background:var(--surface);margin:0 0 12px}
+table{border-collapse:collapse;width:100%;font-size:13.5px;min-width:660px}
+th{background:var(--alt);text-align:left;font-weight:600;font-size:11.5px;
+   letter-spacing:.06em;text-transform:uppercase;color:var(--muted);
+   padding:10px 14px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.5}
+tr:last-child td{border-bottom:0}
+td.num,th.num{font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+.sz{display:inline-block;font-family:var(--mono);font-size:11px;font-weight:600;
+    border-radius:var(--bo-nho);padding:1px 7px;border:1px solid}
+.sz.S{color:var(--good);background:var(--good-bg);border-color:var(--good-line)}
+.sz.M{color:var(--warn);background:var(--warn-bg);border-color:var(--warn-line)}
+.sz.L{color:var(--crit);background:var(--crit-bg);border-color:var(--crit-line)}
+.pill{display:inline-block;font-family:var(--mono);font-size:10.5px;
+      border-radius:var(--bo-tron);padding:1px 9px;border:1px solid;white-space:nowrap}
+.pill.block{color:var(--crit);background:var(--crit-bg);border-color:var(--crit-line)}
+.pill.ba{color:var(--info);background:var(--info-bg);border-color:var(--info-line)}
+.pill.ok{color:var(--good);background:var(--good-bg);border-color:var(--good-line)}
+
+ul,ol{margin:0 0 16px;padding-left:22px}
+li{margin:0 0 7px}
+li::marker{color:var(--faint)}
+hr.rule{border:0;border-top:1px solid var(--line);margin:44px 0}
+footer{color:var(--muted);font-size:12.5px;border-top:1px solid var(--line);
+       padding-top:22px;margin-top:20px}
+footer p{margin:0 0 8px}
+a{color:var(--accent)}
+a:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:2px}
+@media (max-width:640px){
+  .wrap{padding:0 16px 64px}
+  header.top{padding:32px 0 28px}
+  .tile .n{font-size:23px}
+}
+</style>
+
+<header class="top">
+  <div class="wrap">
+    <p class="eyebrow">Rà kiến trúc · CR#10 · QĐ-ITL-90</p>
+    <h1>Kiến trúc FLS sau CR#10</h1>
+    <p class="lede">Owner đưa hai màn nhập <b>Bank Transaction</b> và <b>Cash Ledger</b> vào FLS.
+      Bản rà này trả lời: việc đó thật sự đẻ ra bao nhiêu việc, kiến trúc phải đổi ở đâu,
+      và ba chỗ bản cập nhật hôm qua đã ghi sai.</p>
+    <div class="meta">
+      <span>Ngày <b>2026-09-07</b></span>
+      <span>Mốc mã <b>17df1d9</b></span>
+      <span>Cổng tài liệu <b>5/5</b></span>
+      <span>Cổng số sống <b>66/66</b></span>
+      <span>Kho <b>10.030 dòng</b></span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+<!-- ═══════════════════════════════════════════════════ KẾT LUẬN TRƯỚC -->
+<section>
+  <h2><span class="num">01</span>Kết luận trước</h2>
+  <p class="sub">Câu trả lời ngắn, rồi mới đến căn cứ.</p>
+
+  <div class="call">
+    <span class="lbl">Điều phải nói đầu tiên</span>
+    <p><strong>Đây không phải “thêm hai màn hình”.</strong> FLS hiện tại <strong>không có đầu</strong> —
+    nó bắt đầu ở <em>giữa</em> chuỗi, đọc đúng <strong>một</strong> sheet đã qua ba lần biến đổi,
+    rồi tái lập sổ. Yêu cầu của owner bảo nó mọc ra phần đầu ấy: nơi con số
+    <em>ra đời</em>, chứ không phải nơi con số được chép lại.</p>
+    <p>Hệ quả nặng nhất không nằm ở số dòng code. Nó nằm ở chỗ:
+    <strong>thước chuẩn hiện tại mất điểm tựa.</strong> Xem mục 05.</p>
+  </div>
+
+  <div class="tiles">
+    <div class="tile is-good"><span class="n">1</span><span class="k">sheet FLS đang đọc hôm nay —
+      <code>Transaction Mapping L1</code></span></div>
+    <div class="tile is-crit"><span class="n">0 / 12</span><span class="k">bảng trong kho phủ được tầng nhập
+      (<code>STM</code> · <code>BNK</code> · <code>CSH</code> đều chưa có)</span></div>
+    <div class="tile is-crit"><span class="n">0 / 17</span><span class="k">tuyến API hiện có làm được việc
+      <em>tạo một dòng mới</em></span></div>
+    <div class="tile is-warn"><span class="n">60+</span><span class="k">sheet <code>R |</code> theo tài khoản —
+      đây mới là tầng kế toán thật sự gõ vào</span></div>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ═══════════════════════════════════════════════ SAI Ở BẢN HÔM QUA -->
+<section>
+  <h2><span class="num">02</span>Ba chỗ bản cập nhật hôm qua ghi sai</h2>
+  <p class="sub">Tôi kiểm tài liệu cũ trước khi vẽ, và phép kiểm ấy bắt được lỗi của chính tôi.
+    Ghi ra chứ không sửa lặng lẽ.</p>
+
+  <div class="call bad">
+    <span class="lbl">⓵ Con số 7.484 thuộc file khác</span>
+    <p>Tôi ghi vào <code>BA-01</code> §4 và <code>00_MASTER_INDEX</code> §2 rằng
+    <code>F04</code> = <code>P100 | Bank Transactions</code> ▸ sheet <code>Bank Transactions</code>,
+    <strong>7.484 dòng</strong>. Truy lại thì <strong>7.484 chỉ có đúng một nguồn</strong> trong cả bộ —
+    và nguồn ấy khai <strong>File = <code>A-CCR_V2_Working.xlsx</code></strong>, không phải P100.</p>
+    <p class="evrow" style="margin:12px 0 0">
+      <span class="ev">FLS-Process-PM-den-ITL.md:204 · Chặng 3</span>
+      <span class="ev">grep toàn bộ: 7.484 xuất hiện ở 1 nguồn gốc</span>
+    </p>
+  </div>
+
+  <div class="call bad">
+    <span class="lbl">⓶ <code>GAP-SCOPE-01</code> đóng khung ngược chiều</span>
+    <p>Hôm qua tôi viết: <em>“<code>QĐ-ITL-90</code> lấy <strong>tầng đã gộp</strong>;
+    tầng thô 60+ định dạng chưa ai quyết.”</em> Đọc lại luồng thật thì <strong>ngược lại</strong>:</p>
+    <ul>
+      <li><strong>Tầng kế toán GÕ VÀO</strong> là <strong>60+ sheet <code>R | &lt;tài khoản&gt;</code></strong>
+        trong <code>P100 | Bank Transactions</code> (66 sheet) và <code>P100 | Cash Ledger</code> (25 sheet).
+        ThomHT &amp; AnhMC, <strong>trước 11:00 hằng ngày</strong>.</li>
+      <li><strong>Tầng “đã gộp”</strong> — <code>Bank Transactions</code> 7.484 dòng —
+        là <strong>ĐẦU RA của máy</strong>, sinh bằng thao tác <code>OP-09</code> <em>bấm Run</em>.
+        Nó <strong>không phải một mặt nhập liệu</strong>.</li>
+    </ul>
+    <p>⇒ Nếu làm đúng như tôi viết hôm qua — chỉ lấy tầng đã gộp — thì
+    <strong>giao được số không phần trăm</strong> điều owner yêu cầu:
+    kế toán vẫn gõ ở chỗ cũ, y nguyên.</p>
+    <p class="evrow" style="margin:12px 0 0">
+      <span class="ev">FLS-Process §Chặng 1 · OP-01/OP-04/OP-05</span>
+      <span class="ev">02_PROCESS_FLOW §2 · 66 sheet / 25 sheet</span>
+    </p>
+  </div>
+
+  <div class="call warn">
+    <span class="lbl">⓷ Tài liệu tả một adapter, mã nguồn làm một adapter khác</span>
+    <p><code>BA-05</code> <code>DD-I06</code> khai <em>“Adapter B ·
+    <code>P100 _ Bank Transactions</code> ▸ <code>Bank Transactions</code>”</em> kèm bản đồ cột.
+    Nhưng mã thật mở đầu bằng: <em>“Adapter B — Cash/Bank:
+    <code>Transaction Mapping L1</code> → ITL-CANON 38 vị trí”</em>.</p>
+    <p>Hai câu này <strong>không nói về cùng một chỗ trong chuỗi</strong> — cách nhau ba lần biến đổi.
+    Đây là <strong>lệch tài liệu ↔ mã có sẵn từ trước</strong>, ⛔ không phải do <code>CR#10</code> sinh ra,
+    và <strong>chưa cổng nào canh nó</strong>. Đề nghị mở <code>GAP-DOC-07</code>.</p>
+    <p class="evrow" style="margin:12px 0 0">
+      <span class="ev">02_BA/05_DATA_DICTIONARY_ERD.md:384</span>
+      <span class="ev">fls/adapters/bank.py:1 · docstring</span>
+      <span class="ev">fls/oracle/nguon.py:34 · BAN_SAO_RAW</span>
+    </p>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ═══════════════════════════════════════════════════ FLS HÔM NAY -->
+<section>
+  <h2><span class="num">03</span>FLS hôm nay đứng ở đâu trong chuỗi</h2>
+  <p class="sub">Đây là chỗ phải nhìn thấy trước khi bàn thiết kế. FLS đang cầm cái đuôi.</p>
+
+  <div class="key">
+    <span><i class="h"></i> người gõ</span>
+    <span><i class="m"></i> máy Sheets tính</span>
+    <span><i class="f"></i> FLS cầm</span>
+    <span><i class="x"></i> chưa tồn tại</span>
+  </div>
+
+  <div class="diag">
+    <div class="pipe p5">
+      <div class="stage"><div class="box human">
+        <span class="t">Sao kê từng tài khoản</span>
+        <span class="d">Kế toán gõ vào <code>R | &lt;số TK&gt;_&lt;bank&gt;</code></span>
+        <span class="n">60+ sheet · trước 11:00</span></div></div>
+      <div class="arw">▸</div>
+      <div class="stage"><div class="box mach">
+        <span class="t">Bank / Cash Transactions</span>
+        <span class="d">Gộp bằng <code>OP-09</code> bấm Run</span>
+        <span class="n">7.484 + 1.847 dòng</span></div></div>
+      <div class="arw">▸</div>
+      <div class="stage"><div class="box mach">
+        <span class="t">Ledger 111 / 112</span>
+        <span class="d"><code>FILTER·SORT</code> đảo cột, tách tài khoản</span>
+        <span class="n">5.067 + 7.626 dòng</span></div></div>
+      <div class="arw">▸</div>
+      <div class="stage"><div class="box mach">
+        <span class="t">Transaction Mapping L1</span>
+        <span class="d">Ghép PM, sinh mã, tra danh mục</span>
+        <span class="n">FLS đọc TỪ ĐÂY</span></div></div>
+      <div class="arw">▸</div>
+      <div class="stage"><div class="box fls">
+        <span class="t">fls_itl → F01 · F02 · F03</span>
+        <span class="d">Tái lập sổ, hàng chờ, ghép lệnh, bút toán</span>
+        <span class="n">10.030 dòng · 17 tuyến</span></div></div>
+    </div>
+    <div class="band p5">
+      <div class="seg off" style="grid-column:1/8">ngoài tầm FLS — Google Sheets</div>
+      <div class="seg on" style="grid-column:9/10">FLS cầm</div>
+    </div>
+  </div>
+  <p class="cap"><b>Đọc ra một câu:</b> FLS chứng minh được nó tái lập đúng <em>cái đuôi</em>,
+    nhưng nó chưa bao giờ chạm vào <em>chỗ con số ra đời</em>. Bốn chặng đầu là vùng nó
+    chỉ nhìn thấy kết quả.</p>
+
+  <div class="call">
+    <span class="lbl">Vì sao điều này quan trọng cho CR#10</span>
+    <p>Toàn bộ bằng chứng đúng-sai của FLS hôm nay là <strong>phép so với sheet</strong>:
+    parity <strong>69.510/69.510 ô</strong> trên 23 kỳ, không dung sai; đối soát kho ↔ sổ sống
+    <strong>10.030/10.030 dòng</strong>. Cả hai đều là câu <em>“tôi chép lại đúng”</em>.</p>
+    <p>Một dòng bank <strong>gõ thẳng vào FLS</strong> thì ⛔ <strong>không có bản gốc nào để chép lại</strong>.
+    Câu hỏi đúng-sai đổi hẳn dạng.</p>
+    <p class="evrow" style="margin:12px 0 0">
+      <span class="ev">QĐ-ITL-35 · parity 69.510 ô</span>
+      <span class="ev">QĐ-ITL-74 · 10.030/10.030</span>
+      <span class="ev">fls/db/migrations · 12 bảng, 0 bảng STM</span>
+    </p>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ═══════════════════════════════════════════════════ KIẾN TRÚC ĐỀ XUẤT -->
+<section>
+  <h2><span class="num">04</span>Kiến trúc đề xuất — FLS mọc đầu</h2>
+  <p class="sub">Không phải thiết kế mới. Là <strong>kích hoạt một tầng đã được thiết kế
+    ngày 19/08 rồi xếp lại</strong>.</p>
+
+  <div class="call good">
+    <span class="lbl">Phát hiện đỡ được nhiều việc nhất</span>
+    <p><code>ArchitecturePack-Ledger</code> §2 (19/08) <strong>đã có sẵn</strong> ba thực thể mà tầng nhập cần,
+    mỗi cái kèm bằng chứng là sheet thật:</p>
+    <ul style="margin-top:10px">
+      <li><code>STM</code> <strong>StatementLine</strong> — dòng sao kê thô
+        <span class="ev">Transaction date · Description · Currency · Debit · Credit · Reference number · Source</span></li>
+      <li><code>BNK</code> <strong>BankAccount</strong> — pháp nhân, ngân hàng, số TK, tiền tệ, sheet nguồn, dải đọc Nợ/Có
+        <span class="ev">BankAccountList · 3.003 dòng</span></li>
+      <li><code>CSH</code> <strong>CashFund</strong> — quỹ tiền mặt + số dư đầu kỳ
+        <span class="ev">Cash Ledger List · 997 dòng</span></li>
+    </ul>
+    <p>§4.1–4.2 của chính pack ấy còn viết sẵn các bước:
+    <em>“Khai báo BNK/CSH … Nạp sao kê → STM [SLA: trước 11h]”</em>.
+    Pack đứng ở <strong>v0.2 — chờ owner duyệt</strong> suốt từ 19/08.
+    <strong><code>QĐ-ITL-90</code> chính là cái duyệt ấy.</strong></p>
+  </div>
+
+  <h3>Bốn tầng</h3>
+  <div class="diag">
+    <div class="pipe p4">
+      <div class="stage"><div class="box moi">
+        <span class="t">Tầng 0 · NHẬP</span>
+        <span class="d"><code>F04</code> Bank · <code>F05</code> Cash.
+          Một khuôn nhập duy nhất, ngữ cảnh theo tài khoản.
+          Ranh giới <strong>nháp → chốt</strong> theo ngày × tài khoản.</span>
+        <span class="n">mới · fls_stm</span></div></div>
+      <div class="arw">▸</div>
+      <div class="stage"><div class="box moi">
+        <span class="t">Tầng 1 · GỘP</span>
+        <span class="d">Hợp nhất trong code, thay thao tác <code>OP-09</code> bấm Run.
+          Phát hiện trùng thay cột <code>Check trùng</code>.</span>
+        <span class="n">mới · thuần hàm</span></div></div>
+      <div class="arw">▸</div>
+      <div class="stage"><div class="box fls">
+        <span class="t">Tầng 2 · SỔ</span>
+        <span class="d"><code>ITL-CANON</code> 38 vị trí, hợp đồng 14 trường,
+          <code>fls_itl</code> chỉ-thêm.</span>
+        <span class="n">đang có · 10.030 dòng</span></div></div>
+      <div class="arw">▸</div>
+      <div class="stage"><div class="box fls">
+        <span class="t">Tầng 3 · VIỆC</span>
+        <span class="d">Hàng chờ, ghép PM, bút toán, cổng hôm nay.</span>
+        <span class="n">đang có · F01·F02·F03</span></div></div>
+    </div>
+    <div class="band p4">
+      <div class="seg new" style="grid-column:1/4">phải dựng — CR#10</div>
+      <div class="seg on" style="grid-column:5/8">đã chạy thật</div>
+    </div>
+  </div>
+  <p class="cap"><b>Danh mục nuôi tầng 0:</b> <code>fls_bank_account</code> (từ <code>BankAccountList</code>)
+    và <code>fls_cash_fund</code> (từ <code>Cash Ledger List</code>) — nạp y hệt cách
+    <code>nap_mapping_master.py</code> đã nạp 73 mã hợp đồng.</p>
+
+  <div class="call">
+    <span class="lbl">Một hiểu lầm phải gỡ: “60+ định dạng”</span>
+    <p>Luật <code>T4</code> lấy lý do <em>“60+ ngân hàng, mỗi bank một định dạng”</em>.
+    Đọc kỹ thì <strong>60+ là 60+ <em>tài khoản</em>, không phải 60+ <em>lược đồ</em></strong>:
+    mọi sheet <code>R |</code> đều đổ về cùng sáu trường
+    (<em>ngày · diễn giải · tiền tệ · nợ · có · reference</em>).
+    Khác biệt nằm ở <strong>bản xuất của ngân hàng</strong> — thứ kế toán <em>đọc rồi gõ lại</em>,
+    ⛔ không phải thứ máy phải phân tích.</p>
+    <p>⇒ FLS cần <strong>một khuôn nhập + một bảng buộc theo tài khoản</strong>,
+    ⛔ <strong>không cần 60 bộ phân tích cú pháp</strong>. Và bảng buộc ấy
+    <strong>đã tồn tại</strong>: <code>BNK.Bank Sheet</code> + <code>Range_*</code>.</p>
+    <p>⚠ Hai ngoại lệ đã biết, phải xử riêng chứ đừng để lọt:
+    <code>R | HoangACB</code> có <strong>hai cột ngày</strong> (chọn sai là sai kỳ) ·
+    <code>R | BGO1</code> đang <code>#REF!</code>.</p>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ═══════════════════════════════════════════════════ THƯỚC CHUẨN -->
+<section>
+  <h2><span class="num">05</span>Quyết định kiến trúc lớn nhất: thước chuẩn đổi</h2>
+  <p class="sub">Nếu chỉ đọc một mục trong bản này, đọc mục này.</p>
+
+  <div class="call bad">
+    <span class="lbl">Cái mất</span>
+    <p>Với lằn <strong>đọc sheet</strong>, câu hỏi là <em>“FLS có chép đúng không?”</em> —
+    và nó trả lời được <strong>đến từng ô</strong>, vì luôn có bản gốc bên cạnh để so.</p>
+    <p>Với lằn <strong>gõ vào FLS</strong>, ⛔ <strong>không còn bản gốc</strong>.
+    Hỏi <em>“chép đúng không?”</em> là hỏi một câu <strong>vô nghĩa</strong>.
+    Phép parity ⛔ <strong>không hỏng — nó mất đối tượng</strong>.
+    Đây là chỗ dễ dựng một <strong>cổng xanh rỗng</strong> nhất: một phép so
+    ⛔ không có gì để so vẫn in ra dấu tích xanh.</p>
+  </div>
+
+  <div class="call good">
+    <span class="lbl">Cái thay vào — và nó đã có sẵn</span>
+    <p>Câu hỏi đúng cho lằn nhập ⛔ không phải <em>“có chép đúng không”</em> mà là
+    <strong>“số này có khớp tiền thật trong tài khoản không?”</strong></p>
+    <p>Và <strong>đã có sẵn một trọng tài độc lập</strong>:
+    khối <code>2. CCR</code> của A-CCR — <strong>số dư thật theo ngày × tài khoản</strong>,
+    đọc ở <strong>dòng <code>226</code></strong>, <code>DIF = Treasury − Accounting</code>.</p>
+    <p><strong>Thước chuẩn mới của tầng 0</strong> = <code>ACC-2</code> nâng lên thành cổng chính:
+    tổng theo <code>(tài khoản × ngày)</code> khớp <strong>đến đồng</strong> với số dư thật.
+    Cộng <code>ACC-1</code> (mỗi giao dịch đúng 1 lần) · <code>ACC-3</code> (tập khoá bằng nhau,
+    chênh liệt kê từng dòng) · <code>ACC-4</code> (<code>#N/A</code> có tên nguyên nhân).</p>
+    <p class="evrow" style="margin:12px 0 0">
+      <span class="ev">QĐ-ITL-41 · ACC-1..4</span>
+      <span class="ev">QĐ-ITL-25 · dòng 226, ⛔ không đọc Diff After Adjuts</span>
+    </p>
+  </div>
+
+  <div class="call warn">
+    <span class="lbl">Kéo theo: ranh giới ITL ↔ A-CCR phải viết lại</span>
+    <p><code>QĐ-ITL-18</code> chia việc: <em>A-CCR giữ phép đối soát số dư, ITL chỉ <strong>đọc kết quả</strong>.</em>
+    Ranh giới ấy đứng vững khi ITL ở <strong>hạ nguồn</strong>.</p>
+    <p>Sau <code>CR#10</code>, FLS <strong>sinh ra chính những con số mà A-CCR đối soát</strong>.
+    Người bị đo và người đo thành một. ⚠ <code>QĐ-ITL-26</code> để cổng ở mức
+    <strong>cảnh báo, không chặn</strong> — với lằn nhập thì mức ấy
+    <strong>phải xem lại</strong>: một dòng tiền gõ sai mà chỉ được nhắc nhẹ sẽ
+    <strong>đi thẳng vào P&amp;L</strong>.</p>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ═══════════════════════════════════════════════════ CẮT DẦN -->
+<section>
+  <h2><span class="num">06</span>Cắt theo TÀI KHOẢN, không cắt một phát</h2>
+  <p class="sub">Đảo chiều dòng dữ liệu là việc rủi ro nhất trong bản này. Đề xuất làm nó
+    <strong>từng phần và lùi được</strong>.</p>
+
+  <p>Thêm <strong>một cột</strong> vào <code>fls_bank_account</code>:
+    <code>nguon_nhap ∈ { sheet, fls }</code>. Mỗi tài khoản tự quyết định nó đang sống ở đâu.</p>
+
+  <div class="tw"><table>
+    <thead><tr><th>Cờ tài khoản</th><th>FLS làm gì</th><th>Thước chuẩn áp cho nó</th><th>Lùi được?</th></tr></thead>
+    <tbody>
+      <tr><td><code>sheet</code> <span class="pill ok">mặc định</span></td>
+        <td>Đọc như hôm nay, ⛔ không đổi một thao tác nào của kế toán</td>
+        <td>Parity từng ô — giữ nguyên</td>
+        <td>—</td></tr>
+      <tr><td><code>fls</code></td>
+        <td>FLS là <strong>nơi con số ra đời</strong>; <code>F04</code>/<code>F05</code> mở cho tài khoản đó</td>
+        <td>Đối soát số dư <code>2. CCR</code> + <code>ACC-1..4</code></td>
+        <td>Có — đổi cờ về <code>sheet</code></td></tr>
+    </tbody>
+  </table></div>
+
+  <p><strong>Vì sao đây là đường đúng:</strong> nó giữ được <code>QĐ-ITL-40</code>
+  (<em>cắt tại mốc kỳ</em>) mà ⛔ không bắt cả 60+ tài khoản nhảy cùng lúc; nó cho phép
+  <strong>một tài khoản chạy thử một kỳ</strong> rồi mới nhân rộng; và nó biến câu hỏi
+  <em>“đã sẵn sàng chưa”</em> thành một câu <strong>đo được từng tài khoản</strong>
+  thay vì một cuộc họp.</p>
+
+  <div class="call warn">
+    <span class="lbl">⚠ Nhưng nó ⛔ không giải được câu chặn</span>
+    <p>Cắt dần <strong>làm nhẹ rủi ro</strong>, ⛔ <strong>không trả lời</strong>
+    <code>GAP-SCOPE-02</code>. Ngay khi tài khoản đầu tiên bật cờ <code>fls</code>,
+    P100 <strong>thiếu dòng của tài khoản ấy</strong> — mà <code>1.1</code>/<code>1.2 Ledger</code>
+    và <code>2. CCR</code> đều đọc từ P100. Hoặc FLS <strong>ghi ngược</strong> (là
+    <em>ghi đôi</em>, thứ <code>QĐ-ITL-32</code> đã bỏ), hoặc chuỗi hạ nguồn của P100
+    <strong>phải chuyển sang đọc FLS</strong>. ⛔ Không có đường thứ ba.</p>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ═══════════════════════════════════════════════════ CÔNG VIỆC -->
+<section>
+  <h2><span class="num">07</span>Công việc phát sinh</h2>
+  <p class="sub">Cỡ việc là <strong>phán đoán của người</strong>, ⛔ không phải số đo —
+    khai đúng như cách <code>tien_do.py</code> tách <em>đo thật</em> khỏi <em>người ước</em>.
+    Cột “vì sao mới” thì đo được.</p>
+
+  <div class="tw"><table>
+    <thead><tr><th class="num">#</th><th>Việc</th><th>Vì sao là việc MỚI (đo được)</th><th class="num">Cỡ</th><th>Trạng thái</th></tr></thead>
+    <tbody>
+      <tr><td class="num">1</td><td>Ba bảng <code>fls_stm</code> · <code>fls_bank_account</code> · <code>fls_cash_fund</code> + migration <code>0015</code></td>
+        <td><strong>0/12</strong> bảng hiện có phủ được tầng nhập</td>
+        <td class="num"><span class="sz M">M</span></td><td><span class="pill ok">làm được ngay</span></td></tr>
+      <tr><td class="num">2</td><td>Bộ nạp danh mục <code>BNK</code> 3.003 + <code>CSH</code> 997 dòng</td>
+        <td>Có khuôn sẵn — <code>nap_mapping_master.py</code> đã làm y hệt cho 73 mã <code>hd</code></td>
+        <td class="num"><span class="sz S">S</span></td><td><span class="pill ok">làm được ngay</span></td></tr>
+      <tr><td class="num">3</td><td>Cửa API tầng nhập: liệt kê / tạo / sửa / xoá dòng theo <code>(tài khoản × ngày)</code>, đóng ngày</td>
+        <td><strong>0/17</strong> tuyến hiện có tạo được một dòng mới — cả 17 đều thao tác trên sổ đã có</td>
+        <td class="num"><span class="sz L">L</span></td><td><span class="pill block">chờ GAP-SCOPE-02</span></td></tr>
+      <tr><td class="num">4</td><td>Ranh giới <strong>nháp → chốt</strong></td>
+        <td><code>INV-I08</code> <em>sổ chỉ-thêm</em> ⛔ không dùng được cho gõ mới: mọi lỗi gõ sẽ thành một cặp bút toán <strong>vĩnh viễn</strong></td>
+        <td class="num"><span class="sz M">M</span></td><td><span class="pill ba">cần BA chốt</span></td></tr>
+      <tr><td class="num">5</td><td>Phát hiện trùng</td>
+        <td>Hôm nay là cột công thức <code>Check trùng</code> của Sheets — ⛔ không có bản trong code</td>
+        <td class="num"><span class="sz M">M</span></td><td><span class="pill ok">làm được ngay</span></td></tr>
+      <tr><td class="num">6</td><td>Số dư luỹ kế + cổng đối soát <code>2. CCR</code></td>
+        <td>Thay cho parity đã <strong>mất đối tượng</strong> — xem mục 05</td>
+        <td class="num"><span class="sz L">L</span></td><td><span class="pill ba">cần chốt mức chặn</span></td></tr>
+      <tr><td class="num">7</td><td>Màn <code>F04</code> / <code>F05</code></td>
+        <td>Khác <strong>KIỂU</strong> với F01–F03: cần tạo/xoá dòng, ngữ cảnh tài khoản, số dư chạy, đóng ngày</td>
+        <td class="num"><span class="sz L">L</span></td><td><span class="pill block">chờ GAP-SCR-10</span></td></tr>
+      <tr><td class="num">8</td><td>Ghi ngược P100 <strong>hoặc</strong> chuyển hạ nguồn P100 sang đọc FLS</td>
+        <td>P100 nuôi <code>1.1</code>/<code>1.2 Ledger</code> và <code>2. CCR</code>; bật cờ <code>fls</code> là cắt nguồn ấy</td>
+        <td class="num"><span class="sz L">L</span></td><td><span class="pill block">⛔ CHẶN</span></td></tr>
+      <tr><td class="num">9</td><td>Cờ <code>nguon_nhap</code> + đường lùi theo tài khoản</td>
+        <td>Không có nó thì việc 8 thành một cú nhảy một-phát cho cả 60+ tài khoản</td>
+        <td class="num"><span class="sz S">S</span></td><td><span class="pill ok">làm được ngay</span></td></tr>
+      <tr><td class="num">10</td><td><code>SCREEN_SPEC</code> cho <code>F04</code>/<code>F05</code></td>
+        <td><code>BA-06</code> mới có <code>F01·F02·F03·F06</code>; <code>R-A1</code> cấm bịa hình dạng màn</td>
+        <td class="num"><span class="sz M">M</span></td><td><span class="pill ba">BA</span></td></tr>
+      <tr><td class="num">11</td><td>Viết lại ranh giới ITL ↔ A-CCR (<code>QĐ-ITL-18</code>, <code>QĐ-ITL-26</code>)</td>
+        <td>FLS nay <strong>sinh ra</strong> số mà A-CCR đối soát ⇒ người đo và người bị đo thành một</td>
+        <td class="num"><span class="sz M">M</span></td><td><span class="pill ba">cần owner</span></td></tr>
+      <tr><td class="num">12</td><td>Hai ngoại lệ: <code>R | HoangACB</code> hai cột ngày · <code>R | BGO1</code> <code>#REF!</code></td>
+        <td>Đã ghi trong <code>FLS-Process</code> §Chặng 1 dưới mục <em>Bẫy</em> — chọn sai cột ngày là <strong>sai kỳ</strong></td>
+        <td class="num"><span class="sz S">S</span></td><td><span class="pill ok">làm được ngay</span></td></tr>
+    </tbody>
+  </table></div>
+
+  <p class="cap"><b>Đọc bảng này theo cột cuối, không theo cột cỡ.</b>
+    Bốn việc <span class="pill ok">làm được ngay</span> gộp lại vẫn ⛔ không cho kế toán gõ được một dòng nào —
+    vì việc <strong>3</strong> và <strong>8</strong> đứng chắn. Nói cách khác:
+    <strong>đường tới hạn của CR#10 ⛔ không phải code, mà là một câu trả lời.</strong></p>
+</section>
+
+<hr class="rule">
+
+<!-- ═══════════════════════════════════════════════════ TÀI LIỆU CŨ -->
+<section>
+  <h2><span class="num">08</span>Tài liệu cũ phải sửa</h2>
+  <p class="sub">Kết quả rà. Bảy chỗ — trong đó <strong>bốn chỗ là do bản cập nhật hôm qua của tôi</strong>.</p>
+
+  <div class="tw"><table>
+    <thead><tr><th>Tài liệu</th><th>Chỗ lệch</th><th>Ai gây</th></tr></thead>
+    <tbody>
+      <tr><td><code>BA-01</code> §4</td>
+        <td>Gán <code>F04</code> = <code>P100 | Bank Transactions ▸ Bank Transactions (7.484 dòng)</code> — <strong>sai file</strong></td>
+        <td><span class="pill block">bản 06/09</span></td></tr>
+      <tr><td><code>00_MASTER_INDEX</code> §2 · <code>QĐ-ITL-90</code> · changelog</td>
+        <td>Cùng lỗi gán file, ba chỗ</td>
+        <td><span class="pill block">bản 06/09</span></td></tr>
+      <tr><td><code>06_DASHBOARD</code> <code>GAP-SCOPE-01</code></td>
+        <td>Đóng khung <strong>ngược chiều</strong> — tầng nhập thật là <code>R |</code>, không phải tầng gộp</td>
+        <td><span class="pill block">bản 06/09</span></td></tr>
+      <tr><td><code>Lo-trinh…</code> §3 · dòng <code>S4</code></td>
+        <td>Ghi <em>“chỉ tầng đã gộp, ⛔ không phải kéo/thả 60+ định dạng”</em> — hẹp sai chỗ</td>
+        <td><span class="pill block">bản 06/09</span></td></tr>
+      <tr><td><code>BA-05</code> <code>DD-I06</code></td>
+        <td>Tả Adapter B đọc <code>Bank Transactions</code>; mã đọc <code>Transaction Mapping L1</code></td>
+        <td><span class="pill ba">có sẵn từ trước</span></td></tr>
+      <tr><td><code>ArchitecturePack-Ledger</code> v0.2</td>
+        <td>Vẫn mang nhãn <em>“đề xuất — chờ owner duyệt”</em> từ 19/08; §4.1–4.2 nay <strong>đã được duyệt</strong> bởi <code>QĐ-ITL-90</code></td>
+        <td><span class="pill ba">có sẵn từ trước</span></td></tr>
+      <tr><td><code>02_PROCESS_FLOW</code> §2</td>
+        <td>Bảng <em>5 nguồn đầu vào</em> vẫn xếp P100 là nguồn Treasury — sau <code>CR#10</code> vai trò ấy dịch</td>
+        <td><span class="pill ba">có sẵn từ trước</span></td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="call warn">
+    <span class="lbl">Một điều đáng nói về chính bộ cổng</span>
+    <p>Cả <strong>bảy</strong> chỗ trên đều đi qua cổng tài liệu <strong>5/5 xanh</strong> và cổng số sống
+    <strong>66/66 xanh</strong>. ⛔ Không cổng nào thấy.</p>
+    <p>Lý do đo được: hai cổng ấy canh <strong>hình thức</strong> (phiên bản ↔ changelog · số ↔ số máy đo ·
+    bảng ↔ số cột · ngày ↔ <code>git log</code>). ⛔ Không cổng nào canh
+    <strong>một câu văn có gán đúng con số cho đúng cái file hay không</strong>.
+    Đó ⛔ không phải lỗi của cổng — nhưng nó là <strong>giới hạn phải nói ra</strong>,
+    vì <em>“5/5 và 66/66”</em> rất dễ bị đọc thành <em>“bộ tài liệu đúng”</em>.</p>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ═══════════════════════════════════════════════════ CHẶN -->
+<section>
+  <h2><span class="num">09</span>Ba câu chặn — bản đã sửa lại</h2>
+  <p class="sub">Sau khi rà, hai trong ba câu đổi nội dung so với bản hôm qua.</p>
+
+  <div class="tw"><table>
+    <thead><tr><th>GAP</th><th>Câu hỏi (bản đã sửa)</th><th>Ai trả lời</th><th>Chặn gì</th></tr></thead>
+    <tbody>
+      <tr>
+        <td><code>GAP-SCOPE-01</code><br><span class="pill block">đã viết lại</span></td>
+        <td><strong>Tầng nhập của <code>F04</code> là 60+ sheet <code>R |</code>, đúng không?</strong>
+          Bản hôm qua hỏi ngược. Nếu owner muốn đúng thứ kế toán đang gõ thì câu trả lời là <em>có</em>,
+          và <em>“60+ định dạng”</em> ⛔ không còn là rào — cần <strong>một khuôn + bảng buộc <code>BNK</code></strong>.</td>
+        <td>COO-CFO</td>
+        <td>hình dạng <code>F04</code></td>
+      </tr>
+      <tr>
+        <td><code>GAP-SCOPE-02</code><br><span class="pill block">⛔ CHẶN CODE</span></td>
+        <td><strong>Khi một tài khoản bật cờ <code>fls</code>, P100 lấy dòng của nó ở đâu?</strong>
+          Ghi ngược ⇒ <em>ghi đôi</em> (<code>QĐ-ITL-32</code> đã bỏ). Không ghi ⇒
+          <code>1.1</code>/<code>1.2 Ledger</code> và <code>2. CCR</code> <strong>hụt</strong>.
+          ⛔ Không có đường thứ ba.</td>
+        <td>COO-CFO + Kế toán</td>
+        <td>việc 3 · 7 · 8</td>
+      </tr>
+      <tr>
+        <td><code>GAP-SCR-10</code></td>
+        <td><code>SCREEN_SPEC</code> cho <code>F04</code>/<code>F05</code>. ⛔ Không bịa (<code>R-A1</code>).
+          Cần trả lời tối thiểu: <strong>đơn vị làm việc là gì</strong> — một ngày × một tài khoản,
+          hay một lô dán vào?</td>
+        <td>BA</td>
+        <td>việc 7</td>
+      </tr>
+      <tr>
+        <td><code>GAP-DOC-07</code><br><span class="pill ba">đề nghị mở</span></td>
+        <td>Lệch <strong>tài liệu ↔ mã</strong> ở Adapter B. ⛔ Không cổng nào canh
+          <em>“tài liệu tả đúng chỗ mã thật đang đọc”</em>.</td>
+        <td>Tech Lead</td>
+        <td>⛔ không chặn</td>
+      </tr>
+    </tbody>
+  </table></div>
+</section>
+
+<hr class="rule">
+
+<!-- ═══════════════════════════════════════════════════ GIỚI HẠN -->
+<section>
+  <h2><span class="num">10</span>Cái bản này ⛔ KHÔNG đo được</h2>
+  <p class="sub">Khai ra thay vì để người đọc tự suy.</p>
+  <ul>
+    <li><strong>⛔ Tôi chưa đọc sheet sống.</strong> Toàn bộ số trong bản này lấy từ
+      <strong>bộ tài liệu</strong> và <strong>mã nguồn</strong>, ⛔ không phải từ Google Sheets hôm nay.
+      Máy này đang <strong>không có mạng</strong> — lệnh <code>git push</code> cùng phiên đã thất bại.</li>
+    <li><strong>⛔ Con số dòng thật của tầng nhập chưa ai đếm.</strong> <code>7.484</code>/<code>1.847</code>
+      là <strong>đầu ra sau khi gộp</strong>. Số dòng kế toán thật sự gõ trên 60+ sheet <code>R |</code>
+      <strong>chưa có ở đâu trong bộ</strong> — nó là phép đo đầu tiên nên làm khi có mạng.</li>
+    <li><strong>⛔ Cỡ việc S/M/L là ước lượng của tôi</strong>, ⛔ không phải số đo.
+      Chúng sẽ sai; cột <em>“vì sao là việc mới”</em> mới là phần đứng vững được.</li>
+    <li><strong>⛔ Chưa hỏi kế toán.</strong> ThomHT và AnhMC là người gõ tầng này mỗi ngày trước 11:00.
+      Câu <em>“đơn vị làm việc là một ngày × một tài khoản hay một lô dán vào”</em>
+      <strong>họ trả lời trong ba phút</strong>, còn tôi thì ⛔ không.</li>
+  </ul>
+
+  <div class="call">
+    <span class="lbl">Đề nghị việc kế tiếp</span>
+    <p><strong>⓵</strong> Sửa 7 chỗ tài liệu ở mục 08 (làm được ngay) ·
+       <strong>⓶</strong> Owner trả lời <code>GAP-SCOPE-02</code> — đây là thứ duy nhất đang chắn ·
+       <strong>⓷</strong> Một buổi 30 phút với ThomHT/AnhMC để đóng <code>GAP-SCR-10</code> ·
+       <strong>⓸</strong> Khi có mạng: đếm dòng thật trên 60+ sheet <code>R |</code>.</p>
+    <p>⛔ Ba việc đầu ⛔ <strong>không cần một dòng code nào</strong>.</p>
+  </div>
+</section>
+
+<footer>
+  <p><strong>Nguồn của bản này:</strong> bộ tài liệu ITL tại <code>FLS/docs/ITL/</code>
+    (65 tệp <code>.md</code>) · mã nguồn <code>fls/</code> tại mốc <code>17df1d9</code> ·
+    12 migration · 17 tuyến API · kho <code>fls_itl</code> 10.030 dòng.</p>
+  <p><strong>Hệ thị giác</strong> lấy nguyên từ <code>fls/web/tep/tokens.css</code>
+    (<code>QĐ-ITL-77</code> — một bản sự thật về màu). ⛔ Không mã màu nào bịa thêm.
+    ⛔ Không thư viện, ⛔ không cần mạng.</p>
+  <p>Chấm tròn trên chip chứng cứ: <span style="color:var(--good)">●</span> đo được ·
+    <span style="color:var(--warn)">●</span> phán đoán ·
+    <span style="color:var(--crit)">●</span> chưa ai đo.</p>
+</footer>
+
+</div>

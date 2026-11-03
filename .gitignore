@@ -1,0 +1,17 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.env
+.env.*
+
+# ⛔ Ban chup so THAT (tools/sao_luu_kho.py). CHUA du lieu ke toan that, trong
+# do co cot `memo` (Dien giai) CO THE mang ten nguoi ⇒ ⛔ khong bao gio vao git.
+sao_luu/
+
+# ⛔⛔ Hien vat sinh tu SO THAT (`tools/mui_thu_luoi.py`, `tools/sao_luu_kho.py`…).
+# Mui thu luoi F02 mang **ca cot `memo` (Dien giai)** cua 748 dong sổ that — cung
+# loai nguy voi `sao_luu/`: no CO THE mang ten nguoi. Va tep nay con **de gui di**
+# hon ban chup: no la mot trang `.html` mo len la doc duoc ⇒ ⛔ khong bao gio vao
+# git, va khi gui cho ai thi phai biet minh dang gui du lieu ke toan that.
+hien_vat/

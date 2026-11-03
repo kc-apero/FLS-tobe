@@ -1,0 +1,464 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   hinh.css — hinh dang cua man hinh FLS.
+
+   ⭐ **Lay NGUYEN tu `FLS-Design-P6.html`** *(owner chot 2026-09-03: "toi
+   thich cac asset thiet ke cua FLS-Design-P6 hon")*. Thay doi duy nhat so
+   voi ban ve: **moi ma mau doi thanh `var(--…)`** tro ve `tokens.css`.
+
+   ⛔⛔ **⛔ Khong mot ma mau nao trong tep nay.** Bai
+   `tests/web/test_khong_ma_mau_go_tay.py` NO neu thay `#rrggbb`/`rgb(`/`hsl(`.
+   ⇒ Muon them mau thi them **o `tokens.css`**, va luc do phai tra loi duoc
+   *"mau nay den tu dau trong `A-CCR`"*.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);
+     font:400 13.5px/1.5 var(--sans)}
+h1,h2,h3{margin:0;letter-spacing:-.01em}
+.wrap{max-width:var(--trang-tran);margin:0 auto;padding:0 20px 72px}
+/* ⭐ Man rong thi DUNG HET cho co. ⛔ Day la man LAM (quet hang tram dong,
+   52 cot), ⛔ khong phai mot trang chu de doc — luat "dong chu 65 ky tu" ⛔
+   khong ap o day. Do that: man owner 1894px ma trang khoa 1440 ⇒ bo phi
+   ~450px doi ben. */
+@media (min-width:1600px){.wrap{max-width:var(--trang-tran-rong)}}
+.mono{font-family:var(--mono)}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.neg{color:var(--crit)}
+.muted{color:var(--muted)}
+.faint{color:var(--faint)}
+.spacer{flex:1}
+hr{border:0;border-top:1px solid var(--line);margin:0}
+
+/* ── shell: top bar + control bar (hinh lay tu A-CCR Global Shell) ────── */
+.top{background:var(--ink);color:var(--on-ink);padding:10px 20px;display:flex;
+     align-items:center;gap:14px;flex-wrap:wrap}
+.top .brand{font:700 15px/1 var(--sans)}
+.top .sub{font:500 11.5px/1 var(--mono);color:var(--faint)}
+.pill{border:1px solid var(--on-ink-line);border-radius:var(--bo-tron);
+      padding:4px 10px;font:500 11.5px/1 var(--mono);color:var(--on-ink-muted)}
+.ctl{background:var(--surface);border-bottom:1px solid var(--line);
+     padding:8px 20px;display:flex;align-items:center;gap:18px;flex-wrap:wrap;
+     font-size:12.5px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:var(--bo);
+     overflow:hidden}
+.seg button{border:0;background:var(--surface);padding:5px 11px;
+            font:500 12.5px/1 var(--sans);color:var(--muted);cursor:pointer}
+.seg button[aria-pressed=true]{background:var(--accent);color:var(--on-ink)}
+
+/* ── chip niem tin: component TAI DUNG tu A-CCR ──────────────────────── */
+.chip{display:inline-flex;align-items:center;gap:5px;
+      border-radius:var(--bo-tron);padding:2px 9px;
+      font:600 11px/1.5 var(--sans);border:1px solid transparent;
+      white-space:nowrap}
+.chip.flash{background:var(--alt);color:var(--muted);border-color:var(--line);
+            font-style:italic}
+.chip.recon{background:var(--info-bg);color:var(--info);
+            border-color:var(--info-line)}
+.chip.signed{background:var(--good-bg);color:var(--good);
+             border-color:var(--good-line)}
+.chip.info{background:var(--info-bg);color:var(--info);
+           border-color:var(--info-line)}
+.chip.ok{background:var(--good-bg);color:var(--good);
+         border-color:var(--good-line)}
+.chip.warn{background:var(--warn-bg);color:var(--warn);
+           border-color:var(--warn-line)}
+.chip.crit{background:var(--crit-bg);color:var(--crit);
+           border-color:var(--crit-line)}
+.chip.lock{background:var(--alt);color:var(--faint);border-color:var(--line)}
+
+/* ── nut ─────────────────────────────────────────────────────────────── */
+button.b{font:600 12.5px/1 var(--sans);border-radius:var(--bo);padding:6px 11px;
+         cursor:pointer;border:1px solid var(--line);background:var(--surface);
+         color:var(--ink)}
+button.b:hover{border-color:var(--accent);color:var(--accent)}
+button.b.pri{background:var(--accent);border-color:var(--accent);
+             color:var(--on-ink)}
+button.b.pri:hover{background:var(--accent-hi)}
+button.b.danger:hover{border-color:var(--crit);color:var(--crit)}
+button.b[disabled]{opacity:.45;cursor:not-allowed;border-color:var(--line);
+                   color:var(--faint)}
+button.b[disabled]:hover{border-color:var(--line);color:var(--faint)}
+.tiny{font:600 11px/1 var(--sans);padding:4px 7px}
+
+/* ── the / khoi ──────────────────────────────────────────────────────── */
+.card{background:var(--surface);border:1px solid var(--line);
+      border-radius:var(--bo-the)}
+.card>header{padding:11px 14px;border-bottom:1px solid var(--line);
+             display:flex;align-items:center;gap:10px}
+.card>header h3{font:600 13.5px/1 var(--sans)}
+.pad{padding:14px}
+.grid4{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+       gap:14px}
+.k{font:600 10.5px/1 var(--mono);letter-spacing:.12em;color:var(--muted);
+   text-transform:uppercase}
+.v{font:700 26px/1.1 var(--mono);font-variant-numeric:tabular-nums;
+   margin:6px 0 4px}
+.stack{display:flex;flex-direction:column;gap:14px}
+.row{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-start}
+.col{flex:1;min-width:320px}
+.hint{font-size:12px;color:var(--muted);padding:8px 0 0}
+.meas{font:600 10.5px/1 var(--mono);color:var(--good);
+      background:var(--good-bg);border:1px solid var(--good-line);
+      border-radius:var(--bo-nho);padding:2px 6px}
+
+/* ── bang chung ──────────────────────────────────────────────────────── */
+table{border-collapse:separate;border-spacing:0;width:100%;font-size:12.5px}
+th,td{text-align:left;padding:0 9px;height:var(--row);
+      border-bottom:1px solid var(--line);white-space:nowrap}
+th{background:var(--alt);font:600 11.5px/1 var(--sans);color:var(--muted);
+   position:sticky;top:0;z-index:2}
+td.r,th.r{text-align:right;font-family:var(--mono);
+          font-variant-numeric:tabular-nums}
+tbody tr:hover td{background:var(--row-hover)}
+.scroll{overflow:auto;max-height:420px;
+        border-radius:0 0 var(--bo-the) var(--bo-the)}
+
+/* ── LUOI F02: co che da chung minh o mui thu (QĐ-ITL-66) ────────────── */
+.gwrap{overflow:auto;max-height:460px;border-top:1px solid var(--line)}
+table.g{font-size:var(--grid-fs)}
+table.g th,table.g td{height:var(--row);border-right:1px solid var(--line)}
+/* ⭐ Dong cung tieu de + HAI cot khoa (hanh vi §1-6). 346px = tong be rong
+   hai cot khoa da do o mui thu — con so nay cho UAT xac nhan co du. */
+table.g th.f1,table.g td.f1{position:sticky;left:0;z-index:3;
+  width:var(--khoa-1);background:var(--alt);
+  border-right:2px solid var(--line)}
+table.g th.f2,table.g td.f2{position:sticky;left:var(--khoa-1);z-index:3;
+  width:var(--khoa-2);background:var(--alt);border-right:2px solid var(--ink)}
+table.g th.f1,table.g th.f2{z-index:4}
+/* ⭐ O GO DUOC phai trong KHAC o chi-doc — day dung cho mui thu 27/08 sai:
+   no de 38 tieu de la chu cai va moi o chi-doc, owner thay trong 30 giay. */
+td.edit{background:var(--surface);
+        box-shadow:inset 0 0 0 1px var(--info-line)}
+td.edit:focus-within,td.edit:hover{box-shadow:inset 0 0 0 2px var(--accent)}
+td.edit input{width:100%;border:0;outline:0;background:transparent;
+  font:inherit;font-family:inherit;color:var(--ink);padding:0}
+td.ro{color:var(--muted);background:var(--alt)}
+/* ⭐ O MO DUOC ngan keo doi soat — cot khoa thu nhat. ⛔ `cursor:pointer` mot
+   minh ⛔ KHONG du: no chi hien ra khi chuot da o dung tren o, nen no ⛔ khong
+   tra loi duoc cau *"o day co gi bam duoc khong"*. Do la dung khuyet tat owner
+   bat ngay 03/09 (*"sao khong co panel"* — trong khi panel van chay). */
+table.g td.mo-duoc{color:var(--accent);cursor:pointer;
+  text-decoration:underline dotted;text-underline-offset:2px}
+table.g td.mo-duoc:hover{background:var(--edit-h-bg);
+  text-decoration:underline solid}
+/* ⭐ DONG DANG CHON — no phai CON THAY DUOC khi panel mo, vi ca y do cua
+   layout master–detail la *"dong van trong tam mat"*. */
+table.g tr.chon>td{background:var(--edit-h-bg)}
+table.g tr.chon>td.f1,table.g tr.chon>td.f2{background:var(--edit-h-bg);
+  box-shadow:inset 3px 0 0 var(--accent)}
+
+/* ══ MASTER–DETAIL cua `F02` ═══════════════════════════════════════════════
+   ⭐ Do khuon `FLS-Wireframe.html` §`s-f02`: *"Quet ben trai, bam mot dong →
+   chi tiet doi soat truot ra ben phai (dong VAN trong tam mat)"*.
+   ⛔⛔ Ban dau `B5` lam ngan keo bang mot **hop che kin man** (`HT.mo`). No
+   chay dung, nhung no pha dung cai cau trong ngoac: hop che mat cai luoi ⇒
+   moi lan doi soat mot dong la mot lan **ra khoi** danh sach roi **quay lai
+   tim cho cu**.                                                             */
+.f02-wrap{display:grid;grid-template-columns:1fr;gap:14px;align-items:start}
+.f02-wrap.split{grid-template-columns:minmax(0,1fr)
+  clamp(var(--panel-san),30vw,var(--panel-tran))}
+/* ⭐ `clamp` chu ⛔ KHONG mot con so: `--panel-san` (430px) la san ban ve —
+   man hep thi panel y het hom nay; man rong thi no lon toi `--panel-tran`.
+   ⇒ Con so 430 van con do de UAT tra loi, ⛔ khong bi xoa mat. */
+/* ⚠ `minmax(0,1fr)` chu ⛔ KHONG `1fr`: voi `1fr`, cai bang ben trong keu to
+   hon o luoi cho phep va **day panel ra khoi man**. */
+.drawerp{position:sticky;top:12px;align-self:start;
+  max-height:calc(100vh - 24px);display:flex;flex-direction:column;
+  overflow:hidden;border:1px solid var(--line);border-radius:var(--bo-the);
+  background:var(--surface);box-shadow:var(--shadow-drawer)}
+.drawerp>header{display:flex;align-items:center;gap:8px;padding:10px 13px;
+  border-bottom:1px solid var(--line);background:var(--alt);flex:none}
+/* ⭐ Vung KHONG CUON: no tra loi *"toi dang doi soat dong nao"* ke ca khi da
+   cuon xuong het nhat ky. */
+.dfixed{flex:none;border-bottom:2px solid var(--line)}
+.dstrip{display:flex;flex-wrap:wrap;gap:5px 16px;align-items:baseline;
+  padding:11px 13px}
+.dstrip .amt{font-family:var(--mono);font-variant-numeric:tabular-nums;
+  font-size:24px;font-weight:600;letter-spacing:-.01em}
+/* ⚠ CA HAI ve khac 0 ⇒ may ⛔ khong chon ho, phai hien **hai** so ⇒ nho lai
+   cho vua mot dong. ⛔ Khong cat mot ve di cho gon. */
+.dstrip .amt.doi{font-size:17px}
+.dstrip .amt.neg{color:var(--crit)}
+/* ⭐⭐ MOT LUAT CHU — va `Diễn giải` ⛔ khong duoc la ngoai le go tay.
+   ⛔⛔ Ban dau lop nay dat cung `font-family` chu thuong. Nghe hop ly *(no la
+   van xuoi ma)* — nhung the la **hai** cho khai cung mot su that: ban khai
+   `VAN_XUOI` o `fls/api/cot_so.py`, va lop CSS nay. Mai kia BA them mot truong
+   van xuoi thu hai thi ban khai doi ma lop nay **dung yen**.
+   ⇒ Chu **may** la mac dinh *(day la cuon so: gan het la ma)*; lop `.van` —
+   do **JS gan tu ban khai** — moi doi sang chu thuong.                      */
+.dmemo{padding:0 13px 10px;font-size:13px;color:var(--ink);line-height:1.5;
+  text-wrap:pretty;font-family:var(--mono)}
+.dmemo.van{font-family:var(--sans)}
+
+/* ══ ⭐⭐ DIGEST — ba o tham chieu ngay duoi so tien ═══════════════════════
+   ⛔⛔ **Vi sao chung roi len day.** Truoc do chin o chung tu la mot **khoi
+   rieng** (`①`) nam **tren** khoi 7 o go duoc. Nhung ke toan mo panel ra la de
+   **go 7 o**; chung tu chi de **tra**. ⇒ Khoi `①` bi **hoa tan** vao digest,
+   va digest thi nam ngoai vung cuon ⇒ cuon xuong go o thu 7 **van con thay**
+   ngay/tien/tai khoan de doi chieu. Ke toan yeu cau dung dieu nay.
+
+   ⭐ `auto-fit` chu ⛔ KHONG `1fr 1fr`: panel rong ra thi thanh 3 cot. */
+.dref{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));
+  gap:8px 16px;padding:0 13px 11px}
+.dref .o{min-width:0}
+.dref .o.dai{grid-column:1/-1}
+.dref .k{display:block;font:500 10.5px/1.4 var(--sans);letter-spacing:.04em;
+  color:var(--muted)}
+.dref .v{font-family:var(--mono);font-size:12.5px;overflow-wrap:anywhere}
+.dref .v.rong{font-family:var(--sans);color:var(--faint)}
+.dscroll{flex:1;min-height:0;overflow:auto;padding:12px 13px}
+
+/* ══ HUONG 1 · DAI PHAN QUYET ═════════════════════════════════════════════
+   Mot dong chip ngay duoi so tien, tra loi *"dong nay co can toi khong"*
+   TRUOC khi nguoi ta cuon. ⛔ No nam NGOAI `.dscroll` ⇒ cuon xuong cuoi nhat
+   ky van thay. */
+.pq{display:flex;flex-wrap:wrap;gap:5px;padding:9px 13px;
+  border-bottom:1px solid var(--line);background:var(--warn-bg);flex:none}
+.pq.ok{background:var(--good-bg)}
+.pq.cho{background:var(--alt)}
+.pq .chip.nhay{cursor:pointer}
+.pq .chip.nhay:hover{border-color:var(--accent);color:var(--accent)}
+
+/* ══ ⭐⭐ MOT bang bao `KIEM TRA` / MOT dong trang thai ════════════════════
+   ⛔⛔ **Cai nay thay mot dai TAM chip dem viec.** Dai cu ⛔ khong sai — moi
+   chip la mot phep dem that — nhung no bay **tam** tin hieu cung mot luc, va
+   bay chung **cung mot trong luong**, nen mat khong biet nhin dau truoc.
+   Cong voi 111 dau `⛔` quanh do thi thanh cai ke toan goi la *"kho nhin"*.
+
+   ⭐ Luat cua ban thiet ke: **toi da MOT bang `--crit` moi panel**, va no chi
+   dung cho thu **it, hiem va that** — ⛔ khong dung cho `chưa phân loại`
+   *(76,6% so)*. Con lai la **mot dong trang thai** binh than.               */
+.kt{margin:12px 13px 0;padding:10px 12px;border-radius:var(--bo);
+  background:var(--crit-bg);border:1px solid var(--crit-line);
+  color:var(--crit-ink);font-size:12.5px;line-height:1.5}
+.kt .nhan{display:block;font-weight:600;letter-spacing:.06em;
+  margin-bottom:3px}
+.kt ul{margin:0;padding-left:18px}
+.kt li+li{margin-top:3px}
+
+.tt-dong{margin:12px 13px 0;padding:8px 12px;border-radius:var(--bo);
+  font-size:12.5px;background:var(--alt);border:1px solid var(--line);
+  color:var(--muted)}
+.tt-dong.xong{background:var(--good-bg);border-color:var(--good-line);
+  color:var(--good);font-weight:500}
+/* ⭐ Nhom vua duoc nhay toi sang len mot nhip — ⛔ khong thi nguoi ta nhay
+   xuong roi ⛔ khong biet minh vua dap xuong dau. */
+.grp.soi{animation:soi 1.6s ease-out}
+@keyframes soi{from{background:var(--accent-soft)}to{background:transparent}}
+/* ⚠ Tat chuyen dong thi giu NEN nhat — cung mot tin hieu, ⛔ khong doi sang
+   mot vach ben. `man_f02.js` go lop nay ra sau 1,6s nen no ⛔ khong dong lai. */
+@media (prefers-reduced-motion:reduce){
+  .grp.soi{animation:none;background:var(--accent-soft)}}
+
+/* ══ HUONG 4 · XEP DOI O NGAN ═════════════════════════════════════════════
+   Ma ngan (`VGOH`, `PM02279`, mot ngay) dang chiem tron mot dong 430px moi
+   cai. Xep doi cat ~40% chieu cao ma ⛔ khong giau mot o nao. */
+/* ⭐ `auto-fit` chu ⛔ KHONG `1fr 1fr`: panel rong ra thi luoi TU thanh 3 cot.
+   ⛔ Khai cung hai cot thi panel 680px chi de lam moi o rong gap doi — dung
+   cai da rong san, va ⛔ khong hien them duoc mot o nao. */
+.doi{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
+  gap:1px;background:var(--line);border-top:1px solid var(--line)}
+.doi .o{background:var(--surface);padding:5px 9px;min-width:0}
+.doi .rong{color:var(--faint)}
+
+/* ══ ⭐⭐ MOT LUAT CHU cho ca panel ════════════════════════════════════════
+   ⛔⛔ **Loi cu:** panel chon kieu chu / hoa-thuong / cach xep theo **DO DAI
+   gia tri**. Cung mot nhan, gia tri ngan thi ra `Đ V TIỀN TỆ` hoa chu may;
+   gia tri dai thi ra `Tài khoản` thuong chu thuong. Voi nguoi doc thi no
+   trong nhu **ngau nhien** — va do dung la cai owner goi la "lon xon".
+
+   ⇒ **Luat moi: hinh thuc di theo o do LA GI, ⛔ khong theo gia tri dai hay
+   ngan.** Nhan: MOT kieu. Gia tri: chu may, tru o khai `van` (van xuoi).   */
+
+/* ⓐ NHAN — mot kieu duy nhat, moi cho trong panel.
+   ⛔ Bo han chu HOA: tieng Viet viet hoa toan bo CO DAU thi dau doi vao nhau
+   va rat kho quet (`NGÀY CHỨNG TỪ`). Lop `.k` goc van giu chu hoa vi no phuc
+   vu **the so lieu** (`.k`/`.v` o `card`) — ⛔ khong sua no, chi de len o day. */
+.drawerp .doi .k,.drawerp .fld>div:first-child{font:500 11px/1.35 var(--sans);
+  letter-spacing:0;text-transform:none;color:var(--muted)}
+.drawerp .doi .k{display:block}
+
+/* ⓑ GIA TRI — chu MAY la mac dinh (day la cuon so: gan het la ma, va ma dat
+   chu may thi cac ky tu thang cot nen mot ky tu bi doi NHIN RA duoc).
+   `.van` la ngoai le, va no den tu ban khai `VAN_XUOI` o `fls/api/cot_so.py`
+   — ⛔ khong phai mot phong doan o day. */
+.drawerp .doi .v,.drawerp .fld>div:last-child{font-family:var(--mono);
+  font-variant-numeric:tabular-nums}
+.drawerp .doi .v.van,.drawerp .fld>div:last-child.van{font-family:var(--sans);
+  font-variant-numeric:normal}
+.doi .v{font-size:12px;overflow-wrap:anywhere}
+
+/* ══ HUONG 2 · GAP O RONG, CO DEM ════════════════════════════════════════
+   95% o canon la rong (do tren 5.400 o that). ⛔ Dong gap PHAI mang con so —
+   an ma khong dem la dung dieu `INV-I16` cam. */
+.gapfold{display:flex;align-items:center;gap:8px;padding:7px 9px;
+  border-top:1px solid var(--line);background:var(--alt);
+  color:var(--muted);font-size:11.5px;cursor:pointer;min-width:0}
+.gapfold:hover{background:var(--accent-soft);color:var(--accent)}
+.gapfold .chip{overflow:hidden;text-overflow:ellipsis;max-width:52%}
+/* ⚠ Man hep: panel xuong DUOI luoi, ⛔ khong bop luoi con mot nua.
+   ⚠ Nguong 1180 = 346px (hai cot khoa) + 430px (san panel) + cho tho. */
+@media (max-width:1180px){.f02-wrap.split{grid-template-columns:1fr}
+  .drawerp{position:static;max-height:none}}
+/* ══ ⭐⭐ CHUA GAN = BINH THAN, ⛔ KHONG bao dong ═══════════════════════════
+   ⛔⛔ **Do that: 7.682 / 10.030 dong (76,6%) dang o trang thai `UNMAPPED`.**
+   Nghia la *"dong nay con viec"* la chuyen cua **ba phan tu** cuon so. Ve no
+   bang nen vang + chu nghieng thi man hinh **luc nao cung dang keu**, va khi
+   co chuyen THAT thi ⛔ khong con nac nao cao hon de dung.
+
+   ⇒ `chưa gán` lay **nen nhat + chu mo**: no la **viec dang cho**, ⛔ khong
+   phai su co. Mau bao dong (`--crit`) danh cho thu **it, hiem va that**:
+   ca hai ve tien khac 0 · ky da chot ma con sua · go khac nguon.
+
+   ⚠ Ten lop giu nguyen `unmapped` — no goi ten **trang thai du lieu** *(cot
+   `work_status`)*, ⛔ khong goi ten hinh thuc. Doi hinh thuc thi ⛔ khong doi
+   ten trang thai.                                                          */
+td.unmapped{background:var(--alt);color:var(--muted)}
+
+/* ══ ⭐⭐ `#N/A` la MOT CAU TRA LOI — va no PHAI khac o RONG ═══════════════
+   ⛔⛔ **Loi that:** truoc day o `#N/A` va o `chưa gán` dung **cung mot lop**
+   ⇒ hai thu trong **y het nhau** tren man. Nhung chung khac han:
+     · `chưa gán`  = ⛔ **chua ai gan** — mot viec dang cho NGUOI
+     · `#N/A`      = may **da tra va ⛔ khong ra** — mot cau tra loi cua MAY
+   Gop chung lai la vi pham rang buoc #3 cua ban thiet ke *(bo trong ⛔ khac
+   "may ⛔ khong biet")*, va ke toan ⛔ khong co cach nao phan biet.
+
+   ⇒ `#N/A` lay **vien dut** — dau hieu thi giac cua *"o nay may da cham vao
+   nhung ⛔ khong co ket qua"*, ⛔ khong phai mau bao dong.                  */
+td.na{background:var(--surface);color:var(--faint);
+  box-shadow:inset 0 0 0 1px var(--line)}
+td.na>span,.na-o{font-family:var(--mono);border:1px dashed var(--faint);
+  border-radius:var(--bo-nho);padding:0 5px;color:var(--faint)}
+
+/* ⭐ Trang thai thu BA: o **RONG**. ⛔ Phai khac ca `#N/A` LAN `chưa gán`:
+   `chưa gán`  = ⛔ chua ai gan          *(viec cho NGUOI)*
+   `#N/A`      = may tra va ⛔ khong ra  *(cau tra loi cua MAY)*
+   `rỗng`      = may ⛔ chua ghi gi vao  *(⛔ chua den luot no)*             */
+.pb-rong{color:var(--faint);font-style:italic;font-family:var(--sans)}
+
+/* ⭐ The chu thay dau `🔒` da bi cat. ⛔ Mau ⛔ khong bao gio la thu DUY NHAT
+   cho mot nghia (rang buoc #9) ⇒ the nay **luon co chu**. */
+.the-may{display:inline-block;margin-left:7px;
+  font:500 10.5px/1.5 var(--sans);letter-spacing:0;
+  background:var(--info-bg);border:1px solid var(--info-line);
+  color:var(--info);border-radius:var(--bo-tron);padding:1px 8px}
+th.edit-h{background:var(--edit-h-bg);color:var(--accent)}
+.badge-lock{font:600 10px/1 var(--mono);color:var(--faint)}
+
+/* ⭐ Trang thai CHUA LUU / DA LUU cua mot o — hanh vi lay tu demo dong
+   (`FLS-Demo-Dong.html`), hinh dang giu theo ban ve. `GAP-SCR-07` con mo:
+   luu theo LO hay tung o, va bao lau. */
+td.edit.chua-luu{box-shadow:inset 0 0 0 2px var(--warn);
+                 background:var(--warn-bg)}
+td.edit.da-luu{box-shadow:inset 0 0 0 2px var(--good-line);
+               background:var(--good-bg)}
+
+/* ⭐ O DANG CHON — hanh vi §1-1 (dieu huong ban phim). ⛔ Phai thay ro tu 2
+   met: ke toan go khong roi tay khoi ban phim, nen "con tro dang o dau" la
+   thu duy nhat cho ho biet phim tiep theo roi vao o nao. */
+td.chon{box-shadow:inset 0 0 0 2px var(--accent);
+        background:var(--row-hover);position:relative;z-index:1}
+td.chon.chua-luu{box-shadow:inset 0 0 0 2px var(--accent),
+                            inset 0 0 0 5px var(--warn-bg)}
+
+/* ── drawer ──────────────────────────────────────────────────────────── */
+.drawer{background:var(--surface);border:1px solid var(--line);
+        border-radius:var(--bo-the);box-shadow:var(--shadow-drawer)}
+.drawer>header{padding:12px 14px;border-bottom:1px solid var(--line);
+               display:flex;align-items:center;gap:10px}
+.grp{border-top:1px solid var(--line)}
+.grp>div.t{padding:9px 14px;background:var(--alt);
+           font:600 11.5px/1 var(--sans);color:var(--muted);display:flex;
+           align-items:center;gap:8px}
+.fld{display:grid;grid-template-columns:190px 1fr;gap:0;
+     border-top:1px solid var(--line)}
+/* ⚠ Trong panel, cot nhan 190px cung an mat gan nua be ngang khi panel o muc
+   san (430px). ⇒ cho no co gian, nhung ⛔ khong duoi 118px — duoi nguong ay
+   nhan tieng Viet bat dau xuong ba dong. */
+.drawerp .fld{grid-template-columns:clamp(118px,32%,190px) 1fr}
+.drawerp .fld>div{padding:7px 11px}
+.fld>div{padding:8px 14px}
+.fld>div:first-child{color:var(--muted);background:var(--label-bg)}
+.inp{border:1px solid var(--info-line);border-radius:5px;padding:5px 8px;
+     font:inherit;width:100%;max-width:340px}
+.inp:focus{outline:0;border-color:var(--accent);
+           box-shadow:0 0 0 2px var(--focus-ring)}
+.src{font:500 11px/1.4 var(--mono);color:var(--muted);margin-top:3px}
+.src.need{color:var(--warn)}
+
+/* ── hop thoai xac nhan ──────────────────────────────────────────────── */
+/* Ban ve ve hop thoai NAM TRONG TRANG (de xem duoc ca bon cung luc). Man
+   that can mot lop che, nen `.scrim` them o day — ⛔ khong lay hinh cua
+   demo, chi lay dung cai lop che. */
+.scrim{position:fixed;inset:0;background:var(--scrim);display:none;
+       align-items:center;justify-content:center;z-index:50;padding:18px}
+.scrim.on{display:flex}
+.dlg{max-width:520px;width:100%;border:1px solid var(--line);
+     border-radius:var(--bo-the);background:var(--surface);
+     box-shadow:var(--shadow-dlg)}
+.dlg>header{padding:13px 16px;border-bottom:1px solid var(--line);
+            font:700 14px/1 var(--sans)}
+.dlg .body{padding:14px 16px;font-size:13px;max-height:60vh;overflow:auto}
+.dlg .foot{padding:12px 16px;border-top:1px solid var(--line);display:flex;
+           gap:9px;justify-content:flex-end}
+/* Khoi chu y: vien MONG DU VONG + nen nhat, cung khuon the cua A-CCR.
+   ⛔ KHONG dung mot vach mau day mot ben (hook `impeccable` bat 28/08). */
+.note{background:var(--alt);border:1px solid var(--line);padding:9px 12px;
+      font-size:12.5px;border-radius:var(--bo);margin:9px 0}
+.note.warn{background:var(--warn-bg);border-color:var(--warn-line)}
+.note.crit{background:var(--crit-bg);border-color:var(--crit-line)}
+.note.ok{background:var(--good-bg);border-color:var(--good-line)}
+
+/* ── chon man (ban ve dung tab; man that giu nguyen hinh do) ─────────── */
+.tabs{display:flex;gap:6px;flex-wrap:wrap;padding:16px 0 0}
+.tabs button{border:1px solid var(--line);background:var(--surface);
+  border-radius:7px;padding:8px 13px;font:600 12.5px/1 var(--sans);
+  color:var(--muted);cursor:pointer}
+.tabs button[aria-pressed=true]{background:var(--ink);color:var(--on-ink);
+  border-color:var(--ink)}
+section.screen{display:none;padding-top:16px}
+section.screen.on{display:block}
+
+/* ══ ⭐⭐ KHUON 4 TRANG THAI — dung chung, ⛔ khong de moi man tu ung bien ══
+   `DEV-12` §3: *"Rong va loi ⛔ khong duoc la 'chua lam'"*.                */
+
+/* ⓐ DANG TAI */
+.sk{background:linear-gradient(90deg,var(--sk-a) 25%,var(--sk-b) 50%,
+    var(--sk-a) 75%);background-size:200% 100%;animation:sh 1.2s infinite;
+    border-radius:var(--bo-nho);height:12px}
+@keyframes sh{0%{background-position:200% 0}100%{background-position:-200% 0}}
+.tt-tai{padding:16px;display:flex;flex-direction:column;gap:9px}
+
+/* ⓑ RONG — ⛔ khong duoc trong nhu "chua lam" */
+.tt-rong{padding:26px 18px;text-align:center;color:var(--muted);
+         font-size:12.5px}
+.tt-rong .icon{font-size:22px;display:block;margin-bottom:6px}
+.tt-rong b{color:var(--ink)}
+
+/* ⓒ LOI */
+.tt-loi{padding:16px 18px;background:var(--crit-bg);
+        border:1px solid var(--crit-line);border-radius:var(--bo);
+        font-size:12.5px}
+.tt-loi .ma{font:600 11px/1 var(--mono);color:var(--crit-ink)}
+.tt-loi .cau{margin:6px 0 10px;color:var(--ink)}
+
+/* ⓓ mac dinh = noi dung that, ⛔ khong can lop rieng */
+
+/* ── ba muc do cua mot CONG (F03) ────────────────────────────────────── */
+.gate{border-radius:var(--bo-the);border:1px solid var(--line);padding:13px 14px;
+      background:var(--surface)}
+.gate .st{font:700 15px/1.2 var(--sans);margin:5px 0 3px}
+.gate.pass{border-color:var(--good-line);background:var(--good-bg)}
+.gate.pass .st{color:var(--good)}
+.gate.fail{border-color:var(--crit-line);background:var(--crit-bg)}
+.gate.fail .st{color:var(--crit)}
+/* ⭐⭐ `dat = null` PHAI trong KHAC HAN ca xanh lan do — luat so 1 cua du an
+   dat vao mot pixel: cong chua tung thay do la cong chua biet co song. */
+.gate.unk{border:2px dashed var(--faint);
+  background:repeating-linear-gradient(45deg,var(--alt),var(--alt) 7px,
+             var(--page) 7px,var(--page) 14px)}
+.gate.unk .st{color:var(--muted)}
+
+/* ── ⚠ thanh CANH BAO GIA LAP — chi hien khi man dang chay so GIA ────── */
+.gia-lap{background:var(--crit-bg);border-bottom:2px solid var(--crit);
+         color:var(--crit-ink);padding:9px 20px;font:700 12.5px/1.4 var(--sans)}

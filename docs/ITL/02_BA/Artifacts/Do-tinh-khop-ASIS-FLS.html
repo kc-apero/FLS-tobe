@@ -1,0 +1,614 @@
+<meta charset="utf-8">
+<title>Đo tính khớp AS-IS ↔ FLS</title>
+<style>
+/* Hệ thị giác lấy NGUYÊN từ `fls/web/tep/tokens.css` (QĐ-ITL-77).
+   Bộ TỐI là dẫn xuất. ⛔ Không mã màu nào bịa thêm. ⛔ Không thư viện, ⛔ không mạng. */
+:root{
+  --sans:'IBM Plex Sans','Segoe UI',system-ui,-apple-system,sans-serif;
+  --mono:'IBM Plex Mono','Cascadia Mono',Consolas,ui-monospace,monospace;
+  --ink:#14201e; --muted:#5c6b68; --faint:#9aa8a5;
+  --line:#dde4e3; --surface:#fff; --alt:#f6f8f8; --page:#eef1f1; --label-bg:#fcfdfd;
+  --accent:#0e7570; --accent-hi:#0a5c58;
+  --crit:#c73a3a; --crit-bg:#fbeaea; --crit-line:#f3cdcd;
+  --warn:#c07414; --warn-bg:#fdf4e7; --warn-line:#f0dcbe;
+  --good:#2c7a4b; --good-bg:#e8f4ec; --good-line:#bcdcc8;
+  --info:#2563eb; --info-bg:#e9effd; --info-line:#b9cdf7;
+  --bo-nho:4px; --bo:6px; --bo-the:8px; --bo-tron:999px;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --ink:#e4ecea; --muted:#96a6a3; --faint:#6a7c78;
+  --line:#2b3937; --surface:#161f1e; --alt:#1c2625; --page:#0f1817; --label-bg:#1a2423;
+  --accent:#43b7af; --accent-hi:#63cdc5;
+  --crit:#f08a8a; --crit-bg:#2a1a1a; --crit-line:#4a2828;
+  --warn:#e0a659; --warn-bg:#291f12; --warn-line:#4a3a1e;
+  --good:#6fc48f; --good-bg:#152519; --good-line:#28452f;
+  --info:#84a9f5; --info-bg:#151d2e; --info-line:#2b3a60;
+}}
+:root[data-theme="dark"]{
+  --ink:#e4ecea; --muted:#96a6a3; --faint:#6a7c78;
+  --line:#2b3937; --surface:#161f1e; --alt:#1c2625; --page:#0f1817; --label-bg:#1a2423;
+  --accent:#43b7af; --accent-hi:#63cdc5;
+  --crit:#f08a8a; --crit-bg:#2a1a1a; --crit-line:#4a2828;
+  --warn:#e0a659; --warn-bg:#291f12; --warn-line:#4a3a1e;
+  --good:#6fc48f; --good-bg:#152519; --good-line:#28452f;
+  --info:#84a9f5; --info-bg:#151d2e; --info-line:#2b3a60;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font-family:var(--sans);
+     font-size:15px;line-height:1.62;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px 96px}
+
+header.top{background:var(--ink);padding:44px 0 38px;margin-bottom:40px}
+:root[data-theme="dark"] header.top{background:#0b1211}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) header.top{background:#0b1211}}
+header.top .wrap{padding-bottom:0}
+.eyebrow{font-family:var(--mono);font-size:11.5px;letter-spacing:.13em;
+         text-transform:uppercase;color:#8fc4c0;margin:0 0 14px}
+header.top h1{font-size:clamp(30px,4.6vw,46px);line-height:1.1;margin:0 0 16px;
+              font-weight:650;letter-spacing:-.022em;text-wrap:balance;color:#fff}
+header.top .lede{font-size:17px;line-height:1.55;color:#cfdbd9;margin:0;max-width:66ch}
+.meta{display:flex;flex-wrap:wrap;gap:8px 22px;margin-top:26px;
+      font-family:var(--mono);font-size:11.5px;color:#93a5a2}
+.meta b{color:#cfe3e0;font-weight:500}
+
+section{margin:0 0 52px}
+h2{font-size:23px;line-height:1.25;letter-spacing:-.012em;font-weight:640;margin:0 0 6px;text-wrap:balance}
+h2 .num{font-family:var(--mono);font-size:13px;font-weight:500;color:var(--accent);
+        margin-right:10px;letter-spacing:.04em}
+.sub{color:var(--muted);margin:0 0 22px;max-width:72ch}
+h3{font-size:16.5px;font-weight:620;margin:30px 0 10px;letter-spacing:-.005em}
+p{margin:0 0 14px;max-width:78ch}
+strong{font-weight:620}
+code{font-family:var(--mono);font-size:.88em;background:var(--alt);
+     border:1px solid var(--line);border-radius:var(--bo-nho);padding:.08em .34em}
+
+.ev{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);
+    font-size:10.5px;letter-spacing:.02em;color:var(--muted);background:var(--label-bg);
+    border:1px solid var(--line);border-radius:var(--bo-tron);padding:1px 9px;
+    white-space:nowrap;vertical-align:1px}
+.ev::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--good);flex:none}
+.ev.doan::before{background:var(--warn)}
+.ev.thieu::before{background:var(--crit)}
+.evrow{display:flex;flex-wrap:wrap;gap:7px;margin:12px 0 0}
+
+.call{background:var(--alt);border:1px solid var(--line);border-radius:var(--bo);
+      padding:17px 20px;margin:0 0 22px}
+.call.bad{background:var(--crit-bg);border-color:var(--crit-line)}
+.call.warn{background:var(--warn-bg);border-color:var(--warn-line)}
+.call.good{background:var(--good-bg);border-color:var(--good-line)}
+.call p:last-child,.call ul:last-child,.call ol:last-child{margin-bottom:0}
+.call .lbl{display:block;font-family:var(--mono);font-size:11px;letter-spacing:.1em;
+           text-transform:uppercase;margin:0 0 8px;color:var(--accent)}
+.call.bad .lbl{color:var(--crit)} .call.warn .lbl{color:var(--warn)} .call.good .lbl{color:var(--good)}
+
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:1px;
+       background:var(--line);border:1px solid var(--line);border-radius:var(--bo-the);
+       overflow:hidden;margin:0 0 24px}
+.tile{background:var(--surface);padding:18px 20px}
+.tile .n{font-family:var(--mono);font-size:26px;font-weight:600;letter-spacing:-.02em;
+         font-variant-numeric:tabular-nums;display:block;line-height:1.15}
+.tile .k{display:block;font-size:12.5px;color:var(--muted);margin-top:5px;line-height:1.42}
+.tile.is-crit .n{color:var(--crit)} .tile.is-warn .n{color:var(--warn)}
+.tile.is-good .n{color:var(--good)} .tile.is-acc .n{color:var(--accent)}
+
+.tw{overflow-x:auto;border:1px solid var(--line);border-radius:var(--bo-the);
+    background:var(--surface);margin:0 0 14px}
+table{border-collapse:collapse;width:100%;font-size:13.5px;min-width:680px}
+th{background:var(--alt);text-align:left;font-weight:600;font-size:11.5px;letter-spacing:.06em;
+   text-transform:uppercase;color:var(--muted);padding:10px 14px;
+   border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.5}
+tr:last-child td{border-bottom:0}
+td.num,th.num{font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+td.c,th.c{text-align:center}
+
+.bac{display:inline-block;font-family:var(--mono);font-size:11px;font-weight:600;
+   border-radius:var(--bo-nho);padding:1px 7px;border:1px solid;white-space:nowrap}
+.bac.k0{color:var(--crit);background:var(--crit-bg);border-color:var(--crit-line)}
+.bac.k1{color:var(--warn);background:var(--warn-bg);border-color:var(--warn-line)}
+.bac.k2{color:var(--info);background:var(--info-bg);border-color:var(--info-line)}
+.bac.k3{color:var(--good);background:var(--good-bg);border-color:var(--good-line)}
+.bac.k4{color:#fff;background:var(--accent);border-color:var(--accent)}
+.tag{display:inline-block;font-family:var(--mono);font-size:10.5px;border-radius:var(--bo-tron);
+     padding:1px 9px;border:1px solid;white-space:nowrap;
+     color:var(--muted);background:var(--label-bg);border-color:var(--line)}
+.tag.L1{color:var(--info);background:var(--info-bg);border-color:var(--info-line)}
+.tag.L2{color:var(--accent);background:var(--alt);border-color:var(--line)}
+.tag.L3{color:var(--warn);background:var(--warn-bg);border-color:var(--warn-line)}
+.tag.L4{color:var(--good);background:var(--good-bg);border-color:var(--good-line)}
+.tag.L5{color:var(--crit);background:var(--crit-bg);border-color:var(--crit-line)}
+
+/* thang bậc khớp — dải ngang */
+.thang{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--line);
+       border:1px solid var(--line);border-radius:var(--bo-the);overflow:hidden;margin:0 0 12px}
+.thang .b{background:var(--surface);padding:14px 15px;display:flex;flex-direction:column;gap:5px}
+.thang .b .c{font-family:var(--mono);font-size:12px;font-weight:600}
+.thang .b .t{font-size:13px;font-weight:600;line-height:1.3}
+.thang .b .d{font-size:11.5px;color:var(--muted);line-height:1.45}
+.thang .b.x0 .c{color:var(--crit)} .thang .b.x1 .c{color:var(--warn)}
+.thang .b.x2 .c{color:var(--info)} .thang .b.x3 .c{color:var(--good)}
+.thang .b.x4 .c{color:var(--accent)}
+@media (max-width:820px){.thang{grid-template-columns:repeat(2,1fr)}}
+@media (max-width:460px){.thang{grid-template-columns:1fr}}
+
+/* lộ trình */
+.steps{display:flex;flex-direction:column;gap:1px;background:var(--line);
+       border:1px solid var(--line);border-radius:var(--bo-the);overflow:hidden;margin:0 0 14px}
+.step{background:var(--surface);padding:16px 18px;display:grid;
+      grid-template-columns:64px 1fr 132px;gap:16px;align-items:start}
+.step .id{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--accent);padding-top:1px}
+.step .bd .t{font-size:15px;font-weight:620;margin:0 0 4px;line-height:1.32}
+.step .bd .d{font-size:13px;color:var(--muted);line-height:1.5;margin:0}
+.step .bd .dod{font-size:12px;margin:8px 0 0;padding:8px 11px;background:var(--alt);
+               border:1px solid var(--line);border-radius:var(--bo-nho);color:var(--ink)}
+.step .bd .dod b{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;
+                 text-transform:uppercase;color:var(--muted);display:block;margin-bottom:3px}
+.step .rt{font-size:12px;color:var(--muted);text-align:right;line-height:1.5}
+@media (max-width:760px){.step{grid-template-columns:52px 1fr}.step .rt{grid-column:2;text-align:left}}
+
+ul,ol{margin:0 0 16px;padding-left:22px;max-width:78ch}
+li{margin:0 0 7px}
+li::marker{color:var(--faint)}
+hr.rule{border:0;border-top:1px solid var(--line);margin:44px 0}
+footer{color:var(--muted);font-size:12.5px;border-top:1px solid var(--line);
+       padding-top:22px;margin-top:20px}
+footer p{margin:0 0 8px;max-width:none}
+a{color:var(--accent)}
+a:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:2px}
+@media (max-width:640px){.wrap{padding:0 16px 64px}header.top{padding:32px 0 28px}}
+</style>
+
+<header class="top">
+  <div class="wrap">
+    <p class="eyebrow">Phương pháp luận · trước khi đánh giá</p>
+    <h1>Đo tính khớp AS-IS ↔ FLS</h1>
+    <p class="lede">Owner cần hệ thống <b>đáp ứng logic hiện có trên Google Sheets</b>.
+      Bản này ⛔ chưa đánh giá — nó dựng <b>cách</b> đánh giá: cái gì được coi là “logic”,
+      cái gì được coi là bằng chứng, và thứ tự làm.</p>
+    <div class="meta">
+      <span>Ngày <b>2026-09-07</b></span>
+      <span>Nguồn <b>RAW_guide · 11 tệp · 5.773 dòng</b></span>
+      <span>Kiểm kê <b>444 sheet</b></span>
+      <span>Thao tác <b>24 OP</b></span>
+      <span>Mốc mã <b>17df1d9</b></span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+<!-- ══════════════════════════════════════════════ VÌ SAO CẦN PHƯƠNG PHÁP -->
+<section>
+  <h2><span class="num">01</span>Vì sao phải dựng phương pháp trước</h2>
+  <p class="sub">Câu <em>“hệ thống có khớp logic GSheet không?”</em> nghe như một câu hỏi.
+    Thực ra nó là <strong>năm câu hỏi khác nhau</strong>, và mỗi câu cần một loại bằng chứng khác nhau.</p>
+
+  <div class="call bad">
+    <span class="lbl">Cái hỏng nếu gộp năm câu thành một</span>
+    <p>Bộ này đã có <strong>hai lần</strong> dựng ra một dấu tích xanh mà ⛔ không đo gì:
+    hai cổng <code>RUN_ATOMIC</code> <strong>xanh 0 suốt hai tháng</strong> trên
+    <strong>28 vi phạm thật</strong>, vì chúng lọc <code>IS NOT NULL</code> trên chính cột chúng canh.
+    Và <code>kiem_bang_tuyen</code> — cổng lớn nhất của <code>P4</code> — đo trên
+    <strong>dòng người gõ</strong> thay vì câu SQL thật.</p>
+    <p>Một phép đánh giá tính khớp <strong>không có phương pháp</strong> sẽ tạo ra đúng loại
+    kết quả đó, chỉ khác là ở quy mô lớn hơn nhiều — và lần này nó sẽ được đọc thành
+    <em>“hệ thống đã sẵn sàng”</em>.</p>
+    <p class="evrow">
+      <span class="ev">gate-filtering-own-column-is-blind</span>
+      <span class="ev">GAP-API-05 · 6 vi phạm trên 5 tuyến</span>
+    </p>
+  </div>
+
+  <h3>Năm loại “logic”, năm loại bằng chứng</h3>
+  <div class="tw"><table>
+    <thead><tr><th class="c">Loại</th><th>Là gì</th><th>Ví dụ THẬT trong bộ này</th><th>Bằng chứng phải là</th></tr></thead>
+    <tbody>
+      <tr><td class="c"><span class="tag L1">L1</span></td>
+        <td><strong>Hình dạng</strong><br>cột, tên, kiểu, dòng header/dữ liệu</td>
+        <td><code>Bank Transactions</code>: header dòng <strong>2</strong>, dữ liệu từ dòng <strong>4</strong>,
+          <strong>7.715</strong> dòng × <strong>10</strong> cột</td>
+        <td>So <strong>bản khai ↔ tệp thật, HAI CHIỀU</strong>. Khai mà không có = cột chết;
+          có mà không khai = cột bị giấu</td></tr>
+      <tr><td class="c"><span class="tag L2">L2</span></td>
+        <td><strong>Phép tính</strong><br>công thức sinh ra giá trị</td>
+        <td><code>Classifying = iferror(&lt;ô canon&gt;, 'Need to manual input')</code> ·
+          <code>112!A3 = FILTER(SORT(…))</code> đảo cột</td>
+        <td>Tái lập <strong>từng ô</strong>, ⛔ cấm ngưỡng — đúng luật <code>QĐ-ITL-33</code></td></tr>
+      <tr><td class="c"><span class="tag L3">L3</span></td>
+        <td><strong>Luật nghiệp vụ</strong><br>quy tắc người phải tuân</td>
+        <td><code>OP-03</code> <em>1 khoá = 1 mã <code>Reference number</code></em> ·
+          <code>OP-05</code> nạp <strong>trước 11:00</strong></td>
+        <td>Ca thử <strong>có ca ĐỎ</strong> — một luật chưa từng bị vi phạm trong test là
+          một luật <strong>chưa được kiểm</strong></td></tr>
+      <tr><td class="c"><span class="tag L4">L4</span></td>
+        <td><strong>Thao tác</strong><br>việc người thật sự làm</td>
+        <td><strong>24 thao tác <code>OP-01…OP-24</code></strong>, mỗi cái có bằng chứng
+          là ô thật trong sheet</td>
+        <td>Truy vết <code>OP → US → cửa API → màn</code>. Đứt ở đâu thì
+          <strong>chỉ ra đúng chỗ đứt</strong></td></tr>
+      <tr><td class="c"><span class="tag L5">L5</span></td>
+        <td><strong>Bất biến ngầm</strong><br>thứ ⛔ không ai viết ra mà sổ đang dựa vào</td>
+        <td><code>P100 Bank ▸ Log</code> — <strong>171.358 dòng</strong>
+          <code>Action | Composite Key</code>. Một nhật ký thay đổi <strong>đã tồn tại</strong>,
+          ⛔ chưa tài liệu nào của ITL nhắc đến</td>
+        <td><strong>Phải đi TÌM.</strong> ⛔ Không có bản khai để so ⇒ đây là loại nguy nhất
+          và là loại duy nhất ⛔ không tự lộ ra</td></tr>
+    </tbody>
+  </table></div>
+
+  <p class="sub" style="margin-top:14px">⛔ <strong>L5 là chỗ dự án này thua nhiều nhất.</strong>
+    Mọi bài học đắt nhất trong bộ đều thuộc L5: <em>“tầng-2 phải đọc ladder”</em> im lặng 3 ngày ·
+    <em>“số 0 thì ⛔ không rỗng”</em> làm sai 36% số dòng · <em>“cột <code>P</code> chứ ⛔ không phải
+    <code>BL</code>”</em>. ⛔ Không cái nào bị bắt bởi một phép so hình dạng.</p>
+</section>
+
+<hr class="rule">
+
+<!-- ══════════════════════════════════════════════ THANG BẬC -->
+<section>
+  <h2><span class="num">02</span>Thang khớp — 5 bậc, ⛔ không phải đạt/không đạt</h2>
+  <p class="sub">Nhị phân <em>đạt / không đạt</em> giấu đi đúng thứ cần biết:
+    <strong>chưa đo</strong> và <strong>đã đo, biết lệch, biết vì sao</strong> là hai trạng thái
+    hoàn toàn khác nhau — mà cả hai đều ⛔ không phải “đạt”.</p>
+
+  <div class="thang">
+    <div class="b x0"><span class="c">K0</span><span class="t">Chưa đo</span>
+      <span class="d">⛔ Không phép so nào chạm tới. <strong>Mặc định của mọi thứ</strong> cho tới khi chứng minh ngược lại</span></div>
+    <div class="b x1"><span class="c">K1</span><span class="t">Biết lệch</span>
+      <span class="d">Đã đo · lệch · và <strong>phân loại được nguyên nhân từng nhóm</strong></span></div>
+    <div class="b x2"><span class="c">K2</span><span class="t">Khớp có điều kiện</span>
+      <span class="d">Khớp <strong>trong phạm vi đã khai</strong> — một kỳ, một tài khoản, một lát</span></div>
+    <div class="b x3"><span class="c">K3</span><span class="t">Khớp đầy đủ</span>
+      <span class="d">Khớp trên <strong>toàn tập</strong>, có phép thử khoá lại</span></div>
+    <div class="b x4"><span class="c">K4</span><span class="t">Khớp + cưỡng chế</span>
+      <span class="d">Có <strong>cổng chạy tự động</strong>, và cổng ấy <strong>đã thấy ĐỎ</strong> ít nhất một lần</span></div>
+  </div>
+
+  <div class="call">
+    <span class="lbl">Luật đọc thang</span>
+    <p><strong>Chỉ <span class="bac k4">K4</span> mới được gọi là “hệ thống đáp ứng”.</strong>
+    <span class="bac k3">K3</span> nghĩa là <em>hôm nay khớp</em> — ⛔ không nói gì về ngày mai,
+    và bộ này đã chứng minh <strong>20 con số lệch chỉ sau 19 giờ</strong>.</p>
+    <p>⚠ <span class="bac k1">K1</span> ⛔ <strong>không phải thất bại.</strong> Một chỗ lệch
+    <em>đã phân loại được</em> là một chỗ <strong>quyết định được</strong>. Chỗ nguy hiểm là
+    <span class="bac k0">K0</span> đội lốt <span class="bac k3">K3</span>.</p>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ══════════════════════════════════════════════ NĂM LUẬT -->
+<section>
+  <h2><span class="num">03</span>Năm luật của phép đo</h2>
+  <p class="sub">⛔ Không phải nguyên tắc chung chung — cả năm đều rút ra từ
+    <strong>một lần bộ này đã sai thật</strong>, và mỗi luật ghi kèm lần sai đó.</p>
+
+  <div class="tw"><table>
+    <thead><tr><th class="c">#</th><th>Luật</th><th>Lần đã sai — căn cứ</th></tr></thead>
+    <tbody>
+      <tr><td class="c"><code>Đ-1</code></td>
+        <td><strong>ĐẾM trước khi ĐO.</strong> Trước mỗi phép so, đếm số hàng nó sẽ chạm.
+          <strong>Xanh trên tập rỗng là <em>chưa đo</em>, ⛔ không phải <em>đạt</em>.</strong></td>
+        <td><code>sorow_audit</code> <strong>1,8 triệu dòng / 0 dấu</strong> ⇒ cổng
+          <strong>chưa từng có khả năng đỏ</strong></td></tr>
+      <tr><td class="c"><code>Đ-2</code></td>
+        <td><strong>Mỗi phép so phải ĐỎ được ít nhất một lần</strong> trước khi tin nó.
+          Diễn tập đỏ là một phần của phép so, ⛔ không phải việc thêm.</td>
+        <td>Đợt <code>P4</code>: <strong>3 cổng đỏ giả + 1 bài xanh giả</strong> trong <em>một buổi</em></td></tr>
+      <tr><td class="c"><code>Đ-3</code></td>
+        <td><strong>⛔ Không so hai cột trước khi hỏi chúng có CÙNG ĐƠN VỊ ĐO không.</strong>
+          Đo độ trùng từ vựng trước, so giá trị sau.</td>
+        <td><code>QĐ-ITL-89</code>: <code>le</code> vs <code>le_payer</code> trùng <strong>44%</strong>
+          ⇒ <strong>94% báo động là so táo với cam</strong></td></tr>
+      <tr><td class="c"><code>Đ-4</code></td>
+        <td><strong>Lệch phải PHÂN LOẠI ĐƯỢC, ⛔ không chỉ đếm được.</strong>
+          <em>“Chênh 7.294 dòng”</em> vô dụng; <em>“7.294 = a ngoài kỳ + b nguồn chết +
+          c chưa giải thích”</em> mới dùng được.</td>
+        <td><code>ACC-3</code> đã khai đúng luật này: <em>tập khoá bằng nhau, chênh
+          <strong>liệt kê từng dòng</strong></em></td></tr>
+      <tr><td class="c"><code>Đ-5</code></td>
+        <td><strong><code>???</code> là ô của NGƯỜI.</strong> Guide AS-IS còn rất nhiều
+          <code>???</code>. ⛔ Không được lấp bằng suy đoán, kể cả suy đoán hợp lý.</td>
+        <td><code>R-A1</code> · <code>_PLAN</code> §4 <code>P4</code>:
+          <em>“mỗi câu ‘kế toán làm X’ phải trỏ được về dấu vết, hoặc ghi <code>[chưa xác minh]</code>”</em></td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<hr class="rule">
+
+<!-- ══════════════════════════════════════════════ LỘ TRÌNH -->
+<section>
+  <h2><span class="num">04</span>Lộ trình 6 bước — <code>Đ1</code> … <code>Đ6</code></h2>
+  <p class="sub">Ký hiệu <code>Đ</code> chọn để ⛔ không đụng <code>G1–G7</code> (guide AS-IS) ·
+    <code>B1–B7</code> (chặng màn hình) · <code>IM0–IM7</code> (milestone) · <code>P0–P6</code> (pha code).</p>
+
+  <div class="steps">
+    <div class="step">
+      <div class="id">Đ1</div>
+      <div class="bd">
+        <p class="t">Dựng <strong>SỔ ĐỐI CHIẾU</strong> — một dòng cho một đơn vị logic</p>
+        <p class="d">⛔ Không phải văn xuôi. Một bảng, mỗi dòng: <code>mã</code> · <code>loại L1–L5</code> ·
+          <code>nguồn AS-IS (tệp:dòng)</code> · <code>chỗ tương ứng trong FLS</code> ·
+          <code>bậc K0–K4</code> · <code>phép thử</code>. Đây là <strong>vật mang</strong> của cả
+          phép đánh giá — mọi bước sau chỉ đổi cột <code>bậc</code> của nó.</p>
+        <p class="dod"><b>Xong khi</b> Mỗi sheet Tầng A và mỗi <code>OP-xx</code> có ít nhất một dòng ·
+          tổng số dòng được <strong>khai ra</strong> · mặc định mọi dòng là <span class="bac k0">K0</span></p>
+      </div>
+      <div class="rt">1 phiên<br><span class="tag">⛔ không chặn</span></div>
+    </div>
+
+    <div class="step">
+      <div class="id">Đ2</div>
+      <div class="bd">
+        <p class="t">Đối chiếu <strong>HÌNH DẠNG</strong> <span class="tag L1">L1</span> — máy, hai chiều</p>
+        <p class="d">Tái dùng đúng cơ chế đã chạy: <code>cot_so.py::kiem_bang_cot</code> đã làm phép
+          hai chiều cho lưới <code>F02</code>, và <code>soi_bang_tuyen.py</code> đã chứng minh phép
+          <em>bản khai ↔ thứ thật</em> bắt được lỗi. ⛔ Đây là bước <strong>rẻ nhất</strong> và nên
+          làm trước để loại sớm các lệch tầm thường.</p>
+        <p class="dod"><b>Xong khi</b> 6 sheet trong phạm vi (§05) có bảng cột khai đầy đủ ·
+          phép so chạy được bằng lệnh · đã thấy đỏ ít nhất một lần <em>(<code>Đ-2</code>)</em></p>
+      </div>
+      <div class="rt">1–2 phiên<br><span class="tag">cần tệp gốc</span></div>
+    </div>
+
+    <div class="step">
+      <div class="id">Đ3</div>
+      <div class="bd">
+        <p class="t">Đối chiếu <strong>PHÉP TÍNH</strong> <span class="tag L2">L2</span> — từng ô</p>
+        <p class="d">Lằn <em>đọc sheet</em> đã có sẵn thước: parity <strong>69.510/69.510 ô</strong>.
+          Việc ở đây là <strong>mở rộng lên đầu chuỗi</strong> — và ⚠ đúng chỗ này gặp vấn đề đã nêu ở
+          bản vẽ kiến trúc: <strong>với dữ liệu gõ thẳng vào FLS thì parity mất đối tượng</strong>.
+          ⇒ Bước này phải <strong>chia đôi</strong>: lằn tái lập dùng parity, lằn nhập dùng
+          <code>ACC-1..4</code> + đối soát số dư.</p>
+        <p class="dod"><b>Xong khi</b> Mỗi công thức Tầng A trong phạm vi hoặc <strong>đã tái lập</strong>,
+          hoặc <strong>khai rõ vì sao ⛔ không tái lập được</strong> — ⛔ không có ô trống</p>
+      </div>
+      <div class="rt">2–3 phiên<br><span class="tag">song song Đ4</span></div>
+    </div>
+
+    <div class="step">
+      <div class="id">Đ4</div>
+      <div class="bd">
+        <p class="t">Đối chiếu <strong>LUẬT + THAO TÁC</strong> <span class="tag L3">L3</span>
+          <span class="tag L4">L4</span> — ma trận 24 <code>OP</code></p>
+        <p class="d">Với mỗi <code>OP-01…OP-24</code>: nó <em>còn tồn tại sau khi lên FLS không</em> ·
+          <em>ai làm</em> · <em>ở màn nào / cửa nào</em> · <em>hay đã biến mất</em>.
+          ⭐ Đây là <strong>sản phẩm dễ đọc nhất cho owner</strong> trong cả bộ — nó trả lời thẳng câu
+          <em>“kế toán còn làm được việc họ đang làm không?”</em></p>
+        <p class="dod"><b>Xong khi</b> 24/24 <code>OP</code> có một trong bốn nhãn:
+          <em>đã có ở FLS</em> · <em>ở lại GSheet có chủ ý</em> · <em>mất — có lý do</em> ·
+          <em>mất — ⛔ chưa ai biết</em>. Nhãn cuối là danh sách phải trình owner</p>
+      </div>
+      <div class="rt">2 phiên<br><span class="tag L4">giá trị cao nhất</span></div>
+    </div>
+
+    <div class="step">
+      <div class="id">Đ5</div>
+      <div class="bd">
+        <p class="t">Săn <strong>BẤT BIẾN NGẦM</strong> <span class="tag L5">L5</span> — bước nguy nhất</p>
+        <p class="d">Đi tìm thứ sổ đang dựa vào mà ⛔ không bản khai nào nói. Bốn mục tiêu đã nhìn thấy,
+          ⛔ chưa ai giải thích: <code>Log</code> <strong>171.358 dòng</strong> ·
+          cột <code>Check trùng</code> và <code>Num</code> · sheet <code>Bank Transactions_Filter</code>
+          (<strong>7.813</strong> dòng × 12 cột, nhiều hơn bản gốc) ·
+          <code>CANhật ký xử lý Giao dịch</code> <strong>1.015 dòng</strong>.</p>
+        <p class="dod"><b>Xong khi</b> Mỗi cột/sheet <strong>⛔ chưa ai giải thích</strong> trong phạm vi
+          có một câu trả lời, hoặc một dòng trong danh sách hỏi kế toán. ⛔ Không đoán <em>(<code>Đ-5</code>)</em></p>
+      </div>
+      <div class="rt">2 phiên<br><span class="tag L5">phải sau Đ2–Đ4</span></div>
+    </div>
+
+    <div class="step">
+      <div class="id">Đ6</div>
+      <div class="bd">
+        <p class="t">Cưỡng chế — biến <span class="bac k3">K3</span> thành <span class="bac k4">K4</span></p>
+        <p class="d">Mỗi chỗ đã khớp phải có <strong>một cổng chạy được bằng lệnh</strong>, và cổng ấy
+          phải <strong>đã thấy đỏ</strong>. Chỗ nào ở lại <span class="bac k0">K0</span>/<span class="bac k1">K1</span>
+          thì <strong>khai thẳng</strong> — kèm lý do và ai đóng.</p>
+        <p class="dod"><b>Xong khi</b> Sổ đối chiếu ⛔ không còn ô trống ở cột <code>bậc</code> ·
+          mọi <span class="bac k4">K4</span> nằm trong một lệnh chạy được · bản tổng kết một trang cho owner</p>
+      </div>
+      <div class="rt">1–2 phiên<br><span class="tag">chốt</span></div>
+    </div>
+  </div>
+
+  <p class="sub"><strong>Thứ tự bắt buộc:</strong> <code>Đ1</code> →
+    <code>Đ2</code> → (<code>Đ3</code> ∥ <code>Đ4</code>) → <code>Đ5</code> → <code>Đ6</code>.
+    <code>Đ5</code> phải đứng sau vì <strong>chỉ nhìn ra luật ⛔ không ai viết khi đã biết hết luật đã viết</strong>.
+    Tổng <strong>9–12 phiên</strong> — ước lượng của tôi, ⛔ không phải số đo.</p>
+</section>
+
+<hr class="rule">
+
+<!-- ══════════════════════════════════════════════ PHẠM VI -->
+<section>
+  <h2><span class="num">05</span>Bắt đầu ở đâu — ⛔ không phải ở 444 sheet</h2>
+  <p class="sub">Kiểm kê có <strong>444 sheet</strong>, Tầng A <strong>≈102</strong>. Đánh giá tính khớp
+    cho cả ngần ấy là việc <strong>vô nghĩa</strong>: phần lớn nằm ngoài đường FLS đi qua, và
+    <span class="bac k0">K0</span> ở đó là <strong>đúng theo thiết kế</strong>.</p>
+
+  <div class="call good">
+    <span class="lbl">Sáu sheet — và chỉ sáu</span>
+    <p>FLS <strong>đang</strong> hoặc <strong>sắp</strong> chạm đúng sáu chỗ. Đánh giá tính khớp
+    bắt đầu và kết thúc ở đây; mọi thứ khác khai là <span class="bac k0">K0</span> <em>có chủ ý</em>.</p>
+  </div>
+
+  <div class="tw"><table>
+    <thead><tr><th>Sheet</th><th>Workbook</th><th class="num">Quy mô</th><th>Vai trò với FLS</th><th class="c">Bậc hôm nay</th></tr></thead>
+    <tbody>
+      <tr><td><code>Transaction Mapping L1</code></td><td>ITL RAW <em>(bản sao sống)</em></td>
+        <td class="num">—</td><td><strong>Nguồn duy nhất FLS đang đọc</strong></td>
+        <td class="c"><span class="bac k3">K3</span></td></tr>
+      <tr><td><code>ITL Ledge</code></td><td>ITL ADJUSTED</td><td class="num">—</td>
+        <td>Đích tái lập · nguồn 7 khối <code>Manual input</code></td>
+        <td class="c"><span class="bac k3">K3</span></td></tr>
+      <tr><td><code>Mapping Master</code></td><td>ITL RAW</td><td class="num">73 mã <code>hd</code></td>
+        <td>Danh mục đã nạp vào kho</td><td class="c"><span class="bac k3">K3</span></td></tr>
+      <tr><td><code>2. CCR</code> · dòng <code>226</code></td><td>A-CCR</td><td class="num">—</td>
+        <td><strong>Trọng tài số dư</strong> — thước chuẩn cho lằn nhập</td>
+        <td class="c"><span class="bac k0">K0</span></td></tr>
+      <tr><td><code>Bank Transactions</code><br><span class="ev thieu">⚠ hai sheet TRÙNG TÊN</span></td>
+        <td>P100 Bank <em>(⛔ không phải A-CCR)</em></td>
+        <td class="num">7.715 × 10</td><td><strong>Đích của <code>F04</code></strong> — <code>CR#10</code></td>
+        <td class="c"><span class="bac k0">K0</span></td></tr>
+      <tr><td><code>Cash Ledger Transactions</code></td><td>P100 Cash</td><td class="num">1.847</td>
+        <td><strong>Đích của <code>F05</code></strong> — <code>CR#10</code></td>
+        <td class="c"><span class="bac k0">K0</span></td></tr>
+    </tbody>
+  </table></div>
+
+  <p>⇒ Cộng thêm <strong>67 sheet <code>R | &lt;tài khoản&gt;</code></strong> ở tầng nhập —
+    nhưng chúng là <strong>một archetype</strong>, ⛔ không phải 67 lần đánh giá.
+    ⚠ Với <strong>một điều kiện</strong>: xem mục 07.</p>
+</section>
+
+<hr class="rule">
+
+<!-- ══════════════════════════════════════════════ SỐ ĐO ĐẦU TIÊN -->
+<section>
+  <h2><span class="num">06</span>Ba số đo đầu tiên — phương pháp có răng hay không</h2>
+  <p class="sub">Tôi chạy thử phương pháp trên chính bộ guide, ngay khi dựng xong.
+    Ba kết quả, và cả ba <strong>đều đổi một thứ đang được tin</strong>.</p>
+
+  <div class="tiles">
+    <div class="tile is-crit"><span class="n">7.715 ≠ 7.484</span>
+      <span class="k">Hai sheet <strong>cùng tên</strong> <code>Bank Transactions</code> ở hai workbook.
+      Số tôi ghi vào tài liệu hôm qua lấy nhầm cái thứ hai</span></div>
+    <div class="tile is-warn"><span class="n">16.625 → 9.331</span>
+      <span class="k">Tầng nhập <strong>16.625</strong> dòng (67 tài khoản) · tầng đã gộp
+      <strong>9.331</strong>. Chênh <strong>44%</strong> — <span class="bac k0">K0</span></span></div>
+    <div class="tile is-crit"><span class="n">171.358</span>
+      <span class="k">Dòng trong <code>P100 Bank ▸ Log</code> — một <strong>nhật ký thay đổi
+      đã tồn tại</strong>, ⛔ chưa tài liệu ITL nào nhắc</span></div>
+  </div>
+
+  <div class="call warn">
+    <span class="lbl">⚠ Đọc ba con số này cho ĐÚNG</span>
+    <p><strong>⛔ Tôi ⛔ KHÔNG kết luận “mất 44%”.</strong> Hai vế có thể đếm khác đơn vị:
+    dòng sheet (kể cả dòng trống) so với dòng dữ liệu · phép gộp có <strong>bộ lọc ngày</strong>
+    (<code>&gt;$B$3</code>) · và có <strong>nguồn chết</strong> đã biết
+    (<code>R | …_MSB USD_VGO1</code> trễ <strong>407 ngày</strong>).</p>
+    <p>Đó chính là luật <code>Đ-4</code> đang chạy: con số <strong>7.294</strong> hôm nay là
+    <span class="bac k0">K0</span>. Nó chỉ lên <span class="bac k1">K1</span> khi tách được thành các
+    nhóm <strong>có tên</strong>. ⭐ Và nó là <strong>phép đo đầu tiên</strong> mà
+    <code>Đ3</code> phải chạy.</p>
+    <p class="evrow">
+      <span class="ev">_GUIDE_02 · bảng Tầng B/C · 68 sheet, 0 thiếu số dòng</span>
+      <span class="ev doan">chưa phân loại nguyên nhân chênh</span>
+    </p>
+  </div>
+
+  <div class="call bad">
+    <span class="lbl">Và một hệ quả phải sửa trong tài liệu</span>
+    <p>Bản cập nhật <code>CR#10</code> hôm qua ghi <code>F04</code> =
+    <em><code>P100 | Bank Transactions ▸ Bank Transactions</code>, <strong>7.484 dòng</strong></em>.
+    <strong>Tên file đúng, con số sai</strong> — <code>7.484</code> là của bản A-CCR;
+    bản P100 là <strong>7.715 × 10 cột</strong>, header dòng <strong>2</strong>, dữ liệu từ dòng <strong>4</strong>.
+    Đây là chỗ thứ <strong>tám</strong> phải sửa, cộng vào bảy chỗ đã liệt kê ở bản vẽ kiến trúc.</p>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ══════════════════════════════════════════════ NỢ CỦA AS-IS -->
+<section>
+  <h2><span class="num">07</span>Nợ của chính bộ AS-IS — phải biết trước khi dựa vào nó</h2>
+  <p class="sub">Bộ guide là nền của cả phép đánh giá. Nhưng nó <strong>chưa xong</strong>, và
+    chỗ chưa xong rơi <strong>đúng vào</strong> phần <code>CR#10</code> vừa mở.</p>
+
+  <div class="call bad">
+    <span class="lbl">⛔ Nợ nặng nhất</span>
+    <p><strong><code>_GUIDE_08_Archetypes.md</code> ⛔ KHÔNG TỒN TẠI.</strong> Bước <code>G5</code>
+    của lộ trình guide chưa chạy — và <code>G5</code> chính là bước phải viết
+    <em>“69 sheet <code>R | …</code> kèm <strong>bảng lệch định dạng từng ngân hàng</strong>”</em>.</p>
+    <p>⇒ <strong>Tầng mà <code>F04</code> sắp tiếp quản là tầng DUY NHẤT ⛔ chưa có đặc tả AS-IS.</strong>
+    Bằng chứng nó cần đặc tả thì đã có sẵn và rất cụ thể: <code>R | HoangACB</code> dùng
+    <strong>hai cột ngày</strong> (<code>Ngày hiệu lực</code> / <code>Ngày giao dịch</code> — chọn sai
+    là <strong>sai kỳ</strong>) · <code>R | BGO1</code> đang <code>#REF!</code>.</p>
+  </div>
+
+  <div class="tw"><table>
+    <thead><tr><th>Nợ</th><th>Ảnh hưởng tới phép đánh giá</th><th class="c">Chặn bước</th></tr></thead>
+    <tbody>
+      <tr><td><code>_GUIDE_08</code> ⛔ chưa có <em>(bước <code>G5</code>)</em></td>
+        <td>Tầng nhập <strong>⛔ không có bản khai để so</strong> ⇒ <code>Đ2</code> ⛔ không chạy được
+          cho <code>F04</code>. Phải chạy <code>G5</code> trước, hoặc <strong>gộp <code>G5</code>
+          vào <code>Đ2</code></strong></td>
+        <td class="c"><code>Đ2</code></td></tr>
+      <tr><td><code>G7</code> pass live ⛔ chưa chạy</td>
+        <td>Mọi số trong guide là <strong>offline, chụp 2026-08-18</strong> — nay đã
+          <strong>20 ngày</strong>. Sổ vận hành <strong>chạy tiếp liên tục</strong></td>
+        <td class="c"><code>Đ2</code> <code>Đ3</code></td></tr>
+      <tr><td>Rất nhiều <code>???</code> ở Tầng A</td>
+        <td>Kể cả <code>Bank Transactions</code>: <em>Mục tiêu nghiệp vụ <code>???</code> ·
+          Thao tác kế toán <code>???</code></em>. ⛔ Không được lấp <em>(<code>Đ-5</code>)</em></td>
+        <td class="c"><code>Đ4</code> <code>Đ5</code></td></tr>
+      <tr><td>18/24 <code>OP</code> có <code>???</code> ở ô <em>Ai</em> hoặc <em>Khi nào</em></td>
+        <td>Ma trận <code>OP</code> sẽ có <strong>nhiều ô trống</strong> — và đó là kết quả
+          <strong>đúng</strong>, ⛔ không phải thiếu sót của phép đo</td>
+        <td class="c"><code>Đ4</code></td></tr>
+      <tr><td>Giá trị <strong>ngày</strong> trong <code>.xlsx</code> ⛔ không tin được</td>
+        <td>Chỉ <strong>2,7%</strong> ô ngày còn nguyên kiểu. ⇒ <code>Đ3</code> ⛔ <strong>không được</strong>
+          so giá trị ngày từ tệp offline. <strong>Cấu trúc và công thức thì tin được</strong></td>
+        <td class="c"><code>Đ3</code></td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="call good">
+    <span class="lbl">⭐ Nhưng bộ guide cũng đã trả sẵn ba món rất đắt</span>
+    <ul>
+      <li><strong>24 thao tác <code>OP-xx</code> có bằng chứng</strong> — mỗi cái trỏ về một ô thật.
+        <code>Đ4</code> ⛔ không phải bắt đầu từ số 0.</li>
+      <li><strong>Bộ giải mã <code>__xludf.DUMMYFUNCTION</code></strong> — công thức Google lấy được
+        <strong>offline</strong>, ⛔ không cần mở live cho mọi sheet.</li>
+      <li><strong>Luật ba loại ô A/B/C</strong> — và cảnh báo rằng ô loại C
+        <em>“nhìn bằng mắt tưởng là gõ tay, thực ra là kết quả công thức mảng”</em>.
+        ⛔ Nhận nhầm loại C ⇒ <strong>đếm sai khối lượng người gõ</strong>.</li>
+    </ul>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ══════════════════════════════════════════════ GIỚI HẠN -->
+<section>
+  <h2><span class="num">08</span>Cái bản này ⛔ KHÔNG làm, và ⛔ không đo được</h2>
+  <ul>
+    <li><strong>⛔ Bản này ⛔ chưa đánh giá gì.</strong> Nó dựng <em>cách</em> đánh giá.
+      Ba số đo ở mục 06 là <strong>thử phương pháp</strong>, ⛔ không phải kết quả đánh giá.</li>
+    <li><strong>⛔ Chưa đọc Google Sheets sống.</strong> Mọi số lấy từ <code>RAW_guide</code>
+      (chụp <strong>2026-08-18</strong>) và mã nguồn. Máy đang <strong>⛔ không có mạng</strong>.</li>
+    <li><strong>⛔ Ước lượng 9–12 phiên là phán đoán của tôi</strong>, ⛔ không phải số đo — và nó
+      <strong>chưa tính <code>G5</code></strong>, thứ có thể phải làm trước <code>Đ2</code>.</li>
+    <li><strong>⛔ Chưa hỏi ai.</strong> <code>_GUIDE_09</code> §6 đã soạn sẵn
+      <strong>18 câu phỏng vấn</strong> chia theo từng PIC (LAN·THƯƠNG · ThomHT·AnhMC ·
+      ThuongCT · Hoài · Kế toán trưởng). Chúng ⛔ chưa được gửi — mà nhiều ô
+      <code>???</code> chỉ đóng được bằng đúng những câu đó.</li>
+  </ul>
+
+  <div class="call">
+    <span class="lbl">Đề nghị — thứ tự tôi khuyên</span>
+    <p><strong>⓵</strong> Owner duyệt <strong>thang <code>K0–K4</code></strong> và
+      <strong>phạm vi 6 sheet</strong> (mục 05) — hai thứ này quyết định mọi việc sau ·
+      <strong>⓶</strong> Chạy <code>Đ1</code> dựng sổ đối chiếu <em>(⛔ không chặn gì, làm được ngay)</em> ·
+      <strong>⓷</strong> Quyết <code>G5</code>: chạy riêng, hay gộp vào <code>Đ2</code> ·
+      <strong>⓸</strong> Gửi <strong>18 câu phỏng vấn</strong> đã soạn sẵn — chúng chạy
+      <strong>song song</strong> với <code>Đ1–Đ3</code> và ⛔ không tốn phiên nào của tôi.</p>
+    <p>⭐ <strong>Việc ⓸ nên làm NGAY hôm nay</strong> dù ba việc kia chưa bắt đầu: nó có
+    <strong>độ trễ dài nhất</strong> và ⛔ không phụ thuộc vào bất cứ thứ gì.</p>
+  </div>
+</section>
+
+<footer>
+  <p><strong>Nguồn:</strong> <code>FIN-ERP/AS-IS system/Accounting_Files/RAW_guide</code> —
+    11 tệp, 5.773 dòng, chụp 2026-08-18 · bộ tài liệu ITL tại <code>FLS/docs/ITL/</code> (65 tệp) ·
+    mã nguồn <code>fls/</code> tại mốc <code>17df1d9</code>.</p>
+  <p><strong>Đọc cùng:</strong> bản vẽ <em>Kiến trúc FLS sau CR#10</em> — mục 05 của nó
+    (<em>thước chuẩn mất điểm tựa</em>) là tiền đề của bước <code>Đ3</code> ở đây.</p>
+  <p>Chấm trên chip chứng cứ: <span style="color:var(--good)">●</span> đo được ·
+    <span style="color:var(--warn)">●</span> phán đoán ·
+    <span style="color:var(--crit)">●</span> chưa ai đo.
+    Hệ thị giác từ <code>fls/web/tep/tokens.css</code> (<code>QĐ-ITL-77</code>).</p>
+</footer>
+
+</div>

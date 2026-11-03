@@ -1,0 +1,97 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   tokens.SNAPSHOT.css — ⚠⚠ ĐÂY LÀ MỘT BẢN CHỤP, ⛔ KHÔNG PHẢI BẢN SỐNG.
+
+   ⭐ SSOT thật:  FLS/fls/web/tep/tokens.css
+   ⭐ Chụp lúc:   2026-09-04
+
+   ⛔⛔ ĐỪNG sửa tệp này rồi tưởng đã sửa hệ. Tệp này tồn tại vì bộ asset
+   phải **tự đứng được** khi đưa cho một phiên thiết kế ⛔ không có repo.
+   Muốn đổi màu ⇒ đổi ở SSOT, rồi chụp lại tệp này.
+
+   ⚠ Chính tệp SSOT đã ghi bài học này: trước `B2` bộ màu tồn tại ở **BA
+   chỗ**, và câu "màu nhãn là màu gì" có ba câu trả lời đúng — chúng đã lệch.
+   ⇒ Bản chụp này mang **tên khác** (`.SNAPSHOT.`) đúng để ⛔ không ai nhầm
+   nó với bản sống.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+:root{
+  /* ── chu ──────────────────────────────────────────────────────────── */
+  --sans:'IBM Plex Sans','Segoe UI',system-ui,-apple-system,sans-serif;
+  --mono:'IBM Plex Mono','Cascadia Mono',Consolas,ui-monospace,monospace;
+
+  /* ── muc chu ──────────────────────────────────────────────────────── */
+  --ink:#14201e;      /* chu chinh + nen thanh tren */
+  --muted:#5c6b68;    /* chu phu */
+  --faint:#9aa8a5;    /* chu mo — va la mau vien cua o "⛔ khong do duoc" */
+
+  /* ── be mat ───────────────────────────────────────────────────────── */
+  --line:#dde4e3;     /* moi duong ke */
+  --surface:#fff;     /* nen the */
+  --alt:#f6f8f8;      /* nen tieu de bang · o chi-doc */
+  --page:#eef1f1;     /* nen trang */
+  --row-hover:#fafcfc;   /* dong duoi con tro (ban ve) */
+  --label-bg:#fcfdfd;    /* cot nhan trong khoi truong (ban ve + demo) */
+
+  /* ── mau tuong tac ────────────────────────────────────────────────── */
+  --accent:#0e7570;
+  --accent-hi:#0a5c58;
+  --focus-ring:#0e757022;   /* vong sang khi o dang go */
+  --edit-h-bg:#eef6f6;      /* tieu de cot GO DUOC (ban ve) */
+
+  /* ── ⭐ mau NGU NGHIA — tach han khoi mau tuong tac ───────────────── */
+  --crit:#c73a3a;     --crit-bg:#fbeaea;  --crit-line:#f3cdcd;
+  --crit-ink:#7d2020;                     /* chu tren thanh canh bao (demo) */
+  --warn:#c07414;     --warn-bg:#fdf4e7;  --warn-line:#f0dcbe;
+  --good:#2c7a4b;     --good-bg:#e8f4ec;  --good-line:#bcdcc8;
+  --info:#2563eb;     --info-bg:#e9effd;  --info-line:#b9cdf7;
+
+  /* ── tren nen dam (thanh tren) ────────────────────────────────────── */
+  --on-ink:#fff;
+  --on-ink-line:#3a4a47;
+  --on-ink-muted:#cfd8d6;
+
+  /* ── do bong · man che ────────────────────────────────────────────── */
+  --shadow-drawer:0 8px 28px rgba(20,32,30,.10);
+  --shadow-dlg:0 10px 34px rgba(20,32,30,.14);
+  --shadow-modal:0 16px 44px rgba(20,32,30,.30);
+  --scrim:rgba(20,32,30,.45);
+
+  /* ── ⭐ trang thai DANG TAI (khung 4 trang thai) ──────────────────── */
+  --sk-a:#e9eeee;
+  --sk-b:#f4f7f7;
+
+  /* ── ⚠ CHI DEMO — bang "MAY SE GHI GI" cua `FLS-Demo-Dong.html` ─────
+     ⛔ Man THAT ⛔ khong co bang nay: ke toan can thay KET QUA, ⛔ khong can
+     doc nhat ky ky thuat. Giu o day de demo dong dung chung mot bo mau, ⛔
+     khong phai de man that dung.                                          */
+  --out-bg:#0f1a19;   --out-fg:#cfe3e0;
+  --out-doc:#7fd3cc;  --out-canh:#f0c27a;
+  --out-ghi:#8fd6a8;  --out-chan:#f2a0a0;
+
+  /* ═════ MAT DO ═══════════════════════════════════════════════════════
+     ⭐ Day dac hon `A-CCR`. `A-CCR` la man DOC cho CFO; day la man LAM, ke
+     toan quet hang tram dong (`BA-06` §7 "khac biet vai phai giu").
+     ⚠ Ba con so nay CHUA duoc UAT xac nhan (`GAP-SCR-03`).             */
+  --row:30px;         /* chieu cao mot dong luoi */
+  --grid-fs:12.5px;   /* co chu trong luoi */
+  --khoa-1:96px;      /* be rong cot khoa thu nhat  (dong cung) */
+  --khoa-2:250px;     /* be rong cot khoa thu hai   (dong cung) */
+  /* 96 + 250 = 346px — con so do o mui thu 27/08, cho UAT tra loi co du khong */
+
+  /* ── ⭐ BE RONG lam viec (owner yeu cau 04/09: "mo rong toan man hinh") ──
+     ⛔⛔ Truoc do trang khoa cung o `1440px` va panel khoa cung o `430px`.
+     Do that tren may owner: man **1894px** ⇒ **~450px bo phi**, trong khi
+     panel phai cuon **2,3 man** moi het.
+
+     ⭐ `430` giu lai lam **SAN**, ⛔ khong phai lam so co dinh: no la con so
+     ban ve, va `06_SCREEN_SPEC` §2 khai no **cho UAT tra loi co du khong**.
+     Bo han no di la vut mat cau hoi ay. ⇒ panel = `clamp(san, 30vw, tran)`:
+     man hep thi y het hom nay, man rong thi no lon ra.                      */
+  --panel-san:430px;   /* ⛔ KHONG BAO GIO hep hon — con so ban ve `B1` */
+  --panel-tran:680px;  /* ⚠ tran, ⛔ chua UAT: xem `GAP-SCR-03` */
+  --trang-tran:1440px;     /* be rong trang, man thuong */
+  --trang-tran-rong:1880px; /* man >= 1600px: dung het cho co */
+
+  /* ── bo goc ───────────────────────────────────────────────────────── */
+  --bo-nho:4px; --bo:6px; --bo-the:8px; --bo-tron:999px;
+}

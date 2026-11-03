@@ -1,0 +1,1492 @@
+{
+  "contract": "ERD-CONTRACT",
+  "version": 1,
+  "entities": [
+    {
+      "table": "fls_adjustment",
+      "kind": "table",
+      "erd_entity": "ADJUSTMENT_ENTRY",
+      "island_reason": "",
+      "columns": [
+        {
+          "name": "adj_id",
+          "type": "bigint",
+          "null": false,
+          "pk": true,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "itl_id",
+          "type": "bigint",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": "fls_itl.itl_id"
+        },
+        {
+          "name": "field",
+          "type": "text",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "value_after",
+          "type": "text",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "state",
+          "type": "text",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "reversal_of",
+          "type": "bigint",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": "fls_adjustment.adj_id"
+        },
+        {
+          "name": "actor",
+          "type": "text",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "at",
+          "type": "timestamptz",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "evt_id",
+          "type": "bigint",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": "fls_queue_event.evt_id"
+        }
+      ],
+      "pk_cols": [],
+      "unique_keys": []
+    },
+    {
+      "table": "fls_da_xong",
+      "kind": "view",
+      "erd_entity": "QUEUE_DONE",
+      "island_reason": "khung xem doc tu fls_queue_event — dong da duoc NGUOI bam xong, khong luu gi",
+      "columns": [
+        {
+          "name": "itl_id",
+          "type": "bigint",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "evt_id",
+          "type": "bigint",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "actor",
+          "type": "text",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "at",
+          "type": "timestamptz",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "reason",
+          "type": "text",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        }
+      ],
+      "pk_cols": [],
+      "unique_keys": []
+    },
+    {
+      "table": "fls_itl",
+      "kind": "table",
+      "erd_entity": "ITL_ROW",
+      "island_reason": "",
+      "columns": [
+        {
+          "name": "itl_id",
+          "type": "bigint",
+          "null": false,
+          "pk": true,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "content_key",
+          "type": "text",
+          "null": false,
+          "pk": false,
+          "unique": true,
+          "fk": null
+        },
+        {
+          "name": "source_system",
+          "type": "text",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "source_sheet",
+          "type": "text",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "source_row",
+          "type": "int",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "run_id",
+          "type": "text",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": "fls_run.run_id"
+        },
+        {
+          "name": "contract_version",
+          "type": "text",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "canon_version",
+          "type": "text",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "mapping_version",
+          "type": "text",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "raw_frozen",
+          "type": "boolean",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "is_flash",
+          "type": "boolean",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "period_state",
+          "type": "text",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "doc_date",
+          "type": "date",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "doc_no",
+          "type": "text",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "memo",
+          "type": "text",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "curr",
+          "type": "text",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "ps_no",
+          "type": "numeric(20,2)",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "ps_co",
+          "type": "numeric(20,2)",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "acct",
+          "type": "text",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "le",
+          "type": "text",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": "fls_le.le_code"
+        },
+        {
+          "name": "hd",
+          "type": "text",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "pay_type",
+          "type": "text",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "cdt1",
+          "type": "text",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "svc_start",
+          "type": "text",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "svc_end",
+          "type": "text",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "hd_thyt",
+          "type": "text",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "pay_type_thyt",
+          "type": "text",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "cdt1_thyt",
+          "type": "text",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "svc_start_thyt",
+          "type": "text",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "svc_end_thyt",
+          "type": "text",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "work_status",
+          "type": "text",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "id_payee",
+          "type": "text",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "invoice",
+          "type": "text",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "id_payee_thyt",
+          "type": "text",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "invoice_thyt",
+          "type": "text",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "le_payer",
+          "type": "text",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": "fls_le.le_code"
+        },
+        {
+          "name": "is_intercompany",
+          "type": "boolean",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "pic",
+          "type": "text",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "audit_status",
+          "type": "text",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "pm_hinh",
+          "type": "text",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "itl_id_sheet",
+          "type": "text",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "canon",
+          "type": "jsonb",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        }
+      ],
+      "pk_cols": [],
+      "unique_keys": []
+    },
+    {
+      "table": "fls_journal",
+      "kind": "table",
+      "erd_entity": "JOURNAL",
+      "island_reason": "",
+      "columns": [
+        {
+          "name": "jrn_id",
+          "type": "bigint",
+          "null": false,
+          "pk": true,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "itl_id",
+          "type": "bigint",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": "fls_itl.itl_id"
+        },
+        {
+          "name": "field",
+          "type": "text",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "value_before",
+          "type": "text",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "value_after",
+          "type": "text",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "actor",
+          "type": "text",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "at",
+          "type": "timestamptz",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "value_source",
+          "type": "text",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "reason",
+          "type": "text",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        }
+      ],
+      "pk_cols": [],
+      "unique_keys": []
+    },
+    {
+      "table": "fls_le",
+      "kind": "table",
+      "erd_entity": "LEGAL_ENTITY",
+      "island_reason": "danh muc phap nhan — fls_itl tro TOI no, khong nguoc lai",
+      "columns": [
+        {
+          "name": "le_code",
+          "type": "text",
+          "null": false,
+          "pk": true,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "le_name",
+          "type": "text",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "is_entity",
+          "type": "boolean",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        }
+      ],
+      "pk_cols": [],
+      "unique_keys": []
+    },
+    {
+      "table": "fls_mapping_master",
+      "kind": "table",
+      "erd_entity": "MAPPING_MASTER",
+      "island_reason": "danh muc HD — tra theo gia tri hd, khong FK vi hd co the UNMAPPED",
+      "columns": [
+        {
+          "name": "hd_code",
+          "type": "text",
+          "null": false,
+          "pk": true,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "need_cfa2",
+          "type": "text",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "method_cfa2",
+          "type": "text",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "code_hr",
+          "type": "text",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "coa1",
+          "type": "text",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "coa2",
+          "type": "text",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        }
+      ],
+      "pk_cols": [],
+      "unique_keys": []
+    },
+    {
+      "table": "fls_migration",
+      "kind": "table",
+      "erd_entity": "MIGRATION",
+      "island_reason": "so ghi cac lan di tru — ha tang, khong gan dong so nao",
+      "columns": [
+        {
+          "name": "version",
+          "type": "int",
+          "null": false,
+          "pk": true,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "name",
+          "type": "text",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "checksum",
+          "type": "text",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "applied_at",
+          "type": "timestamptz",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        }
+      ],
+      "pk_cols": [],
+      "unique_keys": []
+    },
+    {
+      "table": "fls_moi_noi",
+      "kind": "view",
+      "erd_entity": "PM_LINK_EFFECTIVE",
+      "island_reason": "khung xem doc tu fls_pm_link tru fls_pm_unlink — moi noi dang co hieu luc, khong luu gi",
+      "columns": [
+        {
+          "name": "link_id",
+          "type": "bigint",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "itl_id",
+          "type": "bigint",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "pm_line_id",
+          "type": "text",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "amount",
+          "type": "numeric(20,2)",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "hinh",
+          "type": "text",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "lan",
+          "type": "smallint",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "run_id",
+          "type": "text",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        }
+      ],
+      "pk_cols": [],
+      "unique_keys": []
+    },
+    {
+      "table": "fls_pm_line",
+      "kind": "table",
+      "erd_entity": "PM_LINE_SNAP",
+      "island_reason": "",
+      "columns": [
+        {
+          "name": "run_id",
+          "type": "text",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": "fls_run.run_id"
+        },
+        {
+          "name": "pm_line_id",
+          "type": "text",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "pm_slip_id",
+          "type": "text",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "ref_tho",
+          "type": "text",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "ref_canon",
+          "type": "text",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "amount",
+          "type": "numeric(20,2)",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "curr",
+          "type": "text",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "status",
+          "type": "text",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "hd",
+          "type": "text",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "cdt1",
+          "type": "text",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "source_row",
+          "type": "integer",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "read_at",
+          "type": "timestamptz",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        }
+      ],
+      "pk_cols": [
+        "run_id",
+        "pm_line_id"
+      ],
+      "unique_keys": [
+        [
+          "run_id",
+          "source_row"
+        ]
+      ]
+    },
+    {
+      "table": "fls_pm_link",
+      "kind": "table",
+      "erd_entity": "PM_LINK",
+      "island_reason": "",
+      "columns": [
+        {
+          "name": "itl_id",
+          "type": "bigint",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": "fls_itl.itl_id"
+        },
+        {
+          "name": "pm_line_id",
+          "type": "text",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "amount",
+          "type": "numeric(20,2)",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "hinh",
+          "type": "text",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "run_id",
+          "type": "text",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": "fls_run.run_id"
+        },
+        {
+          "name": "created_at",
+          "type": "timestamptz",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "link_id",
+          "type": "bigint",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "lan",
+          "type": "smallint",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        }
+      ],
+      "pk_cols": [
+        "link_id"
+      ],
+      "unique_keys": [
+        [
+          "itl_id",
+          "pm_line_id",
+          "lan"
+        ]
+      ]
+    },
+    {
+      "table": "fls_pm_unlink",
+      "kind": "table",
+      "erd_entity": "PM_UNLINK",
+      "island_reason": "",
+      "columns": [
+        {
+          "name": "unlink_id",
+          "type": "bigint",
+          "null": false,
+          "pk": true,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "link_id",
+          "type": "bigint",
+          "null": false,
+          "pk": false,
+          "unique": true,
+          "fk": "fls_pm_link.link_id"
+        },
+        {
+          "name": "itl_id",
+          "type": "bigint",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": "fls_itl.itl_id"
+        },
+        {
+          "name": "evt_id",
+          "type": "bigint",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": "fls_queue_event.evt_id"
+        },
+        {
+          "name": "at",
+          "type": "timestamptz",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        }
+      ],
+      "pk_cols": [],
+      "unique_keys": []
+    },
+    {
+      "table": "fls_queue_event",
+      "kind": "table",
+      "erd_entity": "QUEUE_EVENT",
+      "island_reason": "",
+      "columns": [
+        {
+          "name": "evt_id",
+          "type": "bigint",
+          "null": false,
+          "pk": true,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "itl_id",
+          "type": "bigint",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": "fls_itl.itl_id"
+        },
+        {
+          "name": "evt_type",
+          "type": "text",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "reason",
+          "type": "text",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "defer_until",
+          "type": "date",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "actor",
+          "type": "text",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "at",
+          "type": "timestamptz",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        }
+      ],
+      "pk_cols": [],
+      "unique_keys": []
+    },
+    {
+      "table": "fls_queue_reason_weekly",
+      "kind": "view",
+      "erd_entity": "QUEUE_REASON_WEEKLY",
+      "island_reason": "",
+      "columns": [
+        {
+          "name": "tuan",
+          "type": "date",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "so_lan",
+          "type": "int",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        }
+      ],
+      "pk_cols": [],
+      "unique_keys": []
+    },
+    {
+      "table": "fls_queue_state",
+      "kind": "view",
+      "erd_entity": "QUEUE_STATE",
+      "island_reason": "",
+      "columns": [
+        {
+          "name": "itl_id",
+          "type": "bigint",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "reason",
+          "type": "text",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "defer_until",
+          "type": "date",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "defer_count",
+          "type": "int",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        }
+      ],
+      "pk_cols": [],
+      "unique_keys": []
+    },
+    {
+      "table": "fls_reject",
+      "kind": "table",
+      "erd_entity": "REJECT",
+      "island_reason": "",
+      "columns": [
+        {
+          "name": "rej_id",
+          "type": "bigint",
+          "null": false,
+          "pk": true,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "run_id",
+          "type": "text",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": "fls_run.run_id"
+        },
+        {
+          "name": "source_system",
+          "type": "text",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "source_sheet",
+          "type": "text",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "source_row",
+          "type": "int",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "reason",
+          "type": "text",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        }
+      ],
+      "pk_cols": [],
+      "unique_keys": [
+        [
+          "run_id",
+          "source_row"
+        ]
+      ]
+    },
+    {
+      "table": "fls_run",
+      "kind": "table",
+      "erd_entity": "RUN",
+      "island_reason": "",
+      "columns": [
+        {
+          "name": "run_id",
+          "type": "text",
+          "null": false,
+          "pk": true,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "contract_version",
+          "type": "text",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "canon_version",
+          "type": "text",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "mapping_version",
+          "type": "text",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "started_at",
+          "type": "timestamptz",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "row_count",
+          "type": "int",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "state",
+          "type": "text",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        }
+      ],
+      "pk_cols": [],
+      "unique_keys": []
+    },
+    {
+      "table": "fls_source",
+      "kind": "table",
+      "erd_entity": "SOURCE",
+      "island_reason": "manifest pipeline — pipeline ghi, F06 doc (DD-I07)",
+      "columns": [
+        {
+          "name": "source_id",
+          "type": "bigint",
+          "null": false,
+          "pk": true,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "source_key",
+          "type": "text",
+          "null": false,
+          "pk": false,
+          "unique": true,
+          "fk": null
+        },
+        {
+          "name": "src_type",
+          "type": "text",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "last_seen_at",
+          "type": "timestamptz",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "lag_days",
+          "type": "int",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "cutoff_date",
+          "type": "date",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "txn_count",
+          "type": "int",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        }
+      ],
+      "pk_cols": [],
+      "unique_keys": []
+    },
+    {
+      "table": "fls_sua_tay",
+      "kind": "view",
+      "erd_entity": "MANUAL_EFFECTIVE",
+      "island_reason": "khung xem doc tu fls_adjustment — tinh gia tri nguoi go dang co hieu luc, khong luu gi",
+      "columns": [
+        {
+          "name": "itl_id",
+          "type": "bigint",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "field",
+          "type": "text",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "value_after",
+          "type": "text",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "adj_id",
+          "type": "bigint",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "actor",
+          "type": "text",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "at",
+          "type": "timestamptz",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        }
+      ],
+      "pk_cols": [],
+      "unique_keys": []
+    }
+  ],
+  "relations": [
+    {
+      "from": "fls_adjustment",
+      "to": "fls_adjustment",
+      "via": "reversal_of"
+    },
+    {
+      "from": "fls_adjustment",
+      "to": "fls_itl",
+      "via": "itl_id"
+    },
+    {
+      "from": "fls_adjustment",
+      "to": "fls_queue_event",
+      "via": "evt_id"
+    },
+    {
+      "from": "fls_itl",
+      "to": "fls_le",
+      "via": "le"
+    },
+    {
+      "from": "fls_itl",
+      "to": "fls_le",
+      "via": "le_payer"
+    },
+    {
+      "from": "fls_itl",
+      "to": "fls_run",
+      "via": "run_id"
+    },
+    {
+      "from": "fls_journal",
+      "to": "fls_itl",
+      "via": "itl_id"
+    },
+    {
+      "from": "fls_pm_line",
+      "to": "fls_run",
+      "via": "run_id"
+    },
+    {
+      "from": "fls_pm_link",
+      "to": "fls_itl",
+      "via": "itl_id"
+    },
+    {
+      "from": "fls_pm_link",
+      "to": "fls_run",
+      "via": "run_id"
+    },
+    {
+      "from": "fls_pm_unlink",
+      "to": "fls_itl",
+      "via": "itl_id"
+    },
+    {
+      "from": "fls_pm_unlink",
+      "to": "fls_pm_link",
+      "via": "link_id"
+    },
+    {
+      "from": "fls_pm_unlink",
+      "to": "fls_queue_event",
+      "via": "evt_id"
+    },
+    {
+      "from": "fls_queue_event",
+      "to": "fls_itl",
+      "via": "itl_id"
+    },
+    {
+      "from": "fls_reject",
+      "to": "fls_run",
+      "via": "run_id"
+    }
+  ]
+}

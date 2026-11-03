@@ -1,0 +1,123 @@
+[importlinter]
+root_package = fls
+include_external_packages = True
+
+# Chi fls/repo/ va fls/db/ duoc cham driver DB (psycopg).
+# fls.db.pg_migrate import psycopg trong HAM (lazy) de --dry-run chay offline
+# khong can driver; fls.db nam ngoai source_modules nen dung quyen.
+# Cac tang khac se duoc THEM vao source_modules ngay khi chung ton tai:
+#   (het — fls.api da them 28/08 o P4)
+# import-linter bao loi neu source_modules tro toi module chua ton tai, nen danh
+# sach nay lon dan theo pha thay vi khai truoc mot loat package rong.
+[importlinter:contract:1]
+name = Chi fls.repo va fls.db duoc import driver DB
+type = forbidden
+source_modules =
+    fls.contract
+    fls.canon
+    fls.ledger
+    fls.oracle
+    fls.adapters
+    fls.api
+forbidden_modules =
+    psycopg
+
+# fls.db.model la LA (leaf) SSOT: khong duoc phu thuoc bat cu gi trong fls.
+# Neu model import render/schema thi "khai bao mot lan" mat y nghia (vong phu thuoc).
+[importlinter:contract:2]
+name = fls.db.model la leaf SSOT, khong phu thuoc gi trong fls
+type = forbidden
+source_modules =
+    fls.db.model
+forbidden_modules =
+    fls.db.render
+    fls.contract
+
+# canon la tang duoi cung cua nghiep vu: chuan hoa hinh dang du lieu.
+# Cam nguoc chieu — 01_TECH_DESIGN §4 "mui ten mot chieu ve canon va contract".
+[importlinter:contract:3]
+name = fls.canon khong duoc phu thuoc tang tren
+type = forbidden
+source_modules =
+    fls.canon
+forbidden_modules =
+    fls.ledger
+    fls.repo
+    fls.db
+
+# ledger la ham thuan: canon -> payload. Cam biet gi ve tang ghi.
+[importlinter:contract:4]
+name = fls.ledger khong duoc biet tang ghi DB
+type = forbidden
+source_modules =
+    fls.ledger
+forbidden_modules =
+    fls.repo
+    fls.db
+
+# oracle la THUOC CHUAN: chup so goc + tu soi. No duoc dung lai luat cua ledger
+# (de chi co MOT ban luat Final trong ca he) nhung ⛔ khong duoc biet tang ghi:
+# mot cai thuoc ma ghi duoc vao so la thuoc khong con dung de do.
+[importlinter:contract:5]
+name = fls.oracle khong duoc biet tang ghi DB
+type = forbidden
+source_modules =
+    fls.oracle
+forbidden_modules =
+    fls.repo
+    fls.db
+
+# adapters cho nguon vao canon. Cam biet tang ghi: mot bo nap ma ghi duoc thang
+# vao so thi khong con cho nao chan duoc "0 dong roi im lang" nua.
+[importlinter:contract:6]
+name = fls.adapters khong duoc biet tang ghi DB
+type = forbidden
+source_modules =
+    fls.adapters
+forbidden_modules =
+    fls.repo
+    fls.db
+
+# ⛔⛔ `fls.api` khong duoc biet tang KHO. Ket noi DB duoc TRUYEN VAO tu ngoai
+# (`tools/chay_cua.py`), nen trong ca tang cua ⛔ khong co duong nao tu mo duoc
+# mot ket noi — ke ca ket noi GHI duoc. Do la cach cua doc `P4` khong the ghi
+# vao so **bang cau truc**, chu khong bang ky luat nguoi viet.
+#
+# ⚠ Rang buoc nay cung la thu chan `fls.api` di duong tat: neu no import
+# `fls.db.kho` de tu goi `noi_chi_doc()` thi ⓐ nguoc chieu kien truc va ⓑ keo
+# psycopg vao tang cua (vi pham rang buoc 1).
+[importlinter:contract:7]
+name = fls.api khong duoc biet tang kho (ket noi phai truyen vao)
+type = forbidden
+source_modules =
+    fls.api
+forbidden_modules =
+    fls.db
+
+# ⭐⭐ `P6` — LUAT THU TAM. `fls.web` chi duoc goi `fls.api`, ⛔ khong duoc voi
+# xuong `repo`/`db`/`canon`/`ledger`/`oracle`/`adapters` (`DEV-12` §3).
+#
+# ⛔⛔ **Vi sao luat nay quan trong hon no trong.** Tang man hinh la tang de bi
+# ep nhat: mot o thieu du lieu, va duong ngan nhat luon la *"cho no doc thang
+# mot bang"*. Lam mot lan thi man hinh co mot duong doc **⛔ khong di qua cua**
+# — tuc ⛔ khong qua phep kiem the, ⛔ khong qua pham vi lan nap, ⛔ khong de
+# lai vet. Ca ba lop kiem soat cua `P4` bien mat trong mot dong `import`.
+#
+# ⚠ Hom nay `fls.web` con ⛔ khong import **bat cu gi** trong `fls` — ke ca
+# `fls.api` (no chi biet mot bang tep tinh). Bai
+# `tests/web/test_web_khong_biet_tang_duoi.py` ghim moc **chat hon** ay; rang
+# buoc duoi day la moc **noi long** ma `DEV-12` §3 khai. Neu bai kia do thi
+# nguoi sua phai doc lai vi sao tang nay tung ⛔ khong can gi ca.
+[importlinter:contract:8]
+name = fls.web chi duoc goi fls.api, khong duoc voi xuong tang duoi
+type = forbidden
+source_modules =
+    fls.web
+forbidden_modules =
+    fls.db
+    fls.repo
+    fls.canon
+    fls.ledger
+    fls.oracle
+    fls.adapters
+    psycopg

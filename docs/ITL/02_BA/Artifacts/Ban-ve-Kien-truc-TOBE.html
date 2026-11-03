@@ -1,0 +1,1357 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kiến trúc PM → ITL</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bitter:wght@500;600;700&family=Be+Vietnam+Pro:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+
+<style>
+  :root{
+    --paper:#F7F8F5; --surface:#FFFFFF; --bar:#EAF0E8;
+    --ink:#1B2420; --ink-2:#5A6661; --ink-3:#84908A;
+    --rule:#D2DAD3; --rule-2:#E4EAE3;
+    --accent:#0F5C4A; --accent-soft:#E1EDE7;
+    --red:#A32B23; --red-soft:#F7E6E3;
+    --amber:#87680F; --amber-soft:#F5EEDA;
+    /* Bản vẽ giữ nền GIẤY ở cả hai chế độ — cố ý, như bản vẽ ghim trên bàn */
+    --plate:#F1F4EE; --plate-ink:#1B2420; --plate-rule:#C7D1C6; --plate-band:#E2E9DF;
+    --shadow:0 1px 2px rgba(27,36,32,.06), 0 8px 24px -16px rgba(27,36,32,.18);
+    --maxw:74ch;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#0F1411; --surface:#161C18; --bar:#1B221D;
+      --ink:#E7EDE5; --ink-2:#AAB6AF; --ink-3:#77837C;
+      --rule:#2A332C; --rule-2:#212a23;
+      --accent:#66C4A4; --accent-soft:#17271F;
+      --red:#E9897C; --red-soft:#2B1A17;
+      --amber:#D8AE4C; --amber-soft:#261F11;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 30px -18px rgba(0,0,0,.7);
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#0F1411; --surface:#161C18; --bar:#1B221D;
+    --ink:#E7EDE5; --ink-2:#AAB6AF; --ink-3:#77837C;
+    --rule:#2A332C; --rule-2:#212a23;
+    --accent:#66C4A4; --accent-soft:#17271F;
+    --red:#E9897C; --red-soft:#2B1A17;
+    --amber:#D8AE4C; --amber-soft:#261F11;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 10px 30px -18px rgba(0,0,0,.7);
+  }
+
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--paper); color:var(--ink);
+    font-family:"Be Vietnam Pro","Segoe UI",system-ui,sans-serif;
+    font-size:16.5px; line-height:1.62;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1080px; margin:0 auto; padding:0 clamp(16px,4vw,40px)}
+  .col{max-width:var(--maxw)}
+
+  /* ---------- masthead ---------- */
+  .masthead{border-bottom:1px solid var(--rule); padding:clamp(28px,5vw,52px) 0 22px}
+  .eyebrow{
+    font-family:"IBM Plex Mono",ui-monospace,monospace; font-size:11.5px;
+    letter-spacing:.16em; text-transform:uppercase; color:var(--accent);
+    display:flex; gap:10px; flex-wrap:wrap; align-items:center;
+  }
+  .eyebrow .dot{color:var(--ink-3)}
+  h1{
+    font-family:Bitter,Georgia,serif; font-weight:700;
+    font-size:clamp(30px,5.2vw,46px); line-height:1.1; letter-spacing:-.015em;
+    margin:14px 0 10px; text-wrap:balance;
+  }
+  .standfirst{font-size:clamp(17px,2vw,19.5px); color:var(--ink-2); max-width:62ch; margin:0}
+  .meta{
+    margin-top:20px; display:flex; flex-wrap:wrap; gap:6px 20px;
+    font-family:"IBM Plex Mono",ui-monospace,monospace; font-size:12px; color:var(--ink-3);
+  }
+  .meta b{color:var(--ink-2); font-weight:500}
+
+  /* ---------- nav ---------- */
+  .plateNav{
+    position:sticky; top:0; z-index:20; background:var(--paper);
+    border-bottom:1px solid var(--rule);
+  }
+  .plateNav .wrap{display:flex; gap:6px; overflow-x:auto; padding-top:8px; padding-bottom:8px}
+  .plateNav a{
+    flex:0 0 auto; text-decoration:none; color:var(--ink-2);
+    font-family:"IBM Plex Mono",ui-monospace,monospace; font-size:11.5px;
+    border:1px solid var(--rule); border-radius:2px; padding:4px 9px; white-space:nowrap;
+  }
+  .plateNav a:hover,.plateNav a:focus-visible{border-color:var(--accent); color:var(--accent); outline:none}
+
+  /* ---------- sections ---------- */
+  main{padding-bottom:80px}
+  section, .plate{margin-top:clamp(40px,6vw,68px)}
+  h2{
+    font-family:Bitter,Georgia,serif; font-weight:600; font-size:clamp(21px,2.6vw,26px);
+    line-height:1.25; margin:0 0 8px; text-wrap:balance;
+  }
+  h3{
+    font-family:"IBM Plex Mono",ui-monospace,monospace; font-weight:500; font-size:12px;
+    letter-spacing:.14em; text-transform:uppercase; color:var(--ink-3);
+    margin:30px 0 8px;
+  }
+  p{margin:0 0 14px}
+  a{color:var(--accent)}
+  strong{font-weight:600}
+  code, .m{
+    font-family:"IBM Plex Mono",ui-monospace,monospace; font-size:.88em;
+    background:var(--bar); padding:1px 5px; border-radius:2px;
+  }
+  .num{font-variant-numeric:tabular-nums}
+
+  /* ---------- findings strip ---------- */
+  .findings{display:grid; gap:14px; grid-template-columns:repeat(auto-fit,minmax(248px,1fr))}
+  .finding{background:var(--surface); border:1px solid var(--rule); display:flex; flex-direction:column}
+  .finding .k{
+    font-family:"IBM Plex Mono",ui-monospace,monospace; font-size:11px; letter-spacing:.14em;
+    text-transform:uppercase; color:var(--ink-2);
+    background:var(--bar); border-bottom:1px solid var(--rule); padding:7px 18px;
+  }
+  .finding .v{
+    font-family:Bitter,Georgia,serif; font-size:clamp(19px,2.4vw,23px); font-weight:600;
+    line-height:1.2; margin:0; padding:14px 18px 0; font-variant-numeric:tabular-nums;
+    color:var(--accent);
+  }
+  .finding p{font-size:14.5px; color:var(--ink-2); margin:0; padding:8px 18px 18px}
+  .finding.red .v{color:var(--red)}
+  .finding.amber .v{color:var(--amber)}
+
+  /* ---------- plate ---------- */
+  .plate{border:1px solid var(--rule); background:var(--surface); box-shadow:var(--shadow)}
+  .plate > .cap{
+    display:flex; gap:14px; align-items:baseline; flex-wrap:wrap;
+    padding:14px 18px; border-bottom:1px solid var(--rule); background:var(--bar);
+  }
+  .cap .no{
+    font-family:"IBM Plex Mono",ui-monospace,monospace; font-size:11.5px; letter-spacing:.14em;
+    color:var(--accent); flex:0 0 auto; font-variant-numeric:tabular-nums;
+  }
+  .cap .ttl{font-family:Bitter,Georgia,serif; font-weight:600; font-size:clamp(17px,2.1vw,20px); line-height:1.25}
+  .cap .sub{flex:1 1 100%; font-size:14px; color:var(--ink-2); margin:0}
+  .draw{
+    background:var(--plate); color:var(--plate-ink);
+    border-bottom:1px solid var(--rule);
+    overflow-x:auto; padding:22px 18px;
+  }
+  .draw pre.mermaid{margin:0; background:none; border:0; min-width:min-content; text-align:center}
+  .read{padding:20px 18px 22px}
+  .read > *:last-child{margin-bottom:0}
+  .read .col{max-width:70ch}
+
+  /* ---------- bar chart (bản vẽ 02) ---------- */
+  .bars{display:flex; flex-direction:column; gap:10px; padding:6px 0 2px}
+  .row{display:grid; grid-template-columns:minmax(150px,1fr) 3fr auto; gap:12px; align-items:center}
+  .row .lbl{font-size:14px; color:var(--plate-ink)}
+  .row .lbl small{display:block; font-family:"IBM Plex Mono",ui-monospace,monospace; font-size:11px; color:#6C7A72}
+  .track{background:var(--plate-band); height:22px; position:relative; border-radius:1px}
+  .fill{position:absolute; inset:0 auto 0 0; background:#0F5C4A; border-radius:1px}
+  .fill.slow{background:#A32B23}
+  .val{
+    font-family:"IBM Plex Mono",ui-monospace,monospace; font-size:13.5px; font-variant-numeric:tabular-nums;
+    min-width:5.5ch; text-align:right; color:var(--plate-ink);
+  }
+  .barsNote{
+    margin:16px 0 0; padding-top:12px; border-top:1px dashed var(--plate-rule);
+    font-size:14.5px; color:#3C4A44;
+  }
+
+  /* ---------- callouts: ghi chú đóng dấu trên giấy ---------- */
+  .call{
+    background:var(--accent-soft); border:1px solid var(--accent);
+    padding:16px; margin:18px 0; position:relative;
+  }
+  .call.warn{border-color:var(--red); background:var(--red-soft)}
+  .call.park{border-color:var(--amber); background:var(--amber-soft)}
+  .call .tag{
+    font-family:"IBM Plex Mono",ui-monospace,monospace; font-size:10.5px; letter-spacing:.16em;
+    text-transform:uppercase; color:var(--accent);
+    display:inline-block; border:1px solid var(--accent); padding:2px 7px;
+    margin:0 0 10px; line-height:1.35;
+  }
+  .call.warn .tag{color:var(--red); border-color:var(--red)}
+  .call.park .tag{color:var(--amber); border-color:var(--amber)}
+  .call p{margin:0; font-size:15px}
+  .call p + p{margin-top:8px}
+
+  /* ---------- tables ---------- */
+  .tblWrap{overflow-x:auto; margin:16px 0}
+  table{border-collapse:collapse; width:100%; font-size:14.5px; min-width:460px}
+  caption{
+    text-align:left; font-family:"IBM Plex Mono",ui-monospace,monospace; font-size:11px;
+    letter-spacing:.14em; text-transform:uppercase; color:var(--ink-3); padding-bottom:8px;
+  }
+  th,td{text-align:left; padding:8px 12px; border-bottom:1px solid var(--rule-2); vertical-align:top}
+  thead th{
+    border-bottom:1px solid var(--rule); font-family:"IBM Plex Mono",ui-monospace,monospace;
+    font-size:11.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--ink-3); font-weight:500;
+  }
+  tbody tr:nth-child(odd){background:var(--bar)}
+  td.n, th.n{text-align:right; font-family:"IBM Plex Mono",ui-monospace,monospace; font-variant-numeric:tabular-nums; white-space:nowrap}
+
+  /* ---------- closing ---------- */
+  .closing{border-top:2px solid var(--ink); padding-top:26px}
+  ol.steps{margin:0; padding-left:0; list-style:none; counter-reset:s; display:grid; gap:12px}
+  ol.steps li{counter-increment:s; display:grid; grid-template-columns:auto 1fr; gap:14px; align-items:start}
+  ol.steps li::before{
+    content:counter(s); font-family:"IBM Plex Mono",ui-monospace,monospace; font-size:12px;
+    color:var(--accent); border:1px solid var(--accent); width:24px; height:24px;
+    display:grid; place-items:center; border-radius:50%; margin-top:2px;
+  }
+  footer{border-top:1px solid var(--rule); margin-top:56px; padding:22px 0 60px; color:var(--ink-3); font-size:13.5px}
+  footer ul{margin:8px 0 0; padding-left:18px}
+  footer code{background:none; padding:0}
+
+  @media (prefers-reduced-motion:no-preference){
+    html{scroll-behavior:smooth}
+  }
+  @media (max-width:600px){
+    .row{grid-template-columns:1fr auto; }
+    .row .track{grid-column:1 / -1}
+  }
+</style>
+</head>
+<body>
+
+
+<header class="masthead">
+  <div class="wrap">
+    <div class="eyebrow">
+      <span>FIN-ERP</span><span class="dot">·</span><span>Dự án ITL</span>
+      <span class="dot">·</span><span>Bản vẽ kiến trúc</span>
+    </div>
+    <h1>Kiến trúc PM&nbsp;→&nbsp;ITL</h1>
+    <p class="standfirst">Mười một bản vẽ trả lời bốn câu: <strong>vì sao sổ chậm</strong>, <strong>cắt gì và giữ gì</strong>, <strong>theo thứ tự nào</strong>, và <strong>thế nào là xong</strong>. Mỗi bản vẽ kèm một đoạn đọc bằng lời thường.</p>
+    <div class="meta">
+      <span><b>Ngày</b> 2026-08-24 <em>(bổ sung bản vẽ 11 + đính chính: 2026-08-26)</em></span>
+      <span><b>Chủ sở hữu</b> COO-CFO</span>
+      <span><b>Căn cứ</b> QĐ-ITL-27 · 31 · 32 · 33 · 34 · <b>38</b> · <b>41</b> · <b>42</b></span>
+      <span><b>Đo trên</b> 61 sheet / 3 workbook thật</span>
+    </div>
+  </div>
+</header>
+
+
+<div class="wrap">
+  <div class="call warn" style="margin:18px 0 0">
+    <span class="tag">Đọc trước — hai điều bản vẽ này viết ngày 24/08 nay đã khác</span>
+    <p><strong>① “Sheet gương do máy sở hữu” đã bị khai tử</strong> <em>(quyết định 24/08)</em>. Nhiều bản vẽ bên dưới — đặc biệt <strong>03 · 08 · 09</strong> — vẫn nhắc nó khi kể lại kế hoạch cũ. Đầu ra thật nay là: <strong>kho dữ liệu của hệ → bốn màn hình + engine báo cáo</strong>, không có Google Sheet nào ở đầu ra.</p>
+    <p><strong>② Hợp đồng đầu ra là 14 trường gọi theo TÊN</strong>, không phải “13 cột theo vị trí”. Cột pháp nhân lấy từ cột người nhập đủ, không phải cột suy ra <em>(quyết định 20/08 và 24/08)</em>.</p>
+    <p>Hai chỗ này đã sửa ở <strong>bản vẽ 03</strong> và <strong>bản vẽ 06</strong>. Ở các bản vẽ kể lại kế hoạch cũ thì giữ nguyên câu gốc làm lịch sử — đọc kèm đính chính này. <strong>Bản vẽ 11</strong> và <strong>bản vẽ 12</strong> là phần mới, viết theo hiện trạng — bản vẽ 12 là <strong>bảng tiến độ sống</strong>, cập nhật bằng lệnh chứ không gõ tay.</p>
+  </div>
+</div>
+<nav class="plateNav" aria-label="Danh sách bản vẽ">
+  <div class="wrap">
+    <a href="#p01">01 Luồng hiện tại</a>
+    <a href="#p02">02 Vì sao chậm</a>
+    <a href="#p03">03 Cỗ máy 33 giây</a>
+    <a href="#p04">04 Máy phân loại ô</a>
+    <a href="#p05">05 Ba lằn</a>
+    <a href="#p06">06 Kiến trúc đích</a>
+    <a href="#p07">07 Vùng cấm chạm</a>
+    <a href="#p08">08 Ba chặng</a>
+    <a href="#p09">09 Bốn pha</a>
+    <a href="#p10">10 Nghiệm thu</a>
+    <a href="#p11">11 Chín khối · xong là gì</a>
+    <a href="#p12">12 Tiến độ sống</a>
+  </div>
+</nav>
+
+<main class="wrap">
+
+  <section aria-labelledby="nen">
+    <h2 id="nen">Ba phát hiện nền — đọc trước, vì chúng lật cách chọn việc</h2>
+    <p class="col">Mọi bản vẽ dưới đây đứng trên ba con số đã đo, không phải ba giả định. Nếu chỉ nhớ một thứ từ trang này, nhớ ba ô sau.</p>
+    <div class="findings">
+      <div class="finding">
+        <span class="k">Ai thật sự làm việc này</span>
+        <div class="v">2–3 kế toán</div>
+        <p>Kế toán trưởng và CFO-COO hầu như không tham gia. ⇒ Kiểm soát <strong>phải đến từ máy</strong>. Mọi đề xuất kiểu <em>thêm bước duyệt · leo thang · người thứ hai hậu kiểm</em> là leo vào chỗ trống.</p>
+      </div>
+      <div class="finding red">
+        <span class="k">Sổ chậm vì cái gì</span>
+        <div class="v">33,2 giây cho 3 ô</div>
+        <p>Cùng sổ đó, đọc <strong>40.000 ô mất 1,5 giây</strong>. Giá phải trả là <strong>tính lại</strong>, không phải nhiều dữ liệu. ⇒ Cắt ô gõ tay không mua được một giây nào.</p>
+      </div>
+      <div class="finding">
+        <span class="k">Việc thật cần người xem</span>
+        <div class="v">≈ 50 dòng</div>
+        <p>Không phải 6.843. Trong 9.892 dòng tiền quét ngày 22/08: <strong>3.480 dòng gánh 92% tiền vốn không cần lệnh chi</strong>; 50 dòng lớn nhất gánh 89,3% giá trị còn lại.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 01 ============ -->
+  <article class="plate" id="p01">
+    <div class="cap">
+      <span class="no">BẢN VẼ 01</span>
+      <span class="ttl">Luồng hiện tại — mọi thứ nằm trong Google Sheets</span>
+      <p class="sub">Đọc ở đây: năm giai đoạn, bốn nguồn nhập tay, và chỗ báo cáo lãi lỗ lấy số ra.</p>
+    </div>
+    <div class="draw">
+<pre class="mermaid">
+flowchart LR
+  subgraph GS["GOOGLE SHEETS · 12 workbook · 444 sheet · 1,78 triệu dòng"]
+    direction TB
+    I1["Sao kê 60+ tài khoản · mỗi bank một định dạng"] --> S1["① Nạp tiền"]
+    I2["Số dư thật từng ngày"] --> S2["② Đối soát"]
+    I3["Lệnh chi · Google Form"] --> S3["③ Ghép lệnh"]
+    I4["Bảng danh mục · ánh xạ"] --> S3
+    S1 --> S2 --> S3 --> S4["④ Vào sổ"] --> S5["⑤ Chốt sổ · 7 khối gõ tay"]
+    S5 --> LG["ITL Ledge · 64 cột × 10.000 dòng"]
+  end
+  KT["2–3 kế toán làm cả 5 giai đoạn"] -.-> GS
+  LG --> ENG["Engine FPA-T4 · đọc 14 trường theo TÊN"]
+  ENG --> PL["Báo cáo lãi lỗ · đang chạy thật"]
+  classDef inp fill:#F5EEDA,stroke:#87680F,stroke-width:1px,color:#43340A
+  classDef stg fill:#F1F4EE,stroke:#5A6661,stroke-width:1px,color:#1B2420
+  classDef key fill:#E2E9DF,stroke:#0F5C4A,stroke-width:2px,color:#0F3329
+  classDef good fill:#CFE6DA,stroke:#0F5C4A,stroke-width:2px,color:#0B2A22
+  classDef bad fill:#F7E6E3,stroke:#A32B23,stroke-width:2px,color:#57150F
+  classDef hold fill:#F5EEDA,stroke:#87680F,stroke-width:2px,color:#43340A
+  classDef ask fill:#FFFFFF,stroke:#0F5C4A,stroke-width:1px,color:#1B2420
+  class I1,I2,I3,I4 inp
+  class S1,S2,S3,S4,S5 stg
+  class LG,ENG key
+  class PL good
+  class KT bad
+  style GS fill:#FBFAF3,stroke:#87680F,stroke-width:2px,color:#43340A
+</pre>
+    </div>
+    <div class="read">
+      <div class="col">
+        <p>Toàn bộ luồng — từ lúc sao kê ngân hàng đi vào cho tới lúc engine xuất báo cáo lãi lỗ — <strong>nằm trong Google Sheets</strong>. Không có tầng nào ở giữa.</p>
+        <p>Bốn hộp bên trái là chỗ <strong>người gõ dữ liệu vào</strong>. Năm giai đoạn ở giữa là chỗ <strong>Sheets làm máy tính</strong>: nó chở dữ liệu giữa 12 workbook, tra bảng, cộng theo điều kiện, phân loại. Cuối cùng <code>ITL Ledge</code> là sổ, và engine đọc 13 cột của sổ đó <strong>theo vị trí</strong> để ra báo cáo.</p>
+        <div class="call">
+          <span class="tag">Điểm quan trọng nhất của bản vẽ này</span>
+          <p>Google Sheets đang giữ <strong>hai vai cùng lúc</strong>: vai <em>nơi nhập liệu</em> và vai <em>máy tính</em>. Toàn bộ thiết kế đích chỉ làm một việc — <strong>lấy vai máy tính ra, để lại vai nhập liệu</strong>.</p>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- ============ 02 ============ -->
+  <article class="plate" id="p02">
+    <div class="cap">
+      <span class="no">BẢN VẼ 02</span>
+      <span class="ttl">Vì sao chậm — phép đo lật cách chọn việc</span>
+      <p class="sub">Đọc ở đây: thời gian đọc bốn dải khác nhau trên cùng một sổ. Nghe vô lý, nhưng đo hai lượt.</p>
+    </div>
+    <div class="draw">
+      <div class="bars">
+        <div class="row">
+          <div class="lbl">Sheet nhẹ, <strong>3 ô</strong><small>sổ đang nguội</small></div>
+          <div class="track"><div class="fill slow" style="width:100%"></div></div>
+          <div class="val">33,2 s</div>
+        </div>
+        <div class="row">
+          <div class="lbl">Sheet nặng, <strong>3 ô</strong><small>sổ vừa thức</small></div>
+          <div class="track"><div class="fill slow" style="width:25.6%"></div></div>
+          <div class="val">8,5 s</div>
+        </div>
+        <div class="row">
+          <div class="lbl">Sheet nặng, <strong>10.000 ô</strong><small>sổ đã thức</small></div>
+          <div class="track"><div class="fill" style="width:6.3%"></div></div>
+          <div class="val">2,1 s</div>
+        </div>
+        <div class="row">
+          <div class="lbl">Sheet nặng, <strong>40.000 ô</strong><small>sổ đã thức</small></div>
+          <div class="track"><div class="fill" style="width:4.5%"></div></div>
+          <div class="val">1,5 s</div>
+        </div>
+        <p class="barsNote"><strong>Đọc 40.000 ô rẻ hơn đọc 3 ô — 1,5 giây so với 33,2 giây.</strong> Lượt chạy <em>ngược thứ tự</em> làm phép kiểm chứng: phép đọc 40.000 ô đứng đầu tiên chỉ mất 1,9 giây. Cùng chi phí kết nối, không có 33 giây. Nên 33 giây kia là <strong>sổ tính lại</strong>, không phải mạng.</p>
+      </div>
+    </div>
+    <div class="read">
+      <div class="col">
+        <p>Google không tính tiền theo số ô trả về. Nó tính theo việc <strong>đánh thức và tính lại cả workbook</strong> — trả một lần mỗi khi có ai chạm vào sổ. Sau khi sổ đã thức thì dữ liệu gần như miễn phí.</p>
+        <p>Ba hệ quả, mỗi cái lật một cách làm quen thuộc:</p>
+        <div class="tblWrap">
+          <table>
+            <caption>Hệ quả của phép đo</caption>
+            <thead><tr><th>Hệ quả</th><th>Nó lật cái gì</th></tr></thead>
+            <tbody>
+              <tr><td>Chi phí tính theo <strong>số công thức phải tính lại</strong>, không theo số dòng</td><td>Bỏ ý định <em>“chia nhỏ sổ theo kỳ cho nhẹ”</em> — sổ đang chở toàn bộ lịch sử, nhưng đó không phải nguồn của sự chậm</td></tr>
+              <tr><td>Giảm <strong>ô gõ tay</strong> không làm sổ nhanh hơn một giây nào — ô gõ tay là ô hằng, chúng không tính gì</td><td>Lật thứ tự của lộ trình cũ, vốn xếp việc theo khối ô gõ tay</td></tr>
+              <tr><td>Kế toán trả 33 giây này <strong>mỗi lần mở file nguội</strong></td><td>Đây chính là “trải nghiệm chậm” dưới dạng con số — không phải cảm giác</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="call warn">
+          <span class="tag">Giới hạn của phép đo — nói thẳng</span>
+          <p>Con số 33,2 giây là <strong>một lượt</strong>, đo trên một bản copy đã mất kết nối ra ngoài. File gốc còn 205 cạnh sống nên <strong>chậm hơn</strong>, không nhanh hơn. Nhưng <em>thứ tự</em> — 40.000 ô rẻ hơn 3 ô — vững ở cả hai lượt.</p>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- ============ 03 ============ -->
+  <article class="plate" id="p03">
+    <div class="cap">
+      <span class="no">BẢN VẼ 03</span>
+      <span class="ttl">Cỗ máy sinh ra 33 giây — 305 cạnh vượt file chỉ để tự kiểm một ô</span>
+      <p class="sub">Đọc ở đây: bên trái là sổ đang làm gì mỗi lần thức. Bên phải là cùng phép kiểm đó viết trong code.</p>
+    </div>
+    <div class="draw">
+<pre class="mermaid">
+flowchart LR
+  subgraph NOW["HÔM NAY · hàng tự-kiểm nằm trong sổ"]
+    direction TB
+    A1["ITL Ledge hàng 6 · cột A"] --> B1["gọi sang file khác · đọc ĐÚNG 1 ô"]
+    A2["cột B"] --> B2["gọi sang file khác · đọc ĐÚNG 1 ô"]
+    A3["… 38 cột, mỗi cột một cái"] --> B3["38 lần gọi vượt file để kiểm 38 ô"]
+  end
+  subgraph CD2["TRONG CODE · sau khi cắt"]
+    direction TB
+    C1["Đọc MỘT lần"] --> C2["Kiểm toàn bộ 10.000 dòng"]
+  end
+  NOW --> CD2
+  CD2 --> Z["Không ai mất phép kiểm nào · độ phủ mạnh hơn 260 lần"]
+  classDef inp fill:#F5EEDA,stroke:#87680F,stroke-width:1px,color:#43340A
+  classDef stg fill:#F1F4EE,stroke:#5A6661,stroke-width:1px,color:#1B2420
+  classDef key fill:#E2E9DF,stroke:#0F5C4A,stroke-width:2px,color:#0F3329
+  classDef good fill:#CFE6DA,stroke:#0F5C4A,stroke-width:2px,color:#0B2A22
+  classDef bad fill:#F7E6E3,stroke:#A32B23,stroke-width:2px,color:#57150F
+  classDef hold fill:#F5EEDA,stroke:#87680F,stroke-width:2px,color:#43340A
+  classDef ask fill:#FFFFFF,stroke:#0F5C4A,stroke-width:1px,color:#1B2420
+  class A1,A2,A3 stg
+  class B1,B2,B3 bad
+  class C1 key
+  class C2 good
+  class Z good
+  style NOW fill:#FDF4F2,stroke:#A32B23,stroke-width:2px,color:#57150F
+  style CD2 fill:#EDF6F1,stroke:#0F5C4A,stroke-width:2px,color:#0F3329
+</pre>
+    </div>
+    <div class="read">
+      <div class="col">
+        <p>Đây là kết quả đáng nhất của phép đo, và nó không có trong tài liệu nào trước đó. Trong 3 workbook đo được có <strong>311 cạnh gọi sang file khác</strong>, <strong>305 cạnh</strong> trong đó là loại “đích nằm trong ô”. Cả 311 cạnh <strong>đều nằm ở băng dòng đầu</strong>, không có cái nào ở vùng dữ liệu.</p>
+        <p>Đọc mẫu công thức mới thấy chúng là gì: <strong>không phải để chở số — mà để tự kiểm.</strong> Mỗi công thức gọi sang file khác để đọc <strong>đúng một ô</strong>, rồi so với <strong>đúng một ô</strong> ở hàng bên dưới. Ba mươi tám lần gọi vượt file để kiểm ba mươi tám ô.</p>
+        <div class="tblWrap">
+          <table>
+            <caption>Cạnh vượt file nằm ở đâu</caption>
+            <thead><tr><th>Sheet</th><th class="n">Cạnh</th><th>Kiểm được gì</th></tr></thead>
+            <tbody>
+              <tr><td><code>[RAW ITL]Data Management</code> — có ở cả hai file</td><td class="n">194</td><td>một bảng đo <strong>đã biết là hỏng</strong></td></tr>
+              <tr><td><code>ITL Ledge</code> hàng 6</td><td class="n">38</td><td>38 ô</td></tr>
+              <tr><td>4 sổ <code>H1000</code> lương/nhân sự</td><td class="n">68</td><td>68 ô</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="call">
+          <span class="tag">Hai hệ quả</span>
+          <p><strong>Một.</strong> Phần lớn chi phí vượt-file của sổ không phải để chở số, mà để tự kiểm. Mà mỗi lần chạm sang file khác là <strong>đánh thức file đó</strong> — chính là 33 giây ở bản vẽ 02.</p>
+          <p><strong>Hai.</strong> Đây là chỗ cắt <strong>rẻ nhất và an toàn nhất</strong> của cả dự án: cắt xong không ai mất phép kiểm nào, mà phép kiểm còn mạnh hơn <strong>260 lần</strong> về độ phủ.</p>
+        </div>
+        <div class="call park">
+          <span class="tag">⏸ Nhưng việc này đang treo</span>
+          <p>Cắt hàng tự-kiểm nghĩa là <strong>sửa file của kế toán</strong>. Owner đã đặt giới hạn ngược lại — xem bản vẽ 07.</p>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- ============ 04 ============ -->
+  <article class="plate" id="p04">
+    <div class="cap">
+      <span class="no">BẢN VẼ 04</span>
+      <span class="ttl">Máy phân loại — mọi ô về đúng một trong bốn loại</span>
+      <p class="sub">Đọc ở đây: cách xác định “cắt gì, giữ gì” mà không cần tranh luận theo module hay theo màn hình.</p>
+    </div>
+    <div class="draw">
+<pre class="mermaid">
+flowchart TB
+  A["Một ô bất kỳ trong 444 sheet"] --> B{"Ô có bắt đầu bằng dấu bằng?"}
+  B --> L1["KHÔNG ⇒ LOẠI 1 · NGƯỜI GÕ · ô hằng"]
+  B --> C{"CÓ. Ô chỉ DI CHUYỂN dữ liệu?"}
+  C --> L2["ĐÚNG ⇒ LOẠI 2 · MÁY CHỞ · IMPORTRANGE, QUERY, FILTER"]
+  C --> L3["KHÔNG, có phép tính ⇒ LOẠI 3 · MÁY TÍNH · VLOOKUP, SUMIFS, ArrayFormula"]
+  A --> D{"Sheet không ai tham chiếu tới?"}
+  D --> L4["ĐÚNG ⇒ LOẠI 4 · NGƯỜI XEM"]
+  L1 --> O1["Thô từ ngoài ⇒ Ở LẠI Sheets. Quyết định từng dòng ⇒ màn hình"]
+  L2 --> O2["CODE 100 phần trăm · KHÔNG cần màn hình nào"]
+  L3 --> O2
+  L4 --> O3["Sheet gương do máy ghi, hoặc màn hình đọc"]
+  classDef inp fill:#F5EEDA,stroke:#87680F,stroke-width:1px,color:#43340A
+  classDef stg fill:#F1F4EE,stroke:#5A6661,stroke-width:1px,color:#1B2420
+  classDef key fill:#E2E9DF,stroke:#0F5C4A,stroke-width:2px,color:#0F3329
+  classDef good fill:#CFE6DA,stroke:#0F5C4A,stroke-width:2px,color:#0B2A22
+  classDef bad fill:#F7E6E3,stroke:#A32B23,stroke-width:2px,color:#57150F
+  classDef hold fill:#F5EEDA,stroke:#87680F,stroke-width:2px,color:#43340A
+  classDef ask fill:#FFFFFF,stroke:#0F5C4A,stroke-width:1px,color:#1B2420
+  class A stg
+  class B,C,D ask
+  class L1 hold
+  class L2,L3 key
+  class L4 stg
+  class O1 hold
+  class O2 good
+  class O3 stg
+</pre>
+    </div>
+    <div class="read">
+      <div class="col">
+        <p>Luật rất đơn giản: <strong>mọi ô thuộc đúng một loại</strong>. Phân loại xong thì chỗ cắt tự hiện ra. Đã chạy thật trên <strong>61 sheet / 3 workbook</strong> — đọc công thức, không đọc giá trị.</p>
+        <div class="tblWrap">
+          <table>
+            <caption>Kết quả đo, ngày 22/08</caption>
+            <thead><tr><th>Đếm được</th><th class="n">Số</th><th>Nghĩa</th></tr></thead>
+            <tbody>
+              <tr><td>Cột <strong>phải code</strong> — loại 2 + loại 3</td><td class="n">1.755</td><td>chặn dưới, không phải số cuối</td></tr>
+              <tr><td>Cột hằng — loại 1 và loại 4</td><td class="n">799</td><td>người gõ hoặc ô hiện</td></tr>
+              <tr><td>Cạnh gọi sang file khác</td><td class="n">311</td><td>305 cái là loại “đích nằm trong ô”</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="call">
+          <span class="tag">Điểm quan trọng nhất của bảng phân loại</span>
+          <p><strong>Loại 2 và loại 3 là việc VÔ HÌNH.</strong> Code hoá chúng thì: không ai phải đổi một thao tác · không phải thiết kế một màn hình nào · không phải huấn luyện ai · không cần ai đồng ý đổi cách làm.</p>
+          <p>⇒ Đây vừa là phần <strong>rẻ nhất để làm</strong>, vừa là phần <strong>duy nhất mua được tốc độ</strong>. Với ràng buộc 2–3 kế toán, “không đòi ai đổi thao tác” là lợi thế rất lớn, không phải chi tiết phụ.</p>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- ============ 05 ============ -->
+  <article class="plate" id="p05">
+    <div class="cap">
+      <span class="no">BẢN VẼ 05</span>
+      <span class="ttl">Ba lằn — ba luật xếp thứ tự, cả ba đều đúng trong lằn của nó</span>
+      <p class="sub">Đọc ở đây: vì sao không gộp tất cả thành một danh sách việc.</p>
+    </div>
+    <div class="draw">
+<pre class="mermaid">
+flowchart LR
+  subgraph LO["LẰN Ô · đã có"]
+    direction TB
+    O1["Cắt: 22.360 ô gõ tay"] --> O2["Xếp: rủi ro THẤP trước"] --> O3["Mua: chất lượng số và trải nghiệm"]
+  end
+  subgraph LC["LẰN CỔNG · đã chạy thật"]
+    direction TB
+    K1["Cắt: phép kiểm, phép đối soát"] --> K2["Xếp: rủi ro CAO trước"] --> K3["Mua: kiểm soát"]
+  end
+  subgraph LM["LẰN MÁNG · mở mới"]
+    direction TB
+    M1["Cắt: cạnh chở và cột tính"] --> M2["Xếp: giá thành TÍNH LẠI cao trước"] --> M3["Mua: TỐC ĐỘ"]
+  end
+  classDef inp fill:#F5EEDA,stroke:#87680F,stroke-width:1px,color:#43340A
+  classDef stg fill:#F1F4EE,stroke:#5A6661,stroke-width:1px,color:#1B2420
+  classDef key fill:#E2E9DF,stroke:#0F5C4A,stroke-width:2px,color:#0F3329
+  classDef good fill:#CFE6DA,stroke:#0F5C4A,stroke-width:2px,color:#0B2A22
+  classDef bad fill:#F7E6E3,stroke:#A32B23,stroke-width:2px,color:#57150F
+  classDef hold fill:#F5EEDA,stroke:#87680F,stroke-width:2px,color:#43340A
+  classDef ask fill:#FFFFFF,stroke:#0F5C4A,stroke-width:1px,color:#1B2420
+  class O1,O2,O3,K1,K2,K3 stg
+  class M1,M2 key
+  class M3 good
+  style LO fill:#F6F7F3,stroke:#5A6661,stroke-width:1px,color:#1B2420
+  style LC fill:#F6F7F3,stroke:#5A6661,stroke-width:1px,color:#1B2420
+  style LM fill:#EDF6F1,stroke:#0F5C4A,stroke-width:3px,color:#0F3329
+</pre>
+    </div>
+    <div class="read">
+      <div class="col">
+        <p>Ba lằn cắt ba thứ khác nhau, nên phải xếp thứ tự theo ba luật khác nhau. Lằn Ô xếp <strong>rủi ro thấp trước</strong> — để đội học cách làm mới ở chỗ sai cũng không lệch báo cáo một đồng. Lằn Cổng xếp <strong>rủi ro cao trước</strong> — vì phép kiểm phải chặn chỗ đắt nhất. Lằn Máng xếp <strong>giá thành tính lại cao trước</strong> — vì đó là thứ duy nhất mua được tốc độ.</p>
+        <p>Vì sao phải là ba lằn riêng, không gộp một danh sách: gộp thì lằn nào có việc <em>trông nhỏ</em> sẽ chết. <strong>Lằn Máng đặc biệt dễ chết khi gộp, vì việc của nó vô hình</strong> — cắt xong không ai thấy màn hình mới nào, chỉ thấy sổ bớt chậm.</p>
+      </div>
+    </div>
+  </article>
+
+  <!-- ============ 06 ============ -->
+  <article class="plate" id="p06">
+    <div class="cap">
+      <span class="no">BẢN VẼ 06</span>
+      <span class="ttl">Kiến trúc đích — bản vẽ chính</span>
+      <p class="sub">Đọc ở đây: cái gì rời Google Sheets, cái gì ở lại vĩnh viễn, và mũi tên nào không được tồn tại.</p>
+      <div class="call warn">
+        <span class="tag">Đính chính 2026-08-26 — hai chỗ bản vẽ này từng vẽ sai</span>
+        <p><strong>① Không còn “sheet gương”.</strong> Bản đầu vẽ một Google Sheet do máy sở hữu làm chỗ người xem. Nó đã bị <strong>khai tử</strong> — đầu ra nay là kho dữ liệu của hệ, rồi ra bốn màn hình và engine báo cáo. <strong>② Hợp đồng đầu ra là 14 trường gọi theo TÊN</strong>, không phải “13 cột theo vị trí” như bản đầu ghi — cột pháp nhân lấy từ cột người nhập đủ, không phải cột suy ra.</p>
+      </div>
+    </div>
+    <div class="draw">
+<pre class="mermaid">
+flowchart LR
+  subgraph GS2["GOOGLE SHEETS · ở lại, có thể là mãi"]
+    direction TB
+    N1["Sao kê 60+ tài khoản"]
+    N2["Số dư thật từng ngày"]
+    N3["Lệnh chi · Google Form"]
+    N4["Bảng danh mục · ánh xạ"]
+  end
+  subgraph SYS["HỆ THỐNG · phần code hoá, VÔ HÌNH với kế toán"]
+    direction TB
+    RD["Đọc chỉ-đọc qua API · MỘT CHIỀU"]
+    CA["Máy tính · ghép lệnh, đối soát, phân loại, phân bổ"]
+    LE["Sổ ITL trong hệ · khoá BỀN, nhật ký thay đổi"]
+    RD --> CA --> LE
+  end
+  subgraph OUT["NGƯỜI XEM"]
+    direction TB
+    SC["4 màn hình · hàng chờ, nhật ký, đối soát, truy vết"]
+    EN["Engine FPA-T4 · 14 trường theo TÊN"]
+  end
+  N1 --> RD
+  N2 --> RD
+  N3 --> RD
+  N4 --> RD
+  LE --> SC
+  LE --> EN
+  SC -.-> LE
+  LE -.-> STOP["KHÔNG BAO GIỜ ghi ngược vào Google Sheets"]
+  classDef inp fill:#F5EEDA,stroke:#87680F,stroke-width:1px,color:#43340A
+  classDef stg fill:#F1F4EE,stroke:#5A6661,stroke-width:1px,color:#1B2420
+  classDef key fill:#E2E9DF,stroke:#0F5C4A,stroke-width:2px,color:#0F3329
+  classDef good fill:#CFE6DA,stroke:#0F5C4A,stroke-width:2px,color:#0B2A22
+  classDef bad fill:#F7E6E3,stroke:#A32B23,stroke-width:2px,color:#57150F
+  classDef hold fill:#F5EEDA,stroke:#87680F,stroke-width:2px,color:#43340A
+  classDef ask fill:#FFFFFF,stroke:#0F5C4A,stroke-width:1px,color:#1B2420
+  class N1,N2,N3,N4 inp
+  class RD,CA,LE key
+  class SC,EN stg
+  class STOP bad
+  style GS2 fill:#FBFAF3,stroke:#87680F,stroke-width:2px,color:#43340A
+  style SYS fill:#EDF6F1,stroke:#0F5C4A,stroke-width:3px,color:#0F3329
+  style OUT fill:#F6F7F3,stroke:#5A6661,stroke-width:2px,color:#1B2420
+</pre>
+    </div>
+    <div class="read">
+      <div class="col">
+        <p><strong>Google Sheets không bị xoá.</strong> Nó thu hẹp lại thành chỗ người gõ dữ liệu thô — bốn nhóm bên trái, và bốn nhóm này <strong>ở lại vĩnh viễn</strong>. Máy đọc chúng theo <strong>một chiều</strong>, tính toàn bộ phần giữa trong code, rồi đổ kết quả vào <strong>sổ của hệ</strong>. Từ sổ đó ra hai đường xem: bốn màn hình, và engine báo cáo.</p>
+        <p><strong>Mũi tên ngược vào Google Sheets không tồn tại.</strong></p>
+        <div class="tblWrap">
+          <table>
+            <caption>Vì sao bốn nhóm này ở lại Sheets</caption>
+            <thead><tr><th>Ở lại</th><th>Vì sao</th></tr></thead>
+            <tbody>
+              <tr><td>Sao kê ngân hàng và quỹ</td><td>60+ định dạng, chưa có kết nối tự động. Chuyển chỗ này mua ít nhất, rủi ro cao nhất</td></tr>
+              <tr><td>Số dư thật từng ngày</td><td>người đọc sao kê rồi gõ — không nguồn máy nào thay được</td></tr>
+              <tr><td>Lệnh chi qua Google Form</td><td>nghiệp vụ đã quen form; máy giờ đọc được mã trong diễn giải nên bớt phụ thuộc</td></tr>
+              <tr><td>Bảng danh mục và ánh xạ</td><td>thay đổi vài lần một năm</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <h3>Bốn luật thiết kế — đều đã trả giá rồi</h3>
+        <div class="tblWrap">
+          <table>
+            <thead><tr><th>Luật</th><th>Nội dung</th><th>Đã trả giá ở đâu</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Một chiều</strong></td><td>Máy đọc Sheets, <strong>không bao giờ ghi</strong> vào file đang sống. Kết quả đổ vào file do máy sở hữu</td><td>sự cố 13/08 — chủ file sửa đồng thời làm dịch địa chỉ ô</td></tr>
+              <tr><td><strong>Không bê bẫy sang hệ mới</strong></td><td>Đích gọi file phải <strong>tường minh</strong> · khoá phải <strong>bền</strong>, không phải số thứ tự dòng · không code hoá bộ lọc kỳ mà sổ thật <strong>không có</strong></td><td>code hoá nguyên xi = bê nguyên lỗi, rồi lỗi thành “lỗi của hệ mới”</td></tr>
+              <tr><td><strong>Đóng băng đường ra trước khi code</strong></td><td>Engine đọc <strong>14 trường theo TÊN</strong> — đó là hợp đồng, không phải gợi ý</td><td>engine đang xuất báo cáo thật; đổi hình dạng đầu ra là làm sập báo cáo đang chạy</td></tr>
+              <tr><td><strong>Sổ hiện tại là thước chuẩn</strong></td><td>Không cắt cạnh nào trước khi code chạy <strong>song song</strong> và khớp</td><td>sổ chỉ bị cắt sau khi đã có thứ thay</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- ============ 07 ============ -->
+  <article class="plate" id="p07">
+    <div class="cap">
+      <span class="no">BẢN VẼ 07</span>
+      <span class="ttl">Vùng cấm chạm — giới hạn owner đặt ngày 24/08</span>
+      <p class="sub">Đọc ở đây: cái gì được làm, cái gì dừng, và hệ quả phải nói thẳng.</p>
+    </div>
+    <div class="draw">
+<pre class="mermaid">
+flowchart LR
+  subgraph BAN["VÙNG CẤM CHẠM · file của kế toán"]
+    direction TB
+    F1["12 workbook đang sống"]
+    F2["2 sheet chết · 536.000 ô công thức"]
+    F3["Bảng đo hỏng · 62 phần trăm cạnh vượt file"]
+    F4["305 cạnh tự-kiểm"]
+  end
+  subgraph OKR["ĐƯỢC · chỉ ĐỌC"]
+    RD2["Đọc qua API một chiều · không sửa gì"]
+  end
+  subgraph OKW["ĐƯỢC · file MỚI do máy sở hữu"]
+    direction TB
+    SY2["Sổ ITL trong hệ"]
+    MR2["Sheet gương 3 tab · chỗ DUY NHẤT tốc độ hiện ra"]
+    SY2 --> MR2
+  end
+  BAN --> RD2
+  RD2 --> OKW
+  MR2 --> KT2["Kế toán đọc ở ĐÂY"]
+  classDef inp fill:#F5EEDA,stroke:#87680F,stroke-width:1px,color:#43340A
+  classDef stg fill:#F1F4EE,stroke:#5A6661,stroke-width:1px,color:#1B2420
+  classDef key fill:#E2E9DF,stroke:#0F5C4A,stroke-width:2px,color:#0F3329
+  classDef good fill:#CFE6DA,stroke:#0F5C4A,stroke-width:2px,color:#0B2A22
+  classDef bad fill:#F7E6E3,stroke:#A32B23,stroke-width:2px,color:#57150F
+  classDef hold fill:#F5EEDA,stroke:#87680F,stroke-width:2px,color:#43340A
+  classDef ask fill:#FFFFFF,stroke:#0F5C4A,stroke-width:1px,color:#1B2420
+  class F1 stg
+  class F2,F3,F4 bad
+  class RD2 stg
+  class SY2 key
+  class MR2,KT2 good
+  style BAN fill:#FDF4F2,stroke:#A32B23,stroke-width:3px,color:#57150F
+  style OKR fill:#F6F7F3,stroke:#5A6661,stroke-width:2px,color:#1B2420
+  style OKW fill:#EDF6F1,stroke:#0F5C4A,stroke-width:3px,color:#0F3329
+</pre>
+    </div>
+    <div class="read">
+      <div class="col">
+        <p>Owner chốt ngày 24/08: <strong>không đụng vào các sheet hiện có, không động vào file của kế toán</strong>. Mọi hành động <strong>cắt · xoá · sửa</strong> trên workbook kế toán dừng lại, chờ một lần uỷ quyền riêng.</p>
+        <div class="call warn">
+          <span class="tag">Hệ quả phải nói thẳng, không giấu</span>
+          <p>Cả <strong>ba</strong> việc mà phép đo gọi là <em>“rẻ nhất mua tốc độ, không cần code”</em> đều là hành động <strong>ghi vào file của kế toán</strong>: dọn 2 sheet chết · dừng bảng đo hỏng · bỏ 305 cạnh tự-kiểm.</p>
+          <p>⇒ <strong>Chặng 1 sẽ không làm sổ hiện tại nhanh hơn một giây nào.</strong> Con số 33,2 giây ở bản vẽ 02 không còn là đích của chặng 1.</p>
+        </div>
+        <p>Tốc độ chuyển sang <strong>chỉ đến trên đường mới</strong>: máy đọc dữ liệu thô một lần, tính trong code, ghi ra sheet gương. Kế toán hưởng tốc độ <strong>khi chuyển sang đọc đường mới</strong>, không phải khi sổ cũ nhẹ đi.</p>
+        <div class="call">
+          <span class="tag">Điều quyết định này KHÔNG làm hỏng</span>
+          <p>Luật <strong>một chiều</strong> vốn đã nói <em>máy đọc, không bao giờ ghi vào file sống</em>. Nay nó không còn là lựa chọn kỹ thuật mà là <strong>giới hạn owner đặt</strong> — nên toàn bộ bản vẽ 06 đúng nguyên vẹn, kể cả mũi tên “không bao giờ ghi ngược”.</p>
+          <p>Vẫn làm được đủ, tất cả chỉ đọc: <strong>chặng 1 code hoá loại 2 + loại 3</strong> · <strong>sheet gương 3 tab</strong> <em>(file mới, không chạm file kế toán)</em> · máy quét hằng ngày · lấy mốc nền tốc độ.</p>
+        </div>
+        <div class="call park">
+          <span class="tag">⏸ Đã đo — chờ uỷ quyền</span>
+          <p>Ba việc treo, <strong>số đo không mất</strong>: dọn 6 nhóm sheet chết · dừng bảng đo hỏng · bỏ 305 cạnh tự-kiểm. Ngày nào owner mở thì làm được ngay, không phải đo lại.</p>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- ============ 08 ============ -->
+  <article class="plate" id="p08">
+    <div class="cap">
+      <span class="no">BẢN VẼ 08</span>
+      <span class="ttl">Ba chặng — thứ tự đã chốt, và vì sao không đảo được</span>
+      <p class="sub">Đọc ở đây: mỗi chặng làm gì, và kế toán <em>thấy</em> gì.</p>
+    </div>
+    <div class="draw">
+<pre class="mermaid">
+flowchart LR
+  C1["CHẶNG 1 · MÁNG · code hoá máy chở và máy tính · Mapping L1, CCR, ITL Ledge, H1000 · cộng sheet gương 3 tab"]
+  C2["CHẶNG 2 · MÀN HÌNH · 4 màn hình · khối 7 và 6 trước · 0 rủi ro báo cáo"]
+  C3["CHẶNG 3 · LEDGER NỀN TẢNG · khối 8 và 9 · 15.517 ô"]
+  C1 --> C2 --> C3
+  V1["Kế toán thấy: KHÔNG đổi một thao tác nào, chỉ thêm một bookmark"]
+  V2["Kế toán thấy: màn hình mới, đọc từ nguồn ĐÃ NHANH"]
+  V3["Chờ ranh giới với engine phân bổ venture"]
+  C1 -.-> V1
+  C2 -.-> V2
+  C3 -.-> V3
+  classDef inp fill:#F5EEDA,stroke:#87680F,stroke-width:1px,color:#43340A
+  classDef stg fill:#F1F4EE,stroke:#5A6661,stroke-width:1px,color:#1B2420
+  classDef key fill:#E2E9DF,stroke:#0F5C4A,stroke-width:2px,color:#0F3329
+  classDef good fill:#CFE6DA,stroke:#0F5C4A,stroke-width:2px,color:#0B2A22
+  classDef bad fill:#F7E6E3,stroke:#A32B23,stroke-width:2px,color:#57150F
+  classDef hold fill:#F5EEDA,stroke:#87680F,stroke-width:2px,color:#43340A
+  classDef ask fill:#FFFFFF,stroke:#0F5C4A,stroke-width:1px,color:#1B2420
+  class C1 key
+  class C2 stg
+  class C3 hold
+  class V1 good
+  class V2 stg
+  class V3 hold
+</pre>
+    </div>
+    <div class="read">
+      <div class="col">
+        <p>Owner chốt ngày 22/08: <strong>phần máy trước, màn hình sau</strong> — cộng một sheet gương do máy sở hữu để đội thấy kết quả ngay.</p>
+        <div class="call">
+          <span class="tag">Lý do của thứ tự này không phải sở thích — là tránh làm lại</span>
+          <p>Màn hình phải đọc số <strong>từ đâu đó</strong>. Dựng màn hình hàng chờ trước khi cắt máng thì nó đọc qua đúng chuỗi hiện tại, và kế toán <strong>vẫn chờ 33 giây — chỉ là chờ trong một giao diện đẹp hơn</strong>. Sau đó cắt máng lại phải đổi nguồn của màn hình: <strong>làm hai lần</strong>.</p>
+        </div>
+        <div class="tblWrap">
+          <table>
+            <caption>Bảy màn hình rút còn bốn</caption>
+            <thead><tr><th>Màn hình</th><th>Quyết</th><th>Vì sao</th></tr></thead>
+            <tbody>
+              <tr><td>Hàng chờ điền trường</td><td>giữ</td><td>chính là “bảng việc” lên đời — chỗ 2–3 người sống</td></tr>
+              <tr><td>Nhật ký thay đổi</td><td>giữ</td><td>không chặn + không hậu kiểm người ⇒ <strong>kiểm soát duy nhất còn lại</strong></td></tr>
+              <tr><td>Bảng đối soát và chất lượng</td><td>giữ</td><td>chứa cổng tiền, đúng “một trang cho CFO”</td></tr>
+              <tr><td>Truy vết ngược</td><td>giữ</td><td>cần để xử ~50 dòng: từ dòng tiền đi ngược về lệnh chi</td></tr>
+              <tr><td>Nạp sao kê</td><td>bỏ</td><td>sao kê ở lại Google Sheets — 60+ định dạng</td></tr>
+              <tr><td>Quản lý bảng ánh xạ</td><td>hoãn</td><td>thay đổi vài lần/năm; giữ Sheet + bắt nhật ký là đủ</td></tr>
+              <tr><td>Chốt kỳ và ký quỹ</td><td>bỏ</td><td>cổng <strong>không chặn</strong> và kế toán trưởng <strong>không tham gia</strong> ⇒ chữ ký giả</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- ============ 09 ============ -->
+  <article class="plate" id="p09">
+    <div class="cap">
+      <span class="no">BẢN VẼ 09</span>
+      <span class="ttl">Bốn pha cho mỗi khối — không khối nào được nhảy pha</span>
+      <p class="sub">Đọc ở đây: cách chuyển từng khối việc mà không có ngày “đổi hệ” nào.</p>
+    </div>
+    <div class="draw">
+<pre class="mermaid">
+flowchart LR
+  A["PHA A · GƯƠNG · màn hình chỉ ĐỌC, Sheets vẫn là nơi làm"]
+  G1["Cổng: 0 ô lệch, 2 kỳ liên tiếp"]
+  B["PHA B · MÁY SUY ĐỐI CHIẾU · người gõ MỘT lần như cũ, máy đoán song song rồi tự so"]
+  G2["Cổng: tỷ lệ máy suy đúng đạt ngưỡng"]
+  C["PHA C · ĐẢO CHIỀU · màn hình là nơi làm, Sheets thành gương chỉ đọc"]
+  G3["Cổng: 1 kỳ không sự cố"]
+  D["PHA D · CẮT · Sheets của khối này ngưng hẳn"]
+  E["CẦN UỶ QUYỀN RIÊNG · cắt nghĩa là sửa file kế toán"]
+  A --> G1 --> B --> G2 --> C --> G3 --> D --> E
+  classDef inp fill:#F5EEDA,stroke:#87680F,stroke-width:1px,color:#43340A
+  classDef stg fill:#F1F4EE,stroke:#5A6661,stroke-width:1px,color:#1B2420
+  classDef key fill:#E2E9DF,stroke:#0F5C4A,stroke-width:2px,color:#0F3329
+  classDef good fill:#CFE6DA,stroke:#0F5C4A,stroke-width:2px,color:#0B2A22
+  classDef bad fill:#F7E6E3,stroke:#A32B23,stroke-width:2px,color:#57150F
+  classDef hold fill:#F5EEDA,stroke:#87680F,stroke-width:2px,color:#43340A
+  classDef ask fill:#FFFFFF,stroke:#0F5C4A,stroke-width:1px,color:#1B2420
+  class A stg
+  class B,C key
+  class G1,G2,G3 ask
+  class D hold
+  class E bad
+</pre>
+    </div>
+    <div class="read">
+      <div class="col">
+        <p>Không có ngày “chuyển hệ”. Mỗi khối việc đi qua đúng bốn pha, và <strong>pha B là chỗ đáng nói nhất</strong>: bản đầu của lộ trình đòi người <em>gõ cả hai chỗ</em>. Với 2–3 người và 22.360 ô, đòi gõ lại là <strong>đảm bảo họ dùng mặc định nhiều hơn</strong> — lộ trình tự làm hỏng chính dữ liệu nó đang đo.</p>
+        <p>Nên pha B đổi thành: <strong>người gõ một lần như cũ, máy đoán song song rồi tự so với cái người đã gõ</strong>. Số ô gõ thêm cho 2–3 kế toán phải bằng <strong>không</strong>. Và nó đo đúng thứ cần đo — không phải <em>“cái máng có nhận đúng không”</em> mà <em>“luật của máy có đoán đúng không”</em>.</p>
+        <div class="call">
+          <span class="tag">Luật cứng của pha B và C</span>
+          <p>Sheets và màn hình phải <strong>cùng đọc một nguồn</strong>, không phải hai nguồn song song. Để hai nguồn thì hai bên trôi và không còn gì để so — đây là bẫy phổ biến nhất của kiểu chuyển đổi này.</p>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- ============ 10 ============ -->
+  <article class="plate" id="p10">
+    <div class="cap">
+      <span class="no">BẢN VẼ 10</span>
+      <span class="ttl">Nghiệm thu — và vì sao chặng 1 cấm có ngưỡng</span>
+      <p class="sub">Đọc ở đây: lấy gì làm thước chuẩn khi không được làm nhẹ sổ.</p>
+    </div>
+    <div class="draw">
+<pre class="mermaid">
+flowchart TB
+  A["Một cột trong 1.755 cột phải code"] --> B{"Cột có phụ thuộc cạnh gọi sang file khác?"}
+  B --> T1["KHÔNG ⇒ thước chuẩn là BẢN COPY · công thức và giá trị còn nguyên"]
+  B --> T2["CÓ ⇒ thước chuẩn là sổ ITL_altered trên BigQuery · đang phục vụ báo cáo thật"]
+  B --> T3["Còn lại ⇒ đọc dải NHỎ, lặp nhiều lần, tích luỹ trên file gốc"]
+  T1 --> R["So từng ô · PHẢI KHỚP 100 phần trăm · CẤM có ngưỡng"]
+  T2 --> R
+  T3 --> R
+  R --> X{"Có ô nào lệch?"}
+  X --> OK["KHÔNG ⇒ cắt được"]
+  X --> Y["CÓ ⇒ hoặc code sai, hoặc sổ có một luật CHƯA AI VIẾT RA · cả hai đều phải giải trình"]
+  classDef inp fill:#F5EEDA,stroke:#87680F,stroke-width:1px,color:#43340A
+  classDef stg fill:#F1F4EE,stroke:#5A6661,stroke-width:1px,color:#1B2420
+  classDef key fill:#E2E9DF,stroke:#0F5C4A,stroke-width:2px,color:#0F3329
+  classDef good fill:#CFE6DA,stroke:#0F5C4A,stroke-width:2px,color:#0B2A22
+  classDef bad fill:#F7E6E3,stroke:#A32B23,stroke-width:2px,color:#57150F
+  classDef hold fill:#F5EEDA,stroke:#87680F,stroke-width:2px,color:#43340A
+  classDef ask fill:#FFFFFF,stroke:#0F5C4A,stroke-width:1px,color:#1B2420
+  class A stg
+  class B,X ask
+  class T1,T2,T3 key
+  class R,OK good
+  class Y hold
+</pre>
+    </div>
+    <div class="read">
+      <div class="col">
+        <p>Đây là điểm làm Lằn Máng <strong>an toàn hơn</strong> Lằn Ô, ngược với trực giác.</p>
+        <div class="tblWrap">
+          <table>
+            <thead><tr><th></th><th>Lằn Ô</th><th>Lằn Máng</th></tr></thead>
+            <tbody>
+              <tr><td>Máy làm gì</td><td><strong>ĐOÁN</strong> giá trị mà người từng gõ</td><td><strong>TÍNH LẠI</strong> đúng cái sổ đang tính</td></tr>
+              <tr><td>Nên kỳ vọng</td><td>một tỷ lệ đúng dưới 100%</td><td><strong>khớp 100%, từng ô</strong></td></tr>
+              <tr><td>Cần ngưỡng?</td><td><strong>CÓ</strong></td><td><strong>KHÔNG. Cấm có ngưỡng</strong></td></tr>
+              <tr><td>Lệch một ô nghĩa là</td><td>máy đoán chưa giỏi — bình thường</td><td>hoặc code sai, hoặc sổ có luật ngầm — <strong>cả hai phải giải trình</strong></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <p>Vì máy chở và máy tính là <strong>phép tính tất định</strong>, code hoá chúng có một cổng nghiệm thu <strong>tuyệt đối</strong>: chạy song song, so từng ô, phải bằng nhau hết. Không có chỗ cho ý kiến.</p>
+        <div class="call">
+          <span class="tag">Và mỗi ô lệch là một món quà</span>
+          <p>Nó chỉ đúng chỗ có <strong>luật ngầm</strong>. Ví dụ có sẵn để thử ngay: 29 cột tổng sai của tháng 1/2025 · một loại tiền không được cộng ở cột nào · hai loại tiền nằm ngoài vòng đối soát. Code tính đúng sẽ <strong>lệch</strong> với sổ ở đúng những chỗ đó — và đó là bằng chứng code đúng, sổ sai.</p>
+        </div>
+        <div class="call warn">
+          <span class="tag">Chỗ khó mới xuất hiện ngày 24/08</span>
+          <p>Nghiệm thu đòi khớp 100% từng ô <strong>với sổ hiện tại</strong>. Nhưng đọc <em>giá trị</em> trên file gốc chỉ thành công <strong>1 trong 5 lần</strong> — sổ nặng đến mức chính máy chủ Google bỏ dở. Mà nay <strong>không được làm nhẹ sổ</strong>. ⇒ Thước chuẩn phải chọn <strong>theo từng cột</strong>, ba tầng như bản vẽ trên. Việc đầu tiên: phân 1.755 cột thành <em>có / không phụ thuộc cạnh vượt file</em> — làm được từ dữ liệu đã đo, <strong>không cần chạm sổ</strong>.</p>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <!-- ============ 11 ============ -->
+  <article class="plate" id="p11">
+    <div class="cap">
+      <span class="no">BẢN VẼ 11</span>
+      <span class="ttl">Chín khối máy — và điều kiện để một khối được gọi là XONG</span>
+      <p class="sub">Đọc ở đây: hệ chia thành chín khối nào, khối nào đã xong, và “xong” nghĩa là gì bằng thứ đo được.</p>
+    </div>
+    <div class="draw">
+<pre class="mermaid">
+flowchart TB
+  subgraph L0["ĐÃ XONG · nền móng"]
+    direction LR
+    DB["Khuôn dữ liệu · khai một lần, sinh ra cả bảng lẫn bản đồ"]
+    CT["Hợp đồng 14 trường · khoá cứng, đổi là báo động"]
+  end
+  subgraph L1["ĐANG TỚI · chở và ghi sổ"]
+    direction LR
+    CN["Khuôn 36 cột · chuẩn hoá mọi nguồn về một hình"]
+    LG["Lớp ghi sổ · cấp số bền, không đổi khi chèn lùi ngày"]
+    RP["Cửa duy nhất vào kho · chỉ thêm, không sửa, không xoá"]
+  end
+  subgraph L2["SAU ĐÓ · đối chiếu và chở nguồn"]
+    direction LR
+    OR["Thước chuẩn · ảnh chụp sổ gốc, tự soi"]
+    AD["Sáu bộ chở nguồn · bank, quỹ, đối soát, lương, nền tảng, công nợ"]
+  end
+  subgraph L3["CUỐI · người dùng thấy"]
+    direction LR
+    AP["Cửa vào ra · mọi lần ghi để lại nhật ký"]
+    WB["Bốn màn hình · hàng chờ, sổ, cổng hôm nay, danh mục"]
+  end
+  DB --> CN
+  CT --> CN
+  CN --> LG --> RP
+  OR --> AD --> AP --> WB
+  RP --> AD
+  classDef good fill:#CFE6DA,stroke:#0F5C4A,stroke-width:2px,color:#0B2A22
+  classDef key fill:#E2E9DF,stroke:#0F5C4A,stroke-width:2px,color:#0F3329
+  classDef stg fill:#F1F4EE,stroke:#5A6661,stroke-width:1px,color:#1B2420
+  classDef hold fill:#F5EEDA,stroke:#87680F,stroke-width:1px,color:#43340A
+  class DB,CT good
+  class CN,LG,RP key
+  class OR,AD stg
+  class AP,WB hold
+  style L0 fill:#EDF6F1,stroke:#0F5C4A,stroke-width:3px,color:#0F3329
+  style L1 fill:#F6F7F3,stroke:#0F5C4A,stroke-width:2px,color:#1B2420
+  style L2 fill:#F6F7F3,stroke:#5A6661,stroke-width:2px,color:#1B2420
+  style L3 fill:#FBFAF3,stroke:#87680F,stroke-width:2px,color:#43340A
+</pre>
+    </div>
+    <div class="read">
+      <div class="col">
+        <p><strong>“Xong” ở dự án này đã từng nghĩa là “code chạy không lỗi”.</strong> Và đó chính là cách một khối hụt 22 dòng mà bảng đếm vẫn tự khớp, một khối chia sai suốt ba ngày trong im lặng, một hợp đồng trôi từ 14 trường về 13. Nên mỗi khối dưới đây có <strong>một điều kiện xong đo được</strong> và <strong>một điều kiện CHƯA xong</strong> — cái thứ hai viết từ chính những cái bẫy đã sập.</p>
+
+        <div class="call">
+          <span class="tag">Luật xuyên suốt cả chín khối</span>
+          <p>Không khối nào được gọi là xong khi <strong>cổng của nó chưa từng thấy đỏ một lần</strong>. Cổng chưa từng đỏ là cổng chưa biết có sống. Đây không phải khẩu hiệu: khối nền móng đã được thử bằng cách <strong>cố tình xoá sổ nhật ký khỏi bản đồ dữ liệu</strong> — cổng đỏ ngay, rồi mới khôi phục.</p>
+        </div>
+
+        <div class="tblWrap">
+          <table>
+            <caption>Chín khối · điều kiện xong · điều kiện chưa xong</caption>
+            <thead><tr><th>Khối</th><th>Xong khi</th><th>CHƯA xong nếu</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><strong>Khuôn dữ liệu</strong> · <em>đã xong</em></td>
+                <td>Hình dạng dữ liệu khai <strong>một lần</strong> rồi máy sinh ra <strong>cả bảng thật lẫn bản đồ</strong>. Không tồn tại bản vẽ tay thứ hai để lệch.</td>
+                <td>Sửa được bản đồ bằng tay mà không ai biết · lệnh cập nhật báo <em>thành công</em> trong khi áp thiếu.</td>
+              </tr>
+              <tr>
+                <td><strong>Hợp đồng 14 trường</strong> · <em>đã xong</em></td>
+                <td>Đúng 14 trường, gọi <strong>theo tên</strong>. Ô pháp nhân lấy từ cột người nhập đủ, không phải cột suy ra.</td>
+                <td>Con số 14 lấy từ <strong>tài liệu</strong> thay vì từ <strong>code</strong> — đúng cái đã làm hợp đồng trôi về 13.</td>
+              </tr>
+              <tr>
+                <td><strong>Khuôn 36 cột</strong></td>
+                <td>Giữ cột <strong>theo vị trí</strong> — có bốn cột trùng tên hệt nhau, lưu theo tên là mất cột. Ngày là ngày, không phải chữ.</td>
+                <td>Còn <strong>bất kỳ</strong> giá trị mặc định tự gán trong im lặng — đó là gốc của cái thùng rác đang hứng gần như mọi khoản không rõ.</td>
+              </tr>
+              <tr>
+                <td><strong>Lớp ghi sổ</strong></td>
+                <td><strong>Chèn một dòng lùi ngày vào giữa sổ không làm đổi số của bất kỳ dòng nào.</strong> Đây là cổng quan trọng nhất của cả khối.</td>
+                <td>Số nhận dạng bám <strong>vị trí dòng</strong> — sổ hiện tại làm thế, và đó là gốc của 1.356 dòng đối soát báo sai.</td>
+              </tr>
+              <tr>
+                <td><strong>Cửa vào kho</strong></td>
+                <td>Chỉ <strong>một</strong> chỗ được nói chuyện với kho dữ liệu. Ghi là <strong>thêm</strong>, không sửa, không xoá. Không đường nào ghi ngược vào hệ lệnh chi hay file kế toán.</td>
+                <td>Một khối khác đi đường tắt “cho nhanh” · có hàm nào ghi được vào file Google đang sống.</td>
+              </tr>
+              <tr>
+                <td><strong>Thước chuẩn</strong></td>
+                <td>Ảnh chụp <strong>đóng băng từ sổ gốc</strong>, chụp cả đầu vào và đầu ra trong cùng một lần đọc, và <strong>tự soi</strong>: dòng nào không tự nhất quán thì loại khỏi thước.</td>
+                <td>Lấy thước từ bản đã qua xử lý <em>(sai 680 mã ngân sách)</em> · từ bản sao của <strong>sổ đã điều chỉnh</strong> <em>(nó tự sản xuất giá trị mặc định với 0 ô lỗi — nguy hơn báo lỗi)</em>. ⚠ Bản sao của <strong>sổ thô</strong> thì <strong>được dùng</strong> — nó giữ nguyên 6.648 ô báo “không tìm thấy” thay vì bịa — nhưng phải kèm ba phép tự kiểm <em>(sổ có còn được cập nhật · nguồn có còn dữ liệu · tỷ lệ ghép có nằm trong khoảng thường thấy)</em> · từ bản xuất ra file <em>(84 dòng mất mã làm bốc hơi 19,9 tỷ mà tổng vẫn tự khớp)</em>.</td>
+              </tr>
+              <tr>
+                <td><strong>Sáu bộ chở nguồn</strong></td>
+                <td>Khớp thước chuẩn <strong>100% từng ô, không có dung sai</strong>. Nguồn đổi hình dạng thì <strong>nổ to</strong>, không đoán. Chạy lại không nhân đôi.</td>
+                <td>Công bố tỷ lệ ghép <strong>cao hơn thực đo</strong> — số thật là <strong>33,8%</strong>, và <strong>4.940 dòng tiền ra không có lệnh</strong> · bảng đo lấy tử số và mẫu số từ hai tổng thể khác nhau, đúng cơ chế đã tạo ra con số “100%” giả.</td>
+              </tr>
+              <tr>
+                <td><strong>Cửa vào ra</strong></td>
+                <td><strong>Không có cửa nào sửa hay xoá</strong> dòng sổ — sửa chỉ bằng bút toán mới. Mỗi lần ghi để lại <strong>nhật ký đủ bảy trường</strong>: đó là chỗ kiểm soát duy nhất còn lại sau khi bỏ người hậu kiểm.</td>
+                <td>Dựng ra một <strong>bước duyệt của người thứ hai</strong> — vai đó đã khai tử; một cái nút không ai bấm còn tệ hơn không có · thiếu cửa cho <strong>đảo bút toán</strong> và <strong>chốt kỳ</strong>.</td>
+              </tr>
+              <tr>
+                <td><strong>Bốn màn hình</strong></td>
+                <td>Đủ <strong>tám thao tác quen tay của Sheets</strong>. Lệch tổng thì nút xác nhận <strong>bị chặn</strong>, không cho chia bừa.</td>
+                <td><strong>2–3 kế toán không dùng.</strong> Đây là rủi ro số một của cả dự án, và là <em>hành vi</em> chứ không phải kỹ thuật. Màn đẹp mà họ quay về Sheets thì khối này chưa xong, dù máy kiểm tra xanh hết.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="call warn">
+          <span class="tag">Một điều kiện chung dễ bị bỏ</span>
+          <p><strong>Không dòng nào được rơi trong im lặng.</strong> Mỗi dòng phải đi đúng một trong ba đường: vào sổ · bị loại <em>kèm lý do bằng chữ</em> · vào hàng chờ. Cộng ba đường phải bằng số dòng nguồn. Lý do phải viết ra là vì bài học cũ: khi máy tự gán mặc định, con số vẫn cân, chỉ có ý nghĩa là mất.</p>
+        </div>
+
+        <div class="call">
+          <span class="tag">Chi tiết đầy đủ ở đâu</span>
+          <p>Bảng trên là bản đọc cho người quyết. Bản đủ — kèm tên từng lệnh kiểm tra và tên từng phép thử — nằm ở <code>03_Dev/03_IMPLEMENTATION_PLAN.md</code> §5, chín khối tương ứng chín thư mục code.</p>
+        </div>
+      </div>
+    </div>
+  </article>
+
+  <article class="plate" id="p12">
+    <div class="cap">
+      <span class="no">BẢN VẼ 12</span>
+      <span class="ttl">Bảng tiến độ sống — chín khối, từng cấu phần, cập nhật liên tục</span>
+      <p class="sub">Đọc ở đây: hôm nay đã làm được bao nhiêu phần trăm, từng khối gồm những cấu phần nào, cấu phần nào đã có và bằng chứng là gì. Bảng này cập nhật bằng <strong>lệnh</strong>, không gõ tay.</p>
+    </div>
+
+    <div class="draw">
+<pre class="mermaid">
+flowchart LR
+  subgraph X["XONG HẲN · 4 khối"]
+    direction TB
+    A1["Khuôn dữ liệu"]
+    A2["Hợp đồng 14 trường"]
+    A3["Khuôn 36 cột"]
+    A4["Lớp ghi sổ"]
+  end
+  subgraph D["ĐANG LÀM · 4 khối"]
+    direction TB
+    B1["Thước chuẩn · 95%"]
+    B2["Cửa vào kho · 95%"]
+    B3["Bộ nạp nguồn · 45%"]
+    B4["Cửa vào ra · 85%"]
+  end
+  subgraph C["CHƯA MỞ · 1 khối"]
+    direction TB
+    C2["Bốn màn hình"]
+  end
+  X --> D --> C
+  classDef good fill:#CFE6DA,stroke:#0F5C4A,stroke-width:2px,color:#0B2A22
+  classDef mid fill:#F5EEDA,stroke:#87680F,stroke-width:1px,color:#43340A
+  classDef non fill:#F1F4EE,stroke:#5A6661,stroke-width:1px,color:#1B2420
+  class A1,A2,A3,A4 good
+  class B1,B2,B3,B4 mid
+  class C2 non
+  style X fill:#EDF6F1,stroke:#0F5C4A,stroke-width:3px,color:#0F3329
+  style D fill:#FBFAF3,stroke:#87680F,stroke-width:2px,color:#43340A
+  style C fill:#F6F7F3,stroke:#5A6661,stroke-width:2px,color:#1B2420
+</pre>
+    </div>
+
+    <div class="read">
+      <div class="col">
+
+        <div class="findings">
+          <div class="finding">
+            <span class="k">Tiến độ theo khối lượng việc</span>
+            <p class="v num">82%</p>
+            <p>Không phải 5/9 = 56%. Năm khối đã xong là năm khối <strong>nhỏ nhất</strong>; khối cuối — bốn màn hình — gánh <strong>20%</strong> khối lượng và mới ở <strong>70%</strong>: ba màn đã nối cửa thật, màn thứ tư đang <strong>bị chặn</strong> vì một cửa đặc tả bảo có mà <strong>không hề tồn tại</strong>.</p>
+          </div>
+          <div class="finding">
+            <span class="k">Phép thử tự động</span>
+            <p class="v num">1024</p>
+            <p>Trên <strong>8.590 dòng</strong> code chạy việc, cộng nhiều hơn thế nữa code chỉ để kiểm. Nghĩa là <strong>phần kiểm nhiều hơn phần làm</strong> — có chủ ý.</p>
+          </div>
+          <div class="finding">
+            <span class="k">Dòng sổ · mối nối lệnh chi</span>
+            <p class="v num">10.030 · 2.745</p>
+            <p>Sổ thật trong kho, và số dòng đã nối được về đúng lệnh chi <strong>mà không phải đoán</strong>. ⚠ Đây là <strong>bản sao</strong>: bản sao nạp <strong>27/08 13:42</strong> — sổ Google Sheets có thể đã chạy tiếp từ lúc đó, và con số này ⛔ không tự biết điều ấy.</p>
+          </div>
+          <div class="finding amber">
+            <span class="k">Chặng đã đi</span>
+            <p class="v num">5,5 / 7</p>
+            <p>Nền, ghi sổ, thước chuẩn xong; <strong>cửa đọc, cửa ghi và ghép lệnh bằng tay đều đã chạy thật</strong>. ⭐ <strong>Chặng lên 5,5/7 hôm 03/09</strong>: chặng cuối — bốn màn hình — <strong>đã đi 5 trong 7 bước</strong>, và <strong>ba màn chạy thật</strong> (cổng hôm nay · hàng chờ · sổ ITL). ⛔ <strong>Nhưng không làm tròn lên 6</strong>, vì hai bước còn lại <strong>không tự đi được</strong>: màn danh mục <strong>bị chặn</strong> — nó phải có một cửa đọc mà <strong>đặc tả bảo có nhưng không hề tồn tại</strong>, và máy không được phép tự bịa hình dạng cửa ấy rồi gọi đó là đặc tả; còn bước cuối là <strong>tuần đầu kế toán gõ thật</strong> — nó trả lời ba câu <strong>không máy nào đo được</strong> (cảm giác khi gõ · thời gian màn hình vẽ ra trên máy kế toán · cột khoá rộng 346 điểm có đủ nhìn). ⇒ Từ đây tiến độ <strong>không còn phụ thuộc vào việc viết thêm code</strong>. Dời việc bị chặn sang chỗ khác là cách dễ nhất để một bảng tiến độ nói dối.</p>
+          </div>
+        </div>
+
+        <p><strong>Bốn con số trên đo bốn thứ khác nhau, và chúng lệch nhau là chuyện bình thường.</strong> Đếm theo khối thì được <strong>56%</strong> (5 trong 9 khối xong hẳn), đếm theo chặng thì 5,5/7 ≈ <strong>79%</strong>, đếm theo khối lượng việc thì <strong>82%</strong>. Con số đáng dùng để ra quyết định là <strong>con số theo khối lượng việc</strong> — vì nó tính cả việc chưa làm, không chỉ việc đã làm.</p>
+
+        <div class="bars">
+          <div class="row"><div class="lbl">Khuôn dữ liệu <small>db · 72 phép thử</small></div><div class="track"><div class="fill" style="width:100%"></div></div><div class="val">100%</div></div>
+          <div class="row"><div class="lbl">Hợp đồng 14 trường <small>contract · 9</small></div><div class="track"><div class="fill" style="width:100%"></div></div><div class="val">100%</div></div>
+          <div class="row"><div class="lbl">Khuôn 36 cột <small>canon · 34</small></div><div class="track"><div class="fill" style="width:100%"></div></div><div class="val">100%</div></div>
+          <div class="row"><div class="lbl">Lớp ghi sổ <small>ledger · 73</small></div><div class="track"><div class="fill" style="width:100%"></div></div><div class="val">100%</div></div>
+          <div class="row"><div class="lbl">Thước chuẩn <small>oracle · 93</small></div><div class="track"><div class="fill" style="width:95%"></div></div><div class="val">95%</div></div>
+          <div class="row"><div class="lbl">Cửa duy nhất vào kho <small>repo · 230</small></div><div class="track"><div class="fill" style="width:100%"></div></div><div class="val">100%</div></div>
+          <div class="row"><div class="lbl">Sáu bộ nạp nguồn <small>adapters · 60</small></div><div class="track"><div class="fill slow" style="width:45%"></div></div><div class="val">45%</div></div>
+          <div class="row"><div class="lbl">Cửa vào ra <small>api · 176</small></div><div class="track"><div class="fill" style="width:85%"></div></div><div class="val">85%</div></div>
+          <div class="row"><div class="lbl">Bốn màn hình <small>web · F03 + F01 + F02</small></div><div class="track"><div class="fill slow" style="width:70%"></div></div><div class="val">70%</div></div>
+        </div>
+        <p class="barsNote">Thanh dài = phần đã làm của riêng khối đó. Thanh đỏ = khối gánh nhiều việc nhất mà làm được ít nhất — đó là nơi thời gian sẽ đi.</p>
+
+        <div class="call">
+          <span class="tag">Cách cập nhật bảng này</span>
+          <p>Chạy <code>python tools/tien_do.py</code> trong repo <code>FLS</code>. Nó tự đếm số phép thử, số dòng, số hàm của từng khối rồi in ra bảng — <strong>chỉ ba cột là do người phán đoán</strong>: phần trăm xong, trọng số, và chặng. Ba cột đó khai trong chính công cụ, sửa một chỗ.</p>
+          <p><strong>Hai cột do người phán đoán, và mỗi lần đổi phải kèm lý do.</strong> Phần trăm xong và trọng số không đo được — chúng khai trong chính công cụ, kèm <strong>nhật ký đổi</strong>. Đợt 27/08 đổi bốn lần, hai bước: <strong>cửa vào ra 0→40%</strong> (cửa đọc chạy thật) rồi <strong>40→75%</strong> (cửa ghi chạy thật); <strong>cửa vào kho 85→90→95%</strong>. ⛔ <strong>Cửa vào ra dừng ở 75%, không lên cao hơn</strong>: <strong>ghép lệnh bằng tay bị chặn</strong>, còn sáu đường đọc phụ và chốt kỳ/ký thì chưa có — làm tròn lên đây là tự thưởng cho việc chưa làm.</p>
+          <p><strong>Vì sao phải là lệnh, không phải gõ tay.</strong> Một bảng tiến độ gõ tay sẽ già đi trong im lặng — đúng cái bệnh cả dự án này đang chữa. Công cụ còn tự kiểm: trọng số chín khối cộng lại phải bằng 100, lệch thì nó báo lỗi.</p>
+        </div>
+
+        <h3>Từng khối gồm những cấu phần nào</h3>
+        <p>Ký hiệu: <strong>✔</strong> đã có và có phép thử · <strong>◐</strong> có một phần · <strong>○</strong> chưa mở.</p>
+
+        <div class="tblWrap">
+          <table>
+            <caption>Khối 1 · Khuôn dữ liệu — <strong>xong</strong> · 10 tệp · 1.086 dòng · 71 phép thử</caption>
+            <thead><tr><th>Cấu phần</th><th>Làm gì</th><th>Bằng chứng</th></tr></thead>
+            <tbody>
+              <tr><td>✔ Bản khai hình dạng</td><td>Khai <strong>một lần</strong> bằng dữ liệu, máy sinh ra <strong>cả bảng thật lẫn bản đồ</strong></td><td>Không tồn tại bản vẽ tay thứ hai để lệch</td></tr>
+              <tr><td>✔ 11 bảng + 2 khung xem</td><td>Toàn bộ kho dữ liệu của hệ</td><td>Máy đối chiếu với kho thật: khớp <strong>13/13</strong></td></tr>
+              <tr><td>✔ Bốn cổng bản đồ</td><td>Bản đồ sinh ra phải trùng bản đã lưu; mọi bảng phải có mặt; bảng rời phải có lý do viết ra</td><td>Cổng đã <strong>thấy đỏ thật</strong>: xoá thử sổ nhật ký khỏi bản đồ → đỏ ngay</td></tr>
+              <tr><td>✔ Cổng đối chiếu kho thật</td><td>So kho dữ liệu <em>đang chạy</em> với bản khai — cột, ràng buộc, khoá liên kết</td><td>Sinh ra sau khi bắt được lệnh cập nhật báo <em>thành công</em> mà áp thiếu</td></tr>
+              <tr><td>✔ Hai chốt ở tầng kho</td><td>Kho <strong>tự từ chối</strong> sửa dòng đã đóng băng và đổi số nhận dạng</td><td>Thử lại đúng lỗi cũ trên kho thật → kho chặn</td></tr>
+              <tr><td>✔ Đường di trú có số thứ tự</td><td>Chỉ tiến, không lùi; có sổ ghi và dấu niêm phong chống sửa lịch sử</td><td>Cổng nối hai nguồn: kho trống → áp hết → đối chiếu phải xanh</td></tr>
+                          <tr><td>✔ <strong>Hai kho tách rời</strong></td><td>Kho <strong>thật</strong> giữ sổ; kho <strong>test</strong> hứng mọi phép thử. Đường tới kho test <strong>tự nổ</strong> nếu nó trỏ vào kho thật</td><td>⛔ Dựng ra vì bộ test <strong>đang ghi thẳng vào sổ thật</strong>: <strong>1.204 dòng bịa</strong> nằm lẫn trong sổ, trong đó <strong>194 dòng nằm ngay trong danh sách việc phải làm của kế toán</strong></td></tr>
+              <tr><td>✔ <strong>Chốt chỉ-đọc ở tầng kho</strong></td><td>Phép thử nào <em>cố ý</em> phải soi kho thật thì mở bằng cửa <strong>chỉ đọc</strong> — kho <strong>tự từ chối</strong> mọi lệnh ghi</td><td>Bật lên là <strong>bắt được ngay</strong> một phép thử đang tạo bảng thẳng trong kho thật mà không ai thấy. Không dựa vào kỷ luật của người viết</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="tblWrap">
+          <table>
+            <caption>Khối 2 · Hợp đồng 14 trường — <strong>xong</strong> · 86 dòng · 9 phép thử</caption>
+            <thead><tr><th>Cấu phần</th><th>Làm gì</th><th>Bằng chứng</th></tr></thead>
+            <tbody>
+              <tr><td>✔ Hợp đồng là dữ liệu</td><td>Một bảng khai, không phải hằng số rải khắp code</td><td>Đổi được ở một chỗ, và đổi thì phép thử đỏ</td></tr>
+              <tr><td>✔ Cổng khoá 14 trường</td><td>Chạy ở <strong>mọi</strong> chặng, không chỉ chặng đầu</td><td>Dựng ra vì hợp đồng đã từng trôi từ 14 trường về 13</td></tr>
+                          <tr><td>✔ <strong>Hai bản hợp đồng cùng tồn tại</strong></td><td>Bản <strong>v1.0</strong> giữ nguyên làm <strong>lịch sử</strong> và vẫn có cổng khoá riêng; bản <strong>v1.1</strong> là bản đang dùng</td><td>Sổ thật ghi thời gian dịch vụ là <strong>một tháng do người gõ</strong> (<em>"tháng 5"</em>, <em>"2025.07"</em>), không phải một ngày cụ thể. Đường sai là <strong>lặng lẽ sửa chữ trong bản đã đóng băng</strong> — nên bản cũ không đổi một chữ, và có bảng nói rõ <strong>đổi cái gì</strong></td></tr>
+              <tr><td>✔ <strong>Cổng chặn lệch không khai</strong></td><td>Thêm một chỗ lệch giữa hợp đồng và kho mà <strong>không khai ra</strong> thì phép thử đỏ</td><td>Không có cổng này thì mỗi lần vướng, đường dễ nhất là sửa hợp đồng cho hết vướng — và sau vài lần thì hợp đồng không còn nghĩa gì</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="tblWrap">
+          <table>
+            <caption>Khối 3 · Khuôn 36 cột — <strong>xong</strong> · 5 tệp · 393 dòng · 34 phép thử</caption>
+            <thead><tr><th>Cấu phần</th><th>Làm gì</th><th>Bằng chứng</th></tr></thead>
+            <tbody>
+              <tr><td>✔ 38 vị trí / 36 trường</td><td>Giữ cột <strong>theo vị trí</strong>, không theo tên</td><td>Khuôn có <strong>bốn cột trùng tên hệt nhau</strong> — lưu theo tên là mất cột</td></tr>
+              <tr><td>✔ Chặn truy cập theo tên</td><td>Cố ý <strong>không</strong> mở đường lấy cột bằng tên</td><td>Chặn từ thiết kế, không dựa vào nhắc nhở</td></tr>
+              <tr><td>✔ Phân biệt thiếu với sai kiểu</td><td>Thiếu → hàng chờ · sai kiểu → loại kèm lý do bằng chữ</td><td>Hai đường khác nhau, không gộp</td></tr>
+              <tr><td>✔ Không đoán ngày mơ hồ</td><td>Ngày mà cả hai cách đọc đều hợp lệ thì <strong>nổ</strong>, không đoán</td><td>Nguồn có ~5.369 dòng ngày dạng chữ</td></tr>
+              <tr><td>✔ Sửa một niềm tin sai</td><td>Hai cột thời gian dịch vụ <strong>cùng một bảng tra</strong>, khác nhau ở khoá</td><td>Niềm tin cũ từng bị <strong>khoá trong một phép thử</strong> — đã sửa cả hai</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="tblWrap">
+          <table>
+            <caption>Khối 4 · Lớp ghi sổ — <strong>xong</strong> · 3 tệp · 394 dòng · 64 phép thử</caption>
+            <thead><tr><th>Cấu phần</th><th>Làm gì</th><th>Bằng chứng</th></tr></thead>
+            <tbody>
+              <tr><td>✔ Luật chốt giá trị, hai bước</td><td>Giá trị cuối tính từ <strong>ô phân loại và ô trung gian</strong> — không phải từ ô người gõ</td><td><strong>4.088/4.088 ô khớp</strong> trên 584 dòng thật</td></tr>
+              <tr><td>✔ Bảy mặc định riêng cho bảy khối</td><td>Mỗi khối một hằng, đo trên 9.219 dòng</td><td>Bản cũ dùng <strong>một hằng chung</strong> → khối 7 lệch 521/584</td></tr>
+              <tr><td>✔ Chỗ nói thật</td><td>Giá trị máy tự gán: cột đối chiếu <strong>giữ nguyên</strong> để khớp sổ, cột sự thật để <strong>trống</strong> + vào hàng chờ</td><td>Vừa khớp sổ 100%, vừa không nói dối</td></tr>
+              <tr><td>✔ Số nhận dạng bền</td><td>Cấp lúc nạp, <strong>trước</strong> khi ghép, rồi đóng băng</td><td>Chèn lùi ngày <strong>không đổi số của bất kỳ dòng nào</strong></td></tr>
+              <tr><td>✔ Khoá đối sánh riêng</td><td>Khoá nội dung chỉ để <strong>đối sánh</strong>, không làm danh tính</td><td>Có phép thử khoá: <strong>không</strong> được chứa vị trí dòng</td></tr>
+                          <tr><td>✔ <strong>Bảy cột phân loại có địa chỉ</strong></td><td>Cột phân loại của bảy khối <strong>không lưu</strong> — vì suy lại được từ khuôn chuẩn</td><td>Đo <strong>68.915 ô · 7/7 khối · khớp 100,0000%</strong>. Trước đó lời hứa này <strong>không có địa chỉ</strong>, nên không thể đo</td></tr>
+              <tr><td>✔ <strong>Hàng chờ</strong> đúng nghĩa</td><td>Trường nào máy <strong>không suy được</strong> thì dòng vào hàng chờ, không chỉ trường máy tự gán mặc định</td><td>Trước khi sửa: 6.634 dòng không có mã dự toán mà hàng chờ đếm được <strong>0</strong>. Sau: <strong>7.625</strong> dòng chờ · 2.348 dòng xong</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="tblWrap">
+          <table>
+            <caption>Khối 5 · Thước chuẩn — <strong>95%</strong> · 9 tệp · 791 dòng · 89 phép thử</caption>
+            <thead><tr><th>Cấu phần</th><th>Làm gì</th><th>Bằng chứng · còn thiếu</th></tr></thead>
+            <tbody>
+              <tr><td>✔ Khai báo nguồn</td><td>Địa chỉ hai sổ + <strong>bốn thứ tuyệt đối không mở</strong>, mỗi cái kèm lý do là bằng chứng</td><td>Có phép thử khoá địa chỉ, và khoá cả việc nguồn đang dùng <strong>không nằm trong danh sách cấm</strong></td></tr>
+              <tr><td>✔ Ba nhóm cột</td><td>Ô lỗi ở cột gốc = lỗi thật · ở nửa ghép = <strong>câu trả lời</strong> · hai cột trống thì không đọc</td><td>Phép thử: ba nhóm <strong>phủ kín 38 vị trí và không chồng nhau</strong></td></tr>
+              <tr><td>✔ Ba cổng “sổ còn sống”</td><td>Sổ ngừng cập nhật · nguồn hết dữ liệu · tỷ lệ ghép rơi khỏi khoảng thường thấy</td><td><strong>Đã thấy đỏ thật</strong> trên sổ sống, mỗi cổng một lý do bằng chữ</td></tr>
+              <tr><td>✔ Tự soi trước khi làm thước</td><td>Dòng nào không tự nhất quán thì <strong>loại khỏi thước</strong>, kèm lý do</td><td>Người có thể gõ một ô giữa hai lần máy đọc</td></tr>
+              <tr><td>✔ Ảnh chụp đóng băng</td><td>Dấu niêm phong đo <strong>nội dung</strong>, độc lập với thứ tự đọc và lần chạy</td><td>Ảnh chụp rỗng thì <strong>nổ</strong>, không trả dấu niêm phong của rỗng</td></tr>
+              <tr><td>✔ Đọc tích luỹ, thử lại</td><td>Một lát lỗi <strong>không</strong> phá cả lượt đọc; lát trùng nhau bị chặn</td><td>Đo thật: có lát trượt cả 3/3 lần</td></tr>
+              <tr><td>✔ Cái chặn “không đo gì mà báo xanh”</td><td>Mặc định là <strong>KHÔNG ĐẠT</strong>; chỉ đạt khi chứng minh được cả ba: có đo thật, không lỗ trống, không ô lệch</td><td>Sinh ra vì cổng <strong>đã nói dối một lần</strong>: đọc 0 dòng mà in “khớp 100%” rồi báo đạt</td></tr>
+              <tr><td>✔ Đối chiếu <strong>cả sổ</strong></td><td>Mở rộng từ một tháng ra toàn bộ <strong>22 kỳ</strong></td><td>⭐ <strong>64.393/64.393 ô = 100,0000%</strong> · 0 ô lệch · <strong>0 ô phải chuẩn hoá số</strong> <em>(bản một tháng trước đó có 396)</em>. 20 dòng bị loại khỏi thước — <strong>dồn hết vào kỳ cuối</strong>, nên đọc được là <em>file lưu khi mấy dòng cuối còn đang settle</em>, không phải luật sai</td></tr>
+              <tr><td>○ Chụp đầu vào và đầu ra trong <em>một</em> lượt</td><td>Hiện còn đọc hai sổ hai lượt riêng</td><td>Hai lượt cách nhau thì người có thể gõ ở giữa. ⛔ <strong>Bị chặn từ bên ngoài</strong> — xem khối cảnh báo dưới</td></tr>
+                          <tr><td>✔ <strong>Cổng đọc-đủ</strong></td><td>Sau khi đọc, <strong>đọc lại sáu cột then chốt bằng một câu riêng</strong> rồi so số ô có giá trị; kèm <strong>ngưỡng sàn</strong></td><td>Dựng ra vì một lát đọc <strong>hợp lệ</strong> — đúng cột, đúng dòng, không lỗi — vẫn <strong>thiếu 257 giá trị</strong>, và <strong>bốn cổng đã có đều không thấy gì</strong></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="tblWrap">
+          <table>
+            <caption>Khối 6 · Cửa duy nhất vào kho — <strong>95%</strong> · 6 tệp · 1.454 dòng · 124 phép thử</caption>
+            <thead><tr><th>Cấu phần</th><th>Làm gì</th><th>Bằng chứng · còn thiếu</th></tr></thead>
+            <tbody>
+              <tr><td>✔ Một cửa duy nhất</td><td>Chỉ khối này được nói chuyện với kho</td><td>Cưỡng chế bằng máy: <strong>6 luật ranh giới, 0 vi phạm</strong></td></tr>
+              <tr><td>✔ Ghi là thêm, không sửa</td><td>Không hàm nào phát lệnh sửa hay xoá dòng sổ</td><td>Phép thử <strong>quét mã nguồn</strong>, không dựa vào nhắc nhở</td></tr>
+              <tr><td>✔ <strong>Lần nạp thật</strong></td><td>Cả một lượt nạp: mở lượt · bổ danh mục pháp nhân · ghi dòng loại · ghi sổ · chốt lượt</td><td><strong>10.030 dòng sổ thật</strong> trong kho <em>(kho đã được dựng lại sau khi dọn dấu bộ test)</em>. Bốn đường cân của lượt nạp: <code>vào 10.100 = sổ 9.973 + loại 19 + rỗng 108 + trùng 0</code> — ⛔ đó là số của <strong>lượt nạp trước khi dựng lại</strong>; hai đường <code>rỗng</code> và <code>trùng</code> <strong>chỉ in ra lúc nạp, không lưu ở bảng nào</strong>, nên từ kho ⛔ không đo lại được</td></tr>
+              <tr><td>✔ Cả lượt nạp trong <strong>một giao dịch</strong></td><td>Nổ giữa đường thì sổ <strong>không đổi một dòng</strong></td><td>Dựng ra vì hai lần nạp đầu nổ giữa đường và để lại <strong>394 dòng đã ghi</strong> — cổng bốn đường không gỡ được cái đã ghi</td></tr>
+              <tr><td>✔ Chạy lại không nhân đôi, và <strong>nói ra đã bỏ qua bao nhiêu</strong></td><td>Dòng đã có trong sổ thì giữ nguyên, không ai ghi đè</td><td>Lượt hai: <code>sổ 0 + trùng 9.973</code>. Bỏ qua trong im lặng thì không ai biết sổ có tăng hay không</td></tr>
+              <tr><td>✔ <strong>Phạm vi đọc — bắt buộc, không có mặc định</strong></td><td>Mọi câu đọc phải nói <strong>đọc phần nào của kho</strong>; thiếu là nổ ngay lúc gọi</td><td>⛔ Chỗ hỏng hôm 27/08 không phải <em>"lọc sai"</em> mà là <strong>không gì bắt buộc phải lọc</strong>. Muốn đọc cả kho thì phải <strong>viết ra lý do</strong>, và có phép thử chặn tầng cửa gọi đường đó</td></tr>
+              <tr><td>✔ <strong>Xếp hàng chờ theo tiền, trong từng loại tiền</strong></td><td>Mỗi dòng một <strong>hạng</strong> và một <strong>% tiền luỹ kế</strong> — để nói được <em>"xem tới đây là phủ 90% tiền"</em></td><td>⛔ Dựng lại 27/08 vì bản đầu là một <strong>khung xem</strong> không mang được phạm vi: nó xếp <strong>trước</strong> khi ai kịp lọc, và <strong>lọc ở đầu ra không sửa được một thứ tự đã xếp sai</strong>. Cùng một dòng sổ: đúng phạm vi <strong>hạng 1 · 70,00%</strong>, đọc cả kho <strong>hạng 2 · 99,97%</strong></td></tr>
+              <tr><td>○ Đường ghi cho các bảng còn lại</td><td>Bút toán · nhật ký · hàng chờ · sổ loại</td><td>Lớn dần theo từng chặng sau</td></tr>
+              <tr><td>○ Đường đọc chỉ-đọc sang hệ lệnh chi</td><td>Đọc được, <strong>không</strong> ghi được</td><td>Cần cho chặng ghép lệnh</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="tblWrap">
+          <table>
+            <caption>Khối 7 · Sáu bộ nạp nguồn — <strong>45%</strong> · 2/6 bộ · 497 dòng · 48 phép thử</caption>
+            <thead><tr><th>Cấu phần</th><th>Làm gì</th><th>Bằng chứng · còn thiếu</th></tr></thead>
+            <tbody>
+              <tr><td>✔ Bộ nạp <strong>Bank</strong> — <strong>đã chạy thật</strong></td><td>Sổ thô 38 cột → khuôn chuẩn, đọc <strong>sổ sống</strong> 10.100 dòng trong 12 giây</td><td>20 phép thử theo đúng sáu điều kiện xong. Và một lệnh chạy được: <code>tools/nap_that.py --that</code></td></tr>
+              <tr><td>✔ Nổ to khi nguồn đổi hình dạng</td><td>So <strong>từng vị trí</strong> với khuôn: đổi tên · thêm cột · <strong>đổi chỗ hai cột</strong> · đặt tên cho cột trống</td><td>Đổi chỗ là lỗi nguy nhất — <strong>tổng vẫn khớp</strong> mà mọi ô về sai chỗ</td></tr>
+              <tr><td>✔ Không làm sạch giá trị nào</td><td>Không cắt khoảng trắng, không đổi chữ hoa, không làm tròn</td><td>Cổng ra là khớp 100% từng ô — mỗi phép làm sạch là một chỗ lệch <strong>vì lỗi của ta</strong></td></tr>
+              <tr><td>✔ Ba đường luôn cân</td><td>Vào sổ + bị loại + dòng trống = số dòng nguồn</td><td>Lệch thì <strong>nổ</strong>; và dòng bị loại mang <strong>số dòng thật</strong> để kế toán tìm được chỗ sửa</td></tr>
+              <tr><td>✔ Chạy lại không nhân đôi</td><td>Hàm thuần, không giữ trạng thái</td><td>Hai lượt cho kết quả y hệt</td></tr>
+              <tr><td>◐ Bộ nạp <strong>A — ghép lệnh chi</strong> · <strong>lõi xong, đã chạy thật</strong></td><td>Ghép theo <strong>dòng</strong> lệnh chi; sáu hình dạng, mỗi hình một con số; <strong>2.745 mối nối</strong> đã vào kho <em>(2.650 là số cũ, khi hình <code>B</code> chưa đậu và chưa áp dung sai 1.000)</em></td><td>⛔ Ba tiền đề của bản đặc tả bị số liệu lật. Còn ba tầng chờ kế toán trả lời và chờ hai khối cuối</td></tr>
+              <tr><td>✔ <strong>Chia tiền không mất một đồng lẻ</strong></td><td>Một lần chuyển trả nhiều dòng lệnh thì tiền chia theo từng dòng, và <strong>cộng lại phải khít</strong></td><td>Chia theo tỷ lệ rồi làm tròn từng phần thì mất vài đồng lẻ — và mất tiền lẻ trong một hệ kế toán là lỗi không thể giải thích</td></tr>
+              <tr><td>✔ <strong>Chỗ từ chối đoán</strong></td><td>Nhiều dòng bank × nhiều dòng lệnh, tiền cộng lại đúng — <strong>vẫn không ghép</strong></td><td>Có nhiều cách chia đều cộng đúng; chọn một cách là <strong>máy quyết thay người</strong>. 27 dòng, đẩy sang người bấm</td></tr>
+              <tr><td>✔ <strong>Tiền tệ kiểm trước tiền</strong></td><td>Hai bên khác đơn vị thì <strong>không cộng</strong>, dù cộng ra số trông hình</td><td>199 dòng. Nếu cộng bừa mà tình cờ bằng nhau thì ghép sai <strong>mà không cổng nào đỏ</strong></td></tr>
+              <tr><td>○ Bốn bộ còn lại</td><td>Quỹ · đối soát · lương · nền tảng · công nợ</td><td>Xếp sau khi khuôn bộ nạp được chứng minh đúng</td></tr>
+                          <tr><td>✔ <strong>Bảng nối một–nhiều</strong></td><td>Một lần chuyển tiền trả <strong>nhiều dòng lệnh</strong> thì được ghi thành <strong>nhiều mối nối</strong>, mà <strong>số dòng sổ không đổi</strong></td><td>Trước đó 27 dòng như thế phải xếp vào hàng chờ <em>dù tiền đã khớp</em>, chỉ vì chỗ lưu chỉ giữ được một mối nối. Có dòng chia cho tới <strong>10</strong> dòng lệnh</td></tr>
+              <tr><td>✔ <strong>Một chỗ duy nhất giữ mối nối</strong></td><td>Chỗ lưu cũ đã <strong>bỏ</strong>, không giữ song song hai nơi</td><td>Hai nơi ghi cùng một việc thì sớm muộn chúng nói khác nhau — và không ai biết nơi nào đúng</td></tr>
+              <tr><td>✔ <strong>Cổng cộng tiền, chặn trước khi ghi</strong></td><td>Cộng tiền các mối nối của một dòng phải <strong>đúng bằng</strong> tiền đã chuyển; lệch thì <strong>dừng, không ghi gì</strong></td><td>Không có cổng này thì phép chia tiền có thể <strong>bịa ra hoặc làm mất tiền</strong> mà không ai thấy. Trên dữ liệu thật: <strong>lệch 0</strong></td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="tblWrap">
+          <table>
+            <caption>Khối 8 · Cửa vào ra — <strong>75%</strong> · 6 tệp · 1.036 dòng · 108 phép thử</caption>
+            <thead><tr><th>Cấu phần</th><th>Làm gì</th><th>Bằng chứng · còn thiếu</th></tr></thead>
+            <tbody>
+              <tr><td>✔ <strong>Sáu cửa đọc — đã chạy thật</strong></td><td>Sổ · một dòng đầy đủ · hàng chờ · tóm tắt hàng chờ · nhật ký · cổng hôm nay</td><td><strong>10.030 dòng sổ lật hết qua cửa</strong>, và hàng chờ trả về đúng thứ tự tiền: <strong>USD 4.492 · VND 2.987 · SGD 120 · HKD 83</strong></td></tr>
+              <tr><td>✔ <strong>Cửa chỉ trả dòng của lần nạp thật</strong></td><td>Mọi câu đọc <strong>bắt buộc</strong> mang một phạm vi; thiếu là <strong>nổ ngay lúc gọi</strong>, không âm thầm thành <em>"cả kho"</em></td><td>⛔ Dựng ra vì <strong>194 dòng bịa</strong> từng nằm ngay trong danh sách việc của kế toán. Xin một lần nạp <em>của phép thử</em> qua địa chỉ cửa thì trả <strong>rỗng</strong> — không có đường vòng</td></tr>
+              <tr><td>✔ <strong>Cửa đọc không thể ghi — kho tự chặn</strong></td><td>Máy <strong>từ chối chạy</strong> nếu đường nối tới kho còn ghi được</td><td>Không phải một lời hứa trong tài liệu: <strong>chính kho từ chối</strong> lệnh ghi. Mọi lệnh sửa qua cửa trả <strong>405</strong></td></tr>
+              <tr><td>✔ <strong>Mở cửa ghi mà cửa đọc không yếu đi một chút nào</strong></td><td>Máy giữ <strong>hai</strong> đường nối kho, và <strong>bảng đường đi</strong> quyết đường nào dùng cho việc nào — không phải người viết việc tự chọn</td><td>Mọi đường đọc <strong>luôn</strong> chạy trên đường bị kho chặn ghi, <strong>kể cả khi cửa ghi đang mở</strong>. Đo bằng cách <strong>đếm số lần mở đường ghi = 0</strong> sau bốn lần đọc. ⭐ Và cửa <strong>mặc định chạy chỉ-đọc</strong>: phải gõ tường minh mới mở phần ghi, còn trên sổ thật thì <strong>cả bốn đường ghi đều trả 405</strong></td></tr>
+              <tr><td>✔ <strong>Không có thẻ thì không mở cửa</strong></td><td>Thẻ hết hạn · thẻ tự khai <em>"không ký"</em> · thẻ đổi thuật toán · thẻ không hạn — <strong>từ chối cả bốn</strong></td><td>Thiếu chìa thì máy <strong>không chạy</strong>, không có chế độ <em>"tạm cho qua"</em>. Và người không có thẻ <strong>không được biết đường nào tồn tại</strong></td></tr>
+              <tr><td>✔ <strong>Bảng đường đi khai một lần</strong></td><td>Một bản khai sinh ra <strong>cả máy dẫn đường lẫn cổng soát</strong></td><td>Cổng soát bắt: lệnh sửa nhắm vào sổ · đường ghi mà không để lại dấu · đường chạm bảng của hệ khác. Đã thấy đỏ từng phép</td></tr>
+              <tr><td>✔ <strong>Bảng cổng không bao giờ toàn xanh</strong></td><td>Cổng nào <strong>chưa đo được</strong> thì nói thẳng là chưa đo được, kèm lý do — không đội lốt màu xanh</td><td>Hôm nay: <strong>3 đạt · 0 không đạt · 5 chưa đo được</strong>. Một màn hình <em>"4/4 xanh"</em> trong khi bốn cổng kế toán chưa hề đo là con số nói dối nặng nhất của cả hệ</td></tr>
+              <tr><td>○ Sáu cửa đọc còn lại</td><td>Độ phủ · tuần · nguồn · danh mục · pháp nhân · trạng thái hàng chờ</td><td>⚠ Phần lớn <strong>chờ bảng nguồn có dữ liệu</strong>. ⛔ Đừng đọc <em>"chặng 4 xong"</em> thành <em>"cửa đọc xong"</em></td></tr>
+              <tr><td>✔ <strong>Sửa là THÊM bút toán — sổ không đổi một ô</strong></td><td>Người gõ một giá trị thì giá trị đó <strong>ghi thêm vào một sổ bút toán</strong>; ô trong sổ gốc <strong>giữ nguyên</strong>, và màn hình nói được <strong>cả hai</strong>: <em>"nguồn nói X, người gõ Y"</em></td><td>⛔ Bản đặc tả cũ nói ghi thẳng lên cột song song — <strong>sai hai luật cùng lúc</strong>: sổ chỉ được thêm, và cột đó là <strong>cây thước đo máy</strong>. Ghi giá trị người vào đó là <strong>bỏ bàn tay vào cái thước</strong>: từ đó không ai phân biệt được <em>"máy suy đúng"</em> với <em>"người đã sửa"</em>. ⭐ Đã <strong>sửa đặc tả</strong>, không sửa việc cho khớp một đặc tả sai. Đo: <strong>17 cột của sổ không đổi một ô</strong> sau cả vòng ghi</td></tr>
+              <tr><td>✔ <strong>Tên người lấy từ THẺ, không ai tự khai</strong></td><td>Ai gõ là lấy từ thẻ ra vào; gửi kèm một cái tên khác thì máy <strong>từ chối</strong></td><td>Sau khi bỏ người hậu kiểm, <strong>vết là lớp kiểm soát duy nhất còn lại</strong> — một cuốn nhật ký mà người gõ tự khai tên thì không còn là nhật ký. ⛔ Và từ chối <strong>ra tiếng</strong>, không âm thầm bỏ qua: một cái nút gửi tên rồi thấy nó bị bỏ qua là một kỳ vọng sai đã hình thành</td></tr>
+              <tr><td>✔ <strong>Bút toán và vết đi cùng nhau hoặc không đi</strong></td><td>Hai việc ghi vào <strong>một nhịp</strong>: hoặc cả hai vào, hoặc không gì vào</td><td>Chứng minh bằng cách <strong>cố ý làm câu ghi vết nổ</strong>, rồi đòi bút toán <strong>không được còn lại</strong>. Nếu tách hai nhịp thì sẽ có lúc sổ có bút toán mà <strong>không có vết ai làm</strong></td></tr>
+              <tr><td>✔ <strong>Một chỗ duy nhất được ghi</strong></td><td>Cả hệ chỉ <strong>một tệp</strong> được phép ghi vào ba bảng mang vết</td><td>Máy <strong>đọc mã nguồn</strong> để chặn chỗ ghi thứ hai — cùng cách đã dùng cho luật từng có <strong>bốn bản sao</strong>. ⭐ Và có bài <strong>chứng minh chính chỗ đó thật sự ghi</strong>: thiếu bài này thì cổng xanh mà <strong>chẳng bảo vệ gì</strong></td></tr>
+              <tr><td>✔ <strong>Hệ KÊU khi người gõ khác nguồn</strong></td><td>Gõ khác số của nguồn thì máy <strong>chặn lại</strong> và <strong>nói nguồn đang là gì</strong>; muốn ghi đè phải xác nhận <strong>kèm lý do</strong></td><td>Nói kèm <em>"nguồn đang là gì"</em> mới đủ để câu hỏi <em>"ghi đè không?"</em> có nội dung. ⛔ Kỳ đã chốt thì <strong>chặn kể cả khi xác nhận</strong> — xác nhận là để ghi đè <strong>nguồn</strong>, không phải để mở một kỳ đã chốt</td></tr>
+              <tr><td>✔ <strong>Sửa lại một lần gõ = thêm một dòng đảo</strong></td><td>Đảo xong, giá trị <strong>tự lùi về</strong> cái trước đó — hoặc về số của nguồn nếu không còn lần gõ nào</td><td>⛔ Không đổi trạng thái dòng cũ: đổi tại chỗ thì cuốn nhật ký không còn là nhật ký. Đảo hai lần cùng một dòng, hay đảo <strong>một bản đảo</strong>: bị chặn</td></tr>
+              <tr><td>✔ <strong>Hoãn phải có hạn, và lần thứ ba chỉ đổi màu</strong></td><td>Hoãn không hạn là <strong>bỏ qua</strong>, nên máy đòi một ngày. Lần thứ ba <strong>đổi màu trên màn hình</strong></td><td>⛔ <strong>Không báo lên cấp trên và không chặn lần thứ tư</strong> — luồng này <strong>không có cấp trên</strong>; chặn lại là dùng một bộ máy không có người thứ hai để xử lý</td></tr>
+              <tr><td>✔ <strong>Ghép lệnh bằng tay — ĐÃ CHẠY THẬT</strong></td><td>Người xem danh sách dòng lệnh ứng viên rồi <strong>chọn dòng</strong>, máy cộng tổng lại và so với tiền đã chuyển</td><td>⭐ <strong>Chủ sổ đã chọn: lưu lại một bản chụp dòng lệnh vào kho lúc nạp.</strong> Bản chụp là <strong>của một lần nạp</strong>, không phải một danh mục — nạp lại thì <strong>thêm bản mới</strong>, bản cũ còn nguyên. Và mỗi lần trả danh sách, cửa <strong>nói luôn bản chụp già bao nhiêu</strong> — đó là câu trả lời cho <em>"bản lưu cũ đi thì sao"</em>, chứ không phải hứa rằng nó không cũ. Chạy thật: <strong>3.703 dòng lệnh · 1.468 phiếu</strong> vào kho, sổ <strong>không thêm một dòng</strong>. ⛔ <strong>Còn thiếu thật:</strong> danh sách <strong>không xếp được theo ngày và theo tên người nhận</strong> (bản chụp cố ý không mang thông tin cá nhân), và <strong>chưa có đường bỏ mối nối</strong> nếu ghép sai</td></tr>
+              <tr><td>✔ <strong>Danh sách ứng viên xếp theo BỐN BẬC CÓ TÊN</strong></td><td><em>mã khớp</em> › <em>tiền bằng đúng</em> › <em>tiền gần đúng</em> › <em>cùng loại tiền</em></td><td>⛔ <strong>Không phải một điểm số</strong>: màn hình phải nói được <strong>vì sao</strong> phiếu này đứng đầu, và một con số 0..1 thì không trả lời được câu đó. Dòng bị từ chối duyệt <strong>vẫn hiện</strong>, kèm cảnh báo — ẩn đi thì người gõ sẽ không hiểu vì sao phiếu mình biết là có thì không thấy</td></tr>
+              <tr><td>✔ <strong>Lệch tổng thì từ chối, và giữ nguyên dòng trong hàng chờ</strong></td><td>Cộng các dòng lệnh đã chọn rồi so với tiền thật đã chuyển; lệch quá mức cho phép thì <strong>không ghi gì cả</strong></td><td>⭐ Máy <strong>không chia bừa</strong> cho khớp. Và nếu N dòng lệnh nói N thứ khác nhau về mã dự toán thì máy <strong>khai ra là không suy được</strong>, chứ không lấy dòng đầu tiên</td></tr>
+              <tr><td>⚠ <strong>Mức cho phép lệch đang quá rộng cho việc ghép tay</strong></td><td>Con số <strong>1.000 đồng</strong> được duyệt cho phép ghép <strong>tự động</strong>, nơi khoảng lệch thật lớn nhất chỉ <strong>2 đồng</strong></td><td>⛔ Trên cửa ghép tay thì người chọn dòng nào cũng được, nên cùng con số ấy <strong>cho phép ghép 100 đồng với 1.099 đồng</strong>. Nó đã làm <strong>hai bài kiểm của tôi báo xanh sai</strong>. <strong>Câu hỏi cho kế toán trưởng:</strong> mức cho phép nên là một <strong>con số cố định</strong>, hay phải kèm một <strong>tỷ lệ</strong>? Tôi không tự đặt</td></tr>
+              <tr><td>✔ <strong>Nhật ký đủ bảy trường</strong></td><td>Mỗi lần ghi để lại dấu: dòng nào · ô nào · trước · sau · ai · lúc nào · giá trị cũ đến từ đâu</td><td><strong>Chỗ kiểm soát duy nhất còn lại</strong> sau khi bỏ người hậu kiểm. Ô nào máy <strong>không suy được</strong> thì vết ghi thẳng là <em>"chưa biết"</em>, ⛔ không để trống để sau này ai đọc cũng tưởng là có nguồn</td></tr>
+              <tr><td>○ Đảo bút toán · chốt kỳ và ký</td><td>—</td><td>⚠ <strong>Chưa có bản đặc tả</strong>. Có máy trạng thái mà không có cửa, không có màn hình. Phải bổ đặc tả trước khi tới chặng này</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="tblWrap">
+          <table>
+            <caption>Khối 9 · Bốn màn hình — <strong>chưa mở</strong></caption>
+            <thead><tr><th>Cấu phần</th><th>Làm gì</th><th>Ghi chú</th></tr></thead>
+            <tbody>
+              <tr><td>○ Thử nghiệm lưới <em>trước</em> khi dựng màn</td><td>Chứng minh lưới chịu được thao tác quen tay</td><td>Phải đạt trước, không dựng màn rồi mới thử</td></tr>
+              <tr><td>○ Bốn màn + khay nhật ký</td><td>Hàng chờ và ghép lệnh · sổ · cổng hôm nay · danh mục</td><td>Chặng 6</td></tr>
+              <tr><td>○ Tám thao tác quen tay của Sheets</td><td>Thiếu một cái là kế toán quay về Sheets</td><td>—</td></tr>
+              <tr><td>○ Chặn xác nhận khi lệch tổng</td><td>Không cho chia bừa</td><td>—</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="call warn">
+          <span class="tag">Một cánh cửa vừa phát hiện là đóng — và cần owner mở</span>
+          <p><strong>Sổ điều chỉnh không đọc được bằng máy.</strong> Không phải vì quyền, không phải vì mạng — đo rồi: hỏi <em>tên sổ</em> thì trả lời trong <strong>0,6 giây</strong>, hỏi <em>công thức</em> trả lời trong <strong>0,5 giây</strong>, nhưng hỏi <strong>một ô giá trị</strong> thì <strong>treo</strong>. Một ô. Ở mọi trang trong sổ.</p>
+          <p><strong>Vì sao:</strong> ô đầu tiên của sổ là một công thức <em>kéo cả vùng dữ liệu từ một sổ khác sang</em>. Nên hỏi bất cứ ô nào cũng bắt cả quyển sổ tính lại từ đầu — và nó không tính xong trong thời gian chờ. Cùng phép hỏi đó trên sổ thô thì <strong>1,8 giây, 1.000 ô</strong>.</p>
+          <p><strong>Việc cần owner làm — một lần, rồi xong:</strong> tạo một bản <strong>“dán giá trị”</strong> của trang <em>ITL Ledge</em> từ file gốc <em>(sao chép → dán chỉ giá trị, không mang công thức)</em>. Bản đó đọc tức thì. Và nó <strong>chính là</strong> thứ mà điều kiện “ảnh chụp đóng băng từ sổ gốc” đã đòi từ đầu — không phải một ngoại lệ.</p>
+          <p><strong>Trong lúc chờ:</strong> thước chuẩn chạy trên hiện vật đã đóng băng, đủ 22 kỳ, khớp 100%. Giới hạn phải nói rõ: hiện vật <strong>thiếu khoảng một kỳ rưỡi gần nhất</strong>.</p>
+        </div>
+
+        <div class="call warn">
+          <span class="tag">Điều đáng lo nhất không nằm trong bảng nào</span>
+          <p>Khối 9 có một điều kiện chưa xong mà <strong>không phép thử nào đo được</strong>: <strong>2–3 kế toán không dùng</strong>. Đây là rủi ro số một của cả dự án, và là <em>hành vi</em> chứ không phải kỹ thuật. Màn hình đẹp, máy kiểm tra xanh hết, mà họ quay về Sheets thì khối này chưa xong — và 37% ở trên cũng không có nghĩa gì.</p>
+        </div>
+
+        <div class="call">
+          <span class="tag">⛔ Bản vẽ này cũng vừa bị bắt là nói sai</span>
+          <p><strong>Cả đợt việc lớn nhất tuần bị dán sai ngày — về phía tương lai.</strong> Hai cửa API, hai luật cổng mới, ba cổng đỏ giả: sổ ghi việc nói làm ngày <strong>28/08</strong>, còn <code>git log</code> nói rõ làm <strong>27/08, từ 13:56 đến 17:49</strong>. Sai ở <strong>54 chỗ</strong> trên <strong>16 file</strong> — kể cả dòng đầu bảng tiến độ, kể cả số quyết định. Và <strong>bốn phép kiểm tài liệu vẫn xanh suốt</strong>, vì ⛔ <strong>không phép nào trong đó kiểm ngày</strong>.</p>
+          <p><strong>Vì sao một ngày lệch lại đáng nói.</strong> Nhật ký đổi tiến độ là <em>bằng chứng</em> cho từng bước phần trăm. Ghi sai ngày thì mất thứ tự nhân–quả — mà ở chính đợt đó, thứ tự nhân–quả là cái đã bắt được ba cổng nói dối. Kèm một câu thành sai theo: <em>"khung xem sống được một ngày"</em> — nó sống <strong>1 giờ 48 phút</strong>.</p>
+          <p><strong>Đã thêm phép kiểm thứ năm:</strong> ⛔ không tài liệu nào được ghi một ngày <strong>chưa xảy ra</strong>. Nó soi <strong>240 ô ngày</strong> ở dòng đầu file, dòng nhật ký, và dòng số quyết định. ⛔ <strong>Và chính nó vừa xanh giả một lần</strong>: lần thử đầu tôi đặt ngày tương lai vào <em>đúng ô đã lệch thật</em> mà cổng vẫn xanh — mẫu của nó đòi đúng chữ <em>"Cập nhật:"</em> còn file ghi <em>"Cập nhật lần cuối:"</em>. Sửa mẫu, rồi diễn tập <strong>cả bốn nhánh đều thấy đỏ</strong> mới tính là sống.</p>
+        </div>
+
+        <div class="call">
+          <span class="tag">Dấu thời điểm</span>
+          <p>Số trong bản vẽ này đo ngày <strong>03/09/2026</strong> trên nhánh <code>feat/p2-oracle-parity</code>, commit <code>17df1d9</code>. <strong>1024 phép thử xanh · 8 luật ranh giới, 0 vi phạm · cổng tài liệu 5/5 · cổng số sống 66/66 · kho dữ liệu thật khớp bản khai · bản đồ không lệch · đối chiếu cả sổ 69.510/69.510 ô trên 23 kỳ · 10.030 dòng sổ thật, 2.745 mối nối lệnh chi và <strong>bản chụp 3.703 dòng lệnh</strong> đã nằm trong kho.</strong> ⭐ <strong>Sổ bút toán và nhật ký vẫn 0 dòng</strong> — vòng ghi chưa từng chạy trên sổ thật, và đó là chủ ý. Chạy lại <code>python tools/tien_do.py</code> để lấy số mới.</p>
+        </div>
+
+      </div>
+    </div>
+  </article>
+
+  <!-- ============ closing ============ -->
+  <section class="closing">
+    <h2>Nghĩa gì với owner</h2>
+    <div class="col">
+      <ol class="steps">
+        <li><div><strong>Google Sheets không bị xoá</strong> — nó thu về đúng bốn nhóm nhập liệu thô và ở lại đó vĩnh viễn. Cái bị xoá là <strong>vai trò máy tính</strong> của nó.</div></li>
+        <li><div><strong>Phần code hoá đáng làm nhất lại là phần không ai nhìn thấy</strong> — máy chở và máy tính. Nó không cần một màn hình nào, không đòi 2–3 kế toán đổi một thao tác nào, và có cổng nghiệm thu tuyệt đối.</div></li>
+        <li><div><strong>Nhưng nửa mục tiêu “tăng tốc độ” đổi cách giao:</strong> không phải <em>sổ cũ nhẹ đi</em>, mà <em>đường mới nhanh</em>. ⛔ <strong>Đính chính 26/08:</strong> câu gốc ở đây nói <em>“sheet gương là chỗ duy nhất tốc độ hiện ra được”</em>. Sheet gương <strong>đã bị khai tử</strong> — tốc độ nay hiện ra ở <strong>kho dữ liệu của hệ</strong> và <strong>bốn màn hình</strong> đọc từ đó.</div></li>
+        <li><div><strong>Có một lỗi đang chảy vào báo cáo hôm nay</strong>, độc lập với lộ trình: <strong>14 tài khoản</strong> không có ô pháp nhân ⇒ <strong>211 dòng tiền</strong> (2,1%) vào báo cáo lãi lỗ không thuộc pháp nhân nào — chở 1,79 tỷ VND · 6,26 triệu USD · 3,13 triệu HKD · 10.000 SGD. Owner đã xếp <em>chưa gấp</em>; máy vẫn <strong>dán nhãn trong sổ của hệ</strong> để khi cần thì số đã có sẵn.</div></li>
+      </ol>
+
+      <h3>Bước tiếp — không còn việc nào chờ owner</h3>
+      <div class="tblWrap">
+        <table>
+          <thead><tr><th class="n">#</th><th>Việc</th><th>Vì sao ở vị trí này</th></tr></thead>
+          <tbody>
+            <tr><td class="n">1</td><td><strong>Phân 1.755 cột theo phụ thuộc cạnh vượt file</strong> ⇒ chốt thước chuẩn từng cột</td><td>điều kiện vào của mọi việc code — làm từ dữ liệu đã đo, không chạm sổ</td></tr>
+            <tr><td class="n">2</td><td><strong>Chạy P1 — khuôn 36 cột + lớp ghi sổ</strong> <em>(thay việc “dựng sheet gương 3 tab” của bản gốc, đã khai tử)</em></td><td>đường mới phải có sổ bền trước khi có màn hình đọc từ nó</td></tr>
+            <tr><td class="n">3</td><td><strong>Code hoá theo thứ tự đã đo</strong>: Mapping L1 → CCR → ITL Ledge → 4 sổ H1000</td><td>xếp theo số ô × độ sâu quét, không theo cảm giác</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer class="wrap">
+  <p>Trang này là bản vẽ, không phải nguồn sự thật. Nguồn sự thật nằm trong bộ tài liệu:</p>
+  <ul>
+    <li><code>00_MASTER_INDEX.md</code> — sổ quyết định</li>
+    <li><code>01_Orchestrator/06_ORCHESTRATOR_DASHBOARD.md</code> v0.20 — trạng thái duy nhất</li>
+    <li><code>03_Dev/03_IMPLEMENTATION_PLAN.md</code> v1.2 §5 — <strong>Definition of Done đầy đủ của chín khối</strong>, kèm tên từng lệnh kiểm tra</li>
+    <li><code>02_BA/Artifacts/Phuong-phap-luan-Codehoa-va-Thiet-ke-TOBE.md</code> v0.3 — phương pháp</li>
+    <li><code>02_BA/Artifacts/Lo-trinh-Chuyen-doi-Gsheet-to-UI.md</code> v0.4 — lộ trình</li>
+    <li><code>02_BA/Artifacts/Ket-qua-Phan-loai-4-loai-o.md</code> — số đo phân loại</li>
+  </ul>
+  <p>Mọi con số trên trang này đo trên Google Sheets thật, chỉ đọc, ngày 22–24/08/2026.</p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js"></script>
+<script>
+  // 9 so do cua ban ve nam trong cac khoi PRE mang lop mermaid. Ban goc duoc viet cho
+  // moi truong tu render diagram nen KHONG co script nao => mo local chi thay ma nguon.
+  // Script nay va cho do (them 2026-08-26).
+  (function () {
+    if (typeof mermaid === "undefined") {
+      document.querySelectorAll("pre.mermaid").forEach(function (el) {
+        var w = document.createElement("div");
+        w.style.cssText = "border:1px solid #A32B23;background:#F7E6E3;color:#57150F;padding:10px 14px;margin-bottom:8px;font:12px/1.5 ui-monospace,monospace";
+        w.textContent = "Khong tai duoc thu vien Mermaid (can Internet). Duoi day la ma nguon cua so do.";
+        el.parentNode.insertBefore(w, el);
+      });
+      return;
+    }
+    mermaid.initialize({ startOnLoad: true, securityLevel: "loose", theme: "base" });
+  })();
+</script>
+</body>
+</html>

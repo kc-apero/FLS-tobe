@@ -1,0 +1,30 @@
+-- 0009 · BO khung xem `fls_queue_xep_tien` (dung 27/08 o migration 0008).
+--
+-- ⛔⛔ Mot ngay sau khi dung. Ly do khong phai "doi y" ma la mot dieu do duoc
+-- luc bat dau lam cua doc `P4`: **khung xem SQL khong nhan tham so**, nen no
+-- khong the mang PHAM VI — va phep xep hang cho **bat buoc** phai co pham vi.
+--
+-- Hai duong duy nhat cua mot khung xem, va ca hai deu sai:
+--
+--   ⓐ Khong loc gi (chinh la ban 0008) → `hang` va `luy_ke_pct` duoc tinh
+--     TRUOC khi ai kip loc. Loc o dau ra ⛔ KHONG sua duoc thu tu da xep sai.
+--     Do duoc 27/08: 194 dong dau test tung nam trong hang cho, mang
+--     1.285.475.949 tien BIA. Chung se day % luy ke cua MOI dong that lech di,
+--     ma ban than chung khong con trong danh sach ⇒ con so sai ma khong con
+--     dau vet nao giai thich vi sao. Dung loai sai im lang ca he nay chan.
+--   ⓑ Nhet ban trang `NAP-yyyy-mm-dd-NGUON` vao trong khung xem → kho TEST
+--     khong duoc phep dung `run_id` hinh do (neu dung thi cong `kiem_kho` MU:
+--     mot lan test ghi lan vao so that se trong y nhu lan nap that) ⇒ khung xem
+--     tra RONG trong moi bai test ⇒ phep xep khong con bai nao do duoc.
+--
+-- ⇒ Phep xep chuyen vao mot cau CO THAM SO: `fls/repo/doc_bao_cao.doc_hang_cho`,
+--    voi pham vi nam TRONG cau con, tuc la TRUOC khi xep. Luat `PARTITION BY
+--    curr` cua `QĐ-ITL-58` giu nguyen tung chu.
+--
+-- ⭐ Doi lai duoc mot bai kiem ma khung xem ⛔ khong bao gio kiem duoc:
+--    `test_dong_cua_run_LA_khong_lam_lech_luy_ke`.
+--
+-- ⚠ Bo khung xem ⛔ khong mat mot o du lieu nao — no khong luu gi, chi doc
+--    `fls_itl`. `INV-I08` (append-only) khong bi cham: day la DDL cua mot khung
+--    xem, ⛔ khong phai `DELETE` len so.
+DROP VIEW IF EXISTS fls_queue_xep_tien;
