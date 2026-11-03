@@ -1,0 +1,453 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Con voi PD Now</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Serif:wght@500;600&display=swap">
+<style>
+/* Bố cục: một cột đọc ~72ch cho chữ, bảng và sơ đồ được phép rộng hơn trong khung cuộn ngang riêng. */
+:root{
+  --bg:#f7f8f6; --paper:#ffffff; --fg:#1d2420; --muted:#5b665f; --line:#d6dcd7;
+  --accent:#1f4e79; --accent-soft:#e3ecf5;
+  --ok:#2e7d4f; --ok-soft:#dcefe3; --mid:#b7791f; --mid-soft:#fff1d1; --no:#8a918c; --no-soft:#eceeec; --skip:#c4c9c5;
+  --band1:#e8f0f8; --band2:#e8f3ec; --band3:#fbf1dc; --band4:#f3e9f4; --band5:#f1e9e3;
+  --sans:"IBM Plex Sans",system-ui,"Segoe UI",Arial,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
+  --serif:"IBM Plex Serif",Georgia,serif;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --bg:#151916; --paper:#1d2320; --fg:#e6ebe7; --muted:#a2aca5; --line:#343c37;
+  --accent:#8fb8e0; --accent-soft:#223243;
+  --ok:#6fcf97; --ok-soft:#1f3a2b; --mid:#e2b45a; --mid-soft:#3d3119; --no:#8d968f; --no-soft:#272c29; --skip:#4a524d;
+  --band1:#1e2a36; --band2:#1c2f24; --band3:#352c1a; --band4:#2f2432; --band5:#33291f; color-scheme:dark }}
+:root[data-theme="dark"]{
+  --bg:#151916; --paper:#1d2320; --fg:#e6ebe7; --muted:#a2aca5; --line:#343c37;
+  --accent:#8fb8e0; --accent-soft:#223243;
+  --ok:#6fcf97; --ok-soft:#1f3a2b; --mid:#e2b45a; --mid-soft:#3d3119; --no:#8d968f; --no-soft:#272c29; --skip:#4a524d;
+  --band1:#1e2a36; --band2:#1c2f24; --band3:#352c1a; --band4:#2f2432; --band5:#33291f; color-scheme:dark }
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--fg);font:15px/1.55 var(--sans);
+  padding-block:0 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+main{max-width:1180px;margin:0 auto}
+header.top{padding:28px 0 12px;border-bottom:2px solid var(--accent)}
+h1{font:600 30px/1.2 var(--serif);margin:0 0 8px;text-wrap:balance}
+h2{font:600 21px/1.25 var(--serif);margin:40px 0 10px;text-wrap:balance}
+h3{font:600 16px/1.3 var(--sans);margin:22px 0 8px}
+p{max-width:76ch}
+.meta{color:var(--muted);font-size:13.5px;max-width:none}
+.meta b{color:var(--fg)}
+code,.mono{font-family:var(--mono);font-size:.92em}
+code{background:var(--accent-soft);padding:0 .3em;border-radius:3px}
+.lede{font-size:16px;max-width:80ch}
+.pill{display:inline-block;font:500 12px/1 var(--mono);padding:4px 7px;border-radius:3px;white-space:nowrap}
+.ok{background:var(--ok-soft);color:var(--ok)} .mid{background:var(--mid-soft);color:var(--mid)} .no{background:var(--no-soft);color:var(--no)} .skip{background:var(--no-soft);color:var(--muted)}
+.scroll{overflow-x:auto;border:1px solid var(--line);border-radius:4px;background:var(--paper)}
+table{border-collapse:collapse;width:100%;font-size:13.5px}
+th,td{border-bottom:1px solid var(--line);padding:7px 9px;vertical-align:top;text-align:left}
+th{background:var(--accent-soft);font-weight:600;font-size:12.5px;letter-spacing:.02em;text-transform:uppercase}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+tr.band th{background:var(--band-c,var(--band1));text-transform:none;font-size:13.5px;letter-spacing:0}
+td:first-child{white-space:nowrap}
+.steps td:first-child{white-space:normal;font-weight:500;min-width:150px}
+.legend{display:flex;flex-wrap:wrap;gap:10px 18px;font-size:13px;color:var(--muted);margin:10px 0}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.sw{width:14px;height:14px;border-radius:3px;border:1px solid var(--line)}
+.diagram{overflow-x:auto;background:var(--paper);border:1px solid var(--line);border-radius:4px;padding:8px}
+.diagram svg{display:block;min-width:960px;width:100%;height:auto;font-family:var(--sans)}
+figcaption{font-size:13px;color:var(--muted);margin:8px 2px 0;max-width:none}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin:14px 0}
+.kpi{background:var(--paper);border:1px solid var(--line);border-left:4px solid var(--accent);padding:10px 12px;min-width:0}
+.kpi .v{font:500 24px/1.1 var(--mono);font-variant-numeric:tabular-nums}
+.kpi .l{font-size:12.5px;color:var(--muted);margin-top:4px}
+ol.truth{max-width:86ch;padding-left:1.2em}
+ol.truth li{margin:8px 0}
+.note{border-left:3px solid var(--mid);background:var(--mid-soft);padding:8px 12px;max-width:86ch;font-size:14px}
+footer{margin-top:48px;color:var(--muted);font-size:12.5px;border-top:1px solid var(--line);padding-top:10px}
+@media (max-width:640px){ h1{font-size:24px} body{font-size:14px} }
+</style>
+</head>
+<body>
+<main>
+<header class="top">
+  <h1>Con voi PD Now — toàn luồng FLS và các giai đoạn triển khai</h1>
+  <p class="meta"><b>v0.1 · 2026-11-03</b> · Bản HTML của <code>docs/ITL/_PD_NOW_VOI_VA_GIAI_DOAN.md</code> · Người đọc: owner (COO-CFO) + ba agent dự án.<br>
+  Đo lúc soạn: bảng <code>FS2 PD Now.csv</code> (137 dòng · 118 cột · <b>116 bước có số</b>) · mã nguồn @ <code>2d1b710</code> (nhánh <code>feat/p2-oracle-parity</code>) · <b>2.044</b> hàm <code>test_</code> · kho PostgreSQL không chạy được ở phiên soạn ⇒ mọi con số về kho trích từ tài liệu / chú thích mã, có ghi chỗ trích.</p>
+</header>
+
+<p class="lede">Bảng PD Now là ma trận vào/ra: mỗi hàng là một bước (một sheet hoặc file), mỗi cột cũng là một bước; ô <code>I</code> trên hàng R ở cột S nghĩa là <i>R đổ vào S</i>. Đọc máy: 96 cột có chủ, 116 hàng có số. Trang này vẽ 116 bước ấy thành một con voi 5 khâu (không tầng nào quá 5 nhánh, giữ nguyên văn từng bước), phủ hiện trạng mã FLS lên từng bước, rồi chia 4 giai đoạn.</p>
+
+<div class="kpis">
+  <div class="kpi"><div class="v">101 / 116</div><div class="l">bước AS-IS đã <b>Done</b> bằng tay (Not yet 6 · Doing 2 · Cancel 2 · trống 5)</div></div>
+  <div class="kpi"><div class="v">14 · 15 · 82</div><div class="l">bước FLS ✅ · ◐ · ⛔ trên 113 bước thuộc 5 khâu (2 bước —)</div></div>
+  <div class="kpi"><div class="v">8.387</div><div class="l">dòng <code>fls_itl</code> hôm nay — 1/4 họ nguồn (Bank)</div></div>
+  <div class="kpi"><div class="v">0 / 8.387</div><div class="l">dòng có <code>le</code> (pháp nhân) — suy được 100% từ <code>source_sheet</code>, luật chưa viết</div></div>
+</div>
+
+<h2>§1 · Con voi — 5 khâu, mỗi khâu ≤ 5 nhóm</h2>
+<div class="legend">
+  <span><i class="sw" style="background:var(--ok-soft);border-color:var(--ok)"></i>✅ máy làm được, đã đo khớp</span>
+  <span><i class="sw" style="background:var(--mid-soft);border-color:var(--mid)"></i>◐ một phần · chỉ mã · chỉ đo</span>
+  <span><i class="sw" style="background:var(--no-soft);border-style:dashed"></i>⛔ 0 mã</span>
+  <span><i class="sw" style="background:transparent;border-color:var(--skip)"></i>— AS-IS Cancel / không cần</span>
+  <span>Mũi tên chỉ đi giữa hai khâu kề nhau; nhảy khâu (vd. 101 → 611) ghi ở bảng, không vẽ.</span>
+</div>
+<figure class="diagram" style="margin:0">
+<svg viewBox="0 0 1180 760" role="img" aria-label="Con voi PD Now: 5 khâu, mỗi khâu 3–5 nhóm, phủ trạng thái FLS">
+  <defs>
+    <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0 0L10 5L0 10z" fill="var(--muted)"/></marker>
+  </defs>
+  <style>
+    .bd{fill:var(--band-fill);stroke:var(--line)}
+    .bt{font:600 13px var(--sans);fill:var(--fg)}
+    .bs{font:12px var(--mono);fill:var(--muted)}
+    .bx{stroke-width:1.3}
+    .s-ok{fill:var(--ok-soft);stroke:var(--ok)} .s-mid{fill:var(--mid-soft);stroke:var(--mid)} .s-no{fill:var(--no-soft);stroke:var(--no);stroke-dasharray:4 3} .s-skip{fill:none;stroke:var(--skip)}
+    .t1{font:600 12.5px var(--sans);fill:var(--fg)} .t2{font:11.5px var(--sans);fill:var(--fg)} .t3{font:11px var(--mono);fill:var(--muted)}
+    .gd{font:600 12px var(--mono);fill:var(--accent)} .gdl{stroke:var(--accent);stroke-width:2;fill:none}
+    .ar{stroke:var(--muted);stroke-width:1.6;fill:none;marker-end:url(#ah)}
+  </style>
+
+  <!-- rail giai đoạn (trái) -->
+  <path class="gdl" d="M24 24 h-8 v276 h8"/><text class="gd" x="12" y="156" transform="rotate(-90 12 156)" text-anchor="middle">GĐ1 · INPUT → một bảng ITL</text>
+  <path class="gdl" d="M24 322 h-8 v116 h8"/><text class="gd" x="12" y="380" transform="rotate(-90 12 380)" text-anchor="middle">GĐ2</text>
+  <path class="gdl" d="M24 460 h-8 v116 h8"/><text class="gd" x="12" y="518" transform="rotate(-90 12 518)" text-anchor="middle">GĐ3</text>
+  <path class="gdl" d="M24 598 h-8 v140 h8"/><text class="gd" x="12" y="668" transform="rotate(-90 12 668)" text-anchor="middle">GĐ4</text>
+
+  <!-- ① INPUT -->
+  <g style="--band-fill:var(--band1)">
+    <rect class="bd" x="40" y="20" width="1130" height="130" rx="4"/>
+    <text class="bt" x="52" y="40">① INPUT · COLLECT RAW</text><text class="bs" x="260" y="40">bước 100–116 · 17 bước · 4 nhóm</text>
+    <g class="bx">
+      <rect class="s-no" x="52" y="52" width="262" height="86" rx="3"/>
+      <text class="t1" x="62" y="70">I-A · Ngân sách &amp; nhân sự</text>
+      <text class="t2" x="62" y="88">100 RTB · 101 Payroll Sheet · 102 EDD</text>
+      <text class="t3" x="62" y="106">RTB Not yet · H1000 "blackbox lớn"</text>
+      <text class="t3" x="62" y="124">FLS: 0 tham chiếu</text>
+
+      <rect class="s-no" x="330" y="52" width="262" height="86" rx="3"/>
+      <text class="t1" x="340" y="70">I-B · Dữ liệu nền tảng (Looker)</text>
+      <text class="t2" x="340" y="88">103 GI · 104 OMC · 105 SC · 106 PS</text>
+      <text class="t3" x="340" y="106">PLA4 · PLA2 · Locker · SHQ1 · SHQ2</text>
+      <text class="t3" x="340" y="124">FLS: chỉ enum 'Platform'</text>
+
+      <rect class="s-mid" x="608" y="52" width="262" height="86" rx="3"/>
+      <text class="t1" x="618" y="70">I-C · P100 PAY Tool (Gform → duyệt)</text>
+      <text class="t2" x="618" y="88">PE 107/8 · PI 109/10 · PM 111/12 · PC 113/14</text>
+      <text class="t3" x="618" y="106">PM ✅ ảnh chụp 3.772 dòng</text>
+      <text class="t3" x="618" y="124">PE/PI ◐ chỉ mã · PC ⛔ 0 tham chiếu</text>
+
+      <rect class="s-mid" x="886" y="52" width="272" height="86" rx="3"/>
+      <text class="t1" x="896" y="70">I-D · Tiền (General Trustest)</text>
+      <text class="t2" x="896" y="88">115 Statement Bank/PO/PP · 116 Cash</text>
+      <text class="t3" x="896" y="106">Bank ✅ 60 sheet R| · 8.338/8.338</text>
+      <text class="t3" x="896" y="124">Cash ◐ 8 dòng chảy đã khai, chưa nạp</text>
+    </g>
+  </g>
+  <path class="ar" d="M605 150 v16"/>
+
+  <!-- ② AGGREGATE -->
+  <g style="--band-fill:var(--band2)">
+    <rect class="bd" x="40" y="168" width="1130" height="132" rx="4"/>
+    <text class="bt" x="52" y="188">② AGGREGATE / PREPARE</text><text class="bs" x="300" y="188">bước 200–224 · 301–319 · 44 bước · 3 nhóm</text>
+    <g class="bx">
+      <rect class="s-mid" x="52" y="200" width="355" height="88" rx="3"/>
+      <text class="t1" x="62" y="218">A-① Sổ tiền</text>
+      <text class="t2" x="62" y="236">200–204 P100 Bank/Cash · 205–209 A-CCR 111/112 · CCR</text>
+      <text class="t3" x="62" y="254">201 ✅ dựng lại Bank Transactions 8.338/8.338</text>
+      <text class="t3" x="62" y="272">204/209 CCR ◐ chỉ đo (do_trong_tai.py) · Cash ◐</text>
+
+      <rect class="s-mid" x="423" y="200" width="355" height="88" rx="3"/>
+      <text class="t1" x="433" y="218">A-② Sổ bổ trợ</text>
+      <text class="t2" x="433" y="236">210–213 GI/OMC/SC/PS · 214–218 Unpivot ×5</text>
+      <text class="t2" x="433" y="252">219–222 H1000 ×4 · 223–224 AP/AR (Not yet)</text>
+      <text class="t3" x="433" y="272">PM ✅ 3.703 dòng, nối 26,79% · còn lại ⛔</text>
+
+      <rect class="s-mid" x="794" y="200" width="364" height="88" rx="3"/>
+      <text class="t1" x="804" y="218">A-③ ITL hợp nhất</text>
+      <text class="t2" x="804" y="236">RAW 1/2: 301 Mapping Master · 307 Original · 308 L1</text>
+      <text class="t2" x="804" y="252">ADJUSTED: 314 ITL Ledge · 315–318 H1000 · 319 AGGREGATE</text>
+      <text class="t3" x="804" y="272">fls_itl 8.387 ✅ · parity 69.510 ô · 319 mới 1/4 nguồn</text>
+    </g>
+  </g>
+  <path class="ar" d="M605 300 v16"/>
+
+  <!-- ③ CALCULATE -->
+  <g style="--band-fill:var(--band3)">
+    <rect class="bd" x="40" y="318" width="1130" height="120" rx="4"/>
+    <text class="bt" x="52" y="338">③ CALCULATE</text><text class="bs" x="170" y="338">bước 400–419 · 20 bước · 3 nhóm · file "Report I General Ledger"</text>
+    <g class="bx">
+      <rect class="s-no" x="52" y="350" width="355" height="76" rx="3"/>
+      <text class="t1" x="62" y="368">C-① Nạp Templ 2 + tỷ giá</text>
+      <text class="t2" x="62" y="386">400 ITL Ledge · 401–404 H1000 ×4 · 405 Exchange Rate</text>
+      <text class="t3" x="62" y="404">FLS: 0 tham chiếu 'tỷ giá' · hình E đẩy cho người</text>
+
+      <rect class="s-mid" x="423" y="350" width="355" height="76" rx="3"/>
+      <text class="t1" x="433" y="368">C-② General Ledger · quy đổi một tiền tệ</text>
+      <text class="t2" x="433" y="386">406 GL · 407/408 H1000 (Doing) · 412/413 → P&amp;L file</text>
+      <text class="t3" x="433" y="404">◐ 412 [4] ≈ nhãn AV (allocate.py)</text>
+
+      <rect class="s-no" x="794" y="350" width="364" height="76" rx="3"/>
+      <text class="t1" x="804" y="368">C-③ Khối KRF × kỳ (Templ 3 / 4)</text>
+      <text class="t2" x="804" y="386">Daily 409·411·414·416·418 · YHQM 410·415·417·419</text>
+      <text class="t3" x="804" y="404">FLS: 0 tham chiếu 'KRF'</text>
+    </g>
+  </g>
+  <path class="ar" d="M605 438 v16"/>
+
+  <!-- ④ ALLOCATE -->
+  <g style="--band-fill:var(--band4)">
+    <rect class="bd" x="40" y="456" width="1130" height="120" rx="4"/>
+    <text class="bt" x="52" y="476">④ ALLOCATE</text><text class="bs" x="160" y="476">bước 500–513 · 14 bước · 3 nhóm</text>
+    <g class="bx">
+      <rect class="s-skip" x="52" y="488" width="262" height="76" rx="3"/>
+      <text class="t1" x="62" y="506">AL-① HR · 500</text>
+      <text class="t2" x="62" y="524">"Không cần: đã allocate tại Raw</text>
+      <text class="t2" x="62" y="540">(Payroll Sheet, HD/KRF tách sẵn)"</text>
+
+      <rect class="s-no" x="330" y="488" width="448" height="76" rx="3"/>
+      <text class="t1" x="340" y="506">AL-② Non-HR · Map by ITL (Templ 2.5 / 2.7)</text>
+      <text class="t2" x="340" y="524">GI 501–507: Block 1 → 2 (×7 CDT1) → 3 (% CDT1 · Vendor · Month)</text>
+      <text class="t3" x="340" y="542">508 OMC · 509 SC · 510 PS · FLS: không chia một đồng nào</text>
+
+      <rect class="s-no" x="794" y="488" width="364" height="76" rx="3"/>
+      <text class="t1" x="804" y="506">AL-③ Khoá đơn giản</text>
+      <text class="t2" x="804" y="524">511 By LE ("easy") · 512 By NOEM · 513 By GI</text>
+      <text class="t3" x="804" y="542">method_cfa2 đã lưu (73 mã, 52 rỗng) — chưa thực thi</text>
+    </g>
+  </g>
+  <path class="ar" d="M605 576 v16"/>
+
+  <!-- ⑤ REPORT -->
+  <g style="--band-fill:var(--band5)">
+    <rect class="bd" x="40" y="594" width="1130" height="146" rx="4"/>
+    <text class="bt" x="52" y="614">⑤ REPORT</text><text class="bs" x="150" y="614">bước 600–617 · 18 bước · 5 nhóm</text>
+    <g class="bx">
+      <rect class="s-no" x="52" y="626" width="210" height="102" rx="3"/>
+      <text class="t1" x="62" y="644">R-① Số phân bổ → P&amp;L</text>
+      <text class="t2" x="62" y="662">600 GI · 601 OMC · 602 SC</text>
+      <text class="t2" x="62" y="678">603 PS · 604 Allocation Table</text>
+      <text class="t3" x="62" y="700">Templ 2.7 · by CDT1</text>
+
+      <rect class="s-no" x="278" y="626" width="236" height="102" rx="3"/>
+      <text class="t1" x="288" y="644">R-② Daily Report 3 · P&amp;L</text>
+      <text class="t2" x="288" y="662">605 FS1 Sign-off · 606 ATL</text>
+      <text class="t2" x="288" y="678">607 FS2 · 608 FS1 · 609 DR3</text>
+      <text class="t3" x="288" y="700">Group × CDT1 · Templ 5</text>
+
+      <rect class="s-no" x="530" y="626" width="184" height="102" rx="3"/>
+      <text class="t1" x="540" y="644">R-③ Daily Report 2 · CF</text>
+      <text class="t2" x="540" y="662">610</text>
+      <text class="t3" x="540" y="700">CF Group × LE</text>
+
+      <rect class="s-mid" x="730" y="626" width="210" height="102" rx="3"/>
+      <text class="t1" x="740" y="644">R-④ HR &amp; quản trị dữ liệu</text>
+      <text class="t2" x="740" y="662">611 H1000 Index · 612 HR RPT</text>
+      <text class="t2" x="740" y="678">613 [RAW ITL] Data Mgmt</text>
+      <text class="t3" x="740" y="700">613 ◐ ≈ màn F02 + nhật ký</text>
+
+      <rect class="s-no" x="956" y="626" width="202" height="102" rx="3"/>
+      <text class="t1" x="966" y="644">R-⑤ CCR</text>
+      <text class="t2" x="966" y="662">614 Tỷ giá · 615 Daily Report</text>
+      <text class="t2" x="966" y="678">616 CCR Pdf · 617 Nhật ký CA</text>
+      <text class="t3" x="966" y="700">FLS: chỉ đo 2. CCR</text>
+    </g>
+  </g>
+</svg>
+<figcaption>Hình 1 — Con voi PD Now. Năm dải = năm khâu theo thứ tự chảy của dữ liệu; mỗi dải ≤ 5 nhóm; màu ô = trạng thái FLS hôm nay (xấu nhất trong nhóm). Rail trái = giai đoạn triển khai (§3). Ba bước <code>700–702</code> (OTHERS) nằm ngoài 5 khâu. Kiểm cạnh: 5 dải · 18 ô · 4 mũi tên, mỗi mũi tên nối hai dải kề nhau, 0 mũi tên chéo.</figcaption>
+</figure>
+
+<h3>Ba điều bảng PD Now nói</h3>
+<div class="scroll"><table>
+<thead><tr><th>Điều bảng nói</th><th>Con số</th><th>Nghĩa với FLS</th></tr></thead>
+<tbody>
+<tr><td>5 khâu đúng thứ tự INPUT → AGGREGATE → CALCULATE → ALLOCATE → REPORT</td><td class="mono">1xx 17 · 2xx 25 · 3xx 19 · 4xx 20 · 5xx 14 · 6xx 18 · 7xx 3</td><td>INPUT chiếm hai dải số (1xx thu thô + 2xx/3xx gom). ALLOCATE không có bước nào ở tầng HR (500: đã allocate tại Raw).</td></tr>
+<tr><td>Trạng thái AS-IS</td><td class="mono">Done 101 · Not yet 6 · Doing 2 · Cancel 2 · trống 5</td><td>Sheets hôm nay đã đi hết luồng bằng tay. Hai bước Cancel là hai chỗ Sheets không gánh nổi: <code>309</code> (L2) và <b><code>319</code> ITL AGGREGATE — "Aggregate về 1 bảng ITL duy nhất", bỏ vì Gsheet không hỗ trợ bảng lớn</b>. Đúng câu owner đặt cho giai đoạn đầu.</td></tr>
+<tr><td>Cấp phân bổ <code>AL</code> trên từng bước</td><td class="mono">CFA1·CFA2·CFA3 · PLA1…PLA5</td><td>CFA1 = sổ ITL theo pháp nhân · CFA2 = <b>cờ</b> có-dòng-tiền-thật / nội-bộ (<code>QĐ-ITL-140</code>, không phải bậc) · CFA3/PLA3 = HR · PLA1 = AP/AR · PLA2 = SC · PLA4 = nền tảng · PLA5 = bản ký.</td></tr>
+<tr><td>7 nhóm khoá (cột H…N)</td><td>General Trustest (Ngày · Tiền · Tiền tệ · <b>LE</b>) · Statement Ref No · PE (Budget/KRF/HD · CDT · Vendor · Singular/Advance · Action Date) · PI (Invoice · PE ID) · PM (PI ID · PE ID) · PC · CDT</td><td>Đây là <b>các chiều của báo cáo đầu ra</b>. Từ bước 308 trở đi mọi bước mang đủ 7 nhóm ⇒ "báo cáo đủ các chiều cho hệ khác" = đủ 7 nhóm khoá này.</td></tr>
+</tbody></table></div>
+
+<h2>§2 · FLS hôm nay đứng ở đâu — đếm theo bước</h2>
+<div class="scroll"><table>
+<thead><tr><th>Khâu</th><th class="n">Bước</th><th class="n">✅</th><th class="n">◐</th><th class="n">⛔</th><th class="n">—</th><th>Nói gọn</th></tr></thead>
+<tbody>
+<tr><td>① INPUT</td><td class="n">17</td><td class="n">3</td><td class="n">5</td><td class="n">9</td><td class="n">0</td><td>Tiền ngân hàng + lệnh chi PM đã vào; 4 họ nguồn chi phí khác (HR · nền tảng · PE/PI/PC · quỹ) chưa. ✅ = 111·112·115; ◐ = 107–110·116.</td></tr>
+<tr><td>② AGGREGATE</td><td class="n">44</td><td class="n">11</td><td class="n">8</td><td class="n">24</td><td class="n">1</td><td>Lõi <code>Original → L1 → ITL Ledge</code> xong và đo bằng parity; <code>319</code> có vỏ <code>fls_itl</code> nhưng mới 1/4 họ nguồn. — = 309 Cancel.</td></tr>
+<tr><td>③ CALCULATE</td><td class="n">20</td><td class="n">0</td><td class="n">1</td><td class="n">19</td><td class="n">0</td><td>Chưa có một phép tính nào: không tỷ giá, không quy đổi, không khối KRF. ◐ = 412 [4].</td></tr>
+<tr><td>④ ALLOCATE</td><td class="n">14</td><td class="n">0</td><td class="n">0</td><td class="n">13</td><td class="n">1</td><td>Luật "cần phân bổ? bằng cách nào?" đã lưu (<code>fls_mapping_master</code>) nhưng chưa thực thi. — = 500 không cần.</td></tr>
+<tr><td>⑤ REPORT</td><td class="n">18</td><td class="n">0</td><td class="n">1</td><td class="n">17</td><td class="n">0</td><td>Cơ chế ghi an toàn về Sheets có (<code>ghi_o.py</code>, 27 bài); bộ xuất 64 cột D1 chưa tồn tại; 0 báo cáo. ◐ = 613.</td></tr>
+<tr><th>Tổng 5 khâu</th><th class="n">113</th><th class="n">14</th><th class="n">15</th><th class="n">82</th><th class="n">2</th><th style="text-transform:none;font-weight:500">~31.100 dòng Python nằm gần trọn ở ① + ② và ở hàng chờ / nhật ký quanh <code>fls_itl</code>.</th></tr>
+</tbody></table></div>
+
+<h3>Ba sự thật quyết định giai đoạn đầu (đã đo, có chỗ trích)</h3>
+<ol class="truth">
+<li><b>Chiều pháp nhân đang rỗng trong kho:</b> <code>fls_itl.le</code> = 0/8.387 · <code>le_payer</code> = 0/8.387 ⇒ <code>is_intercompany</code> false 100% (<code>05_DATA_DICTIONARY_ERD.md:1690</code>, <code>QĐ-ITL-140</code>). Nhưng suy được 100% từ <code>source_sheet</code>: bóc tiền tố <code>R | </code> rồi tách 4 mảnh (số TK · ngân hàng · tiền tệ · pháp nhân) khớp 8.387/8.387 trên 49 nguồn (<code>GAP-SPEC-04</code>, luật chưa viết ra). AS-IS đang có 14 tài khoản · 211 dòng (2,1%) vào P&amp;L với pháp nhân rỗng (<code>GAP-ITL-47</code>, owner tạm bỏ qua 24/08).</li>
+<li><b>CFA2 không phải bậc phân bổ</b> mà là cờ "có dòng tiền thật / nội bộ Apero", luật nằm ở FPS (form PE/PI/PM), không ở FLS (<code>QĐ-ITL-140</code>). ⇒ "mọi chi phí về đến mọi pháp nhân" ở giai đoạn đầu là gắn <code>le</code> + <code>le_payer</code> cho mọi dòng, không phải chia tiền.</li>
+<li><b><code>fls_pm_line.pe_line</code> / <code>pi_line</code> trỏ vào bảng không tồn tại</b> (lớp lỗi <code>pm_line_id</code> của <code>DD-I13</code>, lần thứ ba). <code>PE_Unpivot</code> (2.694 × 23) mang ID Payee 95%; ID Payer chỉ 4% ⇒ vế "ai trả" lấy từ <code>PM_Unpivot.Pháp nhân thanh toán</code> (17 giá trị, 5 mã có tên).</li>
+</ol>
+
+<h2>§3 · Bước nào của con voi FLS đã làm — bảng từng bước</h2>
+<p>Mỗi bảng dưới đây giữ nguyên văn tên bước của PD Now; cột cuối là trạng thái FLS kèm con số đo.</p>
+
+<h3>① INPUT · COLLECT RAW — 17 bước</h3>
+<div class="scroll"><table class="steps">
+<thead><tr><th>Nhóm · bước</th><th>Nguồn gốc (Original Source)</th><th>AL</th><th>AS-IS</th><th>FLS hôm nay</th></tr></thead>
+<tbody>
+<tr class="band" style="--band-c:var(--band1)"><th colspan="5">I-A · Ngân sách &amp; nhân sự</th></tr>
+<tr><td>100 RTB | RealTime Budget</td><td>—</td><td>All</td><td>Not yet</td><td><span class="pill no">⛔</span> 0 tham chiếu trong <code>fls/</code></td></tr>
+<tr><td>101 H1000 | Payroll Sheet (mỗi sheet một workflow)</td><td>H1000 Ledger (APERO-HR Allocate HD_FS1)</td><td>PLA3</td><td>Done</td><td><span class="pill no">⛔</span> chỉ chuỗi "H1000 Ledger" ở <code>adapters/mapping_master.py:31</code></td></tr>
+<tr><td>102 H1310 EDD | Quyết định nhân sự (Responses)</td><td>—</td><td>PLA3</td><td>—</td><td><span class="pill no">⛔</span></td></tr>
+<tr class="band" style="--band-c:var(--band1)"><th colspan="5">I-B · Dữ liệu nền tảng (Looker)</th></tr>
+<tr><td>103 GI · 104 OMC (RAW của FS1, Revenue/OMC Monthly)</td><td>Finance Report ED Dev 02-12-2023 Locker (Data · AnhTQ)</td><td>PLA4</td><td>Done</td><td><span class="pill no">⛔</span> "Platform" chỉ là một giá trị enum của <code>fls_source.src_type</code></td></tr>
+<tr><td>105 SC (Chi phí Service Apero · SHQ1) · 106 PS (AperoGroup_Payment · SHQ2)</td><td>file RAW riêng</td><td>PLA2 / PLA4</td><td>Done</td><td><span class="pill no">⛔</span></td></tr>
+<tr class="band" style="--band-c:var(--band1)"><th colspan="5">I-C · P100 PAY Tool — mỗi phiếu 2 bước: nhân dân nhập Gform → boss duyệt ở Gsheet</th></tr>
+<tr><td>107 / 108 PE</td><td>A | P100 | PE11 Entry Data</td><td>tbu</td><td>Done</td><td><span class="pill mid">◐</span> chỉ mã <code>pe_slip/pe_line</code> trong <code>fls_pm_line</code> (migration 0023) — trỏ vào không có bảng PE</td></tr>
+<tr><td>109 / 110 PI</td><td>A | PAY100 | PI11 Entry Data</td><td>tbu</td><td>Done</td><td><span class="pill mid">◐</span> như PE</td></tr>
+<tr><td>111 / 112 PM</td><td>A | PAY100 | PM11 Entry Data</td><td>tbu</td><td>Done</td><td><span class="pill ok">✅</span> ảnh chụp <code>fls_pm_line</code> 3.772 dòng (lằn PM, chup_id 23793)</td></tr>
+<tr><td>113 / 114 PC</td><td>A | PAY100 | PC11 Entry Data</td><td>tbu</td><td>Done</td><td><span class="pill no">⛔</span> 0 tham chiếu "PC" trong <code>fls/</code> · <code>tools/</code> · <code>tests/</code></td></tr>
+<tr class="band" style="--band-c:var(--band1)"><th colspan="5">I-D · Tiền (khoá General Trustest)</th></tr>
+<tr><td>115 Statement | Bank/PO/PP (nhập tay từ sao kê)</td><td>A - Statement → P100 | Bank Transactions</td><td>CFA3</td><td>Done</td><td><span class="pill ok">✅</span> 60 sheet <code>R |</code> · <code>adapters/sao_ke.py</code> · dựng lại khớp 8.338/8.338</td></tr>
+<tr><td>116 Cash Transactions (kế toán nhập tay)</td><td>P100 | Cash Ledger</td><td>CFA3</td><td>Done</td><td><span class="pill mid">◐</span> 8 dòng chảy quỹ đã khai (<code>tools/nap_nguon_va_khai.py</code>) nhưng lằn Cash chưa chụp, chưa nạp (<code>chup_sao_ke.py:46</code> chỉ LAN="Bank", <code>GAP-CANON-02</code>)</td></tr>
+</tbody></table></div>
+
+<h3>② AGGREGATE / PREPARE — 44 bước, 3 nhóm lớn</h3>
+<div class="scroll"><table class="steps">
+<thead><tr><th>Nhóm · bước</th><th>Việc (cột Formula, rút gọn)</th><th>AS-IS</th><th>FLS hôm nay</th></tr></thead>
+<tbody>
+<tr class="band" style="--band-c:var(--band2)"><th colspan="4">A-① Sổ tiền — 9 bước</th></tr>
+<tr><td>200 R | Acc No_Bank Currency_LE (mỗi bank/ví một kiểu)</td><td>Kế toán nhập tay từ statement vào Templ 1</td><td>Done</td><td><span class="pill ok">✅</span> = tầng R| FLS đọc (bản khai dòng 1, <code>fls_khai_cot</code> 408 dòng = 68 × 6)</td></tr>
+<tr><td>201 Bank Transactions</td><td>Nút GScript gom từ nhiều sheet R</td><td>Done</td><td><span class="pill ok">✅</span> <code>tools/dung_lai_bank_transactions.py</code> 8.338/8.338</td></tr>
+<tr><td>202 R | abc_xyz_LE · 203 Cash Ledger Transactions</td><td>nhập tay → GScript gom</td><td>Done</td><td><span class="pill mid">◐</span> khai xong, chưa nạp (như 116)</td></tr>
+<tr><td>204 2. CCR Cash (balance từng sheet R, audit đủ giao dịch)</td><td>nhập tay</td><td>Done</td><td><span class="pill no">⛔</span></td></tr>
+<tr><td>205 A-CCR Bank Transactions · 206 Cash Ledger Transactions</td><td>GScript gom từ P100</td><td>Done</td><td><span class="pill mid">◐</span> cú đẩy P100 → A-CCR là thứ <code>QĐ-ITL-100</code> chốt FLS thay; mã ghi <code>fls/xuat/ghi_o.py</code> có, cờ duyệt tắt</td></tr>
+<tr><td>207 1.2 Ledger 112 · 208 1.1 Ledger 111</td><td>Formula Filter &amp; Sort theo thời gian</td><td>Done</td><td><span class="pill mid">◐</span> 208 là nguồn của 302 → FLS đọc qua Transaction Mapping L1</td></tr>
+<tr><td>209 2. CCR (balance từng statement)</td><td>nhập tay</td><td>Done</td><td><span class="pill mid">◐</span> chỉ đo: <code>tools/do_trong_tai.py</code> đọc 2. CCR 229 × 655, không ghi</td></tr>
+<tr class="band" style="--band-c:var(--band2)"><th colspan="4">A-② Sổ bổ trợ — 15 bước</th></tr>
+<tr><td>210 GI · 211 OMC Platform Data Ledger (Looker → Gsheet)</td><td>Importrange &amp; filter, sắp theo thời gian</td><td>Done</td><td><span class="pill no">⛔</span></td></tr>
+<tr><td>212 SC · 213 PS Platform Data Ledger (từ file RAW)</td><td>gom + sắp</td><td>Done</td><td><span class="pill no">⛔</span></td></tr>
+<tr><td>214 PE_Unpivot (duỗi PELine thành từng giao dịch)</td><td>GScript</td><td>Done</td><td><span class="pill no">⛔</span> FLS không duỗi; 2.694 × 23 mang ID Payee 95% (<code>QĐ-ITL-140</code>)</td></tr>
+<tr><td>215 PI_Unpivot (duỗi PILine + check Status)</td><td>GScript</td><td>Done</td><td><span class="pill no">⛔</span> chỉ là tên bảng tra của 4 cột W/X/AB/AC (<code>canon/spec.py</code>) — 973 × 24</td></tr>
+<tr><td>216 PM11_Entry Data (nhập ID PM/PE/PI, HD, CDT1, check Σ PM ≤ PI/PE; CA nhập Reference number) · 217 PM_Unpivot</td><td>GScript</td><td>Done</td><td><span class="pill ok">✅</span> đọc [Importrange]PM_Unpivot 3.703 dòng · 1.468 phiếu · 28 cột; ghép theo DÒNG (<code>adapters/pm_join.py</code>), nối 26,79% (AS-IS VLOOKUP 33,2% nhưng 968 dòng lệch tiền)</td></tr>
+<tr><td>218 PC_Unpivot</td><td>Gform → Data Entry</td><td>Done</td><td><span class="pill no">⛔</span></td></tr>
+<tr><td>219 1.3 Ledger NIS/INT/COM 2025 · 220 …2024</td><td>"tbu — Blackbox lớn, từ dữ liệu lương C&amp;B sẽ fill"</td><td>Done (todo check IO)</td><td><span class="pill no">⛔</span></td></tr>
+<tr><td>221 1.3 Ledger PIT 2025 · 222 …2024</td><td>như trên</td><td>Done</td><td><span class="pill no">⛔</span></td></tr>
+<tr><td>223 1.3 AP Ledger · 224 1.4 AR Ledger</td><td>Cần dựng: Importrange filter PE; PE&amp;PI chưa PM/PC; audit với GI &amp; OMC</td><td><b>Not yet</b></td><td><span class="pill no">⛔</span> <code>QĐ-ITL-03</code>: adapter F là gói riêng</td></tr>
+<tr class="band" style="--band-c:var(--band2)"><th colspan="4">A-③ ITL hợp nhất — 19 bước (tim của khâu)</th></tr>
+<tr><td>301 Mapping Master</td><td>bảng tra mã reference</td><td>Done</td><td><span class="pill ok">✅</span> <code>fls_mapping_master</code> 73 mã hd · 23 cần CFA2 · 52/73 cột Method rỗng</td></tr>
+<tr><td>302 [Importrange]1.1 Ledger 111 · 303 PE_Unpivot · 304 PI_Unpivot · 305 PM_Unpivot · 306 PC11</td><td>Importrange</td><td>Done</td><td><span class="pill mid">◐</span> 302·305 ✅ qua L1 / pm_join · 303·304·306 ⛔</td></tr>
+<tr><td>307 Transaction Original (gom Cash + Bank về 1 bảng)</td><td>Query</td><td>Done</td><td><span class="pill ok">✅</span> = 7 cột BASE của canon (A–G)</td></tr>
+<tr><td>308 Transaction Mapping L1 (sort · lookup PM/PI/PE · lookup Master Mapping LE · đánh số)</td><td>4 công thức</td><td>Done</td><td><span class="pill ok">✅</span> <code>adapters/bank.py</code> → 38 vị trí / 36 trường → <code>fls_itl</code> 8.387 dòng; 6.648 ô #N/A giữ nguyên (<code>QĐ-ITL-50</code>)</td></tr>
+<tr><td>309 Transaction Mapping L2</td><td>—</td><td><b>Cancel</b></td><td><span class="pill skip">—</span></td></tr>
+<tr><td>310 AP Transaction Original · 311 AP Audited · 312 AP L2</td><td>—</td><td><b>Not yet</b></td><td><span class="pill no">⛔</span></td></tr>
+<tr><td>313 [Importrange]Mapping Master</td><td>Importrange</td><td>Done</td><td><span class="pill ok">✅</span> cùng bảng 301</td></tr>
+<tr><td>314 <b>ITL Ledge</b> (import A–Q · manual R–AT · lookup AW · audit mã) — Templ 2 ITL (Standard Input)</td><td>4 công thức</td><td>Done</td><td><span class="pill ok">✅</span> thước chuẩn <code>fls/oracle/</code>: 64 cột (<code>ledge_spec.py</code>), parity 69.510/69.510 ô · 23 kỳ; Classifying 68.915 ô 7/7 khối; Final 4.088/4.088; 18 cột lưu, phần còn lại khai lý do không lưu</td></tr>
+<tr><td>315–318 H1000 Ledge NIS/INT/COM &amp; PIT × Y2025/Y2024</td><td>import A–Q · lookup Master Mapping R–AT</td><td>Done</td><td><span class="pill no">⛔</span></td></tr>
+<tr><td>319 <b>ITL AGGREGATE</b> — "Agrregate về 1 bảng ITL duy nhất"</td><td>—</td><td><b>Cancel</b> (Gsheet không hỗ trợ bảng lớn)</td><td><span class="pill mid">◐</span> <code>fls_itl</code> chính là bảng này, nhưng chỉ chứa 1 nguồn (Bank): <code>source_system</code> khai Bank|Cash|HR|Platform mà mới có Bank chảy vào</td></tr>
+</tbody></table></div>
+
+<h3>③ CALCULATE — 20 bước</h3>
+<div class="scroll"><table class="steps">
+<thead><tr><th>Nhóm · bước</th><th>Việc</th><th>AL</th><th>AS-IS</th><th>FLS hôm nay</th></tr></thead>
+<tbody>
+<tr class="band" style="--band-c:var(--band3)"><th colspan="5">C-① Nạp Templ 2 + tỷ giá</th></tr>
+<tr><td>400 ITL Ledge → CF report (GScript A–AW, kế toán bấm Run)</td><td>chuyển ITL đã Adjusted sang</td><td>CFA1·PLA1</td><td>Done</td><td><span class="pill no">⛔</span></td></tr>
+<tr><td>401–404 H1000 Ledge ×4 → CF report (+ convert Data Date)</td><td>GScript / Importrange</td><td>CFA3·PLA3</td><td>Done</td><td><span class="pill no">⛔</span></td></tr>
+<tr><td>405 9.2 Exchange Rate</td><td>—</td><td>—</td><td>Done</td><td><span class="pill no">⛔</span> 0 tham chiếu "tỷ giá / exchange rate" trong <code>fls/</code>; hình E (khác tiền tệ) đẩy cho người (<code>pm_join.py:30</code>)</td></tr>
+<tr class="band" style="--band-c:var(--band3)"><th colspan="5">C-② General Ledger · quy đổi</th></tr>
+<tr><td>406 Report I General Ledger (Query + chuyển amount về 1 tiền tệ + audit cash balance)</td><td>—</td><td>CFA1·PLA1</td><td>Done</td><td><span class="pill no">⛔</span></td></tr>
+<tr><td>407 Report I H1000 Ledge Y2025 (CFA3, gồm giao dịch phân bổ) · 408 …For PL Report (PLA3)</td><td>Query &amp; Sort + quy đổi</td><td>CFA3 / PLA3</td><td><b>Doing</b> (todo audit balance)</td><td><span class="pill no">⛔</span></td></tr>
+<tr><td>412 GL → P&amp;L file ([4] đánh dấu ITL chưa allocate được PLA2/PLA3) · 413 H1000 → P&amp;L file</td><td>GScript + 3 công thức</td><td>CFA1·PLA1 / PLA3</td><td>Done</td><td><span class="pill mid">◐</span> [4] ≈ cột AV "Need to Allocate to CFA2" (<code>ledger/allocate.py</code>) — chỉ nhãn</td></tr>
+<tr class="band" style="--band-c:var(--band3)"><th colspan="5">C-③ Khối KRF × kỳ (Templ 3 = Day · Templ 4 = Y/H/Q/M, "một kiểu PD590")</th></tr>
+<tr><td>Daily: 409 CFA1 · 411 CFA3 (KRF nhóm HDH &gt; 0 vì hạch toán kép 334-6xx) · 414 PLA1 PM only · 416 PLA3 HR only · 418 PLA3 PM+HR ("Hoàn thiện Calculate tại đây")</td><td>Sumifs &amp; Sum</td><td>—</td><td>Done</td><td><span class="pill no">⛔</span> 0 tham chiếu "KRF" trong <code>fls/</code>; phép gom duy nhất là tiền/đếm theo tiền tệ ở hàng chờ</td></tr>
+<tr><td>YHQM: 410 CFA1 · 415 PLA1 · 417 PLA3 HR · 419 PLA3 PM+HR</td><td>Sumifs &amp; Sum</td><td>—</td><td>Done</td><td><span class="pill no">⛔</span></td></tr>
+</tbody></table></div>
+
+<h3>④ ALLOCATE — 14 bước</h3>
+<div class="scroll"><table class="steps">
+<thead><tr><th>Nhóm · bước</th><th>Việc</th><th>AS-IS</th><th>FLS hôm nay</th></tr></thead>
+<tbody>
+<tr class="band" style="--band-c:var(--band4)"><th colspan="4">AL-① HR</th></tr>
+<tr><td>500 n/a</td><td>"Không cần vì đã Allocate tại Raw (Payroll Sheet, HD/KRF Code separated)"</td><td>Done</td><td><span class="pill skip">—</span> đúng: HR vào ITL đã mang HD/KRF</td></tr>
+<tr class="band" style="--band-c:var(--band4)"><th colspan="4">AL-② Non-HR · Map by ITL (GI làm mẫu; Templ 2.5 / 2.7)</th></tr>
+<tr><td>501 [Import] GL (Combine Code Vendor-Date-NoTrans; Amount USD) · 502 Source (Looker) · 503 Vendor &amp; Network Mapping (<b>Mapping Block 1</b>: ID Vendor ↔ [Network-Acc] ↔ CDT1/Product/FU)</td><td>3 bảng vào</td><td>Done</td><td><span class="pill no">⛔</span></td></tr>
+<tr><td>504 CFA1 | GI Platform Data Ledger (Block 1 × No of Month) · 505 MID 1 (<b>Block 2</b> = Block 1 × 7 CDT1) · 506 MID 2 (<b>Block 3</b>: % by CDT1 by Vendor by Month) · 507 MID 3 (khử nhiễu)</td><td>4 bước formula</td><td>Done</td><td><span class="pill no">⛔</span> <code>allocate.py</code> chỉ suy 3 cột nhãn AU/AV/AW; không chia một đồng nào</td></tr>
+<tr><td>508 OMC · 509 SC · 510 PS — "Tương tự GI"</td><td>—</td><td>Done</td><td><span class="pill no">⛔</span></td></tr>
+<tr class="band" style="--band-c:var(--band4)"><th colspan="4">AL-③ Khoá đơn giản</th></tr>
+<tr><td>511 By LE ("easy") · 512 By NOEM · 513 By GI</td><td>—</td><td>Done</td><td><span class="pill no">⛔</span> phương pháp đã nằm trong <code>fls_mapping_master.method_cfa2</code>: By GI 8 · By NOEM 5 · H1000 Ledger 4 · 4 ledger — giá trị lưu, chưa thực thi</td></tr>
+</tbody></table></div>
+
+<h3>⑤ REPORT — 18 bước</h3>
+<div class="scroll"><table class="steps">
+<thead><tr><th>Nhóm · bước</th><th>Việc</th><th>AS-IS</th><th>FLS hôm nay</th></tr></thead>
+<tbody>
+<tr class="band" style="--band-c:var(--band5)"><th colspan="4">R-① Số phân bổ → P&amp;L file</th></tr>
+<tr><td>600 GI · 601 OMC (version không dùng nữa, giữ check chéo) · 602 SC · 603 PS (GScript A–AD, Templ 2.7) · 604 Allocation Table By NOEM &amp; By GI</td><td>chuyển Allocate Amount by CDT1</td><td>Done</td><td><span class="pill no">⛔</span></td></tr>
+<tr class="band" style="--band-c:var(--band5)"><th colspan="4">R-② Daily Report 3 · P&amp;L (Templ 5)</th></tr>
+<tr><td>605 [FS1][PLA5] DR3 Sign-off · 606 PLA3 YHQM PM+HR | ATL (bảng phân loại cần allocate tạm ở Master Mapping) · 607 [FS2] DR3 · 608 [FS1] DR3 · 609 DR3 (PL FS1+FS2, Group &amp; CDT1)</td><td>—</td><td>Done</td><td><span class="pill no">⛔</span></td></tr>
+<tr class="band" style="--band-c:var(--band5)"><th colspan="4">R-③ Daily Report 2 · CF</th></tr>
+<tr><td>610 (= CFA1 Daily + YHQM, gồm CF Group &amp; LE)</td><td>—</td><td>Done</td><td><span class="pill no">⛔</span></td></tr>
+<tr class="band" style="--band-c:var(--band5)"><th colspan="4">R-④ HR &amp; quản trị dữ liệu</th></tr>
+<tr><td>611 H1000 Index · 612 [HR RPT] EDD CLEAN98% · 613 [RAW ITL] Data Management</td><td>—</td><td>Done</td><td><span class="pill mid">◐</span> 613 ≈ màn F02 sổ ITL (23 cột) + <code>fls_journal</code>; 611/612 ⛔</td></tr>
+<tr class="band" style="--band-c:var(--band5)"><th colspan="4">R-⑤ CCR</th></tr>
+<tr><td>614 9.2 Exchange Rate · 615 5. Daily Report (tempo) · 616 CCR | DEL | W | Pdf (in ký bản cứng tháng 1 lần) · 617 [CA] Nhật ký xử lý giao dịch</td><td>—</td><td>Done</td><td><span class="pill no">⛔</span> chỉ đo (<code>do_trong_tai.py</code>)</td></tr>
+</tbody></table></div>
+<p class="meta">Bước 700–702 "OTHERS": 700 C12 · 701 DS theo dõi BHXH (đổ vào H1000 ×4) · 702 Nghiệm thu data cho kế toán dịch vụ — ngoài 5 khâu, giữ làm chú thích.</p>
+
+<h2>§4 · Chia giai đoạn — 4 giai đoạn, giai đoạn 1 chia 5 chặng</h2>
+<p class="note">Nguyên tắc: mỗi giai đoạn không đi quá một khâu của con voi; giai đoạn sau không bắt đầu khi giai đoạn trước còn một cổng ĐỎ. Mỗi chặng có cổng ra khai <code>mong</code> (luật Đ5). Cổng đo trên kho thật khi có Docker; ở phiên này chỉ khai, chưa chạy.</p>
+<div class="scroll"><table>
+<thead><tr><th>GĐ</th><th>Khâu</th><th>Câu chứng minh xong</th><th>Trọng tâm</th></tr></thead>
+<tbody>
+<tr><td><b>GĐ1</b></td><td>① + ②</td><td>"<b>Mọi</b> dòng chi phí của 4 họ nguồn nằm trong <b>một</b> bảng <code>fls_itl</code>, và <b>mọi</b> dòng có pháp nhân — hoặc nằm trong một danh sách rỗng-có-tên"</td><td>Đóng khâu 319 mà Sheets bỏ</td></tr>
+<tr><td>GĐ2</td><td>③</td><td>"Một hàm <code>khoi(kỳ, AL)</code> sinh lại 11 sheet 409–419 khớp từng ô, trên tiền đã quy đổi bằng bảng tỷ giá có nguồn"</td><td>Thay 11 sheet Sumifs bằng 1 phép gom</td></tr>
+<tr><td>GĐ3</td><td>④</td><td>"23 mã hd cần CFA2 được chia theo đúng <code>method_cfa2</code>, Σ sau chia = Σ trước chia từng dòng"</td><td>Thực thi <code>fls_mapping_master</code> thay vì chỉ lưu</td></tr>
+<tr><td>GĐ4</td><td>⑤</td><td>"DR2 · DR3 · CCR dựng lại từ kho khớp bản ký; và một <b>hợp đồng xuất</b> đủ 7 nhóm khoá cho hệ khác"</td><td>Output cho hệ thống kế tiếp</td></tr>
+</tbody></table></div>
+
+<h3>GĐ1 — đi hết INPUT, về một bảng ITL, mọi chi phí có pháp nhân</h3>
+<div class="scroll"><table>
+<thead><tr><th>Chặng</th><th>Bước PD Now</th><th>Làm gì (ít nhất)</th><th>Cổng ra — <code>mong</code></th></tr></thead>
+<tbody>
+<tr><td><b>1.1 Tiền — đóng lằn Quỹ</b></td><td>116 · 202 · 203 · 204</td><td>Mở lằn Cash ở <code>tools/chup_sao_ke.py</code> (hôm nay LAN="Bank"); quyết <code>GAP-CANON-02</code> (khuôn 11 cột quỹ); nạp 8 dòng chảy quỹ qua cùng đường F04 (không viết bộ đọc thứ hai)</td><td><code>fls_itl</code> có <code>source_system='Cash'</code>; số dòng = Cash Ledger Transactions từng quỹ (mẫu số đo trước); nạp lại ⇒ vào sổ = 0; 2. CCR Cash (204) so được balance theo ngày — lệch liệt kê từng ngày, không %</td></tr>
+<tr><td><b>1.2 PAY Tool đủ 4 phiếu</b></td><td>107–114 · 214 215 218 · 303 304 306</td><td>Ba bảng ảnh chụp <code>fls_pe_line</code> · <code>fls_pi_line</code> · <code>fls_pc_line</code> (cùng lằn <code>fls_chup</code>, cùng bản khai cột); <code>pe_line/pi_line</code> trong <code>fls_pm_line</code> thành FK thật; cột canon W/X (khoá PELine), AB/AC (khoá PILine), Y (ID Payee ← PE) đổ từ bảng của FLS thay vì từ oracle</td><td><code>fls_pe_line</code> = 2.694 · <code>fls_pi_line</code> = 973 (đo lại lúc chụp); 0 <code>pe_line/pi_line</code> trỏ vào rỗng (hôm nay = 100% trỏ rỗng); <code>id_payee</code> phủ ≥ 95% dòng có PE; parity W/X/AB/AC/Y với Transaction Mapping L1 = 100% từng ô</td></tr>
+<tr><td><b>1.3 HR — bốn sổ H1000</b></td><td>101 102 · 219–222 · 315–318</td><td>Adapter D: đọc 4 sheet H1000 Ledge (đã qua import A–Q + lookup Master Mapping R–AT) → canon → <code>fls_itl</code> với <code>source_system='HR'</code>; giữ HD/KRF đã tách ở Raw (500: không phân bổ lại); <code>code_hr</code> của Mapping Master là khoá</td><td>4 lần nạp = 4 <code>run_id</code>; Σ ps_no/ps_co từng năm × từng sổ = sheet; mọi dòng HR có <code>hd</code> (mong 100% — HR đã mang HD ở Raw; dòng thiếu là lỗi nguồn, vào hàng chờ có tên); KRF nhóm HDH &gt; 0 (411) tái lập được</td></tr>
+<tr><td><b>1.4 Nền tảng + AP/AR</b> (chờ owner chốt phạm vi)</td><td>103–106 · 210–213 · 223 224 · 310–312</td><td>Adapter E (GI/OMC/SC/PS — 15.517 ô, 69% phạm vi khối 8+9, chặn <code>GAP-ITL-18</code>) và F (AP/AR — <code>QĐ-ITL-03</code> gói riêng; AS-IS cũng Not yet). Đề xuất: GĐ1 nạp SC (chi phí thật, PLA2) và PS; GI/OMC là khoá phân bổ (doanh thu) ⇒ bảng riêng <code>fls_platform_*</code>, không trộn vào <code>fls_itl</code>; AP/AR lùi GĐ1b</td><td>Mỗi ledger: số dòng = Looker/RAW; <code>source_system='Platform'</code> chỉ cho SC/PS; GI/OMC có bảng riêng với khoá (vendor, month, network-acc) sẵn cho GĐ3</td></tr>
+<tr><td><b>1.5 Hợp nhất + pháp nhân</b> ⭐</td><td>319 · 301/313 · 308 [3] · 511 (By LE)</td><td>ⓐ Viết luật tách <code>source_sheet</code> (<code>GAP-SPEC-04</code>) thành hàm thuần <code>fls/canon/</code> + đổ <code>le</code> cho Bank/Cash; ⓑ <code>le_payer</code> ← PM_Unpivot.Pháp nhân thanh toán qua <code>fls_pm_link</code>; ⓒ <code>fls_le</code> đủ tên (hôm nay 24/29 thiếu tên, <code>GAP-LE-01</code>) + 6 tài khoản thẻ PO* + 4 tài khoản không "_"; ⓓ 14 tài khoản · 211 dòng rỗng pháp nhân (<code>GAP-ITL-47</code>) → owner quyết từng tài khoản, không regex; ⓔ bộ xuất 64 cột D1</td><td><code>le</code> NULL = 0/N hoặc danh sách rỗng có tên tài khoản và owner ký; Σ tiền theo LE = Σ tiền theo nguồn (hai cách đếm, cùng một tổng); <code>is_intercompany</code> không còn false 100% — in số dòng true và so với luật FPS; D1 64 cột đối chiếu từng dòng với ITL Ledge thật (D2); một SELECT trả đủ 4 họ nguồn</td></tr>
+</tbody></table></div>
+<p><b>Thứ tự chạy không phải thứ tự số:</b> 1.5ⓐ (luật tách <code>source_sheet</code>) làm trước vì nó rẻ, đã đo 8.387/8.387, và đổi ngay con số pháp nhân của sổ đang có; rồi 1.1 → 1.2 → 1.3 → 1.4 → 1.5ⓑ–ⓔ.</p>
+
+<h3>GĐ2 · GĐ3 · GĐ4 — chặng và cổng</h3>
+<div class="scroll"><table>
+<thead><tr><th>GĐ · chặng</th><th>Bước</th><th>Cổng ra — <code>mong</code></th></tr></thead>
+<tbody>
+<tr class="band" style="--band-c:var(--band3)"><th colspan="3">GĐ2 — CALCULATE</th></tr>
+<tr><td>2.1 Bảng tỷ giá có nguồn</td><td>405 · 614</td><td><code>fls_ty_gia(kỳ, tiền tệ, tỷ giá, nguồn)</code>; mọi dòng <code>fls_itl</code> quy đổi được hoặc vào hàng chờ "thiếu tỷ giá kỳ X" — 0 dòng rơi im</td></tr>
+<tr><td>2.2 General Ledger một tiền tệ</td><td>406–408 · 412 413</td><td>Σ sau quy đổi = sheet Report I General Ledger từng kỳ; audit cash balance = 2. CCR theo ngày</td></tr>
+<tr><td>2.3 Khối KRF × kỳ</td><td>409–419</td><td>một hàm <code>khoi(kỳ ∈ {D,M,Q,H,Y}, AL ∈ {CFA1,CFA3,PLA1,PLA3})</code> sinh lại 11 sheet khớp từng ô (Templ 3/4)</td></tr>
+<tr class="band" style="--band-c:var(--band4)"><th colspan="3">GĐ3 — ALLOCATE</th></tr>
+<tr><td>3.1 Mapping Block 1</td><td>503</td><td><code>fls_vendor_network(vendor_id, network_acc, cdt1, product, fu)</code> — số vendor = sheet; 0 vendor không map được mà không có tên</td></tr>
+<tr><td>3.2 Block 2/3 — % by CDT1</td><td>504–507 + 508–510</td><td>Với mỗi hd có <code>method_cfa2 ∈ {GI, OMC, SC, PS Ledger}</code>: Σ phần chia = đúng tiền gốc từng dòng (<code>INV-I16</code>: lệch thì chặn); bảng % by CDT1 by Vendor by Month khớp MID 2</td></tr>
+<tr><td>3.3 By LE / NOEM / GI</td><td>511–513 · 604</td><td>23 mã cần CFA2 đều chia xong hoặc nằm trong 52/73 mã Method rỗng — danh sách ấy owner điền, máy không đoán</td></tr>
+<tr class="band" style="--band-c:var(--band5)"><th colspan="3">GĐ4 — REPORT</th></tr>
+<tr><td>4.1 Daily Report 2 · CF</td><td>610</td><td>Dựng từ <code>khoi(D/YHQM, CFA1)</code> theo CF Group × LE; khớp bản đang dùng từng ô</td></tr>
+<tr><td>4.2 Daily Report 3 · P&amp;L</td><td>600–609</td><td>PL FS1 + FS2, Group × CDT1; 605 bản ký làm oracle</td></tr>
+<tr><td>4.3 CCR + HR</td><td>611–617</td><td>CCR theo ngày khớp 2. CCR; pdf ký tháng 1 lần (616); HR report từ <code>fls_itl</code> HR</td></tr>
+<tr><td>4.4 <b>Hợp đồng xuất cho hệ khác</b></td><td>(mới)</td><td>Một bảng / GET duy nhất, 7 nhóm khoá của §1 làm chiều: LE × le_payer × HD/KRF × CDT1 × kỳ (D/M/Q/H/Y) × tiền tệ (gốc + quy đổi) × AL × nguồn; version hoá như ITL-CONTRACT</td></tr>
+</tbody></table></div>
+
+<h2>§5 · Câu cần owner quyết trước khi GĐ1 chạy</h2>
+<div class="scroll"><table>
+<thead><tr><th>#</th><th>Câu</th><th>Chặn</th></tr></thead>
+<tbody>
+<tr><td>1</td><td>GI/OMC vào <code>fls_itl</code> hay bảng riêng? (đề xuất: bảng riêng, vì chúng là khoá phân bổ, không phải chi phí)</td><td>1.4</td></tr>
+<tr><td>2</td><td>AP/AR (223/224, AS-IS cũng Not yet) thuộc GĐ1 hay lùi GĐ1b? (<code>QĐ-ITL-03</code> nói gói riêng)</td><td>1.4</td></tr>
+<tr><td>3</td><td>211 dòng · 14 tài khoản rỗng pháp nhân (<code>GAP-ITL-47</code>, tạm bỏ qua 24/08): GĐ1 đòi 0 dòng rỗng — owner quyết từng tài khoản, hay chấp nhận danh sách rỗng-có-tên?</td><td>1.5 ⓓ</td></tr>
+<tr><td>4</td><td><code>fls_le</code> thiếu tên 24/29 mã (<code>GAP-LE-01</code>) — ai cấp danh mục pháp nhân chuẩn?</td><td>1.5 ⓒ</td></tr>
+<tr><td>5</td><td>H1000 là "Blackbox lớn" (ghi ở 101, 219–222): GĐ1 chỉ đọc đầu ra 4 sổ H1000 Ledge (315–318), không mở hộp đen Payroll — đồng ý?</td><td>1.3</td></tr>
+</tbody></table></div>
+
+<footer>Nguồn: <code>A_FPA_PD_PLB_Guide_2025 - FS2 PD Now.csv</code> · <code>docs/ITL/_PD_NOW_VOI_VA_GIAI_DOAN.md</code> v0.1 (2026-11-03) · mã nguồn @ <code>2d1b710</code>. Trang tự chứa, không gọi mạng ngoài font.</footer>
+</main>
+</body>
+</html>
