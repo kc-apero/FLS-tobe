@@ -1,0 +1,53 @@
+[importlinter]
+root_package = fls
+include_external_packages = True
+
+# Chi fls/repo/ va fls/db/ duoc cham driver DB (psycopg).
+# fls.db.pg_migrate import psycopg trong HAM (lazy) de --dry-run chay offline
+# khong can driver; fls.db nam ngoai source_modules nen dung quyen.
+# Cac tang khac se duoc THEM vao source_modules ngay khi chung ton tai:
+#   fls.adapters (P2) · fls.oracle (P2) · fls.api (P4)   [canon+ledger da them o P1]
+# import-linter bao loi neu source_modules tro toi module chua ton tai, nen danh
+# sach nay lon dan theo pha thay vi khai truoc mot loat package rong.
+[importlinter:contract:1]
+name = Chi fls.repo va fls.db duoc import driver DB
+type = forbidden
+source_modules =
+    fls.contract
+    fls.canon
+    fls.ledger
+forbidden_modules =
+    psycopg
+
+# fls.db.model la LA (leaf) SSOT: khong duoc phu thuoc bat cu gi trong fls.
+# Neu model import render/schema thi "khai bao mot lan" mat y nghia (vong phu thuoc).
+[importlinter:contract:2]
+name = fls.db.model la leaf SSOT, khong phu thuoc gi trong fls
+type = forbidden
+source_modules =
+    fls.db.model
+forbidden_modules =
+    fls.db.render
+    fls.contract
+
+# canon la tang duoi cung cua nghiep vu: chuan hoa hinh dang du lieu.
+# Cam nguoc chieu — 01_TECH_DESIGN §4 "mui ten mot chieu ve canon va contract".
+[importlinter:contract:3]
+name = fls.canon khong duoc phu thuoc tang tren
+type = forbidden
+source_modules =
+    fls.canon
+forbidden_modules =
+    fls.ledger
+    fls.repo
+    fls.db
+
+# ledger la ham thuan: canon -> payload. Cam biet gi ve tang ghi.
+[importlinter:contract:4]
+name = fls.ledger khong duoc biet tang ghi DB
+type = forbidden
+source_modules =
+    fls.ledger
+forbidden_modules =
+    fls.repo
+    fls.db

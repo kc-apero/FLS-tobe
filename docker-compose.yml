@@ -1,0 +1,8 @@
+services:
+  pg:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: fls
+      POSTGRES_PASSWORD: fls
+      POSTGRES_DB: fls
+    ports: ["5433:5432"]

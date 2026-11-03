@@ -1,0 +1,5 @@
+# Git KHONG duoc doi LF->CRLF: golden-file va hien vat ERD duoc so sanh nguyen van,
+# doi ky tu xuong dong la cong G-ERD-1 do gia tren may khac.
+* text eol=lf
+*.png binary
+*.xlsx binary
