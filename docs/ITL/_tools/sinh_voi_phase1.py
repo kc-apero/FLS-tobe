@@ -34,7 +34,7 @@ GOC = Path(__file__).resolve().parents[3]
 DICH = GOC / "docs/ITL/02_BA/Artifacts/Voi-FLS-tobe-phase1.html"
 
 # ───────────────────────────── lưới ─────────────────────────────
-W, H = 1420, 1092
+W, H = 1420, 1206
 C0 = (128, 236)                         # cột 0: điểm khởi động của vùng FLS
 
 
@@ -64,17 +64,18 @@ DAI = {
     "H1": ("H", 118, 74, ""),
     "c1": ("C", 290, 84, "① KHAI & CHỤP"),
     "c2": ("C", 410, 78, "② DỰNG"),
-    "c3": ("C", 524, 78, "③ GHÉP & SOÁT"),
-    "c4": ("C", 638, 78, "④ GHI"),
-    "d1": ("D", 764, 78, "⑤ SỔ GỐC"),
-    "d2": ("D", 878, 72, "⑥ HIỆU LỰC"),
-    "e1": ("E", 998, 70, "⑦ NGƯỜI THẤY"),
+    "c3": ("C", 524, 78, "③ MAPPING"),
+    "c4": ("C", 638, 78, "④ SOÁT"),
+    "c5": ("C", 752, 78, "⑤ GHI"),
+    "d1": ("D", 878, 78, "⑥ SỔ GỐC"),
+    "d2": ("D", 992, 72, "⑦ HIỆU LỰC"),
+    "e1": ("E", 1112, 70, "⑧ NGƯỜI THẤY"),
 }
-TANG = {"A0": 0, "B0": 0, "G0": 0, "H0": 0, "A1": 1, "B1": 1, "G1": 1, "H1": 1, "c1": 2, "c2": 3, "c3": 4, "c4": 5, "d1": 6, "d2": 7, "e1": 8}
+TANG = {"A0": 0, "B0": 0, "G0": 0, "H0": 0, "A1": 1, "B1": 1, "G1": 1, "H1": 1, "c1": 2, "c2": 3, "c3": 4, "c4": 5, "c5": 6, "d1": 7, "d2": 8, "e1": 9}
 VUNG = {   # mã: (nhãn, nhãn phụ, y0, y1)
-    "C": ("FLS · NẠP", "chưa vào sổ", 266, 728),
-    "D": ("FLS · SỔ", "PostgreSQL · chỉ-thêm", 740, 962),
-    "E": ("ĐẦU RA", "màn FLS + hệ khác", 974, 1080),
+    "C": ("FLS · NẠP", "chưa vào sổ", 266, 842),
+    "D": ("FLS · SỔ", "PostgreSQL · chỉ-thêm", 854, 1076),
+    "E": ("ĐẦU RA", "màn FLS + hệ khác", 1088, 1194),
 }
 TEN_VUNG = {"A": "Nguồn ngoài · FPS", "B": "Phương pháp xử lý (1) · mapping với bank transaction — sao kê & sổ quỹ",
             "G": "Phương pháp xử lý (2) · HR", "H": "Phương pháp xử lý (3) · nền tảng", "C": "FLS · NẠP",
@@ -98,7 +99,7 @@ class Hop:
 
     @property
     def y(self) -> tuple[float, float]:
-        _v, y0, h, _n = DAI[self.dai] if self.dai in DAI else DAI_M[self.dai]
+        _v, y0, h, _n = DAI.get(self.dai) or DAI_M.get(self.dai) or DAI_N[self.dai]
         if self.tang == "tren":
             return y0, y0 + h / 2 - 4
         if self.tang == "duoi":
@@ -124,14 +125,14 @@ HOP: list[Hop] = [
     Hop("oKTq", "B0", cot(5), "o", "b", "KẾ TOÁN QUỸ", ("ghi sổ quỹ hằng ngày",),
         doi_chieu="ngoài FLS — 8 dòng chảy quỹ có bản khai dòng 1"),
     Hop("oHR", "G0", cot(6), "o", "b", "HR · C&B", ("lập sổ lương",), doi_chieu="ngoài FLS"),
-    Hop("oNT", "H0", cot(7), "o", "b", "CHỦ SỔ NỀN TẢNG", ("dịch vụ · thanh toán",), doi_chieu="ngoài FLS"),
+    Hop("oNT", "H0", cot(7), "o", "b", "DATA · LOOKER", ("xuất file chi phí",), doi_chieu="ngoài FLS — owner 04/11"),
     Hop("saoke", "B1", cot(4), "x", "b", "sao kê ngân hàng", ("60 dòng chảy", "19 bố cục cột"), "sheet R |",
         doi_chieu="tools/nap_nguon_va_khai.py (60 ngân hàng + 8 quỹ = 68 nguồn)"),
     Hop("soquy", "B1", cot(5), "x", "b", "sổ quỹ", ("8 dòng chảy", "kế toán ghi tay"), "sheet R |",
         doi_chieu="như trên"),
     Hop("soluong", "G1", cot(6), "x", "b", "sổ lương HR", ("4 sổ: 2 loại × 2 năm", "HD/KRF tách sẵn"), "sheet HR",
         doi_chieu="0 tham chiếu trong fls/ (chỉ chuỗi phương pháp ở mapping_master.py:31)"),
-    Hop("sont", "H1", cot(7), "x", "b", "sổ nền tảng", ("chi phí dịch vụ (SC)", "thanh toán (PS)"), "file RAW",
+    Hop("sont", "H1", cot(7), "x", "b", "file xuất Looker", ("OMC · GI · Server · PS", "4 loại · 4 luật"), "không có trên FPS",
         doi_chieu="0 tham chiếu trong fls/ (Platform chỉ là enum)"),
     # ── c1 · KHAI & CHỤP ──
     Hop("S1", "c1", C0, "o", "b", "S1 · NHỊP", ("mỗi giờ 8h–19h",), tang="tren", khoi="kd1",
@@ -152,7 +153,7 @@ HOP: list[Hop] = [
     Hop("anhHR", "c1", cot(6), "d", "q", "ảnh sổ lương HR",
         ("lằn HR ⛔", "đợt chi theo venture · kỳ"), "fls_chup lằn 'HR'", huy=("S1",),
         doi_chieu="chưa có: chup_sao_ke.py chỉ chụp lằn Bank", khoi="pp2"),
-    Hop("anhNT", "c1", cot(7), "d", "q", "ảnh sổ nền tảng",
+    Hop("anhNT", "c1", cot(7), "d", "q", "ảnh file Looker",
         ("lằn Platform ⛔", "bố cục cột: chưa chốt"), "fls_chup 'Platform'", huy=("S1",),
         doi_chieu="chưa có: chup_sao_ke.py chỉ chụp lằn Bank", khoi="pp3"),
     # ── c2 · DỰNG ──
@@ -171,36 +172,43 @@ HOP: list[Hop] = [
         ("lương · BHXH · BHYT", "→ Σ mỗi đợt + LE venture"), "GĐ2: tách xuống KRF",
         huy=("S3", "S4"), khoi="pp2",
         doi_chieu="chưa có (adapter D) · owner 04/11: GĐ1 mapping đợt đi tiền → LE, GĐ2 → KRF"),
-    Hop("dNT", "c2", cot(7), "p", "q", "DỰNG dòng nền tảng",
-        ("SC · PS → canon", "giữ LE của sổ"), "chưa có (adapter E)",
+    Hop("dNT", "c2", cot(7), "p", "q", "DỰNG chi phí nền tảng",
+        ("4 loại → canon", "→ mapping + allocate"), "chi tiết: §1c",
         huy=("S3", "S4"), doi_chieu="chưa có (adapter E)", khoi="pp3"),
-    # ── c3 · GHÉP & SOÁT ──
-    Hop("ghep", "c3", nhip(1, 3), "p", "b", "MAPPING bank txns ↔ lệnh chi (Reference No) — PP (1)",
-        ("Reference No → chia tiền theo PM line",
-         "Σ line = tiền dòng, lệch ⇒ chặn · khác tiền tệ ⇒ để người"),
-        "ra 3 lớp L1 · L2 · L3 (§1b) · hôm nay nối 26,79% dòng", huy=("S4",),
+    # ── c3 · MAPPING — tách theo nhóm (owner 04/11): phần chưa khớp chuyển NGANG sang nhóm kế ──
+    Hop("ghep", "c3", (cot(1)[0], cot(5)[1] - 24), "p", "b", "MAPPING PP (1) · bank txns ↔ lệnh chi (Reference No)",
+        ("Reference No → chia tiền theo PM line · Σ line = tiền dòng, lệch ⇒ chặn",
+         "khác tiền tệ · N×M ⇒ để người · ra 3 lớp L1 · L2 · L3 (§1b)"),
+        "hôm nay nối 26,79% dòng", huy=("S4",), khoi="m1",
         doi_chieu="fls/adapters/pm_join.py · chay_nap.py:637 chen_moi_noi"),
-    Hop("soat", "c3", nhip(4, 7), "p", "b", "SOÁT lô",
-        ("9 luật · CHẶN ⇒ nguồn bị chừa · CỜ ⇒ vẫn ghi, vào hàng chờ có lý do",
-         "4 vế phải cân: vào = sổ + loại + rỗng + trùng"),
-        "fls/kiem/soat_nap.py", huy=("S3", "S4"),
-        doi_chieu="fls/kiem/soat_nap.py · chay_nap.py:611 cổng bốn đường"),
-    # ── c4 · GHI ──
-    Hop("S4", "c4", C0, "o", "b", "S4 · NHẬN", ("kế toán · F04",), tang="tren", khoi="kd4",
+    Hop("ghep2", "c3", (cot(6)[0], cot(6)[1] - 18), "p", "q", "MAPPING PP (2)",
+        ("đợt lương · BH", "↔ bank txns → LE"), "chi tiết §1b", huy=("S4",), khoi="m2",
+        doi_chieu="chưa có · owner 04/11"),
+    Hop("ghep3", "c3", cot(7), "p", "q", "MAPPING PP (3)",
+        ("4 luật · khớp kỳ + Σ", "→ allocate venture"), "chi tiết §1c", huy=("S4",), khoi="m3",
+        doi_chieu="chưa có · owner 04/11"),
+    # ── c4 · SOÁT — mỗi nhóm một bộ luật soát ──
+    Hop("soat", "c4", (cot(1)[0], cot(5)[1] - 24), "p", "b", "SOÁT PP (1)",
+        ("9 luật sao kê · CHẶN ⇒ nguồn bị chừa · CỜ ⇒ vẫn ghi, vào hàng chờ có lý do",
+         "Σ PM line = tiền dòng · 4 vế cân: vào = sổ + loại + rỗng + trùng · biên bản 9 dòng trên F04"),
+        "fls/kiem/soat_nap.py", huy=("S3", "S4"), khoi="m1",
+        doi_chieu="fls/kiem/soat_nap.py · chay_nap.py:611 cổng bốn đường · QĐ-ITL-112"),
+    Hop("soat2", "c4", (cot(6)[0], cot(6)[1] - 18), "p", "q", "SOÁT PP (2)",
+        ("Σ đợt = Σ giao dịch", "mọi đợt có LE"), "chưa có", huy=("S3", "S4"), khoi="m2",
+        doi_chieu="chưa có"),
+    Hop("soat3", "c4", cot(7), "p", "q", "SOÁT PP (3)",
+        ("Σ phần chia = tiền", "Σ % venture = 100"), "chưa có", huy=("S3", "S4"), khoi="m3",
+        doi_chieu="chưa có"),
+    # ── c5 · GHI ──
+    Hop("S4", "c5", C0, "o", "b", "S4 · NHẬN", ("kế toán · F04",), tang="tren", khoi="kd4",
         doi_chieu="POST /nap/lo"),
-    Hop("S5", "c4", C0, "o", "b", "S5 · GHÉP·SỬA", ("kế toán · F01·F02",), tang="duoi", khoi="kd4",
+    Hop("S5", "c5", C0, "o", "b", "S5 · GHÉP·SỬA", ("kế toán · F01·F02",), tang="duoi", khoi="kd4",
         doi_chieu="POST match · adjust · reverse · …"),
-    Hop("ghiNap", "c4", nhip(1, 4), "p", "b", "GHI lượt nạp — một giao dịch",
-        ("run · dòng sổ · dòng loại · mối nối máy · gợi ý hd/cdt1",
+    Hop("ghiNap", "c5", nhip(1, 7), "p", "b", "GHI lượt nạp — một giao dịch cho cả 3 nhóm",
+        ("run · dòng sổ · dòng loại · mối nối máy (PP 1) · đợt gắn LE (PP 2) · phần chia venture (PP 3) · gợi ý hd/cdt1",
          "lỗi giữa chừng ⇒ ⛔ không còn dòng nào đã ghi"),
-        "fls/repo/chay_nap.py", huy=("S4",),
+        "fls/repo/chay_nap.py — hôm nay chỉ phần PP (1)", huy=("S4",),
         doi_chieu="chay_nap.py:621 `with conn.transaction()`"),
-    Hop("bienban", "c4", cot(5), "d", "b", "biên bản lô", ("9 dòng tổng", "n vào · m bị chừa"), "hiện trên F04",
-        huy=("S3",), doi_chieu="QĐ-ITL-112 · man_f04.js"),
-    Hop("ghiTay", "c4", nhip(6, 7), "p", "b", "GHI tay — một giao dịch",
-        ("ghép · bỏ ghép · sửa · đảo · lý do", "actor lấy từ thẻ đăng nhập"),
-        "fls/repo/ghi_tay.py — chỗ ghi duy nhất", huy=("S5",),
-        doi_chieu="fls/repo/ghi_tay.py"),
     # ── d1 · SỔ GỐC ──
     Hop("loai", "d1", cot(1), "d", "b", "dòng bị loại", ("mỗi dòng một", "lý do có tên"), "fls_reject",
         doi_chieu="schema.py fls_reject"),
@@ -208,11 +216,15 @@ HOP: list[Hop] = [
         ("một bảng · 4 họ nguồn (Bank·Cash·HR·Platform)", "chỉ-thêm · ⛔ không PUT/DELETE"),
         "fls_itl 8.387 · hôm nay 1 họ nguồn",
         doi_chieu="schema.py fls_itl · INV-I08 · source_system khai 4 giá trị"),
-    Hop("lopSua", "d1", nhip(4, 7), "d", "b", "lớp sửa chỉ-thêm (gộp vẽ)",
-        ("mối nối · bỏ nối · bút toán (người / máy gợi ý) · sự kiện hàng chờ · nhật ký",
+    Hop("lopSua", "d1", (cot(4)[0], cot(6)[1] - 24), "d", "b", "lớp sửa chỉ-thêm (gộp vẽ)",
+        ("mối nối · bỏ nối · bút toán (người / máy gợi ý) · sự kiện · nhật ký",
          "sửa = thêm dòng · dòng sổ ⛔ không đổi một ô"),
         "fls_pm_link 2.263 · fls_adjustment 4.428 · fls_journal",
         doi_chieu="fls_pm_link · fls_pm_unlink · fls_adjustment · fls_queue_event · fls_journal"),
+    Hop("ghiTay", "d1", cot(7), "p", "b", "GHI tay",
+        ("ghép · sửa · đảo · lý do", "actor từ thẻ đăng nhập"),
+        "chỗ ghi duy nhất", huy=("S5",),
+        doi_chieu="fls/repo/ghi_tay.py"),
     # ── d2 · HIỆU LỰC ──
     Hop("kiem", "d2", (cot(1)[0], cot(1)[1] - 16), "p", "q", "KIỂM cổng GĐ1",
         ("mỗi cổng khai mong",), "đỏ khi khác",
@@ -262,7 +274,7 @@ TEN: list[Ten] = [
         "như o3", "ngoài FLS", tam(5), "1b"),
     Ten("o5", "oHR", "soluong", "b", "lập sổ lương đã tách HD/KRF", "(sổ, năm, dòng)", "1 sổ – n dòng",
         "bề rộng cột đổi ⇒ bộ đọc nổ, ⛔ không đoán", "ngoài FLS", tam(6), "1c"),
-    Ten("o6", "oNT", "sont", "b", "ghi chi phí dịch vụ · thanh toán", "(sổ, tháng, dòng)", "1 sổ – n dòng",
+    Ten("o6", "oNT", "sont", "b", "xuất file chi phí OMC · GI · Server · PS theo vendor · venture · tháng", "(loại, tháng, dòng)", "1 file – n dòng",
         "như o5", "ngoài FLS", tam(7), "1c"),
     # 2 · vượt ranh giới
     Ten("x1", "soPM", "anhFPS", "q", "dòng sổ cái PM: tiền · tiền tệ · Ref · khoá PE/PI · HD · CDT1 · pháp nhân trả · trạng thái",
@@ -278,7 +290,7 @@ TEN: list[Ten] = [
         "như x3 + số dư theo ngày nếu nguồn có", "⛔ lằn Cash chưa bật (GAP-CANON-02)", tam(5), "2b"),
     Ten("x5", "soluong", "anhHR", "q", "4 sổ lương theo năm", "(sổ, năm, dòng)", "1 sổ – n dòng",
         "Σ Nợ/Có từng sổ phải bằng sổ nguồn", "⛔", tam(6), "2c"),
-    Ten("x6", "sont", "anhNT", "q", "sổ chi phí dịch vụ · sổ thanh toán", "(sổ, tháng, dòng)", "1 sổ – n dòng",
+    Ten("x6", "sont", "anhNT", "q", "file chi phí 4 loại", "(loại, tháng, dòng)", "1 file – n dòng",
         "như x5", "⛔", tam(7), "2c"),
     # 3 · khai & dựng
     Ten("k1", "anhFPS", "khai", "n", "đề xuất pháp nhân TK: TK chi + pháp nhân thanh toán trên sổ cái PM, đếm theo nguồn",
@@ -299,32 +311,40 @@ TEN: list[Ten] = [
         "dòng thiếu venture ⇒ hàng chờ có tên (mong 0)", "⛔", tam(6), "3b"),
     Ten("b5", "anhNT", "dNT", "q", "dòng lằn Platform", "chup_id + dòng", "1 – 1",
         "dòng thiếu pháp nhân ⇒ hàng chờ có tên", "⛔", tam(7), "3b"),
-    # 4 · ghép, soát, ghi
+    # 4 · mapping, soát, ghi — tách theo nhóm
     Ten("g1", "dLenh", "ghep", "q", "mỗi PM line: tiền · tiền tệ · Reference No · chiều chi phí", "pm_line_id", "1 – 1",
         "N line một phiếu nói N giá trị ⇒ 'không suy được', ⛔ không lấy dòng đầu (INV-I16)",
         "◐ có phần PM, chưa đủ chiều", 410.0, "4a"),
     Ten("g2", "dTien", "ghep", "b", "dòng tiền canon + Reference No", "content_key", "1 dòng tiền – n PM line",
-        "Σ tiền các line = tiền dòng · khác tiền tệ ⇒ để người (chờ tỷ giá, GĐ2)", "✅", tam(3), "4a"),
-    Ten("g3", "dTien", "soat", "b", "dòng tiền canon", "content_key", "1 – 1",
-        "9 luật soát chạy theo TỪNG nguồn (⛔ nối phẳng 60 nguồn)", "✅", 911.0, "4a"),
-    Ten("g4", "dHR", "soat", "q", "đợt lương / BHXH / BHYT: venture · kỳ · Σ tiền · LE", "(venture, kỳ, loại)", "1 đợt – n giao dịch bank",
-        "Σ đợt = Σ giao dịch bank đã ghép · đợt không ra LE ⇒ hàng chờ", "⛔", tam(6), "4a"),
-    Ten("g5", "dNT", "soat", "q", "dòng nền tảng canon", "content_key", "1 – 1",
-        "cùng 9 luật + Σ từng sổ = nguồn", "⛔", tam(7), "4a"),
-    Ten("w1", "ghep", "ghiNap", "b", "mối nối dự kiến (dòng, PM line, tiền chia, hình nối)", "(content_key, pm_line_id)",
-        "1 – n", "chèn SAU dòng sổ (cần itl_id) nhưng TRONG cùng giao dịch", "✅", 410.0, "4b"),
-    Ten("w2", "soat", "ghiNap", "b", "dòng đạt + dòng loại + cờ", "content_key", "1 – 1",
-        "CHẶN ⇒ 0 dòng của nguồn ấy · 4 vế không cân ⇒ ⛔ không ghi gì", "✅", 827.0, "4b"),
-    Ten("w3", "soat", "bienban", "b", "9 dòng tổng · nguồn bị chừa có tên luật", "luật", "9 dòng / lô",
-        "đã đo = 0 hiện 'chưa đo', ⛔ không hiện số 0", "✅", tam(5), "4b"),
+        "Σ tiền các line = tiền dòng · khác tiền tệ ⇒ để người (chờ tỷ giá, GĐ2)", "✅", 827.0, "4a"),
+    Ten("g3", "dHR", "ghep2", "q", "đợt lương / BHXH / BHYT: venture · kỳ · Σ tiền · LE", "(venture, kỳ, loại)", "1 đợt – n giao dịch bank",
+        "đợt không ra LE ⇒ hàng chờ", "⛔", 1140.0, "4a"),
+    Ten("g4", "dNT", "ghep3", "q", "chi phí nền tảng 4 loại theo vendor · venture · tháng", "(loại, vendor, tháng)", "n – 1 kỳ",
+        "loại lạ ⇒ chặn, nêu tên loại", "⛔", tam(7), "4a"),
+    Ten("q1", "ghep", "ghep2", "q", "giao dịch bank còn ở lớp L3 sau PP (1)", "content_key", "—",
+        "chỉ chuyển dòng chưa khớp; dòng đã khớp ⛔ thử lại ở nhóm sau", "⛔", None, "4b"),
+    Ten("q2", "ghep2", "ghep3", "q", "giao dịch bank còn lại sau PP (2)", "content_key", "—",
+        "còn lại sau PP (3) ⇒ ở L3, vào vòng cộng dồn §1b", "⛔", None, "4b"),
+    Ten("w1", "ghep", "soat", "b", "mối nối dự kiến + dòng tiền canon", "(content_key, pm_line_id)", "1 – n",
+        "9 luật soát chạy theo TỪNG nguồn (⛔ nối phẳng 60 nguồn)", "✅", 410.0, "4c"),
+    Ten("w2", "ghep2", "soat2", "q", "đợt đã khớp + LE", "(venture, kỳ, loại)", "1 – n",
+        "Σ đợt = Σ giao dịch", "⛔", 1140.0, "4c"),
+    Ten("w3", "ghep3", "soat3", "q", "giao dịch khớp + phần chia venture", "(content_key, venture)", "1 – n",
+        "Σ phần chia = tiền giao dịch", "⛔", tam(7), "4c"),
+    Ten("r1", "soat", "ghiNap", "b", "dòng đạt + dòng loại + cờ + mối nối", "content_key", "1 – 1",
+        "CHẶN ⇒ 0 dòng của nguồn ấy · 4 vế không cân ⇒ ⛔ không ghi gì", "✅", 827.0, "4d"),
+    Ten("r2", "soat2", "ghiNap", "q", "đợt đạt soát, đã gắn LE", "(venture, kỳ, loại)", "—",
+        "đợt lệch ⇒ ⛔ ghi, vào hàng chờ", "⛔", 1140.0, "4d"),
+    Ten("r3", "soat3", "ghiNap", "q", "phần chia venture đạt soát", "(content_key, venture)", "—",
+        "lệch Σ ⇒ ⛔ ghi cả giao dịch ấy", "⛔", tam(7), "4d"),
     Ten("s1", "ghiNap", "loai", "b", "dòng bị loại + lý do", "run_id + dòng nguồn", "1 – 1",
-        "mỗi dòng loại có lý do có tên", "✅", tam(1), "4c"),
+        "mỗi dòng loại có lý do có tên", "✅", tam(1), "4e"),
     Ten("s2", "ghiNap", "soITL", "b", "dòng sổ: General Trustest + TK + pháp nhân + run_id", "content_key UNIQUE", "1 – 1",
-        "trùng ⇒ ⛔ không ghi, đếm vế 'trùng' · nạp lại cùng ảnh ⇒ vào sổ = 0", "✅ (pháp nhân còn rỗng)", 577.0, "4c"),
-    Ten("s3", "ghiNap", "lopSua", "b", "mối nối máy + gợi ý hd/cdt1 (nguồn = máy gợi ý)", "itl_id + pm_line_id", "1 – n",
-        "máy gợi ý ⛔ không đè lên ô người đã chốt", "✅", 827.0, "4c"),
+        "trùng ⇒ ⛔ không ghi, đếm vế 'trùng' · nạp lại cùng ảnh ⇒ vào sổ = 0", "✅ (pháp nhân còn rỗng)", 577.0, "4e"),
+    Ten("s3", "ghiNap", "lopSua", "b", "mối nối máy · đợt gắn LE · phần chia venture · gợi ý (nguồn = máy)", "itl_id", "1 – n",
+        "máy gợi ý ⛔ không đè lên ô người đã chốt", "◐ phần PP (1)", 827.0, "4e"),
     Ten("s4", "ghiTay", "lopSua", "b", "ghép · bỏ ghép · sửa · đảo · lý do · xong/mở lại", "itl_id", "1 – n",
-        "bút toán + nhật ký trong MỘT giao dịch · actor từ thẻ, gửi trong thân ⇒ 400", "✅", 1245.0, "4c"),
+        "bút toán + nhật ký trong MỘT giao dịch · actor từ thẻ, gửi trong thân ⇒ 400", "✅", None, "4e"),
     # 5 · hiệu lực & ra ngoài
     Ten("h1", "loai", "kiem", "q", "số dòng loại theo lý do", "run_id", "—",
         "vế 'loại' của 4 vế", "◐ cổng 4 vế có ở lúc nạp", tam(1), "5a"),
@@ -352,8 +372,9 @@ NHOM = {
     "2c": "Phương pháp (2) và (3) · Sheets API, tài khoản dịch vụ chỉ-đọc (x5 · x6)",
     "3": "Nhóm 3 · Khai và dựng (k1–k2 · b1–b5)", "3a": "Bản khai nguồn và pháp nhân TK (k1 · k2 · b2)",
     "3b": "Đọc ảnh thành dòng (b1 · b3 · b4 · b5)",
-    "4": "Nhóm 4 · Ghép, soát, ghi (g1–g5 · w1–w3 · s1–s4)", "4a": "Vào ghép và soát (g1–g5)",
-    "4b": "Ra ghi và biên bản (w1–w3)", "4c": "Vào sổ (s1–s4)",
+    "4": "Nhóm 4 · Mapping, soát, ghi — theo nhóm (g · q · w · r · s)", "4a": "Vào mapping từng nhóm (g1–g4)",
+    "4b": "Chuyển phần chưa khớp sang nhóm kế (q1 · q2)", "4c": "Mapping → soát, từng nhóm (w1–w3)",
+    "4d": "Soát → ghi (r1–r3)", "4e": "Vào sổ (s1–s4)",
     "5": "Nhóm 5 · Hiệu lực và ra ngoài (h1–h4 · v1–v4)", "5a": "Sổ hiệu lực và cổng (h1–h4)",
     "5b": "Người thấy và hệ khác (v1–v4)",
 }
@@ -471,27 +492,122 @@ TEN_M: list[Ten] = [
 
 
 def kiem_m() -> list[str]:
+    return (kiem_phong(HOP_M, TEN_M, HOP_M_THEO, DAI_M, TANG_M)
+            + kiem_phong(HOP_N, TEN_N, HOP_N_THEO, DAI_N, TANG_N))
+
+
+def kiem_phong(hops, tens, ht, dai, tang) -> list[str]:
     loi: list[str] = []
-    for d in DAI_M:
-        n = sum(1 for h in HOP_M if h.dai == d)
+    for d in dai:
+        n = sum(1 for h in hops if h.dai == d)
         if not 2 <= n <= 5:
             loi.append(f"hình phóng to · dải {d}: {n} hộp")
-    for t in TEN_M:
-        a, b = HOP_M_THEO[t.tu], HOP_M_THEO[t.toi]
-        x1, y1, x2, y2 = doan(t, HOP_M_THEO)
+    for t in tens:
+        a, b = ht[t.tu], ht[t.toi]
+        x1, y1, x2, y2 = doan(t, ht)
         if t.x is not None:
             if not (a.x[0] + 6 <= t.x <= a.x[1] - 6 and b.x[0] + 6 <= t.x <= b.x[1] - 6):
                 loi.append(f"{t.ma}: x={t.x} ngoài hộp {a.ma}/{b.ma}")
-            if abs(TANG_M[b.dai] - TANG_M[a.dai]) != 1:
+            if abs(tang[b.dai] - tang[a.dai]) != 1:
                 loi.append(f"{t.ma}: ⛔ không kề nhau")
         elif a.dai != b.dai:
             loi.append(f"{t.ma}: ngang mà khác dải")
-        for h in HOP_M:
+        for h in hops:
             if h.ma in (t.tu, t.toi):
                 continue
             if cat_hop(x1, min(y1, y2) + 0.5, x2, max(y1, y2) - 0.5, h) and cat_hop(min(x1, x2) + 0.5, y1, max(x1, x2) - 0.5, y2, h):
                 loi.append(f"{t.ma} cắt qua hộp {h.ma}")
     return loi
+
+
+# ═════════════════ HÌNH PHÓNG TO · PP (3) — 4 chi phí nền tảng ═════════════════
+# Owner 04/11: OMC · GI · Server · PS ⛔ có trên FPS ⇒ xuất file từ data Looker → mapping với bank txns
+# (4 loại, 4 luật khác nhau) → allocate về các ventures. Luật cụ thể do owner điền — trang ⛔ tự bịa.
+WN, HN = 1300, 600
+
+
+def cotn(a: int, b: int | None = None) -> tuple[int, int]:
+    b = b or a
+    return 130 + (a - 1) * 200, 130 + (b - 1) * 200 + 160
+
+
+def tamn(a: int, b: int | None = None) -> float:
+    x0, x1 = cotn(a, b)
+    return (x0 + x1) / 2
+
+
+DAI_N = {
+    "n1": ("N", 16, 84, "① VÀO"),
+    "n2": ("N", 136, 84, "② MAPPING"),
+    "n3": ("N", 256, 84, "③ KẾT QUẢ"),
+    "n4": ("N", 376, 84, "④ ALLOCATE"),
+    "n5": ("N", 496, 84, "⑤ RA"),
+}
+TANG_N = {"n1": 0, "n2": 1, "n3": 2, "n4": 3, "n5": 4}
+
+HOP_N: list[Hop] = [
+    Hop("nFile", "n1", cotn(1, 3), "x", "b", "file xuất Looker (đã chụp, b5)",
+        ("OMC · GI · Server · PS — mỗi dòng: loại · vendor · app/venture · tháng · tiền",
+         "không có trên FPS ⇒ không có Reference No"), "4 loại · 4 luật", doi_chieu="owner 04/11"),
+    Hop("nBank", "n1", cotn(4, 5), "d", "b", "bank txns chưa ghép (L3)",
+        ("giao dịch không có trên FPS (§1b)", "TK · ngày · tiền · tiền tệ · nội dung"),
+        "nội dung: chờ nới QĐ-ITL-92", doi_chieu="hàng chờ UNMAPPED"),
+    Hop("nLuat", "n1", cotn(6), "d", "n", "4 luật mapping",
+        ("1 luật / loại", "người ký"), "owner điền", doi_chieu="chờ owner — xem bảng §1c"),
+    Hop("nTach", "n2", cotn(1), "p", "n", "TÁCH tỉ lệ venture",
+        ("từ chính file", "Looker"), "mỗi loại · tháng", doi_chieu="đề xuất"),
+    Hop("nMap", "n2", cotn(2, 6), "p", "n", "MAPPING chi phí nền tảng ↔ bank txns",
+        ("áp luật của từng loại: nhận diện giao dịch · khớp kỳ · khớp Σ tiền",
+         "lệch ⇒ chặn, ⛔ chia bừa · giao dịch khớp ≥ 2 loại ⇒ để người"), "không đi qua FPS", doi_chieu="đề xuất"),
+    Hop("nTyLe", "n3", cotn(1), "d", "n", "tỉ lệ venture",
+        ("loại · tháng ·", "venture · %"), "Σ % = 100", doi_chieu="đề xuất"),
+    Hop("nKhop", "n3", cotn(2, 3), "d", "n", "khớp",
+        ("giao dịch ↔ chi phí kỳ của một loại", "→ mối nối"), "Σ chi phí kỳ = Σ giao dịch", doi_chieu="đề xuất"),
+    Hop("nCho", "n3", cotn(4, 5), "d", "n", "có trên Looker, chưa có tiền",
+        ("chi phí kỳ chưa thấy giao dịch", "tuổi > N ngày ⇒ cờ"), "giống L2 của §1b", doi_chieu="đề xuất"),
+    Hop("nCon", "n3", cotn(6), "d", "n", "tiền chưa khớp",
+        ("ở lại L3, vào", "vòng cộng dồn §1b"), "UNMAPPED", doi_chieu="đề xuất"),
+    Hop("nAlloc", "n4", cotn(1, 3), "p", "n", "ALLOCATE về các ventures",
+        ("chia tiền giao dịch đã khớp theo tỉ lệ venture của đúng loại · tháng",
+         "phần lẻ làm tròn dồn vào một venture có tên, ⛔ mất xu"), "Σ phần chia = tiền giao dịch", doi_chieu="đề xuất"),
+    Hop("nBB", "n4", cotn(4, 6), "d", "n", "biên bản PP (3)",
+        ("đếm theo loại: khớp · chờ tiền · tiền chưa khớp", "+ lý do có tên"), "mỗi lượt", doi_chieu="đề xuất"),
+    Hop("nRa", "n5", cotn(1, 3), "d", "n", "dòng phân bổ theo venture",
+        ("venture · LE · loại · tháng · tiền · giao dịch gốc", "→ lớp sửa (chỉ-thêm) → sổ hiệu lực"), "giao dịch gốc ⛔ đổi một ô",
+        doi_chieu="đề xuất"),
+    Hop("nKiem", "n5", cotn(4, 5), "p", "n", "KIỂM Σ phân bổ",
+        ("Σ phần chia = tiền giao dịch,", "từng giao dịch · từng tiền tệ"), "lệch ⇒ chặn cả lượt", doi_chieu="đề xuất"),
+]
+HOP_N_THEO = {h.ma: h for h in HOP_N}
+
+TEN_N: list[Ten] = [
+    Ten("n1", "nFile", "nTach", "n", "dòng chi phí có cột venture", "(loại, tháng, venture)", "n – 1",
+        "venture rỗng ⇒ hàng chờ có tên", "⛔ đề xuất", tamn(1)),
+    Ten("n2", "nFile", "nMap", "q", "chi phí theo loại · vendor · tháng", "(loại, vendor, tháng)", "n – 1 kỳ",
+        "loại lạ ⇒ chặn, nêu tên loại", "⛔", tamn(2, 3)),
+    Ten("n3", "nBank", "nMap", "b", "giao dịch chưa ghép: TK · ngày · tiền · nội dung", "content_key", "1 – 1",
+        "đọc từ ảnh, ⛔ Sheets sống", "✅ hàng chờ có", tamn(4, 5)),
+    Ten("n4", "nLuat", "nMap", "n", "luật của từng loại", "loại + version", "4 luật",
+        "luật chưa ký ⇒ loại ấy ⛔ chạy", "⛔ chờ owner", tamn(6)),
+    Ten("n5", "nTach", "nTyLe", "n", "tỉ lệ % theo venture", "(loại, tháng, venture)", "1 – n",
+        "Σ % mỗi loại · tháng = 100, lệch ⇒ chặn", "⛔", tamn(1)),
+    Ten("n6", "nMap", "nKhop", "n", "cặp (giao dịch, chi phí kỳ, loại)", "(content_key, loại, tháng)", "n – m",
+        "Σ chi phí kỳ = Σ giao dịch của loại", "⛔", tamn(2, 3)),
+    Ten("n7", "nMap", "nCho", "n", "chi phí kỳ không giao dịch nào khớp", "(loại, tháng)", "—",
+        "chỉ so với ảnh sao kê của TK chi tới ảnh mới nhất", "⛔", tamn(4, 5)),
+    Ten("n8", "nMap", "nCon", "n", "giao dịch không khớp loại nào", "content_key", "—",
+        "vẫn UNMAPPED, ⛔ tự gán loại", "⛔", tamn(6)),
+    Ten("n9", "nTyLe", "nAlloc", "n", "tỉ lệ venture của đúng loại · tháng", "(loại, tháng)", "1 – n",
+        "thiếu tỉ lệ ⇒ ⛔ chia, vào hàng chờ", "⛔", tamn(1)),
+    Ten("n10", "nKhop", "nAlloc", "n", "giao dịch đã khớp + loại + tháng", "content_key", "1 – n phần",
+        "chỉ chia giao dịch đã khớp", "⛔", tamn(2, 3)),
+    Ten("n11", "nCho", "nBB", "n", "số chi phí chờ tiền theo loại", "(loại, tháng)", "—", "in mẫu số", "⛔", tamn(4, 5)),
+    Ten("n12", "nCon", "nBB", "n", "số giao dịch chưa khớp", "content_key", "—", "in mẫu số", "⛔", tamn(6)),
+    Ten("n13", "nAlloc", "nRa", "n", "phần chia theo venture", "(content_key, venture)", "1 – n",
+        "ghi chỉ-thêm, giao dịch gốc giữ nguyên", "⛔", tamn(2)),
+    Ten("n14", "nRa", "nKiem", "n", "các phần chia của từng giao dịch", "content_key", "n – 1",
+        "Σ phần = tiền giao dịch", "⛔", None),
+]
 
 
 # ───────────────────────────── kiểm hình ─────────────────────────────
@@ -615,6 +731,9 @@ def svg() -> str:
     o.append('<text class="vt vt-pp1" x="1085" y="277">PP (2)</text>')
     o.append('<rect class="khung-pp1" x="1247" y="281" width="165" height="216" rx="6"/>')
     o.append('<text class="vt vt-pp1" x="1253" y="277">PP (3)</text>')
+    for x0, x1, nh, lx in ((242, 1055, "PP (1)", 250), (1077, 1229, "PP (2)", 1083), (1244, 1412, "PP (3)", 1252)):
+        o.append(f'<rect class="khung-pp1" x="{x0}" y="515" width="{x1 - x0}" height="210" rx="6"/>')
+        o.append(f'<text class="vt vt-pp1" x="{lx}" y="511">{nh}</text>')
     for i, s in enumerate(("◀ FPS: đọc sổ cái", "chỉ-đọc · vai đọc riêng", "Sheets API · TK dịch vụ ▶",
                            "quyền chỉ-đọc")):
         o.append(f'<text class="rt" x="{tam(3)}" y="{213 + i * 12}" text-anchor="middle">{E(s)}</text>')
@@ -680,6 +799,16 @@ def svg_m() -> str:
     return "\n".join(o)
 
 
+def svg_n() -> str:
+    o = [f'<svg viewBox="0 0 {WN} {HN}" role="group" aria-label="PP (3) phóng to: bấm một hộp hay mũi tên để xem chi tiết">']
+    o.append(f'<rect class="vz vz-C" x="124" y="6" width="{WN - 128}" height="588" rx="6"/>')
+    for d, (_v, y0, h, nh) in DAI_N.items():
+        o.append(f'<text class="br" x="10" y="{y0 + h / 2 + 4}">{E(nh)}</text>')
+    ve_phan(o, HOP_N, TEN_N, HOP_N_THEO)
+    o.append('</svg>')
+    return "\n".join(o)
+
+
 # ───────────────────────────── bảng ─────────────────────────────
 def pill(co_ma: str) -> str:
     c = "ok" if co_ma.startswith("✅") else ("mid" if co_ma.startswith("◐") else
@@ -710,7 +839,7 @@ def bang_ten() -> str:
     return "\n".join(o)
 
 
-VUNG_BANG = [("A", ("A0", "A1")), ("B", ("B0", "B1")), ("G", ("G0", "G1")), ("H", ("H0", "H1")), ("C", ("c1", "c2", "c3", "c4")),
+VUNG_BANG = [("A", ("A0", "A1")), ("B", ("B0", "B1")), ("G", ("G0", "G1")), ("H", ("H0", "H1")), ("C", ("c1", "c2", "c3", "c4", "c5")),
              ("D", ("d1", "d2")), ("E", ("e1",))]
 NHAN_DAI_BANG = {"A0": "ai sinh ra", "A1": "sổ nguồn", "B0": "ai sinh ra", "B1": "sổ nguồn",
                  "G0": "ai sinh ra", "G1": "sổ nguồn", "H0": "ai sinh ra", "H1": "sổ nguồn"}
@@ -751,21 +880,24 @@ def du_lieu_js() -> str:
                   "huy": list(h.huy), "dc": h.doi_chieu, "vung": TEN_VUNG[DAI[h.dai][0]],
                   "dai": NHAN_DAI_BANG.get(h.dai) or DAI[h.dai][3], "vao": vao[h.ma], "ra": ra[h.ma]}
            for h in HOP}
-    vm = {h.ma: [] for h in HOP_M}
-    rm = {h.ma: [] for h in HOP_M}
-    for t in TEN_M:
-        rm[t.tu].append(t.ma)
-        vm[t.toi].append(t.ma)
-    for h in HOP_M:
-        hop[h.ma] = {"ten": h.ten, "loai": LOAI_CHU[h.loai], "tt": h.tt, "dong": list(h.dong), "mono": h.mono,
-                     "huy": list(h.huy), "dc": h.doi_chieu, "vung": "Mapping PP (1) · phóng to",
-                     "dai": DAI_M[h.dai][3], "vao": vm[h.ma], "ra": rm[h.ma]}
+    for hops, tens, nv, dai in ((HOP_M, TEN_M, "Mapping PP (1) · phóng to", DAI_M),
+                                (HOP_N, TEN_N, "PP (3) nền tảng · phóng to", DAI_N)):
+        vm = {h.ma: [] for h in hops}
+        rm = {h.ma: [] for h in hops}
+        for t in tens:
+            rm[t.tu].append(t.ma)
+            vm[t.toi].append(t.ma)
+        for h in hops:
+            hop[h.ma] = {"ten": h.ten, "loai": LOAI_CHU[h.loai], "tt": h.tt, "dong": list(h.dong), "mono": h.mono,
+                         "huy": list(h.huy), "dc": h.doi_chieu, "vung": nv,
+                         "dai": dai[h.dai][3], "vao": vm[h.ma], "ra": rm[h.ma]}
     ten = {t.ma: {"tu": t.tu, "toi": t.toi, "tt": t.tt, "cai_gi": t.cai_gi, "khoa": t.khoa, "ban_so": t.ban_so,
                   "cong": t.cong, "co_ma": t.co_ma, "nhom": NHOM[t.nhom[0]] + " · " + NHOM[t.nhom]}
            for t in TEN}
-    for t in TEN_M:
-        ten[t.ma] = {"tu": t.tu, "toi": t.toi, "tt": t.tt, "cai_gi": t.cai_gi, "khoa": t.khoa, "ban_so": t.ban_so,
-                     "cong": t.cong, "co_ma": t.co_ma, "nhom": "Mapping PP (1) · phóng to"}
+    for tens, nv in ((TEN_M, "Mapping PP (1) · phóng to"), (TEN_N, "PP (3) nền tảng · phóng to")):
+        for t in tens:
+            ten[t.ma] = {"tu": t.tu, "toi": t.toi, "tt": t.tt, "cai_gi": t.cai_gi, "khoa": t.khoa, "ban_so": t.ban_so,
+                         "cong": t.cong, "co_ma": t.co_ma, "nhom": nv}
     s = json.dumps({"hop": hop, "ten": ten, "tt": TT_CHU}, ensure_ascii=False)
     return s.replace("</", "<\\/")
 
@@ -1098,7 +1230,7 @@ def trang() -> str:
         raise SystemExit("⛔ hình SAI:\n  " + "\n  ".join(k["loi"] + kiem_m()))
     cap = (f'Hình 1 — Voi FLS-tobe-phase1. Máy kiểm lúc sinh: <b>{len(TEN_VUNG)} vùng · {len(DAI)} dải · {k["hop"]} hộp · '
            f'{k["ten"]} mũi tên</b> ({k["doc"]} dọc · {k["ngang"]} ngang) · <b>0</b> mũi tên chéo · <b>0</b> mũi tên nhảy dải · '
-           f'<b>{k["cheo"]}</b> chỗ hai mũi tên cắt nhau · <b>0</b> mũi tên cắt qua hộp. Mỗi dải 2–5 mục (một khung PP hay cột khởi động tính một mục; vùng nguồn PP (2), (3) có chủ ý một hộp mỗi dải), mỗi vùng 1–4 dải. '
+           f'<b>{k["cheo"]}</b> chỗ hai mũi tên cắt nhau · <b>0</b> mũi tên cắt qua hộp. Mỗi dải 2–5 mục (một khung PP hay cột khởi động tính một mục; vùng nguồn PP (2), (3) có chủ ý một hộp mỗi dải), mỗi vùng 1–5 dải. '
            'Hai thứ cố ý <b>không vẽ thành mũi tên</b>: ① điểm khởi động (S1–S5) vẽ bằng <b>huy hiệu</b> trên hộp nó khởi, '
            'vì một nhịp kích hai phép chụp sẽ phải cắt các mũi tên đi vào; ② <i>GHI tay</i> đọc dòng sổ và ứng viên lệnh chi '
            'từ dải dưới (chiều đọc ngược). Một hộp <b>gộp vẽ</b>: '
@@ -1160,9 +1292,24 @@ def trang() -> str:
 <b>Luật mồi cho bảng luật</b> — năm loại giao dịch kế toán ghi là hay bị sót trên PM: lãi và phí ngân hàng · điều chuyển nội bộ, mua bán ngoại tệ · chi phí năm trước trả năm nay · quẹt thẻ chưa nhập PM · doanh thu, OMC, server chưa nhập. <b>Danh mục loại giao dịch</b> dùng lại cột "Loại giao dịch (Payment Type)" của sổ cái PM để L1 và L3 nói cùng một bộ từ.<br>
 <b>Hai câu chờ owner:</b> ① vòng này cần đọc <b>nội dung giao dịch</b> trên sao kê, nhưng hôm nay FLS chỉ được đọc ba cột (ngày · Reference number · nguồn — QĐ-ITL-92) và <code>fls_itl.memo</code> rỗng 8.387/8.387 ⇒ có nới QĐ-ITL-92 cho cột nội dung, chỉ để suy diễn? ② chọn <b>k</b> (số xác nhận để thành luật ứng viên) và <b>N</b> (số ngày để L2 bị cờ).</p>
 """, """
+<h2>§1c · Phương pháp (3) — 4 chi phí nền tảng: OMC · GI · Server · PS</h2>
+<p>Bốn loại chi phí này <b>không có trên FPS</b>, nên không có Reference No để ghép như PP (1). Đường đi: xuất file từ data Looker → mapping với bank txns, <b>mỗi loại một luật</b> → allocate về các ventures. Giao dịch ngân hàng đưa vào là những dòng còn ở lớp L3 của §1b.</p>
+<figure class="diagram" id="hinh-n">""", svg_n(), """<figcaption>Hình 3 — PP (3) phóng to. 5 dải · 13 hộp · 14 mũi tên, máy kiểm như hình 1. Mọi hộp nét đứt xanh: đề xuất, chờ owner ký luật.</figcaption></figure>
+<h3>Mỗi luật mapping phải khai năm điều</h3>
+<p>Luật cụ thể của OMC, GI, Server, PS do owner điền; trang này chỉ khai <b>hình dạng</b> một luật phải có, để bốn luật so được với nhau.</p>
+<div class="scroll"><table>
+<thead><tr><th>điều phải khai</th><th>hình dạng</th><th>vì sao</th></tr></thead>
+<tbody>
+<tr><td>① nhận diện giao dịch</td><td>TK chi + vendor / từ khoá nội dung + chiều tiền ra</td><td>không có Reference No; thiếu nội dung thì cần nới QĐ-ITL-92 (câu ① §1b)</td></tr>
+<tr><td>② khớp kỳ</td><td>tháng chi phí trên Looker ↔ tháng của giao dịch (trả trước / trả sau bao nhiêu tháng)</td><td>một giao dịch có thể trả chi phí của tháng trước</td></tr>
+<tr><td>③ khớp tiền</td><td>Σ chi phí kỳ của loại = Σ giao dịch khớp; dung sai; cùng tiền tệ hay quy đổi</td><td>lệch thì chặn, không chia bừa (INV-I16)</td></tr>
+<tr><td>④ tỉ lệ venture</td><td>cột nào của file Looker cho phần của từng venture; venture = LE hay CDT1 (câu 5 §7)</td><td>allocate cần Σ % = 100 cho từng loại · tháng</td></tr>
+<tr><td>⑤ ai ký, từ khi nào</td><td>người ký + ngày hiệu lực + version</td><td>luật đổi thì lượt cũ giữ version đã dùng</td></tr>
+</tbody></table></div>
+""", """
 <h2>§2 · Đã sửa gì</h2>
 <p class="note"><b>v0.3 (owner, 04/11):</b> nguồn FPS là <b>sổ cái PM / PC</b>, đã mang đủ chiều ⇒ bỏ hai hộp "phiếu PE·PI·PM·PC" và "danh mục FPS"; bước dựng đổi từ <i>DỰNG chuỗi phiếu</i> (đi PM → PI → PE) thành <i>DỰNG dòng lệnh</i> (đọc thẳng từng dòng sổ cái). Đề xuất pháp nhân TK (k1) nay đếm từ TK chi + pháp nhân thanh toán trên sổ cái PM.</p>
-<p class="note"><b>v0.3.1–v0.3.2 (owner, 04/11, bình luận trên hình):</b> tách riêng ba phương pháp xử lý nguồn Sheets. <b>(1) mapping với bank transaction</b> — sao kê &amp; sổ quỹ: kế toán dán / ghi → bản khai nguồn → ảnh chụp đọc theo bản khai → DỰNG dòng tiền; dòng tiền chưa mang chiều chi phí nên phải <b>mapping với bank txns theo reference number</b> (hộp MAPPING: mã Reference number trên giao dịch ngân hàng ↔ cùng mã trên dòng sổ cái PM, chia tiền theo PM line). PP (2), (3) đã mang chiều chi phí từ nguồn nên không qua bước mapping. Sửa tay (GHI tay → lớp sửa) là bước chung cho mọi dòng sổ, không riêng phương pháp nào. <b>(2) lương · BHXH · BHYT</b> — sổ lương HR: HR lập → ảnh sổ lương → DỰNG đợt lương · BH. <b>GĐ1:</b> luật mapping các đợt đi tiền lương / BHXH / BHYT của các venture với bank txns → gắn <b>LE</b> (§1b). <b>GĐ2:</b> mapping xuống <b>KRF</b>. <b>(3)</b> sổ nền tảng: chủ sổ lập → ảnh sổ nền tảng → DỰNG dòng nền tảng. Vùng nguồn Sheets tách làm ba; hộp "ảnh sổ nhập tay" tách làm ba; mỗi phương pháp là một khung đi từ nguồn xuống tới bước dựng.</p>
+<p class="note"><b>v0.3.1–v0.3.2 (owner, 04/11, bình luận trên hình):</b> tách riêng ba phương pháp xử lý nguồn Sheets. <b>(1) mapping với bank transaction</b> — sao kê &amp; sổ quỹ: kế toán dán / ghi → bản khai nguồn → ảnh chụp đọc theo bản khai → DỰNG dòng tiền; dòng tiền chưa mang chiều chi phí nên phải <b>mapping với bank txns theo reference number</b> (hộp MAPPING: mã Reference number trên giao dịch ngân hàng ↔ cùng mã trên dòng sổ cái PM, chia tiền theo PM line). PP (2), (3) cũng mapping với bank txns nhưng bằng luật riêng (§1b, §1c), không qua Reference No của PM. Sửa tay (GHI tay → lớp sửa) là bước chung cho mọi dòng sổ, không riêng phương pháp nào. <b>(2) lương · BHXH · BHYT</b> — sổ lương HR: HR lập → ảnh sổ lương → DỰNG đợt lương · BH. <b>GĐ1:</b> luật mapping các đợt đi tiền lương / BHXH / BHYT của các venture với bank txns → gắn <b>LE</b> (§1b). <b>GĐ2:</b> mapping xuống <b>KRF</b>. <b>(3) 4 chi phí nền tảng OMC · GI · Server · PS</b> — không có trên FPS: xuất file từ data Looker → mapping với bank txns, mỗi loại một luật → allocate về các ventures (§1c). Vùng nguồn Sheets tách làm ba; hộp "ảnh sổ nhập tay" tách làm ba; mỗi phương pháp là một khung đi từ nguồn xuống tới bước dựng.</p>
 <p>Năm chỗ bản v0.1 vẽ sai, sửa từ v0.2:</p>
 <ol class="fix">
 <li><b>Bản khai nguồn đứng trước phép chụp.</b> Ảnh sao kê đọc vùng chuẩn <i>theo</i> bản khai và ghi lại <code>khai_version</code> (<code>fls/repo/chup.py:16</code>, <code>tools/chup_sao_ke.py</code>).</li>
@@ -1172,7 +1319,7 @@ def trang() -> str:
 <li><b>"Một bảng ITL duy nhất" là sổ hiệu lực</b> (sổ gốc + lớp sửa), không chỉ <code>fls_itl</code>.</li>
 </ol>
 
-<h2>§3 · Mũi tên nói gì — 39 mũi tên, 5 nhóm</h2>
+<h2>§3 · Mũi tên nói gì — 43 mũi tên, 5 nhóm</h2>
 <p>Mỗi mũi tên là <b>một dòng dữ liệu</b>: nó chở gì, nối bằng khoá nào, một-nhiều ra sao, cổng nào đứng trên nó, và hôm nay đã chảy chưa. Bấm một dòng để thấy nó trên hình.</p>
 """,
          bang_ten(),
@@ -1221,7 +1368,7 @@ def trang() -> str:
 <tr class="b1"><th colspan="4">Chặng II · Mở họ lệnh chi và chi phí (bước 3–5)</th></tr>
 <tr><td>3</td><td>x1 · x2 · b1 · g1 (sổ cái PM + PC)</td><td>Hợp đồng §5 chốt trước; đặt kiểu 13 cột PM còn thô; ảnh sổ cái dùng lại lằn ảnh chụp, không dựng hệ thứ hai</td><td>0 khoá lệnh chi trỏ rỗng · chiều lệnh chi khớp sổ đang chạy 100% từng ô</td></tr>
 <tr><td>4</td><td>x5 · b4 · g4 (PP 2 · lương / BHXH / BHYT)</td><td>GĐ1 chỉ cần đợt đi tiền của từng venture để gắn LE cho giao dịch bank; KRF để GĐ2; không mở hộp đen lương</td><td>mọi giao dịch bank loại lương / BH có LE (hoặc hàng chờ có tên) · Σ đợt mỗi venture mỗi kỳ = Σ giao dịch đã ghép</td></tr>
-<tr><td>5</td><td>x6 · b5 · g5 (PP 3 · nền tảng SC · PS)</td><td>Chờ owner chốt phạm vi (câu 5)</td><td>số dòng = sổ nguồn</td></tr>
+<tr><td>5</td><td>x6 · b5 · g5 (PP 3 · OMC · GI · Server · PS)</td><td>Không có trên FPS ⇒ 4 luật mapping riêng; Looker → mapping bank txns → allocate về ventures (§1c)</td><td>số dòng = file Looker · mọi giao dịch 4 loại khớp hoặc vào hàng chờ có tên · Σ phần chia = tiền giao dịch</td></tr>
 <tr class="b1"><th colspan="4">Chặng III · Chứng minh một bảng (bước 6–7)</th></tr>
 <tr><td>6</td><td>h2 · h3 · sổ hiệu lực thành một view có tên</td><td>Hôm nay màn tự ghép ở cửa đọc; hệ khác cần một bảng</td><td>một SELECT trả đủ 4 họ nguồn · đủ 3 vai pháp nhân</td></tr>
 <tr><td>7</td><td>h1 · h4 · v1 · v4 (cổng GĐ1 + xuất đối chiếu)</td><td>Hợp nhất chỉ chứng minh được khi cả 4 họ đã vào</td><td>Σ theo pháp nhân = Σ theo nguồn, từng tiền tệ · chênh với sổ đang chạy liệt kê từng dòng, có tên</td></tr>
@@ -1235,7 +1382,7 @@ def trang() -> str:
 <tr><td>2</td><td>Pháp nhân TK nằm trong <b>bản khai nguồn</b> (máy đề xuất, kế toán khai, owner ký) — đồng ý? Tên pháp nhân chuẩn lấy từ đâu?</td><td>14 TK · 211 dòng có tên TK không nói pháp nhân; hai bên còn gọi một pháp nhân bằng hai mã (<code>VVOH - Astronex</code> ↔ <code>ASTRONEX</code>); 24/29 mã thiếu tên</td><td>bước 1</td></tr>
 <tr><td>3</td><td>FPS cấp sổ cái PM / PC qua <b>kết nối CSDL chỉ-đọc</b> hay <b>xuất bảng định kỳ</b>? Và ba cột ở cuối §5 có trong sổ cái không?</td><td>Quyết định tuyến của x1/x2 và việc chiều lệnh chi có đủ không; hôm nay sổ PM đi qua Sheets</td><td>bước 3</td></tr>
 <tr><td>4</td><td>HR và nền tảng: FLS đọc sổ ở Sheets như hôm nay, hay chờ hệ nguồn có hợp đồng?</td><td>Quyết định tuyến của x5/x6</td><td>bước 4–5</td></tr>
-<tr><td>5</td><td>GI/OMC không vào sổ (là khoá phân bổ, dùng ở GĐ3)? AP/AR lùi khỏi GĐ1?</td><td>Phạm vi họ "Platform" của sổ</td><td>bước 5</td></tr>
+<tr><td>5</td><td>PP (3): "venture" khi allocate là <b>LE</b> hay <b>CDT1</b>? Tỉ lệ chia lấy từ cột nào của file Looker? AP/AR lùi khỏi GĐ1?</td><td>Owner 04/11 chốt OMC · GI · Server · PS là chi phí, mapping với bank txns rồi allocate về ventures — thay câu cũ "GI/OMC không vào sổ"</td><td>bước 5</td></tr>
 </tbody></table></div>
 
 <footer>Voi FLS-tobe-phase1 v0.3.2 · 2026-11-04 · sinh bởi <code>docs/ITL/_tools/sinh_voi_phase1.py</code> · cùng bộ với <code>_PD_NOW_VOI_VA_GIAI_DOAN.md</code>.</footer>
