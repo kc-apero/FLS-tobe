@@ -98,7 +98,7 @@ class Hop:
 
     @property
     def y(self) -> tuple[float, float]:
-        _v, y0, h, _n = DAI[self.dai]
+        _v, y0, h, _n = DAI[self.dai] if self.dai in DAI else DAI_M[self.dai]
         if self.tang == "tren":
             return y0, y0 + h / 2 - 4
         if self.tang == "duoi":
@@ -177,7 +177,7 @@ HOP: list[Hop] = [
     Hop("ghep", "c3", nhip(1, 3), "p", "b", "MAPPING bank txns ↔ lệnh chi (Reference No) — PP (1)",
         ("Reference No → chia tiền theo PM line",
          "Σ line = tiền dòng, lệch ⇒ chặn · khác tiền tệ ⇒ để người"),
-        "có: ghép theo dòng, 26,79% dòng nối", huy=("S4",),
+        "ra 3 lớp L1 · L2 · L3 (§1b) · hôm nay nối 26,79% dòng", huy=("S4",),
         doi_chieu="fls/adapters/pm_join.py · chay_nap.py:637 chen_moi_noi"),
     Hop("soat", "c3", nhip(4, 7), "p", "b", "SOÁT lô",
         ("9 luật · CHẶN ⇒ nguồn bị chừa · CỜ ⇒ vẫn ghi, vào hàng chờ có lý do",
@@ -358,11 +358,143 @@ NHOM = {
 }
 
 
+# ═════════════════ HÌNH PHÓNG TO · MAPPING PP (1) — ba lớp giao dịch + vòng cộng dồn ═════════════════
+# Owner 04/11 (bình luận trên hình): cần luật xác định ① giao dịch có trên FPS mà chưa có trên bank txns,
+# ② có trên bank txns mà không có trên FPS, ③ cơ chế vòng cộng dồn tự suy diễn: TK + nội dung + loại bank
+# → loại giao dịch. ⛔ Máy chỉ GỢI Ý; luật do người ký (INV-I16 · QĐ-ITL-56/58 — máy ⛔ tự đặt quy định).
+WM, HM = 1220, 600
+# khe 40 giữa cột 2|3 và 4|5 — chỗ các mũi tên ngang chạy qua, đủ chỗ cho nhãn mũi tên
+_XM = (130, 302, 502, 674, 874, 1046)
+
+
+def cotm(a: int, b: int | None = None) -> tuple[int, int]:
+    b = b or a
+    return _XM[a - 1], _XM[b - 1] + 160
+
+
+def tamm(a: int, b: int | None = None) -> float:
+    x0, x1 = cotm(a, b)
+    return (x0 + x1) / 2
+
+
+DAI_M = {
+    "m1": ("M", 16, 84, "① VÀO"),
+    "m2": ("M", 136, 84, "② MAPPING"),
+    "m3": ("M", 256, 84, "③ BA LỚP"),
+    "m4": ("M", 376, 84, "④ SUY DIỄN"),
+    "m5": ("M", 496, 84, "⑤ XÁC NHẬN"),
+}
+TANG_M = {"m1": 0, "m2": 1, "m3": 2, "m4": 3, "m5": 4}
+
+HOP_M: list[Hop] = [
+    Hop("mPM", "m1", cotm(1, 2), "d", "q", "dòng sổ cái PM",
+        ("mỗi PM line: Reference No · tiền · tiền tệ", "· pháp nhân trả · vendor · trạng thái · loại GD"),
+        "đã DỰNG (b1) · hôm nay qua Sheets", doi_chieu="fls_pm_line 3.772 dòng (14 cột có kiểu)"),
+    Hop("mBank", "m1", cotm(3, 4), "d", "b", "bank transactions",
+        ("dòng tiền đã DỰNG (b3)", "TK · ngày · Nợ/Có · Ref · nội dung"),
+        "nội dung: chưa đọc (QĐ-ITL-92)", doi_chieu="fls_itl 8.387 · memo rỗng 8.387/8.387"),
+    Hop("mLuatGhep", "m1", cotm(5, 6), "d", "q", "luật ghép đã ký",
+        ("VN: Ref + tiền + pháp nhân", "nước ngoài: từ khoá + vendor + tiền"),
+        "QĐ-ITL-144 · máy mới dùng Ref + tiền", doi_chieu="QĐ-ITL-144 (owner + kế toán 18/09)"),
+    Hop("mMap", "m2", cotm(1, 5), "p", "b", "MAPPING bank txns ↔ lệnh chi",
+        ("chạy luật ghép theo thứ tự; Σ tiền các PM line = tiền giao dịch, lệch ⇒ chặn",
+         "khác tiền tệ · N×M ⇒ để người, ⛔ không đoán, ⛔ không chia bừa"),
+        "fls/adapters/pm_join.py · fls/repo/may_ghep.py", doi_chieu="pm_join.py hình A–F · INV-I16"),
+    Hop("mBB", "m2", cotm(6), "d", "q", "biên bản mapping",
+        ("đếm 3 lớp", "+ lý do có tên"), "mỗi lượt nạp", doi_chieu="hôm nay: /queue/coverage · /queue/mau-so"),
+    Hop("mL1", "m3", cotm(1, 2), "d", "b", "L1 · khớp",
+        ("Ref chung, Σ tiền khớp, cùng tiền tệ", "→ mối nối, vào sổ (s3)"),
+        "hôm nay 2.263 mối nối", doi_chieu="fls_pm_link"),
+    Hop("mL2", "m3", cotm(3, 4), "d", "b", "L2 · có trên FPS, chưa có bank",
+        ("PM đã duyệt, chưa thấy tiền ở TK chi", "tuổi > N ngày ⇒ cờ 'lệnh chưa thấy tiền'"),
+        "hôm nay 1.345 dòng · 698 phiếu", doi_chieu="fls/repo/lenh_cho.py · màn F01 lằn lệnh"),
+    Hop("mL3", "m3", cotm(5, 6), "d", "b", "L3 · có bank, không có FPS",
+        ("không Ref, hoặc Ref không PM nào mang", "trạng thái vẫn UNMAPPED (QĐ-ITL-58)"),
+        "89,7% dòng chưa ghép: có mã, không PM", doi_chieu="13_LO_TRINH §0 ⓶ (6.577 dòng)"),
+    Hop("mKy", "m4", cotm(1, 2), "o", "n", "S6 · OWNER KÝ LUẬT", ("luật ứng viên → luật hiệu lực",),
+        doi_chieu="đề xuất · người ký, máy ⛔ tự đặt quy định (QĐ-ITL-56)"),
+    Hop("mLuat", "m4", cotm(3, 4), "d", "n", "bảng luật suy diễn",
+        ("(TK + mẫu nội dung + loại bank)", "→ loại giao dịch · có version"),
+        "seed: 5 loại hay sót", doi_chieu="đề xuất · seed từ 'Check list mapping' (lãi/phí NH, điều chuyển nội bộ…)"),
+    Hop("mSuy", "m4", cotm(5, 6), "p", "n", "SUY DIỄN loại giao dịch",
+        ("áp luật hiệu lực cho dòng L3", "ra gợi ý, ⛔ không tự chốt"),
+        "INV-I16", doi_chieu="đề xuất"),
+    Hop("mKT", "m5", cotm(1, 2), "o", "b", "S5 · KẾ TOÁN XÁC NHẬN", ("giữ hoặc sửa gợi ý · F01",),
+        doi_chieu="POST adjust / match (ghi_tay.py)"),
+    Hop("mXN", "m5", cotm(3, 4), "p", "n", "GOM bằng chứng luật",
+        ("mỗi xác nhận +1 cho khoá luật", "≥k lần đồng ý, 0 lần khác ⇒ luật ứng viên"),
+        "một lần sửa ngược ⇒ luật về 'xem lại'", doi_chieu="đề xuất"),
+    Hop("mGoiY", "m5", cotm(5, 6), "d", "n", "gợi ý loại giao dịch",
+        ("nguồn = máy gợi ý (lớp sửa)", "hiện ở F01 cạnh dòng L3"),
+        "đo: độ phủ L3 · tỉ lệ giữ nguyên", doi_chieu="đề xuất · cùng cơ chế fls_may_goi_y"),
+]
+HOP_M_THEO = {h.ma: h for h in HOP_M}
+
+TEN_M: list[Ten] = [
+    Ten("m1", "mPM", "mMap", "q", "PM line: Ref · tiền · tiền tệ · pháp nhân trả · vendor", "pm_line_id", "1 – 1",
+        "chỉ dòng trạng thái cuối đã duyệt", "◐ có, chưa có pháp nhân/vendor có kiểu", tamm(1, 2)),
+    Ten("m2", "mBank", "mMap", "b", "giao dịch: TK · ngày · tiền · tiền tệ · Ref", "content_key", "1 – 1",
+        "đọc từ ảnh, ⛔ Sheets sống", "✅", tamm(3, 4)),
+    Ten("m3", "mLuatGhep", "mMap", "q", "thứ tự nhánh: VN (Ref + tiền + pháp nhân) → nước ngoài (từ khoá + vendor + tiền)",
+        "version luật", "1 bộ luật / lượt", "luật đổi ⇒ version mới, lượt cũ giữ version đã dùng",
+        "◐ máy mới dùng Ref + tiền, chưa dùng pháp nhân", tamm(5)),
+    Ten("m4", "mMap", "mBB", "q", "số dòng mỗi lớp + lý do", "run_id", "1 / lượt",
+        "L1 + L1b + L2 + L3 = mẫu số, đếm trước (Đ3)", "◐ có /queue/mau-so", None),
+    Ten("m5", "mMap", "mL1", "b", "cặp (giao dịch, PM line, tiền chia)", "itl_id + pm_line_id", "1 – n",
+        "Σ tiền chia = tiền giao dịch · cùng tiền tệ", "✅", tamm(1, 2)),
+    Ten("m6", "mMap", "mL2", "b", "PM line đã duyệt không giao dịch nào mang Ref của nó", "pm_line_id", "—",
+        "chỉ so với ảnh sao kê của TK chi tới ảnh mới nhất · tuổi > N ngày ⇒ cờ", "✅ 1.345 dòng", tamm(3, 4)),
+    Ten("m7", "mMap", "mL3", "b", "giao dịch không Ref, hoặc Ref không PM nào mang", "content_key", "—",
+        "⛔ không gán nhãn 'không cần lệnh chi' (QĐ-ITL-56/58)", "✅ hàng chờ UNMAPPED", tamm(5)),
+    Ten("m8", "mL3", "mSuy", "n", "dòng L3: TK · mẫu nội dung · loại bank · chiều Nợ/Có", "content_key", "1 – 1",
+        "thiếu nội dung ⇒ ⛔ suy diễn, chỉ báo 'thiếu nội dung'", "⛔ chờ nới QĐ-ITL-92", 1120.0),
+    Ten("m9", "mLuat", "mSuy", "n", "luật hiệu lực", "(TK, mẫu nội dung, loại bank)", "1 khoá – 1 loại GD",
+        "khoá khớp ≥2 luật nói khác nhau ⇒ ⛔ gợi ý", "⛔ đề xuất", None),
+    Ten("m10", "mKy", "mLuat", "n", "chữ ký trên luật ứng viên", "luật + version", "1 – 1",
+        "luật chỉ hiệu lực khi có người ký (signed_by, signed_at)", "⛔ đề xuất", None),
+    Ten("m11", "mSuy", "mGoiY", "n", "loại giao dịch gợi ý + luật đã dùng", "itl_id", "1 – 1",
+        "gợi ý ⛔ đè ô người đã chốt", "⛔ đề xuất", 1120.0),
+    Ten("m12", "mGoiY", "mXN", "n", "gợi ý đã được người giữ hoặc sửa", "itl_id", "1 – 1",
+        "chỉ đếm xác nhận của NGƯỜI (actor từ thẻ), ⛔ máy tự xác nhận", "⛔ đề xuất", None),
+    Ten("m13", "mKT", "mXN", "b", "cú bấm giữ / sửa loại giao dịch", "itl_id", "1 – 1",
+        "ghi lớp sửa trong một giao dịch (ghi_tay.py)", "✅ cửa ghi có", None),
+    Ten("m14", "mXN", "mLuat", "n", "luật ứng viên: khoá + loại GD + số bằng chứng", "(TK, mẫu nội dung, loại bank)", "1 – 1",
+        "VÒNG CỘNG DỒN: càng nhiều xác nhận, càng nhiều dòng L3 có gợi ý ở lượt sau", "⛔ đề xuất", tamm(3, 4)),
+]
+
+
+def kiem_m() -> list[str]:
+    loi: list[str] = []
+    for d in DAI_M:
+        n = sum(1 for h in HOP_M if h.dai == d)
+        if not 2 <= n <= 5:
+            loi.append(f"hình phóng to · dải {d}: {n} hộp")
+    for t in TEN_M:
+        a, b = HOP_M_THEO[t.tu], HOP_M_THEO[t.toi]
+        x1, y1, x2, y2 = doan(t, HOP_M_THEO)
+        if t.x is not None:
+            if not (a.x[0] + 6 <= t.x <= a.x[1] - 6 and b.x[0] + 6 <= t.x <= b.x[1] - 6):
+                loi.append(f"{t.ma}: x={t.x} ngoài hộp {a.ma}/{b.ma}")
+            if abs(TANG_M[b.dai] - TANG_M[a.dai]) != 1:
+                loi.append(f"{t.ma}: ⛔ không kề nhau")
+        elif a.dai != b.dai:
+            loi.append(f"{t.ma}: ngang mà khác dải")
+        for h in HOP_M:
+            if h.ma in (t.tu, t.toi):
+                continue
+            if cat_hop(x1, min(y1, y2) + 0.5, x2, max(y1, y2) - 0.5, h) and cat_hop(min(x1, x2) + 0.5, y1, max(x1, x2) - 0.5, y2, h):
+                loi.append(f"{t.ma} cắt qua hộp {h.ma}")
+    return loi
+
+
 # ───────────────────────────── kiểm hình ─────────────────────────────
-def doan(t: Ten) -> tuple[float, float, float, float]:
-    a, b = HOP_THEO[t.tu], HOP_THEO[t.toi]
-    if t.x is not None:                                    # dọc, a ở trên b
-        return t.x, a.y[1], t.x, b.y[0]
+def doan(t: Ten, ht: dict | None = None) -> tuple[float, float, float, float]:
+    ht = ht or HOP_THEO
+    a, b = ht[t.tu], ht[t.toi]
+    if t.x is not None:
+        if a.y[0] > b.y[0]:                                # dọc đi LÊN (vòng cộng dồn)
+            return t.x, a.y[0], t.x, b.y[1]
+        return t.x, a.y[1], t.x, b.y[0]                    # dọc, a ở trên b
     ya = (max(a.y[0], b.y[0]) + min(a.y[1], b.y[1])) / 2   # ngang, cùng dải
     if a.x[1] <= b.x[0]:
         return a.x[1], ya, b.x[0], ya
@@ -480,14 +612,20 @@ def svg() -> str:
                            "quyền chỉ-đọc")):
         o.append(f'<text class="rt" x="{tam(3)}" y="{213 + i * 12}" text-anchor="middle">{E(s)}</text>')
     o.append('<text class="rt" x="182" y="256" text-anchor="middle">ranh giới FLS</text>')
-    # mũi tên vẽ TRƯỚC hộp để đầu mũi tên nằm sát mép, hộp không che vùng bấm
-    for t in TEN:
-        x1, y1, x2, y2 = doan(t)
+    ve_phan(o, HOP, TEN, HOP_THEO)
+    o.append('</svg>')
+    return "\n".join(o)
+
+
+def ve_phan(o: list[str], hops: list, tens: list, ht: dict) -> None:
+    """Vẽ mũi tên (trước) rồi hộp (sau) — dùng chung cho hình chính và hình phóng to."""
+    for t in tens:
+        x1, y1, x2, y2 = doan(t, ht)
         if t.x is not None:
-            y2 -= 1
+            y2 += 1 if y2 < y1 else -1
         else:
             x2 += -1 if x2 > x1 else 1
-        a, b = HOP_THEO[t.tu], HOP_THEO[t.toi]
+        a, b = ht[t.tu], ht[t.toi]
         nhan = f"Mũi tên {t.ma}: {a.ten} → {b.ten}"
         o.append(f'<g class="ten-g" data-id="t:{t.ma}" data-tt="{t.tt}" data-comment-target tabindex="0" '
                  f'role="button" aria-label="{E(nhan)}">')
@@ -499,7 +637,7 @@ def svg() -> str:
         else:
             o.append(f'<text class="tl" x="{(x1 + x2) / 2:.1f}" y="{y1 - 4:.1f}" text-anchor="middle">{t.ma}</text>')
         o.append('</g>')
-    for h in HOP:
+    for h in hops:
         x0, x1 = h.x
         y0, y1 = h.y
         cls = f"hop hop-{h.loai} tt-{h.tt}"
@@ -522,6 +660,15 @@ def svg() -> str:
             o.append(f'<rect class="huy" x="{bx:.1f}" y="{y0 - 7}" width="{bw:.1f}" height="14" rx="7"/>'
                      f'<text class="huyt" x="{bx + bw / 2:.1f}" y="{y0 + 3.5}" text-anchor="middle">{E(s)}</text>')
         o.append('</g>')
+
+
+def svg_m() -> str:
+    o = [f'<svg viewBox="0 0 {WM} {HM}" role="group" aria-label="Mapping PP (1) phóng to: bấm một hộp hay mũi tên để xem chi tiết">']
+    o.append('<rect class="vz vz-C" x="124" y="6" width="1092" height="588" rx="6"/>')
+    for d, (_v, y0, h, nh) in DAI_M.items():
+        o.append(f'<text class="br" x="10" y="{y0 + h / 2 + 4}">{E(nh)}</text>')
+    o.append(f'<text class="vt vt-pp1" x="{cotm(1)[0]}" y="{DAI_M["m5"][1] - 10}">VÒNG CỘNG DỒN: m14 đưa luật ứng viên lên lại bảng luật</text>')
+    ve_phan(o, HOP_M, TEN_M, HOP_M_THEO)
     o.append('</svg>')
     return "\n".join(o)
 
@@ -597,9 +744,21 @@ def du_lieu_js() -> str:
                   "huy": list(h.huy), "dc": h.doi_chieu, "vung": TEN_VUNG[DAI[h.dai][0]],
                   "dai": NHAN_DAI_BANG.get(h.dai) or DAI[h.dai][3], "vao": vao[h.ma], "ra": ra[h.ma]}
            for h in HOP}
+    vm = {h.ma: [] for h in HOP_M}
+    rm = {h.ma: [] for h in HOP_M}
+    for t in TEN_M:
+        rm[t.tu].append(t.ma)
+        vm[t.toi].append(t.ma)
+    for h in HOP_M:
+        hop[h.ma] = {"ten": h.ten, "loai": LOAI_CHU[h.loai], "tt": h.tt, "dong": list(h.dong), "mono": h.mono,
+                     "huy": list(h.huy), "dc": h.doi_chieu, "vung": "Mapping PP (1) · phóng to",
+                     "dai": DAI_M[h.dai][3], "vao": vm[h.ma], "ra": rm[h.ma]}
     ten = {t.ma: {"tu": t.tu, "toi": t.toi, "tt": t.tt, "cai_gi": t.cai_gi, "khoa": t.khoa, "ban_so": t.ban_so,
                   "cong": t.cong, "co_ma": t.co_ma, "nhom": NHOM[t.nhom[0]] + " · " + NHOM[t.nhom]}
            for t in TEN}
+    for t in TEN_M:
+        ten[t.ma] = {"tu": t.tu, "toi": t.toi, "tt": t.tt, "cai_gi": t.cai_gi, "khoa": t.khoa, "ban_so": t.ban_so,
+                     "cong": t.cong, "co_ma": t.co_ma, "nhom": "Mapping PP (1) · phóng to"}
     s = json.dumps({"hop": hop, "ten": ten, "tt": TT_CHU}, ensure_ascii=False)
     return s.replace("</", "<\\/")
 
@@ -743,7 +902,9 @@ footer{margin-top:48px;color:var(--muted);font-size:12.5px;border-top:1px solid 
 JS = r"""
 (function(){
   const D = JSON.parse(document.getElementById('du-lieu').textContent);
-  const svg = document.querySelector('#hinh svg');
+  const svgs = Array.from(document.querySelectorAll('figure.diagram svg'));
+  const svg = svgs[0];
+  const quaMoiHinh = (f) => svgs.forEach(f);
   const khung = document.getElementById('khung-ct');
   const noiDung = document.getElementById('ct-noi-dung');
   let dang = null, loc = 'tat', binh = null, luuNhap = {};
@@ -753,14 +914,14 @@ JS = r"""
   const tenHop = (m) => D.hop[m].ten;
 
   function sangLen(ids){
-    svg.classList.toggle('loc', !!ids);
-    svg.querySelectorAll('.hop,.ten-g').forEach(n => n.classList.toggle('sang', !!ids && ids.has(n.dataset.id)));
+    quaMoiHinh(sv => { sv.classList.toggle('loc', !!ids);
+      sv.querySelectorAll('.hop,.ten-g').forEach(n => n.classList.toggle('sang', !!ids && ids.has(n.dataset.id))); });
   }
   function apLoc(){
     if (dang) return;
     if (loc === 'tat') { sangLen(null); return; }
     const ids = new Set();
-    svg.querySelectorAll('.hop,.ten-g').forEach(n => { if (n.dataset.tt === loc) ids.add(n.dataset.id); });
+    quaMoiHinh(sv => sv.querySelectorAll('.hop,.ten-g').forEach(n => { if (n.dataset.tt === loc) ids.add(n.dataset.id); }));
     sangLen(ids);
   }
   document.querySelectorAll('.chip[data-loc]').forEach(c => c.addEventListener('click', () => {
@@ -847,13 +1008,13 @@ JS = r"""
   document.getElementById('nut-dong').addEventListener('click', dong);
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && !khung.hidden) dong(); });
 
-  svg.addEventListener('click', e => {
+  quaMoiHinh(svg => svg.addEventListener('click', e => {
     const g = e.target.closest('.hop,.ten-g');
     if (g) chon(g.dataset.id, false); else if (dang) dong();
-  });
-  svg.addEventListener('keydown', e => {
+  }));
+  quaMoiHinh(svg => svg.addEventListener('keydown', e => {
     if ((e.key === 'Enter' || e.key === ' ') && e.target.closest('.hop,.ten-g')) { e.preventDefault(); chon(e.target.closest('.hop,.ten-g').dataset.id, false); }
-  });
+  }));
   document.querySelectorAll('tr.chon').forEach(r => {
     r.addEventListener('click', () => chon(r.dataset.ref, false));
     r.addEventListener('keydown', e => { if (e.key === 'Enter') chon(r.dataset.ref, false); });
@@ -926,8 +1087,8 @@ THAN_TREN = """
 
 def trang() -> str:
     k = kiem()
-    if k["loi"]:
-        raise SystemExit("⛔ hình SAI:\n  " + "\n  ".join(k["loi"]))
+    if k["loi"] or kiem_m():
+        raise SystemExit("⛔ hình SAI:\n  " + "\n  ".join(k["loi"] + kiem_m()))
     cap = (f'Hình 1 — Voi FLS-tobe-phase1. Máy kiểm lúc sinh: <b>{len(TEN_VUNG)} vùng · {len(DAI)} dải · {k["hop"]} hộp · '
            f'{k["ten"]} mũi tên</b> ({k["doc"]} dọc · {k["ngang"]} ngang) · <b>0</b> mũi tên chéo · <b>0</b> mũi tên nhảy dải · '
            f'<b>{k["cheo"]}</b> chỗ hai mũi tên cắt nhau · <b>0</b> mũi tên cắt qua hộp. Mỗi dải 2–5 mục (một khung PP hay cột khởi động tính một mục; vùng nguồn PP (2), (3) có chủ ý một hộp mỗi dải), mỗi vùng 1–4 dải. '
@@ -964,7 +1125,33 @@ def trang() -> str:
 <li><b>Chiều chi phí</b><ul><li>CDT1 chủ dự toán · HD/KRF mã hạng mục · Budget Code mã ngân sách</li></ul></li>
 <li><b>Máy FLS</b><ul><li>canon 36 trường: khuôn dòng chuẩn · <code>content_key</code>: khoá chống trùng nội dung</li><li><code>chup_id</code> / <code>run_id</code>: vết lần chụp / lần nạp · bản khai nguồn: bố cục cột + thứ tự ngày (+ pháp nhân TK)</li><li>lớp sửa: mọi thay đổi là dòng thêm · sổ hiệu lực: sổ gốc + lớp sửa, đọc ra một bảng</li></ul></li>
 </ul>
-
+""", """
+<h2>§1b · Mapping của phương pháp (1) — ba lớp giao dịch và vòng cộng dồn</h2>
+<p>Phóng to hộp MAPPING trên hình chính. Mỗi giao dịch ngân hàng và mỗi dòng sổ cái PM sau một lượt mapping rơi vào <b>đúng một</b> lớp; dòng ở lớp L3 đi qua <b>vòng cộng dồn</b>: luật đã ký gợi ý loại giao dịch, kế toán xác nhận, xác nhận tích lại thành luật mới cho lượt sau. Máy chỉ gợi ý; luật chỉ hiệu lực khi có người ký.</p>
+<figure class="diagram" id="hinh-m">""", svg_m(), """<figcaption>Hình 2 — Mapping PP (1) phóng to. 5 dải · 14 hộp · 14 mũi tên; mũi tên m14 đi <b>lên</b> có chủ ý: đó là vòng cộng dồn. Máy kiểm như hình 1: không mũi tên nhảy dải, lệch hộp hay cắt qua hộp.</figcaption></figure>
+<h3>Luật xếp lớp sau mapping</h3>
+<div class="scroll"><table>
+<thead><tr><th colspan="2" class="sup">Lớp</th><th class="sup">So khớp</th><th class="sup">Hiện trạng</th><th colspan="2" class="sup">Xử lý</th></tr>
+<tr><th>lớp</th><th>điều kiện</th><th>khoá</th><th>hôm nay</th><th>đi đâu</th><th>cổng</th></tr></thead>
+<tbody>
+<tr class="chon" data-ref="h:mL1" tabindex="0"><td><b>L1 · khớp</b></td><td>giao dịch có Reference No trùng ≥ 1 dòng sổ cái PM; Σ tiền các PM line = tiền giao dịch; cùng tiền tệ; nhánh VN thêm pháp nhân trả = pháp nhân TK (QĐ-ITL-144)</td><td>Reference No + tiền (+ pháp nhân)</td><td>2.263 mối nối</td><td>mối nối vào lớp sửa; gợi ý hd/cdt1 từ PM line</td><td>Σ lệch ⇒ chặn, ⛔ chia bừa</td></tr>
+<tr class="chon" data-ref="h:mMap" tabindex="0"><td><b>L1b · khớp mã, lệch</b></td><td>có Reference No chung nhưng Σ tiền lệch, khác tiền tệ, hoặc N giao dịch × M PM line</td><td>Reference No</td><td>84 lệnh khác tiền tệ (Q-FX-1)</td><td>hàng chờ cho người, kèm lý do có tên</td><td>⛔ tự chọn cặp</td></tr>
+<tr class="chon" data-ref="h:mL2" tabindex="0"><td><b>L2 · có trên FPS, chưa có trên bank txns</b></td><td>dòng sổ cái PM trạng thái cuối đã duyệt, không giao dịch nào mang Reference No của nó trong các ảnh sao kê của TK chi, tính tới ảnh mới nhất</td><td>pm_line_id · Reference No · TK chi</td><td>1.345 dòng · 698 phiếu</td><td>F01 lằn lệnh: "lệnh chưa thấy tiền"; tuổi = ngày ảnh mới nhất − ngày thực chi</td><td>tuổi &gt; N ngày ⇒ cờ; TK chi chưa có ảnh ⇒ "chưa đo được", ⛔ coi là chưa chi</td></tr>
+<tr class="chon" data-ref="h:mL3" tabindex="0"><td><b>L3 · có trên bank txns, không có trên FPS</b></td><td>giao dịch không có Reference No, hoặc có mà không dòng sổ cái PM nào mang</td><td>content_key · TK · nội dung · loại bank</td><td>89,7% dòng chưa ghép có mã mà không PM nào mang</td><td>SUY DIỄN loại giao dịch (vòng cộng dồn) → gợi ý ở F01</td><td>trạng thái vẫn UNMAPPED tới khi người chốt; ⛔ nhãn "không cần lệnh chi" (QĐ-ITL-58)</td></tr>
+</tbody></table></div>
+<h3>Vòng cộng dồn — tự suy diễn loại giao dịch</h3>
+<div class="scroll"><table>
+<thead><tr><th>bước</th><th>ai</th><th>đọc</th><th>ghi</th><th>cổng</th></tr></thead>
+<tbody>
+<tr class="chon" data-ref="h:mSuy" tabindex="0"><td>① gợi ý</td><td>máy</td><td>dòng L3 + bảng luật hiệu lực, khoá <code>(TK, mẫu nội dung, loại bank)</code></td><td>gợi ý loại giao dịch, nguồn = máy gợi ý</td><td>khoá khớp hai luật nói khác nhau ⇒ không gợi ý</td></tr>
+<tr class="chon" data-ref="h:mKT" tabindex="0"><td>② xác nhận</td><td>kế toán (F01)</td><td>gợi ý cạnh dòng L3</td><td>giữ hoặc sửa → lớp sửa (chỉ-thêm)</td><td>actor từ thẻ đăng nhập; máy ⛔ tự xác nhận</td></tr>
+<tr class="chon" data-ref="h:mXN" tabindex="0"><td>③ gom bằng chứng</td><td>máy</td><td>các xác nhận theo khoá luật</td><td>luật ứng viên khi ≥ k lần cùng loại giao dịch và 0 lần khác</td><td>một lần người sửa ngược ⇒ luật về "xem lại"</td></tr>
+<tr class="chon" data-ref="h:mKy" tabindex="0"><td>④ ký</td><td>owner / kế toán trưởng</td><td>luật ứng viên + bằng chứng</td><td>luật hiệu lực, có version, <code>signed_by</code>, <code>signed_at</code></td><td>luật ⛔ hiệu lực khi chưa ký (INV-I16 · QĐ-ITL-56)</td></tr>
+<tr class="chon" data-ref="h:mGoiY" tabindex="0"><td>⑤ đo mỗi vòng</td><td>máy</td><td>gợi ý và xác nhận của lượt</td><td>độ phủ (dòng L3 có gợi ý) · độ đúng (gợi ý được giữ nguyên)</td><td>in cả mẫu số; độ đúng tụt ⇒ dừng áp luật mới</td></tr>
+</tbody></table></div>
+<p class="note"><b>Luật mồi cho bảng luật</b> — năm loại giao dịch kế toán ghi là hay bị sót trên PM: lãi và phí ngân hàng · điều chuyển nội bộ, mua bán ngoại tệ · chi phí năm trước trả năm nay · quẹt thẻ chưa nhập PM · doanh thu, OMC, server chưa nhập. <b>Danh mục loại giao dịch</b> dùng lại cột "Loại giao dịch (Payment Type)" của sổ cái PM để L1 và L3 nói cùng một bộ từ.<br>
+<b>Hai câu chờ owner:</b> ① vòng này cần đọc <b>nội dung giao dịch</b> trên sao kê, nhưng hôm nay FLS chỉ được đọc ba cột (ngày · Reference number · nguồn — QĐ-ITL-92) và <code>fls_itl.memo</code> rỗng 8.387/8.387 ⇒ có nới QĐ-ITL-92 cho cột nội dung, chỉ để suy diễn? ② chọn <b>k</b> (số xác nhận để thành luật ứng viên) và <b>N</b> (số ngày để L2 bị cờ).</p>
+""", """
 <h2>§2 · Đã sửa gì</h2>
 <p class="note"><b>v0.3 (owner, 04/11):</b> nguồn FPS là <b>sổ cái PM / PC</b>, đã mang đủ chiều ⇒ bỏ hai hộp "phiếu PE·PI·PM·PC" và "danh mục FPS"; bước dựng đổi từ <i>DỰNG chuỗi phiếu</i> (đi PM → PI → PE) thành <i>DỰNG dòng lệnh</i> (đọc thẳng từng dòng sổ cái). Đề xuất pháp nhân TK (k1) nay đếm từ TK chi + pháp nhân thanh toán trên sổ cái PM.</p>
 <p class="note"><b>v0.3.1–v0.3.2 (owner, 04/11, bình luận trên hình):</b> tách riêng ba phương pháp xử lý nguồn Sheets. <b>(1) mapping với bank transaction</b> — sao kê &amp; sổ quỹ: kế toán dán / ghi → bản khai nguồn → ảnh chụp đọc theo bản khai → DỰNG dòng tiền; dòng tiền chưa mang chiều chi phí nên phải <b>mapping với bank txns theo reference number</b> (hộp MAPPING: mã Reference number trên giao dịch ngân hàng ↔ cùng mã trên dòng sổ cái PM, chia tiền theo PM line). PP (2), (3) đã mang chiều chi phí từ nguồn nên không qua bước mapping. Sửa tay (GHI tay → lớp sửa) là bước chung cho mọi dòng sổ, không riêng phương pháp nào. <b>(2)</b> sổ lương HR: HR lập → ảnh sổ lương → DỰNG dòng lương, giữ HD/KRF nguồn, không phân bổ lại. <b>(3)</b> sổ nền tảng: chủ sổ lập → ảnh sổ nền tảng → DỰNG dòng nền tảng. Vùng nguồn Sheets tách làm ba; hộp "ảnh sổ nhập tay" tách làm ba; mỗi phương pháp là một khung đi từ nguồn xuống tới bước dựng.</p>
@@ -1060,8 +1247,10 @@ def main() -> int:
     print(f"hộp {k['hop']} · mũi tên {k['ten']} (dọc {k['doc']} · ngang {k['ngang']}) · cắt nhau {k['cheo']}")
     for d in DAI:
         print(f"  dải {d}: {so_muc(d)} mục")
-    if k["loi"]:
-        print("⛔ LỖI:\n  " + "\n  ".join(k["loi"]))
+    km = kiem_m()
+    print(f"hình phóng to: hộp {len(HOP_M)} · mũi tên {len(TEN_M)} · lỗi {len(km)}")
+    if k["loi"] or km:
+        print("⛔ LỖI:\n  " + "\n  ".join(k["loi"] + km))
         return 1
     if "--kiem" in sys.argv:
         print("✅ hình đúng luật — ⛔ không ghi (--kiem)")
