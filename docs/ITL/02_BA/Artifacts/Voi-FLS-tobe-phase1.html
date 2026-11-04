@@ -1,14 +1,13 @@
-<!doctype html><html lang="vi"><head><meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Voi FLS-tobe-phase1</title>
+<meta name="claude:viewport-fit-sides" content="cover">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&amp;family=IBM+Plex+Mono:wght@400;500;600;700&amp;family=IBM+Plex+Serif:wght@600&amp;display=swap">
 <style>
-/* Bố cục: hình rộng 1420 nằm trong khung cuộn riêng; chữ một cột; bảng gom 2 tầng theo luật vẽ voi. */
+/* Bố cục: hình rộng 1420 trong khung cuộn riêng; khung chi tiết neo phải (điện thoại: neo đáy); chữ một cột; bảng gom 2 tầng theo luật vẽ voi. */
 :root{
   --bg:#f6f7f5; --paper:#ffffff; --fg:#1c231f; --muted:#59645d; --line:#d3d9d4;
   --accent:#1f4e79; --accent-soft:#e2ebf4;
   --ok:#2e7d4f; --ok-soft:#dcefe3; --mid:#a86d12; --mid-soft:#fff0cf; --no:#7d8580; --no-soft:#eceeec;
-  --prop:#2f62c9; --prop-soft:#e4ecfb;
+  --prop:#2f62c9; --prop-soft:#e4ecfb; --sel:#c2410c;
   --ext:#f1ece2; --zc:#eaf0f6; --zd:#eaf3ed; --ze:#f3eef6; --box:#ffffff; --orig:#fdf6e6;
   --sans:"IBM Plex Sans",system-ui,"Segoe UI",Arial,sans-serif;
   --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
@@ -18,19 +17,19 @@
   --bg:#141815; --paper:#1c221f; --fg:#e5eae6; --muted:#a0aaa3; --line:#353d38;
   --accent:#8fb8e0; --accent-soft:#213041;
   --ok:#6fcf97; --ok-soft:#1d3729; --mid:#e2b45a; --mid-soft:#3a2f18; --no:#8d968f; --no-soft:#262b28;
-  --prop:#86a8f0; --prop-soft:#1f2a44;
+  --prop:#86a8f0; --prop-soft:#1f2a44; --sel:#fb923c;
   --ext:#29251e; --zc:#1a222a; --zd:#1a271f; --ze:#251f29; --box:#222926; --orig:#2d281c; color-scheme:dark }}
 :root[data-theme="dark"]{
   --bg:#141815; --paper:#1c221f; --fg:#e5eae6; --muted:#a0aaa3; --line:#353d38;
   --accent:#8fb8e0; --accent-soft:#213041;
   --ok:#6fcf97; --ok-soft:#1d3729; --mid:#e2b45a; --mid-soft:#3a2f18; --no:#8d968f; --no-soft:#262b28;
-  --prop:#86a8f0; --prop-soft:#1f2a44;
+  --prop:#86a8f0; --prop-soft:#1f2a44; --sel:#fb923c;
   --ext:#29251e; --zc:#1a222a; --zd:#1a271f; --ze:#251f29; --box:#222926; --orig:#2d281c; color-scheme:dark }
 *{box-sizing:border-box}
-html,body{margin:0}
-body{background:var(--bg);color:var(--fg);font:15px/1.55 var(--sans);
+body{background:var(--bg);color:var(--fg);font:15px/1.55 var(--sans);margin:0;
   padding-block:0 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 main{max-width:1440px;margin:0 auto}
+body.co-khung main{margin-right:400px}
 header.top{padding:28px 0 12px;border-bottom:2px solid var(--accent)}
 h1{font:600 30px/1.2 var(--serif);margin:0 0 8px;text-wrap:balance}
 h2{font:600 21px/1.25 var(--serif);margin:40px 0 10px;text-wrap:balance}
@@ -47,12 +46,22 @@ thead th{background:var(--accent-soft);font-weight:600;font-size:12.5px;letter-s
 thead th.sup{text-transform:uppercase;font-size:11.5px;letter-spacing:.06em;color:var(--accent);border-bottom:1px solid var(--line)}
 tr.b1 th{background:var(--accent-soft);font-size:14px;font-weight:700}
 tr.b2 th{background:var(--paper);font-weight:600;color:var(--accent);padding-left:22px;font-size:13px}
+tr.chon{cursor:pointer}
+tr.chon:hover td{background:var(--accent-soft)}
+tr.chon.dang td{background:var(--mid-soft)}
+tr.chon:focus-visible{outline:2px solid var(--sel);outline-offset:-2px}
 td.id{font-family:var(--mono);white-space:nowrap;font-weight:500}
 .ln{display:inline-block;width:18px;height:0;border-top:2px solid var(--muted);vertical-align:middle;margin-right:6px}
 .ln-q{border-top:2px dashed var(--mid)} .ln-n{border-top:2px dashed var(--prop)}
 .pill{display:inline-block;font:500 12px/1.3 var(--mono);padding:3px 7px;border-radius:3px}
 .ok{background:var(--ok-soft);color:var(--ok)} .mid{background:var(--mid-soft);color:var(--mid)}
 .no{background:var(--no-soft);color:var(--no)} .ext{background:var(--ext);color:var(--muted)}
+.thanh{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+.thanh .nhan{font-size:12.5px;color:var(--muted)}
+.chip{font:500 13px/1 var(--sans);padding:7px 11px;border-radius:999px;border:1px solid var(--line);background:var(--paper);color:var(--fg);cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--paper)}
+.chip:focus-visible,.nut:focus-visible{outline:2px solid var(--sel);outline-offset:2px}
 .legend{display:flex;flex-wrap:wrap;gap:8px 20px;font-size:13px;color:var(--muted);margin:10px 0}
 .legend span{display:inline-flex;align-items:center;gap:6px}
 .sw{width:16px;height:12px;border-radius:2px;border:1.3px solid var(--line);display:inline-block}
@@ -66,40 +75,84 @@ figcaption{font-size:13px;color:var(--muted);margin:8px 2px 0;max-width:none}
 .br{font:600 11.5px var(--sans);fill:var(--fg)}
 .ranh{stroke:var(--accent);stroke-width:1.4;stroke-dasharray:8 4}
 .rt{font:500 10.5px var(--mono);fill:var(--accent)}
-.hop rect{stroke-width:1.3;fill:var(--box);stroke:var(--muted)}
-.hop-x rect{fill:var(--ext)} .hop-o rect{fill:var(--orig);stroke:var(--mid)} .hop-p rect{stroke:var(--accent)}
-.tt-q rect{stroke:var(--mid);stroke-dasharray:6 3} .tt-n rect{stroke:var(--prop);stroke-dasharray:6 3}
+.hop{cursor:pointer}
+.hop .khung{stroke-width:1.3;fill:var(--box);stroke:var(--muted)}
+.hop-x .khung{fill:var(--ext)} .hop-o .khung{fill:var(--orig);stroke:var(--mid)} .hop-p .khung{stroke:var(--accent)}
+.tt-q .khung{stroke:var(--mid);stroke-dasharray:6 3} .tt-n .khung{stroke:var(--prop);stroke-dasharray:6 3}
+.hop:hover .khung{stroke-width:2.2}
+.hop:focus{outline:none} .hop:focus-visible .khung{stroke:var(--sel);stroke-width:2.6}
 .t1{font:600 12.5px var(--sans);fill:var(--fg)} .to{font:700 11px var(--mono);fill:var(--fg);letter-spacing:.02em}
 .t2{font:11.5px var(--sans);fill:var(--fg)} .t2o{font:11px var(--sans);fill:var(--muted)}
 .t2n{font:italic 11.5px var(--sans);fill:var(--prop)} .t3{font:10.5px var(--mono);fill:var(--muted)}
 .huy{fill:var(--orig);stroke:var(--mid);stroke-width:1} .huyt{font:600 9.5px var(--mono);fill:var(--mid)}
-.ten{stroke-width:1.6;fill:none} .ten-b{stroke:var(--muted)} .ten-q{stroke:var(--mid);stroke-dasharray:6 3}
+.ten-g{cursor:pointer} .ten-g:focus{outline:none}
+.hit{stroke:transparent;stroke-width:14;fill:none;pointer-events:stroke}
+.ten{stroke-width:1.6;fill:none;pointer-events:none} .ten-b{stroke:var(--muted)} .ten-q{stroke:var(--mid);stroke-dasharray:6 3}
 .ten-n{stroke:var(--prop);stroke-dasharray:6 3}
+.ten-g:hover .ten,.ten-g:focus-visible .ten{stroke-width:3}
+.ten-g:focus-visible .tl{fill:var(--sel)}
 .mk-b{fill:var(--muted)} .mk-q{fill:var(--mid)} .mk-n{fill:var(--prop)}
 .tl{font:600 10.5px var(--mono);fill:var(--accent)}
+svg.loc .hop,svg.loc .ten-g{opacity:.18;transition:opacity .15s}
+svg.loc .hop.sang,svg.loc .ten-g.sang{opacity:1}
+svg .hop.chon-dang .khung{stroke:var(--sel);stroke-width:2.8}
+svg .ten-g.chon-dang .ten{stroke:var(--sel);stroke-width:3.2}
+svg .ten-g.chon-dang .tl{fill:var(--sel)}
+@media (prefers-reduced-motion: reduce){ svg.loc .hop,svg.loc .ten-g{transition:none} }
+.khung-ct{position:fixed;top:env(safe-area-inset-top,0px);right:0;bottom:0;width:384px;background:var(--paper);border-left:1px solid var(--line);
+  padding:16px max(16px,env(safe-area-inset-right,0px)) calc(16px + env(safe-area-inset-bottom,0px)) 16px;overflow-y:auto;z-index:20;box-shadow:-6px 0 18px rgba(0,0,0,.08)}
+.khung-ct .eb{font:600 11px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.khung-ct h3{font:600 18px/1.3 var(--serif);margin:6px 0 10px;text-wrap:balance}
+.khung-ct dl{display:grid;grid-template-columns:96px 1fr;gap:6px 10px;font-size:13.5px;margin:0 0 12px}
+.khung-ct dt{color:var(--muted)} .khung-ct dd{margin:0;min-width:0}
+.khung-ct .dsach{display:flex;flex-direction:column;gap:6px;margin:4px 0 12px}
+.lien{all:unset;cursor:pointer;display:block;font-size:13px;padding:6px 8px;border:1px solid var(--line);border-radius:4px;background:var(--bg)}
+.lien:hover{border-color:var(--accent)} .lien:focus-visible{outline:2px solid var(--sel)}
+.lien b{font-family:var(--mono);color:var(--accent);margin-right:6px}
+.dong{display:flex;gap:8px;align-items:center;justify-content:space-between}
+.nut{font:600 13px/1 var(--sans);padding:9px 12px;border-radius:4px;border:1px solid var(--accent);background:var(--accent);color:var(--paper);cursor:pointer}
+.nut.phu{background:var(--paper);color:var(--accent)}
+.nut[disabled]{opacity:.5;cursor:not-allowed}
+.dong-nut{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0}
+.hoi{border-top:1px solid var(--line);margin-top:14px;padding-top:12px}
+.hoi label{font-size:13px;font-weight:600;display:block;margin-bottom:6px}
+.hoi textarea{width:100%;min-height:96px;font:14px/1.45 var(--sans);padding:8px;border:1px solid var(--line);border-radius:4px;background:var(--bg);color:var(--fg);resize:vertical}
+.hoi textarea:focus-visible{outline:2px solid var(--sel)}
+.bao{font-size:13px;margin:6px 0 0;min-height:1.2em}
+.bao.tot{color:var(--ok)} .bao.loi{color:var(--sel)}
+.ghichu{font-size:12.5px;color:var(--muted)}
+.dong-x{all:unset;cursor:pointer;font:600 20px/1 var(--sans);color:var(--muted);padding:4px 8px}
+.dong-x:focus-visible{outline:2px solid var(--sel)}
 .note{border-left:3px solid var(--mid);background:var(--mid-soft);padding:8px 12px;max-width:96ch;font-size:14px}
+.tin{border-left:3px solid var(--accent);background:var(--accent-soft);padding:8px 12px;max-width:96ch;font-size:14px}
 ol.fix li,ul.terms li{margin:6px 0} ul.terms ul{margin:4px 0;padding-left:1.1em}
 footer{margin-top:48px;color:var(--muted);font-size:12.5px;border-top:1px solid var(--line);padding-top:10px}
+@media (max-width:1100px){ body.co-khung main{margin-right:0}
+  .khung-ct{top:auto;left:0;width:auto;max-height:62vh;border-left:0;border-top:1px solid var(--line);box-shadow:0 -6px 18px rgba(0,0,0,.12);
+    padding-left:max(16px,env(safe-area-inset-left,0px))} }
 @media (max-width:640px){ h1{font-size:24px} body{font-size:14px} }
-</style></head><body><main>
+</style>
+<main>
 
 <header class="top">
   <h1>Voi FLS-tobe-phase1</h1>
-  <p class="meta"><b>v0.2 · 2026-11-03</b> · Giai đoạn 1: đi hết INPUT, về <b>một</b> bảng ITL, mọi dòng có pháp nhân. Phiếu chi lấy từ <b>FPS</b> qua <b>hợp đồng dữ liệu FPS → FLS</b> (§5).
-  Vẽ lại theo luật <i>vẽ voi</i>: gọi đúng tên từng thứ trước, rồi mới gom ≤ 5. Hình, bảng mũi tên và bảng kiểm cạnh <b>sinh từ cùng một bản khai</b> (<code>docs/ITL/_tools/sinh_voi_phase1.py</code>), máy kiểm hình trước khi ghi.<br>
+  <p class="meta"><b>v0.3 · 2026-11-04</b> · Giai đoạn 1: đi hết INPUT, về <b>một</b> bảng ITL, mọi dòng có pháp nhân. Lệnh chi lấy từ <b>sổ cái PM / PC của FPS</b> qua hợp đồng dữ liệu (§5).
+  Hình, bảng mũi tên, bảng kiểm cạnh và khung chi tiết <b>sinh từ cùng một bản khai</b> (<code>docs/ITL/_tools/sinh_voi_phase1.py</code>); máy kiểm hình trước khi ghi.<br>
   PD Now là bản gốc tham khảo: trang này chỉ mượn <b>thuật ngữ</b> (PE · PI · PM · PC · LE · CDT · HD/KRF · Reference No · General Trustest), không dùng tên sheet, tên file hay bước tính của nó. Mã FLS @ <code>2d1b710</code>.</p>
 </header>
+<p class="tin"><b>Cách dùng:</b> bấm một hộp hay một mũi tên (hoặc một dòng trong bảng) để làm nổi các đường nối của nó và mở khung chi tiết. Trong khung có <b>Bình luận phần này</b> và ô <b>Hỏi Claude</b>: câu hỏi được gắn đúng vào phần đang chọn, Claude trả lời trong luồng bình luận ở đó.</p>
 
 <h2>§1 · Con voi — 5 vùng theo nơi chạy, dải theo đời sống của dữ liệu</h2>
+<div class="thanh" role="toolbar" aria-label="Lọc theo trạng thái"><span class="nhan">Làm nổi:</span><button class="chip" data-loc="tat" aria-pressed="true" type="button">Tất cả</button><button class="chip" data-loc="b" aria-pressed="false" type="button">Có mã</button><button class="chip" data-loc="q" aria-pressed="false" type="button">GĐ1 phải dựng</button><button class="chip" data-loc="n" aria-pressed="false" type="button">Đề xuất, chờ owner</button></div>
 <div class="legend"><span><i class="sw" style="background:var(--orig);border-color:var(--mid);border-radius:6px"></i>khởi động (người · nhịp)</span><span><i class="sw" style="background:var(--ext)"></i>nguồn ngoài FLS</span><span><i class="sw" style="border-color:var(--muted)"></i>dữ liệu (tên của vật)</span><span><i class="sw" style="border-color:var(--accent)"></i>xử lý (ĐỘNG TỪ + danh từ)</span><span><i class="ln"></i>có mã</span><span><i class="ln ln-q"></i>GĐ1 phải dựng (đã chốt)</span><span><i class="ln ln-n"></i>đề xuất của trang này (chờ owner)</span><span><span class="pill mid" style="font-size:10px">S1</span> huy hiệu = hộp này do điểm khởi động S1 chạy</span></div>
-<figure class="diagram"><svg viewBox="0 0 1420 1092" role="img" aria-label="Voi FLS-tobe-phase1">
+<figure class="diagram" id="hinh"><svg viewBox="0 0 1420 1092" role="group" aria-label="Voi FLS-tobe-phase1: bấm một hộp hay mũi tên để xem chi tiết">
 <defs>
 <marker id="mb" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" class="mk-b"/></marker>
 <marker id="mq" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" class="mk-q"/></marker>
 <marker id="mn" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" class="mk-n"/></marker>
 </defs>
 <rect class="vz vz-ext" x="242" y="10" width="336" height="194" rx="6"/>
-<text class="vt" x="250" y="28">FPS · hệ thanh toán (ngoài FLS)</text>
+<text class="vt" x="250" y="28">FPS · sổ cái (ngoài FLS)</text>
 <rect class="vz vz-ext" x="743" y="10" width="669" height="194" rx="6"/>
 <text class="vt" x="751" y="28">GOOGLE SHEETS · tầng nhập tay (ngoài FLS)</text>
 <rect class="vz vz-C" x="124" y="266" width="1288" height="462" rx="6"/>
@@ -113,7 +166,7 @@ footer{margin-top:48px;color:var(--muted);font-size:12.5px;border-top:1px solid 
 <text class="vr2" x="10" y="1006">màn FLS + hệ khác</text>
 <text class="vr" x="10" y="28">NGUỒN</text><text class="vr2" x="10" y="42">ngoài FLS, chỉ-đọc</text>
 <text class="br" x="10" y="81.0">ai sinh ra</text>
-<text class="br" x="10" y="173.0">phiếu · sổ nguồn</text>
+<text class="br" x="10" y="173.0">sổ nguồn</text>
 <text class="br" x="10" y="336.0">① KHAI &amp; CHỤP</text>
 <text class="br" x="10" y="453.0">② DỰNG</text>
 <text class="br" x="10" y="567.0">③ GHÉP &amp; SOÁT</text>
@@ -122,448 +175,566 @@ footer{margin-top:48px;color:var(--muted);font-size:12.5px;border-top:1px solid 
 <text class="br" x="10" y="918.0">⑥ HIỆU LỰC</text>
 <text class="br" x="10" y="1037.0">⑦ NGƯỜI THẤY</text>
 <line class="ranh" x1="124" y1="261" x2="1412" y2="261"/>
-<text class="rt" x="660.5" y="213" text-anchor="middle">◀ FPS: kết nối CSDL</text>
+<text class="rt" x="660.5" y="213" text-anchor="middle">◀ FPS: đọc sổ cái</text>
 <text class="rt" x="660.5" y="225" text-anchor="middle">chỉ-đọc · vai đọc riêng</text>
 <text class="rt" x="660.5" y="237" text-anchor="middle">Sheets API · TK dịch vụ ▶</text>
 <text class="rt" x="660.5" y="249" text-anchor="middle">quyền chỉ-đọc</text>
 <text class="rt" x="182" y="256" text-anchor="middle">ranh giới FLS</text>
-<g class="hop hop-o tt-b"><rect x="248" y="40" width="157" height="46" rx="9"/>
-<text class="to" x="256" y="54">NGƯỜI LẬP &amp; DUYỆT</text>
-<text class="t2o" x="256" y="67">phiếu trong FPS</text>
+<g class="ten-g" data-id="t:o1" data-tt="b" data-comment-target tabindex="0" role="button" aria-label="Mũi tên o1: LẬP &amp; DUYỆT PM → sổ cái PM">
+<line class="hit" x1="326.5" y1="86.0" x2="326.5" y2="117.0"/>
+<line class="ten ten-b" x1="326.5" y1="86.0" x2="326.5" y2="117.0" marker-end="url(#mb)"/>
+<text class="tl" x="330.5" y="105.5">o1</text>
 </g>
-<g class="hop hop-o tt-b"><rect x="415" y="40" width="157" height="46" rx="9"/>
-<text class="to" x="423" y="54">NGƯỜI GIỮ DANH MỤC</text>
-<text class="t2o" x="423" y="67">danh mục trong FPS</text>
+<g class="ten-g" data-id="t:o2" data-tt="b" data-comment-target tabindex="0" role="button" aria-label="Mũi tên o2: LẬP &amp; DUYỆT PC → sổ cái PC">
+<line class="hit" x1="493.5" y1="86.0" x2="493.5" y2="117.0"/>
+<line class="ten ten-b" x1="493.5" y1="86.0" x2="493.5" y2="117.0" marker-end="url(#mb)"/>
+<text class="tl" x="497.5" y="105.5">o2</text>
 </g>
-<g class="hop hop-x tt-b"><rect x="248" y="118" width="157" height="74" rx="3"/>
-<text class="t1" x="256" y="134">phiếu đã duyệt</text>
-<text class="t2" x="256" y="149">PE · PI · PM · PC</text>
-<text class="t2" x="256" y="164">mỗi loại: slip + line</text>
-<text class="t3" x="256" y="184">fps_*_slip · _line</text>
+<g class="ten-g" data-id="t:o3" data-tt="b" data-comment-target tabindex="0" role="button" aria-label="Mũi tên o3: KẾ TOÁN → sao kê ngân hàng">
+<line class="hit" x1="827.5" y1="86.0" x2="827.5" y2="117.0"/>
+<line class="ten ten-b" x1="827.5" y1="86.0" x2="827.5" y2="117.0" marker-end="url(#mb)"/>
+<text class="tl" x="831.5" y="105.5">o3</text>
 </g>
-<g class="hop hop-x tt-b"><rect x="415" y="118" width="157" height="74" rx="3"/>
-<text class="t1" x="423" y="134">danh mục FPS</text>
-<text class="t2" x="423" y="149">LE · CDT · HD/KRF</text>
-<text class="t2" x="423" y="164">đối tác · TK · tỷ giá</text>
-<text class="t3" x="423" y="184">fps_le · fps_ven …</text>
+<g class="ten-g" data-id="t:o4" data-tt="b" data-comment-target tabindex="0" role="button" aria-label="Mũi tên o4: KẾ TOÁN → sổ quỹ">
+<line class="hit" x1="994.5" y1="86.0" x2="994.5" y2="117.0"/>
+<line class="ten ten-b" x1="994.5" y1="86.0" x2="994.5" y2="117.0" marker-end="url(#mb)"/>
+<text class="tl" x="998.5" y="105.5">o4</text>
 </g>
-<g class="hop hop-o tt-b"><rect x="749" y="40" width="324" height="46" rx="9"/>
+<g class="ten-g" data-id="t:o5" data-tt="b" data-comment-target tabindex="0" role="button" aria-label="Mũi tên o5: HR · C&amp;B → sổ lương HR">
+<line class="hit" x1="1161.5" y1="86.0" x2="1161.5" y2="117.0"/>
+<line class="ten ten-b" x1="1161.5" y1="86.0" x2="1161.5" y2="117.0" marker-end="url(#mb)"/>
+<text class="tl" x="1165.5" y="105.5">o5</text>
+</g>
+<g class="ten-g" data-id="t:o6" data-tt="b" data-comment-target tabindex="0" role="button" aria-label="Mũi tên o6: CHỦ SỔ NỀN TẢNG → sổ nền tảng">
+<line class="hit" x1="1328.5" y1="86.0" x2="1328.5" y2="117.0"/>
+<line class="ten ten-b" x1="1328.5" y1="86.0" x2="1328.5" y2="117.0" marker-end="url(#mb)"/>
+<text class="tl" x="1332.5" y="105.5">o6</text>
+</g>
+<g class="ten-g" data-id="t:x1" data-tt="q" data-comment-target tabindex="0" role="button" aria-label="Mũi tên x1: sổ cái PM → ảnh sổ cái FPS">
+<line class="hit" x1="326.5" y1="192.0" x2="326.5" y2="289.0"/>
+<line class="ten ten-q" x1="326.5" y1="192.0" x2="326.5" y2="289.0" marker-end="url(#mq)"/>
+<text class="tl" x="330.5" y="244.5">x1</text>
+</g>
+<g class="ten-g" data-id="t:x2" data-tt="q" data-comment-target tabindex="0" role="button" aria-label="Mũi tên x2: sổ cái PC → ảnh sổ cái FPS">
+<line class="hit" x1="493.5" y1="192.0" x2="493.5" y2="289.0"/>
+<line class="ten ten-q" x1="493.5" y1="192.0" x2="493.5" y2="289.0" marker-end="url(#mq)"/>
+<text class="tl" x="497.5" y="244.5">x2</text>
+</g>
+<g class="ten-g" data-id="t:x3" data-tt="b" data-comment-target tabindex="0" role="button" aria-label="Mũi tên x3: sao kê ngân hàng → ảnh sổ nhập tay">
+<line class="hit" x1="827.5" y1="192.0" x2="827.5" y2="289.0"/>
+<line class="ten ten-b" x1="827.5" y1="192.0" x2="827.5" y2="289.0" marker-end="url(#mb)"/>
+<text class="tl" x="831.5" y="244.5">x3</text>
+</g>
+<g class="ten-g" data-id="t:x4" data-tt="q" data-comment-target tabindex="0" role="button" aria-label="Mũi tên x4: sổ quỹ → ảnh sổ nhập tay">
+<line class="hit" x1="994.5" y1="192.0" x2="994.5" y2="289.0"/>
+<line class="ten ten-q" x1="994.5" y1="192.0" x2="994.5" y2="289.0" marker-end="url(#mq)"/>
+<text class="tl" x="998.5" y="244.5">x4</text>
+</g>
+<g class="ten-g" data-id="t:x5" data-tt="q" data-comment-target tabindex="0" role="button" aria-label="Mũi tên x5: sổ lương HR → ảnh sổ nhập tay">
+<line class="hit" x1="1161.5" y1="192.0" x2="1161.5" y2="289.0"/>
+<line class="ten ten-q" x1="1161.5" y1="192.0" x2="1161.5" y2="289.0" marker-end="url(#mq)"/>
+<text class="tl" x="1165.5" y="244.5">x5</text>
+</g>
+<g class="ten-g" data-id="t:x6" data-tt="q" data-comment-target tabindex="0" role="button" aria-label="Mũi tên x6: sổ nền tảng → ảnh sổ nhập tay">
+<line class="hit" x1="1328.5" y1="192.0" x2="1328.5" y2="289.0"/>
+<line class="ten ten-q" x1="1328.5" y1="192.0" x2="1328.5" y2="289.0" marker-end="url(#mq)"/>
+<text class="tl" x="1332.5" y="244.5">x6</text>
+</g>
+<g class="ten-g" data-id="t:k1" data-tt="n" data-comment-target tabindex="0" role="button" aria-label="Mũi tên k1: ảnh sổ cái FPS → bản khai nguồn">
+<line class="hit" x1="556.0" y1="332.0" x2="593.0" y2="332.0"/>
+<line class="ten ten-n" x1="556.0" y1="332.0" x2="593.0" y2="332.0" marker-end="url(#mn)"/>
+<text class="tl" x="574.5" y="328.0" text-anchor="middle">k1</text>
+</g>
+<g class="ten-g" data-id="t:k2" data-tt="b" data-comment-target tabindex="0" role="button" aria-label="Mũi tên k2: bản khai nguồn → ảnh sổ nhập tay">
+<line class="hit" x1="727.0" y1="332.0" x2="764.0" y2="332.0"/>
+<line class="ten ten-b" x1="727.0" y1="332.0" x2="764.0" y2="332.0" marker-end="url(#mb)"/>
+<text class="tl" x="745.5" y="328.0" text-anchor="middle">k2</text>
+</g>
+<g class="ten-g" data-id="t:b2" data-tt="n" data-comment-target tabindex="0" role="button" aria-label="Mũi tên b2: bản khai nguồn → DỰNG dòng tiền">
+<line class="hit" x1="660.5" y1="374.0" x2="660.5" y2="409.0"/>
+<line class="ten ten-n" x1="660.5" y1="374.0" x2="660.5" y2="409.0" marker-end="url(#mn)"/>
+<text class="tl" x="664.5" y="395.5">b2</text>
+</g>
+<g class="ten-g" data-id="t:b1" data-tt="q" data-comment-target tabindex="0" role="button" aria-label="Mũi tên b1: ảnh sổ cái FPS → DỰNG dòng lệnh">
+<line class="hit" x1="410.0" y1="374.0" x2="410.0" y2="409.0"/>
+<line class="ten ten-q" x1="410.0" y1="374.0" x2="410.0" y2="409.0" marker-end="url(#mq)"/>
+<text class="tl" x="414.0" y="395.5">b1</text>
+</g>
+<g class="ten-g" data-id="t:b3" data-tt="b" data-comment-target tabindex="0" role="button" aria-label="Mũi tên b3: ảnh sổ nhập tay → DỰNG dòng tiền">
+<line class="hit" x1="911.0" y1="374.0" x2="911.0" y2="409.0"/>
+<line class="ten ten-b" x1="911.0" y1="374.0" x2="911.0" y2="409.0" marker-end="url(#mb)"/>
+<text class="tl" x="915.0" y="395.5">b3</text>
+</g>
+<g class="ten-g" data-id="t:b4" data-tt="q" data-comment-target tabindex="0" role="button" aria-label="Mũi tên b4: ảnh sổ nhập tay → DỰNG dòng chi phí">
+<line class="hit" x1="1245.0" y1="374.0" x2="1245.0" y2="409.0"/>
+<line class="ten ten-q" x1="1245.0" y1="374.0" x2="1245.0" y2="409.0" marker-end="url(#mq)"/>
+<text class="tl" x="1249.0" y="395.5">b4</text>
+</g>
+<g class="ten-g" data-id="t:g1" data-tt="q" data-comment-target tabindex="0" role="button" aria-label="Mũi tên g1: DỰNG dòng lệnh → GHÉP lệnh chi với dòng tiền">
+<line class="hit" x1="410.0" y1="488.0" x2="410.0" y2="523.0"/>
+<line class="ten ten-q" x1="410.0" y1="488.0" x2="410.0" y2="523.0" marker-end="url(#mq)"/>
+<text class="tl" x="414.0" y="509.5">g1</text>
+</g>
+<g class="ten-g" data-id="t:g2" data-tt="b" data-comment-target tabindex="0" role="button" aria-label="Mũi tên g2: DỰNG dòng tiền → GHÉP lệnh chi với dòng tiền">
+<line class="hit" x1="660.5" y1="488.0" x2="660.5" y2="523.0"/>
+<line class="ten ten-b" x1="660.5" y1="488.0" x2="660.5" y2="523.0" marker-end="url(#mb)"/>
+<text class="tl" x="664.5" y="509.5">g2</text>
+</g>
+<g class="ten-g" data-id="t:g3" data-tt="b" data-comment-target tabindex="0" role="button" aria-label="Mũi tên g3: DỰNG dòng tiền → SOÁT lô">
+<line class="hit" x1="911.0" y1="488.0" x2="911.0" y2="523.0"/>
+<line class="ten ten-b" x1="911.0" y1="488.0" x2="911.0" y2="523.0" marker-end="url(#mb)"/>
+<text class="tl" x="915.0" y="509.5">g3</text>
+</g>
+<g class="ten-g" data-id="t:g4" data-tt="q" data-comment-target tabindex="0" role="button" aria-label="Mũi tên g4: DỰNG dòng chi phí → SOÁT lô">
+<line class="hit" x1="1245.0" y1="488.0" x2="1245.0" y2="523.0"/>
+<line class="ten ten-q" x1="1245.0" y1="488.0" x2="1245.0" y2="523.0" marker-end="url(#mq)"/>
+<text class="tl" x="1249.0" y="509.5">g4</text>
+</g>
+<g class="ten-g" data-id="t:w1" data-tt="b" data-comment-target tabindex="0" role="button" aria-label="Mũi tên w1: GHÉP lệnh chi với dòng tiền → GHI lượt nạp — một giao dịch">
+<line class="hit" x1="410.0" y1="602.0" x2="410.0" y2="637.0"/>
+<line class="ten ten-b" x1="410.0" y1="602.0" x2="410.0" y2="637.0" marker-end="url(#mb)"/>
+<text class="tl" x="414.0" y="623.5">w1</text>
+</g>
+<g class="ten-g" data-id="t:w2" data-tt="b" data-comment-target tabindex="0" role="button" aria-label="Mũi tên w2: SOÁT lô → GHI lượt nạp — một giao dịch">
+<line class="hit" x1="827.0" y1="602.0" x2="827.0" y2="637.0"/>
+<line class="ten ten-b" x1="827.0" y1="602.0" x2="827.0" y2="637.0" marker-end="url(#mb)"/>
+<text class="tl" x="831.0" y="623.5">w2</text>
+</g>
+<g class="ten-g" data-id="t:w3" data-tt="b" data-comment-target tabindex="0" role="button" aria-label="Mũi tên w3: SOÁT lô → biên bản lô">
+<line class="hit" x1="994.5" y1="602.0" x2="994.5" y2="637.0"/>
+<line class="ten ten-b" x1="994.5" y1="602.0" x2="994.5" y2="637.0" marker-end="url(#mb)"/>
+<text class="tl" x="998.5" y="623.5">w3</text>
+</g>
+<g class="ten-g" data-id="t:s1" data-tt="b" data-comment-target tabindex="0" role="button" aria-label="Mũi tên s1: GHI lượt nạp — một giao dịch → dòng bị loại">
+<line class="hit" x1="326.5" y1="716.0" x2="326.5" y2="763.0"/>
+<line class="ten ten-b" x1="326.5" y1="716.0" x2="326.5" y2="763.0" marker-end="url(#mb)"/>
+<text class="tl" x="330.5" y="743.5">s1</text>
+</g>
+<g class="ten-g" data-id="t:s2" data-tt="b" data-comment-target tabindex="0" role="button" aria-label="Mũi tên s2: GHI lượt nạp — một giao dịch → SỔ ITL">
+<line class="hit" x1="577.0" y1="716.0" x2="577.0" y2="763.0"/>
+<line class="ten ten-b" x1="577.0" y1="716.0" x2="577.0" y2="763.0" marker-end="url(#mb)"/>
+<text class="tl" x="581.0" y="743.5">s2</text>
+</g>
+<g class="ten-g" data-id="t:s3" data-tt="b" data-comment-target tabindex="0" role="button" aria-label="Mũi tên s3: GHI lượt nạp — một giao dịch → lớp sửa chỉ-thêm (gộp vẽ)">
+<line class="hit" x1="827.0" y1="716.0" x2="827.0" y2="763.0"/>
+<line class="ten ten-b" x1="827.0" y1="716.0" x2="827.0" y2="763.0" marker-end="url(#mb)"/>
+<text class="tl" x="831.0" y="743.5">s3</text>
+</g>
+<g class="ten-g" data-id="t:s4" data-tt="b" data-comment-target tabindex="0" role="button" aria-label="Mũi tên s4: GHI tay — một giao dịch → lớp sửa chỉ-thêm (gộp vẽ)">
+<line class="hit" x1="1245.0" y1="716.0" x2="1245.0" y2="763.0"/>
+<line class="ten ten-b" x1="1245.0" y1="716.0" x2="1245.0" y2="763.0" marker-end="url(#mb)"/>
+<text class="tl" x="1249.0" y="743.5">s4</text>
+</g>
+<g class="ten-g" data-id="t:h1" data-tt="q" data-comment-target tabindex="0" role="button" aria-label="Mũi tên h1: dòng bị loại → KIỂM cổng GĐ1">
+<line class="hit" x1="326.5" y1="842.0" x2="326.5" y2="877.0"/>
+<line class="ten ten-q" x1="326.5" y1="842.0" x2="326.5" y2="877.0" marker-end="url(#mq)"/>
+<text class="tl" x="330.5" y="863.5">h1</text>
+</g>
+<g class="ten-g" data-id="t:h2" data-tt="b" data-comment-target tabindex="0" role="button" aria-label="Mũi tên h2: SỔ ITL → SỔ ITL HIỆU LỰC — bảng ITL duy nhất của GĐ1">
+<line class="hit" x1="577.0" y1="842.0" x2="577.0" y2="877.0"/>
+<line class="ten ten-b" x1="577.0" y1="842.0" x2="577.0" y2="877.0" marker-end="url(#mb)"/>
+<text class="tl" x="581.0" y="863.5">h2</text>
+</g>
+<g class="ten-g" data-id="t:h3" data-tt="b" data-comment-target tabindex="0" role="button" aria-label="Mũi tên h3: lớp sửa chỉ-thêm (gộp vẽ) → SỔ ITL HIỆU LỰC — bảng ITL duy nhất của GĐ1">
+<line class="hit" x1="1078.0" y1="842.0" x2="1078.0" y2="877.0"/>
+<line class="ten ten-b" x1="1078.0" y1="842.0" x2="1078.0" y2="877.0" marker-end="url(#mb)"/>
+<text class="tl" x="1082.0" y="863.5">h3</text>
+</g>
+<g class="ten-g" data-id="t:h4" data-tt="q" data-comment-target tabindex="0" role="button" aria-label="Mũi tên h4: SỔ ITL HIỆU LỰC — bảng ITL duy nhất của GĐ1 → KIỂM cổng GĐ1">
+<line class="hit" x1="431.0" y1="914.0" x2="390.0" y2="914.0"/>
+<line class="ten ten-q" x1="431.0" y1="914.0" x2="390.0" y2="914.0" marker-end="url(#mq)"/>
+<text class="tl" x="410.5" y="910.0" text-anchor="middle">h4</text>
+</g>
+<g class="ten-g" data-id="t:v1" data-tt="q" data-comment-target tabindex="0" role="button" aria-label="Mũi tên v1: KIỂM cổng GĐ1 → màn F03 · cổng">
+<line class="hit" x1="320.0" y1="950.0" x2="320.0" y2="997.0"/>
+<line class="ten ten-q" x1="320.0" y1="950.0" x2="320.0" y2="997.0" marker-end="url(#mq)"/>
+<text class="tl" x="324.0" y="977.5">v1</text>
+</g>
+<g class="ten-g" data-id="t:v2" data-tt="b" data-comment-target tabindex="0" role="button" aria-label="Mũi tên v2: SỔ ITL HIỆU LỰC — bảng ITL duy nhất của GĐ1 → màn F01 · hàng chờ">
+<line class="hit" x1="577.0" y1="950.0" x2="577.0" y2="997.0"/>
+<line class="ten ten-b" x1="577.0" y1="950.0" x2="577.0" y2="997.0" marker-end="url(#mb)"/>
+<text class="tl" x="581.0" y="977.5">v2</text>
+</g>
+<g class="ten-g" data-id="t:v3" data-tt="b" data-comment-target tabindex="0" role="button" aria-label="Mũi tên v3: SỔ ITL HIỆU LỰC — bảng ITL duy nhất của GĐ1 → màn F02 · sổ ITL">
+<line class="hit" x1="911.0" y1="950.0" x2="911.0" y2="997.0"/>
+<line class="ten ten-b" x1="911.0" y1="950.0" x2="911.0" y2="997.0" marker-end="url(#mb)"/>
+<text class="tl" x="915.0" y="977.5">v3</text>
+</g>
+<g class="ten-g" data-id="t:v4" data-tt="q" data-comment-target tabindex="0" role="button" aria-label="Mũi tên v4: SỔ ITL HIỆU LỰC — bảng ITL duy nhất của GĐ1 → XUẤT cho hệ khác">
+<line class="hit" x1="1245.0" y1="950.0" x2="1245.0" y2="997.0"/>
+<line class="ten ten-q" x1="1245.0" y1="950.0" x2="1245.0" y2="997.0" marker-end="url(#mq)"/>
+<text class="tl" x="1249.0" y="977.5">v4</text>
+</g>
+<g class="hop hop-o tt-b" data-id="h:oPM" data-tt="b" data-comment-target tabindex="0" role="button" aria-label="LẬP &amp; DUYỆT PM (khởi động, có mã)"><rect class="khung" x="248" y="40" width="157" height="46" rx="9"/>
+<text class="to" x="256" y="54">LẬP &amp; DUYỆT PM</text>
+<text class="t2o" x="256" y="67">lệnh chi trong FPS</text>
+</g>
+<g class="hop hop-o tt-b" data-id="h:oPC" data-tt="b" data-comment-target tabindex="0" role="button" aria-label="LẬP &amp; DUYỆT PC (khởi động, có mã)"><rect class="khung" x="415" y="40" width="157" height="46" rx="9"/>
+<text class="to" x="423" y="54">LẬP &amp; DUYỆT PC</text>
+<text class="t2o" x="423" y="67">quyết toán trong FPS</text>
+</g>
+<g class="hop hop-x tt-b" data-id="h:soPM" data-tt="b" data-comment-target tabindex="0" role="button" aria-label="sổ cái PM (nguồn ngoài, có mã)"><rect class="khung" x="248" y="118" width="157" height="74" rx="3"/>
+<text class="t1" x="256" y="134">sổ cái PM</text>
+<text class="t2" x="256" y="149">1 dòng = 1 PM line</text>
+<text class="t2" x="256" y="164">PE·PI · HD · CDT1 · Ref No</text>
+<text class="t3" x="256" y="184">28 cột · 3.772 dòng</text>
+</g>
+<g class="hop hop-x tt-b" data-id="h:soPC" data-tt="b" data-comment-target tabindex="0" role="button" aria-label="sổ cái PC (nguồn ngoài, có mã)"><rect class="khung" x="415" y="118" width="157" height="74" rx="3"/>
+<text class="t1" x="423" y="134">sổ cái PC</text>
+<text class="t2" x="423" y="149">1 dòng = 1 PC line</text>
+<text class="t2" x="423" y="164">quyết toán · hoàn ứng</text>
+<text class="t3" x="423" y="184">AS-IS: chưa đọc</text>
+</g>
+<g class="hop hop-o tt-b" data-id="h:oKT" data-tt="b" data-comment-target tabindex="0" role="button" aria-label="KẾ TOÁN (khởi động, có mã)"><rect class="khung" x="749" y="40" width="324" height="46" rx="9"/>
 <text class="to" x="757" y="54">KẾ TOÁN</text>
 <text class="t2o" x="757" y="67">dán sao kê vào sheet R | · ghi sổ quỹ</text>
 </g>
-<g class="hop hop-o tt-b"><rect x="1083" y="40" width="157" height="46" rx="9"/>
+<g class="hop hop-o tt-b" data-id="h:oHR" data-tt="b" data-comment-target tabindex="0" role="button" aria-label="HR · C&amp;B (khởi động, có mã)"><rect class="khung" x="1083" y="40" width="157" height="46" rx="9"/>
 <text class="to" x="1091" y="54">HR · C&amp;B</text>
 <text class="t2o" x="1091" y="67">lập sổ lương</text>
 </g>
-<g class="hop hop-o tt-b"><rect x="1250" y="40" width="157" height="46" rx="9"/>
+<g class="hop hop-o tt-b" data-id="h:oNT" data-tt="b" data-comment-target tabindex="0" role="button" aria-label="CHỦ SỔ NỀN TẢNG (khởi động, có mã)"><rect class="khung" x="1250" y="40" width="157" height="46" rx="9"/>
 <text class="to" x="1258" y="54">CHỦ SỔ NỀN TẢNG</text>
 <text class="t2o" x="1258" y="67">dịch vụ · thanh toán</text>
 </g>
-<g class="hop hop-x tt-b"><rect x="749" y="118" width="157" height="74" rx="3"/>
+<g class="hop hop-x tt-b" data-id="h:saoke" data-tt="b" data-comment-target tabindex="0" role="button" aria-label="sao kê ngân hàng (nguồn ngoài, có mã)"><rect class="khung" x="749" y="118" width="157" height="74" rx="3"/>
 <text class="t1" x="757" y="134">sao kê ngân hàng</text>
 <text class="t2" x="757" y="149">60 dòng chảy</text>
 <text class="t2" x="757" y="164">19 bố cục cột</text>
 <text class="t3" x="757" y="184">sheet R |</text>
 </g>
-<g class="hop hop-x tt-b"><rect x="916" y="118" width="157" height="74" rx="3"/>
+<g class="hop hop-x tt-b" data-id="h:soquy" data-tt="b" data-comment-target tabindex="0" role="button" aria-label="sổ quỹ (nguồn ngoài, có mã)"><rect class="khung" x="916" y="118" width="157" height="74" rx="3"/>
 <text class="t1" x="924" y="134">sổ quỹ</text>
 <text class="t2" x="924" y="149">8 dòng chảy</text>
 <text class="t2" x="924" y="164">kế toán ghi tay</text>
 <text class="t3" x="924" y="184">sheet R |</text>
 </g>
-<g class="hop hop-x tt-b"><rect x="1083" y="118" width="157" height="74" rx="3"/>
+<g class="hop hop-x tt-b" data-id="h:soluong" data-tt="b" data-comment-target tabindex="0" role="button" aria-label="sổ lương HR (nguồn ngoài, có mã)"><rect class="khung" x="1083" y="118" width="157" height="74" rx="3"/>
 <text class="t1" x="1091" y="134">sổ lương HR</text>
 <text class="t2" x="1091" y="149">4 sổ: 2 loại × 2 năm</text>
 <text class="t2" x="1091" y="164">HD/KRF tách sẵn</text>
 <text class="t3" x="1091" y="184">sheet HR</text>
 </g>
-<g class="hop hop-x tt-b"><rect x="1250" y="118" width="157" height="74" rx="3"/>
+<g class="hop hop-x tt-b" data-id="h:sont" data-tt="b" data-comment-target tabindex="0" role="button" aria-label="sổ nền tảng (nguồn ngoài, có mã)"><rect class="khung" x="1250" y="118" width="157" height="74" rx="3"/>
 <text class="t1" x="1258" y="134">sổ nền tảng</text>
 <text class="t2" x="1258" y="149">chi phí dịch vụ (SC)</text>
 <text class="t2" x="1258" y="164">thanh toán (PS)</text>
 <text class="t3" x="1258" y="184">file RAW</text>
 </g>
-<g class="hop hop-o tt-b"><rect x="128" y="290" width="108" height="38.0" rx="9"/>
+<g class="hop hop-o tt-b" data-id="h:S1" data-tt="b" data-comment-target tabindex="0" role="button" aria-label="S1 · NHỊP (khởi động, có mã)"><rect class="khung" x="128" y="290" width="108" height="38.0" rx="9"/>
 <text class="to" x="136" y="304">S1 · NHỊP</text>
 <text class="t2o" x="136" y="317">mỗi giờ 8h–19h</text>
 </g>
-<g class="hop hop-o tt-b"><rect x="128" y="336.0" width="108" height="38.0" rx="9"/>
+<g class="hop hop-o tt-b" data-id="h:S2" data-tt="b" data-comment-target tabindex="0" role="button" aria-label="S2 · KHAI (khởi động, có mã)"><rect class="khung" x="128" y="336.0" width="108" height="38.0" rx="9"/>
 <text class="to" x="136" y="350.0">S2 · KHAI</text>
 <text class="t2o" x="136" y="363.0">kế toán · F04</text>
 </g>
-<g class="hop hop-d tt-q"><rect x="248" y="290" width="308" height="84" rx="3"/>
-<text class="t1" x="256" y="306">ảnh FPS</text>
-<text class="t2" x="256" y="321">phiếu 4 loại + danh mục, đóng băng</text>
+<g class="hop hop-d tt-q" data-id="h:anhFPS" data-tt="q" data-comment-target tabindex="0" role="button" aria-label="ảnh sổ cái FPS (dữ liệu, GĐ1 phải dựng)"><rect class="khung" x="248" y="290" width="308" height="84" rx="3"/>
+<text class="t1" x="256" y="306">ảnh sổ cái FPS</text>
+<text class="t2" x="256" y="321">PM + PC, đóng băng mỗi lần chụp</text>
 <text class="t2" x="256" y="336">hôm nay: chỉ PM, đọc qua Sheets</text>
-<text class="t3" x="256" y="366">fls_pm_line 3.772 · thiếu PE/PI/PC</text>
+<text class="t3" x="256" y="366">fls_pm_line 3.772 · PC chưa có</text>
 <rect class="huy" x="525.6" y="283" width="24.4" height="14" rx="7"/><text class="huyt" x="537.8" y="293.5" text-anchor="middle">S1</text>
 </g>
-<g class="hop hop-d tt-b"><rect x="594" y="290" width="133" height="84" rx="3"/>
+<g class="hop hop-d tt-b" data-id="h:khai" data-tt="b" data-comment-target tabindex="0" role="button" aria-label="bản khai nguồn (dữ liệu, có mã)"><rect class="khung" x="594" y="290" width="133" height="84" rx="3"/>
 <text class="t1" x="602" y="306">bản khai nguồn</text>
 <text class="t2" x="602" y="321">cột · thứ tự ngày</text>
 <text class="t2n" x="602" y="336">+ pháp nhân: đề xuất</text>
 <text class="t3" x="602" y="366">fls_khai_cot 408</text>
 <rect class="huy" x="696.6" y="283" width="24.4" height="14" rx="7"/><text class="huyt" x="708.8" y="293.5" text-anchor="middle">S2</text>
 </g>
-<g class="hop hop-d tt-b"><rect x="765" y="290" width="642" height="84" rx="3"/>
+<g class="hop hop-d tt-b" data-id="h:anhSo" data-tt="b" data-comment-target tabindex="0" role="button" aria-label="ảnh sổ nhập tay (dữ liệu, có mã)"><rect class="khung" x="765" y="290" width="642" height="84" rx="3"/>
 <text class="t1" x="773" y="306">ảnh sổ nhập tay</text>
 <text class="t2" x="773" y="321">lằn Bank ✅ 60 nguồn · 182 ảnh  ·  Cash ⛔  ·  HR ⛔  ·  Platform ⛔</text>
 <text class="t2" x="773" y="336">đọc vùng chuẩn THEO bản khai, ghi khai_version · không đọc Diễn giải</text>
 <text class="t3" x="773" y="366">fls_chup · fls_chup_nguon · fls_chup_dong</text>
 <rect class="huy" x="1376.6" y="283" width="24.4" height="14" rx="7"/><text class="huyt" x="1388.8" y="293.5" text-anchor="middle">S1</text>
 </g>
-<g class="hop hop-o tt-b"><rect x="128" y="410" width="108" height="78" rx="9"/>
+<g class="hop hop-o tt-b" data-id="h:S3" data-tt="b" data-comment-target tabindex="0" role="button" aria-label="S3 · XEM LÔ (khởi động, có mã)"><rect class="khung" x="128" y="410" width="108" height="78" rx="9"/>
 <text class="to" x="136" y="424">S3 · XEM LÔ</text>
 <text class="t2o" x="136" y="437">kế toán chọn lô</text>
 <text class="t2o" x="136" y="450">màn F04</text>
 </g>
-<g class="hop hop-p tt-q"><rect x="248" y="410" width="324" height="78" rx="3"/>
-<text class="t1" x="256" y="426">DỰNG chuỗi phiếu</text>
-<text class="t2" x="256" y="441">PM line → PI line → PE line → PE slip</text>
-<text class="t2" x="256" y="456">ra: HD/KRF · CDT1 · đối tác · kỳ DV · LE trả</text>
-<text class="t3" x="256" y="480">khoá: pm_line_id · pi_line_id · pe_line_id</text>
+<g class="hop hop-p tt-q" data-id="h:dLenh" data-tt="q" data-comment-target tabindex="0" role="button" aria-label="DỰNG dòng lệnh (xử lý, GĐ1 phải dựng)"><rect class="khung" x="248" y="410" width="324" height="78" rx="3"/>
+<text class="t1" x="256" y="426">DỰNG dòng lệnh</text>
+<text class="t2" x="256" y="441">mỗi PM / PC line → tiền · Ref · HD/KRF</text>
+<text class="t2" x="256" y="456">· CDT1 · đối tác · kỳ DV · pháp nhân trả</text>
+<text class="t3" x="256" y="480">khoá: pm_line_id · pc_line_id</text>
 <rect class="huy" x="520.0" y="403" width="46.0" height="14" rx="7"/><text class="huyt" x="543.0" y="413.5" text-anchor="middle">S3·S4</text>
 </g>
-<g class="hop hop-p tt-b"><rect x="582" y="410" width="491" height="78" rx="3"/>
+<g class="hop hop-p tt-b" data-id="h:dTien" data-tt="b" data-comment-target tabindex="0" role="button" aria-label="DỰNG dòng tiền (xử lý, có mã)"><rect class="khung" x="582" y="410" width="491" height="78" rx="3"/>
 <text class="t1" x="590" y="426">DỰNG dòng tiền</text>
 <text class="t2" x="590" y="441">ảnh lằn Bank · Cash → canon 36 trường (General Trustest + TK)</text>
 <text class="t2" x="590" y="456">gắn pháp nhân TK từ bản khai của nguồn · content_key chống trùng</text>
 <text class="t3" x="590" y="480">bank 8.338/8.338 · quỹ chưa chạy · pháp nhân: chưa</text>
 <rect class="huy" x="1021.0" y="403" width="46.0" height="14" rx="7"/><text class="huyt" x="1044.0" y="413.5" text-anchor="middle">S3·S4</text>
 </g>
-<g class="hop hop-p tt-q"><rect x="1083" y="410" width="324" height="78" rx="3"/>
+<g class="hop hop-p tt-q" data-id="h:dChiPhi" data-tt="q" data-comment-target tabindex="0" role="button" aria-label="DỰNG dòng chi phí (xử lý, GĐ1 phải dựng)"><rect class="khung" x="1083" y="410" width="324" height="78" rx="3"/>
 <text class="t1" x="1091" y="426">DỰNG dòng chi phí</text>
 <text class="t2" x="1091" y="441">ảnh lằn HR · Platform → canon</text>
 <text class="t2" x="1091" y="456">giữ HD/KRF + pháp nhân của sổ</text>
 <text class="t3" x="1091" y="480">không phân bổ lại</text>
 <rect class="huy" x="1355.0" y="403" width="46.0" height="14" rx="7"/><text class="huyt" x="1378.0" y="413.5" text-anchor="middle">S3·S4</text>
 </g>
-<g class="hop hop-p tt-b"><rect x="248" y="524" width="491" height="78" rx="3"/>
+<g class="hop hop-p tt-b" data-id="h:ghep" data-tt="b" data-comment-target tabindex="0" role="button" aria-label="GHÉP lệnh chi với dòng tiền (xử lý, có mã)"><rect class="khung" x="248" y="524" width="491" height="78" rx="3"/>
 <text class="t1" x="256" y="540">GHÉP lệnh chi với dòng tiền</text>
-<text class="t2" x="256" y="555">Reference No (ở PM slip) → chia tiền theo PM line</text>
+<text class="t2" x="256" y="555">Reference No → chia tiền theo PM line</text>
 <text class="t2" x="256" y="570">Σ line = tiền dòng, lệch ⇒ chặn · khác tiền tệ ⇒ để người</text>
-<text class="t3" x="256" y="594">có: ghép theo dòng 26,79% · thiếu: chuỗi PI/PE</text>
+<text class="t3" x="256" y="594">có: ghép theo dòng, 26,79% dòng nối</text>
 <rect class="huy" x="708.6" y="517" width="24.4" height="14" rx="7"/><text class="huyt" x="720.8" y="527.5" text-anchor="middle">S4</text>
 </g>
-<g class="hop hop-p tt-b"><rect x="749" y="524" width="658" height="78" rx="3"/>
+<g class="hop hop-p tt-b" data-id="h:soat" data-tt="b" data-comment-target tabindex="0" role="button" aria-label="SOÁT lô (xử lý, có mã)"><rect class="khung" x="749" y="524" width="658" height="78" rx="3"/>
 <text class="t1" x="757" y="540">SOÁT lô</text>
 <text class="t2" x="757" y="555">9 luật · CHẶN ⇒ nguồn bị chừa · CỜ ⇒ vẫn ghi, vào hàng chờ có lý do</text>
 <text class="t2" x="757" y="570">4 vế phải cân: vào = sổ + loại + rỗng + trùng</text>
 <text class="t3" x="757" y="594">fls/kiem/soat_nap.py</text>
 <rect class="huy" x="1355.0" y="517" width="46.0" height="14" rx="7"/><text class="huyt" x="1378.0" y="527.5" text-anchor="middle">S3·S4</text>
 </g>
-<g class="hop hop-o tt-b"><rect x="128" y="638" width="108" height="35.0" rx="9"/>
+<g class="hop hop-o tt-b" data-id="h:S4" data-tt="b" data-comment-target tabindex="0" role="button" aria-label="S4 · NHẬN (khởi động, có mã)"><rect class="khung" x="128" y="638" width="108" height="35.0" rx="9"/>
 <text class="to" x="136" y="652">S4 · NHẬN</text>
 <text class="t2o" x="136" y="665">kế toán · F04</text>
 </g>
-<g class="hop hop-o tt-b"><rect x="128" y="681.0" width="108" height="35.0" rx="9"/>
+<g class="hop hop-o tt-b" data-id="h:S5" data-tt="b" data-comment-target tabindex="0" role="button" aria-label="S5 · GHÉP·SỬA (khởi động, có mã)"><rect class="khung" x="128" y="681.0" width="108" height="35.0" rx="9"/>
 <text class="to" x="136" y="695.0">S5 · GHÉP·SỬA</text>
 <text class="t2o" x="136" y="708.0">kế toán · F01·F02</text>
 </g>
-<g class="hop hop-p tt-b"><rect x="248" y="638" width="658" height="78" rx="3"/>
+<g class="hop hop-p tt-b" data-id="h:ghiNap" data-tt="b" data-comment-target tabindex="0" role="button" aria-label="GHI lượt nạp — một giao dịch (xử lý, có mã)"><rect class="khung" x="248" y="638" width="658" height="78" rx="3"/>
 <text class="t1" x="256" y="654">GHI lượt nạp — một giao dịch</text>
 <text class="t2" x="256" y="669">run · dòng sổ · dòng loại · mối nối máy · gợi ý hd/cdt1</text>
 <text class="t2" x="256" y="684">lỗi giữa chừng ⇒ ⛔ không còn dòng nào đã ghi</text>
 <text class="t3" x="256" y="708">fls/repo/chay_nap.py</text>
 <rect class="huy" x="875.6" y="631" width="24.4" height="14" rx="7"/><text class="huyt" x="887.8" y="641.5" text-anchor="middle">S4</text>
 </g>
-<g class="hop hop-d tt-b"><rect x="916" y="638" width="157" height="78" rx="3"/>
+<g class="hop hop-d tt-b" data-id="h:bienban" data-tt="b" data-comment-target tabindex="0" role="button" aria-label="biên bản lô (dữ liệu, có mã)"><rect class="khung" x="916" y="638" width="157" height="78" rx="3"/>
 <text class="t1" x="924" y="654">biên bản lô</text>
 <text class="t2" x="924" y="669">9 dòng tổng</text>
 <text class="t2" x="924" y="684">n vào · m bị chừa</text>
 <text class="t3" x="924" y="708">hiện trên F04</text>
 <rect class="huy" x="1042.6" y="631" width="24.4" height="14" rx="7"/><text class="huyt" x="1054.8" y="641.5" text-anchor="middle">S3</text>
 </g>
-<g class="hop hop-p tt-b"><rect x="1083" y="638" width="324" height="78" rx="3"/>
+<g class="hop hop-p tt-b" data-id="h:ghiTay" data-tt="b" data-comment-target tabindex="0" role="button" aria-label="GHI tay — một giao dịch (xử lý, có mã)"><rect class="khung" x="1083" y="638" width="324" height="78" rx="3"/>
 <text class="t1" x="1091" y="654">GHI tay — một giao dịch</text>
 <text class="t2" x="1091" y="669">ghép · bỏ ghép · sửa · đảo · lý do</text>
 <text class="t2" x="1091" y="684">actor lấy từ thẻ đăng nhập</text>
 <text class="t3" x="1091" y="708">fls/repo/ghi_tay.py — chỗ ghi duy nhất</text>
 <rect class="huy" x="1376.6" y="631" width="24.4" height="14" rx="7"/><text class="huyt" x="1388.8" y="641.5" text-anchor="middle">S5</text>
 </g>
-<g class="hop hop-d tt-b"><rect x="248" y="764" width="157" height="78" rx="3"/>
+<g class="hop hop-d tt-b" data-id="h:loai" data-tt="b" data-comment-target tabindex="0" role="button" aria-label="dòng bị loại (dữ liệu, có mã)"><rect class="khung" x="248" y="764" width="157" height="78" rx="3"/>
 <text class="t1" x="256" y="780">dòng bị loại</text>
 <text class="t2" x="256" y="795">mỗi dòng một</text>
 <text class="t2" x="256" y="810">lý do có tên</text>
 <text class="t3" x="256" y="834">fls_reject</text>
 </g>
-<g class="hop hop-d tt-b"><rect x="415" y="764" width="324" height="78" rx="3"/>
+<g class="hop hop-d tt-b" data-id="h:soITL" data-tt="b" data-comment-target tabindex="0" role="button" aria-label="SỔ ITL (dữ liệu, có mã)"><rect class="khung" x="415" y="764" width="324" height="78" rx="3"/>
 <text class="t1" x="423" y="780">SỔ ITL</text>
 <text class="t2" x="423" y="795">một bảng · 4 họ nguồn (Bank·Cash·HR·Platform)</text>
 <text class="t2" x="423" y="810">chỉ-thêm · ⛔ không PUT/DELETE</text>
 <text class="t3" x="423" y="834">fls_itl 8.387 · hôm nay 1 họ nguồn</text>
 </g>
-<g class="hop hop-d tt-b"><rect x="749" y="764" width="658" height="78" rx="3"/>
+<g class="hop hop-d tt-b" data-id="h:lopSua" data-tt="b" data-comment-target tabindex="0" role="button" aria-label="lớp sửa chỉ-thêm (gộp vẽ) (dữ liệu, có mã)"><rect class="khung" x="749" y="764" width="658" height="78" rx="3"/>
 <text class="t1" x="757" y="780">lớp sửa chỉ-thêm (gộp vẽ)</text>
 <text class="t2" x="757" y="795">mối nối · bỏ nối · bút toán (người / máy gợi ý) · sự kiện hàng chờ · nhật ký</text>
 <text class="t2" x="757" y="810">sửa = thêm dòng · dòng sổ ⛔ không đổi một ô</text>
 <text class="t3" x="757" y="834">fls_pm_link 2.263 · fls_adjustment 4.428 · fls_journal</text>
 </g>
-<g class="hop hop-p tt-q"><rect x="248" y="878" width="141" height="72" rx="3"/>
+<g class="hop hop-p tt-q" data-id="h:kiem" data-tt="q" data-comment-target tabindex="0" role="button" aria-label="KIỂM cổng GĐ1 (xử lý, GĐ1 phải dựng)"><rect class="khung" x="248" y="878" width="141" height="72" rx="3"/>
 <text class="t1" x="256" y="894">KIỂM cổng GĐ1</text>
 <text class="t2" x="256" y="909">mỗi cổng khai mong</text>
 <text class="t3" x="256" y="942">đỏ khi khác</text>
 </g>
-<g class="hop hop-d tt-q"><rect x="431" y="878" width="976" height="72" rx="3"/>
+<g class="hop hop-d tt-q" data-id="h:hieuLuc" data-tt="q" data-comment-target tabindex="0" role="button" aria-label="SỔ ITL HIỆU LỰC — bảng ITL duy nhất của GĐ1 (dữ liệu, GĐ1 phải dựng)"><rect class="khung" x="431" y="878" width="976" height="72" rx="3"/>
 <text class="t1" x="439" y="894">SỔ ITL HIỆU LỰC — bảng ITL duy nhất của GĐ1</text>
-<text class="t2" x="439" y="909">dòng sổ + giá trị đang hiệu lực (người › máy gợi ý › nguồn) + chuỗi phiếu + 3 vai pháp nhân</text>
+<text class="t2" x="439" y="909">dòng sổ + giá trị đang hiệu lực (người › máy gợi ý › nguồn) + chiều lệnh chi + 3 vai pháp nhân</text>
 <text class="t3" x="439" y="942">hôm nay: ghép tại cửa đọc (doc_bao_cao + 7 view) · GĐ1: một view có tên, đủ 4 họ</text>
 </g>
-<g class="hop hop-d tt-b"><rect x="248" y="998" width="157" height="70" rx="3"/>
+<g class="hop hop-d tt-b" data-id="h:f03" data-tt="b" data-comment-target tabindex="0" role="button" aria-label="màn F03 · cổng (dữ liệu, có mã)"><rect class="khung" x="248" y="998" width="157" height="70" rx="3"/>
 <text class="t1" x="256" y="1014">màn F03 · cổng</text>
 <text class="t2" x="256" y="1029">đạt · không đạt</text>
 <text class="t2" x="256" y="1044">· chưa đo được</text>
 </g>
-<g class="hop hop-d tt-b"><rect x="415" y="998" width="324" height="70" rx="3"/>
+<g class="hop hop-d tt-b" data-id="h:f01" data-tt="b" data-comment-target tabindex="0" role="button" aria-label="màn F01 · hàng chờ (dữ liệu, có mã)"><rect class="khung" x="415" y="998" width="324" height="70" rx="3"/>
 <text class="t1" x="423" y="1014">màn F01 · hàng chờ</text>
 <text class="t2" x="423" y="1029">dòng chưa ghép / chưa đủ chiều</text>
 <text class="t2" x="423" y="1044">luôn lọc một tiền tệ</text>
 </g>
-<g class="hop hop-d tt-b"><rect x="749" y="998" width="324" height="70" rx="3"/>
+<g class="hop hop-d tt-b" data-id="h:f02" data-tt="b" data-comment-target tabindex="0" role="button" aria-label="màn F02 · sổ ITL (dữ liệu, có mã)"><rect class="khung" x="749" y="998" width="324" height="70" rx="3"/>
 <text class="t1" x="757" y="1014">màn F02 · sổ ITL</text>
 <text class="t2" x="757" y="1029">lưới sổ hiệu lực</text>
 <text class="t2" x="757" y="1044">ô nào · ai nói · lúc nào</text>
 </g>
-<g class="hop hop-d tt-q"><rect x="1083" y="998" width="324" height="70" rx="3"/>
+<g class="hop hop-d tt-q" data-id="h:xuat" data-tt="q" data-comment-target tabindex="0" role="button" aria-label="XUẤT cho hệ khác (dữ liệu, GĐ1 phải dựng)"><rect class="khung" x="1083" y="998" width="324" height="70" rx="3"/>
 <text class="t1" x="1091" y="1014">XUẤT cho hệ khác</text>
 <text class="t2" x="1091" y="1029">GĐ1: khuôn sổ đang chạy, đối chiếu từng dòng</text>
 <text class="t2" x="1091" y="1044">GĐ4: hợp đồng xuất đủ chiều</text>
 </g>
-<line class="ten ten-b" x1="326.5" y1="86.0" x2="326.5" y2="117.0" marker-end="url(#mb)"/>
-<text class="tl" x="330.5" y="105.5">o1</text>
-<line class="ten ten-b" x1="493.5" y1="86.0" x2="493.5" y2="117.0" marker-end="url(#mb)"/>
-<text class="tl" x="497.5" y="105.5">o2</text>
-<line class="ten ten-b" x1="827.5" y1="86.0" x2="827.5" y2="117.0" marker-end="url(#mb)"/>
-<text class="tl" x="831.5" y="105.5">o3</text>
-<line class="ten ten-b" x1="994.5" y1="86.0" x2="994.5" y2="117.0" marker-end="url(#mb)"/>
-<text class="tl" x="998.5" y="105.5">o4</text>
-<line class="ten ten-b" x1="1161.5" y1="86.0" x2="1161.5" y2="117.0" marker-end="url(#mb)"/>
-<text class="tl" x="1165.5" y="105.5">o5</text>
-<line class="ten ten-b" x1="1328.5" y1="86.0" x2="1328.5" y2="117.0" marker-end="url(#mb)"/>
-<text class="tl" x="1332.5" y="105.5">o6</text>
-<line class="ten ten-q" x1="326.5" y1="192.0" x2="326.5" y2="289.0" marker-end="url(#mq)"/>
-<text class="tl" x="330.5" y="244.5">x1</text>
-<line class="ten ten-q" x1="493.5" y1="192.0" x2="493.5" y2="289.0" marker-end="url(#mq)"/>
-<text class="tl" x="497.5" y="244.5">x2</text>
-<line class="ten ten-b" x1="827.5" y1="192.0" x2="827.5" y2="289.0" marker-end="url(#mb)"/>
-<text class="tl" x="831.5" y="244.5">x3</text>
-<line class="ten ten-q" x1="994.5" y1="192.0" x2="994.5" y2="289.0" marker-end="url(#mq)"/>
-<text class="tl" x="998.5" y="244.5">x4</text>
-<line class="ten ten-q" x1="1161.5" y1="192.0" x2="1161.5" y2="289.0" marker-end="url(#mq)"/>
-<text class="tl" x="1165.5" y="244.5">x5</text>
-<line class="ten ten-q" x1="1328.5" y1="192.0" x2="1328.5" y2="289.0" marker-end="url(#mq)"/>
-<text class="tl" x="1332.5" y="244.5">x6</text>
-<line class="ten ten-n" x1="556.0" y1="332.0" x2="593.0" y2="332.0" marker-end="url(#mn)"/>
-<text class="tl" x="574.5" y="328.0" text-anchor="middle">k1</text>
-<line class="ten ten-b" x1="727.0" y1="332.0" x2="764.0" y2="332.0" marker-end="url(#mb)"/>
-<text class="tl" x="745.5" y="328.0" text-anchor="middle">k2</text>
-<line class="ten ten-n" x1="660.5" y1="374.0" x2="660.5" y2="409.0" marker-end="url(#mn)"/>
-<text class="tl" x="664.5" y="395.5">b2</text>
-<line class="ten ten-q" x1="410.0" y1="374.0" x2="410.0" y2="409.0" marker-end="url(#mq)"/>
-<text class="tl" x="414.0" y="395.5">b1</text>
-<line class="ten ten-b" x1="911.0" y1="374.0" x2="911.0" y2="409.0" marker-end="url(#mb)"/>
-<text class="tl" x="915.0" y="395.5">b3</text>
-<line class="ten ten-q" x1="1245.0" y1="374.0" x2="1245.0" y2="409.0" marker-end="url(#mq)"/>
-<text class="tl" x="1249.0" y="395.5">b4</text>
-<line class="ten ten-q" x1="410.0" y1="488.0" x2="410.0" y2="523.0" marker-end="url(#mq)"/>
-<text class="tl" x="414.0" y="509.5">g1</text>
-<line class="ten ten-b" x1="660.5" y1="488.0" x2="660.5" y2="523.0" marker-end="url(#mb)"/>
-<text class="tl" x="664.5" y="509.5">g2</text>
-<line class="ten ten-b" x1="911.0" y1="488.0" x2="911.0" y2="523.0" marker-end="url(#mb)"/>
-<text class="tl" x="915.0" y="509.5">g3</text>
-<line class="ten ten-q" x1="1245.0" y1="488.0" x2="1245.0" y2="523.0" marker-end="url(#mq)"/>
-<text class="tl" x="1249.0" y="509.5">g4</text>
-<line class="ten ten-b" x1="410.0" y1="602.0" x2="410.0" y2="637.0" marker-end="url(#mb)"/>
-<text class="tl" x="414.0" y="623.5">w1</text>
-<line class="ten ten-b" x1="827.0" y1="602.0" x2="827.0" y2="637.0" marker-end="url(#mb)"/>
-<text class="tl" x="831.0" y="623.5">w2</text>
-<line class="ten ten-b" x1="994.5" y1="602.0" x2="994.5" y2="637.0" marker-end="url(#mb)"/>
-<text class="tl" x="998.5" y="623.5">w3</text>
-<line class="ten ten-b" x1="326.5" y1="716.0" x2="326.5" y2="763.0" marker-end="url(#mb)"/>
-<text class="tl" x="330.5" y="743.5">s1</text>
-<line class="ten ten-b" x1="577.0" y1="716.0" x2="577.0" y2="763.0" marker-end="url(#mb)"/>
-<text class="tl" x="581.0" y="743.5">s2</text>
-<line class="ten ten-b" x1="827.0" y1="716.0" x2="827.0" y2="763.0" marker-end="url(#mb)"/>
-<text class="tl" x="831.0" y="743.5">s3</text>
-<line class="ten ten-b" x1="1245.0" y1="716.0" x2="1245.0" y2="763.0" marker-end="url(#mb)"/>
-<text class="tl" x="1249.0" y="743.5">s4</text>
-<line class="ten ten-q" x1="326.5" y1="842.0" x2="326.5" y2="877.0" marker-end="url(#mq)"/>
-<text class="tl" x="330.5" y="863.5">h1</text>
-<line class="ten ten-b" x1="577.0" y1="842.0" x2="577.0" y2="877.0" marker-end="url(#mb)"/>
-<text class="tl" x="581.0" y="863.5">h2</text>
-<line class="ten ten-b" x1="1078.0" y1="842.0" x2="1078.0" y2="877.0" marker-end="url(#mb)"/>
-<text class="tl" x="1082.0" y="863.5">h3</text>
-<line class="ten ten-q" x1="431.0" y1="914.0" x2="390.0" y2="914.0" marker-end="url(#mq)"/>
-<text class="tl" x="410.5" y="910.0" text-anchor="middle">h4</text>
-<line class="ten ten-q" x1="320.0" y1="950.0" x2="320.0" y2="997.0" marker-end="url(#mq)"/>
-<text class="tl" x="324.0" y="977.5">v1</text>
-<line class="ten ten-b" x1="577.0" y1="950.0" x2="577.0" y2="997.0" marker-end="url(#mb)"/>
-<text class="tl" x="581.0" y="977.5">v2</text>
-<line class="ten ten-b" x1="911.0" y1="950.0" x2="911.0" y2="997.0" marker-end="url(#mb)"/>
-<text class="tl" x="915.0" y="977.5">v3</text>
-<line class="ten ten-q" x1="1245.0" y1="950.0" x2="1245.0" y2="997.0" marker-end="url(#mq)"/>
-<text class="tl" x="1249.0" y="977.5">v4</text>
-</svg><figcaption>Hình 1 — Voi FLS-tobe-phase1. Máy kiểm lúc sinh: <b>5 vùng · 11 dải · 36 hộp · 37 mũi tên</b> (34 dọc · 3 ngang) · <b>0</b> mũi tên chéo · <b>0</b> mũi tên nhảy dải · <b>0</b> chỗ hai mũi tên cắt nhau · <b>0</b> mũi tên cắt qua hộp. Mỗi dải 2–5 hộp, mỗi vùng 1–4 dải. Hai thứ cố ý <b>không vẽ thành mũi tên</b>: ① điểm khởi động (S1–S5) vẽ bằng <b>huy hiệu</b> trên hộp nó khởi, vì một nhịp kích ba phép chụp sẽ phải cắt sáu mũi tên đi vào; ② <i>GHI tay</i> đọc dòng sổ và ứng viên lệnh chi từ dải dưới (chiều đọc ngược). Ba hộp <b>gộp vẽ</b>: ảnh FPS (phiếu + danh mục, một nguồn một hợp đồng), phiếu đã duyệt (4 loại), lớp sửa (5 bảng luôn ghi trong cùng một giao dịch).</figcaption></figure>
+</svg><figcaption>Hình 1 — Voi FLS-tobe-phase1. Máy kiểm lúc sinh: <b>5 vùng · 11 dải · 36 hộp · 37 mũi tên</b> (34 dọc · 3 ngang) · <b>0</b> mũi tên chéo · <b>0</b> mũi tên nhảy dải · <b>0</b> chỗ hai mũi tên cắt nhau · <b>0</b> mũi tên cắt qua hộp. Mỗi dải 2–5 hộp, mỗi vùng 1–4 dải. Hai thứ cố ý <b>không vẽ thành mũi tên</b>: ① điểm khởi động (S1–S5) vẽ bằng <b>huy hiệu</b> trên hộp nó khởi, vì một nhịp kích hai phép chụp sẽ phải cắt các mũi tên đi vào; ② <i>GHI tay</i> đọc dòng sổ và ứng viên lệnh chi từ dải dưới (chiều đọc ngược). Hai hộp <b>gộp vẽ</b>: ảnh sổ nhập tay (4 lằn, một cơ chế chụp) và lớp sửa (5 bảng luôn ghi trong cùng một giao dịch).</figcaption></figure>
 
 <h3>Thuật ngữ trên hình</h3>
 <ul class="terms">
-<li><b>Phiếu FPS</b><ul><li>PE dự toán · PI hoá đơn · PM lệnh chi · PC quyết toán</li><li><i>slip</i> = phiếu · <i>line</i> = dòng tiền trong phiếu; line giữ tiền + khoá chuỗi, slip giữ mô tả · ngân hàng · kỳ dịch vụ · Reference No · pháp nhân trả · CDT</li></ul></li>
-<li><b>Tiền</b><ul><li>General Trustest: bộ trường tối thiểu của một dòng tiền — ngày · tiền · tiền tệ · LE</li><li>Reference No: mã ngân hàng cấp, có trên sao kê và trên PM slip — khoá ghép tiền ↔ lệnh chi</li></ul></li>
-<li><b>Ba vai pháp nhân</b> (xem câu 1, §7)<ul><li>pháp nhân TK: chủ tài khoản tiền đi ra / vào — khai theo nguồn</li><li><code>le_payer</code>: pháp nhân thanh toán ghi trên PM</li><li><code>le</code>: pháp nhân nhận, khi đối tác của PE là pháp nhân Apero; <code>le ≠ le_payer</code> ⇒ cờ nội bộ (<code>is_intercompany</code>)</li></ul></li>
-<li><b>Chiều chi phí</b><ul><li>CDT1 chủ dự toán (gốc ở PE slip) · HD/KRF mã hạng mục · Budget Code mã ngân sách</li></ul></li>
+<li><b>Sổ cái FPS</b><ul><li>sổ cái PM: mỗi dòng một PM line (lệnh chi), mang sẵn khoá PE/PI, HD/KRF, CDT1, pháp nhân thanh toán, Reference No</li><li>sổ cái PC: mỗi dòng một PC line (quyết toán, hoàn ứng), trỏ về PM/PE gốc</li></ul></li>
+<li><b>Tiền</b><ul><li>General Trustest: bộ trường tối thiểu của một dòng tiền — ngày · tiền · tiền tệ · LE</li><li>Reference No: mã ngân hàng cấp, có trên sao kê và trên dòng sổ cái PM — khoá ghép tiền ↔ lệnh chi</li></ul></li>
+<li><b>Ba vai pháp nhân</b> (xem câu 1, §7)<ul><li>pháp nhân TK: chủ tài khoản tiền đi ra / vào — khai theo nguồn</li><li><code>le_payer</code>: pháp nhân thanh toán ghi trên sổ cái PM</li><li><code>le</code>: pháp nhân nhận, khi đối tác là pháp nhân Apero; <code>le ≠ le_payer</code> ⇒ cờ nội bộ (<code>is_intercompany</code>)</li></ul></li>
+<li><b>Chiều chi phí</b><ul><li>CDT1 chủ dự toán · HD/KRF mã hạng mục · Budget Code mã ngân sách</li></ul></li>
 <li><b>Máy FLS</b><ul><li>canon 36 trường: khuôn dòng chuẩn · <code>content_key</code>: khoá chống trùng nội dung</li><li><code>chup_id</code> / <code>run_id</code>: vết lần chụp / lần nạp · bản khai nguồn: bố cục cột + thứ tự ngày (+ pháp nhân TK)</li><li>lớp sửa: mọi thay đổi là dòng thêm · sổ hiệu lực: sổ gốc + lớp sửa, đọc ra một bảng</li></ul></li>
 </ul>
 
-<h2>§2 · Năm chỗ bản v0.1 vẽ sai — sửa trước khi gom</h2>
+<h2>§2 · Đã sửa gì</h2>
+<p class="note"><b>v0.3 (owner, 04/11):</b> nguồn FPS là <b>sổ cái PM / PC</b>, đã mang đủ chiều ⇒ bỏ hai hộp "phiếu PE·PI·PM·PC" và "danh mục FPS"; bước dựng đổi từ <i>DỰNG chuỗi phiếu</i> (đi PM → PI → PE) thành <i>DỰNG dòng lệnh</i> (đọc thẳng từng dòng sổ cái). Đề xuất pháp nhân TK (k1) nay đếm từ TK chi + pháp nhân thanh toán trên sổ cái PM.</p>
+<p>Năm chỗ bản v0.1 vẽ sai, sửa từ v0.2:</p>
 <ol class="fix">
-<li><b>Bản khai nguồn đứng trước phép chụp.</b> Ảnh sao kê đọc vùng chuẩn <i>theo</i> bản khai và ghi lại <code>khai_version</code> (<code>fls/repo/chup.py:16</code>, <code>tools/chup_sao_ke.py</code>). v0.1 không có bản khai trên hình.</li>
-<li><b>Pháp nhân của dòng tiền phải có lúc DỰNG, không phải một bước sau.</b> <code>fls_itl</code> chỉ-thêm và pháp nhân là cột của dòng sổ ⇒ luật gắn pháp nhân phải nằm trong bản khai của nguồn (người khai, owner ký), đọc ở bước dựng. v0.1 vẽ "GẮN pháp nhân" thành hộp riêng, không nói luật nằm ở đâu.</li>
-<li><b>Hai đường ghi tách bạch.</b> Máy ghi cả lượt nạp trong <i>một</i> giao dịch (run · dòng sổ · dòng loại · mối nối · gợi ý — <code>chay_nap.py:621</code>); người ghi qua <code>ghi_tay.py</code>, chỗ ghi duy nhất. v0.1 gộp hai đường làm một hộp "NỐI".</li>
-<li><b>Năm điểm khởi động vẽ riêng.</b> Nhịp mỗi giờ chỉ <i>chụp</i>; khai nguồn, xem trước lô, Nhận lô, ghép/sửa là bốn cú bấm khác nhau của kế toán. v0.1 không vẽ ai hay cái gì làm cho dữ liệu chạy.</li>
-<li><b>"Một bảng ITL duy nhất" là sổ hiệu lực, không chỉ <code>fls_itl</code>.</b> Sửa là thêm bút toán, nên bảng người đọc và hệ khác nhận = sổ gốc + lớp sửa. v0.1 dừng ở <code>fls_itl</code>.</li>
+<li><b>Bản khai nguồn đứng trước phép chụp.</b> Ảnh sao kê đọc vùng chuẩn <i>theo</i> bản khai và ghi lại <code>khai_version</code> (<code>fls/repo/chup.py:16</code>, <code>tools/chup_sao_ke.py</code>).</li>
+<li><b>Pháp nhân của dòng tiền phải có lúc DỰNG.</b> <code>fls_itl</code> chỉ-thêm và pháp nhân là cột của dòng sổ ⇒ luật gắn pháp nhân nằm trong bản khai của nguồn (người khai, owner ký), đọc ở bước dựng.</li>
+<li><b>Hai đường ghi tách bạch.</b> Máy ghi cả lượt nạp trong <i>một</i> giao dịch (<code>chay_nap.py:621</code>); người ghi qua <code>ghi_tay.py</code>, chỗ ghi duy nhất.</li>
+<li><b>Năm điểm khởi động vẽ riêng.</b> Nhịp mỗi giờ chỉ <i>chụp</i>; khai nguồn, xem lô, Nhận lô, ghép/sửa là bốn cú bấm khác nhau của kế toán.</li>
+<li><b>"Một bảng ITL duy nhất" là sổ hiệu lực</b> (sổ gốc + lớp sửa), không chỉ <code>fls_itl</code>.</li>
 </ol>
 
 <h2>§3 · Mũi tên nói gì — 37 mũi tên, 5 nhóm</h2>
-<p>Mỗi mũi tên là <b>một dòng dữ liệu</b>: nó chở gì, nối bằng khoá nào, một-nhiều ra sao, cổng nào đứng trên nó, và hôm nay đã chảy chưa. Mã mũi tên trùng với nhãn trên hình.</p>
+<p>Mỗi mũi tên là <b>một dòng dữ liệu</b>: nó chở gì, nối bằng khoá nào, một-nhiều ra sao, cổng nào đứng trên nó, và hôm nay đã chảy chưa. Bấm một dòng để thấy nó trên hình.</p>
 
 <div class="scroll"><table class="arrows">
 <thead><tr><th colspan="2" class="sup">Mũi tên</th><th colspan="3" class="sup">Dữ liệu chảy</th><th colspan="2" class="sup">Kiểm soát</th></tr>
 <tr><th>#</th><th>từ → tới</th><th>cái gì chảy</th><th>khoá</th><th>bản số</th><th>cổng trên mũi tên</th><th>hôm nay</th></tr></thead><tbody>
 <tr class="b1"><th colspan="7">Nhóm 1 · Nguồn sinh ra (o1–o6)</th></tr>
 <tr class="b2"><th colspan="7">FPS (o1–o2)</th></tr>
-<tr><td class="id"><i class="ln ln-b"></i>o1</td><td>NGƯỜI LẬP &amp; DUYỆT → phiếu đã duyệt</td><td>phiếu đi luồng lập → duyệt của FPS</td><td><code>pe/pi/pm/pc_id</code></td><td>1 phiếu – n dòng</td><td>FLS ⛔ không can thiệp; chỉ đọc trạng thái cuối</td><td><span class="pill ext">ngoài FLS</span></td></tr>
-<tr><td class="id"><i class="ln ln-b"></i>o2</td><td>NGƯỜI GIỮ DANH MỤC → danh mục FPS</td><td>mã + tên + hiệu lực của danh mục</td><td><code>mã</code></td><td>1 mã – 1 bản ghi hiệu lực</td><td>mã trùng là lỗi của FPS, FLS báo chứ ⛔ không sửa</td><td><span class="pill ext">ngoài FLS</span></td></tr>
+<tr class="chon" data-ref="t:o1" data-comment-target tabindex="0"><td class="id"><i class="ln ln-b"></i>o1</td><td>LẬP &amp; DUYỆT PM → sổ cái PM</td><td>PM duyệt xong thì thành dòng sổ cái PM</td><td><code>pm_line_id</code></td><td>1 PM – n dòng</td><td>FLS ⛔ không can thiệp luồng duyệt; chỉ đọc trạng thái cuối</td><td><span class="pill ext">ngoài FLS</span></td></tr>
+<tr class="chon" data-ref="t:o2" data-comment-target tabindex="0"><td class="id"><i class="ln ln-b"></i>o2</td><td>LẬP &amp; DUYỆT PC → sổ cái PC</td><td>PC duyệt xong thì thành dòng sổ cái PC</td><td><code>pc_line_id</code></td><td>1 PC – n dòng</td><td>như o1</td><td><span class="pill ext">ngoài FLS</span></td></tr>
 <tr class="b2"><th colspan="7">Google Sheets (o3–o6)</th></tr>
-<tr><td class="id"><i class="ln ln-b"></i>o3</td><td>KẾ TOÁN → sao kê ngân hàng</td><td>dán sao kê vào vùng chuẩn của sheet R |</td><td><code>(dòng chảy, dòng)</code></td><td>1 dòng chảy – n dòng</td><td>bố cục cột theo bản khai dòng 1 (68/68 sheet khai đủ)</td><td><span class="pill ext">ngoài FLS</span></td></tr>
-<tr><td class="id"><i class="ln ln-b"></i>o4</td><td>KẾ TOÁN → sổ quỹ</td><td>ghi thu chi quỹ</td><td><code>(dòng chảy quỹ, dòng)</code></td><td>1 quỹ – n dòng</td><td>như o3</td><td><span class="pill ext">ngoài FLS</span></td></tr>
-<tr><td class="id"><i class="ln ln-b"></i>o5</td><td>HR · C&amp;B → sổ lương HR</td><td>lập sổ lương đã tách HD/KRF</td><td><code>(sổ, năm, dòng)</code></td><td>1 sổ – n dòng</td><td>bề rộng cột đổi ⇒ bộ đọc nổ, ⛔ không đoán</td><td><span class="pill ext">ngoài FLS</span></td></tr>
-<tr><td class="id"><i class="ln ln-b"></i>o6</td><td>CHỦ SỔ NỀN TẢNG → sổ nền tảng</td><td>ghi chi phí dịch vụ · thanh toán</td><td><code>(sổ, tháng, dòng)</code></td><td>1 sổ – n dòng</td><td>như o5</td><td><span class="pill ext">ngoài FLS</span></td></tr>
+<tr class="chon" data-ref="t:o3" data-comment-target tabindex="0"><td class="id"><i class="ln ln-b"></i>o3</td><td>KẾ TOÁN → sao kê ngân hàng</td><td>dán sao kê vào vùng chuẩn của sheet R |</td><td><code>(dòng chảy, dòng)</code></td><td>1 dòng chảy – n dòng</td><td>bố cục cột theo bản khai dòng 1 (68/68 sheet khai đủ)</td><td><span class="pill ext">ngoài FLS</span></td></tr>
+<tr class="chon" data-ref="t:o4" data-comment-target tabindex="0"><td class="id"><i class="ln ln-b"></i>o4</td><td>KẾ TOÁN → sổ quỹ</td><td>ghi thu chi quỹ</td><td><code>(dòng chảy quỹ, dòng)</code></td><td>1 quỹ – n dòng</td><td>như o3</td><td><span class="pill ext">ngoài FLS</span></td></tr>
+<tr class="chon" data-ref="t:o5" data-comment-target tabindex="0"><td class="id"><i class="ln ln-b"></i>o5</td><td>HR · C&amp;B → sổ lương HR</td><td>lập sổ lương đã tách HD/KRF</td><td><code>(sổ, năm, dòng)</code></td><td>1 sổ – n dòng</td><td>bề rộng cột đổi ⇒ bộ đọc nổ, ⛔ không đoán</td><td><span class="pill ext">ngoài FLS</span></td></tr>
+<tr class="chon" data-ref="t:o6" data-comment-target tabindex="0"><td class="id"><i class="ln ln-b"></i>o6</td><td>CHỦ SỔ NỀN TẢNG → sổ nền tảng</td><td>ghi chi phí dịch vụ · thanh toán</td><td><code>(sổ, tháng, dòng)</code></td><td>1 sổ – n dòng</td><td>như o5</td><td><span class="pill ext">ngoài FLS</span></td></tr>
 <tr class="b1"><th colspan="7">Nhóm 2 · Vượt ranh giới vào FLS (x1–x6)</th></tr>
-<tr class="b2"><th colspan="7">FPS → FLS · kết nối CSDL chỉ-đọc · vai đọc riêng (x1–x2)</th></tr>
-<tr><td class="id"><i class="ln ln-q"></i>x1</td><td>phiếu đã duyệt → ảnh FPS</td><td>slip + line 4 loại phiếu · trạng thái · Reference No · payer_id</td><td><code>line_id</code></td><td>1 lần chụp – n dòng</td><td>chụp 2 lần ⇒ 2 chup_id, ảnh cũ ⛔ không đổi một ô · cột riêng tư ⛔ không vào kho</td><td><span class="pill mid">◐ PM có, đọc qua Sheets; PE/PI/PC ⛔</span></td></tr>
-<tr><td class="id"><i class="ln ln-q"></i>x2</td><td>danh mục FPS → ảnh FPS</td><td>danh mục đang hiệu lực (LE · CDT · HD/KRF · ngân sách · đối tác · TK · tỷ giá)</td><td><code>mã + ngày hiệu lực</code></td><td>1 lần chụp – n mã</td><td>mã trùng ⇒ chặn · tên rỗng ⇒ cờ (hôm nay 24/29 LE thiếu tên)</td><td><span class="pill no">⛔ chỉ fls_le suy từ giá trị</span></td></tr>
+<tr class="b2"><th colspan="7">FPS → FLS · đọc sổ cái chỉ-đọc (x1–x2)</th></tr>
+<tr class="chon" data-ref="t:x1" data-comment-target tabindex="0"><td class="id"><i class="ln ln-q"></i>x1</td><td>sổ cái PM → ảnh sổ cái FPS</td><td>dòng sổ cái PM: tiền · tiền tệ · Ref · khoá PE/PI · HD · CDT1 · pháp nhân trả · trạng thái</td><td><code>pm_line_id</code></td><td>1 lần chụp – n dòng</td><td>bộ tiêu đề lệch hợp đồng ⇒ nổ to (như kiem_tieu_de_pm) · chụp 2 lần ⇒ 2 chup_id, ảnh cũ ⛔ không đổi · Email ⛔ không vào kho</td><td><span class="pill mid">◐ có, đọc qua Sheets (3.772 dòng)</span></td></tr>
+<tr class="chon" data-ref="t:x2" data-comment-target tabindex="0"><td class="id"><i class="ln ln-q"></i>x2</td><td>sổ cái PC → ảnh sổ cái FPS</td><td>dòng sổ cái PC: tiền · khoá PM/PE gốc · trạng thái</td><td><code>pc_line_id</code></td><td>1 lần chụp – n dòng</td><td>như x1</td><td><span class="pill no">⛔ chưa đọc</span></td></tr>
 <tr class="b2"><th colspan="7">Sheets → FLS · Sheets API · tài khoản dịch vụ, quyền chỉ-đọc (x3–x6)</th></tr>
-<tr><td class="id"><i class="ln ln-b"></i>x3</td><td>sao kê ngân hàng → ảnh sổ nhập tay</td><td>vùng chuẩn, 5/6 trường (⛔ không Diễn giải)</td><td><code>(nguồn, dòng) + khai_version</code></td><td>1 nguồn – n dòng</td><td>thiếu bản khai ⇒ nổ, nêu tên sheet · 429 ⇒ lùi rồi thử lại · nguồn 0 dòng vẫn có mặt</td><td><span class="pill ok">✅ 60 nguồn · 182 ảnh</span></td></tr>
-<tr><td class="id"><i class="ln ln-q"></i>x4</td><td>sổ quỹ → ảnh sổ nhập tay</td><td>vùng chuẩn sổ quỹ</td><td><code>(nguồn, dòng)</code></td><td>1 quỹ – n dòng</td><td>như x3 + số dư theo ngày nếu nguồn có</td><td><span class="pill no">⛔ lằn Cash chưa bật (GAP-CANON-02)</span></td></tr>
-<tr><td class="id"><i class="ln ln-q"></i>x5</td><td>sổ lương HR → ảnh sổ nhập tay</td><td>4 sổ lương theo năm</td><td><code>(sổ, năm, dòng)</code></td><td>1 sổ – n dòng</td><td>Σ Nợ/Có từng sổ phải bằng sổ nguồn</td><td><span class="pill no">⛔</span></td></tr>
-<tr><td class="id"><i class="ln ln-q"></i>x6</td><td>sổ nền tảng → ảnh sổ nhập tay</td><td>sổ chi phí dịch vụ · sổ thanh toán</td><td><code>(sổ, tháng, dòng)</code></td><td>1 sổ – n dòng</td><td>như x5</td><td><span class="pill no">⛔</span></td></tr>
+<tr class="chon" data-ref="t:x3" data-comment-target tabindex="0"><td class="id"><i class="ln ln-b"></i>x3</td><td>sao kê ngân hàng → ảnh sổ nhập tay</td><td>vùng chuẩn, 5/6 trường (⛔ không Diễn giải)</td><td><code>(nguồn, dòng) + khai_version</code></td><td>1 nguồn – n dòng</td><td>thiếu bản khai ⇒ nổ, nêu tên sheet · 429 ⇒ lùi rồi thử lại · nguồn 0 dòng vẫn có mặt</td><td><span class="pill ok">✅ 60 nguồn · 182 ảnh</span></td></tr>
+<tr class="chon" data-ref="t:x4" data-comment-target tabindex="0"><td class="id"><i class="ln ln-q"></i>x4</td><td>sổ quỹ → ảnh sổ nhập tay</td><td>vùng chuẩn sổ quỹ</td><td><code>(nguồn, dòng)</code></td><td>1 quỹ – n dòng</td><td>như x3 + số dư theo ngày nếu nguồn có</td><td><span class="pill no">⛔ lằn Cash chưa bật (GAP-CANON-02)</span></td></tr>
+<tr class="chon" data-ref="t:x5" data-comment-target tabindex="0"><td class="id"><i class="ln ln-q"></i>x5</td><td>sổ lương HR → ảnh sổ nhập tay</td><td>4 sổ lương theo năm</td><td><code>(sổ, năm, dòng)</code></td><td>1 sổ – n dòng</td><td>Σ Nợ/Có từng sổ phải bằng sổ nguồn</td><td><span class="pill no">⛔</span></td></tr>
+<tr class="chon" data-ref="t:x6" data-comment-target tabindex="0"><td class="id"><i class="ln ln-q"></i>x6</td><td>sổ nền tảng → ảnh sổ nhập tay</td><td>sổ chi phí dịch vụ · sổ thanh toán</td><td><code>(sổ, tháng, dòng)</code></td><td>1 sổ – n dòng</td><td>như x5</td><td><span class="pill no">⛔</span></td></tr>
 <tr class="b1"><th colspan="7">Nhóm 3 · Khai và dựng (k1–k2 · b1–b4)</th></tr>
 <tr class="b2"><th colspan="7">Bản khai nguồn và pháp nhân TK (k1 · k2 · b2)</th></tr>
-<tr><td class="id"><i class="ln ln-n"></i>k1</td><td>ảnh FPS → bản khai nguồn</td><td>đề xuất pháp nhân TK: TK ngân hàng → LE chủ TK (danh mục FPS)</td><td><code>bank_account_id ↔ nguồn</code></td><td>1 nguồn – 1 LE</td><td>máy đề xuất, người khai, owner ký · ⛔ không regex (14 TK · 211 dòng tên TK không nói LE)</td><td><span class="pill no">⛔ đề xuất mới</span></td></tr>
-<tr><td class="id"><i class="ln ln-b"></i>k2</td><td>bản khai nguồn → ảnh sổ nhập tay</td><td>bố cục cột + thứ tự ngày của từng nguồn</td><td><code>source_id + khai_version</code></td><td>1 nguồn – 1 bản khai hiệu lực</td><td>thiếu khai ⇒ nổ · khai sửa = version mới, bản cũ ⛔ không đổi</td><td><span class="pill ok">✅ 408 dòng = 68 × 6</span></td></tr>
-<tr><td class="id"><i class="ln ln-n"></i>b2</td><td>bản khai nguồn → DỰNG dòng tiền</td><td>pháp nhân TK của nguồn</td><td><code>source_id</code></td><td>1 nguồn – n dòng tiền</td><td>nguồn chưa khai pháp nhân ⇒ dòng vào hàng chờ &#x27;thiếu pháp nhân&#x27;, ⛔ không đoán</td><td><span class="pill no">⛔ đề xuất mới</span></td></tr>
-<tr class="b2"><th colspan="7">Đọc ảnh thành dòng canon (b1 · b3 · b4)</th></tr>
-<tr><td class="id"><i class="ln ln-q"></i>b1</td><td>ảnh FPS → DỰNG chuỗi phiếu</td><td>slip + line 4 loại phiếu + danh mục</td><td><code>line_id</code></td><td>n – 1 mỗi bậc chuỗi</td><td>khoá trỏ rỗng ⇒ cờ &#x27;chuỗi đứt&#x27;, dòng vẫn vào kèm lý do</td><td><span class="pill no">⛔</span></td></tr>
-<tr><td class="id"><i class="ln ln-b"></i>b3</td><td>ảnh sổ nhập tay → DỰNG dòng tiền</td><td>dòng lằn Bank · Cash</td><td><code>chup_id + dòng</code></td><td>1 – 1</td><td>đọc từ ẢNH, ⛔ không đọc Sheets sống</td><td><span class="pill ok">✅ Bank · ⛔ Cash</span></td></tr>
-<tr><td class="id"><i class="ln ln-q"></i>b4</td><td>ảnh sổ nhập tay → DỰNG dòng chi phí</td><td>dòng lằn HR · Platform</td><td><code>chup_id + dòng</code></td><td>1 – 1</td><td>dòng thiếu HD ⇒ hàng chờ (mong 0)</td><td><span class="pill no">⛔</span></td></tr>
+<tr class="chon" data-ref="t:k1" data-comment-target tabindex="0"><td class="id"><i class="ln ln-n"></i>k1</td><td>ảnh sổ cái FPS → bản khai nguồn</td><td>đề xuất pháp nhân TK: TK chi + pháp nhân thanh toán trên sổ cái PM, đếm theo nguồn</td><td><code>số TK ↔ nguồn</code></td><td>1 nguồn – 1 pháp nhân</td><td>máy đề xuất, kế toán khai, owner ký · nguồn có &gt;1 pháp nhân ⇒ ⛔ không đề xuất · ⛔ không regex (14 TK · 211 dòng)</td><td><span class="pill no">⛔ đề xuất mới</span></td></tr>
+<tr class="chon" data-ref="t:k2" data-comment-target tabindex="0"><td class="id"><i class="ln ln-b"></i>k2</td><td>bản khai nguồn → ảnh sổ nhập tay</td><td>bố cục cột + thứ tự ngày của từng nguồn</td><td><code>source_id + khai_version</code></td><td>1 nguồn – 1 bản khai hiệu lực</td><td>thiếu khai ⇒ nổ · khai sửa = version mới, bản cũ ⛔ không đổi</td><td><span class="pill ok">✅ 408 dòng = 68 × 6</span></td></tr>
+<tr class="chon" data-ref="t:b2" data-comment-target tabindex="0"><td class="id"><i class="ln ln-n"></i>b2</td><td>bản khai nguồn → DỰNG dòng tiền</td><td>pháp nhân TK của nguồn</td><td><code>source_id</code></td><td>1 nguồn – n dòng tiền</td><td>nguồn chưa khai pháp nhân ⇒ dòng vào hàng chờ &#x27;thiếu pháp nhân&#x27;, ⛔ không đoán</td><td><span class="pill no">⛔ đề xuất mới</span></td></tr>
+<tr class="b2"><th colspan="7">Đọc ảnh thành dòng (b1 · b3 · b4)</th></tr>
+<tr class="chon" data-ref="t:b1" data-comment-target tabindex="0"><td class="id"><i class="ln ln-q"></i>b1</td><td>ảnh sổ cái FPS → DỰNG dòng lệnh</td><td>dòng sổ cái PM + PC, đủ chiều</td><td><code>pm_line_id · pc_line_id</code></td><td>1 – 1</td><td>cột hợp đồng rỗng ⇒ cờ có tên cột, dòng vẫn vào · 13 cột còn thô phải đặt kiểu</td><td><span class="pill mid">◐ PM 14 cột có kiểu</span></td></tr>
+<tr class="chon" data-ref="t:b3" data-comment-target tabindex="0"><td class="id"><i class="ln ln-b"></i>b3</td><td>ảnh sổ nhập tay → DỰNG dòng tiền</td><td>dòng lằn Bank · Cash</td><td><code>chup_id + dòng</code></td><td>1 – 1</td><td>đọc từ ẢNH, ⛔ không đọc Sheets sống</td><td><span class="pill ok">✅ Bank · ⛔ Cash</span></td></tr>
+<tr class="chon" data-ref="t:b4" data-comment-target tabindex="0"><td class="id"><i class="ln ln-q"></i>b4</td><td>ảnh sổ nhập tay → DỰNG dòng chi phí</td><td>dòng lằn HR · Platform</td><td><code>chup_id + dòng</code></td><td>1 – 1</td><td>dòng thiếu HD ⇒ hàng chờ (mong 0)</td><td><span class="pill no">⛔</span></td></tr>
 <tr class="b1"><th colspan="7">Nhóm 4 · Ghép, soát, ghi (g1–g4 · w1–w3 · s1–s4)</th></tr>
 <tr class="b2"><th colspan="7">Vào ghép và soát (g1–g4)</th></tr>
-<tr><td class="id"><i class="ln ln-q"></i>g1</td><td>DỰNG chuỗi phiếu → GHÉP lệnh chi với dòng tiền</td><td>mỗi PM line: tiền · tiền tệ · Reference No · chiều phiếu</td><td><code>pm_line_id</code></td><td>1 – 1</td><td>N line một phiếu nói N giá trị ⇒ &#x27;không suy được&#x27;, ⛔ không lấy dòng đầu (INV-I16)</td><td><span class="pill mid">◐ chỉ phần PM</span></td></tr>
-<tr><td class="id"><i class="ln ln-b"></i>g2</td><td>DỰNG dòng tiền → GHÉP lệnh chi với dòng tiền</td><td>dòng tiền canon + Reference No</td><td><code>content_key</code></td><td>1 dòng tiền – n PM line</td><td>Σ tiền các line = tiền dòng · khác tiền tệ ⇒ để người (chờ tỷ giá, GĐ2)</td><td><span class="pill ok">✅</span></td></tr>
-<tr><td class="id"><i class="ln ln-b"></i>g3</td><td>DỰNG dòng tiền → SOÁT lô</td><td>dòng tiền canon</td><td><code>content_key</code></td><td>1 – 1</td><td>9 luật soát chạy theo TỪNG nguồn (⛔ nối phẳng 60 nguồn)</td><td><span class="pill ok">✅</span></td></tr>
-<tr><td class="id"><i class="ln ln-q"></i>g4</td><td>DỰNG dòng chi phí → SOÁT lô</td><td>dòng chi phí canon</td><td><code>content_key</code></td><td>1 – 1</td><td>cùng 9 luật + Σ từng sổ = nguồn</td><td><span class="pill no">⛔</span></td></tr>
+<tr class="chon" data-ref="t:g1" data-comment-target tabindex="0"><td class="id"><i class="ln ln-q"></i>g1</td><td>DỰNG dòng lệnh → GHÉP lệnh chi với dòng tiền</td><td>mỗi PM line: tiền · tiền tệ · Reference No · chiều chi phí</td><td><code>pm_line_id</code></td><td>1 – 1</td><td>N line một phiếu nói N giá trị ⇒ &#x27;không suy được&#x27;, ⛔ không lấy dòng đầu (INV-I16)</td><td><span class="pill mid">◐ có phần PM, chưa đủ chiều</span></td></tr>
+<tr class="chon" data-ref="t:g2" data-comment-target tabindex="0"><td class="id"><i class="ln ln-b"></i>g2</td><td>DỰNG dòng tiền → GHÉP lệnh chi với dòng tiền</td><td>dòng tiền canon + Reference No</td><td><code>content_key</code></td><td>1 dòng tiền – n PM line</td><td>Σ tiền các line = tiền dòng · khác tiền tệ ⇒ để người (chờ tỷ giá, GĐ2)</td><td><span class="pill ok">✅</span></td></tr>
+<tr class="chon" data-ref="t:g3" data-comment-target tabindex="0"><td class="id"><i class="ln ln-b"></i>g3</td><td>DỰNG dòng tiền → SOÁT lô</td><td>dòng tiền canon</td><td><code>content_key</code></td><td>1 – 1</td><td>9 luật soát chạy theo TỪNG nguồn (⛔ nối phẳng 60 nguồn)</td><td><span class="pill ok">✅</span></td></tr>
+<tr class="chon" data-ref="t:g4" data-comment-target tabindex="0"><td class="id"><i class="ln ln-q"></i>g4</td><td>DỰNG dòng chi phí → SOÁT lô</td><td>dòng chi phí canon</td><td><code>content_key</code></td><td>1 – 1</td><td>cùng 9 luật + Σ từng sổ = nguồn</td><td><span class="pill no">⛔</span></td></tr>
 <tr class="b2"><th colspan="7">Ra ghi và biên bản (w1–w3)</th></tr>
-<tr><td class="id"><i class="ln ln-b"></i>w1</td><td>GHÉP lệnh chi với dòng tiền → GHI lượt nạp — một giao dịch</td><td>mối nối dự kiến (dòng, PM line, tiền chia, hình nối)</td><td><code>(content_key, pm_line_id)</code></td><td>1 – n</td><td>chèn SAU dòng sổ (cần itl_id) nhưng TRONG cùng giao dịch</td><td><span class="pill ok">✅</span></td></tr>
-<tr><td class="id"><i class="ln ln-b"></i>w2</td><td>SOÁT lô → GHI lượt nạp — một giao dịch</td><td>dòng đạt + dòng loại + cờ</td><td><code>content_key</code></td><td>1 – 1</td><td>CHẶN ⇒ 0 dòng của nguồn ấy · 4 vế không cân ⇒ ⛔ không ghi gì</td><td><span class="pill ok">✅</span></td></tr>
-<tr><td class="id"><i class="ln ln-b"></i>w3</td><td>SOÁT lô → biên bản lô</td><td>9 dòng tổng · nguồn bị chừa có tên luật</td><td><code>luật</code></td><td>9 dòng / lô</td><td>đã đo = 0 hiện &#x27;chưa đo&#x27;, ⛔ không hiện số 0</td><td><span class="pill ok">✅</span></td></tr>
+<tr class="chon" data-ref="t:w1" data-comment-target tabindex="0"><td class="id"><i class="ln ln-b"></i>w1</td><td>GHÉP lệnh chi với dòng tiền → GHI lượt nạp — một giao dịch</td><td>mối nối dự kiến (dòng, PM line, tiền chia, hình nối)</td><td><code>(content_key, pm_line_id)</code></td><td>1 – n</td><td>chèn SAU dòng sổ (cần itl_id) nhưng TRONG cùng giao dịch</td><td><span class="pill ok">✅</span></td></tr>
+<tr class="chon" data-ref="t:w2" data-comment-target tabindex="0"><td class="id"><i class="ln ln-b"></i>w2</td><td>SOÁT lô → GHI lượt nạp — một giao dịch</td><td>dòng đạt + dòng loại + cờ</td><td><code>content_key</code></td><td>1 – 1</td><td>CHẶN ⇒ 0 dòng của nguồn ấy · 4 vế không cân ⇒ ⛔ không ghi gì</td><td><span class="pill ok">✅</span></td></tr>
+<tr class="chon" data-ref="t:w3" data-comment-target tabindex="0"><td class="id"><i class="ln ln-b"></i>w3</td><td>SOÁT lô → biên bản lô</td><td>9 dòng tổng · nguồn bị chừa có tên luật</td><td><code>luật</code></td><td>9 dòng / lô</td><td>đã đo = 0 hiện &#x27;chưa đo&#x27;, ⛔ không hiện số 0</td><td><span class="pill ok">✅</span></td></tr>
 <tr class="b2"><th colspan="7">Vào sổ (s1–s4)</th></tr>
-<tr><td class="id"><i class="ln ln-b"></i>s1</td><td>GHI lượt nạp — một giao dịch → dòng bị loại</td><td>dòng bị loại + lý do</td><td><code>run_id + dòng nguồn</code></td><td>1 – 1</td><td>mỗi dòng loại có lý do có tên</td><td><span class="pill ok">✅</span></td></tr>
-<tr><td class="id"><i class="ln ln-b"></i>s2</td><td>GHI lượt nạp — một giao dịch → SỔ ITL</td><td>dòng sổ: General Trustest + TK + pháp nhân + run_id</td><td><code>content_key UNIQUE</code></td><td>1 – 1</td><td>trùng ⇒ ⛔ không ghi, đếm vế &#x27;trùng&#x27; · nạp lại cùng ảnh ⇒ vào sổ = 0</td><td><span class="pill ok">✅ (pháp nhân còn rỗng)</span></td></tr>
-<tr><td class="id"><i class="ln ln-b"></i>s3</td><td>GHI lượt nạp — một giao dịch → lớp sửa chỉ-thêm (gộp vẽ)</td><td>mối nối máy + gợi ý hd/cdt1 (nguồn = máy gợi ý)</td><td><code>itl_id + pm_line_id</code></td><td>1 – n</td><td>máy gợi ý ⛔ không đè lên ô người đã chốt</td><td><span class="pill ok">✅</span></td></tr>
-<tr><td class="id"><i class="ln ln-b"></i>s4</td><td>GHI tay — một giao dịch → lớp sửa chỉ-thêm (gộp vẽ)</td><td>ghép · bỏ ghép · sửa · đảo · lý do · xong/mở lại</td><td><code>itl_id</code></td><td>1 – n</td><td>bút toán + nhật ký trong MỘT giao dịch · actor từ thẻ, gửi trong thân ⇒ 400</td><td><span class="pill ok">✅</span></td></tr>
+<tr class="chon" data-ref="t:s1" data-comment-target tabindex="0"><td class="id"><i class="ln ln-b"></i>s1</td><td>GHI lượt nạp — một giao dịch → dòng bị loại</td><td>dòng bị loại + lý do</td><td><code>run_id + dòng nguồn</code></td><td>1 – 1</td><td>mỗi dòng loại có lý do có tên</td><td><span class="pill ok">✅</span></td></tr>
+<tr class="chon" data-ref="t:s2" data-comment-target tabindex="0"><td class="id"><i class="ln ln-b"></i>s2</td><td>GHI lượt nạp — một giao dịch → SỔ ITL</td><td>dòng sổ: General Trustest + TK + pháp nhân + run_id</td><td><code>content_key UNIQUE</code></td><td>1 – 1</td><td>trùng ⇒ ⛔ không ghi, đếm vế &#x27;trùng&#x27; · nạp lại cùng ảnh ⇒ vào sổ = 0</td><td><span class="pill ok">✅ (pháp nhân còn rỗng)</span></td></tr>
+<tr class="chon" data-ref="t:s3" data-comment-target tabindex="0"><td class="id"><i class="ln ln-b"></i>s3</td><td>GHI lượt nạp — một giao dịch → lớp sửa chỉ-thêm (gộp vẽ)</td><td>mối nối máy + gợi ý hd/cdt1 (nguồn = máy gợi ý)</td><td><code>itl_id + pm_line_id</code></td><td>1 – n</td><td>máy gợi ý ⛔ không đè lên ô người đã chốt</td><td><span class="pill ok">✅</span></td></tr>
+<tr class="chon" data-ref="t:s4" data-comment-target tabindex="0"><td class="id"><i class="ln ln-b"></i>s4</td><td>GHI tay — một giao dịch → lớp sửa chỉ-thêm (gộp vẽ)</td><td>ghép · bỏ ghép · sửa · đảo · lý do · xong/mở lại</td><td><code>itl_id</code></td><td>1 – n</td><td>bút toán + nhật ký trong MỘT giao dịch · actor từ thẻ, gửi trong thân ⇒ 400</td><td><span class="pill ok">✅</span></td></tr>
 <tr class="b1"><th colspan="7">Nhóm 5 · Hiệu lực và ra ngoài (h1–h4 · v1–v4)</th></tr>
 <tr class="b2"><th colspan="7">Sổ hiệu lực và cổng (h1–h4)</th></tr>
-<tr><td class="id"><i class="ln ln-q"></i>h1</td><td>dòng bị loại → KIỂM cổng GĐ1</td><td>số dòng loại theo lý do</td><td><code>run_id</code></td><td>—</td><td>vế &#x27;loại&#x27; của 4 vế</td><td><span class="pill mid">◐ cổng 4 vế có ở lúc nạp</span></td></tr>
-<tr><td class="id"><i class="ln ln-b"></i>h2</td><td>SỔ ITL → SỔ ITL HIỆU LỰC — bảng ITL duy nhất của GĐ1</td><td>dòng sổ gốc</td><td><code>itl_id</code></td><td>1 – 1</td><td>sổ gốc ⛔ không đổi; giá trị hiệu lực đọc qua view</td><td><span class="pill ok">✅</span></td></tr>
-<tr><td class="id"><i class="ln ln-b"></i>h3</td><td>lớp sửa chỉ-thêm (gộp vẽ) → SỔ ITL HIỆU LỰC — bảng ITL duy nhất của GĐ1</td><td>giá trị người / máy gợi ý · mối nối · trạng thái hàng chờ</td><td><code>itl_id</code></td><td>n – 1</td><td>người › máy gợi ý › nguồn; bỏ nối ⇒ giá trị máy rút theo</td><td><span class="pill ok">✅</span></td></tr>
-<tr><td class="id"><i class="ln ln-q"></i>h4</td><td>SỔ ITL HIỆU LỰC — bảng ITL duy nhất của GĐ1 → KIỂM cổng GĐ1</td><td>sổ hiệu lực cho 5 cổng GĐ1</td><td><code>le · source_system · curr</code></td><td>—</td><td>le NULL = 0 · Σ theo LE = Σ theo nguồn · 0 khoá phiếu trỏ rỗng</td><td><span class="pill no">⛔</span></td></tr>
+<tr class="chon" data-ref="t:h1" data-comment-target tabindex="0"><td class="id"><i class="ln ln-q"></i>h1</td><td>dòng bị loại → KIỂM cổng GĐ1</td><td>số dòng loại theo lý do</td><td><code>run_id</code></td><td>—</td><td>vế &#x27;loại&#x27; của 4 vế</td><td><span class="pill mid">◐ cổng 4 vế có ở lúc nạp</span></td></tr>
+<tr class="chon" data-ref="t:h2" data-comment-target tabindex="0"><td class="id"><i class="ln ln-b"></i>h2</td><td>SỔ ITL → SỔ ITL HIỆU LỰC — bảng ITL duy nhất của GĐ1</td><td>dòng sổ gốc</td><td><code>itl_id</code></td><td>1 – 1</td><td>sổ gốc ⛔ không đổi; giá trị hiệu lực đọc qua view</td><td><span class="pill ok">✅</span></td></tr>
+<tr class="chon" data-ref="t:h3" data-comment-target tabindex="0"><td class="id"><i class="ln ln-b"></i>h3</td><td>lớp sửa chỉ-thêm (gộp vẽ) → SỔ ITL HIỆU LỰC — bảng ITL duy nhất của GĐ1</td><td>giá trị người / máy gợi ý · mối nối · trạng thái hàng chờ</td><td><code>itl_id</code></td><td>n – 1</td><td>người › máy gợi ý › nguồn; bỏ nối ⇒ giá trị máy rút theo</td><td><span class="pill ok">✅</span></td></tr>
+<tr class="chon" data-ref="t:h4" data-comment-target tabindex="0"><td class="id"><i class="ln ln-q"></i>h4</td><td>SỔ ITL HIỆU LỰC — bảng ITL duy nhất của GĐ1 → KIỂM cổng GĐ1</td><td>sổ hiệu lực cho 5 cổng GĐ1</td><td><code>le · source_system · curr</code></td><td>—</td><td>pháp nhân rỗng = 0 · Σ theo pháp nhân = Σ theo nguồn · 0 khoá lệnh chi trỏ rỗng</td><td><span class="pill no">⛔</span></td></tr>
 <tr class="b2"><th colspan="7">Người thấy và hệ khác (v1–v4)</th></tr>
-<tr><td class="id"><i class="ln ln-q"></i>v1</td><td>KIỂM cổng GĐ1 → màn F03 · cổng</td><td>kết quả cổng: đạt / không đạt / chưa đo được</td><td><code>mã cổng</code></td><td>—</td><td>phép ⛔ đo được là ĐỎ, ⛔ không phải &#x27;không thấy lệch&#x27;</td><td><span class="pill mid">◐ 8 cổng cũ</span></td></tr>
-<tr><td class="id"><i class="ln ln-b"></i>v2</td><td>SỔ ITL HIỆU LỰC — bảng ITL duy nhất của GĐ1 → màn F01 · hàng chờ</td><td>dòng chưa ghép / chưa đủ chiều + lý do</td><td><code>itl_id</code></td><td>—</td><td>luôn lọc một tiền tệ, ⛔ không có dòng tổng</td><td><span class="pill ok">✅</span></td></tr>
-<tr><td class="id"><i class="ln ln-b"></i>v3</td><td>SỔ ITL HIỆU LỰC — bảng ITL duy nhất của GĐ1 → màn F02 · sổ ITL</td><td>lưới sổ hiệu lực + ngăn kéo &#x27;nguồn nói · người nói&#x27;</td><td><code>itl_id</code></td><td>—</td><td>ô máy gợi ý hiện là gợi ý, ⛔ không trông như số chốt</td><td><span class="pill ok">✅</span></td></tr>
-<tr><td class="id"><i class="ln ln-q"></i>v4</td><td>SỔ ITL HIỆU LỰC — bảng ITL duy nhất của GĐ1 → XUẤT cho hệ khác</td><td>sổ hiệu lực theo khuôn sổ đang chạy</td><td><code>số chứng từ + ngày + TK</code></td><td>1 – 1</td><td>chênh liệt kê TỪNG dòng, mọi chênh có tên lý do, ⛔ không phần trăm</td><td><span class="pill no">⛔ bộ xuất chưa có</span></td></tr>
+<tr class="chon" data-ref="t:v1" data-comment-target tabindex="0"><td class="id"><i class="ln ln-q"></i>v1</td><td>KIỂM cổng GĐ1 → màn F03 · cổng</td><td>kết quả cổng: đạt / không đạt / chưa đo được</td><td><code>mã cổng</code></td><td>—</td><td>phép ⛔ đo được là ĐỎ, ⛔ không phải &#x27;không thấy lệch&#x27;</td><td><span class="pill mid">◐ 8 cổng cũ</span></td></tr>
+<tr class="chon" data-ref="t:v2" data-comment-target tabindex="0"><td class="id"><i class="ln ln-b"></i>v2</td><td>SỔ ITL HIỆU LỰC — bảng ITL duy nhất của GĐ1 → màn F01 · hàng chờ</td><td>dòng chưa ghép / chưa đủ chiều + lý do</td><td><code>itl_id</code></td><td>—</td><td>luôn lọc một tiền tệ, ⛔ không có dòng tổng</td><td><span class="pill ok">✅</span></td></tr>
+<tr class="chon" data-ref="t:v3" data-comment-target tabindex="0"><td class="id"><i class="ln ln-b"></i>v3</td><td>SỔ ITL HIỆU LỰC — bảng ITL duy nhất của GĐ1 → màn F02 · sổ ITL</td><td>lưới sổ hiệu lực + ngăn kéo &#x27;nguồn nói · người nói&#x27;</td><td><code>itl_id</code></td><td>—</td><td>ô máy gợi ý hiện là gợi ý, ⛔ không trông như số chốt</td><td><span class="pill ok">✅</span></td></tr>
+<tr class="chon" data-ref="t:v4" data-comment-target tabindex="0"><td class="id"><i class="ln ln-q"></i>v4</td><td>SỔ ITL HIỆU LỰC — bảng ITL duy nhất của GĐ1 → XUẤT cho hệ khác</td><td>sổ hiệu lực theo khuôn sổ đang chạy</td><td><code>số chứng từ + ngày + TK</code></td><td>1 – 1</td><td>chênh liệt kê TỪNG dòng, mọi chênh có tên lý do, ⛔ không phần trăm</td><td><span class="pill no">⛔ bộ xuất chưa có</span></td></tr>
 </tbody></table></div>
-<h2>§4 · Kiểm cạnh — mỗi hộp: vào gì, ra gì, khớp mã nào</h2><p>Bảng này máy sinh từ cùng bản khai với hình: cột <i>vào</i>/<i>ra</i> là mã mũi tên, nên một mũi tên thiếu trên hình cũng thiếu ở đây.</p>
+<h2>§4 · Kiểm cạnh — mỗi hộp: vào gì, ra gì, khớp mã nào</h2><p>Máy sinh từ cùng bản khai với hình: cột <i>vào</i>/<i>ra</i> là mã mũi tên, nên một mũi tên thiếu trên hình cũng thiếu ở đây.</p>
 <div class="scroll"><table class="audit">
 <thead><tr><th>hộp</th><th>loại · trạng thái</th><th>vào</th><th>ra</th><th>đối chiếu mã / tài liệu</th></tr></thead><tbody>
 <tr class="b1"><th colspan="5">Nguồn ngoài · FPS</th></tr>
 <tr class="b2"><th colspan="5">ai sinh ra</th></tr>
-<tr><td><b>NGƯỜI LẬP &amp; DUYỆT</b></td><td>khởi động · có mã</td><td class="mono">—</td><td class="mono">o1</td><td>ngoài FLS — FLS chỉ đọc trạng thái cuối</td></tr>
-<tr><td><b>NGƯỜI GIỮ DANH MỤC</b></td><td>khởi động · có mã</td><td class="mono">—</td><td class="mono">o2</td><td>ngoài FLS</td></tr>
-<tr class="b2"><th colspan="5">phiếu · sổ nguồn</th></tr>
-<tr><td><b>phiếu đã duyệt</b></td><td>nguồn ngoài · có mã</td><td class="mono">o1</td><td class="mono">x1</td><td>10 bảng slip/line có trong code FPS (FLS-vs-FPS-Compare-Audit §4)</td></tr>
-<tr><td><b>danh mục FPS</b></td><td>nguồn ngoài · có mã</td><td class="mono">o2</td><td class="mono">x2</td><td>fps_le · fps_cdt · fps_kr · fps_bgc · fps_ven · fps_bank_account · fps_exchange_rate (Audit §4)</td></tr>
+<tr class="chon" data-ref="h:oPM" data-comment-target tabindex="0"><td><b>LẬP &amp; DUYỆT PM</b></td><td>khởi động · có mã</td><td class="mono">—</td><td class="mono">o1</td><td>ngoài FLS — FLS chỉ đọc dòng đã vào sổ cái</td></tr>
+<tr class="chon" data-ref="h:oPC" data-comment-target tabindex="0"><td><b>LẬP &amp; DUYỆT PC</b></td><td>khởi động · có mã</td><td class="mono">—</td><td class="mono">o2</td><td>ngoài FLS</td></tr>
+<tr class="b2"><th colspan="5">sổ nguồn</th></tr>
+<tr class="chon" data-ref="h:soPM" data-comment-target tabindex="0"><td><b>sổ cái PM</b></td><td>nguồn ngoài · có mã</td><td class="mono">o1</td><td class="mono">x1</td><td>AS-IS đọc qua tab PM_Unpivot: 28 cột có tên (pm_join.py, G-MOD-3) — 14 có kiểu · 1 cấm · 13 thô</td></tr>
+<tr class="chon" data-ref="h:soPC" data-comment-target tabindex="0"><td><b>sổ cái PC</b></td><td>nguồn ngoài · có mã</td><td class="mono">o2</td><td class="mono">x2</td><td>0 tham chiếu PC trong fls/ · tools/ · tests/</td></tr>
 <tr class="b1"><th colspan="5">Nguồn ngoài · Google Sheets</th></tr>
 <tr class="b2"><th colspan="5">ai sinh ra</th></tr>
-<tr><td><b>KẾ TOÁN</b></td><td>khởi động · có mã</td><td class="mono">—</td><td class="mono">o3 o4</td><td>ngoài FLS — 68 dòng chảy có bản khai dòng 1</td></tr>
-<tr><td><b>HR · C&amp;B</b></td><td>khởi động · có mã</td><td class="mono">—</td><td class="mono">o5</td><td>ngoài FLS</td></tr>
-<tr><td><b>CHỦ SỔ NỀN TẢNG</b></td><td>khởi động · có mã</td><td class="mono">—</td><td class="mono">o6</td><td>ngoài FLS</td></tr>
-<tr class="b2"><th colspan="5">phiếu · sổ nguồn</th></tr>
-<tr><td><b>sao kê ngân hàng</b></td><td>nguồn ngoài · có mã</td><td class="mono">o3</td><td class="mono">x3</td><td>tools/nap_nguon_va_khai.py (60 ngân hàng + 8 quỹ = 68 nguồn)</td></tr>
-<tr><td><b>sổ quỹ</b></td><td>nguồn ngoài · có mã</td><td class="mono">o4</td><td class="mono">x4</td><td>như trên</td></tr>
-<tr><td><b>sổ lương HR</b></td><td>nguồn ngoài · có mã</td><td class="mono">o5</td><td class="mono">x5</td><td>0 tham chiếu trong fls/ (chỉ chuỗi phương pháp ở mapping_master.py:31)</td></tr>
-<tr><td><b>sổ nền tảng</b></td><td>nguồn ngoài · có mã</td><td class="mono">o6</td><td class="mono">x6</td><td>0 tham chiếu trong fls/ (Platform chỉ là enum)</td></tr>
+<tr class="chon" data-ref="h:oKT" data-comment-target tabindex="0"><td><b>KẾ TOÁN</b></td><td>khởi động · có mã</td><td class="mono">—</td><td class="mono">o3 o4</td><td>ngoài FLS — 68 dòng chảy có bản khai dòng 1</td></tr>
+<tr class="chon" data-ref="h:oHR" data-comment-target tabindex="0"><td><b>HR · C&amp;B</b></td><td>khởi động · có mã</td><td class="mono">—</td><td class="mono">o5</td><td>ngoài FLS</td></tr>
+<tr class="chon" data-ref="h:oNT" data-comment-target tabindex="0"><td><b>CHỦ SỔ NỀN TẢNG</b></td><td>khởi động · có mã</td><td class="mono">—</td><td class="mono">o6</td><td>ngoài FLS</td></tr>
+<tr class="b2"><th colspan="5">sổ nguồn</th></tr>
+<tr class="chon" data-ref="h:saoke" data-comment-target tabindex="0"><td><b>sao kê ngân hàng</b></td><td>nguồn ngoài · có mã</td><td class="mono">o3</td><td class="mono">x3</td><td>tools/nap_nguon_va_khai.py (60 ngân hàng + 8 quỹ = 68 nguồn)</td></tr>
+<tr class="chon" data-ref="h:soquy" data-comment-target tabindex="0"><td><b>sổ quỹ</b></td><td>nguồn ngoài · có mã</td><td class="mono">o4</td><td class="mono">x4</td><td>như trên</td></tr>
+<tr class="chon" data-ref="h:soluong" data-comment-target tabindex="0"><td><b>sổ lương HR</b></td><td>nguồn ngoài · có mã</td><td class="mono">o5</td><td class="mono">x5</td><td>0 tham chiếu trong fls/ (chỉ chuỗi phương pháp ở mapping_master.py:31)</td></tr>
+<tr class="chon" data-ref="h:sont" data-comment-target tabindex="0"><td><b>sổ nền tảng</b></td><td>nguồn ngoài · có mã</td><td class="mono">o6</td><td class="mono">x6</td><td>0 tham chiếu trong fls/ (Platform chỉ là enum)</td></tr>
 <tr class="b1"><th colspan="5">FLS · NẠP</th></tr>
 <tr class="b2"><th colspan="5">① KHAI &amp; CHỤP</th></tr>
-<tr><td><b>S1 · NHỊP</b></td><td>khởi động · có mã</td><td class="mono">—</td><td class="mono">—</td><td>fls/repo/nhip_chup.py (QĐ-ITL-114) · tools/nhip_chup.py chụp Bank + PM</td></tr>
-<tr><td><b>S2 · KHAI</b></td><td>khởi động · có mã</td><td class="mono">—</td><td class="mono">—</td><td>POST khai-cot · thu-tu (fls/api)</td></tr>
-<tr><td><b>ảnh FPS</b></td><td>dữ liệu · GĐ1 dựng · khởi bởi S1</td><td class="mono">x1 x2</td><td class="mono">k1 b1</td><td>fls_pm_line (migration 0011/0023); PE/PI/PC/danh mục: chưa có bảng</td></tr>
-<tr><td><b>bản khai nguồn</b></td><td>dữ liệu · có mã · khởi bởi S2</td><td class="mono">k1</td><td class="mono">k2 b2</td><td>fls/repo/khai_cot.py (chỉ-thêm, có version); cột pháp nhân: chưa có</td></tr>
-<tr><td><b>ảnh sổ nhập tay</b></td><td>dữ liệu · có mã · khởi bởi S1</td><td class="mono">x3 x4 x5 x6 k2</td><td class="mono">b3 b4</td><td>tools/chup_sao_ke.py (LAN=&#x27;Bank&#x27;) · fls/repo/chup.py:16 khai_version</td></tr>
+<tr class="chon" data-ref="h:S1" data-comment-target tabindex="0"><td><b>S1 · NHỊP</b></td><td>khởi động · có mã</td><td class="mono">—</td><td class="mono">—</td><td>fls/repo/nhip_chup.py (QĐ-ITL-114) · tools/nhip_chup.py chụp Bank + PM</td></tr>
+<tr class="chon" data-ref="h:S2" data-comment-target tabindex="0"><td><b>S2 · KHAI</b></td><td>khởi động · có mã</td><td class="mono">—</td><td class="mono">—</td><td>POST khai-cot · thu-tu (fls/api)</td></tr>
+<tr class="chon" data-ref="h:anhFPS" data-comment-target tabindex="0"><td><b>ảnh sổ cái FPS</b></td><td>dữ liệu · GĐ1 phải dựng · khởi bởi S1</td><td class="mono">x1 x2</td><td class="mono">k1 b1</td><td>fls_pm_line (migration 0011/0023) · fls/repo/anh_pm.py; PC: chưa có bảng</td></tr>
+<tr class="chon" data-ref="h:khai" data-comment-target tabindex="0"><td><b>bản khai nguồn</b></td><td>dữ liệu · có mã · khởi bởi S2</td><td class="mono">k1</td><td class="mono">k2 b2</td><td>fls/repo/khai_cot.py (chỉ-thêm, có version); cột pháp nhân: chưa có</td></tr>
+<tr class="chon" data-ref="h:anhSo" data-comment-target tabindex="0"><td><b>ảnh sổ nhập tay</b></td><td>dữ liệu · có mã · khởi bởi S1</td><td class="mono">x3 x4 x5 x6 k2</td><td class="mono">b3 b4</td><td>tools/chup_sao_ke.py (LAN=&#x27;Bank&#x27;) · fls/repo/chup.py:16 khai_version</td></tr>
 <tr class="b2"><th colspan="5">② DỰNG</th></tr>
-<tr><td><b>S3 · XEM LÔ</b></td><td>khởi động · có mã</td><td class="mono">—</td><td class="mono">—</td><td>POST /nap/lo/xem-truoc</td></tr>
-<tr><td><b>DỰNG chuỗi phiếu</b></td><td>xử lý · GĐ1 dựng · khởi bởi S3, S4</td><td class="mono">b1</td><td class="mono">g1</td><td>chưa có: fls_pm_line.pe_line/pi_line trỏ vào bảng không tồn tại (QĐ-ITL-140)</td></tr>
-<tr><td><b>DỰNG dòng tiền</b></td><td>xử lý · có mã · khởi bởi S3, S4</td><td class="mono">b2 b3</td><td class="mono">g2 g3</td><td>fls/adapters/sao_ke.py + sao_ke_canon.py</td></tr>
-<tr><td><b>DỰNG dòng chi phí</b></td><td>xử lý · GĐ1 dựng · khởi bởi S3, S4</td><td class="mono">b4</td><td class="mono">g4</td><td>chưa có (adapter D/E)</td></tr>
+<tr class="chon" data-ref="h:S3" data-comment-target tabindex="0"><td><b>S3 · XEM LÔ</b></td><td>khởi động · có mã</td><td class="mono">—</td><td class="mono">—</td><td>POST /nap/lo/xem-truoc</td></tr>
+<tr class="chon" data-ref="h:dLenh" data-comment-target tabindex="0"><td><b>DỰNG dòng lệnh</b></td><td>xử lý · GĐ1 phải dựng · khởi bởi S3, S4</td><td class="mono">b1</td><td class="mono">g1</td><td>có một phần: fls_pm_line đặt kiểu 14 cột (PM_COT); PC + cột còn thô: chưa</td></tr>
+<tr class="chon" data-ref="h:dTien" data-comment-target tabindex="0"><td><b>DỰNG dòng tiền</b></td><td>xử lý · có mã · khởi bởi S3, S4</td><td class="mono">b2 b3</td><td class="mono">g2 g3</td><td>fls/adapters/sao_ke.py + sao_ke_canon.py</td></tr>
+<tr class="chon" data-ref="h:dChiPhi" data-comment-target tabindex="0"><td><b>DỰNG dòng chi phí</b></td><td>xử lý · GĐ1 phải dựng · khởi bởi S3, S4</td><td class="mono">b4</td><td class="mono">g4</td><td>chưa có (adapter D/E)</td></tr>
 <tr class="b2"><th colspan="5">③ GHÉP &amp; SOÁT</th></tr>
-<tr><td><b>GHÉP lệnh chi với dòng tiền</b></td><td>xử lý · có mã · khởi bởi S4</td><td class="mono">g1 g2</td><td class="mono">w1</td><td>fls/adapters/pm_join.py · chay_nap.py:637 chen_moi_noi</td></tr>
-<tr><td><b>SOÁT lô</b></td><td>xử lý · có mã · khởi bởi S3, S4</td><td class="mono">g3 g4</td><td class="mono">w2 w3</td><td>fls/kiem/soat_nap.py · chay_nap.py:611 cổng bốn đường</td></tr>
+<tr class="chon" data-ref="h:ghep" data-comment-target tabindex="0"><td><b>GHÉP lệnh chi với dòng tiền</b></td><td>xử lý · có mã · khởi bởi S4</td><td class="mono">g1 g2</td><td class="mono">w1</td><td>fls/adapters/pm_join.py · chay_nap.py:637 chen_moi_noi</td></tr>
+<tr class="chon" data-ref="h:soat" data-comment-target tabindex="0"><td><b>SOÁT lô</b></td><td>xử lý · có mã · khởi bởi S3, S4</td><td class="mono">g3 g4</td><td class="mono">w2 w3</td><td>fls/kiem/soat_nap.py · chay_nap.py:611 cổng bốn đường</td></tr>
 <tr class="b2"><th colspan="5">④ GHI</th></tr>
-<tr><td><b>S4 · NHẬN</b></td><td>khởi động · có mã</td><td class="mono">—</td><td class="mono">—</td><td>POST /nap/lo</td></tr>
-<tr><td><b>S5 · GHÉP·SỬA</b></td><td>khởi động · có mã</td><td class="mono">—</td><td class="mono">—</td><td>POST match · adjust · reverse · …</td></tr>
-<tr><td><b>GHI lượt nạp — một giao dịch</b></td><td>xử lý · có mã · khởi bởi S4</td><td class="mono">w1 w2</td><td class="mono">s1 s2 s3</td><td>chay_nap.py:621 `with conn.transaction()`</td></tr>
-<tr><td><b>biên bản lô</b></td><td>dữ liệu · có mã · khởi bởi S3</td><td class="mono">w3</td><td class="mono">—</td><td>QĐ-ITL-112 · man_f04.js</td></tr>
-<tr><td><b>GHI tay — một giao dịch</b></td><td>xử lý · có mã · khởi bởi S5</td><td class="mono">—</td><td class="mono">s4</td><td>fls/repo/ghi_tay.py</td></tr>
+<tr class="chon" data-ref="h:S4" data-comment-target tabindex="0"><td><b>S4 · NHẬN</b></td><td>khởi động · có mã</td><td class="mono">—</td><td class="mono">—</td><td>POST /nap/lo</td></tr>
+<tr class="chon" data-ref="h:S5" data-comment-target tabindex="0"><td><b>S5 · GHÉP·SỬA</b></td><td>khởi động · có mã</td><td class="mono">—</td><td class="mono">—</td><td>POST match · adjust · reverse · …</td></tr>
+<tr class="chon" data-ref="h:ghiNap" data-comment-target tabindex="0"><td><b>GHI lượt nạp — một giao dịch</b></td><td>xử lý · có mã · khởi bởi S4</td><td class="mono">w1 w2</td><td class="mono">s1 s2 s3</td><td>chay_nap.py:621 `with conn.transaction()`</td></tr>
+<tr class="chon" data-ref="h:bienban" data-comment-target tabindex="0"><td><b>biên bản lô</b></td><td>dữ liệu · có mã · khởi bởi S3</td><td class="mono">w3</td><td class="mono">—</td><td>QĐ-ITL-112 · man_f04.js</td></tr>
+<tr class="chon" data-ref="h:ghiTay" data-comment-target tabindex="0"><td><b>GHI tay — một giao dịch</b></td><td>xử lý · có mã · khởi bởi S5</td><td class="mono">—</td><td class="mono">s4</td><td>fls/repo/ghi_tay.py</td></tr>
 <tr class="b1"><th colspan="5">FLS · SỔ</th></tr>
 <tr class="b2"><th colspan="5">⑤ SỔ GỐC</th></tr>
-<tr><td><b>dòng bị loại</b></td><td>dữ liệu · có mã</td><td class="mono">s1</td><td class="mono">h1</td><td>schema.py fls_reject</td></tr>
-<tr><td><b>SỔ ITL</b></td><td>dữ liệu · có mã</td><td class="mono">s2</td><td class="mono">h2</td><td>schema.py fls_itl · INV-I08 · source_system khai 4 giá trị</td></tr>
-<tr><td><b>lớp sửa chỉ-thêm (gộp vẽ)</b></td><td>dữ liệu · có mã</td><td class="mono">s3 s4</td><td class="mono">h3</td><td>fls_pm_link · fls_pm_unlink · fls_adjustment · fls_queue_event · fls_journal</td></tr>
+<tr class="chon" data-ref="h:loai" data-comment-target tabindex="0"><td><b>dòng bị loại</b></td><td>dữ liệu · có mã</td><td class="mono">s1</td><td class="mono">h1</td><td>schema.py fls_reject</td></tr>
+<tr class="chon" data-ref="h:soITL" data-comment-target tabindex="0"><td><b>SỔ ITL</b></td><td>dữ liệu · có mã</td><td class="mono">s2</td><td class="mono">h2</td><td>schema.py fls_itl · INV-I08 · source_system khai 4 giá trị</td></tr>
+<tr class="chon" data-ref="h:lopSua" data-comment-target tabindex="0"><td><b>lớp sửa chỉ-thêm (gộp vẽ)</b></td><td>dữ liệu · có mã</td><td class="mono">s3 s4</td><td class="mono">h3</td><td>fls_pm_link · fls_pm_unlink · fls_adjustment · fls_queue_event · fls_journal</td></tr>
 <tr class="b2"><th colspan="5">⑥ HIỆU LỰC</th></tr>
-<tr><td><b>KIỂM cổng GĐ1</b></td><td>xử lý · GĐ1 dựng</td><td class="mono">h1 h4</td><td class="mono">v1</td><td>/gates có 8 cổng · cổng GĐ1 (§3 nhóm 5): chưa</td></tr>
-<tr><td><b>SỔ ITL HIỆU LỰC — bảng ITL duy nhất của GĐ1</b></td><td>dữ liệu · GĐ1 dựng</td><td class="mono">h2 h3</td><td class="mono">h4 v2 v3 v4</td><td>fls/repo/doc_bao_cao.py · view fls_sua_tay / fls_may_goi_y / fls_moi_noi …</td></tr>
+<tr class="chon" data-ref="h:kiem" data-comment-target tabindex="0"><td><b>KIỂM cổng GĐ1</b></td><td>xử lý · GĐ1 phải dựng</td><td class="mono">h1 h4</td><td class="mono">v1</td><td>/gates có 8 cổng · cổng GĐ1 (§3 nhóm 5): chưa</td></tr>
+<tr class="chon" data-ref="h:hieuLuc" data-comment-target tabindex="0"><td><b>SỔ ITL HIỆU LỰC — bảng ITL duy nhất của GĐ1</b></td><td>dữ liệu · GĐ1 phải dựng</td><td class="mono">h2 h3</td><td class="mono">h4 v2 v3 v4</td><td>fls/repo/doc_bao_cao.py · view fls_sua_tay / fls_may_goi_y / fls_moi_noi …</td></tr>
 <tr class="b1"><th colspan="5">ĐẦU RA</th></tr>
-<tr><td><b>màn F03 · cổng</b></td><td>dữ liệu · có mã</td><td class="mono">v1</td><td class="mono">—</td><td>fls/web/tep/man_f03.js</td></tr>
-<tr><td><b>màn F01 · hàng chờ</b></td><td>dữ liệu · có mã</td><td class="mono">v2</td><td class="mono">—</td><td>fls/web/tep/man_f01*.js</td></tr>
-<tr><td><b>màn F02 · sổ ITL</b></td><td>dữ liệu · có mã</td><td class="mono">v3</td><td class="mono">—</td><td>fls/web/tep/man_f02.js</td></tr>
-<tr><td><b>XUẤT cho hệ khác</b></td><td>dữ liệu · GĐ1 dựng</td><td class="mono">v4</td><td class="mono">—</td><td>fls/xuat/ chỉ có ghi_o.py; bộ xuất: chưa có</td></tr>
+<tr class="chon" data-ref="h:f03" data-comment-target tabindex="0"><td><b>màn F03 · cổng</b></td><td>dữ liệu · có mã</td><td class="mono">v1</td><td class="mono">—</td><td>fls/web/tep/man_f03.js</td></tr>
+<tr class="chon" data-ref="h:f01" data-comment-target tabindex="0"><td><b>màn F01 · hàng chờ</b></td><td>dữ liệu · có mã</td><td class="mono">v2</td><td class="mono">—</td><td>fls/web/tep/man_f01*.js</td></tr>
+<tr class="chon" data-ref="h:f02" data-comment-target tabindex="0"><td><b>màn F02 · sổ ITL</b></td><td>dữ liệu · có mã</td><td class="mono">v3</td><td class="mono">—</td><td>fls/web/tep/man_f02.js</td></tr>
+<tr class="chon" data-ref="h:xuat" data-comment-target tabindex="0"><td><b>XUẤT cho hệ khác</b></td><td>dữ liệu · GĐ1 phải dựng</td><td class="mono">v4</td><td class="mono">—</td><td>fls/xuat/ chỉ có ghi_o.py; bộ xuất: chưa có</td></tr>
 </tbody></table></div>
 
-<h2>§5 · Hợp đồng dữ liệu FPS → FLS — trường nào phải sang</h2>
-<p>Trường cần có lấy từ các nhóm khoá của bản gốc. "Ở FPS" = đã thấy trong code FPS theo tài liệu đối chiếu (<code>FLS-vs-FPS-Compare-Audit.md</code> §3–§4, <code>FLS-ERD-Full-Detail.md</code> §0.4); "hỏi FPS" = chưa thấy, phải xác nhận hoặc mở CR.</p>
+<h2>§5 · Hợp đồng dữ liệu sổ cái PM / PC → FLS</h2>
+<p>Trường cần có lấy từ các nhóm khoá của bản gốc. Cột <i>sổ PM hôm nay</i> đối chiếu với <b>28 cột</b> FLS đang đọc từ sổ PM qua Sheets (<code>fls/adapters/pm_join.py</code>: 14 cột đã đặt kiểu · 1 cột cấm · 13 cột còn thô). "Cần xác nhận" = sổ PM hôm nay chưa có cột ấy; theo owner sổ cái FPS có đủ, cần FPS cho tên cột.</p>
 <div class="scroll"><table>
-<thead><tr><th colspan="2" class="sup">FPS</th><th colspan="2" class="sup">Hợp đồng</th><th colspan="2" class="sup">FLS</th></tr>
-<tr><th>thực thể</th><th>mức</th><th>trường cần sang</th><th>thoả nhóm khoá</th><th>đích trong FLS</th><th>ở FPS?</th></tr></thead>
+<thead><tr><th colspan="2" class="sup">Hợp đồng</th><th class="sup">FLS</th><th colspan="2" class="sup">Đối chiếu</th></tr>
+<tr><th>trường</th><th>nhóm khoá</th><th>đích trong FLS</th><th>sổ PM hôm nay</th><th>sổ PC</th></tr></thead>
 <tbody>
-<tr class="b1"><th colspan="6">PE — dự toán</th></tr>
-<tr><td><code>fps_pe_slip</code></td><td>slip</td><td><code>pe_id</code> · <code>cdt_code</code> · <code>vendor_id</code> (đối tác nhận) · loại chi (đơn lẻ / tạm ứng) · ngày duyệt · <code>service_start/end_date</code> · trạng thái</td><td>khoá PE: CDT · Vendor · Singular/Advance · Action Date</td><td>ảnh FPS → chuỗi phiếu: CDT1 · đối tác · kỳ dịch vụ (nhánh PE)</td><td>cdt_code · service dates: <b>ở FPS</b> · loại chi, ngày duyệt: <b>hỏi FPS</b></td></tr>
-<tr><td><code>fps_pe_line</code></td><td>line</td><td><code>line_id</code> · <code>pe_id</code> · <code>bgc_code</code> · <code>kr_code</code> · <code>amount</code> · <code>pe_date</code></td><td>khoá PE: Budget / KRF / HD</td><td>chuỗi phiếu: HD/KRF · Budget Code</td><td><b>ở FPS</b> · tiền tệ của line: <b>hỏi FPS</b></td></tr>
-<tr class="b1"><th colspan="6">PI — hoá đơn</th></tr>
-<tr><td><code>fps_pi_slip</code></td><td>slip</td><td><code>pi_id</code> · số hoá đơn · tệp hoá đơn (đường dẫn) · <code>service_start/end_date</code> · ghi chú</td><td>khoá PI: Invoice</td><td>chuỗi phiếu: hoá đơn · kỳ dịch vụ (nhánh PI) · ghi chú</td><td>service dates: <b>ở FPS</b> · số hoá đơn, tệp: <b>hỏi FPS</b></td></tr>
-<tr><td><code>fps_pi_line</code></td><td>line</td><td><code>line_id</code> · <code>pi_id</code> · <code>pe_line_id</code> · <code>amount</code></td><td>khoá PI: PE ID</td><td>chuỗi PI → PE</td><td><code>pe_line_id</code> trên PI line: <b>hỏi FPS</b></td></tr>
-<tr class="b1"><th colspan="6">PM — lệnh chi (mắt xích nối với tiền)</th></tr>
-<tr><td><code>fps_pm_slip</code></td><td>slip</td><td><code>pm_id</code> · <b><code>reference_number</code></b> · <b><code>payer_id</code></b> · <code>bank_account_id</code> · loại giao dịch · <code>service_start/end_date</code> · trạng thái cuối</td><td>Reference No · General Trustest (LE trả)</td><td>ghép (c3) · <code>le_payer</code></td><td><b>ở FPS</b> (slip)</td></tr>
-<tr><td><code>fps_pm_line</code></td><td>line</td><td><code>line_id</code> · <code>pm_id</code> · <b><code>pi_line_id</code></b> · <code>amount</code> · tiền tệ · <code>pm_date</code></td><td>khoá PM: PI ID · PE ID · Tiền · Tiền tệ</td><td><code>fls_pm_line</code> → mối nối</td><td>line_id · pm_id · pi_line_id · amount · pm_date: <b>ở FPS</b> · tiền tệ line, <code>pe_line_id</code> trực tiếp: <b>hỏi FPS</b></td></tr>
-<tr class="b1"><th colspan="6">PC — quyết toán</th></tr>
-<tr><td><code>fps_pc_slip</code> · <code>fps_pc_line</code></td><td>slip + line</td><td><code>pc_id</code> · <code>line_id</code> · phiếu gốc · <code>amount</code> · ngày</td><td>nhóm khoá PC: bản gốc để trống ⇒ GĐ1 chỉ chụp</td><td>ảnh FPS; chưa vào canon</td><td>bảng: <b>ở FPS</b> · cột: <b>hỏi FPS</b></td></tr>
-<tr class="b1"><th colspan="6">Danh mục — nguồn của tên, hiệu lực và pháp nhân</th></tr>
-<tr><td><code>fps_le</code></td><td>danh mục</td><td><code>le_code</code> · <code>le_name</code> · <code>country</code> · <code>is_active</code></td><td>General Trustest: LE</td><td><code>fls_le</code> (thay bản suy từ giá trị, hết 24/29 thiếu tên)</td><td><b>ở FPS</b>; <code>is_entity</code> là CR</td></tr>
-<tr><td><code>fps_bank_account</code></td><td>danh mục</td><td><code>bank_account_id</code> · số TK · ngân hàng · tiền tệ · <b>pháp nhân chủ TK</b></td><td>General Trustest: LE qua TK</td><td>k1: đề xuất pháp nhân TK cho bản khai nguồn</td><td>bảng: <b>ở FPS</b> · cột chủ TK: <b>hỏi FPS</b> / CR</td></tr>
-<tr><td><code>fps_ven</code> (+ khối đối tác)</td><td>danh mục</td><td><code>vendor_id</code> · tên · khối · <b>đối tác nào là pháp nhân Apero</b></td><td>khoá PE: Vendor</td><td>đối tác · <code>le</code> (pháp nhân nhận)</td><td>vendor: <b>ở FPS</b> · luật vendor ↔ pháp nhân: ở FPS, <b>hỏi FPS</b></td></tr>
-<tr><td><code>fps_cdt</code> · <code>fps_kr</code> · <code>fps_bgc</code></td><td>danh mục</td><td>mã · tên · cha · hiệu lực</td><td>CDT · khoá PE</td><td>tên cho chuỗi phiếu</td><td><b>ở FPS</b></td></tr>
-<tr><td><code>fps_exchange_rate</code></td><td>danh mục</td><td>tiền tệ từ / tới · tỷ giá · ngày hiệu lực</td><td>(GĐ2)</td><td>chụp sẵn; GĐ1 không quy đổi</td><td><b>ở FPS</b></td></tr>
+<tr class="b1"><th colspan="5">Tiền và tham chiếu</th></tr>
+<tr><td>số tiền · tiền tệ của line</td><td>General Trustest</td><td>ghép: Σ line = tiền dòng (g1)</td><td><span class="pill ok">có kiểu · cột 9, 8</span></td><td><span class="pill no">cần xác nhận</span></td></tr>
+<tr><td>Reference No</td><td>Statement Ref No</td><td>khoá ghép tiền ↔ lệnh chi (c3)</td><td><span class="pill ok">có kiểu · cột 25</span></td><td><span class="pill ext">không cần</span></td></tr>
+<tr><td>ngân hàng · số TK chi</td><td>General Trustest (LE qua TK)</td><td>k1: đề xuất pháp nhân TK</td><td><span class="pill mid">thô</span></td><td><span class="pill ext">không cần</span></td></tr>
+<tr><td>ngày thực chi</td><td>General Trustest</td><td>đối chiếu ngày với sao kê</td><td><span class="pill no">cần xác nhận</span> (chỉ có dấu thời điểm lập)</td><td><span class="pill no">cần xác nhận</span></td></tr>
+<tr class="b1"><th colspan="5">Khoá chuỗi</th></tr>
+<tr><td>ID PM slip · ID PM line</td><td>khoá PM</td><td><code>pm_line_id</code> của mối nối</td><td><span class="pill ok">có kiểu · cột 15, 16</span></td><td>PM gốc: <span class="pill no">cần xác nhận</span></td></tr>
+<tr><td>ID PE slip · ID PE line (+ tạm ứng / gấp)</td><td>khoá PE</td><td>chiều lệnh chi</td><td><span class="pill ok">có kiểu · cột 17, 18, 3, 4</span></td><td>PE gốc: <span class="pill no">cần xác nhận</span></td></tr>
+<tr><td>ID PI slip · ID PI line</td><td>khoá PI</td><td>chiều lệnh chi</td><td><span class="pill ok">có kiểu · cột 19, 20</span></td><td><span class="pill ext">không cần</span></td></tr>
+<tr><td>ID PC slip · ID PC line</td><td>khoá PC</td><td><code>pc_line_id</code></td><td><span class="pill ext">không có</span></td><td><span class="pill no">cần xác nhận</span></td></tr>
+<tr class="b1"><th colspan="5">Chiều chi phí</th></tr>
+<tr><td>Budget Code (HD/KRF)</td><td>khoá PE: Budget/KRF/HD</td><td><code>hd</code> (máy gợi ý → người chốt)</td><td><span class="pill ok">có kiểu · cột 21</span></td><td><span class="pill no">cần xác nhận</span></td></tr>
+<tr><td>Chủ dự toán CDT1</td><td>CDT</td><td><code>cdt1</code></td><td><span class="pill ok">có kiểu · cột 22</span> (+ biến thể "Chủ dự toán *" còn thô)</td><td><span class="pill no">cần xác nhận</span></td></tr>
+<tr><td>loại giao dịch (Payment Type)</td><td>khoá PE: Singular/Advance</td><td><code>pay_type</code></td><td><span class="pill mid">thô</span></td><td><span class="pill ext">không cần</span></td></tr>
+<tr class="b1"><th colspan="5">Pháp nhân và đối tác</th></tr>
+<tr><td>pháp nhân thanh toán</td><td>General Trustest: LE</td><td><code>le_payer</code></td><td><span class="pill mid">thô · đầy 100%</span></td><td><span class="pill no">cần xác nhận</span></td></tr>
+<tr><td>đối tác nhận (ID Payee) + đối tác có phải pháp nhân Apero</td><td>khoá PE: Vendor ID</td><td><code>id_payee</code> · <code>le</code> (pháp nhân nhận)</td><td><span class="pill no">cần xác nhận</span> (hôm nay ở PE, 95%)</td><td><span class="pill ext">không cần</span></td></tr>
+<tr><td>tên TK nhận</td><td>—</td><td>giữ trong kho, không đưa lên bề mặt (owner 11/09)</td><td><span class="pill mid">thô</span></td><td><span class="pill ext">không cần</span></td></tr>
+<tr><td>email người lập</td><td>—</td><td><b>cấm vào kho</b> (<code>PM_COT_RIENG_TU</code>)</td><td><span class="pill ext">có, bị chặn</span></td><td>—</td></tr>
+<tr class="b1"><th colspan="5">Kỳ và trạng thái</th></tr>
+<tr><td>trạng thái cuối</td><td>—</td><td>chỉ đọc dòng đã duyệt</td><td><span class="pill ok">có kiểu · cột 24</span></td><td><span class="pill no">cần xác nhận</span></td></tr>
+<tr><td>kỳ dịch vụ: bắt đầu · kết thúc</td><td>khoá PI / PE</td><td><code>svc_start</code> · <code>svc_end</code></td><td><span class="pill no">cần xác nhận</span> (hôm nay ở PI)</td><td><span class="pill ext">không cần</span></td></tr>
 </tbody></table></div>
-<p class="note"><b>Ba điểm phải chốt với FPS trước khi viết bộ đọc:</b> ① Reference No nằm ở <b>PM slip</b>, không ở line ⇒ FLS chia tiền theo line và đòi Σ line = tiền dòng. ② Kỳ dịch vụ nằm ở <b>slip</b> của PE/PI/PM ⇒ hai nhánh kỳ dịch vụ đều đọc từ slip. ③ CDT gốc ở <b>PE slip</b> ⇒ CDT1 lấy qua chuỗi PM → PI → PE, không lấy ở PM.</p>
+<p class="note"><b>Ba cột phải hỏi FPS trước khi viết bộ đọc:</b> ① <b>đối tác nhận</b> và cờ "đối tác là pháp nhân Apero": thiếu thì <code>le</code> rỗng và cờ nội bộ không bao giờ bật. ② <b>kỳ dịch vụ</b>: thiếu thì sai kỳ ghi nhận P&amp;L. ③ <b>khoá gốc của dòng PC</b> (PM hay PE): thiếu thì quyết toán không nối được về lệnh chi.</p>
 
 <h2>§6 · Thứ tự làm trong GĐ1 — theo mũi tên</h2>
 <div class="scroll"><table>
@@ -572,8 +743,8 @@ footer{margin-top:48px;color:var(--muted);font-size:12.5px;border-top:1px solid 
 <tr class="b1"><th colspan="4">Chặng I · Đóng họ tiền trên sổ đang có (bước 1–2)</th></tr>
 <tr><td>1</td><td>k1 · b2 · cột pháp nhân TK trong bản khai nguồn</td><td>Rẻ nhất: tách tài khoản ra pháp nhân đã đo 8.387/8.387 trên 49 nguồn; đổi ngay chiều pháp nhân của sổ đang có</td><td>pháp nhân TK rỗng = 0 hoặc danh sách có tên TK, owner ký (14 TK · 211 dòng)</td></tr>
 <tr><td>2</td><td>x4 · b3 cho lằn Cash</td><td>Cùng bộ đọc với sao kê, chỉ bật lằn và khuôn quỹ</td><td>số dòng = sổ quỹ từng quỹ · nạp lại = 0 trùng · số dư theo ngày khớp</td></tr>
-<tr class="b1"><th colspan="4">Chặng II · Mở họ phiếu và chi phí (bước 3–5)</th></tr>
-<tr><td>3</td><td>x1 · x2 · b1 · g1 (FPS 4 phiếu + danh mục)</td><td>Hợp đồng §5 chốt trước; ảnh FPS dùng lại lằn ảnh chụp, không dựng hệ thứ hai</td><td>0 khoá phiếu trỏ rỗng · chiều phiếu khớp sổ đang chạy 100% từng ô</td></tr>
+<tr class="b1"><th colspan="4">Chặng II · Mở họ lệnh chi và chi phí (bước 3–5)</th></tr>
+<tr><td>3</td><td>x1 · x2 · b1 · g1 (sổ cái PM + PC)</td><td>Hợp đồng §5 chốt trước; đặt kiểu 13 cột PM còn thô; ảnh sổ cái dùng lại lằn ảnh chụp, không dựng hệ thứ hai</td><td>0 khoá lệnh chi trỏ rỗng · chiều lệnh chi khớp sổ đang chạy 100% từng ô</td></tr>
 <tr><td>4</td><td>x5 · b4 · g4 (HR)</td><td>HR đã tách HD/KRF ở nguồn ⇒ không phân bổ; chỉ đọc đầu ra, không mở hộp đen lương</td><td>Σ từng sổ từng năm = nguồn · 0 dòng thiếu HD</td></tr>
 <tr><td>5</td><td>x6 · b4 · g4 (nền tảng SC · PS)</td><td>Chờ owner chốt phạm vi (câu 5)</td><td>số dòng = sổ nguồn</td></tr>
 <tr class="b1"><th colspan="4">Chặng III · Chứng minh một bảng (bước 6–7)</th></tr>
@@ -585,12 +756,190 @@ footer{margin-top:48px;color:var(--muted);font-size:12.5px;border-top:1px solid 
 <div class="scroll"><table>
 <thead><tr><th>#</th><th>câu</th><th>vì sao phải hỏi</th><th>chặn</th></tr></thead>
 <tbody>
-<tr><td>1</td><td><b><code>le</code> nghĩa là gì?</b> Đề xuất: tách ba vai thành ba trường — pháp nhân TK (mới, từ bản khai) · <code>le_payer</code> (PM) · <code>le</code> = pháp nhân nhận (PE). "Chi phí về pháp nhân" ở GĐ1 = pháp nhân TK.</td><td>Hai tài liệu nói khác nhau: <code>00_MASTER_INDEX</code> (<code>QĐ-ITL-144</code>) ghi <code>le</code> "suy được 100% từ <code>source_sheet</code>" (tức chủ TK); <code>05_DATA_DICTIONARY_ERD</code> §ⓑ ghi <code>le</code> = "ai nhận" ← đối tác của PE</td><td>bước 1</td></tr>
-<tr><td>2</td><td>Pháp nhân TK nằm trong <b>bản khai nguồn</b> (máy đề xuất, kế toán khai, owner ký) — đồng ý?</td><td>14 TK · 211 dòng có tên TK không nói pháp nhân; hai bên còn gọi một pháp nhân bằng hai mã (<code>VVOH - Astronex</code> ↔ <code>ASTRONEX</code>)</td><td>bước 1</td></tr>
-<tr><td>3</td><td>FPS cấp <b>kết nối CSDL chỉ-đọc</b> (vai đọc riêng) hay <b>xuất bảng định kỳ</b>?</td><td>Quyết định tuyến của x1/x2; hôm nay PM đi qua Sheets</td><td>bước 3</td></tr>
+<tr><td>1</td><td><b><code>le</code> nghĩa là gì?</b> Đề xuất: tách ba vai thành ba trường — pháp nhân TK (mới, từ bản khai) · <code>le_payer</code> (sổ cái PM) · <code>le</code> = pháp nhân nhận. "Chi phí về pháp nhân" ở GĐ1 = pháp nhân TK.</td><td>Hai tài liệu nói khác nhau: <code>00_MASTER_INDEX</code> (<code>QĐ-ITL-144</code>) ghi <code>le</code> "suy được 100% từ <code>source_sheet</code>" (tức chủ TK); <code>05_DATA_DICTIONARY_ERD</code> §ⓑ ghi <code>le</code> = "ai nhận" ← đối tác</td><td>bước 1</td></tr>
+<tr><td>2</td><td>Pháp nhân TK nằm trong <b>bản khai nguồn</b> (máy đề xuất, kế toán khai, owner ký) — đồng ý? Tên pháp nhân chuẩn lấy từ đâu?</td><td>14 TK · 211 dòng có tên TK không nói pháp nhân; hai bên còn gọi một pháp nhân bằng hai mã (<code>VVOH - Astronex</code> ↔ <code>ASTRONEX</code>); 24/29 mã thiếu tên</td><td>bước 1</td></tr>
+<tr><td>3</td><td>FPS cấp sổ cái PM / PC qua <b>kết nối CSDL chỉ-đọc</b> hay <b>xuất bảng định kỳ</b>? Và ba cột ở cuối §5 có trong sổ cái không?</td><td>Quyết định tuyến của x1/x2 và việc chiều lệnh chi có đủ không; hôm nay sổ PM đi qua Sheets</td><td>bước 3</td></tr>
 <tr><td>4</td><td>HR và nền tảng: FLS đọc sổ ở Sheets như hôm nay, hay chờ hệ nguồn có hợp đồng?</td><td>Quyết định tuyến của x5/x6</td><td>bước 4–5</td></tr>
 <tr><td>5</td><td>GI/OMC không vào sổ (là khoá phân bổ, dùng ở GĐ3)? AP/AR lùi khỏi GĐ1?</td><td>Phạm vi họ "Platform" của sổ</td><td>bước 5</td></tr>
 </tbody></table></div>
 
-<footer>Voi FLS-tobe-phase1 v0.2 · 2026-11-03 · sinh bởi <code>docs/ITL/_tools/sinh_voi_phase1.py</code> · cùng bộ với <code>_PD_NOW_VOI_VA_GIAI_DOAN.md</code>. Trang tự chứa, chỉ gọi mạng cho font.</footer>
-</main></body></html>
+<footer>Voi FLS-tobe-phase1 v0.3 · 2026-11-04 · sinh bởi <code>docs/ITL/_tools/sinh_voi_phase1.py</code> · cùng bộ với <code>_PD_NOW_VOI_VA_GIAI_DOAN.md</code>.</footer>
+</main>
+<aside class="khung-ct" id="khung-ct" hidden aria-label="Chi tiết phần đang chọn">
+  <div class="dong"><span class="eb" style="font:600 11px var(--mono);letter-spacing:.06em;color:var(--muted)">CHI TIẾT</span><button class="dong-x" id="nut-dong" type="button" aria-label="Đóng khung chi tiết">×</button></div>
+  <div id="ct-noi-dung"></div>
+</aside>
+
+<script type="application/json" id="du-lieu">{"hop": {"oPM": {"ten": "LẬP & DUYỆT PM", "loai": "khởi động", "tt": "b", "dong": ["lệnh chi trong FPS"], "mono": "", "huy": [], "dc": "ngoài FLS — FLS chỉ đọc dòng đã vào sổ cái", "vung": "Nguồn ngoài · FPS", "dai": "ai sinh ra", "vao": [], "ra": ["o1"]}, "oPC": {"ten": "LẬP & DUYỆT PC", "loai": "khởi động", "tt": "b", "dong": ["quyết toán trong FPS"], "mono": "", "huy": [], "dc": "ngoài FLS", "vung": "Nguồn ngoài · FPS", "dai": "ai sinh ra", "vao": [], "ra": ["o2"]}, "soPM": {"ten": "sổ cái PM", "loai": "nguồn ngoài", "tt": "b", "dong": ["1 dòng = 1 PM line", "PE·PI · HD · CDT1 · Ref No"], "mono": "28 cột · 3.772 dòng", "huy": [], "dc": "AS-IS đọc qua tab PM_Unpivot: 28 cột có tên (pm_join.py, G-MOD-3) — 14 có kiểu · 1 cấm · 13 thô", "vung": "Nguồn ngoài · FPS", "dai": "sổ nguồn", "vao": ["o1"], "ra": ["x1"]}, "soPC": {"ten": "sổ cái PC", "loai": "nguồn ngoài", "tt": "b", "dong": ["1 dòng = 1 PC line", "quyết toán · hoàn ứng"], "mono": "AS-IS: chưa đọc", "huy": [], "dc": "0 tham chiếu PC trong fls/ · tools/ · tests/", "vung": "Nguồn ngoài · FPS", "dai": "sổ nguồn", "vao": ["o2"], "ra": ["x2"]}, "oKT": {"ten": "KẾ TOÁN", "loai": "khởi động", "tt": "b", "dong": ["dán sao kê vào sheet R | · ghi sổ quỹ"], "mono": "", "huy": [], "dc": "ngoài FLS — 68 dòng chảy có bản khai dòng 1", "vung": "Nguồn ngoài · Google Sheets", "dai": "ai sinh ra", "vao": [], "ra": ["o3", "o4"]}, "oHR": {"ten": "HR · C&B", "loai": "khởi động", "tt": "b", "dong": ["lập sổ lương"], "mono": "", "huy": [], "dc": "ngoài FLS", "vung": "Nguồn ngoài · Google Sheets", "dai": "ai sinh ra", "vao": [], "ra": ["o5"]}, "oNT": {"ten": "CHỦ SỔ NỀN TẢNG", "loai": "khởi động", "tt": "b", "dong": ["dịch vụ · thanh toán"], "mono": "", "huy": [], "dc": "ngoài FLS", "vung": "Nguồn ngoài · Google Sheets", "dai": "ai sinh ra", "vao": [], "ra": ["o6"]}, "saoke": {"ten": "sao kê ngân hàng", "loai": "nguồn ngoài", "tt": "b", "dong": ["60 dòng chảy", "19 bố cục cột"], "mono": "sheet R |", "huy": [], "dc": "tools/nap_nguon_va_khai.py (60 ngân hàng + 8 quỹ = 68 nguồn)", "vung": "Nguồn ngoài · Google Sheets", "dai": "sổ nguồn", "vao": ["o3"], "ra": ["x3"]}, "soquy": {"ten": "sổ quỹ", "loai": "nguồn ngoài", "tt": "b", "dong": ["8 dòng chảy", "kế toán ghi tay"], "mono": "sheet R |", "huy": [], "dc": "như trên", "vung": "Nguồn ngoài · Google Sheets", "dai": "sổ nguồn", "vao": ["o4"], "ra": ["x4"]}, "soluong": {"ten": "sổ lương HR", "loai": "nguồn ngoài", "tt": "b", "dong": ["4 sổ: 2 loại × 2 năm", "HD/KRF tách sẵn"], "mono": "sheet HR", "huy": [], "dc": "0 tham chiếu trong fls/ (chỉ chuỗi phương pháp ở mapping_master.py:31)", "vung": "Nguồn ngoài · Google Sheets", "dai": "sổ nguồn", "vao": ["o5"], "ra": ["x5"]}, "sont": {"ten": "sổ nền tảng", "loai": "nguồn ngoài", "tt": "b", "dong": ["chi phí dịch vụ (SC)", "thanh toán (PS)"], "mono": "file RAW", "huy": [], "dc": "0 tham chiếu trong fls/ (Platform chỉ là enum)", "vung": "Nguồn ngoài · Google Sheets", "dai": "sổ nguồn", "vao": ["o6"], "ra": ["x6"]}, "S1": {"ten": "S1 · NHỊP", "loai": "khởi động", "tt": "b", "dong": ["mỗi giờ 8h–19h"], "mono": "", "huy": [], "dc": "fls/repo/nhip_chup.py (QĐ-ITL-114) · tools/nhip_chup.py chụp Bank + PM", "vung": "FLS · NẠP", "dai": "① KHAI & CHỤP", "vao": [], "ra": []}, "S2": {"ten": "S2 · KHAI", "loai": "khởi động", "tt": "b", "dong": ["kế toán · F04"], "mono": "", "huy": [], "dc": "POST khai-cot · thu-tu (fls/api)", "vung": "FLS · NẠP", "dai": "① KHAI & CHỤP", "vao": [], "ra": []}, "anhFPS": {"ten": "ảnh sổ cái FPS", "loai": "dữ liệu", "tt": "q", "dong": ["PM + PC, đóng băng mỗi lần chụp", "hôm nay: chỉ PM, đọc qua Sheets"], "mono": "fls_pm_line 3.772 · PC chưa có", "huy": ["S1"], "dc": "fls_pm_line (migration 0011/0023) · fls/repo/anh_pm.py; PC: chưa có bảng", "vung": "FLS · NẠP", "dai": "① KHAI & CHỤP", "vao": ["x1", "x2"], "ra": ["k1", "b1"]}, "khai": {"ten": "bản khai nguồn", "loai": "dữ liệu", "tt": "b", "dong": ["cột · thứ tự ngày", "+ pháp nhân: đề xuất"], "mono": "fls_khai_cot 408", "huy": ["S2"], "dc": "fls/repo/khai_cot.py (chỉ-thêm, có version); cột pháp nhân: chưa có", "vung": "FLS · NẠP", "dai": "① KHAI & CHỤP", "vao": ["k1"], "ra": ["k2", "b2"]}, "anhSo": {"ten": "ảnh sổ nhập tay", "loai": "dữ liệu", "tt": "b", "dong": ["lằn Bank ✅ 60 nguồn · 182 ảnh  ·  Cash ⛔  ·  HR ⛔  ·  Platform ⛔", "đọc vùng chuẩn THEO bản khai, ghi khai_version · không đọc Diễn giải"], "mono": "fls_chup · fls_chup_nguon · fls_chup_dong", "huy": ["S1"], "dc": "tools/chup_sao_ke.py (LAN='Bank') · fls/repo/chup.py:16 khai_version", "vung": "FLS · NẠP", "dai": "① KHAI & CHỤP", "vao": ["x3", "x4", "x5", "x6", "k2"], "ra": ["b3", "b4"]}, "S3": {"ten": "S3 · XEM LÔ", "loai": "khởi động", "tt": "b", "dong": ["kế toán chọn lô", "màn F04"], "mono": "", "huy": [], "dc": "POST /nap/lo/xem-truoc", "vung": "FLS · NẠP", "dai": "② DỰNG", "vao": [], "ra": []}, "dLenh": {"ten": "DỰNG dòng lệnh", "loai": "xử lý", "tt": "q", "dong": ["mỗi PM / PC line → tiền · Ref · HD/KRF", "· CDT1 · đối tác · kỳ DV · pháp nhân trả"], "mono": "khoá: pm_line_id · pc_line_id", "huy": ["S3", "S4"], "dc": "có một phần: fls_pm_line đặt kiểu 14 cột (PM_COT); PC + cột còn thô: chưa", "vung": "FLS · NẠP", "dai": "② DỰNG", "vao": ["b1"], "ra": ["g1"]}, "dTien": {"ten": "DỰNG dòng tiền", "loai": "xử lý", "tt": "b", "dong": ["ảnh lằn Bank · Cash → canon 36 trường (General Trustest + TK)", "gắn pháp nhân TK từ bản khai của nguồn · content_key chống trùng"], "mono": "bank 8.338/8.338 · quỹ chưa chạy · pháp nhân: chưa", "huy": ["S3", "S4"], "dc": "fls/adapters/sao_ke.py + sao_ke_canon.py", "vung": "FLS · NẠP", "dai": "② DỰNG", "vao": ["b2", "b3"], "ra": ["g2", "g3"]}, "dChiPhi": {"ten": "DỰNG dòng chi phí", "loai": "xử lý", "tt": "q", "dong": ["ảnh lằn HR · Platform → canon", "giữ HD/KRF + pháp nhân của sổ"], "mono": "không phân bổ lại", "huy": ["S3", "S4"], "dc": "chưa có (adapter D/E)", "vung": "FLS · NẠP", "dai": "② DỰNG", "vao": ["b4"], "ra": ["g4"]}, "ghep": {"ten": "GHÉP lệnh chi với dòng tiền", "loai": "xử lý", "tt": "b", "dong": ["Reference No → chia tiền theo PM line", "Σ line = tiền dòng, lệch ⇒ chặn · khác tiền tệ ⇒ để người"], "mono": "có: ghép theo dòng, 26,79% dòng nối", "huy": ["S4"], "dc": "fls/adapters/pm_join.py · chay_nap.py:637 chen_moi_noi", "vung": "FLS · NẠP", "dai": "③ GHÉP & SOÁT", "vao": ["g1", "g2"], "ra": ["w1"]}, "soat": {"ten": "SOÁT lô", "loai": "xử lý", "tt": "b", "dong": ["9 luật · CHẶN ⇒ nguồn bị chừa · CỜ ⇒ vẫn ghi, vào hàng chờ có lý do", "4 vế phải cân: vào = sổ + loại + rỗng + trùng"], "mono": "fls/kiem/soat_nap.py", "huy": ["S3", "S4"], "dc": "fls/kiem/soat_nap.py · chay_nap.py:611 cổng bốn đường", "vung": "FLS · NẠP", "dai": "③ GHÉP & SOÁT", "vao": ["g3", "g4"], "ra": ["w2", "w3"]}, "S4": {"ten": "S4 · NHẬN", "loai": "khởi động", "tt": "b", "dong": ["kế toán · F04"], "mono": "", "huy": [], "dc": "POST /nap/lo", "vung": "FLS · NẠP", "dai": "④ GHI", "vao": [], "ra": []}, "S5": {"ten": "S5 · GHÉP·SỬA", "loai": "khởi động", "tt": "b", "dong": ["kế toán · F01·F02"], "mono": "", "huy": [], "dc": "POST match · adjust · reverse · …", "vung": "FLS · NẠP", "dai": "④ GHI", "vao": [], "ra": []}, "ghiNap": {"ten": "GHI lượt nạp — một giao dịch", "loai": "xử lý", "tt": "b", "dong": ["run · dòng sổ · dòng loại · mối nối máy · gợi ý hd/cdt1", "lỗi giữa chừng ⇒ ⛔ không còn dòng nào đã ghi"], "mono": "fls/repo/chay_nap.py", "huy": ["S4"], "dc": "chay_nap.py:621 `with conn.transaction()`", "vung": "FLS · NẠP", "dai": "④ GHI", "vao": ["w1", "w2"], "ra": ["s1", "s2", "s3"]}, "bienban": {"ten": "biên bản lô", "loai": "dữ liệu", "tt": "b", "dong": ["9 dòng tổng", "n vào · m bị chừa"], "mono": "hiện trên F04", "huy": ["S3"], "dc": "QĐ-ITL-112 · man_f04.js", "vung": "FLS · NẠP", "dai": "④ GHI", "vao": ["w3"], "ra": []}, "ghiTay": {"ten": "GHI tay — một giao dịch", "loai": "xử lý", "tt": "b", "dong": ["ghép · bỏ ghép · sửa · đảo · lý do", "actor lấy từ thẻ đăng nhập"], "mono": "fls/repo/ghi_tay.py — chỗ ghi duy nhất", "huy": ["S5"], "dc": "fls/repo/ghi_tay.py", "vung": "FLS · NẠP", "dai": "④ GHI", "vao": [], "ra": ["s4"]}, "loai": {"ten": "dòng bị loại", "loai": "dữ liệu", "tt": "b", "dong": ["mỗi dòng một", "lý do có tên"], "mono": "fls_reject", "huy": [], "dc": "schema.py fls_reject", "vung": "FLS · SỔ", "dai": "⑤ SỔ GỐC", "vao": ["s1"], "ra": ["h1"]}, "soITL": {"ten": "SỔ ITL", "loai": "dữ liệu", "tt": "b", "dong": ["một bảng · 4 họ nguồn (Bank·Cash·HR·Platform)", "chỉ-thêm · ⛔ không PUT/DELETE"], "mono": "fls_itl 8.387 · hôm nay 1 họ nguồn", "huy": [], "dc": "schema.py fls_itl · INV-I08 · source_system khai 4 giá trị", "vung": "FLS · SỔ", "dai": "⑤ SỔ GỐC", "vao": ["s2"], "ra": ["h2"]}, "lopSua": {"ten": "lớp sửa chỉ-thêm (gộp vẽ)", "loai": "dữ liệu", "tt": "b", "dong": ["mối nối · bỏ nối · bút toán (người / máy gợi ý) · sự kiện hàng chờ · nhật ký", "sửa = thêm dòng · dòng sổ ⛔ không đổi một ô"], "mono": "fls_pm_link 2.263 · fls_adjustment 4.428 · fls_journal", "huy": [], "dc": "fls_pm_link · fls_pm_unlink · fls_adjustment · fls_queue_event · fls_journal", "vung": "FLS · SỔ", "dai": "⑤ SỔ GỐC", "vao": ["s3", "s4"], "ra": ["h3"]}, "kiem": {"ten": "KIỂM cổng GĐ1", "loai": "xử lý", "tt": "q", "dong": ["mỗi cổng khai mong"], "mono": "đỏ khi khác", "huy": [], "dc": "/gates có 8 cổng · cổng GĐ1 (§3 nhóm 5): chưa", "vung": "FLS · SỔ", "dai": "⑥ HIỆU LỰC", "vao": ["h1", "h4"], "ra": ["v1"]}, "hieuLuc": {"ten": "SỔ ITL HIỆU LỰC — bảng ITL duy nhất của GĐ1", "loai": "dữ liệu", "tt": "q", "dong": ["dòng sổ + giá trị đang hiệu lực (người › máy gợi ý › nguồn) + chiều lệnh chi + 3 vai pháp nhân"], "mono": "hôm nay: ghép tại cửa đọc (doc_bao_cao + 7 view) · GĐ1: một view có tên, đủ 4 họ", "huy": [], "dc": "fls/repo/doc_bao_cao.py · view fls_sua_tay / fls_may_goi_y / fls_moi_noi …", "vung": "FLS · SỔ", "dai": "⑥ HIỆU LỰC", "vao": ["h2", "h3"], "ra": ["h4", "v2", "v3", "v4"]}, "f03": {"ten": "màn F03 · cổng", "loai": "dữ liệu", "tt": "b", "dong": ["đạt · không đạt", "· chưa đo được"], "mono": "", "huy": [], "dc": "fls/web/tep/man_f03.js", "vung": "ĐẦU RA", "dai": "⑦ NGƯỜI THẤY", "vao": ["v1"], "ra": []}, "f01": {"ten": "màn F01 · hàng chờ", "loai": "dữ liệu", "tt": "b", "dong": ["dòng chưa ghép / chưa đủ chiều", "luôn lọc một tiền tệ"], "mono": "", "huy": [], "dc": "fls/web/tep/man_f01*.js", "vung": "ĐẦU RA", "dai": "⑦ NGƯỜI THẤY", "vao": ["v2"], "ra": []}, "f02": {"ten": "màn F02 · sổ ITL", "loai": "dữ liệu", "tt": "b", "dong": ["lưới sổ hiệu lực", "ô nào · ai nói · lúc nào"], "mono": "", "huy": [], "dc": "fls/web/tep/man_f02.js", "vung": "ĐẦU RA", "dai": "⑦ NGƯỜI THẤY", "vao": ["v3"], "ra": []}, "xuat": {"ten": "XUẤT cho hệ khác", "loai": "dữ liệu", "tt": "q", "dong": ["GĐ1: khuôn sổ đang chạy, đối chiếu từng dòng", "GĐ4: hợp đồng xuất đủ chiều"], "mono": "", "huy": [], "dc": "fls/xuat/ chỉ có ghi_o.py; bộ xuất: chưa có", "vung": "ĐẦU RA", "dai": "⑦ NGƯỜI THẤY", "vao": ["v4"], "ra": []}}, "ten": {"o1": {"tu": "oPM", "toi": "soPM", "tt": "b", "cai_gi": "PM duyệt xong thì thành dòng sổ cái PM", "khoa": "pm_line_id", "ban_so": "1 PM – n dòng", "cong": "FLS ⛔ không can thiệp luồng duyệt; chỉ đọc trạng thái cuối", "co_ma": "ngoài FLS", "nhom": "Nhóm 1 · Nguồn sinh ra (o1–o6) · FPS (o1–o2)"}, "o2": {"tu": "oPC", "toi": "soPC", "tt": "b", "cai_gi": "PC duyệt xong thì thành dòng sổ cái PC", "khoa": "pc_line_id", "ban_so": "1 PC – n dòng", "cong": "như o1", "co_ma": "ngoài FLS", "nhom": "Nhóm 1 · Nguồn sinh ra (o1–o6) · FPS (o1–o2)"}, "o3": {"tu": "oKT", "toi": "saoke", "tt": "b", "cai_gi": "dán sao kê vào vùng chuẩn của sheet R |", "khoa": "(dòng chảy, dòng)", "ban_so": "1 dòng chảy – n dòng", "cong": "bố cục cột theo bản khai dòng 1 (68/68 sheet khai đủ)", "co_ma": "ngoài FLS", "nhom": "Nhóm 1 · Nguồn sinh ra (o1–o6) · Google Sheets (o3–o6)"}, "o4": {"tu": "oKT", "toi": "soquy", "tt": "b", "cai_gi": "ghi thu chi quỹ", "khoa": "(dòng chảy quỹ, dòng)", "ban_so": "1 quỹ – n dòng", "cong": "như o3", "co_ma": "ngoài FLS", "nhom": "Nhóm 1 · Nguồn sinh ra (o1–o6) · Google Sheets (o3–o6)"}, "o5": {"tu": "oHR", "toi": "soluong", "tt": "b", "cai_gi": "lập sổ lương đã tách HD/KRF", "khoa": "(sổ, năm, dòng)", "ban_so": "1 sổ – n dòng", "cong": "bề rộng cột đổi ⇒ bộ đọc nổ, ⛔ không đoán", "co_ma": "ngoài FLS", "nhom": "Nhóm 1 · Nguồn sinh ra (o1–o6) · Google Sheets (o3–o6)"}, "o6": {"tu": "oNT", "toi": "sont", "tt": "b", "cai_gi": "ghi chi phí dịch vụ · thanh toán", "khoa": "(sổ, tháng, dòng)", "ban_so": "1 sổ – n dòng", "cong": "như o5", "co_ma": "ngoài FLS", "nhom": "Nhóm 1 · Nguồn sinh ra (o1–o6) · Google Sheets (o3–o6)"}, "x1": {"tu": "soPM", "toi": "anhFPS", "tt": "q", "cai_gi": "dòng sổ cái PM: tiền · tiền tệ · Ref · khoá PE/PI · HD · CDT1 · pháp nhân trả · trạng thái", "khoa": "pm_line_id", "ban_so": "1 lần chụp – n dòng", "cong": "bộ tiêu đề lệch hợp đồng ⇒ nổ to (như kiem_tieu_de_pm) · chụp 2 lần ⇒ 2 chup_id, ảnh cũ ⛔ không đổi · Email ⛔ không vào kho", "co_ma": "◐ có, đọc qua Sheets (3.772 dòng)", "nhom": "Nhóm 2 · Vượt ranh giới vào FLS (x1–x6) · FPS → FLS · đọc sổ cái chỉ-đọc (x1–x2)"}, "x2": {"tu": "soPC", "toi": "anhFPS", "tt": "q", "cai_gi": "dòng sổ cái PC: tiền · khoá PM/PE gốc · trạng thái", "khoa": "pc_line_id", "ban_so": "1 lần chụp – n dòng", "cong": "như x1", "co_ma": "⛔ chưa đọc", "nhom": "Nhóm 2 · Vượt ranh giới vào FLS (x1–x6) · FPS → FLS · đọc sổ cái chỉ-đọc (x1–x2)"}, "x3": {"tu": "saoke", "toi": "anhSo", "tt": "b", "cai_gi": "vùng chuẩn, 5/6 trường (⛔ không Diễn giải)", "khoa": "(nguồn, dòng) + khai_version", "ban_so": "1 nguồn – n dòng", "cong": "thiếu bản khai ⇒ nổ, nêu tên sheet · 429 ⇒ lùi rồi thử lại · nguồn 0 dòng vẫn có mặt", "co_ma": "✅ 60 nguồn · 182 ảnh", "nhom": "Nhóm 2 · Vượt ranh giới vào FLS (x1–x6) · Sheets → FLS · Sheets API · tài khoản dịch vụ, quyền chỉ-đọc (x3–x6)"}, "x4": {"tu": "soquy", "toi": "anhSo", "tt": "q", "cai_gi": "vùng chuẩn sổ quỹ", "khoa": "(nguồn, dòng)", "ban_so": "1 quỹ – n dòng", "cong": "như x3 + số dư theo ngày nếu nguồn có", "co_ma": "⛔ lằn Cash chưa bật (GAP-CANON-02)", "nhom": "Nhóm 2 · Vượt ranh giới vào FLS (x1–x6) · Sheets → FLS · Sheets API · tài khoản dịch vụ, quyền chỉ-đọc (x3–x6)"}, "x5": {"tu": "soluong", "toi": "anhSo", "tt": "q", "cai_gi": "4 sổ lương theo năm", "khoa": "(sổ, năm, dòng)", "ban_so": "1 sổ – n dòng", "cong": "Σ Nợ/Có từng sổ phải bằng sổ nguồn", "co_ma": "⛔", "nhom": "Nhóm 2 · Vượt ranh giới vào FLS (x1–x6) · Sheets → FLS · Sheets API · tài khoản dịch vụ, quyền chỉ-đọc (x3–x6)"}, "x6": {"tu": "sont", "toi": "anhSo", "tt": "q", "cai_gi": "sổ chi phí dịch vụ · sổ thanh toán", "khoa": "(sổ, tháng, dòng)", "ban_so": "1 sổ – n dòng", "cong": "như x5", "co_ma": "⛔", "nhom": "Nhóm 2 · Vượt ranh giới vào FLS (x1–x6) · Sheets → FLS · Sheets API · tài khoản dịch vụ, quyền chỉ-đọc (x3–x6)"}, "k1": {"tu": "anhFPS", "toi": "khai", "tt": "n", "cai_gi": "đề xuất pháp nhân TK: TK chi + pháp nhân thanh toán trên sổ cái PM, đếm theo nguồn", "khoa": "số TK ↔ nguồn", "ban_so": "1 nguồn – 1 pháp nhân", "cong": "máy đề xuất, kế toán khai, owner ký · nguồn có >1 pháp nhân ⇒ ⛔ không đề xuất · ⛔ không regex (14 TK · 211 dòng)", "co_ma": "⛔ đề xuất mới", "nhom": "Nhóm 3 · Khai và dựng (k1–k2 · b1–b4) · Bản khai nguồn và pháp nhân TK (k1 · k2 · b2)"}, "k2": {"tu": "khai", "toi": "anhSo", "tt": "b", "cai_gi": "bố cục cột + thứ tự ngày của từng nguồn", "khoa": "source_id + khai_version", "ban_so": "1 nguồn – 1 bản khai hiệu lực", "cong": "thiếu khai ⇒ nổ · khai sửa = version mới, bản cũ ⛔ không đổi", "co_ma": "✅ 408 dòng = 68 × 6", "nhom": "Nhóm 3 · Khai và dựng (k1–k2 · b1–b4) · Bản khai nguồn và pháp nhân TK (k1 · k2 · b2)"}, "b2": {"tu": "khai", "toi": "dTien", "tt": "n", "cai_gi": "pháp nhân TK của nguồn", "khoa": "source_id", "ban_so": "1 nguồn – n dòng tiền", "cong": "nguồn chưa khai pháp nhân ⇒ dòng vào hàng chờ 'thiếu pháp nhân', ⛔ không đoán", "co_ma": "⛔ đề xuất mới", "nhom": "Nhóm 3 · Khai và dựng (k1–k2 · b1–b4) · Bản khai nguồn và pháp nhân TK (k1 · k2 · b2)"}, "b1": {"tu": "anhFPS", "toi": "dLenh", "tt": "q", "cai_gi": "dòng sổ cái PM + PC, đủ chiều", "khoa": "pm_line_id · pc_line_id", "ban_so": "1 – 1", "cong": "cột hợp đồng rỗng ⇒ cờ có tên cột, dòng vẫn vào · 13 cột còn thô phải đặt kiểu", "co_ma": "◐ PM 14 cột có kiểu", "nhom": "Nhóm 3 · Khai và dựng (k1–k2 · b1–b4) · Đọc ảnh thành dòng (b1 · b3 · b4)"}, "b3": {"tu": "anhSo", "toi": "dTien", "tt": "b", "cai_gi": "dòng lằn Bank · Cash", "khoa": "chup_id + dòng", "ban_so": "1 – 1", "cong": "đọc từ ẢNH, ⛔ không đọc Sheets sống", "co_ma": "✅ Bank · ⛔ Cash", "nhom": "Nhóm 3 · Khai và dựng (k1–k2 · b1–b4) · Đọc ảnh thành dòng (b1 · b3 · b4)"}, "b4": {"tu": "anhSo", "toi": "dChiPhi", "tt": "q", "cai_gi": "dòng lằn HR · Platform", "khoa": "chup_id + dòng", "ban_so": "1 – 1", "cong": "dòng thiếu HD ⇒ hàng chờ (mong 0)", "co_ma": "⛔", "nhom": "Nhóm 3 · Khai và dựng (k1–k2 · b1–b4) · Đọc ảnh thành dòng (b1 · b3 · b4)"}, "g1": {"tu": "dLenh", "toi": "ghep", "tt": "q", "cai_gi": "mỗi PM line: tiền · tiền tệ · Reference No · chiều chi phí", "khoa": "pm_line_id", "ban_so": "1 – 1", "cong": "N line một phiếu nói N giá trị ⇒ 'không suy được', ⛔ không lấy dòng đầu (INV-I16)", "co_ma": "◐ có phần PM, chưa đủ chiều", "nhom": "Nhóm 4 · Ghép, soát, ghi (g1–g4 · w1–w3 · s1–s4) · Vào ghép và soát (g1–g4)"}, "g2": {"tu": "dTien", "toi": "ghep", "tt": "b", "cai_gi": "dòng tiền canon + Reference No", "khoa": "content_key", "ban_so": "1 dòng tiền – n PM line", "cong": "Σ tiền các line = tiền dòng · khác tiền tệ ⇒ để người (chờ tỷ giá, GĐ2)", "co_ma": "✅", "nhom": "Nhóm 4 · Ghép, soát, ghi (g1–g4 · w1–w3 · s1–s4) · Vào ghép và soát (g1–g4)"}, "g3": {"tu": "dTien", "toi": "soat", "tt": "b", "cai_gi": "dòng tiền canon", "khoa": "content_key", "ban_so": "1 – 1", "cong": "9 luật soát chạy theo TỪNG nguồn (⛔ nối phẳng 60 nguồn)", "co_ma": "✅", "nhom": "Nhóm 4 · Ghép, soát, ghi (g1–g4 · w1–w3 · s1–s4) · Vào ghép và soát (g1–g4)"}, "g4": {"tu": "dChiPhi", "toi": "soat", "tt": "q", "cai_gi": "dòng chi phí canon", "khoa": "content_key", "ban_so": "1 – 1", "cong": "cùng 9 luật + Σ từng sổ = nguồn", "co_ma": "⛔", "nhom": "Nhóm 4 · Ghép, soát, ghi (g1–g4 · w1–w3 · s1–s4) · Vào ghép và soát (g1–g4)"}, "w1": {"tu": "ghep", "toi": "ghiNap", "tt": "b", "cai_gi": "mối nối dự kiến (dòng, PM line, tiền chia, hình nối)", "khoa": "(content_key, pm_line_id)", "ban_so": "1 – n", "cong": "chèn SAU dòng sổ (cần itl_id) nhưng TRONG cùng giao dịch", "co_ma": "✅", "nhom": "Nhóm 4 · Ghép, soát, ghi (g1–g4 · w1–w3 · s1–s4) · Ra ghi và biên bản (w1–w3)"}, "w2": {"tu": "soat", "toi": "ghiNap", "tt": "b", "cai_gi": "dòng đạt + dòng loại + cờ", "khoa": "content_key", "ban_so": "1 – 1", "cong": "CHẶN ⇒ 0 dòng của nguồn ấy · 4 vế không cân ⇒ ⛔ không ghi gì", "co_ma": "✅", "nhom": "Nhóm 4 · Ghép, soát, ghi (g1–g4 · w1–w3 · s1–s4) · Ra ghi và biên bản (w1–w3)"}, "w3": {"tu": "soat", "toi": "bienban", "tt": "b", "cai_gi": "9 dòng tổng · nguồn bị chừa có tên luật", "khoa": "luật", "ban_so": "9 dòng / lô", "cong": "đã đo = 0 hiện 'chưa đo', ⛔ không hiện số 0", "co_ma": "✅", "nhom": "Nhóm 4 · Ghép, soát, ghi (g1–g4 · w1–w3 · s1–s4) · Ra ghi và biên bản (w1–w3)"}, "s1": {"tu": "ghiNap", "toi": "loai", "tt": "b", "cai_gi": "dòng bị loại + lý do", "khoa": "run_id + dòng nguồn", "ban_so": "1 – 1", "cong": "mỗi dòng loại có lý do có tên", "co_ma": "✅", "nhom": "Nhóm 4 · Ghép, soát, ghi (g1–g4 · w1–w3 · s1–s4) · Vào sổ (s1–s4)"}, "s2": {"tu": "ghiNap", "toi": "soITL", "tt": "b", "cai_gi": "dòng sổ: General Trustest + TK + pháp nhân + run_id", "khoa": "content_key UNIQUE", "ban_so": "1 – 1", "cong": "trùng ⇒ ⛔ không ghi, đếm vế 'trùng' · nạp lại cùng ảnh ⇒ vào sổ = 0", "co_ma": "✅ (pháp nhân còn rỗng)", "nhom": "Nhóm 4 · Ghép, soát, ghi (g1–g4 · w1–w3 · s1–s4) · Vào sổ (s1–s4)"}, "s3": {"tu": "ghiNap", "toi": "lopSua", "tt": "b", "cai_gi": "mối nối máy + gợi ý hd/cdt1 (nguồn = máy gợi ý)", "khoa": "itl_id + pm_line_id", "ban_so": "1 – n", "cong": "máy gợi ý ⛔ không đè lên ô người đã chốt", "co_ma": "✅", "nhom": "Nhóm 4 · Ghép, soát, ghi (g1–g4 · w1–w3 · s1–s4) · Vào sổ (s1–s4)"}, "s4": {"tu": "ghiTay", "toi": "lopSua", "tt": "b", "cai_gi": "ghép · bỏ ghép · sửa · đảo · lý do · xong/mở lại", "khoa": "itl_id", "ban_so": "1 – n", "cong": "bút toán + nhật ký trong MỘT giao dịch · actor từ thẻ, gửi trong thân ⇒ 400", "co_ma": "✅", "nhom": "Nhóm 4 · Ghép, soát, ghi (g1–g4 · w1–w3 · s1–s4) · Vào sổ (s1–s4)"}, "h1": {"tu": "loai", "toi": "kiem", "tt": "q", "cai_gi": "số dòng loại theo lý do", "khoa": "run_id", "ban_so": "—", "cong": "vế 'loại' của 4 vế", "co_ma": "◐ cổng 4 vế có ở lúc nạp", "nhom": "Nhóm 5 · Hiệu lực và ra ngoài (h1–h4 · v1–v4) · Sổ hiệu lực và cổng (h1–h4)"}, "h2": {"tu": "soITL", "toi": "hieuLuc", "tt": "b", "cai_gi": "dòng sổ gốc", "khoa": "itl_id", "ban_so": "1 – 1", "cong": "sổ gốc ⛔ không đổi; giá trị hiệu lực đọc qua view", "co_ma": "✅", "nhom": "Nhóm 5 · Hiệu lực và ra ngoài (h1–h4 · v1–v4) · Sổ hiệu lực và cổng (h1–h4)"}, "h3": {"tu": "lopSua", "toi": "hieuLuc", "tt": "b", "cai_gi": "giá trị người / máy gợi ý · mối nối · trạng thái hàng chờ", "khoa": "itl_id", "ban_so": "n – 1", "cong": "người › máy gợi ý › nguồn; bỏ nối ⇒ giá trị máy rút theo", "co_ma": "✅", "nhom": "Nhóm 5 · Hiệu lực và ra ngoài (h1–h4 · v1–v4) · Sổ hiệu lực và cổng (h1–h4)"}, "h4": {"tu": "hieuLuc", "toi": "kiem", "tt": "q", "cai_gi": "sổ hiệu lực cho 5 cổng GĐ1", "khoa": "le · source_system · curr", "ban_so": "—", "cong": "pháp nhân rỗng = 0 · Σ theo pháp nhân = Σ theo nguồn · 0 khoá lệnh chi trỏ rỗng", "co_ma": "⛔", "nhom": "Nhóm 5 · Hiệu lực và ra ngoài (h1–h4 · v1–v4) · Sổ hiệu lực và cổng (h1–h4)"}, "v1": {"tu": "kiem", "toi": "f03", "tt": "q", "cai_gi": "kết quả cổng: đạt / không đạt / chưa đo được", "khoa": "mã cổng", "ban_so": "—", "cong": "phép ⛔ đo được là ĐỎ, ⛔ không phải 'không thấy lệch'", "co_ma": "◐ 8 cổng cũ", "nhom": "Nhóm 5 · Hiệu lực và ra ngoài (h1–h4 · v1–v4) · Người thấy và hệ khác (v1–v4)"}, "v2": {"tu": "hieuLuc", "toi": "f01", "tt": "b", "cai_gi": "dòng chưa ghép / chưa đủ chiều + lý do", "khoa": "itl_id", "ban_so": "—", "cong": "luôn lọc một tiền tệ, ⛔ không có dòng tổng", "co_ma": "✅", "nhom": "Nhóm 5 · Hiệu lực và ra ngoài (h1–h4 · v1–v4) · Người thấy và hệ khác (v1–v4)"}, "v3": {"tu": "hieuLuc", "toi": "f02", "tt": "b", "cai_gi": "lưới sổ hiệu lực + ngăn kéo 'nguồn nói · người nói'", "khoa": "itl_id", "ban_so": "—", "cong": "ô máy gợi ý hiện là gợi ý, ⛔ không trông như số chốt", "co_ma": "✅", "nhom": "Nhóm 5 · Hiệu lực và ra ngoài (h1–h4 · v1–v4) · Người thấy và hệ khác (v1–v4)"}, "v4": {"tu": "hieuLuc", "toi": "xuat", "tt": "q", "cai_gi": "sổ hiệu lực theo khuôn sổ đang chạy", "khoa": "số chứng từ + ngày + TK", "ban_so": "1 – 1", "cong": "chênh liệt kê TỪNG dòng, mọi chênh có tên lý do, ⛔ không phần trăm", "co_ma": "⛔ bộ xuất chưa có", "nhom": "Nhóm 5 · Hiệu lực và ra ngoài (h1–h4 · v1–v4) · Người thấy và hệ khác (v1–v4)"}}, "tt": {"b": "có mã", "q": "GĐ1 phải dựng", "n": "đề xuất, chờ owner"}}</script>
+<script>
+(function(){
+  const D = JSON.parse(document.getElementById('du-lieu').textContent);
+  const svg = document.querySelector('#hinh svg');
+  const khung = document.getElementById('khung-ct');
+  const noiDung = document.getElementById('ct-noi-dung');
+  let dang = null, loc = 'tat', binh = null, luuNhap = {};
+
+  const el = (id) => document.querySelector('[data-id="' + id + '"]');
+  const txt = (s) => { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; };
+  const tenHop = (m) => D.hop[m].ten;
+
+  function sangLen(ids){
+    svg.classList.toggle('loc', !!ids);
+    svg.querySelectorAll('.hop,.ten-g').forEach(n => n.classList.toggle('sang', !!ids && ids.has(n.dataset.id)));
+  }
+  function apLoc(){
+    if (dang) return;
+    if (loc === 'tat') { sangLen(null); return; }
+    const ids = new Set();
+    svg.querySelectorAll('.hop,.ten-g').forEach(n => { if (n.dataset.tt === loc) ids.add(n.dataset.id); });
+    sangLen(ids);
+  }
+  document.querySelectorAll('.chip[data-loc]').forEach(c => c.addEventListener('click', () => {
+    loc = c.dataset.loc;
+    document.querySelectorAll('.chip[data-loc]').forEach(x => x.setAttribute('aria-pressed', String(x === c)));
+    apLoc();
+  }));
+
+  function lienTen(m){
+    const t = D.ten[m];
+    return '<button class="lien" data-di="t:' + m + '"><b>' + m + '</b>' + txt(tenHop(t.tu) + ' → ' + tenHop(t.toi)) +
+      '<br><span class="ghichu">' + txt(t.cai_gi) + '</span></button>';
+  }
+  function veHop(m){
+    const h = D.hop[m];
+    let s = '<div class="eb">' + txt(h.vung + ' · ' + h.dai + ' · ' + h.loai + ' · ' + D.tt[h.tt]) + '</div>';
+    s += '<h3>' + txt(h.ten) + '</h3>';
+    if (h.dong.length) s += '<p>' + h.dong.map(txt).join('<br>') + '</p>';
+    s += '<dl>';
+    if (h.mono) s += '<dt>số liệu</dt><dd class="mono">' + txt(h.mono) + '</dd>';
+    if (h.huy.length) s += '<dt>khởi bởi</dt><dd>' + h.huy.map(x => '<button class="lien" data-di="h:' + x + '" style="display:inline-block"><b>' + x + '</b>' + txt(D.hop[x].ten.replace(/^S\d · /, '')) + '</button>').join(' ') + '</dd>';
+    s += '<dt>đối chiếu</dt><dd>' + txt(h.dc) + '</dd></dl>';
+    s += '<div class="eb">vào (' + h.vao.length + ')</div><div class="dsach">' + (h.vao.map(lienTen).join('') || '<span class="ghichu">không có mũi tên vào</span>') + '</div>';
+    s += '<div class="eb">ra (' + h.ra.length + ')</div><div class="dsach">' + (h.ra.map(lienTen).join('') || '<span class="ghichu">không có mũi tên ra</span>') + '</div>';
+    return s;
+  }
+  function veTen(m){
+    const t = D.ten[m];
+    let s = '<div class="eb">mũi tên ' + m + ' · ' + txt(D.tt[t.tt]) + '</div>';
+    s += '<h3>' + txt(tenHop(t.tu) + ' → ' + tenHop(t.toi)) + '</h3>';
+    s += '<p class="ghichu">' + txt(t.nhom) + '</p><dl>';
+    s += '<dt>chở gì</dt><dd>' + txt(t.cai_gi) + '</dd>';
+    s += '<dt>khoá</dt><dd><code>' + txt(t.khoa) + '</code></dd>';
+    s += '<dt>bản số</dt><dd>' + txt(t.ban_so) + '</dd>';
+    s += '<dt>cổng</dt><dd>' + txt(t.cong) + '</dd>';
+    s += '<dt>hôm nay</dt><dd>' + txt(t.co_ma) + '</dd></dl>';
+    s += '<div class="dsach"><button class="lien" data-di="h:' + t.tu + '"><b>từ</b>' + txt(tenHop(t.tu)) + '</button>';
+    s += '<button class="lien" data-di="h:' + t.toi + '"><b>tới</b>' + txt(tenHop(t.toi)) + '</button></div>';
+    return s;
+  }
+  function nhanPhan(id){
+    const [k, m] = id.split(':');
+    if (k === 'h') return 'Hộp "' + tenHop(m) + '"';
+    const t = D.ten[m];
+    return 'Mũi tên ' + m + ' (' + tenHop(t.tu) + ' → ' + tenHop(t.toi) + ')';
+  }
+  function veHoi(id){
+    let s = '<div class="hoi"><div class="dong-nut">';
+    s += '<button class="nut phu" id="nut-bl" type="button">Bình luận phần này</button>';
+    s += '<button class="nut phu" id="nut-xem" type="button">Xem trên hình</button></div>';
+    s += '<label for="o-hoi">Hỏi Claude về ' + txt(nhanPhan(id)) + '</label>';
+    s += '<textarea id="o-hoi" maxlength="3000" placeholder="Ví dụ: cột pháp nhân này lấy từ đâu khi nguồn có hai pháp nhân?"></textarea>';
+    s += '<div class="dong-nut"><button class="nut" id="nut-gui" type="button">Gửi cho Claude</button></div>';
+    s += '<p class="bao" id="bao" role="status"></p>';
+    s += '<p class="ghichu">Câu hỏi được đăng thành một luồng bình luận gắn vào đúng phần này; Claude trả lời ngay trong luồng đó.</p></div>';
+    return s;
+  }
+
+  function chon(id, cuon){
+    if (dang) { const cu = el(dang); if (cu) cu.classList.remove('chon-dang'); }
+    document.querySelectorAll('tr.chon.dang').forEach(r => r.classList.remove('dang'));
+    const o = document.getElementById('o-hoi'); if (o && dang) luuNhap[dang] = o.value;
+    dang = id;
+    const n = el(id); if (!n) return;
+    n.classList.add('chon-dang');
+    document.querySelectorAll('tr.chon[data-ref="' + id + '"]').forEach(r => r.classList.add('dang'));
+    const [k, m] = id.split(':');
+    const ids = new Set([id]);
+    if (k === 'h') { const h = D.hop[m]; h.vao.concat(h.ra).forEach(t => { ids.add('t:' + t); ids.add('h:' + D.ten[t].tu); ids.add('h:' + D.ten[t].toi); }); }
+    else { const t = D.ten[m]; ids.add('h:' + t.tu); ids.add('h:' + t.toi); }
+    sangLen(ids);
+    noiDung.innerHTML = (k === 'h' ? veHop(m) : veTen(m)) + veHoi(id);
+    khung.hidden = false; document.body.classList.add('co-khung');
+    const oh = document.getElementById('o-hoi'); oh.value = luuNhap[id] || '';
+    capNhatNut();
+    if (cuon) n.scrollIntoView({behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'center', inline: 'center'});
+  }
+  function dong(){
+    const o = document.getElementById('o-hoi'); if (o && dang) luuNhap[dang] = o.value;
+    if (dang) { const cu = el(dang); if (cu) cu.classList.remove('chon-dang'); }
+    document.querySelectorAll('tr.chon.dang').forEach(r => r.classList.remove('dang'));
+    dang = null; khung.hidden = true; document.body.classList.remove('co-khung'); apLoc();
+  }
+  document.getElementById('nut-dong').addEventListener('click', dong);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && !khung.hidden) dong(); });
+
+  svg.addEventListener('click', e => {
+    const g = e.target.closest('.hop,.ten-g');
+    if (g) chon(g.dataset.id, false); else if (dang) dong();
+  });
+  svg.addEventListener('keydown', e => {
+    if ((e.key === 'Enter' || e.key === ' ') && e.target.closest('.hop,.ten-g')) { e.preventDefault(); chon(e.target.closest('.hop,.ten-g').dataset.id, false); }
+  });
+  document.querySelectorAll('tr.chon').forEach(r => {
+    r.addEventListener('click', () => chon(r.dataset.ref, false));
+    r.addEventListener('keydown', e => { if (e.key === 'Enter') chon(r.dataset.ref, false); });
+  });
+  noiDung.addEventListener('click', async e => {
+    const l = e.target.closest('.lien'); if (l) { chon(l.dataset.di, false); return; }
+    if (e.target.id === 'nut-xem') { const n = el(dang); if (n) n.scrollIntoView({behavior:'auto', block:'center', inline:'center'}); return; }
+    if (e.target.id === 'nut-bl') return moBinhLuan();
+    if (e.target.id === 'nut-gui') return guiClaude();
+  });
+
+  // ── bình luận / gửi Claude ──
+  function bao(s, kieu){ const b = document.getElementById('bao'); if (b) { b.textContent = s; b.className = 'bao ' + (kieu || ''); } }
+  async function capNhatNut(){
+    const bl = document.getElementById('nut-bl'), gui = document.getElementById('nut-gui');
+    if (!bl) return;
+    if (!binh) { bl.disabled = true; gui.disabled = true; bao('Bình luận và hỏi Claude chỉ có khi mở trang này trên claude.ai.', ''); return; }
+    bl.disabled = false;
+    let tt = 'off';
+    try { tt = await binh.canSendToClaude(); } catch (_) { tt = 'off'; }
+    if (tt === 'available') { gui.disabled = false; return; }
+    gui.disabled = true;
+    bao(tt === 'writers_only' ? 'Chỉ người có quyền chỉnh sửa trang mới gửi được cho Claude; bạn vẫn bình luận thường được.'
+      : tt === 'no_session' ? 'Chưa có phiên Claude nào đang theo dõi trang này. Câu hỏi vẫn đăng được bằng nút "Bình luận phần này".'
+      : 'Gửi cho Claude không bật ở đây. Dùng nút "Bình luận phần này".', '');
+  }
+  async function moBinhLuan(){
+    const n = el(dang); if (!binh || !n) return;
+    try { const r = await binh.openComposer({element: n}); if (!r.opened) bao('Khung bình luận đang mở với nội dung chưa gửi.', ''); }
+    catch (err) { bao(err && err.code === 'rate_limited' ? 'Mở hơi nhanh, đợi một chút rồi bấm lại.' : 'Không mở được khung bình luận ở đây.', 'loi'); }
+  }
+  const LOI = {
+    consent_required: 'Chưa gửi: bạn chưa cho phép trang này bình luận thay bạn. Bản nháp vẫn còn.',
+    forbidden: 'Bình luận từ trang đang tắt ở đây. Dùng chế độ bình luận của claude.ai.',
+    claude_unavailable: 'Không gửi được cho Claude lúc này, chưa có gì được đăng. Bản nháp vẫn còn; bạn có thể bình luận thường.',
+    rate_limited: 'Gửi hơi nhanh, đợi một chút rồi bấm lại.',
+    invalid: 'Nội dung không hợp lệ (rỗng hoặc quá dài).'
+  };
+  async function guiClaude(){
+    const o = document.getElementById('o-hoi'), gui = document.getElementById('nut-gui');
+    const chu = (o.value || '').trim();
+    if (!chu) { bao('Gõ câu hỏi trước đã.', 'loi'); o.focus(); return; }
+    const n = el(dang); if (!binh || !n) return;
+    gui.disabled = true; bao('Đang gửi…', '');
+    try {
+      const anchor = await binh.anchorFor(n);
+      await binh.sendToClaude({anchor, text: '[' + dang.slice(2) + ' · ' + nhanPhan(dang) + '] ' + chu});
+      o.value = ''; luuNhap[dang] = '';
+      bao('Đã gửi cho Claude. Câu trả lời sẽ hiện trong luồng bình luận gắn ở phần này.', 'tot');
+    } catch (err) {
+      bao(LOI[err && err.code] || ('Không gửi được (' + ((err && err.code) || 'lỗi') + '). Bản nháp vẫn còn.'), 'loi');
+    } finally { gui.disabled = false; capNhatNut(); }
+  }
+  if (window.claude && window.claude.use) {
+    window.claude.use('comments').then(c => { binh = c; if (dang) capNhatNut(); }).catch(() => { binh = null; });
+  }
+})();
+</script>
