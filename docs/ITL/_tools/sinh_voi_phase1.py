@@ -76,7 +76,7 @@ VUNG = {   # mã: (nhãn, nhãn phụ, y0, y1)
     "D": ("FLS · SỔ", "PostgreSQL · chỉ-thêm", 740, 962),
     "E": ("ĐẦU RA", "màn FLS + hệ khác", 974, 1080),
 }
-TEN_VUNG = {"A": "Nguồn ngoài · FPS", "B": "Phương pháp xử lý (1) · mapping (Reference No) & adjust — sao kê & sổ quỹ",
+TEN_VUNG = {"A": "Nguồn ngoài · FPS", "B": "Phương pháp xử lý (1) · mapping với bank transaction — sao kê & sổ quỹ",
             "G": "Phương pháp xử lý (2) · HR", "H": "Phương pháp xử lý (3) · nền tảng", "C": "FLS · NẠP",
             "D": "FLS · SỔ", "E": "ĐẦU RA"}
 
@@ -196,7 +196,7 @@ HOP: list[Hop] = [
         doi_chieu="chay_nap.py:621 `with conn.transaction()`"),
     Hop("bienban", "c4", cot(5), "d", "b", "biên bản lô", ("9 dòng tổng", "n vào · m bị chừa"), "hiện trên F04",
         huy=("S3",), doi_chieu="QĐ-ITL-112 · man_f04.js"),
-    Hop("ghiTay", "c4", nhip(6, 7), "p", "b", "GHI tay — adjust PP (1)",
+    Hop("ghiTay", "c4", nhip(6, 7), "p", "b", "GHI tay — một giao dịch",
         ("ghép · bỏ ghép · sửa · đảo · lý do", "actor lấy từ thẻ đăng nhập"),
         "fls/repo/ghi_tay.py — chỗ ghi duy nhất", huy=("S5",),
         doi_chieu="fls/repo/ghi_tay.py"),
@@ -344,7 +344,7 @@ TEN: list[Ten] = [
 ]
 
 NHOM = {
-    "1": "Nhóm 1 · Nguồn sinh ra (o1–o6)", "1a": "FPS (o1–o2)", "1b": "Phương pháp (1) · mapping & adjust — sao kê & sổ quỹ (o3–o4)",
+    "1": "Nhóm 1 · Nguồn sinh ra (o1–o6)", "1a": "FPS (o1–o2)", "1b": "Phương pháp (1) · mapping với bank transaction — sao kê & sổ quỹ (o3–o4)",
     "1c": "Phương pháp (2) · HR và (3) · nền tảng (o5 · o6)",
     "2": "Nhóm 2 · Vượt ranh giới vào FLS (x1–x6)", "2a": "FPS → FLS · đọc sổ cái chỉ-đọc (x1–x2)",
     "2b": "Phương pháp (1) · Sheets API, tài khoản dịch vụ chỉ-đọc, đọc theo bản khai (x3–x4)",
@@ -454,7 +454,7 @@ def svg() -> str:
     o.append('<rect class="vz vz-ext" x="242" y="10" width="336" height="194" rx="6"/>')
     o.append('<text class="vt" x="250" y="28">FPS · sổ cái (ngoài FLS)</text>')
     o.append('<rect class="vz vz-pp1" x="743" y="10" width="334" height="194" rx="6"/>')
-    o.append('<text class="vt vt-pp1" x="751" y="28">PHƯƠNG PHÁP (1) · MAPPING (REF NO) & ADJUST</text>')
+    o.append('<text class="vt vt-pp1" x="751" y="28">PHƯƠNG PHÁP (1) · MAPPING VỚI BANK TXN</text>')
     o.append('<rect class="vz vz-pp1" x="1080" y="10" width="164" height="194" rx="6"/>')
     o.append('<text class="vt vt-pp1" x="1086" y="28">PHƯƠNG PHÁP (2)</text>')
     o.append('<rect class="vz vz-pp1" x="1247" y="10" width="165" height="194" rx="6"/>')
@@ -471,7 +471,7 @@ def svg() -> str:
         o.append(f'<text class="br" x="10" y="{y0 + h / 2 + dy}">{E(nh)}</text>')
     o.append('<line class="ranh" x1="124" y1="261" x2="1412" y2="261"/>')
     o.append('<rect class="khung-pp1" x="576" y="281" width="501" height="216" rx="6"/>')
-    o.append('<text class="vt vt-pp1" x="582" y="277">PP (1) · MAPPING & ADJUST</text>')
+    o.append('<text class="vt vt-pp1" x="582" y="277">PP (1) · MAPPING VỚI BANK TXN</text>')
     o.append('<rect class="khung-pp1" x="1079" y="281" width="166" height="216" rx="6"/>')
     o.append('<text class="vt vt-pp1" x="1085" y="277">PP (2)</text>')
     o.append('<rect class="khung-pp1" x="1247" y="281" width="165" height="216" rx="6"/>')
@@ -967,7 +967,7 @@ def trang() -> str:
 
 <h2>§2 · Đã sửa gì</h2>
 <p class="note"><b>v0.3 (owner, 04/11):</b> nguồn FPS là <b>sổ cái PM / PC</b>, đã mang đủ chiều ⇒ bỏ hai hộp "phiếu PE·PI·PM·PC" và "danh mục FPS"; bước dựng đổi từ <i>DỰNG chuỗi phiếu</i> (đi PM → PI → PE) thành <i>DỰNG dòng lệnh</i> (đọc thẳng từng dòng sổ cái). Đề xuất pháp nhân TK (k1) nay đếm từ TK chi + pháp nhân thanh toán trên sổ cái PM.</p>
-<p class="note"><b>v0.3.1–v0.3.2 (owner, 04/11, bình luận trên hình):</b> tách riêng ba phương pháp xử lý nguồn Sheets. <b>(1) mapping &amp; adjust</b> — sao kê &amp; sổ quỹ: kế toán dán / ghi → bản khai nguồn → ảnh chụp đọc theo bản khai → DỰNG dòng tiền; dòng tiền chưa mang chiều chi phí nên phải <b>mapping với bank txns theo reference number</b> (hộp MAPPING: mã Reference number trên giao dịch ngân hàng ↔ cùng mã trên dòng sổ cái PM, chia tiền theo PM line) rồi <b>adjust</b> (hộp GHI tay → lớp sửa: người điền / sửa chiều còn thiếu, chỉ-thêm). PP (2), (3) đã mang chiều từ nguồn nên không qua hai bước này. <b>(2)</b> sổ lương HR: HR lập → ảnh sổ lương → DỰNG dòng lương, giữ HD/KRF nguồn, không phân bổ lại. <b>(3)</b> sổ nền tảng: chủ sổ lập → ảnh sổ nền tảng → DỰNG dòng nền tảng. Vùng nguồn Sheets tách làm ba; hộp "ảnh sổ nhập tay" tách làm ba; mỗi phương pháp là một khung đi từ nguồn xuống tới bước dựng.</p>
+<p class="note"><b>v0.3.1–v0.3.2 (owner, 04/11, bình luận trên hình):</b> tách riêng ba phương pháp xử lý nguồn Sheets. <b>(1) mapping với bank transaction</b> — sao kê &amp; sổ quỹ: kế toán dán / ghi → bản khai nguồn → ảnh chụp đọc theo bản khai → DỰNG dòng tiền; dòng tiền chưa mang chiều chi phí nên phải <b>mapping với bank txns theo reference number</b> (hộp MAPPING: mã Reference number trên giao dịch ngân hàng ↔ cùng mã trên dòng sổ cái PM, chia tiền theo PM line). PP (2), (3) đã mang chiều chi phí từ nguồn nên không qua bước mapping. Sửa tay (GHI tay → lớp sửa) là bước chung cho mọi dòng sổ, không riêng phương pháp nào. <b>(2)</b> sổ lương HR: HR lập → ảnh sổ lương → DỰNG dòng lương, giữ HD/KRF nguồn, không phân bổ lại. <b>(3)</b> sổ nền tảng: chủ sổ lập → ảnh sổ nền tảng → DỰNG dòng nền tảng. Vùng nguồn Sheets tách làm ba; hộp "ảnh sổ nhập tay" tách làm ba; mỗi phương pháp là một khung đi từ nguồn xuống tới bước dựng.</p>
 <p>Năm chỗ bản v0.1 vẽ sai, sửa từ v0.2:</p>
 <ol class="fix">
 <li><b>Bản khai nguồn đứng trước phép chụp.</b> Ảnh sao kê đọc vùng chuẩn <i>theo</i> bản khai và ghi lại <code>khai_version</code> (<code>fls/repo/chup.py:16</code>, <code>tools/chup_sao_ke.py</code>).</li>
