@@ -150,7 +150,7 @@ HOP: list[Hop] = [
         "fls_chup · fls_chup_nguon (khai_version)", huy=("S1",),
         doi_chieu="tools/chup_sao_ke.py (LAN='Bank') · fls/repo/chup.py:16 khai_version", khoi="pp1"),
     Hop("anhHR", "c1", cot(6), "d", "q", "ảnh sổ lương HR",
-        ("lằn HR ⛔", "bố cục cột: chưa chốt"), "fls_chup lằn 'HR'", huy=("S1",),
+        ("lằn HR ⛔", "đợt chi theo venture · kỳ"), "fls_chup lằn 'HR'", huy=("S1",),
         doi_chieu="chưa có: chup_sao_ke.py chỉ chụp lằn Bank", khoi="pp2"),
     Hop("anhNT", "c1", cot(7), "d", "q", "ảnh sổ nền tảng",
         ("lằn Platform ⛔", "bố cục cột: chưa chốt"), "fls_chup 'Platform'", huy=("S1",),
@@ -167,9 +167,10 @@ HOP: list[Hop] = [
          "gắn pháp nhân TK từ bản khai của nguồn · content_key chống trùng"),
         "bank 8.338/8.338 · quỹ chưa chạy · pháp nhân: chưa", huy=("S3", "S4"),
         doi_chieu="fls/adapters/sao_ke.py + sao_ke_canon.py", khoi="pp1"),
-    Hop("dHR", "c2", cot(6), "p", "q", "DỰNG dòng lương",
-        ("sổ lương → canon", "giữ HD/KRF + LE sổ"), "không phân bổ lại",
-        huy=("S3", "S4"), doi_chieu="chưa có (adapter D)", khoi="pp2"),
+    Hop("dHR", "c2", cot(6), "p", "q", "DỰNG đợt lương · BH",
+        ("lương · BHXH · BHYT", "→ Σ mỗi đợt + LE venture"), "GĐ2: tách xuống KRF",
+        huy=("S3", "S4"), khoi="pp2",
+        doi_chieu="chưa có (adapter D) · owner 04/11: GĐ1 mapping đợt đi tiền → LE, GĐ2 → KRF"),
     Hop("dNT", "c2", cot(7), "p", "q", "DỰNG dòng nền tảng",
         ("SC · PS → canon", "giữ LE của sổ"), "chưa có (adapter E)",
         huy=("S3", "S4"), doi_chieu="chưa có (adapter E)", khoi="pp3"),
@@ -294,8 +295,8 @@ TEN: list[Ten] = [
         "cột hợp đồng rỗng ⇒ cờ có tên cột, dòng vẫn vào · 13 cột còn thô phải đặt kiểu", "◐ PM 14 cột có kiểu", 410.0, "3b"),
     Ten("b3", "anhTien", "dTien", "b", "dòng lằn Bank · Cash", "chup_id + dòng", "1 – 1",
         "đọc từ ẢNH, ⛔ không đọc Sheets sống", "✅ Bank · ⛔ Cash", 911.0, "3b"),
-    Ten("b4", "anhHR", "dHR", "q", "dòng lằn HR", "chup_id + dòng", "1 – 1",
-        "dòng thiếu HD ⇒ hàng chờ (mong 0)", "⛔", tam(6), "3b"),
+    Ten("b4", "anhHR", "dHR", "q", "dòng sổ lương: venture · kỳ · loại (lương / BHXH / BHYT) · tiền", "chup_id + dòng", "n – 1 đợt",
+        "dòng thiếu venture ⇒ hàng chờ có tên (mong 0)", "⛔", tam(6), "3b"),
     Ten("b5", "anhNT", "dNT", "q", "dòng lằn Platform", "chup_id + dòng", "1 – 1",
         "dòng thiếu pháp nhân ⇒ hàng chờ có tên", "⛔", tam(7), "3b"),
     # 4 · ghép, soát, ghi
@@ -306,8 +307,8 @@ TEN: list[Ten] = [
         "Σ tiền các line = tiền dòng · khác tiền tệ ⇒ để người (chờ tỷ giá, GĐ2)", "✅", tam(3), "4a"),
     Ten("g3", "dTien", "soat", "b", "dòng tiền canon", "content_key", "1 – 1",
         "9 luật soát chạy theo TỪNG nguồn (⛔ nối phẳng 60 nguồn)", "✅", 911.0, "4a"),
-    Ten("g4", "dHR", "soat", "q", "dòng lương canon", "content_key", "1 – 1",
-        "cùng 9 luật + Σ từng sổ từng năm = nguồn", "⛔", tam(6), "4a"),
+    Ten("g4", "dHR", "soat", "q", "đợt lương / BHXH / BHYT: venture · kỳ · Σ tiền · LE", "(venture, kỳ, loại)", "1 đợt – n giao dịch bank",
+        "Σ đợt = Σ giao dịch bank đã ghép · đợt không ra LE ⇒ hàng chờ", "⛔", tam(6), "4a"),
     Ten("g5", "dNT", "soat", "q", "dòng nền tảng canon", "content_key", "1 – 1",
         "cùng 9 luật + Σ từng sổ = nguồn", "⛔", tam(7), "4a"),
     Ten("w1", "ghep", "ghiNap", "b", "mối nối dự kiến (dòng, PM line, tiền chia, hình nối)", "(content_key, pm_line_id)",
@@ -387,14 +388,18 @@ DAI_M = {
 TANG_M = {"m1": 0, "m2": 1, "m3": 2, "m4": 3, "m5": 4}
 
 HOP_M: list[Hop] = [
-    Hop("mPM", "m1", cotm(1, 2), "d", "q", "dòng sổ cái PM",
-        ("mỗi PM line: Reference No · tiền · tiền tệ", "· pháp nhân trả · vendor · trạng thái · loại GD"),
-        "đã DỰNG (b1) · hôm nay qua Sheets", doi_chieu="fls_pm_line 3.772 dòng (14 cột có kiểu)"),
+    Hop("mPM", "m1", cotm(1), "d", "q", "dòng sổ cái PM",
+        ("Ref · tiền · tiền tệ", "pháp nhân trả · vendor"),
+        "đã DỰNG (b1)", doi_chieu="fls_pm_line 3.772 dòng (14 cột có kiểu) · hôm nay qua Sheets"),
+    Hop("mHR", "m1", cotm(2), "d", "q", "đợt lương · BH",
+        ("PP (2): lương · BHXH", "· BHYT, Σ venture · kỳ"),
+        "đã DỰNG (b4)", doi_chieu="owner 04/11: GĐ1 → LE, GĐ2 → KRF"),
     Hop("mBank", "m1", cotm(3, 4), "d", "b", "bank transactions",
         ("dòng tiền đã DỰNG (b3)", "TK · ngày · Nợ/Có · Ref · nội dung"),
         "nội dung: chưa đọc (QĐ-ITL-92)", doi_chieu="fls_itl 8.387 · memo rỗng 8.387/8.387"),
     Hop("mLuatGhep", "m1", cotm(5, 6), "d", "q", "luật ghép đã ký",
-        ("VN: Ref + tiền + pháp nhân", "nước ngoài: từ khoá + vendor + tiền"),
+        ("VN: Ref + tiền + pháp nhân · ngoài: từ khoá + vendor + tiền",
+         "lương / BH: TK chi + nội dung + Σ đợt venture · kỳ → LE"),
         "QĐ-ITL-144 · máy mới dùng Ref + tiền", doi_chieu="QĐ-ITL-144 (owner + kế toán 18/09)"),
     Hop("mMap", "m2", cotm(1, 5), "p", "b", "MAPPING bank txns ↔ lệnh chi",
         ("chạy luật ghép theo thứ tự; Σ tiền các PM line = tiền giao dịch, lệch ⇒ chặn",
@@ -403,7 +408,7 @@ HOP_M: list[Hop] = [
     Hop("mBB", "m2", cotm(6), "d", "q", "biên bản mapping",
         ("đếm 3 lớp", "+ lý do có tên"), "mỗi lượt nạp", doi_chieu="hôm nay: /queue/coverage · /queue/mau-so"),
     Hop("mL1", "m3", cotm(1, 2), "d", "b", "L1 · khớp",
-        ("Ref chung, Σ tiền khớp, cùng tiền tệ", "→ mối nối, vào sổ (s3)"),
+        ("Ref chung + Σ khớp, hoặc khớp đợt lương / BH", "→ mối nối · LE venture (s3)"),
         "hôm nay 2.263 mối nối", doi_chieu="fls_pm_link"),
     Hop("mL2", "m3", cotm(3, 4), "d", "b", "L2 · có trên FPS, chưa có bank",
         ("PM đã duyệt, chưa thấy tiền ở TK chi", "tuổi > N ngày ⇒ cờ 'lệnh chưa thấy tiền'"),
@@ -432,7 +437,9 @@ HOP_M_THEO = {h.ma: h for h in HOP_M}
 
 TEN_M: list[Ten] = [
     Ten("m1", "mPM", "mMap", "q", "PM line: Ref · tiền · tiền tệ · pháp nhân trả · vendor", "pm_line_id", "1 – 1",
-        "chỉ dòng trạng thái cuối đã duyệt", "◐ có, chưa có pháp nhân/vendor có kiểu", tamm(1, 2)),
+        "chỉ dòng trạng thái cuối đã duyệt", "◐ có, chưa có pháp nhân/vendor có kiểu", tamm(1)),
+    Ten("m15", "mHR", "mMap", "q", "đợt lương / BHXH / BHYT: venture · kỳ · Σ tiền · LE", "(venture, kỳ, loại)", "1 đợt – n giao dịch",
+        "Σ giao dịch ghép vào một đợt = Σ đợt; lệch ⇒ chặn", "⛔ chưa có", tamm(2)),
     Ten("m2", "mBank", "mMap", "b", "giao dịch: TK · ngày · tiền · tiền tệ · Ref", "content_key", "1 – 1",
         "đọc từ ảnh, ⛔ Sheets sống", "✅", tamm(3, 4)),
     Ten("m3", "mLuatGhep", "mMap", "q", "thứ tự nhánh: VN (Ref + tiền + pháp nhân) → nước ngoài (từ khoá + vendor + tiền)",
@@ -1128,13 +1135,13 @@ def trang() -> str:
 """, """
 <h2>§1b · Mapping của phương pháp (1) — ba lớp giao dịch và vòng cộng dồn</h2>
 <p>Phóng to hộp MAPPING trên hình chính. Mỗi giao dịch ngân hàng và mỗi dòng sổ cái PM sau một lượt mapping rơi vào <b>đúng một</b> lớp; dòng ở lớp L3 đi qua <b>vòng cộng dồn</b>: luật đã ký gợi ý loại giao dịch, kế toán xác nhận, xác nhận tích lại thành luật mới cho lượt sau. Máy chỉ gợi ý; luật chỉ hiệu lực khi có người ký.</p>
-<figure class="diagram" id="hinh-m">""", svg_m(), """<figcaption>Hình 2 — Mapping PP (1) phóng to. 5 dải · 14 hộp · 14 mũi tên; mũi tên m14 đi <b>lên</b> có chủ ý: đó là vòng cộng dồn. Máy kiểm như hình 1: không mũi tên nhảy dải, lệch hộp hay cắt qua hộp.</figcaption></figure>
+<figure class="diagram" id="hinh-m">""", svg_m(), """<figcaption>Hình 2 — Mapping PP (1) phóng to, nhận cả đợt lương / BH của PP (2). 5 dải · 15 hộp · 15 mũi tên; mũi tên m14 đi <b>lên</b> có chủ ý: đó là vòng cộng dồn. Máy kiểm như hình 1: không mũi tên nhảy dải, lệch hộp hay cắt qua hộp.</figcaption></figure>
 <h3>Luật xếp lớp sau mapping</h3>
 <div class="scroll"><table>
 <thead><tr><th colspan="2" class="sup">Lớp</th><th class="sup">So khớp</th><th class="sup">Hiện trạng</th><th colspan="2" class="sup">Xử lý</th></tr>
 <tr><th>lớp</th><th>điều kiện</th><th>khoá</th><th>hôm nay</th><th>đi đâu</th><th>cổng</th></tr></thead>
 <tbody>
-<tr class="chon" data-ref="h:mL1" tabindex="0"><td><b>L1 · khớp</b></td><td>giao dịch có Reference No trùng ≥ 1 dòng sổ cái PM; Σ tiền các PM line = tiền giao dịch; cùng tiền tệ; nhánh VN thêm pháp nhân trả = pháp nhân TK (QĐ-ITL-144)</td><td>Reference No + tiền (+ pháp nhân)</td><td>2.263 mối nối</td><td>mối nối vào lớp sửa; gợi ý hd/cdt1 từ PM line</td><td>Σ lệch ⇒ chặn, ⛔ chia bừa</td></tr>
+<tr class="chon" data-ref="h:mL1" tabindex="0"><td><b>L1 · khớp</b></td><td>giao dịch có Reference No trùng ≥ 1 dòng sổ cái PM; Σ tiền các PM line = tiền giao dịch; cùng tiền tệ; nhánh VN thêm pháp nhân trả = pháp nhân TK (QĐ-ITL-144). <b>Hoặc</b> (PP 2) giao dịch từ TK chi lương khớp Σ một đợt lương / BHXH / BHYT của một venture trong kỳ ⇒ LE venture</td><td>Reference No + tiền (+ pháp nhân)</td><td>2.263 mối nối</td><td>mối nối vào lớp sửa; gợi ý hd/cdt1 từ PM line</td><td>Σ lệch ⇒ chặn, ⛔ chia bừa</td></tr>
 <tr class="chon" data-ref="h:mMap" tabindex="0"><td><b>L1b · khớp mã, lệch</b></td><td>có Reference No chung nhưng Σ tiền lệch, khác tiền tệ, hoặc N giao dịch × M PM line</td><td>Reference No</td><td>84 lệnh khác tiền tệ (Q-FX-1)</td><td>hàng chờ cho người, kèm lý do có tên</td><td>⛔ tự chọn cặp</td></tr>
 <tr class="chon" data-ref="h:mL2" tabindex="0"><td><b>L2 · có trên FPS, chưa có trên bank txns</b></td><td>dòng sổ cái PM trạng thái cuối đã duyệt, không giao dịch nào mang Reference No của nó trong các ảnh sao kê của TK chi, tính tới ảnh mới nhất</td><td>pm_line_id · Reference No · TK chi</td><td>1.345 dòng · 698 phiếu</td><td>F01 lằn lệnh: "lệnh chưa thấy tiền"; tuổi = ngày ảnh mới nhất − ngày thực chi</td><td>tuổi &gt; N ngày ⇒ cờ; TK chi chưa có ảnh ⇒ "chưa đo được", ⛔ coi là chưa chi</td></tr>
 <tr class="chon" data-ref="h:mL3" tabindex="0"><td><b>L3 · có trên bank txns, không có trên FPS</b></td><td>giao dịch không có Reference No, hoặc có mà không dòng sổ cái PM nào mang</td><td>content_key · TK · nội dung · loại bank</td><td>89,7% dòng chưa ghép có mã mà không PM nào mang</td><td>SUY DIỄN loại giao dịch (vòng cộng dồn) → gợi ý ở F01</td><td>trạng thái vẫn UNMAPPED tới khi người chốt; ⛔ nhãn "không cần lệnh chi" (QĐ-ITL-58)</td></tr>
@@ -1149,12 +1156,13 @@ def trang() -> str:
 <tr class="chon" data-ref="h:mKy" tabindex="0"><td>④ ký</td><td>owner / kế toán trưởng</td><td>luật ứng viên + bằng chứng</td><td>luật hiệu lực, có version, <code>signed_by</code>, <code>signed_at</code></td><td>luật ⛔ hiệu lực khi chưa ký (INV-I16 · QĐ-ITL-56)</td></tr>
 <tr class="chon" data-ref="h:mGoiY" tabindex="0"><td>⑤ đo mỗi vòng</td><td>máy</td><td>gợi ý và xác nhận của lượt</td><td>độ phủ (dòng L3 có gợi ý) · độ đúng (gợi ý được giữ nguyên)</td><td>in cả mẫu số; độ đúng tụt ⇒ dừng áp luật mới</td></tr>
 </tbody></table></div>
-<p class="note"><b>Luật mồi cho bảng luật</b> — năm loại giao dịch kế toán ghi là hay bị sót trên PM: lãi và phí ngân hàng · điều chuyển nội bộ, mua bán ngoại tệ · chi phí năm trước trả năm nay · quẹt thẻ chưa nhập PM · doanh thu, OMC, server chưa nhập. <b>Danh mục loại giao dịch</b> dùng lại cột "Loại giao dịch (Payment Type)" của sổ cái PM để L1 và L3 nói cùng một bộ từ.<br>
+<p class="note"><b>Luật GĐ1 cho PP (2):</b> các đợt đi tiền lương / BHXH / BHYT của các venture — giao dịch bank từ TK chi lương, nội dung mang loại đợt, tổng khớp Σ đợt của một venture trong kỳ ⇒ <b>LE</b> của venture ấy. <b>GĐ2:</b> từ đợt đã gắn LE, tách xuống <b>KRF</b> theo sổ lương.<br>
+<b>Luật mồi cho bảng luật</b> — năm loại giao dịch kế toán ghi là hay bị sót trên PM: lãi và phí ngân hàng · điều chuyển nội bộ, mua bán ngoại tệ · chi phí năm trước trả năm nay · quẹt thẻ chưa nhập PM · doanh thu, OMC, server chưa nhập. <b>Danh mục loại giao dịch</b> dùng lại cột "Loại giao dịch (Payment Type)" của sổ cái PM để L1 và L3 nói cùng một bộ từ.<br>
 <b>Hai câu chờ owner:</b> ① vòng này cần đọc <b>nội dung giao dịch</b> trên sao kê, nhưng hôm nay FLS chỉ được đọc ba cột (ngày · Reference number · nguồn — QĐ-ITL-92) và <code>fls_itl.memo</code> rỗng 8.387/8.387 ⇒ có nới QĐ-ITL-92 cho cột nội dung, chỉ để suy diễn? ② chọn <b>k</b> (số xác nhận để thành luật ứng viên) và <b>N</b> (số ngày để L2 bị cờ).</p>
 """, """
 <h2>§2 · Đã sửa gì</h2>
 <p class="note"><b>v0.3 (owner, 04/11):</b> nguồn FPS là <b>sổ cái PM / PC</b>, đã mang đủ chiều ⇒ bỏ hai hộp "phiếu PE·PI·PM·PC" và "danh mục FPS"; bước dựng đổi từ <i>DỰNG chuỗi phiếu</i> (đi PM → PI → PE) thành <i>DỰNG dòng lệnh</i> (đọc thẳng từng dòng sổ cái). Đề xuất pháp nhân TK (k1) nay đếm từ TK chi + pháp nhân thanh toán trên sổ cái PM.</p>
-<p class="note"><b>v0.3.1–v0.3.2 (owner, 04/11, bình luận trên hình):</b> tách riêng ba phương pháp xử lý nguồn Sheets. <b>(1) mapping với bank transaction</b> — sao kê &amp; sổ quỹ: kế toán dán / ghi → bản khai nguồn → ảnh chụp đọc theo bản khai → DỰNG dòng tiền; dòng tiền chưa mang chiều chi phí nên phải <b>mapping với bank txns theo reference number</b> (hộp MAPPING: mã Reference number trên giao dịch ngân hàng ↔ cùng mã trên dòng sổ cái PM, chia tiền theo PM line). PP (2), (3) đã mang chiều chi phí từ nguồn nên không qua bước mapping. Sửa tay (GHI tay → lớp sửa) là bước chung cho mọi dòng sổ, không riêng phương pháp nào. <b>(2)</b> sổ lương HR: HR lập → ảnh sổ lương → DỰNG dòng lương, giữ HD/KRF nguồn, không phân bổ lại. <b>(3)</b> sổ nền tảng: chủ sổ lập → ảnh sổ nền tảng → DỰNG dòng nền tảng. Vùng nguồn Sheets tách làm ba; hộp "ảnh sổ nhập tay" tách làm ba; mỗi phương pháp là một khung đi từ nguồn xuống tới bước dựng.</p>
+<p class="note"><b>v0.3.1–v0.3.2 (owner, 04/11, bình luận trên hình):</b> tách riêng ba phương pháp xử lý nguồn Sheets. <b>(1) mapping với bank transaction</b> — sao kê &amp; sổ quỹ: kế toán dán / ghi → bản khai nguồn → ảnh chụp đọc theo bản khai → DỰNG dòng tiền; dòng tiền chưa mang chiều chi phí nên phải <b>mapping với bank txns theo reference number</b> (hộp MAPPING: mã Reference number trên giao dịch ngân hàng ↔ cùng mã trên dòng sổ cái PM, chia tiền theo PM line). PP (2), (3) đã mang chiều chi phí từ nguồn nên không qua bước mapping. Sửa tay (GHI tay → lớp sửa) là bước chung cho mọi dòng sổ, không riêng phương pháp nào. <b>(2) lương · BHXH · BHYT</b> — sổ lương HR: HR lập → ảnh sổ lương → DỰNG đợt lương · BH. <b>GĐ1:</b> luật mapping các đợt đi tiền lương / BHXH / BHYT của các venture với bank txns → gắn <b>LE</b> (§1b). <b>GĐ2:</b> mapping xuống <b>KRF</b>. <b>(3)</b> sổ nền tảng: chủ sổ lập → ảnh sổ nền tảng → DỰNG dòng nền tảng. Vùng nguồn Sheets tách làm ba; hộp "ảnh sổ nhập tay" tách làm ba; mỗi phương pháp là một khung đi từ nguồn xuống tới bước dựng.</p>
 <p>Năm chỗ bản v0.1 vẽ sai, sửa từ v0.2:</p>
 <ol class="fix">
 <li><b>Bản khai nguồn đứng trước phép chụp.</b> Ảnh sao kê đọc vùng chuẩn <i>theo</i> bản khai và ghi lại <code>khai_version</code> (<code>fls/repo/chup.py:16</code>, <code>tools/chup_sao_ke.py</code>).</li>
@@ -1212,7 +1220,7 @@ def trang() -> str:
 <tr><td>2</td><td>x4 · b3 cho lằn Cash</td><td>Cùng bộ đọc với sao kê, chỉ bật lằn và khuôn quỹ</td><td>số dòng = sổ quỹ từng quỹ · nạp lại = 0 trùng · số dư theo ngày khớp</td></tr>
 <tr class="b1"><th colspan="4">Chặng II · Mở họ lệnh chi và chi phí (bước 3–5)</th></tr>
 <tr><td>3</td><td>x1 · x2 · b1 · g1 (sổ cái PM + PC)</td><td>Hợp đồng §5 chốt trước; đặt kiểu 13 cột PM còn thô; ảnh sổ cái dùng lại lằn ảnh chụp, không dựng hệ thứ hai</td><td>0 khoá lệnh chi trỏ rỗng · chiều lệnh chi khớp sổ đang chạy 100% từng ô</td></tr>
-<tr><td>4</td><td>x5 · b4 · g4 (PP 2 · HR)</td><td>HR đã tách HD/KRF ở nguồn ⇒ không phân bổ; chỉ đọc đầu ra, không mở hộp đen lương</td><td>Σ từng sổ từng năm = nguồn · 0 dòng thiếu HD</td></tr>
+<tr><td>4</td><td>x5 · b4 · g4 (PP 2 · lương / BHXH / BHYT)</td><td>GĐ1 chỉ cần đợt đi tiền của từng venture để gắn LE cho giao dịch bank; KRF để GĐ2; không mở hộp đen lương</td><td>mọi giao dịch bank loại lương / BH có LE (hoặc hàng chờ có tên) · Σ đợt mỗi venture mỗi kỳ = Σ giao dịch đã ghép</td></tr>
 <tr><td>5</td><td>x6 · b5 · g5 (PP 3 · nền tảng SC · PS)</td><td>Chờ owner chốt phạm vi (câu 5)</td><td>số dòng = sổ nguồn</td></tr>
 <tr class="b1"><th colspan="4">Chặng III · Chứng minh một bảng (bước 6–7)</th></tr>
 <tr><td>6</td><td>h2 · h3 · sổ hiệu lực thành một view có tên</td><td>Hôm nay màn tự ghép ở cửa đọc; hệ khác cần một bảng</td><td>một SELECT trả đủ 4 họ nguồn · đủ 3 vai pháp nhân</td></tr>
