@@ -776,6 +776,35 @@ LUONG: dict[str, tuple[str, ...]] = {
 }
 
 # ── ba phương pháp: luồng trọn từ nguồn tới sổ (bấm nhãn khung PP trên hình 1)
+# ── bốn agent của vùng FLS · NẠP (owner 05/11: "highlight 4 con agents") — bước sau: dựng AP, chạy Flip eval
+AGENT = {   # mã: (dải, nhãn ngắn, tên, luồng ≤ 5 bước, hộp thuộc agent)
+    "ag1": ("c1", "AGENT 1", "Agent 1 · KHAI & CHỤP", (
+        "Khởi bởi nhịp mỗi giờ (S1) và cú khai nguồn của kế toán (S2)",
+        "Đọc chỉ-đọc: sổ cái PM / PC (FPS), 60 sao kê + 8 quỹ + 2 sheet CCR, sổ lương, file Looker",
+        "Giữ bản khai nguồn có version: cột · thứ tự ngày · pháp nhân TK",
+        "Ghi ảnh chụp đóng băng có chup_id; ảnh cũ không đổi một ô",
+        "Ra: ảnh cho Agent 2"), ("anhFPS", "khai", "anhTien", "anhHR", "anhNT")),
+    "ag2": ("c2", "AGENT 2", "Agent 2 · DỰNG", (
+        "Khởi bởi kế toán chọn lô / xem trước (S3) hoặc Nhận (S4)",
+        "Đọc ảnh của Agent 1",
+        "Dựng 4 loại dòng: lệnh (PM/PC) · tiền + số dư ngày · đợt lương/BH · chi phí nền tảng",
+        "Gắn pháp nhân, tính content_key, giữ đủ hai vế Nợ / Có",
+        "Ra: dòng chuẩn cho Agent 3"), ("dLenh", "dTien", "dHR", "dNT")),
+    "ag3": ("c3", "AGENT 3", "Agent 3 · MAPPING", (
+        "Khởi bởi Nhận lô (S4)",
+        "PP (1): bank txns ↔ lệnh chi qua Reference No + luật vế Nợ → L1 · L2 · L3",
+        "PP (2): L3 còn lại ↔ đợt lương / BHXH / BHYT → LE",
+        "PP (3): phần còn lại ↔ 4 chi phí nền tảng → allocate venture",
+        "Ra: mối nối, phần chia và dòng chưa khớp cho Agent 4"), ("ghep", "ghep2", "ghep3")),
+    "ag4": ("c4", "AGENT 4", "Agent 4 · SOÁT", (
+        "Khởi bởi xem trước (S3) và Nhận (S4)",
+        "PP (1): 9 luật sao kê · Σ PM line = tiền · 4 vế · số dư ngày = CCR (DIF = 0)",
+        "PP (2): Σ đợt = Σ giao dịch · mọi đợt có LE",
+        "PP (3): Σ phần chia = tiền · Σ % venture = 100",
+        "Ra: dòng đạt cho GHI; CHẶN / CỜ / lệch vào hàng chờ có lý do"), ("soat", "soat2", "soat3")),
+}
+AG_THEO_DAI = {v[0]: k for k, v in AGENT.items()}
+
 PP_LUONG = {
     "pp1": ("Phương pháp (1) · mapping với bank transaction", (
         "Kế toán dán sao kê, ghi sổ quỹ, nhập số dư CCR ở Google Sheets",
@@ -881,6 +910,10 @@ def gan_luong() -> list[str]:
         if not 1 <= len(buoc) <= 5:
             loi.append(f"luồng {ma}: {len(buoc)} bước (phải 1–5)")
         tat_ca[ma].luong = buoc
+    for k, (d, _n, _t, buoc, tv) in AGENT.items():
+        if not 1 <= len(buoc) <= 5:
+            loi.append(f"{k}: {len(buoc)} bước")
+        loi += [f"{k}: hộp {m} không ở dải {d}" for m in tv if m not in HOP_THEO or HOP_THEO[m].dai != d]
     for k, (_t, buoc, tv) in PP_LUONG.items():
         if not 1 <= len(buoc) <= 5:
             loi.append(f"luồng {k}: {len(buoc)} bước")
@@ -978,6 +1011,13 @@ def svg() -> str:
     o.append('<text class="vr" x="10" y="28">NGUỒN</text><text class="vr2" x="10" y="42">ngoài FLS, chỉ-đọc</text>')
     for d, (_v, y0, h, nh) in DAI.items():
         if not nh or d in ("B0", "B1", "G0", "G1", "H0", "H1"):
+            continue
+        if d in AG_THEO_DAI:
+            k = AG_THEO_DAI[d]
+            o.append(f'<g class="pp-nhan ag-nhan" data-id="h:{k}" tabindex="0" role="button" aria-label="{E(AGENT[k][2])}">'
+                     f'<rect class="ag-the" x="4" y="{y0 + 4}" width="114" height="{h - 8}" rx="6"/>'
+                     f'<text class="ag-so" x="12" y="{y0 + h / 2 - 3}">{E(AGENT[k][1])} ▸</text>'
+                     f'<text class="ag-ten" x="12" y="{y0 + h / 2 + 13}">{E(nh)}</text></g>')
             continue
         dy = 18 if d in ("A0", "A1") else 4
         o.append(f'<text class="br" x="10" y="{y0 + h / 2 + dy}">{E(nh)}</text>')
@@ -1120,7 +1160,8 @@ def vao_ra() -> tuple[dict, dict]:
 
 
 NHOM_LUONG = [
-    ("Ba phương pháp — luồng trọn từ nguồn tới sổ", [("", ["pp1", "pp2", "pp3"])]),
+    ("Bốn agent và ba phương pháp", [("Bốn agent · FLS · NẠP", ["ag1", "ag2", "ag3", "ag4"]),
+                                     ("Ba phương pháp · luồng trọn từ nguồn tới sổ", ["pp1", "pp2", "pp3"])]),
     ("FLS · NẠP", [("① KHAI & CHỤP", ["anhFPS", "khai", "anhTien", "anhHR", "anhNT"]),
                    ("② DỰNG", ["dLenh", "dTien", "dHR", "dNT"]),
                    ("③ MAPPING", ["ghep", "ghep2", "ghep3"]),
@@ -1144,7 +1185,10 @@ def bang_luong() -> str:
             if ten_con:
                 o.append(f'<tr class="b2"><th colspan="3">{E(ten_con)}</th></tr>')
             for ma in mas:
-                if ma in PP_LUONG:
+                if ma in AGENT:
+                    _d, _n, ten, buoc, _tv = AGENT[ma]
+                    tt = "agent · bước sau: AP → Flip eval"
+                elif ma in PP_LUONG:
                     ten, buoc, _tv = PP_LUONG[ma]
                     tt = "GĐ1 phải dựng"
                 else:
@@ -1212,6 +1256,10 @@ def du_lieu_js() -> str:
                   "dai": NHAN_DAI_BANG.get(h.dai) or DAI[h.dai][3], "vao": vao[h.ma], "ra": ra[h.ma],
                   "luong": list(h.luong), "nm": list(h.nm)}
            for h in HOP}
+    for k, (_d, _n, ten_ag, buoc, tv) in AGENT.items():
+        hop[k] = {"ten": ten_ag, "loai": "agent", "tt": "b", "dong": [], "mono": "", "huy": [],
+                  "dc": "owner 05/11 · bước sau: dựng AP → chạy Flip eval", "vung": "FLS · NẠP · bốn agent",
+                  "dai": DAI[_d][3], "vao": [], "ra": [], "luong": list(buoc), "thanh_vien": list(tv)}
     for k, (ten_pp, buoc, tv) in PP_LUONG.items():
         hop[k] = {"ten": ten_pp, "loai": "phương pháp", "tt": "q", "dong": [], "mono": "", "huy": [],
                   "dc": "bình luận owner 04/11 trên hình", "vung": "Ba phương pháp xử lý", "dai": "luồng trọn",
@@ -1313,6 +1361,9 @@ figcaption{font-size:13px;color:var(--muted);margin:8px 2px 0;max-width:none}
 .nm{stroke-width:1} .nm-may{fill:var(--prop-soft);stroke:var(--prop)} .nm-nguoi{fill:var(--mid-soft);stroke:var(--mid)} .nm-ca{fill:var(--accent-soft);stroke:var(--accent)}
 .nmt{font:700 9px var(--mono)} .nmt-may{fill:var(--prop)} .nmt-nguoi{fill:var(--mid)} .nmt-ca{fill:var(--accent)}
 span.pill.nm-may{background:var(--prop-soft);color:var(--prop)} span.pill.nm-nguoi{background:var(--mid-soft);color:var(--mid)} span.pill.nm-ca{background:var(--accent-soft);color:var(--accent)}
+.ag-the{fill:var(--sel);opacity:.12;stroke:var(--sel);stroke-width:1.4}
+.ag-nhan:hover .ag-the,.ag-nhan:focus-visible .ag-the{opacity:.24}
+.ag-so{font:700 12px var(--mono);fill:var(--sel);letter-spacing:.04em} .ag-ten{font:600 11px var(--sans);fill:var(--fg)}
 .pp-nhan{cursor:pointer} .pp-hit{fill:transparent} .pp-nhan:hover .pp-hit,.pp-nhan:focus-visible .pp-hit{fill:var(--mid-soft)}
 .pp-nhan:focus{outline:none} .pp-nhan:focus-visible .vt{text-decoration:underline}
 ol.luong{margin:4px 0 12px;padding-left:1.3em;font-size:13.5px} ol.luong li{margin:3px 0}
@@ -1662,7 +1713,7 @@ def trang() -> str:
 </tbody></table></div>
 """, """
 <h2>§1d · Luồng xử lý dữ liệu theo từng hộp</h2>
-<p>Mỗi hộp xử lý và hộp dữ liệu trong FLS có một luồng tổng quan, tối đa 5 bước. Cùng luồng này hiện ở đầu khung chi tiết khi bấm hộp, và trong chú thích khi rê chuột lên hộp. Bấm nhãn <b>PHƯƠNG PHÁP (1) / (2) / (3) ▸</b> trên hình 1 để xem luồng trọn của từng phương pháp và làm nổi các hộp thuộc nó.</p>
+<p>Vùng FLS · NẠP chạy bởi <b>bốn agent</b> (nhãn đỏ ở lề trái hình 1: AGENT 1 KHAI &amp; CHỤP · AGENT 2 DỰNG · AGENT 3 MAPPING · AGENT 4 SOÁT); bấm nhãn để xem agent nhận gì, làm gì, ra gì. Bước sau khi xong voi: dựng AP rồi chạy Flip eval cho bốn agent này. Mỗi hộp xử lý và hộp dữ liệu trong FLS có một luồng tổng quan, tối đa 5 bước. Cùng luồng này hiện ở đầu khung chi tiết khi bấm hộp, và trong chú thích khi rê chuột lên hộp. Bấm nhãn <b>PHƯƠNG PHÁP (1) / (2) / (3) ▸</b> trên hình 1 để xem luồng trọn của từng phương pháp và làm nổi các hộp thuộc nó.</p>
 """, bang_luong(), """
 <h2>§1e · Nguồn của máy, nguồn của người — đầu vào và đầu ra</h2>
 <p>Mỗi nguồn vào và mỗi đầu ra mang một nhãn ở góc trên-trái của hộp: <b>MÁY</b> (hệ sinh, không ai gõ) · <b>NGƯỜI</b> (người gõ, dán hoặc ký) · <b>NGƯỜI+MÁY</b> (người nhập, máy sinh sổ; hoặc máy đề xuất, người chốt). Chỗ nào có tay người là chỗ cần một cổng canh, ghi ở cột cuối.</p>
