@@ -95,6 +95,7 @@ class Hop:
     huy: tuple[str, ...] = ()        # huy hiệu khởi động S1..S5
     tang: str = ""                   # "tren" | "duoi" cho hộp xếp chồng ở cột 0
     doi_chieu: str = ""              # đối chiếu mã / tài liệu (bảng kiểm cạnh)
+    luong: tuple[str, ...] = ()      # luồng xử lý tổng quan, ≤ 5 bước (gán từ LUONG bên dưới)
     khoi: str = ""                   # khung chứa (vd "pp1" = phương pháp xử lý 1) — tính MỘT mục khi đếm dải
 
     @property
@@ -620,6 +621,185 @@ TEN_N: list[Ten] = [
 ]
 
 
+# ═════════════════ LUỒNG XỬ LÝ TỔNG QUAN — mỗi hộp ≤ 5 bước (owner 05/11) ═════════════════
+# Hiện ở: khung chi tiết khi bấm hộp · chú thích khi rê chuột · bảng §1d. Luật vẽ voi: ≤ 5 bước.
+LUONG: dict[str, tuple[str, ...]] = {
+    # ── c1 · KHAI & CHỤP
+    "anhFPS": ("Nhịp S1 mở kết nối chỉ-đọc vào sổ cái PM / PC (hôm nay: tab PM đọc qua Sheets)",
+               "Kiểm bộ tiêu đề theo hợp đồng cột; lệch ⇒ nổ, nêu tên cột",
+               "Bỏ cột riêng tư (email người lập) trước khi lưu",
+               "Ghi một ảnh mới có chup_id; ảnh cũ không đổi một ô",
+               "Báo số dòng và tuổi ảnh cho bước dựng"),
+    "khai": ("Kế toán mở F04, chọn nguồn (S2)",
+             "FLS đọc dòng 1 của sheet: vị trí 6 trường chuẩn, đo thứ tự ngày dmy / mdy",
+             "Máy đề xuất pháp nhân TK từ TK chi + pháp nhân thanh toán trên sổ cái PM (k1)",
+             "Kế toán khai, owner ký pháp nhân",
+             "Ghi bản khai version mới; bản cũ giữ nguyên"),
+    "anhTien": ("Nhịp S1 lấy bản khai hiệu lực của từng nguồn",
+                "Đọc vùng chuẩn 60 sheet sao kê, 8 dòng chảy quỹ, 2 sheet CCR qua Sheets API chỉ-đọc",
+                "Chỉ lấy cột đã khai, không đọc Diễn giải",
+                "Ghi ảnh có chup_id + khai_version từng nguồn; nguồn 0 dòng vẫn có mặt",
+                "Dọn ảnh không ai dùng sau 30 ngày; ảnh đã nạp giữ vĩnh viễn"),
+    "anhHR": ("Nhịp chụp sổ lương HR",
+              "Kiểm bề rộng cột theo hợp đồng; lệch ⇒ nổ",
+              "Ghi ảnh theo sổ · năm, có chup_id"),
+    "anhNT": ("DATA xuất file chi phí từ Looker",
+              "Nhịp chụp file vào kho",
+              "Kiểm 4 loại OMC · GI · Server · PS; loại lạ ⇒ chặn",
+              "Ghi ảnh có chup_id"),
+    # ── c2 · DỰNG
+    "dLenh": ("Đọc ảnh sổ cái PM / PC mới nhất",
+              "Đặt kiểu từng cột theo hợp đồng (14 cột có kiểu, 13 cột còn thô phải đặt)",
+              "Mỗi PM / PC line → bản ghi lệnh: Ref · tiền · tiền tệ · HD/KRF · CDT1 · đối tác · kỳ DV · pháp nhân trả",
+              "Cột hợp đồng rỗng ⇒ cờ có tên cột, dòng vẫn đi tiếp",
+              "Chuyển sang MAPPING PP (1)"),
+    "dTien": ("Đọc ảnh lằn Bank · Cash · CCR",
+              "Mỗi dòng sao kê / quỹ → canon 36 trường, giữ cả PS Nợ và PS Có",
+              "Đọc ngày theo thứ tự đã khai; gắn pháp nhân TK từ bản khai nguồn",
+              "Tính content_key chống trùng",
+              "Lằn CCR → bảng số dư đầu kỳ và số dư từng ngày của từng TK / quỹ"),
+    "dHR": ("Đọc ảnh sổ lương",
+            "Gom theo venture · kỳ · loại (lương / BHXH / BHYT)",
+            "Tính Σ tiền mỗi đợt",
+            "Gắn LE của venture",
+            "GĐ2: tách đợt xuống KRF"),
+    "dNT": ("Đọc ảnh file Looker",
+            "Tách 4 loại OMC · GI · Server · PS",
+            "Mỗi loại → chi phí theo vendor · venture · tháng",
+            "Tách tỉ lệ venture (Σ % = 100 mỗi loại · tháng)",
+            "Chuyển sang MAPPING PP (3)"),
+    # ── c3 · MAPPING
+    "ghep": ("Nhận dòng tiền (cả hai vế) và dòng lệnh",
+             "Vế Có (tiền ra): so Reference No với PM line; Σ tiền các line = tiền dòng",
+             "Vế Nợ (tiền vào): luật vế Nợ — nội bộ, doanh thu, hoàn tiền, vay và lãi",
+             "Xếp lớp L1 khớp · L1b khớp mã lệch · L2 FPS có, bank chưa · L3 bank có, FPS không",
+             "Chuyển L3 sang MAPPING PP (2) (q1)"),
+    "ghep2": ("Nhận giao dịch L3 từ PP (1) và đợt lương / BH",
+              "Lọc giao dịch từ TK chi lương",
+              "Khớp Σ một đợt của một venture trong kỳ",
+              "Khớp ⇒ gắn LE venture",
+              "Còn lại chuyển sang MAPPING PP (3) (q2)"),
+    "ghep3": ("Nhận giao dịch còn lại và chi phí 4 loại",
+              "Áp luật của từng loại: nhận diện giao dịch · khớp kỳ · khớp Σ tiền",
+              "Khớp ⇒ allocate tiền giao dịch về venture theo tỉ lệ",
+              "Chờ tiền / chưa khớp ⇒ hàng chờ, còn ở L3 cho vòng cộng dồn",
+              "Chuyển sang SOÁT PP (3)"),
+    # ── c4 · SOÁT
+    "soat": ("Chạy 9 luật trên TỪNG nguồn",
+             "CHẶN ⇒ chừa nguồn ấy; CỜ ⇒ vẫn ghi, vào hàng chờ có lý do",
+             "Kiểm Σ PM line = tiền dòng và 4 vế: vào = sổ + loại + rỗng + trùng",
+             "Kiểm số dư đầu + Σ PS Nợ − Σ PS Có theo ngày = số dư CCR / CCR Cash (DIF = 0)",
+             "In biên bản 9 dòng trên F04"),
+    "soat2": ("Kiểm Σ đợt = Σ giao dịch đã ghép",
+              "Kiểm mọi đợt có LE",
+              "Lệch ⇒ không ghi đợt ấy, vào hàng chờ"),
+    "soat3": ("Kiểm Σ phần chia = tiền giao dịch",
+              "Kiểm Σ % venture = 100 mỗi loại · tháng",
+              "Lệch ⇒ không ghi giao dịch ấy"),
+    # ── c5 · GHI
+    "ghiNap": ("Kế toán bấm Nhận lô trên F04 (S4)",
+               "Mở MỘT giao dịch cơ sở dữ liệu",
+               "Ghi run, dòng sổ (bỏ qua dòng trùng content_key), dòng loại",
+               "Ghi mối nối (PP 1), đợt gắn LE (PP 2), phần chia venture (PP 3), gợi ý của máy",
+               "Kiểm 4 vế cân; lỗi giữa chừng ⇒ huỷ cả lượt"),
+    # ── d1 · SỔ GỐC
+    "loai": ("Mỗi dòng không vào sổ được một lý do có tên",
+             "Được đếm vào vế 'loại' của 4 vế"),
+    "soITL": ("Nhận dòng từ GHI lượt nạp",
+              "content_key UNIQUE chặn dòng trùng",
+              "Chỉ-thêm (INV-I08): không cửa sửa, không cửa xoá",
+              "Mỗi dòng mang run_id, nguồn và pháp nhân TK"),
+    "lopSua": ("Nhận mối nối / bút toán của máy (s3) và của người (s4)",
+               "Mỗi thay đổi là một dòng mới; bỏ nối là thêm dòng bỏ nối",
+               "Giá trị hiệu lực: người › máy gợi ý › nguồn",
+               "Nhật ký ghi ai · lúc nào · giá trị cũ → mới"),
+    "ghiTay": ("Kế toán ghép / sửa / đảo trên F01 · F02 (S5)",
+               "Actor lấy từ thẻ đăng nhập; gửi trong thân ⇒ 400",
+               "Ghi bút toán + sự kiện + nhật ký trong một giao dịch",
+               "Ô đang mang giá trị khác nguồn ⇒ 409, kèm giá trị đang có",
+               "Sổ gốc không đổi một ô"),
+    # ── d2 · HIỆU LỰC
+    "kiem": ("Đọc sổ hiệu lực và dòng loại",
+             "Chạy 5 cổng GĐ1: pháp nhân rỗng · Σ theo pháp nhân = Σ theo nguồn · khoá lệnh chi trỏ rỗng · DIF CCR · 4 vế",
+             "Mỗi cổng so với kết quả mong đã khai",
+             "Không đo được ⇒ ĐỎ",
+             "Đẩy kết quả ra F03"),
+    "hieuLuc": ("Ghép dòng sổ gốc với lớp sửa",
+                "Lấy giá trị hiệu lực từng ô",
+                "Gắn chiều lệnh chi và 3 vai pháp nhân (TK · trả · nhận)",
+                "Một view có tên, đủ 4 họ nguồn, đủ hai vế",
+                "Được F01, F02, XUẤT và KIỂM đọc"),
+    # ── e1 · ĐẦU RA
+    "f03": ("Đọc kết quả cổng", "Hiện đạt · không đạt · chưa đo được"),
+    "f01": ("Lọc theo một tiền tệ", "Hiện dòng chưa ghép / chưa đủ chiều kèm lý do", "Kế toán ghép hoặc sửa (S5)"),
+    "f02": ("Hiện lưới sổ hiệu lực", "Ngăn kéo: nguồn nói gì · người nói gì · lúc nào", "Sửa một ô → GHI tay"),
+    "xuat": ("Gom sổ hiệu lực theo TK · pháp nhân · ngày",
+             "Dựng bảng báo cáo daily",
+             "ghi_o.py tìm ô đích theo khoá, không theo địa chỉ cứng",
+             "Chạy khô → owner duyệt",
+             "Ghi vào sheet báo cáo daily của CCR khi cờ duyệt bật"),
+    # ── hình 2 · mapping PP (1)
+    "mMap": ("Nhận PM line, đợt lương / BH, giao dịch bank và luật ghép đã ký",
+             "Chạy luật theo thứ tự: VN (Ref + tiền + pháp nhân) → nước ngoài (từ khoá + vendor + tiền) → lương / BH",
+             "Σ tiền phải khớp; lệch ⇒ chặn; khác tiền tệ / N×M ⇒ để người",
+             "Xếp mỗi dòng vào đúng một lớp L1 · L1b · L2 · L3",
+             "Đếm từng lớp vào biên bản mapping"),
+    "mSuy": ("Nhận dòng L3 và luật hiệu lực",
+             "Tìm luật theo khoá (TK, mẫu nội dung, loại bank)",
+             "Hai luật nói khác nhau ⇒ không gợi ý",
+             "Ghi gợi ý loại giao dịch, nguồn = máy gợi ý"),
+    "mXN": ("Nhận các lần kế toán giữ / sửa gợi ý",
+            "Cộng bằng chứng theo khoá luật",
+            "Đủ k lần cùng kết quả, 0 lần khác ⇒ luật ứng viên",
+            "Một lần người sửa ngược ⇒ luật về 'xem lại'",
+            "Đưa luật ứng viên lên chờ owner ký (m14)"),
+    "mLuat": ("Luật mồi: 5 loại giao dịch hay sót",
+              "Thêm luật ứng viên từ vòng cộng dồn",
+              "Chỉ hiệu lực khi owner ký; có version"),
+    # ── hình 3 · PP (3)
+    "nTach": ("Đọc cột venture của file Looker",
+              "Tính % từng venture theo loại · tháng",
+              "Σ % ≠ 100 ⇒ chặn"),
+    "nMap": ("Nhận chi phí 4 loại, giao dịch L3 và 4 luật đã ký",
+             "Nhận diện giao dịch theo luật của từng loại",
+             "Khớp kỳ và Σ tiền; lệch ⇒ chặn",
+             "Giao dịch khớp ≥ 2 loại ⇒ để người",
+             "Xếp: khớp · chờ tiền · tiền chưa khớp"),
+    "nAlloc": ("Nhận giao dịch đã khớp và tỉ lệ venture",
+               "Chia tiền theo tỉ lệ đúng loại · tháng",
+               "Phần lẻ dồn vào một venture có tên",
+               "Ghi phần chia chỉ-thêm; giao dịch gốc giữ nguyên"),
+    "nKiem": ("Cộng các phần chia của từng giao dịch",
+              "So với tiền giao dịch, từng tiền tệ",
+              "Lệch ⇒ chặn cả lượt"),
+}
+
+# ── ba phương pháp: luồng trọn từ nguồn tới sổ (bấm nhãn khung PP trên hình 1)
+PP_LUONG = {
+    "pp1": ("Phương pháp (1) · mapping với bank transaction", (
+        "Kế toán dán sao kê, ghi sổ quỹ, nhập số dư CCR ở Google Sheets",
+        "FLS chụp theo bản khai nguồn (Bank · Cash · CCR)",
+        "Dựng dòng tiền đủ hai vế PS Nợ / PS Có + số dư ngày; gắn pháp nhân TK",
+        "Mapping với sổ cái PM qua Reference No (vế Có) và luật vế Nợ → L1 · L2 · L3",
+        "Soát 9 luật + DIF CCR = 0 → ghi sổ; L3 chuyển sang PP (2)"),
+        ("oKTnh", "oKTq", "oCCR", "saoke", "soquy", "ccr", "khai", "anhTien", "dTien", "ghep", "soat", "ghiNap")),
+    "pp2": ("Phương pháp (2) · lương · BHXH · BHYT", (
+        "HR lập sổ lương theo venture",
+        "FLS chụp sổ lương",
+        "Dựng đợt lương / BHXH / BHYT theo venture · kỳ",
+        "Mapping đợt với giao dịch L3 từ TK chi lương → gắn LE (GĐ1); KRF ở GĐ2",
+        "Soát Σ đợt = Σ giao dịch → ghi sổ; phần còn lại sang PP (3)"),
+        ("oHR", "soluong", "anhHR", "dHR", "ghep2", "soat2", "ghiNap")),
+    "pp3": ("Phương pháp (3) · 4 chi phí nền tảng", (
+        "DATA xuất file OMC · GI · Server · PS từ Looker",
+        "FLS chụp file",
+        "Dựng 4 loại chi phí và tỉ lệ venture",
+        "Mapping với giao dịch còn lại theo 4 luật riêng → allocate về ventures",
+        "Soát Σ phần chia = tiền giao dịch → ghi sổ"),
+        ("oNT", "sont", "anhNT", "dNT", "ghep3", "soat3", "ghiNap")),
+}
+
+
 # ───────────────────────────── kiểm hình ─────────────────────────────
 def doan(t: Ten, ht: dict | None = None) -> tuple[float, float, float, float]:
     ht = ht or HOP_THEO
@@ -652,8 +832,27 @@ def so_muc(d: str) -> int:
     return sum(1 for h in hs if not h.khoi) + len({h.khoi for h in hs if h.khoi})
 
 
+def gan_luong() -> list[str]:
+    loi = []
+    tat_ca = {h.ma: h for h in HOP + HOP_M + HOP_N}
+    for ma, buoc in LUONG.items():
+        if ma not in tat_ca:
+            loi.append(f"LUONG có hộp lạ: {ma}")
+            continue
+        if not 1 <= len(buoc) <= 5:
+            loi.append(f"luồng {ma}: {len(buoc)} bước (phải 1–5)")
+        tat_ca[ma].luong = buoc
+    for k, (_t, buoc, tv) in PP_LUONG.items():
+        if not 1 <= len(buoc) <= 5:
+            loi.append(f"luồng {k}: {len(buoc)} bước")
+        loi += [f"{k}: thành viên lạ {m}" for m in tv if m not in HOP_THEO]
+    # mọi hộp XỬ LÝ phải có luồng
+    loi += [f"hộp xử lý {h.ma} thiếu luồng" for h in HOP + HOP_M + HOP_N if h.loai == "p" and not h.luong]
+    return loi
+
+
 def kiem() -> dict:
-    loi: list[str] = []
+    loi: list[str] = gan_luong()
     for d in DAI:
         n = so_muc(d)
         if d in MOT_HOP_OK and n == 1:
@@ -719,11 +918,11 @@ def svg() -> str:
     o.append('<rect class="vz vz-ext" x="242" y="10" width="336" height="194" rx="6"/>')
     o.append('<text class="vt" x="250" y="28">FPS · sổ cái (ngoài FLS)</text>')
     o.append('<rect class="vz vz-pp1" x="743" y="10" width="501" height="194" rx="6"/>')
-    o.append('<text class="vt vt-pp1" x="751" y="28">PHƯƠNG PHÁP (1) · MAPPING VỚI BANK TXN</text>')
+    o.append('<g class="pp-nhan" data-id="h:pp1" tabindex="0" role="button" aria-label="Luồng PHƯƠNG PHÁP (1) · MAPPING VỚI BANK TXN"><rect class="pp-hit" x="747" y="16" width="300" height="16" rx="3"/><text class="vt vt-pp1" x="751" y="28">PHƯƠNG PHÁP (1) · MAPPING VỚI BANK TXN ▸</text></g>')
     o.append('<rect class="vz vz-pp1" x="1247" y="10" width="164" height="194" rx="6"/>')
-    o.append('<text class="vt vt-pp1" x="1253" y="28">PHƯƠNG PHÁP (2)</text>')
+    o.append('<g class="pp-nhan" data-id="h:pp2" tabindex="0" role="button" aria-label="Luồng PHƯƠNG PHÁP (2)"><rect class="pp-hit" x="1249" y="16" width="134" height="16" rx="3"/><text class="vt vt-pp1" x="1253" y="28">PHƯƠNG PHÁP (2) ▸</text></g>')
     o.append('<rect class="vz vz-pp1" x="1414" y="10" width="165" height="194" rx="6"/>')
-    o.append('<text class="vt vt-pp1" x="1420" y="28">PHƯƠNG PHÁP (3)</text>')
+    o.append('<g class="pp-nhan" data-id="h:pp3" tabindex="0" role="button" aria-label="Luồng PHƯƠNG PHÁP (3)"><rect class="pp-hit" x="1416" y="16" width="134" height="16" rx="3"/><text class="vt vt-pp1" x="1420" y="28">PHƯƠNG PHÁP (3) ▸</text></g>')
     for v, (n1, n2, y0, y1) in VUNG.items():
         o.append(f'<rect class="vz vz-{v}" x="124" y="{y0}" width="1455" height="{y1 - y0}" rx="6"/>')
         o.append(f'<text class="vr" x="10" y="{y0 + 18}">{E(n1)}</text>')
@@ -779,7 +978,9 @@ def ve_phan(o: list[str], hops: list, tens: list, ht: dict) -> None:
         cls = f"hop hop-{h.loai} tt-{h.tt}"
         o.append(f'<g class="{cls}" data-id="h:{h.ma}" data-tt="{h.tt}" data-comment-target tabindex="0" '
                  f'role="button" aria-label="{E(h.ten)} ({LOAI_CHU[h.loai]}, {TT_CHU[h.tt]})">'
-                 f'<rect class="khung" x="{x0}" y="{y0}" width="{x1 - x0}" height="{y1 - y0}" '
+                 + (f'<title>{E(h.ten)} — luồng: ' + E(" → ".join(f"{i + 1}. {b}" for i, b in enumerate(h.luong)))
+                    + '</title>' if h.luong else '')
+                 + f'<rect class="khung" x="{x0}" y="{y0}" width="{x1 - x0}" height="{y1 - y0}" '
                  f'rx="{9 if h.loai == "o" else 3}"/>')
         nho = h.loai == "o"
         ty = y0 + (14 if nho else 16)
@@ -864,6 +1065,44 @@ def vao_ra() -> tuple[dict, dict]:
     return vao, ra
 
 
+NHOM_LUONG = [
+    ("Ba phương pháp — luồng trọn từ nguồn tới sổ", [("", ["pp1", "pp2", "pp3"])]),
+    ("FLS · NẠP", [("① KHAI & CHỤP", ["anhFPS", "khai", "anhTien", "anhHR", "anhNT"]),
+                   ("② DỰNG", ["dLenh", "dTien", "dHR", "dNT"]),
+                   ("③ MAPPING", ["ghep", "ghep2", "ghep3"]),
+                   ("④–⑤ SOÁT & GHI", ["soat", "soat2", "soat3", "ghiNap"])]),
+    ("FLS · SỔ", [("⑥ SỔ GỐC", ["loai", "soITL", "lopSua", "ghiTay"]),
+                  ("⑦ HIỆU LỰC", ["kiem", "hieuLuc"])]),
+    ("ĐẦU RA", [("", ["f03", "f01", "f02", "xuat"])]),
+    ("Hình phóng to", [("Hình 2 · mapping PP (1)", ["mMap", "mSuy", "mXN", "mLuat"]),
+                       ("Hình 3 · PP (3)", ["nTach", "nMap", "nAlloc", "nKiem"])]),
+]
+
+
+def bang_luong() -> str:
+    gan_luong()
+    tat_ca = {h.ma: h for h in HOP + HOP_M + HOP_N}
+    o = ['<div class="scroll"><table class="luong-bang">',
+         '<thead><tr><th>hộp</th><th>luồng xử lý tổng quan</th><th>hôm nay</th></tr></thead><tbody>']
+    for nhom, con in NHOM_LUONG:
+        o.append(f'<tr class="b1"><th colspan="3">{E(nhom)}</th></tr>')
+        for ten_con, mas in con:
+            if ten_con:
+                o.append(f'<tr class="b2"><th colspan="3">{E(ten_con)}</th></tr>')
+            for ma in mas:
+                if ma in PP_LUONG:
+                    ten, buoc, _tv = PP_LUONG[ma]
+                    tt = "GĐ1 phải dựng"
+                else:
+                    h = tat_ca[ma]
+                    ten, buoc, tt = h.ten, h.luong, TT_CHU[h.tt]
+                li = "".join(f"<li>{E(b)}</li>" for b in buoc)
+                o.append(f'<tr class="chon" data-ref="h:{ma}" data-comment-target tabindex="0"><td><b>{E(ten)}</b></td>'
+                         f'<td><ol>{li}</ol></td><td>{E(tt)}</td></tr>')
+    o.append('</tbody></table></div>')
+    return "\n".join(o)
+
+
 def bang_canh() -> str:
     vao, ra = vao_ra()
     o = ['<div class="scroll"><table class="audit">',
@@ -888,8 +1127,13 @@ def du_lieu_js() -> str:
     vao, ra = vao_ra()
     hop = {h.ma: {"ten": h.ten, "loai": LOAI_CHU[h.loai], "tt": h.tt, "dong": list(h.dong), "mono": h.mono,
                   "huy": list(h.huy), "dc": h.doi_chieu, "vung": TEN_VUNG[DAI[h.dai][0]],
-                  "dai": NHAN_DAI_BANG.get(h.dai) or DAI[h.dai][3], "vao": vao[h.ma], "ra": ra[h.ma]}
+                  "dai": NHAN_DAI_BANG.get(h.dai) or DAI[h.dai][3], "vao": vao[h.ma], "ra": ra[h.ma],
+                  "luong": list(h.luong)}
            for h in HOP}
+    for k, (ten_pp, buoc, tv) in PP_LUONG.items():
+        hop[k] = {"ten": ten_pp, "loai": "phương pháp", "tt": "q", "dong": [], "mono": "", "huy": [],
+                  "dc": "bình luận owner 04/11 trên hình", "vung": "Ba phương pháp xử lý", "dai": "luồng trọn",
+                  "vao": [], "ra": [], "luong": list(buoc), "thanh_vien": list(tv)}
     for hops, tens, nv, dai in ((HOP_M, TEN_M, "Mapping PP (1) · phóng to", DAI_M),
                                 (HOP_N, TEN_N, "PP (3) nền tảng · phóng to", DAI_N)):
         vm = {h.ma: [] for h in hops}
@@ -900,7 +1144,7 @@ def du_lieu_js() -> str:
         for h in hops:
             hop[h.ma] = {"ten": h.ten, "loai": LOAI_CHU[h.loai], "tt": h.tt, "dong": list(h.dong), "mono": h.mono,
                          "huy": list(h.huy), "dc": h.doi_chieu, "vung": nv,
-                         "dai": dai[h.dai][3], "vao": vm[h.ma], "ra": rm[h.ma]}
+                         "dai": dai[h.dai][3], "vao": vm[h.ma], "ra": rm[h.ma], "luong": list(h.luong)}
     ten = {t.ma: {"tu": t.tu, "toi": t.toi, "tt": t.tt, "cai_gi": t.cai_gi, "khoa": t.khoa, "ban_so": t.ban_so,
                   "cong": t.cong, "co_ma": t.co_ma, "nhom": NHOM[t.nhom[0]] + " · " + NHOM[t.nhom]}
            for t in TEN}
@@ -983,6 +1227,10 @@ figcaption{font-size:13px;color:var(--muted);margin:8px 2px 0;max-width:none}
 .vz{stroke:var(--line);stroke-width:1} .vz-ext{fill:var(--ext)} .vz-C{fill:var(--zc)} .vz-D{fill:var(--zd)} .vz-E{fill:var(--ze)}
 .vt{font:600 11.5px var(--mono);fill:var(--muted);letter-spacing:.04em}
 .vt-pp1{fill:var(--sel)} .vt2{font:10.5px var(--sans);fill:var(--muted)}
+.pp-nhan{cursor:pointer} .pp-hit{fill:transparent} .pp-nhan:hover .pp-hit,.pp-nhan:focus-visible .pp-hit{fill:var(--mid-soft)}
+.pp-nhan:focus{outline:none} .pp-nhan:focus-visible .vt{text-decoration:underline}
+ol.luong{margin:4px 0 12px;padding-left:1.3em;font-size:13.5px} ol.luong li{margin:3px 0}
+table.luong-bang ol{margin:0;padding-left:1.2em} table.luong-bang li{margin:2px 0}
 .vz-pp1{fill:var(--ext);stroke:var(--sel);stroke-width:1.4}
 .khung-pp1{fill:none;stroke:var(--sel);stroke-width:1.4;stroke-dasharray:3 3}
 .vr{font:700 12px var(--mono);fill:var(--accent);letter-spacing:.04em}
@@ -1088,6 +1336,8 @@ JS = r"""
     const h = D.hop[m];
     let s = '<div class="eb">' + txt(h.vung + ' · ' + h.dai + ' · ' + h.loai + ' · ' + D.tt[h.tt]) + '</div>';
     s += '<h3>' + txt(h.ten) + '</h3>';
+    if (h.luong && h.luong.length) s += '<div class="eb">luồng xử lý</div><ol class="luong">' + h.luong.map(b => '<li>' + txt(b) + '</li>').join('') + '</ol>';
+    if (h.thanh_vien) s += '<div class="eb">hộp thuộc luồng (' + h.thanh_vien.length + ')</div><div class="dsach">' + h.thanh_vien.map(x => '<button class="lien" data-di="h:' + x + '">' + txt(D.hop[x].ten) + '</button>').join('') + '</div>';
     if (h.dong.length) s += '<p>' + h.dong.map(txt).join('<br>') + '</p>';
     s += '<dl>';
     if (h.mono) s += '<dt>số liệu</dt><dd class="mono">' + txt(h.mono) + '</dd>';
@@ -1139,7 +1389,11 @@ JS = r"""
     document.querySelectorAll('tr.chon[data-ref="' + id + '"]').forEach(r => r.classList.add('dang'));
     const [k, m] = id.split(':');
     const ids = new Set([id]);
-    if (k === 'h') { const h = D.hop[m]; h.vao.concat(h.ra).forEach(t => { ids.add('t:' + t); ids.add('h:' + D.ten[t].tu); ids.add('h:' + D.ten[t].toi); }); }
+    if (k === 'h' && D.hop[m].thanh_vien) {
+      const tv = new Set(D.hop[m].thanh_vien); tv.forEach(x => ids.add('h:' + x));
+      Object.keys(D.ten).forEach(t => { if (tv.has(D.ten[t].tu) && tv.has(D.ten[t].toi)) ids.add('t:' + t); });
+    }
+    else if (k === 'h') { const h = D.hop[m]; h.vao.concat(h.ra).forEach(t => { ids.add('t:' + t); ids.add('h:' + D.ten[t].tu); ids.add('h:' + D.ten[t].toi); }); }
     else { const t = D.ten[m]; ids.add('h:' + t.tu); ids.add('h:' + t.toi); }
     sangLen(ids);
     noiDung.innerHTML = (k === 'h' ? veHop(m) : veTen(m)) + veHoi(id);
@@ -1158,11 +1412,12 @@ JS = r"""
   document.addEventListener('keydown', e => { if (e.key === 'Escape' && !khung.hidden) dong(); });
 
   quaMoiHinh(svg => svg.addEventListener('click', e => {
-    const g = e.target.closest('.hop,.ten-g');
+    const g = e.target.closest('.hop,.ten-g,.pp-nhan');
     if (g) chon(g.dataset.id, false); else if (dang) dong();
   }));
   quaMoiHinh(svg => svg.addEventListener('keydown', e => {
-    if ((e.key === 'Enter' || e.key === ' ') && e.target.closest('.hop,.ten-g')) { e.preventDefault(); chon(e.target.closest('.hop,.ten-g').dataset.id, false); }
+    const g = e.target.closest('.hop,.ten-g,.pp-nhan');
+    if ((e.key === 'Enter' || e.key === ' ') && g) { e.preventDefault(); chon(g.dataset.id, false); }
   }));
   document.querySelectorAll('tr.chon').forEach(r => {
     r.addEventListener('click', () => chon(r.dataset.ref, false));
@@ -1318,6 +1573,9 @@ def trang() -> str:
 <tr><td>⑤ ai ký, từ khi nào</td><td>người ký + ngày hiệu lực + version</td><td>luật đổi thì lượt cũ giữ version đã dùng</td></tr>
 </tbody></table></div>
 """, """
+<h2>§1d · Luồng xử lý dữ liệu theo từng hộp</h2>
+<p>Mỗi hộp xử lý và hộp dữ liệu trong FLS có một luồng tổng quan, tối đa 5 bước. Cùng luồng này hiện ở đầu khung chi tiết khi bấm hộp, và trong chú thích khi rê chuột lên hộp. Bấm nhãn <b>PHƯƠNG PHÁP (1) / (2) / (3) ▸</b> trên hình 1 để xem luồng trọn của từng phương pháp và làm nổi các hộp thuộc nó.</p>
+""", bang_luong(), """
 <h2>§2 · Đã sửa gì</h2>
 <p class="note"><b>v0.3 (owner, 04/11):</b> nguồn FPS là <b>sổ cái PM / PC</b>, đã mang đủ chiều ⇒ bỏ hai hộp "phiếu PE·PI·PM·PC" và "danh mục FPS"; bước dựng đổi từ <i>DỰNG chuỗi phiếu</i> (đi PM → PI → PE) thành <i>DỰNG dòng lệnh</i> (đọc thẳng từng dòng sổ cái). Đề xuất pháp nhân TK (k1) nay đếm từ TK chi + pháp nhân thanh toán trên sổ cái PM.</p>
 <p class="note"><b>v0.3.1–v0.3.2 (owner, 04/11, bình luận trên hình):</b> tách riêng ba phương pháp xử lý nguồn Sheets. <b>(1) mapping với bank transaction</b> — đủ hai vế PS Nợ (tiền vào) và PS Có (tiền ra), soát số dư ngày theo CCR / CCR Cash — sao kê &amp; sổ quỹ: kế toán dán / ghi → bản khai nguồn → ảnh chụp đọc theo bản khai → DỰNG dòng tiền; dòng tiền chưa mang chiều chi phí nên phải <b>mapping với bank txns theo reference number</b> (hộp MAPPING: mã Reference number trên giao dịch ngân hàng ↔ cùng mã trên dòng sổ cái PM, chia tiền theo PM line). PP (2), (3) cũng mapping với bank txns nhưng bằng luật riêng (§1b, §1c), không qua Reference No của PM. Sửa tay (GHI tay → lớp sửa) là bước chung cho mọi dòng sổ, không riêng phương pháp nào. <b>(2) lương · BHXH · BHYT</b> — sổ lương HR: HR lập → ảnh sổ lương → DỰNG đợt lương · BH. <b>GĐ1:</b> luật mapping các đợt đi tiền lương / BHXH / BHYT của các venture với bank txns → gắn <b>LE</b> (§1b). <b>GĐ2:</b> mapping xuống <b>KRF</b>. <b>(3) 4 chi phí nền tảng OMC · GI · Server · PS</b> — không có trên FPS: xuất file từ data Looker → mapping với bank txns, mỗi loại một luật → allocate về các ventures (§1c). Vùng nguồn Sheets tách làm ba; hộp "ảnh sổ nhập tay" tách làm ba; mỗi phương pháp là một khung đi từ nguồn xuống tới bước dựng.</p>
