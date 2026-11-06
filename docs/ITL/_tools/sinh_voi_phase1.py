@@ -2102,7 +2102,7 @@ td.id{font-family:var(--mono);white-space:nowrap;font-weight:500}
 .pill{display:inline-block;font:500 12px/1.3 var(--mono);padding:3px 7px;border-radius:3px}
 .ok{background:var(--ok-soft);color:var(--ok)} .mid{background:var(--mid-soft);color:var(--mid)}
 .no{background:var(--no-soft);color:var(--no)} .ext{background:var(--ext);color:var(--muted)}
-.thanh{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bg);display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.thanh{background:var(--bg);display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
 .thanh .nhan{font-size:12.5px;color:var(--muted)}
 .chip{font:500 13px/1 var(--sans);padding:7px 11px;border-radius:999px;border:1px solid var(--line);background:var(--paper);color:var(--fg);cursor:pointer}
@@ -2211,7 +2211,7 @@ footer{margin-top:48px;color:var(--muted);font-size:12.5px;border-top:1px solid 
 .ten-a{stroke:var(--asis)} .ten-t{stroke:var(--asis);stroke-dasharray:2 3}
 .mk-a,.mk-t{fill:var(--asis)}
 .fe-hinh svg{min-width:1000px;background:#fff;border-radius:4px}
-.tab-trang{display:flex;flex-wrap:wrap;gap:6px;margin:14px 0 4px;border-bottom:2px solid var(--line)}
+.tab-trang{display:flex;flex-wrap:wrap;gap:6px;margin:14px 0 4px;border-bottom:2px solid var(--line);position:sticky;top:env(safe-area-inset-top,0px);z-index:15;background:var(--bg);padding-top:6px}
 .tab-trang a{font:600 14px/1 var(--sans);padding:10px 14px;color:var(--muted);text-decoration:none;border:1px solid transparent;border-bottom:none;border-radius:6px 6px 0 0;margin-bottom:-2px}
 .tab-trang a[aria-current="page"]{color:var(--accent);background:var(--paper);border-color:var(--line);border-bottom:2px solid var(--paper)}
 .tab-trang a:hover{color:var(--fg)} .tab-trang a:focus-visible{outline:2px solid var(--sel);outline-offset:2px}
