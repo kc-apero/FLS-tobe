@@ -1,0 +1,1488 @@
+{
+ "_nguon": "artifact 'Voi ITL AS-IS' (claude.ai/artifact/G2t8p1p8RVMmLGcaqQHwug) · đọc 2026-11-06 · đã bỏ URL Google Sheets",
+ "hop": {
+  "oDN": {
+   "ten": "NGƯỜI ĐỀ NGHỊ·DUYỆT",
+   "dong": [
+    "Gform PE·PI·PM·PC",
+    "duyệt trên Gsheet"
+   ],
+   "loai": "khởi động (người)",
+   "vung": "NGUỒN · NGƯỜI",
+   "dai": "① ai khởi động",
+   "luong": "P100 · lệnh chi",
+   "nm": "",
+   "ai": "người đề nghị (nhân dân) · người duyệt (boss)",
+   "cach": "Điền Gform; người duyệt bấm duyệt trong Gsheet. Với lương: HR/KT lập PE theo số ở sheet P100 I Suggestion của file lương tháng (liên kết không vẽ L1).",
+   "buoc": "107–114",
+   "file": "A | PAY100 | PE11/PI11/PM11/PC11 Entry Data",
+   "issue": "",
+   "vao": [],
+   "ra": [
+    "n1"
+   ]
+  },
+  "oCA": {
+   "ten": "CA · NHẬP REF",
+   "dong": [
+    "hằng ngày",
+    "Reference number"
+   ],
+   "loai": "khởi động (người)",
+   "vung": "NGUỒN · NGƯỜI",
+   "dai": "① ai khởi động",
+   "luong": "P100 · lệnh chi",
+   "nm": "",
+   "ai": "CA (kế toán thanh toán)",
+   "cach": "Sau khi chi, gõ số Reference number của giao dịch bank vào cột Reference number của PM11_Entry Data. Một PMLine ứng nhiều giao dịch thì chỉ điền một mã (sheet Note của file Bank).",
+   "buoc": "216 [2]",
+   "file": "A | PAY100 | PM11 Entry Data",
+   "issue": "",
+   "vao": [],
+   "ra": [
+    "n2"
+   ]
+  },
+  "oSD": {
+   "ten": "NGƯỜI NHẬP SỐ DƯ",
+   "dong": [
+    "số dư cuối ngày",
+    "từng TK · từng quỹ"
+   ],
+   "loai": "khởi động (người)",
+   "vung": "NGUỒN · NGƯỜI",
+   "dai": "① ai khởi động",
+   "luong": "Dòng tiền · bank · quỹ · CCR",
+   "nm": "",
+   "ai": "kế toán / treasury",
+   "cach": "Nhập tay số dư cuối ngày của từng sao kê và từng quỹ vào 2. CCR (bank) và 2. CCR Cash (quỹ).",
+   "buoc": "204 · 209",
+   "file": "A-CCR_V2_Working · 2. CCR",
+   "issue": "",
+   "vao": [],
+   "ra": [
+    "n3"
+   ]
+  },
+  "oNH": {
+   "ten": "KẾ TOÁN NGÂN HÀNG",
+   "dong": [
+    "tải sao kê",
+    "dán vào sheet R |"
+   ],
+   "loai": "khởi động (người)",
+   "vung": "NGUỒN · NGƯỜI",
+   "dai": "① ai khởi động",
+   "luong": "Dòng tiền · bank · quỹ · CCR",
+   "nm": "",
+   "ai": "kế toán ngân hàng",
+   "cach": "Mỗi lần có sao kê mới: tải từ bank, dán thô vào sheet R | <số TK>_<bank> <tiền tệ>_<LE>. Mỗi bank/ví một bố cục cột riêng.",
+   "buoc": "115 · 200",
+   "file": "P100 | Bank Transactions",
+   "issue": "",
+   "vao": [],
+   "ra": [
+    "n4"
+   ]
+  },
+  "oKQ": {
+   "ten": "KẾ TOÁN QUỸ",
+   "dong": [
+    "ghi khi phát sinh",
+    "phiếu thu · phiếu chi"
+   ],
+   "loai": "khởi động (người)",
+   "vung": "NGUỒN · NGƯỜI",
+   "dai": "① ai khởi động",
+   "luong": "Dòng tiền · bank · quỹ · CCR",
+   "nm": "",
+   "ai": "kế toán quỹ · thủ quỹ",
+   "cach": "Ghi giao dịch vào sổ quỹ tương ứng, lập phiếu biên nhận / xuất quỹ; kiểm kê cuối tháng.",
+   "buoc": "116 · 202",
+   "file": "P100 | Cash Ledger · Index",
+   "issue": "",
+   "vao": [],
+   "ra": [
+    "n5"
+   ]
+  },
+  "oHR": {
+   "ten": "HR · C&B",
+   "dong": [
+    "nhập EDD (Gform H1310)",
+    "lập bảng lương mỗi tháng"
+   ],
+   "loai": "khởi động (người)",
+   "vung": "NGUỒN · NGƯỜI",
+   "dai": "① ai khởi động",
+   "luong": "Lương · H1000 HR C&B",
+   "nm": "",
+   "ai": "HR · C&B",
+   "cach": "Ghi mọi quyết định nhân sự qua Gform H1310; mỗi tháng tạo file lương từ file mẫu và nhập chấm công, BHXH, COM, thưởng, phụ cấp, người phụ thuộc…",
+   "buoc": "101 · 102",
+   "file": "H1310 EDD · file lương tháng",
+   "issue": "",
+   "vao": [],
+   "ra": [
+    "n6",
+    "n7"
+   ]
+  },
+  "oDT": {
+   "ten": "DATA · LOOKER",
+   "dong": [
+    "xuất file chi phí",
+    "+ SC (Luận) · PS (KT)"
+   ],
+   "loai": "khởi động (người)",
+   "vung": "NGUỒN · NGƯỜI",
+   "dai": "① ai khởi động",
+   "luong": "Nền tảng · Looker",
+   "nm": "",
+   "ai": "Data (AnhTQ) · SHQ1 · kế toán",
+   "cach": "Xuất bảng giao dịch từ Looker \"Finance Report - ED - Dev\" theo tháng; SC và PS do chủ file tự cập nhật.",
+   "buoc": "103–106",
+   "file": "GI Platform Data Ledger | H2.2025",
+   "issue": "",
+   "vao": [],
+   "ra": [
+    "n8"
+   ]
+  },
+  "dEntry": {
+   "ten": "Entry Data PE11·PI11·PM11·PC11",
+   "dong": [
+    "1 phiếu = nhiều line",
+    "+ cột Reference number (PM11)"
+   ],
+   "loai": "dữ liệu",
+   "vung": "NGUỒN · NGƯỜI",
+   "dai": "② sổ nhập tay",
+   "luong": "P100 · lệnh chi",
+   "nm": "NGƯỜI+MÁY",
+   "ai": "",
+   "cach": "Sheet Data Entry hứng từng Gform; GScript điền ID PMSlip/PMLine/PE/PI, HDCode, CDT1 và kiểm Σ PM ≤ PI/PE (dòng 216 [1]).",
+   "buoc": "107–114 · 216",
+   "file": "A | PAY100 | PM11 Entry Data",
+   "issue": "Reference number gõ tay; sai hay thiếu thì bước ghép ⑩ ra #N/A.",
+   "vao": [
+    "n1",
+    "n2"
+   ],
+   "ra": [
+    "m1"
+   ]
+  },
+  "dCCR": {
+   "ten": "2. CCR · CCR Cash",
+   "dong": [
+    "số dư từng TK",
+    "từng quỹ, từng ngày"
+   ],
+   "loai": "dữ liệu",
+   "vung": "NGUỒN · NGƯỜI",
+   "dai": "② sổ nhập tay",
+   "luong": "Dòng tiền · bank · quỹ · CCR",
+   "nm": "NGƯỜI",
+   "ai": "",
+   "cach": "Bảng số dư cuối ngày theo pháp nhân · bank · tiền tệ · tài khoản; tỷ giá lấy từ 9.2.Exchange Rate.",
+   "buoc": "204 · 209",
+   "file": "A-CCR_V2_Working · 2. CCR",
+   "issue": "",
+   "vao": [
+    "n3"
+   ],
+   "ra": [
+    "m22"
+   ]
+  },
+  "dSK": {
+   "ten": "sao kê · sheet R |",
+   "dong": [
+    "mỗi TK 1 sheet (≈70)",
+    "+ 6 cột chuẩn J–O"
+   ],
+   "loai": "dữ liệu",
+   "vung": "NGUỒN · NGƯỜI",
+   "dai": "② sổ nhập tay",
+   "luong": "Dòng tiền · bank · quỹ · CCR",
+   "nm": "NGƯỜI+MÁY",
+   "ai": "",
+   "cach": "Cột A–I dán thô; J–O là ARRAYFORMULA chuẩn hoá: Date · Debit (tiền vào) · Credit (tiền ra, âm) · Currency · Ref_adjust · Ref (ưu tiên _adjust) + Check trùng.",
+   "buoc": "115 · 200",
+   "file": "P100 | Bank Transactions · R | 358468128_VPB VND_VGOH",
+   "issue": "",
+   "vao": [
+    "n4"
+   ],
+   "ra": [
+    "m3"
+   ]
+  },
+  "dSQ": {
+   "ten": "sổ quỹ · sheet R |",
+   "dong": [
+    "CNC · HotBonus · PO…",
+    "kế toán ghi tay"
+   ],
+   "loai": "dữ liệu",
+   "vung": "NGUỒN · NGƯỜI",
+   "dai": "② sổ nhập tay",
+   "luong": "Dòng tiền · bank · quỹ · CCR",
+   "nm": "NGƯỜI",
+   "ai": "",
+   "cach": "Mỗi quỹ một sheet R |; ghi theo chứng từ phiếu thu/chi.",
+   "buoc": "116 · 202",
+   "file": "P100 | Cash Ledger",
+   "issue": "",
+   "vao": [
+    "n5"
+   ],
+   "ra": [
+    "m6"
+   ]
+  },
+  "dEDD": {
+   "ten": "EDD · quyết định NS",
+   "dong": [
+    "mọi quyết định đã ký",
+    "H1310. Data Entry"
+   ],
+   "loai": "dữ liệu",
+   "vung": "NGUỒN · NGƯỜI",
+   "dai": "② sổ nhập tay",
+   "luong": "Lương · H1000 HR C&B",
+   "nm": "NGƯỜI",
+   "ai": "",
+   "cach": "Lưu toàn bộ EDD (Employee Detail Decision) của mọi nhân sự: chức danh, ngạch, CDT/CDT1, pháp nhân, thu nhập Gross…",
+   "buoc": "102",
+   "file": "H1310 I F | EDD (Responses)",
+   "issue": "",
+   "vao": [
+    "n6"
+   ],
+   "ra": [
+    "n9",
+    "m7"
+   ]
+  },
+  "dPR": {
+   "ten": "file lương tháng",
+   "dong": [
+    "H1350.Payroll",
+    "+ P100 I Suggestion"
+   ],
+   "loai": "dữ liệu",
+   "vung": "NGUỒN · NGƯỜI",
+   "dai": "② sổ nhập tay",
+   "luong": "Lương · H1000 HR C&B",
+   "nm": "NGƯỜI+MÁY",
+   "ai": "",
+   "cach": "Bảng lương từng nhân viên. Cột \"MID for Finance\": HDCode, luật phân bổ HD→HD (ALT.A3), CDT→CDT1 (ALT.A2) và 5 cột P100 Suggestion (NIS L1 · NIS L3 · COM L2 · INT · PIT) ghi PE Slip/Line. Sheet P100 I Suggestion: 25 dòng = 5 pháp nhân × 5 loại, số tiền = SUMIFS.",
+   "buoc": "101",
+   "file": "HR - H1350 H1360 | 2025-10",
+   "issue": "",
+   "vao": [
+    "n7",
+    "n9"
+   ],
+   "ra": [
+    "m8"
+   ]
+  },
+  "oKTL": {
+   "ten": "KẾ TOÁN·DÁN GD LƯƠNG",
+   "dong": [
+    "GD bank đã chi lương",
+    "vào sheet No 1–25"
+   ],
+   "loai": "khởi động (người)",
+   "vung": "NGUỒN · NGƯỜI",
+   "dai": "② sổ nhập tay",
+   "luong": "Lương · H1000 HR C&B",
+   "nm": "",
+   "ai": "kế toán",
+   "cach": "Dán tay tối đa 5 giao dịch bank (số FT, TK, tiền) của từng khoản lương/BH/PIT vào dòng 4–8 của sheet No n. Nguồn: sao kê / sổ 112 (liên kết không vẽ L2).",
+   "buoc": "101 (hộp đen)",
+   "file": "HR - H1350 H1360 | 2025-10 · No 1 | Column DE",
+   "issue": "",
+   "vao": [],
+   "ra": [
+    "m9"
+   ]
+  },
+  "dLK": {
+   "ten": "file xuất Looker",
+   "dong": [
+    "theo tháng 202507…",
+    "+ file SC · file PS"
+   ],
+   "loai": "dữ liệu",
+   "vung": "NGUỒN · NGƯỜI",
+   "dai": "② sổ nhập tay",
+   "luong": "Nền tảng · Looker",
+   "nm": "MÁY",
+   "ai": "",
+   "cach": "Bảng giao dịch chi phí nền tảng do Looker sinh, mỗi tháng một tab.",
+   "buoc": "103–106",
+   "file": "GI Platform Data Ledger",
+   "issue": "",
+   "vao": [
+    "n8"
+   ],
+   "ra": [
+    "m10"
+   ]
+  },
+  "pDUOI": {
+   "ten": "DUỖI DÒNG",
+   "dong": [
+    "PE·PI·PM line",
+    "→ từng giao dịch"
+   ],
+   "loai": "xử lý",
+   "vung": "NGUỒN · MÁY",
+   "dai": "③ máy gom · tách",
+   "luong": "P100 · lệnh chi",
+   "nm": "",
+   "ai": "",
+   "cach": "GScript duỗi mỗi line thành một dòng giao dịch, kiểm Status (Log Transaction); PM line được gắn đủ dữ liệu lọc nhập một lần ở PE/PI.",
+   "buoc": "214–217",
+   "file": "A | P100 | PE11 Entry Data",
+   "issue": "",
+   "vao": [
+    "m1",
+    "m2"
+   ],
+   "ra": [
+    "m11"
+   ]
+  },
+  "oKTS": {
+   "ten": "KẾ TOÁN·CHẠY SCRIPT",
+   "dong": [
+    "duỗi PE · PI · PM"
+   ],
+   "loai": "khởi động (người)",
+   "vung": "NGUỒN · MÁY",
+   "dai": "③ máy gom · tách",
+   "luong": "P100 · lệnh chi",
+   "nm": "",
+   "ai": "kế toán",
+   "cach": "Chạy GScript duỗi dòng trong file Entry Data.",
+   "buoc": "214",
+   "file": "A | P100 | PE11 Entry Data",
+   "issue": "",
+   "vao": [],
+   "ra": [
+    "m2"
+   ]
+  },
+  "pGB": {
+   "ten": "GOM GD BANK",
+   "dong": [
+    "≈70 sheet R → 1 bảng"
+   ],
+   "loai": "xử lý",
+   "vung": "NGUỒN · MÁY",
+   "dai": "③ máy gom · tách",
+   "luong": "Dòng tiền · bank · quỹ · CCR",
+   "nm": "",
+   "ai": "",
+   "cach": "GScript đọc 6 cột chuẩn của mọi sheet R | và ghi vào bảng Bank Transactions, có sheet Log.",
+   "buoc": "201",
+   "file": "P100 | Bank Transactions",
+   "issue": "",
+   "vao": [
+    "m3",
+    "m4"
+   ],
+   "ra": [
+    "m12"
+   ]
+  },
+  "oKTG": {
+   "ten": "KẾ TOÁN · BẤM GOM",
+   "dong": [
+    "nút GScript",
+    "bank & quỹ"
+   ],
+   "loai": "khởi động (người)",
+   "vung": "NGUỒN · MÁY",
+   "dai": "③ máy gom · tách",
+   "luong": "Dòng tiền · bank · quỹ · CCR",
+   "nm": "",
+   "ai": "kế toán",
+   "cach": "Bấm nút chạy GScript gom ở file Bank và file Cash Ledger.",
+   "buoc": "201 · 203",
+   "file": "P100 | Bank Transactions",
+   "issue": "",
+   "vao": [],
+   "ra": [
+    "m4",
+    "m5"
+   ]
+  },
+  "pGQ": {
+   "ten": "GOM GD QUỸ",
+   "dong": [
+    "sheet R | → 1 bảng"
+   ],
+   "loai": "xử lý",
+   "vung": "NGUỒN · MÁY",
+   "dai": "③ máy gom · tách",
+   "luong": "Dòng tiền · bank · quỹ · CCR",
+   "nm": "",
+   "ai": "",
+   "cach": "GScript gom các sổ quỹ vào Cash Ledger Transactions.",
+   "buoc": "203",
+   "file": "P100 | Cash Ledger",
+   "issue": "",
+   "vao": [
+    "m5",
+    "m6"
+   ],
+   "ra": [
+    "m13"
+   ]
+  },
+  "pTH": {
+   "ten": "TỔNG HỢP NHÂN SỰ",
+   "dong": [
+    "Mid.1 → Mid.2",
+    "theo tháng hiệu lực"
+   ],
+   "loai": "xử lý",
+   "vung": "NGUỒN · MÁY",
+   "dai": "③ máy gom · tách",
+   "luong": "Lương · H1000 HR C&B",
+   "nm": "",
+   "ai": "",
+   "cach": "H1310.Mid.1 = ARRAYFORMULA từ Data Entry; Mid.2 = SORT giảm dần, thêm khoá tháng-năm và CDT riêng cho DA/CR.",
+   "buoc": "612",
+   "file": "[HR RPT] H1310 EDD (CLEAN98%)",
+   "issue": "",
+   "vao": [
+    "m7"
+   ],
+   "ra": [
+    "m14"
+   ]
+  },
+  "pTACH": {
+   "ten": "TÁCH LƯƠNG THEO HD·CDT1",
+   "dong": [
+    "dòng đảo Nợ = GD bank",
+    "+ FILTER từng nhân viên → Có"
+   ],
+   "loai": "xử lý",
+   "vung": "NGUỒN · MÁY",
+   "dai": "③ máy gom · tách",
+   "luong": "Lương · H1000 HR C&B",
+   "nm": "",
+   "ai": "",
+   "cach": "Mỗi sheet No n: dòng 10–14 đảo GD bank (PS Nợ = PS Có gốc, \"Allocate Transaction of …\"); từ dòng 15, FILTER H1350.Payroll theo khoá PE ra từng dòng nhân viên: PS Có, HDCode (CV), CDT1 (DB), pháp nhân (F). Ô CHECK BALANCE kiểm Σ Có = Σ Nợ.",
+   "buoc": "101 · 401 (hạch toán kép 334–6xx)",
+   "file": "HR - H1350 H1360 | 2025-10 · No 1 | Column DE",
+   "issue": "File 2025-10: No 4 (INT) lệch 567.500; No 5 (PIT) lệch ≈510,8 tr vì chưa dán GD bank gốc.",
+   "vao": [
+    "m8",
+    "m9"
+   ],
+   "ra": [
+    "m15"
+   ]
+  },
+  "pGN": {
+   "ten": "GOM NGUỒN NỀN TẢNG",
+   "dong": [
+    "GI · OMC · SC · PS"
+   ],
+   "loai": "xử lý",
+   "vung": "NGUỒN · MÁY",
+   "dai": "③ máy gom · tách",
+   "luong": "Nền tảng · Looker",
+   "nm": "",
+   "ai": "",
+   "cach": "Gom các tab tháng về Source (Looker), sắp theo thời gian.",
+   "buoc": "210–213",
+   "file": "GI Platform Data Ledger · Source (Looker)",
+   "issue": "",
+   "vao": [
+    "m10"
+   ],
+   "ra": [
+    "m16"
+   ]
+  },
+  "dUNP": {
+   "ten": "PE·PI·PM_Unpivot",
+   "dong": [
+    "+ PC11_Entry Data",
+    "1 dòng = 1 giao dịch"
+   ],
+   "loai": "dữ liệu",
+   "vung": "NGUỒN · MÁY",
+   "dai": "④ sổ đã gom",
+   "luong": "P100 · lệnh chi",
+   "nm": "MÁY",
+   "ai": "",
+   "cach": "PM_Unpivot có cột Z = Reference number: chìa khoá để ghép với bank.",
+   "buoc": "214–218",
+   "file": "A | PAY100 | PM11 · PM_Unpivot",
+   "issue": "",
+   "vao": [
+    "m11"
+   ],
+   "ra": [
+    "r1"
+   ]
+  },
+  "dBT": {
+   "ten": "Bank Transactions",
+   "dong": [
+    "Ngày·Diễn giải·Tiền tệ",
+    "Nợ · Có · Ref · Source"
+   ],
+   "loai": "dữ liệu",
+   "vung": "NGUỒN · MÁY",
+   "dai": "④ sổ đã gom",
+   "luong": "Dòng tiền · bank · quỹ · CCR",
+   "nm": "MÁY",
+   "ai": "",
+   "cach": "Một bảng cho mọi tài khoản; Check trùng theo Ref + ngày + tiền.",
+   "buoc": "201",
+   "file": "P100 | Bank Transactions · Bank Transactions",
+   "issue": "",
+   "vao": [
+    "m12"
+   ],
+   "ra": [
+    "m17"
+   ]
+  },
+  "oKTC": {
+   "ten": "KẾ TOÁN·CHẠY SCRIPT",
+   "dong": [
+    "chuyển sang A-CCR"
+   ],
+   "loai": "khởi động (người)",
+   "vung": "NGUỒN · MÁY",
+   "dai": "④ sổ đã gom",
+   "luong": "Dòng tiền · bank · quỹ · CCR",
+   "nm": "",
+   "ai": "kế toán",
+   "cach": "Chạy GScript chép Bank Transactions và Cash Ledger Transactions sang file A-CCR_V2_Working.",
+   "buoc": "205 · 206",
+   "file": "A-CCR_V2_Working",
+   "issue": "",
+   "vao": [],
+   "ra": [
+    "m18"
+   ]
+  },
+  "dCT": {
+   "ten": "Cash Ledger Trans.",
+   "dong": [
+    "mọi quỹ trong 1 bảng"
+   ],
+   "loai": "dữ liệu",
+   "vung": "NGUỒN · MÁY",
+   "dai": "④ sổ đã gom",
+   "luong": "Dòng tiền · bank · quỹ · CCR",
+   "nm": "MÁY",
+   "ai": "",
+   "cach": "Bảng tổng hợp giao dịch các quỹ (Auto Script).",
+   "buoc": "203",
+   "file": "P100 | Cash Ledger · Cash Ledger Transactions",
+   "issue": "",
+   "vao": [
+    "m13"
+   ],
+   "ra": [
+    "m19"
+   ]
+  },
+  "dHRR": {
+   "ten": "H1000 I HR Report",
+   "dong": [
+    "ALL·QUIT·ACTIVE·Gross",
+    "CDT→CDT1→Ngạch×tháng"
+   ],
+   "loai": "đầu ra",
+   "vung": "NGUỒN · MÁY",
+   "dai": "④ sổ đã gom",
+   "luong": "Lương · H1000 HR C&B",
+   "nm": "NGƯỜI+MÁY",
+   "ai": "",
+   "cach": "Báo cáo nhân sự (output B). Các ô đã xem, kể cả tab \"[Formula]\", đang là giá trị dán cứng: chưa rõ dán tay hay script ghi.",
+   "buoc": "612",
+   "file": "[HR RPT] … · H1000 I HR Report",
+   "issue": "",
+   "vao": [
+    "m14"
+   ],
+   "ra": []
+  },
+  "dL13": {
+   "ten": "1.3 Ledger NIS/INT/COM · PIT",
+   "dong": [
+    "trong từng file lương tháng",
+    "= QUERY gộp 20 + 5 sheet No"
+   ],
+   "loai": "dữ liệu",
+   "vung": "NGUỒN · MÁY",
+   "dai": "④ sổ đã gom",
+   "luong": "Lương · H1000 HR C&B",
+   "nm": "MÁY",
+   "ai": "",
+   "cach": "\"1.3 Ledger NIS/INT/COM\" gộp 20 sheet No (NIS, COM, INT); \"1.3 Ledger PIT\" gộp 5 sheet No PIT. Cùng bố cục cột với Transaction Mapping L1.",
+   "buoc": "101",
+   "file": "HR - H1350 H1360 | 2025-10 · 1.3 Ledger NIS/INT/COM",
+   "issue": "",
+   "vao": [
+    "m15"
+   ],
+   "ra": [
+    "m20"
+   ]
+  },
+  "dPL": {
+   "ten": "Platform Data Ledger",
+   "dong": [
+    "GI · OMC · SC · PS",
+    "Source (Looker)"
+   ],
+   "loai": "dữ liệu",
+   "vung": "NGUỒN · MÁY",
+   "dai": "④ sổ đã gom",
+   "luong": "Nền tảng · Looker",
+   "nm": "MÁY",
+   "ai": "",
+   "cach": "Sổ chi phí nền tảng theo vendor; dùng cho bước PHÂN BỔ, không vào ITL.",
+   "buoc": "210–213",
+   "file": "GI Platform Data Ledger",
+   "issue": "",
+   "vao": [
+    "m16"
+   ],
+   "ra": [
+    "o3"
+   ]
+  },
+  "pCH": {
+   "ten": "CHUYỂN SANG A-CCR · SẮP NGÀY",
+   "dong": [
+    "Bank Tx → 1.2 Ledger 112",
+    "Cash Tx → 1.1 Ledger 111"
+   ],
+   "loai": "xử lý",
+   "vung": "NGUỒN · MÁY",
+   "dai": "⑤ chuyển · gom năm",
+   "luong": "Dòng tiền · bank · quỹ · CCR",
+   "nm": "",
+   "ai": "",
+   "cach": "GScript chép sang sheet Bank Transactions / Cash Ledger Transactions của A-CCR; 1.2 và 1.1 Ledger là FILTER(SORT) theo ngày, tách số TK bằng REGEX.",
+   "buoc": "205–208",
+   "file": "A-CCR_V2_Working · 1.2 Ledger 112",
+   "issue": "",
+   "vao": [
+    "m17",
+    "m18",
+    "m19"
+   ],
+   "ra": [
+    "m23"
+   ]
+  },
+  "oKT12": {
+   "ten": "KẾ TOÁN · THÊM THÁNG",
+   "dong": [
+    "dán URL file lương",
+    "cấp quyền · sửa ô A4"
+   ],
+   "loai": "khởi động (người)",
+   "vung": "NGUỒN · MÁY",
+   "dai": "⑤ chuyển · gom năm",
+   "luong": "Lương · H1000 HR C&B",
+   "nm": "",
+   "ai": "kế toán",
+   "cach": "Index BC1–BC3: dán URL file lương tháng mới vào cột G, cấp quyền IMPORTRANGE, sửa tay công thức A4 của 1.3 Ledger … YYYY.",
+   "buoc": "219–222",
+   "file": "H1000 Ledger · Index",
+   "issue": "",
+   "vao": [],
+   "ra": [
+    "m21"
+   ]
+  },
+  "pG12": {
+   "ten": "GOM 12 THÁNG",
+   "dong": [
+    "QUERY{IMPORTRANGE từng tháng}",
+    "cột I·J·K–AN tự kiểm tháng"
+   ],
+   "loai": "xử lý",
+   "vung": "NGUỒN · MÁY",
+   "dai": "⑤ chuyển · gom năm",
+   "luong": "Lương · H1000 HR C&B",
+   "nm": "",
+   "ai": "",
+   "cach": "Mỗi sổ năm = QUERY ghép IMPORTRANGE của từng file tháng; cột I/J báo tháng đã vào sổ, K–AN báo sheet No nào có mặt.",
+   "buoc": "219–222",
+   "file": "H1000 Ledger (APERO-HR Allocate HD_FS1)",
+   "issue": "",
+   "vao": [
+    "m20",
+    "m21"
+   ],
+   "ra": [
+    "m25"
+   ]
+  },
+  "pSOAT": {
+   "ten": "SOÁT ĐỦ GIAO DỊCH",
+   "dong": [
+    "số dư CCR = lũy kế",
+    "lệch ⇒ nhập bổ sung"
+   ],
+   "loai": "xử lý",
+   "vung": "NGUỒN · MÁY",
+   "dai": "⑥ sổ cái · soát",
+   "luong": "Dòng tiền · bank · quỹ · CCR",
+   "nm": "",
+   "ai": "",
+   "cach": "So số dư nhập tay ở 2. CCR / 2. CCR Cash với lũy kế 1.2 Ledger 112 / Cash Ledger theo ngày để biết đã nhập đủ giao dịch chưa. Lệch thì kế toán rà lại sao kê/sổ quỹ (vòng về ②, không vẽ).",
+   "buoc": "204 · 209",
+   "file": "A-CCR_V2_Working · 2. CCR",
+   "issue": "",
+   "vao": [
+    "m22",
+    "m24"
+   ],
+   "ra": []
+  },
+  "dLED": {
+   "ten": "1.2 Ledger 112 · 1.1 Ledger 111",
+   "dong": [
+    "Ngày · Số CT · Diễn giải · Tiền tệ",
+    "Nợ · Có · Source · Tài khoản"
+   ],
+   "loai": "dữ liệu",
+   "vung": "NGUỒN · MÁY",
+   "dai": "⑥ sổ cái · soát",
+   "luong": "Dòng tiền · bank · quỹ · CCR",
+   "nm": "MÁY",
+   "ai": "",
+   "cach": "Sổ cái tiền gửi (112) và tiền mặt (111), sắp theo ngày; Số chứng từ = Reference number của bank.",
+   "buoc": "207 · 208",
+   "file": "A-CCR_V2_Working · 1.2 Ledger 112",
+   "issue": "",
+   "vao": [
+    "m23"
+   ],
+   "ra": [
+    "m24",
+    "r2"
+   ]
+  },
+  "dH1000": {
+   "ten": "H1000 Ledger · 6 sổ năm",
+   "dong": [
+    "NIS/INT/COM + PIT",
+    "× 2024 · 2025 · 2026"
+   ],
+   "loai": "dữ liệu",
+   "vung": "NGUỒN · MÁY",
+   "dai": "⑥ sổ cái · soát",
+   "luong": "Lương · H1000 HR C&B",
+   "nm": "MÁY",
+   "ai": "",
+   "cach": "Sổ HR theo năm, đã tách sẵn HD/CDT1 từng nhân viên. Artifact to-be ghi \"4 sổ: 2 loại × 2 năm\"; hiện đã có thêm sổ 2026.",
+   "buoc": "219–222",
+   "file": "H1000 Ledger · 1.3 Ledger NIS/INT/COM 2025",
+   "issue": "PIT 2025 gọi Index!G26 (2025-6) hai lần ⇒ nghi trùng tháng 6; NIS 2025 không gọi G32 (2025-12).",
+   "vao": [
+    "m25"
+   ],
+   "ra": [
+    "j2"
+   ]
+  },
+  "dIU": {
+   "ten": "Importrange Unpivot",
+   "dong": [
+    "PE · PI · PM_Unpivot",
+    "+ PC11_Entry Data"
+   ],
+   "loai": "dữ liệu",
+   "vung": "ITL 1/2 · RAW",
+   "dai": "⑦ nhập vào RAW",
+   "luong": "",
+   "nm": "MÁY",
+   "ai": "",
+   "cach": "IMPORTRANGE nguyên các tab Unpivot.",
+   "buoc": "303–306",
+   "file": "ITL 1/2 (RAW) · [Importrange]PM_Unpivot",
+   "issue": "",
+   "vao": [
+    "r1"
+   ],
+   "ra": [
+    "r6"
+   ]
+  },
+  "dMM": {
+   "ten": "Mapping Master",
+   "dong": [
+    "sheet bank → LE",
+    "HD → cách phân bổ"
+   ],
+   "loai": "dữ liệu",
+   "vung": "ITL 1/2 · RAW",
+   "dai": "⑦ nhập vào RAW",
+   "luong": "",
+   "nm": "NGƯỜI+MÁY",
+   "ai": "",
+   "cach": "Bảng tra: tên sheet bank → LE; HD qua COA; cần phân bổ CFA2 không, cách phân bổ, mã HR Allocate; LE → No. Một phần IMPORTRANGE từ file \"[A][Hue][ITL] Nghiệm thu…\".",
+   "buoc": "301",
+   "file": "ITL 1/2 (RAW) · Mapping Master",
+   "issue": "",
+   "vao": [],
+   "ra": [
+    "r7"
+   ]
+  },
+  "dIL": {
+   "ten": "[Importrange] 1.2 Ledger 112 · 1.1 Ledger 111",
+   "dong": [
+    "IMPORTRANGE từ A-CCR"
+   ],
+   "loai": "dữ liệu",
+   "vung": "ITL 1/2 · RAW",
+   "dai": "⑦ nhập vào RAW",
+   "luong": "",
+   "nm": "MÁY",
+   "ai": "",
+   "cach": "Index của RAW trỏ tới A-CCR_V2_Working !A1:H.",
+   "buoc": "302",
+   "file": "ITL 1/2 (RAW) · [Importrange]1.2 Ledger 112",
+   "issue": "",
+   "vao": [
+    "r2"
+   ],
+   "ra": [
+    "r3"
+   ]
+  },
+  "pGOP": {
+   "ten": "GỘP GIAO DỊCH",
+   "dong": [
+    "QUERY {112 ; 111} · bỏ dòng trống"
+   ],
+   "loai": "xử lý",
+   "vung": "ITL 1/2 · RAW",
+   "dai": "⑧ gộp",
+   "luong": "",
+   "nm": "",
+   "ai": "",
+   "cach": "QUERY ghép sổ 112 và 111 thành một bảng.",
+   "buoc": "307",
+   "file": "ITL 1/2 (RAW) · Transaction Original",
+   "issue": "",
+   "vao": [
+    "r3"
+   ],
+   "ra": [
+    "r4"
+   ]
+  },
+  "dTO": {
+   "ten": "Transaction Original",
+   "dong": [
+    "mọi giao dịch bank + quỹ, cả hai vế"
+   ],
+   "loai": "dữ liệu",
+   "vung": "ITL 1/2 · RAW",
+   "dai": "⑨ giao dịch gốc",
+   "luong": "",
+   "nm": "MÁY",
+   "ai": "",
+   "cach": "Ngày · Số CT · Diễn giải · Tiền tệ · Nợ · Có · Source · Tài khoản.",
+   "buoc": "307",
+   "file": "ITL 1/2 (RAW) · Transaction Original",
+   "issue": "",
+   "vao": [
+    "r4"
+   ],
+   "ra": [
+    "r5"
+   ]
+  },
+  "pGHEP": {
+   "ten": "GHÉP LỆNH CHI",
+   "dong": [
+    "Số chứng từ = Reference number (PM_Unpivot cột Z)",
+    "→ PM·PE·PI · HD · CDT1 · LE (Mapping Master)"
+   ],
+   "loai": "xử lý",
+   "vung": "ITL 1/2 · RAW",
+   "dai": "⑩ ghép lệnh chi",
+   "luong": "",
+   "nm": "",
+   "ai": "",
+   "cach": "[1] SORT theo ngày (A–G) · [2] VLOOKUP Số CT trong PM_Unpivot lấy loại GD, PE/PI line, pháp nhân TT, ID PM/PE/PI, HD, CDT1, Status; tiếp PI/PE lấy thời điểm dịch vụ, payee, hoá đơn · [3] LE từ Mapping Master theo tên sheet bank · [4] số thứ tự sinh ITL ID.",
+   "buoc": "308",
+   "file": "ITL 1/2 (RAW) · Transaction Mapping L1",
+   "issue": "Giao dịch không có Ref khớp PM ra #N/A (guide: rà #N/A, ngắn hạn tạo RAW ADJUSTED).",
+   "vao": [
+    "r5",
+    "r6",
+    "r7"
+   ],
+   "ra": [
+    "r8"
+   ]
+  },
+  "dML1": {
+   "ten": "Transaction Mapping L1",
+   "dong": [
+    "mỗi giao dịch + lệnh chi + LE + No (số thứ tự ITL)"
+   ],
+   "loai": "dữ liệu",
+   "vung": "ITL 1/2 · RAW",
+   "dai": "⑪ sổ ghép L1",
+   "luong": "",
+   "nm": "MÁY",
+   "ai": "",
+   "cach": "Kèm sheet [RAW ITL]Data Management.",
+   "buoc": "308",
+   "file": "ITL 1/2 (RAW) · Transaction Mapping L1",
+   "issue": "",
+   "vao": [
+    "r8"
+   ],
+   "ra": [
+    "j1"
+   ]
+  },
+  "dITLi": {
+   "ten": "ITL Ledge · cột A–Q",
+   "dong": [
+    "IMPORTRANGE từ RAW"
+   ],
+   "loai": "dữ liệu",
+   "vung": "ITL 2/2 · ADJ",
+   "dai": "⑫ nhập vào ADJ",
+   "luong": "",
+   "nm": "MÁY",
+   "ai": "",
+   "cach": "Templ 2 ITL (Standard Input): A–Q là các trường quan trọng nhập từ RAW.",
+   "buoc": "313 · 314",
+   "file": "ITL 2/2 (ADJUSTED) · ITL Ledge",
+   "issue": "",
+   "vao": [
+    "j1"
+   ],
+   "ra": [
+    "j3"
+   ]
+  },
+  "oKTA": {
+   "ten": "KẾ TOÁN · NHẬP TAY",
+   "dong": [
+    "cột Manual input",
+    "dòng thiếu / sai mã"
+   ],
+   "loai": "khởi động (người)",
+   "vung": "ITL 2/2 · ADJ",
+   "dai": "⑫ nhập vào ADJ",
+   "luong": "",
+   "nm": "",
+   "ai": "kế toán",
+   "cach": "Gõ vào cột Manual input khi Classifying ra \"Need to manual input\" hoặc sai.",
+   "buoc": "314–318",
+   "file": "ITL 2/2 (ADJUSTED) · ITL Ledge",
+   "issue": "",
+   "vao": [],
+   "ra": [
+    "j4"
+   ]
+  },
+  "dH1i": {
+   "ten": "H1000 Ledge (HR Allocate HD)",
+   "dong": [
+    "Y2024 · Y2025 · Y2026 · cột A–Q"
+   ],
+   "loai": "dữ liệu",
+   "vung": "ITL 2/2 · ADJ",
+   "dai": "⑫ nhập vào ADJ",
+   "luong": "",
+   "nm": "MÁY",
+   "ai": "",
+   "cach": "B1 = file H1000 Ledger, B2 = tên sổ, B3 = Start Date; A10 = FILTER(IMPORTRANGE(A4:F), ngày > B3).",
+   "buoc": "315–318",
+   "file": "ITL 2/2 · H1000 Ledge NIS/INT/COM (HR Allocate HD) Y2025",
+   "issue": "",
+   "vao": [
+    "j2"
+   ],
+   "ra": [
+    "j5"
+   ]
+  },
+  "pADJ": {
+   "ten": "CHỈNH TAY · ADJUSTMENT ZONE",
+   "dong": [
+    "mỗi trường 4 cột: Classifying → Manual input → MID → Final",
+    "Classifying tra [Importrange] Mapping Master · Final = Manual/MID nếu Classifying trống hoặc \"Need to manual input\""
+   ],
+   "loai": "xử lý",
+   "vung": "ITL 2/2 · ADJ",
+   "dai": "⑬ chỉnh tay",
+   "luong": "",
+   "nm": "",
+   "ai": "",
+   "cach": "Ví dụ HDCode: GAH → \"GAH | GA HR Cost\", DC → \"DC | Dev Cost (Maintain App)\". Mặc định: CDT1 dòng đầu = SHQ2, ID Payee = VD0, Hoá đơn = \"Nợ hoá đơn\". AW tra Master Mapping xem dòng nào cần phân bổ.",
+   "buoc": "314–318",
+   "file": "ITL 2/2 (ADJUSTED)",
+   "issue": "",
+   "vao": [
+    "j3",
+    "j4",
+    "j5"
+   ],
+   "ra": [
+    "j6",
+    "j7"
+   ]
+  },
+  "dITLF": {
+   "ten": "ITL Ledge (Final)",
+   "dong": [
+    "ITL ID · LE · HD · CDT1 · loại GD · kỳ dịch vụ"
+   ],
+   "loai": "dữ liệu",
+   "vung": "ITL 2/2 · ADJ",
+   "dai": "⑭ sổ ITL Final",
+   "luong": "",
+   "nm": "NGƯỜI+MÁY",
+   "ai": "",
+   "cach": "Bảng ITL của giao dịch bank + quỹ. Bảng gộp chung ITL AGGREGATE (dòng 319) đã bị huỷ vì Gsheet không chịu nổi bảng lớn.",
+   "buoc": "314 · 319",
+   "file": "ITL 2/2 (ADJUSTED) · ITL Ledge",
+   "issue": "",
+   "vao": [
+    "j6"
+   ],
+   "ra": [
+    "j8",
+    "o1"
+   ]
+  },
+  "dH1F": {
+   "ten": "H1000 Ledge (Final)",
+   "dong": [
+    "cột R = ITL ID của GD bank gốc"
+   ],
+   "loai": "dữ liệu",
+   "vung": "ITL 2/2 · ADJ",
+   "dai": "⑭ sổ ITL Final",
+   "luong": "",
+   "nm": "NGƯỜI+MÁY",
+   "ai": "",
+   "cach": "R = VLOOKUP Số CT trong ITL Ledge, chỉ ở dòng có PS Nợ (dòng đảo) ⇒ nối các dòng lương với giao dịch bank đã chi.",
+   "buoc": "315–318",
+   "file": "ITL 2/2 · H1000 Ledge … Y2025",
+   "issue": "",
+   "vao": [
+    "j7",
+    "j8"
+   ],
+   "ra": [
+    "o2"
+   ]
+  },
+  "oRPT": {
+   "ten": "Report I General Ledger | CF report",
+   "dong": [
+    "CFA1 Daily · 5. Daily Report 2 · Daily Report 3"
+   ],
+   "loai": "đầu ra",
+   "vung": "ĐẦU RA",
+   "dai": "⑮ báo cáo",
+   "luong": "",
+   "nm": "",
+   "ai": "",
+   "cach": "Ngoài phạm vi INPUT: GScript/IMPORTRANGE chuyển ITL sang, quy đổi tiền tệ, SUMIFS theo KRF × ngày / Y-H-Q-M.",
+   "buoc": "400–419 · 609–610",
+   "file": "Report I General Ledger | CF report",
+   "issue": "",
+   "vao": [
+    "o1"
+   ],
+   "ra": []
+  },
+  "oRH": {
+   "ten": "Report I H1000 Ledge · PLA3 Daily",
+   "dong": [
+    "[MID] Report I PLA3 Daily | HR Only"
+   ],
+   "loai": "đầu ra",
+   "vung": "ĐẦU RA",
+   "dai": "⑮ báo cáo",
+   "luong": "",
+   "nm": "",
+   "ai": "",
+   "cach": "Sổ HR đã chia HD nên bước ALLOCATE HR (dòng 500) không cần.",
+   "buoc": "401–404 · 407–408 · 416–419 · 500",
+   "file": "Report I General Ledger | CF report",
+   "issue": "",
+   "vao": [
+    "o2"
+   ],
+   "ra": []
+  },
+  "oALL": {
+   "ten": "PHÂN BỔ NỀN TẢNG",
+   "dong": [
+    "ALLOCATE",
+    "ngoài INPUT"
+   ],
+   "loai": "đầu ra",
+   "vung": "ĐẦU RA",
+   "dai": "⑮ báo cáo",
+   "luong": "",
+   "nm": "",
+   "ai": "",
+   "cach": "Map PE qua PM theo Combine Code (Vendor-Date-NoTrans), phân bổ theo CDT1.",
+   "buoc": "501–513",
+   "file": "GI Platform Data Ledger",
+   "issue": "",
+   "vao": [
+    "o3"
+   ],
+   "ra": []
+  }
+ },
+ "ten": {
+  "n1": {
+   "tu": "oDN",
+   "toi": "dEntry",
+   "kieu": "tay",
+   "cai_gi": "đề nghị · duyệt PE/PI/PM/PC"
+  },
+  "n2": {
+   "tu": "oCA",
+   "toi": "dEntry",
+   "kieu": "tay",
+   "cai_gi": "Reference number hằng ngày"
+  },
+  "n3": {
+   "tu": "oSD",
+   "toi": "dCCR",
+   "kieu": "tay",
+   "cai_gi": "số dư cuối ngày"
+  },
+  "n4": {
+   "tu": "oNH",
+   "toi": "dSK",
+   "kieu": "tay",
+   "cai_gi": "sao kê thô"
+  },
+  "n5": {
+   "tu": "oKQ",
+   "toi": "dSQ",
+   "kieu": "tay",
+   "cai_gi": "giao dịch quỹ"
+  },
+  "n6": {
+   "tu": "oHR",
+   "toi": "dEDD",
+   "kieu": "tay",
+   "cai_gi": "quyết định nhân sự"
+  },
+  "n7": {
+   "tu": "oHR",
+   "toi": "dPR",
+   "kieu": "tay",
+   "cai_gi": "chấm công · BH · COM · thưởng…"
+  },
+  "n8": {
+   "tu": "oDT",
+   "toi": "dLK",
+   "kieu": "may",
+   "cai_gi": "xuất bảng giao dịch"
+  },
+  "n9": {
+   "tu": "dEDD",
+   "toi": "dPR",
+   "kieu": "may",
+   "cai_gi": "danh sách tính lương (H1350.3)"
+  },
+  "m1": {
+   "tu": "dEntry",
+   "toi": "pDUOI",
+   "kieu": "may",
+   "cai_gi": "dòng đã duyệt"
+  },
+  "m2": {
+   "tu": "oKTS",
+   "toi": "pDUOI",
+   "kieu": "tay",
+   "cai_gi": "chạy GScript"
+  },
+  "m3": {
+   "tu": "dSK",
+   "toi": "pGB",
+   "kieu": "may",
+   "cai_gi": "6 cột chuẩn"
+  },
+  "m4": {
+   "tu": "oKTG",
+   "toi": "pGB",
+   "kieu": "tay",
+   "cai_gi": "bấm nút gom"
+  },
+  "m5": {
+   "tu": "oKTG",
+   "toi": "pGQ",
+   "kieu": "tay",
+   "cai_gi": "bấm nút gom"
+  },
+  "m6": {
+   "tu": "dSQ",
+   "toi": "pGQ",
+   "kieu": "may",
+   "cai_gi": "dòng sổ quỹ"
+  },
+  "m7": {
+   "tu": "dEDD",
+   "toi": "pTH",
+   "kieu": "may",
+   "cai_gi": "EDD"
+  },
+  "m8": {
+   "tu": "dPR",
+   "toi": "pTACH",
+   "kieu": "may",
+   "cai_gi": "dòng nhân viên + khoá PE"
+  },
+  "m9": {
+   "tu": "oKTL",
+   "toi": "pTACH",
+   "kieu": "tay",
+   "cai_gi": "GD bank chi lương"
+  },
+  "m10": {
+   "tu": "dLK",
+   "toi": "pGN",
+   "kieu": "may",
+   "cai_gi": "tab tháng"
+  },
+  "m11": {
+   "tu": "pDUOI",
+   "toi": "dUNP",
+   "kieu": "may",
+   "cai_gi": "giao dịch đã duỗi"
+  },
+  "m12": {
+   "tu": "pGB",
+   "toi": "dBT",
+   "kieu": "may",
+   "cai_gi": "giao dịch bank"
+  },
+  "m13": {
+   "tu": "pGQ",
+   "toi": "dCT",
+   "kieu": "may",
+   "cai_gi": "giao dịch quỹ"
+  },
+  "m14": {
+   "tu": "pTH",
+   "toi": "dHRR",
+   "kieu": "may",
+   "cai_gi": "headcount · Gross"
+  },
+  "m15": {
+   "tu": "pTACH",
+   "toi": "dL13",
+   "kieu": "may",
+   "cai_gi": "dòng đảo + dòng HD·CDT1"
+  },
+  "m16": {
+   "tu": "pGN",
+   "toi": "dPL",
+   "kieu": "may",
+   "cai_gi": "giao dịch nền tảng"
+  },
+  "m17": {
+   "tu": "dBT",
+   "toi": "pCH",
+   "kieu": "may",
+   "cai_gi": "Bank Transactions"
+  },
+  "m18": {
+   "tu": "oKTC",
+   "toi": "pCH",
+   "kieu": "tay",
+   "cai_gi": "chạy GScript"
+  },
+  "m19": {
+   "tu": "dCT",
+   "toi": "pCH",
+   "kieu": "may",
+   "cai_gi": "Cash Ledger Transactions"
+  },
+  "m20": {
+   "tu": "dL13",
+   "toi": "pG12",
+   "kieu": "may",
+   "cai_gi": "sổ tháng"
+  },
+  "m21": {
+   "tu": "oKT12",
+   "toi": "pG12",
+   "kieu": "tay",
+   "cai_gi": "URL · quyền · công thức A4"
+  },
+  "m22": {
+   "tu": "dCCR",
+   "toi": "pSOAT",
+   "kieu": "may",
+   "cai_gi": "số dư nhập tay"
+  },
+  "m23": {
+   "tu": "pCH",
+   "toi": "dLED",
+   "kieu": "may",
+   "cai_gi": "sổ 112 · 111"
+  },
+  "m24": {
+   "tu": "dLED",
+   "toi": "pSOAT",
+   "kieu": "may",
+   "cai_gi": "lũy kế theo ngày"
+  },
+  "m25": {
+   "tu": "pG12",
+   "toi": "dH1000",
+   "kieu": "may",
+   "cai_gi": "12 tháng / sổ"
+  },
+  "r1": {
+   "tu": "dUNP",
+   "toi": "dIU",
+   "kieu": "may",
+   "cai_gi": "IMPORTRANGE"
+  },
+  "r2": {
+   "tu": "dLED",
+   "toi": "dIL",
+   "kieu": "may",
+   "cai_gi": "IMPORTRANGE"
+  },
+  "r3": {
+   "tu": "dIL",
+   "toi": "pGOP",
+   "kieu": "may",
+   "cai_gi": "112 · 111"
+  },
+  "r4": {
+   "tu": "pGOP",
+   "toi": "dTO",
+   "kieu": "may",
+   "cai_gi": "bảng gộp"
+  },
+  "r5": {
+   "tu": "dTO",
+   "toi": "pGHEP",
+   "kieu": "may",
+   "cai_gi": "giao dịch theo ngày"
+  },
+  "r6": {
+   "tu": "dIU",
+   "toi": "pGHEP",
+   "kieu": "may",
+   "cai_gi": "PM·PE·PI line (khoá Ref)"
+  },
+  "r7": {
+   "tu": "dMM",
+   "toi": "pGHEP",
+   "kieu": "may",
+   "cai_gi": "LE theo sheet bank"
+  },
+  "r8": {
+   "tu": "pGHEP",
+   "toi": "dML1",
+   "kieu": "may",
+   "cai_gi": "dòng đã ghép"
+  },
+  "j1": {
+   "tu": "dML1",
+   "toi": "dITLi",
+   "kieu": "may",
+   "cai_gi": "IMPORTRANGE A–Q"
+  },
+  "j2": {
+   "tu": "dH1000",
+   "toi": "dH1i",
+   "kieu": "may",
+   "cai_gi": "IMPORTRANGE + FILTER"
+  },
+  "j3": {
+   "tu": "dITLi",
+   "toi": "pADJ",
+   "kieu": "may",
+   "cai_gi": "dòng ITL"
+  },
+  "j4": {
+   "tu": "oKTA",
+   "toi": "pADJ",
+   "kieu": "tay",
+   "cai_gi": "Manual input"
+  },
+  "j5": {
+   "tu": "dH1i",
+   "toi": "pADJ",
+   "kieu": "may",
+   "cai_gi": "dòng HR"
+  },
+  "j6": {
+   "tu": "pADJ",
+   "toi": "dITLF",
+   "kieu": "may",
+   "cai_gi": "Final"
+  },
+  "j7": {
+   "tu": "pADJ",
+   "toi": "dH1F",
+   "kieu": "may",
+   "cai_gi": "Final"
+  },
+  "j8": {
+   "tu": "dITLF",
+   "toi": "dH1F",
+   "kieu": "may",
+   "cai_gi": "ITL ID (VLOOKUP Số CT)"
+  },
+  "o1": {
+   "tu": "dITLF",
+   "toi": "oRPT",
+   "kieu": "may",
+   "cai_gi": "ITL Ledge"
+  },
+  "o2": {
+   "tu": "dH1F",
+   "toi": "oRH",
+   "kieu": "may",
+   "cai_gi": "H1000 Ledge"
+  },
+  "o3": {
+   "tu": "dPL",
+   "toi": "oALL",
+   "kieu": "may",
+   "cai_gi": "sổ nền tảng"
+  }
+ }
+}
