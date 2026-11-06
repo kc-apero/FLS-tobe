@@ -1713,11 +1713,11 @@ FE_THE = [   # (agent, phép kiểm, lỗi đáng sợ, đơn vị heatmap, đá
      "phải nối A · B · C — phải để người D · E · F — L3 · ca chuyển", "ITL Ledge Final (AS-IS) + oracle",
      "0 nối sai trên nhóm phải-để-người; tổng ≤ v0"),
     ("A3.2 · PP (2) lương", "a3-2-luong.eval.noi-sai-dot", "ghi đợt sai không báo: tháng trùng / thiếu, Σ Có ≠ Σ Nợ",
-     "NIS L1 · NIS L3 · COM L2 · INT · PIT — tháng trùng · thiếu · Σ lệch · sổ 2026", "H1000 Final ↔ ITL (AS-IS), lỗi thật do người xác nhận",
+     "NIS L1 · NIS L3 · COM L2 · INT · PIT — tháng trùng · thiếu · Σ lệch · sổ 2026", "~34 file H1000 đã adjust ↔ ITL (AS-IS)",
      "0 đợt lỗi bị ghi"),
     ("A3.3 · PP (3) nền tảng", "a3-3-nen-tang.eval.chia-sai", "nối nhầm PE hoặc chia sai CDT1 ⇒ chi phí về sai chủ dự toán",
      "OMC · GI · SC · PS — trúng nhiều · trúng 0 · lệch kỳ · vendor mới", "PHÂN BỔ NỀN TẢNG (AS-IS) sau khi người gán nhãn",
-     "0 sai trên trúng nhiều / trúng 0; bar tổng: câu hỏi mở"),
+     "0 sai trên ca cài sẵn; không bar tổng"),
     ("A4 · SOÁT (agent chấm)", "a4-soat.eval.lot-chan", "bỏ lọt: lô đáng CHẶN được báo đạt ⇒ dòng sai vào sổ chỉ-thêm",
      "mất/thừa dòng · thiếu trường · định dạng/nguồn · số dư · ca chuyển", "lô đột biến dựng + lỗi thật (646 dòng mất, 31 mã float)",
      "0 bỏ lọt; báo động oan ≤ v0"),
@@ -1729,7 +1729,7 @@ def bang_fleet_eval() -> str:
     if "<svg" not in svg_fe:
         raise SystemExit("⛔ grid.svg hỏng — render lại bằng render_grid.py")
     o = ['''
-<h2>§9 · Fleet eval cho các agent — kế hoạch (nháp, chờ Gate 3)</h2>
+<h2>§9 · Fleet eval cho các agent — kế hoạch v1.0.0 (chờ ThuongCT duyệt)</h2>
 <p>Đo từng agent <b>theo phiên bản đóng băng</b>, trên ca nó chưa thấy, bằng một bộ chấm <b>khác mô hình và chấm mù</b> theo đáp án giấu kín; nhiều persona kế toán để thấy agent làm <b>ai</b> vấp. Agent: <b>Qwen 3.8-27B chạy local</b>. Phiên bản gốc <code>v0</code> = mã tất định hôm nay, để vòng đầu so "không tệ hơn". Vai: owner <b>ThuongCT</b> · operator <b>KhanhCQ</b> · duyệt độc lập <b>Lanptn</b>. Tiền đề: TO-BE đã đối chiếu từng bước với AS-IS (<code>docs/ITL/02_BA/Artifacts/Kiem-TOBE-theo-ASIS.md</code>).</p>
 <figure class="diagram fe-hinh" id="hinh-fe">''', svg_fe, '''<figcaption>Hình 4 — Sơ đồ quy trình fleet eval: 4 dải · 6 agent, sinh từ <code>docs/ITL/05_FleetEval/grid-spec.json</code> bằng <code>render_grid.py</code> (kiểm: 0 lỗ). Viền liền = đang chạy · đứt = một phần · chấm = chưa chạy; màu nền ô người kiểm = độ nặng (QUICK · MEDIUM · DEEP); cờ góc = hỏi mỗi mục (EACH) / mỗi phiên bản (VER). A3.2 và A3.3 ghi vào sổ <b>không qua người kiểm</b> — chỉ fleet eval chặn trước.</figcaption></figure>
 <h3>Bốn thẻ eval của phiên bản 1.0 (A1 · A2 để phiên bản sau)</h3>
@@ -1738,7 +1738,7 @@ def bang_fleet_eval() -> str:
     for ag, ck, so, dv, da, bar in FE_THE:
         o.append(f'<tr><td><b>{E(ag)}</b></td><td><code>{E(ck)}</code></td><td>{E(so)}</td><td>{E(dv)}</td><td>{E(da)}</td><td>{E(bar)}</td></tr>')
     o.append('''</tbody></table></div>
-<p class="note"><b>Chung cho cả bốn thẻ:</b> bộ chấm = mô hình local thứ hai, khác họ Qwen (tên: câu hỏi mở) · Lanptn chấm lại 10% mỗi vòng, đồng thuận &lt; 0,8 ⇒ vòng vô hiệu · persona P1 kế toán mới · P2 kế toán ngân hàng lâu năm · P3 người duyệt cuối kỳ (+ P4 C&amp;B HR cho A3.2) — <b>cả bốn là gợi ý</b> tới khi hiệu chuẩn bằng think-aloud với 2–3 kế toán thật (recall ≥ 0,6 · precision ≥ 0,5, ghi trước khi xem) · không đặt trần chi phí, mỗi vòng ghi giờ GPU thực tiêu · <b>ship</b> khi đạt bar + không tệ hơn bản trước, <b>chặn</b> khi một ca cài sẵn trượt, <b>chạy lại</b> khi vòng vô hiệu. Thẻ đầy đủ: <code>docs/ITL/05_FleetEval/eval-cards/</code>.</p>''')
+<p class="note"><b>Chung cho cả bốn thẻ:</b> bộ chấm và persona = <b>gpt-oss-20b</b> local (khác họ Qwen) · Lanptn chấm lại 10% mỗi vòng, đồng thuận &lt; 0,8 ⇒ vòng vô hiệu · persona P1 kế toán mới · P2 kế toán ngân hàng lâu năm · P3 người duyệt cuối kỳ (+ P4 C&amp;B HR cho A3.2) — <b>cả bốn là gợi ý</b> tới khi hiệu chuẩn bằng think-aloud với ThuongCT · AnhMC · NgaNLT (recall ≥ 0,6 · precision ≥ 0,5, ghi trước khi xem) · không đặt trần chi phí, mỗi vòng ghi giờ GPU thực tiêu · <b>ship</b> khi đạt bar + không tệ hơn bản trước, <b>chặn</b> khi một ca cài sẵn trượt, <b>chạy lại</b> khi vòng vô hiệu. Thẻ đầy đủ: <code>docs/ITL/05_FleetEval/eval-cards/</code> · bản kế hoạch: <code>docs/ITL/05_FleetEval/AP_FLS_FleetEval_v1.0.0_2026-11-06.html</code>. ⚠ KhanhCQ vừa dựng agent vừa vận hành vòng — trái quy tắc how-to; cách bù chờ ThuongCT quyết (AP Q1).</p>''')
     return "\n".join(o)
 
 

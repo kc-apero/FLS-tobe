@@ -21,7 +21,7 @@ Phần chung: `_chung.md`. Trạng thái: nháp.
 ## B. Đầu vào của vòng
 | | |
 |---|---|
-| Bộ ca | File Looker theo tháng + PE/PM + bank txns; đáp án = PHÂN BỔ NỀN TẢNG của AS-IS **sau khi người xác nhận** (AS-IS chưa có người kiểm ⇒ phải gán nhãn). Cỡ bể: **câu hỏi mở**. |
+| Bộ ca | File Looker theo tháng + PE/PM + bank txns; đáp án = PHÂN BỔ NỀN TẢNG của AS-IS **sau khi người xác nhận** (AS-IS chưa có người kiểm ⇒ phải gán nhãn). Bể: **không giới hạn** (KhanhCQ 06/11). |
 | Ca cài sẵn | Combine Code trúng **≥ 2 PE** · trúng **0 PE** · vendor đổi tên · chi phí trả trước / sau tháng · Σ % CDT1 ≠ 100. **Ca chuyển:** vendor mới. |
 | Đơn vị (heatmap) | **loại:** OMC · GI · SC · PS — **ca cài sẵn:** trúng nhiều · trúng 0 · lệch kỳ · ca chuyển |
 | Persona | P1 · P2 · P3 (gợi ý) |
@@ -30,7 +30,7 @@ Phần chung: `_chung.md`. Trạng thái: nháp.
 ## C. Bar, mẫu, nơi nhận
 | | |
 |---|---|
-| Chỉ số + bar | **Tỉ lệ dòng chi phí đúng trọn chuỗi** (PE/PM · giao dịch · CDT1) ≥ bar tuyệt đối — **câu hỏi mở** (chưa có `v0` để so); **0** sai trên ca cài sẵn "trúng nhiều / trúng 0" *(đề xuất)*. |
-| Chênh nhỏ nhất | **câu hỏi mở** — phụ thuộc cỡ bể. |
+| Chỉ số + bar | **Tỉ lệ dòng chi phí đúng trọn chuỗi** (PE/PM · giao dịch · CDT1) **không có bar tổng** (KhanhCQ 06/11) — chỉ báo cáo; bar duy nhất: **0** sai trên ca cài sẵn "trúng nhiều / trúng 0 / lệch kỳ". |
+| Chênh nhỏ nhất | 1 ca cài sẵn sai. |
 | Mẫu *(đề xuất)* | mọi ca cài sẵn + 2 tháng × 4 loại, phân tầng theo vendor × 3 persona. |
 | Nơi nhận | Nối nhầm → luật Combine Code / prompt A3.3 · CDT1 trên Looker sai → chủ file (DATA / người cập nhật SC · PS) · ô không có ca → ca kiểm mới. |

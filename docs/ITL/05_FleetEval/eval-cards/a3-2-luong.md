@@ -21,7 +21,7 @@ Phần chung: `_chung.md`. Trạng thái: nháp.
 ## B. Đầu vào của vòng
 | | |
 |---|---|
-| Bộ ca | 6 sổ H1000 năm (NIS/INT/COM · PIT, có 2026) + ITL Ledge (AS-IS nối bằng VLOOKUP Số CT ở dòng đảo `[dH1F]`). Mỗi tháng **25 đợt** = 5 pháp nhân × 5 loại `[dPR]`. Số tháng có trong bể: **câu hỏi mở**. |
+| Bộ ca | 6 sổ H1000 năm (NIS/INT/COM · PIT, có 2026) + ITL Ledge (AS-IS nối bằng VLOOKUP Số CT ở dòng đảo `[dH1F]`). Mỗi tháng **25 đợt** = 5 pháp nhân × 5 loại `[dPR]`. Bể: **~34 file H1000 đã adjust** (KhanhCQ 06/11). |
 | Ca cài sẵn (lỗi thật) | PIT 2025 gọi tháng 6 **hai lần** · NIS 2025 **thiếu** tháng 12 `[dH1000]` · 2025-10 No 4 (INT) lệch **567.500**, No 5 (PIT) lệch **≈ 510,8 tr** vì chưa dán giao dịch gốc `[pTACH]`. **Ca chuyển:** sổ 2026. |
 | Đơn vị (heatmap) | **loại đợt:** NIS L1 · NIS L3 · COM L2 · INT · PIT — **ca cài sẵn:** tháng trùng · tháng thiếu · Σ lệch · ca chuyển |
 | Persona | P1 · P2 · P3 · **P4 C&B HR** (gợi ý) |
