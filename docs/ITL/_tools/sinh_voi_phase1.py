@@ -1805,7 +1805,7 @@ FE_THE = [   # (agent, phép kiểm, lỗi đáng sợ, đơn vị heatmap, đá
 ]
 
 
-AP_FE = "AP_FLS_FleetEval_v1.1.0_2026-11-06.html"     # bản AP đăng kèm trang (ap.html)
+AP_FE = "AP_FLS_FleetEval_v1.1.0_2026-11-06.html"     # bản AP nhúng nguyên vào trang 2 (F4)
 FE_THE_TEP = ("a3-1-ref", "a3-2-luong", "a3-3-nen-tang", "a4-soat")
 
 
@@ -1848,10 +1848,12 @@ def bang_fleet_eval() -> str:
         van = (FE_THU_MUC / f"eval-cards/{t}.md").read_text(encoding="utf-8")
         tieu, than = van.split("\n", 1)
         o.append(f'<details class="the"><summary>{_md_dong(tieu.lstrip("# "))}</summary>' + md_html(than, cap=4) + '</details>')
-    o.append(f'''<h2>F4 · Bản kế hoạch (AP)</h2>
-<p>Bản AP theo khuôn của skill <code>plan-fleet-eval</code>: mục tiêu · sơ đồ · thẻ · vòng R1–R8 · lưu và làm sạch · nghiệm thu A1–A7 · câu hỏi mở Q1–Q6. Mọi mục ở trạng thái <b>review</b> — chỉ owner ThuongCT đặt <i>agreed</i>.</p>
-<p><a class="nut" href="ap.html" target="_blank" rel="noopener">Mở bản AP v1.1.0 ↗</a> <span class="ghichu">nguồn: <code>docs/ITL/05_FleetEval/{AP_FE}</code></span></p>
-<p class="note"><b>Chờ ThuongCT quyết:</b> Q1 KhanhCQ vừa dựng agent vừa vận hành vòng (how-to cấm) — đề xuất giữ, bù bằng manifest ThuongCT ký + Lanptn đối checksum · Q2 Lanptn chỉ duyệt, yêu cầu tinh chỉnh đi qua ThuongCT · Q3 bộ ca + đáp án để ngoài repo · Q4 A3.2 / A3.3 có kế toán duyệt mẫu 10% trước khi ghi · Q5 nút duyệt / khiếu nại trên F02 · Q6 thẻ A1 · A2 khi chúng chuyển sang LLM.</p>''')
+    ap = (FE_THU_MUC / AP_FE).read_text(encoding="utf-8")
+    than = ap[ap.index("<main>") + 6:ap.index("</main>")]
+    than = than.replace("<h1>", '<h3 class="ap-h1">', 1).replace("</h1>", "</h3>", 1)
+    o.append(f'''<h2 id="ap">F4 · Bản kế hoạch (AP) — nhúng nguyên trong trang này</h2>
+<p class="ghichu">Nguồn: <code>docs/ITL/05_FleetEval/{AP_FE}</code> (khuôn skill <code>plan-fleet-eval</code>); trang chép phần thân lúc sinh — sửa file AP (bản mới) rồi sinh lại, ⛔ sửa ở đây. Mọi mục ở trạng thái <b>review</b>, chỉ owner ThuongCT đặt <i>agreed</i>.</p>
+<div class="ap-nhung">''' + than + "</div>")
     return "\n".join(o)
 
 
@@ -2140,6 +2142,18 @@ details.the{border:1px solid var(--line);border-radius:4px;background:var(--pape
 details.the>summary{cursor:pointer;font-weight:600;color:var(--accent);padding:4px 0}
 details.the h4,details.the h5{margin:12px 0 6px}
 a.nut{display:inline-block;text-decoration:none}
+.ap-nhung{border:1px solid var(--line);border-radius:6px;background:var(--paper);padding:4px 18px 18px;margin-top:10px}
+.ap-nhung .ap-h1{font:600 20px/1.3 var(--serif);margin:16px 0 4px} .ap-nhung .sub{color:var(--muted)}
+.ap-nhung .tw{overflow-x:auto;margin:8px 0} .ap-nhung table{font-size:13px}
+.ap-nhung th,.ap-nhung td{border:1px solid var(--line);padding:5px 8px} .ap-nhung th{background:var(--accent-soft)}
+.ap-nhung tr.band td{background:var(--accent-soft);font-weight:600;color:var(--muted)}
+.ap-nhung .state{display:inline-block;font:600 11px/1.4 var(--sans);padding:1px 7px;border-radius:10px;border:1px solid currentColor;margin-left:6px}
+.ap-nhung .state.review{color:var(--mid)} .ap-nhung .state.agreed{color:var(--ok)} .ap-nhung .state.draft{color:var(--muted)}
+.ap-nhung nav{background:var(--bg);border:1px solid var(--line);border-radius:6px;padding:8px 14px;margin:10px 0}
+.ap-nhung nav a{color:var(--accent)} .ap-nhung h2{border-top:2px solid var(--fg);padding-top:10px}
+.ap-nhung .grid-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:6px}
+.ap-nhung .grid-wrap svg{min-width:1000px;display:block;background:#fff}
+.ap-nhung figcaption{font-size:13px;color:var(--muted)}
 .goc{font-size:13px;border-left:3px solid var(--asis);padding:5px 9px;margin:6px 0;background:var(--bg)}
 .goc .van-chu,span.van-chu{color:var(--sel)}
 .sw-a{background:var(--za);border-color:var(--asis)}
@@ -2358,7 +2372,7 @@ THAN_TREN = """
   Nửa phải của hình 1 là luồng <b>AS-IS</b> lấy từ sơ đồ "Voi ITL AS-IS" (<code>docs/ITL/_tools/voi_asis_goc.json</code>).<br>
   PD Now là bản gốc tham khảo: trang này chỉ mượn <b>thuật ngữ</b> (PE · PI · PM · PC · LE · CDT · HD/KRF · Reference No · General Trustest), không dùng tên sheet, tên file hay bước tính của nó. Mã FLS @ <code>2d1b710</code>.</p>
 </header>
-<p class="tin"><b>Hai trang:</b> <b>Trang 1</b> — con voi TO-BE cạnh AS-IS và bản kiểm từng bước (§1a). <b>Trang 2</b> — fleet eval: agent nào chạy mô hình nào, sơ đồ quy trình, bốn thẻ, bản AP. <b>Cách dùng:</b> bấm một hộp hay một mũi tên (hoặc một dòng trong bảng) để làm nổi các đường nối của nó và mở khung chi tiết. Trong khung có <b>Bình luận phần này</b> và ô <b>Hỏi Claude</b>: câu hỏi được gắn đúng vào phần đang chọn, Claude trả lời trong luồng bình luận ở đó.</p>
+<p class="tin"><b>Hai trang:</b> <b>Trang 1</b> — con voi TO-BE cạnh AS-IS và bản kiểm từng bước (§1a). <b>Trang 2</b> — fleet eval: agent nào chạy mô hình nào, sơ đồ quy trình, bốn thẻ, và <b>bản AP nhúng nguyên</b> (F4). <b>Cách dùng:</b> bấm một hộp hay một mũi tên (hoặc một dòng trong bảng) để làm nổi các đường nối của nó và mở khung chi tiết. Trong khung có <b>Bình luận phần này</b> và ô <b>Hỏi Claude</b>: câu hỏi được gắn đúng vào phần đang chọn, Claude trả lời trong luồng bình luận ở đó.</p>
 """
 
 
@@ -2381,7 +2395,7 @@ def trang() -> str:
          '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&amp;family=IBM+Plex+Mono:wght@400;500;600;700&amp;family=IBM+Plex+Serif:wght@600&amp;display=swap">',
          f'<style>{CSS}</style>', '<main>', THAN_TREN,
          '<nav class="tab-trang" aria-label="Trang"><a href="#trang-1" data-trang="trang-1" aria-current="page">Trang 1 · Mapping TO-BE ↔ AS-IS</a>'
-         '<a href="#trang-2" data-trang="trang-2">Trang 2 · Fleet eval</a><a href="ap.html" target="_blank" rel="noopener">Bản AP v1.1.0 ↗</a></nav>',
+         '<a href="#trang-2" data-trang="trang-2">Trang 2 · Fleet eval + AP</a></nav>',
          '<section class="trang" id="trang-1">',
          '<h2>§1 · Con voi — TO-BE và AS-IS cạnh nhau, chung lớp theo đời sống của dữ liệu</h2>',
          '<div class="thanh" role="toolbar" aria-label="Lọc theo trạng thái"><span class="nhan">Làm nổi:</span>'
