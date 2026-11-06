@@ -206,8 +206,8 @@
      "id": "a3-3-nen-tang",
      "boxes": {
       "human_in": {
-       "label": "File Looker + PE/PM",
-       "sub": "OMC · GI · SC · PS",
+       "label": "GI·OMC Looker + SC·PS Gsheet",
+       "sub": "+ dòng ITL có PE/PM",
        "status": "built"
       },
       "llm": {

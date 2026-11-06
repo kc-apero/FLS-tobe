@@ -139,7 +139,8 @@ HOP: list[Hop] = [
     Hop("oCCR", "B0", cot(5), "o", "b", "NGƯỜI NHẬP SỐ DƯ", ("số dư ngày từng TK",),
         doi_chieu="ngoài FLS — người nhập chưa xác định (FLS-Process-PM-den-ITL §8 #14)"),
     Hop("oHR", "G0", cot(6), "o", "b", "HR · C&B", ("lập sổ lương",), doi_chieu="ngoài FLS"),
-    Hop("oNT", "H0", cot(7), "o", "b", "DATA · LOOKER", ("xuất file chi phí",), doi_chieu="ngoài FLS — owner 04/11"),
+    Hop("oNT", "H0", cot(7), "o", "b", "DATA · SHQ1 · SHQ2", ("GI · OMC: Data (AnhTQ) xuất Looker · SC: Luận · PS: kế toán",),
+        doi_chieu="ngoài FLS — PD Now bước 103–106 (owner 06/11: Looker chỉ GI · OMC; SC · PS ở Google Sheets)"),
     Hop("saoke", "B1", cot(3), "x", "b", "sao kê ngân hàng", ("60 dòng chảy", "19 bố cục cột"), "sheet R |",
         doi_chieu="tools/nap_nguon_va_khai.py (60 ngân hàng + 8 quỹ = 68 nguồn)"),
     Hop("soquy", "B1", cot(4), "x", "b", "sổ quỹ", ("8 dòng chảy", "kế toán ghi tay"), "sheet R |",
@@ -150,8 +151,10 @@ HOP: list[Hop] = [
         ("6 sổ năm NIS/INT/COM · PIT (có 2026)", "đã tách HD · CDT1 · pháp nhân từng nhân viên; số FT do kế toán dán"),
         "AS-IS [dH1000] · nạp thẳng (owner 06/11)",
         doi_chieu="AS-IS: file lương tháng → sheet No n → 1.3 Ledger → H1000 Ledger năm; 0 tham chiếu trong fls/"),
-    Hop("sont", "H1", cot(7), "x", "b", "file xuất Looker", ("OMC · GI · SC · PS (SC = server cost)", "có PE/PM trên FPS · nối qua Combine Code"), "SC · PS do chủ file cập nhật",
-        doi_chieu="0 tham chiếu trong fls/ (Platform chỉ là enum)"),
+    Hop("sont", "H1", cot(7), "x", "b", "4 sổ Platform Data Ledger",
+        ("GI · OMC: Source (Looker) · SC: Gsheet 'Chi phí Service Apero' · PS: Gsheet 'AperoGroup_Payment'",
+         "có PE/PM trên FPS · nối dòng ITL qua Combine Code"), "H2.2025 · PD Now 210–213",
+        doi_chieu="PD Now 103–106 (nguồn) · 210–213 (Platform Data Ledger); 0 tham chiếu trong fls/ (Platform chỉ là enum)"),
     # ── c1 · KHAI & CHỤP ──
     Hop("S1", "c1", C0, "o", "b", "S1 · NHỊP", ("mỗi giờ 8h–19h",), tang="tren", khoi="kd1",
         doi_chieu="fls/repo/nhip_chup.py (QĐ-ITL-114) · tools/nhip_chup.py chụp Bank + PM"),
@@ -171,8 +174,8 @@ HOP: list[Hop] = [
     Hop("anhHR", "c1", cot(6), "d", "q", "ảnh sổ lương HR",
         ("lằn HR ⛔", "6 sổ H1000 · từng dòng nhân viên"), "fls_chup lằn 'HR'", huy=("S1",),
         doi_chieu="chưa có: chup_sao_ke.py chỉ chụp lằn Bank", khoi="pp2"),
-    Hop("anhNT", "c1", cot(7), "d", "q", "ảnh file Looker",
-        ("lằn Platform ⛔", "bố cục cột: chưa chốt"), "fls_chup 'Platform'", huy=("S1",),
+    Hop("anhNT", "c1", cot(7), "d", "q", "ảnh nguồn nền tảng",
+        ("lằn Platform ⛔", "Looker (GI · OMC) + 2 Gsheet (SC · PS)"), "fls_chup 'Platform'", huy=("S1",),
         doi_chieu="chưa có: chup_sao_ke.py chỉ chụp lằn Bank", khoi="pp3"),
     # ── c2 · DỰNG ──
     Hop("S3", "c2", C0, "o", "b", "S3 · XEM LÔ", ("kế toán chọn lô", "màn F04"),
@@ -295,7 +298,7 @@ TEN: list[Ten] = [
         "ô số dư rỗng ⇒ ngày ấy 'chưa đo được'", "ngoài FLS", tam(6), "1b"),
     Ten("o5", "oHR", "soluong", "b", "lập file lương, tách HD · CDT1 · pháp nhân; kế toán dán số FT bank vào từng khoản", "(sổ, năm, dòng)", "1 sổ – n dòng",
         "bề rộng cột đổi ⇒ bộ đọc nổ, ⛔ không đoán", "ngoài FLS", tam(7), "1c"),
-    Ten("o6", "oNT", "sont", "b", "xuất file chi phí OMC · GI · SC · PS theo vendor · CDT1 · tháng", "(loại, tháng, dòng)", "1 file – n dòng",
+    Ten("o6", "oNT", "sont", "b", "GI · OMC xuất bảng Transactions từ Looker; SC (Luận) · PS (kế toán) cập nhật ở Google Sheets", "(loại, tháng, dòng)", "1 sổ – n dòng",
         "như o5", "ngoài FLS", tam(8), "1c"),
     # 2 · vượt ranh giới
     Ten("x1", "soPM", "anhFPS", "q", "dòng sổ cái PM: tiền · tiền tệ · Ref · khoá PE/PI · HD · CDT1 · pháp nhân trả · trạng thái; "
@@ -582,8 +585,8 @@ DAI_N = {
 TANG_N = {"n1": 0, "n2": 1, "n3": 2, "n4": 3, "n5": 4}
 
 HOP_N: list[Hop] = [
-    Hop("nFile", "n1", cotn(1, 3), "x", "b", "file xuất Looker (đã chụp, b5)",
-        ("OMC · GI · SC · PS — mỗi dòng: loại · vendor · app/CDT1 · tháng · tiền",
+    Hop("nFile", "n1", cotn(1, 3), "x", "b", "4 sổ Platform Data Ledger (đã chụp, b5)",
+        ("GI · OMC: Looker · SC · PS: Google Sheets — mỗi dòng: vendor · ngày · NoTrans · tiền",
          "có PE/PM trên FPS ⇒ nối qua Combine Code (Vendor-Date-NoTrans)"), "4 loại · 4 luật", doi_chieu="owner 04/11"),
     Hop("nBank", "n1", cotn(4, 5), "d", "b", "bank txns chưa ghép (L3)",
         ("giao dịch không có trên FPS (§1b)", "TK · ngày · tiền · tiền tệ · nội dung"),
@@ -591,7 +594,7 @@ HOP_N: list[Hop] = [
     Hop("nLuat", "n1", cotn(6), "d", "n", "4 luật mapping",
         ("1 luật / loại", "người ký"), "owner điền", doi_chieu="chờ owner — xem bảng §1c"),
     Hop("nTach", "n2", cotn(1), "p", "n", "TÁCH tỉ lệ CDT1",
-        ("từ chính file", "Looker"), "mỗi loại · tháng", doi_chieu="đề xuất"),
+        ("Mapping Block 1", "Vendor ↔ Network-Acc ↔ CDT1"), "mỗi loại · tháng", doi_chieu="PD Now 503–507 (CFA1 → CFA2 MID 1–3)"),
     Hop("nMap", "n2", cotn(2, 6), "p", "n", "MAPPING chi phí ↔ PE/PM ↔ bank txns",
         ("Combine Code → PE/PM line → Reference No → giao dịch bank; khớp kỳ · khớp Σ tiền",
          "lệch ⇒ chặn, ⛔ chia bừa · giao dịch khớp ≥ 2 loại ⇒ để người"), "đi qua PE/PM (owner 06/11)", doi_chieu="đề xuất"),
@@ -599,7 +602,7 @@ HOP_N: list[Hop] = [
         ("loại · tháng ·", "CDT1 · %"), "Σ % = 100", doi_chieu="đề xuất"),
     Hop("nKhop", "n3", cotn(2, 3), "d", "n", "khớp",
         ("giao dịch ↔ chi phí kỳ của một loại", "→ mối nối"), "Σ chi phí kỳ = Σ giao dịch", doi_chieu="đề xuất"),
-    Hop("nCho", "n3", cotn(4, 5), "d", "n", "có trên Looker, chưa có tiền",
+    Hop("nCho", "n3", cotn(4, 5), "d", "n", "có trên sổ nguồn, chưa có tiền",
         ("chi phí kỳ chưa thấy giao dịch", "tuổi > N ngày ⇒ cờ"), "giống L2 của §1b", doi_chieu="đề xuất"),
     Hop("nCon", "n3", cotn(6), "d", "n", "tiền chưa khớp",
         ("ở lại L3, vào", "vòng cộng dồn §1b"), "UNMAPPED", doi_chieu="đề xuất"),
@@ -668,7 +671,7 @@ LUONG: dict[str, tuple[str, ...]] = {
     "anhHR": ("Nhịp chụp sổ lương HR",
               "Kiểm bề rộng cột theo hợp đồng; lệch ⇒ nổ",
               "Ghi ảnh theo sổ · năm, có chup_id"),
-    "anhNT": ("DATA xuất file chi phí từ Looker",
+    "anhNT": ("Data xuất GI · OMC từ Looker; Luận / kế toán cập nhật SC / PS ở Google Sheets",
               "Nhịp chụp file vào kho",
               "Kiểm 4 loại OMC · GI · SC · PS; loại lạ ⇒ chặn",
               "Ghi ảnh có chup_id"),
@@ -688,7 +691,7 @@ LUONG: dict[str, tuple[str, ...]] = {
             "Lấy Số CT bank từ dòng đảo (số FT kế toán đã dán)",
             "Kiểm đủ tháng, không tháng trùng",
             "Chuyển sang MAPPING PP (2)"),
-    "dNT": ("Đọc ảnh file Looker",
+    "dNT": ("Đọc ảnh 4 sổ Platform Data Ledger (Looker · Gsheet)",
             "Tách 4 loại OMC · GI · SC · PS",
             "Mỗi loại → chi phí theo vendor · CDT1 · tháng",
             "Dựng Combine Code Vendor-Date-NoTrans",
@@ -782,7 +785,7 @@ LUONG: dict[str, tuple[str, ...]] = {
               "Thêm luật ứng viên từ vòng cộng dồn",
               "Chỉ hiệu lực khi owner ký; có version"),
     # ── hình 3 · PP (3)
-    "nTach": ("Đọc cột CDT1 của file Looker",
+    "nTach": ("Đọc Mapping Block 1: ID Vendor ↔ Network-Acc ↔ CDT1 (PD Now 503)",
               "Tính % từng CDT1 theo loại · tháng",
               "Σ % ≠ 100 ⇒ chặn"),
     "nMap": ("Nhận chi phí 4 loại, giao dịch L3 và 4 luật đã ký",
@@ -804,7 +807,7 @@ LUONG: dict[str, tuple[str, ...]] = {
 AGENT = {   # mã: (dải, nhãn ngắn, tên, luồng ≤ 5 bước, hộp thuộc agent)
     "ag1": ("c1", "AGENT 1", "Agent 1 · KHAI & CHỤP", (
         "Khởi bởi nhịp mỗi giờ (S1) và cú khai nguồn của kế toán (S2)",
-        "Đọc chỉ-đọc: sổ cái PM / PC (FPS), 60 sao kê + 8 quỹ + 2 sheet CCR, 6 sổ H1000, file Looker",
+        "Đọc chỉ-đọc: sổ cái PM / PC (FPS), 60 sao kê + 8 quỹ + 2 sheet CCR, 6 sổ H1000, 4 sổ nền tảng (Looker · Gsheet)",
         "Giữ bản khai nguồn có version: cột · thứ tự ngày · pháp nhân TK",
         "Ghi ảnh chụp đóng băng có chup_id; ảnh cũ không đổi một ô",
         "Ra: ảnh cho Agent 2"), ("anhFPS", "khai", "anhTien", "anhHR", "anhNT")),
@@ -818,7 +821,7 @@ AGENT = {   # mã: (dải, nhãn ngắn, tên, luồng ≤ 5 bước, hộp thu�
         "Khởi bởi Nhận lô (S4)",
         "PP (1): bank txns ↔ lệnh chi qua Reference No + luật vế Nợ → L1 · L2 · L3",
         "PP (2): dòng lương H1000 ↔ giao dịch bank theo Số CT",
-        "PP (3): Looker → PE/PM (Combine Code) → bank txns, chia theo CDT1",
+        "PP (3): dòng ITL (đã có PE, đã nối bank) ⨝ nguồn GI · OMC · SC · PS theo Combine Code → chia CDT1",
         "Ra: mối nối, phần chia và dòng chưa khớp cho Agent 4"), ("ghep", "ghep2", "ghep3")),
     "ag4": ("c4", "AGENT 4", "Agent 4 · SOÁT", (
         "Chạy gpt-oss-20b — khác mô hình với A1–A3 (Qwen); khởi bởi xem trước (S3) và Nhận (S4)",
@@ -874,10 +877,10 @@ PP_LUONG = {
         "Soát Σ Có = Σ Nợ, đủ tháng → ghi sổ; phần còn lại sang PP (3)"),
         ("oHR", "soluong", "anhHR", "dHR", "ghep2", "soat2", "ghiNap")),
     "pp3": ("Phương pháp (3) · 4 chi phí nền tảng", (
-        "DATA xuất file OMC · GI · SC · PS từ Looker",
-        "FLS chụp file",
-        "Dựng 4 loại chi phí + Combine Code",
-        "Combine Code → PE/PM trên FPS → Reference No → giao dịch bank; chia theo CDT1",
+        "Data xuất GI · OMC từ Looker; SC (Luận) · PS (kế toán) ở Google Sheets",
+        "FLS chụp 4 sổ Platform Data Ledger",
+        "Dựng 4 loại chi phí + Combine Code Vendor-Date-NoTrans",
+        "Combine Code nối dòng ITL (đã có PE/PM, đã nối bank) với dòng nguồn; Mapping Block 1 → chia CDT1 × tháng",
         "Soát Σ phần chia = tiền giao dịch → ghi sổ"),
         ("oNT", "sont", "anhNT", "dNT", "ghep3", "soat3", "ghiNap")),
 }
@@ -898,7 +901,7 @@ NGUON_NM: dict[str, tuple[str, str, str, str]] = {
             "ô rỗng ⇒ ngày ấy 'chưa đo được', ⛔ coi là khớp"),
     "soluong": ("VÀO", "NGƯỜI", "HR · C&B lập file lương, tách HD · CDT1 · pháp nhân; kế toán dán số FT bank vào từng khoản",
                 "tháng trùng / thiếu, Σ lệch khi chưa dán FT (2025-10: INT lệch 567.500 · PIT ≈ 510,8 tr) ⇒ soát chặn"),
-    "sont": ("VÀO", "NGƯỜI+MÁY", "GI · OMC do Looker sinh; SC (server cost) và PS do chủ file tự cập nhật",
+    "sont": ("VÀO", "NGƯỜI+MÁY", "GI · OMC do Looker sinh, Data (AnhTQ) xuất; SC (server cost) do SHQ1 (Luận) nhập ở Gsheet 'Chi phí Service Apero'; PS do SHQ2 (kế toán) nhập ở Gsheet 'AperoGroup_Payment'",
              "xuất sai kỳ / thiếu loại ⇒ chặn khi loại lạ; Σ chi phí kỳ phải khớp giao dịch"),
     # ── VÀO · người nhập ngay trong FLS
     "khai": ("VÀO", "NGƯỜI+MÁY", "máy đề xuất cột, thứ tự ngày, pháp nhân TK; kế toán khai, owner ký",
@@ -924,15 +927,15 @@ NGUON_NM: dict[str, tuple[str, str, str, str]] = {
 NGAN: dict[str, tuple[str, str]] = {
     "oPM": ("LẬP·DUYỆT PM·PC", "trong FPS"), "oKTnh": ("KT NGÂN HÀNG", "dán sao kê"),
     "oKTq": ("KẾ TOÁN QUỸ", "ghi sổ quỹ"), "oCCR": ("NHẬP SỐ DƯ", "từng TK · ngày"),
-    "oHR": ("HR · C&B", "lập sổ lương"), "oNT": ("DATA · LOOKER", "xuất file"),
+    "oHR": ("HR · C&B", "lập sổ lương"), "oNT": ("DATA·LUẬN·KT", "Looker · Gsheet"),
     "soPM": ("sổ cái PM · PC", "FPS · 3.772 dòng"), "saoke": ("sao kê", "60 dòng chảy"),
     "soquy": ("sổ quỹ", "8 dòng chảy"), "ccr": ("CCR · CCR Cash", "số dư ngày"),
-    "soluong": ("sổ H1000", "6 sổ năm · đã tách"), "sont": ("file Looker", "OMC·GI·SC·PS"),
+    "soluong": ("sổ H1000", "6 sổ năm · đã tách"), "sont": ("sổ nền tảng", "Looker + 2 Gsheet"),
     "S1": ("S1 · NHỊP", ""), "S2": ("S2 · KHAI", ""), "S3": ("S3 · XEM", "F04"),
     "S4": ("S4 · NHẬN", ""), "S5": ("S5 · SỬA", ""),
     "anhFPS": ("ảnh sổ cái", "PM·PC đóng băng"), "khai": ("bản khai", "cột·ngày·LE"),
     "anhTien": ("ảnh sao kê · quỹ · CCR", "theo bản khai · Bank ✅ · Cash ⛔ · CCR ⛔"),
-    "anhHR": ("ảnh sổ lương", "lằn HR ⛔"), "anhNT": ("ảnh Looker", "lằn Platform ⛔"),
+    "anhHR": ("ảnh sổ lương", "lằn HR ⛔"), "anhNT": ("ảnh nền tảng", "lằn Platform ⛔"),
     "dLenh": ("DỰNG lệnh chi", "PM / PC line"),
     "dTien": ("DỰNG dòng tiền + số dư ngày", "hai vế PS Nợ · PS Có · pháp nhân TK · content_key"),
     "dHR": ("DỰNG dòng lương", "nạp thẳng H1000"), "dNT": ("DỰNG nền tảng", "+ Combine Code"),
@@ -964,7 +967,7 @@ HOP_A: list[Hop] = [
     Hop("aoKQ", "A0", cota(4), "o", "a", "KẾ TOÁN QUỸ", goc=("oKQ",), doi_chieu="TO-BE: KẾ TOÁN QUỸ"),
     Hop("aoSD", "A0", cota(5), "o", "a", "NGƯỜI NHẬP SỐ DƯ", goc=("oSD",), doi_chieu="TO-BE: NGƯỜI NHẬP SỐ DƯ"),
     Hop("aoHR", "A0", cota(6), "o", "a", "HR · C&B", goc=("oHR",), doi_chieu="TO-BE: HR · C&B"),
-    Hop("aoDT", "A0", cota(7), "o", "a", "DATA · LOOKER", goc=("oDT",), doi_chieu="TO-BE: DATA · LOOKER"),
+    Hop("aoDT", "A0", cota(7), "o", "a", "DATA (Looker) · LUẬN · KẾ TOÁN (Gsheet)", goc=("oDT",), doi_chieu="TO-BE: DATA · SHQ1 · SHQ2"),
     # sổ nguồn
     Hop("aEntry", "A1", cota(1), "x", "a", "Entry Data P100 (PE · PI · PM · PC)", goc=("dEntry",),
         doi_chieu="TO-BE: sổ cái PM · PC của FPS (đọc thẳng sổ cái, ⛔ đọc phiếu)"),
@@ -972,7 +975,8 @@ HOP_A: list[Hop] = [
     Hop("aSQ", "A1", cota(4), "x", "a", "sổ quỹ · sheet R |", goc=("dSQ",), doi_chieu="TO-BE: sổ quỹ (cùng sheet)"),
     Hop("aCCR", "A1", cota(5), "x", "a", "2. CCR · CCR Cash", goc=("dCCR",), doi_chieu="TO-BE: CCR · CCR Cash (cùng sheet)"),
     Hop("aPR", "A1", cota(6), "x", "a", "EDD + file lương tháng", goc=("dEDD", "dPR"), doi_chieu="TO-BE: sổ lương HR"),
-    Hop("aLK", "A1", cota(7), "x", "a", "file xuất Looker", goc=("dLK",), doi_chieu="TO-BE: file Looker (cùng file)"),
+    Hop("aLK", "A1", cota(7), "x", "a", "GI · OMC (Looker) + SC · PS (Google Sheets)", goc=("dLK",),
+        doi_chieu="TO-BE: 4 sổ Platform Data Ledger (cùng nguồn) · PD Now 103–106"),
     # ① KHAI & CHỤP
     Hop("aDuoi", "c1", cota(1), "p", "a", "DUỖI DÒNG (GScript) → PE·PI·PM_Unpivot", goc=("oKTS", "pDUOI", "dUNP"), tay=True,
         doi_chieu="TO-BE: ảnh sổ cái (nhịp S1, ⛔ người bấm)"),
@@ -1017,10 +1021,10 @@ HOP_A_THEO = {h.ma: h for h in HOP_A}
 NGAN.update({
     "aoP": ("ĐỀ NGHỊ · CA", "Gform · gõ Ref"), "aoNH": ("KT NGÂN HÀNG", "gõ sao kê"),
     "aoKQ": ("KẾ TOÁN QUỸ", "ghi thu chi"), "aoSD": ("NHẬP SỐ DƯ", "tay · ai: ?"),
-    "aoHR": ("HR · C&B", "EDD · lương"), "aoDT": ("DATA · LOOKER", "xuất bảng"),
+    "aoHR": ("HR · C&B", "EDD · lương"), "aoDT": ("DATA·LUẬN·KT", "Looker · Gsheet"),
     "aEntry": ("Entry Data P100", "PE·PI·PM·PC"), "aSK": ("sao kê R |", "60 sheet"),
     "aSQ": ("sổ quỹ R |", "8 quỹ"), "aCCR": ("2. CCR · Cash", "số dư gõ tay"),
-    "aPR": ("EDD · lương", "file tháng"), "aLK": ("file Looker", "GI · OMC"),
+    "aPR": ("EDD · lương", "file tháng"), "aLK": ("sổ nền tảng", "Looker + Gsheet"),
     "aDuoi": ("DUỖI DÒNG", "→ PM_Unpivot"), "aMM": ("Mapping Master", "sheet → LE"),
     "aGom": ("GOM GD BANK · QUỸ", "nút GScript → Bank / Cash Trans."), "aGN": ("GOM NỀN TẢNG", "→ Platform Ledger"),
     "aGop": ("CHUYỂN A-CCR · GỘP", "Ledger 111/112 → Trans. Original"), "aTach": ("TÁCH LƯƠNG", "HD·CDT1 → H1000"),
@@ -1038,7 +1042,7 @@ TEN_A: list[Ten] = [
     Ten("a3", "aoKQ", "aSQ", "t", "ghi giao dịch quỹ", "", "", "", "", 0.0, "", ("n5",)),
     Ten("a4", "aoSD", "aCCR", "t", "nhập số dư cuối ngày từng TK / quỹ", "", "", "", "", 0.0, "", ("n3",)),
     Ten("a5", "aoHR", "aPR", "t", "quyết định nhân sự · chấm công · BH · COM · thưởng", "", "", "", "", 0.0, "", ("n6", "n7")),
-    Ten("a6", "aoDT", "aLK", "t", "xuất bảng giao dịch từ Looker", "", "", "", "", 0.0, "", ("n8",)),
+    Ten("a6", "aoDT", "aLK", "t", "GI · OMC xuất bảng từ Looker; SC · PS cập nhật tay ở Google Sheets", "", "", "", "", 0.0, "", ("n8",)),
     Ten("a7", "aEntry", "aDuoi", "a", "dòng đã duyệt", "", "", "", "", 0.0, "", ("m1",)),
     Ten("a8", "aSK", "aGom", "a", "6 cột chuẩn của sheet R |", "", "", "", "", 0.0, "", ("m3",)),
     Ten("a9", "aSQ", "aGom", "a", "dòng sổ quỹ", "", "", "", "", 0.0, "", ("m6",)),
@@ -1308,7 +1312,7 @@ def svg() -> str:
                      f'<text class="vt vt-pp1" x="{x0 + 6}" y="{yt0 + 14}">{E(nh)}</text></g>')
         else:
             o.append(f'<text class="vt" x="{x0 + 6}" y="{yt0 + 14}">{E(nh)}</text>')
-    for (a, b), nh in (((1, 1), "P100"), ((2, 2), ""), ((3, 5), "R | · CCR"), ((6, 6), "HR"), ((7, 7), "Looker")):
+    for (a, b), nh in (((1, 1), "P100"), ((2, 2), ""), ((3, 5), "R | · CCR"), ((6, 6), "HR"), ((7, 7), "Looker·GS")):
         if not nh:
             continue
         x0, x1 = cota(a)[0] - 3, cota(b)[1] + 3
@@ -1590,7 +1594,7 @@ def bang_luong() -> str:
 # ── §1 · đọc ngang từng lớp: TO-BE ↔ AS-IS ↔ khác ở đâu (danh sách gap đầu tiên của audit) ──
 KHAC_LOP = {
     "A0": "Người vẫn gõ ở cả hai bên; FLS không thay chỗ gõ. Bên AS-IS, CA gõ Reference number SAU khi chi, giờ không cố định; người nhập số dư CCR chưa xác định.",
-    "A1": "AS-IS đọc phiếu Entry Data P100; TO-BE đọc thẳng sổ cái PM · PC của FPS. Sao kê, sổ quỹ, CCR, file Looker: cùng một sheet ở hai bên.",
+    "A1": "AS-IS đọc phiếu Entry Data P100; TO-BE đọc thẳng sổ cái PM · PC của FPS. Sao kê, sổ quỹ, CCR, nguồn nền tảng (Looker GI · OMC + Gsheet SC · PS): cùng nguồn ở hai bên.",
     "c1": "AS-IS: người bấm GScript duỗi / gom; Mapping Master là bảng tra sửa tại chỗ. TO-BE: nhịp S1 chụp theo bản khai, bản khai có version, owner ký.",
     "c2": "AS-IS: đẩy tay sang A-CCR (đang trễ 19 ngày, thiếu 377 dòng — mô tả luồng người N3). TO-BE: DỰNG từ ảnh, đủ hai vế, gắn pháp nhân TK.",
     "c3": "AS-IS: VLOOKUP Reference number chỉ lấy dòng đầu, mã trùng bị bỏ qua không báo; người nhận ra giao dịch nhờ đọc Diễn giải. TO-BE: Σ line = tiền, N×M để người; máy chưa đọc Diễn giải (QĐ-ITL-92).",
@@ -1805,7 +1809,7 @@ FE_THE = [   # (agent, phép kiểm, lỗi đáng sợ, đơn vị heatmap, đá
 ]
 
 
-AP_FE = "AP_FLS_FleetEval_v1.1.0_2026-11-06.html"     # bản AP nhúng nguyên vào trang 2 (F4)
+AP_FE = "AP_FLS_FleetEval_v1.1.1_2026-11-06.html"     # bản AP nhúng nguyên vào trang 2 (F4)
 FE_THE_TEP = ("a3-1-ref", "a3-2-luong", "a3-3-nen-tang", "a4-soat")
 
 
@@ -1858,7 +1862,7 @@ def bang_fleet_eval() -> str:
 
 
 NHOM_NM = [
-    ("VÀO — nguồn đầu vào", [("Do hệ sinh: FPS · Looker", ["soPM", "sont"]),
+    ("VÀO — nguồn đầu vào", [("Do hệ sinh (+ người): FPS · Looker / Gsheet nền tảng", ["soPM", "sont"]),
                              ("Do người nhập ở Google Sheets", ["saoke", "soquy", "ccr", "soluong"]),
                              ("Do người nhập ngay trong FLS", ["khai", "lopSua", "mLuat"])]),
     ("RA — đầu ra", [("", ["f01", "f02", "f03", "xuat"])]),
@@ -2458,7 +2462,7 @@ def trang() -> str:
 <b>Hai câu chờ owner:</b> ① vòng này cần đọc <b>nội dung giao dịch</b> trên sao kê, nhưng hôm nay FLS chỉ được đọc ba cột (ngày · Reference number · nguồn — QĐ-ITL-92) và <code>fls_itl.memo</code> rỗng 8.387/8.387 ⇒ có nới QĐ-ITL-92 cho cột nội dung, chỉ để suy diễn? ② chọn <b>k</b> (số xác nhận để thành luật ứng viên) và <b>N</b> (số ngày để L2 bị cờ).</p>
 """, """
 <h2>§1c · Phương pháp (3) — 4 chi phí nền tảng: OMC · GI · SC · PS</h2>
-<p><b>Sửa 06/11:</b> bốn loại chi phí này <b>có PE/PM trên FPS</b> (AS-IS nối bằng Combine Code Vendor-Date-NoTrans), và kết quả phải <b>mapping được với bank txns</b>. Đường đi: xuất file từ data Looker → Combine Code → PE/PM → Reference No → bank txns → chia theo <b>CDT1</b>. SC = server cost. Giao dịch ngân hàng đưa vào là những dòng còn ở lớp L3 của §1b.</p>
+<p><b>Sửa 06/11:</b> bốn loại chi phí này <b>có PE/PM trên FPS</b> (AS-IS nối bằng Combine Code Vendor-Date-NoTrans), và kết quả phải <b>mapping được với bank txns</b>. <b>Nguồn (PD Now 103–106, sửa theo bình luận owner):</b> GI · OMC xuất từ <b>Looker</b> (Data · AnhTQ); <b>SC</b> (server cost) ở Gsheet <i>Chi phí Service Apero</i> (SHQ1 · Luận); <b>PS</b> ở Gsheet <i>AperoGroup_Payment</i> (SHQ2 · kế toán). <b>Cách nối (PD Now 501–507):</b> dòng ITL đã adjust (đã có PE/PM, đã nối bank qua Reference No) ⨝ dòng nguồn theo Combine Code <i>Vendor-Date-NoTrans</i> → Mapping Block 1 (ID Vendor ↔ Network-Acc ↔ CDT1) → chia theo <b>CDT1 × tháng</b> (CFA2 MID 1–3) → báo cáo P&amp;L theo CDT1 (600–603). Giao dịch ngân hàng đưa vào là những dòng còn ở lớp L3 của §1b.</p>
 <figure class="diagram" id="hinh-n">""", svg_n(), """<figcaption>Hình 3 — PP (3) phóng to. 5 dải · 13 hộp · 14 mũi tên, máy kiểm như hình 1. Mọi hộp nét đứt xanh: đề xuất, chờ owner ký luật.</figcaption></figure>
 <h3>Mỗi luật mapping phải khai năm điều</h3>
 <p>Luật cụ thể của OMC, GI, SC (server cost), PS do owner điền; trang này chỉ khai <b>hình dạng</b> một luật phải có, để bốn luật so được với nhau.</p>
@@ -2466,9 +2470,9 @@ def trang() -> str:
 <thead><tr><th>điều phải khai</th><th>hình dạng</th><th>vì sao</th></tr></thead>
 <tbody>
 <tr><td>① nhận diện giao dịch</td><td>TK chi + vendor / từ khoá nội dung + chiều tiền ra</td><td>không có Reference No; thiếu nội dung thì cần nới QĐ-ITL-92 (câu ① §1b)</td></tr>
-<tr><td>② khớp kỳ</td><td>tháng chi phí trên Looker ↔ tháng của giao dịch (trả trước / trả sau bao nhiêu tháng)</td><td>một giao dịch có thể trả chi phí của tháng trước</td></tr>
+<tr><td>② khớp kỳ</td><td>tháng chi phí trên sổ nguồn ↔ tháng của giao dịch (trả trước / trả sau bao nhiêu tháng)</td><td>một giao dịch có thể trả chi phí của tháng trước</td></tr>
 <tr><td>③ khớp tiền</td><td>Σ chi phí kỳ của loại = Σ giao dịch khớp; dung sai; cùng tiền tệ hay quy đổi</td><td>lệch thì chặn, không chia bừa (INV-I16)</td></tr>
-<tr><td>④ tỉ lệ CDT1</td><td>chia theo <b>CDT1</b> (đã chốt 06/11, như AS-IS); cột nào của file Looker cho phần của từng CDT1</td><td>allocate cần Σ % = 100 cho từng loại · tháng</td></tr>
+<tr><td>④ tỉ lệ CDT1</td><td>chia theo <b>CDT1</b> (đã chốt 06/11, như AS-IS) qua Mapping Block 1 (ID Vendor ↔ Network-Acc ↔ CDT1 × số tháng, PD Now 503–504)</td><td>allocate cần Σ % = 100 cho từng loại · tháng</td></tr>
 <tr><td>⑤ ai ký, từ khi nào</td><td>người ký + ngày hiệu lực + version</td><td>luật đổi thì lượt cũ giữ version đã dùng</td></tr>
 </tbody></table></div>
 """, """
@@ -2543,7 +2547,7 @@ def trang() -> str:
 <tr class="b1"><th colspan="4">Chặng II · Mở họ lệnh chi và chi phí (bước 3–5)</th></tr>
 <tr><td>3</td><td>x1 · b1 · g1 (sổ cái PM + PC)</td><td>Hợp đồng §5 chốt trước; đặt kiểu 13 cột PM còn thô; ảnh sổ cái dùng lại lằn ảnh chụp, không dựng hệ thứ hai</td><td>0 khoá lệnh chi trỏ rỗng · chiều lệnh chi khớp sổ đang chạy 100% từng ô</td></tr>
 <tr><td>4</td><td>x5 · b4 · g4 (PP 2 · lương / BHXH / BHYT)</td><td>Nạp thẳng H1000 đã tách (06/11) — không tự khớp Σ; khoá là Số CT kế toán đã dán</td><td>mọi dòng lương nối được Số CT (hoặc hàng chờ có tên) · Σ Có = Σ Nợ mỗi đợt · đủ tháng, 0 tháng trùng</td></tr>
-<tr><td>5</td><td>x6 · b5 · g5 (PP 3 · OMC · GI · SC · PS)</td><td>Có PE/PM (sửa 06/11): Looker → Combine Code → PE/PM → Reference No → bank txns, chia theo CDT1 (§1c)</td><td>số dòng = file Looker · mọi giao dịch 4 loại khớp hoặc vào hàng chờ có tên · Σ phần chia = tiền giao dịch</td></tr>
+<tr><td>5</td><td>x6 · b5 · g5 (PP 3 · OMC · GI · SC · PS)</td><td>Có PE/PM (sửa 06/11): dòng ITL ⨝ nguồn GI · OMC (Looker) · SC · PS (Gsheet) theo Combine Code → chia CDT1 (§1c)</td><td>số dòng = 4 sổ nguồn · mọi giao dịch 4 loại khớp hoặc vào hàng chờ có tên · Σ phần chia = tiền giao dịch</td></tr>
 <tr class="b1"><th colspan="4">Chặng III · Chứng minh một bảng (bước 6–7)</th></tr>
 <tr><td>6</td><td>h2 · h3 · sổ hiệu lực thành một view có tên</td><td>Hôm nay màn tự ghép ở cửa đọc; hệ khác cần một bảng</td><td>một SELECT trả đủ 4 họ nguồn · đủ 3 vai pháp nhân</td></tr>
 <tr><td>7</td><td>h1 · h4 · v1 · v4 (cổng GĐ1 + xuất đối chiếu)</td><td>Hợp nhất chỉ chứng minh được khi cả 4 họ đã vào</td><td>Σ theo pháp nhân = Σ theo nguồn, từng tiền tệ · chênh với sổ đang chạy liệt kê từng dòng, có tên</td></tr>
