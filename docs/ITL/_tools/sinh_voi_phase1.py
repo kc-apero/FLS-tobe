@@ -447,14 +447,14 @@ HOP_M: list[Hop] = [
         ("Ref · tiền · tiền tệ", "pháp nhân trả · vendor"),
         "đã DỰNG (b1)", doi_chieu="fls_pm_line 3.772 dòng (14 cột có kiểu) · hôm nay qua Sheets"),
     Hop("mHR", "m1", cotm(2), "d", "q", "đợt lương · BH",
-        ("PP (2): lương · BHXH", "· BHYT, Σ venture · kỳ"),
+        ("PP (2): dòng lương H1000", "Số CT · HD · CDT1 · pháp nhân"),
         "đã DỰNG (b4)", doi_chieu="owner 04/11: GĐ1 → LE, GĐ2 → KRF"),
     Hop("mBank", "m1", cotm(3, 4), "d", "b", "bank transactions",
         ("dòng tiền đã DỰNG (b3)", "TK · ngày · Nợ/Có · Ref · nội dung"),
         "nội dung: chưa đọc (QĐ-ITL-92)", doi_chieu="fls_itl 8.387 · memo rỗng 8.387/8.387"),
     Hop("mLuatGhep", "m1", cotm(5, 6), "d", "q", "luật ghép đã ký",
         ("VN: Ref + tiền + pháp nhân · ngoài: từ khoá + vendor + tiền",
-         "lương / BH: TK chi + nội dung + Σ đợt venture · kỳ → LE"),
+         "lương / BH: Số CT (số FT kế toán dán) = Reference number"),
         "QĐ-ITL-144 · máy mới dùng Ref + tiền", doi_chieu="QĐ-ITL-144 (owner + kế toán 18/09)"),
     Hop("mMap", "m2", cotm(1, 5), "p", "b", "MAPPING bank txns ↔ lệnh chi",
         ("chạy luật ghép theo thứ tự; Σ tiền các PM line = tiền giao dịch, lệch ⇒ chặn",
@@ -463,7 +463,7 @@ HOP_M: list[Hop] = [
     Hop("mBB", "m2", cotm(6), "d", "q", "biên bản mapping",
         ("đếm 3 lớp", "+ lý do có tên"), "mỗi lượt nạp", doi_chieu="hôm nay: /queue/coverage · /queue/mau-so"),
     Hop("mL1", "m3", cotm(1, 2), "d", "b", "L1 · khớp",
-        ("Ref chung + Σ khớp, hoặc khớp đợt lương / BH", "→ mối nối · LE venture (s3)"),
+        ("Ref chung + Σ khớp, hoặc Số CT của dòng lương", "→ mối nối (s3)"),
         "hôm nay 2.263 mối nối", doi_chieu="fls_pm_link"),
     Hop("mL2", "m3", cotm(3, 4), "d", "b", "L2 · có trên FPS, chưa có bank",
         ("PM đã duyệt, chưa thấy tiền ở TK chi", "tuổi > N ngày ⇒ cờ 'lệnh chưa thấy tiền'"),
@@ -493,8 +493,8 @@ HOP_M_THEO = {h.ma: h for h in HOP_M}
 TEN_M: list[Ten] = [
     Ten("m1", "mPM", "mMap", "q", "PM line: Ref · tiền · tiền tệ · pháp nhân trả · vendor", "pm_line_id", "1 – 1",
         "chỉ dòng trạng thái cuối đã duyệt", "◐ có, chưa có pháp nhân/vendor có kiểu", tamm(1)),
-    Ten("m15", "mHR", "mMap", "q", "đợt lương / BHXH / BHYT: venture · kỳ · Σ tiền · LE", "(venture, kỳ, loại)", "1 đợt – n giao dịch",
-        "Σ giao dịch ghép vào một đợt = Σ đợt; lệch ⇒ chặn", "⛔ chưa có", tamm(2)),
+    Ten("m15", "mHR", "mMap", "q", "dòng lương H1000 + Số CT (số FT kế toán dán)", "Số CT", "n dòng lương – 1 giao dịch",
+        "Σ dòng lương của một giao dịch = tiền giao dịch; lệch ⇒ hàng chờ", "⛔ chưa có", tamm(2)),
     Ten("m2", "mBank", "mMap", "b", "giao dịch: TK · ngày · tiền · tiền tệ · Ref", "content_key", "1 – 1",
         "đọc từ ảnh, ⛔ Sheets sống", "✅", tamm(3, 4)),
     Ten("m3", "mLuatGhep", "mMap", "q", "thứ tự nhánh: VN (Ref + tiền + pháp nhân) → nước ngoài (từ khoá + vendor + tiền)",
@@ -725,7 +725,7 @@ LUONG: dict[str, tuple[str, ...]] = {
     "ghiNap": ("Kế toán bấm Nhận lô trên F04 (S4)",
                "Mở MỘT giao dịch cơ sở dữ liệu",
                "Ghi run, dòng sổ (bỏ qua dòng trùng content_key), dòng loại",
-               "Ghi mối nối (PP 1), đợt gắn LE (PP 2), phần chia venture (PP 3), gợi ý của máy",
+               "Ghi mối nối (PP 1), dòng lương nối Số CT (PP 2), phần chia CDT1 (PP 3), gợi ý của máy",
                "Kiểm 4 vế cân; lỗi giữa chừng ⇒ huỷ cả lượt"),
     # ── d1 · SỔ GỐC
     "loai": ("Mỗi dòng không vào sổ được một lý do có tên",
@@ -782,17 +782,17 @@ LUONG: dict[str, tuple[str, ...]] = {
               "Thêm luật ứng viên từ vòng cộng dồn",
               "Chỉ hiệu lực khi owner ký; có version"),
     # ── hình 3 · PP (3)
-    "nTach": ("Đọc cột venture của file Looker",
-              "Tính % từng venture theo loại · tháng",
+    "nTach": ("Đọc cột CDT1 của file Looker",
+              "Tính % từng CDT1 theo loại · tháng",
               "Σ % ≠ 100 ⇒ chặn"),
     "nMap": ("Nhận chi phí 4 loại, giao dịch L3 và 4 luật đã ký",
              "Nhận diện giao dịch theo luật của từng loại",
              "Khớp kỳ và Σ tiền; lệch ⇒ chặn",
              "Giao dịch khớp ≥ 2 loại ⇒ để người",
              "Xếp: khớp · chờ tiền · tiền chưa khớp"),
-    "nAlloc": ("Nhận giao dịch đã khớp và tỉ lệ venture",
+    "nAlloc": ("Nhận giao dịch đã khớp và tỉ lệ CDT1",
                "Chia tiền theo tỉ lệ đúng loại · tháng",
-               "Phần lẻ dồn vào một venture có tên",
+               "Phần lẻ dồn vào một CDT1 có tên",
                "Ghi phần chia chỉ-thêm; giao dịch gốc giữ nguyên"),
     "nKiem": ("Cộng các phần chia của từng giao dịch",
               "So với tiền giao dịch, từng tiền tệ",
@@ -804,30 +804,36 @@ LUONG: dict[str, tuple[str, ...]] = {
 AGENT = {   # mã: (dải, nhãn ngắn, tên, luồng ≤ 5 bước, hộp thuộc agent)
     "ag1": ("c1", "AGENT 1", "Agent 1 · KHAI & CHỤP", (
         "Khởi bởi nhịp mỗi giờ (S1) và cú khai nguồn của kế toán (S2)",
-        "Đọc chỉ-đọc: sổ cái PM / PC (FPS), 60 sao kê + 8 quỹ + 2 sheet CCR, sổ lương, file Looker",
+        "Đọc chỉ-đọc: sổ cái PM / PC (FPS), 60 sao kê + 8 quỹ + 2 sheet CCR, 6 sổ H1000, file Looker",
         "Giữ bản khai nguồn có version: cột · thứ tự ngày · pháp nhân TK",
         "Ghi ảnh chụp đóng băng có chup_id; ảnh cũ không đổi một ô",
         "Ra: ảnh cho Agent 2"), ("anhFPS", "khai", "anhTien", "anhHR", "anhNT")),
     "ag2": ("c2", "AGENT 2", "Agent 2 · DỰNG", (
         "Khởi bởi kế toán chọn lô / xem trước (S3) hoặc Nhận (S4)",
         "Đọc ảnh của Agent 1",
-        "Dựng 4 loại dòng: lệnh (PM/PC) · tiền + số dư ngày · đợt lương/BH · chi phí nền tảng",
+        "Dựng 4 loại dòng: lệnh (PM/PC) · tiền + số dư ngày · dòng lương H1000 · chi phí nền tảng + Combine Code",
         "Gắn pháp nhân, tính content_key, giữ đủ hai vế Nợ / Có",
         "Ra: dòng chuẩn cho Agent 3"), ("dLenh", "dTien", "dHR", "dNT")),
     "ag3": ("c3", "AGENT 3", "Agent 3 · MAPPING", (
         "Khởi bởi Nhận lô (S4)",
         "PP (1): bank txns ↔ lệnh chi qua Reference No + luật vế Nợ → L1 · L2 · L3",
-        "PP (2): L3 còn lại ↔ đợt lương / BHXH / BHYT → LE",
-        "PP (3): phần còn lại ↔ 4 chi phí nền tảng → allocate venture",
+        "PP (2): dòng lương H1000 ↔ giao dịch bank theo Số CT",
+        "PP (3): Looker → PE/PM (Combine Code) → bank txns, chia theo CDT1",
         "Ra: mối nối, phần chia và dòng chưa khớp cho Agent 4"), ("ghep", "ghep2", "ghep3")),
     "ag4": ("c4", "AGENT 4", "Agent 4 · SOÁT", (
-        "Khởi bởi xem trước (S3) và Nhận (S4)",
+        "Chạy gpt-oss-20b — khác mô hình với A1–A3 (Qwen); khởi bởi xem trước (S3) và Nhận (S4)",
         "PP (1): 9 luật sao kê · Σ PM line = tiền · 4 vế · số dư ngày = CCR (DIF = 0)",
-        "PP (2): Σ đợt = Σ giao dịch · mọi đợt có LE",
-        "PP (3): Σ phần chia = tiền · Σ % venture = 100",
+        "PP (2): Σ Có = Σ Nợ mỗi đợt · đủ tháng, ⛔ tháng trùng",
+        "PP (3): Σ phần chia = tiền · Σ % CDT1 = 100",
         "Ra: dòng đạt cho GHI; CHẶN / CỜ / lệch vào hàng chờ có lý do"), ("soat", "soat2", "soat3")),
 }
 AG_THEO_DAI = {v[0]: k for k, v in AGENT.items()}
+
+# ⭐ Owner 06/11: "dùng 1 model khác để kiểm". Agent LÀM (A1 · A2 · A3.x) chạy Qwen; agent KIỂM trong luồng (A4 SOÁT)
+#   chạy mô hình KHÁC họ (gpt-oss-20b) — một bộ kiểm cùng họ với thứ nó kiểm sẽ chấm dễ (how-to 5.1).
+#   Bộ chấm FLEET EVAL thì phải khác mô hình của CHÍNH agent bị đo ⇒ A1–A3 chấm bằng gpt-oss, A4 chấm bằng Qwen.
+AG_MO_HINH = {"ag1": "Qwen 3.8-27B", "ag2": "Qwen 3.8-27B", "ag3": "Qwen 3.8-27B", "ag4": "gpt-oss-20b"}
+AG_CHAM = {"ag1": "gpt-oss-20b", "ag2": "gpt-oss-20b", "ag3": "gpt-oss-20b", "ag4": "Qwen 3.8-27B"}
 
 # ── owner 06/11: "phần TO-BE thể hiện rõ được các agents mapping" ⇒ Agent 3 tách ba agent con, mỗi PP một con,
 #    nối nhau bằng phần CHƯA khớp (q1 · q2). Chip "A3.1 / A3.2 / A3.3" trên hộp MAPPING bấm được.
@@ -1004,7 +1010,7 @@ HOP_A: list[Hop] = [
         doi_chieu="TO-BE: XUẤT báo cáo daily CCR · F02"),
     Hop("aRH", "e1", cota(6), "d", "a", "Report H1000 Ledge · PLA3 Daily", goc=("oRH",), doi_chieu="TO-BE: XUẤT"),
     Hop("aALL", "e1", cota(7), "d", "a", "PHÂN BỔ NỀN TẢNG (% CDT1 × tháng)", goc=("oALL",),
-        doi_chieu="TO-BE: MAPPING (3) → allocate venture"),
+        doi_chieu="TO-BE: MAPPING (3) → chia theo CDT1"),
 ]
 HOP_A_THEO = {h.ma: h for h in HOP_A}
 
@@ -1328,8 +1334,9 @@ def svg() -> str:
             k = AG_THEO_DAI[d]
             o.append(f'<g class="pp-nhan ag-nhan" data-id="h:{k}" tabindex="0" role="button" aria-label="{E(AGENT[k][2])}">'
                      f'<rect class="ag-the ag-the-{k}" x="20" y="{y0 + 1}" width="76" height="{h - 2}" rx="5"/>'
-                     f'<text class="ag-so ag-so-{k}" x="25" y="{y0 + h / 2 - 3}">{E(AGENT[k][1])} ▸</text>'
-                     f'<text class="ag-ten" x="25" y="{y0 + h / 2 + 11}">{E(nh.replace(" & ", "·"))}</text></g>')
+                     f'<text class="ag-so ag-so-{k}" x="25" y="{y0 + 13}">{E(AGENT[k][1])} ▸</text>'
+                     f'<text class="ag-ten" x="25" y="{y0 + 25}">{E(nh.replace(" & ", "·"))}</text>'
+                     f'<text class="ag-mh ag-so-{k}" x="25" y="{y0 + 36}">{E(AG_MO_HINH[k])}</text></g>')
             continue
         o.append(f'<text class="br" x="22" y="{y0 + h / 2 + 4}">{E(nh)}</text>')
     # ── ranh giới FLS (chỉ nửa TO-BE: bên AS-IS mọi thứ đều ở Sheets) ──
@@ -1661,7 +1668,7 @@ def bang_chi_phi() -> str:
 <tr class="chon" data-ref="h:ag1" tabindex="0"><td><b>Agent 1 · KHAI &amp; CHỤP</b></td><td>đọc chỉ-đọc theo bản khai, ghi ảnh</td><td>không — luật</td></tr>
 <tr class="chon" data-ref="h:ag2" tabindex="0"><td><b>Agent 2 · DỰNG</b></td><td>đặt kiểu, canon 36 trường, content_key</td><td>không — luật</td></tr>
 <tr class="chon" data-ref="h:ag3a" tabindex="0"><td><b>Agent 3.1 · MAPPING PP (1)</b></td><td>Reference No + Σ tiền → L1 · L2 · L3</td><td>L1 · L2: không. <b>L3: có thể</b> — suy diễn loại giao dịch từ diễn giải sao kê (vòng cộng dồn, hình 2)</td></tr>
-<tr class="chon" data-ref="h:ag3b" tabindex="0"><td><b>Agent 3.2 · MAPPING PP (2)</b></td><td>khớp Σ đợt lương / BH của venture</td><td>không — phép cộng</td></tr>
+<tr class="chon" data-ref="h:ag3b" tabindex="0"><td><b>Agent 3.2 · MAPPING PP (2)</b></td><td>nối dòng lương H1000 với bank theo Số CT</td><td>không — tra khoá + phép cộng</td></tr>
 <tr class="chon" data-ref="h:ag3c" tabindex="0"><td><b>Agent 3.3 · MAPPING PP (3)</b></td><td>nhận diện giao dịch OMC · GI · SC · PS</td><td><b>có thể</b> — khi từ khoá / vendor không đủ nhận diện</td></tr>
 <tr class="chon" data-ref="h:ag4" tabindex="0"><td><b>Agent 4 · SOÁT</b></td><td>9 luật · Σ · DIF CCR = 0</td><td>không — kiểm phải tất định</td></tr>
 </tbody></table></div>
@@ -1704,6 +1711,80 @@ def bang_chi_phi() -> str:
     return "\n".join(o)
 
 
+# ═════════════════ markdown → HTML tối thiểu (bảng · tiêu đề · danh sách · trích) ═════════════════
+# Repo ⛔ có thư viện `markdown`; hai tài liệu nhúng vào trang (kiểm TO-BE theo AS-IS · thẻ eval) chỉ dùng chừng này cú pháp.
+import re as _re
+
+
+def _md_dong(t: str) -> str:
+    t = E(t, quote=False)
+    t = _re.sub(r"`([^`]+)`", r"<code>\1</code>", t)
+    t = _re.sub(r"\*\*([^*]+)\*\*", r"<b>\1</b>", t)
+    t = _re.sub(r"(?<![\w*])\*([^*\s][^*]*)\*(?![\w*])", r"<i>\1</i>", t)
+    return t
+
+
+def md_html(van: str, cap: int = 3) -> str:
+    o: list[str] = []
+    dong = van.splitlines()
+    i = 0
+    while i < len(dong):
+        d = dong[i]
+        if not d.strip():
+            i += 1
+            continue
+        m = _re.match(r"^(#{1,4}) (.*)", d)
+        if m:
+            n = min(6, len(m.group(1)) + cap - 1)
+            o.append(f"<h{n}>{_md_dong(m.group(2))}</h{n}>")
+            i += 1
+            continue
+        if d.strip() == "---":
+            o.append("<hr>")
+            i += 1
+            continue
+        if d.startswith("|"):
+            bang = []
+            while i < len(dong) and dong[i].startswith("|"):
+                bang.append(dong[i])
+                i += 1
+            hang = [[c.strip().replace("\x00", "|") for c in r.replace("\\|", "\x00").strip().strip("|").split("|")] for r in bang]
+            hang = [r for r in hang if not all(_re.fullmatch(r":?-{2,}:?", c) for c in r)]
+            o.append('<div class="scroll"><table><thead><tr>' + "".join(f"<th>{_md_dong(c)}</th>" for c in hang[0]) + "</tr></thead><tbody>")
+            for r in hang[1:]:
+                o.append("<tr>" + "".join(f"<td>{_md_dong(c)}</td>" for c in r) + "</tr>")
+            o.append("</tbody></table></div>")
+            continue
+        if d.startswith("> "):
+            k = []
+            while i < len(dong) and dong[i].startswith(">"):
+                k.append(dong[i][1:].strip())
+                i += 1
+            o.append('<p class="tin">' + " ".join(_md_dong(x) for x in k) + "</p>")
+            continue
+        if d.startswith("- "):
+            o.append("<ul>")
+            while i < len(dong) and dong[i].startswith("- "):
+                o.append(f"<li>{_md_dong(dong[i][2:])}</li>")
+                i += 1
+            o.append("</ul>")
+            continue
+        k = []
+        while i < len(dong) and dong[i].strip() and not _re.match(r"^(#{1,4} |\||> |- |---$)", dong[i]):
+            k.append(dong[i])
+            i += 1
+        o.append("<p>" + " ".join(_md_dong(x) for x in k) + "</p>")
+    return "\n".join(o)
+
+
+def bang_kiem_asis() -> str:
+    van = (GOC / "docs/ITL/02_BA/Artifacts/Kiem-TOBE-theo-ASIS.md").read_text(encoding="utf-8")
+    van = van.split("\n", 1)[1]                      # bỏ tiêu đề cấp 1 — trang đặt tiêu đề riêng
+    return ('<h2 id="kiem-asis">§1a · Kiểm TO-BE theo luồng AS-IS thực tế</h2>'
+            '<p class="ghichu">Nhúng nguyên từ <code>docs/ITL/02_BA/Artifacts/Kiem-TOBE-theo-ASIS.md</code> lúc sinh trang — sửa tài liệu ấy rồi sinh lại, ⛔ sửa ở đây.</p>'
+            + md_html(van, cap=3))
+
+
 # ═════════════════ §9 · FLEET EVAL — sơ đồ quy trình + bốn thẻ (owner 06/11: "đưa sơ đồ vào artifact này") ═════════════════
 # Nguồn sự thật: docs/ITL/05_FleetEval/grid-spec.json (render bằng skill plan-fleet-eval) và eval-cards/*.md.
 # Trang chỉ NHÚNG grid.svg đã render — ⛔ vẽ lại tay, để sơ đồ ở đây và ở AP không lệch nhau.
@@ -1724,21 +1805,53 @@ FE_THE = [   # (agent, phép kiểm, lỗi đáng sợ, đơn vị heatmap, đá
 ]
 
 
+AP_FE = "AP_FLS_FleetEval_v1.1.0_2026-11-06.html"     # bản AP đăng kèm trang (ap.html)
+FE_THE_TEP = ("a3-1-ref", "a3-2-luong", "a3-3-nen-tang", "a4-soat")
+
+
 def bang_fleet_eval() -> str:
     svg_fe = (FE_THU_MUC / "grid.svg").read_text(encoding="utf-8")
     if "<svg" not in svg_fe:
         raise SystemExit("⛔ grid.svg hỏng — render lại bằng render_grid.py")
+    if not (FE_THU_MUC / AP_FE).exists():
+        raise SystemExit(f"⛔ thiếu {AP_FE}")
+    vai = {"ag1": "WRITE · đọc nguồn", "ag2": "WRITE · chuẩn hoá dòng", "ag3": "WRITE · nối lệnh chi", "ag4": "JUDGE · kiểm kết quả của A2 · A3"}
+    the = {"ag1": "phiên bản sau", "ag2": "phiên bản sau", "ag3a": "a3-1-ref.eval.ghep-sai", "ag3b": "a3-2-luong.eval.noi-sai-dot",
+           "ag3c": "a3-3-nen-tang.eval.chia-sai", "ag4": "a4-soat.eval.lot-chan"}
+    nguoi = {"ag1": "kế toán khai, owner ký · mỗi nguồn", "ag2": "kế toán xem trước lô F04 · mỗi lô",
+             "ag3a": "kế toán ghép / sửa F01 · mỗi dòng hàng chờ", "ag3b": "⛔ chưa có (Q4)", "ag3c": "⛔ chưa có (Q4)",
+             "ag4": "kế toán đọc biên bản F04 · mỗi lô"}
     o = ['''
-<h2>§9 · Fleet eval cho các agent — kế hoạch v1.0.0 (chờ ThuongCT duyệt)</h2>
-<p>Đo từng agent <b>theo phiên bản đóng băng</b>, trên ca nó chưa thấy, bằng một bộ chấm <b>khác mô hình và chấm mù</b> theo đáp án giấu kín; nhiều persona kế toán để thấy agent làm <b>ai</b> vấp. Agent: <b>Qwen 3.8-27B chạy local</b>. Phiên bản gốc <code>v0</code> = mã tất định hôm nay, để vòng đầu so "không tệ hơn". Vai: owner <b>ThuongCT</b> · operator <b>KhanhCQ</b> · duyệt độc lập <b>Lanptn</b>. Tiền đề: TO-BE đã đối chiếu từng bước với AS-IS (<code>docs/ITL/02_BA/Artifacts/Kiem-TOBE-theo-ASIS.md</code>).</p>
-<figure class="diagram fe-hinh" id="hinh-fe">''', svg_fe, '''<figcaption>Hình 4 — Sơ đồ quy trình fleet eval: 4 dải · 6 agent, sinh từ <code>docs/ITL/05_FleetEval/grid-spec.json</code> bằng <code>render_grid.py</code> (kiểm: 0 lỗ). Viền liền = đang chạy · đứt = một phần · chấm = chưa chạy; màu nền ô người kiểm = độ nặng (QUICK · MEDIUM · DEEP); cờ góc = hỏi mỗi mục (EACH) / mỗi phiên bản (VER). A3.2 và A3.3 ghi vào sổ <b>không qua người kiểm</b> — chỉ fleet eval chặn trước.</figcaption></figure>
-<h3>Bốn thẻ eval của phiên bản 1.0 (A1 · A2 để phiên bản sau)</h3>
+<h2>F1 · Mỗi agent khác nhau ở đâu</h2>
+<p>Năm agent <b>làm</b> (A1 · A2 · A3.1–A3.3) chạy <b>Qwen 3.8-27B</b>. Agent <b>kiểm</b> trong luồng (A4 SOÁT) chạy <b>gpt-oss-20b</b> — một mô hình khác họ, vì bộ kiểm cùng họ với thứ nó kiểm sẽ chấm dễ. Bộ chấm của fleet eval cũng phải khác mô hình của <b>chính</b> agent bị đo: A1–A3 chấm bằng gpt-oss-20b, còn A4 (đã là gpt-oss) chấm bằng Qwen. Không agent nào được chấm bằng mô hình của chính nó.</p>
 <div class="scroll"><table>
-<thead><tr><th>agent</th><th>phép kiểm</th><th>lỗi đáng sợ nhất</th><th>đơn vị heatmap</th><th>đáp án lấy từ</th><th>bar (đề xuất)</th></tr></thead><tbody>''']
-    for ag, ck, so, dv, da, bar in FE_THE:
-        o.append(f'<tr><td><b>{E(ag)}</b></td><td><code>{E(ck)}</code></td><td>{E(so)}</td><td>{E(dv)}</td><td>{E(da)}</td><td>{E(bar)}</td></tr>')
+<thead><tr><th>agent</th><th>vai</th><th>mô hình chạy</th><th>ai kiểm khi chạy thật</th><th>fleet eval chấm bằng</th><th>phép kiểm</th></tr></thead><tbody>''']
+    for k in ("ag1", "ag2", "ag3a", "ag3b", "ag3c", "ag4"):
+        cha = AGENT_CON[k][0] if k in AGENT_CON else k
+        ten = AGENT_CON[k][2] if k in AGENT_CON else AGENT[k][2]
+        mh, ch = AG_MO_HINH[cha], AG_CHAM[cha]
+        lop = "mh-kiem" if mh != "Qwen 3.8-27B" else "mh-lam"
+        o.append(f'<tr class="chon" data-ref="h:{k}" data-comment-target tabindex="0"><td><b>{E(ten)}</b></td><td>{E(vai[cha])}</td>'
+                 f'<td><span class="pill {lop}">{E(mh)}</span></td><td>{E(nguoi[k])}</td>'
+                 f'<td><span class="pill {"mh-lam" if ch.startswith("Qwen") else "mh-kiem"}">{E(ch)}</span></td><td><code>{E(the[k])}</code></td></tr>')
     o.append('''</tbody></table></div>
-<p class="note"><b>Chung cho cả bốn thẻ:</b> bộ chấm và persona = <b>gpt-oss-20b</b> local (khác họ Qwen) · Lanptn chấm lại 10% mỗi vòng, đồng thuận &lt; 0,8 ⇒ vòng vô hiệu · persona P1 kế toán mới · P2 kế toán ngân hàng lâu năm · P3 người duyệt cuối kỳ (+ P4 C&amp;B HR cho A3.2) — <b>cả bốn là gợi ý</b> tới khi hiệu chuẩn bằng think-aloud với ThuongCT · AnhMC · NgaNLT (recall ≥ 0,6 · precision ≥ 0,5, ghi trước khi xem) · không đặt trần chi phí, mỗi vòng ghi giờ GPU thực tiêu · <b>ship</b> khi đạt bar + không tệ hơn bản trước, <b>chặn</b> khi một ca cài sẵn trượt, <b>chạy lại</b> khi vòng vô hiệu. Thẻ đầy đủ: <code>docs/ITL/05_FleetEval/eval-cards/</code> · bản kế hoạch: <code>docs/ITL/05_FleetEval/AP_FLS_FleetEval_v1.0.0_2026-11-06.html</code>. ⚠ KhanhCQ vừa dựng agent vừa vận hành vòng — trái quy tắc how-to; cách bù chờ ThuongCT quyết (AP Q1).</p>''')
+<p class="ghichu">Persona của fleet eval dùng cùng mô hình với bộ chấm của agent ấy, nhưng prompt riêng. Bản mã tất định hôm nay là <code>v0</code> — mốc "không tệ hơn" cho vòng LLM đầu của A3.1 và A4.</p>
+<h2>F2 · Sơ đồ quy trình fleet eval</h2>
+<figure class="diagram fe-hinh" id="hinh-fe">''')
+    o.append(svg_fe)
+    o.append('''<figcaption>Hình F2 — 4 dải · 6 agent, sinh từ <code>docs/ITL/05_FleetEval/grid-spec.json</code> bằng <code>render_grid.py</code> (kiểm: 0 lỗ). Viền liền = đang chạy · đứt = một phần · chấm = chưa chạy; màu nền ô người = độ nặng; cờ góc = hỏi mỗi mục (EACH) / mỗi phiên bản (VER). A3.2 và A3.3 ghi vào sổ <b>không qua người kiểm</b> — chỉ fleet eval chặn trước.</figcaption></figure>
+<h2>F3 · Bốn thẻ eval</h2>
+<p>Thẻ là hợp đồng: operator chạy đúng điều thẻ ghi, người duyệt soát vòng theo thẻ. Nguồn: <code>docs/ITL/05_FleetEval/eval-cards/</code> (nhúng nguyên lúc sinh trang).</p>''')
+    chung = (FE_THU_MUC / "eval-cards/_chung.md").read_text(encoding="utf-8")
+    o.append('<details class="the" open><summary>Phần chung của bốn thẻ</summary>' + md_html(chung.split("\n", 1)[1], cap=4) + '</details>')
+    for t in FE_THE_TEP:
+        van = (FE_THU_MUC / f"eval-cards/{t}.md").read_text(encoding="utf-8")
+        tieu, than = van.split("\n", 1)
+        o.append(f'<details class="the"><summary>{_md_dong(tieu.lstrip("# "))}</summary>' + md_html(than, cap=4) + '</details>')
+    o.append(f'''<h2>F4 · Bản kế hoạch (AP)</h2>
+<p>Bản AP theo khuôn của skill <code>plan-fleet-eval</code>: mục tiêu · sơ đồ · thẻ · vòng R1–R8 · lưu và làm sạch · nghiệm thu A1–A7 · câu hỏi mở Q1–Q6. Mọi mục ở trạng thái <b>review</b> — chỉ owner ThuongCT đặt <i>agreed</i>.</p>
+<p><a class="nut" href="ap.html" target="_blank" rel="noopener">Mở bản AP v1.1.0 ↗</a> <span class="ghichu">nguồn: <code>docs/ITL/05_FleetEval/{AP_FE}</code></span></p>
+<p class="note"><b>Chờ ThuongCT quyết:</b> Q1 KhanhCQ vừa dựng agent vừa vận hành vòng (how-to cấm) — đề xuất giữ, bù bằng manifest ThuongCT ký + Lanptn đối checksum · Q2 Lanptn chỉ duyệt, yêu cầu tinh chỉnh đi qua ThuongCT · Q3 bộ ca + đáp án để ngoài repo · Q4 A3.2 / A3.3 có kế toán duyệt mẫu 10% trước khi ghi · Q5 nút duyệt / khiếu nại trên F02 · Q6 thẻ A1 · A2 khi chúng chuyển sang LLM.</p>''')
     return "\n".join(o)
 
 
@@ -1798,12 +1911,14 @@ def du_lieu_js() -> str:
                   "luong": list(h.luong), "nm": list(h.nm)}
            for h in HOP}
     for k, (_d, _n, ten_ag, buoc, tv) in AGENT.items():
-        hop[k] = {"ten": ten_ag, "loai": "agent", "tt": "b", "dong": [], "mono": "", "huy": [],
-                  "dc": "owner 05/11 · bước sau: dựng AP → chạy Flip eval", "vung": "FLS · NẠP · bốn agent",
+        hop[k] = {"ten": ten_ag, "loai": f"agent · chạy {AG_MO_HINH[k]}", "tt": "b", "dong": [], "mono": "", "huy": [],
+                  "dc": f"mô hình chạy: {AG_MO_HINH[k]} · fleet eval chấm bằng: {AG_CHAM[k]} · AP fleet eval v1.1.0 (trang 2)",
+                  "vung": "FLS · NẠP · bốn agent",
                   "dai": DAI[_d][3], "vao": [], "ra": [], "luong": list(buoc), "thanh_vien": list(tv)}
     for k, (cha, _c, ten_c, buoc, tv) in AGENT_CON.items():
-        hop[k] = {"ten": ten_c, "loai": "agent con", "tt": "b", "dong": [], "mono": "", "huy": [],
-                  "dc": f"thuộc {AGENT[cha][2]} · bước sau: dựng AP → chạy Flip eval", "vung": "FLS · NẠP · agent mapping",
+        hop[k] = {"ten": ten_c, "loai": f"agent con · chạy {AG_MO_HINH[cha]}", "tt": "b", "dong": [], "mono": "", "huy": [],
+                  "dc": f"thuộc {AGENT[cha][2]} · mô hình chạy: {AG_MO_HINH[cha]} · fleet eval chấm bằng: {AG_CHAM[cha]}",
+                  "vung": "FLS · NẠP · agent mapping",
                   "dai": DAI[AGENT[cha][0]][3], "vao": [], "ra": [], "luong": list(buoc), "thanh_vien": list(tv)}
     for k, (ten_pp, buoc, tv) in PP_LUONG.items():
         hop[k] = {"ten": ten_pp, "loai": "phương pháp", "tt": "q", "dong": [], "mono": "", "huy": [],
@@ -1929,6 +2044,7 @@ span.pill.nm-may{background:var(--prop-soft);color:var(--prop)} span.pill.nm-ngu
 .ag-so-ag1{fill:var(--ag1)} .ag-so-ag2{fill:var(--ag2)} .ag-so-ag3{fill:var(--ag3)} .ag-so-ag4{fill:var(--ag4)}
 .ag-dai{fill-opacity:.07;stroke-opacity:.45;stroke-width:1}
 .ag-dai-ag1{fill:var(--ag1);stroke:var(--ag1)} .ag-dai-ag2{fill:var(--ag2);stroke:var(--ag2)} .ag-dai-ag3{fill:var(--ag3);stroke:var(--ag3)} .ag-dai-ag4{fill:var(--ag4);stroke:var(--ag4)}
+.ag-mh{font:600 8.5px var(--mono);letter-spacing:.01em}
 .ag-chip-n{fill:var(--paper);fill-opacity:1} .ag-chip-t{font:700 8.5px var(--mono)}
 .ag-chip:hover .ag-chip-n,.ag-chip:focus-visible .ag-chip-n{fill:var(--mid-soft)}
 .ag-nhan:hover .ag-the,.ag-nhan:focus-visible .ag-the{fill-opacity:.26}
@@ -2014,6 +2130,16 @@ footer{margin-top:48px;color:var(--muted);font-size:12.5px;border-top:1px solid 
 .ten-a{stroke:var(--asis)} .ten-t{stroke:var(--asis);stroke-dasharray:2 3}
 .mk-a,.mk-t{fill:var(--asis)}
 .fe-hinh svg{min-width:1000px;background:#fff;border-radius:4px}
+.tab-trang{display:flex;flex-wrap:wrap;gap:6px;margin:14px 0 4px;border-bottom:2px solid var(--line)}
+.tab-trang a{font:600 14px/1 var(--sans);padding:10px 14px;color:var(--muted);text-decoration:none;border:1px solid transparent;border-bottom:none;border-radius:6px 6px 0 0;margin-bottom:-2px}
+.tab-trang a[aria-current="page"]{color:var(--accent);background:var(--paper);border-color:var(--line);border-bottom:2px solid var(--paper)}
+.tab-trang a:hover{color:var(--fg)} .tab-trang a:focus-visible{outline:2px solid var(--sel);outline-offset:2px}
+section.trang[hidden]{display:none}
+.pill.mh-lam{background:var(--ag3);color:var(--paper)} .pill.mh-kiem{background:var(--ag4);color:var(--paper)}
+details.the{border:1px solid var(--line);border-radius:4px;background:var(--paper);margin:8px 0;padding:6px 12px}
+details.the>summary{cursor:pointer;font-weight:600;color:var(--accent);padding:4px 0}
+details.the h4,details.the h5{margin:12px 0 6px}
+a.nut{display:inline-block;text-decoration:none}
 .goc{font-size:13px;border-left:3px solid var(--asis);padding:5px 9px;margin:6px 0;background:var(--bg)}
 .goc .van-chu,span.van-chu{color:var(--sel)}
 .sw-a{background:var(--za);border-color:var(--asis)}
@@ -2115,6 +2241,9 @@ JS = r"""
     const o = document.getElementById('o-hoi'); if (o && dang) luuNhap[dang] = o.value;
     dang = id;
     const n = el(id); if (!n) return;
+    // chỉ chuyển trang khi phần ấy KHÔNG có mặt ở trang đang mở (bấm dòng bảng ở trang 2 ⛔ bị kéo sang trang 1)
+    const thay = [...document.querySelectorAll('[data-id="' + id + '"],[data-ref="' + id + '"]')].some(x => !x.closest('section.trang[hidden]'));
+    const sc = n.closest('section.trang'); if (!thay && sc && sc.hidden) document.querySelector('.tab-trang a[data-trang="' + sc.id + '"]').click();
     n.classList.add('chon-dang');
     document.querySelectorAll('tr.chon[data-ref="' + id + '"]').forEach(r => r.classList.add('dang'));
     const [k, m] = id.split(':');
@@ -2202,6 +2331,19 @@ JS = r"""
       bao(LOI[err && err.code] || ('Không gửi được (' + ((err && err.code) || 'lỗi') + '). Bản nháp vẫn còn.'), 'loi');
     } finally { gui.disabled = false; capNhatNut(); }
   }
+  // ── hai trang: #trang-1 · #trang-2 ──
+  function moTrang(id){
+    if (!document.getElementById(id)) id = 'trang-1';
+    document.querySelectorAll('section.trang').forEach(sc => { sc.hidden = sc.id !== id; });
+    document.querySelectorAll('.tab-trang a[data-trang]').forEach(a => {
+      if (a.dataset.trang === id) a.setAttribute('aria-current', 'page'); else a.removeAttribute('aria-current'); });
+  }
+  document.querySelectorAll('.tab-trang a[data-trang]').forEach(a => a.addEventListener('click', e => {
+    e.preventDefault(); moTrang(a.dataset.trang);
+    try { history.replaceState(null, '', '#' + a.dataset.trang); } catch (_) {}
+    window.scrollTo({top: 0}); }));
+  moTrang((location.hash || '#trang-1').slice(1));
+  window.addEventListener('hashchange', () => moTrang(location.hash.slice(1)));
   if (window.claude && window.claude.use) {
     window.claude.use('comments').then(c => { binh = c; if (dang) capNhatNut(); }).catch(() => { binh = null; });
   }
@@ -2211,12 +2353,12 @@ JS = r"""
 THAN_TREN = """
 <header class="top">
   <h1>Voi FLS-tobe-phase1</h1>
-  <p class="meta"><b>v0.5 · 2026-11-06</b> · Giai đoạn 1: đi hết INPUT, về <b>một</b> bảng ITL, mọi dòng có pháp nhân. Lệnh chi lấy từ <b>sổ cái PM / PC của FPS</b> qua hợp đồng dữ liệu (§5).
+  <p class="meta"><b>v0.6 · 2026-11-06</b> · Giai đoạn 1: đi hết INPUT, về <b>một</b> bảng ITL, mọi dòng có pháp nhân. Lệnh chi lấy từ <b>sổ cái PM / PC của FPS</b> qua hợp đồng dữ liệu (§5).
   Hình, bảng mũi tên, bảng kiểm cạnh và khung chi tiết <b>sinh từ cùng một bản khai</b> (<code>docs/ITL/_tools/sinh_voi_phase1.py</code>); máy kiểm hình trước khi ghi.<br>
   Nửa phải của hình 1 là luồng <b>AS-IS</b> lấy từ sơ đồ "Voi ITL AS-IS" (<code>docs/ITL/_tools/voi_asis_goc.json</code>).<br>
   PD Now là bản gốc tham khảo: trang này chỉ mượn <b>thuật ngữ</b> (PE · PI · PM · PC · LE · CDT · HD/KRF · Reference No · General Trustest), không dùng tên sheet, tên file hay bước tính của nó. Mã FLS @ <code>2d1b710</code>.</p>
 </header>
-<p class="tin"><b>Cách dùng:</b> bấm một hộp hay một mũi tên (hoặc một dòng trong bảng) để làm nổi các đường nối của nó và mở khung chi tiết. Trong khung có <b>Bình luận phần này</b> và ô <b>Hỏi Claude</b>: câu hỏi được gắn đúng vào phần đang chọn, Claude trả lời trong luồng bình luận ở đó.</p>
+<p class="tin"><b>Hai trang:</b> <b>Trang 1</b> — con voi TO-BE cạnh AS-IS và bản kiểm từng bước (§1a). <b>Trang 2</b> — fleet eval: agent nào chạy mô hình nào, sơ đồ quy trình, bốn thẻ, bản AP. <b>Cách dùng:</b> bấm một hộp hay một mũi tên (hoặc một dòng trong bảng) để làm nổi các đường nối của nó và mở khung chi tiết. Trong khung có <b>Bình luận phần này</b> và ô <b>Hỏi Claude</b>: câu hỏi được gắn đúng vào phần đang chọn, Claude trả lời trong luồng bình luận ở đó.</p>
 """
 
 
@@ -2238,6 +2380,9 @@ def trang() -> str:
          '<meta name="claude:viewport-fit-sides" content="cover">',
          '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&amp;family=IBM+Plex+Mono:wght@400;500;600;700&amp;family=IBM+Plex+Serif:wght@600&amp;display=swap">',
          f'<style>{CSS}</style>', '<main>', THAN_TREN,
+         '<nav class="tab-trang" aria-label="Trang"><a href="#trang-1" data-trang="trang-1" aria-current="page">Trang 1 · Mapping TO-BE ↔ AS-IS</a>'
+         '<a href="#trang-2" data-trang="trang-2">Trang 2 · Fleet eval</a><a href="ap.html" target="_blank" rel="noopener">Bản AP v1.1.0 ↗</a></nav>',
+         '<section class="trang" id="trang-1">',
          '<h2>§1 · Con voi — TO-BE và AS-IS cạnh nhau, chung lớp theo đời sống của dữ liệu</h2>',
          '<div class="thanh" role="toolbar" aria-label="Lọc theo trạng thái"><span class="nhan">Làm nổi:</span>'
          '<button class="chip" data-loc="tat" aria-pressed="true" type="button">Tất cả</button>'
@@ -2259,7 +2404,7 @@ def trang() -> str:
          '<span><span class="pill mid" style="font-size:10px">TAY</span> có bước người bấm / gõ</span><span><b style="color:var(--sel)">!</b> AS-IS có lỗi đã ghi nhận</span>'
          '</div>',
          f'<figure class="diagram" id="hinh">{svg()}<figcaption>{cap}</figcaption></figure>',
-         bang_lop(),
+         bang_lop(), bang_kiem_asis(),
          """
 <h3>Thuật ngữ trên hình</h3>
 <ul class="terms">
@@ -2278,7 +2423,7 @@ def trang() -> str:
 <thead><tr><th colspan="2" class="sup">Lớp</th><th class="sup">So khớp</th><th class="sup">Hiện trạng</th><th colspan="2" class="sup">Xử lý</th></tr>
 <tr><th>lớp</th><th>điều kiện</th><th>khoá</th><th>hôm nay</th><th>đi đâu</th><th>cổng</th></tr></thead>
 <tbody>
-<tr class="chon" data-ref="h:mL1" tabindex="0"><td><b>L1 · khớp</b></td><td>giao dịch có Reference No trùng ≥ 1 dòng sổ cái PM; Σ tiền các PM line = tiền giao dịch; cùng tiền tệ; nhánh VN thêm pháp nhân trả = pháp nhân TK (QĐ-ITL-144). <b>Hoặc</b> (PP 2) giao dịch từ TK chi lương khớp Σ một đợt lương / BHXH / BHYT của một venture trong kỳ ⇒ LE venture</td><td>Reference No + tiền (+ pháp nhân)</td><td>2.263 mối nối</td><td>mối nối vào lớp sửa; gợi ý hd/cdt1 từ PM line</td><td>Σ lệch ⇒ chặn, ⛔ chia bừa</td></tr>
+<tr class="chon" data-ref="h:mL1" tabindex="0"><td><b>L1 · khớp</b></td><td>giao dịch có Reference No trùng ≥ 1 dòng sổ cái PM; Σ tiền các PM line = tiền giao dịch; cùng tiền tệ; nhánh VN thêm pháp nhân trả = pháp nhân TK (QĐ-ITL-144). <b>Hoặc</b> (PP 2) Reference number của giao dịch = Số CT kế toán đã dán vào dòng lương H1000 (Σ dòng = tiền giao dịch)</td><td>Reference No + tiền (+ pháp nhân)</td><td>2.263 mối nối</td><td>mối nối vào lớp sửa; gợi ý hd/cdt1 từ PM line</td><td>Σ lệch ⇒ chặn, ⛔ chia bừa</td></tr>
 <tr class="chon" data-ref="h:mMap" tabindex="0"><td><b>L1b · khớp mã, lệch</b></td><td>có Reference No chung nhưng Σ tiền lệch, khác tiền tệ, hoặc N giao dịch × M PM line</td><td>Reference No</td><td>84 lệnh khác tiền tệ (Q-FX-1)</td><td>hàng chờ cho người, kèm lý do có tên</td><td>⛔ tự chọn cặp</td></tr>
 <tr class="chon" data-ref="h:mL2" tabindex="0"><td><b>L2 · có trên FPS, chưa có trên bank txns</b></td><td>dòng sổ cái PM trạng thái cuối đã duyệt, không giao dịch nào mang Reference No của nó trong các ảnh sao kê của TK chi, tính tới ảnh mới nhất</td><td>pm_line_id · Reference No · TK chi</td><td>1.345 dòng · 698 phiếu</td><td>F01 lằn lệnh: "lệnh chưa thấy tiền"; tuổi = ngày ảnh mới nhất − ngày thực chi</td><td>tuổi &gt; N ngày ⇒ cờ; TK chi chưa có ảnh ⇒ "chưa đo được", ⛔ coi là chưa chi</td></tr>
 <tr class="chon" data-ref="h:mL3" tabindex="0"><td><b>L3 · có trên bank txns, không có trên FPS</b></td><td>giao dịch không có Reference No, hoặc có mà không dòng sổ cái PM nào mang</td><td>content_key · TK · nội dung · loại bank</td><td>89,7% dòng chưa ghép có mã mà không PM nào mang</td><td>SUY DIỄN loại giao dịch (vòng cộng dồn) → gợi ý ở F01</td><td>trạng thái vẫn UNMAPPED tới khi người chốt; ⛔ nhãn "không cần lệnh chi" (QĐ-ITL-58)</td></tr>
@@ -2294,7 +2439,7 @@ def trang() -> str:
 <tr class="chon" data-ref="h:mGoiY" tabindex="0"><td>⑤ đo mỗi vòng</td><td>máy</td><td>gợi ý và xác nhận của lượt</td><td>độ phủ (dòng L3 có gợi ý) · độ đúng (gợi ý được giữ nguyên)</td><td>in cả mẫu số; độ đúng tụt ⇒ dừng áp luật mới</td></tr>
 </tbody></table></div>
 <p class="note"><b>Vế PS Nợ (tiền vào)</b> — hôm nay máy chỉ ghép vế PS Có (mẫu số 8.246 dòng, <code>13_LO_TRINH</code> B0). Tiền vào không có PM nên mặc định rơi vào L3; luật mồi cho vế Nợ: chuyển nội bộ giữa hai TK Apero (cặp với một PS Có cùng tiền ở TK kia, lệch ngày nhỏ ⇒ bật <code>is_intercompany</code>) · doanh thu nền tảng · hoàn tiền · vay và lãi. Mọi dòng, cả hai vế, cuối ngày phải cộng ra đúng số dư trong CCR / CCR Cash.<br>
-<b>Luật GĐ1 cho PP (2):</b> các đợt đi tiền lương / BHXH / BHYT của các venture — giao dịch bank từ TK chi lương, nội dung mang loại đợt, tổng khớp Σ đợt của một venture trong kỳ ⇒ <b>LE</b> của venture ấy. <b>GĐ2:</b> từ đợt đã gắn LE, tách xuống <b>KRF</b> theo sổ lương.<br>
+<b>Luật PP (2) (sửa 06/11):</b> nạp thẳng sổ H1000 — dòng lương đã tách HD · CDT1 · pháp nhân tới từng nhân viên; nối giao dịch bank theo <b>Số CT</b> (số FT kế toán dán), soát Σ Có = Σ Nợ mỗi đợt và đủ tháng. Bỏ luật cũ "khớp Σ đợt theo venture → LE".<br>
 <b>Luật mồi cho bảng luật</b> — năm loại giao dịch kế toán ghi là hay bị sót trên PM: lãi và phí ngân hàng · điều chuyển nội bộ, mua bán ngoại tệ · chi phí năm trước trả năm nay · quẹt thẻ chưa nhập PM · doanh thu, OMC, server chưa nhập. <b>Danh mục loại giao dịch</b> dùng lại cột "Loại giao dịch (Payment Type)" của sổ cái PM để L1 và L3 nói cùng một bộ từ.<br>
 <b>Hai câu chờ owner:</b> ① vòng này cần đọc <b>nội dung giao dịch</b> trên sao kê, nhưng hôm nay FLS chỉ được đọc ba cột (ngày · Reference number · nguồn — QĐ-ITL-92) và <code>fls_itl.memo</code> rỗng 8.387/8.387 ⇒ có nới QĐ-ITL-92 cho cột nội dung, chỉ để suy diễn? ② chọn <b>k</b> (số xác nhận để thành luật ứng viên) và <b>N</b> (số ngày để L2 bị cờ).</p>
 """, """
@@ -2309,7 +2454,7 @@ def trang() -> str:
 <tr><td>① nhận diện giao dịch</td><td>TK chi + vendor / từ khoá nội dung + chiều tiền ra</td><td>không có Reference No; thiếu nội dung thì cần nới QĐ-ITL-92 (câu ① §1b)</td></tr>
 <tr><td>② khớp kỳ</td><td>tháng chi phí trên Looker ↔ tháng của giao dịch (trả trước / trả sau bao nhiêu tháng)</td><td>một giao dịch có thể trả chi phí của tháng trước</td></tr>
 <tr><td>③ khớp tiền</td><td>Σ chi phí kỳ của loại = Σ giao dịch khớp; dung sai; cùng tiền tệ hay quy đổi</td><td>lệch thì chặn, không chia bừa (INV-I16)</td></tr>
-<tr><td>④ tỉ lệ venture</td><td>cột nào của file Looker cho phần của từng venture; venture = LE hay CDT1 (câu 5 §7)</td><td>allocate cần Σ % = 100 cho từng loại · tháng</td></tr>
+<tr><td>④ tỉ lệ CDT1</td><td>chia theo <b>CDT1</b> (đã chốt 06/11, như AS-IS); cột nào của file Looker cho phần của từng CDT1</td><td>allocate cần Σ % = 100 cho từng loại · tháng</td></tr>
 <tr><td>⑤ ai ký, từ khi nào</td><td>người ký + ngày hiệu lực + version</td><td>luật đổi thì lượt cũ giữ version đã dùng</td></tr>
 </tbody></table></div>
 """, """
@@ -2320,6 +2465,7 @@ def trang() -> str:
 <p>Mỗi nguồn vào và mỗi đầu ra mang một nhãn ở góc trên-trái của hộp: <b>MÁY</b> (hệ sinh, không ai gõ) · <b>NGƯỜI</b> (người gõ, dán hoặc ký) · <b>NGƯỜI+MÁY</b> (người nhập, máy sinh sổ; hoặc máy đề xuất, người chốt). Chỗ nào có tay người là chỗ cần một cổng canh, ghi ở cột cuối.</p>
 """, bang_nm(), """
 <h2>§2 · Đã sửa gì</h2>
+<p class="note"><b>v0.6 (KhanhCQ, 06/11):</b> tách hai trang; nhúng bản kiểm TO-BE theo AS-IS (§1a) và bản AP fleet eval. <b>Agent kiểm dùng mô hình khác agent làm:</b> A4 SOÁT chạy gpt-oss-20b, A1–A3 chạy Qwen 3.8-27B; nhãn mô hình hiện trên từng nhãn agent ở lề trái hình 1.</p>
 <p class="note"><b>v0.5 (KhanhCQ, 06/11):</b> <b>TO-BE thay thế, cải tiến và bao gồm AS-IS</b> — không chạy song song (kiểm từng bước: <code>docs/ITL/02_BA/Artifacts/Kiem-TOBE-theo-ASIS.md</code>). Agent dự kiến: <b>Qwen 3.8-27B chạy local</b>. PP (2) <b>nạp thẳng sổ H1000</b> (đã tách HD · CDT1 · pháp nhân tới từng nhân viên) và nối giao dịch bank theo Số CT, bỏ phép tự khớp Σ đợt theo venture. PP (3) đi qua <b>PE/PM</b> bằng Combine Code rồi tới bank txns, chia theo <b>CDT1</b>. SC = server cost. Pháp nhân TK lấy từ <b>tên sheet R + Mapping Master</b>; ảnh đọc thêm <code>Reference number_adjust</code> (người đè mã). Ô bỏ trống ở vùng chỉnh tay <b>giữ giá trị mặc định như AS-IS</b> (parity: CDT1 = SHQ2, ID đối tác = VD0, …).</p>
 <p class="note"><b>v0.4.1 (owner, 06/11):</b> nửa TO-BE hiện rõ các agent — mỗi agent một <b>dải màu</b> trải ngang (cùng màu nhãn ở lề); Agent 3 tách thành <b>ba agent mapping</b> A3.1 (PP 1 · Reference No) · A3.2 (PP 2 · lương / BH) · A3.3 (PP 3 · nền tảng), chip trên hộp bấm được. Thêm <b>§8</b>: chi phí máy chủ ↔ mô hình mã nguồn mở tự huấn luyện.</p>
 <p class="note"><b>v0.4 (owner, 06/11):</b> đặt luồng <b>AS-IS</b> (sơ đồ "Voi ITL AS-IS") <b>cạnh</b> TO-BE trong <b>một</b> hình — AS-IS bên phải; AS-IS xếp vào đúng các lớp của TO-BE, <b>không sinh lớp mới</b>; 52 hộp gốc gộp thành 28 hộp, mỗi hộp gộp giữ đủ chi tiết gốc trong khung bấm. Bỏ bớt chữ để thu nhỏ: hộp chỉ còn tên + một dòng, nhãn máy/người thành vạch màu mép trái. Hai hộp FPS gộp thành <i>sổ cái PM · PC</i> (bỏ o2, x2). Mũi tên dọc nay tự đặt giữa phần hai hộp chồng nhau. Hình cao 736 thay vì 1.206.</p>
@@ -2382,8 +2528,8 @@ def trang() -> str:
 <tr><td>2</td><td>x4 · x7 · b3 (lằn Cash + lằn CCR)</td><td>Cùng bộ đọc với sao kê, chỉ bật lằn; CCR cho số dư ngày để soát đủ hai vế PS Nợ · PS Có</td><td>số dòng = sổ quỹ từng quỹ · nạp lại = 0 trùng · số dư đầu + Σ Nợ − Σ Có = số dư CCR / CCR Cash từng TK từng ngày (DIF = 0)</td></tr>
 <tr class="b1"><th colspan="4">Chặng II · Mở họ lệnh chi và chi phí (bước 3–5)</th></tr>
 <tr><td>3</td><td>x1 · b1 · g1 (sổ cái PM + PC)</td><td>Hợp đồng §5 chốt trước; đặt kiểu 13 cột PM còn thô; ảnh sổ cái dùng lại lằn ảnh chụp, không dựng hệ thứ hai</td><td>0 khoá lệnh chi trỏ rỗng · chiều lệnh chi khớp sổ đang chạy 100% từng ô</td></tr>
-<tr><td>4</td><td>x5 · b4 · g4 (PP 2 · lương / BHXH / BHYT)</td><td>GĐ1 chỉ cần đợt đi tiền của từng venture để gắn LE cho giao dịch bank; KRF để GĐ2; không mở hộp đen lương</td><td>mọi giao dịch bank loại lương / BH có LE (hoặc hàng chờ có tên) · Σ đợt mỗi venture mỗi kỳ = Σ giao dịch đã ghép</td></tr>
-<tr><td>5</td><td>x6 · b5 · g5 (PP 3 · OMC · GI · SC · PS)</td><td>Không có trên FPS ⇒ 4 luật mapping riêng; Looker → mapping bank txns → allocate về ventures (§1c)</td><td>số dòng = file Looker · mọi giao dịch 4 loại khớp hoặc vào hàng chờ có tên · Σ phần chia = tiền giao dịch</td></tr>
+<tr><td>4</td><td>x5 · b4 · g4 (PP 2 · lương / BHXH / BHYT)</td><td>Nạp thẳng H1000 đã tách (06/11) — không tự khớp Σ; khoá là Số CT kế toán đã dán</td><td>mọi dòng lương nối được Số CT (hoặc hàng chờ có tên) · Σ Có = Σ Nợ mỗi đợt · đủ tháng, 0 tháng trùng</td></tr>
+<tr><td>5</td><td>x6 · b5 · g5 (PP 3 · OMC · GI · SC · PS)</td><td>Có PE/PM (sửa 06/11): Looker → Combine Code → PE/PM → Reference No → bank txns, chia theo CDT1 (§1c)</td><td>số dòng = file Looker · mọi giao dịch 4 loại khớp hoặc vào hàng chờ có tên · Σ phần chia = tiền giao dịch</td></tr>
 <tr class="b1"><th colspan="4">Chặng III · Chứng minh một bảng (bước 6–7)</th></tr>
 <tr><td>6</td><td>h2 · h3 · sổ hiệu lực thành một view có tên</td><td>Hôm nay màn tự ghép ở cửa đọc; hệ khác cần một bảng</td><td>một SELECT trả đủ 4 họ nguồn · đủ 3 vai pháp nhân</td></tr>
 <tr><td>7</td><td>h1 · h4 · v1 · v4 (cổng GĐ1 + xuất đối chiếu)</td><td>Hợp nhất chỉ chứng minh được khi cả 4 họ đã vào</td><td>Σ theo pháp nhân = Σ theo nguồn, từng tiền tệ · chênh với sổ đang chạy liệt kê từng dòng, có tên</td></tr>
@@ -2399,8 +2545,8 @@ def trang() -> str:
 <tr><td>4</td><td>HR và nền tảng: FLS đọc sổ ở Sheets như hôm nay, hay chờ hệ nguồn có hợp đồng?</td><td>Quyết định tuyến của x5/x6</td><td>bước 4–5</td></tr>
 <tr><td>5</td><td>⭐ <b>Đã trả lời 06/11:</b> chia theo <b>CDT1</b> (như AS-IS), qua PE/PM. Câu cũ: PP (3): "venture" khi allocate là <b>LE</b> hay <b>CDT1</b>? Tỉ lệ chia lấy từ cột nào của file Looker? AP/AR lùi khỏi GĐ1?</td><td>Owner 04/11 chốt OMC · GI · SC · PS là chi phí, mapping với bank txns rồi allocate về ventures — thay câu cũ "GI/OMC không vào sổ"</td><td>bước 5</td></tr>
 </tbody></table></div>
-""", bang_chi_phi(), bang_fleet_eval(), """
-<footer>Voi FLS-tobe-phase1 v0.5 · 2026-11-06 · sinh bởi <code>docs/ITL/_tools/sinh_voi_phase1.py</code> · cùng bộ với <code>_PD_NOW_VOI_VA_GIAI_DOAN.md</code>.</footer>
+""", bang_chi_phi(), '</section><section class="trang" id="trang-2" hidden>', bang_fleet_eval(), '</section>', """
+<footer>Voi FLS-tobe-phase1 v0.6 · 2026-11-06 · Trang 1 mapping TO-BE ↔ AS-IS · Trang 2 fleet eval · sinh bởi <code>docs/ITL/_tools/sinh_voi_phase1.py</code> · cùng bộ với <code>_PD_NOW_VOI_VA_GIAI_DOAN.md</code>.</footer>
 </main>
 <aside class="khung-ct" id="khung-ct" hidden aria-label="Chi tiết phần đang chọn">
   <div class="dong"><span class="eb" style="font:600 11px var(--mono);letter-spacing:.06em;color:var(--muted)">CHI TIẾT</span><button class="dong-x" id="nut-dong" type="button" aria-label="Đóng khung chi tiết">×</button></div>

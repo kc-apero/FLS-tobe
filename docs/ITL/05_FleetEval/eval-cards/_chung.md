@@ -5,9 +5,9 @@ Trạng thái: **đã chốt ở Gate 3 (KhanhCQ 06/11)** — bar, cỡ mẫu, n
 
 | Mục | Nội dung |
 |---|---|
-| Mô hình agent | `Qwen 3.8-27B`, chạy local. Phiên bản LLM đầu tiên = `v1`. **Phiên bản gốc `v0` = mã tất định hôm nay** (`fls/` @ commit đóng băng) — cột "không tệ hơn bản trước" của vòng đầu so với `v0`. |
-| Mô hình chấm | `gpt-oss-20b`, chạy local — khác họ Qwen (06/11). |
-| Mô hình persona | `gpt-oss-20b`, prompt riêng (⛔ chung prompt với bộ chấm, ⛔ trùng mô hình agent). |
+| Mô hình agent | Agent **làm** (A1 · A2 · A3.1–A3.3): `Qwen 3.8-27B`. Agent **kiểm** trong luồng (A4 SOÁT): **`gpt-oss-20b`** — khác họ với thứ nó kiểm (KhanhCQ 06/11: "dùng 1 model khác để kiểm"). Cả hai chạy local. Phiên bản LLM đầu tiên = `v1`. **Phiên bản gốc `v0` = mã tất định hôm nay** (`fls/` @ commit đóng băng) — cột "không tệ hơn bản trước" của vòng đầu so với `v0`. |
+| Mô hình chấm | Khác mô hình của **chính** agent bị đo: A3.1 · A3.2 · A3.3 chấm bằng `gpt-oss-20b`; **A4 chấm bằng `Qwen 3.8-27B`** (A4 đã là gpt-oss). ⛔ agent nào được chấm bằng mô hình của chính nó. |
+| Mô hình persona | Cùng mô hình với bộ chấm của agent ấy (A3.x: `gpt-oss-20b` · A4: `Qwen 3.8-27B`), prompt riêng (⛔ chung prompt với bộ chấm, ⛔ trùng mô hình agent bị đo). |
 | Chấm mù | Bộ chấm chỉ thấy mã ngẫu nhiên, ⛔ tên agent, ⛔ phiên bản. Đáp án chỉ bộ chấm đọc; mọi lượt đọc được ghi log. |
 | Chấm lại bằng người | Lanptn chấm lại **10%** số mục mỗi vòng *(đề xuất)*; đồng thuận < **0,8** ⇒ vòng **vô hiệu** *(đề xuất)*. |
 | Nguồn đáp án | **ITL Ledge Final của AS-IS** (sổ kế toán đã chỉnh) + kết quả so khớp oracle (`fls/oracle`). Chỗ AS-IS biết là sai (lỗi đã ghi) ⇒ đáp án do người xác nhận lại, `label_source = human-verified`. |
