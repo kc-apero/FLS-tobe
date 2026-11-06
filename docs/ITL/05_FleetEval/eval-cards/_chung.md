@@ -5,7 +5,7 @@ Trạng thái: **đã chốt ở Gate 3 (KhanhCQ 06/11)** — bar, cỡ mẫu, n
 
 | Mục | Nội dung |
 |---|---|
-| Mô hình agent | Agent **làm** (A1 · A2 · A3.1–A3.3): `Qwen 3.8-27B`. Agent **kiểm** trong luồng (A4 SOÁT): **`gpt-oss-20b`** — khác họ với thứ nó kiểm (KhanhCQ 06/11: "dùng 1 model khác để kiểm"). Cả hai chạy local. Phiên bản LLM đầu tiên = `v1`. **Phiên bản gốc `v0` = mã tất định hôm nay** (`fls/` @ commit đóng băng) — cột "không tệ hơn bản trước" của vòng đầu so với `v0`. |
+| Mô hình agent | Agent **làm** (A1 · A2 · A3.1–A3.3): `Qwen 3.8-27B`. Agent **kiểm** trong luồng (A4 · Auditor (Compounding Loop)): **`gpt-oss-20b`** — khác họ với thứ nó kiểm (KhanhCQ 06/11: "dùng 1 model khác để kiểm"). Cả hai chạy local. Phiên bản LLM đầu tiên = `v1`. **Phiên bản gốc `v0` = mã tất định hôm nay** (`fls/` @ commit đóng băng) — cột "không tệ hơn bản trước" của vòng đầu so với `v0`. |
 | Mô hình chấm | Khác mô hình của **chính** agent bị đo: A3.1 · A3.2 · A3.3 chấm bằng `gpt-oss-20b`; **A4 chấm bằng `Qwen 3.8-27B`** (A4 đã là gpt-oss). ⛔ agent nào được chấm bằng mô hình của chính nó. |
 | Mô hình persona | Cùng mô hình với bộ chấm của agent ấy (A3.x: `gpt-oss-20b` · A4: `Qwen 3.8-27B`), prompt riêng (⛔ chung prompt với bộ chấm, ⛔ trùng mô hình agent bị đo). |
 | Chấm mù | Bộ chấm chỉ thấy mã ngẫu nhiên, ⛔ tên agent, ⛔ phiên bản. Đáp án chỉ bộ chấm đọc; mọi lượt đọc được ghi log. |

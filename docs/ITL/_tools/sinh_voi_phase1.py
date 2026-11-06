@@ -832,7 +832,7 @@ AGENT = {   # mã: (dải, nhãn ngắn, tên, luồng ≤ 5 bước, hộp thu�
 }
 AG_THEO_DAI = {v[0]: k for k, v in AGENT.items()}
 
-# ⭐ Owner 06/11: "dùng 1 model khác để kiểm". Agent LÀM (A1 · A2 · A3.x) chạy Qwen; agent KIỂM trong luồng (A4 SOÁT)
+# ⭐ Owner 06/11: "dùng 1 model khác để kiểm". Agent LÀM (A1 · A2 · A3.x) chạy Qwen; agent KIỂM trong luồng (A4 · Auditor)
 #   chạy mô hình KHÁC họ (gpt-oss-20b) — một bộ kiểm cùng họ với thứ nó kiểm sẽ chấm dễ (how-to 5.1).
 #   Bộ chấm FLEET EVAL thì phải khác mô hình của CHÍNH agent bị đo ⇒ A1–A3 chấm bằng gpt-oss, A4 chấm bằng Qwen.
 AG_NGAN = {"ag1": "Collect_raw_data", "ag2": "Group Ledger", "ag3": "Filter·Adjust", "ag4": "Auditor"}
@@ -1548,7 +1548,7 @@ def vao_ra() -> tuple[dict, dict]:
 
 NHOM_LUONG = [
     ("Bốn agent và ba phương pháp", [("Bốn agent · FLS · NẠP", ["ag1", "ag2", "ag3", "ag4"]),
-                                     ("Agent 3 tách ba agent mapping — mỗi phương pháp một con", ["ag3a", "ag3b", "ag3c"]),
+                                     ("Agent 3 · Filter Fulfill & Adjust tách ba agent con — mỗi phương pháp một con", ["ag3a", "ag3b", "ag3c"]),
                                      ("Ba phương pháp · luồng trọn từ nguồn tới sổ", ["pp1", "pp2", "pp3"])]),
     ("FLS · NẠP", [("① KHAI & CHỤP", ["anhFPS", "khai", "anhTien", "anhHR", "anhNT"]),
                    ("② DỰNG", ["dLenh", "dTien", "dHR", "dNT"]),
@@ -1578,7 +1578,7 @@ def bang_luong() -> str:
                     tt = "agent · bước sau: AP → Flip eval"
                 elif ma in AGENT_CON:
                     _c, _n, ten, buoc, _tv = AGENT_CON[ma]
-                    tt = "agent mapping · thuộc Agent 3"
+                    tt = "agent con · thuộc Agent 3 · Filter Fulfill & Adjust"
                 elif ma in PP_LUONG:
                     ten, buoc, _tv = PP_LUONG[ma]
                     tt = "GĐ1 phải dựng"
@@ -1667,7 +1667,7 @@ def bang_chi_phi() -> str:
     o = ['''
 <h2>§8 · Chi phí: máy chủ ↔ mô hình mã nguồn mở tự huấn luyện</h2>
 <p class="note"><b>06/11:</b> đã chọn <b>Qwen 3.8-27B chạy local</b> cho các agent. Các dòng "mô hình mở 8B" dưới đây chỉ còn là mốc so sánh; giờ GPU cho mô hình 27B <b>chưa tính lại</b>.</p>
-<p><b>Câu hỏi trước tiên là agent nào cần mô hình.</b> Ba trong bốn agent chạy bằng luật, không cần mô hình — chi phí của chúng chỉ là <b>máy chủ</b>. Mô hình chỉ có việc ở <b>phần dư</b> của các agent mapping: dòng còn ở L3 sau khi luật đã chạy hết.</p>
+<p><b>Câu hỏi trước tiên là agent nào cần mô hình.</b> Ba trong bốn agent chạy bằng luật, không cần mô hình — chi phí của chúng chỉ là <b>máy chủ</b>. Mô hình chỉ có việc ở <b>phần dư</b> của các agent con của Agent 3 · Filter Fulfill &amp; Adjust: dòng còn ở L3 sau khi luật đã chạy hết.</p>
 <div class="scroll"><table>
 <thead><tr><th>agent</th><th>việc</th><th>cần mô hình?</th></tr></thead><tbody>
 <tr class="chon" data-ref="h:ag1" tabindex="0"><td><b>Agent 1 · Collect_raw_data</b></td><td>đọc chỉ-đọc theo bản khai, ghi ảnh</td><td>không — luật</td></tr>
@@ -1795,22 +1795,22 @@ def bang_kiem_asis() -> str:
 # Trang chỉ NHÚNG grid.svg đã render — ⛔ vẽ lại tay, để sơ đồ ở đây và ở AP không lệch nhau.
 FE_THU_MUC = GOC / "docs/ITL/05_FleetEval"
 FE_THE = [   # (agent, phép kiểm, lỗi đáng sợ, đơn vị heatmap, đáp án, bar đề xuất)
-    ("A3.1 · PP (1) Ref", "a3-1-ref.eval.ghep-sai", "nối chắc chắn nhưng sai một PM line ⇒ HD/CDT1 sai mà kế toán tin",
+    ("A3.1 · Filter Fulfill & Adjust · PP (1)", "a3-1-ref.eval.ghep-sai", "nối chắc chắn nhưng sai một PM line ⇒ HD/CDT1 sai mà kế toán tin",
      "phải nối A · B · C — phải để người D · E · F — L3 · ca chuyển", "ITL Ledge Final (AS-IS) + oracle",
      "0 nối sai trên nhóm phải-để-người; tổng ≤ v0"),
-    ("A3.2 · PP (2) lương", "a3-2-luong.eval.noi-sai-dot", "ghi đợt sai không báo: tháng trùng / thiếu, Σ Có ≠ Σ Nợ",
+    ("A3.2 · Filter Fulfill & Adjust · PP (2)", "a3-2-luong.eval.noi-sai-dot", "ghi đợt sai không báo: tháng trùng / thiếu, Σ Có ≠ Σ Nợ",
      "NIS L1 · NIS L3 · COM L2 · INT · PIT — tháng trùng · thiếu · Σ lệch · sổ 2026", "~34 file H1000 đã adjust ↔ ITL (AS-IS)",
      "0 đợt lỗi bị ghi"),
-    ("A3.3 · PP (3) nền tảng", "a3-3-nen-tang.eval.chia-sai", "nối nhầm PE hoặc chia sai CDT1 ⇒ chi phí về sai chủ dự toán",
+    ("A3.3 · Filter Fulfill & Adjust · PP (3)", "a3-3-nen-tang.eval.chia-sai", "nối nhầm PE hoặc chia sai CDT1 ⇒ chi phí về sai chủ dự toán",
      "OMC · GI · SC · PS — trúng nhiều · trúng 0 · lệch kỳ · vendor mới", "PHÂN BỔ NỀN TẢNG (AS-IS) sau khi người gán nhãn",
      "0 sai trên ca cài sẵn; không bar tổng"),
-    ("A4 · SOÁT (agent chấm)", "a4-soat.eval.lot-chan", "bỏ lọt: lô đáng CHẶN được báo đạt ⇒ dòng sai vào sổ chỉ-thêm",
+    ("A4 · Auditor (Compounding Loop)", "a4-soat.eval.lot-chan", "bỏ lọt: lô đáng CHẶN được báo đạt ⇒ dòng sai vào sổ chỉ-thêm",
      "mất/thừa dòng · thiếu trường · định dạng/nguồn · số dư · ca chuyển", "lô đột biến dựng + lỗi thật (646 dòng mất, 31 mã float)",
      "0 bỏ lọt; báo động oan ≤ v0"),
 ]
 
 
-AP_FE = "AP_FLS_FleetEval_v1.1.2_2026-11-06.html"     # bản AP nhúng nguyên vào trang 2 (F4)
+AP_FE = "AP_FLS_FleetEval_v1.1.3_2026-11-06.html"     # bản AP nhúng nguyên vào trang 2 (F4)
 FE_THE_TEP = ("a3-1-ref", "a3-2-luong", "a3-3-nen-tang", "a4-soat")
 
 
@@ -1828,7 +1828,7 @@ def bang_fleet_eval() -> str:
              "ag4": "kế toán đọc biên bản F04 · mỗi lô"}
     o = ['''
 <h2>F1 · Mỗi agent khác nhau ở đâu</h2>
-<p>Năm agent <b>làm</b> (A1 · A2 · A3.1–A3.3) chạy <b>Qwen 3.8-27B</b>. Agent <b>kiểm</b> trong luồng (A4 SOÁT) chạy <b>gpt-oss-20b</b> — một mô hình khác họ, vì bộ kiểm cùng họ với thứ nó kiểm sẽ chấm dễ. Bộ chấm của fleet eval cũng phải khác mô hình của <b>chính</b> agent bị đo: A1–A3 chấm bằng gpt-oss-20b, còn A4 (đã là gpt-oss) chấm bằng Qwen. Không agent nào được chấm bằng mô hình của chính nó.</p>
+<p>Năm agent <b>làm</b> (A1 · A2 · A3.1–A3.3) chạy <b>Qwen 3.8-27B</b>. Agent <b>kiểm</b> trong luồng (A4 · Auditor) chạy <b>gpt-oss-20b</b> — một mô hình khác họ, vì bộ kiểm cùng họ với thứ nó kiểm sẽ chấm dễ. Bộ chấm của fleet eval cũng phải khác mô hình của <b>chính</b> agent bị đo: A1–A3 chấm bằng gpt-oss-20b, còn A4 (đã là gpt-oss) chấm bằng Qwen. Không agent nào được chấm bằng mô hình của chính nó.</p>
 <div class="scroll"><table>
 <thead><tr><th>agent</th><th>vai</th><th>mô hình chạy</th><th>ai kiểm khi chạy thật</th><th>fleet eval chấm bằng</th><th>phép kiểm</th></tr></thead><tbody>''']
     for k in ("ag1", "ag2", "ag3a", "ag3b", "ag3c", "ag4"):
@@ -1921,11 +1921,11 @@ def du_lieu_js() -> str:
         hop[k] = {"ten": ten_ag, "loai": f"agent · chạy {AG_MO_HINH[k]}", "tt": "b", "dong": [], "mono": "", "huy": [],
                   "dc": f"mô hình chạy: {AG_MO_HINH[k]} · fleet eval chấm bằng: {AG_CHAM[k]} · AP fleet eval v1.1.0 (trang 2)",
                   "vung": "FLS · NẠP · bốn agent",
-                  "dai": DAI[_d][3], "vao": [], "ra": [], "luong": list(buoc), "thanh_vien": list(tv)}
+                  "dai": f"{DAI[_d][3]} · {AG_NGAN[k]}", "vao": [], "ra": [], "luong": list(buoc), "thanh_vien": list(tv)}
     for k, (cha, _c, ten_c, buoc, tv) in AGENT_CON.items():
         hop[k] = {"ten": ten_c, "loai": f"agent con · chạy {AG_MO_HINH[cha]}", "tt": "b", "dong": [], "mono": "", "huy": [],
                   "dc": f"thuộc {AGENT[cha][2]} · mô hình chạy: {AG_MO_HINH[cha]} · fleet eval chấm bằng: {AG_CHAM[cha]}",
-                  "vung": "FLS · NẠP · agent mapping",
+                  "vung": "FLS · NẠP · Agent 3 · Filter Fulfill & Adjust",
                   "dai": DAI[AGENT[cha][0]][3], "vao": [], "ra": [], "luong": list(buoc), "thanh_vien": list(tv)}
     for k, (ten_pp, buoc, tv) in PP_LUONG.items():
         hop[k] = {"ten": ten_pp, "loai": "phương pháp", "tt": "q", "dong": [], "mono": "", "huy": [],
@@ -2418,7 +2418,7 @@ def trang() -> str:
          '<span><i class="ln ln-n"></i>đề xuất của trang này (chờ owner)</span>'
          '<span><i class="sw" style="border-left:4px solid var(--mid)"></i>NGƯỜI <i class="sw" style="border-left:4px solid var(--prop)"></i>MÁY <i class="sw" style="border-left:4px solid var(--accent)"></i>NGƯỜI+MÁY · vạch mép trái = nguồn do ai làm ra (§1e)</span>'
          '<span><span class="pill mid" style="font-size:10px">S1</span> huy hiệu = hộp do điểm khởi động S1 chạy</span><span><i class="sw" style="border:1.4px dashed var(--sel)"></i>PP (n) = phương pháp xử lý n</span>'
-         '<span><i class="sw" style="background:var(--ag1);opacity:.5"></i><i class="sw" style="background:var(--ag2);opacity:.5"></i><i class="sw" style="background:var(--ag3);opacity:.5"></i><i class="sw" style="background:var(--ag4);opacity:.5"></i>dải màu = việc của Agent 1–4 · chip A3.1–A3.3 = ba agent mapping</span>'
+         '<span><i class="sw" style="background:var(--ag1);opacity:.5"></i><i class="sw" style="background:var(--ag2);opacity:.5"></i><i class="sw" style="background:var(--ag3);opacity:.5"></i><i class="sw" style="background:var(--ag4);opacity:.5"></i>dải màu = việc của Agent 1–4 · chip A3.1–A3.3 = ba agent con của Filter Fulfill &amp; Adjust</span>'
          '<span><i class="sw sw-a"></i>AS-IS (Sheets hôm nay)</span><span><i class="ln ln-a"></i>công thức / GScript</span><span><i class="ln ln-t"></i>người làm tay</span>'
          '<span><span class="pill mid" style="font-size:10px">TAY</span> có bước người bấm / gõ</span><span><b style="color:var(--sel)">!</b> AS-IS có lỗi đã ghi nhận</span>'
          '</div>',
@@ -2478,7 +2478,7 @@ def trang() -> str:
 </tbody></table></div>
 """, """
 <h2>§1d · Luồng xử lý dữ liệu theo từng hộp</h2>
-<p>Vùng FLS · NẠP chạy bởi <b>bốn agent</b> (nhãn đỏ ở lề trái hình 1: AGENT 1 KHAI &amp; CHỤP · AGENT 2 DỰNG · AGENT 3 MAPPING · AGENT 4 SOÁT); bấm nhãn để xem agent nhận gì, làm gì, ra gì. Bước sau khi xong voi: dựng AP rồi chạy Flip eval cho bốn agent này. Mỗi hộp xử lý và hộp dữ liệu trong FLS có một luồng tổng quan, tối đa 5 bước. Cùng luồng này hiện ở đầu khung chi tiết khi bấm hộp, và trong chú thích khi rê chuột lên hộp. Bấm nhãn <b>PHƯƠNG PHÁP (1) / (2) / (3) ▸</b> trên hình 1 để xem luồng trọn của từng phương pháp và làm nổi các hộp thuộc nó.</p>
+<p>Vùng FLS · NẠP chạy bởi <b>bốn agent</b> (nhãn màu ở lề trái hình 1: AGENT 1 Collect_raw_data · AGENT 2 Generate Group Ledger (ITL raw) · AGENT 3 Filter Fulfill &amp; Adjust (ITL Adjust) · AGENT 4 Auditor (Compounding Loop)); bấm nhãn để xem agent nhận gì, làm gì, ra gì. Bước sau khi xong voi: dựng AP rồi chạy Flip eval cho bốn agent này. Mỗi hộp xử lý và hộp dữ liệu trong FLS có một luồng tổng quan, tối đa 5 bước. Cùng luồng này hiện ở đầu khung chi tiết khi bấm hộp, và trong chú thích khi rê chuột lên hộp. Bấm nhãn <b>PHƯƠNG PHÁP (1) / (2) / (3) ▸</b> trên hình 1 để xem luồng trọn của từng phương pháp và làm nổi các hộp thuộc nó.</p>
 """, bang_luong(), """
 <h2>§1e · Nguồn của máy, nguồn của người — đầu vào và đầu ra</h2>
 <p>Mỗi nguồn vào và mỗi đầu ra mang một nhãn ở góc trên-trái của hộp: <b>MÁY</b> (hệ sinh, không ai gõ) · <b>NGƯỜI</b> (người gõ, dán hoặc ký) · <b>NGƯỜI+MÁY</b> (người nhập, máy sinh sổ; hoặc máy đề xuất, người chốt). Chỗ nào có tay người là chỗ cần một cổng canh, ghi ở cột cuối.</p>
