@@ -26,7 +26,7 @@
        "status": "built"
       },
       "llm": {
-       "label": "A1 · KHAI & CHỤP",
+       "label": "A1 · Collect_raw_data",
        "sub": "Qwen 3.8-27B local · v1 (v0 = mã)",
        "status": "proposed"
       },
@@ -71,7 +71,7 @@
        "status": "partial"
       },
       "llm": {
-       "label": "A2 · DỰNG",
+       "label": "A2 · Group Ledger (ITL raw)",
        "sub": "Qwen 3.8-27B local · v1 (v0 = mã)",
        "status": "proposed"
       },
@@ -116,7 +116,7 @@
        "status": "built"
       },
       "llm": {
-       "label": "A3.1 · PP (1) Ref",
+       "label": "Filter·Adjust A3.1 PP1",
        "sub": "Qwen 3.8-27B local · v1 (v0 = mã)",
        "status": "proposed"
       },
@@ -167,7 +167,7 @@
        "status": "built"
       },
       "llm": {
-       "label": "A3.2 · PP (2) lương",
+       "label": "Filter·Adjust A3.2 PP2",
        "sub": "Qwen 3.8-27B local · v1 (v0 = mã)",
        "status": "proposed"
       },
@@ -211,7 +211,7 @@
        "status": "built"
       },
       "llm": {
-       "label": "A3.3 · PP (3) nền tảng",
+       "label": "Filter·Adjust A3.3 PP3",
        "sub": "Qwen 3.8-27B local · v1 (v0 = mã)",
        "status": "proposed"
       },
@@ -261,7 +261,7 @@
        "status": "partial"
       },
       "llm": {
-       "label": "A4 · SOÁT",
+       "label": "A4 · Auditor",
        "sub": "gpt-oss-20b local · v1 (v0 = mã)",
        "status": "proposed"
       },

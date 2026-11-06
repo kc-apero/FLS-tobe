@@ -24,10 +24,11 @@
 <text x="119.0" y="87.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">KT ngân hàng · quỹ</text>
 <text x="119.0" y="100.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">dán sao kê R |, sổ</text>
 <text x="119.0" y="113.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">quỹ, số dư CCR</text>
-<rect x="252.0" y="70.0" width="128.0" height="74.0" rx="6" fill="#6d28d9" fill-opacity="0.04" stroke="#6d28d9" stroke-width="1.6" stroke-dasharray="2 3"><title>A1 · KHAI &amp; CHỤP | kind: llm | status: proposed | sub: Qwen 3.8-27B local · v1 (v0 = mã)</title></rect>
-<text x="259.0" y="87.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">A1 · KHAI &amp; CHỤP</text>
-<text x="259.0" y="100.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">Qwen 3.8-27B local ·</text>
-<text x="259.0" y="113.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">v1 (v0 = mã)</text>
+<rect x="252.0" y="70.0" width="128.0" height="74.0" rx="6" fill="#6d28d9" fill-opacity="0.04" stroke="#6d28d9" stroke-width="1.6" stroke-dasharray="2 3"><title>A1 · Collect_raw_data | kind: llm | status: proposed | sub: Qwen 3.8-27B local · v1 (v0 = mã)</title></rect>
+<text x="259.0" y="87.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">A1 ·</text>
+<text x="259.0" y="100.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">Collect_raw_data</text>
+<text x="259.0" y="113.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">Qwen 3.8-27B local ·</text>
+<text x="259.0" y="126.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">v1 (v0 = mã)</text>
 <line x1="241.0" y1="107.0" x2="250.0" y2="107.0" stroke="#52606d" stroke-width="1.4" marker-end="url(#arr)"/>
 <rect x="392.0" y="70.0" width="128.0" height="74.0" rx="6" fill="#52606d" fill-opacity="0.04" stroke="#52606d" stroke-width="1.6" stroke-dasharray="7 4"><title>Bản khai + ảnh | kind: artefact | status: partial | sub: cột · thứ tự ngày · LE</title></rect>
 <text x="399.0" y="87.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">Bản khai + ảnh</text>
@@ -61,10 +62,11 @@
 <text x="119.0" y="187.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">Ảnh của A1</text>
 <text x="119.0" y="200.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">bank · quỹ · CCR ·</text>
 <text x="119.0" y="213.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">PM·PC</text>
-<rect x="252.0" y="170.0" width="128.0" height="74.0" rx="6" fill="#6d28d9" fill-opacity="0.04" stroke="#6d28d9" stroke-width="1.6" stroke-dasharray="2 3"><title>A2 · DỰNG | kind: llm | status: proposed | sub: Qwen 3.8-27B local · v1 (v0 = mã)</title></rect>
-<text x="259.0" y="187.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">A2 · DỰNG</text>
-<text x="259.0" y="200.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">Qwen 3.8-27B local ·</text>
-<text x="259.0" y="213.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">v1 (v0 = mã)</text>
+<rect x="252.0" y="170.0" width="128.0" height="74.0" rx="6" fill="#6d28d9" fill-opacity="0.04" stroke="#6d28d9" stroke-width="1.6" stroke-dasharray="2 3"><title>A2 · Group Ledger (ITL raw) | kind: llm | status: proposed | sub: Qwen 3.8-27B local · v1 (v0 = mã)</title></rect>
+<text x="259.0" y="187.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">A2 · Group Ledger</text>
+<text x="259.0" y="200.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">(ITL raw)</text>
+<text x="259.0" y="213.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">Qwen 3.8-27B local ·</text>
+<text x="259.0" y="226.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">v1 (v0 = mã)</text>
 <line x1="241.0" y1="207.0" x2="250.0" y2="207.0" stroke="#52606d" stroke-width="1.4" marker-end="url(#arr)"/>
 <rect x="392.0" y="170.0" width="128.0" height="74.0" rx="6" fill="#52606d" fill-opacity="0.04" stroke="#52606d" stroke-width="1.6"><title>Dòng tiền hai vế | kind: artefact | status: built | sub: canon 36 · content_key</title></rect>
 <text x="399.0" y="187.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">Dòng tiền hai vế</text>
@@ -95,10 +97,11 @@
 <rect x="112.0" y="270.0" width="128.0" height="74.0" rx="6" fill="#b91c1c" fill-opacity="0.04" stroke="#b91c1c" stroke-width="1.6"><title>Dòng tiền + lệnh | kind: human | status: built | sub: PM·PC, Ref do CA gõ</title></rect>
 <text x="119.0" y="293.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">Dòng tiền + lệnh</text>
 <text x="119.0" y="306.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">PM·PC, Ref do CA gõ</text>
-<rect x="252.0" y="270.0" width="128.0" height="74.0" rx="6" fill="#6d28d9" fill-opacity="0.04" stroke="#6d28d9" stroke-width="1.6" stroke-dasharray="2 3"><title>A3.1 · PP (1) Ref | kind: llm | status: proposed | sub: Qwen 3.8-27B local · v1 (v0 = mã)</title></rect>
-<text x="259.0" y="287.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">A3.1 · PP (1) Ref</text>
-<text x="259.0" y="300.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">Qwen 3.8-27B local ·</text>
-<text x="259.0" y="313.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">v1 (v0 = mã)</text>
+<rect x="252.0" y="270.0" width="128.0" height="74.0" rx="6" fill="#6d28d9" fill-opacity="0.04" stroke="#6d28d9" stroke-width="1.6" stroke-dasharray="2 3"><title>Filter·Adjust A3.1 PP1 | kind: llm | status: proposed | sub: Qwen 3.8-27B local · v1 (v0 = mã)</title></rect>
+<text x="259.0" y="287.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">Filter·Adjust A3.1</text>
+<text x="259.0" y="300.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">PP1</text>
+<text x="259.0" y="313.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">Qwen 3.8-27B local ·</text>
+<text x="259.0" y="326.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">v1 (v0 = mã)</text>
 <line x1="241.0" y1="307.0" x2="250.0" y2="307.0" stroke="#52606d" stroke-width="1.4" marker-end="url(#arr)"/>
 <rect x="392.0" y="270.0" width="128.0" height="74.0" rx="6" fill="#52606d" fill-opacity="0.04" stroke="#52606d" stroke-width="1.6"><title>L1 · L2 · L3 | kind: artefact | status: built | sub: + gợi ý HD/CDT1</title></rect>
 <text x="399.0" y="293.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">L1 · L2 · L3</text>
@@ -137,9 +140,9 @@
 <text x="119.0" y="377.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">Sổ H1000 đã tách</text>
 <text x="119.0" y="390.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">34 file đã adjust ·</text>
 <text x="119.0" y="403.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">số FT KT dán</text>
-<rect x="252.0" y="360.0" width="128.0" height="74.0" rx="6" fill="#6d28d9" fill-opacity="0.04" stroke="#6d28d9" stroke-width="1.6" stroke-dasharray="2 3"><title>A3.2 · PP (2) lương | kind: llm | status: proposed | sub: Qwen 3.8-27B local · v1 (v0 = mã)</title></rect>
-<text x="259.0" y="377.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">A3.2 · PP (2)</text>
-<text x="259.0" y="390.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">lương</text>
+<rect x="252.0" y="360.0" width="128.0" height="74.0" rx="6" fill="#6d28d9" fill-opacity="0.04" stroke="#6d28d9" stroke-width="1.6" stroke-dasharray="2 3"><title>Filter·Adjust A3.2 PP2 | kind: llm | status: proposed | sub: Qwen 3.8-27B local · v1 (v0 = mã)</title></rect>
+<text x="259.0" y="377.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">Filter·Adjust A3.2</text>
+<text x="259.0" y="390.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">PP2</text>
 <text x="259.0" y="403.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">Qwen 3.8-27B local ·</text>
 <text x="259.0" y="416.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">v1 (v0 = mã)</text>
 <line x1="241.0" y1="397.0" x2="250.0" y2="397.0" stroke="#52606d" stroke-width="1.4" marker-end="url(#arr)"/>
@@ -175,9 +178,9 @@
 <text x="119.0" y="467.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">GI·OMC Looker +</text>
 <text x="119.0" y="480.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">SC·PS Gsheet</text>
 <text x="119.0" y="493.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">+ dòng ITL có PE/PM</text>
-<rect x="252.0" y="450.0" width="128.0" height="74.0" rx="6" fill="#6d28d9" fill-opacity="0.04" stroke="#6d28d9" stroke-width="1.6" stroke-dasharray="2 3"><title>A3.3 · PP (3) nền tảng | kind: llm | status: proposed | sub: Qwen 3.8-27B local · v1 (v0 = mã)</title></rect>
-<text x="259.0" y="467.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">A3.3 · PP (3) nền</text>
-<text x="259.0" y="480.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">tảng</text>
+<rect x="252.0" y="450.0" width="128.0" height="74.0" rx="6" fill="#6d28d9" fill-opacity="0.04" stroke="#6d28d9" stroke-width="1.6" stroke-dasharray="2 3"><title>Filter·Adjust A3.3 PP3 | kind: llm | status: proposed | sub: Qwen 3.8-27B local · v1 (v0 = mã)</title></rect>
+<text x="259.0" y="467.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">Filter·Adjust A3.3</text>
+<text x="259.0" y="480.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">PP3</text>
 <text x="259.0" y="493.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">Qwen 3.8-27B local ·</text>
 <text x="259.0" y="506.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">v1 (v0 = mã)</text>
 <line x1="241.0" y1="487.0" x2="250.0" y2="487.0" stroke="#52606d" stroke-width="1.4" marker-end="url(#arr)"/>
@@ -215,8 +218,8 @@
 <rect x="112.0" y="550.0" width="128.0" height="74.0" rx="6" fill="#b91c1c" fill-opacity="0.04" stroke="#b91c1c" stroke-width="1.6" stroke-dasharray="7 4"><title>Kết quả A2 · A3 | kind: human | status: partial | sub: + số dư CCR</title></rect>
 <text x="119.0" y="573.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">Kết quả A2 · A3</text>
 <text x="119.0" y="586.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">+ số dư CCR</text>
-<rect x="252.0" y="550.0" width="128.0" height="74.0" rx="6" fill="#6d28d9" fill-opacity="0.04" stroke="#6d28d9" stroke-width="1.6" stroke-dasharray="2 3"><title>A4 · SOÁT | kind: llm | status: proposed | sub: gpt-oss-20b local · v1 (v0 = mã)</title></rect>
-<text x="259.0" y="567.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">A4 · SOÁT</text>
+<rect x="252.0" y="550.0" width="128.0" height="74.0" rx="6" fill="#6d28d9" fill-opacity="0.04" stroke="#6d28d9" stroke-width="1.6" stroke-dasharray="2 3"><title>A4 · Auditor | kind: llm | status: proposed | sub: gpt-oss-20b local · v1 (v0 = mã)</title></rect>
+<text x="259.0" y="567.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">A4 · Auditor</text>
 <text x="259.0" y="580.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">gpt-oss-20b local ·</text>
 <text x="259.0" y="593.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">v1 (v0 = mã)</text>
 <line x1="241.0" y1="587.0" x2="250.0" y2="587.0" stroke="#52606d" stroke-width="1.4" marker-end="url(#arr)"/>

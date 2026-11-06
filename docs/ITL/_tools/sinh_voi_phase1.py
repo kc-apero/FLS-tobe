@@ -805,25 +805,25 @@ LUONG: dict[str, tuple[str, ...]] = {
 # ── ba phương pháp: luồng trọn từ nguồn tới sổ (bấm nhãn khung PP trên hình 1)
 # ── bốn agent của vùng FLS · NẠP (owner 05/11: "highlight 4 con agents") — bước sau: dựng AP, chạy Flip eval
 AGENT = {   # mã: (dải, nhãn ngắn, tên, luồng ≤ 5 bước, hộp thuộc agent)
-    "ag1": ("c1", "AGENT 1", "Agent 1 · KHAI & CHỤP", (
+    "ag1": ("c1", "AGENT 1", "Agent 1 · Collect_raw_data", (
         "Khởi bởi nhịp mỗi giờ (S1) và cú khai nguồn của kế toán (S2)",
         "Đọc chỉ-đọc: sổ cái PM / PC (FPS), 60 sao kê + 8 quỹ + 2 sheet CCR, 6 sổ H1000, 4 sổ nền tảng (Looker · Gsheet)",
         "Giữ bản khai nguồn có version: cột · thứ tự ngày · pháp nhân TK",
         "Ghi ảnh chụp đóng băng có chup_id; ảnh cũ không đổi một ô",
         "Ra: ảnh cho Agent 2"), ("anhFPS", "khai", "anhTien", "anhHR", "anhNT")),
-    "ag2": ("c2", "AGENT 2", "Agent 2 · DỰNG", (
+    "ag2": ("c2", "AGENT 2", "Agent 2 · Generate Group Ledger (ITL raw)", (
         "Khởi bởi kế toán chọn lô / xem trước (S3) hoặc Nhận (S4)",
         "Đọc ảnh của Agent 1",
         "Dựng 4 loại dòng: lệnh (PM/PC) · tiền + số dư ngày · dòng lương H1000 · chi phí nền tảng + Combine Code",
         "Gắn pháp nhân, tính content_key, giữ đủ hai vế Nợ / Có",
         "Ra: dòng chuẩn cho Agent 3"), ("dLenh", "dTien", "dHR", "dNT")),
-    "ag3": ("c3", "AGENT 3", "Agent 3 · MAPPING", (
+    "ag3": ("c3", "AGENT 3", "Agent 3 · Filter Fulfill & Adjust (ITL Adjust)", (
         "Khởi bởi Nhận lô (S4)",
         "PP (1): bank txns ↔ lệnh chi qua Reference No + luật vế Nợ → L1 · L2 · L3",
         "PP (2): dòng lương H1000 ↔ giao dịch bank theo Số CT",
         "PP (3): dòng ITL (đã có PE, đã nối bank) ⨝ nguồn GI · OMC · SC · PS theo Combine Code → chia CDT1",
         "Ra: mối nối, phần chia và dòng chưa khớp cho Agent 4"), ("ghep", "ghep2", "ghep3")),
-    "ag4": ("c4", "AGENT 4", "Agent 4 · SOÁT", (
+    "ag4": ("c4", "AGENT 4", "Agent 4 · Auditor (Compounding Loop)", (
         "Chạy gpt-oss-20b — khác mô hình với A1–A3 (Qwen); khởi bởi xem trước (S3) và Nhận (S4)",
         "PP (1): 9 luật sao kê · Σ PM line = tiền · 4 vế · số dư ngày = CCR (DIF = 0)",
         "PP (2): Σ Có = Σ Nợ mỗi đợt · đủ tháng, ⛔ tháng trùng",
@@ -835,25 +835,26 @@ AG_THEO_DAI = {v[0]: k for k, v in AGENT.items()}
 # ⭐ Owner 06/11: "dùng 1 model khác để kiểm". Agent LÀM (A1 · A2 · A3.x) chạy Qwen; agent KIỂM trong luồng (A4 SOÁT)
 #   chạy mô hình KHÁC họ (gpt-oss-20b) — một bộ kiểm cùng họ với thứ nó kiểm sẽ chấm dễ (how-to 5.1).
 #   Bộ chấm FLEET EVAL thì phải khác mô hình của CHÍNH agent bị đo ⇒ A1–A3 chấm bằng gpt-oss, A4 chấm bằng Qwen.
+AG_NGAN = {"ag1": "Collect_raw_data", "ag2": "Group Ledger", "ag3": "Filter·Adjust", "ag4": "Auditor"}
 AG_MO_HINH = {"ag1": "Qwen 3.8-27B", "ag2": "Qwen 3.8-27B", "ag3": "Qwen 3.8-27B", "ag4": "gpt-oss-20b"}
 AG_CHAM = {"ag1": "gpt-oss-20b", "ag2": "gpt-oss-20b", "ag3": "gpt-oss-20b", "ag4": "Qwen 3.8-27B"}
 
 # ── owner 06/11: "phần TO-BE thể hiện rõ được các agents mapping" ⇒ Agent 3 tách ba agent con, mỗi PP một con,
 #    nối nhau bằng phần CHƯA khớp (q1 · q2). Chip "A3.1 / A3.2 / A3.3" trên hộp MAPPING bấm được.
 AGENT_CON = {   # mã: (agent cha, chip, tên, luồng ≤ 5 bước, hộp)
-    "ag3a": ("ag3", "A3.1", "Agent 3.1 · MAPPING PP (1) — bank txns ↔ lệnh chi", (
+    "ag3a": ("ag3", "A3.1", "Agent 3.1 · Filter Fulfill & Adjust · PP (1) — bank txns ↔ lệnh chi", (
         "Nhận dòng tiền hai vế (Agent 2) và dòng lệnh PM / PC",
         "Vế Có: Reference No → PM line; Σ tiền các line = tiền giao dịch, lệch ⇒ chặn",
         "Vế Nợ: luật vế Nợ (nội bộ · doanh thu · hoàn tiền · vay và lãi)",
         "Xếp L1 · L1b · L2 · L3; L3 đi qua vòng cộng dồn (hình 2) để được gợi ý loại giao dịch",
         "Chuyển L3 còn lại cho Agent 3.2 (q1)"), ("ghep",)),
-    "ag3b": ("ag3", "A3.2", "Agent 3.2 · MAPPING PP (2) — dòng lương H1000 ↔ bank txns", (
+    "ag3b": ("ag3", "A3.2", "Agent 3.2 · Filter Fulfill & Adjust · PP (2) — dòng lương H1000 ↔ bank txns", (
         "Nhận L3 từ Agent 3.1 và dòng lương H1000 đã tách HD · CDT1 · pháp nhân (Agent 2)",
         "Nối theo Số CT (số FT kế toán đã dán) = Reference number của giao dịch",
         "Σ dòng lương của một giao dịch = tiền giao dịch, lệch ⇒ hàng chờ",
         "Tháng trùng / thiếu ⇒ chặn",
         "Chuyển phần còn lại cho Agent 3.3 (q2)"), ("ghep2",)),
-    "ag3c": ("ag3", "A3.3", "Agent 3.3 · MAPPING PP (3) — 4 chi phí nền tảng ↔ PE/PM ↔ bank txns", (
+    "ag3c": ("ag3", "A3.3", "Agent 3.3 · Filter Fulfill & Adjust · PP (3) — 4 chi phí nền tảng ↔ PE/PM ↔ bank txns", (
         "Nhận giao dịch còn lại và chi phí OMC · GI · SC · PS (Agent 2)",
         "Combine Code (Vendor-Date-NoTrans) → PE/PM line trên FPS",
         "Reference No của PM → giao dịch bank; chia tiền theo CDT1",
@@ -1339,7 +1340,7 @@ def svg() -> str:
             o.append(f'<g class="pp-nhan ag-nhan" data-id="h:{k}" tabindex="0" role="button" aria-label="{E(AGENT[k][2])}">'
                      f'<rect class="ag-the ag-the-{k}" x="20" y="{y0 + 1}" width="76" height="{h - 2}" rx="5"/>'
                      f'<text class="ag-so ag-so-{k}" x="25" y="{y0 + 13}">{E(AGENT[k][1])} ▸</text>'
-                     f'<text class="ag-ten" x="25" y="{y0 + 25}">{E(nh.replace(" & ", "·"))}</text>'
+                     f'<text class="ag-ten" x="25" y="{y0 + 25}">{E(AG_NGAN[k])}</text>'
                      f'<text class="ag-mh ag-so-{k}" x="25" y="{y0 + 36}">{E(AG_MO_HINH[k])}</text></g>')
             continue
         o.append(f'<text class="br" x="22" y="{y0 + h / 2 + 4}">{E(nh)}</text>')
@@ -1669,12 +1670,12 @@ def bang_chi_phi() -> str:
 <p><b>Câu hỏi trước tiên là agent nào cần mô hình.</b> Ba trong bốn agent chạy bằng luật, không cần mô hình — chi phí của chúng chỉ là <b>máy chủ</b>. Mô hình chỉ có việc ở <b>phần dư</b> của các agent mapping: dòng còn ở L3 sau khi luật đã chạy hết.</p>
 <div class="scroll"><table>
 <thead><tr><th>agent</th><th>việc</th><th>cần mô hình?</th></tr></thead><tbody>
-<tr class="chon" data-ref="h:ag1" tabindex="0"><td><b>Agent 1 · KHAI &amp; CHỤP</b></td><td>đọc chỉ-đọc theo bản khai, ghi ảnh</td><td>không — luật</td></tr>
-<tr class="chon" data-ref="h:ag2" tabindex="0"><td><b>Agent 2 · DỰNG</b></td><td>đặt kiểu, canon 36 trường, content_key</td><td>không — luật</td></tr>
-<tr class="chon" data-ref="h:ag3a" tabindex="0"><td><b>Agent 3.1 · MAPPING PP (1)</b></td><td>Reference No + Σ tiền → L1 · L2 · L3</td><td>L1 · L2: không. <b>L3: có thể</b> — suy diễn loại giao dịch từ diễn giải sao kê (vòng cộng dồn, hình 2)</td></tr>
-<tr class="chon" data-ref="h:ag3b" tabindex="0"><td><b>Agent 3.2 · MAPPING PP (2)</b></td><td>nối dòng lương H1000 với bank theo Số CT</td><td>không — tra khoá + phép cộng</td></tr>
-<tr class="chon" data-ref="h:ag3c" tabindex="0"><td><b>Agent 3.3 · MAPPING PP (3)</b></td><td>nhận diện giao dịch OMC · GI · SC · PS</td><td><b>có thể</b> — khi từ khoá / vendor không đủ nhận diện</td></tr>
-<tr class="chon" data-ref="h:ag4" tabindex="0"><td><b>Agent 4 · SOÁT</b></td><td>9 luật · Σ · DIF CCR = 0</td><td>không — kiểm phải tất định</td></tr>
+<tr class="chon" data-ref="h:ag1" tabindex="0"><td><b>Agent 1 · Collect_raw_data</b></td><td>đọc chỉ-đọc theo bản khai, ghi ảnh</td><td>không — luật</td></tr>
+<tr class="chon" data-ref="h:ag2" tabindex="0"><td><b>Agent 2 · Generate Group Ledger (ITL raw)</b></td><td>đặt kiểu, canon 36 trường, content_key</td><td>không — luật</td></tr>
+<tr class="chon" data-ref="h:ag3a" tabindex="0"><td><b>Agent 3.1 · Filter Fulfill &amp; Adjust · PP (1)</b></td><td>Reference No + Σ tiền → L1 · L2 · L3</td><td>L1 · L2: không. <b>L3: có thể</b> — suy diễn loại giao dịch từ diễn giải sao kê (vòng cộng dồn, hình 2)</td></tr>
+<tr class="chon" data-ref="h:ag3b" tabindex="0"><td><b>Agent 3.2 · Filter Fulfill &amp; Adjust · PP (2)</b></td><td>nối dòng lương H1000 với bank theo Số CT</td><td>không — tra khoá + phép cộng</td></tr>
+<tr class="chon" data-ref="h:ag3c" tabindex="0"><td><b>Agent 3.3 · Filter Fulfill &amp; Adjust · PP (3)</b></td><td>nhận diện giao dịch OMC · GI · SC · PS</td><td><b>có thể</b> — khi từ khoá / vendor không đủ nhận diện</td></tr>
+<tr class="chon" data-ref="h:ag4" tabindex="0"><td><b>Agent 4 · Auditor (Compounding Loop)</b></td><td>9 luật · Σ · DIF CCR = 0</td><td>không — kiểm phải tất định</td></tr>
 </tbody></table></div>
 <h3>Giá đơn vị (công bố, tra 06/11/2026)</h3>
 <div class="scroll"><table>
@@ -1809,7 +1810,7 @@ FE_THE = [   # (agent, phép kiểm, lỗi đáng sợ, đơn vị heatmap, đá
 ]
 
 
-AP_FE = "AP_FLS_FleetEval_v1.1.1_2026-11-06.html"     # bản AP nhúng nguyên vào trang 2 (F4)
+AP_FE = "AP_FLS_FleetEval_v1.1.2_2026-11-06.html"     # bản AP nhúng nguyên vào trang 2 (F4)
 FE_THE_TEP = ("a3-1-ref", "a3-2-luong", "a3-3-nen-tang", "a4-soat")
 
 
@@ -2054,7 +2055,7 @@ span.pill.nm-may{background:var(--prop-soft);color:var(--prop)} span.pill.nm-ngu
 .ag-chip-n{fill:var(--paper);fill-opacity:1} .ag-chip-t{font:700 8.5px var(--mono)}
 .ag-chip:hover .ag-chip-n,.ag-chip:focus-visible .ag-chip-n{fill:var(--mid-soft)}
 .ag-nhan:hover .ag-the,.ag-nhan:focus-visible .ag-the{fill-opacity:.26}
-.ag-so{font:700 11px var(--mono);fill:var(--sel);letter-spacing:.03em} .ag-ten{font:600 9.5px var(--sans);fill:var(--fg)}
+.ag-so{font:700 11px var(--mono);fill:var(--sel);letter-spacing:.03em} .ag-ten{font:600 9px var(--sans);fill:var(--fg)}
 .pp-nhan{cursor:pointer} .pp-hit{fill:transparent} .pp-nhan:hover .pp-hit,.pp-nhan:focus-visible .pp-hit{fill:var(--mid-soft)}
 .pp-nhan:focus{outline:none} .pp-nhan:focus-visible .vt{text-decoration:underline}
 ol.luong{margin:4px 0 12px;padding-left:1.3em;font-size:13.5px} ol.luong li{margin:3px 0}
@@ -2371,7 +2372,7 @@ JS = r"""
 THAN_TREN = """
 <header class="top">
   <h1>Voi FLS-tobe-phase1</h1>
-  <p class="meta"><b>v0.6 · 2026-11-06</b> · Giai đoạn 1: đi hết INPUT, về <b>một</b> bảng ITL, mọi dòng có pháp nhân. Lệnh chi lấy từ <b>sổ cái PM / PC của FPS</b> qua hợp đồng dữ liệu (§5).
+  <p class="meta"><b>v0.6.1 · 2026-11-06</b> · Giai đoạn 1: đi hết INPUT, về <b>một</b> bảng ITL, mọi dòng có pháp nhân. Lệnh chi lấy từ <b>sổ cái PM / PC của FPS</b> qua hợp đồng dữ liệu (§5).
   Hình, bảng mũi tên, bảng kiểm cạnh và khung chi tiết <b>sinh từ cùng một bản khai</b> (<code>docs/ITL/_tools/sinh_voi_phase1.py</code>); máy kiểm hình trước khi ghi.<br>
   Nửa phải của hình 1 là luồng <b>AS-IS</b> lấy từ sơ đồ "Voi ITL AS-IS" (<code>docs/ITL/_tools/voi_asis_goc.json</code>).<br>
   PD Now là bản gốc tham khảo: trang này chỉ mượn <b>thuật ngữ</b> (PE · PI · PM · PC · LE · CDT · HD/KRF · Reference No · General Trustest), không dùng tên sheet, tên file hay bước tính của nó. Mã FLS @ <code>2d1b710</code>.</p>
@@ -2483,6 +2484,7 @@ def trang() -> str:
 <p>Mỗi nguồn vào và mỗi đầu ra mang một nhãn ở góc trên-trái của hộp: <b>MÁY</b> (hệ sinh, không ai gõ) · <b>NGƯỜI</b> (người gõ, dán hoặc ký) · <b>NGƯỜI+MÁY</b> (người nhập, máy sinh sổ; hoặc máy đề xuất, người chốt). Chỗ nào có tay người là chỗ cần một cổng canh, ghi ở cột cuối.</p>
 """, bang_nm(), """
 <h2>§2 · Đã sửa gì</h2>
+<p class="note"><b>v0.6.1 (owner, 06/11, bình luận trên hình):</b> đổi tên bốn agent — Agent 1 <b>Collect_raw_data</b> · Agent 2 <b>Generate Group Ledger (ITL raw)</b> · Agent 3 <b>Filter Fulfill &amp; Adjust (ITL Adjust)</b> · Agent 4 <b>Auditor (Compounding Loop)</b>. Phạm vi hộp của từng agent giữ nguyên. Nguồn PP (3) theo PD Now: GI · OMC từ Looker, SC · PS từ Google Sheets.</p>
 <p class="note"><b>v0.6 (KhanhCQ, 06/11):</b> tách hai trang; nhúng bản kiểm TO-BE theo AS-IS (§1a) và bản AP fleet eval. <b>Agent kiểm dùng mô hình khác agent làm:</b> A4 SOÁT chạy gpt-oss-20b, A1–A3 chạy Qwen 3.8-27B; nhãn mô hình hiện trên từng nhãn agent ở lề trái hình 1.</p>
 <p class="note"><b>v0.5 (KhanhCQ, 06/11):</b> <b>TO-BE thay thế, cải tiến và bao gồm AS-IS</b> — không chạy song song (kiểm từng bước: <code>docs/ITL/02_BA/Artifacts/Kiem-TOBE-theo-ASIS.md</code>). Agent dự kiến: <b>Qwen 3.8-27B chạy local</b>. PP (2) <b>nạp thẳng sổ H1000</b> (đã tách HD · CDT1 · pháp nhân tới từng nhân viên) và nối giao dịch bank theo Số CT, bỏ phép tự khớp Σ đợt theo venture. PP (3) đi qua <b>PE/PM</b> bằng Combine Code rồi tới bank txns, chia theo <b>CDT1</b>. SC = server cost. Pháp nhân TK lấy từ <b>tên sheet R + Mapping Master</b>; ảnh đọc thêm <code>Reference number_adjust</code> (người đè mã). Ô bỏ trống ở vùng chỉnh tay <b>giữ giá trị mặc định như AS-IS</b> (parity: CDT1 = SHQ2, ID đối tác = VD0, …).</p>
 <p class="note"><b>v0.4.1 (owner, 06/11):</b> nửa TO-BE hiện rõ các agent — mỗi agent một <b>dải màu</b> trải ngang (cùng màu nhãn ở lề); Agent 3 tách thành <b>ba agent mapping</b> A3.1 (PP 1 · Reference No) · A3.2 (PP 2 · lương / BH) · A3.3 (PP 3 · nền tảng), chip trên hộp bấm được. Thêm <b>§8</b>: chi phí máy chủ ↔ mô hình mã nguồn mở tự huấn luyện.</p>
@@ -2564,7 +2566,7 @@ def trang() -> str:
 <tr><td>5</td><td>⭐ <b>Đã trả lời 06/11:</b> chia theo <b>CDT1</b> (như AS-IS), qua PE/PM. Câu cũ: PP (3): "venture" khi allocate là <b>LE</b> hay <b>CDT1</b>? Tỉ lệ chia lấy từ cột nào của file Looker? AP/AR lùi khỏi GĐ1?</td><td>Owner 04/11 chốt OMC · GI · SC · PS là chi phí, mapping với bank txns rồi allocate về ventures — thay câu cũ "GI/OMC không vào sổ"</td><td>bước 5</td></tr>
 </tbody></table></div>
 """, bang_chi_phi(), '</section><section class="trang" id="trang-2" hidden>', bang_fleet_eval(), '</section>', """
-<footer>Voi FLS-tobe-phase1 v0.6 · 2026-11-06 · Trang 1 mapping TO-BE ↔ AS-IS · Trang 2 fleet eval · sinh bởi <code>docs/ITL/_tools/sinh_voi_phase1.py</code> · cùng bộ với <code>_PD_NOW_VOI_VA_GIAI_DOAN.md</code>.</footer>
+<footer>Voi FLS-tobe-phase1 v0.6.1 · 2026-11-06 · Trang 1 mapping TO-BE ↔ AS-IS · Trang 2 fleet eval · sinh bởi <code>docs/ITL/_tools/sinh_voi_phase1.py</code> · cùng bộ với <code>_PD_NOW_VOI_VA_GIAI_DOAN.md</code>.</footer>
 </main>
 <aside class="khung-ct" id="khung-ct" hidden aria-label="Chi tiết phần đang chọn">
   <div class="dong"><span class="eb" style="font:600 11px var(--mono);letter-spacing:.06em;color:var(--muted)">CHI TIẾT</span><button class="dong-x" id="nut-dong" type="button" aria-label="Đóng khung chi tiết">×</button></div>

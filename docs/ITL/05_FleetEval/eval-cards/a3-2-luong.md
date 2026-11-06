@@ -1,4 +1,4 @@
-# Thẻ eval: `a3-2-luong` — MAPPING PP (2) · dòng lương H1000 ↔ bank txns
+# Thẻ eval: `a3-2-luong` — A3.2 · Filter Fulfill & Adjust · PP (2) · dòng lương H1000 ↔ bank txns
 
 Phần chung: `_chung.md`. Trạng thái: nháp.
 

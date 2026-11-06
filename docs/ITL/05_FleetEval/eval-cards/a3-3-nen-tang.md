@@ -1,4 +1,4 @@
-# Thẻ eval: `a3-3-nen-tang` — MAPPING PP (3) · chi phí nền tảng ↔ PE/PM ↔ bank txns
+# Thẻ eval: `a3-3-nen-tang` — A3.3 · Filter Fulfill & Adjust · PP (3) · chi phí nền tảng ↔ PE/PM ↔ bank txns
 
 Phần chung: `_chung.md`. Trạng thái: nháp.
 

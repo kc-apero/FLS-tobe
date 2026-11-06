@@ -1,4 +1,4 @@
-# Thẻ eval: `a4-soat` — SOÁT (agent chấm)
+# Thẻ eval: `a4-soat` — A4 · Auditor (Compounding Loop) · agent chấm
 
 Phần chung: `_chung.md`. Trạng thái: nháp. **JUDGE**: agent này chấm agent khác ⇒ phải có fleet eval riêng.
 

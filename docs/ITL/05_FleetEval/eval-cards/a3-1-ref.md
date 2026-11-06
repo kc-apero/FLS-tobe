@@ -1,4 +1,4 @@
-# Thẻ eval: `a3-1-ref` — MAPPING PP (1) · bank txns ↔ lệnh chi theo Reference No
+# Thẻ eval: `a3-1-ref` — A3.1 · Filter Fulfill & Adjust · PP (1) · bank txns ↔ lệnh chi theo Reference No
 
 Phần chung: `_chung.md`. Trạng thái: nháp.
 
