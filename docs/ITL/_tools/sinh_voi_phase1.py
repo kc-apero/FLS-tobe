@@ -825,6 +825,29 @@ AGENT = {   # mã: (dải, nhãn ngắn, tên, luồng ≤ 5 bước, hộp thu�
 }
 AG_THEO_DAI = {v[0]: k for k, v in AGENT.items()}
 
+# ── owner 06/11: "phần TO-BE thể hiện rõ được các agents mapping" ⇒ Agent 3 tách ba agent con, mỗi PP một con,
+#    nối nhau bằng phần CHƯA khớp (q1 · q2). Chip "A3.1 / A3.2 / A3.3" trên hộp MAPPING bấm được.
+AGENT_CON = {   # mã: (agent cha, chip, tên, luồng ≤ 5 bước, hộp)
+    "ag3a": ("ag3", "A3.1", "Agent 3.1 · MAPPING PP (1) — bank txns ↔ lệnh chi", (
+        "Nhận dòng tiền hai vế (Agent 2) và dòng lệnh PM / PC",
+        "Vế Có: Reference No → PM line; Σ tiền các line = tiền giao dịch, lệch ⇒ chặn",
+        "Vế Nợ: luật vế Nợ (nội bộ · doanh thu · hoàn tiền · vay và lãi)",
+        "Xếp L1 · L1b · L2 · L3; L3 đi qua vòng cộng dồn (hình 2) để được gợi ý loại giao dịch",
+        "Chuyển L3 còn lại cho Agent 3.2 (q1)"), ("ghep",)),
+    "ag3b": ("ag3", "A3.2", "Agent 3.2 · MAPPING PP (2) — đợt lương · BH ↔ bank txns", (
+        "Nhận L3 từ Agent 3.1 và đợt lương / BHXH / BHYT (Agent 2)",
+        "Lọc giao dịch từ TK chi lương",
+        "Khớp Σ một đợt của một venture trong kỳ",
+        "Khớp ⇒ gắn LE venture (GĐ2: xuống KRF)",
+        "Chuyển phần còn lại cho Agent 3.3 (q2)"), ("ghep2",)),
+    "ag3c": ("ag3", "A3.3", "Agent 3.3 · MAPPING PP (3) — 4 chi phí nền tảng ↔ bank txns", (
+        "Nhận giao dịch còn lại và chi phí OMC · GI · Server · PS (Agent 2)",
+        "Áp luật của từng loại: nhận diện giao dịch · khớp kỳ · khớp Σ tiền",
+        "Khớp ⇒ allocate tiền giao dịch về venture theo tỉ lệ",
+        "Chưa khớp ⇒ ở lại L3, vào hàng chờ có lý do",
+        "Ra: mối nối, phần chia và dòng chưa khớp cho Agent 4"), ("ghep3",)),
+}
+
 PP_LUONG = {
     "pp1": ("Phương pháp (1) · mapping với bank transaction", (
         "Kế toán dán sao kê, ghi sổ quỹ, nhập số dư CCR ở Google Sheets",
@@ -1090,6 +1113,13 @@ def gan_luong() -> list[str]:
         if not 1 <= len(buoc) <= 5:
             loi.append(f"luồng {ma}: {len(buoc)} bước (phải 1–5)")
         tat_ca[ma].luong = buoc
+    for k, (cha, _c, _t, buoc, tv) in AGENT_CON.items():
+        if not 1 <= len(buoc) <= 5:
+            loi.append(f"{k}: {len(buoc)} bước")
+        loi += [f"{k}: hộp {m} không thuộc agent cha {cha}" for m in tv if m not in AGENT[cha][4]]
+    con_phu = sorted(m for v in AGENT_CON.values() for m in v[4])
+    if con_phu != sorted(AGENT["ag3"][4]):
+        loi.append(f"agent con phải phủ ĐÚNG hộp của Agent 3: {con_phu} ≠ {sorted(AGENT['ag3'][4])}")
     for k, (d, _n, _t, buoc, tv) in AGENT.items():
         if not 1 <= len(buoc) <= 5:
             loi.append(f"{k}: {len(buoc)} bước")
@@ -1278,6 +1308,10 @@ def svg() -> str:
     for v, (n1, _n2, y0, y1) in VUNG.items():
         o.append(f'<rect class="vz vz-{v}" x="{C0[0] - 4}" y="{y0}" width="{xr - C0[0] + 4}" height="{y1 - y0}" rx="5"/>')
         o.append(f'<rect class="vz vz-asis" x="{xa}" y="{y0}" width="{W - 2 - xa}" height="{y1 - y0}" rx="5"/>')
+    # ── dải màu của 4 agent: trải ngang nửa TO-BE, cùng màu với nhãn ở lề ──
+    for k, (d, *_r) in AGENT.items():
+        _v, y0, h, _nh = DAI[d]
+        o.append(f'<rect class="ag-dai ag-dai-{k}" x="16" y="{y0 - 5}" width="{xr - 16}" height="{h + 10}" rx="6"/>')
     # ── dải chữ dọc tên vùng (lề trái) ──
     for nh, y0, y1 in (("NGUỒN", yt0, yt1),) + tuple((n1, y0, y1) for n1, _n2, y0, y1 in VUNG.values()):
         ym = (y0 + y1) / 2
@@ -1289,8 +1323,8 @@ def svg() -> str:
         if d in AG_THEO_DAI:
             k = AG_THEO_DAI[d]
             o.append(f'<g class="pp-nhan ag-nhan" data-id="h:{k}" tabindex="0" role="button" aria-label="{E(AGENT[k][2])}">'
-                     f'<rect class="ag-the" x="20" y="{y0 + 1}" width="76" height="{h - 2}" rx="5"/>'
-                     f'<text class="ag-so" x="25" y="{y0 + h / 2 - 3}">{E(AGENT[k][1])} ▸</text>'
+                     f'<rect class="ag-the ag-the-{k}" x="20" y="{y0 + 1}" width="76" height="{h - 2}" rx="5"/>'
+                     f'<text class="ag-so ag-so-{k}" x="25" y="{y0 + h / 2 - 3}">{E(AGENT[k][1])} ▸</text>'
                      f'<text class="ag-ten" x="25" y="{y0 + h / 2 + 11}">{E(nh.replace(" & ", "·"))}</text></g>')
             continue
         o.append(f'<text class="br" x="22" y="{y0 + h / 2 + 4}">{E(nh)}</text>')
@@ -1306,6 +1340,13 @@ def svg() -> str:
         y0, y1 = DAI[d0][1] - 4, DAI[d1][1] + DAI[d1][2] + 4
         o.append(f'<rect class="khung-pp1" x="{x0}" y="{y0}" width="{x1 - x0}" height="{y1 - y0}" rx="5"/>')
     ve_gon(o, HOP, TEN, HOP_THEO)
+    for k, (_cha, chip, ten_c, _b, tv) in AGENT_CON.items():    # chip agent con, mép trên-phải hộp MAPPING
+        h = HOP_THEO[tv[0]]
+        bw = 9 + 5.6 * len(chip)
+        bx = h.x[1] - 6 - bw
+        o.append(f'<g class="pp-nhan ag-chip" data-id="h:{k}" tabindex="0" role="button" aria-label="{E(ten_c)}">'
+                 f'<rect class="ag-the ag-the-ag3 ag-chip-n" x="{bx:.1f}" y="{h.y[0] - 7}" width="{bw:.1f}" height="13" rx="6.5"/>'
+                 f'<text class="ag-so ag-so-ag3 ag-chip-t" x="{bx + bw / 2:.1f}" y="{h.y[0] + 2.5}" text-anchor="middle">{E(chip)}</text></g>')
     ve_gon(o, HOP_A, TEN_A, HOP_A_THEO)
     o.append('</svg>')
     return "\n".join(o)
@@ -1491,6 +1532,7 @@ def vao_ra() -> tuple[dict, dict]:
 
 NHOM_LUONG = [
     ("Bốn agent và ba phương pháp", [("Bốn agent · FLS · NẠP", ["ag1", "ag2", "ag3", "ag4"]),
+                                     ("Agent 3 tách ba agent mapping — mỗi phương pháp một con", ["ag3a", "ag3b", "ag3c"]),
                                      ("Ba phương pháp · luồng trọn từ nguồn tới sổ", ["pp1", "pp2", "pp3"])]),
     ("FLS · NẠP", [("① KHAI & CHỤP", ["anhFPS", "khai", "anhTien", "anhHR", "anhNT"]),
                    ("② DỰNG", ["dLenh", "dTien", "dHR", "dNT"]),
@@ -1518,6 +1560,9 @@ def bang_luong() -> str:
                 if ma in AGENT:
                     _d, _n, ten, buoc, _tv = AGENT[ma]
                     tt = "agent · bước sau: AP → Flip eval"
+                elif ma in AGENT_CON:
+                    _c, _n, ten, buoc, _tv = AGENT_CON[ma]
+                    tt = "agent mapping · thuộc Agent 3"
                 elif ma in PP_LUONG:
                     ten, buoc, _tv = PP_LUONG[ma]
                     tt = "GĐ1 phải dựng"
@@ -1555,6 +1600,102 @@ def bang_lop() -> str:
         ai = " · ".join(NGAN[h.ma][0] for h in HOP_A if h.dai == d)
         o.append(f'<tr><td>{E(nh)}</td><td>{E(tb)}</td><td>{E(ai)}</td><td>{E(KHAC_LOP[d])}</td></tr>')
     o.append('</tbody></table></div>')
+    return "\n".join(o)
+
+
+# ═════════════════ §8 · CHI PHÍ SERVER ↔ MÔ HÌNH MỞ (owner 06/11) ═════════════════
+# ⚠ Mọi con số tiền dưới đây là GIÁ CÔNG BỐ tra ngày 06/11/2026 (nguồn ở cuối §8) nhân với GIẢ ĐỊNH khối lượng
+#   — ⛔ chưa đo trên FLS. Tính bằng máy ở đây để bảng và lời văn ⛔ lệch nhau (Đ4: mỗi số nói nó đếm gì).
+TOK_VAO, TOK_RA = 1000, 300           # token / dòng cần mô hình (giả định: luật + ngữ cảnh ~1.000 vào, ~300 ra gồm suy nghĩ)
+KHOI_LUONG = (10_000, 50_000)         # dòng cần mô hình / tháng — 2 kịch bản, ⛔ chưa đo
+GIA_API = {                           # $ / 1 triệu token (vào, ra) — bảng giá Anthropic, bộ nhớ đệm 06/10/2026
+    "Claude Haiku 5.5": (0.10, 0.50), "Claude Sonnet 5.5": (2.00, 10.00), "Claude Opus 5.5": (4.00, 20.00)}
+GIAM_LO = 0.5                         # Message Batches API: −50 %
+GPU_L40S = (0.79, 0.99)               # $ / giờ thuê theo nhu cầu (RunPod · Lambda, 2026)
+GPU_H100 = (2.01, 3.99)               # $ / giờ, nhà cung cấp chuyên GPU; hyperscaler $10–12
+GIO_THANG = 730
+LORA_LUOT = (2, 60)                   # $ tính toán cho MỘT lượt LoRA mô hình 8B (vài–10 giờ GPU)
+LORA_SO_LUOT = (1, 10)                # số lượt thử tới khi đạt
+
+
+def usd(x: float) -> str:
+    if x >= 100:
+        return f"${x:,.0f}".replace(",", ".")
+    return f"${x:.3f}".replace(".", ",") if x < 1 else f"${x:.2f}".replace(".", ",")
+
+
+def tp(x: float) -> str:
+    """số thập phân kiểu Việt: 0,79 — ⛔ trộn 0.79 với 0,79 trên cùng trang."""
+    return f"{x:g}".replace(".", ",")
+
+
+def so(n: float) -> str:
+    return f"{n:,.0f}".replace(",", ".")
+
+
+def gia_1000(model: str, lo: bool = True) -> float:
+    vao, ra = GIA_API[model]
+    g = (TOK_VAO * vao + TOK_RA * ra) / 1000   # $ / 1.000 dòng
+    return g * (GIAM_LO if lo else 1)
+
+
+def bang_chi_phi() -> str:
+    n1, n2 = KHOI_LUONG
+    gpu_ngay = tuple(30 * g for g in GPU_L40S)                 # lô 1 giờ/ngày
+    gpu_247 = tuple(GIO_THANG * g for g in GPU_L40S)
+    h100_247 = tuple(GIO_THANG * g for g in GPU_H100)
+    lora = (LORA_LUOT[0] * LORA_SO_LUOT[0], LORA_LUOT[1] * LORA_SO_LUOT[1])
+    hoa_von_sonnet = gpu_247[0] / gia_1000("Claude Sonnet 5.5") * 1000
+    hoa_von_haiku = gpu_247[0] / gia_1000("Claude Haiku 5.5") * 1000
+    k = lambda t: f"{so(t[0])}–{so(t[1])}"   # noqa: E731
+    o = ['''
+<h2>§8 · Chi phí: máy chủ ↔ mô hình mã nguồn mở tự huấn luyện</h2>
+<p><b>Câu hỏi trước tiên là agent nào cần mô hình.</b> Ba trong bốn agent chạy bằng luật, không cần mô hình — chi phí của chúng chỉ là <b>máy chủ</b>. Mô hình chỉ có việc ở <b>phần dư</b> của các agent mapping: dòng còn ở L3 sau khi luật đã chạy hết.</p>
+<div class="scroll"><table>
+<thead><tr><th>agent</th><th>việc</th><th>cần mô hình?</th></tr></thead><tbody>
+<tr class="chon" data-ref="h:ag1" tabindex="0"><td><b>Agent 1 · KHAI &amp; CHỤP</b></td><td>đọc chỉ-đọc theo bản khai, ghi ảnh</td><td>không — luật</td></tr>
+<tr class="chon" data-ref="h:ag2" tabindex="0"><td><b>Agent 2 · DỰNG</b></td><td>đặt kiểu, canon 36 trường, content_key</td><td>không — luật</td></tr>
+<tr class="chon" data-ref="h:ag3a" tabindex="0"><td><b>Agent 3.1 · MAPPING PP (1)</b></td><td>Reference No + Σ tiền → L1 · L2 · L3</td><td>L1 · L2: không. <b>L3: có thể</b> — suy diễn loại giao dịch từ diễn giải sao kê (vòng cộng dồn, hình 2)</td></tr>
+<tr class="chon" data-ref="h:ag3b" tabindex="0"><td><b>Agent 3.2 · MAPPING PP (2)</b></td><td>khớp Σ đợt lương / BH của venture</td><td>không — phép cộng</td></tr>
+<tr class="chon" data-ref="h:ag3c" tabindex="0"><td><b>Agent 3.3 · MAPPING PP (3)</b></td><td>nhận diện giao dịch OMC · GI · Server · PS</td><td><b>có thể</b> — khi từ khoá / vendor không đủ nhận diện</td></tr>
+<tr class="chon" data-ref="h:ag4" tabindex="0"><td><b>Agent 4 · SOÁT</b></td><td>9 luật · Σ · DIF CCR = 0</td><td>không — kiểm phải tất định</td></tr>
+</tbody></table></div>
+<h3>Giá đơn vị (công bố, tra 06/11/2026)</h3>
+<div class="scroll"><table>
+<thead><tr><th>khoản</th><th>giá</th><th>ghi chú</th></tr></thead><tbody>''']
+    for m, (vao, ra) in GIA_API.items():
+        o.append(f'<tr><td>API {E(m)}</td><td>${tp(vao)} vào · ${tp(ra)} ra / 1 triệu token</td>'
+                 f'<td>gửi theo lô (Batches API) giảm 50% ⇒ <b>{usd(gia_1000(m))}</b> / 1.000 dòng</td></tr>')
+    o.append(f'<tr><td>thuê GPU L40S (48 GB, đủ chạy mô hình mở 7–8B)</td><td>${tp(GPU_L40S[0])}–{tp(GPU_L40S[1])} / giờ</td><td>RunPod · Lambda, theo nhu cầu</td></tr>')
+    o.append(f'<tr><td>thuê GPU H100</td><td>${tp(GPU_H100[0])}–{tp(GPU_H100[1])} / giờ</td><td>nhà cung cấp chuyên GPU; hyperscaler $10–12; giá đang <b>tăng</b> trong 2026</td></tr>')
+    o.append(f'<tr><td>một lượt LoRA mô hình mở 8B</td><td>${LORA_LUOT[0]}–{LORA_LUOT[1]} tiền GPU</td><td>vài tới ~10 giờ GPU tuỳ số mẫu; tốn chủ yếu ở chạy lại và giờ máy rảnh</td></tr>')
+    o.append('</tbody></table></div>')
+    o.append(f'''<h3>Chi phí tháng theo phương án — phần mô hình, cộng thêm máy chủ FLS</h3>
+<p class="ghichu">Giả định (⛔ chưa đo): mỗi dòng cần mô hình ≈ {so(TOK_VAO)} token vào + {TOK_RA} token ra; {so(n1)} hoặc {so(n2)} dòng / tháng. Máy chủ FLS (PostgreSQL + Python) phương án nào cũng phải có, nên không cộng vào cột dưới.</p>''')
+    o.append(f'<div class="scroll"><table><thead><tr><th>phương án</th><th>một lần</th><th>/ tháng @ {so(n1)} dòng</th>'
+             f'<th>/ tháng @ {so(n2)} dòng</th><th>dữ liệu rời công ty?</th><th>đánh đổi</th></tr></thead><tbody>')
+    o.append('<tr><td><b>⓪ Chỉ luật + vòng cộng dồn</b> (không mô hình)</td><td>—</td><td>$0</td><td>$0</td><td>không</td><td>dòng L3 chưa có luật ở lại hàng chờ cho người</td></tr>')
+    for m in GIA_API:
+        g = gia_1000(m)
+        o.append(f'<tr><td>API {E(m)}, gửi theo lô</td><td>—</td><td>{usd(g * n1 / 1000)}</td><td>{usd(g * n2 / 1000)}</td>'
+                 f'<td><b>có</b> — diễn giải sao kê ra API ngoài</td><td>không giữ máy; chất lượng tiếng Việt phải đo</td></tr>')
+    o.append(f'<tr><td>Mô hình mở 8B tự chạy, <b>không</b> huấn luyện — GPU L40S theo lô 1 giờ/ngày</td><td>công dựng</td>'
+             f'<td colspan="2">${k(gpu_ngay)} cho 1 giờ GPU/ngày — đủ bao nhiêu dòng / giờ thì ⛔ chưa đo</td><td>không</td><td>người vận hành GPU; mô hình chưa quen chữ kế toán Việt</td></tr>')
+    o.append(f'<tr><td>Như trên, GPU L40S chạy 24/7 (trả lời ngay mỗi nhịp)</td><td>công dựng</td><td colspan="2">${k(gpu_247)}</td><td>không</td><td>trả tiền cả giờ rảnh</td></tr>')
+    o.append(f'<tr><td><b>Huấn luyện mô hình mở 8B (LoRA)</b> + tự chạy như trên</td><td>${k(lora)} tiền GPU ({LORA_SO_LUOT[0]}–{LORA_SO_LUOT[1]} lượt) + <b>công gắn nhãn</b></td>'
+             f'<td colspan="2">như dòng tự chạy: ${k(gpu_ngay)} theo lô · ${k(gpu_247)} 24/7</td><td>không</td><td>cần tập dòng L3 đã được kế toán xác nhận; huấn luyện lại khi luật / nguồn đổi</td></tr>')
+    o.append(f'<tr><td>Tự chạy trên H100 24/7 (mô hình lớn hơn)</td><td>công dựng</td><td colspan="2">${k(h100_247)}</td><td>không</td><td>chỉ đáng khi 8B không đủ đúng</td></tr>')
+    o.append('</tbody></table></div>')
+    o.append(f'''<p class="note"><b>Điểm hoà vốn.</b> GPU L40S chạy 24/7 (từ ~{usd(gpu_247[0])}/tháng) chỉ rẻ hơn API Sonnet 5.5 gửi theo lô khi vượt <b>~{so(hoa_von_sonnet)} dòng/tháng</b>, và rẻ hơn API Haiku 5.5 gửi theo lô khi vượt <b>~{so(hoa_von_haiku)} dòng/tháng</b>. Sổ FLS hôm nay có 8.387 dòng tiền tất cả — phần cần mô hình chỉ là phần dư L3 của số ấy. ⇒ Ở khối lượng này, <b>tiền GPU không phải lý do chọn mô hình mở</b>; lý do thật (nếu có) là <b>dữ liệu không được rời công ty</b>.</p>''')
+    o.append('''<p class="note"><b>Ba thứ không nằm trong bảng tiền:</b> ① <b>dữ liệu rời công ty</b> — diễn giải sao kê có tên người ~4,3–4,8% số ô (đo khi mở QĐ-ITL-128, <code>NFR-I13</code>); gửi ra API ngoài là quyết định của owner. ② <b>chất lượng chưa đo</b> — mô hình nào cũng phải chấm trên chính các dòng L3 kế toán đã xác nhận; vòng cộng dồn sinh ra tập này miễn phí, nó cũng là dữ liệu huấn luyện duy nhất cho phương án LoRA. ③ <b>người vận hành</b> — tự chạy GPU cần người giữ máy, cập nhật mô hình, canh hỏng; API thì không.</p>
+<p><b>Đề xuất thứ tự:</b> GĐ1 chạy phương án ⓪ và <b>đo</b> số dòng L3 còn lại mỗi tháng. Khi có ≥ vài trăm dòng đã xác nhận: chấm thử API Haiku 5.5 và Sonnet 5.5 gửi theo lô trên tập ấy (vài đô). Chỉ tính huấn luyện mô hình mở khi owner chốt <b>dữ liệu không ra ngoài</b>, hoặc khối lượng vượt điểm hoà vốn ở trên.</p>
+<p class="ghichu">Nguồn giá (tra 06/11/2026; giá đổi thường xuyên, xem lại trước khi chi): bảng giá API Anthropic (bộ nhớ đệm 06/10/2026, Batches −50%) ·
+<a href="https://www.spheron.network/blog/h100-price-per-hour-2026/">Spheron · H100 2026</a> ·
+<a href="https://intuitionlabs.ai/articles/h100-rental-prices-cloud-comparison">IntuitionLabs · H100 15 nhà cung cấp</a> ·
+<a href="https://gpu-cost.pages.dev/gpu/l40s/">gpu-cost · L40S</a> ·
+<a href="https://deploybase.ai/articles/l40s-on-runpod-pricing-specs-how-to-rent">DeployBase · L40S RunPod</a> ·
+<a href="https://www.techloy.com/fine-tuning-an-open-model-on-a-rented-gpu-what-an-hour-costs-in-2026/">Techloy · fine-tune trên GPU thuê 2026</a> ·
+<a href="https://io.net/p/faq-how-much-does-it-cost-to-fine-tune-an-llm">io.net · chi phí fine-tune</a>. Nhiều nguồn là blog của nhà cho thuê GPU, có thể lạc quan.</p>''')
     return "\n".join(o)
 
 
@@ -1617,6 +1758,10 @@ def du_lieu_js() -> str:
         hop[k] = {"ten": ten_ag, "loai": "agent", "tt": "b", "dong": [], "mono": "", "huy": [],
                   "dc": "owner 05/11 · bước sau: dựng AP → chạy Flip eval", "vung": "FLS · NẠP · bốn agent",
                   "dai": DAI[_d][3], "vao": [], "ra": [], "luong": list(buoc), "thanh_vien": list(tv)}
+    for k, (cha, _c, ten_c, buoc, tv) in AGENT_CON.items():
+        hop[k] = {"ten": ten_c, "loai": "agent con", "tt": "b", "dong": [], "mono": "", "huy": [],
+                  "dc": f"thuộc {AGENT[cha][2]} · bước sau: dựng AP → chạy Flip eval", "vung": "FLS · NẠP · agent mapping",
+                  "dai": DAI[AGENT[cha][0]][3], "vao": [], "ra": [], "luong": list(buoc), "thanh_vien": list(tv)}
     for k, (ten_pp, buoc, tv) in PP_LUONG.items():
         hop[k] = {"ten": ten_pp, "loai": "phương pháp", "tt": "q", "dong": [], "mono": "", "huy": [],
                   "dc": "bình luận owner 04/11 trên hình", "vung": "Ba phương pháp xử lý", "dai": "luồng trọn",
@@ -1670,6 +1815,7 @@ CSS = r"""
   --prop:#2f62c9; --prop-soft:#e4ecfb; --sel:#c2410c;
   --ext:#f1ece2; --zc:#eaf0f6; --zd:#eaf3ed; --ze:#f3eef6; --box:#ffffff; --orig:#fdf6e6;
   --za:#f0eee8; --asis:#8a6a44;
+  --ag1:#0f766e; --ag2:#6d28d9; --ag3:#c2410c; --ag4:#15803d;
   --sans:"IBM Plex Sans",system-ui,"Segoe UI",Arial,sans-serif;
   --mono:"IBM Plex Mono",ui-monospace,Consolas,monospace;
   --serif:"IBM Plex Serif",Georgia,serif;
@@ -1679,13 +1825,13 @@ CSS = r"""
   --accent:#8fb8e0; --accent-soft:#213041;
   --ok:#6fcf97; --ok-soft:#1d3729; --mid:#e2b45a; --mid-soft:#3a2f18; --no:#8d968f; --no-soft:#262b28;
   --prop:#86a8f0; --prop-soft:#1f2a44; --sel:#fb923c;
-  --ext:#29251e; --zc:#1a222a; --zd:#1a271f; --ze:#251f29; --box:#222926; --orig:#2d281c; --za:#22211e; --asis:#cfa977; color-scheme:dark }}
+  --ext:#29251e; --zc:#1a222a; --zd:#1a271f; --ze:#251f29; --box:#222926; --orig:#2d281c; --za:#22211e; --asis:#cfa977; --ag1:#2dd4bf; --ag2:#a78bfa; --ag3:#fb923c; --ag4:#4ade80; color-scheme:dark }}
 :root[data-theme="dark"]{
   --bg:#141815; --paper:#1c221f; --fg:#e5eae6; --muted:#a0aaa3; --line:#353d38;
   --accent:#8fb8e0; --accent-soft:#213041;
   --ok:#6fcf97; --ok-soft:#1d3729; --mid:#e2b45a; --mid-soft:#3a2f18; --no:#8d968f; --no-soft:#262b28;
   --prop:#86a8f0; --prop-soft:#1f2a44; --sel:#fb923c;
-  --ext:#29251e; --zc:#1a222a; --zd:#1a271f; --ze:#251f29; --box:#222926; --orig:#2d281c; --za:#22211e; --asis:#cfa977; color-scheme:dark }
+  --ext:#29251e; --zc:#1a222a; --zd:#1a271f; --ze:#251f29; --box:#222926; --orig:#2d281c; --za:#22211e; --asis:#cfa977; --ag1:#2dd4bf; --ag2:#a78bfa; --ag3:#fb923c; --ag4:#4ade80; color-scheme:dark }
 *{box-sizing:border-box}
 body{background:var(--bg);color:var(--fg);font:15px/1.55 var(--sans);margin:0;
   padding-block:0 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
@@ -1735,8 +1881,14 @@ figcaption{font-size:13px;color:var(--muted);margin:8px 2px 0;max-width:none}
 .nm{stroke-width:1} .nm-may{fill:var(--prop-soft);stroke:var(--prop)} .nm-nguoi{fill:var(--mid-soft);stroke:var(--mid)} .nm-ca{fill:var(--accent-soft);stroke:var(--accent)}
 .nmt{font:700 9px var(--mono)} .nmt-may{fill:var(--prop)} .nmt-nguoi{fill:var(--mid)} .nmt-ca{fill:var(--accent)}
 span.pill.nm-may{background:var(--prop-soft);color:var(--prop)} span.pill.nm-nguoi{background:var(--mid-soft);color:var(--mid)} span.pill.nm-ca{background:var(--accent-soft);color:var(--accent)}
-.ag-the{fill:var(--sel);opacity:.12;stroke:var(--sel);stroke-width:1.4}
-.ag-nhan:hover .ag-the,.ag-nhan:focus-visible .ag-the{opacity:.24}
+.ag-the{fill:var(--sel);fill-opacity:.12;stroke:var(--sel);stroke-width:1.4}
+.ag-the-ag1{fill:var(--ag1);stroke:var(--ag1)} .ag-the-ag2{fill:var(--ag2);stroke:var(--ag2)} .ag-the-ag3{fill:var(--ag3);stroke:var(--ag3)} .ag-the-ag4{fill:var(--ag4);stroke:var(--ag4)}
+.ag-so-ag1{fill:var(--ag1)} .ag-so-ag2{fill:var(--ag2)} .ag-so-ag3{fill:var(--ag3)} .ag-so-ag4{fill:var(--ag4)}
+.ag-dai{fill-opacity:.07;stroke-opacity:.45;stroke-width:1}
+.ag-dai-ag1{fill:var(--ag1);stroke:var(--ag1)} .ag-dai-ag2{fill:var(--ag2);stroke:var(--ag2)} .ag-dai-ag3{fill:var(--ag3);stroke:var(--ag3)} .ag-dai-ag4{fill:var(--ag4);stroke:var(--ag4)}
+.ag-chip-n{fill:var(--paper);fill-opacity:1} .ag-chip-t{font:700 8.5px var(--mono)}
+.ag-chip:hover .ag-chip-n,.ag-chip:focus-visible .ag-chip-n{fill:var(--mid-soft)}
+.ag-nhan:hover .ag-the,.ag-nhan:focus-visible .ag-the{fill-opacity:.26}
 .ag-so{font:700 11px var(--mono);fill:var(--sel);letter-spacing:.03em} .ag-ten{font:600 9.5px var(--sans);fill:var(--fg)}
 .pp-nhan{cursor:pointer} .pp-hit{fill:transparent} .pp-nhan:hover .pp-hit,.pp-nhan:focus-visible .pp-hit{fill:var(--mid-soft)}
 .pp-nhan:focus{outline:none} .pp-nhan:focus-visible .vt{text-decoration:underline}
@@ -2015,7 +2167,7 @@ JS = r"""
 THAN_TREN = """
 <header class="top">
   <h1>Voi FLS-tobe-phase1</h1>
-  <p class="meta"><b>v0.4 · 2026-11-06</b> · Giai đoạn 1: đi hết INPUT, về <b>một</b> bảng ITL, mọi dòng có pháp nhân. Lệnh chi lấy từ <b>sổ cái PM / PC của FPS</b> qua hợp đồng dữ liệu (§5).
+  <p class="meta"><b>v0.4.1 · 2026-11-06</b> · Giai đoạn 1: đi hết INPUT, về <b>một</b> bảng ITL, mọi dòng có pháp nhân. Lệnh chi lấy từ <b>sổ cái PM / PC của FPS</b> qua hợp đồng dữ liệu (§5).
   Hình, bảng mũi tên, bảng kiểm cạnh và khung chi tiết <b>sinh từ cùng một bản khai</b> (<code>docs/ITL/_tools/sinh_voi_phase1.py</code>); máy kiểm hình trước khi ghi.<br>
   Nửa phải của hình 1 là luồng <b>AS-IS</b> lấy từ sơ đồ "Voi ITL AS-IS" (<code>docs/ITL/_tools/voi_asis_goc.json</code>).<br>
   PD Now là bản gốc tham khảo: trang này chỉ mượn <b>thuật ngữ</b> (PE · PI · PM · PC · LE · CDT · HD/KRF · Reference No · General Trustest), không dùng tên sheet, tên file hay bước tính của nó. Mã FLS @ <code>2d1b710</code>.</p>
@@ -2058,6 +2210,7 @@ def trang() -> str:
          '<span><i class="ln ln-n"></i>đề xuất của trang này (chờ owner)</span>'
          '<span><i class="sw" style="border-left:4px solid var(--mid)"></i>NGƯỜI <i class="sw" style="border-left:4px solid var(--prop)"></i>MÁY <i class="sw" style="border-left:4px solid var(--accent)"></i>NGƯỜI+MÁY · vạch mép trái = nguồn do ai làm ra (§1e)</span>'
          '<span><span class="pill mid" style="font-size:10px">S1</span> huy hiệu = hộp do điểm khởi động S1 chạy</span><span><i class="sw" style="border:1.4px dashed var(--sel)"></i>PP (n) = phương pháp xử lý n</span>'
+         '<span><i class="sw" style="background:var(--ag1);opacity:.5"></i><i class="sw" style="background:var(--ag2);opacity:.5"></i><i class="sw" style="background:var(--ag3);opacity:.5"></i><i class="sw" style="background:var(--ag4);opacity:.5"></i>dải màu = việc của Agent 1–4 · chip A3.1–A3.3 = ba agent mapping</span>'
          '<span><i class="sw sw-a"></i>AS-IS (Sheets hôm nay)</span><span><i class="ln ln-a"></i>công thức / GScript</span><span><i class="ln ln-t"></i>người làm tay</span>'
          '<span><span class="pill mid" style="font-size:10px">TAY</span> có bước người bấm / gõ</span><span><b style="color:var(--sel)">!</b> AS-IS có lỗi đã ghi nhận</span>'
          '</div>',
@@ -2123,6 +2276,7 @@ def trang() -> str:
 <p>Mỗi nguồn vào và mỗi đầu ra mang một nhãn ở góc trên-trái của hộp: <b>MÁY</b> (hệ sinh, không ai gõ) · <b>NGƯỜI</b> (người gõ, dán hoặc ký) · <b>NGƯỜI+MÁY</b> (người nhập, máy sinh sổ; hoặc máy đề xuất, người chốt). Chỗ nào có tay người là chỗ cần một cổng canh, ghi ở cột cuối.</p>
 """, bang_nm(), """
 <h2>§2 · Đã sửa gì</h2>
+<p class="note"><b>v0.4.1 (owner, 06/11):</b> nửa TO-BE hiện rõ các agent — mỗi agent một <b>dải màu</b> trải ngang (cùng màu nhãn ở lề); Agent 3 tách thành <b>ba agent mapping</b> A3.1 (PP 1 · Reference No) · A3.2 (PP 2 · lương / BH) · A3.3 (PP 3 · nền tảng), chip trên hộp bấm được. Thêm <b>§8</b>: chi phí máy chủ ↔ mô hình mã nguồn mở tự huấn luyện.</p>
 <p class="note"><b>v0.4 (owner, 06/11):</b> đặt luồng <b>AS-IS</b> (sơ đồ "Voi ITL AS-IS") <b>cạnh</b> TO-BE trong <b>một</b> hình — AS-IS bên phải; AS-IS xếp vào đúng các lớp của TO-BE, <b>không sinh lớp mới</b>; 52 hộp gốc gộp thành 28 hộp, mỗi hộp gộp giữ đủ chi tiết gốc trong khung bấm. Bỏ bớt chữ để thu nhỏ: hộp chỉ còn tên + một dòng, nhãn máy/người thành vạch màu mép trái. Hai hộp FPS gộp thành <i>sổ cái PM · PC</i> (bỏ o2, x2). Mũi tên dọc nay tự đặt giữa phần hai hộp chồng nhau. Hình cao 736 thay vì 1.206.</p>
 <p class="note"><b>v0.3 (owner, 04/11):</b> nguồn FPS là <b>sổ cái PM / PC</b>, đã mang đủ chiều ⇒ bỏ hai hộp "phiếu PE·PI·PM·PC" và "danh mục FPS"; bước dựng đổi từ <i>DỰNG chuỗi phiếu</i> (đi PM → PI → PE) thành <i>DỰNG dòng lệnh</i> (đọc thẳng từng dòng sổ cái). Đề xuất pháp nhân TK (k1) nay đếm từ TK chi + pháp nhân thanh toán trên sổ cái PM.</p>
 <p class="note"><b>v0.3.1–v0.3.2 (owner, 04/11, bình luận trên hình):</b> tách riêng ba phương pháp xử lý nguồn Sheets. <b>(1) mapping với bank transaction</b> — đủ hai vế PS Nợ (tiền vào) và PS Có (tiền ra), soát số dư ngày theo CCR / CCR Cash — sao kê &amp; sổ quỹ: kế toán dán / ghi → bản khai nguồn → ảnh chụp đọc theo bản khai → DỰNG dòng tiền; dòng tiền chưa mang chiều chi phí nên phải <b>mapping với bank txns theo reference number</b> (hộp MAPPING: mã Reference number trên giao dịch ngân hàng ↔ cùng mã trên dòng sổ cái PM, chia tiền theo PM line). PP (2), (3) cũng mapping với bank txns nhưng bằng luật riêng (§1b, §1c), không qua Reference No của PM. Sửa tay (GHI tay → lớp sửa) là bước chung cho mọi dòng sổ, không riêng phương pháp nào. <b>(2) lương · BHXH · BHYT</b> — sổ lương HR: HR lập → ảnh sổ lương → DỰNG đợt lương · BH. <b>GĐ1:</b> luật mapping các đợt đi tiền lương / BHXH / BHYT của các venture với bank txns → gắn <b>LE</b> (§1b). <b>GĐ2:</b> mapping xuống <b>KRF</b>. <b>(3) 4 chi phí nền tảng OMC · GI · Server · PS</b> — không có trên FPS: xuất file từ data Looker → mapping với bank txns, mỗi loại một luật → allocate về các ventures (§1c). Vùng nguồn Sheets tách làm ba; hộp "ảnh sổ nhập tay" tách làm ba; mỗi phương pháp là một khung đi từ nguồn xuống tới bước dựng.</p>
@@ -2200,8 +2354,8 @@ def trang() -> str:
 <tr><td>4</td><td>HR và nền tảng: FLS đọc sổ ở Sheets như hôm nay, hay chờ hệ nguồn có hợp đồng?</td><td>Quyết định tuyến của x5/x6</td><td>bước 4–5</td></tr>
 <tr><td>5</td><td>PP (3): "venture" khi allocate là <b>LE</b> hay <b>CDT1</b>? Tỉ lệ chia lấy từ cột nào của file Looker? AP/AR lùi khỏi GĐ1?</td><td>Owner 04/11 chốt OMC · GI · Server · PS là chi phí, mapping với bank txns rồi allocate về ventures — thay câu cũ "GI/OMC không vào sổ"</td><td>bước 5</td></tr>
 </tbody></table></div>
-
-<footer>Voi FLS-tobe-phase1 v0.4 · 2026-11-06 · sinh bởi <code>docs/ITL/_tools/sinh_voi_phase1.py</code> · cùng bộ với <code>_PD_NOW_VOI_VA_GIAI_DOAN.md</code>.</footer>
+""", bang_chi_phi(), """
+<footer>Voi FLS-tobe-phase1 v0.4.1 · 2026-11-06 · sinh bởi <code>docs/ITL/_tools/sinh_voi_phase1.py</code> · cùng bộ với <code>_PD_NOW_VOI_VA_GIAI_DOAN.md</code>.</footer>
 </main>
 <aside class="khung-ct" id="khung-ct" hidden aria-label="Chi tiết phần đang chọn">
   <div class="dong"><span class="eb" style="font:600 11px var(--mono);letter-spacing:.06em;color:var(--muted)">CHI TIẾT</span><button class="dong-x" id="nut-dong" type="button" aria-label="Đóng khung chi tiết">×</button></div>
