@@ -1,0 +1,264 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1274 850" width="100%" role="img" aria-label="FLS phase 1 · vùng NẠP: sáu agent (Qwen 3.8-27B, chạy local) và fleet eval của từng agent: process bands by columns from human input to store, with a store, scrubber and improvement loop" font-family="-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">
+<defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#52606d"/></marker></defs>
+<rect x="0" y="0" width="1274" height="850" fill="#ffffff"/>
+<rect x="112.0" y="10" width="548.0" height="20" rx="4" fill="#f5f7fa"/>
+<text x="386.0" y="24.0" font-size="10" font-weight="bold" fill="#52606d" text-anchor="middle">BEFORE IT GOES LIVE</text>
+<rect x="706.0" y="10" width="268.0" height="20" rx="4" fill="#f5f7fa"/>
+<text x="840.0" y="24.0" font-size="10" font-weight="bold" fill="#52606d" text-anchor="middle">LIVE</text>
+<rect x="986.0" y="10" width="268.0" height="20" rx="4" fill="#f5f7fa"/>
+<text x="1120.0" y="24.0" font-size="10" font-weight="bold" fill="#52606d" text-anchor="middle">MEASURE AND KEEP</text>
+<text x="176.0" y="50.0" font-size="10.5" font-weight="bold" fill="#b91c1c" text-anchor="middle">NGƯỜI ĐƯA VÀO</text>
+<text x="316.0" y="50.0" font-size="10.5" font-weight="bold" fill="#6d28d9" text-anchor="middle">AGENT (LLM)</text>
+<text x="456.0" y="50.0" font-size="10.5" font-weight="bold" fill="#52606d" text-anchor="middle">ĐẦU RA</text>
+<text x="596.0" y="50.0" font-size="10.5" font-weight="bold" fill="#b91c1c" text-anchor="middle">NGƯỜI KIỂM</text>
+<text x="770.0" y="50.0" font-size="10.5" font-weight="bold" fill="#52606d" text-anchor="middle">VÀO SỔ</text>
+<text x="910.0" y="50.0" font-size="10.5" font-weight="bold" fill="#b91c1c" text-anchor="middle">NGƯỜI DÙNG</text>
+<text x="1050.0" y="50.0" font-size="10.5" font-weight="bold" fill="#1d4ed8" text-anchor="middle">FLEET EVAL</text>
+<text x="1190.0" y="50.0" font-size="10.5" font-weight="bold" fill="#0f766e" text-anchor="middle">LƯU</text>
+<rect x="668.0" y="64" width="28" height="582" rx="4" fill="#0f766e" fill-opacity="0.10" stroke="#0f766e" stroke-dasharray="3 3"/>
+<text x="686.0" y="355.0" font-size="9.5" font-weight="bold" fill="#0f766e" text-anchor="middle" transform="rotate(-90 686.0 355.0)">SCRUBBER</text>
+<rect x="8" y="70" width="94" height="82" rx="6" fill="#f5f7fa" stroke="#cbd2d9"/>
+<text x="55.0" y="115.0" font-size="12" font-weight="bold" fill="#1f2933" text-anchor="middle">① KHAI·CHỤP</text>
+<text x="55.0" y="129.0" font-size="8.5" font-weight="normal" fill="#52606d" text-anchor="middle">đọc nguồn</text>
+<rect x="112.0" y="70.0" width="128.0" height="74.0" rx="6" fill="#b91c1c" fill-opacity="0.04" stroke="#b91c1c" stroke-width="1.6"><title>KT ngân hàng · quỹ | kind: human | status: built | sub: dán sao kê R |, sổ quỹ, số dư CCR</title></rect>
+<text x="119.0" y="87.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">KT ngân hàng · quỹ</text>
+<text x="119.0" y="100.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">dán sao kê R |, sổ</text>
+<text x="119.0" y="113.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">quỹ, số dư CCR</text>
+<rect x="252.0" y="70.0" width="128.0" height="74.0" rx="6" fill="#6d28d9" fill-opacity="0.04" stroke="#6d28d9" stroke-width="1.6" stroke-dasharray="2 3"><title>A1 · KHAI &amp; CHỤP | kind: llm | status: proposed | sub: Qwen 3.8-27B local · v0</title></rect>
+<text x="259.0" y="87.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">A1 · KHAI &amp; CHỤP</text>
+<text x="259.0" y="100.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">Qwen 3.8-27B local ·</text>
+<text x="259.0" y="113.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">v0</text>
+<line x1="241.0" y1="107.0" x2="250.0" y2="107.0" stroke="#52606d" stroke-width="1.4" marker-end="url(#arr)"/>
+<rect x="392.0" y="70.0" width="128.0" height="74.0" rx="6" fill="#52606d" fill-opacity="0.04" stroke="#52606d" stroke-width="1.6" stroke-dasharray="7 4"><title>Bản khai + ảnh | kind: artefact | status: partial | sub: cột · thứ tự ngày · LE</title></rect>
+<text x="399.0" y="87.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">Bản khai + ảnh</text>
+<text x="399.0" y="100.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">cột · thứ tự ngày ·</text>
+<text x="399.0" y="113.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">LE</text>
+<line x1="381.0" y1="107.0" x2="390.0" y2="107.0" stroke="#52606d" stroke-width="1.4" marker-end="url(#arr)"/>
+<rect x="532.0" y="70.0" width="128.0" height="74.0" rx="6" fill="#b91c1c" fill-opacity="0.28" stroke="#b91c1c" stroke-width="1.6" stroke-dasharray="7 4"><title>KT khai, owner ký | kind: human | status: partial | weight: medium | freq: each | sub: mỗi nguồn mỗi version</title></rect>
+<text x="539.0" y="96.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">KT khai, owner ký</text>
+<text x="539.0" y="109.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">mỗi nguồn mỗi</text>
+<text x="539.0" y="122.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">version</text>
+<path d="M621.2 70.0 h32.8 a6 6 0 0 1 6 6 v10 h-38.8 z" fill="#b91c1c"/>
+<text x="640.6" y="81.5" font-size="8.5" font-weight="bold" fill="#ffffff" text-anchor="middle">EACH</text>
+<line x1="521.0" y1="107.0" x2="530.0" y2="107.0" stroke="#52606d" stroke-width="1.4" marker-end="url(#arr)"/>
+<rect x="986.0" y="70.0" width="128.0" height="74.0" rx="6" fill="#1d4ed8" fill-opacity="0.04" stroke="#1d4ed8" stroke-width="1.6" stroke-dasharray="2 3"><title>a1-khai-chup.eval.lech-cot-ngay | kind: fleet | status: proposed | freq: version | sample: ? nguồn | cost: ?</title></rect>
+<text x="993.0" y="96.0" font-size="9.6" font-weight="bold" fill="#1f2933" text-anchor="start">a1-khai-chup</text>
+<text x="993.0" y="109.0" font-size="9.6" font-weight="bold" fill="#1f2933" text-anchor="start">.eval.lech-cot-ngay</text>
+<text x="993.0" y="122.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">? nguồn</text>
+<text x="993.0" y="135.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">?</text>
+<path d="M1081.4 70.0 h26.6 a6 6 0 0 1 6 6 v10 h-32.6 z" fill="#1d4ed8"/>
+<text x="1097.7" y="81.5" font-size="8.5" font-weight="bold" fill="#ffffff" text-anchor="middle">VER</text>
+<line x1="661.0" y1="107.0" x2="984.0" y2="107.0" stroke="#52606d" stroke-width="1.4" marker-end="url(#arr)"/>
+<rect x="1126.0" y="70.0" width="128.0" height="74.0" rx="6" fill="#0f766e" fill-opacity="0.04" stroke="#0f766e" stroke-width="1.6"><title>fls_khai_cot | kind: store | status: built | sub: fls_chup · khai_version</title></rect>
+<text x="1133.0" y="87.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">fls_khai_cot</text>
+<text x="1133.0" y="100.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">fls_chup ·</text>
+<text x="1133.0" y="113.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">khai_version</text>
+<line x1="1115.0" y1="107.0" x2="1124.0" y2="107.0" stroke="#52606d" stroke-width="1.4" marker-end="url(#arr)"/>
+<rect x="8" y="170" width="94" height="82" rx="6" fill="#f5f7fa" stroke="#cbd2d9"/>
+<text x="55.0" y="215.0" font-size="12" font-weight="bold" fill="#1f2933" text-anchor="middle">② DỰNG</text>
+<text x="55.0" y="229.0" font-size="8.5" font-weight="normal" fill="#52606d" text-anchor="middle">chuẩn hoá dòng</text>
+<rect x="112.0" y="170.0" width="128.0" height="74.0" rx="6" fill="#b91c1c" fill-opacity="0.04" stroke="#b91c1c" stroke-width="1.6" stroke-dasharray="7 4"><title>Ảnh của A1 | kind: human | status: partial | sub: bank · quỹ · CCR · PM·PC</title></rect>
+<text x="119.0" y="187.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">Ảnh của A1</text>
+<text x="119.0" y="200.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">bank · quỹ · CCR ·</text>
+<text x="119.0" y="213.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">PM·PC</text>
+<rect x="252.0" y="170.0" width="128.0" height="74.0" rx="6" fill="#6d28d9" fill-opacity="0.04" stroke="#6d28d9" stroke-width="1.6" stroke-dasharray="2 3"><title>A2 · DỰNG | kind: llm | status: proposed | sub: Qwen 3.8-27B local · v0</title></rect>
+<text x="259.0" y="187.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">A2 · DỰNG</text>
+<text x="259.0" y="200.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">Qwen 3.8-27B local ·</text>
+<text x="259.0" y="213.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">v0</text>
+<line x1="241.0" y1="207.0" x2="250.0" y2="207.0" stroke="#52606d" stroke-width="1.4" marker-end="url(#arr)"/>
+<rect x="392.0" y="170.0" width="128.0" height="74.0" rx="6" fill="#52606d" fill-opacity="0.04" stroke="#52606d" stroke-width="1.6"><title>Dòng tiền hai vế | kind: artefact | status: built | sub: canon 36 · content_key</title></rect>
+<text x="399.0" y="187.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">Dòng tiền hai vế</text>
+<text x="399.0" y="200.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">canon 36 ·</text>
+<text x="399.0" y="213.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">content_key</text>
+<line x1="381.0" y1="207.0" x2="390.0" y2="207.0" stroke="#52606d" stroke-width="1.4" marker-end="url(#arr)"/>
+<rect x="532.0" y="170.0" width="128.0" height="74.0" rx="6" fill="#b91c1c" fill-opacity="0.28" stroke="#b91c1c" stroke-width="1.6"><title>KT xem trước lô | kind: human | status: built | weight: medium | freq: each | sub: F04 · S3</title></rect>
+<text x="539.0" y="202.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">KT xem trước lô</text>
+<text x="539.0" y="215.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">F04 · S3</text>
+<path d="M621.2 170.0 h32.8 a6 6 0 0 1 6 6 v10 h-38.8 z" fill="#b91c1c"/>
+<text x="640.6" y="181.5" font-size="8.5" font-weight="bold" fill="#ffffff" text-anchor="middle">EACH</text>
+<line x1="521.0" y1="207.0" x2="530.0" y2="207.0" stroke="#52606d" stroke-width="1.4" marker-end="url(#arr)"/>
+<rect x="986.0" y="170.0" width="128.0" height="74.0" rx="6" fill="#1d4ed8" fill-opacity="0.04" stroke="#1d4ed8" stroke-width="1.6" stroke-dasharray="2 3"><title>a2-dung.eval.mat-dong | kind: fleet | status: proposed | freq: version | sample: ? lô | cost: ?</title></rect>
+<text x="993.0" y="196.0" font-size="9.6" font-weight="bold" fill="#1f2933" text-anchor="start">a2-dung</text>
+<text x="993.0" y="209.0" font-size="9.6" font-weight="bold" fill="#1f2933" text-anchor="start">.eval.mat-dong</text>
+<text x="993.0" y="222.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">? lô</text>
+<text x="993.0" y="235.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">?</text>
+<path d="M1081.4 170.0 h26.6 a6 6 0 0 1 6 6 v10 h-32.6 z" fill="#1d4ed8"/>
+<text x="1097.7" y="181.5" font-size="8.5" font-weight="bold" fill="#ffffff" text-anchor="middle">VER</text>
+<line x1="661.0" y1="207.0" x2="984.0" y2="207.0" stroke="#52606d" stroke-width="1.4" marker-end="url(#arr)"/>
+<rect x="1126.0" y="170.0" width="128.0" height="74.0" rx="6" fill="#0f766e" fill-opacity="0.04" stroke="#0f766e" stroke-width="1.6"><title>fls_itl | kind: store | status: built | sub: fls_reject · run_id</title></rect>
+<text x="1133.0" y="193.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">fls_itl</text>
+<text x="1133.0" y="206.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">fls_reject · run_id</text>
+<line x1="1115.0" y1="207.0" x2="1124.0" y2="207.0" stroke="#52606d" stroke-width="1.4" marker-end="url(#arr)"/>
+<rect x="8" y="270" width="94" height="262" rx="6" fill="#f5f7fa" stroke="#cbd2d9"/>
+<text x="55.0" y="405.0" font-size="12" font-weight="bold" fill="#1f2933" text-anchor="middle">③ MAPPING</text>
+<text x="55.0" y="419.0" font-size="8.5" font-weight="normal" fill="#52606d" text-anchor="middle">nối lệnh chi</text>
+<rect x="112.0" y="270.0" width="128.0" height="74.0" rx="6" fill="#b91c1c" fill-opacity="0.04" stroke="#b91c1c" stroke-width="1.6"><title>Dòng tiền + lệnh | kind: human | status: built | sub: PM·PC, Ref do CA gõ</title></rect>
+<text x="119.0" y="293.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">Dòng tiền + lệnh</text>
+<text x="119.0" y="306.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">PM·PC, Ref do CA gõ</text>
+<rect x="252.0" y="270.0" width="128.0" height="74.0" rx="6" fill="#6d28d9" fill-opacity="0.04" stroke="#6d28d9" stroke-width="1.6" stroke-dasharray="2 3"><title>A3.1 · PP (1) Ref | kind: llm | status: proposed | sub: Qwen 3.8-27B local · v0</title></rect>
+<text x="259.0" y="287.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">A3.1 · PP (1) Ref</text>
+<text x="259.0" y="300.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">Qwen 3.8-27B local ·</text>
+<text x="259.0" y="313.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">v0</text>
+<line x1="241.0" y1="307.0" x2="250.0" y2="307.0" stroke="#52606d" stroke-width="1.4" marker-end="url(#arr)"/>
+<rect x="392.0" y="270.0" width="128.0" height="74.0" rx="6" fill="#52606d" fill-opacity="0.04" stroke="#52606d" stroke-width="1.6"><title>L1 · L2 · L3 | kind: artefact | status: built | sub: + gợi ý HD/CDT1</title></rect>
+<text x="399.0" y="293.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">L1 · L2 · L3</text>
+<text x="399.0" y="306.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">+ gợi ý HD/CDT1</text>
+<line x1="381.0" y1="307.0" x2="390.0" y2="307.0" stroke="#52606d" stroke-width="1.4" marker-end="url(#arr)"/>
+<rect x="532.0" y="270.0" width="128.0" height="74.0" rx="6" fill="#b91c1c" fill-opacity="0.28" stroke="#b91c1c" stroke-width="1.6" stroke-dasharray="7 4"><title>KT ghép · sửa F01 | kind: human | status: partial | weight: medium | freq: each | sub: S5 · dòng hàng chờ</title></rect>
+<text x="539.0" y="302.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">KT ghép · sửa F01</text>
+<text x="539.0" y="315.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">S5 · dòng hàng chờ</text>
+<path d="M621.2 270.0 h32.8 a6 6 0 0 1 6 6 v10 h-38.8 z" fill="#b91c1c"/>
+<text x="640.6" y="281.5" font-size="8.5" font-weight="bold" fill="#ffffff" text-anchor="middle">EACH</text>
+<line x1="521.0" y1="307.0" x2="530.0" y2="307.0" stroke="#52606d" stroke-width="1.4" marker-end="url(#arr)"/>
+<rect x="706.0" y="270.0" width="128.0" height="74.0" rx="6" fill="#52606d" fill-opacity="0.04" stroke="#52606d" stroke-width="1.6" stroke-dasharray="7 4"><title>Sổ hiệu lực | kind: artefact | status: partial | sub: → báo cáo daily CCR</title></rect>
+<text x="713.0" y="293.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">Sổ hiệu lực</text>
+<text x="713.0" y="306.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">→ báo cáo daily CCR</text>
+<line x1="661.0" y1="307.0" x2="704.0" y2="307.0" stroke="#52606d" stroke-width="1.4" marker-end="url(#arr)"/>
+<rect x="986.0" y="270.0" width="128.0" height="74.0" rx="6" fill="#1d4ed8" fill-opacity="0.04" stroke="#1d4ed8" stroke-width="1.6" stroke-dasharray="2 3"><title>a3-1-ref.eval.ghep-sai | kind: fleet | status: proposed | freq: version | sample: ? dòng | cost: ?</title></rect>
+<text x="993.0" y="296.0" font-size="9.6" font-weight="bold" fill="#1f2933" text-anchor="start">a3-1-ref</text>
+<text x="993.0" y="309.0" font-size="9.6" font-weight="bold" fill="#1f2933" text-anchor="start">.eval.ghep-sai</text>
+<text x="993.0" y="322.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">? dòng</text>
+<text x="993.0" y="335.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">?</text>
+<path d="M1081.4 270.0 h26.6 a6 6 0 0 1 6 6 v10 h-32.6 z" fill="#1d4ed8"/>
+<text x="1097.7" y="281.5" font-size="8.5" font-weight="bold" fill="#ffffff" text-anchor="middle">VER</text>
+<line x1="835.0" y1="307.0" x2="984.0" y2="307.0" stroke="#52606d" stroke-width="1.4" marker-end="url(#arr)"/>
+<rect x="1126.0" y="270.0" width="128.0" height="74.0" rx="6" fill="#0f766e" fill-opacity="0.04" stroke="#0f766e" stroke-width="1.6"><title>fls_pm_link | kind: store | status: built | sub: adjustment · journal</title></rect>
+<text x="1133.0" y="293.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">fls_pm_link</text>
+<text x="1133.0" y="306.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">adjustment · journal</text>
+<line x1="1115.0" y1="307.0" x2="1124.0" y2="307.0" stroke="#52606d" stroke-width="1.4" marker-end="url(#arr)"/>
+<rect x="112.0" y="360.0" width="128.0" height="74.0" rx="6" fill="#b91c1c" fill-opacity="0.04" stroke="#b91c1c" stroke-width="1.6"><title>Sổ H1000 đã tách | kind: human | status: built | sub: HD·CDT1 · số FT KT dán</title></rect>
+<text x="119.0" y="377.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">Sổ H1000 đã tách</text>
+<text x="119.0" y="390.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">HD·CDT1 · số FT KT</text>
+<text x="119.0" y="403.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">dán</text>
+<rect x="252.0" y="360.0" width="128.0" height="74.0" rx="6" fill="#6d28d9" fill-opacity="0.04" stroke="#6d28d9" stroke-width="1.6" stroke-dasharray="2 3"><title>A3.2 · PP (2) lương | kind: llm | status: proposed | sub: Qwen 3.8-27B local · v0</title></rect>
+<text x="259.0" y="377.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">A3.2 · PP (2)</text>
+<text x="259.0" y="390.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">lương</text>
+<text x="259.0" y="403.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">Qwen 3.8-27B local ·</text>
+<text x="259.0" y="416.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">v0</text>
+<line x1="241.0" y1="397.0" x2="250.0" y2="397.0" stroke="#52606d" stroke-width="1.4" marker-end="url(#arr)"/>
+<rect x="392.0" y="360.0" width="128.0" height="74.0" rx="6" fill="#52606d" fill-opacity="0.04" stroke="#52606d" stroke-width="1.6" stroke-dasharray="2 3"><title>Dòng lương ↔ bank | kind: artefact | status: proposed | sub: nối Số CT · pháp nhân</title></rect>
+<text x="399.0" y="377.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">Dòng lương ↔ bank</text>
+<text x="399.0" y="390.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">nối Số CT · pháp</text>
+<text x="399.0" y="403.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">nhân</text>
+<line x1="381.0" y1="397.0" x2="390.0" y2="397.0" stroke="#52606d" stroke-width="1.4" marker-end="url(#arr)"/>
+<rect x="706.0" y="360.0" width="128.0" height="74.0" rx="6" fill="#52606d" fill-opacity="0.04" stroke="#52606d" stroke-width="1.6" stroke-dasharray="2 3"><title>Sổ hiệu lực | kind: artefact | status: proposed | sub: cùng bảng ITL</title></rect>
+<text x="713.0" y="383.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">Sổ hiệu lực</text>
+<text x="713.0" y="396.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">cùng bảng ITL</text>
+<line x1="521.0" y1="397.0" x2="704.0" y2="397.0" stroke="#52606d" stroke-width="1.4" marker-end="url(#arr)"/>
+<rect x="986.0" y="360.0" width="128.0" height="74.0" rx="6" fill="#1d4ed8" fill-opacity="0.04" stroke="#1d4ed8" stroke-width="1.6" stroke-dasharray="2 3"><title>a3-2-luong.eval.noi-sai-dot | kind: fleet | status: proposed | freq: version | sample: ? đợt | cost: ?</title></rect>
+<text x="993.0" y="386.0" font-size="9.6" font-weight="bold" fill="#1f2933" text-anchor="start">a3-2-luong</text>
+<text x="993.0" y="399.0" font-size="9.6" font-weight="bold" fill="#1f2933" text-anchor="start">.eval.noi-sai-dot</text>
+<text x="993.0" y="412.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">? đợt</text>
+<text x="993.0" y="425.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">?</text>
+<path d="M1081.4 360.0 h26.6 a6 6 0 0 1 6 6 v10 h-32.6 z" fill="#1d4ed8"/>
+<text x="1097.7" y="371.5" font-size="8.5" font-weight="bold" fill="#ffffff" text-anchor="middle">VER</text>
+<line x1="835.0" y1="397.0" x2="984.0" y2="397.0" stroke="#52606d" stroke-width="1.4" marker-end="url(#arr)"/>
+<rect x="1126.0" y="360.0" width="128.0" height="74.0" rx="6" fill="#0f766e" fill-opacity="0.04" stroke="#0f766e" stroke-width="1.6" stroke-dasharray="2 3"><title>lớp sửa | kind: store | status: proposed | sub: chưa có bảng</title></rect>
+<text x="1133.0" y="383.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">lớp sửa</text>
+<text x="1133.0" y="396.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">chưa có bảng</text>
+<line x1="1115.0" y1="397.0" x2="1124.0" y2="397.0" stroke="#52606d" stroke-width="1.4" marker-end="url(#arr)"/>
+<rect x="112.0" y="450.0" width="128.0" height="74.0" rx="6" fill="#b91c1c" fill-opacity="0.04" stroke="#b91c1c" stroke-width="1.6"><title>File Looker + PE/PM | kind: human | status: built | sub: OMC · GI · SC · PS</title></rect>
+<text x="119.0" y="467.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">File Looker +</text>
+<text x="119.0" y="480.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">PE/PM</text>
+<text x="119.0" y="493.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">OMC · GI · SC · PS</text>
+<rect x="252.0" y="450.0" width="128.0" height="74.0" rx="6" fill="#6d28d9" fill-opacity="0.04" stroke="#6d28d9" stroke-width="1.6" stroke-dasharray="2 3"><title>A3.3 · PP (3) nền tảng | kind: llm | status: proposed | sub: Qwen 3.8-27B local · v0</title></rect>
+<text x="259.0" y="467.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">A3.3 · PP (3) nền</text>
+<text x="259.0" y="480.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">tảng</text>
+<text x="259.0" y="493.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">Qwen 3.8-27B local ·</text>
+<text x="259.0" y="506.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">v0</text>
+<line x1="241.0" y1="487.0" x2="250.0" y2="487.0" stroke="#52606d" stroke-width="1.4" marker-end="url(#arr)"/>
+<rect x="392.0" y="450.0" width="128.0" height="74.0" rx="6" fill="#52606d" fill-opacity="0.04" stroke="#52606d" stroke-width="1.6" stroke-dasharray="2 3"><title>Chi phí ↔ PE/PM ↔ bank | kind: artefact | status: proposed | sub: chia theo CDT1</title></rect>
+<text x="399.0" y="467.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">Chi phí ↔ PE/PM ↔</text>
+<text x="399.0" y="480.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">bank</text>
+<text x="399.0" y="493.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">chia theo CDT1</text>
+<line x1="381.0" y1="487.0" x2="390.0" y2="487.0" stroke="#52606d" stroke-width="1.4" marker-end="url(#arr)"/>
+<rect x="706.0" y="450.0" width="128.0" height="74.0" rx="6" fill="#52606d" fill-opacity="0.04" stroke="#52606d" stroke-width="1.6" stroke-dasharray="2 3"><title>Sổ hiệu lực | kind: artefact | status: proposed | sub: cùng bảng ITL</title></rect>
+<text x="713.0" y="473.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">Sổ hiệu lực</text>
+<text x="713.0" y="486.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">cùng bảng ITL</text>
+<line x1="521.0" y1="487.0" x2="704.0" y2="487.0" stroke="#52606d" stroke-width="1.4" marker-end="url(#arr)"/>
+<rect x="986.0" y="450.0" width="128.0" height="74.0" rx="6" fill="#1d4ed8" fill-opacity="0.04" stroke="#1d4ed8" stroke-width="1.6" stroke-dasharray="2 3"><title>a3-3-nen-tang.eval.chia-sai | kind: fleet | status: proposed | freq: version | sample: ? kỳ | cost: ?</title></rect>
+<text x="993.0" y="476.0" font-size="9.6" font-weight="bold" fill="#1f2933" text-anchor="start">a3-3-nen-tang</text>
+<text x="993.0" y="489.0" font-size="9.6" font-weight="bold" fill="#1f2933" text-anchor="start">.eval.chia-sai</text>
+<text x="993.0" y="502.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">? kỳ</text>
+<text x="993.0" y="515.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">?</text>
+<path d="M1081.4 450.0 h26.6 a6 6 0 0 1 6 6 v10 h-32.6 z" fill="#1d4ed8"/>
+<text x="1097.7" y="461.5" font-size="8.5" font-weight="bold" fill="#ffffff" text-anchor="middle">VER</text>
+<line x1="835.0" y1="487.0" x2="984.0" y2="487.0" stroke="#52606d" stroke-width="1.4" marker-end="url(#arr)"/>
+<rect x="1126.0" y="450.0" width="128.0" height="74.0" rx="6" fill="#0f766e" fill-opacity="0.04" stroke="#0f766e" stroke-width="1.6" stroke-dasharray="2 3"><title>lớp sửa | kind: store | status: proposed | sub: chưa có bảng</title></rect>
+<text x="1133.0" y="473.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">lớp sửa</text>
+<text x="1133.0" y="486.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">chưa có bảng</text>
+<line x1="1115.0" y1="487.0" x2="1124.0" y2="487.0" stroke="#52606d" stroke-width="1.4" marker-end="url(#arr)"/>
+<rect x="8" y="550" width="94" height="82" rx="6" fill="#f5f7fa" stroke="#cbd2d9"/>
+<text x="55.0" y="595.0" font-size="12" font-weight="bold" fill="#1f2933" text-anchor="middle">JUDGE</text>
+<text x="55.0" y="609.0" font-size="8.5" font-weight="normal" fill="#52606d" text-anchor="middle">④ SOÁT</text>
+<rect x="112.0" y="550.0" width="128.0" height="74.0" rx="6" fill="#b91c1c" fill-opacity="0.04" stroke="#b91c1c" stroke-width="1.6" stroke-dasharray="7 4"><title>Kết quả A2 · A3 | kind: human | status: partial | sub: + số dư CCR</title></rect>
+<text x="119.0" y="573.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">Kết quả A2 · A3</text>
+<text x="119.0" y="586.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">+ số dư CCR</text>
+<rect x="252.0" y="550.0" width="128.0" height="74.0" rx="6" fill="#6d28d9" fill-opacity="0.04" stroke="#6d28d9" stroke-width="1.6" stroke-dasharray="2 3"><title>A4 · SOÁT | kind: llm | status: proposed | sub: Qwen 3.8-27B local · v0</title></rect>
+<text x="259.0" y="567.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">A4 · SOÁT</text>
+<text x="259.0" y="580.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">Qwen 3.8-27B local ·</text>
+<text x="259.0" y="593.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">v0</text>
+<line x1="241.0" y1="587.0" x2="250.0" y2="587.0" stroke="#52606d" stroke-width="1.4" marker-end="url(#arr)"/>
+<rect x="392.0" y="550.0" width="128.0" height="74.0" rx="6" fill="#52606d" fill-opacity="0.04" stroke="#52606d" stroke-width="1.6" stroke-dasharray="7 4"><title>Đạt · CHẶN · CỜ | kind: artefact | status: partial | sub: DIF theo TK · ngày</title></rect>
+<text x="399.0" y="573.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">Đạt · CHẶN · CỜ</text>
+<text x="399.0" y="586.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">DIF theo TK · ngày</text>
+<line x1="381.0" y1="587.0" x2="390.0" y2="587.0" stroke="#52606d" stroke-width="1.4" marker-end="url(#arr)"/>
+<rect x="532.0" y="550.0" width="128.0" height="74.0" rx="6" fill="#b91c1c" fill-opacity="0.10" stroke="#b91c1c" stroke-width="1.6"><title>KT đọc biên bản | kind: human | status: built | weight: quick | freq: each | sub: 9 dòng · F04</title></rect>
+<text x="539.0" y="582.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">KT đọc biên bản</text>
+<text x="539.0" y="595.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">9 dòng · F04</text>
+<path d="M621.2 550.0 h32.8 a6 6 0 0 1 6 6 v10 h-38.8 z" fill="#b91c1c"/>
+<text x="640.6" y="561.5" font-size="8.5" font-weight="bold" fill="#ffffff" text-anchor="middle">EACH</text>
+<line x1="521.0" y1="587.0" x2="530.0" y2="587.0" stroke="#52606d" stroke-width="1.4" marker-end="url(#arr)"/>
+<rect x="986.0" y="550.0" width="128.0" height="74.0" rx="6" fill="#1d4ed8" fill-opacity="0.04" stroke="#1d4ed8" stroke-width="1.6" stroke-dasharray="2 3"><title>a4-soat.eval.lot-chan | kind: fleet | status: proposed | freq: version | sample: ? lô cài lỗi | cost: ?</title></rect>
+<text x="993.0" y="576.0" font-size="9.6" font-weight="bold" fill="#1f2933" text-anchor="start">a4-soat</text>
+<text x="993.0" y="589.0" font-size="9.6" font-weight="bold" fill="#1f2933" text-anchor="start">.eval.lot-chan</text>
+<text x="993.0" y="602.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">? lô cài lỗi</text>
+<text x="993.0" y="615.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">?</text>
+<path d="M1081.4 550.0 h26.6 a6 6 0 0 1 6 6 v10 h-32.6 z" fill="#1d4ed8"/>
+<text x="1097.7" y="561.5" font-size="8.5" font-weight="bold" fill="#ffffff" text-anchor="middle">VER</text>
+<line x1="661.0" y1="587.0" x2="984.0" y2="587.0" stroke="#52606d" stroke-width="1.4" marker-end="url(#arr)"/>
+<rect x="1126.0" y="550.0" width="128.0" height="74.0" rx="6" fill="#0f766e" fill-opacity="0.04" stroke="#0f766e" stroke-width="1.6" stroke-dasharray="7 4"><title>biên bản nạp | kind: store | status: partial | sub: fls_run</title></rect>
+<text x="1133.0" y="573.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">biên bản nạp</text>
+<text x="1133.0" y="586.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">fls_run</text>
+<line x1="1115.0" y1="587.0" x2="1124.0" y2="587.0" stroke="#52606d" stroke-width="1.4" marker-end="url(#arr)"/>
+<rect x="986.0" y="688.0" width="268.0" height="58.0" rx="6" fill="#0f766e" fill-opacity="0.04" stroke="#0f766e" stroke-width="1.6" stroke-dasharray="7 4"><title>STORE | kind: store | status: partial | sub: một bản ghi mỗi mục · lớp lưu giữ</title></rect>
+<text x="993.0" y="711.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">STORE</text>
+<text x="993.0" y="724.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">một bản ghi mỗi mục · lớp lưu giữ</text>
+<rect x="706.0" y="688.0" width="268.0" height="58.0" rx="6" fill="#0f766e" fill-opacity="0.04" stroke="#0f766e" stroke-width="1.6" stroke-dasharray="2 3"><title>SCRUBBER | kind: store | status: proposed | sub: tên người, số TK, diễn giải, khoá bí mật</title></rect>
+<text x="713.0" y="711.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">SCRUBBER</text>
+<text x="713.0" y="724.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">tên người, số TK, diễn giải, khoá bí mật</text>
+<rect x="252.0" y="688.0" width="408.0" height="58.0" rx="6" fill="#6d28d9" fill-opacity="0.04" stroke="#6d28d9" stroke-width="1.6" stroke-dasharray="2 3"><title>IMPROVE EACH AGENT | kind: llm | status: proposed | sub: luật · tham chiếu · cặp ưu tiên · ca kiểm mới</title></rect>
+<text x="259.0" y="711.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">IMPROVE EACH AGENT</text>
+<text x="259.0" y="724.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">luật · tham chiếu · cặp ưu tiên · ca kiểm mới</text>
+<line x1="1190.0" y1="630.0" x2="1190.0" y2="686.0" stroke="#52606d" stroke-width="1.4" marker-end="url(#arr)"/>
+<text x="1184.0" y="674.0" font-size="9" font-weight="normal" fill="#52606d" text-anchor="end">human + fleet data</text>
+<line x1="985.0" y1="717.0" x2="976.0" y2="717.0" stroke="#52606d" stroke-width="1.4" marker-end="url(#arr)"/>
+<line x1="705.0" y1="717.0" x2="662.0" y2="717.0" stroke="#52606d" stroke-width="1.4" marker-end="url(#arr)"/>
+<line x1="316.0" y1="687.0" x2="316.0" y2="632.0" stroke="#52606d" stroke-width="1.4" marker-end="url(#arr)" stroke-dasharray="4 3"/>
+<text x="322.0" y="674.0" font-size="9" font-weight="normal" fill="#52606d" text-anchor="start">back into each LLM</text>
+<text x="112.0" y="772.0" font-size="9.5" font-weight="bold" fill="#52606d" text-anchor="start">Kind</text>
+<rect x="112" y="780" width="14" height="12" rx="2" fill="#b91c1c" fill-opacity="0.28" stroke="#b91c1c"/>
+<text x="131.0" y="790.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">a person</text>
+<rect x="230" y="780" width="14" height="12" rx="2" fill="#6d28d9" fill-opacity="0.28" stroke="#6d28d9"/>
+<text x="249.0" y="790.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">an LLM agent</text>
+<rect x="348" y="780" width="14" height="12" rx="2" fill="#52606d" fill-opacity="0.28" stroke="#52606d"/>
+<text x="367.0" y="790.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">artefact or step</text>
+<rect x="466" y="780" width="14" height="12" rx="2" fill="#1d4ed8" fill-opacity="0.28" stroke="#1d4ed8"/>
+<text x="485.0" y="790.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">fleet eval</text>
+<rect x="584" y="780" width="14" height="12" rx="2" fill="#0f766e" fill-opacity="0.28" stroke="#0f766e"/>
+<text x="603.0" y="790.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">store and scrub</text>
+<text x="112.0" y="812.0" font-size="9.5" font-weight="bold" fill="#52606d" text-anchor="start">Status (line) · weight (fill) · ask frequency (corner flag)</text>
+<rect x="112" y="820" width="26" height="12" rx="2" fill="none" stroke="#1f2933" stroke-width="1.6"/>
+<text x="143.0" y="830.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">BUILT</text>
+<rect x="212" y="820" width="26" height="12" rx="2" fill="none" stroke="#1f2933" stroke-width="1.6" stroke-dasharray="7 4"/>
+<text x="243.0" y="830.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">PARTIAL</text>
+<rect x="312" y="820" width="26" height="12" rx="2" fill="none" stroke="#1f2933" stroke-width="1.6" stroke-dasharray="2 3"/>
+<text x="343.0" y="830.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">PROPOSED</text>
+<rect x="412" y="820" width="26" height="12" rx="2" fill="#b91c1c" fill-opacity="0.10" stroke="#b91c1c"/>
+<text x="443.0" y="830.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">QUICK</text>
+<rect x="504" y="820" width="26" height="12" rx="2" fill="#b91c1c" fill-opacity="0.28" stroke="#b91c1c"/>
+<text x="535.0" y="830.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">MEDIUM</text>
+<rect x="596" y="820" width="26" height="12" rx="2" fill="#b91c1c" fill-opacity="0.50" stroke="#b91c1c"/>
+<text x="627.0" y="830.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">DEEP</text>
+<text x="688.0" y="830.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">EACH = every item · VER = once per version · 10% = a sample</text>
+</svg>

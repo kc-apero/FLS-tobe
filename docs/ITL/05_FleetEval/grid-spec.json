@@ -1,0 +1,104 @@
+{
+  "title": "FLS phase 1 · vùng NẠP: sáu agent (Qwen 3.8-27B, chạy local) và fleet eval của từng agent",
+  "version": "1.0.0",
+  "_comment": "Nguồn: artifact Voi FLS-tobe-phase1 v0.4.1 + Kiem-TOBE-theo-ASIS.md + trả lời owner 06/11. Agent LLM chưa chạy (PROPOSED); bản mã tất định hôm nay là phiên bản gốc để so 'không tệ hơn bản trước'. Số mẫu và chi phí chưa có: để '?' — là câu hỏi mở, không đoán.",
+  "column_labels": {"human_in": "NGƯỜI ĐƯA VÀO", "llm": "AGENT (LLM)", "output": "ĐẦU RA", "human_check": "NGƯỜI KIỂM", "publish": "VÀO SỔ", "human_use": "NGƯỜI DÙNG", "fleet_eval": "FLEET EVAL", "store": "LƯU"},
+  "bands": [
+    {
+      "name": "① KHAI·CHỤP",
+      "note": "đọc nguồn",
+      "agents": [
+        {
+          "id": "a1-khai-chup",
+          "boxes": {
+            "human_in": {"label": "KT ngân hàng · quỹ", "sub": "dán sao kê R |, sổ quỹ, số dư CCR", "status": "built"},
+            "llm": {"label": "A1 · KHAI & CHỤP", "sub": "Qwen 3.8-27B local · v0", "status": "proposed"},
+            "output": {"label": "Bản khai + ảnh", "sub": "cột · thứ tự ngày · LE", "status": "partial"},
+            "human_check": {"label": "KT khai, owner ký", "sub": "mỗi nguồn mỗi version", "status": "partial", "weight": "medium", "freq": "each"},
+            "fleet_eval": {"check": "a1-khai-chup.eval.lech-cot-ngay", "sample": "? nguồn", "cost": "?", "status": "proposed", "freq": "version"},
+            "store": {"label": "fls_khai_cot", "sub": "fls_chup · khai_version", "status": "built"}
+          }
+        }
+      ]
+    },
+    {
+      "name": "② DỰNG",
+      "note": "chuẩn hoá dòng",
+      "agents": [
+        {
+          "id": "a2-dung",
+          "boxes": {
+            "human_in": {"label": "Ảnh của A1", "sub": "bank · quỹ · CCR · PM·PC", "status": "partial"},
+            "llm": {"label": "A2 · DỰNG", "sub": "Qwen 3.8-27B local · v0", "status": "proposed"},
+            "output": {"label": "Dòng tiền hai vế", "sub": "canon 36 · content_key", "status": "built"},
+            "human_check": {"label": "KT xem trước lô", "sub": "F04 · S3", "status": "built", "weight": "medium", "freq": "each"},
+            "fleet_eval": {"check": "a2-dung.eval.mat-dong", "sample": "? lô", "cost": "?", "status": "proposed", "freq": "version"},
+            "store": {"label": "fls_itl", "sub": "fls_reject · run_id", "status": "built"}
+          }
+        }
+      ]
+    },
+    {
+      "name": "③ MAPPING",
+      "note": "nối lệnh chi",
+      "agents": [
+        {
+          "id": "a3-1-ref",
+          "boxes": {
+            "human_in": {"label": "Dòng tiền + lệnh", "sub": "PM·PC, Ref do CA gõ", "status": "built"},
+            "llm": {"label": "A3.1 · PP (1) Ref", "sub": "Qwen 3.8-27B local · v0", "status": "proposed"},
+            "output": {"label": "L1 · L2 · L3", "sub": "+ gợi ý HD/CDT1", "status": "built"},
+            "human_check": {"label": "KT ghép · sửa F01", "sub": "S5 · dòng hàng chờ", "status": "partial", "weight": "medium", "freq": "each"},
+            "publish": {"label": "Sổ hiệu lực", "sub": "→ báo cáo daily CCR", "status": "partial"},
+            "fleet_eval": {"check": "a3-1-ref.eval.ghep-sai", "sample": "? dòng", "cost": "?", "status": "proposed", "freq": "version"},
+            "store": {"label": "fls_pm_link", "sub": "adjustment · journal", "status": "built"}
+          }
+        },
+        {
+          "id": "a3-2-luong",
+          "boxes": {
+            "human_in": {"label": "Sổ H1000 đã tách", "sub": "HD·CDT1 · số FT KT dán", "status": "built"},
+            "llm": {"label": "A3.2 · PP (2) lương", "sub": "Qwen 3.8-27B local · v0", "status": "proposed"},
+            "output": {"label": "Dòng lương ↔ bank", "sub": "nối Số CT · pháp nhân", "status": "proposed"},
+            "publish": {"label": "Sổ hiệu lực", "sub": "cùng bảng ITL", "status": "proposed"},
+            "fleet_eval": {"check": "a3-2-luong.eval.noi-sai-dot", "sample": "? đợt", "cost": "?", "status": "proposed", "freq": "version"},
+            "store": {"label": "lớp sửa", "sub": "chưa có bảng", "status": "proposed"}
+          }
+        },
+        {
+          "id": "a3-3-nen-tang",
+          "boxes": {
+            "human_in": {"label": "File Looker + PE/PM", "sub": "OMC · GI · SC · PS", "status": "built"},
+            "llm": {"label": "A3.3 · PP (3) nền tảng", "sub": "Qwen 3.8-27B local · v0", "status": "proposed"},
+            "output": {"label": "Chi phí ↔ PE/PM ↔ bank", "sub": "chia theo CDT1", "status": "proposed"},
+            "publish": {"label": "Sổ hiệu lực", "sub": "cùng bảng ITL", "status": "proposed"},
+            "fleet_eval": {"check": "a3-3-nen-tang.eval.chia-sai", "sample": "? kỳ", "cost": "?", "status": "proposed", "freq": "version"},
+            "store": {"label": "lớp sửa", "sub": "chưa có bảng", "status": "proposed"}
+          }
+        }
+      ]
+    },
+    {
+      "name": "JUDGE",
+      "note": "④ SOÁT",
+      "agents": [
+        {
+          "id": "a4-soat",
+          "boxes": {
+            "human_in": {"label": "Kết quả A2 · A3", "sub": "+ số dư CCR", "status": "partial"},
+            "llm": {"label": "A4 · SOÁT", "sub": "Qwen 3.8-27B local · v0", "status": "proposed"},
+            "output": {"label": "Đạt · CHẶN · CỜ", "sub": "DIF theo TK · ngày", "status": "partial"},
+            "human_check": {"label": "KT đọc biên bản", "sub": "9 dòng · F04", "status": "built", "weight": "quick", "freq": "each"},
+            "fleet_eval": {"check": "a4-soat.eval.lot-chan", "sample": "? lô cài lỗi", "cost": "?", "status": "proposed", "freq": "version"},
+            "store": {"label": "biên bản nạp", "sub": "fls_run", "status": "partial"}
+          }
+        }
+      ]
+    }
+  ],
+  "lane": {
+    "store": {"label": "STORE", "sub": "một bản ghi mỗi mục · lớp lưu giữ", "status": "partial"},
+    "scrubber": {"label": "SCRUBBER", "sub": "tên người, số TK, diễn giải, khoá bí mật", "status": "proposed"},
+    "improve": {"label": "IMPROVE EACH AGENT", "sub": "luật · tham chiếu · cặp ưu tiên · ca kiểm mới", "status": "proposed"}
+  }
+}

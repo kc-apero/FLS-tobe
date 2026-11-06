@@ -49,3 +49,37 @@ Mã trong ngoặc `[oCA]`, `[pGHEP]`… là mã hộp của sơ đồ AS-IS gố
 TO-BE đi đúng **xương sống** của AS-IS cho PP (1): đọc vùng chuẩn → ghép Reference number → soát số dư CCR → một bảng ITL. Kế hoạch fleet eval cho Agent 1, 2, A3.1 và Agent 4 có thể dựng ngay trên đó.
 
 **PP (2) và PP (3) chưa theo luồng thực tế** (#9, #10, #12, #13): TO-BE đang mô tả một cách làm mới, không phải cách người đang làm. Chưa nên đóng băng A3.2, A3.3 để đo cho tới khi owner chốt bốn điểm này. Nếu không, fleet eval sẽ chấm chúng theo một đáp án mà chính AS-IS không dùng.
+
+---
+
+## 5 · Quyết định của owner (06/11, KhanhCQ trả lời)
+
+> **TO-BE thay thế, cải tiến và bao gồm AS-IS** — ⛔ không chạy hai luồng song song. Mỗi bước AS-IS phải có chỗ trong TO-BE.
+
+| # | Câu | Quyết định | Việc phải làm trên TO-BE |
+|---|---|---|---|
+| §0 | Đo cái gì | **Agent LLM**: Qwen 3.8-27B, chạy local. Bản mã tất định hôm nay là phiên bản gốc để so "không tệ hơn bản trước" | Ghi mô hình lên hình; §8 tính lại cho mô hình 27B |
+| 9–10 | PP (2) | **Nạp thẳng sổ H1000** (đã tách HD · CDT1 · pháp nhân tới từng nhân viên, số FT do kế toán dán) | A3.2 đổi từ "khớp Σ đợt → LE" thành "nạp H1000, nối Số CT với bank, soát Σ" |
+| 12 | PP (3) | Chi phí nền tảng **có PE/PM**; kết quả phải **mapping được với bank txns** | A3.3: Looker → PE/PM (Combine Code) → bank txns qua Ref của PM; chia theo CDT1 |
+| 13 | SC | **SC = server cost** | Đổi "Server" thành "SC (server cost)" |
+| 11 | Giá trị mặc định | Owner hỏi lại: *giá trị mặc định là gì?* — xem bảng dưới | Chờ owner chốt |
+| — | Lỗi đáng sợ nhất | Tạm duyệt bảng đề xuất; owner có thể bổ sung | — |
+| — | Ca kiểm | Đồng ý: đáp án từ ITL Ledge Final của AS-IS + so khớp oracle; ca cài sẵn từ lỗi thật | — |
+| — | Vai | Owner **ThuongCT** · Operator **KhanhCQ** · Duyệt độc lập **Lanptn** | — |
+
+### Giá trị mặc định của sổ ADJUSTED (AS-IS) là gì
+
+Khi kế toán **bỏ trống** ô "Input here" ở vùng chỉnh tay, công thức `MID` tự điền một **giá trị cứng riêng cho từng khối**. Đo trên **9.219 dòng** của `ITL Ledge` (`fls/ledger/final_rule.py:59–76`):
+
+| Khối | Trường | Giá trị mặc định | Số ô đang mang nó |
+|---|---|---|---|
+| 1 | HD (Budget Code) | `OGA \| GAC - Other` | 297 |
+| 2 | Loại giao dịch | `Thanh toán (Regular)` | 179 |
+| 3 | CDT1 (chủ dự toán) | `SHQ2 \| Headquarters2` | 1.222 |
+| 4–5 | Bắt đầu / kết thúc dịch vụ | ⛔ không có giá trị cứng (chưa suy được luật, `GAP-ORA-06`) | — |
+| 6 | ID đối tác | `VD0` | 1.642 |
+| 7 | Hoá đơn | `Nợ hoá đơn` | 6.573 / 6.582 |
+
+Hệ quả: ở 1.222 dòng, CDT1 = SHQ2 **không phải vì ai chọn**, mà vì ô bị bỏ trống — báo cáo theo chủ dự toán dồn các dòng ấy về SHQ2.
+Mã FLS đã tách sẵn hai giá trị (`KetQuaFinal`): `parity` (giống sổ, kể cả mặc định) và `thyt` (rỗng ở chỗ máy tự điền, cờ `may_tu_bia`).
+**Đề xuất:** TO-BE ghi `thyt` vào sổ hiệu lực (ô hiện "chưa biết" và vào hàng chờ), giữ `parity` chỉ để so khớp với AS-IS trong giai đoạn chuyển.
