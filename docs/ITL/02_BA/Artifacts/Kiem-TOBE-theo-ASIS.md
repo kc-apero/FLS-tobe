@@ -58,7 +58,7 @@ TO-BE đi đúng **xương sống** của AS-IS cho PP (1): đọc vùng chuẩn
 
 | # | Câu | Quyết định | Việc phải làm trên TO-BE |
 |---|---|---|---|
-| §0 | Đo cái gì | **Agent LLM** — ⚠ sửa 09/11: **gọi API**, ⛔ local; Qwen 3.8 (agent làm) · gpt-oss-120b (agent kiểm), cả hai fine-tune được qua API. (Bản 06/11: Qwen 3.8-27B, chạy local.) Bản mã tất định hôm nay là phiên bản gốc để so "không tệ hơn bản trước" | Ghi mô hình lên hình; §8 tính lại cho mô hình 27B |
+| §0 | Đo cái gì | **Agent LLM** — ⚠ sửa 09/11 lần 2: **gọi API, hai phương án** — A: Claude Opus 5.5 làm · Gemini 3.8 Flash kiểm, gọi thẳng, ⛔ fine-tune; B: Qwen 3.8 làm · gpt-oss-120b kiểm; không agent nào cần fine-tune ở bước đầu (Voi F0b). (09/11 lần 1: Qwen 3.8 · gpt-oss-120b, cả hai fine-tune được qua API.) (Bản 06/11: Qwen 3.8-27B, chạy local.) Bản mã tất định hôm nay là phiên bản gốc để so "không tệ hơn bản trước" | Ghi mô hình lên hình; §8 tính lại cho mô hình 27B |
 | 9–10 | PP (2) | **Nạp thẳng sổ H1000** (đã tách HD · CDT1 · pháp nhân tới từng nhân viên, số FT do kế toán dán) | A3.2 đổi từ "khớp Σ đợt → LE" thành "nạp H1000, nối Số CT với bank, soát Σ" |
 | 12 | PP (3) | Chi phí nền tảng **có PE/PM**; kết quả phải **mapping được với bank txns** | A3.3: Looker → PE/PM (Combine Code) → bank txns qua Ref của PM; chia theo CDT1 |
 | 13 | SC | **SC = server cost** | Đổi "Server" thành "SC (server cost)" |
