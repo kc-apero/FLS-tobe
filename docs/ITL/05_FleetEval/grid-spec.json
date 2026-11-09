@@ -1,5 +1,5 @@
 {
- "title": "FLS phase 1 · vùng NẠP: agent làm chạy Qwen 3.8-27B, agent kiểm A4 chạy gpt-oss-20b (local) — và fleet eval của từng agent",
+ "title": "FLS · vùng NẠP: agent gọi API — Qwen 3.8 làm, gpt-oss-120b kiểm (cả hai fine-tune được) — và fleet eval của từng agent",
  "version": "1.0.0",
  "_comment": "Nguồn: artifact Voi FLS-tobe-phase1 v0.4.1 + Kiem-TOBE-theo-ASIS.md + trả lời owner 06/11. Agent LLM chưa chạy (PROPOSED); bản mã tất định hôm nay là phiên bản gốc để so 'không tệ hơn bản trước'. Số mẫu và chi phí chưa có: để '?' — là câu hỏi mở, không đoán.",
  "column_labels": {
@@ -27,7 +27,7 @@
       },
       "llm": {
        "label": "A1 · Collect_raw_data",
-       "sub": "Qwen 3.8-27B local · v1 (v0 = mã)",
+       "sub": "Qwen 3.8 · API · v1 (v0 = mã)",
        "status": "proposed"
       },
       "output": {
@@ -45,7 +45,7 @@
       "fleet_eval": {
        "check": "a1-khai-chup.eval.lech-cot-ngay",
        "sample": "phiên bản sau",
-       "cost": "chấm: gpt-oss-20b",
+       "cost": "chấm: gpt-oss-120b",
        "status": "proposed",
        "freq": "version"
       },
@@ -72,7 +72,7 @@
       },
       "llm": {
        "label": "A2 · Group Ledger (ITL raw)",
-       "sub": "Qwen 3.8-27B local · v1 (v0 = mã)",
+       "sub": "Qwen 3.8 · API · v1 (v0 = mã)",
        "status": "proposed"
       },
       "output": {
@@ -90,7 +90,7 @@
       "fleet_eval": {
        "check": "a2-dung.eval.mat-dong",
        "sample": "phiên bản sau",
-       "cost": "chấm: gpt-oss-20b",
+       "cost": "chấm: gpt-oss-120b",
        "status": "proposed",
        "freq": "version"
       },
@@ -117,7 +117,7 @@
       },
       "llm": {
        "label": "Filter·Adjust A3.1 PP1",
-       "sub": "Qwen 3.8-27B local · v1 (v0 = mã)",
+       "sub": "Qwen 3.8 · API · v1 (v0 = mã)",
        "status": "proposed"
       },
       "output": {
@@ -140,7 +140,7 @@
       "fleet_eval": {
        "check": "a3-1-ref.eval.ghep-sai",
        "sample": "~60 ca × 3 persona",
-       "cost": "chấm: gpt-oss-20b",
+       "cost": "chấm: gpt-oss-120b",
        "status": "proposed",
        "freq": "version"
       },
@@ -168,7 +168,7 @@
       },
       "llm": {
        "label": "Filter·Adjust A3.2 PP2",
-       "sub": "Qwen 3.8-27B local · v1 (v0 = mã)",
+       "sub": "Qwen 3.8 · API · v1 (v0 = mã)",
        "status": "proposed"
       },
       "output": {
@@ -184,7 +184,7 @@
       "fleet_eval": {
        "check": "a3-2-luong.eval.noi-sai-dot",
        "sample": "ca cài sẵn + đợt mẫu",
-       "cost": "chấm: gpt-oss-20b",
+       "cost": "chấm: gpt-oss-120b",
        "status": "proposed",
        "freq": "version"
       },
@@ -212,7 +212,7 @@
       },
       "llm": {
        "label": "Filter·Adjust A3.3 PP3",
-       "sub": "Qwen 3.8-27B local · v1 (v0 = mã)",
+       "sub": "Qwen 3.8 · API · v1 (v0 = mã)",
        "status": "proposed"
       },
       "output": {
@@ -228,7 +228,7 @@
       "fleet_eval": {
        "check": "a3-3-nen-tang.eval.chia-sai",
        "sample": "chỉ ca cài sẵn",
-       "cost": "chấm: gpt-oss-20b",
+       "cost": "chấm: gpt-oss-120b",
        "status": "proposed",
        "freq": "version"
       },
@@ -262,7 +262,7 @@
       },
       "llm": {
        "label": "A4 · Auditor",
-       "sub": "gpt-oss-20b local · v1 (v0 = mã)",
+       "sub": "gpt-oss-120b · API · v1 (v0 = mã)",
        "status": "proposed"
       },
       "output": {
@@ -280,7 +280,7 @@
       "fleet_eval": {
        "check": "a4-soat.eval.lot-chan",
        "sample": "≥10 lô lỗi + 5 sạch",
-       "cost": "chấm: Qwen 3.8-27B",
+       "cost": "chấm: Qwen 3.8",
        "status": "proposed",
        "freq": "version"
       },

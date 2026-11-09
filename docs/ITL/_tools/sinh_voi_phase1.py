@@ -824,7 +824,7 @@ AGENT = {   # mã: (dải, nhãn ngắn, tên, luồng ≤ 5 bước, hộp thu�
         "PP (3): dòng ITL (đã có PE, đã nối bank) ⨝ nguồn GI · OMC · SC · PS theo Combine Code → chia CDT1",
         "Ra: mối nối, phần chia và dòng chưa khớp cho Agent 4"), ("ghep", "ghep2", "ghep3")),
     "ag4": ("c4", "AGENT 4", "Agent 4 · Auditor (Compounding Loop)", (
-        "Chạy gpt-oss-20b — khác mô hình với A1–A3 (Qwen); khởi bởi xem trước (S3) và Nhận (S4)",
+        "Chạy gpt-oss-120b qua API — khác họ với A1–A3 (Qwen 3.8); khởi bởi xem trước (S3) và Nhận (S4)",
         "PP (1): 9 luật sao kê · Σ PM line = tiền · 4 vế · số dư ngày = CCR (DIF = 0)",
         "PP (2): Σ Có = Σ Nợ mỗi đợt · đủ tháng, ⛔ tháng trùng",
         "PP (3): Σ phần chia = tiền · Σ % CDT1 = 100",
@@ -836,8 +836,10 @@ AG_THEO_DAI = {v[0]: k for k, v in AGENT.items()}
 #   chạy mô hình KHÁC họ (gpt-oss-20b) — một bộ kiểm cùng họ với thứ nó kiểm sẽ chấm dễ (how-to 5.1).
 #   Bộ chấm FLEET EVAL thì phải khác mô hình của CHÍNH agent bị đo ⇒ A1–A3 chấm bằng gpt-oss, A4 chấm bằng Qwen.
 AG_NGAN = {"ag1": "Collect_raw_data", "ag2": "Group Ledger", "ag3": "Filter·Adjust", "ag4": "Auditor"}
-AG_MO_HINH = {"ag1": "Qwen 3.8-27B", "ag2": "Qwen 3.8-27B", "ag3": "Qwen 3.8-27B", "ag4": "gpt-oss-20b"}
-AG_CHAM = {"ag1": "gpt-oss-20b", "ag2": "gpt-oss-20b", "ag3": "gpt-oss-20b", "ag4": "Qwen 3.8-27B"}
+# ⭐ 09/11 (KhanhCQ): agent ⛔ build local mà GỌI API ⇒ chọn mô hình vừa inference vừa fine-tune được qua API
+#   (để fleet eval đo được cả bản gốc lẫn bản LoRA). Hai họ khác nhau vẫn giữ: Qwen làm · gpt-oss kiểm. Xem F0 trang 2.
+AG_MO_HINH = {"ag1": "Qwen 3.8", "ag2": "Qwen 3.8", "ag3": "Qwen 3.8", "ag4": "gpt-oss-120b"}
+AG_CHAM = {"ag1": "gpt-oss-120b", "ag2": "gpt-oss-120b", "ag3": "gpt-oss-120b", "ag4": "Qwen 3.8"}
 
 # ── owner 06/11: "phần TO-BE thể hiện rõ được các agents mapping" ⇒ Agent 3 tách ba agent con, mỗi PP một con,
 #    nối nhau bằng phần CHƯA khớp (q1 · q2). Chip "A3.1 / A3.2 / A3.3" trên hộp MAPPING bấm được.
@@ -1666,6 +1668,7 @@ def bang_chi_phi() -> str:
     k = lambda t: f"{so(t[0])}–{so(t[1])}"   # noqa: E731
     o = ['''
 <h2>§8 · Chi phí: máy chủ ↔ mô hình mã nguồn mở tự huấn luyện</h2>
+<p class="note"><b>09/11 — đổi hướng:</b> agent <b>gọi API</b>, không build local. Chọn <b>Qwen 3.8</b> (agent làm) và <b>gpt-oss-120b</b> (agent kiểm, bộ chấm) trên Together AI — cả hai inference và fine-tune LoRA qua API. Giá tham khảo (nguồn thứ ba, tra 09/11): gpt-oss-120b serverless ~$0,15 vào / $0,60 ra mỗi 1 triệu token; fine-tune LoRA SFT nhóm 17–69B ~$1,50 và gpt-oss-120b ~$2,50 mỗi 1 triệu token huấn luyện; bản LoRA chạy trên endpoint riêng (~$3,99–6,49 / giờ H100) vì Together đã ngừng chạy LoRA serverless. Chi tiết và lý do chọn: F0 ở trang 2. Bảng dưới đây giữ làm mốc so sánh cũ.</p>
 <p class="note"><b>06/11:</b> đã chọn <b>Qwen 3.8-27B chạy local</b> cho các agent. Các dòng "mô hình mở 8B" dưới đây chỉ còn là mốc so sánh; giờ GPU cho mô hình 27B <b>chưa tính lại</b>.</p>
 <p><b>Câu hỏi trước tiên là agent nào cần mô hình.</b> Ba trong bốn agent chạy bằng luật, không cần mô hình — chi phí của chúng chỉ là <b>máy chủ</b>. Mô hình chỉ có việc ở <b>phần dư</b> của các agent con của Agent 3 · Filter Fulfill &amp; Adjust: dòng còn ở L3 sau khi luật đã chạy hết.</p>
 <div class="scroll"><table>
@@ -1790,40 +1793,103 @@ def bang_kiem_asis() -> str:
             + md_html(van, cap=3))
 
 
+# ═════════════════ F0 · CHỌN MÔ HÌNH GỌI API (09/11) ═════════════════
+F0_UNG_VIEN = [  # (mô hình · nơi gọi, inference API, fine-tune API, vai, kết luận)
+    ("Qwen 3.8 · Together AI (dự phòng Fireworks)", "có (serverless cho bản gốc)", "có — LoRA hoặc full; bản LoRA chạy trên endpoint riêng",
+     "agent làm A1 · A2 · A3.x · bộ chấm của A4", "✅ chọn"),
+    ("gpt-oss-120b · Together AI / Fireworks", "có — ~$0,15 / $0,60 mỗi 1 triệu token", "có — LoRA (Together, Fireworks)",
+     "agent kiểm A4 · bộ chấm của A1–A3", "✅ chọn"),
+    ("gpt-oss-20b · Together AI", "có", "có — LoRA", "persona của fleet eval (rẻ hơn)", "✅ chọn cho persona"),
+    ("Gemini 2.5 Flash · Vertex AI", "có", "có — supervised + preference tuning", "họ thứ ba nếu cần bộ chấm độc lập hơn", "◐ dự phòng"),
+    ("Claude (Anthropic API)", "có", "⛔ — chỉ Claude 3 Haiku fine-tune được, qua Amazon Bedrock", "—", "⛔ không đạt điều kiện fine-tune"),
+    ("OpenAI (GPT-4.1 …)", "có", "⛔ đang dừng — ngừng nhận job mới từ 06/01/2027 (nguồn thứ ba)", "—", "⛔ rủi ro dừng dịch vụ"),
+]
+
+
+def bang_chon_mo_hinh() -> str:
+    o = ['''
+<h2>F0 · Chọn mô hình — gọi API, vừa inference vừa fine-tune</h2>
+<p>Đổi hướng 09/11: các agent <b>không build local mà gọi API</b>. Điều kiện chọn: (1) gọi inference qua API, (2) <b>fine-tune được qua API</b> để mỗi bản LoRA thành một phiên bản đo được bằng fleet eval, (3) hai <b>họ khác nhau</b> cho agent làm và agent kiểm.</p>
+<div class="scroll"><table><thead><tr><th>mô hình · nơi gọi</th><th>inference API</th><th>fine-tune API</th><th>vai</th><th>kết luận</th></tr></thead><tbody>''']
+    for m, i, f, v, k in F0_UNG_VIEN:
+        lop = "ok" if k.startswith("✅") else ("mid" if k.startswith("◐") else "no")
+        o.append(f'<tr><td><b>{E(m)}</b></td><td>{E(i)}</td><td>{E(f)}</td><td>{E(v)}</td><td><span class="pill {lop}">{E(k)}</span></td></tr>')
+    o.append('''</tbody></table></div>
+<p class="note"><b>Fleet eval với mô hình gọi API:</b> một phiên bản = <b>mã mô hình gốc + mã adapter LoRA (nếu có) + checksum prompt + checksum tham chiếu</b>; đóng băng cả bốn ở R1. Bản gốc gọi serverless; bản LoRA phải chạy trên <b>endpoint riêng</b> (Together đã ngừng chạy LoRA serverless) — nên mỗi vòng ghi cả giờ endpoint lẫn token. Dữ liệu gửi ra API <b>phải qua scrubber trước</b> (tên người ~4,3–4,8% ô diễn giải, số tài khoản, email — <code>NFR-I13</code>); điều khoản lưu giữ dữ liệu của nhà cung cấp: câu hỏi mở. Tên chính xác của bản Qwen 3.8 (cỡ tham số) cần đối chiếu bảng mô hình của nhà cung cấp lúc mở tài khoản.</p>
+<p class="ghichu">Nguồn (tra 09/11/2026; nhiều trang là nguồn thứ ba): <a href="https://docs.together.ai/docs/fine-tuning-models">Together · mô hình fine-tune được</a> · <a href="https://docs.together.ai/docs/fine-tuning/lora-vs-full">Together · LoRA và endpoint riêng</a> · <a href="https://docs.together.ai/docs/changelog">Together · changelog</a> · <a href="https://www.eesel.ai/blog/together-ai-pricing">eesel · giá Together 2026</a> · <a href="https://docs.fireworks.ai/fine-tuning/supervised-fine-tuning">Fireworks · SFT, multi-LoRA</a> · <a href="https://www.morphllm.com/fireworks-ai-pricing">morphllm · giá Fireworks</a> · <a href="https://cloud.google.com/vertex-ai/generative-ai/docs/models/tune-text-models-supervised">Vertex · tuning Gemini</a> · <a href="https://aws.amazon.com/blogs/aws/fine-tuning-for-anthropics-claude-3-haiku-model-in-amazon-bedrock-is-now-generally-available">AWS · fine-tune Claude 3 Haiku</a> · <a href="https://www.developersdigest.tech/blog/openai-fine-tuning-shutdown-alternatives">developersdigest · OpenAI dừng fine-tuning</a>.</p>''')
+    return "\n".join(o)
+
+
 # ═════════════════ TRANG 3 · ROADMAP (owner 06/11) ═════════════════
 # Hai phase. ⭐ Cùng MỘT hình 1: Phase 1 chạy các hộp bằng MÃ theo rule script Gsheet (đó là v0 của fleet eval);
 # Phase 2 thay mã bằng agent local, mỗi phiên bản qua fleet eval. Luật vẽ voi: mỗi phase ≤ 5 bước, mỗi bảng ≤ 5 dòng / nhóm.
-RM_P1 = [  # (bước, việc, rule Gsheet phải theo, hôm nay, cổng xong)
-    ("1.1 Khai nguồn", "bản khai cột · thứ tự ngày · pháp nhân TK cho 60 sao kê, 8 quỹ, CCR, sổ cái PM · PC, H1000, 4 sổ nền tảng",
-     "pháp nhân theo tên sheet <code>R | &lt;TK&gt;_&lt;bank&gt; &lt;tiền tệ&gt;_&lt;LE&gt;</code> + Mapping Master; đọc cả <code>Reference number_adjust</code> (người đè mã)",
-     "✅ 408 dòng khai (68 nguồn × 6) · pháp nhân TK, _adjust ⛔", "mọi nguồn có bản khai hiệu lực, owner ký"),
-    ("1.2 Chụp đủ lằn", "Bank · Cash · CCR · sổ cái PM / PC · H1000 · Platform",
-     "vùng chuẩn J–O của sheet R (ARRAYFORMULA) — như GScript gom Bank / Cash Transactions",
-     "✅ Bank 60 nguồn · Cash, CCR, PC, H1000, Platform ⛔", "số dòng mỗi lằn = sổ Gsheet tương ứng"),
-    ("1.3 Dựng · ghép · soát", "dòng tiền hai vế · ghép Reference number · nạp H1000 · nối nền tảng qua Combine Code · 9 luật + DIF CCR",
-     "VLOOKUP Số CT ↔ PM_Unpivot cột Z · CHECK BALANCE sheet No · Combine Code Vendor-Date-NoTrans · số dư CCR = lũy kế 111/112 — FLS chặt hơn ở chỗ script im lặng (mã trùng, #N/A)",
-     "◐ PP (1) có mã (nối 26,79% dòng) · PP (2), (3) ⛔", "mọi chênh với script có tên lý do"),
-    ("1.4 Một sổ + báo cáo", "sổ ITL hiệu lực (sổ gốc + lớp sửa) · XUẤT báo cáo daily vào CCR",
-     "7 khối ADJUSTED: Final = f(Classifying, MID), ô trống nhận giá trị mặc định (parity, owner 06/11) · Report General Ledger",
-     "✅ <code>final_rule.py</code> khớp 4.088/4.088 ô · bộ xuất ⛔", "một view có tên, đủ 4 họ nguồn"),
-    ("1.5 Chuyển vận hành", "đối chiếu từng ô với ITL Ledge Final của Gsheet trên các tháng đã chốt → cắt Gsheet",
-     "TO-BE thay thế AS-IS, ⛔ chạy hai luồng song song (owner 06/11)",
-     "◐ oracle parity (<code>fls/oracle</code>, nhánh p2)", "ThuongCT ký cắt khi chênh = 0 hoặc mọi chênh có tên"),
+import datetime as _dt
+
+RM_BAT_DAU = _dt.date(2026, 11, 9)            # thứ Hai T46
+RM_SO_TUAN = 21                               # tới tuần 29/03/2027
+RM_TET = {13}                                 # tuần 08/02/2027 — Tết Đinh Mùi (mùng 1 = 06/02/2027): ⛔ mở cửa, ⛔ cắt
+RM_TT = {"x": ("Xong", "s-x"), "d": ("Đang làm", "s-d"), "c": ("Chưa làm", "s-c"), "b": ("Bị chặn", "s-b"), "r": ("Chưa rõ", "s-r")}
+# nhóm → [(mã, tên, chi tiết theo ngày, trạng thái, tuần đầu, tuần cuối, {tuần: ký hiệu})]  — ◆ mốc · ★ đưa vào chạy thật
+RM_GANTT = [
+    ("Mốc", [
+        ("M", "Mốc chính", "20/11 khai xong mọi nguồn · 18/12 harness + vòng 0 · 18/01 agent đầu tiên lên G1 · 29/01 cắt Gsheet · ★ 01/02 vận hành trên FLS · 29/03 rà roadmap",
+         "c", 99, 99, {1: "◆", 5: "◆", 10: "◆", 11: "◆", 12: "★", 20: "◆"}),
+    ]),
+    ("Phase 1 · A — Nền tảng FLS: chuyển toàn bộ Gsheet lên phần mềm, chạy đúng luồng hiện tại", [
+        ("P1.1", "Khai nguồn · pháp nhân TK · Reference number_adjust", "09/11–20/11 khai đủ 68 nguồn + sổ cái PM · PC, H1000, 4 sổ nền tảng · owner ký 20/11", "d", 0, 1, {1: "◆"}),
+        ("P1.2", "Chụp đủ lằn", "16/11–27/11 Cash · CCR · 23/11–04/12 sổ cái PM · PC, H1000, 4 sổ nền tảng", "d", 1, 3, {3: "◆"}),
+        ("P1.3", "Dựng · ghép · soát theo rule script Gsheet", "23/11–11/12 PP (1) đủ hai vế · 07/12–18/12 PP (2) nạp H1000 · 14/12–25/12 PP (3) Combine Code", "d", 2, 6, {6: "◆"}),
+        ("P1.4", "Một sổ hiệu lực + báo cáo daily CCR", "14/12–08/01 view sổ hiệu lực đủ 4 họ nguồn · bộ xuất báo cáo daily (chạy khô → cờ duyệt)", "d", 5, 8, {8: "◆"}),
+        ("P1.5", "Đối chiếu từng ô → cắt Gsheet", "04/01–29/01 đối chiếu với ITL Ledge Final trên các tháng đã chốt · ThuongCT ký cắt 29/01 · ★ vận hành trên FLS từ 01/02", "c", 8, 11, {11: "◆", 12: "★"}),
+    ]),
+    ("Phase 1 · B — Cho AI hiểu luồng chạy và script đang chạy", [
+        ("B1", "Mở API · chốt mô hình · scrubber", "09/11–20/11 tài khoản Together AI, mã mô hình chính xác · scrubber tên người / số TK / email trước khi gửi API", "c", 0, 1, {1: "◆"}),
+        ("B2", "Bộ tri thức luồng + script", "16/11–04/12 AS-IS 52 hộp · PD Now 137 dòng · GScript gom bank / quỹ · VLOOKUP Số CT · CHECK BALANCE · Combine Code · MID / Final 7 khối · Mapping Master", "d", 1, 3, {3: "◆"}),
+        ("B3", "Bài kiểm \"hiểu luồng\"", "30/11–11/12 hỏi–đáp có đáp án cho từng script; agent đúng ≥ 90% (đề xuất) mới sang C4", "c", 3, 4, {4: "◆"}),
+    ]),
+    ("Phase 1 · C — Compounding loop trên tệp dữ liệu mẫu (bộ RAW + bộ ADJUST)", [
+        ("C1", "Dựng cặp RAW → ADJUST", "23/11–04/12 ITL RAW (Transaction Mapping L1) ↔ ITL Ledge Final · ~34 file H1000 · 4 sổ nền tảng · làm sạch · tách phần giữ riêng (held-out)", "c", 2, 3, {}),
+        ("C2", "Harness fleet eval", "30/11–18/12 persona · bộ chấm mù · cấu hình vòng · chạy thử trên đầu ra giả (skill code-fleet-eval)", "c", 3, 5, {5: "◆"}),
+        ("C3", "Vòng 0 — đo v0 (mã)", "14/12–18/12 cùng mẫu, làm mốc \"không tệ hơn\"", "c", 5, 5, {5: "◆"}),
+        ("C4", "Vòng cộng dồn 1 → 3", "mỗi vòng 2 tuần: 21/12–01/01 · 04/01–15/01 · 18/01–29/01 — gợi ý → người giữ / sửa → luật ứng viên → ThuongCT ký → fine-tune LoRA trên cặp RAW → ADJUST → fleet eval", "c", 6, 11, {7: "◆", 9: "◆", 11: "◆"}),
+    ]),
+    ("Phase 2 · hạng 1 — A3 Filter Fulfill & Adjust (ITL Adjust): mở theo từng khối", [
+        ("A3.1", "PP (1) · 7 khối ADJUSTED", "04/01–15/01 G0 bóng · ★ 18/01 G1 khối 2 Loại GD + 7 Hoá đơn · 01/02 G1 khối 1 HD + 3 CDT1 · 22/02 G2 khối 2 · 7 · 22/02 G1 khối 6 Đối tác · 08/03 G1 khối 4–5 Kỳ DV", "c", 8, 20, {10: "★", 12: "◆", 15: "◆", 17: "◆"}),
+        ("A3.2", "PP (2) · lương H1000", "01/02–12/02 G0 bóng (trùng Tết) · ★ 22/02 G1 gợi ý nối Số CT", "c", 12, 20, {15: "★"}),
+        ("A3.3", "PP (3) · nền tảng GI · OMC · SC · PS", "15/02–26/02 G0 bóng · ★ 08/03 G1 gợi ý Combine Code + chia CDT1", "c", 14, 20, {17: "★"}),
+    ]),
+    ("Phase 2 · hạng 2–4 — A4 · A2 · A1", [
+        ("A4", "Auditor (Compounding Loop)", "11/01–22/01 G0 bóng (chỉ THÊM cờ, ⛔ bỏ cờ của v0) · ★ 25/01 G1 cờ trên biên bản F04 · 22/02 G1 đề xuất luật cho compounding loop · 08/03 giải thích DIF CCR", "c", 9, 20, {11: "★", 15: "◆", 17: "◆"}),
+        ("A2", "Generate Group Ledger (ITL raw)", "01/02–12/02 G0 bóng · ★ 22/02 G1 gợi ý cặp cho dòng L3 có mã trong diễn giải · 15/03 G1 gợi ý hình E (khác tiền tệ), F (Σ lệch) · hình A · B · C giữ mã v0", "c", 12, 20, {15: "★", 18: "◆"}),
+        ("A1", "Collect_raw_data", "22/02–05/03 G0 bóng · ★ 08/03 G1 đề xuất bản khai cho sheet mới · 22/03 G1 báo đổi bố cục cột", "c", 15, 20, {17: "★", 19: "◆"}),
+    ]),
 ]
-RM_P2 = [  # (bước, việc, ai / mô hình, cổng)
-    ("2.1 Agent hoá bốn chặng", "Collect_raw_data · Generate Group Ledger (ITL raw) · Filter Fulfill &amp; Adjust (ITL Adjust, A3.1–A3.3) · Auditor (Compounding Loop)",
-     "agent làm: Qwen 3.8-27B · agent kiểm: gpt-oss-20b · chạy local · mốc so = mã Phase 1 (<code>v0</code>)", "mỗi agent có thẻ eval (trang 2)"),
-    ("2.2 Compounding loop", "dòng L3 → máy gợi ý loại giao dịch → người giữ / sửa → đủ bằng chứng thành luật ứng viên → owner ký → lượt sau gợi ý nhiều hơn (hình 2)",
-     "máy gợi ý · kế toán xác nhận · ThuongCT ký luật", "độ phủ L3 tăng, độ đúng ⛔ giảm"),
-    ("2.3 Fleet eval mỗi phiên bản", "đóng băng → rút mẫu → persona chạy → chấm mù → báo cáo → phân loại → sửa → chạy lại (R1–R8)",
-     "operator KhanhCQ · chấm lại 10% Lanptn · bộ chấm khác mô hình agent", "ship / chặn / chạy lại theo AP v1.1.3"),
-    ("2.4 Chuyển việc từ người sang agent", "từng việc một, khi agent đạt bar và không tệ hơn <code>v0</code>",
-     "ThuongCT quyết từng việc", "đạt bar ở các vòng liên tiếp — số vòng: câu hỏi mở"),
-    ("2.5 Người làm auditor", "người thôi gõ / bấm / điền; chỉ kiểm mẫu, ký luật, xử lý hàng chờ có lý do",
-     "kế toán (AnhMC, NgaNLT, …) · Lanptn · ThuongCT", "tỉ lệ mẫu và ngưỡng: câu hỏi mở"),
+RM_HANG = [  # (hạng, agent, vì sao, đơn vị mở đầu tiên, G1 dự kiến)
+    ("1", "A3 · Filter Fulfill & Adjust (ITL Adjust)", "Việc người tốn nhất: điền tay vùng ADJUSTED R–AT, 6.843 lần ô bỏ trống nhận giá trị mặc định. Dữ liệu học có sẵn: cặp RAW → ADJUST. Đầu ra là gợi ý từng ô, người giữ / sửa ⇒ rủi ro thấp, mỗi lần sửa nuôi compounding loop.",
+     "khối 2 Loại GD + khối 7 Hoá đơn (ít giá trị, đo dễ)", "18/01/2027"),
+    ("2", "A4 · Auditor (Compounding Loop)", "Chỉ THÊM cờ, ⛔ bỏ cờ của mã v0 ⇒ lên sớm không làm hệ thống kém đi. Là nơi chạy compounding loop: gom xác nhận của người thành luật ứng viên.",
+     "cờ thêm trên biên bản F04", "25/01/2027"),
+    ("3", "A2 · Generate Group Ledger (ITL raw)", "Mã v0 đã ghép đúng hình A · B · C (2.256 + 27 + 80 mã); agent chỉ cần cho phần dư. Sai ở đây làm sai chiều chi phí ⇒ mở sau, chỉ ở dạng gợi ý.",
+     "dòng L3 có mã trong diễn giải (60 mã rỗng + 136 ghi mã khác)", "22/02/2027"),
+    ("4", "A1 · Collect_raw_data", "68 nguồn đã có bản khai, bố cục đổi ít ⇒ giá trị chủ yếu khi có sheet mới.", "đề xuất bản khai cho sheet mới", "08/03/2027"),
+]
+RM_CUA = [  # (cấp, nghĩa, mở khi — đề xuất, chờ ThuongCT chốt)
+    ("G0 · Bóng", "chạy song song trên dữ liệu thật, ⛔ ghi gì; so với người", "vòng fleet eval đạt bar trên phần giữ riêng · 0 ca cài sẵn trượt"),
+    ("G1 · Gợi ý", "hiện gợi ý trên F01 / F04; người giữ hoặc sửa; mỗi lần sửa vào compounding loop", "G0 ≥ 2 tuần · đúng ≥ 95% so với người · 0 ca cài sẵn trượt"),
+    ("G2 · Tự ghi phần chắc", "agent tự điền khi độ tự tin ≥ ngưỡng; người kiểm mẫu 10%", "G1: người giữ nguyên ≥ 98% gợi ý trong 2 vòng liên tiếp"),
+    ("G3 · Người làm auditor", "agent làm trọn đơn vị; người chỉ kiểm mẫu + ký luật", "G2 ≥ 4 tuần · mẫu kiểm 0 lỗi · ThuongCT ký"),
+]
+RM_DON_VI = [  # (agent, đơn vị, G1, G2)
+    ("A3", "khối 2 Loại GD + khối 7 Hoá đơn", "18/01", "22/02"),
+    ("A3", "khối 1 HD + khối 3 CDT1", "01/02", "15/03"),
+    ("A3", "khối 6 Đối tác · khối 4–5 Kỳ DV (chưa có luật, GAP-ORA-06)", "22/02 · 08/03", "sau 29/03"),
+    ("A3", "PP (2) lương · PP (3) nền tảng", "22/02 · 08/03", "sau 29/03"),
+    ("A4", "cờ thêm trên biên bản (S1–S10) · đề xuất luật · giải thích DIF CCR", "25/01 · 22/02 · 08/03", "— (A4 chỉ thêm cờ)"),
+    ("A2", "L3 có mã trong diễn giải · hình E / F", "22/02 · 15/03", "sau 29/03"),
+    ("A1", "bản khai sheet mới · báo đổi bố cục cột", "08/03 · 22/03", "sau 29/03"),
 ]
 RM_NGUOI = [  # (việc của người, AS-IS hôm nay, Phase 1, Phase 2)
-    ("Gõ / dán sao kê, ghi quỹ, nhập số dư CCR", "người làm", "người vẫn làm ở Gsheet; FLS đọc", "giữ ở nguồn; Collect_raw_data đọc · Auditor soát"),
+    ("Gõ / dán sao kê, ghi quỹ, nhập số dư CCR", "người làm", "người vẫn làm ở Gsheet; FLS đọc", "giữ ở nguồn; A1 Collect_raw_data đọc · A4 Auditor soát"),
     ("Bấm GScript gom / duỗi / chuyển A-CCR", "người bấm", "⛔ hết — nhịp FLS chụp", "⛔ hết"),
     ("Gõ Reference number, dán số FT lương", "người gõ sau khi chi", "người vẫn gõ; FLS ghép theo đúng rule", "agent gợi ý cặp; người duyệt mẫu"),
     ("Điền tay vùng ADJUSTED, ghép / sửa hàng chờ", "người điền R–AT", "người sửa trên F01 · F02 (lớp sửa có actor)", "Filter Fulfill &amp; Adjust gợi ý; người giữ / sửa → compounding loop"),
@@ -1832,35 +1898,72 @@ RM_NGUOI = [  # (việc của người, AS-IS hôm nay, Phase 1, Phase 2)
 
 
 def bang_roadmap() -> str:
+    tuan = [RM_BAT_DAU + _dt.timedelta(weeks=i) for i in range(RM_SO_TUAN)]
     o = ['''
 <h2>R0 · Hai phase</h2>
 <div class="rm-the">
-<div class="rm-p rm-p1"><div class="rm-so">PHASE 1</div><div class="rm-ten">Dựng FLS Platform</div>
-<p>Chuyển vận hành từ Google Sheets lên nền tảng FLS, <b>theo đúng rule trong các script đang chạy ở Gsheet</b> (GScript, công thức). Các hộp trên hình 1 chạy bằng <b>mã tất định</b>; người vẫn nhập liệu ở nguồn như hôm nay.</p>
-<p class="rm-ra"><b>Ra:</b> một sổ ITL trên nền tảng, khớp sổ Gsheet từng ô; Gsheet được cắt.</p></div>
+<div class="rm-p rm-p1"><div class="rm-so">PHASE 1 · 09/11/2026 → 29/01/2027</div><div class="rm-ten">Chuyển toàn bộ Gsheet lên phần mềm · AI hiểu luồng · compounding loop trên tệp mẫu</div>
+<p>(A) FLS chạy <b>đúng luồng hiện tại</b> theo rule các script Gsheet. (B) Cho AI <b>hiểu luồng chạy và script đang chạy</b>. (C) Chạy <b>compounding loop trên tệp dữ liệu mẫu</b> — đã có bộ RAW và bộ ADJUST — để agent học và được đo bằng fleet eval.</p>
+<p class="rm-ra"><b>Ra:</b> ★ 01/02/2027 vận hành trên FLS, Gsheet được cắt; mỗi agent có điểm fleet eval trên tệp mẫu.</p></div>
 <div class="rm-mui" aria-hidden="true">→</div>
-<div class="rm-p rm-p2"><div class="rm-so">PHASE 2</div><div class="rm-ten">User-agents local · compounding loop · fleet eval</div>
-<p>Thay mã của từng chặng bằng <b>agent chạy local</b>, mỗi phiên bản qua <b>fleet eval</b>; luật lớn dần qua <b>compounding loop</b>. Tự động hoá các việc người đang làm; <b>người chỉ đóng vai trò auditor</b>.</p>
-<p class="rm-ra"><b>Ra:</b> người kiểm mẫu và ký luật, ⛔ còn gõ / bấm / điền.</p></div>
+<div class="rm-p rm-p2"><div class="rm-so">PHASE 2 · từ 04/01/2027, mở dần</div><div class="rm-ten">Đưa agent đạt nghiệm thu vào hệ thống · tiếp tục fleet eval</div>
+<p><b>Không đợi tất cả agent xong:</b> mỗi agent chia thành đơn vị nhỏ (khối, hình ghép, loại luật), mỗi đơn vị có cửa G0 → G3. Đơn vị nào đạt cửa thì mở đơn vị ấy; trượt thì chỉ đơn vị ấy lùi một cấp (cờ tắt được).</p>
+<p class="rm-ra"><b>Ra:</b> người chuyển dần sang vai auditor, theo từng đơn vị.</p></div>
 </div>
-<p class="ghichu">Cùng một hình 1 cho cả hai phase: Phase 1 dựng các hộp bằng mã (chính là <code>v0</code> — mốc "không tệ hơn" của fleet eval), Phase 2 thay mã trong từng hộp bằng agent. Các agent trên hình 1 và trang 2 là việc của <b>Phase 2</b>.</p>
-<h2>R1 · Phase 1 — dựng nền tảng, chuyển vận hành theo rule của script Gsheet</h2>
-<div class="scroll"><table><thead><tr><th>bước</th><th>việc</th><th>rule Gsheet phải theo</th><th>hôm nay</th><th>cổng xong</th></tr></thead><tbody>''']
-    for b, v, r, h, c in RM_P1:
-        o.append(f'<tr><td><b>{b}</b></td><td>{v}</td><td>{r}</td><td>{h}</td><td>{c}</td></tr>')
+<h2>R1 · Timeline theo module</h2>
+<p class="ghichu">Mỗi cột là một tuần, ghi ngày thứ Hai. Ô tô = tuần đang làm · ◆ mốc · ★ đưa vào chạy thật · cột xám = tuần Tết (mùng 1 Tết là 06/02/2027): ⛔ mở cửa, ⛔ cắt. Mọi ngày là <b>đề xuất, chờ ThuongCT chốt</b>.</p>
+<div class="scroll rm-gantt-wrap"><table class="rm-gantt"><thead>''']
+    thang = []
+    for t in tuan:
+        k = f"{t.month:02d}/{t.year}"
+        if thang and thang[-1][0] == k:
+            thang[-1][1] += 1
+        else:
+            thang.append([k, 1])
+    o.append('<tr><th class="g-item" rowspan="3">module · việc</th><th rowspan="3">trạng thái</th>'
+             + "".join(f'<th colspan="{n}">Tháng {k}</th>' for k, n in thang) + '</tr>')
+    o.append("<tr>" + "".join(f'<th class="g-w{" g-tet" if i in RM_TET else ""}">T{t.isocalendar()[1]}</th>' for i, t in enumerate(tuan)) + "</tr>")
+    o.append("<tr>" + "".join(f'<th class="g-w{" g-tet" if i in RM_TET else ""}">{t.day:02d}/{t.month:02d}</th>' for i, t in enumerate(tuan)) + "</tr></thead><tbody>")
+    for nhom, hang in RM_GANTT:
+        o.append(f'<tr class="g-nhom"><td colspan="{2 + RM_SO_TUAN}">{E(nhom)}</td></tr>')
+        for ma, ten, ct, tt, a, b, moc in hang:
+            chu, lop = RM_TT[tt]
+            o.append(f'<tr><td class="g-item"><b>{E(ma)} · {E(ten)}</b><div class="g-ct">{E(ct)}</div></td><td><span class="g-tt {lop}">{chu}</span></td>')
+            for i in range(RM_SO_TUAN):
+                cl = ["gc"]
+                if a <= i <= b:
+                    cl.append("g-on")
+                if i in RM_TET:
+                    cl.append("g-tet")
+                o.append(f'<td class="{" ".join(cl)}">{moc.get(i, "")}</td>')
+            o.append("</tr>")
     o.append('''</tbody></table></div>
-<p class="note">Phase 1 <b>không</b> thêm luật mới: mọi luật lấy từ script và công thức đang chạy (đã đọc: GScript gom bank / quỹ, VLOOKUP ghép lệnh chi, CHECK BALANCE sheet lương, Combine Code nền tảng, MID / Final của ADJUSTED). Chỗ FLS khác script chỉ là chỗ script <b>im lặng</b> — mã trùng bị VLOOKUP lấy dòng đầu, <code>#N/A</code>, ô trống — và mỗi chỗ ấy hiện thành hàng chờ có tên lý do. Thứ tự chi tiết theo mũi tên: §6 ở trang 1.</p>
-<h2>R2 · Phase 2 — user-agents local, compounding loop, fleet eval</h2>
-<div class="scroll"><table><thead><tr><th>bước</th><th>việc</th><th>ai · mô hình</th><th>cổng</th></tr></thead><tbody>''')
-    for b, v, a, c in RM_P2:
-        o.append(f'<tr><td><b>{b}</b></td><td>{v}</td><td>{a}</td><td>{c}</td></tr>')
+<h2>R2 · Xếp hạng agent — đưa vào nhanh nhất và chính xác nhất</h2>
+<p>Thứ tự theo ba trục: <b>giá trị</b> (việc người tốn nhất), <b>dữ liệu học có sẵn</b>, <b>rủi ro khi sai</b> (gợi ý hay tự ghi, sai thì lan tới đâu). Mỗi agent thay mã <code>v0</code> của Phase 1 trong từng hộp của hình 1; mã v0 vẫn là lưới an toàn khi một đơn vị bị lùi.</p>
+<div class="scroll"><table><thead><tr><th>hạng</th><th>agent</th><th>vì sao hạng này</th><th>đơn vị mở đầu tiên</th><th>G1 dự kiến</th></tr></thead><tbody>''')
+    for h, ag, vs, dv, g1 in RM_HANG:
+        o.append(f'<tr><td><b>{h}</b></td><td><b>{E(ag)}</b></td><td>{E(vs)}</td><td>{E(dv)}</td><td>{g1}</td></tr>')
     o.append('''</tbody></table></div>
-<h2>R3 · Việc của người qua hai phase</h2>
+<h2>R3 · Cửa mở của từng agent — đạt cửa nào mở cửa ấy</h2>
+<p>Một <b>đơn vị</b> = một phần việc đo riêng được của một agent (một khối của vùng ADJUSTED, một hình ghép, một loại cờ, một loại nguồn). Mỗi cặp <i>(agent × đơn vị × cấp)</i> mở riêng, bằng cờ bật / tắt; trượt thì chỉ đơn vị ấy lùi một cấp, mã v0 chạy thay. Ngưỡng là <b>đề xuất</b>, chờ ThuongCT chốt.</p>
+<div class="scroll"><table><thead><tr><th>cấp</th><th>agent làm gì</th><th>mở khi</th></tr></thead><tbody>''')
+    for cap, ng, mk in RM_CUA:
+        o.append(f'<tr><td><b>{E(cap)}</b></td><td>{E(ng)}</td><td>{E(mk)}</td></tr>')
+    o.append('</tbody></table></div><h3>Đơn vị của từng agent và ngày mở dự kiến</h3><div class="scroll"><table><thead><tr><th>agent</th><th>đơn vị</th><th>G1 · gợi ý</th><th>G2 · tự ghi phần chắc</th></tr></thead><tbody>')
+    cu = None
+    for ag, dv, g1, g2 in RM_DON_VI:
+        if ag != cu:
+            cu = ag
+            o.append(f'<tr class="b2"><th colspan="4">{E({"A3": "A3 · Filter Fulfill & Adjust", "A4": "A4 · Auditor (Compounding Loop)", "A2": "A2 · Generate Group Ledger", "A1": "A1 · Collect_raw_data"}[ag])}</th></tr>')
+        o.append(f'<tr><td>{E(ag)}</td><td>{E(dv)}</td><td>{E(g1)}</td><td>{E(g2)}</td></tr>')
+    o.append('''</tbody></table></div>
+<p class="note"><b>Fleet eval trong Phase 2:</b> mỗi phiên bản mới (prompt, adapter LoRA, tham chiếu) chạy một vòng trước khi mở; thêm một vòng giám sát mỗi 2 tuần trên mẫu mới. Ca đã dùng để sửa agent chuyển sang bộ hồi quy. Mô hình gọi API (F0, trang 2): Qwen 3.8 cho agent làm, gpt-oss-120b cho agent kiểm và bộ chấm.</p>
+<h2>R4 · Việc của người qua hai phase</h2>
 <div class="scroll"><table><thead><tr><th>việc</th><th>AS-IS hôm nay</th><th>Phase 1</th><th>Phase 2 — người là auditor</th></tr></thead><tbody>''')
     for v, a, p1, p2 in RM_NGUOI:
         o.append(f'<tr><td><b>{v}</b></td><td>{a}</td><td>{p1}</td><td>{p2}</td></tr>')
     o.append('''</tbody></table></div>
-<p class="note"><b>Câu chờ owner:</b> ① Phase 1 cắt Gsheet khi nào — đối chiếu bao nhiêu tháng đã chốt, chênh bao nhiêu thì được cắt? ② Phase 2 chuyển một việc sang agent sau bao nhiêu vòng fleet eval đạt liên tiếp? ③ Khi người là auditor, kiểm mẫu bao nhiêu % mỗi lô? ④ Có chuyển ghép Reference number sang Agent 2 (Generate Group Ledger) và compounding loop sang Agent 4 (Auditor) không?</p>''')
+<p class="note"><b>Câu chờ owner:</b> ① Ngày nào được chốt — nhất là 29/01 cắt Gsheet và 18/01 mở agent đầu tiên? ② Đối chiếu bao nhiêu tháng đã chốt thì được cắt? ③ Ngưỡng các cửa G0–G3 (95% · 98% · mẫu 10% · 4 tuần) có giữ không? ④ Điều khoản lưu giữ dữ liệu của nhà cung cấp API, và có cần bản không lưu dữ liệu (zero retention) không? ⑤ Có chuyển ghép Reference number sang A2 và compounding loop sang A4 trên hình 1 không? (roadmap này đã viết theo tên mới của agent)</p>''')
     return "\n".join(o)
 
 
@@ -1884,7 +1987,7 @@ FE_THE = [   # (agent, phép kiểm, lỗi đáng sợ, đơn vị heatmap, đá
 ]
 
 
-AP_FE = "AP_FLS_FleetEval_v1.1.3_2026-11-06.html"     # bản AP nhúng nguyên vào trang 2 (F4)
+AP_FE = "AP_FLS_FleetEval_v1.2.0_2026-11-09.html"     # bản AP nhúng nguyên vào trang 2 (F4)
 FE_THE_TEP = ("a3-1-ref", "a3-2-luong", "a3-3-nen-tang", "a4-soat")
 
 
@@ -1900,16 +2003,16 @@ def bang_fleet_eval() -> str:
     nguoi = {"ag1": "kế toán khai, owner ký · mỗi nguồn", "ag2": "kế toán xem trước lô F04 · mỗi lô",
              "ag3a": "kế toán ghép / sửa F01 · mỗi dòng hàng chờ", "ag3b": "⛔ chưa có (Q4)", "ag3c": "⛔ chưa có (Q4)",
              "ag4": "kế toán đọc biên bản F04 · mỗi lô"}
-    o = ['''
+    o = [bang_chon_mo_hinh(), '''
 <h2>F1 · Mỗi agent khác nhau ở đâu</h2>
-<p>Năm agent <b>làm</b> (A1 · A2 · A3.1–A3.3) chạy <b>Qwen 3.8-27B</b>. Agent <b>kiểm</b> trong luồng (A4 · Auditor) chạy <b>gpt-oss-20b</b> — một mô hình khác họ, vì bộ kiểm cùng họ với thứ nó kiểm sẽ chấm dễ. Bộ chấm của fleet eval cũng phải khác mô hình của <b>chính</b> agent bị đo: A1–A3 chấm bằng gpt-oss-20b, còn A4 (đã là gpt-oss) chấm bằng Qwen. Không agent nào được chấm bằng mô hình của chính nó.</p>
+<p>Mọi agent <b>gọi API</b> (09/11). Năm agent <b>làm</b> (A1 · A2 · A3.1–A3.3) chạy <b>Qwen 3.8</b>. Agent <b>kiểm</b> trong luồng (A4 · Auditor) chạy <b>gpt-oss-120b</b> — một mô hình khác họ, vì bộ kiểm cùng họ với thứ nó kiểm sẽ chấm dễ. Bộ chấm của fleet eval cũng phải khác mô hình của <b>chính</b> agent bị đo: A1–A3 chấm bằng gpt-oss-120b, còn A4 chấm bằng Qwen 3.8. Không agent nào được chấm bằng mô hình của chính nó. Cả hai họ đều <b>fine-tune được qua API</b>, nên mỗi bản LoRA là một phiên bản mới đi qua fleet eval (F0).</p>
 <div class="scroll"><table>
 <thead><tr><th>agent</th><th>vai</th><th>mô hình chạy</th><th>ai kiểm khi chạy thật</th><th>fleet eval chấm bằng</th><th>phép kiểm</th></tr></thead><tbody>''']
     for k in ("ag1", "ag2", "ag3a", "ag3b", "ag3c", "ag4"):
         cha = AGENT_CON[k][0] if k in AGENT_CON else k
         ten = AGENT_CON[k][2] if k in AGENT_CON else AGENT[k][2]
         mh, ch = AG_MO_HINH[cha], AG_CHAM[cha]
-        lop = "mh-kiem" if mh != "Qwen 3.8-27B" else "mh-lam"
+        lop = "mh-kiem" if not mh.startswith("Qwen") else "mh-lam"
         o.append(f'<tr class="chon" data-ref="h:{k}" data-comment-target tabindex="0"><td><b>{E(ten)}</b></td><td>{E(vai[cha])}</td>'
                  f'<td><span class="pill {lop}">{E(mh)}</span></td><td>{E(nguoi[k])}</td>'
                  f'<td><span class="pill {"mh-lam" if ch.startswith("Qwen") else "mh-kiem"}">{E(ch)}</span></td><td><code>{E(the[k])}</code></td></tr>')
@@ -2238,6 +2341,18 @@ a.nut{display:inline-block;text-decoration:none}
 .rm-p2{border-top-color:var(--ag4)} .rm-so{font:700 12px var(--mono);letter-spacing:.08em;color:var(--accent)} .rm-p2 .rm-so{color:var(--ag4)}
 .rm-ten{font:600 18px/1.3 var(--serif);margin:4px 0 6px} .rm-p p{margin:6px 0;font-size:14px} .rm-ra{color:var(--muted)}
 .rm-mui{align-self:center;font:600 28px var(--sans);color:var(--muted)}
+table.rm-gantt{border-collapse:separate;border-spacing:0;width:auto;font-size:12px}
+table.rm-gantt th,table.rm-gantt td{border-bottom:1px solid var(--line);border-right:1px solid var(--line);padding:3px 4px;text-align:center;vertical-align:middle}
+table.rm-gantt th.g-item,table.rm-gantt td.g-item{text-align:left;min-width:330px;max-width:420px;padding:6px 10px;position:sticky;left:0;background:var(--paper);z-index:1}
+table.rm-gantt .g-ct{font-size:11.5px;color:var(--muted);margin-top:2px;line-height:1.4}
+table.rm-gantt th.g-w,table.rm-gantt td.gc{width:44px;min-width:44px}
+table.rm-gantt td.g-on{background:var(--accent-soft);color:var(--accent);font-weight:700}
+table.rm-gantt .g-tet{background:repeating-linear-gradient(45deg,var(--no-soft),var(--no-soft) 4px,transparent 4px,transparent 8px)}
+table.rm-gantt td.g-on.g-tet{background:repeating-linear-gradient(45deg,var(--accent-soft),var(--accent-soft) 4px,var(--no-soft) 4px,var(--no-soft) 8px)}
+table.rm-gantt tr.g-nhom td{background:var(--accent-soft);font-weight:700;text-align:left;padding:6px 10px;position:sticky;left:0}
+.g-tt{display:inline-block;font:600 11px/1.3 var(--sans);padding:2px 7px;border-radius:999px;white-space:nowrap}
+.s-x{background:var(--ok-soft);color:var(--ok)} .s-d{background:var(--prop-soft);color:var(--prop)} .s-c{background:var(--paper);color:var(--muted);box-shadow:inset 0 0 0 1px var(--line)}
+.s-b{background:#fee2e2;color:#991b1b} .s-r{background:var(--no-soft);color:var(--no)}
 @media (max-width:760px){ .rm-mui{display:none} }
 .goc{font-size:13px;border-left:3px solid var(--asis);padding:5px 9px;margin:6px 0;background:var(--bg)}
 .goc .van-chu,span.van-chu{color:var(--sel)}
@@ -2452,12 +2567,12 @@ JS = r"""
 THAN_TREN = """
 <header class="top">
   <h1>Voi FLS-tobe-phase1</h1>
-  <p class="meta"><b>v0.7 · 2026-11-06</b> · Giai đoạn 1: đi hết INPUT, về <b>một</b> bảng ITL, mọi dòng có pháp nhân. Lệnh chi lấy từ <b>sổ cái PM / PC của FPS</b> qua hợp đồng dữ liệu (§5).
+  <p class="meta"><b>v0.8 · 2026-11-09</b> · Giai đoạn 1: đi hết INPUT, về <b>một</b> bảng ITL, mọi dòng có pháp nhân. Lệnh chi lấy từ <b>sổ cái PM / PC của FPS</b> qua hợp đồng dữ liệu (§5).
   Hình, bảng mũi tên, bảng kiểm cạnh và khung chi tiết <b>sinh từ cùng một bản khai</b> (<code>docs/ITL/_tools/sinh_voi_phase1.py</code>); máy kiểm hình trước khi ghi.<br>
   Nửa phải của hình 1 là luồng <b>AS-IS</b> lấy từ sơ đồ "Voi ITL AS-IS" (<code>docs/ITL/_tools/voi_asis_goc.json</code>).<br>
   PD Now là bản gốc tham khảo: trang này chỉ mượn <b>thuật ngữ</b> (PE · PI · PM · PC · LE · CDT · HD/KRF · Reference No · General Trustest), không dùng tên sheet, tên file hay bước tính của nó. Mã FLS @ <code>2d1b710</code>.</p>
 </header>
-<p class="tin"><b>Hai trang:</b> <b>Trang 1</b> — con voi TO-BE cạnh AS-IS và bản kiểm từng bước (§1a). <b>Trang 2</b> — fleet eval: agent nào chạy mô hình nào, sơ đồ quy trình, bốn thẻ, và <b>bản AP nhúng nguyên</b> (F4). <b>Trang 3</b> — roadmap hai phase: dựng nền tảng theo rule Gsheet, rồi agent hoá với người làm auditor. <b>Cách dùng:</b> bấm một hộp hay một mũi tên (hoặc một dòng trong bảng) để làm nổi các đường nối của nó và mở khung chi tiết. Trong khung có <b>Bình luận phần này</b> và ô <b>Hỏi Claude</b>: câu hỏi được gắn đúng vào phần đang chọn, Claude trả lời trong luồng bình luận ở đó.</p>
+<p class="tin"><b>Hai trang:</b> <b>Trang 1</b> — con voi TO-BE cạnh AS-IS và bản kiểm từng bước (§1a). <b>Trang 2</b> — fleet eval: agent nào chạy mô hình nào, sơ đồ quy trình, bốn thẻ, và <b>bản AP nhúng nguyên</b> (F4). <b>Trang 3</b> — roadmap theo ngày: Phase 1 chuyển Gsheet lên FLS + AI hiểu luồng + compounding loop trên tệp mẫu; Phase 2 đưa từng agent đạt cửa vào hệ thống. <b>Cách dùng:</b> bấm một hộp hay một mũi tên (hoặc một dòng trong bảng) để làm nổi các đường nối của nó và mở khung chi tiết. Trong khung có <b>Bình luận phần này</b> và ô <b>Hỏi Claude</b>: câu hỏi được gắn đúng vào phần đang chọn, Claude trả lời trong luồng bình luận ở đó.</p>
 """
 
 
@@ -2564,6 +2679,7 @@ def trang() -> str:
 <p>Mỗi nguồn vào và mỗi đầu ra mang một nhãn ở góc trên-trái của hộp: <b>MÁY</b> (hệ sinh, không ai gõ) · <b>NGƯỜI</b> (người gõ, dán hoặc ký) · <b>NGƯỜI+MÁY</b> (người nhập, máy sinh sổ; hoặc máy đề xuất, người chốt). Chỗ nào có tay người là chỗ cần một cổng canh, ghi ở cột cuối.</p>
 """, bang_nm(), """
 <h2>§2 · Đã sửa gì</h2>
+<p class="note"><b>v0.8 (KhanhCQ, 09/11):</b> agent <b>gọi API</b> thay vì build local — chọn Qwen 3.8 (agent làm) và gpt-oss-120b (agent kiểm, bộ chấm), cả hai inference và fine-tune được qua API (F0 trang 2). Trang 3 viết lại: timeline theo tuần theo module, xếp hạng agent, cửa G0–G3 mở theo từng đơn vị.</p>
 <p class="note"><b>v0.7 (KhanhCQ, 06/11):</b> thêm <b>trang 3 · Roadmap</b> — Phase 1 dựng FLS Platform, chuyển vận hành từ Gsheet theo rule script đang chạy; Phase 2 user-agents local + compounding loop + fleet eval, người chỉ làm auditor.</p>
 <p class="note"><b>v0.6.1 (owner, 06/11, bình luận trên hình):</b> đổi tên bốn agent — Agent 1 <b>Collect_raw_data</b> · Agent 2 <b>Generate Group Ledger (ITL raw)</b> · Agent 3 <b>Filter Fulfill &amp; Adjust (ITL Adjust)</b> · Agent 4 <b>Auditor (Compounding Loop)</b>. Phạm vi hộp của từng agent giữ nguyên. Nguồn PP (3) theo PD Now: GI · OMC từ Looker, SC · PS từ Google Sheets.</p>
 <p class="note"><b>v0.6 (KhanhCQ, 06/11):</b> tách hai trang; nhúng bản kiểm TO-BE theo AS-IS (§1a) và bản AP fleet eval. <b>Agent kiểm dùng mô hình khác agent làm:</b> A4 SOÁT chạy gpt-oss-20b, A1–A3 chạy Qwen 3.8-27B; nhãn mô hình hiện trên từng nhãn agent ở lề trái hình 1.</p>
@@ -2647,7 +2763,7 @@ def trang() -> str:
 <tr><td>5</td><td>⭐ <b>Đã trả lời 06/11:</b> chia theo <b>CDT1</b> (như AS-IS), qua PE/PM. Câu cũ: PP (3): "venture" khi allocate là <b>LE</b> hay <b>CDT1</b>? Tỉ lệ chia lấy từ cột nào của file Looker? AP/AR lùi khỏi GĐ1?</td><td>Owner 04/11 chốt OMC · GI · SC · PS là chi phí, mapping với bank txns rồi allocate về ventures — thay câu cũ "GI/OMC không vào sổ"</td><td>bước 5</td></tr>
 </tbody></table></div>
 """, bang_chi_phi(), '</section><section class="trang" id="trang-2" hidden>', bang_fleet_eval(), '</section><section class="trang" id="trang-3" hidden>', bang_roadmap(), '</section>', """
-<footer>Voi FLS-tobe-phase1 v0.7 · 2026-11-06 · Trang 1 mapping TO-BE ↔ AS-IS · Trang 2 fleet eval · Trang 3 roadmap · sinh bởi <code>docs/ITL/_tools/sinh_voi_phase1.py</code> · cùng bộ với <code>_PD_NOW_VOI_VA_GIAI_DOAN.md</code>.</footer>
+<footer>Voi FLS-tobe-phase1 v0.8 · 2026-11-09 · Trang 1 mapping TO-BE ↔ AS-IS · Trang 2 fleet eval · Trang 3 roadmap · sinh bởi <code>docs/ITL/_tools/sinh_voi_phase1.py</code> · cùng bộ với <code>_PD_NOW_VOI_VA_GIAI_DOAN.md</code>.</footer>
 </main>
 <aside class="khung-ct" id="khung-ct" hidden aria-label="Chi tiết phần đang chọn">
   <div class="dong"><span class="eb" style="font:600 11px var(--mono);letter-spacing:.06em;color:var(--muted)">CHI TIẾT</span><button class="dong-x" id="nut-dong" type="button" aria-label="Đóng khung chi tiết">×</button></div>

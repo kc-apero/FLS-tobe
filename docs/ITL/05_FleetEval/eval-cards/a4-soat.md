@@ -6,7 +6,7 @@ Phần chung: `_chung.md`. Trạng thái: nháp. **JUDGE**: agent này chấm ag
 | Dấu | Giá trị |
 |---|---|
 | Dải | ④ SOÁT (JUDGE) |
-| Agent | PROPOSED · **`gpt-oss-20b` local** (khác họ Qwen của các agent nó soát); `v0` mã `fls/kiem/soat_nap.py` (9 luật S1–S8 + S10) BUILT |
+| Agent | PROPOSED · **`gpt-oss-120b` qua API** (khác họ Qwen của các agent nó soát); `v0` mã `fls/kiem/soat_nap.py` (9 luật S1–S8 + S10) BUILT |
 | Fleet eval | PROPOSED |
 | Người kiểm | kế toán đọc biên bản 9 dòng trên F04 · QUICK · mỗi lô |
 | Người dùng | kế toán quyết Nhận lô (S4) · tín hiệu: nhận / không nhận lô |
@@ -25,7 +25,7 @@ Phần chung: `_chung.md`. Trạng thái: nháp. **JUDGE**: agent này chấm ag
 | Ca cài sẵn (lỗi thật) | **646 dòng bị loại không có bản ghi** (`0020`, 23 nguồn) · **31 mã bị hạ `float`** ở Bank Transactions của AS-IS · **10/60** nguồn rỗng (phải "chưa đo", ⛔ đỏ oan). **Ca chuyển:** nguồn có bố cục cột chưa gặp. |
 | Đơn vị (heatmap) | **mất / thừa dòng:** S1 · S7 — **thiếu trường:** S2 · S3 · S4 — **định dạng / nguồn:** S5 · S6 · S8 · S10 — **số dư:** S9 · DIF CCR — **ca chuyển** |
 | Persona | P1 · P2 · P3 đọc biên bản: có quyết đúng nhận / không nhận lô không (gợi ý) |
-| Bộ chấm | **`Qwen 3.8-27B`** (khác mô hình của A4) · rubric 0–2: 0 = báo đạt ca phải chặn · 1 = chặn đúng, sai hạng (CHẶN ↔ CỜ) hoặc thiếu nguồn dính · 2 = đúng hạng + đúng nguồn + đúng số đo. |
+| Bộ chấm | **`Qwen 3.8`** qua API (khác mô hình của A4) · rubric 0–2: 0 = báo đạt ca phải chặn · 1 = chặn đúng, sai hạng (CHẶN ↔ CỜ) hoặc thiếu nguồn dính · 2 = đúng hạng + đúng nguồn + đúng số đo. |
 
 ## C. Bar, mẫu, nơi nhận
 | | |
