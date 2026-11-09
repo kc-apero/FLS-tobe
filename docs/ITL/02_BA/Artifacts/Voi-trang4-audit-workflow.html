@@ -1,0 +1,152 @@
+<!-- Trang 4 · Audit workflow — đăng bởi một phiên khác lên artifact Voi FLS (bản 1793949970-2a48, 06/11/2026 07:26 UTC).
+     Chép nguyên văn để bộ sinh trang (docs/ITL/_tools/sinh_voi_phase1.py) nhúng lại, ⛔ mất khi đăng bản mới. Sửa nội dung ở file này. -->
+<section class="trang" id="trang-4" hidden>
+<style>
+.pill.sai{background:var(--sel);color:var(--paper)}
+.au-tom{display:flex;flex-wrap:wrap;gap:10px;margin:10px 0}
+.au-o{flex:1 1 150px;border:1px solid var(--line);border-radius:6px;background:var(--paper);padding:10px 14px}
+.au-o b{display:block;font:700 26px/1.1 var(--mono)} .au-o span{font-size:13px;color:var(--muted)}
+.au-o.ok b{color:var(--ok)} .au-o.mid b{color:var(--mid)} .au-o.sai b{color:var(--sel)}
+.chuoi{font:12.5px/1.55 var(--mono);background:var(--paper);border:1px solid var(--line);border-radius:4px;padding:10px 12px;overflow-x:auto;white-space:pre;margin:8px 0}
+table.au td:nth-child(4){white-space:nowrap}
+.lop-h{font:700 12px var(--mono);letter-spacing:.06em;color:var(--accent);margin:22px 0 4px}
+</style>
+<h2>Trang 4 · Audit workflow</h2>
+<p class="meta"><b>06/11/2026</b> · Đọc trực tiếp <b>17 file Google Sheets</b> (công thức trong ô, không chỉ giá trị) và <b>6 dự án Apps Script</b>, đối chiếu với PD Now (<code>[FS2] PD Now</code>, bước 100–617) và hình AS-IS ở trang 1. Gồm hai phần: <b>1 · Luồng tìm được</b> — hệ thống đang chạy thật thế nào, khoá mapping là gì, khớp được bao nhiêu; <b>2 · Audit sơ đồ AS-IS → cải tiến TO-BE</b>.</p>
+<div class="scroll"><table><thead><tr><th>nguồn đọc</th><th>đã đọc</th><th>giới hạn</th></tr></thead><tbody>
+<tr><td>Apps Script</td><td><b>Cash Ledger</b> (gắn P100 | Cash Ledger, chạy lần cuối 14:08 hôm nay) · <b>Daily Report</b> (gắn A-CCR_V2_Working, 12:11 hôm nay) · <b>P120M - PM11</b>, <b>PE11</b>, <b>P120I - PI11</b> (bản sao "2310: …" ngày 23/10/2026) · script EDD (createPayrollFile)</td><td>File <b>P100 | Bank Transactions</b> chỉ có quyền nhận xét ⇒ không mở được script; file Cash Ledger chứa sẵn hàm <code>consolidateBankTransactions</code> cùng mã, nên coi là cùng logic. Script của Report General Ledger (chuyển ITL) không có quyền.</td></tr>
+<tr><td>Sheets</td><td>PM11 Entry Data · Bank Transactions · Cash Ledger · A-CCR · ITL 1/2 RAW · ITL 2/2 ADJUSTED · EDD (H1350.List) · H1000 Ledger · file lương 2025-10, 2026-1 · GI · OMC · SC · PS Platform Data Ledger · Chi phí Service Apero · Report GL CF</td><td><b>AperoGroup_Payment</b> (nguồn PS) không có quyền.</td></tr>
+</tbody></table></div>
+
+<h2>1 · Luồng tìm được</h2>
+<p>Luồng chạy qua 7 chặng. Mỗi chặng ghi rõ <b>ai / cái gì làm</b> (người, công thức, script), <b>khoá nối</b> và <b>số đo hôm nay</b>.</p>
+<div class="chuoi">① LỆNH CHI   Gform PE/PI/PM ─▶ PE11·PI11·PM11 Entry Data ─script▶ ID Slip/Line + kiểm Σ PM ≤ PE+PI
+                 file duyệt theo CDT ─script merge▶ PE12/PI12/PM12_Approve ─script▶ PE/PI/PM_Unpivot (Status_Final, Reference number)
+② TIỀN      KT dán sao kê ─▶ 64 sheet "R | …" ─script gom (khoá chống trùng)▶ Bank Transactions ─┐
+            KT ghi quỹ ─▶ 8 sheet quỹ (Ref PT/PC tự sinh) ─script gom▶ Cash Ledger Transactions ─┤─script chép đè▶ A-CCR
+            A-CCR: 1.2 Ledger 112 · 1.1 Ledger 111 (FILTER·SORT) ─▶ 2. CCR: số dư KT nhập tay ↔ lũy kế ⇒ DIF
+③ GHÉP      ITL RAW: IMPORTRANGE 111/112 + Unpivot ─QUERY▶ Transaction Original ─VLOOKUP Ref▶ Transaction Mapping L1
+            + LE từ Mapping Master theo tên sheet R + đối chiếu LE TK ↔ pháp nhân trả (AK)
+④ LƯƠNG     EDD: script tạo file lương tháng ─▶ H1350.List ─IMPORTRANGE▶ H1000 Ledger Index (cột G dán tay)
+            file lương: KT dán FT bank ─▶ sheet No n (CHECK BALANCE) ─▶ 1.3 Ledger ─QUERY▶ H1000 Ledger sổ năm
+⑤ ADJUSTED  ITL Ledge: A–Q từ RAW · 7 khối Classifying/Manual/MID/Final · cờ phân bổ (MM) · AUDIT ZONE ↔ Report GL
+            H1000 Ledge: FILTER sổ năm theo Start Date · nối ITL ID theo Số CT
+⑥ BÁO CÁO   script chuyển ITL ─▶ Report GL CF / P&amp;L ─script chép▶ A-CCR 5. Daily Report 2/3 ─script▶ PDF + mail T2–T6
+⑦ NỀN TẢNG  GI·OMC (Looker) · SC·PS (Gsheet) ─▶ Source ─▶ CFA1 ⨝ Report GL theo Combine Code ─▶ CFA2 MID 1–3 chia CDT1 ─▶ P&amp;L</div>
+
+<p class="lop-h">① LỆNH CHI — P100 (PE11 · PI11 · PM11)</p>
+<div class="scroll"><table><thead><tr><th>bước</th><th>cơ chế thật</th><th>khoá / logic</th></tr></thead><tbody>
+<tr><td>Nhập và duyệt</td><td>Người đề nghị điền Gform → sheet <code>…11_Entry Data</code>. Mỗi CDT có một file duyệt riêng (dự án "Update Approve PE/PM/PC to &lt;CDT&gt;"); script <code>mergeDataFromMultipleFiles</code> đọc danh sách link ở <code>CDT_Approval_Link_PM</code> và gom về <code>PM12_Approve PM</code>.</td><td>khoá ID PMSlip / PESlip / PISlip</td></tr>
+<tr><td>Sinh ID, kiểm tiền</td><td><code>runFullPMCheckFlow</code>: <code>generatePMSlipIDs</code> · <code>generatePMLineIDs</code> · <code>updateAllData</code> ghi cờ "Check Tổng tiền cần thanh toán PM ≤ PI/PE". PE: <code>runBatch1</code> (sinh mã PE Slip, kiểm tổng, gửi mail xác nhận).</td><td>Σ PM ≤ tiền PELine + PILine (tra theo ID PELine / ID PILine)</td></tr>
+<tr><td>Duỗi dòng</td><td>PE: <code>unpivotPaymentData</code> tách mỗi PE Slip thành tối đa <b>5 lần thanh toán</b> → ID PELine = <code>PESlip-n</code>. PI: <code>unpivotPIData</code> tối đa <b>3 lần</b>; Status_Final ghép theo <b>ID PISlip + Timestamp đến từng giây</b>. PM: <code>mergePMDataWithDebug</code> upsert <code>PM_Unpivot</code> theo ID PMLine, lấy Status_Final từ PM12 và <b>Reference number từ Entry tại lúc chạy</b>.</td><td>Unpivot chỉ <b>thêm / cập nhật, không xoá</b>; dòng chưa có trên file duyệt bị bỏ qua</td></tr>
+<tr><td>Gõ Reference number</td><td>Kế toán điền cột Reference number ở PM11_Entry Data rồi chạy script PM_Unpivot — theo <code>0. CCR Flow-use</code> (1.3), <b>trước 10h30 sáng D+1</b>. Một PMLine trả bằng n giao dịch ⇒ chỉ điền một mã, và đè mã ấy vào cột <code>_adjust</code> của cả n giao dịch (sheet Note, file Bank).</td><td>PM_Unpivot cột Z = Reference number</td></tr>
+</tbody></table></div>
+
+<p class="lop-h">② TIỀN — P100 Bank · P100 Cash · A-CCR</p>
+<div class="scroll"><table><thead><tr><th>bước</th><th>cơ chế thật</th><th>khoá / logic</th></tr></thead><tbody>
+<tr><td>Sao kê</td><td>64 sheet <code>R | &lt;TK&gt;_&lt;bank&gt; &lt;tiền tệ&gt;_&lt;tên&gt;</code>. A–I dán thô; J–M, O, P công thức; <b>N = Reference number_adjust gõ tay</b>; O = N nếu có, không thì Ref thô. <b>Dòng 1 ghi số 1–6</b> trên các cột chuẩn (1 ngày · 2 diễn giải · 3 tiền tệ · 4 Nợ · 5 Có · 6 Ref).</td><td>Bản khai vị trí nằm ngay trong sheet (dòng 1)</td></tr>
+<tr><td>Gom (script)</td><td><code>runConsolidateTransactions_</code>: quét mọi sheet tên <code>R |</code> / <code>R_</code>, đọc cột theo số 1–6 ở dòng 1 từ dòng 3; bỏ dòng thiếu ngày hoặc tiền = 0 hoặc bắt đầu bằng "#"; ngày dạng <code>dd/mm/yyyy</code> đọc ngày trước, dạng khác giao cho <code>new Date()</code>. Khoá chống trùng = <code>ngày|Nợ|Có|Ref|sheet#lần-xuất-hiện</code>; dòng đã có thì bỏ qua, dòng mới nối thêm; sắp lại theo ngày, ghi đè toàn bảng, cột Num = số lần Ref xuất hiện. Log xoá mỗi lần chạy.</td><td><b>Chỉ nối thêm</b>: sửa tiền, ngày hay Ref ở sheet R sinh ra dòng mới, dòng cũ vẫn nằm lại</td></tr>
+<tr><td>Quỹ</td><td>8 sheet quỹ; A–E chuẩn sẵn. Với <code>R | VND_CNC</code>, <code>R | CNC</code>, <code>R | VND_HotBonus</code>: <code>onEdit</code> sinh lại <b>toàn bộ</b> Ref = <code>PT/PC + số thứ tự 5 chữ số theo pháp nhân + pháp nhân</code> mỗi khi sửa cột D/E/H. Gom bằng cùng script.</td><td>Ref quỹ là số thứ tự ⇒ chèn hay xoá một dòng làm đổi Ref của mọi dòng sau</td></tr>
+<tr><td>Sang A-CCR</td><td>Menu "🔄 Cập nhật dữ liệu": script <b>xoá rồi chép đè</b> A:H từ Bank / Cash Ledger Transactions. <code>1.2 Ledger 112</code> = FILTER(SORT) + REGEXEXTRACT số TK; <code>1.1 Ledger 111</code> tương tự, không có số TK. Hôm nay hai bên khớp: 10.035 mã Ref.</td><td>chép toàn bảng — chỉ lệch khi chưa bấm</td></tr>
+<tr><td>Soát số dư</td><td><code>2. CCR</code>: khối Treasury dòng "Nhập" (kế toán nhập số dư ngày hôm trước, <b>trước 10h30</b>) · khối Accounting = công thức lũy kế · dòng cuối <code>DIF = Treasury − Accounting</code>. Có thêm cột <b>ID / Pass</b> tài khoản ngân hàng.</td><td>theo TK × ngày</td></tr>
+</tbody></table></div>
+
+<p class="lop-h">③ GHÉP — ITL 1/2 (RAW)</p>
+<div class="scroll"><table><thead><tr><th>bước</th><th>cơ chế thật</th><th>khoá / số đo hôm nay</th></tr></thead><tbody>
+<tr><td>Transaction Original</td><td><code>QUERY({1.2 Ledger 112; 1.1 Ledger 111})</code>. Cột G tên "Tài khoản" nhưng chứa <b>tên sheet R</b>; số TK ở H bị bỏ khi sang L1 (L1 lấy A:G).</td><td>12.321 dòng</td></tr>
+<tr><td>Ghép lệnh chi</td><td><code>Transaction Mapping L1</code>: SORT A:G → <code>VLOOKUP(Số CT, PM_Unpivot!Z → C…Y)</code> lấy dòng đầu → tiếp PI_Unpivot, PE_Unpivot theo ID PELine / PILine.</td><td>khớp <b>3.545 / 12.321 (28,8%)</b> · 8.776 dòng <code>#N/A</code> · 334 mã Ref xuất hiện &gt; 1 lần trong Bank Transactions (2.929 dòng)</td></tr>
+<tr><td>Pháp nhân</td><td>AG = <code>VLOOKUP(tên sheet R, Mapping Master!A:B)</code>; AH = SPLIT(Pháp nhân thanh toán); <b>AK = (AG = AH)</b> — kiểm LE tài khoản ↔ LE trả đã có sẵn; AL = số thứ tự sinh ITL ID.</td><td>LE <code>#N/A</code> 253 dòng · AK: TRUE 2.176 · <b>FALSE 1.350</b> (CN↔CNC 262 · VVOT↔VGO2 257 · "Cash Treasury" 551 · SGO2 trả hộ ~50)</td></tr>
+</tbody></table></div>
+
+<p class="lop-h">④ LƯƠNG — EDD · file lương tháng · H1000 Ledger</p>
+<div class="scroll"><table><thead><tr><th>bước</th><th>cơ chế thật</th><th>khoá / số đo hôm nay</th></tr></thead><tbody>
+<tr><td>Tạo file lương</td><td>Script <code>createPayrollFile</code> (file EDD): copy file mẫu, chép dữ liệu tay <code>H1350.3</code>, ghi một dòng vào <b><code>H1350.List</code></b> (ngày tạo · tên · năm · tháng · ID file).</td><td>H1350.List đủ <b>2024-1 … 2026-10</b></td></tr>
+<tr><td>Tách lương</td><td>File tháng: KT dán tối đa 5 giao dịch bank (số FT) vào sheet <code>No n</code>; dòng đảo + FILTER H1350.Payroll theo khoá PE ra từng nhân viên (HD, CDT1, pháp nhân); ô CHECK BALANCE. <code>P100 I Suggestion</code> = 30 dòng (6 pháp nhân × 5 loại), có 25 sheet No.</td><td>2025-10: <b>9/25</b> sheet No lệch (5 PIT Q4 · 3 INT · 1 COM)</td></tr>
+<tr><td>Sổ năm</td><td>Index A–F = <code>IMPORTRANGE(EDD, "H1350.List!A3:F")</code>; cột G chip file <b>dán tay</b>; sổ năm = QUERY nối IMPORTRANGE(Index!Gn) từng tháng.</td><td>NIS 2025 thiếu 2025-12 · PIT 2025 trùng 2025-6 và 2025-9 · NIS 2026: 588/588 dòng là tháng 1 · ngày 10/02 đọc thành 2-Oct</td></tr>
+<tr><td>Nối ITL</td><td>ADJUSTED <code>H1000 Ledge …</code>: FILTER(IMPORTRANGE(A4:F), ngày &gt; B3); R = VLOOKUP Số CT trong ITL Ledge (chỉ dòng PS Nợ) ⇒ ITL ID.</td><td>khoá Số CT = số FT</td></tr>
+</tbody></table></div>
+
+<p class="lop-h">⑤–⑥ ADJUSTED · BÁO CÁO</p>
+<div class="scroll"><table><thead><tr><th>bước</th><th>cơ chế thật</th><th>khoá / logic</th></tr></thead><tbody>
+<tr><td>ITL Ledge</td><td>A–Q = FILTER(IMPORTRANGE RAW) theo Start Date; R = "ITL#"&amp;No. 7 khối (HD · Loại GD · CDT1 · bắt đầu DV · kết thúc DV · ID đối tác · hoá đơn), mỗi khối 4 cột: <b>Classifying</b> = giá trị RAW hoặc "Need to manual input" · <b>Manual input</b> · <b>MID</b> = Classifying nếu ô tay trống, = <b>mặc định khi ô tay = "Input here"</b>, = ô tay nếu khác · <b>Final</b> = Classifying nếu hợp lệ, chỉ dùng MID khi Classifying lỗi. AU–AW: cờ "Need to Allocate to CFA2" và phương pháp từ Mapping Master. <b>AUDIT ZONE AX–BC</b>: so ITL ID, HD, Loại GD với Report GL, đếm FALSE.</td><td>Mặc định: OGA · Thanh toán (Regular) · SHQ2 · tháng của ngày CT · VD0 · Nợ hoá đơn</td></tr>
+<tr><td>Báo cáo</td><td>Script (không có quyền đọc) chuyển ITL sang Report GL CF / P&amp;L. Dự án "Daily Report" của A-CCR: <code>copyReport_to_A_CCR</code>, <code>copyReportPL_to_A_CCR</code> chép đè <code>5. Daily Report 2/3</code>; <code>createAndSendDailyReport</code> xuất PDF vùng cố định <code>A1:AK2526</code> rồi gửi mail thứ 2–6. Flow-use (3.1)–(3.5): điền HD cho giao dịch quẹt thẻ chưa có trên P100, bấm Run 4 lần để đối chiếu ITL#.</td><td>vùng in và vùng tô viền viết cứng</td></tr>
+</tbody></table></div>
+
+<p class="lop-h">⑦ NỀN TẢNG — GI · OMC · SC · PS Platform Data Ledger</p>
+<div class="scroll"><table><thead><tr><th>bước</th><th>cơ chế thật</th><th>khoá / số đo hôm nay</th></tr></thead><tbody>
+<tr><td>Nguồn</td><td>GI: tab <code>Source (Looker)</code> là bảng dán giá trị. OMC: QUERY 10 tab tháng xuất từ Looker. <b>SC: tab tên "Source (Looker)" nhưng là công thức đọc <code>MID | Source (Luận)</code> = QUERY(IMPORTRANGE) file Gsheet "Chi phí Service Apero". PS: tương tự từ "AperoGroup_Payment".</b></td><td>tháng GI/OMC = <code>"2025"&amp;MONTH()</code> (năm viết cứng)</td></tr>
+<tr><td>Nối ITL</td><td><code>[Import]Report I General Ledger</code> lọc theo HD (vd "SC | Server Cost"); AY = <code>ID Payee - tháng - No&lt;thứ tự xuất hiện&gt;</code>. CFA1: khối vendor × tháng nhập cố định; C = cùng Combine Code; R = VLOOKUP(C → AY) hoặc "Ko tìm thấy"; PE Amount = SUMIFS Source, có nhánh viết cứng theo vendor (GI: VD444, VD341, VD428).</td><td>"Need to manual input": SC 327 · PS 333</td></tr>
+<tr><td>Chia CDT1</td><td>CFA2 MID 1 (Mapping Block 1 × số tháng) → MID 2 (× 7 CDT1) → MID 3 (% theo vendor × tháng) → P&amp;L 600–603.</td><td>—</td></tr>
+</tbody></table></div>
+
+<p class="lop-h">Khoá mapping của toàn luồng</p>
+<div class="scroll"><table><thead><tr><th>nối</th><th>khoá AS-IS</th><th>cách nối</th><th>điểm yếu</th></tr></thead><tbody>
+<tr><td>giao dịch bank ↔ PM line</td><td>Reference number (ưu tiên _adjust) = PM_Unpivot Z</td><td>VLOOKUP dòng đầu</td><td>28,8% khớp; mã trùng chỉ lấy dòng đầu; Ref trên PM_Unpivot chỉ mới khi chạy lại merge</td></tr>
+<tr><td>tài khoản ↔ pháp nhân</td><td>tên sheet R</td><td>Mapping Master A:B</td><td>10 sheet thiếu khoá, 3 LE trái 2. CCR, 3 hệ mã LE</td></tr>
+<tr><td>PM ↔ PE / PI</td><td>ID PELine / ID PILine</td><td>tra theo ID</td><td>PI status ghép theo Timestamp đến từng giây</td></tr>
+<tr><td>lương ↔ bank</td><td>Số CT (FT) KT dán</td><td>VLOOKUP trong ITL Ledge</td><td>ngày đọc sai định dạng; sổ năm lấy thiếu / trùng tháng</td></tr>
+<tr><td>nền tảng ↔ ITL</td><td>ID Payee-tháng-No thứ tự</td><td>VLOOKUP Combine Code</td><td>đổi thứ tự dòng là ghép lệch</td></tr>
+<tr><td>chống trùng khi gom</td><td>ngày|Nợ|Có|Ref|sheet#n</td><td>script, chỉ nối thêm</td><td>sửa Ref / tiền sau khi gom ⇒ dòng mới, dòng cũ không mất</td></tr>
+</tbody></table></div>
+
+<h2>2 · Audit với sơ đồ AS-IS → cải tiến cho TO-BE</h2>
+<div class="au-tom">
+<div class="au-o ok"><b>5</b><span>hộp AS-IS mô tả đúng</span></div>
+<div class="au-o mid"><b>10</b><span>hộp cần bổ sung / cập nhật số</span></div>
+<div class="au-o sai"><b>7</b><span>hộp sai hoặc thiếu bước</span></div>
+</div>
+<h3>2.1 · Audit từng hộp AS-IS</h3>
+<div class="scroll"><table class="au"><thead><tr><th>hộp · bước PD</th><th>hình AS-IS nói</th><th>file / script thật</th><th>kết quả</th><th>sửa hình AS-IS</th></tr></thead><tbody>
+<tr class="b1"><th colspan="5">NGUỒN · KHAI &amp; CHỤP</th></tr>
+<tr><td class="id">aoP · aEntry · 107–114</td><td>Điền Gform, duyệt trên Gsheet; GScript điền ID, kiểm Σ PM ≤ PI/PE</td><td>Đúng; thiếu bước merge từ các file duyệt theo CDT (script) và duỗi PE 5 lần / PI 3 lần</td><td><span class="pill mid">BỔ SUNG</span></td><td>thêm "file duyệt theo CDT → merge" và quy tắc duỗi</td></tr>
+<tr><td class="id">aoP (CA) · 216</td><td>CA gõ Ref sau khi chi, giờ không cố định</td><td>Flow-use (1.3): hạn trước 10h30 D+1; Ref vào PM_Unpivot chỉ khi chạy merge</td><td><span class="pill mid">BỔ SUNG</span></td><td>ghi hạn và bước "chạy script PM_Unpivot"</td></tr>
+<tr><td class="id">aSK · 115·200</td><td>A–I dán thô, J–O ARRAYFORMULA; 60 nguồn</td><td>N (_adjust) gõ tay; dòng 1 là bản khai 1–6; 64 sheet</td><td><span class="pill mid">BỔ SUNG</span></td><td>N là ô người; 64 nguồn</td></tr>
+<tr><td class="id">aGom · 201·203</td><td>GScript đọc 6 cột chuẩn; Check trùng Ref + ngày + tiền</td><td>Đúng; thêm khoá chống trùng có số lần xuất hiện, <b>chỉ nối thêm</b></td><td><span class="pill mid">BỔ SUNG</span></td><td>ghi rủi ro dòng cũ còn lại khi sửa sau gom</td></tr>
+<tr><td class="id">aSQ · 116·202</td><td>Mỗi quỹ một sheet R |, theo mẫu tên có LE</td><td>tên không theo mẫu; Ref quỹ tự sinh PT/PC theo thứ tự (onEdit) ở 3/8 sheet</td><td><span class="pill sai">SAI</span></td><td>thêm hộp "Ref quỹ tự sinh"; LE quỹ không suy từ tên</td></tr>
+<tr><td class="id">aoSD · aCCR · 204·209</td><td>Người nhập số dư chưa xác định</td><td>kế toán, trước 10h30 D+1; DIF = Treasury − Accounting</td><td><span class="pill mid">BỔ SUNG</span></td><td>điền người, giờ</td></tr>
+<tr><td class="id">aGop · 205–208</td><td>GScript chép sang A-CCR; đang trễ 19 ngày / thiếu 377 dòng</td><td>script xoá rồi chép đè; hôm nay 10.035 = 10.035</td><td><span class="pill mid">BỔ SUNG</span></td><td>bỏ số trễ; ghi "chép đè"</td></tr>
+<tr><td class="id">aoDT · aLK · aGN · 103–106·210–213</td><td>GI Platform Data Ledger, Source (Looker), do Looker sinh</td><td>4 file; SC · PS từ Gsheet qua tab MID</td><td><span class="pill sai">SAI</span></td><td>tách 4 nguồn như ⑦</td></tr>
+<tr><td class="id">aPR · 101–102</td><td>EDD + file lương tháng</td><td>thiếu <code>H1350.List</code> — danh sách file lương do script EDD ghi</td><td><span class="pill sai">SAI</span></td><td>thêm H1350.List làm nguồn Index</td></tr>
+<tr class="b1"><th colspan="5">DỰNG · GHÉP</th></tr>
+<tr><td class="id">aTach · 219–222</td><td>6 sổ năm; PIT 2025 trùng G26; NIS 2025 thiếu G32</td><td>thêm trùng G29; sổ 2026 chỉ có tháng 1; ngày đảo</td><td><span class="pill sai">SAI</span></td><td>cập nhật lỗi sổ năm</td></tr>
+<tr><td class="id">aTach · 101</td><td>Suggestion 25 dòng = 5 × 5; No 4, No 5 lệch</td><td>30 dòng = 6 × 5; 9/25 sheet lệch</td><td><span class="pill mid">BỔ SUNG</span></td><td>sửa số</td></tr>
+<tr><td class="id">aGop · 307</td><td>QUERY ghép 112 + 111</td><td>Đúng; "Tài khoản" ở L1 thực là tên sheet R</td><td><span class="pill ok">ĐÚNG</span></td><td>—</td></tr>
+<tr><td class="id">aMM · 301</td><td>Tên sheet → LE</td><td>10 sheet thiếu khoá; 3 LE trái 2. CCR; "Cash Treasury"; 3 hệ mã</td><td><span class="pill sai">SAI</span></td><td>ghi trạng thái MM</td></tr>
+<tr><td class="id">aGhep · 308</td><td>VLOOKUP Ref dòng đầu, LE từ MM, số thứ tự ITL</td><td>Đúng; thiếu kiểm AK (LE TK ↔ LE trả, FALSE 1.350)</td><td><span class="pill mid">BỔ SUNG</span></td><td>thêm hộp "DoubleCheck LE"</td></tr>
+<tr><td class="id">aSoat · 204·209</td><td>So số dư nhập tay với lũy kế</td><td>Đúng (DIF)</td><td><span class="pill ok">ĐÚNG</span></td><td>—</td></tr>
+<tr class="b1"><th colspan="5">GHI · SỔ · RA</th></tr>
+<tr><td class="id">aNhap · 313–314</td><td>A–Q IMPORTRANGE</td><td>Đúng</td><td><span class="pill ok">ĐÚNG</span></td><td>—</td></tr>
+<tr><td class="id">aADJ · 314–318</td><td>gõ khi Classifying lỗi hoặc sai; ô trống nhận mặc định</td><td>mặc định khi ô = "Input here"; Final ưu tiên Classifying</td><td><span class="pill sai">SAI</span></td><td>viết lại luật 4 cột</td></tr>
+<tr><td class="id">aFinal · 319</td><td>ITL Ledge Final; AGGREGATE huỷ</td><td>Đúng; thiếu AUDIT ZONE ↔ Report GL</td><td><span class="pill mid">BỔ SUNG</span></td><td>thêm hộp soát chéo</td></tr>
+<tr><td class="id">aH1i · aH1F · 315–318</td><td>FILTER theo Start Date; R = VLOOKUP Số CT</td><td>Đúng; có thêm Y2026</td><td><span class="pill ok">ĐÚNG</span></td><td>—</td></tr>
+<tr><td class="id">aALL · 501–510</td><td>Combine Code Vendor-Date-NoTrans, chia CDT1</td><td>Đúng hướng; No = thứ tự xuất hiện; nhánh vendor viết cứng</td><td><span class="pill mid">BỔ SUNG</span></td><td>ghi rủi ro thứ tự</td></tr>
+<tr><td class="id">aRPT · aRH · 400–419·609–617</td><td>Report GL; in CCR ký tháng</td><td>đã có daily report + mail T2–T6; 2 bước tay (3.1), (3.2–3.5)</td><td><span class="pill sai">SAI</span></td><td>thêm daily report và 2 bước tay</td></tr>
+<tr><td class="id">aRH · 401–404</td><td>Sổ HR đã chia HD nên không cần ALLOCATE HR</td><td>Đúng (PD 500)</td><td><span class="pill ok">ĐÚNG</span></td><td>—</td></tr>
+</tbody></table></div>
+
+<h3>2.2 · Lỗi dữ liệu đang có trong Gsheet (ca cài sẵn cho fleet eval)</h3>
+<div class="scroll"><table class="au"><thead><tr><th>#</th><th>chỗ</th><th>lỗi</th><th>mức</th><th>dùng cho</th></tr></thead><tbody>
+<tr><td class="id">D1</td><td>SC · MID | Source (Luận)</td><td>IMPORTRANGE tab 202410 hai lần: 15 dòng, Σ 1.415.115.348 ₫</td><td><span class="pill sai">SAI</span></td><td>A1 · A3.3</td></tr>
+<tr><td class="id">D2</td><td>PS · MID | Source (AperoGroup_Payment )</td><td>dòng tiêu đề từng tab lọt thành dữ liệu (≥ 8 dòng, <code>#N/A</code>); tháng chỉ nhận "2025", chỉ tới dòng 1946; VND_ex lấy nhầm cột</td><td><span class="pill sai">SAI</span></td><td>A1 · A3.3</td></tr>
+<tr><td class="id">D3</td><td>H1000 Ledger sổ năm</td><td>PIT 2025 trùng 2025-6, 2025-9; NIS 2025 thiếu 2025-12; 2026 chỉ có tháng 1 (thiếu 2026-2 … 2026-10)</td><td><span class="pill sai">SAI</span></td><td>A1 · A3.2 · A4</td></tr>
+<tr><td class="id">D4</td><td>file lương 2026-1</td><td>ngày chứng từ đảo ngày / tháng (FT ngày 10/02 → 2-Oct-26)</td><td><span class="pill sai">SAI</span></td><td>A2 · A4</td></tr>
+<tr><td class="id">D5</td><td>Mapping Master</td><td>10 sheet R thiếu khoá; Mercury + PO5 → UGO1, Airwallex HGO1 → HGO6 trái 2. CCR</td><td><span class="pill sai">SAI</span></td><td>A2 (pháp nhân)</td></tr>
+<tr><td class="id">D6</td><td>file lương 2025-10</td><td>9/25 sheet No CHECK = FALSE</td><td><span class="pill mid">BỔ SUNG</span></td><td>A3.2 · A4</td></tr>
+<tr><td class="id">D7</td><td>GI · OMC</td><td>năm viết cứng "2025" trong cột tháng</td><td><span class="pill mid">BỔ SUNG</span></td><td>A1</td></tr>
+</tbody></table></div>
+
+<h3>2.3 · Cải tiến cho sơ đồ TO-BE</h3>
+<div class="scroll"><table><thead><tr><th>#</th><th>cải tiến</th><th>vì sao (bằng chứng ở phần 1)</th><th>hộp / agent TO-BE</th><th>ưu tiên</th></tr></thead><tbody>
+<tr><td class="id">T1</td><td><b>Khoá chống trùng không chứa Ref.</b> content_key = TK · ngày · Nợ · Có · số thứ tự trong sao kê; Ref và Ref_adjust là thuộc tính có lịch sử (lớp sửa)</td><td>Script gom dùng Ref trong khoá và chỉ nối thêm ⇒ đổi _adjust sau gom sinh dòng mới, dòng cũ còn; Ref quỹ là số thứ tự tự sinh lại</td><td>ảnh sao kê · DỰNG dòng tiền · Agent 1–2</td><td><span class="pill sai">CAO</span></td></tr>
+<tr><td class="id">T2</td><td><b>Bản khai nguồn đọc dòng 1 (số 1–6)</b> như script — đã có cho bank; thêm bản khai riêng cho quỹ (A–E chuẩn, Ref PT/PC) và cho nguồn nền tảng theo tháng</td><td>Script đọc vị trí từ dòng 1; quỹ khác bố cục; file SC đổi bố cục từ 202508</td><td>bản khai nguồn · k2</td><td><span class="pill mid">TB</span></td></tr>
+<tr><td class="id">T3</td><td><b>Bảng quy đổi mã pháp nhân</b> (VVOT ↔ VGO2 ↔ VVOO, CN ↔ CNC…) và làm sạch Mapping Master trước khi dùng làm đáp án; k1 dùng AK của AS-IS làm mốc (TRUE 2.176 / FALSE 1.350)</td><td>519 FALSE chỉ do lệch mã; 551 do quỹ "Cash Treasury" không có LE thật</td><td>k1 · bản khai pháp nhân TK · cổng "pháp nhân rỗng"</td><td><span class="pill sai">CAO</span></td></tr>
+<tr><td class="id">T4</td><td><b>Ghép Ref đọc thẳng Reference number trên sổ cái PM</b> (không chờ merge), giữ luật "1 PMLine – n giao dịch ⇒ một mã"; mốc so 28,8% dòng khớp</td><td>VLOOKUP dòng đầu; PM_Unpivot chỉ cập nhật Ref khi chạy merge</td><td>MAPPING PP (1) · A3.1</td><td><span class="pill sai">CAO</span></td></tr>
+<tr><td class="id">T5</td><td><b>Lương: đọc H1350.List</b> thay cột G dán tay; mỗi tháng đọc <code>1.3 Ledger</code> của file tháng; cổng "đủ tháng, không trùng tháng"; kiểm ngày CT theo ngày trong số FT</td><td>H1350.List đủ tới 2026-10 mà sổ năm 2026 chỉ có tháng 1; trùng / thiếu tháng; ngày đảo</td><td>ảnh sổ lương HR · DỰNG dòng lương · A3.2 · SOÁT PP (2)</td><td><span class="pill sai">CAO</span></td></tr>
+<tr><td class="id">T6</td><td><b>Nền tảng: chụp từ nguồn thật</b> (Looker cho GI/OMC; hai Gsheet cho SC/PS qua bản khai theo tab tháng), lọc dòng tiêu đề, năm lấy từ ngày; thay "No thứ tự" bằng khoá ổn định (ID PELine / PMLine); luật vendor viết cứng thành luật mapping có tên</td><td>D1, D2, D7; Combine Code phụ thuộc thứ tự dòng</td><td>4 sổ Platform Data Ledger · MAPPING PP (3) · A3.3</td><td><span class="pill sai">CAO</span></td></tr>
+<tr><td class="id">T7</td><td><b>Parity ADJUSTED theo đúng 4 cột</b> (Classifying → Input here → Manual → Final ưu tiên Classifying); trong TO-BE lớp sửa cho phép người đè cả giá trị Classifying sai, có actor</td><td>AS-IS không cho gõ đè giá trị hợp lệ; mặc định bật khi "Input here"</td><td>lớp sửa · GHI tay · parity</td><td><span class="pill mid">TB</span></td></tr>
+<tr><td class="id">T8</td><td><b>Thêm 3 hộp TO-BE thay bước AS-IS</b>: soát chéo sổ ITL ↔ báo cáo (AUDIT ZONE) · hàng chờ "giao dịch quẹt thẻ chưa có PM" (Flow-use 3.1) · XUẤT daily thay <code>5. Daily Report</code> + mail T2–T6</td><td>AS-IS có, TO-BE chưa vẽ</td><td>KIỂM cổng · F01 · XUẤT</td><td><span class="pill mid">TB</span></td></tr>
+<tr><td class="id">T9</td><td><b>Nhịp S1 theo SLA 10h30 D+1</b>: chụp sau hạn nhập số dư và Ref; ca kiểm ghi đáp án theo ảnh nào</td><td>Flow-use (1)</td><td>S1 · fleet eval (đáp án theo ảnh)</td><td><span class="pill ok">THẤP</span></td></tr>
+<tr><td class="id">T10</td><td><b>Không chụp cột nhạy cảm</b>: ID / Pass ở 2. CCR, CCCD ở sheet quỹ, email ở PM_Unpivot</td><td>thấy trong file</td><td>bản khai nguồn (cột cấm)</td><td><span class="pill sai">CAO</span></td></tr>
+</tbody></table></div>
+<p class="tin"><b>Kết luận:</b> xương sống PP (1) trên hình đúng với file và script. Chỗ sai tập trung ở <b>nguồn và khoá</b>: khoá chống trùng có chứa Ref, mã pháp nhân 3 hệ, sổ lương năm lấy từ cột dán tay, nguồn SC · PS gắn nhãn Looker. T1, T3–T6 và T10 nên đưa vào hình TO-BE trước khi đóng băng phiên bản để đo; D1–D7 dùng luôn làm ca cài sẵn cho fleet eval.</p>
+</section>

@@ -2572,7 +2572,7 @@ THAN_TREN = """
   Nửa phải của hình 1 là luồng <b>AS-IS</b> lấy từ sơ đồ "Voi ITL AS-IS" (<code>docs/ITL/_tools/voi_asis_goc.json</code>).<br>
   PD Now là bản gốc tham khảo: trang này chỉ mượn <b>thuật ngữ</b> (PE · PI · PM · PC · LE · CDT · HD/KRF · Reference No · General Trustest), không dùng tên sheet, tên file hay bước tính của nó. Mã FLS @ <code>2d1b710</code>.</p>
 </header>
-<p class="tin"><b>Hai trang:</b> <b>Trang 1</b> — con voi TO-BE cạnh AS-IS và bản kiểm từng bước (§1a). <b>Trang 2</b> — fleet eval: agent nào chạy mô hình nào, sơ đồ quy trình, bốn thẻ, và <b>bản AP nhúng nguyên</b> (F4). <b>Trang 3</b> — roadmap theo ngày: Phase 1 chuyển Gsheet lên FLS + AI hiểu luồng + compounding loop trên tệp mẫu; Phase 2 đưa từng agent đạt cửa vào hệ thống. <b>Cách dùng:</b> bấm một hộp hay một mũi tên (hoặc một dòng trong bảng) để làm nổi các đường nối của nó và mở khung chi tiết. Trong khung có <b>Bình luận phần này</b> và ô <b>Hỏi Claude</b>: câu hỏi được gắn đúng vào phần đang chọn, Claude trả lời trong luồng bình luận ở đó.</p>
+<p class="tin"><b>Bốn trang:</b> <b>Trang 1</b> — con voi TO-BE cạnh AS-IS và bản kiểm từng bước (§1a). <b>Trang 2</b> — fleet eval: agent nào chạy mô hình nào, sơ đồ quy trình, bốn thẻ, và <b>bản AP nhúng nguyên</b> (F4). <b>Trang 3</b> — roadmap theo ngày: Phase 1 chuyển Gsheet lên FLS + AI hiểu luồng + compounding loop trên tệp mẫu; Phase 2 đưa từng agent đạt cửa vào hệ thống. <b>Trang 4</b> — audit workflow: luồng tìm được từ file + Apps Script, audit sơ đồ AS-IS và cải tiến cho TO-BE (06/11). <b>Cách dùng:</b> bấm một hộp hay một mũi tên (hoặc một dòng trong bảng) để làm nổi các đường nối của nó và mở khung chi tiết. Trong khung có <b>Bình luận phần này</b> và ô <b>Hỏi Claude</b>: câu hỏi được gắn đúng vào phần đang chọn, Claude trả lời trong luồng bình luận ở đó.</p>
 """
 
 
@@ -2595,7 +2595,7 @@ def trang() -> str:
          '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&amp;family=IBM+Plex+Mono:wght@400;500;600;700&amp;family=IBM+Plex+Serif:wght@600&amp;display=swap">',
          f'<style>{CSS}</style>', '<main>', THAN_TREN,
          '<nav class="tab-trang" aria-label="Trang"><a href="#trang-1" data-trang="trang-1" aria-current="page">Trang 1 · Mapping TO-BE ↔ AS-IS</a>'
-         '<a href="#trang-2" data-trang="trang-2">Trang 2 · Fleet eval + AP</a><a href="#trang-3" data-trang="trang-3">Trang 3 · Roadmap</a></nav>',
+         '<a href="#trang-2" data-trang="trang-2">Trang 2 · Fleet eval + AP</a><a href="#trang-3" data-trang="trang-3">Trang 3 · Roadmap</a><a href="#trang-4" data-trang="trang-4">Trang 4 · Audit workflow</a></nav>',
          '<section class="trang" id="trang-1">',
          '<h2>§1 · Con voi — TO-BE và AS-IS cạnh nhau, chung lớp theo đời sống của dữ liệu</h2>',
          '<div class="thanh" role="toolbar" aria-label="Lọc theo trạng thái"><span class="nhan">Làm nổi:</span>'
@@ -2762,8 +2762,8 @@ def trang() -> str:
 <tr><td>4</td><td>HR và nền tảng: FLS đọc sổ ở Sheets như hôm nay, hay chờ hệ nguồn có hợp đồng?</td><td>Quyết định tuyến của x5/x6</td><td>bước 4–5</td></tr>
 <tr><td>5</td><td>⭐ <b>Đã trả lời 06/11:</b> chia theo <b>CDT1</b> (như AS-IS), qua PE/PM. Câu cũ: PP (3): "venture" khi allocate là <b>LE</b> hay <b>CDT1</b>? Tỉ lệ chia lấy từ cột nào của file Looker? AP/AR lùi khỏi GĐ1?</td><td>Owner 04/11 chốt OMC · GI · SC · PS là chi phí, mapping với bank txns rồi allocate về ventures — thay câu cũ "GI/OMC không vào sổ"</td><td>bước 5</td></tr>
 </tbody></table></div>
-""", bang_chi_phi(), '</section><section class="trang" id="trang-2" hidden>', bang_fleet_eval(), '</section><section class="trang" id="trang-3" hidden>', bang_roadmap(), '</section>', """
-<footer>Voi FLS-tobe-phase1 v0.8 · 2026-11-09 · Trang 1 mapping TO-BE ↔ AS-IS · Trang 2 fleet eval · Trang 3 roadmap · sinh bởi <code>docs/ITL/_tools/sinh_voi_phase1.py</code> · cùng bộ với <code>_PD_NOW_VOI_VA_GIAI_DOAN.md</code>.</footer>
+""", bang_chi_phi(), '</section><section class="trang" id="trang-2" hidden>', bang_fleet_eval(), '</section><section class="trang" id="trang-3" hidden>', bang_roadmap(), '</section>', (GOC / "docs/ITL/02_BA/Artifacts/Voi-trang4-audit-workflow.html").read_text(encoding="utf-8"), """
+<footer>Voi FLS-tobe-phase1 v0.8 · 2026-11-09 · Trang 1 mapping TO-BE ↔ AS-IS · Trang 2 fleet eval · Trang 3 roadmap · Trang 4 audit workflow · sinh bởi <code>docs/ITL/_tools/sinh_voi_phase1.py</code> · cùng bộ với <code>_PD_NOW_VOI_VA_GIAI_DOAN.md</code>.</footer>
 </main>
 <aside class="khung-ct" id="khung-ct" hidden aria-label="Chi tiết phần đang chọn">
   <div class="dong"><span class="eb" style="font:600 11px var(--mono);letter-spacing:.06em;color:var(--muted)">CHI TIẾT</span><button class="dong-x" id="nut-dong" type="button" aria-label="Đóng khung chi tiết">×</button></div>
