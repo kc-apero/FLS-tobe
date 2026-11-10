@@ -2056,7 +2056,12 @@ RM_NGUOI = [  # (việc của người, AS-IS hôm nay, sau Phase 1 — từ 23/
 def ve_gantt(cot: list, nhom_hang: list, tet=frozenset()) -> str:
     # cot = [(nhãn nhóm cột, nhãn dòng 2, nhãn dòng 3)] — một Gantt cho cả theo NGÀY (Phase 1) lẫn theo TUẦN (Phase 2)
     n = len(cot)
-    o = ['<div class="scroll rm-gantt-wrap"><table class="rm-gantt"><thead>']
+    # ⭐ owner 10/11 (bình luận trên R2): "sửa lại giao diện phần này và phần dưới, đồng bộ cho full màn hình"
+    #   ⇒ mọi Gantt rộng 100%, table-layout cố định; cột "module · việc" và "trạng thái" CÙNG bề rộng ở mọi Gantt
+    #   nên hai bảng (theo ngày · theo tuần) thẳng hàng bên trái; cột thời gian chia đều phần còn lại.
+    #   min-width giữ ≥ 44px mỗi cột thời gian — màn hẹp thì cuộn ngang TRONG khung, trang ⛔ cuộn ngang.
+    o = [f'<div class="scroll rm-gantt-wrap"><table class="rm-gantt" style="--n:{n}">'
+         '<colgroup><col class="g-c-item"><col class="g-c-tt">' + "<col>" * n + "</colgroup><thead>"]
     gop = []
     for g, _, _ in cot:
         if gop and gop[-1][0] == g:
@@ -2520,12 +2525,15 @@ a.nut{display:inline-block;text-decoration:none}
 .rm-p2{border-top-color:var(--ag4)} .rm-so{font:700 12px var(--mono);letter-spacing:.08em;color:var(--accent)} .rm-p2 .rm-so{color:var(--ag4)}
 .rm-ten{font:600 18px/1.3 var(--serif);margin:4px 0 6px} .rm-p p{margin:6px 0;font-size:14px} .rm-ra{color:var(--muted)}
 .rm-mui{align-self:center;font:600 28px var(--sans);color:var(--muted)}
-table.rm-gantt{border-collapse:separate;border-spacing:0;width:auto;font-size:12px}
+table.rm-gantt{--gi:440px;--gt:92px;border-collapse:separate;border-spacing:0;width:100%;table-layout:fixed;font-size:12px;min-width:calc(var(--gi) + var(--gt) + 44px * var(--n))}
+table.rm-gantt col.g-c-item{width:var(--gi)} table.rm-gantt col.g-c-tt{width:var(--gt)}   /* chung mọi Gantt ⇒ thẳng hàng */
+@media (max-width:760px){ table.rm-gantt{--gi:210px;--gt:74px} }
+#trang-3 p,#trang-3 .note,#trang-3 .ghichu{max-width:none}   /* owner 10/11: trang 3 đồng bộ full màn hình */
 table.rm-gantt th,table.rm-gantt td{border-bottom:1px solid var(--line);border-right:1px solid var(--line);padding:3px 4px;text-align:center;vertical-align:middle}
-table.rm-gantt th.g-item,table.rm-gantt td.g-item{text-align:left;min-width:330px;max-width:420px;padding:6px 10px;position:sticky;left:0;background:var(--paper);z-index:1}
+table.rm-gantt th.g-item,table.rm-gantt td.g-item{text-align:left;padding:6px 10px;position:sticky;left:0;background:var(--paper);z-index:1}
 table.rm-gantt .g-ct{font-size:11.5px;color:var(--muted);margin-top:2px;line-height:1.4}
 table.rm-gantt .g-tan{color:var(--ok)} table.rm-gantt .g-tan b{font-weight:600}
-table.rm-gantt th.g-w,table.rm-gantt td.gc{width:44px;min-width:44px}
+table.rm-gantt th.g-w,table.rm-gantt td.gc{min-width:44px;overflow:hidden}
 table.rm-gantt td.g-on{background:var(--accent-soft);color:var(--accent);font-weight:700}
 table.rm-gantt .g-tet{background:repeating-linear-gradient(45deg,var(--no-soft),var(--no-soft) 4px,transparent 4px,transparent 8px)}
 table.rm-gantt td.g-on.g-tet{background:repeating-linear-gradient(45deg,var(--accent-soft),var(--accent-soft) 4px,var(--no-soft) 4px,var(--no-soft) 8px)}

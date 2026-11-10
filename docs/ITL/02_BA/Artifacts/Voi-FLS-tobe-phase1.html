@@ -194,12 +194,15 @@ a.nut{display:inline-block;text-decoration:none}
 .rm-p2{border-top-color:var(--ag4)} .rm-so{font:700 12px var(--mono);letter-spacing:.08em;color:var(--accent)} .rm-p2 .rm-so{color:var(--ag4)}
 .rm-ten{font:600 18px/1.3 var(--serif);margin:4px 0 6px} .rm-p p{margin:6px 0;font-size:14px} .rm-ra{color:var(--muted)}
 .rm-mui{align-self:center;font:600 28px var(--sans);color:var(--muted)}
-table.rm-gantt{border-collapse:separate;border-spacing:0;width:auto;font-size:12px}
+table.rm-gantt{--gi:440px;--gt:92px;border-collapse:separate;border-spacing:0;width:100%;table-layout:fixed;font-size:12px;min-width:calc(var(--gi) + var(--gt) + 44px * var(--n))}
+table.rm-gantt col.g-c-item{width:var(--gi)} table.rm-gantt col.g-c-tt{width:var(--gt)}   /* chung mọi Gantt ⇒ thẳng hàng */
+@media (max-width:760px){ table.rm-gantt{--gi:210px;--gt:74px} }
+#trang-3 p,#trang-3 .note,#trang-3 .ghichu{max-width:none}   /* owner 10/11: trang 3 đồng bộ full màn hình */
 table.rm-gantt th,table.rm-gantt td{border-bottom:1px solid var(--line);border-right:1px solid var(--line);padding:3px 4px;text-align:center;vertical-align:middle}
-table.rm-gantt th.g-item,table.rm-gantt td.g-item{text-align:left;min-width:330px;max-width:420px;padding:6px 10px;position:sticky;left:0;background:var(--paper);z-index:1}
+table.rm-gantt th.g-item,table.rm-gantt td.g-item{text-align:left;padding:6px 10px;position:sticky;left:0;background:var(--paper);z-index:1}
 table.rm-gantt .g-ct{font-size:11.5px;color:var(--muted);margin-top:2px;line-height:1.4}
 table.rm-gantt .g-tan{color:var(--ok)} table.rm-gantt .g-tan b{font-weight:600}
-table.rm-gantt th.g-w,table.rm-gantt td.gc{width:44px;min-width:44px}
+table.rm-gantt th.g-w,table.rm-gantt td.gc{min-width:44px;overflow:hidden}
 table.rm-gantt td.g-on{background:var(--accent-soft);color:var(--accent);font-weight:700}
 table.rm-gantt .g-tet{background:repeating-linear-gradient(45deg,var(--no-soft),var(--no-soft) 4px,transparent 4px,transparent 8px)}
 table.rm-gantt td.g-on.g-tet{background:repeating-linear-gradient(45deg,var(--accent-soft),var(--accent-soft) 4px,var(--no-soft) 4px,var(--no-soft) 8px)}
@@ -2967,7 +2970,7 @@ Kiểu viền = trạng thái, màu nền = độ nặng của người kiểm, 
 <p class="note"><b>Đọc bảng trên:</b> của mục tiêu (A), phần đọc bank · dựng RAW và ADJUSTED · ghi · hàng chờ · màn hình <b>đã có và đã đo</b> — chỉ cần chạy lại. Việc mới thật trong 10 ngày: <b>ba lằn nguồn</b> (bật Cash, thêm H1000, thêm 4 sổ nền tảng), <b>bộ xuất báo cáo daily CCR</b>, <b>scrubber + gọi API</b>, <b>gói tri thức script</b> và <b>harness fleet eval</b>. ⚠ Rủi ro: nếu H1000 hoặc nền tảng chưa xanh ở N10, luồng ấy chạy bóng trên Gsheet thêm một tuần; phần đã xanh vẫn cắt 23/11. Ba nhánh chạy song song: (A) do agent fls-dev dựng, KhanhCQ duyệt; (B) và (C) do KhanhCQ; ThuongCT · AnhMC · NgaNLT vào ở N5–N7 (think-aloud) và N9–N10 (giữ / sửa gợi ý, ký).</p>
 <h2>R2 · Phase 1 — 10 ngày, theo ngày</h2>
 <p class="ghichu">Mỗi cột là một ngày làm việc (N1–N10). Ô tô = ngày đang làm · ◆ mốc · ★ đưa vào chạy thật. Dòng "tận dụng" là module đã có trong repo. Mọi ngày là <b>đề xuất, chờ ThuongCT chốt</b>.</p>
-<div class="scroll rm-gantt-wrap"><table class="rm-gantt"><thead>
+<div class="scroll rm-gantt-wrap"><table class="rm-gantt" style="--n:10"><colgroup><col class="g-c-item"><col class="g-c-tt"><col><col><col><col><col><col><col><col><col><col></colgroup><thead>
 <tr><th class="g-item" rowspan="3">module · việc</th><th rowspan="3">trạng thái</th><th colspan="5">Tuần 1 · 09/11–13/11</th><th colspan="5">Tuần 2 · 16/11–20/11</th></tr>
 <tr><th class="g-w">N1</th><th class="g-w">N2</th><th class="g-w">N3</th><th class="g-w">N4</th><th class="g-w">N5</th><th class="g-w">N6</th><th class="g-w">N7</th><th class="g-w">N8</th><th class="g-w">N9</th><th class="g-w">N10</th></tr>
 <tr><th class="g-w">T2 09/11</th><th class="g-w">T3 10/11</th><th class="g-w">T4 11/11</th><th class="g-w">T5 12/11</th><th class="g-w">T6 13/11</th><th class="g-w">T2 16/11</th><th class="g-w">T3 17/11</th><th class="g-w">T4 18/11</th><th class="g-w">T5 19/11</th><th class="g-w">T6 20/11</th></tr>
@@ -3135,7 +3138,7 @@ Kiểu viền = trạng thái, màu nền = độ nặng của người kiểm, 
 </tbody></table></div>
 <h2>R3 · Phase 2 — theo tuần</h2>
 <p class="ghichu">Mỗi cột là một tuần, ghi ngày thứ Hai. Cột kẻ sọc = tuần Tết (mùng 1 Tết là 06/02/2027): ⛔ mở cửa, ⛔ cắt.</p>
-<div class="scroll rm-gantt-wrap"><table class="rm-gantt"><thead>
+<div class="scroll rm-gantt-wrap"><table class="rm-gantt" style="--n:16"><colgroup><col class="g-c-item"><col class="g-c-tt"><col><col><col><col><col><col><col><col><col><col><col><col><col><col><col><col></colgroup><thead>
 <tr><th class="g-item" rowspan="3">module · việc</th><th rowspan="3">trạng thái</th><th colspan="2">Tháng 11/2026</th><th colspan="4">Tháng 12/2026</th><th colspan="4">Tháng 01/2027</th><th colspan="4">Tháng 02/2027</th><th colspan="2">Tháng 03/2027</th></tr>
 <tr><th class="g-w">T48</th><th class="g-w">T49</th><th class="g-w">T50</th><th class="g-w">T51</th><th class="g-w">T52</th><th class="g-w">T53</th><th class="g-w">T1</th><th class="g-w">T2</th><th class="g-w">T3</th><th class="g-w">T4</th><th class="g-w">T5</th><th class="g-w g-tet">T6</th><th class="g-w">T7</th><th class="g-w">T8</th><th class="g-w">T9</th><th class="g-w">T10</th></tr>
 <tr><th class="g-w">23/11</th><th class="g-w">30/11</th><th class="g-w">07/12</th><th class="g-w">14/12</th><th class="g-w">21/12</th><th class="g-w">28/12</th><th class="g-w">04/01</th><th class="g-w">11/01</th><th class="g-w">18/01</th><th class="g-w">25/01</th><th class="g-w">01/02</th><th class="g-w g-tet">08/02</th><th class="g-w">15/02</th><th class="g-w">22/02</th><th class="g-w">01/03</th><th class="g-w">08/03</th></tr>
