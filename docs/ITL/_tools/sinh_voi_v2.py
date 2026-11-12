@@ -444,7 +444,7 @@ def svg() -> str:
             o.append(f'<text class="hop-ten" x="{x0 + 8}" y="{y0 + 30 + i * 13}">{E(d)}</text>')
         y_cuoi = y1 - (21 if h.pd else 8) - 9          # dòng chữ cuối phải nằm trên dòng PD / trạng thái
         yy = y0 + 30 + len(dong_ten) * 13
-        for d in h.hien:
+        for d in h.hien[:2]:                         # owner 12/11: bỏ bớt chữ — đủ ở khung chi tiết
             for dd in boc(d, rong, 5.5):
                 if yy > y_cuoi:
                     break
@@ -651,6 +651,294 @@ def du_lieu() -> str:
     return json.dumps({"hop": hop, "ten": ten}, ensure_ascii=False).replace("</", "<\\/")
 
 
+# ═════════════════ NOW ↔ TO-BE · RAW → ITL ADJUST (owner 12/11) ═════════════════
+# "Đặt 2 phần cạnh nhau, mapping 1-1 các OUTPUT giữa as-is và to-be, chỉ tới ITL adjust (sau đó là mã tất định).
+#  Output của as-is và to-be phải giống nhau và phải thể hiện được trên voi. Audit ngược từ output cuối trở lại."
+# ⇒ khoá ghép hai bên là OUTPUT (⛔ hộp): mỗi output có ĐÚNG MỘT hộp sinh ở NOW và ĐÚNG MỘT ở TO-BE.
+#   Mã output = <bước>-<số> theo cùng ngữ pháp tên (RI-1 … SI-3) ⇒ đọc mã là biết output ra ở bước nào.
+OUT = {  # mã: (tên ngắn, đọc từ — output phía trên, giống nhau ở hai bên vì output giống nhau)
+    "RI-1": ("giao dịch sao kê thô", ()),
+    "RI-2": ("giao dịch quỹ thô", ()),
+    "RI-3": ("số dư ngày TK · quỹ", ()),
+    "RI-4": ("PE·PI·PM·PC line đã duyệt", ()),
+    "RI-5": ("payroll tháng + số FT", ()),
+    "RI-6": ("GI·OMC·SC·PS theo vendor", ()),
+    "PR-1": ("giao dịch bank theo ngày (Ledger 112)", ("RI-1",)),
+    "PR-2": ("giao dịch quỹ theo ngày (Ledger 111)", ("RI-2",)),
+    "PR-3": ("PM line đủ chiều (Unpivot)", ("RI-4",)),
+    "PR-4": ("dòng lương theo HD·CDT1 (1.3 Ledger)", ("RI-5",)),
+    "PR-5": ("Platform Data Ledger ×4", ("RI-6",)),
+    "SI-1": ("giao dịch ↔ PM line (Mapping L1)", ("PR-1", "PR-2", "PR-3")),
+    "SI-2": ("ITL Ledge Final", ("SI-1",)),
+    "SI-3": ("H1000 Ledge Final", ("PR-4", "SI-2")),
+}
+OUT_CUOI = ("SI-2", "SI-3")
+OUT_RA_NGOAI = {"RI-3": "cổng soát số dư (KS.SI) — ⛔ vào ITL", "PR-5": "ALLOCATE — mã tất định, ngoài phép so"}
+BANG_CHUNG = {  # output: (trạng thái, bằng chứng hai bên giống nhau — số đo có nhãn)
+    "SI-2": ("◐", "so từng ô với ITL Ledge Final đóng băng: vùng A–Q 64.393/64.393 ô · 22 kỳ; vùng chỉnh tay R–AT (7 khối) 4.088/4.088 ô · 584 dòng tháng 3/2026 — mới họ BANK"),
+    "SI-3": ("⛔", "chưa so: 0 mã H1000 trong fls/"),
+    "SI-1": ("◐", "A–Q của ITL Ledge = IMPORTRANGE của Mapping L1 ⇒ cùng phép so 64.393 ô; máy ghép fls_pm_link 2.263 mối nối"),
+    "PR-1": ("◐", "đọc 8.338/8.338 dòng bank; so từng dòng với Ledger 112: qua parity A–Q"),
+    "PR-2": ("⛔", "lằn Cash chưa chạy"),
+    "PR-3": ("◐", "28 cột PM: 14 có kiểu · 1 cấm · 13 thô; PC: 0 tham chiếu"),
+    "PR-4": ("⛔", "0 mã"),
+    "PR-5": ("⛔", "0 mã (đi ALLOCATE)"),
+    "RI-1": ("✅", "60 nguồn · 182 ảnh, đọc theo bản khai (408 dòng = 68 × 6)"),
+    "RI-2": ("⛔", "0 ảnh lằn Cash"),
+    "RI-3": ("⛔", "chỉ đo (tools/do_trong_tai.py), ⛔ chụp"),
+    "RI-4": ("◐", "PM 3.772 dòng (fls_pm_line) · PC chưa đọc"),
+    "RI-5": ("⛔", "0 mã"),
+    "RI-6": ("⛔", "0 mã"),
+}
+
+
+@dataclass
+class HopN:                 # hộp NOW (AS-IS hôm nay) — gộp các hộp gốc của voi AS-IS
+    ma: str
+    cot: int                # 1–4 trong nửa NOW
+    hang: tuple[str, str]
+    ten: str
+    ra: tuple[str, ...]     # output sinh ra
+    goc: tuple[str, ...]    # mã hộp gốc trong voi_asis_goc.json
+    pd: str
+    tay: bool = False
+
+
+HOP_NOW: list[HopN] = [
+    HopN("N1", 1, ("BANK", "BANK"), "sheet R | · 2. CCR", ("RI-1", "RI-2", "RI-3"), ("dSK", "dSQ", "dCCR", "oNH", "oKQ", "oSD"), "115–116 · 200 · 202 · 204 · 209", True),
+    HopN("N2", 1, ("PAY", "PAY"), "Entry Data PE·PI·PM·PC", ("RI-4",), ("dEntry", "oDN", "oCA"), "107–114", True),
+    HopN("N3", 1, ("HR", "HR"), "file lương tháng", ("RI-5",), ("dPR", "dEDD", "oHR", "oKTL"), "101", True),
+    HopN("N4", 1, ("PLT", "PLT"), "Looker · 2 Gsheet", ("RI-6",), ("dLK", "oDT"), "103–106", True),
+    HopN("N5", 2, ("BANK", "BANK"), "GScript gom → Ledger 112 · 111", ("PR-1", "PR-2"), ("pGB", "dBT", "pGQ", "dCT", "pCH", "dLED", "oKTG", "oKTC"), "201 · 203 · 205–208", True),
+    HopN("N6", 2, ("PAY", "PAY"), "GScript duỗi → Unpivot", ("PR-3",), ("pDUOI", "dUNP", "oKTS"), "214–218", True),
+    HopN("N7", 2, ("HR", "HR"), "tách lương → 1.3 Ledger", ("PR-4",), ("pTACH", "dL13", "pG12", "dH1000", "oKT12"), "219–222", True),
+    HopN("N8", 2, ("PLT", "PLT"), "gom → Platform Ledger", ("PR-5",), ("pGN", "dPL"), "210–213"),
+    HopN("N9", 3, ("BANK", "PAY"), "ITL 1/2 RAW · VLOOKUP Ref", ("SI-1",), ("dIU", "dIL", "pGOP", "dTO", "pGHEP", "dML1"), "302–308"),
+    HopN("N10", 4, ("BANK", "PAY"), "ITL 2/2 ADJUSTED · chỉnh tay R–AT", ("SI-2",), ("dITLi", "pADJ", "dITLF", "oKTA"), "313–314 · 319 huỷ", True),
+    HopN("N11", 4, ("HR", "HR"), "H1000 Ledge · VLOOKUP Số CT", ("SI-3",), ("dH1i", "dH1F"), "315–318"),
+]
+HOP_NOW_THEO = {h.ma: h for h in HOP_NOW}
+NGOAI_NOW = {  # hộp gốc AS-IS ⛔ vào nửa NOW — có lý do
+    "dMM": "Mapping Master → IX.MM (cấu hình)", "pSOAT": "soát số dư → KS.SI (cổng)",
+    "pTH": "báo cáo HR từ EDD — ngoài GĐ1", "dHRR": "báo cáo HR từ EDD — ngoài GĐ1",
+    "oRPT": "sau ITL — mã tất định", "oRH": "sau ITL — mã tất định", "oALL": "sau ITL — mã tất định",
+}
+RA_TOBE = {"RI.BANK": ("RI-1", "RI-2", "RI-3"), "RI.PAY": ("RI-4",), "RI.HR": ("RI-5",), "RI.PLT": ("RI-6",),
+           "PR.BANK": ("PR-1", "PR-2"), "PR.PAY": ("PR-3",), "PR.HR": ("PR-4",), "PR.PLT": ("PR-5",),
+           "SI.MAP": ("SI-1",), "SI.ITL": ("SI-2", "SI-3")}
+TEN_NOW = [  # (mã, từ, tới, làn | "doc") — dọc chỉ trong một cột
+    ("n1", "N1", "N5", "BANK"), ("n2", "N2", "N6", "PAY"), ("n3", "N3", "N7", "HR"), ("n4", "N4", "N8", "PLT"),
+    ("n5", "N5", "N9", "BANK"), ("n6", "N6", "N9", "PAY"), ("n7", "N9", "N10", "PAY"), ("n8", "N7", "N11", "HR"),
+    ("n9", "N10", "N11", "doc"),
+]
+TEN2_TOBE = {"RI.BANK": "Ảnh sao kê · quỹ · CCR", "RI.PAY": "Ảnh sổ cái PM · PC", "RI.HR": "Ảnh sổ H1000",
+             "RI.PLT": "Ảnh 4 nguồn nền tảng", "PR.BANK": "Dòng tiền + số dư ngày", "PR.PAY": "Dòng lệnh PM · PC",
+             "PR.HR": "Dòng lương + Số CT", "PR.PLT": "Chi phí 4 loại", "SI.MAP": "Ghép Ref No · Số CT",
+             "SI.ITL": "Sổ ITL hiệu lực · gốc + lớp sửa"}
+TEN_TOBE2 = [t for t in TEN if t.tu in RA_TOBE and t.toi in RA_TOBE]
+
+# lưới hình 2: nửa NOW cột 1–4 · khe giữa · nửa TO-BE cột 5–8
+LX2, CW2, GAP2, KHE2, TOP2 = 104, 150, 24, 54, 100
+HY2 = {"BANK": (TOP2, 86), "PAY": (TOP2 + 98, 86), "HR": (TOP2 + 196, 86), "PLT": (TOP2 + 294, 86)}
+W2 = LX2 + 8 * CW2 + 6 * GAP2 + KHE2 + 14
+H2 = TOP2 + 294 + 86 + 34
+COT2 = {1: "RAW", 2: "PREPARE", 3: "ITL RAW · ghép", 4: "ITL ADJUST"}
+NOW_TEP = {1: "sheet nguồn", 2: "P100 · A-CCR · H1000 Ledger", 3: "file ITL 1/2 (RAW)", 4: "file ITL 2/2 (ADJUSTED)"}
+TOBE_COT2 = {"RI": 5, "PR": 6, "SI.MAP": 7, "SI.ITL": 8}
+
+
+def cx2(c: int):
+    x = LX2 + (c - 1) * (CW2 + GAP2) + (KHE2 - GAP2 if c >= 5 else 0)
+    return x, x + CW2
+
+
+def yh2(h0: str, h1: str):
+    return HY2[h0][0], HY2[h1][0] + HY2[h1][1]
+
+
+def hop2():
+    """[(mã, bên, x, y, tên, ra, dòng mono, tay)] cho hai nửa."""
+    o = []
+    for h in HOP_NOW:
+        o.append((h.ma, "now", cx2(h.cot), yh2(*h.hang), h.ten, h.ra, "PD " + h.pd.split(" · ")[0] + (" …" if " · " in h.pd else ""), h.tay))
+    for ma, ra in RA_TOBE.items():
+        h = HOP_THEO[ma]
+        c = TOBE_COT2.get(ma) or TOBE_COT2[ma.split(".")[0]]
+        o.append((ma, "tobe", cx2(c), yh2(*h.hang), TEN2_TOBE[ma], ra, ma, bool(h.nguoi)))
+    return o
+
+
+def ten2():
+    hs = {m: (x, y) for m, _b, x, y, *_r in hop2()}
+    o = []
+    for ma, tu, toi, lan_ in TEN_NOW:
+        o.append((ma, tu, toi, lan_))
+    for t in TEN_TOBE2:
+        o.append((t.ma, t.tu, t.toi, t.hang))
+    return o, hs
+
+
+def kiem_now() -> list[str]:
+    loi: list[str] = []
+    # ① 1-1 theo output
+    for ben, ds in (("NOW", [(h.ma, h.ra) for h in HOP_NOW]), ("TO-BE", list(RA_TOBE.items()))):
+        tat = [o for _m, ra in ds for o in ra]
+        if sorted(tat) != sorted(OUT):
+            loi.append(f"{ben}: output ≠ bộ chung — thiếu {sorted(set(OUT) - set(tat))} · thừa / trùng {sorted(o for o in set(tat) if tat.count(o) != 1 or o not in OUT)}")
+    for o in OUT:
+        if not o.split("-")[0] in ("RI", "PR", "SI"):
+            loi.append(f"{o}: sai ngữ pháp")
+    for ma, ra in RA_TOBE.items():                    # output TO-BE ra đúng bước của hộp sinh nó
+        loi += [f"{o}: ra ở hộp {ma} khác bước" for o in ra if o.split("-")[0] != HOP_THEO[ma].buoc]
+    # ② 52 hộp AS-IS gốc đều có chỗ
+    goc = [g for h in HOP_NOW for g in h.goc] + list(NGOAI_NOW)
+    tat = set(json.loads(Path(__file__).with_name("voi_asis_goc.json").read_text(encoding="utf-8"))["hop"])
+    if sorted(goc) != sorted(tat):
+        loi.append(f"AS-IS gốc: thiếu {sorted(tat - set(goc))} · lạ / trùng {sorted(g for g in set(goc) if goc.count(g) != 1 or g not in tat)}")
+    # ③ mũi tên thẳng, ⛔ cắt hộp
+    tens, hs = ten2()
+    hop_ds = hop2()
+    for ma, tu, toi, lan_ in tens:
+        (ax, ay), (bx, by) = hs[tu], hs[toi]
+        if lan_ == "doc":
+            xm = (max(ax[0], bx[0]) + min(ax[1], bx[1])) / 2
+            if not (ax[0] < xm < ax[1] and bx[0] < xm < bx[1] and ay[1] <= by[0]):
+                loi.append(f"{ma}: dọc mà ⛔ cùng cột / ⛔ đi xuống")
+            continue
+        y = HY2[lan_][0] + HY2[lan_][1] / 2
+        if not (ay[0] < y < ay[1] and by[0] < y < by[1] and ax[1] < bx[0]):
+            loi.append(f"{ma}: làn {lan_} sai")
+        for m2, _b, x2, y2, *_r in hop_ds:
+            if m2 not in (tu, toi) and x2[0] < bx[0] and ax[1] < x2[1] and y2[0] < y < y2[1]:
+                loi.append(f"{ma} cắt qua {m2}")
+    # ④ mỗi quan hệ "đọc từ" có đường mũi tên ở CẢ HAI voi ⇒ output giống nhau thì đường đi cũng hiện trên voi
+    for ben, sinh, canh in (("NOW", {o: h.ma for h in HOP_NOW for o in h.ra}, [(t[1], t[2]) for t in TEN_NOW]),
+                            ("TO-BE", {o: m for m, ra in RA_TOBE.items() for o in ra}, [(t.tu, t.toi) for t in TEN_TOBE2])):
+        for o, (_t, tu_ds) in OUT.items():
+            for i in tu_ds:
+                if i not in sinh or o not in sinh:          # thiếu hộp sinh ⇒ luật ① đã báo ĐỎ; ⛔ nổ ở đây
+                    loi.append(f"{ben}: ⛔ đo được đường {i} → {o} (thiếu hộp sinh)")
+                    continue
+                a, b = sinh[i], sinh[o]
+                if a != b and not co_duong(a, b, canh):
+                    loi.append(f"{ben}: {o} đọc từ {i} mà ⛔ có đường {a} → {b}")
+    return loi
+
+
+def co_duong(a, b, canh) -> bool:
+    di, thay = [a], {a}
+    while di:
+        x = di.pop()
+        for u, v in canh:
+            if u == x and v not in thay:
+                if v == b:
+                    return True
+                thay.add(v)
+                di.append(v)
+    return False
+
+
+def svg2() -> str:
+    o = [f'<svg viewBox="0 0 {W2} {H2}" style="width:100%;max-width:{W2}px;height:auto" role="group" '
+         'aria-label="NOW (AS-IS) bên trái, TO-BE bên phải, từ RAW tới ITL Adjust; chip cùng mã là cùng một output">',
+         '<defs><marker id="mui2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" class="mui"/></marker></defs>']
+    # tầng 1: hai nửa · tầng 2: file AS-IS / agent · tầng 3: bước
+    for ben, c0, c1, nh, lop in (("now", 1, 4, "NOW · AS-IS Google Sheets hôm nay", "ben-now"), ("tobe", 5, 8, "TO-BE · FLS", "ben-tobe")):
+        x0, x1 = cx2(c0)[0] - 6, cx2(c1)[1] + 6
+        o.append(f'<rect class="ben {lop}" x="{x0}" y="4" width="{x1 - x0}" height="22" rx="5"/><text class="ben-t" x="{x0 + 10}" y="19">{E(nh)}</text>')
+        y0, y1 = HY2["BANK"][0] - 6, HY2["PLT"][0] + HY2["PLT"][1] + 6
+        o.append(f'<rect class="ben-k {lop}" x="{x0}" y="{y0}" width="{x1 - x0}" height="{y1 - y0}" rx="9"/>')
+    tang2 = [(1, 1, "sheet nguồn"), (2, 2, "P100 · A-CCR · H1000"), (3, 3, "ITL 1/2 RAW"), (4, 4, "ITL 2/2 ADJUSTED"),
+             (5, 5, "AGENT 1"), (6, 7, "AGENT 2 · ITL RAW"), (8, 8, "AGENT 3 · ITL ADJUST")]
+    for c0, c1, nh in tang2:
+        x0, x1 = cx2(c0)[0], cx2(c1)[1]
+        ag = {5: "ag-ag1", 6: "ag-ag2", 8: "ag-ag3"}.get(c0, "ag-now")
+        o.append(f'<rect class="tang2 {ag}" x="{x0}" y="32" width="{x1 - x0}" height="18" rx="4"/>'
+                 f'<text class="tang2-t" x="{(x0 + x1) / 2}" y="45" text-anchor="middle">{E(nh)}</text>')
+    for c in range(1, 9):
+        x0, x1 = cx2(c)
+        o.append(f'<text class="cot-t" x="{(x0 + x1) / 2}" y="70" text-anchor="middle">{E(COT2[(c - 1) % 4 + 1])}</text>')
+    for hm, (y, hh) in HY2.items():
+        o.append(f'<rect class="hang-n" x="8" y="{y}" width="{LX2 - 18}" height="{hh}" rx="6"/>'
+                 f'<text class="hang-t" x="18" y="{y + hh / 2 + 4}">{hm}</text>')
+    # mũi tên
+    tens, hs = ten2()
+    for ma, tu, toi, lan_ in tens:
+        (ax, ay), (bx, by) = hs[tu], hs[toi]
+        if lan_ == "doc":
+            xm = (max(ax[0], bx[0]) + min(ax[1], bx[1])) / 2
+            o.append(f'<g class="ten-g" data-ten="{ma}"><title>{ma} · VLOOKUP Số CT → ITL ID</title><line class="ten" x1="{xm}" y1="{ay[1]}" x2="{xm}" y2="{by[0] - 1}" marker-end="url(#mui2)"/>'
+                     f'<text class="ten-t" x="{xm + 4}" y="{(ay[1] + by[0]) / 2 + 3}">{ma}</text></g>')
+            continue
+        y = HY2[lan_][0] + HY2[lan_][1] / 2
+        o.append(f'<g class="ten-g" data-ten="{ma}"><line class="ten" x1="{ax[1]}" y1="{y}" x2="{bx[0] - 1}" y2="{y}" marker-end="url(#mui2)"/>'
+                 f'<text class="ten-t" x="{(ax[1] + bx[0]) / 2}" y="{y - 4}" text-anchor="middle">{ma}</text></g>')
+    # PR-5 → ALLOCATE (ngoài phép so) — chữ, ⛔ mũi tên
+    for c in (2, 6):
+        x0, x1 = cx2(c)
+        y = HY2["PLT"][0] + HY2["PLT"][1] / 2
+        o.append(f'<text class="ra-ngoai" x="{x1 + 8}" y="{y + 4}">→ ALLOCATE (mã tất định)</text>')
+    # hộp
+    for ma, ben, (x0, x1), (y0, y1), ten, ra, mono, tay in hop2():
+        lop = "now" if ben == "now" else "ag-" + agent_cua(HOP_THEO[ma])
+        o.append(f'<g class="hop2 {lop}" data-hop2="{ma}" data-o="{" ".join(ra)}" tabindex="0" role="button" aria-label="{E(ma)} · {E(ten)} · ra {" ".join(ra)}">'
+                 f'<title>{E(ten)} — ra: {E(" · ".join(o_ + " " + OUT[o_][0] for o_ in ra))}</title>'
+                 f'<rect class="hop-k" x="{x0}" y="{y0}" width="{x1 - x0}" height="{y1 - y0}" rx="6"/>'
+                 f'<text class="hop-ma" x="{x0 + 7}" y="{y0 + 14}">{E(cat_chu(mono, x1 - x0 - (60 if tay else 14), 6.2))}</text>')
+        if tay:
+            o.append(f'<rect class="nguoi" x="{x1 - 44}" y="{y0 + 4}" width="38" height="13" rx="3"/><text class="nguoi-t" x="{x1 - 25}" y="{y0 + 14}" text-anchor="middle">{"TAY" if ben == "now" else "NGƯỜI"}</text>')
+        for i, d in enumerate(boc(ten, x1 - x0 - 14, 6.2)[:2]):
+            o.append(f'<text class="hop-ten" x="{x0 + 7}" y="{y0 + 30 + i * 13}">{E(d)}</text>')
+        bx = x0 + 7
+        for oo in ra:
+            bw = 38
+            o.append(f'<g class="chip" data-o="{oo}"><rect class="chip-k chip-{oo[:2].lower()}{" chip-cuoi" if oo in OUT_CUOI else ""}" x="{bx}" y="{y1 - 20}" width="{bw}" height="15" rx="7.5"/>'
+                     f'<text class="chip-t" x="{bx + bw / 2}" y="{y1 - 9}" text-anchor="middle">{oo}</text></g>')
+            bx += bw + 4
+        o.append('</g>')
+    o.append('</svg>')
+    return "\n".join(o)
+
+
+def bang_audit() -> str:
+    sinh_now = {o: h for h in HOP_NOW for o in h.ra}
+    sinh_tb = {o: m for m, ra in RA_TOBE.items() for o in ra}
+    dung = {o: [p for p, (_t, tu) in OUT.items() if o in tu] for o in OUT}
+    nhom = [("① OUTPUT CUỐI · ITL ADJUST", [("", ["SI-2", "SI-3"])]),
+            ("② ITL RAW · ghép", [("", ["SI-1"])]),
+            ("③ PREPARE", [("", ["PR-1", "PR-2", "PR-3", "PR-4", "PR-5"])]),
+            ("④ RAW", [("tiền", ["RI-1", "RI-2", "RI-3"]), ("lệnh chi · lương · nền tảng", ["RI-4", "RI-5", "RI-6"])])]
+    o = ['<div class="scroll"><table class="io"><thead><tr><th>output</th><th>đọc từ ← · dùng bởi →</th><th>NOW sinh ở</th><th>TO-BE sinh ở</th>'
+         '<th>bằng chứng hai bên giống nhau</th></tr></thead><tbody>']
+    for g, con in nhom:
+        o.append(f'<tr class="b1"><th colspan="5">{E(g)}</th></tr>')
+        for tc, ds in con:
+            if tc:
+                o.append(f'<tr class="b2"><th colspan="5">{E(tc)}</th></tr>')
+            for oo in ds:
+                tt, bc = BANG_CHUNG[oo]
+                n = sinh_now[oo]
+                tu = " · ".join(OUT[oo][1]) or "nguồn ngoài"
+                ra = " · ".join(dung[oo]) or OUT_RA_NGOAI.get(oo, "mã tất định (CALCULATE)")
+                o.append(f'<tr class="chon2" data-o="{oo}" tabindex="0"><td><span class="chip-h chip-{oo[:2].lower()}">{oo}</span> {E(OUT[oo][0])}'
+                         f'{" <b>· output cuối</b>" if oo in OUT_CUOI else ""}</td>'
+                         f'<td class="mono">← {E(tu)}<br>→ {E(ra)}</td>'
+                         f'<td><b class="mono">{n.ma}</b> {E(n.ten)}<div class="fls">PD {E(n.pd)}</div></td>'
+                         f'<td><b class="mono">{E(sinh_tb[oo])}</b> {E(TEN2_TOBE[sinh_tb[oo]])}</td>'
+                         f'<td><span class="pill {lop_tt(tt)}">{tt}</span> {E(bc)}</td></tr>')
+    o.append('</tbody></table></div>')
+    return "\n".join(o)
+
+
+def tom_tat_now() -> str:
+    dem = {k: sum(1 for v in BANG_CHUNG.values() if v[0] == k) for k in ("✅", "◐", "⛔")}
+    cuoi = " · ".join(f"{o} {OUT[o][0]} {BANG_CHUNG[o][0]}" for o in OUT_CUOI)
+    return (f'<p class="note">Máy kiểm lúc sinh: <b>{len(OUT)} output</b>, mỗi output có đúng 1 hộp sinh ở NOW và đúng 1 ở TO-BE; '
+            f'{len(HOP_NOW)} hộp NOW gộp đủ {sum(len(h.goc) for h in HOP_NOW)} hộp gốc của voi AS-IS ({len(NGOAI_NOW)} hộp còn lại có lý do: cấu hình, cổng, sau ITL); '
+            f'mọi quan hệ "đọc từ" đều có đường mũi tên trên CẢ HAI voi. Output cuối: {E(cuoi)}. '
+            f'Đã chứng minh giống nhau: ✅ {dem["✅"]} · ◐ {dem["◐"]} · ⛔ {dem["⛔"]} trên {len(OUT)}.</p>')
+
+
 CSS = r"""
 /* Lưới FPA: hàng = phần dữ liệu, cột = bước. Hình rộng cuộn trong khung; khung chi tiết neo phải (điện thoại: đáy). */
 :root{
@@ -741,6 +1029,22 @@ tr.chon{cursor:pointer}tr.chon:hover,tr.chon.sang{background:var(--mid-s)}
 .zoom button:focus-visible{outline:2px solid var(--sel);outline-offset:1px}
 #z-muc{font:600 12px var(--mono);min-width:48px;text-align:center;color:var(--muted);font-variant-numeric:tabular-nums}
 #hinh-khung svg{display:block;height:auto}
+.ben{stroke:none}.ben-now{fill:var(--muted)}.ben-tobe{fill:var(--fg)}.ben-t{font:700 11.5px var(--mono);letter-spacing:.06em;fill:var(--paper)}
+.ben-k{fill:none;stroke-width:1.6}.ben-k.ben-now{stroke:var(--muted);stroke-dasharray:6 4}.ben-k.ben-tobe{stroke:var(--fg)}
+.tang2{stroke:none}.tang2.ag-now{fill:var(--line)}.tang2.ag-ag1{fill:var(--a1-s)}.tang2.ag-ag2{fill:var(--a2-s)}.tang2.ag-ag3{fill:var(--a3-s)}
+.tang2-t{font:600 10px var(--mono);letter-spacing:.05em}
+.hop2{cursor:pointer}.hop2.now .hop-k{fill:var(--paper);stroke:var(--muted);stroke-dasharray:4 3;stroke-width:1.4}.hop2.now .hop-ma{fill:var(--muted);font-weight:500}
+.hop2.ag-ag1 .hop-k{stroke:var(--a1);fill:var(--a1-s)}.hop2.ag-ag2 .hop-k{stroke:var(--a2);fill:var(--a2-s)}.hop2.ag-ag3 .hop-k{stroke:var(--a3);fill:var(--a3-s)}
+.hop2.ag-ag1 .hop-ma{fill:var(--a1)}.hop2.ag-ag2 .hop-ma{fill:var(--a2)}.hop2.ag-ag3 .hop-ma{fill:var(--a3)}
+.chip{cursor:pointer}.chip-k{stroke-width:1.2}.chip-t{font:700 9.5px var(--mono)}
+.chip-ri{fill:var(--a1-s);stroke:var(--a1)}.chip-pr{fill:var(--a2-s);stroke:var(--a2)}.chip-si{fill:var(--a3-s);stroke:var(--a3)}.chip-cuoi{stroke-width:2.4}
+.chip-h{display:inline-block;font:700 11px var(--mono);padding:0 6px;border-radius:8px;border:1.2px solid}
+span.chip-ri{background:var(--a1-s);border-color:var(--a1);color:var(--a1)}span.chip-pr{background:var(--a2-s);border-color:var(--a2);color:var(--a2)}span.chip-si{background:var(--a3-s);border-color:var(--a3);color:var(--a3)}
+.ra-ngoai{font:italic 10px var(--sans);fill:var(--muted)}
+svg.loc2 .hop2:not(.sang2){opacity:.3}svg.loc2 .ten-g{opacity:.3}
+.hop2.sang2 .hop-k{stroke:var(--sel)!important;stroke-width:3}.chip.sang2 .chip-k{stroke:var(--sel);stroke-width:3}
+tr.chon2{cursor:pointer}tr.chon2.sang2{background:var(--mid-s)}
+.note{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:10px 14px;font-size:13px;max-width:none}
 .legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:12.5px;color:var(--muted);margin:8px 0}
 .legend i{display:inline-block;width:14px;height:10px;border-radius:2px;vertical-align:-1px;margin-right:5px;border:1.5px solid}
 .ngu{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px;margin:10px 0}
@@ -807,13 +1111,24 @@ JS = r"""
   nutVua.addEventListener('click', vuaKhung);
   window.addEventListener('resize', () => { if (vua) vuaKhung(); });
   vuaKhung();
+  // ── hình 2: bấm chip / hộp / dòng bảng ⇒ sáng mọi chỗ mang cùng output, ở cả hai bên
+  const svg2 = document.querySelector('#hinh2 svg');
+  function sang2(os){
+    document.querySelectorAll('.sang2').forEach(x => x.classList.remove('sang2'));
+    if (!os) { svg2.classList.remove('loc2'); return; }
+    svg2.classList.add('loc2');
+    os.forEach(o => document.querySelectorAll('[data-o~="'+o+'"]').forEach(x => x.classList.add('sang2')));
+  }
+  svg2.addEventListener('click', ev => { const c = ev.target.closest('.chip') || ev.target.closest('[data-o]'); sang2(c ? c.dataset.o.split(' ') : null); });
+  svg2.addEventListener('keydown', ev => { const c = ev.target.closest('[data-o]'); if (c && (ev.key === 'Enter' || ev.key === ' ')) { ev.preventDefault(); sang2(c.dataset.o.split(' ')); } });
+  document.querySelectorAll('tr.chon2').forEach(r => r.addEventListener('click', () => { sang2([r.dataset.o]); svg2.scrollIntoView({block:'nearest'}); }));
   document.addEventListener('keydown', ev => { if (ev.key === 'Escape') dong(); });
 })();
 """
 
 
 def trang() -> str:
-    loi = kiem()
+    loi = kiem() + kiem_now()
     if loi:
         raise SystemExit("⛔ voi SAI:\n  " + "\n  ".join(loi))
     n_dl = sum(1 for h in HOP if HANG[h.hang[0]][0] == "DỮ LIỆU")
@@ -853,16 +1168,23 @@ def trang() -> str:
          '<span id="z-muc" aria-live="polite">100%</span><button type="button" id="z-cong" aria-label="Phóng to">+</button>'
          '<button type="button" id="z-100">100%</button><button type="button" id="z-vua" aria-pressed="true">Vừa khung</button></div>',
          f'<figure id="hinh"><div class="scroll" id="hinh-khung">{svg()}</div><figcaption>{cap}</figcaption></figure>',
-         '<h2>§2 · Đầu vào và đầu ra của từng hộp</h2>'
+         '<h2>§2 · NOW ↔ TO-BE · RAW → ITL Adjust, ghép theo output</h2>'
+         '<p>Hai voi cạnh nhau, cùng hàng họ dữ liệu, cùng bốn bước. Chip <span class="chip-h chip-ri">RI-1</span> … <span class="chip-h chip-si">SI-3</span> là <b>output</b>: '
+         'cùng mã ở hai bên là cùng một output — bấm một chip hay một hộp để làm sáng cặp. Dừng ở ITL Adjust; CALCULATE → REPORT là mã tất định, giữ nguyên.</p>',
+         f'<figure id="hinh2"><div class="scroll">{svg2()}</div></figure>', tom_tat_now(),
+         '<h2>§3 · Audit ngược — từ output cuối về RAW</h2>'
+         '<p>Đọc từ trên xuống: output cuối trước, rồi output nó đọc từ, tới nguồn thô. Mỗi dòng: NOW sinh ở đâu, TO-BE sinh ở đâu, và phép đo nào chứng minh hai bên ra cùng một thứ.</p>',
+         bang_audit(),
+         '<h2>§4 · Đầu vào và đầu ra của từng hộp TO-BE</h2>'
          '<p>Cột <i>vào</i> / <i>ra</i>: dòng đậm là mũi tên trên hình (mã <span class="mono">e…</span>), dòng nhạt là nguồn ngoài, người, hay cấu hình. '
          'Cột <i>thay bước PD Now</i> nối mỗi hộp về đúng các bước AS-IS nó thay — bấm một dòng để thấy hộp trên hình.</p>',
          bang_io(),
-         '<h2>§3 · Mũi tên nói gì</h2>', bang_ten(),
-         '<h2>§4 · Mọi bước PD Now đều có chỗ</h2>', bang_phu(),
-         '<h2>§5 · Soát lại voi AS-IS trong artifact theo PD Now</h2>'
+         '<h2>§5 · Mũi tên nói gì</h2>', bang_ten(),
+         '<h2>§6 · Mọi bước PD Now đều có chỗ</h2>', bang_phu(),
+         '<h2>§7 · Soát lại voi AS-IS trong artifact theo PD Now</h2>'
          f'<p>Đo bằng máy: lấy cột "bước" của 52 hộp AS-IS gốc (<code>voi_asis_goc.json</code>) so với {len(PDNOW["buoc"])} bước PD Now và {len(PDNOW["ten"])} mũi tên suy từ ma trận I/O.</p>',
          bang_asis(),
-         '<h2>§6 · Câu chờ owner duyệt</h2><ol>'
+         '<h2>§8 · Câu chờ owner duyệt</h2><ol>'
          '<li><b>Ngữ pháp tên</b> <code>RI·PR·SI·CA·SO·AL·DW·RP·KS·IX + .phần</code> và đuôi <code>-ATL</code> — giữ? (vd <code>APR</code> của FPA gồm cả RAW, ở đây RAW tách thành <code>RI</code>.)</li>'
          '<li><b>Chia agent theo hai file ITL của AS-IS:</b> bước ghép Reference No / Số CT (<code>SI.MAP</code>, PD 302–308 nằm trong file ITL 1/2 RAW) chuyển từ Agent 3 sang <b>Agent 2 · ITL raw</b>; Agent 3 · ITL Adjust giữ sổ ITL + lớp sửa (file 2/2 ADJUSTED). Voi v0.9 đặt bước ghép ở Agent 3 — đổi như vậy được không?</li>'
          '<li><b>Hai cột STANDARD INPUT</b> (ghép · sổ ITL): sổ ITL hiệu lực là "standard input" của FLS (như A-SI-R20/R50 của FPA) — đúng ý chưa?</li>'
@@ -876,7 +1198,8 @@ def trang() -> str:
 
 
 def main() -> int:
-    loi = kiem()
+    loi = kiem() + kiem_now()
+    print(f"NOW ↔ TO-BE: output {len(OUT)} · hộp NOW {len(HOP_NOW)} (gộp {sum(len(h.goc) for h in HOP_NOW)} hộp gốc + {len(NGOAI_NOW)} ngoài)")
     print(f"hộp {len(HOP)} · mũi tên {len(TEN)} · cột {len(COT)} · hàng {len(HANG)}")
     print(f"PD Now: {len(PDNOW['buoc'])} bước · vào hộp {sum(len(h.pd) for h in HOP)} · ngoài {sum(len(v) for v in NGOAI.values())}")
     if loi:
