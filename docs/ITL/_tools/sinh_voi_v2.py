@@ -90,15 +90,15 @@ HANG = {  # mã hàng: (nhóm hàng, nhãn, nhãn phụ, mã bước của hàng
     "PAY": ("DỮ LIỆU", "PAY", "lệnh chi · PE·PI·PM·PC", None),
     "HR": ("DỮ LIỆU", "HR", "lương · H1000", None),
     "PLT": ("DỮ LIỆU", "PLT", "nền tảng GI·OMC·SC·PS", None),
-    "KS": ("KIỂM SOÁT", "AGENT 4", "Auditor · cổng mỗi bước", "KS"),
+    "KS": ("KIỂM SOÁT", "KIỂM SOÁT", "NOW: người · TO-BE: Agent 4", "KS"),
     "IX": ("CONFIG", "INDEX", "khai · danh mục · tỷ giá", "IX"),
 }
 LX, CW, GAP = 178, 158, 30
 TOP = 120
 HY = {"BANK": (TOP, 104), "PAY": (TOP + 118, 104), "HR": (TOP + 236, 104), "PLT": (TOP + 354, 104),
-      "KS": (TOP + 482, 70), "IX": (TOP + 566, 70)}
+      "KS": (TOP + 500, 70), "IX": (TOP + 584, 70)}        # khe trên KS: dải nhãn Agent 4
 W = LX + 11 * CW + 10 * GAP + 18
-H = TOP + 566 + 70 + 12
+H = TOP + 584 + 70 + 12
 THU_TU_HANG = list(HY)
 
 
@@ -404,6 +404,14 @@ def svg() -> str:
         o.append(f'<rect class="ag-dai ag-{ag}" x="{x0}" y="4" width="{x1 - x0}" height="36" rx="6"/>'
                  f'<text class="ag-t" x="{x0 + 10}" y="18">{E(d1)}</text><text class="ag-t2" x="{x0 + 10}" y="33">{E(d2)}</text>'
                  f'<rect class="ag-khung ag-{ag}" x="{x0}" y="{y0}" width="{x1 - x0}" height="{y1 - y0}" rx="10"/>')
+    # ⭐ owner 13/11: "đưa agent 4 về đúng chỗ bên phần to-be" — Agent 4 là một LÀN của TO-BE (dải + khung riêng
+    #   quanh hàng KIỂM SOÁT), ⛔ nằm ở nhãn hàng chung (chỗ ấy đứng cạnh hộp NOW "soát bằng mắt").
+    yk, hk = HY["KS"]
+    x0, x1 = cx(1)[0] - 8, cx(11)[1] + 8
+    o.append(f'<rect class="ag-dai ag-ag4" x="{x0}" y="{yk - 26}" width="{x1 - x0}" height="20" rx="5"/>'
+             f'<text class="ag-t" x="{x0 + 10}" y="{yk - 12}">{E(AGENT_TEN["ag4"].upper())}</text>'
+             f'<text class="ag-t2" x="{x1 - 10}" y="{yk - 12}" text-anchor="end">một cổng cho mỗi bước · mô hình khác họ với Agent 1–3</text>'
+             f'<rect class="ag-khung ag-ag4" x="{x0}" y="{yk - 6}" width="{x1 - x0}" height="{hk + 12}" rx="10"/>')
     for g in NHOM_COT:
         cs = [c for c, v in COT.items() if v[0] == g]
         x0, x1 = cx(cs[0])[0] - 2, cx(cs[-1])[1] + 2
@@ -958,7 +966,7 @@ figure .scroll{padding:6px}
 figcaption{color:var(--muted);font-size:13px;margin-top:8px;max-width:110ch}
 svg text{font-family:var(--sans);fill:var(--fg)}
 .ag-dai{stroke:none}.ag-t{font:700 11.5px var(--mono);letter-spacing:.06em;fill:var(--paper)}.ag-t2{font:500 10.5px var(--sans);fill:var(--paper)}
-.ag-dai.ag-ag1{fill:var(--a1)}.ag-dai.ag-ag2{fill:var(--a2)}.ag-dai.ag-ag3{fill:var(--a3)}.ag-dai.ag-ma{fill:var(--muted)}
+.ag-dai.ag-ag1{fill:var(--a1)}.ag-dai.ag-ag2{fill:var(--a2)}.ag-dai.ag-ag3{fill:var(--a3)}.ag-dai.ag-ag4{fill:var(--a4)}.ag-khung.ag-ag4{stroke:var(--a4)}.ag-dai.ag-ma{fill:var(--muted)}
 .ag-khung{fill:none;stroke-width:2}.ag-khung.ag-ag1{stroke:var(--a1)}.ag-khung.ag-ag2{stroke:var(--a2)}.ag-khung.ag-ag3{stroke:var(--a3)}
 .ag-khung.ag-ma{stroke:var(--muted);stroke-dasharray:6 4}
 .buoc-l{stroke:var(--line);stroke-width:1.5}.buoc-t{font:600 10.5px var(--mono);letter-spacing:.12em;fill:var(--muted)}

@@ -37,7 +37,7 @@ figure .scroll{padding:6px}
 figcaption{color:var(--muted);font-size:13px;margin-top:8px;max-width:110ch}
 svg text{font-family:var(--sans);fill:var(--fg)}
 .ag-dai{stroke:none}.ag-t{font:700 11.5px var(--mono);letter-spacing:.06em;fill:var(--paper)}.ag-t2{font:500 10.5px var(--sans);fill:var(--paper)}
-.ag-dai.ag-ag1{fill:var(--a1)}.ag-dai.ag-ag2{fill:var(--a2)}.ag-dai.ag-ag3{fill:var(--a3)}.ag-dai.ag-ma{fill:var(--muted)}
+.ag-dai.ag-ag1{fill:var(--a1)}.ag-dai.ag-ag2{fill:var(--a2)}.ag-dai.ag-ag3{fill:var(--a3)}.ag-dai.ag-ag4{fill:var(--a4)}.ag-khung.ag-ag4{stroke:var(--a4)}.ag-dai.ag-ma{fill:var(--muted)}
 .ag-khung{fill:none;stroke-width:2}.ag-khung.ag-ag1{stroke:var(--a1)}.ag-khung.ag-ag2{stroke:var(--a2)}.ag-khung.ag-ag3{stroke:var(--a3)}
 .ag-khung.ag-ma{stroke:var(--muted);stroke-dasharray:6 4}
 .buoc-l{stroke:var(--line);stroke-width:1.5}.buoc-t{font:600 10.5px var(--mono);letter-spacing:.12em;fill:var(--muted)}
@@ -142,7 +142,7 @@ tr.chon2{cursor:pointer}tr.chon2.sang2{background:var(--mid-s)}
 </tbody></table></div>
 <h2>§1 · Con voi — NOW bên trái, TO-BE bên phải</h2><p>Một hình, chung hàng họ dữ liệu. Bên trái: luồng Google Sheets hôm nay tới ITL Adjust. Bên phải: TO-BE theo agent × bước. Chip <span class="chip-h chip-ri">RI-1</span> … <span class="chip-h chip-si">SI-3</span> là <b>output</b> — cùng mã ở hai bên là cùng một output; bấm một chip để làm sáng cặp. Sau ITL Adjust là mã tất định nên bên NOW dừng ở đó.</p><div class="legend"><span><i style="border-color:var(--muted);border-style:dashed"></i>NOW · Google Sheets hôm nay · TAY = người bấm / gõ</span><span><i style="border-color:var(--a1);background:var(--a1-s)"></i>Agent 1 · Collect_raw_data</span><span><i style="border-color:var(--a2);background:var(--a2-s)"></i>Agent 2 · Generate Group Ledger (ITL raw)</span><span><i style="border-color:var(--a3);background:var(--a3-s)"></i>Agent 3 · Filter Fulfill &amp; Adjust (ITL Adjust)</span><span><i style="border-color:var(--muted);border-style:dashed"></i>mã tất định</span><span><i style="border-color:var(--a4);background:var(--a4-s)"></i>Agent 4 · Auditor (Compounding Loop)</span><span><i style="border-color:var(--ix);background:var(--ix-s);border-style:dashed"></i>INDEX · CONFIG</span><span><b style="color:var(--ok)">✅</b> có mã · <b style="color:var(--mid)">◐</b> một phần · <b style="color:var(--no)">⛔</b> chưa có mã</span></div>
 <div class="zoom" role="toolbar" aria-label="Phóng to thu nhỏ hình"><button type="button" id="z-tru" aria-label="Thu nhỏ">−</button><span id="z-muc" aria-live="polite">100%</span><button type="button" id="z-cong" aria-label="Phóng to">+</button><button type="button" id="z-100">100%</button><button type="button" id="z-vua" aria-pressed="true">Vừa khung</button></div>
-<figure id="hinh"><div class="scroll" id="hinh-khung"><svg viewBox="0 0 3012 768" width="3012" height="768" role="group" aria-label="Voi FLS v2: NOW (AS-IS) bên trái tới ITL Adjust, TO-BE bên phải; hàng = họ dữ liệu, cột = bước; chip cùng mã là cùng một output">
+<figure id="hinh"><div class="scroll" id="hinh-khung"><svg viewBox="0 0 3012 786" width="3012" height="786" role="group" aria-label="Voi FLS v2: NOW (AS-IS) bên trái tới ITL Adjust, TO-BE bên phải; hàng = họ dữ liệu, cột = bước; chip cùng mã là cùng một output">
 <defs><marker id="mui" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" class="mui"/></marker></defs>
 <rect class="ben ben-now" x="170" y="4" width="738" height="36" rx="6"/><text class="ag-t" x="180" y="18">NOW · AS-IS GOOGLE SHEETS HÔM NAY</text><text class="ag-t2" x="180" y="33">tới ITL Adjust — phần sau là mã tất định, giữ nguyên</text><rect class="ben-k ben-now" x="170" y="112" width="738" height="474" rx="10"/>
 <line class="buoc-l" x1="178" y1="57" x2="336" y2="57"/><text class="buoc-t" x="257.0" y="53" text-anchor="middle">sheet nguồn</text><text class="cot-t" x="257.0" y="73" text-anchor="middle">RAW</text><text class="cot-ma" x="257.0" y="88" text-anchor="middle">PD 1xx</text>
@@ -216,22 +216,23 @@ tr.chon2{cursor:pointer}tr.chon2.sang2{background:var(--mid-s)}
 <text class="hop-ten" x="750" y="400">Số CT</text>
 <g class="chip" data-o="SI-3"><rect class="chip-k chip-si chip-cuoi" x="750" y="438" width="38" height="15" rx="7.5"/><text class="chip-t" x="769" y="449" text-anchor="middle">SI-3</text></g>
 </g>
-<g class="hop2 now" data-o="" tabindex="0" role="button" aria-label="NOW soát số dư bằng mắt: Ledger 111/112 ↔ 2. CCR (DIF)"><title>soát số dư bằng mắt: Ledger 111/112 ↔ 2. CCR (DIF) · PD 204 · 209</title><rect class="hop-k" x="178" y="602" width="722" height="70" rx="6"/><text class="hop-ma" x="186" y="617">PD 204 · 209</text>
-<rect class="nguoi" x="854" y="607" width="40" height="13" rx="3"/><text class="nguoi-t" x="874" y="617" text-anchor="middle">TAY</text>
-<text class="hop-ten" x="186" y="633">soát số dư bằng mắt: Ledger 111/112 ↔ 2. CCR (DIF)</text>
+<g class="hop2 now" data-o="" tabindex="0" role="button" aria-label="NOW soát số dư bằng mắt: Ledger 111/112 ↔ 2. CCR (DIF)"><title>soát số dư bằng mắt: Ledger 111/112 ↔ 2. CCR (DIF) · PD 204 · 209</title><rect class="hop-k" x="178" y="620" width="722" height="70" rx="6"/><text class="hop-ma" x="186" y="635">PD 204 · 209</text>
+<rect class="nguoi" x="854" y="625" width="40" height="13" rx="3"/><text class="nguoi-t" x="874" y="635" text-anchor="middle">TAY</text>
+<text class="hop-ten" x="186" y="651">soát số dư bằng mắt: Ledger 111/112 ↔ 2. CCR (DIF)</text>
 
 </g>
-<g class="hop2 now" data-o="" tabindex="0" role="button" aria-label="NOW Mapping Master (sheet → LE · hd)"><title>Mapping Master (sheet → LE · hd) · PD 301</title><rect class="hop-k" x="554" y="686" width="158" height="70" rx="6"/><text class="hop-ma" x="562" y="701">PD 301</text>
-<text class="hop-ten" x="562" y="717">Mapping Master (sheet</text>
-<text class="hop-ten" x="562" y="730">→ LE · hd)</text>
+<g class="hop2 now" data-o="" tabindex="0" role="button" aria-label="NOW Mapping Master (sheet → LE · hd)"><title>Mapping Master (sheet → LE · hd) · PD 301</title><rect class="hop-k" x="554" y="704" width="158" height="70" rx="6"/><text class="hop-ma" x="562" y="719">PD 301</text>
+<text class="hop-ten" x="562" y="735">Mapping Master (sheet</text>
+<text class="hop-ten" x="562" y="748">→ LE · hd)</text>
 
 </g>
-<line class="tach" x1="928.0" y1="4" x2="928.0" y2="764"/>
+<line class="tach" x1="928.0" y1="4" x2="928.0" y2="782"/>
 <g transform="translate(778,0)">
 <rect class="ag-dai ag-ag1" x="170" y="4" width="174" height="36" rx="6"/><text class="ag-t" x="180" y="18">AGENT 1 · RAW</text><text class="ag-t2" x="180" y="33">Collect_raw_data</text><rect class="ag-khung ag-ag1" x="170" y="112" width="174" height="474" rx="10"/>
 <rect class="ag-dai ag-ag2" x="358" y="4" width="362" height="36" rx="6"/><text class="ag-t" x="368" y="18">AGENT 2 · ITL RAW</text><text class="ag-t2" x="368" y="33">Generate Group Ledger</text><rect class="ag-khung ag-ag2" x="358" y="112" width="362" height="474" rx="10"/>
 <rect class="ag-dai ag-ag3" x="734" y="4" width="174" height="36" rx="6"/><text class="ag-t" x="744" y="18">AGENT 3 · ITL ADJUST</text><text class="ag-t2" x="744" y="33">Filter Fulfill &amp; Adjust</text><rect class="ag-khung ag-ag3" x="734" y="112" width="174" height="474" rx="10"/>
 <rect class="ag-dai ag-ma" x="922" y="4" width="1302" height="36" rx="6"/><text class="ag-t" x="932" y="18">MÃ TẤT ĐỊNH</text><text class="ag-t2" x="932" y="33">Calculate → Report: luật + phép cộng, không cần mô hình (F0b)</text><rect class="ag-khung ag-ma" x="922" y="112" width="1302" height="474" rx="10"/>
+<rect class="ag-dai ag-ag4" x="170" y="594" width="2054" height="20" rx="5"/><text class="ag-t" x="180" y="608">AGENT 4 · AUDITOR (COMPOUNDING LOOP)</text><text class="ag-t2" x="2214" y="608" text-anchor="end">một cổng cho mỗi bước · mô hình khác họ với Agent 1–3</text><rect class="ag-khung ag-ag4" x="170" y="614" width="2054" height="82" rx="10"/>
 <line class="buoc-l" x1="176" y1="57" x2="526" y2="57"/><text class="buoc-t" x="351.0" y="53" text-anchor="middle">INPUT</text>
 <line class="buoc-l" x1="552" y1="57" x2="1278" y2="57"/><text class="buoc-t" x="915.0" y="53" text-anchor="middle">CALCULATE</text>
 <line class="buoc-l" x1="1304" y1="57" x2="1654" y2="57"/><text class="buoc-t" x="1479.0" y="53" text-anchor="middle">ALLOCATE</text>
@@ -442,66 +443,66 @@ tr.chon2{cursor:pointer}tr.chon2.sang2{background:var(--mid-s)}
 <text class="hop-tt tt-mid" x="1878" y="571">◐ 6 màn ✅ · truy ngược báo cáo ⛔</text>
 
 </g>
-<g class="hop ag-ag4" data-id="h:KS.RI" data-o="" tabindex="0" role="button" aria-label="KS.RI · CỔNG INPUT"><title>KS.RI · CỔNG INPUT</title><rect class="hop-k" x="178" y="602" width="346" height="70" rx="6"/><text class="hop-ma" x="186" y="617">KS.RI</text>
-<text class="hop-ten" x="186" y="632">CỔNG INPUT</text>
-<text class="hop-d" x="186" y="645">bản khai đủ · bề rộng cột</text>
-<text class="hop-tt tt-mid" x="186" y="665">◐</text>
+<g class="hop ag-ag4" data-id="h:KS.RI" data-o="" tabindex="0" role="button" aria-label="KS.RI · CỔNG INPUT"><title>KS.RI · CỔNG INPUT</title><rect class="hop-k" x="178" y="620" width="346" height="70" rx="6"/><text class="hop-ma" x="186" y="635">KS.RI</text>
+<text class="hop-ten" x="186" y="650">CỔNG INPUT</text>
+<text class="hop-d" x="186" y="663">bản khai đủ · bề rộng cột</text>
+<text class="hop-tt tt-mid" x="186" y="683">◐</text>
 
 </g>
-<g class="hop ag-ag4" data-id="h:KS.SI" data-o="" tabindex="0" role="button" aria-label="KS.SI · CỔNG GHÉP + SỔ"><title>KS.SI · CỔNG GHÉP + SỔ</title><rect class="hop-k" x="554" y="602" width="346" height="70" rx="6"/><text class="hop-ma" x="562" y="617">KS.SI</text>
-<rect class="nguoi" x="854" y="607" width="40" height="13" rx="3"/><text class="nguoi-t" x="874" y="617" text-anchor="middle">NGƯỜI</text>
-<text class="hop-ten" x="562" y="632">CỔNG GHÉP + SỔ</text>
-<text class="hop-d" x="562" y="645">9 luật · Σ line = tiền · 4 vế</text>
-<text class="hop-tt tt-mid" x="562" y="665">◐ 9 luật ✅ · DIF ⛔</text>
+<g class="hop ag-ag4" data-id="h:KS.SI" data-o="" tabindex="0" role="button" aria-label="KS.SI · CỔNG GHÉP + SỔ"><title>KS.SI · CỔNG GHÉP + SỔ</title><rect class="hop-k" x="554" y="620" width="346" height="70" rx="6"/><text class="hop-ma" x="562" y="635">KS.SI</text>
+<rect class="nguoi" x="854" y="625" width="40" height="13" rx="3"/><text class="nguoi-t" x="874" y="635" text-anchor="middle">NGƯỜI</text>
+<text class="hop-ten" x="562" y="650">CỔNG GHÉP + SỔ</text>
+<text class="hop-d" x="562" y="663">9 luật · Σ line = tiền · 4 vế</text>
+<text class="hop-tt tt-mid" x="562" y="683">◐ 9 luật ✅ · DIF ⛔</text>
 
 </g>
-<g class="hop ag-ag4" data-id="h:KS.CA" data-o="" tabindex="0" role="button" aria-label="KS.CA · CỔNG CALCULATE"><title>KS.CA · CỔNG CALCULATE</title><rect class="hop-k" x="930" y="602" width="346" height="70" rx="6"/><text class="hop-ma" x="938" y="617">KS.CA</text>
-<text class="hop-ten" x="938" y="632">CỔNG CALCULATE</text>
-<text class="hop-d" x="938" y="645">Σ theo LE = Σ theo nguồn</text>
-<text class="hop-tt tt-no" x="938" y="665">⛔</text>
+<g class="hop ag-ag4" data-id="h:KS.CA" data-o="" tabindex="0" role="button" aria-label="KS.CA · CỔNG CALCULATE"><title>KS.CA · CỔNG CALCULATE</title><rect class="hop-k" x="930" y="620" width="346" height="70" rx="6"/><text class="hop-ma" x="938" y="635">KS.CA</text>
+<text class="hop-ten" x="938" y="650">CỔNG CALCULATE</text>
+<text class="hop-d" x="938" y="663">Σ theo LE = Σ theo nguồn</text>
+<text class="hop-tt tt-no" x="938" y="683">⛔</text>
 
 </g>
-<g class="hop ag-ag4" data-id="h:KS.AL" data-o="" tabindex="0" role="button" aria-label="KS.AL · CỔNG ALLOCATE"><title>KS.AL · CỔNG ALLOCATE</title><rect class="hop-k" x="1306" y="602" width="346" height="70" rx="6"/><text class="hop-ma" x="1314" y="617">KS.AL</text>
-<text class="hop-ten" x="1314" y="632">CỔNG ALLOCATE</text>
-<text class="hop-d" x="1314" y="645">Σ phần chia = tiền GD</text>
-<text class="hop-tt tt-no" x="1314" y="665">⛔</text>
+<g class="hop ag-ag4" data-id="h:KS.AL" data-o="" tabindex="0" role="button" aria-label="KS.AL · CỔNG ALLOCATE"><title>KS.AL · CỔNG ALLOCATE</title><rect class="hop-k" x="1306" y="620" width="346" height="70" rx="6"/><text class="hop-ma" x="1314" y="635">KS.AL</text>
+<text class="hop-ten" x="1314" y="650">CỔNG ALLOCATE</text>
+<text class="hop-d" x="1314" y="663">Σ phần chia = tiền GD</text>
+<text class="hop-tt tt-no" x="1314" y="683">⛔</text>
 
 </g>
-<g class="hop ag-ag4" data-id="h:KS.RP" data-o="" tabindex="0" role="button" aria-label="KS.RP · CỔNG REPORT · PARITY"><title>KS.RP · CỔNG REPORT · PARITY</title><rect class="hop-k" x="1682" y="602" width="534" height="70" rx="6"/><text class="hop-ma" x="1690" y="617">KS.RP</text>
-<text class="hop-ten" x="1690" y="632">CỔNG REPORT · PARITY</text>
-<text class="hop-d" x="1690" y="645">từng ô = ITL Ledge Final / Daily Report AS-IS</text>
-<text class="hop-tt tt-mid" x="1690" y="665">◐ parity ITL ✅ · báo cáo ⛔</text>
+<g class="hop ag-ag4" data-id="h:KS.RP" data-o="" tabindex="0" role="button" aria-label="KS.RP · CỔNG REPORT · PARITY"><title>KS.RP · CỔNG REPORT · PARITY</title><rect class="hop-k" x="1682" y="620" width="534" height="70" rx="6"/><text class="hop-ma" x="1690" y="635">KS.RP</text>
+<text class="hop-ten" x="1690" y="650">CỔNG REPORT · PARITY</text>
+<text class="hop-d" x="1690" y="663">từng ô = ITL Ledge Final / Daily Report AS-IS</text>
+<text class="hop-tt tt-mid" x="1690" y="683">◐ parity ITL ✅ · báo cáo ⛔</text>
 
 </g>
-<g class="hop ag-ix" data-id="h:IX.KHAI" data-o="" tabindex="0" role="button" aria-label="IX.KHAI · BẢN KHAI NGUỒN"><title>IX.KHAI · BẢN KHAI NGUỒN</title><rect class="hop-k" x="178" y="686" width="346" height="70" rx="6"/><text class="hop-ma" x="186" y="701">IX.KHAI</text>
-<rect class="nguoi" x="478" y="691" width="40" height="13" rx="3"/><text class="nguoi-t" x="498" y="701" text-anchor="middle">NGƯỜI</text>
-<text class="hop-ten" x="186" y="716">BẢN KHAI NGUỒN</text>
-<text class="hop-d" x="186" y="729">cột · thứ tự ngày · LE TK</text>
-<text class="hop-tt tt-ok" x="186" y="749">✅ 408 dòng = 68 × 6</text>
+<g class="hop ag-ix" data-id="h:IX.KHAI" data-o="" tabindex="0" role="button" aria-label="IX.KHAI · BẢN KHAI NGUỒN"><title>IX.KHAI · BẢN KHAI NGUỒN</title><rect class="hop-k" x="178" y="704" width="346" height="70" rx="6"/><text class="hop-ma" x="186" y="719">IX.KHAI</text>
+<rect class="nguoi" x="478" y="709" width="40" height="13" rx="3"/><text class="nguoi-t" x="498" y="719" text-anchor="middle">NGƯỜI</text>
+<text class="hop-ten" x="186" y="734">BẢN KHAI NGUỒN</text>
+<text class="hop-d" x="186" y="747">cột · thứ tự ngày · LE TK</text>
+<text class="hop-tt tt-ok" x="186" y="767">✅ 408 dòng = 68 × 6</text>
 
 </g>
-<g class="hop ag-ix" data-id="h:IX.MM" data-o="" tabindex="0" role="button" aria-label="IX.MM · MAPPING MASTER"><title>IX.MM · MAPPING MASTER</title><rect class="hop-k" x="554" y="686" width="346" height="70" rx="6"/><text class="hop-ma" x="562" y="701">IX.MM</text>
-<text class="hop-ten" x="562" y="716">MAPPING MASTER</text>
-<text class="hop-pd" x="562" y="736">PD 301</text>
-<text class="hop-tt tt-mid" x="562" y="749">◐ bộ nạp có</text>
+<g class="hop ag-ix" data-id="h:IX.MM" data-o="" tabindex="0" role="button" aria-label="IX.MM · MAPPING MASTER"><title>IX.MM · MAPPING MASTER</title><rect class="hop-k" x="554" y="704" width="346" height="70" rx="6"/><text class="hop-ma" x="562" y="719">IX.MM</text>
+<text class="hop-ten" x="562" y="734">MAPPING MASTER</text>
+<text class="hop-pd" x="562" y="754">PD 301</text>
+<text class="hop-tt tt-mid" x="562" y="767">◐ bộ nạp có</text>
 
 </g>
-<g class="hop ag-ix" data-id="h:IX.FX" data-o="" tabindex="0" role="button" aria-label="IX.FX · TỶ GIÁ · CHIỀU ASD"><title>IX.FX · TỶ GIÁ · CHIỀU ASD</title><rect class="hop-k" x="930" y="686" width="346" height="70" rx="6"/><text class="hop-ma" x="938" y="701">IX.FX</text>
-<text class="hop-ten" x="938" y="716">TỶ GIÁ · CHIỀU ASD</text>
-<text class="hop-d" x="938" y="729">9.2 Exchange Rate theo tháng</text>
-<text class="hop-tt tt-no" x="938" y="749">⛔</text>
+<g class="hop ag-ix" data-id="h:IX.FX" data-o="" tabindex="0" role="button" aria-label="IX.FX · TỶ GIÁ · CHIỀU ASD"><title>IX.FX · TỶ GIÁ · CHIỀU ASD</title><rect class="hop-k" x="930" y="704" width="346" height="70" rx="6"/><text class="hop-ma" x="938" y="719">IX.FX</text>
+<text class="hop-ten" x="938" y="734">TỶ GIÁ · CHIỀU ASD</text>
+<text class="hop-d" x="938" y="747">9.2 Exchange Rate theo tháng</text>
+<text class="hop-tt tt-no" x="938" y="767">⛔</text>
 
 </g>
-<g class="hop ag-ix" data-id="h:IX.MB" data-o="" tabindex="0" role="button" aria-label="IX.MB · MAPPING BLOCK · TỶ TRỌNG"><title>IX.MB · MAPPING BLOCK · TỶ TRỌNG</title><rect class="hop-k" x="1306" y="686" width="346" height="70" rx="6"/><text class="hop-ma" x="1314" y="701">IX.MB</text>
-<text class="hop-ten" x="1314" y="716">MAPPING BLOCK · TỶ TRỌNG</text>
-<text class="hop-d" x="1314" y="729">Vendor ↔ Network-Acc ↔ CDT1</text>
-<text class="hop-tt tt-no" x="1314" y="749">⛔</text>
+<g class="hop ag-ix" data-id="h:IX.MB" data-o="" tabindex="0" role="button" aria-label="IX.MB · MAPPING BLOCK · TỶ TRỌNG"><title>IX.MB · MAPPING BLOCK · TỶ TRỌNG</title><rect class="hop-k" x="1306" y="704" width="346" height="70" rx="6"/><text class="hop-ma" x="1314" y="719">IX.MB</text>
+<text class="hop-ten" x="1314" y="734">MAPPING BLOCK · TỶ TRỌNG</text>
+<text class="hop-d" x="1314" y="747">Vendor ↔ Network-Acc ↔ CDT1</text>
+<text class="hop-tt tt-no" x="1314" y="767">⛔</text>
 
 </g>
-<g class="hop ag-ix" data-id="h:IX.TMP" data-o="" tabindex="0" role="button" aria-label="IX.TMP · KHUÔN BÁO CÁO"><title>IX.TMP · KHUÔN BÁO CÁO</title><rect class="hop-k" x="1682" y="686" width="534" height="70" rx="6"/><text class="hop-ma" x="1690" y="701">IX.TMP</text>
-<text class="hop-ten" x="1690" y="716">KHUÔN BÁO CÁO</text>
-<text class="hop-d" x="1690" y="729">Templ 1–5 (PD590) · Filters (PD510)</text>
-<text class="hop-tt tt-no" x="1690" y="749">⛔</text>
+<g class="hop ag-ix" data-id="h:IX.TMP" data-o="" tabindex="0" role="button" aria-label="IX.TMP · KHUÔN BÁO CÁO"><title>IX.TMP · KHUÔN BÁO CÁO</title><rect class="hop-k" x="1682" y="704" width="534" height="70" rx="6"/><text class="hop-ma" x="1690" y="719">IX.TMP</text>
+<text class="hop-ten" x="1690" y="734">KHUÔN BÁO CÁO</text>
+<text class="hop-d" x="1690" y="747">Templ 1–5 (PD590) · Filters (PD510)</text>
+<text class="hop-tt tt-no" x="1690" y="767">⛔</text>
 
 </g>
 </g>
@@ -509,8 +510,8 @@ tr.chon2{cursor:pointer}tr.chon2.sang2{background:var(--mid-s)}
 <rect class="hang-n hang-dữ" x="16" y="238" width="148" height="104" rx="6"/><text class="hang-t" x="26" y="287.0">PAY</text><text class="hang-p" x="26" y="302.0">lệnh chi · PE·PI·PM·PC</text>
 <rect class="hang-n hang-dữ" x="16" y="356" width="148" height="104" rx="6"/><text class="hang-t" x="26" y="405.0">HR</text><text class="hang-p" x="26" y="420.0">lương · H1000</text>
 <rect class="hang-n hang-dữ" x="16" y="474" width="148" height="104" rx="6"/><text class="hang-t" x="26" y="523.0">PLT</text><text class="hang-p" x="26" y="538.0">nền tảng GI·OMC·SC·PS</text>
-<rect class="hang-n hang-kiểm" x="16" y="602" width="148" height="70" rx="6"/><text class="hang-t" x="26" y="634.0">AGENT 4</text><text class="hang-p" x="26" y="649.0">Auditor · cổng mỗi bước</text>
-<rect class="hang-n hang-config" x="16" y="686" width="148" height="70" rx="6"/><text class="hang-t" x="26" y="718.0">INDEX</text><text class="hang-p" x="26" y="733.0">khai · danh mục · tỷ giá</text>
+<rect class="hang-n hang-kiểm" x="16" y="620" width="148" height="70" rx="6"/><text class="hang-t" x="26" y="652.0">KIỂM SOÁT</text><text class="hang-p" x="26" y="667.0">NOW: người · TO-BE: Agent 4</text>
+<rect class="hang-n hang-config" x="16" y="704" width="148" height="70" rx="6"/><text class="hang-t" x="26" y="736.0">INDEX</text><text class="hang-p" x="26" y="751.0">khai · danh mục · tỷ giá</text>
 </svg></div><figcaption>Hình 1 — Voi FLS v2. <b>Nửa trái NOW</b>: 13 hộp gộp từ voi AS-IS của artifact cũ, tới ITL Adjust. <b>Nửa phải TO-BE</b> — trục ngang: tầng trên là <b>agent</b> (Agent 1 · Agent 2 · Agent 3 · mã tất định), tầng dưới là <b>bước</b> theo kiến trúc FPA (INPUT · CALCULATE · ALLOCATE · WAREHOUSE · REPORT, 11 cột con); <b>Agent 4 · Auditor</b> là làn ngang chạy suốt các bước. <b>Trục dọc</b>: bốn họ dữ liệu BANK · PAY · HR · PLT, rồi hàng INDEX. Máy kiểm lúc sinh: <b>31 hộp</b> (21 hộp luồng · 5 cổng · 5 cấu hình) · <b>23 mũi tên</b>, cả 23 nằm ngang, đi trái → phải, 0 cắt qua hộp (e8 · e13 đi qua làn trống); mã mỗi hộp nói đúng bước của cột chứa nó. Nhãn NGƯỜI = có tay người · chip A3.3 = agent gợi ý phần dư · "PD …" = bước PD Now hộp ấy thay.</figcaption></figure>
 <p class="note">Máy kiểm lúc sinh: <b>14 output</b>, mỗi output có đúng 1 hộp sinh ở NOW và đúng 1 ở TO-BE; 13 hộp NOW gộp đủ 47 hộp gốc của voi AS-IS (5 hộp còn lại có lý do: cấu hình, cổng, sau ITL); mọi quan hệ "đọc từ" đều có đường mũi tên trên CẢ HAI voi. Output cuối: SI-2 ITL Ledge Final ◐ · SI-3 H1000 Ledge Final ⛔. Đã chứng minh giống nhau: ✅ 1 · ◐ 5 · ⛔ 8 trên 14.</p>
 <h2>§2 · Audit ngược — từ output cuối về RAW</h2><p>Đọc từ trên xuống: output cuối trước, rồi output nó đọc từ, tới nguồn thô. Mỗi dòng: NOW sinh ở đâu, TO-BE sinh ở đâu, và phép đo nào chứng minh hai bên ra cùng một thứ.</p>
