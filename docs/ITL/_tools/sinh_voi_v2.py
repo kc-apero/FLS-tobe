@@ -187,22 +187,25 @@ HOP: list[Hop] = [
         "⛔", r(210, 213),
         fls="0 mã: grep 'Combine Code' trong fls/ + tools/ = 0", cu="dNT"),
     # ── ② CALCULATE · STANDARD INPUT ──
-    Hop("SI.MAP", (3, 3), ("BANK", "HR"), "GHÉP GIAO DỊCH ↔ LỆNH",
-        ("PP (1) Reference No → PM line", "  Σ line = tiền · N×M để người", "PP (2) Số CT → dòng lương",
+    # ⭐ owner 13/11 (bình luận trên hình): "PLT cũng cần được đưa về standard input (tương đương ITL raw ở as-is).
+    #   Vì giới hạn của nền tảng as-is nên H1000 và PLT không thể đưa vào, nhưng lên hệ thống mới SI cần đủ cả 4 phần"
+    #   ⇒ SI.MAP · SI.ITL · CA.GL trải BANK → PLT; e8 vào SI.MAP (⛔ còn đi thẳng ALLOCATE); thêm output SI-4.
+    Hop("SI.MAP", (3, 3), ("BANK", "PLT"), "GHÉP GIAO DỊCH ↔ LỆNH",
+        ("PP1 Ref No → PM · PP2 Số CT → lương", "PP3 Combine Code → PE/PM (nền tảng)", "  Σ line = tiền · N×M để người",
          "→ L1 khớp · L1b lệch", "→ L2 FPS có, bank chưa", "→ L3 bank có, FPS không", "L3: vòng cộng dồn gợi ý loại GD"),
         "◐ PS Có: 26,79% dòng nối", r(302, 308),
         vao=("IX.MM — Mapping Master · luật ghép đã ký",),
-        fls="fls/adapters/pm_join.py · fls/repo/may_ghep.py — fls_pm_link 2.263 · mẫu số PS Có 8.246; PP (2): 0 mã",
+        fls="fls/adapters/pm_join.py · fls/repo/may_ghep.py — fls_pm_link 2.263 · mẫu số PS Có 8.246; PP (2): 0 mã · PP (3) Combine Code: 0 mã",
         cu="ghep · ghep2 (+ hình 2)"),
-    Hop("SI.ITL", (4, 4), ("BANK", "HR"), "SỔ ITL HIỆU LỰC",
-        ("sổ gốc chỉ-thêm (INV-I08)", "+ lớp sửa: người › máy › nguồn", "dòng loại có lý do", "một bảng · 4 họ nguồn",
+    Hop("SI.ITL", (4, 4), ("BANK", "PLT"), "SỔ ITL HIỆU LỰC",
+        ("gốc chỉ-thêm + lớp sửa (người › máy)", "một bảng · đủ 4 họ: BANK·PAY·HR·PLT", "dòng loại có lý do",
          "3 vai pháp nhân", "thay ITL Ledge + H1000 Ledge", "(Final · cột R–AT)"),
         "◐ 1 họ nguồn · parity 4.088/4.088", ("313", "314") + r(315, 319),
         vao=("người: ghép / sửa / đảo trên F01 · F02 (ghi_tay, actor từ thẻ)",),
         fls="fls_itl 8.387 · fls_adjustment 4.428 · fls_reject · fls_journal · final_rule 7 khối 4.088/4.088 ô · RAW 64.393/64.393 ô",
         cu="ghiNap · loai · soITL · lopSua · ghiTay · hieuLuc", nguoi="kế toán sửa tay (thay vùng R–AT)"),
     # ── ② CALCULATE · CA + SO ──
-    Hop("CA.GL", (5, 5), ("BANK", "HR"), "SỔ CÁI GL · QUY ĐỔI",
+    Hop("CA.GL", (5, 5), ("BANK", "PLT"), "SỔ CÁI GL · QUY ĐỔI",
         ("ITL → khuôn GL (Templ 2)", "quy đổi theo tỷ giá tháng", "gắn chiều: CFA1 (LE)", "PLA1 · CFA3 · PLA3 (KRF)",
          "ngày → kỳ chuẩn"),
         "⛔", r(400, 406),
@@ -219,7 +222,7 @@ HOP: list[Hop] = [
         "⛔", r(511, 513), vao=("IX.MB — tỷ trọng LE · NOEM · GI",),
         fls="fls/adapters/mapping_master.py biết từ vựng By GI (8) · By NOEM (5); phép chia: 0 mã", cu="(mới)"),
     Hop("AL.PLT", (7, 7), ("HR", "PLT"), "PHÂN BỔ NỀN TẢNG",
-        ("Combine Code → PE/PM", "Mapping Block 1:", "Vendor ↔ Network ↔ CDT1", "CFA2 MID 1–3 · ×7 CDT1", "Σ phần chia = tiền GD"),
+        ("Mapping Block 1: Vendor ↔ Network ↔ CDT1", "CFA2 MID 1–3 · ×7 CDT1", "Σ phần chia = tiền GD", "(Combine Code đã ghép ở SI.MAP)"),
         "⛔", ("500",) + r(501, 510), vao=("IX.MB — Mapping Block 1",),
         fls="0 mã (fls/ledger/allocate.py chỉ là cột AU = CFA1 của ITL Ledge, ⛔ phân bổ nền tảng)",
         cu="ghep3 · soat3 (+ hình 3)"),
@@ -297,7 +300,7 @@ TEN: list[Ten] = [
     Ten("e5", "PR.BANK", "SI.MAP", "BANK", "dòng tiền canon hai vế + số dư ngày từng TK", "content_key", "207·208→302→307→308", "b"),
     Ten("e6", "PR.PAY", "SI.MAP", "PAY", "dòng lệnh: Ref No · tiền · tiền tệ · HD/KRF · CDT1 · LE trả · kỳ DV", "pm_line_id", "214…217→303…305→308", "b"),
     Ten("e7", "PR.HR", "SI.MAP", "HR", "dòng lương + Số CT (số FT kế toán dán)", "Số CT", "219…222→315…318 (VLOOKUP Số CT)", "b"),
-    Ten("e8", "PR.PLT", "AL.PLT", "PLT", "chi phí theo loại · vendor · ngày + Combine Code — đi qua làn trống tới ALLOCATE", "(vendor, ngày, NoTrans)", "210…213→502→504", "b"),
+    Ten("e8", "PR.PLT", "SI.MAP", "PLT", "chi phí theo loại · vendor · ngày + Combine Code — vào STANDARD INPUT như 3 họ kia", "(vendor, ngày, NoTrans)", "210…213→502→504 (AS-IS: ở ALLOCATE)", "b"),
     Ten("e9", "SI.MAP", "SI.ITL", "PAY", "mối nối (giao dịch ↔ PM line / dòng lương, tiền chia) + lớp L1 · L1b · L2 · L3", "(content_key, pm_line_id)", "308→314 · 315…318", "c"),
     Ten("e10", "SI.ITL", "CA.GL", "PAY", "sổ ITL hiệu lực: dòng + giá trị hiệu lực + 3 vai pháp nhân", "itl_id", "314→400 · 315…318→401…404", "c"),
     Ten("e11", "CA.GL", "SO.CFA1", "BANK", "dòng GL đã quy đổi, chiều CFA1 (theo LE)", "itl_id + kỳ", "400→409→410", "c"),
@@ -315,7 +318,7 @@ TEN: list[Ten] = [
     Ten("e23", "RP.PL", "RP.CCR", "PAY", "Daily Report 3 (P&L) vào báo cáo daily CCR", "(CDT1, ngày)", "609→615", "f"),
 ]
 NHOM_TEN = {  # 5 nhóm trên; INPUT chia 2 nhóm con
-    "a": ("① INPUT", "RAW → PREPARE"), "b": ("① INPUT", "PREPARE → CALCULATE / ALLOCATE"),
+    "a": ("① INPUT", "RAW → PREPARE"), "b": ("① INPUT", "PREPARE → STANDARD INPUT"),
     "c": ("② CALCULATE", ""), "d": ("③ ALLOCATE", ""), "e": ("④ vào KHO", ""), "f": ("⑤ REPORT", ""),
 }
 
@@ -632,7 +635,7 @@ def bang_asis() -> str:
          "tách: CA.GL · SO.CFA1 · SO.PLA3 · AL.KEY · AL.PLT · SO.PLA3-ATL"),
         ("Sai đầu vào", "Mũi tên o3 vẽ <i>sổ nền tảng → PHÂN BỔ</i>. PD Now 501 phân bổ đọc <b>[Import] Report General Ledger</b> (406) + Source (502) "
                         "+ Vendor &amp; Network Mapping (503) — thiếu đầu vào GL: chi phí nền tảng được chia từ dòng PE đã vào sổ, không chỉ từ file nguồn.",
-         "e15 SO.PLA3 → AL.PLT + e8 PR.PLT → AL.PLT"),
+         "e8 PR.PLT → SI.MAP (nền tảng vào SI) + e15 SO.PLA3 → AL.PLT"),
         ("Thiếu nút", "9.2 Exchange Rate (405 · 614); CCR là cả đầu vào (204 · 209) lẫn đầu ra (615 · 616) nhưng chỉ vẽ vào SOÁT. "
                       f"Ma trận PD Now tự nó có {len(PDNOW['treo'])} chỗ 'I' trỏ vào cột không bước nào sinh ra (vd 207 → [Importrange] 1.2 Ledger 112: 302 chỉ ghi 111).",
          "IX.FX · RP.CCR; câu hỏi ④ cuối trang"),
@@ -689,12 +692,17 @@ OUT = {  # mã: (tên ngắn, đọc từ — output phía trên, giống nhau �
     "SI-1": ("giao dịch ↔ PM line (Mapping L1)", ("PR-1", "PR-2", "PR-3")),
     "SI-2": ("ITL Ledge Final", ("SI-1",)),
     "SI-3": ("H1000 Ledge Final", ("PR-4", "SI-2")),
+    "SI-4": ("dòng nền tảng nối PE/PM (Combine Code)", ("PR-5", "SI-1")),
 }
-OUT_CUOI = ("SI-2", "SI-3")
-OUT_RA_NGOAI = {"RI-3": "cổng soát số dư (KS.SI) — ⛔ vào ITL", "PR-5": "ALLOCATE — mã tất định, ngoài phép so"}
+OUT_CUOI = ("SI-2", "SI-3", "SI-4")
+# output mà nửa NOW ⛔ sinh được tới ITL Adjust — AS-IS làm ở chỗ khác; máy chấp nhận CHỈ khi có ghi chỗ ấy
+OUT_NOW_NGOAI = {"SI-4": ("PD 504", "ALLOCATE · CFA1 | GI Platform Data Ledger — Combine Code ghép dòng ITL với nguồn; "
+                                    "Gsheet không gộp được vào ITL (ITL AGGREGATE 319 đã huỷ)")}
+OUT_RA_NGOAI = {"RI-3": "cổng soát số dư (KS.SI) — ⛔ vào ITL", }
 BANG_CHUNG = {  # output: (trạng thái, bằng chứng hai bên giống nhau — số đo có nhãn)
     "SI-2": ("◐", "so từng ô với ITL Ledge Final đóng băng: vùng A–Q 64.393/64.393 ô · 22 kỳ; vùng chỉnh tay R–AT (7 khối) 4.088/4.088 ô · 584 dòng tháng 3/2026 — mới họ BANK"),
     "SI-3": ("⛔", "chưa so: 0 mã H1000 trong fls/"),
+    "SI-4": ("⛔", "chưa so: 0 mã Combine Code trong fls/ + tools/; đáp án AS-IS ở cột A–Q của CFA1 | GI Platform Data Ledger (504)"),
     "SI-1": ("◐", "A–Q của ITL Ledge = IMPORTRANGE của Mapping L1 ⇒ cùng phép so 64.393 ô; máy ghép fls_pm_link 2.263 mối nối"),
     "PR-1": ("◐", "đọc 8.338/8.338 dòng bank; so từng dòng với Ledger 112: qua parity A–Q"),
     "PR-2": ("⛔", "lằn Cash chưa chạy"),
@@ -746,7 +754,7 @@ NGOAI_NOW = {  # hộp gốc AS-IS ⛔ vào nửa NOW — có lý do
 }
 RA_TOBE = {"RI.BANK": ("RI-1", "RI-2", "RI-3"), "RI.PAY": ("RI-4",), "RI.HR": ("RI-5",), "RI.PLT": ("RI-6",),
            "PR.BANK": ("PR-1", "PR-2"), "PR.PAY": ("PR-3",), "PR.HR": ("PR-4",), "PR.PLT": ("PR-5",),
-           "SI.MAP": ("SI-1",), "SI.ITL": ("SI-2", "SI-3")}
+           "SI.MAP": ("SI-1",), "SI.ITL": ("SI-2", "SI-3", "SI-4")}
 TEN_NOW = [  # (mã, từ, tới, làn | "doc") — dọc chỉ trong một cột
     ("n1", "N1", "N5", "BANK"), ("n2", "N2", "N6", "PAY"), ("n3", "N3", "N7", "HR"), ("n4", "N4", "N8", "PLT"),
     ("n5", "N5", "N9", "BANK"), ("n6", "N6", "N9", "PAY"), ("n7", "N9", "N10", "PAY"), ("n8", "N7", "N11", "HR"),
@@ -754,8 +762,8 @@ TEN_NOW = [  # (mã, từ, tới, làn | "doc") — dọc chỉ trong một cộ
 ]
 TEN2_TOBE = {"RI.BANK": "Ảnh sao kê · quỹ · CCR", "RI.PAY": "Ảnh sổ cái PM · PC", "RI.HR": "Ảnh sổ H1000",
              "RI.PLT": "Ảnh 4 nguồn nền tảng", "PR.BANK": "Dòng tiền + số dư ngày", "PR.PAY": "Dòng lệnh PM · PC",
-             "PR.HR": "Dòng lương + Số CT", "PR.PLT": "Chi phí 4 loại", "SI.MAP": "Ghép Ref No · Số CT",
-             "SI.ITL": "Sổ ITL hiệu lực · gốc + lớp sửa"}
+             "PR.HR": "Dòng lương + Số CT", "PR.PLT": "Chi phí 4 loại", "SI.MAP": "Ghép Ref No · Số CT · Combine Code",
+             "SI.ITL": "Sổ ITL hiệu lực · đủ 4 họ"}
 TEN_TOBE2 = [t for t in TEN if t.tu in RA_TOBE and t.toi in RA_TOBE]
 
 # ⭐ Owner 13/11: "đưa sơ đồ 1 và sơ đồ 2 về cùng 1 sơ đồ và đặt cạnh nhau" ⇒ NOW là nửa TRÁI của hình 1,
@@ -788,7 +796,7 @@ def chip_ra(ra, x, y) -> str:
 def kiem_now() -> list[str]:
     loi: list[str] = []
     # ① 1-1 theo output
-    for ben, ds in (("NOW", [(h.ma, h.ra) for h in HOP_NOW]), ("TO-BE", list(RA_TOBE.items()))):
+    for ben, ds in (("NOW", [(h.ma, h.ra) for h in HOP_NOW] + [("ngoài", tuple(OUT_NOW_NGOAI))]), ("TO-BE", list(RA_TOBE.items()))):
         tat = [o for _m, ra in ds for o in ra]
         if sorted(tat) != sorted(OUT):
             loi.append(f"{ben}: output ≠ bộ chung — thiếu {sorted(set(OUT) - set(tat))} · thừa / trùng {sorted(o for o in set(tat) if tat.count(o) != 1 or o not in OUT)}")
@@ -826,6 +834,8 @@ def kiem_now() -> list[str]:
     for ben, sinh, canh in (("NOW", {o: h.ma for h in HOP_NOW for o in h.ra}, [(t[1], t[2]) for t in TEN_NOW]),
                             ("TO-BE", {o: m for m, ra in RA_TOBE.items() for o in ra}, [(t.tu, t.toi) for t in TEN_TOBE2])):
         for o, (_t, tu_ds) in OUT.items():
+            if ben == "NOW" and o in OUT_NOW_NGOAI:      # AS-IS sinh ở ngoài nửa NOW — đã ghi chỗ, ⛔ đòi đường
+                continue
             for i in tu_ds:
                 if i not in sinh or o not in sinh:          # thiếu hộp sinh ⇒ luật ① đã báo ĐỎ; ⛔ nổ ở đây
                     loi.append(f"{ben}: ⛔ đo được đường {i} → {o} (thiếu hộp sinh)")
@@ -895,7 +905,7 @@ def bang_audit() -> str:
     sinh_now = {o: h for h in HOP_NOW for o in h.ra}
     sinh_tb = {o: m for m, ra in RA_TOBE.items() for o in ra}
     dung = {o: [p for p, (_t, tu) in OUT.items() if o in tu] for o in OUT}
-    nhom = [("① OUTPUT CUỐI · ITL ADJUST", [("", ["SI-2", "SI-3"])]),
+    nhom = [("① OUTPUT CUỐI · ITL ADJUST", [("", ["SI-2", "SI-3", "SI-4"])]),
             ("② ITL RAW · ghép", [("", ["SI-1"])]),
             ("③ PREPARE", [("", ["PR-1", "PR-2", "PR-3", "PR-4", "PR-5"])]),
             ("④ RAW", [("tiền", ["RI-1", "RI-2", "RI-3"]), ("lệnh chi · lương · nền tảng", ["RI-4", "RI-5", "RI-6"])])]
@@ -908,14 +918,15 @@ def bang_audit() -> str:
                 o.append(f'<tr class="b2"><th colspan="5">{E(tc)}</th></tr>')
             for oo in ds:
                 tt, bc = BANG_CHUNG[oo]
-                n = sinh_now[oo]
+                n = sinh_now.get(oo)
                 tu = " · ".join(OUT[oo][1]) or "nguồn ngoài"
                 ra = " · ".join(dung[oo]) or OUT_RA_NGOAI.get(oo, "mã tất định (CALCULATE)")
                 o.append(f'<tr class="chon2" data-o="{oo}" tabindex="0"><td><span class="chip-h chip-{oo[:2].lower()}">{oo}</span> {E(OUT[oo][0])}'
                          f'{" <b>· output cuối</b>" if oo in OUT_CUOI else ""}</td>'
                          f'<td class="mono">← {E(tu)}<br>→ {E(ra)}</td>'
-                         f'<td><b class="mono">{n.ma}</b> {E(n.ten)}<div class="fls">PD {E(n.pd)}</div></td>'
-                         f'<td><b class="mono">{E(sinh_tb[oo])}</b> {E(TEN2_TOBE[sinh_tb[oo]])}</td>'
+                         + (f'<td><b class="mono">{n.ma}</b> {E(n.ten)}<div class="fls">PD {E(n.pd)}</div></td>' if n else
+                            f'<td><b class="mono">{OUT_NOW_NGOAI[oo][0]}</b> {E(OUT_NOW_NGOAI[oo][1])}</td>')
+                         + f'<td><b class="mono">{E(sinh_tb[oo])}</b> {E(TEN2_TOBE[sinh_tb[oo]])}</td>'
                          f'<td><span class="pill {lop_tt(tt)}">{tt}</span> {E(bc)}</td></tr>')
     o.append('</tbody></table></div>')
     return "\n".join(o)
@@ -1131,7 +1142,7 @@ def trang() -> str:
            f'theo kiến trúc FPA (INPUT · CALCULATE · ALLOCATE · WAREHOUSE · REPORT, 11 cột con); <b>Agent 4 · Auditor</b> là làn ngang chạy suốt các bước. '
            f'<b>Trục dọc</b>: bốn họ dữ liệu BANK · PAY · HR · PLT, rồi hàng INDEX. '
            f'Máy kiểm lúc sinh: <b>{len(HOP)} hộp</b> ({n_dl} hộp luồng · 5 cổng · 5 cấu hình) · <b>{len(TEN)} mũi tên</b>, cả {len(TEN)} nằm ngang, '
-           f'đi trái → phải, 0 cắt qua hộp (e8 · e13 đi qua làn trống); mã mỗi hộp nói đúng bước của cột chứa nó. '
+           f'đi trái → phải, 0 cắt qua hộp (e13 đi qua làn trống); mã mỗi hộp nói đúng bước của cột chứa nó. '
            f'Nhãn NGƯỜI = có tay người · chip A3.3 = agent gợi ý phần dư · "PD …" = bước PD Now hộp ấy thay.')
     o = ['<title>Voi FLS v2</title>', '<meta name="claude:viewport-fit-sides" content="cover">',
          '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&amp;family=IBM+Plex+Mono:wght@400;500;600;700&amp;display=swap">',
