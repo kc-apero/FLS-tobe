@@ -103,7 +103,8 @@ tr.chon{cursor:pointer}tr.chon:hover,tr.chon.sang{background:var(--mid-s)}
 .chip-h{display:inline-block;font:700 11px var(--mono);padding:0 6px;border-radius:8px;border:1.2px solid}
 span.chip-ri{background:var(--a1-s);border-color:var(--a1);color:var(--a1)}span.chip-pr{background:var(--a2-s);border-color:var(--a2);color:var(--a2)}span.chip-si{background:var(--a3-s);border-color:var(--a3);color:var(--a3)}
 .ra-ngoai{font:italic 10px var(--sans);fill:var(--muted)}
-svg.loc2 .hop2:not(.sang2){opacity:.3}svg.loc2 .ten-g{opacity:.3}
+svg.loc2 .hop2:not(.sang2),svg.loc2 .hop:not(.sang2){opacity:.28}svg.loc2 .ten-g{opacity:.28}
+.hop.sang2 .hop-k{stroke:var(--sel)!important;stroke-width:3}.tach{stroke:var(--line);stroke-width:2;stroke-dasharray:2 5}
 .hop2.sang2 .hop-k{stroke:var(--sel)!important;stroke-width:3}.chip.sang2 .chip-k{stroke:var(--sel);stroke-width:3}
 tr.chon2{cursor:pointer}tr.chon2.sang2{background:var(--mid-s)}
 .note{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:10px 14px;font-size:13px;max-width:none}
@@ -139,10 +140,94 @@ tr.chon2{cursor:pointer}tr.chon2.sang2{background:var(--mid-s)}
 <tr><td class="mono"><b>KS</b></td><td>KIỂM SOÁT</td><td>cổng của từng bước (Agent 4)</td><td class="mono">PD 204 · 209</td><td class="mono">KS.RI · KS.SI · KS.CA · KS.AL · KS.RP</td></tr>
 <tr><td class="mono"><b>IX</b></td><td>INDEX · CONFIG</td><td>bản khai, danh mục, tỷ giá, khuôn</td><td class="mono">PD 5xx TMP</td><td class="mono">IX.KHAI · IX.MM · IX.FX · IX.MB · IX.TMP</td></tr>
 </tbody></table></div>
-<h2>§1 · Con voi — agent × bước × họ dữ liệu</h2><div class="legend"><span><i style="border-color:var(--a1);background:var(--a1-s)"></i>Agent 1 · Collect_raw_data</span><span><i style="border-color:var(--a2);background:var(--a2-s)"></i>Agent 2 · Generate Group Ledger (ITL raw)</span><span><i style="border-color:var(--a3);background:var(--a3-s)"></i>Agent 3 · Filter Fulfill &amp; Adjust (ITL Adjust)</span><span><i style="border-color:var(--muted);border-style:dashed"></i>mã tất định</span><span><i style="border-color:var(--a4);background:var(--a4-s)"></i>Agent 4 · Auditor (Compounding Loop)</span><span><i style="border-color:var(--ix);background:var(--ix-s);border-style:dashed"></i>INDEX · CONFIG</span><span><b style="color:var(--ok)">✅</b> có mã · <b style="color:var(--mid)">◐</b> một phần · <b style="color:var(--no)">⛔</b> chưa có mã</span></div>
+<h2>§1 · Con voi — NOW bên trái, TO-BE bên phải</h2><p>Một hình, chung hàng họ dữ liệu. Bên trái: luồng Google Sheets hôm nay tới ITL Adjust. Bên phải: TO-BE theo agent × bước. Chip <span class="chip-h chip-ri">RI-1</span> … <span class="chip-h chip-si">SI-3</span> là <b>output</b> — cùng mã ở hai bên là cùng một output; bấm một chip để làm sáng cặp. Sau ITL Adjust là mã tất định nên bên NOW dừng ở đó.</p><div class="legend"><span><i style="border-color:var(--muted);border-style:dashed"></i>NOW · Google Sheets hôm nay · TAY = người bấm / gõ</span><span><i style="border-color:var(--a1);background:var(--a1-s)"></i>Agent 1 · Collect_raw_data</span><span><i style="border-color:var(--a2);background:var(--a2-s)"></i>Agent 2 · Generate Group Ledger (ITL raw)</span><span><i style="border-color:var(--a3);background:var(--a3-s)"></i>Agent 3 · Filter Fulfill &amp; Adjust (ITL Adjust)</span><span><i style="border-color:var(--muted);border-style:dashed"></i>mã tất định</span><span><i style="border-color:var(--a4);background:var(--a4-s)"></i>Agent 4 · Auditor (Compounding Loop)</span><span><i style="border-color:var(--ix);background:var(--ix-s);border-style:dashed"></i>INDEX · CONFIG</span><span><b style="color:var(--ok)">✅</b> có mã · <b style="color:var(--mid)">◐</b> một phần · <b style="color:var(--no)">⛔</b> chưa có mã</span></div>
 <div class="zoom" role="toolbar" aria-label="Phóng to thu nhỏ hình"><button type="button" id="z-tru" aria-label="Thu nhỏ">−</button><span id="z-muc" aria-live="polite">100%</span><button type="button" id="z-cong" aria-label="Phóng to">+</button><button type="button" id="z-100">100%</button><button type="button" id="z-vua" aria-pressed="true">Vừa khung</button></div>
-<figure id="hinh"><div class="scroll" id="hinh-khung"><svg viewBox="0 0 2234 768" width="2234" height="768" role="group" aria-label="Voi FLS v2 theo kiến trúc FPA: hàng = phần dữ liệu, cột = bước; bấm một hộp hay mũi tên để xem đầu vào và đầu ra">
+<figure id="hinh"><div class="scroll" id="hinh-khung"><svg viewBox="0 0 3012 768" width="3012" height="768" role="group" aria-label="Voi FLS v2: NOW (AS-IS) bên trái tới ITL Adjust, TO-BE bên phải; hàng = họ dữ liệu, cột = bước; chip cùng mã là cùng một output">
 <defs><marker id="mui" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" class="mui"/></marker></defs>
+<rect class="ben ben-now" x="170" y="4" width="738" height="36" rx="6"/><text class="ag-t" x="180" y="18">NOW · AS-IS GOOGLE SHEETS HÔM NAY</text><text class="ag-t2" x="180" y="33">tới ITL Adjust — phần sau là mã tất định, giữ nguyên</text><rect class="ben-k ben-now" x="170" y="112" width="738" height="474" rx="10"/>
+<line class="buoc-l" x1="178" y1="57" x2="336" y2="57"/><text class="buoc-t" x="257.0" y="53" text-anchor="middle">sheet nguồn</text><text class="cot-t" x="257.0" y="73" text-anchor="middle">RAW</text><text class="cot-ma" x="257.0" y="88" text-anchor="middle">PD 1xx</text>
+<line class="buoc-l" x1="366" y1="57" x2="524" y2="57"/><text class="buoc-t" x="445.0" y="53" text-anchor="middle">P100 · A-CCR · H1000</text><text class="cot-t" x="445.0" y="73" text-anchor="middle">PREPARE</text><text class="cot-ma" x="445.0" y="88" text-anchor="middle">PD 2xx</text>
+<line class="buoc-l" x1="554" y1="57" x2="712" y2="57"/><text class="buoc-t" x="633.0" y="53" text-anchor="middle">file ITL 1/2 RAW</text><text class="cot-t" x="633.0" y="73" text-anchor="middle">ITL RAW · ghép</text><text class="cot-ma" x="633.0" y="88" text-anchor="middle">PD 30x</text>
+<line class="buoc-l" x1="742" y1="57" x2="900" y2="57"/><text class="buoc-t" x="821.0" y="53" text-anchor="middle">file ITL 2/2 ADJUSTED</text><text class="cot-t" x="821.0" y="73" text-anchor="middle">ITL ADJUST</text><text class="cot-ma" x="821.0" y="88" text-anchor="middle">PD 31x</text>
+<g class="ten-g"><line class="ten" x1="336" y1="172.0" x2="365" y2="172.0" marker-end="url(#mui)"/><text class="ten-t" x="351.0" y="168.0" text-anchor="middle">n1</text></g>
+<g class="ten-g"><line class="ten" x1="336" y1="290.0" x2="365" y2="290.0" marker-end="url(#mui)"/><text class="ten-t" x="351.0" y="286.0" text-anchor="middle">n2</text></g>
+<g class="ten-g"><line class="ten" x1="336" y1="408.0" x2="365" y2="408.0" marker-end="url(#mui)"/><text class="ten-t" x="351.0" y="404.0" text-anchor="middle">n3</text></g>
+<g class="ten-g"><line class="ten" x1="336" y1="526.0" x2="365" y2="526.0" marker-end="url(#mui)"/><text class="ten-t" x="351.0" y="522.0" text-anchor="middle">n4</text></g>
+<g class="ten-g"><line class="ten" x1="524" y1="172.0" x2="553" y2="172.0" marker-end="url(#mui)"/><text class="ten-t" x="539.0" y="168.0" text-anchor="middle">n5</text></g>
+<g class="ten-g"><line class="ten" x1="524" y1="290.0" x2="553" y2="290.0" marker-end="url(#mui)"/><text class="ten-t" x="539.0" y="286.0" text-anchor="middle">n6</text></g>
+<g class="ten-g"><line class="ten" x1="712" y1="290.0" x2="741" y2="290.0" marker-end="url(#mui)"/><text class="ten-t" x="727.0" y="286.0" text-anchor="middle">n7</text></g>
+<g class="ten-g"><line class="ten" x1="524" y1="408.0" x2="741" y2="408.0" marker-end="url(#mui)"/><text class="ten-t" x="633.0" y="404.0" text-anchor="middle">n8</text></g>
+<g class="ten-g"><title>n9 · VLOOKUP Số CT → ITL ID</title><line class="ten" x1="821.0" y1="342" x2="821.0" y2="355" marker-end="url(#mui)"/><text class="ten-t" x="825.0" y="352.0">n9</text></g>
+<text class="ra-ngoai" x="554" y="530.0">→ ALLOCATE (mã tất định)</text>
+<g class="hop2 now" data-o="RI-1 RI-2 RI-3" tabindex="0" role="button" aria-label="NOW sheet R | · 2. CCR · ra RI-1 RI-2 RI-3"><title>sheet R | · 2. CCR · PD 115–116 · 200 · 202 · 204 · 209 — ra: RI-1 giao dịch sao kê thô · RI-2 giao dịch quỹ thô · RI-3 số dư ngày TK · quỹ</title><rect class="hop-k" x="178" y="120" width="158" height="104" rx="6"/><text class="hop-ma" x="186" y="135">PD 115–116 · 2…</text>
+<rect class="nguoi" x="290" y="125" width="40" height="13" rx="3"/><text class="nguoi-t" x="310" y="135" text-anchor="middle">TAY</text>
+<text class="hop-ten" x="186" y="151">sheet R | · 2. CCR</text>
+<g class="chip" data-o="RI-1"><rect class="chip-k chip-ri" x="186" y="202" width="38" height="15" rx="7.5"/><text class="chip-t" x="205" y="213" text-anchor="middle">RI-1</text></g><g class="chip" data-o="RI-2"><rect class="chip-k chip-ri" x="228" y="202" width="38" height="15" rx="7.5"/><text class="chip-t" x="247" y="213" text-anchor="middle">RI-2</text></g><g class="chip" data-o="RI-3"><rect class="chip-k chip-ri" x="270" y="202" width="38" height="15" rx="7.5"/><text class="chip-t" x="289" y="213" text-anchor="middle">RI-3</text></g>
+</g>
+<g class="hop2 now" data-o="RI-4" tabindex="0" role="button" aria-label="NOW Entry Data PE·PI·PM·PC · ra RI-4"><title>Entry Data PE·PI·PM·PC · PD 107–114 — ra: RI-4 PE·PI·PM·PC line đã duyệt</title><rect class="hop-k" x="178" y="238" width="158" height="104" rx="6"/><text class="hop-ma" x="186" y="253">PD 107–114</text>
+<rect class="nguoi" x="290" y="243" width="40" height="13" rx="3"/><text class="nguoi-t" x="310" y="253" text-anchor="middle">TAY</text>
+<text class="hop-ten" x="186" y="269">Entry Data PE·PI·PM·PC</text>
+<g class="chip" data-o="RI-4"><rect class="chip-k chip-ri" x="186" y="320" width="38" height="15" rx="7.5"/><text class="chip-t" x="205" y="331" text-anchor="middle">RI-4</text></g>
+</g>
+<g class="hop2 now" data-o="RI-5" tabindex="0" role="button" aria-label="NOW file lương tháng · ra RI-5"><title>file lương tháng · PD 101 — ra: RI-5 payroll tháng + số FT</title><rect class="hop-k" x="178" y="356" width="158" height="104" rx="6"/><text class="hop-ma" x="186" y="371">PD 101</text>
+<rect class="nguoi" x="290" y="361" width="40" height="13" rx="3"/><text class="nguoi-t" x="310" y="371" text-anchor="middle">TAY</text>
+<text class="hop-ten" x="186" y="387">file lương tháng</text>
+<g class="chip" data-o="RI-5"><rect class="chip-k chip-ri" x="186" y="438" width="38" height="15" rx="7.5"/><text class="chip-t" x="205" y="449" text-anchor="middle">RI-5</text></g>
+</g>
+<g class="hop2 now" data-o="RI-6" tabindex="0" role="button" aria-label="NOW Looker · 2 Gsheet · ra RI-6"><title>Looker · 2 Gsheet · PD 103–106 — ra: RI-6 GI·OMC·SC·PS theo vendor</title><rect class="hop-k" x="178" y="474" width="158" height="104" rx="6"/><text class="hop-ma" x="186" y="489">PD 103–106</text>
+<rect class="nguoi" x="290" y="479" width="40" height="13" rx="3"/><text class="nguoi-t" x="310" y="489" text-anchor="middle">TAY</text>
+<text class="hop-ten" x="186" y="505">Looker · 2 Gsheet</text>
+<g class="chip" data-o="RI-6"><rect class="chip-k chip-ri" x="186" y="556" width="38" height="15" rx="7.5"/><text class="chip-t" x="205" y="567" text-anchor="middle">RI-6</text></g>
+</g>
+<g class="hop2 now" data-o="PR-1 PR-2" tabindex="0" role="button" aria-label="NOW GScript gom → Ledger 112 · 111 · ra PR-1 PR-2"><title>GScript gom → Ledger 112 · 111 · PD 201 · 203 · 205–208 — ra: PR-1 giao dịch bank theo ngày (Ledger 112) · PR-2 giao dịch quỹ theo ngày (Ledger 111)</title><rect class="hop-k" x="366" y="120" width="158" height="104" rx="6"/><text class="hop-ma" x="374" y="135">PD 201 · 203…</text>
+<rect class="nguoi" x="478" y="125" width="40" height="13" rx="3"/><text class="nguoi-t" x="498" y="135" text-anchor="middle">TAY</text>
+<text class="hop-ten" x="374" y="151">GScript gom → Ledger</text>
+<text class="hop-ten" x="374" y="164">112 · 111</text>
+<g class="chip" data-o="PR-1"><rect class="chip-k chip-pr" x="374" y="202" width="38" height="15" rx="7.5"/><text class="chip-t" x="393" y="213" text-anchor="middle">PR-1</text></g><g class="chip" data-o="PR-2"><rect class="chip-k chip-pr" x="416" y="202" width="38" height="15" rx="7.5"/><text class="chip-t" x="435" y="213" text-anchor="middle">PR-2</text></g>
+</g>
+<g class="hop2 now" data-o="PR-3" tabindex="0" role="button" aria-label="NOW GScript duỗi → Unpivot · ra PR-3"><title>GScript duỗi → Unpivot · PD 214–218 — ra: PR-3 PM line đủ chiều (Unpivot)</title><rect class="hop-k" x="366" y="238" width="158" height="104" rx="6"/><text class="hop-ma" x="374" y="253">PD 214–218</text>
+<rect class="nguoi" x="478" y="243" width="40" height="13" rx="3"/><text class="nguoi-t" x="498" y="253" text-anchor="middle">TAY</text>
+<text class="hop-ten" x="374" y="269">GScript duỗi → Unpivot</text>
+<g class="chip" data-o="PR-3"><rect class="chip-k chip-pr" x="374" y="320" width="38" height="15" rx="7.5"/><text class="chip-t" x="393" y="331" text-anchor="middle">PR-3</text></g>
+</g>
+<g class="hop2 now" data-o="PR-4" tabindex="0" role="button" aria-label="NOW tách lương → 1.3 Ledger · ra PR-4"><title>tách lương → 1.3 Ledger · PD 219–222 — ra: PR-4 dòng lương theo HD·CDT1 (1.3 Ledger)</title><rect class="hop-k" x="366" y="356" width="158" height="104" rx="6"/><text class="hop-ma" x="374" y="371">PD 219–222</text>
+<rect class="nguoi" x="478" y="361" width="40" height="13" rx="3"/><text class="nguoi-t" x="498" y="371" text-anchor="middle">TAY</text>
+<text class="hop-ten" x="374" y="387">tách lương → 1.3</text>
+<text class="hop-ten" x="374" y="400">Ledger</text>
+<g class="chip" data-o="PR-4"><rect class="chip-k chip-pr" x="374" y="438" width="38" height="15" rx="7.5"/><text class="chip-t" x="393" y="449" text-anchor="middle">PR-4</text></g>
+</g>
+<g class="hop2 now" data-o="PR-5" tabindex="0" role="button" aria-label="NOW gom → Platform Ledger · ra PR-5"><title>gom → Platform Ledger · PD 210–213 — ra: PR-5 Platform Data Ledger ×4</title><rect class="hop-k" x="366" y="474" width="158" height="104" rx="6"/><text class="hop-ma" x="374" y="489">PD 210–213</text>
+<text class="hop-ten" x="374" y="505">gom → Platform Ledger</text>
+<g class="chip" data-o="PR-5"><rect class="chip-k chip-pr" x="374" y="556" width="38" height="15" rx="7.5"/><text class="chip-t" x="393" y="567" text-anchor="middle">PR-5</text></g>
+</g>
+<g class="hop2 now" data-o="SI-1" tabindex="0" role="button" aria-label="NOW ITL 1/2 RAW · VLOOKUP Ref · ra SI-1"><title>ITL 1/2 RAW · VLOOKUP Ref · PD 302–308 — ra: SI-1 giao dịch ↔ PM line (Mapping L1)</title><rect class="hop-k" x="554" y="120" width="158" height="222" rx="6"/><text class="hop-ma" x="562" y="135">PD 302–308</text>
+<text class="hop-ten" x="562" y="151">ITL 1/2 RAW · VLOOKUP</text>
+<text class="hop-ten" x="562" y="164">Ref</text>
+<g class="chip" data-o="SI-1"><rect class="chip-k chip-si" x="562" y="320" width="38" height="15" rx="7.5"/><text class="chip-t" x="581" y="331" text-anchor="middle">SI-1</text></g>
+</g>
+<g class="hop2 now" data-o="SI-2" tabindex="0" role="button" aria-label="NOW ITL 2/2 ADJUSTED · chỉnh tay R–AT · ra SI-2"><title>ITL 2/2 ADJUSTED · chỉnh tay R–AT · PD 313–314 · 319 huỷ — ra: SI-2 ITL Ledge Final</title><rect class="hop-k" x="742" y="120" width="158" height="222" rx="6"/><text class="hop-ma" x="750" y="135">PD 313–314 · 3…</text>
+<rect class="nguoi" x="854" y="125" width="40" height="13" rx="3"/><text class="nguoi-t" x="874" y="135" text-anchor="middle">TAY</text>
+<text class="hop-ten" x="750" y="151">ITL 2/2 ADJUSTED ·</text>
+<text class="hop-ten" x="750" y="164">chỉnh tay R–AT</text>
+<g class="chip" data-o="SI-2"><rect class="chip-k chip-si chip-cuoi" x="750" y="320" width="38" height="15" rx="7.5"/><text class="chip-t" x="769" y="331" text-anchor="middle">SI-2</text></g>
+</g>
+<g class="hop2 now" data-o="SI-3" tabindex="0" role="button" aria-label="NOW H1000 Ledge · VLOOKUP Số CT · ra SI-3"><title>H1000 Ledge · VLOOKUP Số CT · PD 315–318 — ra: SI-3 H1000 Ledge Final</title><rect class="hop-k" x="742" y="356" width="158" height="104" rx="6"/><text class="hop-ma" x="750" y="371">PD 315–318</text>
+<text class="hop-ten" x="750" y="387">H1000 Ledge · VLOOKUP</text>
+<text class="hop-ten" x="750" y="400">Số CT</text>
+<g class="chip" data-o="SI-3"><rect class="chip-k chip-si chip-cuoi" x="750" y="438" width="38" height="15" rx="7.5"/><text class="chip-t" x="769" y="449" text-anchor="middle">SI-3</text></g>
+</g>
+<g class="hop2 now" data-o="" tabindex="0" role="button" aria-label="NOW soát số dư bằng mắt: Ledger 111/112 ↔ 2. CCR (DIF)"><title>soát số dư bằng mắt: Ledger 111/112 ↔ 2. CCR (DIF) · PD 204 · 209</title><rect class="hop-k" x="178" y="602" width="722" height="70" rx="6"/><text class="hop-ma" x="186" y="617">PD 204 · 209</text>
+<rect class="nguoi" x="854" y="607" width="40" height="13" rx="3"/><text class="nguoi-t" x="874" y="617" text-anchor="middle">TAY</text>
+<text class="hop-ten" x="186" y="633">soát số dư bằng mắt: Ledger 111/112 ↔ 2. CCR (DIF)</text>
+
+</g>
+<g class="hop2 now" data-o="" tabindex="0" role="button" aria-label="NOW Mapping Master (sheet → LE · hd)"><title>Mapping Master (sheet → LE · hd) · PD 301</title><rect class="hop-k" x="554" y="686" width="158" height="70" rx="6"/><text class="hop-ma" x="562" y="701">PD 301</text>
+<text class="hop-ten" x="562" y="717">Mapping Master (sheet</text>
+<text class="hop-ten" x="562" y="730">→ LE · hd)</text>
+
+</g>
+<line class="tach" x1="928.0" y1="4" x2="928.0" y2="764"/>
+<g transform="translate(778,0)">
 <rect class="ag-dai ag-ag1" x="170" y="4" width="174" height="36" rx="6"/><text class="ag-t" x="180" y="18">AGENT 1 · RAW</text><text class="ag-t2" x="180" y="33">Collect_raw_data</text><rect class="ag-khung ag-ag1" x="170" y="112" width="174" height="474" rx="10"/>
 <rect class="ag-dai ag-ag2" x="358" y="4" width="362" height="36" rx="6"/><text class="ag-t" x="368" y="18">AGENT 2 · ITL RAW</text><text class="ag-t2" x="368" y="33">Generate Group Ledger</text><rect class="ag-khung ag-ag2" x="358" y="112" width="362" height="474" rx="10"/>
 <rect class="ag-dai ag-ag3" x="734" y="4" width="174" height="36" rx="6"/><text class="ag-t" x="744" y="18">AGENT 3 · ITL ADJUST</text><text class="ag-t2" x="744" y="33">Filter Fulfill &amp; Adjust</text><rect class="ag-khung ag-ag3" x="734" y="112" width="174" height="474" rx="10"/>
@@ -163,12 +248,6 @@ tr.chon2{cursor:pointer}tr.chon2.sang2{background:var(--mid-s)}
 <text class="cot-t" x="1761.0" y="73" text-anchor="middle">KHO FLS</text><text class="cot-ma" x="1761.0" y="88" text-anchor="middle">DW · —</text>
 <text class="cot-t" x="1949.0" y="73" text-anchor="middle">báo cáo thành phần</text><text class="cot-ma" x="1949.0" y="88" text-anchor="middle">RP · PD 6xx</text>
 <text class="cot-t" x="2137.0" y="73" text-anchor="middle">báo cáo đích · màn</text><text class="cot-ma" x="2137.0" y="88" text-anchor="middle">RP · PD 6xx</text>
-<rect class="hang-n hang-dữ" x="16" y="120" width="148" height="104" rx="6"/><text class="hang-t" x="26" y="169.0">BANK</text><text class="hang-p" x="26" y="184.0">tiền · sao kê · quỹ · CCR</text>
-<rect class="hang-n hang-dữ" x="16" y="238" width="148" height="104" rx="6"/><text class="hang-t" x="26" y="287.0">PAY</text><text class="hang-p" x="26" y="302.0">lệnh chi · PE·PI·PM·PC</text>
-<rect class="hang-n hang-dữ" x="16" y="356" width="148" height="104" rx="6"/><text class="hang-t" x="26" y="405.0">HR</text><text class="hang-p" x="26" y="420.0">lương · H1000</text>
-<rect class="hang-n hang-dữ" x="16" y="474" width="148" height="104" rx="6"/><text class="hang-t" x="26" y="523.0">PLT</text><text class="hang-p" x="26" y="538.0">nền tảng GI·OMC·SC·PS</text>
-<rect class="hang-n hang-kiểm" x="16" y="602" width="148" height="70" rx="6"/><text class="hang-t" x="26" y="634.0">AGENT 4</text><text class="hang-p" x="26" y="649.0">Auditor · cổng mỗi bước</text>
-<rect class="hang-n hang-config" x="16" y="686" width="148" height="70" rx="6"/><text class="hang-t" x="26" y="718.0">INDEX</text><text class="hang-p" x="26" y="733.0">khai · danh mục · tỷ giá</text>
 <g class="ten-g" data-id="t:e1" tabindex="0" role="button" aria-label="Mũi tên e1: RI.BANK → PR.BANK"><title>e1 · ảnh sao kê · quỹ · số dư CCR, đọc theo bản khai</title><line class="hit" x1="336" y1="172.0" x2="365" y2="172.0"/><line class="ten" x1="336" y1="172.0" x2="365" y2="172.0" marker-end="url(#mui)"/><text class="ten-t" x="350.5" y="168.0" text-anchor="middle">e1</text></g>
 <g class="ten-g" data-id="t:e2" tabindex="0" role="button" aria-label="Mũi tên e2: RI.PAY → PR.PAY"><title>e2 · ảnh dòng sổ cái PM · PC (bỏ cột Email)</title><line class="hit" x1="336" y1="290.0" x2="365" y2="290.0"/><line class="ten" x1="336" y1="290.0" x2="365" y2="290.0" marker-end="url(#mui)"/><text class="ten-t" x="350.5" y="286.0" text-anchor="middle">e2</text></g>
 <g class="ten-g" data-id="t:e3" tabindex="0" role="button" aria-label="Mũi tên e3: RI.HR → PR.HR"><title>e3 · ảnh payroll tháng đã tách HD · CDT1 · LE + số FT</title><line class="hit" x1="336" y1="408.0" x2="365" y2="408.0"/><line class="ten" x1="336" y1="408.0" x2="365" y2="408.0" marker-end="url(#mui)"/><text class="ten-t" x="350.5" y="404.0" text-anchor="middle">e3</text></g>
@@ -192,73 +271,67 @@ tr.chon2{cursor:pointer}tr.chon2.sang2{background:var(--mid-s)}
 <g class="ten-g" data-id="t:e21" tabindex="0" role="button" aria-label="Mũi tên e21: DW → RP.FLS"><title>e21 · sổ hiệu lực + dây truy ngược</title><line class="hit" x1="1840" y1="408.0" x2="1869" y2="408.0"/><line class="ten" x1="1840" y1="408.0" x2="1869" y2="408.0" marker-end="url(#mui)"/><text class="ten-t" x="1854.5" y="404.0" text-anchor="middle">e21</text></g>
 <g class="ten-g" data-id="t:e22" tabindex="0" role="button" aria-label="Mũi tên e22: RP.CF → RP.CCR"><title>e22 · Daily Report 2 (CF) vào báo cáo daily CCR</title><line class="hit" x1="2028" y1="172.0" x2="2057" y2="172.0"/><line class="ten" x1="2028" y1="172.0" x2="2057" y2="172.0" marker-end="url(#mui)"/><text class="ten-t" x="2042.5" y="168.0" text-anchor="middle">e22</text></g>
 <g class="ten-g" data-id="t:e23" tabindex="0" role="button" aria-label="Mũi tên e23: RP.PL → RP.CCR"><title>e23 · Daily Report 3 (P&amp;L) vào báo cáo daily CCR</title><line class="hit" x1="2028" y1="290.0" x2="2057" y2="290.0"/><line class="ten" x1="2028" y1="290.0" x2="2057" y2="290.0" marker-end="url(#mui)"/><text class="ten-t" x="2042.5" y="286.0" text-anchor="middle">e23</text></g>
-<g class="hop ag-ag1" data-id="h:RI.BANK" tabindex="0" role="button" aria-label="RI.BANK · ẢNH SAO KÊ · QUỸ · CCR"><title>RI.BANK · ẢNH SAO KÊ · QUỸ · CCR</title><rect class="hop-k" x="178" y="120" width="158" height="104" rx="6"/><text class="hop-ma" x="186" y="135">RI.BANK</text>
+<g class="hop ag-ag1" data-id="h:RI.BANK" data-o="RI-1 RI-2 RI-3" tabindex="0" role="button" aria-label="RI.BANK · ẢNH SAO KÊ · QUỸ · CCR"><title>RI.BANK · ẢNH SAO KÊ · QUỸ · CCR</title><rect class="hop-k" x="178" y="120" width="158" height="104" rx="6"/><text class="hop-ma" x="186" y="135">RI.BANK</text>
 <rect class="nguoi" x="290" y="125" width="40" height="13" rx="3"/><text class="nguoi-t" x="310" y="135" text-anchor="middle">NGƯỜI</text>
 <text class="hop-ten" x="186" y="150">ẢNH SAO KÊ · QUỸ · CCR</text>
 <text class="hop-d" x="186" y="163">60 sao kê · 8 quỹ · 2</text>
-<text class="hop-d" x="186" y="175.5">sheet CCR</text>
-<text class="hop-d" x="186" y="188.0">đọc theo bản khai</text>
 <text class="hop-pd" x="186" y="204">PD 115–116 · 200 · 202 · 2…</text>
 <text class="hop-tt tt-mid" x="186" y="217">◐ Bank ✅ · Cash ⛔ · CC…</text>
+<g class="chip" data-o="RI-1"><rect class="chip-k chip-ri" x="186" y="174" width="38" height="15" rx="7.5"/><text class="chip-t" x="205" y="185" text-anchor="middle">RI-1</text></g><g class="chip" data-o="RI-2"><rect class="chip-k chip-ri" x="228" y="174" width="38" height="15" rx="7.5"/><text class="chip-t" x="247" y="185" text-anchor="middle">RI-2</text></g><g class="chip" data-o="RI-3"><rect class="chip-k chip-ri" x="270" y="174" width="38" height="15" rx="7.5"/><text class="chip-t" x="289" y="185" text-anchor="middle">RI-3</text></g>
 </g>
-<g class="hop ag-ag1" data-id="h:RI.PAY" tabindex="0" role="button" aria-label="RI.PAY · ẢNH SỔ CÁI PM · PC"><title>RI.PAY · ẢNH SỔ CÁI PM · PC</title><rect class="hop-k" x="178" y="238" width="158" height="104" rx="6"/><text class="hop-ma" x="186" y="253">RI.PAY</text>
+<g class="hop ag-ag1" data-id="h:RI.PAY" data-o="RI-4" tabindex="0" role="button" aria-label="RI.PAY · ẢNH SỔ CÁI PM · PC"><title>RI.PAY · ẢNH SỔ CÁI PM · PC</title><rect class="hop-k" x="178" y="238" width="158" height="104" rx="6"/><text class="hop-ma" x="186" y="253">RI.PAY</text>
 <rect class="nguoi" x="290" y="243" width="40" height="13" rx="3"/><text class="nguoi-t" x="310" y="253" text-anchor="middle">NGƯỜI</text>
 <text class="hop-ten" x="186" y="268">ẢNH SỔ CÁI PM · PC</text>
 <text class="hop-d" x="186" y="281">PE·PI·PM·PC đã duyệt</text>
-<text class="hop-d" x="186" y="293.5">Email ⛔ vào kho</text>
 <text class="hop-pd" x="186" y="322">PD 107–114</text>
 <text class="hop-tt tt-mid" x="186" y="335">◐ PM ✅ · PC ⛔</text>
+<g class="chip" data-o="RI-4"><rect class="chip-k chip-ri" x="186" y="292" width="38" height="15" rx="7.5"/><text class="chip-t" x="205" y="303" text-anchor="middle">RI-4</text></g>
 </g>
-<g class="hop ag-ag1" data-id="h:RI.HR" tabindex="0" role="button" aria-label="RI.HR · ẢNH SỔ H1000"><title>RI.HR · ẢNH SỔ H1000</title><rect class="hop-k" x="178" y="356" width="158" height="104" rx="6"/><text class="hop-ma" x="186" y="371">RI.HR</text>
+<g class="hop ag-ag1" data-id="h:RI.HR" data-o="RI-5" tabindex="0" role="button" aria-label="RI.HR · ẢNH SỔ H1000"><title>RI.HR · ẢNH SỔ H1000</title><rect class="hop-k" x="178" y="356" width="158" height="104" rx="6"/><text class="hop-ma" x="186" y="371">RI.HR</text>
 <rect class="nguoi" x="290" y="361" width="40" height="13" rx="3"/><text class="nguoi-t" x="310" y="371" text-anchor="middle">NGƯỜI</text>
 <text class="hop-ten" x="186" y="386">ẢNH SỔ H1000</text>
 <text class="hop-d" x="186" y="399">payroll tháng · đã tách</text>
-<text class="hop-d" x="186" y="411.5">HD·CDT1</text>
-<text class="hop-d" x="186" y="424.0">số FT do kế toán dán</text>
 <text class="hop-pd" x="186" y="440">PD 101</text>
 <text class="hop-tt tt-no" x="186" y="453">⛔</text>
+<g class="chip" data-o="RI-5"><rect class="chip-k chip-ri" x="186" y="410" width="38" height="15" rx="7.5"/><text class="chip-t" x="205" y="421" text-anchor="middle">RI-5</text></g>
 </g>
-<g class="hop ag-ag1" data-id="h:RI.PLT" tabindex="0" role="button" aria-label="RI.PLT · ẢNH 4 NGUỒN NỀN TẢNG"><title>RI.PLT · ẢNH 4 NGUỒN NỀN TẢNG</title><rect class="hop-k" x="178" y="474" width="158" height="104" rx="6"/><text class="hop-ma" x="186" y="489">RI.PLT</text>
+<g class="hop ag-ag1" data-id="h:RI.PLT" data-o="RI-6" tabindex="0" role="button" aria-label="RI.PLT · ẢNH 4 NGUỒN NỀN TẢNG"><title>RI.PLT · ẢNH 4 NGUỒN NỀN TẢNG</title><rect class="hop-k" x="178" y="474" width="158" height="104" rx="6"/><text class="hop-ma" x="186" y="489">RI.PLT</text>
 <rect class="nguoi" x="290" y="479" width="40" height="13" rx="3"/><text class="nguoi-t" x="310" y="489" text-anchor="middle">NGƯỜI</text>
 <text class="hop-ten" x="186" y="504">ẢNH 4 NGUỒN NỀN TẢNG</text>
 <text class="hop-d" x="186" y="517">GI·OMC: Looker</text>
-<text class="hop-d" x="186" y="529.5">SC·PS: Google Sheets</text>
 <text class="hop-pd" x="186" y="558">PD 103–106</text>
 <text class="hop-tt tt-no" x="186" y="571">⛔</text>
+<g class="chip" data-o="RI-6"><rect class="chip-k chip-ri" x="186" y="528" width="38" height="15" rx="7.5"/><text class="chip-t" x="205" y="539" text-anchor="middle">RI-6</text></g>
 </g>
-<g class="hop ag-ag2" data-id="h:PR.BANK" tabindex="0" role="button" aria-label="PR.BANK · DÒNG TIỀN + SỐ DƯ NGÀY"><title>PR.BANK · DÒNG TIỀN + SỐ DƯ NGÀY</title><rect class="hop-k" x="366" y="120" width="158" height="104" rx="6"/><text class="hop-ma" x="374" y="135">PR.BANK</text>
+<g class="hop ag-ag2" data-id="h:PR.BANK" data-o="PR-1 PR-2" tabindex="0" role="button" aria-label="PR.BANK · DÒNG TIỀN + SỐ DƯ NGÀY"><title>PR.BANK · DÒNG TIỀN + SỐ DƯ NGÀY</title><rect class="hop-k" x="366" y="120" width="158" height="104" rx="6"/><text class="hop-ma" x="374" y="135">PR.BANK</text>
 <text class="hop-ten" x="374" y="150">DÒNG TIỀN + SỐ DƯ NGÀY</text>
 <text class="hop-d" x="374" y="163">canon 36 trường · 2 vế</text>
-<text class="hop-d" x="374" y="175.5">Nợ/Có</text>
-<text class="hop-d" x="374" y="188.0">LE TK · content_key</text>
 <text class="hop-pd" x="374" y="204">PD 201 · 203 · 205–208</text>
 <text class="hop-tt tt-mid" x="374" y="217">◐ bank 8.338/8.338 · q…</text>
+<g class="chip" data-o="PR-1"><rect class="chip-k chip-pr" x="374" y="174" width="38" height="15" rx="7.5"/><text class="chip-t" x="393" y="185" text-anchor="middle">PR-1</text></g><g class="chip" data-o="PR-2"><rect class="chip-k chip-pr" x="416" y="174" width="38" height="15" rx="7.5"/><text class="chip-t" x="435" y="185" text-anchor="middle">PR-2</text></g>
 </g>
-<g class="hop ag-ag2" data-id="h:PR.PAY" tabindex="0" role="button" aria-label="PR.PAY · DÒNG LỆNH PM · PC"><title>PR.PAY · DÒNG LỆNH PM · PC</title><rect class="hop-k" x="366" y="238" width="158" height="104" rx="6"/><text class="hop-ma" x="374" y="253">PR.PAY</text>
+<g class="hop ag-ag2" data-id="h:PR.PAY" data-o="PR-3" tabindex="0" role="button" aria-label="PR.PAY · DÒNG LỆNH PM · PC"><title>PR.PAY · DÒNG LỆNH PM · PC</title><rect class="hop-k" x="366" y="238" width="158" height="104" rx="6"/><text class="hop-ma" x="374" y="253">PR.PAY</text>
 <text class="hop-ten" x="374" y="268">DÒNG LỆNH PM · PC</text>
 <text class="hop-d" x="374" y="281">duỗi line · đặt kiểu</text>
-<text class="hop-d" x="374" y="293.5">Ref · tiền · HD · CDT1 ·</text>
-<text class="hop-d" x="374" y="306.0">LE trả</text>
 <text class="hop-pd" x="374" y="322">PD 214–218</text>
 <text class="hop-tt tt-mid" x="374" y="335">◐ 14 cột có kiểu · 13…</text>
+<g class="chip" data-o="PR-3"><rect class="chip-k chip-pr" x="374" y="292" width="38" height="15" rx="7.5"/><text class="chip-t" x="393" y="303" text-anchor="middle">PR-3</text></g>
 </g>
-<g class="hop ag-ag2" data-id="h:PR.HR" tabindex="0" role="button" aria-label="PR.HR · DÒNG LƯƠNG"><title>PR.HR · DÒNG LƯƠNG</title><rect class="hop-k" x="366" y="356" width="158" height="104" rx="6"/><text class="hop-ma" x="374" y="371">PR.HR</text>
+<g class="hop ag-ag2" data-id="h:PR.HR" data-o="PR-4" tabindex="0" role="button" aria-label="PR.HR · DÒNG LƯƠNG"><title>PR.HR · DÒNG LƯƠNG</title><rect class="hop-k" x="366" y="356" width="158" height="104" rx="6"/><text class="hop-ma" x="374" y="371">PR.HR</text>
 <text class="hop-ten" x="374" y="386">DÒNG LƯƠNG</text>
 <text class="hop-d" x="374" y="399">NIS·INT·COM·PIT ·</text>
-<text class="hop-d" x="374" y="411.5">HD·CDT1·LE</text>
-<text class="hop-d" x="374" y="424.0">Số CT (số FT) · đủ tháng</text>
 <text class="hop-pd" x="374" y="440">PD 219–222</text>
 <text class="hop-tt tt-no" x="374" y="453">⛔</text>
+<g class="chip" data-o="PR-4"><rect class="chip-k chip-pr" x="374" y="410" width="38" height="15" rx="7.5"/><text class="chip-t" x="393" y="421" text-anchor="middle">PR-4</text></g>
 </g>
-<g class="hop ag-ag2" data-id="h:PR.PLT" tabindex="0" role="button" aria-label="PR.PLT · CHI PHÍ 4 LOẠI"><title>PR.PLT · CHI PHÍ 4 LOẠI</title><rect class="hop-k" x="366" y="474" width="158" height="104" rx="6"/><text class="hop-ma" x="374" y="489">PR.PLT</text>
+<g class="hop ag-ag2" data-id="h:PR.PLT" data-o="PR-5" tabindex="0" role="button" aria-label="PR.PLT · CHI PHÍ 4 LOẠI"><title>PR.PLT · CHI PHÍ 4 LOẠI</title><rect class="hop-k" x="366" y="474" width="158" height="104" rx="6"/><text class="hop-ma" x="374" y="489">PR.PLT</text>
 <text class="hop-ten" x="374" y="504">CHI PHÍ 4 LOẠI</text>
 <text class="hop-d" x="374" y="517">vendor · ngày · NoTrans ·</text>
-<text class="hop-d" x="374" y="529.5">tiền</text>
-<text class="hop-d" x="374" y="542.0">+ Combine Code</text>
 <text class="hop-pd" x="374" y="558">PD 210–213</text>
 <text class="hop-tt tt-no" x="374" y="571">⛔</text>
+<g class="chip" data-o="PR-5"><rect class="chip-k chip-pr" x="374" y="528" width="38" height="15" rx="7.5"/><text class="chip-t" x="393" y="539" text-anchor="middle">PR-5</text></g>
 </g>
-<g class="hop ag-ag2" data-id="h:SI.MAP" tabindex="0" role="button" aria-label="SI.MAP · GHÉP GIAO DỊCH ↔ LỆNH"><title>SI.MAP · GHÉP GIAO DỊCH ↔ LỆNH</title><rect class="hop-k" x="554" y="120" width="158" height="340" rx="6"/><text class="hop-ma" x="562" y="135">SI.MAP</text>
+<g class="hop ag-ag2" data-id="h:SI.MAP" data-o="SI-1" tabindex="0" role="button" aria-label="SI.MAP · GHÉP GIAO DỊCH ↔ LỆNH"><title>SI.MAP · GHÉP GIAO DỊCH ↔ LỆNH</title><rect class="hop-k" x="554" y="120" width="158" height="340" rx="6"/><text class="hop-ma" x="562" y="135">SI.MAP</text>
 <text class="hop-ten" x="562" y="150">GHÉP GIAO DỊCH ↔ LỆNH</text>
 <text class="hop-d" x="562" y="163">PP (1) Reference No → PM</text>
 <text class="hop-d" x="562" y="175.5">line</text>
@@ -266,8 +339,9 @@ tr.chon2{cursor:pointer}tr.chon2.sang2{background:var(--mid-s)}
 <text class="hop-d" x="562" y="200.5">người</text>
 <text class="hop-pd" x="562" y="440">PD 302–308</text>
 <text class="hop-tt tt-mid" x="562" y="453">◐ PS Có: 26,79% dòng n…</text>
+<g class="chip" data-o="SI-1"><rect class="chip-k chip-si" x="562" y="410" width="38" height="15" rx="7.5"/><text class="chip-t" x="581" y="421" text-anchor="middle">SI-1</text></g>
 </g>
-<g class="hop ag-ag3" data-id="h:SI.ITL" tabindex="0" role="button" aria-label="SI.ITL · SỔ ITL HIỆU LỰC"><title>SI.ITL · SỔ ITL HIỆU LỰC</title><rect class="hop-k" x="742" y="120" width="158" height="340" rx="6"/><text class="hop-ma" x="750" y="135">SI.ITL</text>
+<g class="hop ag-ag3" data-id="h:SI.ITL" data-o="SI-2 SI-3" tabindex="0" role="button" aria-label="SI.ITL · SỔ ITL HIỆU LỰC"><title>SI.ITL · SỔ ITL HIỆU LỰC</title><rect class="hop-k" x="742" y="120" width="158" height="340" rx="6"/><text class="hop-ma" x="750" y="135">SI.ITL</text>
 <rect class="nguoi" x="854" y="125" width="40" height="13" rx="3"/><text class="nguoi-t" x="874" y="135" text-anchor="middle">NGƯỜI</text>
 <text class="hop-ten" x="750" y="150">SỔ ITL HIỆU LỰC</text>
 <text class="hop-d" x="750" y="163">sổ gốc chỉ-thêm (INV-I08)</text>
@@ -275,72 +349,82 @@ tr.chon2{cursor:pointer}tr.chon2.sang2{background:var(--mid-s)}
 <text class="hop-d" x="750" y="188.0">nguồn</text>
 <text class="hop-pd" x="750" y="440">PD 313–319</text>
 <text class="hop-tt tt-mid" x="750" y="453">◐ 1 họ nguồn · parity…</text>
+<g class="chip" data-o="SI-2"><rect class="chip-k chip-si chip-cuoi" x="750" y="410" width="38" height="15" rx="7.5"/><text class="chip-t" x="769" y="421" text-anchor="middle">SI-2</text></g><g class="chip" data-o="SI-3"><rect class="chip-k chip-si chip-cuoi" x="792" y="410" width="38" height="15" rx="7.5"/><text class="chip-t" x="811" y="421" text-anchor="middle">SI-3</text></g>
 </g>
-<g class="hop ag-ma" data-id="h:CA.GL" tabindex="0" role="button" aria-label="CA.GL · SỔ CÁI GL · QUY ĐỔI"><title>CA.GL · SỔ CÁI GL · QUY ĐỔI</title><rect class="hop-k" x="930" y="120" width="158" height="340" rx="6"/><text class="hop-ma" x="938" y="135">CA.GL</text>
+<g class="hop ag-ma" data-id="h:CA.GL" data-o="" tabindex="0" role="button" aria-label="CA.GL · SỔ CÁI GL · QUY ĐỔI"><title>CA.GL · SỔ CÁI GL · QUY ĐỔI</title><rect class="hop-k" x="930" y="120" width="158" height="340" rx="6"/><text class="hop-ma" x="938" y="135">CA.GL</text>
 <text class="hop-ten" x="938" y="150">SỔ CÁI GL · QUY ĐỔI</text>
 <text class="hop-d" x="938" y="163">ITL → khuôn GL (Templ 2)</text>
 <text class="hop-d" x="938" y="175.5">quy đổi theo tỷ giá tháng</text>
 <text class="hop-pd" x="938" y="440">PD 400–406</text>
 <text class="hop-tt tt-no" x="938" y="453">⛔</text>
+
 </g>
-<g class="hop ag-ma" data-id="h:SO.CFA1" tabindex="0" role="button" aria-label="SO.CFA1 · CF THEO LE"><title>SO.CFA1 · CF THEO LE</title><rect class="hop-k" x="1118" y="120" width="158" height="104" rx="6"/><text class="hop-ma" x="1126" y="135">SO.CFA1</text>
+<g class="hop ag-ma" data-id="h:SO.CFA1" data-o="" tabindex="0" role="button" aria-label="SO.CFA1 · CF THEO LE"><title>SO.CFA1 · CF THEO LE</title><rect class="hop-k" x="1118" y="120" width="158" height="104" rx="6"/><text class="hop-ma" x="1126" y="135">SO.CFA1</text>
 <text class="hop-ten" x="1126" y="150">CF THEO LE</text>
 <text class="hop-d" x="1126" y="163">khối KRF × ngày</text>
 <text class="hop-d" x="1126" y="175.5">+ Y · H · Q · M</text>
 <text class="hop-pd" x="1126" y="204">PD 409–410</text>
 <text class="hop-tt tt-no" x="1126" y="217">⛔</text>
+
 </g>
-<g class="hop ag-ma" data-id="h:SO.PLA3" tabindex="0" role="button" aria-label="SO.PLA3 · P&amp;L THEO KRF · TRƯỚC PB"><title>SO.PLA3 · P&amp;L THEO KRF · TRƯỚC PB</title><rect class="hop-k" x="1118" y="238" width="158" height="222" rx="6"/><text class="hop-ma" x="1126" y="253">SO.PLA3</text>
+<g class="hop ag-ma" data-id="h:SO.PLA3" data-o="" tabindex="0" role="button" aria-label="SO.PLA3 · P&amp;L THEO KRF · TRƯỚC PB"><title>SO.PLA3 · P&amp;L THEO KRF · TRƯỚC PB</title><rect class="hop-k" x="1118" y="238" width="158" height="222" rx="6"/><text class="hop-ma" x="1126" y="253">SO.PLA3</text>
 <text class="hop-ten" x="1126" y="268">P&amp;L THEO KRF · TRƯỚC</text>
 <text class="hop-ten" x="1126" y="281">PB</text>
 <text class="hop-d" x="1126" y="294">PLA1 PM-only · PLA3 HR</text>
 <text class="hop-d" x="1126" y="306.5">CFA3 HR · PLA3 PM + HR</text>
 <text class="hop-pd" x="1126" y="440">PD 407–408 · 411–419</text>
 <text class="hop-tt tt-no" x="1126" y="453">⛔</text>
+
 </g>
-<g class="hop ag-ma" data-id="h:AL.KEY" tabindex="0" role="button" aria-label="AL.KEY · PHÂN BỔ THEO KHOÁ"><title>AL.KEY · PHÂN BỔ THEO KHOÁ</title><rect class="hop-k" x="1306" y="238" width="158" height="104" rx="6"/><text class="hop-ma" x="1314" y="253">AL.KEY</text>
+<g class="hop ag-ma" data-id="h:AL.KEY" data-o="" tabindex="0" role="button" aria-label="AL.KEY · PHÂN BỔ THEO KHOÁ"><title>AL.KEY · PHÂN BỔ THEO KHOÁ</title><rect class="hop-k" x="1306" y="238" width="158" height="104" rx="6"/><text class="hop-ma" x="1314" y="253">AL.KEY</text>
 <text class="hop-ten" x="1314" y="268">PHÂN BỔ THEO KHOÁ</text>
 <text class="hop-d" x="1314" y="281">By LE · By NOEM · By GI</text>
 <text class="hop-d" x="1314" y="293.5">bảng tỷ trọng</text>
 <text class="hop-pd" x="1314" y="322">PD 511–513</text>
 <text class="hop-tt tt-no" x="1314" y="335">⛔</text>
+
 </g>
-<g class="hop ag-ma" data-id="h:AL.PLT" tabindex="0" role="button" aria-label="AL.PLT · PHÂN BỔ NỀN TẢNG"><title>AL.PLT · PHÂN BỔ NỀN TẢNG</title><rect class="hop-k" x="1306" y="356" width="158" height="222" rx="6"/><text class="hop-ma" x="1314" y="371">AL.PLT</text>
+<g class="hop ag-ma" data-id="h:AL.PLT" data-o="" tabindex="0" role="button" aria-label="AL.PLT · PHÂN BỔ NỀN TẢNG"><title>AL.PLT · PHÂN BỔ NỀN TẢNG</title><rect class="hop-k" x="1306" y="356" width="158" height="222" rx="6"/><text class="hop-ma" x="1314" y="371">AL.PLT</text>
 <rect class="chip3" x="1372" y="361" width="40" height="13" rx="6.5"/><text class="chip3-t" x="1392" y="371" text-anchor="middle">A3.3</text>
 <text class="hop-ten" x="1314" y="386">PHÂN BỔ NỀN TẢNG</text>
 <text class="hop-d" x="1314" y="399">Combine Code → PE/PM</text>
 <text class="hop-d" x="1314" y="411.5">Mapping Block 1:</text>
 <text class="hop-pd" x="1314" y="558">PD 500–510</text>
 <text class="hop-tt tt-no" x="1314" y="571">⛔</text>
+
 </g>
-<g class="hop ag-ma" data-id="h:SO.PLA3-ATL" tabindex="0" role="button" aria-label="SO.PLA3-ATL · P&amp;L SAU PHÂN BỔ"><title>SO.PLA3-ATL · P&amp;L SAU PHÂN BỔ</title><rect class="hop-k" x="1494" y="238" width="158" height="340" rx="6"/><text class="hop-ma" x="1502" y="253">SO.PLA3-ATL</text>
+<g class="hop ag-ma" data-id="h:SO.PLA3-ATL" data-o="" tabindex="0" role="button" aria-label="SO.PLA3-ATL · P&amp;L SAU PHÂN BỔ"><title>SO.PLA3-ATL · P&amp;L SAU PHÂN BỔ</title><rect class="hop-k" x="1494" y="238" width="158" height="340" rx="6"/><text class="hop-ma" x="1502" y="253">SO.PLA3-ATL</text>
 <text class="hop-ten" x="1502" y="268">P&amp;L SAU PHÂN BỔ</text>
 <text class="hop-d" x="1502" y="281">theo CDT1 · LE</text>
 <text class="hop-d" x="1502" y="293.5">ngày + Y·H·Q·M</text>
 <text class="hop-pd" x="1502" y="558">PD 600–604 · 606</text>
 <text class="hop-tt tt-no" x="1502" y="571">⛔</text>
+
 </g>
-<g class="hop ag-ma" data-id="h:DW" tabindex="0" role="button" aria-label="DW · KHO FLS"><title>DW · KHO FLS</title><rect class="hop-k" x="1682" y="120" width="158" height="458" rx="6"/><text class="hop-ma" x="1690" y="135">DW</text>
+<g class="hop ag-ma" data-id="h:DW" data-o="" tabindex="0" role="button" aria-label="DW · KHO FLS"><title>DW · KHO FLS</title><rect class="hop-k" x="1682" y="120" width="158" height="458" rx="6"/><text class="hop-ma" x="1690" y="135">DW</text>
 <text class="hop-ten" x="1690" y="150">KHO FLS</text>
 <text class="hop-d" x="1690" y="163">PostgreSQL · chỉ-thêm</text>
 <text class="hop-d" x="1690" y="175.5">ảnh · dòng · sổ · lớp sửa</text>
 <text class="hop-tt tt-mid" x="1690" y="571">◐ sổ có · khối SO ⛔</text>
+
 </g>
-<g class="hop ag-ma" data-id="h:RP.CF" tabindex="0" role="button" aria-label="RP.CF · DAILY REPORT 2 · CF"><title>RP.CF · DAILY REPORT 2 · CF</title><rect class="hop-k" x="1870" y="120" width="158" height="104" rx="6"/><text class="hop-ma" x="1878" y="135">RP.CF</text>
+<g class="hop ag-ma" data-id="h:RP.CF" data-o="" tabindex="0" role="button" aria-label="RP.CF · DAILY REPORT 2 · CF"><title>RP.CF · DAILY REPORT 2 · CF</title><rect class="hop-k" x="1870" y="120" width="158" height="104" rx="6"/><text class="hop-ma" x="1878" y="135">RP.CF</text>
 <text class="hop-ten" x="1878" y="150">DAILY REPORT 2 · CF</text>
 <text class="hop-d" x="1878" y="163">Group · LE</text>
 <text class="hop-d" x="1878" y="175.5">Templ 5</text>
 <text class="hop-pd" x="1878" y="204">PD 610</text>
 <text class="hop-tt tt-no" x="1878" y="217">⛔</text>
+
 </g>
-<g class="hop ag-ma" data-id="h:RP.PL" tabindex="0" role="button" aria-label="RP.PL · DAILY REPORT 3 · P&amp;L"><title>RP.PL · DAILY REPORT 3 · P&amp;L</title><rect class="hop-k" x="1870" y="238" width="158" height="104" rx="6"/><text class="hop-ma" x="1878" y="253">RP.PL</text>
+<g class="hop ag-ma" data-id="h:RP.PL" data-o="" tabindex="0" role="button" aria-label="RP.PL · DAILY REPORT 3 · P&amp;L"><title>RP.PL · DAILY REPORT 3 · P&amp;L</title><rect class="hop-k" x="1870" y="238" width="158" height="104" rx="6"/><text class="hop-ma" x="1878" y="253">RP.PL</text>
 <text class="hop-ten" x="1878" y="268">DAILY REPORT 3 · P&amp;L</text>
 <text class="hop-d" x="1878" y="281">Group · CDT1</text>
 <text class="hop-d" x="1878" y="293.5">FS1 + FS2</text>
 <text class="hop-pd" x="1878" y="322">PD 605 · 607–609</text>
 <text class="hop-tt tt-no" x="1878" y="335">⛔</text>
+
 </g>
-<g class="hop ag-ma" data-id="h:RP.CCR" tabindex="0" role="button" aria-label="RP.CCR · BÁO CÁO DAILY TRONG CCR"><title>RP.CCR · BÁO CÁO DAILY TRONG CCR</title><rect class="hop-k" x="2058" y="120" width="158" height="222" rx="6"/><text class="hop-ma" x="2066" y="135">RP.CCR</text>
+<g class="hop ag-ma" data-id="h:RP.CCR" data-o="" tabindex="0" role="button" aria-label="RP.CCR · BÁO CÁO DAILY TRONG CCR"><title>RP.CCR · BÁO CÁO DAILY TRONG CCR</title><rect class="hop-k" x="2058" y="120" width="158" height="222" rx="6"/><text class="hop-ma" x="2066" y="135">RP.CCR</text>
 <rect class="nguoi" x="2170" y="125" width="40" height="13" rx="3"/><text class="nguoi-t" x="2190" y="135" text-anchor="middle">NGƯỜI</text>
 <text class="hop-ten" x="2066" y="150">BÁO CÁO DAILY TRONG</text>
 <text class="hop-ten" x="2066" y="163">CCR</text>
@@ -348,229 +432,88 @@ tr.chon2{cursor:pointer}tr.chon2.sang2{background:var(--mid-s)}
 <text class="hop-d" x="2066" y="188.5">6. CCR ký tháng (pdf)</text>
 <text class="hop-pd" x="2066" y="322">PD 614–616</text>
 <text class="hop-tt tt-mid" x="2066" y="335">◐ cơ chế ghi ✅ · bộ xu…</text>
+
 </g>
-<g class="hop ag-ma" data-id="h:RP.FLS" tabindex="0" role="button" aria-label="RP.FLS · MÀN FLS · TRUY NGƯỢC"><title>RP.FLS · MÀN FLS · TRUY NGƯỢC</title><rect class="hop-k" x="1870" y="356" width="346" height="222" rx="6"/><text class="hop-ma" x="1878" y="371">RP.FLS</text>
+<g class="hop ag-ma" data-id="h:RP.FLS" data-o="" tabindex="0" role="button" aria-label="RP.FLS · MÀN FLS · TRUY NGƯỢC"><title>RP.FLS · MÀN FLS · TRUY NGƯỢC</title><rect class="hop-k" x="1870" y="356" width="346" height="222" rx="6"/><text class="hop-ma" x="1878" y="371">RP.FLS</text>
 <text class="hop-ten" x="1878" y="386">MÀN FLS · TRUY NGƯỢC</text>
 <text class="hop-d" x="1878" y="399">F01 hàng chờ · F02 sổ · F03 cổng · F04 nạp lô</text>
 <text class="hop-d" x="1878" y="411.5">bấm một ô báo cáo → dòng → giao dịch → ảnh</text>
 <text class="hop-pd" x="1878" y="558">PD 613 · 617</text>
 <text class="hop-tt tt-mid" x="1878" y="571">◐ 6 màn ✅ · truy ngược báo cáo ⛔</text>
+
 </g>
-<g class="hop ag-ag4" data-id="h:KS.RI" tabindex="0" role="button" aria-label="KS.RI · CỔNG INPUT"><title>KS.RI · CỔNG INPUT</title><rect class="hop-k" x="178" y="602" width="346" height="70" rx="6"/><text class="hop-ma" x="186" y="617">KS.RI</text>
+<g class="hop ag-ag4" data-id="h:KS.RI" data-o="" tabindex="0" role="button" aria-label="KS.RI · CỔNG INPUT"><title>KS.RI · CỔNG INPUT</title><rect class="hop-k" x="178" y="602" width="346" height="70" rx="6"/><text class="hop-ma" x="186" y="617">KS.RI</text>
 <text class="hop-ten" x="186" y="632">CỔNG INPUT</text>
 <text class="hop-d" x="186" y="645">bản khai đủ · bề rộng cột</text>
 <text class="hop-tt tt-mid" x="186" y="665">◐</text>
+
 </g>
-<g class="hop ag-ag4" data-id="h:KS.SI" tabindex="0" role="button" aria-label="KS.SI · CỔNG GHÉP + SỔ"><title>KS.SI · CỔNG GHÉP + SỔ</title><rect class="hop-k" x="554" y="602" width="346" height="70" rx="6"/><text class="hop-ma" x="562" y="617">KS.SI</text>
+<g class="hop ag-ag4" data-id="h:KS.SI" data-o="" tabindex="0" role="button" aria-label="KS.SI · CỔNG GHÉP + SỔ"><title>KS.SI · CỔNG GHÉP + SỔ</title><rect class="hop-k" x="554" y="602" width="346" height="70" rx="6"/><text class="hop-ma" x="562" y="617">KS.SI</text>
 <rect class="nguoi" x="854" y="607" width="40" height="13" rx="3"/><text class="nguoi-t" x="874" y="617" text-anchor="middle">NGƯỜI</text>
 <text class="hop-ten" x="562" y="632">CỔNG GHÉP + SỔ</text>
 <text class="hop-d" x="562" y="645">9 luật · Σ line = tiền · 4 vế</text>
 <text class="hop-tt tt-mid" x="562" y="665">◐ 9 luật ✅ · DIF ⛔</text>
+
 </g>
-<g class="hop ag-ag4" data-id="h:KS.CA" tabindex="0" role="button" aria-label="KS.CA · CỔNG CALCULATE"><title>KS.CA · CỔNG CALCULATE</title><rect class="hop-k" x="930" y="602" width="346" height="70" rx="6"/><text class="hop-ma" x="938" y="617">KS.CA</text>
+<g class="hop ag-ag4" data-id="h:KS.CA" data-o="" tabindex="0" role="button" aria-label="KS.CA · CỔNG CALCULATE"><title>KS.CA · CỔNG CALCULATE</title><rect class="hop-k" x="930" y="602" width="346" height="70" rx="6"/><text class="hop-ma" x="938" y="617">KS.CA</text>
 <text class="hop-ten" x="938" y="632">CỔNG CALCULATE</text>
 <text class="hop-d" x="938" y="645">Σ theo LE = Σ theo nguồn</text>
 <text class="hop-tt tt-no" x="938" y="665">⛔</text>
+
 </g>
-<g class="hop ag-ag4" data-id="h:KS.AL" tabindex="0" role="button" aria-label="KS.AL · CỔNG ALLOCATE"><title>KS.AL · CỔNG ALLOCATE</title><rect class="hop-k" x="1306" y="602" width="346" height="70" rx="6"/><text class="hop-ma" x="1314" y="617">KS.AL</text>
+<g class="hop ag-ag4" data-id="h:KS.AL" data-o="" tabindex="0" role="button" aria-label="KS.AL · CỔNG ALLOCATE"><title>KS.AL · CỔNG ALLOCATE</title><rect class="hop-k" x="1306" y="602" width="346" height="70" rx="6"/><text class="hop-ma" x="1314" y="617">KS.AL</text>
 <text class="hop-ten" x="1314" y="632">CỔNG ALLOCATE</text>
 <text class="hop-d" x="1314" y="645">Σ phần chia = tiền GD</text>
 <text class="hop-tt tt-no" x="1314" y="665">⛔</text>
+
 </g>
-<g class="hop ag-ag4" data-id="h:KS.RP" tabindex="0" role="button" aria-label="KS.RP · CỔNG REPORT · PARITY"><title>KS.RP · CỔNG REPORT · PARITY</title><rect class="hop-k" x="1682" y="602" width="534" height="70" rx="6"/><text class="hop-ma" x="1690" y="617">KS.RP</text>
+<g class="hop ag-ag4" data-id="h:KS.RP" data-o="" tabindex="0" role="button" aria-label="KS.RP · CỔNG REPORT · PARITY"><title>KS.RP · CỔNG REPORT · PARITY</title><rect class="hop-k" x="1682" y="602" width="534" height="70" rx="6"/><text class="hop-ma" x="1690" y="617">KS.RP</text>
 <text class="hop-ten" x="1690" y="632">CỔNG REPORT · PARITY</text>
 <text class="hop-d" x="1690" y="645">từng ô = ITL Ledge Final / Daily Report AS-IS</text>
 <text class="hop-tt tt-mid" x="1690" y="665">◐ parity ITL ✅ · báo cáo ⛔</text>
+
 </g>
-<g class="hop ag-ix" data-id="h:IX.KHAI" tabindex="0" role="button" aria-label="IX.KHAI · BẢN KHAI NGUỒN"><title>IX.KHAI · BẢN KHAI NGUỒN</title><rect class="hop-k" x="178" y="686" width="346" height="70" rx="6"/><text class="hop-ma" x="186" y="701">IX.KHAI</text>
+<g class="hop ag-ix" data-id="h:IX.KHAI" data-o="" tabindex="0" role="button" aria-label="IX.KHAI · BẢN KHAI NGUỒN"><title>IX.KHAI · BẢN KHAI NGUỒN</title><rect class="hop-k" x="178" y="686" width="346" height="70" rx="6"/><text class="hop-ma" x="186" y="701">IX.KHAI</text>
 <rect class="nguoi" x="478" y="691" width="40" height="13" rx="3"/><text class="nguoi-t" x="498" y="701" text-anchor="middle">NGƯỜI</text>
 <text class="hop-ten" x="186" y="716">BẢN KHAI NGUỒN</text>
 <text class="hop-d" x="186" y="729">cột · thứ tự ngày · LE TK</text>
 <text class="hop-tt tt-ok" x="186" y="749">✅ 408 dòng = 68 × 6</text>
+
 </g>
-<g class="hop ag-ix" data-id="h:IX.MM" tabindex="0" role="button" aria-label="IX.MM · MAPPING MASTER"><title>IX.MM · MAPPING MASTER</title><rect class="hop-k" x="554" y="686" width="346" height="70" rx="6"/><text class="hop-ma" x="562" y="701">IX.MM</text>
+<g class="hop ag-ix" data-id="h:IX.MM" data-o="" tabindex="0" role="button" aria-label="IX.MM · MAPPING MASTER"><title>IX.MM · MAPPING MASTER</title><rect class="hop-k" x="554" y="686" width="346" height="70" rx="6"/><text class="hop-ma" x="562" y="701">IX.MM</text>
 <text class="hop-ten" x="562" y="716">MAPPING MASTER</text>
 <text class="hop-pd" x="562" y="736">PD 301</text>
 <text class="hop-tt tt-mid" x="562" y="749">◐ bộ nạp có</text>
+
 </g>
-<g class="hop ag-ix" data-id="h:IX.FX" tabindex="0" role="button" aria-label="IX.FX · TỶ GIÁ · CHIỀU ASD"><title>IX.FX · TỶ GIÁ · CHIỀU ASD</title><rect class="hop-k" x="930" y="686" width="346" height="70" rx="6"/><text class="hop-ma" x="938" y="701">IX.FX</text>
+<g class="hop ag-ix" data-id="h:IX.FX" data-o="" tabindex="0" role="button" aria-label="IX.FX · TỶ GIÁ · CHIỀU ASD"><title>IX.FX · TỶ GIÁ · CHIỀU ASD</title><rect class="hop-k" x="930" y="686" width="346" height="70" rx="6"/><text class="hop-ma" x="938" y="701">IX.FX</text>
 <text class="hop-ten" x="938" y="716">TỶ GIÁ · CHIỀU ASD</text>
 <text class="hop-d" x="938" y="729">9.2 Exchange Rate theo tháng</text>
 <text class="hop-tt tt-no" x="938" y="749">⛔</text>
+
 </g>
-<g class="hop ag-ix" data-id="h:IX.MB" tabindex="0" role="button" aria-label="IX.MB · MAPPING BLOCK · TỶ TRỌNG"><title>IX.MB · MAPPING BLOCK · TỶ TRỌNG</title><rect class="hop-k" x="1306" y="686" width="346" height="70" rx="6"/><text class="hop-ma" x="1314" y="701">IX.MB</text>
+<g class="hop ag-ix" data-id="h:IX.MB" data-o="" tabindex="0" role="button" aria-label="IX.MB · MAPPING BLOCK · TỶ TRỌNG"><title>IX.MB · MAPPING BLOCK · TỶ TRỌNG</title><rect class="hop-k" x="1306" y="686" width="346" height="70" rx="6"/><text class="hop-ma" x="1314" y="701">IX.MB</text>
 <text class="hop-ten" x="1314" y="716">MAPPING BLOCK · TỶ TRỌNG</text>
 <text class="hop-d" x="1314" y="729">Vendor ↔ Network-Acc ↔ CDT1</text>
 <text class="hop-tt tt-no" x="1314" y="749">⛔</text>
+
 </g>
-<g class="hop ag-ix" data-id="h:IX.TMP" tabindex="0" role="button" aria-label="IX.TMP · KHUÔN BÁO CÁO"><title>IX.TMP · KHUÔN BÁO CÁO</title><rect class="hop-k" x="1682" y="686" width="534" height="70" rx="6"/><text class="hop-ma" x="1690" y="701">IX.TMP</text>
+<g class="hop ag-ix" data-id="h:IX.TMP" data-o="" tabindex="0" role="button" aria-label="IX.TMP · KHUÔN BÁO CÁO"><title>IX.TMP · KHUÔN BÁO CÁO</title><rect class="hop-k" x="1682" y="686" width="534" height="70" rx="6"/><text class="hop-ma" x="1690" y="701">IX.TMP</text>
 <text class="hop-ten" x="1690" y="716">KHUÔN BÁO CÁO</text>
 <text class="hop-d" x="1690" y="729">Templ 1–5 (PD590) · Filters (PD510)</text>
 <text class="hop-tt tt-no" x="1690" y="749">⛔</text>
+
 </g>
-</svg></div><figcaption>Hình 1 — Voi FLS v2. <b>Trục ngang</b>: tầng trên là <b>agent</b> (Agent 1 · Agent 2 · Agent 3 · mã tất định), tầng dưới là <b>bước</b> theo kiến trúc FPA (INPUT · CALCULATE · ALLOCATE · WAREHOUSE · REPORT, 11 cột con); <b>Agent 4 · Auditor</b> là làn ngang chạy suốt các bước. <b>Trục dọc</b>: bốn họ dữ liệu BANK · PAY · HR · PLT, rồi hàng INDEX. Máy kiểm lúc sinh: <b>31 hộp</b> (21 hộp luồng · 5 cổng · 5 cấu hình) · <b>23 mũi tên</b>, cả 23 nằm ngang, đi trái → phải, 0 cắt qua hộp (e8 · e13 đi qua làn trống); mã mỗi hộp nói đúng bước của cột chứa nó. Nhãn NGƯỜI = có tay người · chip A3.3 = agent gợi ý phần dư · "PD …" = bước PD Now hộp ấy thay.</figcaption></figure>
-<h2>§2 · NOW ↔ TO-BE · RAW → ITL Adjust, ghép theo output</h2><p>Hai voi cạnh nhau, cùng hàng họ dữ liệu, cùng bốn bước. Chip <span class="chip-h chip-ri">RI-1</span> … <span class="chip-h chip-si">SI-3</span> là <b>output</b>: cùng mã ở hai bên là cùng một output — bấm một chip hay một hộp để làm sáng cặp. Dừng ở ITL Adjust; CALCULATE → REPORT là mã tất định, giữ nguyên.</p>
-<figure id="hinh2"><div class="scroll"><svg viewBox="0 0 1516 514" style="width:100%;max-width:1516px;height:auto" role="group" aria-label="NOW (AS-IS) bên trái, TO-BE bên phải, từ RAW tới ITL Adjust; chip cùng mã là cùng một output">
-<defs><marker id="mui2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" class="mui"/></marker></defs>
-<rect class="ben ben-now" x="98" y="4" width="684" height="22" rx="5"/><text class="ben-t" x="108" y="19">NOW · AS-IS Google Sheets hôm nay</text>
-<rect class="ben-k ben-now" x="98" y="94" width="684" height="392" rx="9"/>
-<rect class="ben ben-tobe" x="824" y="4" width="684" height="22" rx="5"/><text class="ben-t" x="834" y="19">TO-BE · FLS</text>
-<rect class="ben-k ben-tobe" x="824" y="94" width="684" height="392" rx="9"/>
-<rect class="tang2 ag-now" x="104" y="32" width="150" height="18" rx="4"/><text class="tang2-t" x="179.0" y="45" text-anchor="middle">sheet nguồn</text>
-<rect class="tang2 ag-now" x="278" y="32" width="150" height="18" rx="4"/><text class="tang2-t" x="353.0" y="45" text-anchor="middle">P100 · A-CCR · H1000</text>
-<rect class="tang2 ag-now" x="452" y="32" width="150" height="18" rx="4"/><text class="tang2-t" x="527.0" y="45" text-anchor="middle">ITL 1/2 RAW</text>
-<rect class="tang2 ag-now" x="626" y="32" width="150" height="18" rx="4"/><text class="tang2-t" x="701.0" y="45" text-anchor="middle">ITL 2/2 ADJUSTED</text>
-<rect class="tang2 ag-ag1" x="830" y="32" width="150" height="18" rx="4"/><text class="tang2-t" x="905.0" y="45" text-anchor="middle">AGENT 1</text>
-<rect class="tang2 ag-ag2" x="1004" y="32" width="324" height="18" rx="4"/><text class="tang2-t" x="1166.0" y="45" text-anchor="middle">AGENT 2 · ITL RAW</text>
-<rect class="tang2 ag-ag3" x="1352" y="32" width="150" height="18" rx="4"/><text class="tang2-t" x="1427.0" y="45" text-anchor="middle">AGENT 3 · ITL ADJUST</text>
-<text class="cot-t" x="179.0" y="70" text-anchor="middle">RAW</text>
-<text class="cot-t" x="353.0" y="70" text-anchor="middle">PREPARE</text>
-<text class="cot-t" x="527.0" y="70" text-anchor="middle">ITL RAW · ghép</text>
-<text class="cot-t" x="701.0" y="70" text-anchor="middle">ITL ADJUST</text>
-<text class="cot-t" x="905.0" y="70" text-anchor="middle">RAW</text>
-<text class="cot-t" x="1079.0" y="70" text-anchor="middle">PREPARE</text>
-<text class="cot-t" x="1253.0" y="70" text-anchor="middle">ITL RAW · ghép</text>
-<text class="cot-t" x="1427.0" y="70" text-anchor="middle">ITL ADJUST</text>
-<rect class="hang-n" x="8" y="100" width="86" height="86" rx="6"/><text class="hang-t" x="18" y="147.0">BANK</text>
-<rect class="hang-n" x="8" y="198" width="86" height="86" rx="6"/><text class="hang-t" x="18" y="245.0">PAY</text>
-<rect class="hang-n" x="8" y="296" width="86" height="86" rx="6"/><text class="hang-t" x="18" y="343.0">HR</text>
-<rect class="hang-n" x="8" y="394" width="86" height="86" rx="6"/><text class="hang-t" x="18" y="441.0">PLT</text>
-<g class="ten-g" data-ten="n1"><line class="ten" x1="254" y1="143.0" x2="277" y2="143.0" marker-end="url(#mui2)"/><text class="ten-t" x="266.0" y="139.0" text-anchor="middle">n1</text></g>
-<g class="ten-g" data-ten="n2"><line class="ten" x1="254" y1="241.0" x2="277" y2="241.0" marker-end="url(#mui2)"/><text class="ten-t" x="266.0" y="237.0" text-anchor="middle">n2</text></g>
-<g class="ten-g" data-ten="n3"><line class="ten" x1="254" y1="339.0" x2="277" y2="339.0" marker-end="url(#mui2)"/><text class="ten-t" x="266.0" y="335.0" text-anchor="middle">n3</text></g>
-<g class="ten-g" data-ten="n4"><line class="ten" x1="254" y1="437.0" x2="277" y2="437.0" marker-end="url(#mui2)"/><text class="ten-t" x="266.0" y="433.0" text-anchor="middle">n4</text></g>
-<g class="ten-g" data-ten="n5"><line class="ten" x1="428" y1="143.0" x2="451" y2="143.0" marker-end="url(#mui2)"/><text class="ten-t" x="440.0" y="139.0" text-anchor="middle">n5</text></g>
-<g class="ten-g" data-ten="n6"><line class="ten" x1="428" y1="241.0" x2="451" y2="241.0" marker-end="url(#mui2)"/><text class="ten-t" x="440.0" y="237.0" text-anchor="middle">n6</text></g>
-<g class="ten-g" data-ten="n7"><line class="ten" x1="602" y1="241.0" x2="625" y2="241.0" marker-end="url(#mui2)"/><text class="ten-t" x="614.0" y="237.0" text-anchor="middle">n7</text></g>
-<g class="ten-g" data-ten="n8"><line class="ten" x1="428" y1="339.0" x2="625" y2="339.0" marker-end="url(#mui2)"/><text class="ten-t" x="527.0" y="335.0" text-anchor="middle">n8</text></g>
-<g class="ten-g" data-ten="n9"><title>n9 · VLOOKUP Số CT → ITL ID</title><line class="ten" x1="701.0" y1="284" x2="701.0" y2="295" marker-end="url(#mui2)"/><text class="ten-t" x="705.0" y="293.0">n9</text></g>
-<g class="ten-g" data-ten="e1"><line class="ten" x1="980" y1="143.0" x2="1003" y2="143.0" marker-end="url(#mui2)"/><text class="ten-t" x="992.0" y="139.0" text-anchor="middle">e1</text></g>
-<g class="ten-g" data-ten="e2"><line class="ten" x1="980" y1="241.0" x2="1003" y2="241.0" marker-end="url(#mui2)"/><text class="ten-t" x="992.0" y="237.0" text-anchor="middle">e2</text></g>
-<g class="ten-g" data-ten="e3"><line class="ten" x1="980" y1="339.0" x2="1003" y2="339.0" marker-end="url(#mui2)"/><text class="ten-t" x="992.0" y="335.0" text-anchor="middle">e3</text></g>
-<g class="ten-g" data-ten="e4"><line class="ten" x1="980" y1="437.0" x2="1003" y2="437.0" marker-end="url(#mui2)"/><text class="ten-t" x="992.0" y="433.0" text-anchor="middle">e4</text></g>
-<g class="ten-g" data-ten="e5"><line class="ten" x1="1154" y1="143.0" x2="1177" y2="143.0" marker-end="url(#mui2)"/><text class="ten-t" x="1166.0" y="139.0" text-anchor="middle">e5</text></g>
-<g class="ten-g" data-ten="e6"><line class="ten" x1="1154" y1="241.0" x2="1177" y2="241.0" marker-end="url(#mui2)"/><text class="ten-t" x="1166.0" y="237.0" text-anchor="middle">e6</text></g>
-<g class="ten-g" data-ten="e7"><line class="ten" x1="1154" y1="339.0" x2="1177" y2="339.0" marker-end="url(#mui2)"/><text class="ten-t" x="1166.0" y="335.0" text-anchor="middle">e7</text></g>
-<g class="ten-g" data-ten="e9"><line class="ten" x1="1328" y1="241.0" x2="1351" y2="241.0" marker-end="url(#mui2)"/><text class="ten-t" x="1340.0" y="237.0" text-anchor="middle">e9</text></g>
-<text class="ra-ngoai" x="436" y="441.0">→ ALLOCATE (mã tất định)</text>
-<text class="ra-ngoai" x="1162" y="441.0">→ ALLOCATE (mã tất định)</text>
-<g class="hop2 now" data-hop2="N1" data-o="RI-1 RI-2 RI-3" tabindex="0" role="button" aria-label="N1 · sheet R | · 2. CCR · ra RI-1 RI-2 RI-3"><title>sheet R | · 2. CCR — ra: RI-1 giao dịch sao kê thô · RI-2 giao dịch quỹ thô · RI-3 số dư ngày TK · quỹ</title><rect class="hop-k" x="104" y="100" width="150" height="86" rx="6"/><text class="hop-ma" x="111" y="114">PD 115–116 …</text>
-<rect class="nguoi" x="210" y="104" width="38" height="13" rx="3"/><text class="nguoi-t" x="229" y="114" text-anchor="middle">TAY</text>
-<text class="hop-ten" x="111" y="130">sheet R | · 2. CCR</text>
-<g class="chip" data-o="RI-1"><rect class="chip-k chip-ri" x="111" y="166" width="38" height="15" rx="7.5"/><text class="chip-t" x="130.0" y="177" text-anchor="middle">RI-1</text></g>
-<g class="chip" data-o="RI-2"><rect class="chip-k chip-ri" x="153" y="166" width="38" height="15" rx="7.5"/><text class="chip-t" x="172.0" y="177" text-anchor="middle">RI-2</text></g>
-<g class="chip" data-o="RI-3"><rect class="chip-k chip-ri" x="195" y="166" width="38" height="15" rx="7.5"/><text class="chip-t" x="214.0" y="177" text-anchor="middle">RI-3</text></g>
 </g>
-<g class="hop2 now" data-hop2="N2" data-o="RI-4" tabindex="0" role="button" aria-label="N2 · Entry Data PE·PI·PM·PC · ra RI-4"><title>Entry Data PE·PI·PM·PC — ra: RI-4 PE·PI·PM·PC line đã duyệt</title><rect class="hop-k" x="104" y="198" width="150" height="86" rx="6"/><text class="hop-ma" x="111" y="212">PD 107–114</text>
-<rect class="nguoi" x="210" y="202" width="38" height="13" rx="3"/><text class="nguoi-t" x="229" y="212" text-anchor="middle">TAY</text>
-<text class="hop-ten" x="111" y="228">Entry Data</text>
-<text class="hop-ten" x="111" y="241">PE·PI·PM·PC</text>
-<g class="chip" data-o="RI-4"><rect class="chip-k chip-ri" x="111" y="264" width="38" height="15" rx="7.5"/><text class="chip-t" x="130.0" y="275" text-anchor="middle">RI-4</text></g>
-</g>
-<g class="hop2 now" data-hop2="N3" data-o="RI-5" tabindex="0" role="button" aria-label="N3 · file lương tháng · ra RI-5"><title>file lương tháng — ra: RI-5 payroll tháng + số FT</title><rect class="hop-k" x="104" y="296" width="150" height="86" rx="6"/><text class="hop-ma" x="111" y="310">PD 101</text>
-<rect class="nguoi" x="210" y="300" width="38" height="13" rx="3"/><text class="nguoi-t" x="229" y="310" text-anchor="middle">TAY</text>
-<text class="hop-ten" x="111" y="326">file lương tháng</text>
-<g class="chip" data-o="RI-5"><rect class="chip-k chip-ri" x="111" y="362" width="38" height="15" rx="7.5"/><text class="chip-t" x="130.0" y="373" text-anchor="middle">RI-5</text></g>
-</g>
-<g class="hop2 now" data-hop2="N4" data-o="RI-6" tabindex="0" role="button" aria-label="N4 · Looker · 2 Gsheet · ra RI-6"><title>Looker · 2 Gsheet — ra: RI-6 GI·OMC·SC·PS theo vendor</title><rect class="hop-k" x="104" y="394" width="150" height="86" rx="6"/><text class="hop-ma" x="111" y="408">PD 103–106</text>
-<rect class="nguoi" x="210" y="398" width="38" height="13" rx="3"/><text class="nguoi-t" x="229" y="408" text-anchor="middle">TAY</text>
-<text class="hop-ten" x="111" y="424">Looker · 2 Gsheet</text>
-<g class="chip" data-o="RI-6"><rect class="chip-k chip-ri" x="111" y="460" width="38" height="15" rx="7.5"/><text class="chip-t" x="130.0" y="471" text-anchor="middle">RI-6</text></g>
-</g>
-<g class="hop2 now" data-hop2="N5" data-o="PR-1 PR-2" tabindex="0" role="button" aria-label="N5 · GScript gom → Ledger 112 · 111 · ra PR-1 PR-2"><title>GScript gom → Ledger 112 · 111 — ra: PR-1 giao dịch bank theo ngày (Ledger 112) · PR-2 giao dịch quỹ theo ngày (Ledger 111)</title><rect class="hop-k" x="278" y="100" width="150" height="86" rx="6"/><text class="hop-ma" x="285" y="114">PD 201 …</text>
-<rect class="nguoi" x="384" y="104" width="38" height="13" rx="3"/><text class="nguoi-t" x="403" y="114" text-anchor="middle">TAY</text>
-<text class="hop-ten" x="285" y="130">GScript gom → Ledger</text>
-<text class="hop-ten" x="285" y="143">112 · 111</text>
-<g class="chip" data-o="PR-1"><rect class="chip-k chip-pr" x="285" y="166" width="38" height="15" rx="7.5"/><text class="chip-t" x="304.0" y="177" text-anchor="middle">PR-1</text></g>
-<g class="chip" data-o="PR-2"><rect class="chip-k chip-pr" x="327" y="166" width="38" height="15" rx="7.5"/><text class="chip-t" x="346.0" y="177" text-anchor="middle">PR-2</text></g>
-</g>
-<g class="hop2 now" data-hop2="N6" data-o="PR-3" tabindex="0" role="button" aria-label="N6 · GScript duỗi → Unpivot · ra PR-3"><title>GScript duỗi → Unpivot — ra: PR-3 PM line đủ chiều (Unpivot)</title><rect class="hop-k" x="278" y="198" width="150" height="86" rx="6"/><text class="hop-ma" x="285" y="212">PD 214–218</text>
-<rect class="nguoi" x="384" y="202" width="38" height="13" rx="3"/><text class="nguoi-t" x="403" y="212" text-anchor="middle">TAY</text>
-<text class="hop-ten" x="285" y="228">GScript duỗi →</text>
-<text class="hop-ten" x="285" y="241">Unpivot</text>
-<g class="chip" data-o="PR-3"><rect class="chip-k chip-pr" x="285" y="264" width="38" height="15" rx="7.5"/><text class="chip-t" x="304.0" y="275" text-anchor="middle">PR-3</text></g>
-</g>
-<g class="hop2 now" data-hop2="N7" data-o="PR-4" tabindex="0" role="button" aria-label="N7 · tách lương → 1.3 Ledger · ra PR-4"><title>tách lương → 1.3 Ledger — ra: PR-4 dòng lương theo HD·CDT1 (1.3 Ledger)</title><rect class="hop-k" x="278" y="296" width="150" height="86" rx="6"/><text class="hop-ma" x="285" y="310">PD 219–222</text>
-<rect class="nguoi" x="384" y="300" width="38" height="13" rx="3"/><text class="nguoi-t" x="403" y="310" text-anchor="middle">TAY</text>
-<text class="hop-ten" x="285" y="326">tách lương → 1.3</text>
-<text class="hop-ten" x="285" y="339">Ledger</text>
-<g class="chip" data-o="PR-4"><rect class="chip-k chip-pr" x="285" y="362" width="38" height="15" rx="7.5"/><text class="chip-t" x="304.0" y="373" text-anchor="middle">PR-4</text></g>
-</g>
-<g class="hop2 now" data-hop2="N8" data-o="PR-5" tabindex="0" role="button" aria-label="N8 · gom → Platform Ledger · ra PR-5"><title>gom → Platform Ledger — ra: PR-5 Platform Data Ledger ×4</title><rect class="hop-k" x="278" y="394" width="150" height="86" rx="6"/><text class="hop-ma" x="285" y="408">PD 210–213</text>
-<text class="hop-ten" x="285" y="424">gom → Platform Ledger</text>
-<g class="chip" data-o="PR-5"><rect class="chip-k chip-pr" x="285" y="460" width="38" height="15" rx="7.5"/><text class="chip-t" x="304.0" y="471" text-anchor="middle">PR-5</text></g>
-</g>
-<g class="hop2 now" data-hop2="N9" data-o="SI-1" tabindex="0" role="button" aria-label="N9 · ITL 1/2 RAW · VLOOKUP Ref · ra SI-1"><title>ITL 1/2 RAW · VLOOKUP Ref — ra: SI-1 giao dịch ↔ PM line (Mapping L1)</title><rect class="hop-k" x="452" y="100" width="150" height="184" rx="6"/><text class="hop-ma" x="459" y="114">PD 302–308</text>
-<text class="hop-ten" x="459" y="130">ITL 1/2 RAW · VLOOKUP</text>
-<text class="hop-ten" x="459" y="143">Ref</text>
-<g class="chip" data-o="SI-1"><rect class="chip-k chip-si" x="459" y="264" width="38" height="15" rx="7.5"/><text class="chip-t" x="478.0" y="275" text-anchor="middle">SI-1</text></g>
-</g>
-<g class="hop2 now" data-hop2="N10" data-o="SI-2" tabindex="0" role="button" aria-label="N10 · ITL 2/2 ADJUSTED · chỉnh tay R–AT · ra SI-2"><title>ITL 2/2 ADJUSTED · chỉnh tay R–AT — ra: SI-2 ITL Ledge Final</title><rect class="hop-k" x="626" y="100" width="150" height="184" rx="6"/><text class="hop-ma" x="633" y="114">PD 313–314 …</text>
-<rect class="nguoi" x="732" y="104" width="38" height="13" rx="3"/><text class="nguoi-t" x="751" y="114" text-anchor="middle">TAY</text>
-<text class="hop-ten" x="633" y="130">ITL 2/2 ADJUSTED ·</text>
-<text class="hop-ten" x="633" y="143">chỉnh tay R–AT</text>
-<g class="chip" data-o="SI-2"><rect class="chip-k chip-si chip-cuoi" x="633" y="264" width="38" height="15" rx="7.5"/><text class="chip-t" x="652.0" y="275" text-anchor="middle">SI-2</text></g>
-</g>
-<g class="hop2 now" data-hop2="N11" data-o="SI-3" tabindex="0" role="button" aria-label="N11 · H1000 Ledge · VLOOKUP Số CT · ra SI-3"><title>H1000 Ledge · VLOOKUP Số CT — ra: SI-3 H1000 Ledge Final</title><rect class="hop-k" x="626" y="296" width="150" height="86" rx="6"/><text class="hop-ma" x="633" y="310">PD 315–318</text>
-<text class="hop-ten" x="633" y="326">H1000 Ledge · VLOOKUP</text>
-<text class="hop-ten" x="633" y="339">Số CT</text>
-<g class="chip" data-o="SI-3"><rect class="chip-k chip-si chip-cuoi" x="633" y="362" width="38" height="15" rx="7.5"/><text class="chip-t" x="652.0" y="373" text-anchor="middle">SI-3</text></g>
-</g>
-<g class="hop2 ag-ag1" data-hop2="RI.BANK" data-o="RI-1 RI-2 RI-3" tabindex="0" role="button" aria-label="RI.BANK · Ảnh sao kê · quỹ · CCR · ra RI-1 RI-2 RI-3"><title>Ảnh sao kê · quỹ · CCR — ra: RI-1 giao dịch sao kê thô · RI-2 giao dịch quỹ thô · RI-3 số dư ngày TK · quỹ</title><rect class="hop-k" x="830" y="100" width="150" height="86" rx="6"/><text class="hop-ma" x="837" y="114">RI.BANK</text>
-<rect class="nguoi" x="936" y="104" width="38" height="13" rx="3"/><text class="nguoi-t" x="955" y="114" text-anchor="middle">NGƯỜI</text>
-<text class="hop-ten" x="837" y="130">Ảnh sao kê · quỹ ·</text>
-<text class="hop-ten" x="837" y="143">CCR</text>
-<g class="chip" data-o="RI-1"><rect class="chip-k chip-ri" x="837" y="166" width="38" height="15" rx="7.5"/><text class="chip-t" x="856.0" y="177" text-anchor="middle">RI-1</text></g>
-<g class="chip" data-o="RI-2"><rect class="chip-k chip-ri" x="879" y="166" width="38" height="15" rx="7.5"/><text class="chip-t" x="898.0" y="177" text-anchor="middle">RI-2</text></g>
-<g class="chip" data-o="RI-3"><rect class="chip-k chip-ri" x="921" y="166" width="38" height="15" rx="7.5"/><text class="chip-t" x="940.0" y="177" text-anchor="middle">RI-3</text></g>
-</g>
-<g class="hop2 ag-ag1" data-hop2="RI.PAY" data-o="RI-4" tabindex="0" role="button" aria-label="RI.PAY · Ảnh sổ cái PM · PC · ra RI-4"><title>Ảnh sổ cái PM · PC — ra: RI-4 PE·PI·PM·PC line đã duyệt</title><rect class="hop-k" x="830" y="198" width="150" height="86" rx="6"/><text class="hop-ma" x="837" y="212">RI.PAY</text>
-<rect class="nguoi" x="936" y="202" width="38" height="13" rx="3"/><text class="nguoi-t" x="955" y="212" text-anchor="middle">NGƯỜI</text>
-<text class="hop-ten" x="837" y="228">Ảnh sổ cái PM · PC</text>
-<g class="chip" data-o="RI-4"><rect class="chip-k chip-ri" x="837" y="264" width="38" height="15" rx="7.5"/><text class="chip-t" x="856.0" y="275" text-anchor="middle">RI-4</text></g>
-</g>
-<g class="hop2 ag-ag1" data-hop2="RI.HR" data-o="RI-5" tabindex="0" role="button" aria-label="RI.HR · Ảnh sổ H1000 · ra RI-5"><title>Ảnh sổ H1000 — ra: RI-5 payroll tháng + số FT</title><rect class="hop-k" x="830" y="296" width="150" height="86" rx="6"/><text class="hop-ma" x="837" y="310">RI.HR</text>
-<rect class="nguoi" x="936" y="300" width="38" height="13" rx="3"/><text class="nguoi-t" x="955" y="310" text-anchor="middle">NGƯỜI</text>
-<text class="hop-ten" x="837" y="326">Ảnh sổ H1000</text>
-<g class="chip" data-o="RI-5"><rect class="chip-k chip-ri" x="837" y="362" width="38" height="15" rx="7.5"/><text class="chip-t" x="856.0" y="373" text-anchor="middle">RI-5</text></g>
-</g>
-<g class="hop2 ag-ag1" data-hop2="RI.PLT" data-o="RI-6" tabindex="0" role="button" aria-label="RI.PLT · Ảnh 4 nguồn nền tảng · ra RI-6"><title>Ảnh 4 nguồn nền tảng — ra: RI-6 GI·OMC·SC·PS theo vendor</title><rect class="hop-k" x="830" y="394" width="150" height="86" rx="6"/><text class="hop-ma" x="837" y="408">RI.PLT</text>
-<rect class="nguoi" x="936" y="398" width="38" height="13" rx="3"/><text class="nguoi-t" x="955" y="408" text-anchor="middle">NGƯỜI</text>
-<text class="hop-ten" x="837" y="424">Ảnh 4 nguồn nền tảng</text>
-<g class="chip" data-o="RI-6"><rect class="chip-k chip-ri" x="837" y="460" width="38" height="15" rx="7.5"/><text class="chip-t" x="856.0" y="471" text-anchor="middle">RI-6</text></g>
-</g>
-<g class="hop2 ag-ag2" data-hop2="PR.BANK" data-o="PR-1 PR-2" tabindex="0" role="button" aria-label="PR.BANK · Dòng tiền + số dư ngày · ra PR-1 PR-2"><title>Dòng tiền + số dư ngày — ra: PR-1 giao dịch bank theo ngày (Ledger 112) · PR-2 giao dịch quỹ theo ngày (Ledger 111)</title><rect class="hop-k" x="1004" y="100" width="150" height="86" rx="6"/><text class="hop-ma" x="1011" y="114">PR.BANK</text>
-<text class="hop-ten" x="1011" y="130">Dòng tiền + số dư</text>
-<text class="hop-ten" x="1011" y="143">ngày</text>
-<g class="chip" data-o="PR-1"><rect class="chip-k chip-pr" x="1011" y="166" width="38" height="15" rx="7.5"/><text class="chip-t" x="1030.0" y="177" text-anchor="middle">PR-1</text></g>
-<g class="chip" data-o="PR-2"><rect class="chip-k chip-pr" x="1053" y="166" width="38" height="15" rx="7.5"/><text class="chip-t" x="1072.0" y="177" text-anchor="middle">PR-2</text></g>
-</g>
-<g class="hop2 ag-ag2" data-hop2="PR.PAY" data-o="PR-3" tabindex="0" role="button" aria-label="PR.PAY · Dòng lệnh PM · PC · ra PR-3"><title>Dòng lệnh PM · PC — ra: PR-3 PM line đủ chiều (Unpivot)</title><rect class="hop-k" x="1004" y="198" width="150" height="86" rx="6"/><text class="hop-ma" x="1011" y="212">PR.PAY</text>
-<text class="hop-ten" x="1011" y="228">Dòng lệnh PM · PC</text>
-<g class="chip" data-o="PR-3"><rect class="chip-k chip-pr" x="1011" y="264" width="38" height="15" rx="7.5"/><text class="chip-t" x="1030.0" y="275" text-anchor="middle">PR-3</text></g>
-</g>
-<g class="hop2 ag-ag2" data-hop2="PR.HR" data-o="PR-4" tabindex="0" role="button" aria-label="PR.HR · Dòng lương + Số CT · ra PR-4"><title>Dòng lương + Số CT — ra: PR-4 dòng lương theo HD·CDT1 (1.3 Ledger)</title><rect class="hop-k" x="1004" y="296" width="150" height="86" rx="6"/><text class="hop-ma" x="1011" y="310">PR.HR</text>
-<text class="hop-ten" x="1011" y="326">Dòng lương + Số CT</text>
-<g class="chip" data-o="PR-4"><rect class="chip-k chip-pr" x="1011" y="362" width="38" height="15" rx="7.5"/><text class="chip-t" x="1030.0" y="373" text-anchor="middle">PR-4</text></g>
-</g>
-<g class="hop2 ag-ag2" data-hop2="PR.PLT" data-o="PR-5" tabindex="0" role="button" aria-label="PR.PLT · Chi phí 4 loại · ra PR-5"><title>Chi phí 4 loại — ra: PR-5 Platform Data Ledger ×4</title><rect class="hop-k" x="1004" y="394" width="150" height="86" rx="6"/><text class="hop-ma" x="1011" y="408">PR.PLT</text>
-<text class="hop-ten" x="1011" y="424">Chi phí 4 loại</text>
-<g class="chip" data-o="PR-5"><rect class="chip-k chip-pr" x="1011" y="460" width="38" height="15" rx="7.5"/><text class="chip-t" x="1030.0" y="471" text-anchor="middle">PR-5</text></g>
-</g>
-<g class="hop2 ag-ag2" data-hop2="SI.MAP" data-o="SI-1" tabindex="0" role="button" aria-label="SI.MAP · Ghép Ref No · Số CT · ra SI-1"><title>Ghép Ref No · Số CT — ra: SI-1 giao dịch ↔ PM line (Mapping L1)</title><rect class="hop-k" x="1178" y="100" width="150" height="282" rx="6"/><text class="hop-ma" x="1185" y="114">SI.MAP</text>
-<text class="hop-ten" x="1185" y="130">Ghép Ref No · Số CT</text>
-<g class="chip" data-o="SI-1"><rect class="chip-k chip-si" x="1185" y="362" width="38" height="15" rx="7.5"/><text class="chip-t" x="1204.0" y="373" text-anchor="middle">SI-1</text></g>
-</g>
-<g class="hop2 ag-ag3" data-hop2="SI.ITL" data-o="SI-2 SI-3" tabindex="0" role="button" aria-label="SI.ITL · Sổ ITL hiệu lực · gốc + lớp sửa · ra SI-2 SI-3"><title>Sổ ITL hiệu lực · gốc + lớp sửa — ra: SI-2 ITL Ledge Final · SI-3 H1000 Ledge Final</title><rect class="hop-k" x="1352" y="100" width="150" height="282" rx="6"/><text class="hop-ma" x="1359" y="114">SI.ITL</text>
-<rect class="nguoi" x="1458" y="104" width="38" height="13" rx="3"/><text class="nguoi-t" x="1477" y="114" text-anchor="middle">NGƯỜI</text>
-<text class="hop-ten" x="1359" y="130">Sổ ITL hiệu lực · gốc</text>
-<text class="hop-ten" x="1359" y="143">+ lớp sửa</text>
-<g class="chip" data-o="SI-2"><rect class="chip-k chip-si chip-cuoi" x="1359" y="362" width="38" height="15" rx="7.5"/><text class="chip-t" x="1378.0" y="373" text-anchor="middle">SI-2</text></g>
-<g class="chip" data-o="SI-3"><rect class="chip-k chip-si chip-cuoi" x="1401" y="362" width="38" height="15" rx="7.5"/><text class="chip-t" x="1420.0" y="373" text-anchor="middle">SI-3</text></g>
-</g>
-</svg></div></figure>
-<p class="note">Máy kiểm lúc sinh: <b>14 output</b>, mỗi output có đúng 1 hộp sinh ở NOW và đúng 1 ở TO-BE; 11 hộp NOW gộp đủ 45 hộp gốc của voi AS-IS (7 hộp còn lại có lý do: cấu hình, cổng, sau ITL); mọi quan hệ "đọc từ" đều có đường mũi tên trên CẢ HAI voi. Output cuối: SI-2 ITL Ledge Final ◐ · SI-3 H1000 Ledge Final ⛔. Đã chứng minh giống nhau: ✅ 1 · ◐ 5 · ⛔ 8 trên 14.</p>
-<h2>§3 · Audit ngược — từ output cuối về RAW</h2><p>Đọc từ trên xuống: output cuối trước, rồi output nó đọc từ, tới nguồn thô. Mỗi dòng: NOW sinh ở đâu, TO-BE sinh ở đâu, và phép đo nào chứng minh hai bên ra cùng một thứ.</p>
+<rect class="hang-n hang-dữ" x="16" y="120" width="148" height="104" rx="6"/><text class="hang-t" x="26" y="169.0">BANK</text><text class="hang-p" x="26" y="184.0">tiền · sao kê · quỹ · CCR</text>
+<rect class="hang-n hang-dữ" x="16" y="238" width="148" height="104" rx="6"/><text class="hang-t" x="26" y="287.0">PAY</text><text class="hang-p" x="26" y="302.0">lệnh chi · PE·PI·PM·PC</text>
+<rect class="hang-n hang-dữ" x="16" y="356" width="148" height="104" rx="6"/><text class="hang-t" x="26" y="405.0">HR</text><text class="hang-p" x="26" y="420.0">lương · H1000</text>
+<rect class="hang-n hang-dữ" x="16" y="474" width="148" height="104" rx="6"/><text class="hang-t" x="26" y="523.0">PLT</text><text class="hang-p" x="26" y="538.0">nền tảng GI·OMC·SC·PS</text>
+<rect class="hang-n hang-kiểm" x="16" y="602" width="148" height="70" rx="6"/><text class="hang-t" x="26" y="634.0">AGENT 4</text><text class="hang-p" x="26" y="649.0">Auditor · cổng mỗi bước</text>
+<rect class="hang-n hang-config" x="16" y="686" width="148" height="70" rx="6"/><text class="hang-t" x="26" y="718.0">INDEX</text><text class="hang-p" x="26" y="733.0">khai · danh mục · tỷ giá</text>
+</svg></div><figcaption>Hình 1 — Voi FLS v2. <b>Nửa trái NOW</b>: 13 hộp gộp từ voi AS-IS của artifact cũ, tới ITL Adjust. <b>Nửa phải TO-BE</b> — trục ngang: tầng trên là <b>agent</b> (Agent 1 · Agent 2 · Agent 3 · mã tất định), tầng dưới là <b>bước</b> theo kiến trúc FPA (INPUT · CALCULATE · ALLOCATE · WAREHOUSE · REPORT, 11 cột con); <b>Agent 4 · Auditor</b> là làn ngang chạy suốt các bước. <b>Trục dọc</b>: bốn họ dữ liệu BANK · PAY · HR · PLT, rồi hàng INDEX. Máy kiểm lúc sinh: <b>31 hộp</b> (21 hộp luồng · 5 cổng · 5 cấu hình) · <b>23 mũi tên</b>, cả 23 nằm ngang, đi trái → phải, 0 cắt qua hộp (e8 · e13 đi qua làn trống); mã mỗi hộp nói đúng bước của cột chứa nó. Nhãn NGƯỜI = có tay người · chip A3.3 = agent gợi ý phần dư · "PD …" = bước PD Now hộp ấy thay.</figcaption></figure>
+<p class="note">Máy kiểm lúc sinh: <b>14 output</b>, mỗi output có đúng 1 hộp sinh ở NOW và đúng 1 ở TO-BE; 13 hộp NOW gộp đủ 47 hộp gốc của voi AS-IS (5 hộp còn lại có lý do: cấu hình, cổng, sau ITL); mọi quan hệ "đọc từ" đều có đường mũi tên trên CẢ HAI voi. Output cuối: SI-2 ITL Ledge Final ◐ · SI-3 H1000 Ledge Final ⛔. Đã chứng minh giống nhau: ✅ 1 · ◐ 5 · ⛔ 8 trên 14.</p>
+<h2>§2 · Audit ngược — từ output cuối về RAW</h2><p>Đọc từ trên xuống: output cuối trước, rồi output nó đọc từ, tới nguồn thô. Mỗi dòng: NOW sinh ở đâu, TO-BE sinh ở đâu, và phép đo nào chứng minh hai bên ra cùng một thứ.</p>
 <div class="scroll"><table class="io"><thead><tr><th>output</th><th>đọc từ ← · dùng bởi →</th><th>NOW sinh ở</th><th>TO-BE sinh ở</th><th>bằng chứng hai bên giống nhau</th></tr></thead><tbody>
 <tr class="b1"><th colspan="5">① OUTPUT CUỐI · ITL ADJUST</th></tr>
 <tr class="chon2" data-o="SI-2" tabindex="0"><td><span class="chip-h chip-si">SI-2</span> ITL Ledge Final <b>· output cuối</b></td><td class="mono">← SI-1<br>→ SI-3</td><td><b class="mono">N10</b> ITL 2/2 ADJUSTED · chỉnh tay R–AT<div class="fls">PD 313–314 · 319 huỷ</div></td><td><b class="mono">SI.ITL</b> Sổ ITL hiệu lực · gốc + lớp sửa</td><td><span class="pill mid">◐</span> so từng ô với ITL Ledge Final đóng băng: vùng A–Q 64.393/64.393 ô · 22 kỳ; vùng chỉnh tay R–AT (7 khối) 4.088/4.088 ô · 584 dòng tháng 3/2026 — mới họ BANK</td></tr>
@@ -593,7 +536,7 @@ tr.chon2{cursor:pointer}tr.chon2.sang2{background:var(--mid-s)}
 <tr class="chon2" data-o="RI-5" tabindex="0"><td><span class="chip-h chip-ri">RI-5</span> payroll tháng + số FT</td><td class="mono">← nguồn ngoài<br>→ PR-4</td><td><b class="mono">N3</b> file lương tháng<div class="fls">PD 101</div></td><td><b class="mono">RI.HR</b> Ảnh sổ H1000</td><td><span class="pill no">⛔</span> 0 mã</td></tr>
 <tr class="chon2" data-o="RI-6" tabindex="0"><td><span class="chip-h chip-ri">RI-6</span> GI·OMC·SC·PS theo vendor</td><td class="mono">← nguồn ngoài<br>→ PR-5</td><td><b class="mono">N4</b> Looker · 2 Gsheet<div class="fls">PD 103–106</div></td><td><b class="mono">RI.PLT</b> Ảnh 4 nguồn nền tảng</td><td><span class="pill no">⛔</span> 0 mã</td></tr>
 </tbody></table></div>
-<h2>§4 · Đầu vào và đầu ra của từng hộp TO-BE</h2><p>Cột <i>vào</i> / <i>ra</i>: dòng đậm là mũi tên trên hình (mã <span class="mono">e…</span>), dòng nhạt là nguồn ngoài, người, hay cấu hình. Cột <i>thay bước PD Now</i> nối mỗi hộp về đúng các bước AS-IS nó thay — bấm một dòng để thấy hộp trên hình.</p>
+<h2>§3 · Đầu vào và đầu ra của từng hộp TO-BE</h2><p>Cột <i>vào</i> / <i>ra</i>: dòng đậm là mũi tên trên hình (mã <span class="mono">e…</span>), dòng nhạt là nguồn ngoài, người, hay cấu hình. Cột <i>thay bước PD Now</i> nối mỗi hộp về đúng các bước AS-IS nó thay — bấm một dòng để thấy hộp trên hình.</p>
 <div class="scroll"><table class="io"><thead><tr><th>mã · việc</th><th>vào</th><th>ra</th><th>thay bước PD Now (AS-IS)</th><th>FLS hôm nay</th></tr></thead><tbody>
 <tr class="b1"><th colspan="5">Agent 1 · Collect_raw_data</th></tr>
 <tr class="b2"><th colspan="5">RAW · chụp nguồn</th></tr>
@@ -641,7 +584,7 @@ tr.chon2{cursor:pointer}tr.chon2.sang2{background:var(--mid-s)}
 <tr class="chon" data-ref="h:IX.MB" tabindex="0"><td><b class="mono">IX.MB</b><br>MAPPING BLOCK · TỶ TRỌNG<div class="cu">v0.9: (mới)</div></td><td><ul><li>—</li></ul></td><td><ul><li>—</li></ul></td><td><ul class="pd"><li class="ngoai">— (AS-IS không có bước này)</li></ul></td><td><span class="pill no">⛔</span><div class="fls">0 mã</div></td></tr>
 <tr class="chon" data-ref="h:IX.TMP" tabindex="0"><td><b class="mono">IX.TMP</b><br>KHUÔN BÁO CÁO<div class="cu">v0.9: (mới)</div></td><td><ul><li>—</li></ul></td><td><ul><li>—</li></ul></td><td><ul class="pd"><li class="ngoai">— (AS-IS không có bước này)</li></ul></td><td><span class="pill no">⛔</span><div class="fls">0 mã</div></td></tr>
 </tbody></table></div>
-<h2>§5 · Mũi tên nói gì</h2>
+<h2>§4 · Mũi tên nói gì</h2>
 <div class="scroll"><table class="io"><thead><tr><th>#</th><th>từ → tới</th><th>làn</th><th>cái gì chảy</th><th>khoá</th><th>AS-IS hôm nay (bước PD Now)</th></tr></thead><tbody>
 <tr class="b1"><th colspan="6">① INPUT</th></tr>
 <tr class="b2"><th colspan="6">RAW → PREPARE</th></tr>
@@ -681,7 +624,7 @@ tr.chon2{cursor:pointer}tr.chon2.sang2{background:var(--mid-s)}
 <tr class="chon" data-ref="t:e22" tabindex="0"><td class="mono">e22</td><td class="mono">RP.CF → RP.CCR</td><td>BANK</td><td>Daily Report 2 (CF) vào báo cáo daily CCR</td><td><code>(LE, ngày)</code></td><td class="mono">610→615</td></tr>
 <tr class="chon" data-ref="t:e23" tabindex="0"><td class="mono">e23</td><td class="mono">RP.PL → RP.CCR</td><td>PAY</td><td>Daily Report 3 (P&amp;L) vào báo cáo daily CCR</td><td><code>(CDT1, ngày)</code></td><td class="mono">609→615</td></tr>
 </tbody></table></div>
-<h2>§6 · Mọi bước PD Now đều có chỗ</h2>
+<h2>§5 · Mọi bước PD Now đều có chỗ</h2>
 <div class="scroll"><table class="io"><thead><tr><th>pha PD Now</th><th>số bước</th><th>vào hộp TO-BE</th><th>ngoài GĐ1 · lý do</th></tr></thead><tbody>
 <tr><td><b>① INPUT · 1xx–2xx</b></td><td class="mono">42</td><td><b class=mono>RI.HR</b> 101 · <b class=mono>RI.PLT</b> 103–106 · <b class=mono>RI.PAY</b> 107–114 · <b class=mono>RI.BANK</b> 115–116 · 200 · 202 · 204 · 209 · <b class=mono>PR.BANK</b> 201 · 203 · 205–208 · <b class=mono>PR.PLT</b> 210–213 · <b class=mono>PR.PAY</b> 214–218 · <b class=mono>PR.HR</b> 219–222</td><td>100 · 223–224 — chưa làm ở AS-IS (Not yet) — owner chốt GĐ nào<br>102 — báo cáo HR từ EDD, ⛔ đi qua sổ tiền — ngoài GĐ1</td></tr>
 <tr><td><b>② ITL · 3xx</b></td><td class="mono">19</td><td><b class=mono>IX.MM</b> 301 · <b class=mono>SI.MAP</b> 302–308 · <b class=mono>SI.ITL</b> 313–319</td><td>309 — AS-IS đã huỷ (Cancel)<br>310–312 — chưa làm ở AS-IS (Not yet) — owner chốt GĐ nào</td></tr>
@@ -689,7 +632,7 @@ tr.chon2{cursor:pointer}tr.chon2.sang2{background:var(--mid-s)}
 <tr><td><b>③ ALLOCATE · 5xx</b></td><td class="mono">14</td><td><b class=mono>AL.PLT</b> 500–510 · <b class=mono>AL.KEY</b> 511–513</td><td>—</td></tr>
 <tr><td><b>⑤ REPORT + OTHERS · 6xx–7xx</b></td><td class="mono">21</td><td><b class=mono>SO.PLA3-ATL</b> 600–604 · 606 · <b class=mono>RP.PL</b> 605 · 607–609 · <b class=mono>RP.CF</b> 610 · <b class=mono>RP.FLS</b> 613 · 617 · <b class=mono>RP.CCR</b> 614–616</td><td>611–612 — báo cáo HR từ EDD, ⛔ đi qua sổ tiền — ngoài GĐ1<br>700–702 — OTHERS · báo cáo phụ (C12, BHXH, nghiệm thu dịch vụ)</td></tr>
 </tbody></table></div><p class="ghichu">Máy đếm lúc sinh: <b>116/116</b> bước PD Now có chỗ — <b>103</b> vào một hộp TO-BE, <b>13</b> ở rổ "ngoài GĐ1" có lý do; 0 bước gán hai lần.</p>
-<h2>§7 · Soát lại voi AS-IS trong artifact theo PD Now</h2><p>Đo bằng máy: lấy cột "bước" của 52 hộp AS-IS gốc (<code>voi_asis_goc.json</code>) so với 116 bước PD Now và 175 mũi tên suy từ ma trận I/O.</p>
+<h2>§6 · Soát lại voi AS-IS trong artifact theo PD Now</h2><p>Đo bằng máy: lấy cột "bước" của 52 hộp AS-IS gốc (<code>voi_asis_goc.json</code>) so với 116 bước PD Now và 175 mũi tên suy từ ma trận I/O.</p>
 <div class="scroll"><table class="io"><thead><tr><th>soát</th><th>voi AS-IS (artifact v0.9) so với PD Now</th><th>bản v2 xử lý ở</th></tr></thead><tbody>
 <tr><td><b>Độ phủ</b></td><td>91/116 bước PD Now có trong một hộp AS-IS. Thiếu 25: 7 chưa làm / huỷ (100 · 223–224 · 309–312) và <b>18 bước đang chạy</b> (600–608 · 611 · 613–617 · 700–702) — toàn bộ chuỗi REPORT.</td><td class="mono">vẽ đủ: RP.CF · RP.PL · RP.CCR · RP.FLS</td></tr>
 <tr><td><b>Đúng</b></td><td>Tầng INPUT + ITL (101–319) khớp ma trận I/O: duỗi PE·PI·PM, gom bank / quỹ, chuyển A-CCR + sắp Ledger 111/112, IMPORTRANGE, Transaction Original → Mapping L1, vùng chỉnh tay R–AT, H1000 Ledge.</td><td class="mono">giữ, đổi tên theo ngữ pháp mới</td></tr>
@@ -697,7 +640,7 @@ tr.chon2{cursor:pointer}tr.chon2.sang2{background:var(--mid-s)}
 <tr><td><b>Sai đầu vào</b></td><td>Mũi tên o3 vẽ <i>sổ nền tảng → PHÂN BỔ</i>. PD Now 501 phân bổ đọc <b>[Import] Report General Ledger</b> (406) + Source (502) + Vendor &amp; Network Mapping (503) — thiếu đầu vào GL: chi phí nền tảng được chia từ dòng PE đã vào sổ, không chỉ từ file nguồn.</td><td class="mono">e15 SO.PLA3 → AL.PLT + e8 PR.PLT → AL.PLT</td></tr>
 <tr><td><b>Thiếu nút</b></td><td>9.2 Exchange Rate (405 · 614); CCR là cả đầu vào (204 · 209) lẫn đầu ra (615 · 616) nhưng chỉ vẽ vào SOÁT. Ma trận PD Now tự nó có 10 chỗ 'I' trỏ vào cột không bước nào sinh ra (vd 207 → [Importrange] 1.2 Ledger 112: 302 chỉ ghi 111).</td><td class="mono">IX.FX · RP.CCR; câu hỏi ④ cuối trang</td></tr>
 </tbody></table></div>
-<h2>§8 · Câu chờ owner duyệt</h2><ol><li><b>Ngữ pháp tên</b> <code>RI·PR·SI·CA·SO·AL·DW·RP·KS·IX + .phần</code> và đuôi <code>-ATL</code> — giữ? (vd <code>APR</code> của FPA gồm cả RAW, ở đây RAW tách thành <code>RI</code>.)</li><li><b>Chia agent theo hai file ITL của AS-IS:</b> bước ghép Reference No / Số CT (<code>SI.MAP</code>, PD 302–308 nằm trong file ITL 1/2 RAW) chuyển từ Agent 3 sang <b>Agent 2 · ITL raw</b>; Agent 3 · ITL Adjust giữ sổ ITL + lớp sửa (file 2/2 ADJUSTED). Voi v0.9 đặt bước ghép ở Agent 3 — đổi như vậy được không?</li><li><b>Hai cột STANDARD INPUT</b> (ghép · sổ ITL): sổ ITL hiệu lực là "standard input" của FLS (như A-SI-R20/R50 của FPA) — đúng ý chưa?</li><li><b>HR ⛔ qua ALLOCATE</b> (PD 500: đã phân bổ ở payroll) — giữ? <b>Báo cáo HR</b> 102 · 611 · 612 để ngoài GĐ1?</li><li><b>Kho:</b> FLS giữ PostgreSQL chỉ-thêm, hay đẩy khối SO lên BigQuery như FDW của FPA để REPORT dùng chung? Và bước <code>[Importrange] 1.2 Ledger 112</code> mà ma trận PD Now trỏ tới (cột 54) nhưng không ghi thành bước — có thật không?</li><li><b>AP / AR</b> (223 · 224 · 310–312, AS-IS "Not yet") — đưa vào GĐ1 hay GĐ2?</li></ol>
+<h2>§7 · Câu chờ owner duyệt</h2><ol><li><b>Ngữ pháp tên</b> <code>RI·PR·SI·CA·SO·AL·DW·RP·KS·IX + .phần</code> và đuôi <code>-ATL</code> — giữ? (vd <code>APR</code> của FPA gồm cả RAW, ở đây RAW tách thành <code>RI</code>.)</li><li><b>Chia agent theo hai file ITL của AS-IS:</b> bước ghép Reference No / Số CT (<code>SI.MAP</code>, PD 302–308 nằm trong file ITL 1/2 RAW) chuyển từ Agent 3 sang <b>Agent 2 · ITL raw</b>; Agent 3 · ITL Adjust giữ sổ ITL + lớp sửa (file 2/2 ADJUSTED). Voi v0.9 đặt bước ghép ở Agent 3 — đổi như vậy được không?</li><li><b>Hai cột STANDARD INPUT</b> (ghép · sổ ITL): sổ ITL hiệu lực là "standard input" của FLS (như A-SI-R20/R50 của FPA) — đúng ý chưa?</li><li><b>HR ⛔ qua ALLOCATE</b> (PD 500: đã phân bổ ở payroll) — giữ? <b>Báo cáo HR</b> 102 · 611 · 612 để ngoài GĐ1?</li><li><b>Kho:</b> FLS giữ PostgreSQL chỉ-thêm, hay đẩy khối SO lên BigQuery như FDW của FPA để REPORT dùng chung? Và bước <code>[Importrange] 1.2 Ledger 112</code> mà ma trận PD Now trỏ tới (cột 54) nhưng không ghi thành bước — có thật không?</li><li><b>AP / AR</b> (223 · 224 · 310–312, AS-IS "Not yet") — đưa vào GĐ1 hay GĐ2?</li></ol>
 </main>
 <aside class="khung-ct" id="khung-ct" hidden aria-label="Chi tiết"><button class="x" id="nut-dong" type="button" aria-label="Đóng">×</button><div id="ct"></div></aside>
 <script type="application/json" id="du-lieu">{"hop": {"RI.BANK": {"ten": "ẢNH SAO KÊ · QUỸ · CCR", "tt": "◐ Bank ✅ · Cash ⛔ · CCR ⛔", "hien": ["60 sao kê · 8 quỹ · 2 sheet CCR", "đọc theo bản khai"], "fls": "tools/chup_sao_ke.py (LAN='Bank') · fls_chup · fls_chup_nguon (khai_version) — 60 nguồn · 182 ảnh; Cash, CCR: 0 ảnh", "cu": "anhTien", "nguoi": "dán / ghi / nhập số dư ở Google Sheets", "vao": [["", "", "sheet R | sao kê — KT ngân hàng dán (PD 115 · 200)"], ["", "", "sheet R | sổ quỹ — KT quỹ ghi (116 · 202)"], ["", "", "2. CCR · 2. CCR Cash — người nhập số dư (204 · 209)"], ["", "", "IX.KHAI — bố cục cột · thứ tự ngày"]], "ra": [["e1", "PR.BANK", "ảnh sao kê · quỹ · số dư CCR, đọc theo bản khai"]], "pd": [["115", "Bank/PO/PP", "Done"], ["116", "llll", "Done"], ["200", "R | Acc No_Bank Currency_LE", "Done"], ["202", "R | abc_xyz_LE", "Done"], ["204", "2. CCR Cash", "Done"], ["209", "2. CCR", "Done"]], "buoc": "RI · RAW INPUT", "kb": "Agent 1 · Collect_raw_data"}, "RI.PAY": {"ten": "ẢNH SỔ CÁI PM · PC", "tt": "◐ PM ✅ · PC ⛔", "hien": ["PE·PI·PM·PC đã duyệt", "Email ⛔ vào kho"], "fls": "fls_pm_line 3.772 dòng (migration 0011/0023) · fls/repo/anh_pm.py · PM_COT_RIENG_TU = {Email Address}", "cu": "anhFPS", "nguoi": "đề nghị · duyệt · CA gõ Reference No sau khi chi", "vao": [["", "", "FPS · A|PAY100 PE11/PI11/PM11/PC11 Entry Data — người đề nghị Gform, sếp duyệt (107–114)"]], "ra": [["e2", "PR.PAY", "ảnh dòng sổ cái PM · PC (bỏ cột Email)"]], "pd": [["107", "PE", "Done"], ["108", "PE", ""], ["109", "PI", "Done"], ["110", "PI", ""], ["111", "PM", "Done"], ["112", "PM", ""], ["113", "PC", "Done"], ["114", "PC", ""]], "buoc": "RI · RAW INPUT", "kb": "Agent 1 · Collect_raw_data"}, "RI.HR": {"ten": "ẢNH SỔ H1000", "tt": "⛔", "hien": ["payroll tháng · đã tách HD·CDT1", "số FT do kế toán dán"], "fls": "0 mã: grep H1000 trong fls/ = 1 tệp, chỉ chú thích", "cu": "anhHR", "nguoi": "HR lập payroll · KT dán số FT", "vao": [["", "", "H1000 Ledger (APERO-HR Allocate HD) — HR · C&B lập, kế toán dán số FT (101)"]], "ra": [["e3", "PR.HR", "ảnh payroll tháng đã tách HD · CDT1 · LE + số FT"]], "pd": [["101", "Payroll Sheet", "Done"]], "buoc": "RI · RAW INPUT", "kb": "Agent 1 · Collect_raw_data"}, "RI.PLT": {"ten": "ẢNH 4 NGUỒN NỀN TẢNG", "tt": "⛔", "hien": ["GI·OMC: Looker", "SC·PS: Google Sheets"], "fls": "0 mã: chup_sao_ke.py chỉ chụp lằn Bank", "cu": "anhNT", "nguoi": "Data xuất Looker · Luận / KT cập nhật Gsheet", "vao": [["", "", "GI · OMC — Looker, Data (AnhTQ) xuất (103 · 104)"], ["", "", "SC — 'Chi phí Service Apero', SHQ1 (105)"], ["", "", "PS — 'AperoGroup_Payment', SHQ2 (106)"]], "ra": [["e4", "PR.PLT", "ảnh 4 nguồn GI · OMC · SC · PS"]], "pd": [["103", "GI", "Done"], ["104", "OMC", "Done"], ["105", "SC", "Done"], ["106", "PS", "Done"]], "buoc": "RI · RAW INPUT", "kb": "Agent 1 · Collect_raw_data"}, "PR.BANK": {"ten": "DÒNG TIỀN + SỐ DƯ NGÀY", "tt": "◐ bank 8.338/8.338 · quỹ ⛔", "hien": ["canon 36 trường · 2 vế Nợ/Có", "LE TK · content_key"], "fls": "fls/adapters/sao_ke.py + sao_ke_canon.py — 8.338/8.338 dòng bank; số dư ngày: 0 mã", "cu": "dTien", "nguoi": "", "vao": [["e1", "RI.BANK", "ảnh sao kê · quỹ · số dư CCR, đọc theo bản khai"]], "ra": [["e5", "SI.MAP", "dòng tiền canon hai vế + số dư ngày từng TK"]], "pd": [["201", "Bank Transactions", "Done"], ["203", "Cash Ledger Transactions", "Done"], ["205", "Bank Transactions", "Done"], ["206", "Cash Ledger Transactions", "Done"], ["207", "1.2 Ledger 112", "Done"], ["208", "1.1 Ledger 111", "Done"]], "buoc": "PR · PREPARE", "kb": "Agent 2 · Generate Group Ledger (ITL raw)"}, "PR.PAY": {"ten": "DÒNG LỆNH PM · PC", "tt": "◐ 14 cột có kiểu · 13 thô", "hien": ["duỗi line · đặt kiểu", "Ref · tiền · HD · CDT1 · LE trả"], "fls": "fls/adapters/pm_join.py — 28 cột: 14 có kiểu · 1 cấm · 13 thô; PC: 0 tham chiếu", "cu": "dLenh", "nguoi": "", "vao": [["e2", "RI.PAY", "ảnh dòng sổ cái PM · PC (bỏ cột Email)"]], "ra": [["e6", "SI.MAP", "dòng lệnh: Ref No · tiền · tiền tệ · HD/KRF · CDT1 · LE trả · kỳ DV"]], "pd": [["214", "PE_Unpivot", "Done"], ["215", "PI_Unpivot", "Done"], ["216", "PM11_Entry Data", "Done"], ["217", "PM_Unpivot", "Done"], ["218", "PC_Unpivot", "Done"]], "buoc": "PR · PREPARE", "kb": "Agent 2 · Generate Group Ledger (ITL raw)"}, "PR.HR": {"ten": "DÒNG LƯƠNG", "tt": "⛔", "hien": ["NIS·INT·COM·PIT · HD·CDT1·LE", "Số CT (số FT) · đủ tháng"], "fls": "0 mã (adapter D chưa có)", "cu": "dHR", "nguoi": "", "vao": [["e3", "RI.HR", "ảnh payroll tháng đã tách HD · CDT1 · LE + số FT"]], "ra": [["e7", "SI.MAP", "dòng lương + Số CT (số FT kế toán dán)"]], "pd": [["219", "1.3 Ledger NIS/INT/COM 2025", "Done"], ["220", "1.3 Ledger NIS/INT/COM 2024", "Done"], ["221", "1.3 Ledger PIT 2025", "Done"], ["222", "1.3 Ledger PIT 2024", "Done"]], "buoc": "PR · PREPARE", "kb": "Agent 2 · Generate Group Ledger (ITL raw)"}, "PR.PLT": {"ten": "CHI PHÍ 4 LOẠI", "tt": "⛔", "hien": ["vendor · ngày · NoTrans · tiền", "+ Combine Code"], "fls": "0 mã: grep 'Combine Code' trong fls/ + tools/ = 0", "cu": "dNT", "nguoi": "", "vao": [["e4", "RI.PLT", "ảnh 4 nguồn GI · OMC · SC · PS"]], "ra": [["e8", "AL.PLT", "chi phí theo loại · vendor · ngày + Combine Code — đi qua làn trống tới ALLOCATE"]], "pd": [["210", "Source (Looker)", "Done"], ["211", "Source (Looker)", "Done"], ["212", "Source (Looker)", "Done"], ["213", "Source (Looker)", "Done"]], "buoc": "PR · PREPARE", "kb": "Agent 2 · Generate Group Ledger (ITL raw)"}, "SI.MAP": {"ten": "GHÉP GIAO DỊCH ↔ LỆNH", "tt": "◐ PS Có: 26,79% dòng nối", "hien": ["PP (1) Reference No → PM line", "  Σ line = tiền · N×M để người", "PP (2) Số CT → dòng lương", "→ L1 khớp · L1b lệch", "→ L2 FPS có, bank chưa", "→ L3 bank có, FPS không", "L3: vòng cộng dồn gợi ý loại GD"], "fls": "fls/adapters/pm_join.py · fls/repo/may_ghep.py — fls_pm_link 2.263 · mẫu số PS Có 8.246; PP (2): 0 mã", "cu": "ghep · ghep2 (+ hình 2)", "nguoi": "", "vao": [["e5", "PR.BANK", "dòng tiền canon hai vế + số dư ngày từng TK"], ["e6", "PR.PAY", "dòng lệnh: Ref No · tiền · tiền tệ · HD/KRF · CDT1 · LE trả · kỳ DV"], ["e7", "PR.HR", "dòng lương + Số CT (số FT kế toán dán)"], ["", "", "IX.MM — Mapping Master · luật ghép đã ký"]], "ra": [["e9", "SI.ITL", "mối nối (giao dịch ↔ PM line / dòng lương, tiền chia) + lớp L1 · L1b · L2 · L3"]], "pd": [["302", "[Importrange]1.1 Ledger 111", "Done"], ["303", "[Importrange]PE_Unpivot", "Done"], ["304", "[Importrange]PI_Unpivot", "Done"], ["305", "[Importrange]PM_Unpivot", "Done"], ["306", "[Importrange]PC11_Entry Data", "Done"], ["307", "Transaction Original", "Done"], ["308", "Transaction Mapping L1", "Done"]], "buoc": "SI · STANDARD INPUT", "kb": "Agent 2 · Generate Group Ledger (ITL raw)"}, "SI.ITL": {"ten": "SỔ ITL HIỆU LỰC", "tt": "◐ 1 họ nguồn · parity 4.088/4.088", "hien": ["sổ gốc chỉ-thêm (INV-I08)", "+ lớp sửa: người › máy › nguồn", "dòng loại có lý do", "một bảng · 4 họ nguồn", "3 vai pháp nhân", "thay ITL Ledge + H1000 Ledge", "(Final · cột R–AT)"], "fls": "fls_itl 8.387 · fls_adjustment 4.428 · fls_reject · fls_journal · final_rule 7 khối 4.088/4.088 ô · RAW 64.393/64.393 ô", "cu": "ghiNap · loai · soITL · lopSua · ghiTay · hieuLuc", "nguoi": "kế toán sửa tay (thay vùng R–AT)", "vao": [["e9", "SI.MAP", "mối nối (giao dịch ↔ PM line / dòng lương, tiền chia) + lớp L1 · L1b · L2 · L3"], ["", "", "người: ghép / sửa / đảo trên F01 · F02 (ghi_tay, actor từ thẻ)"]], "ra": [["e10", "CA.GL", "sổ ITL hiệu lực: dòng + giá trị hiệu lực + 3 vai pháp nhân"]], "pd": [["313", "[Importrange]Mapping Master", "Done"], ["314", "ITL Ledge", "Done"], ["315", "H1000 Ledge NIS/INT/COM (HR Allocate HD) Y2025", "Done"], ["316", "H1000 Ledge NIS/INT/COM (HR Allocate HD) Y2024", "Done"], ["317", "H1000 Ledge PIT (HR Allocate HD) Y2025", "Done"], ["318", "H1000 Ledge PIT (HR Allocate HD) Y2024", "Done"], ["319", "ITL AGGREGATE", "Cancel"]], "buoc": "SI · STANDARD INPUT", "kb": "Agent 3 · Filter Fulfill & Adjust (ITL Adjust)"}, "CA.GL": {"ten": "SỔ CÁI GL · QUY ĐỔI", "tt": "⛔", "hien": ["ITL → khuôn GL (Templ 2)", "quy đổi theo tỷ giá tháng", "gắn chiều: CFA1 (LE)", "PLA1 · CFA3 · PLA3 (KRF)", "ngày → kỳ chuẩn"], "fls": "0 mã: grep ty_gia / exchange trong fls/ = 0 · 'Report I General Ledger' chỉ có trong 1 chú thích", "cu": "(mới — v0.9 không có tầng CALCULATE)", "nguoi": "", "vao": [["e10", "SI.ITL", "sổ ITL hiệu lực: dòng + giá trị hiệu lực + 3 vai pháp nhân"], ["", "", "IX.FX — tỷ giá tháng (9.2 Exchange Rate)"]], "ra": [["e11", "SO.CFA1", "dòng GL đã quy đổi, chiều CFA1 (theo LE)"], ["e12", "SO.PLA3", "dòng GL đã quy đổi, chiều PLA1 · CFA3 · PLA3 (theo KRF)"]], "pd": [["400", "ITL Ledge", "Done"], ["401", "H1000 Ledge NIS/INT/COM (HR Allocate HD) Y2025", "Done"], ["402", "H1000 Ledge NIS/INT/COM (HR Allocate HD) Y2024", "Done"], ["403", "H1000 Ledge PIT (HR Allocate HD) Y2025", "Done"], ["404", "H1000 Ledge PIT (HR Allocate HD) Y2024", "Done"], ["405", "9.2.Exchange Rate", "Done"], ["406", "Report I General Ledger", "Done"]], "buoc": "CA · CALCULATE", "kb": "mã tất định · không agent"}, "SO.CFA1": {"ten": "CF THEO LE", "tt": "⛔", "hien": ["khối KRF × ngày", "+ Y · H · Q · M"], "fls": "0 mã", "cu": "(mới)", "nguoi": "", "vao": [["e11", "CA.GL", "dòng GL đã quy đổi, chiều CFA1 (theo LE)"]], "ra": [["e13", "DW", "khối CF: KRF × LE × kỳ — đi qua làn trống của ALLOCATE (CF không phân bổ)"]], "pd": [["409", "Report I CFA1 Daily", "Done"], ["410", "Report I CFA1 Y H Q M", "Done"]], "buoc": "SO · STANDARD OUTPUT", "kb": "mã tất định · không agent"}, "SO.PLA3": {"ten": "P&L THEO KRF · TRƯỚC PB", "tt": "⛔", "hien": ["PLA1 PM-only · PLA3 HR", "CFA3 HR · PLA3 PM + HR", "ngày + Y·H·Q·M", "+ dòng GL chi tiết (412)", "HR đã phân bổ ở payroll (500)"], "fls": "0 mã: grep PLA1 / PLA3 trong fls/ = 0", "cu": "(mới)", "nguoi": "", "vao": [["e12", "CA.GL", "dòng GL đã quy đổi, chiều PLA1 · CFA3 · PLA3 (theo KRF)"]], "ra": [["e14", "AL.KEY", "P&L theo KRF trước phân bổ"], ["e15", "AL.PLT", "dòng GL mang PE nền tảng (đã nối bank qua Ref No)"]], "pd": [["407", "Report I H1000 Ledge (HR Allocate HD) Y2025", "Doing"], ["408", "Report I H1000 Ledge (HR Allocate HD) Y2025 | For PL Report", "Doing"], ["411", "MID I Report I CFA3 Daily", "Done"], ["412", "Report I General Ledger", "Done"], ["413", "Report I H1000 Ledge (HR Allocate HD) Y2025 | For PL Report", "Done"], ["414", "[MID] Report I PLA1 Daily I PM only", "Done"], ["415", "[MID] Report I PLA1 Y H Q M | PM Only", "Done"], ["416", "[MID] Report I PLA3 Daily | HR Only", "Done"], ["417", "[MID]  Report I PLA3 Y H Q M | HR Only", "Done"], ["418", "[MID] Report I PLA3 Daily I PM + HR", "Done"], ["419", "Report I PLA3 Y H Q M | PM + HR", "Done"]], "buoc": "SO · STANDARD OUTPUT", "kb": "mã tất định · không agent"}, "AL.KEY": {"ten": "PHÂN BỔ THEO KHOÁ", "tt": "⛔", "hien": ["By LE · By NOEM · By GI", "bảng tỷ trọng"], "fls": "fls/adapters/mapping_master.py biết từ vựng By GI (8) · By NOEM (5); phép chia: 0 mã", "cu": "(mới)", "nguoi": "", "vao": [["e14", "SO.PLA3", "P&L theo KRF trước phân bổ"], ["", "", "IX.MB — tỷ trọng LE · NOEM · GI"]], "ra": [["e16", "SO.PLA3-ATL", "phần chia theo LE · NOEM · GI"]], "pd": [["511", "NON-HR", "Done"], ["512", "NON-HR", "Done"], ["513", "NON-HR", "Done"]], "buoc": "AL · ALLOCATE", "kb": "mã tất định · không agent"}, "AL.PLT": {"ten": "PHÂN BỔ NỀN TẢNG", "tt": "⛔", "hien": ["Combine Code → PE/PM", "Mapping Block 1:", "Vendor ↔ Network ↔ CDT1", "CFA2 MID 1–3 · ×7 CDT1", "Σ phần chia = tiền GD"], "fls": "0 mã (fls/ledger/allocate.py chỉ là cột AU = CFA1 của ITL Ledge, ⛔ phân bổ nền tảng)", "cu": "ghep3 · soat3 (+ hình 3)", "nguoi": "", "vao": [["e8", "PR.PLT", "chi phí theo loại · vendor · ngày + Combine Code — đi qua làn trống tới ALLOCATE"], ["e15", "SO.PLA3", "dòng GL mang PE nền tảng (đã nối bank qua Ref No)"], ["", "", "IX.MB — Mapping Block 1"]], "ra": [["e17", "SO.PLA3-ATL", "phần chia chi phí nền tảng theo CDT1 × tháng"]], "pd": [["500", "n/a", "Done"], ["501", "[Import]Report I General Ledger", "Done"], ["502", "Source (Looker)", "Done"], ["503", "Vendor & Network Mapping", "Done"], ["504", "CFA1 | GI Platform Data Ledger", "Done"], ["505", "CFA2 | MID 1 | GI Allocated Ledger", "Done"], ["506", "CFA2 | MID 2 | GI Allocated Ledger", "Done"], ["507", "CFA2 | MID 3 | GI Platform Data Ledger", "Done"], ["508", "OMC Platform Data Ledger | H2.2025 | Finance Report - ED - Dev 02-12-2023_Finance Monthly Audit_Table", "Done"], ["509", "SC Data Ledger | H2.2025 (Luận's File)", "Done"], ["510", "PS Data Ledger | H2.2025", "Done"]], "buoc": "AL · ALLOCATE", "kb": "mã tất định · không agent"}, "SO.PLA3-ATL": {"ten": "P&L SAU PHÂN BỔ", "tt": "⛔", "hien": ["theo CDT1 · LE", "ngày + Y·H·Q·M", "Allocation Table", "PM + HR + nền tảng", "(ATL = PD Now 606)"], "fls": "0 mã", "cu": "(mới)", "nguoi": "", "vao": [["e16", "AL.KEY", "phần chia theo LE · NOEM · GI"], ["e17", "AL.PLT", "phần chia chi phí nền tảng theo CDT1 × tháng"]], "ra": [["e18", "DW", "khối P&L sau phân bổ: KRF × CDT1 × kỳ"]], "pd": [["600", "CFA2 | MID 3 | GI Platform Data Ledger", "Done"], ["601", "CFA2 | MID 3 | OMC Platform Data Ledger", "Done"], ["602", "CFA2 | MID 3 | SC Platform Data Ledger", "Done"], ["603", "CFA2 | MID 3 | PS Platform Data Ledger", "Done"], ["604", "Allocation Table | By NOEM & By GI", "Done"], ["606", "Report I PLA3 Y H Q M | PM + HR | ATL", "Done"]], "buoc": "SO · STANDARD OUTPUT", "kb": "mã tất định · không agent"}, "DW": {"ten": "KHO FLS", "tt": "◐ sổ có · khối SO ⛔", "hien": ["PostgreSQL · chỉ-thêm", "ảnh · dòng · sổ · lớp sửa", "khối SO theo kỳ", "dây truy ngược:", "ô → dòng → giao dịch → ảnh", "thay IMPORTRANGE giữa", "~10 file Gsheet", "AS-IS: không có kho"], "fls": "fls_chup · fls_itl · fls_pm_link · fls_adjustment · fls_journal (fls/db/schema.py); bảng khối báo cáo: 0", "cu": "(mới — v0.9 vẽ sổ ở tầng ⑥ ⑦)", "nguoi": "", "vao": [["e13", "SO.CFA1", "khối CF: KRF × LE × kỳ — đi qua làn trống của ALLOCATE (CF không phân bổ)"], ["e18", "SO.PLA3-ATL", "khối P&L sau phân bổ: KRF × CDT1 × kỳ"]], "ra": [["e19", "RP.CF", "khối CF đã lưu"], ["e20", "RP.PL", "khối P&L sau phân bổ đã lưu"], ["e21", "RP.FLS", "sổ hiệu lực + dây truy ngược"]], "pd": [], "buoc": "DW · WAREHOUSE", "kb": "mã tất định · không agent"}, "RP.CF": {"ten": "DAILY REPORT 2 · CF", "tt": "⛔", "hien": ["Group · LE", "Templ 5"], "fls": "0 mã: grep 'Daily Report' trong fls/ = 0", "cu": "(mới)", "nguoi": "", "vao": [["e19", "DW", "khối CF đã lưu"]], "ra": [["e22", "RP.CCR", "Daily Report 2 (CF) vào báo cáo daily CCR"]], "pd": [["610", "5. Daily Report 2", "Done"]], "buoc": "RP · REPORT", "kb": "mã tất định · không agent"}, "RP.PL": {"ten": "DAILY REPORT 3 · P&L", "tt": "⛔", "hien": ["Group · CDT1", "FS1 + FS2"], "fls": "0 mã", "cu": "(mới)", "nguoi": "", "vao": [["e20", "DW", "khối P&L sau phân bổ đã lưu"], ["", "", "[FS1] PLA5 Daily Report 3 đã sign-off (605)"]], "ra": [["e23", "RP.CCR", "Daily Report 3 (P&L) vào báo cáo daily CCR"]], "pd": [["605", "[MID][FS1][PLA5]5. Daily Report 3 (Sign off)", "Done"], ["607", "[FS2]5. Daily Report 3", "Done"], ["608", "[FS1]5. Daily Report 3", "Done"], ["609", "5. Daily Report 3", "Done"]], "buoc": "RP · REPORT", "kb": "mã tất định · không agent"}, "RP.CCR": {"ten": "BÁO CÁO DAILY TRONG CCR", "tt": "◐ cơ chế ghi ✅ · bộ xuất ⛔", "hien": ["5. Daily Report", "6. CCR ký tháng (pdf)", "ghi neo theo khoá", "chạy khô → cờ duyệt"], "fls": "fls/xuat/ghi_o.py — ghi ô an toàn, 27 bài · tools/ghi_o_that.py (FLS_CHO_GHI_SHEET=1)", "cu": "xuat", "nguoi": "owner duyệt cú ghi · ThuongCT ký tháng", "vao": [["e22", "RP.CF", "Daily Report 2 (CF) vào báo cáo daily CCR"], ["e23", "RP.PL", "Daily Report 3 (P&L) vào báo cáo daily CCR"], ["", "", "khối Treasury (số dư nhập tay) ở chính file CCR"], ["", "", "IX.FX — tỷ giá in trên CCR (614)"]], "ra": [["", "", "ThuongCT ký CCR mỗi tháng · email pdf + bản scan có chữ ký"]], "pd": [["614", "9.2.Exchange Rate", "Done"], ["615", "5. Daily Report", "Done"], ["616", "6. CCR I DEL I W I Pdf", "Done"]], "buoc": "RP · REPORT", "kb": "mã tất định · không agent"}, "RP.FLS": {"ten": "MÀN FLS · TRUY NGƯỢC", "tt": "◐ 6 màn ✅ · truy ngược báo cáo ⛔", "hien": ["F01 hàng chờ · F02 sổ · F03 cổng · F04 nạp lô", "bấm một ô báo cáo → dòng → giao dịch → ảnh", "thay [RAW ITL] Data Management", "+ nhật ký xử lý giao dịch"], "fls": "fls/web/tep/man_f01*.js · man_f02.js · man_f03.js · man_f04.js — 37 tuyến API", "cu": "f01 · f02 · f03", "nguoi": "", "vao": [["e21", "DW", "sổ hiệu lực + dây truy ngược"]], "ra": [], "pd": [["613", "[RAW ITL]Data Management", "Done"], ["617", "[CA]Nhật ký xử lý Giao dịch", "Done"]], "buoc": "RP · REPORT", "kb": "mã tất định · không agent"}, "KS.RI": {"ten": "CỔNG INPUT", "tt": "◐", "hien": ["bản khai đủ · bề rộng cột", "Σ dòng ảnh = Σ dòng nguồn"], "fls": "fls/kiem/soat_nap.py (sao kê) · kiem_tieu_de_pm", "cu": "soat (một phần)", "nguoi": "", "vao": [], "ra": [], "pd": [], "buoc": "KS · KIỂM SOÁT", "kb": "Agent 4 · Auditor (Compounding Loop)"}, "KS.SI": {"ten": "CỔNG GHÉP + SỔ", "tt": "◐ 9 luật ✅ · DIF ⛔", "hien": ["9 luật · Σ line = tiền · 4 vế", "số dư ngày = CCR (DIF = 0)"], "fls": "fls/kiem/soat_nap.py · chay_nap.py:611 cổng 4 vế", "cu": "soat · soat2 · kiem", "nguoi": "AS-IS: người soát DIF bằng mắt (phép so của 204 · 209)", "vao": [], "ra": [], "pd": [], "buoc": "KS · KIỂM SOÁT", "kb": "Agent 4 · Auditor (Compounding Loop)"}, "KS.CA": {"ten": "CỔNG CALCULATE", "tt": "⛔", "hien": ["Σ theo LE = Σ theo nguồn", "Σ ngày = Σ Y·H·Q·M"], "fls": "0 mã", "cu": "kiem (h4)", "nguoi": "", "vao": [], "ra": [], "pd": [], "buoc": "KS · KIỂM SOÁT", "kb": "Agent 4 · Auditor (Compounding Loop)"}, "KS.AL": {"ten": "CỔNG ALLOCATE", "tt": "⛔", "hien": ["Σ phần chia = tiền GD", "Σ % CDT1 = 100"], "fls": "0 mã", "cu": "soat3", "nguoi": "", "vao": [], "ra": [], "pd": [], "buoc": "KS · KIỂM SOÁT", "kb": "Agent 4 · Auditor (Compounding Loop)"}, "KS.RP": {"ten": "CỔNG REPORT · PARITY", "tt": "◐ parity ITL ✅ · báo cáo ⛔", "hien": ["từng ô = ITL Ledge Final / Daily Report AS-IS", "chênh liệt kê từng ô, có tên"], "fls": "fls/oracle/cong_parity.py — RAW 64.393/64.393 · ADJUSTED 4.088/4.088 ô", "cu": "(mới)", "nguoi": "", "vao": [], "ra": [], "pd": [], "buoc": "KS · KIỂM SOÁT", "kb": "Agent 4 · Auditor (Compounding Loop)"}, "IX.KHAI": {"ten": "BẢN KHAI NGUỒN", "tt": "✅ 408 dòng = 68 × 6", "hien": ["cột · thứ tự ngày · LE TK", "có version, owner ký"], "fls": "fls/repo/khai_cot.py · fls_khai_cot", "cu": "khai", "nguoi": "kế toán khai · owner ký", "vao": [], "ra": [], "pd": [], "buoc": "IX · INDEX · CONFIG", "kb": "cấu hình · người khai, owner ký"}, "IX.MM": {"ten": "MAPPING MASTER", "tt": "◐ bộ nạp có", "hien": ["sheet → LE · hd → cách phân bổ", "+ luật ghép đã ký"], "fls": "fls/adapters/mapping_master.py — 73 mã hd, 0 trùng (đo 28/08)", "cu": "(trong ghep)", "nguoi": "", "vao": [], "ra": [], "pd": [["301", "Mapping Master", "Done"]], "buoc": "IX · INDEX · CONFIG", "kb": "cấu hình · người khai, owner ký"}, "IX.FX": {"ten": "TỶ GIÁ · CHIỀU ASD", "tt": "⛔", "hien": ["9.2 Exchange Rate theo tháng", "ASD · HD List · kỳ Day/Y/H/Q/M"], "fls": "0 mã tỷ giá", "cu": "(mới)", "nguoi": "", "vao": [], "ra": [], "pd": [], "buoc": "IX · INDEX · CONFIG", "kb": "cấu hình · người khai, owner ký"}, "IX.MB": {"ten": "MAPPING BLOCK · TỶ TRỌNG", "tt": "⛔", "hien": ["Vendor ↔ Network-Acc ↔ CDT1", "By LE · NOEM · GI"], "fls": "0 mã", "cu": "(mới)", "nguoi": "", "vao": [], "ra": [], "pd": [], "buoc": "IX · INDEX · CONFIG", "kb": "cấu hình · người khai, owner ký"}, "IX.TMP": {"ten": "KHUÔN BÁO CÁO", "tt": "⛔", "hien": ["Templ 1–5 (PD590) · Filters (PD510)", "kỳ (PD520) · KRF (PD530)"], "fls": "0 mã", "cu": "(mới)", "nguoi": "", "vao": [], "ra": [], "pd": [], "buoc": "IX · INDEX · CONFIG", "kb": "cấu hình · người khai, owner ký"}}, "ten": {"e1": {"tu": "RI.BANK", "toi": "PR.BANK", "cai_gi": "ảnh sao kê · quỹ · số dư CCR, đọc theo bản khai", "khoa": "chup_id + khai_version", "pd": "115→200→201 · 116→202→203"}, "e2": {"tu": "RI.PAY", "toi": "PR.PAY", "cai_gi": "ảnh dòng sổ cái PM · PC (bỏ cột Email)", "khoa": "pm_line_id · pc_line_id", "pd": "107→214 · 109→215 · 111→216 · 113→218"}, "e3": {"tu": "RI.HR", "toi": "PR.HR", "cai_gi": "ảnh payroll tháng đã tách HD · CDT1 · LE + số FT", "khoa": "(sổ, tháng, dòng)", "pd": "101→219…222"}, "e4": {"tu": "RI.PLT", "toi": "PR.PLT", "cai_gi": "ảnh 4 nguồn GI · OMC · SC · PS", "khoa": "(loại, tháng, dòng)", "pd": "103→210 · 104→211 · 105→212 · 106→213"}, "e5": {"tu": "PR.BANK", "toi": "SI.MAP", "cai_gi": "dòng tiền canon hai vế + số dư ngày từng TK", "khoa": "content_key", "pd": "207·208→302→307→308"}, "e6": {"tu": "PR.PAY", "toi": "SI.MAP", "cai_gi": "dòng lệnh: Ref No · tiền · tiền tệ · HD/KRF · CDT1 · LE trả · kỳ DV", "khoa": "pm_line_id", "pd": "214…217→303…305→308"}, "e7": {"tu": "PR.HR", "toi": "SI.MAP", "cai_gi": "dòng lương + Số CT (số FT kế toán dán)", "khoa": "Số CT", "pd": "219…222→315…318 (VLOOKUP Số CT)"}, "e8": {"tu": "PR.PLT", "toi": "AL.PLT", "cai_gi": "chi phí theo loại · vendor · ngày + Combine Code — đi qua làn trống tới ALLOCATE", "khoa": "(vendor, ngày, NoTrans)", "pd": "210…213→502→504"}, "e9": {"tu": "SI.MAP", "toi": "SI.ITL", "cai_gi": "mối nối (giao dịch ↔ PM line / dòng lương, tiền chia) + lớp L1 · L1b · L2 · L3", "khoa": "(content_key, pm_line_id)", "pd": "308→314 · 315…318"}, "e10": {"tu": "SI.ITL", "toi": "CA.GL", "cai_gi": "sổ ITL hiệu lực: dòng + giá trị hiệu lực + 3 vai pháp nhân", "khoa": "itl_id", "pd": "314→400 · 315…318→401…404"}, "e11": {"tu": "CA.GL", "toi": "SO.CFA1", "cai_gi": "dòng GL đã quy đổi, chiều CFA1 (theo LE)", "khoa": "itl_id + kỳ", "pd": "400→409→410"}, "e12": {"tu": "CA.GL", "toi": "SO.PLA3", "cai_gi": "dòng GL đã quy đổi, chiều PLA1 · CFA3 · PLA3 (theo KRF)", "khoa": "itl_id + kỳ", "pd": "406→412→414 · 407/408→413→416"}, "e13": {"tu": "SO.CFA1", "toi": "DW", "cai_gi": "khối CF: KRF × LE × kỳ — đi qua làn trống của ALLOCATE (CF không phân bổ)", "khoa": "(KRF, LE, kỳ)", "pd": "409·410→610"}, "e14": {"tu": "SO.PLA3", "toi": "AL.KEY", "cai_gi": "P&L theo KRF trước phân bổ", "khoa": "(KRF, CDT1, kỳ)", "pd": "412→511…513"}, "e15": {"tu": "SO.PLA3", "toi": "AL.PLT", "cai_gi": "dòng GL mang PE nền tảng (đã nối bank qua Ref No)", "khoa": "itl_id", "pd": "406→501→504"}, "e16": {"tu": "AL.KEY", "toi": "SO.PLA3-ATL", "cai_gi": "phần chia theo LE · NOEM · GI", "khoa": "(KRF, khoá, kỳ)", "pd": "511…513→604"}, "e17": {"tu": "AL.PLT", "toi": "SO.PLA3-ATL", "cai_gi": "phần chia chi phí nền tảng theo CDT1 × tháng", "khoa": "(content_key, CDT1)", "pd": "507→600 · 508…510→601…603"}, "e18": {"tu": "SO.PLA3-ATL", "toi": "DW", "cai_gi": "khối P&L sau phân bổ: KRF × CDT1 × kỳ", "khoa": "(KRF, CDT1, kỳ)", "pd": "600…604→606"}, "e19": {"tu": "DW", "toi": "RP.CF", "cai_gi": "khối CF đã lưu", "khoa": "(KRF, LE, kỳ)", "pd": "409·410→610"}, "e20": {"tu": "DW", "toi": "RP.PL", "cai_gi": "khối P&L sau phân bổ đã lưu", "khoa": "(KRF, CDT1, kỳ)", "pd": "606→607→608→609"}, "e21": {"tu": "DW", "toi": "RP.FLS", "cai_gi": "sổ hiệu lực + dây truy ngược", "khoa": "itl_id · ô báo cáo", "pd": "308·314→613"}, "e22": {"tu": "RP.CF", "toi": "RP.CCR", "cai_gi": "Daily Report 2 (CF) vào báo cáo daily CCR", "khoa": "(LE, ngày)", "pd": "610→615"}, "e23": {"tu": "RP.PL", "toi": "RP.CCR", "cai_gi": "Daily Report 3 (P&L) vào báo cáo daily CCR", "khoa": "(CDT1, ngày)", "pd": "609→615"}}}</script>
@@ -736,7 +679,11 @@ tr.chon2{cursor:pointer}tr.chon2.sang2{background:var(--mid-s)}
     nd.innerHTML = html; khung.hidden = false; sang(ids);
   }
   function dong(){ khung.hidden = true; sang(null); }
-  svg.addEventListener('click', ev => { const g = ev.target.closest('[data-id]'); if (g) chon(g.dataset.id); else dong(); });
+  svg.addEventListener('click', ev => {
+    const c = ev.target.closest('.chip') || ev.target.closest('.hop2');
+    if (c) { dong(); sang2(c.dataset.o ? c.dataset.o.split(' ') : null); return; }
+    sang2(null);
+    const g = ev.target.closest('[data-id]'); if (g) chon(g.dataset.id); else dong(); });
   svg.addEventListener('keydown', ev => { const g = ev.target.closest('[data-id]'); if (g && (ev.key === 'Enter' || ev.key === ' ')) { ev.preventDefault(); chon(g.dataset.id); } });
   document.querySelectorAll('tr.chon').forEach(r => { r.addEventListener('click', () => chon(r.dataset.ref)); r.addEventListener('keydown', ev => { if (ev.key === 'Enter') chon(r.dataset.ref); }); });
   document.getElementById('nut-dong').addEventListener('click', dong);
@@ -754,16 +701,15 @@ tr.chon2{cursor:pointer}tr.chon2.sang2{background:var(--mid-s)}
   window.addEventListener('resize', () => { if (vua) vuaKhung(); });
   vuaKhung();
   // ── hình 2: bấm chip / hộp / dòng bảng ⇒ sáng mọi chỗ mang cùng output, ở cả hai bên
-  const svg2 = document.querySelector('#hinh2 svg');
+  const svg2 = svg;
   function sang2(os){
     document.querySelectorAll('.sang2').forEach(x => x.classList.remove('sang2'));
     if (!os) { svg2.classList.remove('loc2'); return; }
     svg2.classList.add('loc2');
     os.forEach(o => document.querySelectorAll('[data-o~="'+o+'"]').forEach(x => x.classList.add('sang2')));
   }
-  svg2.addEventListener('click', ev => { const c = ev.target.closest('.chip') || ev.target.closest('[data-o]'); sang2(c ? c.dataset.o.split(' ') : null); });
   svg2.addEventListener('keydown', ev => { const c = ev.target.closest('[data-o]'); if (c && (ev.key === 'Enter' || ev.key === ' ')) { ev.preventDefault(); sang2(c.dataset.o.split(' ')); } });
-  document.querySelectorAll('tr.chon2').forEach(r => r.addEventListener('click', () => { sang2([r.dataset.o]); svg2.scrollIntoView({block:'nearest'}); }));
+  document.querySelectorAll('tr.chon2').forEach(r => r.addEventListener('click', () => { dong(); sang2([r.dataset.o]); document.getElementById('hinh').scrollIntoView({block:'nearest'}); }));
   document.addEventListener('keydown', ev => { if (ev.key === 'Escape') dong(); });
 })();
 </script>
