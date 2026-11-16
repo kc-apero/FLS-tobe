@@ -561,3 +561,80 @@ def test_T7_phep_so_09_muc7_dong_B_CO_va_khop_DUNG_mot_lan():
     assert sai != chu
     loi = kiem_mot(sai, ok)
     assert len(loi) == 1 and "nhom 1" in loi[0] and "LỆCH" in loi[0], loi
+
+
+# ── `tim_lint_imports` — duong toi `lint-imports` theo KIEU VENV ─────────────
+# ⛔⛔ Cu ghi cung `.venv/Scripts/lint-imports.exe` *(kieu Windows)* ⇒ cong
+#   ⛔ chay duoc tren Linux: no do bang mot vet `FileNotFoundError` tho. Cac bai
+#   duoi do CA HAI kieu venv tren MOT may: venv gia trong `tmp_path` va truyen
+#   `windows=` tay — ⛔ phu thuoc may dang chay bai.
+_WIN = (".venv", "Scripts", "lint-imports.exe")
+_NIX = (".venv", "bin", "lint-imports")
+
+
+def _venv_gia(goc, *kieu):
+    for k in kieu:
+        p = goc.joinpath(*k)
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_text("")
+    return goc
+
+
+@pytest.mark.parametrize("co, windows, mong", [
+    ((_WIN, _NIX), True, _WIN),       # ca hai co ⇒ kieu cua HE dang chay
+    ((_WIN, _NIX), False, _NIX),
+    ((_NIX,), True, _NIX),            # chi co kieu kia ⇒ van dung no
+    ((_WIN,), False, _WIN),
+])
+def test_tim_lint_imports_chon_dung_kieu_venv(tmp_path, co, windows, mong):
+    from tools.kiem_so_song import tim_lint_imports
+
+    _venv_gia(tmp_path, *co)
+    assert tim_lint_imports(tmp_path, windows=windows) == tmp_path.joinpath(*mong)
+
+
+def test_tim_lint_imports_mac_dinh_theo_os_name(tmp_path):
+    import os
+
+    from tools.kiem_so_song import tim_lint_imports
+
+    _venv_gia(tmp_path, _WIN, _NIX)
+    mong = _WIN if os.name == "nt" else _NIX
+    assert tim_lint_imports(tmp_path) == tmp_path.joinpath(*mong)
+
+
+@pytest.mark.parametrize("windows", [True, False])
+def test_tim_lint_imports_THIEU_CA_HAI_thi_DO_va_noi_da_tim_o_dau(tmp_path,
+                                                                  windows):
+    """`Đ5`: ⛔ do duoc la DO — ⛔ tra mot duong ⛔ co de `subprocess` tu vo.
+
+    ⚠ `.venv/bin/lint-imports` o day la mot THU MUC: ⛔ duoc tinh la tep chay.
+    """
+    from tools.kiem_so_song import tim_lint_imports
+
+    (tmp_path / ".venv" / "bin" / "lint-imports").mkdir(parents=True)
+    with pytest.raises(SystemExit) as e:
+        tim_lint_imports(tmp_path, windows=windows)
+    loi = str(e.value)
+    assert "khong do duoc" in loi, loi
+    assert str(tmp_path.joinpath(*_WIN)) in loi, loi
+    assert str(tmp_path.joinpath(*_NIX)) in loi, loi
+
+
+def test_do_may_GOI_tim_lint_imports_chu_KHONG_ghi_cung_duong():
+    import inspect
+
+    from tools.kiem_so_song import do_may
+
+    nguon = inspect.getsource(do_may)
+    assert "tim_lint_imports()" in nguon
+    assert "lint-imports.exe" not in nguon and '"Scripts"' not in nguon
+
+
+def test_chay_TEP_KHONG_MO_DUOC_thi_DO_bang_cau_cua_cong(tmp_path):
+    """⛔ `OSError` tho *(tep ⛔ co, sai kieu may)* ⇒ cau *"⛔ khong do duoc"*."""
+    from tools.kiem_so_song import _chay
+
+    with pytest.raises(SystemExit) as e:
+        _chay(str(tmp_path / "khong-co-tep-nay"))
+    assert "khong do duoc" in str(e.value), e.value

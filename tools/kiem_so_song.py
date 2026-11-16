@@ -275,12 +275,57 @@ def _chay(*lenh: str) -> str:
     #   la mot cai cong **se bi tat**. ⇒ Dat moi truong ngay tai day, mot
     #   lan, cho **moi** tien trinh con cong goi.
     moi = {**os.environ, "PYTHONUTF8": "1", "PYTHONIOENCODING": "utf-8"}
-    r = subprocess.run(lenh, cwd=GOC, capture_output=True, text=True,
-                       encoding="utf-8", errors="replace", env=moi)
+    # ⛔ Tep chay ⛔ mo duoc *(thieu `git`, hay mot `lint-imports.exe` cua
+    #   Windows bi goi tren Linux)* thi `subprocess` nem `OSError` tho. Van la
+    #   DO, nhung la mot vet do ky thuat ⛔ ai doc — doi thanh cau cua cong.
+    try:
+        r = subprocess.run(lenh, cwd=GOC, capture_output=True, text=True,
+                           encoding="utf-8", errors="replace", env=moi)
+    except OSError as e:
+        raise SystemExit(f"⛔ khong do duoc: `{' '.join(lenh)}` ⛔ chay duoc "
+                         f"({type(e).__name__}: {e.strerror or e})") from None
     if r.returncode != 0:
         raise SystemExit(f"⛔ khong do duoc: `{' '.join(lenh)}` "
                          f"tra ma {r.returncode}\n{r.stderr[-400:]}")
     return r.stdout
+
+
+def tim_lint_imports(goc: pathlib.Path = GOC, *,
+                     windows: bool | None = None) -> pathlib.Path:
+    """Duong toi `lint-imports` TRONG `.venv` cua repo — ca hai kieu venv.
+
+    ⛔⛔ Cu ghi cung `.venv/Scripts/lint-imports.exe` — kieu venv cua
+    **Windows**. Tren Linux venv dat tep o `.venv/bin/lint-imports`, nen cong
+    ⛔ chay duoc tren may Linux / container cloud nao: duong nen S0 cua ISP 3.1
+    (16/11, `isp-3.1/TIEN_DO.md`) phai ghi cong nay la *"⛔ ĐO ĐƯỢC ở
+    container"* — mot phan vi DUONG DAN, ⛔ phai vi cai cong canh.
+
+    ⇒ Thu kieu venv cua HE DANG CHAY truoc, kieu kia sau *(mot venv Windows
+    goi tu WSL van co the chay)*. ⛔ Ca hai deu vang thi DO — luat ⓑ / `Đ5`:
+    phep ⛔ do duoc la DO, ⛔ phai *"khong thay lech"*.
+
+    ⚠ `windows` mac dinh theo `os.name`; truyen tay chi de bai thu do ca hai
+    nhanh tren MOT may. ⚠ ⛔ Dung `shutil.which`: no ap `PATHEXT` / bit chay
+    cua MAY DANG CHAY, nen bai thu ⛔ the dung kieu venv kia ma do.
+    ⚠ ⛔ Roi ra `lint-imports` tren `PATH`: so `kept/broken` phai do bang ban
+    `import-linter` cua venv repo *(`requirements.txt`)*, ⛔ ban nao tinh co
+    cai o may.
+    """
+    if windows is None:
+        windows = os.name == "nt"
+    venv = goc / ".venv"
+    ung_vien = [venv / "Scripts" / "lint-imports.exe",
+                venv / "bin" / "lint-imports"]
+    if not windows:
+        ung_vien.reverse()
+    for p in ung_vien:
+        if p.is_file():
+            return p
+    raise SystemExit(
+        "⛔ khong do duoc: ⛔ khong thay `lint-imports` trong `.venv` — da tim "
+        + " · ".join(f"`{p}`" for p in ung_vien)
+        + ". Dung venv: `python -m venv .venv` roi cai `requirements.txt`. "
+        "Cong nay ⛔ khong duoc phep xanh khi thieu so do.")
 
 
 # Dem so BO TRI COT khac nhau tren cac ban khai **dang hieu luc**.
@@ -403,7 +448,7 @@ def do_may() -> dict[str, str]:
     from fls.oracle import ledge_spec as _ls                 # noqa: PLC0415
 
     td = json.loads(_chay(sys.executable, "tools/tien_do.py", "--json"))
-    lint = _chay(str(GOC / ".venv" / "Scripts" / "lint-imports.exe"))
+    lint = _chay(str(tim_lint_imports()))
     m_lint = re.search(r"Contracts:\s*(\d+)\s+kept,\s*(\d+)\s+broken", lint)
     if not m_lint:
         raise SystemExit("⛔ khong doc duoc ket qua `lint-imports`")
