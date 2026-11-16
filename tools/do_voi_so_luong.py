@@ -29,27 +29,58 @@ Cổng (Đ5 — khai `mong`, NO khi khác, cả hai chiều): tổng dòng · s�
 
 HD1 THEO KỲ — khối `dat_hd1` (ISP 3.1.2 · Step 4 · H2 · `WO-090` · AP v3.1.2 §5.3.1 HD1 ★: *"Lệch = 0,
    hoặc mỗi lệch có tên lý do và owner ký"*):
-  Một kỳ ĐẠT ⇔ (dòng 1-1 100 % — `chạy = có` — HOẶC mọi dòng thiếu của kỳ có nhãn lý do ĐÃ KÝ)
-              ∧ (ô Final 7 khối 100 % — `o_parity_khop = o_parity`, mẫu số > 0, Đ3).
+  Một kỳ ĐẠT ⇔ [dòng] (dòng 1-1 100 % — `chạy = có` — HOẶC mọi dòng thiếu của kỳ có nhãn lý do ĐÃ KÝ)
+              ∧ [ô]   (mẫu số ô trên MỌI dòng sổ của kỳ > 0 (Đ3) ∧ (ô Final = f(Classifying, MID) khớp
+                       trên MỌI dòng sổ của kỳ HOẶC mọi dòng tự-soi loại của kỳ có nhãn ĐÃ KÝ)).
+  ⭐⛔ VÌ SAO vế [ô] đọc MỌI dòng (vòng sửa sau R1 · `KQ-092` · `H2-R1-01` = ⓐ, errata ⑩ của bản vá ISP).
+     Bản đầu tính vế ô bằng `o_parity` — mà `o_parity` BỎ các dòng `soi_mot_dong` loại, và `soi_mot_dong`
+     loại ĐÚNG mọi dòng có một ô `Final ≠ f(Classifying, MID)` ⇒ `o_parity_khop == o_parity` THEO CẤU
+     TRÚC: vế ô chỉ đỏ được khi `0/0`, tức nó lọc bỏ đúng thứ nó phải bắt. Đo (R1 độc lập + 16/11 lại):
+     trên MỌI dòng, ô khớp 69.706/69.769 — 63 ô lệch, cả 63 ở 37 dòng tự-soi loại của 2026-07 (tập dòng
+     loại = tập dòng có ô lệch, 37 = 37; `tests/ledger/test_parity_ca_so.py` ghim 63 = 60 + 3). Ký giả 23
+     dòng thiếu 2026-07 làm kỳ ấy "đạt" trong khi 63 ô FLS ≠ Final sổ ⛔ tên lý do, ⛔ ai ký. Nay:
+       · `o_100` (giữ tên — CG1 đọc) = vế [ô] ở trên, ⛔ còn là "ô 100 % trên dòng tự nhất quán".
+       · vế "mọi dòng loại đã ký" đi KÈM "ô của các dòng còn lại khớp hết" (`o_parity_khop = o_parity`):
+         đúng sẵn theo cấu trúc `soi_mot_dong` (ô lệch ⇒ dòng bị loại), nhưng chặn sự thật RỖNG — kỳ ⛔
+         có dòng loại nào thì "mọi dòng loại đã ký" đúng suông (0/0) và ⛔ được miễn ô lệch nào.
+       · ô chỉ đếm khi ⛔ ô nào trong ba (Cls · MID · Final) là mã lỗi Sheets — CÙNG luật với `o_parity`.
   ⛔ gồm chế độ tự sinh: nó chỉ đo được 2026-03 (một ảnh Manual input) — theo kỳ là việc của `H15`
      (Step 43). Vì thế số ở đây (5/23 khi sổ rỗng) ≠ "tháng đạt HD1" của Figure 5.3.3 (0/23, đòi CẢ
      tự sinh) — hai phép, hai nhãn (Đ4).
+  ⛔ gồm CHIỀU NGƯỢC (`H2-R1-05`): phán theo kỳ chỉ đi một chiều — dòng SỔ → dòng FLS. 147 dòng FLS ⛔ có
+     dòng sổ (DT1a `dong_nguoc`) ⛔ vào phán kỳ nào: ảnh `pm_join.json` ⛔ có ngày (khoá `dong · ref_tho ·
+     cur · tien`) ⇒ ⛔ gán được kỳ. Số ấy in ở `dat_hd1.ngoai_phan` + dòng `①` — "5/23 kỳ đạt" ⛔ có nghĩa
+     "FLS = sổ ở 5 kỳ". BA chốt chiều ngược khi DT2 (Step 8) đóng băng được ngày.
   · NHÃN lý do: tệp `docs/ITL/_tools/phan_loai_ly_do.json` của DT1b (Step 5, làm song song) — H2 chỉ ĐỌC.
     Hợp đồng đọc = khuôn của chính `phan_loai_dong_thieu.json` (DT1a): `{"van_tay": {"thieu", "nguoc"},
     "dong_thieu": [{"dong_sheet": int, "nhan": str | null}, …]}` (khoá thừa bỏ qua). Hai vân tay phải
     BẰNG vân tay tập dòng H2 tính lại từ ảnh (cùng công thức DT1a) — ⛔ thì đó là nhãn của một tập dòng
     KHÁC ⇒ ĐỎ. Tệp VẮNG ⇒ mọi dòng thiếu = "chưa có nhãn" (đỏ) — ⛔ lỗi: DT1b chưa về.
-  · CHỮ KÝ: sổ `docs/ITL/_tools/so_ly_do_hd1.json` — `{"chu_ky": [{"nhan", "so_dong", "nguoi_ky",
-    "ngay"}]}`, khởi tạo RỖNG; O8 = ThuongCT ký thật (⛔ agent). Một chữ ký phủ MỌI dòng thiếu mang nhãn
-    ấy, và `so_dong` phải BẰNG số dòng thiếu mang nhãn ấy trong tệp nhãn — lệch ⇒ ĐỎ (chữ ký cũ: owner
-    ký N dòng, ⛔ được lặng lẽ phủ dòng thứ N+1 mà owner chưa thấy). Sổ VẮNG ⇒ ĐỎ (mất sổ ⛔ được
-    trông như "chưa ai ký").
+    · tập `dong_sheet` HỢP LỆ = dòng thiếu ∪ dòng tự-soi loại (`H2-R1-01` ⓐ — nhãn cho 37 dòng loại đi CÙNG
+      danh sách `dong_thieu`, cùng khuôn; tập 37 dòng ấy CÔNG BỐ ở `dat_hd1.dong_tu_soi_loai`).
+    · dòng VẮNG trong tệp nhãn = "chưa có nhãn" (đỏ) — tệp liệt kê một phần tập vẫn HỢP LỆ (`H2-R1-07`,
+      chiều an toàn; ISP DT1b đòi "Σ = 122" là việc của bên GHI — đổi sang "đòi đủ" khi DT1b về).
+  · CHỮ KÝ: sổ `docs/ITL/_tools/so_ly_do_hd1.json` — `{"chu_ky": [{"nhan", "so_dong", "van_tay_dong",
+    "nguoi_ky", "ngay"}]}`, khởi tạo RỖNG; O8 = ThuongCT ký thật (⛔ agent). Một chữ ký phủ MỌI dòng (thiếu
+    ∪ loại) mang nhãn ấy, và PHẢI buộc vào ĐÚNG TẬP dòng ấy lúc đo:
+      · `so_dong` = số dòng mang nhãn — lệch ⇒ ĐỎ (owner ký N dòng, ⛔ được lặng lẽ phủ dòng thứ N+1);
+      · `van_tay_dong` = `_van_tay_dong(các dong_sheet mang nhãn)` — lệch ⇒ ĐỎ (`H2-R1-02` ⓑ, errata ⑬:
+        chỉ buộc SỐ dòng thì đổi chỗ một dòng giữa hai nhãn đã ký — tổng mỗi nhãn y nguyên — là VÔ HÌNH,
+        K5b của R1 exit 0; số đếm đúng mà tập khác là bẫy Đ4). Công cụ IN SẴN hai số ấy mỗi nhãn ở
+        `dat_hd1.theo_nhan` + dòng `⑤` — owner CHÉP, ⛔ tự tính.
+      · ⛔ ký nhãn `KHAC` (`H2-R1-06`, quyết định orchestrator thay BA): HD1 = lệch CÓ TÊN lý do; `KHAC` =
+        "lý do khác" ⛔ phải tên. So sau khi bỏ dấu + cách + hoa/thường (`Khác`, ` khac ` cũng cấm).
+      · `ngay` YYYY-MM-DD có thật VÀ ≤ hôm nay — ngày tương lai ⇒ ĐỎ; "hôm nay" truyền vào được
+        (`do(hom_nay=…)`) để bài thử tất định.
+    Sổ VẮNG ⇒ ĐỎ (mất sổ ⛔ được trông như "chưa ai ký").
   · ⛔⛔ Đây là MIỄN TRỪ trong cổng — repo cấm "gõ tên vào danh sách miễn trừ để cổng xanh". Nên mọi
-    đầu vào hỏng (JSON · cấu trúc · kiểu · trùng · ngoài tập · vân tay · số dòng) là ĐỎ với nguyên
-    nhân MỘT dòng (`S0-R1-04`), ⛔ rơi về "chưa có nhãn" cho êm; và TẬP kỳ đạt có `MONG` khai trước —
-    một chữ ký thật làm đổi tập ⇒ ĐỎ ⇒ người sửa phải khai lại `MONG["dat_hd1_theo_ky"]` (Đ5, cố ý).
+    đầu vào hỏng (JSON · cấu trúc · kiểu · trùng · ngoài tập · vân tay · số dòng · nhãn cấm · ngày) là ĐỎ
+    với nguyên nhân MỘT dòng (`S0-R1-04`), ⛔ rơi về "chưa có nhãn" cho êm; và TẬP kỳ đạt có `MONG` khai
+    trước — một chữ ký thật làm đổi tập ⇒ ĐỎ ⇒ người sửa phải khai lại `MONG["dat_hd1_theo_ky"]` (Đ5).
   · ⚠ `_sha` và `MONG` (các khoá cũ) được `tools/phan_loai_dong_thieu.py` (DT1a) import — GIỮ NGUYÊN
-    tên + nghĩa (`DT1a-R1-06`); H2 chỉ THÊM khoá `dat_hd1_theo_ky`.
+    tên + nghĩa (`DT1a-R1-06`); H2 chỉ THÊM khoá `dat_hd1_theo_ky` · `o_moi_dong`.
+  · ⚠ CG1 (Step 7, làn BE-CF) đọc `dat_hd1.so_ky_dat` · `.mau_so.so_ky` · `.ky_dat` · `.theo_ky[k].dat` ·
+    `.theo_ky[k].thieu` — ⛔ đổi tên / xoá; chỉ THÊM khoá.
 
 Chạy:  python tools/do_voi_so_luong.py            # in bảng, ⛔ ghi
        python tools/do_voi_so_luong.py --ghi      # ghi docs/ITL/_tools/voi_so_luong.json
@@ -62,6 +93,7 @@ import json
 import os
 import re
 import sys
+import unicodedata
 from collections import Counter, defaultdict
 from datetime import date
 from decimal import Decimal as D
@@ -80,8 +112,12 @@ FX = GOC / "tests" / "fixture"
 RA = GOC / "docs" / "ITL" / "_tools" / "voi_so_luong.json"
 NHAN = GOC / "docs" / "ITL" / "_tools" / "phan_loai_ly_do.json"     # DT1b ghi — H2 chỉ ĐỌC (vắng = chưa có nhãn)
 SO_LY_DO = GOC / "docs" / "ITL" / "_tools" / "so_ly_do_hd1.json"    # O8 ký — H2 khởi tạo RỖNG (vắng = ĐỎ)
-KHOA_CHU_KY = ("nhan", "so_dong", "nguoi_ky", "ngay")             # ISP Step 4 §3: nhãn · số dòng · người ký · ngày
-KHOI = ("hd", "pay_type", "cdt1", "svc_start", "svc_end", "id_payee", "invoice")
+# ISP Step 4 §3: nhãn · số dòng · người ký · ngày — + `van_tay_dong` (H2-R1-02 ⓑ · errata ⑬: buộc chữ ký vào TẬP dòng)
+KHOA_CHU_KY = ("nhan", "so_dong", "van_tay_dong", "nguoi_ky", "ngay")
+# H2-R1-06 (quyết định orchestrator thay BA): HD1 = lệch CÓ TÊN lý do ⇒ nhãn gom "lý do khác" của DT1b
+# (ISP Step 5: KHONG_CO_SAO_KE · KHOA_LECH · TRUNG_SEQ · KHAC) ⛔ ký được. So sau `_goc_nhan` (bỏ dấu/cách/hoa).
+NHAN_CAM_KY = ("KHAC",)
+KHOI =("hd", "pay_type", "cdt1", "svc_start", "svc_end", "id_payee", "invoice")
 
 # ── `mong` — mỗi số lấy từ bài test đã ghim của chính ảnh ấy (⛔ đặt tay ở đây cho đẹp) ──
 MONG = {
@@ -107,7 +143,14 @@ MONG = {
     #    AP v3.1.2 §5.3.1 "dòng ghép 1-1: 9.845/9.967 — 5/23 tháng đủ" + BG-081 §Bảng đếm (đúng 5 kỳ ⛔ có
     #    dòng thiếu) · ô Final 23/23 tháng. Sổ lý do RỖNG ⇒ chỉ kỳ đủ dòng mới đạt. Một chữ ký THẬT (O8)
     #    làm đổi tập này ⇒ ĐỎ ⇒ khai lại ở đây cùng commit chữ ký (Đ5 — cố ý, ⛔ lỗi).
+    #    ⭐ Vòng sửa sau R1 (H2-R1-01 ⓐ): vế ô nay đọc MỌI dòng ⇒ 2026-07 đỏ thêm vì ô — tập ⛔ đổi (5 = 5):
+    #    5 kỳ trên ⛔ có dòng tự-soi loại nào (37/37 ở 2026-07), và 2026-07 vốn đỏ vì 23 dòng thiếu.
     "dat_hd1_theo_ky": ("2024-10", "2024-11", "2024-12", "2025-03", "2025-04"),
+    # ⭐ H2-R1-01 — ô Final = f(Cls, MID) trên MỌI dòng sổ (gồm 37 dòng tự-soi loại), mẫu số vế [ô] của HD1.
+    #    Khai TRƯỚC lần đo của công cụ, từ HAI nguồn: KQ-092 phép (b) — R1 đo ĐỘC LẬP (⛔ import tool):
+    #    69.706/69.769; và tests/ledger/test_parity_ca_so.py — 63 ô lệch (60 ngoài miền + 3 trong miền)
+    #    ⇒ 69.769 − 63 = 69.706. Khác `parity_o` (69.510 = 9.930 dòng tự nhất quán × 7) — hai phép, hai nhãn.
+    "o_moi_dong": (69706, 69769),
 }
 _HONG = object()                     # dấu "tệp ⛔ đọc được" của _doc_json (⛔ nhầm với JSON `null`)
 
@@ -162,6 +205,8 @@ def _so_nguyen(v) -> bool:
 
 
 def _ngay_that(v) -> bool:
+    # ⛔ regex là chốt DUY NHẤT của khuôn: `date.fromisoformat` của Python ≥ 3.11 nhận cả `20261116` lẫn
+    #    `2026-W47-1` (R1 đo: cả hai ra 2026-11-16 — `H2-R1-04`, đột biến R1-M19); bài thử có ca phá riêng.
     if not (isinstance(v, str) and re.fullmatch(r"[0-9]{4}-[0-9]{2}-[0-9]{2}", v)):
         return False
     try:
@@ -171,9 +216,17 @@ def _ngay_that(v) -> bool:
     return True
 
 
-def _doc_nhan(tep: Path, van_tay: dict, tap_thieu: set[int], loi: list[str]) -> dict[int, str] | None:
+def _goc_nhan(n: str) -> str:
+    """Dạng gốc của tên nhãn để so với `NHAN_CAM_KY`: bỏ dấu (NFKD + bỏ dấu kết hợp, `Đ`→`D`), bỏ cách hai
+    đầu, viết hoa — `KHAC` · `Khác` · ` khac ` cùng một gốc (⛔ lách luật bằng cách gõ khác đi)."""
+    bo_dau = "".join(c for c in unicodedata.normalize("NFKD", n) if not unicodedata.combining(c))
+    return bo_dau.replace("Đ", "D").replace("đ", "d").strip().upper()
+
+
+def _doc_nhan(tep: Path, van_tay: dict, tap_hop_le: set[int], loi: list[str]) -> dict[int, str] | None:
     """Tệp nhãn DT1b → `{dong_sheet: nhãn}` (chỉ dòng CÓ nhãn). Vắng ⇒ `{}` (DT1b chưa về — mọi dòng thiếu
-    là "chưa có nhãn", ⛔ lỗi). Có mà hỏng ⇒ `None` + lỗi (mỗi luật một dòng; bài thử có ca phá riêng)."""
+    là "chưa có nhãn", ⛔ lỗi). Có mà hỏng ⇒ `None` + lỗi (mỗi luật một dòng; bài thử có ca phá riêng).
+    `tap_hop_le` = dòng thiếu ∪ dòng tự-soi loại (H2-R1-01 ⓐ). Dòng VẮNG trong tệp = chưa có nhãn (H2-R1-07)."""
     if not tep.exists():
         return {}
     d = _doc_json(tep, "tệp nhãn", loi)
@@ -195,8 +248,8 @@ def _doc_nhan(tep: Path, van_tay: dict, tap_thieu: set[int], loi: list[str]) -> 
         if not _so_nguyen(ds):
             loi.append(f"tệp nhãn: dong_thieu[{i}] cần dong_sheet là số nguyên — có {ds!r}")
             continue
-        if ds not in tap_thieu:
-            loi.append(f"tệp nhãn: dong_sheet {ds} ngoài tập {len(tap_thieu)} dòng thiếu")
+        if ds not in tap_hop_le:
+            loi.append(f"tệp nhãn: dong_sheet {ds} ngoài tập {len(tap_hop_le)} dòng (thiếu ∪ tự-soi loại)")
             continue
         if ds in da_thay:
             loi.append(f"tệp nhãn: dong_sheet {ds} trùng — một dòng chỉ một nhãn")
@@ -212,8 +265,9 @@ def _doc_nhan(tep: Path, van_tay: dict, tap_thieu: set[int], loi: list[str]) -> 
     return None if len(loi) > truoc else nhan
 
 
-def _doc_so(tep: Path, loi: list[str]) -> list[dict] | None:
-    """Sổ lý do → danh sách chữ ký đã kiểm. Vắng/hỏng ⇒ `None` + lỗi (mỗi luật một dòng)."""
+def _doc_so(tep: Path, loi: list[str], hom_nay: date) -> list[dict] | None:
+    """Sổ lý do → danh sách chữ ký đã kiểm. Vắng/hỏng ⇒ `None` + lỗi (mỗi luật một dòng). Kiểm NGHĨA của
+    thứ được ký, ⛔ chỉ kiểu (`H2-R1-06`): nhãn ⛔ được là `KHAC`; ngày ⛔ được sau `hom_nay`."""
     d = _doc_json(tep, "sổ lý do", loi)
     if d is _HONG:
         return None
@@ -228,12 +282,21 @@ def _doc_so(tep: Path, loi: list[str]) -> list[dict] | None:
             continue
         if not _co_chu(c["nhan"]):
             loi.append(f"sổ lý do: chu_ky[{i}] nhãn phải là chuỗi có chữ — có {c['nhan']!r}")
+        elif _goc_nhan(c["nhan"]) in NHAN_CAM_KY:
+            loi.append(f"sổ lý do: chu_ky[{i}] nhãn {c['nhan']!r} ⛔ ký được — {'/'.join(NHAN_CAM_KY)} = 'lý do "
+                       "khác', ⛔ tên; HD1 đòi lệch CÓ TÊN lý do (H2-R1-06) — gán nhãn có tên rồi ký")
         if not (_so_nguyen(c["so_dong"]) and c["so_dong"] > 0):
             loi.append(f"sổ lý do: chu_ky[{i}] so_dong phải là số nguyên > 0 — có {c['so_dong']!r}")
+        if not (isinstance(c["van_tay_dong"], str) and re.fullmatch(r"[0-9a-f]{16}", c["van_tay_dong"])):
+            loi.append(f"sổ lý do: chu_ky[{i}] van_tay_dong phải là 16 ký tự hex thường (chép từ "
+                       f"dat_hd1.theo_nhan) — có {c['van_tay_dong']!r}")
         if not _co_chu(c["nguoi_ky"]):
             loi.append(f"sổ lý do: chu_ky[{i}] người ký phải là chuỗi có chữ — có {c['nguoi_ky']!r}")
         if not _ngay_that(c["ngay"]):
             loi.append(f"sổ lý do: chu_ky[{i}] ngày phải là YYYY-MM-DD có thật — có {c['ngay']!r}")
+        elif date.fromisoformat(c["ngay"]) > hom_nay:
+            loi.append(f"sổ lý do: chu_ky[{i}] ngày {c['ngay']} sau hôm nay {hom_nay.isoformat()} — ⛔ ký trước "
+                       "(H2-R1-06)")
     dem = Counter(c["nhan"] for c in d["chu_ky"] if isinstance(c, dict) and isinstance(c.get("nhan"), str))
     for n, k in sorted(dem.items()):
         if k > 1:
@@ -242,63 +305,109 @@ def _doc_so(tep: Path, loi: list[str]) -> list[dict] | None:
 
 
 def phan_hd1(theo_ky: dict, thieu: list[tuple[int, str]], van_tay: dict,
-             tep_nhan: Path = NHAN, tep_so: Path = SO_LY_DO) -> tuple[dict | None, list[str]]:
+             tep_nhan: Path = NHAN, tep_so: Path = SO_LY_DO, *,
+             loai: list[tuple[int, str]], hom_nay: date | None = None) -> tuple[dict | None, list[str]]:
     """Phán HD1 theo kỳ → (khối `dat_hd1`, lỗi). Đầu vào hỏng ⇒ (None, lỗi): ⛔ phán kỳ nào (Đ5).
 
-    `theo_ky` — `{kỳ: {"co", "chay", "o_parity", "o_parity_khop", …}}` (bốn số của `do()`);
-    `thieu`   — `[(dong_sheet, kỳ)]` dòng sổ ⛔ ghép 1-1; `van_tay` — `{"thieu", "nguoc"}` tính từ ảnh."""
+    `theo_ky` — `{kỳ: {"co", "chay", "o_parity", "o_parity_khop", "o_moi_dong", "o_moi_dong_khop",
+                "loai_tu_soi", …}}` (bốn số của `do()` + ô trên MỌI dòng);
+    `thieu`   — `[(dong_sheet, kỳ)]` dòng sổ ⛔ ghép 1-1; `van_tay` — `{"thieu", "nguoc"}` tính từ ảnh;
+    `loai`    — `[(dong_sheet, kỳ)]` dòng `soi_mot_dong` loại (H2-R1-01 ⓐ). BẮT BUỘC, ⛔ mặc định: quên
+                truyền mà mặc định "rỗng" thì vế ô lặng lẽ thành "mọi dòng loại đã ký" (0/0) — đúng bẫy cũ;
+    `hom_nay` — ngày so với `ngay` của chữ ký (H2-R1-06); `None` ⇒ `date.today()`."""
     loi: list[str] = []
     cac_ky = sorted(theo_ky)
     thieu_ky: dict[str, list[int]] = defaultdict(list)
     for d, k in thieu:
         thieu_ky[k].append(d)
-    # Phòng thủ chồng (Đ2 — hai nguồn cho cùng một số): `có − chạy` của kỳ ↔ dòng thiếu liệt kê.
+    loai_ky: dict[str, list[int]] = defaultdict(list)
+    for d, k in loai:
+        loai_ky[k].append(d)
+    # Phòng thủ chồng (Đ2 — hai nguồn cho cùng một số): `có − chạy` của kỳ ↔ dòng thiếu liệt kê;
+    # `loai_tu_soi` của kỳ ↔ dòng tự-soi loại liệt kê.
     for k in cac_ky:
         a = theo_ky[k].get("co", 0) - theo_ky[k].get("chay", 0)
         if a != len(thieu_ky.get(k, ())):
             loi.append(f"phòng thủ: kỳ {k} có − chạy = {a} · dòng thiếu liệt kê {len(thieu_ky.get(k, ()))}")
-    if set(thieu_ky) - set(cac_ky):
-        loi.append(f"phòng thủ: dòng thiếu thuộc kỳ ngoài bảng {sorted(set(thieu_ky) - set(cac_ky))}")
-    nhan = _doc_nhan(tep_nhan, van_tay, {d for d, _ in thieu}, loi)
-    chu_ky = _doc_so(tep_so, loi)
+        b = theo_ky[k].get("loai_tu_soi", 0)
+        if b != len(loai_ky.get(k, ())):
+            loi.append(f"phòng thủ: kỳ {k} loai_tu_soi = {b} · dòng tự-soi loại liệt kê {len(loai_ky.get(k, ()))}")
+    ngoai = sorted((set(thieu_ky) | set(loai_ky)) - set(cac_ky))
+    if ngoai:
+        loi.append(f"phòng thủ: dòng thiếu / tự-soi loại thuộc kỳ ngoài bảng {ngoai}")
+    nhan = _doc_nhan(tep_nhan, van_tay, {d for d, _ in thieu} | {d for d, _ in loai}, loi)
+    chu_ky = _doc_so(tep_so, loi, hom_nay or date.today())
     if nhan is not None and chu_ky is not None:
-        dem_nhan = Counter(nhan.values())
+        dong_cua: dict[str, list[int]] = defaultdict(list)
+        for d, n in nhan.items():
+            dong_cua[n].append(d)
         for c in chu_ky:
-            if dem_nhan.get(c["nhan"], 0) != c["so_dong"]:
+            ds = dong_cua.get(c["nhan"], [])
+            vt = _van_tay_dong(ds)
+            # ⛔ chỉ so SỐ dòng: đổi chỗ một dòng giữa hai nhãn đã ký giữ nguyên tổng mỗi nhãn (K5b · H2-R1-02)
+            if len(ds) != c["so_dong"] or vt != c["van_tay_dong"]:
                 loi.append(f"sổ lý do: chữ ký {c['nhan']!r} ({c['nguoi_ky']} · {c['ngay']}) ghi số dòng {c['so_dong']} "
-                           f"· tệp nhãn có {dem_nhan.get(c['nhan'], 0)} dòng thiếu mang nhãn ấy — chữ ký cũ, ký lại")
+                           f"· vân tay dòng {c['van_tay_dong']} — tệp nhãn có {len(ds)} dòng (thiếu ∪ tự-soi loại) "
+                           f"mang nhãn ấy · vân tay dòng {vt} — chữ ký cũ, ký lại")
     if loi:
         return None, loi
 
     da_ky = {c["nhan"] for c in chu_ky}
     ket: dict[str, dict] = {}
     for k in cac_ky:
-        x, ds = theo_ky[k], thieu_ky.get(k, [])
+        x, ds, ls = theo_ky[k], thieu_ky.get(k, []), loai_ky.get(k, [])
         ky = sum(1 for d in ds if nhan.get(d) in da_ky)
+        lk = sum(1 for d in ls if nhan.get(d) in da_ky)
         dong_100 = not ds
-        o_100 = x.get("o_parity", 0) > 0 and x.get("o_parity_khop", 0) == x.get("o_parity", 0)   # Đ3: 0/0 ⛔ 100 %
+        om, omk = x.get("o_moi_dong", 0), x.get("o_moi_dong_khop", 0)
+        # [ô] — Đ3: 0/0 ⛔ 100 %. Vế phải "dòng loại đã ký" đi kèm "ô của dòng tự nhất quán khớp hết": mọi ô
+        #       lệch phải nằm trong dòng ĐÃ KÝ; ⛔ thế thì kỳ ⛔ có dòng loại được miễn suông (0 = 0).
+        o_100 = om > 0 and (omk == om or (lk == len(ls)
+                                           and x.get("o_parity_khop", 0) == x.get("o_parity", 0)))
         ket[k] = {"dat": (dong_100 or ky == len(ds)) and o_100, "thieu": len(ds),
                   "co_nhan": sum(1 for d in ds if d in nhan), "da_ky": ky,
-                  "dong_100": dong_100, "o_100": o_100}
+                  "dong_100": dong_100, "o_100": o_100,
+                  "loai_tu_soi": len(ls), "loai_co_nhan": sum(1 for d in ls if d in nhan), "loai_da_ky": lk,
+                  "o_moi_dong": om, "o_moi_dong_khop": omk}
     ky_dat = [k for k in cac_ky if ket[k]["dat"]]
+    dong_cua = defaultdict(list)
+    for d, n in nhan.items():
+        dong_cua[n].append(d)
     return {
-        "_luat": ("kỳ ĐẠT HD1 ⇔ (dòng 1-1 100 % hoặc mọi dòng thiếu của kỳ có nhãn ĐÃ KÝ trong sổ lý do) "
-                  "∧ (ô Final 7 khối 100 %, mẫu số > 0). ⛔ gồm chế độ tự sinh (H15). AP v3.1.2 §5.3.1 HD1."),
+        "_luat": ("kỳ ĐẠT HD1 ⇔ [dòng] (dòng 1-1 100 % hoặc mọi dòng thiếu của kỳ có nhãn ĐÃ KÝ trong sổ lý do) "
+                  "∧ [ô] (mẫu số ô trên MỌI dòng sổ của kỳ > 0 ∧ (ô Final = f(Classifying, MID) khớp trên MỌI dòng "
+                  "— gồm dòng tự-soi loại, ⛔ chỉ dòng đã ghép — hoặc mọi dòng tự-soi loại của kỳ có nhãn ĐÃ KÝ và "
+                  "ô của các dòng còn lại khớp hết)). `o_100` = vế [ô] ấy (H2-R1-01 ⓐ, errata ⑩). Nhãn: tệp DT1b, "
+                  "tập hợp lệ = dòng thiếu ∪ dòng tự-soi loại; dòng VẮNG trong tệp nhãn = chưa có nhãn (đỏ, ⛔ lỗi). "
+                  "Chữ ký: so_dong + van_tay_dong phải bằng TẬP dòng mang nhãn lúc đo (chép từ theo_nhan — "
+                  "errata ⑬); ⛔ ký KHAC; ngày ≤ hôm nay. ⛔ xét: chế độ tự sinh (H15); chiều ngược — dòng FLS ⛔ "
+                  "có dòng sổ (số ở ngoai_phan; ảnh pm_join ⛔ có ngày ⇒ ⛔ gán được kỳ; BA chốt khi DT2). "
+                  "AP v3.1.2 §5.3.1 HD1."),
         "mau_so": {"so_ky": len(cac_ky), "dong_so": sum(theo_ky[k].get("co", 0) for k in cac_ky),
-                   "dong_thieu": len(thieu)},
+                   "dong_thieu": len(thieu), "dong_tu_soi_loai": len(loai),
+                   "o_moi_dong": sum(theo_ky[k].get("o_moi_dong", 0) for k in cac_ky)},
         "tep_nhan": {"duong": _duong(tep_nhan), "co": tep_nhan.exists()},
         "so_ly_do": _duong(tep_so),
         "so_chu_ky": len(chu_ky),
         "van_tay": dict(van_tay),
-        "dem": {"thieu": len(thieu), "co_nhan": len(nhan),
-                "da_ky": sum(1 for v in nhan.values() if v in da_ky)},
+        "dem": {"thieu": len(thieu), "co_nhan": sum(1 for d, _ in thieu if d in nhan),
+                "da_ky": sum(1 for d, _ in thieu if nhan.get(d) in da_ky),
+                "loai_tu_soi": len(loai), "loai_co_nhan": sum(1 for d, _ in loai if d in nhan),
+                "loai_da_ky": sum(1 for d, _ in loai if nhan.get(d) in da_ky)},
         "so_ky_dat": len(ky_dat),
         "ky_dat": ky_dat,
         "theo_ky": ket,
+        # H2-R1-02 ⓑ — owner CHÉP hai số này vào chữ ký (⛔ tự tính); `cam_ky` = nhãn ⛔ ký được (H2-R1-06)
+        "theo_nhan": {n: {"so_dong": len(ds), "van_tay_dong": _van_tay_dong(ds), "da_ky": n in da_ky,
+                          "cam_ky": _goc_nhan(n) in NHAN_CAM_KY} for n, ds in sorted(dong_cua.items())},
+        # H2-R1-01 ⓐ — TẬP dòng tự-soi loại (danh tính, ⛔ chỉ số đếm): nơi gán nhãn cho chúng cần biết dòng nào
+        "dong_tu_soi_loai": {k: sorted(ls) for k, ls in sorted(loai_ky.items())},
     }, []
 
 
-def do(nhan: Path = NHAN, so_ly_do: Path = SO_LY_DO) -> dict:
+def do(nhan: Path = NHAN, so_ly_do: Path = SO_LY_DO, hom_nay: date | None = None) -> dict:
+    """Đo cả bảng + khối `dat_hd1`. `hom_nay` (H2-R1-06) — ngày so với `ngay` của chữ ký; `None` ⇒ hôm nay
+    của máy (CLI); bài thử truyền vào để tất định."""
     loi: list[str] = []
 
     def kiem(ten, co, mong):
@@ -360,8 +469,17 @@ def do(nhan: Path = NHAN, so_ly_do: Path = SO_LY_DO) -> dict:
     line_ky: dict[str, set] = {k: set() for k in cac_ky}
     tong_o = khop_o = 0
     loai = 0
+    # H2-R1-01 ⓐ — ô trên MỌI dòng (⛔ bỏ dòng tự-soi loại) cho vế [ô] của HD1. Counter RIÊNG, ⛔ trộn vào `o`:
+    # `theo_ky`/`tong` cũ của voi_so_luong.json giữ y nguyên (AP sinh từ đó); số mới chỉ sống trong `dat_hd1`.
+    o_moi = {k: Counter() for k in cac_ky}
+    dong_loai: list[tuple[int, str]] = []
     for dong, ky, bon in so:
         x = o[ky]
+        for kh, (cls, _m, mid, fin) in bon.items():
+            if la_o_loi(cls) or la_o_loi(mid) or la_o_loi(fin):      # CÙNG luật bỏ ô lỗi với parity bên dưới
+                continue
+            o_moi[ky]["o_moi_dong"] += 1
+            o_moi[ky]["o_moi_dong_khop"] += _chuan(tinh_final(_chuan(cls) or None, _chuan(mid) or None)) == _chuan(fin)
         x["co"] += 1
         if dong in so_co_canon:
             x["chay"] += 1
@@ -387,6 +505,7 @@ def do(nhan: Path = NHAN, so_ly_do: Path = SO_LY_DO) -> dict:
         if not soi_mot_dong(bon).giu:
             loai += 1
             x["loai_tu_soi"] += 1
+            dong_loai.append((dong, ky))
             continue
         for kh, (cls, _m, mid, fin) in bon.items():
             if la_o_loi(cls) or la_o_loi(mid) or la_o_loi(fin):
@@ -403,6 +522,10 @@ def do(nhan: Path = NHAN, so_ly_do: Path = SO_LY_DO) -> dict:
                 x["hd_parity_khop"] += trung
     kiem("parity ô", (khop_o, tong_o), MONG["parity_o"])
     kiem("dòng tu_soi loại", loai, MONG["dong_loai_tu_soi"])
+    # MONG.get: mất khoá ⇒ ĐỎ một dòng, ⛔ KeyError (S0-R1-04)
+    kiem("ô Final trên MỌI dòng (o_moi_dong)", (sum(o_moi[k]["o_moi_dong_khop"] for k in cac_ky),
+                                                 sum(o_moi[k]["o_moi_dong"] for k in cac_ky)),
+         tuple(MONG.get("o_moi_dong") or ()))
     kiem("parity khối HD", (sum(o[k]["hd_parity_khop"] for k in cac_ky), sum(o[k]["hd_parity"] for k in cac_ky)), MONG["hd_parity"])
     tu_sinh = do_tu_sinh()
     kiem("tự sinh ô Final 2026-03", tu_sinh["o"], MONG["tu_sinh_o"])
@@ -428,12 +551,20 @@ def do(nhan: Path = NHAN, so_ly_do: Path = SO_LY_DO) -> dict:
 
     # ⑤ HD1 theo kỳ (H2): dòng thiếu = dòng sổ ⛔ ghép 1-1 — cùng phép trừ với DT1a, tập khoá bằng vân tay
     thieu = [(dong, ky) for dong, ky, _ in so if dong not in so_co_canon]
-    van_tay = {"thieu": _van_tay_dong(d for d, _ in thieu),
-               "nguoc": _van_tay_dong({b.dong_sheet for b in bank} - set(canon_ve_so))}
-    hd1, loi_hd1 = phan_hd1({k: o[k] for k in cac_ky}, thieu, van_tay, nhan, so_ly_do)
+    nguoc = {b.dong_sheet for b in bank} - set(canon_ve_so)
+    van_tay = {"thieu": _van_tay_dong(d for d, _ in thieu), "nguoc": _van_tay_dong(nguoc)}
+    hd1, loi_hd1 = phan_hd1({k: {**o[k], **o_moi[k]} for k in cac_ky}, thieu, van_tay, nhan, so_ly_do,
+                            loai=dong_loai, hom_nay=hom_nay)
     loi.extend(loi_hd1)
     if hd1 is not None:                        # đầu vào hỏng ⇒ loi_hd1 đã ĐỎ, ⛔ so MONG trên phán rỗng
         kiem("kỳ đạt HD1 (dat_hd1_theo_ky)", tuple(hd1["ky_dat"]), tuple(MONG.get("dat_hd1_theo_ky") or ()))
+        # H2-R1-05 (Đ4) — chiều ngược KHAI bằng số, ⛔ chỉ bằng lời: tập này ⛔ vào phán kỳ nào ở bước này
+        hd1["ngoai_phan"] = {
+            "dong_fls_khong_co_dong_so": len(nguoc),
+            "_vi_sao": ("dòng FLS dựng lại (bank) ⛔ có dòng sổ AS-IS — chiều ngược của HD1, = DT1a dong_nguoc. "
+                        "⛔ vào phán kỳ: ảnh pm_join.json ⛔ có ngày ⇒ ⛔ gán được kỳ. BA chốt khi DT2 (Step 8) "
+                        "đóng băng được ngày."),
+        }
 
     if any(o[k]["co"] == 0 for k in cac_ky):   # Đ3 — mẫu số rỗng là KẾT QUẢ, ⛔ nền
         loi.append("có kỳ 0 dòng")
@@ -501,27 +632,47 @@ def main() -> None:
     print(f"{'Σ':8s} {t['co']:6d} {t['chay']:6d} {t['map_now']:7d} {t['map_fls']:7d} "
           f"{t['o_go_that']:6d} {t['o_mac_dinh']:6d} {t['o_trong']:6d} {t['o_de']:4d} {t['o_parity_khop']:6d}/{t['o_parity']}")
     print("PM:", kq["pm_tong"], "· bank:", kq["bank_tong"])
-    # HD1 theo kỳ — Đ3: MẪU SỐ in TRƯỚC mọi tỷ lệ; Đ4: mỗi số mang nhãn NÓ ĐẾM GÌ
+    # HD1 theo kỳ — Đ3: MẪU SỐ in TRƯỚC mọi tỷ lệ; Đ4: mỗi số mang nhãn NÓ ĐẾM GÌ. Năm dòng ①…⑤ — bài CLI
+    # đòi ĐỦ cả năm, mỗi dòng một lần (H2-R1-04: R1-M17/M18 bỏ `②`/`④` mà bộ R1 vẫn xanh).
     h, ms, d = kq["dat_hd1"], kq["dat_hd1"]["mau_so"], kq["dat_hd1"]["dem"]
     print(f"HD1 · ① MẪU SỐ: {ms['so_ky']} kỳ · {ms['dong_so']} dòng sổ · {ms['dong_thieu']} dòng thiếu (sổ ⛔ ghép 1-1) "
+          f"· {ms['dong_tu_soi_loai']} dòng tự-soi loại · {ms['o_moi_dong']} ô Final trên MỌI dòng "
           f"· tệp nhãn DT1b {h['tep_nhan']['duong']}: {'có' if h['tep_nhan']['co'] else 'VẮNG'} "
-          f"· sổ lý do {h['so_ly_do']}: {h['so_chu_ky']} chữ ký")
-    print(f"HD1 · ② dòng thiếu có nhãn {d['co_nhan']}/{d['thieu']} · có nhãn ĐÃ KÝ {d['da_ky']}/{d['thieu']}")
-    print(f"HD1 · ③ kỳ đạt (dòng 1-1 100 % hoặc mọi dòng thiếu có nhãn ĐÃ KÝ — và ô Final 7 khối 100 %): "
-          f"{h['so_ky_dat']}/{ms['so_ky']} · " + (" · ".join(h["ky_dat"]) or "—"))
+          f"· sổ lý do {h['so_ly_do']}: {h['so_chu_ky']} chữ ký "
+          f"· ⛔ xét {h['ngoai_phan']['dong_fls_khong_co_dong_so']} dòng FLS ⛔ có dòng sổ (chiều ngược — ảnh ⛔ có ngày)")
+    print(f"HD1 · ② dòng thiếu có nhãn {d['co_nhan']}/{d['thieu']} · có nhãn ĐÃ KÝ {d['da_ky']}/{d['thieu']} "
+          f"· dòng tự-soi loại có nhãn {d['loai_co_nhan']}/{d['loai_tu_soi']} · có nhãn ĐÃ KÝ "
+          f"{d['loai_da_ky']}/{d['loai_tu_soi']}")
+    print(f"HD1 · ③ kỳ đạt ([dòng] 1-1 100 % hoặc mọi dòng thiếu có nhãn ĐÃ KÝ — ∧ [ô] Final 7 khối khớp trên MỌI dòng "
+          f"hoặc mọi dòng tự-soi loại có nhãn ĐÃ KÝ): {h['so_ky_dat']}/{ms['so_ky']} · " + (" · ".join(h["ky_dat"]) or "—"))
     do_ = [k for k in kq["ky"] if not h["theo_ky"][k]["dat"]]
-    print(f"HD1 · ④ kỳ đỏ {len(do_)}/{ms['so_ky']} (dòng thiếu · có nhãn · đã ký"
-          + (" · ô khớp/ô" if any(not h["theo_ky"][k]["o_100"] for k in do_) else "") + "): "
-          + (" · ".join(f"{k} {h['theo_ky'][k]['thieu']}·{h['theo_ky'][k]['co_nhan']}·{h['theo_ky'][k]['da_ky']}"
-                        + ("" if h["theo_ky"][k]["o_100"] else
-                           f" ô {kq['theo_ky'][k].get('o_parity_khop', 0)}/{kq['theo_ky'][k].get('o_parity', 0)}")
-                        for k in do_) or "—"))
+
+    def _ky_do(k: str) -> str:
+        y = h["theo_ky"][k]
+        s = f"{k} {y['thieu']}·{y['co_nhan']}·{y['da_ky']}"
+        if y["loai_tu_soi"]:                   # H2-R1-01 ⓑ — người ký phải THẤY dòng tự-soi loại của kỳ
+            s += f" loại {y['loai_tu_soi']}·{y['loai_co_nhan']}·{y['loai_da_ky']}"
+        if not y["o_100"]:
+            s += f" ô {y['o_moi_dong_khop']}/{y['o_moi_dong']}"
+        return s
+
+    print(f"HD1 · ④ kỳ đỏ {len(do_)}/{ms['so_ky']} (dòng thiếu·có nhãn·đã ký [· loại: dòng tự-soi loại·có nhãn·đã ký]"
+          f" [· ô khớp/ô trên MỌI dòng khi vế ô đỏ]): " + (" · ".join(_ky_do(k) for k in do_) or "—"))
+    print("HD1 · ⑤ nhãn để ký (nhãn · so_dong · van_tay_dong — CHÉP NGUYÊN vào chữ ký; ⛔ ký KHAC): "
+          + (" · ".join(f"{n} {x['so_dong']} {x['van_tay_dong']}"
+                        + (" ĐÃ KÝ" if x["da_ky"] else "") + (" ⛔ ký được" if x["cam_ky"] else "")
+                        for n, x in h["theo_nhan"].items()) or "— (0 nhãn)"))
     if a.ghi:
-        # tệp tạm + os.replace (`DT1a-R1-07`): đứt giữa chừng ⛔ để lại voi_so_luong.json cụt
+        # tệp tạm + os.replace (`DT1a-R1-07`): đứt giữa chừng ⛔ để lại voi_so_luong.json cụt — và ⛔ để lại
+        # rác `.tam` hiện ở `git status` (H2-R1-03: bài mô phỏng đứt giữa lúc ghi canh cả hai)
         tam = RA.with_name(RA.name + ".tam")
-        tam.write_text(json.dumps(kq, ensure_ascii=False, indent=1), encoding="utf-8")
-        os.replace(tam, RA)
-        print("✅ đã ghi", RA.relative_to(GOC))
+        try:
+            tam.write_text(json.dumps(kq, ensure_ascii=False, indent=1), encoding="utf-8")
+            os.replace(tam, RA)
+        except BaseException:
+            tam.unlink(missing_ok=True)
+            raise
+        print("✅ đã ghi", _duong(RA))
 
 
 if __name__ == "__main__":
