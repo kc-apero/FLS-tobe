@@ -1,11 +1,13 @@
 # ĐƯỜNG NỀN ISP 3.1 — môi trường test ở container cloud
 
-**Version:** v0.1 · **Ngày:** 2026-11-16 · **Chủ sở hữu:** `fls-dev` *(làn BE-CF)* · **Phiếu:** `WO-065` → `BG-066`
+**Version:** v0.2 · **Ngày:** 2026-11-16 · **Chủ sở hữu:** `fls-dev` *(làn BE-CF)* · **Phiếu:** `WO-065` → `BG-066` *(+ vòng sửa sau R1 `KQ-067`)*
 
 > Ghi THẬT kết quả mọi cổng chạy được ở container cloud, ngay sau bước `S0` của
 > `IncrementalStepPlan-FLS-Voi_v3.1.2.md` — **kể cả bài đỏ có sẵn** *(ghi TÊN, ⛔ sửa — ISP Step 0 §3 Loại trừ)*.
-> Mọi bước sau của ISP so với trang này: một bài đỏ **mới** ⛔ có tên ở §4 là lỗi của bước ấy;
-> một bài ở §4 tự xanh là tin tốt cần **ghi lại**, ⛔ im lặng.
+> Mọi bước sau của ISP so với **tệp máy-đọc** [`duong_nen_bai_do.txt`](duong_nen_bai_do.txt) *(26 node id — §4.3)*:
+> `bash tools/dung_moi_truong_isp.sh --duong-nen` so tập `FAILED`/`ERROR` của lượt với tệp ấy và **ĐỎ cả hai chiều** —
+> một bài đỏ **mới** là lỗi của bước ấy; một bài tự xanh *(BỚT)* là tin tốt cần **ghi lại** vào tệp, ⛔ im lặng.
+> Bảng §4.1/§4.2 là **biên bản** 16/11, ⛔ phải cổng *(`S0-R1-02`)*.
 >
 > ⛔ Đây ⛔ phải kho THẬT `fls-pg-1` của owner (O4 = A). Kho `fls` ở đây **RỖNG** — chỉ mang 26 di trú.
 > Bước tích hợp cuối (`I2`) chạy lại trên máy owner trước merge.
@@ -14,28 +16,31 @@
 
 ```bash
 # chạy từ gốc worktree của mình (mã `fls` lấy từ thư mục làm việc, ⛔ cài vào venv)
-bash tools/dung_moi_truong_isp.sh              # dựng (chạy lại được) + 6 phép kiểm có `mong`
-bash tools/dung_moi_truong_isp.sh --duong-nen  # + pytest toàn bộ + riêng tests/web (ghi log vào $TMPDIR)
-bash tools/dung_moi_truong_isp.sh --chi-kiem   # ⛔ dựng gì — chỉ kiểm
-
-export PG_DSN='postgresql://fls:fls@localhost:5433/fls' PYTHONUTF8=1
-export PG_DSN_TEST='postgresql://fls:fls@localhost:5433/fls_test_<làn>'   # cf · hc · fe · data · r_<bước> (TIEN_DO.md)
-#   ⚠ 19 tệp bài ghim tên kho `== "fls_test"` (§4.2) ⇒ với `fls_test_<làn>`, lượt TOÀN BỘ đỏ thêm 131 bài
-#     ⛔ phải lỗi mã. Tệp đích ⛔ ghim thì dùng được ngay; lượt toàn bộ: chờ orchestrator chốt BG-066 Q1.
+# ⭐ MỖI AGENT MỘT CỤM THEO CỔNG (S0-Q1 = A · TIEN_DO.md): 5433 gốc S0 · 5434 BE-CF · 5435 BE-HC ·
+#    5436 FE · 5437 DATA · 5444…5447 reviewer theo làn của bước đang kiểm. Tên kho GIỮ `fls` / `fls_test`.
+bash tools/dung_moi_truong_isp.sh --cong <N>              # dựng (chạy lại được) + 7 phép kiểm có `mong`
+bash tools/dung_moi_truong_isp.sh --cong <N> --duong-nen  # + pytest toàn bộ + tests/web, SO tập đỏ với duong_nen_bai_do.txt
+bash tools/dung_moi_truong_isp.sh --cong <N> --chi-kiem   # ⛔ dựng gì — chỉ kiểm
+#   (thay --cong <N> bằng FLS_PG_PORT=<N>; bỏ cả hai ⇒ 5433). Cuối mỗi lượt script IN SẴN hai dòng:
+export PG_DSN='postgresql://fls:fls@localhost:<N>/fls'
+export PG_DSN_TEST='postgresql://fls:fls@localhost:<N>/fls_test'
+export PYTHONUTF8=1
 /home/user/FLS-tobe/.venv/bin/python -m pytest <đường dẫn>     # ⛔ thêm -q (pyproject.toml đã có)
 /home/user/FLS-tobe/.venv/bin/lint-imports
 /home/user/FLS-tobe/.venv/bin/python -m fls.db.pg_migrate
 /home/user/FLS-tobe/.venv/bin/python tools/do_voi_so_luong.py
 ```
 
+⚠ ~~`PG_DSN_TEST=…:5433/fls_test_<làn>`~~ — bỏ *(S0-Q1 = A)*: 19 tệp bài ghim tên kho `== "fls_test"` ⇒ lượt TOÀN BỘ đỏ thêm 131 bài ⛔ phải lỗi mã *(§4.2)*. Cụm theo cổng giữ tên `fls_test`, ⛔ sửa bài nào *(§6.1)*.
+
 | Thứ | Ở đâu | Ghi chú |
 |---|---|---|
 | venv dùng chung | `/home/user/FLS-tobe/.venv` *(checkout chính, `gitignore`)* | Python 3.13.18 · `psycopg` 3.3.9 · `pytest` 9.2.0 · `import-linter` 2.16 *(`requirements.txt` chỉ ghi cận dưới `>=` — bản cài là bản PyPI mới nhất ngày 16/11)* |
-| cụm PostgreSQL 16 | dữ liệu `/home/user/fls-pg16` *(NGOÀI repo)* · cổng `5433` · chỉ nghe `localhost` · socket `/var/run/postgresql` | `initdb` chạy bằng user `postgres` *(từ chối root)*; xác thực socket `peer`, TCP `scram-sha-256` |
-| role / kho | role `fls` mật khẩu `fls` *(trùng mặc định `fls/db/kho.py`)* `LOGIN CREATEDB` · kho `fls` RỖNG chủ `fls` | `tests/conftest.py` DROP + CREATE kho test đầu mỗi phiên ⇒ cần `CREATEDB` |
-| khởi động lại cụm | `bash tools/dung_moi_truong_isp.sh` *(thấy cụm tắt ⇒ chỉ `pg_ctl start`)* | tay: `runuser -u postgres -- /usr/lib/postgresql/16/bin/pg_ctl -D /home/user/fls-pg16 -l /home/user/fls-pg16/pg_ctl.log -w start` |
+| cụm PostgreSQL 16 | dữ liệu `/home/user/fls-pg16` cho `5433` · `/home/user/fls-pg16-<N>` cho cổng khác *(NGOÀI repo)* · chỉ nghe `localhost` · socket chung `/var/run/postgresql` *(mỗi cổng một tệp `.s.PGSQL.<N>`)* | `initdb` chạy bằng user `postgres` *(từ chối root)*; xác thực socket `peer`, TCP `scram-sha-256`. 16/11 đang chạy: **5433** · **5434** · **5435** |
+| role / kho | mỗi cụm: role `fls` mật khẩu `fls` *(trùng mặc định `fls/db/kho.py`)* `LOGIN CREATEDB` · kho `fls` RỖNG chủ `fls` | `tests/conftest.py` DROP + CREATE kho test đầu mỗi phiên ⇒ cần `CREATEDB` |
+| khởi động lại cụm | `bash tools/dung_moi_truong_isp.sh --cong <N>` *(thấy cụm tắt ⇒ chỉ `pg_ctl start`)* | tay: `runuser -u postgres -- /usr/lib/postgresql/16/bin/pg_ctl -D <thư mục của cổng> -l <thư mục của cổng>/pg_ctl.log -w start` |
 
-⛔ Script **từ chối ngay** *(exit 2, trước mọi bước)* khi `FLS_CHO_GHI_THAT` đặt hoặc `PG_DSN` ⛔ trỏ `localhost`/`127.0.0.1:5433`. Nó **dừng chuỗi dựng** *(`[ĐỎ] dựng · …`, exit 1, ⛔ tạo role/kho, ⛔ di trú)* khi thư mục dữ liệu có thứ ⛔ phải cụm PG, khi cổng 5433 đã có một PostgreSQL KHÁC nghe *(trên máy owner đó là `fls-pg-1`)*, và **từ chối di trú** khi kho đích có dòng `fls_itl`. ⛔ Nó ⛔ bao giờ gọi `docker`.
+⛔ Script **từ chối ngay** *(exit 2, trước mọi bước, trước cả dòng tiêu đề)* khi: `FLS_CHO_GHI_THAT` đặt · một trong `PGHOST`/`PGHOSTADDR`/`PGPORT`/`PGSERVICE`/`PGSERVICEFILE` **được đặt** *(kể cả rỗng)* · `PG_DSN` *(và `PG_DSN_TEST` nếu đặt)* ⛔ khớp **nguyên chuỗi** `postgresql://<user>:<pass>@(localhost|127.0.0.1):<cổng của lượt>/<[a-z0-9_]+>` *(⛔ query string, ⛔ host khác, cổng phải là cổng của lượt)* · cổng ⛔ thuộc tập ISP · đối số ⛔ khai *(hai chế độ, `--cong` thiếu/hai lần, `--help` kèm đối số khác)*. ⛔⛔ Bản v0.1 viết *"khi `PG_DSN` ⛔ trỏ `localhost`/`127.0.0.1:5433`"* — **sai** với ba dạng R1 đo được *(`…/fls?port=5999` · `postgresql://x@10.0.0.9:5432/y@localhost:5433/fls` · `PGHOSTADDR=…`)*: chốt glob cũ cho cả ba qua *(§3.3)*. Nó **dừng chuỗi dựng** *(`[ĐỎ] dựng · …`, exit 1, ⛔ tạo role/kho, ⛔ di trú)* khi thư mục dữ liệu có thứ ⛔ phải cụm PG, khi cụm có sẵn khai cổng khác cổng của lượt, khi cổng của lượt đã có một PostgreSQL KHÁC nghe *(trên máy owner 5433 là `fls-pg-1`)*, và **từ chối di trú** khi kho đích có dòng `fls_itl`. ⛔ Nó ⛔ bao giờ gọi `docker`. Mọi chỗ in DSN che mật khẩu `://user:***@` — trừ hai dòng `export` cuối lượt khi mật khẩu là mặc định công khai `fls`.
 
 ## 2. Pha ĐỎ — trước khi dựng *(16/11, `39524c5`)*
 
@@ -162,6 +167,24 @@ exit=0
 ```
 
 ⇒ **3/3** chốt dựng/di trú đã thấy ĐỎ *(thư mục lạ · cổng có PG khác · kho có `fls_itl`)*, cộng **2/2** chốt exit 2 ở §3 *(`FLS_CHO_GHI_THAT` · `PG_DSN` lạ)*.
+
+### 3.3 Vòng sửa sau R1 *(`KQ-067` — 2 NÊN SỬA + 6 GHI NHẬN + S0-Q1 = A)* — ĐỎ trên bản cũ trước, rồi mới sửa
+
+Bản cũ = `tools/dung_moi_truong_isp.sh` @ `afb9e3a` *(chạy TẠI CHỖ trong worktree trước khi sửa, hoặc `git show HEAD:… > tools/_cu_tam.sh` rồi xoá — script lấy `GOC` theo vị trí tệp, nên bản sao đặt ngoài repo đo sai)*. Mỗi dòng: lệnh · exit · dòng nguyên văn.
+
+| Mã | Bản cũ *(ĐỎ = lọt / sai)* | Bản mới |
+|---|---|---|
+| `S0-R1-01` ⓐ | `PG_DSN='…@localhost:5433/fls?port=5999' … --chi-kiem` ⇒ **exit 1** · qua chốt, K4 `áp 'Is' / tệp 26 · lệch 'the'` | **exit 2** · `⛔ PG_DSN=postgresql://fls:***@localhost:5433/fls?port=5999 ⛔ khớp NGUYÊN CHUỖI …` |
+| `S0-R1-01` ⓑ | `PG_DSN='postgresql://x@10.0.0.9:5432/y@localhost:5433/fls'` ⇒ **exit 1** · qua chốt, K4 `áp 'before' / … lệch 'or'` | **exit 2** · cùng câu từ chối |
+| `S0-R1-01` ⓒ | `PGHOSTADDR=10.255.255.1` ⇒ **exit 1** · qua chốt, K2 + K3 + K4 nối `10.255.255.1` | **exit 2** · `⛔ biến PGHOSTADDR đang đặt — libpq sẽ gộp nó vào đích nối của PG_DSN …` |
+| `S0-R1-03` | `--chi-kiem --la` ⇒ **exit 0** · `KẾT: ĐẠT` | **exit 2** · `⛔ đối số lạ: --la`; `--duong-nen --chi-kiem` ⇒ exit 2 `⛔ hai chế độ cùng lúc` |
+| `S0-R1-04` | `PG_DSN=…/postgres --chi-kiem` *(⛔ có `fls_migration`)* ⇒ K4 `đo: áp '^' / tệp 26 · lệch '?'` | K4 `đo: tệp 26 · LOI UndefinedTable: relation "fls_migration" does not exist …` *(một dòng)* |
+| `S0-R1-05` | phá thử: `sitecustomize.py` tạm *(scratchpad)* làm rỗng `fls.db.pg_verify.TABLES` ⇒ `[ĐẠT] … pg_verify khớp (0 chỗ lệch)` · `KẾT: ĐẠT` — **xanh trên tập rỗng** *(Đ3)* | `[ĐỎ] … đo: áp '26' / tệp 26 · lệch '0' · so '0' bảng/view` · `KẾT: ĐỎ`; trả nguyên ⇒ `[ĐẠT] 26/26 di trú áp · pg_verify khớp 25 bảng/view (0 lệch)` |
+| `S0-R1-06` | dòng tiêu đề `PG_DSN = postgresql://fls:fls@…` · dòng từ chối in nguyên mật khẩu | `PG_DSN = postgresql://fls:***@localhost:5433/fls`; dòng từ chối `fls:***@` *(bài `test_S0_R1_06_…`: mật khẩu `bimat123` ⛔ xuất hiện)* |
+| `S0-R1-10` K2 | tắt cụm mình, cụm LẠ `initdb` chiếm 5433 ⇒ `[ĐẠT] cụm PG localhost:5433    pg_isready exit 0` | `[ĐỎ] … đo: pg_ctl -D /home/user/fls-pg16 status ≠ 0 (cụm của mình ⛔ chạy)`; dựng ⇒ `⛔ cổng 5433 đã có một PostgreSQL KHÁC đang nghe`; `FLS_PGDATA=/home/user/fls-pg16 --cong 5434` ⇒ K2 `nghe cổng '5433' ≠ 5434`, dựng ⇒ `⛔ cụm … khai port '5433' ≠ cổng của lượt 5434 — TỪ CHỐI`; nhánh ④ *(cha của tiến trình phục vụ)*: thư mục giả `/home/user/fls-pg16-thu-gia` có `postmaster.pid` ghi PID postmaster của cụm **5435** + cổng 5433 ⇒ `pg_ctl status` báo `server is running (PID: 6989)`, ①②③ qua, K2 `[ĐỎ] … tiến trình phục vụ PG_DSN có cha '6769' ≠ postmaster 6989` *(thư mục giả đã gỡ)* |
+| `S0-R1-10` K7 | kho nháp `fls_thu_k7` + 1 dòng `fls_itl` ⇒ `--chi-kiem` **6/6 ĐẠT** · exit 0 | `[ĐỎ] kho fls_thu_k7 RỖNG  mong: fls_itl = 0 dòng — đo: '1'` · exit 1 *(kho nháp đã DROP)* |
+
+Bài thử máy cho chốt + CLI: `tests/test_dung_moi_truong_isp.py` *(30 bài, tất định, ⛔ cần PG — mọi ca chạy trong môi trường GIẢ VẮNG)*. Trên bản cũ: **`20 failed, 10 passed in 149.57s`** *(exit 1; 10 bài xanh là các ca bản cũ vốn từ chối được, hoặc từ chối nhầm lý do — `--cong` là đối số lạ)*; trên bản mới: **`30 passed in 0.85s`**. ⚠ Lượt đỏ ấy để lại một pytest TOÀN BỘ mồ côi *(ca `--duong-nen --chi-kiem` lọt chốt CLI ⇒ dựng + pytest; `timeout` chỉ giết `bash`)* — đã `pkill`; từ đó mọi ca của tệp đều chạy với venv ở `/proc/…` *(⛔ tạo nổi)* nên chốt nào hồi quy cũng chỉ ĐỎ nhanh.
 
 ## 4. Đường nền pytest — hai lượt *(S0-B1 · AC-1 · S0-F1 · AC-5)*
 
@@ -352,6 +375,54 @@ Kho `fls` ở container **RỖNG** *(0 dòng `fls_itl` — chỉ mang di trú)*.
 | B130 | `tests/web/test_wo051_xem_them_khung_cho.py::test_AC7_THU_LAI_lai_loi_MOT_dong_loi_khong_chong` | ERROR | pass |
 | B131 | `tests/web/test_wo051_xem_them_khung_cho.py::test_AC7_doi_tien_te_khi_XEM_THEM_dang_tai_loi_cu_KHONG_hien` | ERROR | pass |
 
+### 4.3 Tệp máy-đọc `duong_nen_bai_do.txt` — cổng của đường nền *(`S0-R1-02`)*
+
+⛔⛔ Bản v0.1 hứa *"một bài đỏ mới ⛔ có tên ở §4 là lỗi của bước ấy"* nhưng ⛔ máy nào so: `--duong-nen` chỉ `[ĐỎ]` khi pytest ⛔ chạy nổi *(exit ∉ {0, 1})* ⇒ một bài đỏ MỚI vẫn `KẾT: ĐẠT` exit 0; R1 phải tự dựng `comm` trên bảng markdown để so 26 = 26.
+
+- [`duong_nen_bai_do.txt`](duong_nen_bai_do.txt): **26** dòng = 26 node id của §4.1 *(máy trích từ bảng: `awk` khối §4.1 · `sed` cột 2 · `LC_ALL=C sort -u`)*, đã sắp, ⛔ chú thích, ⛔ dòng trống; **3** dòng mang tiền tố `tests/web/` *(A10 · A11 · A12)*.
+- `--duong-nen` tách node id từ khối `short test summary info` của `-rfE` *(dòng `FAILED`/`ERROR`, cắt ở ` - ` đầu tiên)*, rồi `comm` với tệp: lượt **toàn bộ** so cả 26; lượt **`tests/web`** so các dòng mang tiền tố `tests/web/`. **THÊM** hay **BỚT** một node ⇒ `[ĐỎ] đường nền …` + in từng node chênh *(`+ THÊM` / `− BỚT`)*. Tệp vắng ⇒ `[ĐỎ]` *(⛔ so được)*; pytest ⛔ có dòng tổng kết ⇒ `[ĐỎ]`. Đổi tệp bằng `FLS_DUONG_NEN_DO=<tệp>` *(dùng cho phép phá thử — ⛔ sửa tệp thật)*.
+- Bước nào làm một bài ở đây tự xanh *(BỚT)* hay chấp nhận một bài đỏ mới *(THÊM — cần lý do, ⛔ "có sẵn" khi nó ⛔ đỏ ở bản gốc)* thì **sửa tệp này trong cùng commit** và ghi lý do vào phiếu — đó là điều Đ5 muốn.
+- ⚠ Đo *(Đ4)*: tập so là **node id**, ⛔ số bài — lượt sau vòng sửa thu thập **2.460** bài *(2.430 của 16/11 + 30 bài mới của `tests/test_dung_moi_truong_isp.py`)*; tổng thay đổi mà tập đỏ vẫn 26 = 26.
+
+**Chứng minh ĐỎ** *(Đ5 — cả hai chiều; tệp thật sha256 `b4e310ea…` trước = sau)*. Tệp TẠM = tệp thật **bỏ** `tests/repo/test_g_mod_3_phan_hoach_truong_pm.py::test_vu_tru_dung_28_cot_co_ten` và **cài** id giả `tests/web/test_khong_ton_tai_pg.py::test_id_GIA_cai_vao_de_thay_BOT`; chạy trên cụm 5434:
+
+```text
+$ FLS_DUONG_NEN_DO=<tệp tạm> bash tools/dung_moi_truong_isp.sh --cong 5434 --duong-nen
+  ── pytest toàn bộ · exit 1
+     13 failed, 2431 passed, 2 xfailed, 14 errors in 313.31s (0:05:13)
+  [ĐỎ]  đường nền toàn bộ mong: tập đỏ = 26 node id của duong_nen_tam.txt — đo: 27 · thêm 2 · bớt 1
+        + THÊM  tests/db/test_khong_ai_tro_lai_kho_that.py::test_khong_file_test_nao_ghi_cung_dia_chi_kho_that
+        + THÊM  tests/repo/test_g_mod_3_phan_hoach_truong_pm.py::test_vu_tru_dung_28_cot_co_ten
+        − BỚT   tests/web/test_khong_ton_tai_pg.py::test_id_GIA_cai_vao_de_thay_BOT
+  ── pytest tests/web · exit 1
+     3 failed, 661 passed in 177.19s (0:02:57)
+  [ĐỎ]  đường nền tests/web  mong: tập đỏ = 4 node id của duong_nen_tam.txt (tiền tố tests/web/) — đo: 3 · thêm 0 · bớt 1
+        − BỚT   tests/web/test_khong_ton_tai_pg.py::test_id_GIA_cai_vao_de_thay_BOT
+══ KẾT: ĐỎ — 2 phép kiểm khác mong hoặc ⛔ đo được
+exit=1
+```
+
+⭐ **Đỏ THẬT, ngoài kế hoạch** — dòng `+ THÊM tests/db/test_khong_ai_tro_lai_kho_that.py::…` ở trên ⛔ phải do tệp tạm: cùng lúc, lượt 5433 với **tệp thật** cũng ĐỎ đúng một node:
+
+```text
+$ bash tools/dung_moi_truong_isp.sh --duong-nen          # 5433, tệp thật, TRƯỚC khi sửa docstring
+  [ĐỎ]  đường nền toàn bộ mong: tập đỏ = 26 node id của duong_nen_bai_do.txt — đo: 27 · thêm 1 · bớt 0
+        + THÊM  tests/db/test_khong_ai_tro_lai_kho_that.py::test_khong_file_test_nao_ghi_cung_dia_chi_kho_that
+  [ĐẠT] đường nền tests/web  tập đỏ = đường nền: 3 = 3 node id (thêm 0 · bớt 0)
+══ KẾT: ĐỎ — 1 phép kiểm khác mong hoặc ⛔ đo được
+```
+
+— docstring bài mới của chính vòng sửa trích nguyên DSN của R1 *(`postgresql://x@10.0.0.9:5432/y@localhost:5433/fls`)*, và cổng quét mã nguồn cấm chuỗi DSN tận cùng `/fls` trong `tests/`. Cổng đúng ⇒ sửa **docstring** *(viết `/<kho>`)*, ⛔ sửa cổng. Đây đúng loại lỗi bản v0.1 để lọt: bài đỏ **mới** trong lượt toàn bộ — v0.1 sẽ in `KẾT: ĐẠT`.
+
+**Lượt chính thức** *(5433, MỘT MÌNH trên máy, cây cuối — sha256 script/bài/tệp đường nền đo trước lượt = sau)*: chạy **hai** lần, ghi cả hai.
+
+| Lượt | pytest toàn bộ | so tập đỏ toàn bộ | pytest `tests/web` | so tập đỏ web | KẾT |
+|---|---|---|---|---|---|
+| chính thức 1 | `14 failed, 2430 passed, 2 xfailed, 14 errors in 306.48s (0:05:06)` | `[ĐỎ]` 28 · thêm 2 · bớt 0 — `+ THÊM tests/web/test_wo032_man_cua_that.py::test_AC3_tim_tien_bac_MA_lech_1_trieu_o_Lech_CO_SO` · `+ THÊM …::test_AC7_o_tien_ung_vien_co_TITLE_dung_chuoi_in_than_cua_that` | `3 failed, 661 passed in 176.22s (0:02:56)` | `[ĐẠT]` 3 = 3 | `ĐỎ` · exit 1 |
+| chính thức 2 | `12 failed, 2432 passed, 2 xfailed, 14 errors in 304.96s (0:05:04)` | `[ĐẠT]` 26 = 26 *(thêm 0 · bớt 0)* | `3 failed, 661 passed in 174.95s (0:02:54)` | `[ĐẠT]` 3 = 3 | **`ĐẠT` · exit 0** |
+
+⚠ **Lượt 1 đỏ vì một bài CHẬP CHỜN có sẵn, ⛔ do S0** *(đo được, ⛔ đoán)*: hai node ấy XANH ở lượt `tests/web` ngay sau, ở hai lượt toàn bộ trước *(5433 + 5434)* và ở lượt 2. Lỗi: `tests/web/khung_node.py:217` `json.loads(r.stdout.strip().splitlines()[-1])` ⇒ `JSONDecodeError`, mảnh cuối bắt đầu giữa chuỗi HTML *(`</td><td class=\"r num\">2.597.094…`)*. Chuỗi nhân quả: `tests/nghiem_thu/test_kq041_mot_luat_tien_te_va_ro_may.py:81` chèn vào `fls_test` dòng `curr = "VND" + chr(0x85)`, số tiền NGẪU NHIÊN *(`:105` `random.randint(10_000, 89_999) * 1000`)*; tệp ấy chạy TRƯỚC `tests/web` trong lượt toàn bộ *(⛔ có trong lượt `tests/web` riêng)*; khi dòng ấy lọt danh sách ứng viên, `JSON.stringify` để nguyên U+0085 *(node 22 đo: `JSON.stringify({curr:"VND\u0085"})` còn mã `85`)* còn `str.splitlines()` tách ở U+0085 *(Python đo: `'{"curr":"VND\x85"}'.splitlines()` ⇒ 2 mảnh; `.split("\n")` ⇒ 1)*. ⛔ Thêm hai node vào tệp đường nền *(đúng khuôn "danh sách miễn trừ để cổng xanh" — cấm)*, ⛔ sửa bài có sẵn *(ngoài phạm vi S0)* ⇒ chuyển orchestrator *(`BG-066` Q7)*. Đến khi sửa gốc: lượt toàn bộ đỏ **chỉ** ở hai node này ⇒ chạy lại và ghi cả hai lượt.
+
 ## 5. Cổng CLAUDE.md ở container *(16/11, sau khi có hai gói)*
 
 `export PG_DSN='postgresql://fls:fls@localhost:5433/fls' PYTHONUTF8=1` · chạy bằng `/home/user/FLS-tobe/.venv/bin/python`.
@@ -398,12 +469,39 @@ lượt C2: exit=1 · 3 failed, 3 passed in 0.19s
 
 ⇒ cách khởi chạy này **thật sự chồng thời gian** *(hai `CREATE DATABASE` va nhau)*, và kho riêng là thứ làm hai lượt ⛔ giẫm nhau. ⚠ Tệp chọn cho AC-6 **⛔ ghim** tên kho; với 19 tệp ở §4.2, kho `fls_test_<làn>` ⛔ đủ — xem BG-066 Q1 *(phép thử phương án "cụm/cổng riêng, giữ tên `fls_test`" đã chạy: hai cụm 5433 + 5434 song song, `tests/repo/test_wo023_f_la_ban_dao_pg.py` `3 passed` ×2; cùng tệp với `fls_test_x` ⇒ `3 errors`; cụm thử đã gỡ)*.
 
+### 6.1 Cụm theo CỔNG — S0-Q1 = A *(vòng sửa sau R1)*
+
+Dựng hai cụm bằng chính script, **song song** *(`--cong 5434` · `FLS_PG_PORT=5435`)*: mỗi lượt `── cụm: chưa có ⇒ initdb /home/user/fls-pg16-<N>` · `CREATE ROLE fls LOGIN CREATEDB` · `CREATE DATABASE fls` · `da ap 26 migration` · **7/7 `[ĐẠT]`** *(K2: `postmaster.pid cổng 5434 · … PG_DSN phục vụ bởi postmaster 6988`; 5435: postmaster `6989`)* · exit 0 cả hai; cuối lượt in `export PG_DSN='postgresql://fls:fls@localhost:5434/fls'` · `export PG_DSN_TEST='postgresql://fls:fls@localhost:5434/fls_test'`.
+
+Phép thử: **một tệp GHIM tên kho** *(`tests/repo/test_wo023_f_la_ban_dao_pg.py:36` `== "fls_test"` — tệp từng `3 errors` với `fls_test_x`)* + `tests/db/test_invariants_pg.py` *(6 bài, ghi `fls_itl`)* — **9** bài; mỗi lượt đặt `PG_DSN` + `PG_DSN_TEST` vào cổng của mình:
+
+```text
+lượt cf (5434): bắt đầu 07:15:15.294197063 · 9 passed in 0.43s · exit=0
+lượt hc (5435): bắt đầu 07:15:15.294120809 · 9 passed in 0.42s · exit=0
+cụm 5434: kho fls fls_test · fls_test: fls_itl = 9 · fls_migration = 26 · current_database = fls_test
+cụm 5435: kho fls fls_test · fls_test: fls_itl = 9 · fls_migration = 26 · current_database = fls_test
+```
+
+**Đối chứng** *(⛔ phải AC — chứng minh phép đo ⛔ rỗng nghĩa)*: cùng 9 bài, hai lượt **chung cổng 5434**, lặp **3** vòng — **3/3** vòng giẫm nhau:
+
+```text
+vòng 1: 2 failed, 6 passed, 1 error in 0.41s (exit 1)  |  9 passed in 0.54s (exit 0)
+vòng 2: 9 passed in 0.42s (exit 0)                      |  2 failed, 6 passed, 1 error in 0.33s (exit 1)
+vòng 3: 2 failed, 6 passed, 1 error in 0.34s (exit 1)  |  9 passed in 0.43s (exit 0)
+E  psycopg.errors.UndefinedTable: relation "fls_run" does not exist        (3 lần)
+E  psycopg.errors.UndefinedTable: relation "fls_sua_tay" does not exist    (6 lần)
+```
+
+⇒ cụm riêng theo cổng là thứ làm hai lượt ⛔ giẫm nhau, **kể cả với tệp ghim `fls_test`** — điều kho `fls_test_<làn>` ⛔ làm được *(§4.2)*. Cụm **5434** *(BE-CF)* · **5435** *(BE-HC)* **để nguyên, đang chạy**; trên 5433 đã DROP `fls_test_a` · `fls_test_b` · `fls_test_cf` *(+ kho nháp `fls_thu_k7` của vòng sửa)* — còn `fls` · `fls_test`.
+
 ## 7. Giới hạn và chuyển orchestrator
 
 - Kho test là cụm cục bộ, ⛔ phải `fls-pg-1` *(O4)*; 26 bài ở §4.1 chỉ đo được trên máy owner.
 - `requirements.txt` chỉ ghi cận dưới `>=` ⇒ venv dựng ngày khác có thể lấy bản mới hơn *(16/11: psycopg 3.3.9 · pytest 9.2.0 · import-linter 2.16)*.
 - pytest ở container chậm hơn CLAUDE.md ghi *(~4 phút)*: 4–5 phút toàn bộ — phần lớn là bài web chờ hẹn giờ *(mỗi tiến trình `node` của `man_f02.js` ~2 s, CPU ~2%)*.
 - Sau khi gộp S0: `lint-imports` **11 kept** ≠ số ghim **9 kept** ở `06_ORCHESTRATOR_DASHBOARD.md:137` và `08_MIGRATION_ROADMAP.md:45` ⇒ `kiem_so_song` *(máy owner)* sẽ ĐỎ hai phép `cong · lint-imports` · `roadmap · lint-imports` cho tới khi `dong_bo_so_song --ghi` soạn lại *(`10` §6 — người chạy là Dev, nhưng hai tệp ấy nay orchestrator ghi)*; `CLAUDE.md` *"9 hợp đồng tầng"* cũng lệch.
+- ⭐ *(v0.2 · `S0-R1-07`)* Chỗ **khai** thứ tư — **SPEC** của `fls-ba`: `docs/ITL/02_BA/08_NFR.md:51` `NFR-I16` *"**9** hợp đồng `import-linter`, **0** vi phạm"* ⇒ cũng lệch sau gộp *(nâng → 11 là việc của `fls-ba`, qua orchestrator; Dev ⛔ sửa `02_BA/**`)*. Đo lại 16/11 *(Đ1 · Đ2)*: grep `9 hợp đồng\|9 kept` trong `fls/`+`tools/`+`tests/`+`CLAUDE.md` = **2** dòng — `CLAUDE.md:73` *(khai)* · `tools/dung_moi_truong_isp.sh` *(chú thích "9 hợp đồng cũ + 2 của S0" — biên bản)*; trong `docs/` = **65** tệp, phần lớn biên bản *(sổ `QĐ`, changelog, phiếu)*. ⇒ Bốn chỗ khai: dashboard:137 · `01_Orchestrator/08_MIGRATION_ROADMAP.md:45` · `CLAUDE.md:73` · `02_BA/08_NFR.md:51`.
 
 ## Changelog
+- **v0.2** *(2026-11-16, `fls-dev` làn BE-CF, vòng sửa sau R1 `KQ-067`)*: đầu trang trỏ tệp máy-đọc; §1 cụm theo CỔNG *(S0-Q1 = A)* + câu chốt viết lại *(câu v0.1 sai với ba dạng DSN của `S0-R1-01`)*; §3.3 ĐỎ bản cũ → XANH bản mới cho `S0-R1-01/03/04/05/06/10`; §4.3 `duong_nen_bai_do.txt` + máy so tập đỏ *(`S0-R1-02`)*; §6.1 hai cụm 5434 · 5435 song song + đối chứng chung cổng; §7 thêm `NFR-I16` *(`S0-R1-07`)*. Bảng §2–§6 của v0.1 giữ nguyên *(biên bản 16/11)*.
 - **v0.1** *(2026-11-16, `fls-dev` làn BE-CF, `WO-065`)*: khởi tạo — lệnh dựng, pha đỏ/xanh, phá thử hai hợp đồng, pytest hai lượt + lượt đối chứng `39524c5`, cổng CLAUDE.md, AC-6.

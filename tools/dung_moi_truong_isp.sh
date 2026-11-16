@@ -2,27 +2,45 @@
 # -*- coding: utf-8 -*-
 # DỰNG môi trường test của ISP 3.1 ở container cloud — rồi IN ĐƯỜNG NỀN đo thật.
 #
-#   bash tools/dung_moi_truong_isp.sh              # dựng (chạy lại được) + kiểm nhanh có `mong`
-#   bash tools/dung_moi_truong_isp.sh --duong-nen  # như trên + pytest TOÀN BỘ + riêng tests/web
-#   bash tools/dung_moi_truong_isp.sh --chi-kiem   # ⛔ dựng gì — chỉ kiểm (đỏ nếu môi trường thiếu)
+#   bash tools/dung_moi_truong_isp.sh [--cong N]              # dựng (chạy lại được) + kiểm nhanh có `mong`
+#   bash tools/dung_moi_truong_isp.sh [--cong N] --duong-nen  # như trên + pytest TOÀN BỘ + tests/web, SO tập đỏ với đường nền
+#   bash tools/dung_moi_truong_isp.sh [--cong N] --chi-kiem   # ⛔ dựng gì — chỉ kiểm (đỏ nếu môi trường thiếu)
+#   N ∈ 5433…5437 · 5444…5447 — mỗi agent MỘT cụm theo cổng (TIEN_DO.md); ⛔ --cong ⇒ FLS_PG_PORT ⇒ 5433
 #
 # ⭐ Vì sao có tệp này (ISP 3.1.2 Step 0 · `WO-065`). Đo 16/11: container cloud ⛔ có Docker,
 #    ⛔ có pytest ở python hệ thống, ⛔ có `.venv` — nên MỌI bước sau của ISP ⛔ chạy được một
 #    bài PG nào. Kho thật `fls-pg-1` nằm trên máy Windows của owner (O4 = A: test ở container,
 #    bước tích hợp cuối chạy lại trên máy owner trước merge).
 #
+# ⭐ Vì sao MỘT CỤM MỖI CỔNG (S0-Q1 = A, orchestrator chốt 16/11 sau R1). Quy ước đầu là "mỗi
+#    agent một KHO `fls_test_<làn>` trên một cụm" — nhưng 24 dòng ở 19 tệp bài ghim `== "fls_test"`
+#    (5 tệp trong `tests/nghiem_thu/`) ⇒ lượt toàn bộ đỏ GIẢ thêm 131 bài (DUONG_NEN.md §4.2). Giữ
+#    tên kho `fls`/`fls_test`, tách bằng CỔNG: 5433 = cụm gốc của S0 · 5434 BE-CF · 5435 BE-HC ·
+#    5436 FE · 5437 DATA · 5444…5447 reviewer theo làn. Thư mục dữ liệu: /home/user/fls-pg16 cho
+#    5433 (giữ nguyên cụm đã dựng ở S0), /home/user/fls-pg16-<N> cho cổng khác.
+#
 # ⛔⛔ Năm luật của tệp này — mỗi luật một cái bẫy đã biết:
 #
 #  ① CHẠY LẠI ĐƯỢC, ⛔ PHÁ GÌ ĐÃ CÓ. venv có rồi ⇒ chỉ cài phần THIẾU; cụm có rồi ⇒ chỉ khởi động;
 #    role/kho có rồi ⇒ bỏ qua. Thư mục dữ liệu tồn tại mà ⛔ phải cụm PG ⇒ TỪ CHỐI, ⛔ xoá.
-#    Cổng 5433 đã có người nghe mà ⛔ phải cụm của tệp này ⇒ TỪ CHỐI (trên máy owner đó là
-#    `fls-pg-1` — kho THẬT). ⛔ Tệp này ⛔ bao giờ gọi `docker` (⛔ `docker compose down`:
-#    `docker-compose.yml` ⛔ khai `volumes:` ⇒ một lệnh `down` là kho rỗng).
+#    Cổng của lượt đã có người nghe mà ⛔ phải cụm của tệp này ⇒ TỪ CHỐI (trên máy owner 5433 là
+#    `fls-pg-1` — kho THẬT). Cụm có sẵn mà khai cổng KHÁC cổng của lượt ⇒ TỪ CHỐI. ⛔ Tệp này ⛔
+#    bao giờ gọi `docker` (⛔ `docker compose down`: `docker-compose.yml` ⛔ khai `volumes:` ⇒ một
+#    lệnh `down` là kho rỗng).
 #
-#  ② ⛔ GHI KHO THẬT. `FLS_CHO_GHI_THAT` đặt ⇒ TỪ CHỐI. `PG_DSN` phải trỏ `localhost`/`127.0.0.1`
-#    cổng 5433 — kho `fls` ở đây là kho RỖNG cục bộ chỉ mang di trú; container ⛔ có sổ thật.
-#    Kho đích có dòng `fls_itl` ⇒ ⛔ phải kho của tệp này ⇒ TỪ CHỐI di trú. Cụm bị từ chối ⇒ DỪNG
-#    chuỗi (⛔ tạo role/kho, ⛔ di trú lên một kho mà tệp này ⛔ dựng).
+#  ② ⛔ GHI KHO THẬT. `FLS_CHO_GHI_THAT` đặt ⇒ TỪ CHỐI. `PG_DSN` (và `PG_DSN_TEST` nếu đặt) phải
+#    khớp NGUYÊN CHUỖI `postgresql://<user>:<pass>@(localhost|127.0.0.1):<cổng của lượt>/<[a-z0-9_]+>`
+#    — ⛔ query string, ⛔ host khác; và ⛔ biến `PGHOST`/`PGHOSTADDR`/`PGPORT`/`PGSERVICE`/
+#    `PGSERVICEFILE` nào được đặt. ⛔⛔ Bản đầu so bằng glob `case` (`postgresql://*@localhost:5433/*`)
+#    và R1 (`KQ-067` · `S0-R1-01`) đo được BA đường "trông cục bộ mà nối đi chỗ khác":
+#      ⓐ `…@localhost:5433/fls?port=5999`              — libpq gộp query string ⇒ nối 127.0.0.1:5999
+#      ⓑ `postgresql://x@10.0.0.9:5432/y@localhost:5433/fls` — `*` nuốt cả `/` ⇒ khớp glob,
+#                                                         libpq nối 10.0.0.9:5432
+#      ⓒ `PGHOSTADDR=10.255.255.1`                      — libpq gộp biến PG* ⇒ nối nơi khác
+#    Ở chế độ dựng, chuỗi sẽ chạy `pg_migrate` (DDL) lên đích ấy. ⇒ So ĐÍCH NỐI như libpq hiểu:
+#    khuôn nguyên chuỗi chặn mọi chỗ libpq lấy thêm tham số (query · userinfo lạ), từ chối biến
+#    PG* chặn chỗ còn lại. Kho đích có dòng `fls_itl` ⇒ ⛔ phải kho của tệp này ⇒ TỪ CHỐI di trú.
+#    Cụm bị từ chối ⇒ DỪNG chuỗi (⛔ tạo role/kho, ⛔ di trú lên một kho mà tệp này ⛔ dựng).
 #
 #  ③ venv DÙNG CHUNG ở CHECKOUT CHÍNH, ⛔ ở worktree. Mỗi agent chạy trong một git worktree riêng
 #    (`.claude/worktrees/agent-*`), và worktree bị dọn khi bước xong — venv đặt trong đó sẽ mất.
@@ -33,25 +51,63 @@
 #    nguồn tiếng Việt bằng trang mã hệ thống và IM LẶNG in 0 byte (CLAUDE.md · Bẫy).
 #
 #  ⑤ ĐỎ khi ⛔ ĐO ĐƯỢC (Đ5). Mỗi phép kiểm khai `mong` trước; khác ⇒ `[ĐỎ]`; ⛔ chạy được ⇒ `[ĐỎ]`
-#    (⛔ phải "không thấy lệch"). Một phép kiểm đỏ ⇒ exit 1. pytest là ĐO ĐƯỜNG NỀN, ⛔ phán:
-#    bài đỏ CÓ SẴN ≠ lỗi môi trường — tên từng bài ghi ở `docs/ITL/03_Dev/isp-3.1/DUONG_NEN.md`;
-#    nhưng pytest ⛔ chạy nổi (mã thoát ∉ {0, 1}) thì vẫn là `[ĐỎ]`.
+#    (⛔ phải "không thấy lệch"). Một phép kiểm đỏ ⇒ exit 1. Phép nào ra `0 lệch` phải in MẪU SỐ
+#    cạnh nó và đỏ khi mẫu số = 0 (Đ3). pytest: bài đỏ CÓ SẴN ≠ lỗi môi trường, nhưng tập đỏ
+#    phải BẰNG tập đã ghi ở `docs/ITL/03_Dev/isp-3.1/duong_nen_bai_do.txt` (node id) — THÊM hay
+#    BỚT một bài đều `[ĐỎ]` (S0-R1-02: bản đầu chỉ đỏ khi pytest ⛔ chạy nổi, nên một bài đỏ MỚI
+#    vẫn `KẾT: ĐẠT`). pytest ⛔ chạy nổi (mã thoát ∉ {0, 1}) hay ⛔ có dòng tổng kết ⇒ `[ĐỎ]`.
+#
+#  ⛔ In mật khẩu của DSN: mọi chỗ in DSN đều che `://user:***@` (S0-R1-06), kể cả dòng từ chối.
+#    Ngoại lệ DUY NHẤT: hai dòng `export` cuối lượt in mật khẩu khi nó là mặc định CÔNG KHAI
+#    `fls` (`fls/db/kho.py:44` · `CLAUDE.md` §Cổng · `CREATE ROLE … PASSWORD 'fls'` dưới đây) —
+#    để agent chép được nguyên dòng; mật khẩu khác ⇒ vẫn che.
 #
 # Biến đổi được (mặc định là sự thật đã đo ở container 16/11):
-#   FLS_VENV    venv dùng chung        (mặc định <checkout chính>/.venv)
-#   FLS_PGDATA  thư mục dữ liệu cụm    (mặc định /home/user/fls-pg16 — NGOÀI repo)
-#   FLS_PGBIN   binary PostgreSQL 16   (mặc định /usr/lib/postgresql/16/bin)
-#   PG_DSN      kho `fls` cục bộ       (mặc định postgresql://fls:fls@localhost:5433/fls — trùng fls/db/kho.py)
-#   PG_DSN_TEST kho test của MỖI agent (quy ước TIEN_DO.md: …/fls_test_<làn>; bỏ trống ⇒ `fls_test` của kho.py)
+#   FLS_PG_PORT      cổng của lượt          (như --cong; cả hai đặt mà khác nhau ⇒ từ chối)
+#   FLS_VENV         venv dùng chung        (mặc định <checkout chính>/.venv)
+#   FLS_PGDATA       thư mục dữ liệu cụm    (mặc định /home/user/fls-pg16 cho 5433, /home/user/fls-pg16-<N> — NGOÀI repo)
+#   FLS_PGBIN        binary PostgreSQL 16   (mặc định /usr/lib/postgresql/16/bin)
+#   FLS_DUONG_NEN_DO tệp node id bài đỏ có sẵn (mặc định docs/ITL/03_Dev/isp-3.1/duong_nen_bai_do.txt)
+#   PG_DSN           kho `fls` cục bộ       (mặc định postgresql://fls:fls@localhost:<N>/fls — trùng fls/db/kho.py ở 5433)
+#   PG_DSN_TEST      kho test               (bỏ trống ⇒ `fls_test` cùng cụm, do fls/db/kho.py suy từ PG_DSN)
 set -uo pipefail
 
-CHE_DO="dung"
-case "${1:-}" in
-  "")            CHE_DO="dung" ;;
-  --duong-nen)   CHE_DO="duong_nen" ;;
-  --chi-kiem)    CHE_DO="chi_kiem" ;;
-  -h|--help)     sed -n '2,8p' "$0"; exit 0 ;;
-  *)             echo "⛔ đối số lạ: $1 (xem --help)" >&2; exit 2 ;;
+# Tập cổng của ISP (TIEN_DO.md · Quy ước chạy song song). Thêm agent ⇒ thêm cổng Ở ĐÂY.
+CONG_ISP="5433 5434 5435 5436 5437 5444 5445 5446 5447"
+
+# ── CLI · từ chối MỌI đối số ⛔ khai (S0-R1-03: bản đầu chỉ soát `$1` ⇒ `--chi-kiem --la` exit 0,
+#    `--duong-nen --chi-kiem` thì DỰNG dù người gọi muốn chỉ kiểm).
+CHE_DO=""; CO_CHE_DO=""; CONG_DOI_SO=""; N_DOI_SO=$#
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    --duong-nen|--chi-kiem)
+      if [ -n "$CO_CHE_DO" ]; then
+        echo "⛔ hai chế độ cùng lúc ($CO_CHE_DO + $1) — chọn MỘT (xem --help)" >&2; exit 2
+      fi
+      CO_CHE_DO="$1"
+      if [ "$1" = --duong-nen ]; then CHE_DO="duong_nen"; else CHE_DO="chi_kiem"; fi ;;
+    --cong)
+      if [ -n "$CONG_DOI_SO" ]; then echo "⛔ --cong đưa hai lần — từ chối" >&2; exit 2; fi
+      if [ "$#" -lt 2 ]; then echo "⛔ --cong thiếu giá trị (xem --help)" >&2; exit 2; fi
+      CONG_DOI_SO="$2"; shift ;;
+    -h|--help)
+      if [ "$N_DOI_SO" != 1 ]; then echo "⛔ --help ⛔ đi kèm đối số khác — từ chối" >&2; exit 2; fi
+      sed -n '2,8p' "$0"; exit 0 ;;
+    *)  echo "⛔ đối số lạ: $1 (xem --help)" >&2; exit 2 ;;
+  esac
+  shift
+done
+CHE_DO="${CHE_DO:-dung}"
+
+# ── cổng của lượt: --cong ⇒ FLS_PG_PORT ⇒ 5433; ⛔ thuộc tập ISP ⇒ từ chối.
+CONG_BIEN="${FLS_PG_PORT:-}"
+if [ -n "$CONG_DOI_SO" ] && [ -n "$CONG_BIEN" ] && [ "$CONG_DOI_SO" != "$CONG_BIEN" ]; then
+  echo "⛔ --cong $CONG_DOI_SO ≠ FLS_PG_PORT=$CONG_BIEN — hai nguồn cổng mâu thuẫn, từ chối" >&2; exit 2
+fi
+CONG="${CONG_DOI_SO:-${CONG_BIEN:-5433}}"
+case " $CONG_ISP " in
+  *" $CONG "*) ;;
+  *) echo "⛔ cổng '$CONG' ⛔ thuộc tập cổng ISP ($CONG_ISP) — từ chối" >&2; exit 2 ;;
 esac
 
 GOC="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -64,14 +120,18 @@ fi
 VENV="${FLS_VENV:-$GOC_CHUNG/.venv}"
 PY="$VENV/bin/python"
 PGBIN="${FLS_PGBIN:-/usr/lib/postgresql/16/bin}"
-PGDATA_ISP="${FLS_PGDATA:-/home/user/fls-pg16}"
-CONG=5433
+if [ "$CONG" = 5433 ]; then PGDATA_MAC_DINH=/home/user/fls-pg16; else PGDATA_MAC_DINH="/home/user/fls-pg16-$CONG"; fi
+PGDATA_ISP="${FLS_PGDATA:-$PGDATA_MAC_DINH}"
 SOCK=/var/run/postgresql
-export PG_DSN="${PG_DSN:-postgresql://fls:fls@localhost:5433/fls}"
-# tên kho lấy từ chính PG_DSN (thường là `fls`) — tạo đúng kho mà di trú và các phép kiểm sẽ nối
-TEN_KHO="${PG_DSN##*/}"; TEN_KHO="${TEN_KHO%%\?*}"
+DUONG_NEN_DO="${FLS_DUONG_NEN_DO:-$GOC/docs/ITL/03_Dev/isp-3.1/duong_nen_bai_do.txt}"
+export PG_DSN="${PG_DSN:-postgresql://fls:fls@localhost:$CONG/fls}"
 export PYTHONUTF8=1 PYTHONIOENCODING=utf-8
-cd "$GOC" || exit 2
+
+# ── S0-R1-06 · che mật khẩu mọi chỗ in DSN. `[^@]*` (⛔ `[^@/]*`): mật khẩu có `/` vẫn bị che.
+#    Dạng từ khoá `password=…` cũng che (dạng ấy bị chốt từ chối, nhưng dòng từ chối có in nó).
+#    Dấu phân cách `|`, ⛔ `#`: biểu thức có `#` trong ngoặc vuông.
+che() { printf '%s\n' "$1" | che_dong; }
+che_dong() { sed -E 's|(://[^:@/?#[:space:]]*):[^@[:space:]]*@|\1:***@|g; s|(password=)[^[:space:]]*|\1***|g'; }
 
 # Đ5 — bộ đếm ĐỎ dùng chung cho cả DỰNG lẫn KIỂM. ⭐ Bước dựng hỏng cũng là ĐỎ: ⛔ để một phép
 # kiểm xanh "nhờ" một cụm/kho KHÁC che đi việc cụm của tệp này ⛔ dựng được (đo 16/11 khi soát lại
@@ -80,16 +140,44 @@ DO=0
 dat() { printf '  [ĐẠT] %-26s %s\n' "$1" "$2"; }
 do_() { printf '  [ĐỎ]  %-26s %s\n' "$1" "$2"; DO=$((DO + 1)); }
 
-# ── ② chốt an toàn — chạy TRƯỚC mọi thứ, kể cả ở chế độ chỉ kiểm.
+# ── ② chốt an toàn — chạy TRƯỚC mọi thứ (kể cả ở chế độ chỉ kiểm), TRƯỚC dòng tiêu đề.
 if [ -n "${FLS_CHO_GHI_THAT:-}" ]; then
   echo "⛔ FLS_CHO_GHI_THAT đang đặt — tệp này ⛔ được chạy cạnh quyền ghi sổ thật. Gỡ biến rồi chạy lại." >&2
   exit 2
 fi
-case "$PG_DSN" in
-  postgresql://*@localhost:5433/*|postgresql://*@127.0.0.1:5433/*) ;;
-  *) echo "⛔ PG_DSN=$PG_DSN ⛔ trỏ cụm cục bộ localhost:5433 — từ chối (kho ở đây phải là kho RỖNG cục bộ)." >&2
-     exit 2 ;;
-esac
+# ⓒ — libpq lấy đích từ các biến này khi DSN ⛔ ghi; `hostaddr` còn THẮNG `host`. Hỏi "có ĐẶT
+#     không" (`${!v+x}`), ⛔ hỏi giá trị: đặt rỗng cũng từ chối — rẻ hơn đoán libpq hiểu rỗng ra sao.
+for BIEN in PGHOST PGHOSTADDR PGPORT PGSERVICE PGSERVICEFILE; do
+  if [ -n "${!BIEN+x}" ]; then
+    echo "⛔ biến $BIEN đang đặt — libpq sẽ gộp nó vào đích nối của PG_DSN (R1 đo: PGHOSTADDR=10.255.255.1 ⇒ nối 10.255.255.1). Gỡ biến rồi chạy lại." >&2
+    exit 2
+  fi
+done
+# ⓐ ⓑ — khuôn NGUYÊN CHUỖI: `[^@/?#]` chặn `/` trước `@` (ⓑ), `$` sau tên kho chặn query (ⓐ).
+RE_DSN='^postgresql://([^:@/?#]+):([^@/?#]+)@(localhost|127\.0\.0\.1):([0-9]+)/([a-z0-9_]+)$'
+kiem_dsn() {   # $1 = tên biến · $2 = giá trị — lệch ⇒ exit 2; khớp ⇒ đặt KHO_DSN = tên kho
+  if ! [[ $2 =~ $RE_DSN ]]; then
+    echo "⛔ $1=$(che "$2") ⛔ khớp NGUYÊN CHUỖI postgresql://<user>:<pass>@(localhost|127.0.0.1):<cổng>/<tên kho [a-z0-9_]> — ⛔ query string, ⛔ host khác. Từ chối (kho ở đây phải là kho RỖNG cục bộ)." >&2
+    exit 2
+  fi
+  if [ "${BASH_REMATCH[4]}" != "$CONG" ]; then
+    echo "⛔ $1 trỏ cổng ${BASH_REMATCH[4]} ≠ cổng của lượt $CONG (--cong / FLS_PG_PORT) — từ chối: dựng cụm này mà di trú/kiểm cụm kia." >&2
+    exit 2
+  fi
+  KHO_DSN="${BASH_REMATCH[5]}"
+}
+kiem_dsn PG_DSN "$PG_DSN"
+TEN_KHO="$KHO_DSN"
+# PG_DSN_TEST: `--duong-nen` chạy pytest, và tests/conftest.py DROP + CREATE kho của biến này ⇒ cùng
+# lớp rủi ro với PG_DSN ⇒ cùng chốt. Bỏ trống ⇒ fls/db/kho.py suy `fls_test` từ PG_DSN (cùng cụm).
+if [ -n "${PG_DSN_TEST:-}" ]; then
+  kiem_dsn PG_DSN_TEST "$PG_DSN_TEST"
+  DSN_TEST_IN="$PG_DSN_TEST"
+else
+  DSN_TEST_IN="${PG_DSN%/*}/fls_test"
+fi
+
+cd "$GOC" || exit 2
 
 # Lệnh của user `postgres`: initdb TỪ CHỐI chạy bằng root (đo 16/11) ⇒ `runuser`.
 chay_pg() {
@@ -99,13 +187,17 @@ chay_pg() {
 psql_qt() {
   chay_pg "$PGBIN/psql" -X -v ON_ERROR_STOP=1 -h "$SOCK" -p "$CONG" -d postgres -tA "$@"
 }
+# S0-R1-04 · heredoc Python in KẾT QUẢ trên dòng cuối, hoặc đúng MỘT dòng `LOI <Kiểu>: <câu>`
+#   (bản đầu lấy `tail -1` của traceback ⇒ in mảnh vụn `áp 'Is' … lệch 'the'`, mất nguyên nhân).
+#   Bash đọc dòng `LOI` nếu có, ⛔ thì dòng cuối.
+loi_hoac_cuoi() { local l; l="$(printf '%s\n' "$1" | grep -m1 '^LOI ')"; printf '%s\n' "${l:-$(printf '%s\n' "$1" | tail -1)}" | che_dong; }
 
 echo "══ dung_moi_truong_isp · chế độ $CHE_DO · $(date -u +%Y-%m-%dT%H:%M:%SZ)"
 echo "   GOC (mã fls)   = $GOC"
 echo "   venv dùng chung = $VENV"
 echo "   cụm PG16       = $PGDATA_ISP (cổng $CONG)"
-echo "   PG_DSN         = $PG_DSN"
-echo "   PG_DSN_TEST    = ${PG_DSN_TEST:-<trống ⇒ fls_test của fls/db/kho.py>}"
+echo "   PG_DSN         = $(che "$PG_DSN")"
+echo "   PG_DSN_TEST    = $(if [ -n "${PG_DSN_TEST:-}" ]; then che "$PG_DSN_TEST"; else echo "<trống ⇒ $(che "$DSN_TEST_IN") (fls/db/kho.py suy từ PG_DSN)>"; fi)"
 
 # ═════════════════════════════════════════════════════════════════ DỰNG
 dung_venv() {
@@ -130,6 +222,13 @@ dung_cum() {
   install -d -m 2775 -o postgres -g postgres "$SOCK"
   if [ -s "$PGDATA_ISP/PG_VERSION" ]; then
     echo "── cụm: đã có (PG $(cat "$PGDATA_ISP/PG_VERSION")) ⇒ giữ"
+    # ① cụm có sẵn mà khai cổng KHÁC ⇒ khởi động nó là dựng một cụm rồi kiểm/di trú ở cổng kia.
+    local cong_khai
+    cong_khai="$(chay_pg "$PGBIN/postgres" -D "$PGDATA_ISP" -C port 2>/dev/null)"
+    if [ "$cong_khai" != "$CONG" ]; then
+      echo "⛔ cụm $PGDATA_ISP khai port '${cong_khai:-?}' ≠ cổng của lượt $CONG — TỪ CHỐI (⛔ sửa cấu hình hộ ai)."
+      return 1
+    fi
   else
     if [ -e "$PGDATA_ISP" ] && [ -n "$(ls -A "$PGDATA_ISP" 2>/dev/null)" ]; then
       echo "⛔ $PGDATA_ISP có dữ liệu mà ⛔ phải cụm PG — TỪ CHỐI (⛔ xoá hộ ai)."
@@ -139,13 +238,14 @@ dung_cum() {
     install -d -m 700 -o postgres -g postgres "$PGDATA_ISP"
     chay_pg "$PGBIN/initdb" -D "$PGDATA_ISP" -U postgres -E UTF8 --locale=C.UTF-8 \
       --auth-local=peer --auth-host=scram-sha-256 >/dev/null || { echo "⛔ initdb hỏng"; return 1; }
-    # cổng 5433 = mặc định của fls/db/kho.py · chỉ nghe localhost · socket ở thư mục chuẩn Debian
+    # cổng của lượt (5433 = mặc định của fls/db/kho.py) · chỉ nghe localhost · socket ở thư mục chuẩn
+    # Debian — mỗi cổng một tệp socket `.s.PGSQL.<cổng>` nên nhiều cụm dùng chung thư mục được.
     chay_pg sh -c "printf '%s\n' \"# dung_moi_truong_isp.sh\" \"port = $CONG\" \"listen_addresses = 'localhost'\" \"unix_socket_directories = '$SOCK'\" >> '$PGDATA_ISP/postgresql.conf'"
   fi
   if chay_pg "$PGBIN/pg_ctl" -D "$PGDATA_ISP" status >/dev/null 2>&1; then
     echo "── cụm: đang chạy ⇒ giữ"
   else
-    # ① cổng đã có người nghe mà ⛔ phải cụm này ⇒ ⛔ chen (trên máy owner đó là kho THẬT).
+    # ① cổng đã có người nghe mà ⛔ phải cụm này ⇒ ⛔ chen (trên máy owner 5433 là kho THẬT).
     if "$PGBIN/pg_isready" -q -h localhost -p "$CONG"; then
       echo "⛔ cổng $CONG đã có một PostgreSQL KHÁC đang nghe — TỪ CHỐI khởi động cụm thứ hai."
       return 1
@@ -183,24 +283,29 @@ dung_role_kho() {
 dung_di_tru() {
   # ② kho ở đây phải là kho RỖNG cục bộ. Đếm `fls_itl` qua kết nối CHỈ ĐỌC; > 0 dòng ⇒ đây ⛔ phải
   #   kho của tệp này (có thể là một bản chụp sổ thật ai đó nạp vào) ⇒ ⛔ chạm DDL, TỪ CHỐI.
-  local n
-  n="$("$PY" - <<'PY' 2>&1
-import os
-from fls.db.kho import noi_chi_doc
-c = noi_chi_doc(os.environ["PG_DSN"])
+  local kq n
+  kq="$("$PY" - <<'PY' 2>&1
+import os, sys
 try:
-    co = c.execute("select to_regclass('public.fls_itl') is not null").fetchone()[0]
-    print(c.execute("select count(*) from fls_itl").fetchone()[0] if co else 0)
-finally:
-    c.close()
+    from fls.db.kho import noi_chi_doc
+    c = noi_chi_doc(os.environ["PG_DSN"])
+    try:
+        co = c.execute("select to_regclass('public.fls_itl') is not null").fetchone()[0]
+        print(c.execute("select count(*) from fls_itl").fetchone()[0] if co else 0)
+    finally:
+        c.close()
+except Exception as e:
+    print(f"LOI {type(e).__name__}: {' '.join(str(e).split())[:200]}")
+    sys.exit(1)
 PY
-)" || { echo "⛔ ⛔ đếm được fls_itl trước di trú: $(echo "$n" | tail -1)"; return 1; }
+)" || { echo "⛔ ⛔ đếm được fls_itl trước di trú: $(loi_hoac_cuoi "$kq")"; return 1; }
+  n="$(printf '%s\n' "$kq" | tail -1)"
   if [ "$n" != 0 ]; then
     echo "⛔ kho $TEN_KHO có $n dòng fls_itl ⇒ ⛔ phải kho RỖNG cục bộ — TỪ CHỐI di trú"
     return 1
   fi
   echo "── di trú: $PY -m fls.db.pg_migrate   (kho $TEN_KHO: 0 dòng fls_itl)"
-  "$PY" -m fls.db.pg_migrate 2>&1 | sed 's/^/   │ /'
+  "$PY" -m fls.db.pg_migrate 2>&1 | che_dong | sed 's/^/   │ /'
   local ma="${PIPESTATUS[0]}"
   echo "   └ exit=$ma"
   [ "$ma" = 0 ]
@@ -241,47 +346,98 @@ else
   do_ "venv + 3 gói" "mong: $PY import được psycopg · pytest · importlinter — đo: ⛔"
 fi
 
-# K2 · cụm nghe ở localhost:5433
-if "$PGBIN/pg_isready" -q -h localhost -p "$CONG" 2>/dev/null; then
-  dat "cụm PG localhost:$CONG" "pg_isready exit 0"
+# K2 · cụm CỦA MÌNH ($PGDATA_ISP) nghe ở localhost:$CONG — ĐỊNH DANH, ⛔ chỉ "có ai trả lời ở cổng".
+#   ⛔⛔ S0-R1-10: bản đầu chỉ hỏi `pg_isready` ⇒ R1 cho một cụm KHÁC chiếm 5433 (cụm của mình tắt)
+#   mà vẫn `[ĐẠT] cụm PG localhost:5433` — trên máy owner đó là `fls-pg-1`. Nay đòi đủ bốn: ①
+#   `pg_ctl -D <thư mục của cổng> status` exit 0 · ② `postmaster.pid` (dòng 4) ghi đúng cổng · ③
+#   `pg_isready` ở cổng ấy · ④ tiến trình phục vụ một kết nối bằng PG_DSN là CON của postmaster
+#   (dòng 1 của `postmaster.pid`) — tức đích nối của PG_DSN chính là cụm trong thư mục ấy.
+K2_LY_DO=""
+if ! chay_pg "$PGBIN/pg_ctl" -D "$PGDATA_ISP" status >/dev/null 2>&1; then
+  K2_LY_DO="pg_ctl -D $PGDATA_ISP status ≠ 0 (cụm của mình ⛔ chạy)"
 else
-  do_ "cụm PG localhost:$CONG" "mong: pg_isready exit 0 — đo: ⛔ trả lời"
+  PID_CUM="$(sed -n 1p "$PGDATA_ISP/postmaster.pid" 2>/dev/null)"
+  CONG_CUM="$(sed -n 4p "$PGDATA_ISP/postmaster.pid" 2>/dev/null)"
+  if [ "$CONG_CUM" != "$CONG" ]; then
+    K2_LY_DO="cụm $PGDATA_ISP nghe cổng '${CONG_CUM:-?}' ≠ $CONG"
+  elif ! "$PGBIN/pg_isready" -q -h localhost -p "$CONG" 2>/dev/null; then
+    K2_LY_DO="pg_isready localhost:$CONG ⛔ trả lời"
+  elif [ ! -x "$PY" ]; then
+    K2_LY_DO="⛔ có venv để hỏi tiến trình phục vụ của PG_DSN"
+  else
+    CHA="$("$PY" - <<'PY' 2>&1
+import os, sys
+try:
+    import psycopg
+    with psycopg.connect(os.environ["PG_DSN"], connect_timeout=5) as c:
+        pid = c.execute("select pg_backend_pid()").fetchone()[0]
+        # đọc khi kết nối CÒN MỞ — đóng rồi thì tiến trình phục vụ đã thoát
+        with open(f"/proc/{pid}/status", encoding="utf-8") as f:
+            print(next(d.split()[1] for d in f if d.startswith("PPid:")))
+except Exception as e:
+    print(f"LOI {type(e).__name__}: {' '.join(str(e).split())[:200]}")
+    sys.exit(1)
+PY
+)"
+    CHA_DONG="$(loi_hoac_cuoi "$CHA")"
+    [ "$CHA_DONG" = "$PID_CUM" ] \
+      || K2_LY_DO="tiến trình phục vụ PG_DSN có cha '$CHA_DONG' ≠ postmaster $PID_CUM của $PGDATA_ISP"
+  fi
+fi
+if [ -z "$K2_LY_DO" ]; then
+  dat "cụm PG localhost:$CONG" "cụm CỦA MÌNH: pg_ctl status 0 · postmaster.pid cổng $CONG · pg_isready 0 · PG_DSN phục vụ bởi postmaster $PID_CUM"
+else
+  do_ "cụm PG localhost:$CONG" "mong: cụm $PGDATA_ISP chạy, nghe $CONG, phục vụ PG_DSN — đo: $K2_LY_DO"
 fi
 
 # K3 · role fls đăng nhập được bằng chính PG_DSN và có CREATEDB (conftest DROP + CREATE kho test)
-QUYEN="$( [ -x "$PY" ] && "$PY" - <<'PY' 2>/dev/null
-import os, psycopg
-with psycopg.connect(os.environ["PG_DSN"], connect_timeout=5) as c:
-    print(c.execute("select rolcreatedb from pg_roles where rolname = current_user").fetchone()[0])
+QUYEN="$( [ -x "$PY" ] && "$PY" - <<'PY' 2>&1
+import os, sys
+try:
+    import psycopg
+    with psycopg.connect(os.environ["PG_DSN"], connect_timeout=5) as c:
+        print(c.execute("select rolcreatedb from pg_roles where rolname = current_user").fetchone()[0])
+except Exception as e:
+    print(f"LOI {type(e).__name__}: {' '.join(str(e).split())[:200]}")
+    sys.exit(1)
 PY
 )"
-if [ "$QUYEN" = "True" ]; then
+QUYEN_DONG="$(loi_hoac_cuoi "$QUYEN")"
+if [ "$QUYEN_DONG" = "True" ]; then
   dat "role fls LOGIN + CREATEDB" "đăng nhập bằng PG_DSN được · rolcreatedb = t"
 else
-  do_ "role fls LOGIN + CREATEDB" "mong: đăng nhập được + rolcreatedb = t — đo: '${QUYEN:-⛔ nối được}'"
+  do_ "role fls LOGIN + CREATEDB" "mong: đăng nhập được + rolcreatedb = t — đo: '${QUYEN_DONG:-⛔ có venv}'"
 fi
 
-# K4 · di trú áp ĐỦ (số dòng fls_migration = số tệp NNNN_*.sql) + pg_verify khớp — qua kết nối CHỈ ĐỌC
+# K4 · di trú áp ĐỦ (số dòng fls_migration = số tệp NNNN_*.sql) + pg_verify khớp N bảng/view, N > 0
+#   (S0-R1-05: bản đầu in "0 chỗ lệch" ⛔ mẫu số — Đ3) — qua kết nối CHỈ ĐỌC
 N_TEP=$(ls "$GOC"/fls/db/migrations/[0-9][0-9][0-9][0-9]_*.sql 2>/dev/null | wc -l)
 DT="$( [ -x "$PY" ] && "$PY" - <<'PY' 2>&1
-import os
-from fls.db.kho import noi_chi_doc
-from fls.db.pg_verify import so_sanh_voi_db
-c = noi_chi_doc(os.environ["PG_DSN"])
+import os, sys
 try:
-    n = c.execute("select count(*) from fls_migration").fetchone()[0]
-    lech = so_sanh_voi_db(c)
-finally:
-    c.close()
-print(f"{n} {len(lech)}")
+    from fls.db.kho import noi_chi_doc
+    from fls.db.pg_verify import TABLES, so_sanh_voi_db
+    c = noi_chi_doc(os.environ["PG_DSN"])
+    try:
+        n = c.execute("select count(*) from fls_migration").fetchone()[0]
+        lech = so_sanh_voi_db(c)
+    finally:
+        c.close()
+    print(f"{n} {len(lech)} {len(TABLES)}")
+except Exception as e:
+    print(f"LOI {type(e).__name__}: {' '.join(str(e).split())[:200]}")
+    sys.exit(1)
 PY
 )"
-N_AP="$(echo "$DT" | tail -1 | awk '{print $1}')"
-N_LECH="$(echo "$DT" | tail -1 | awk '{print $2}')"
-if [ "$N_TEP" -gt 0 ] && [ "$N_AP" = "$N_TEP" ] && [ "$N_LECH" = 0 ]; then
-  dat "di trú + pg_verify" "$N_AP/$N_TEP di trú áp · pg_verify khớp (0 chỗ lệch)"
+DT_DONG="$(loi_hoac_cuoi "$DT")"
+read -r N_AP N_LECH N_BANG <<<"$DT_DONG"
+if [ "${DT_DONG#LOI }" = "$DT_DONG" ] && [ "$N_TEP" -gt 0 ] && [ "${N_AP:-}" = "$N_TEP" ] \
+   && [ "${N_LECH:-}" = 0 ] && [ "${N_BANG:-0}" -gt 0 ] 2>/dev/null; then
+  dat "di trú + pg_verify" "$N_AP/$N_TEP di trú áp · pg_verify khớp $N_BANG bảng/view (0 lệch)"
 else
-  do_ "di trú + pg_verify" "mong: áp = tệp > 0 và 0 lệch — đo: áp '${N_AP:-?}' / tệp $N_TEP · lệch '${N_LECH:-?}' · $(echo "$DT" | tail -1 | cut -c1-120)"
+  if [ "${DT_DONG#LOI }" = "$DT_DONG" ] && [ -n "$DT_DONG" ]; then DT_DO="áp '${N_AP:-?}' / tệp $N_TEP · lệch '${N_LECH:-?}' · so '${N_BANG:-?}' bảng/view"
+  else DT_DO="tệp $N_TEP · ${DT_DONG:-⛔ có venv}"; fi
+  do_ "di trú + pg_verify" "mong: áp = tệp > 0 · 0 lệch trên N > 0 bảng/view — đo: $DT_DO"
 fi
 
 # K5 · lint-imports: 11 hợp đồng giữ, 0 vỡ
@@ -310,9 +466,63 @@ else
   do_ "HD1 do_voi_so_luong" "mong: exit 0 · chay $MONG_HD1_CHAY / co $MONG_HD1_CO — đo: ⛔ có venv"
 fi
 
-# ═════════════════════════════════════════════════════════════════ ĐƯỜNG NỀN pytest (đo, ⛔ phán)
-chay_pytest() {   # $1 = nhãn · còn lại = đối số pytest
-  local nhan="$1"; shift
+# K7 · kho của PG_DSN RỖNG — `fls_itl` = 0 dòng, đếm qua kết nối CHỈ ĐỌC (S0-R1-10).
+#   ⛔⛔ Bản đầu khai "kho `fls` ở đây RỖNG" (BG-066 · DUONG_NEN.md:10) mà ⛔ phép nào canh: đo 16/11
+#   trên kho nháp có 1 dòng `fls_itl`, `--chi-kiem` vẫn 6/6 ĐẠT. Bảng chưa có (chưa di trú) ⇒ ⛔ đo
+#   được ⇒ ĐỎ (Đ5), ⛔ coi là "0 dòng".
+RONG="$( [ -x "$PY" ] && "$PY" - <<'PY' 2>&1
+import os, sys
+try:
+    from fls.db.kho import noi_chi_doc
+    c = noi_chi_doc(os.environ["PG_DSN"])
+    try:
+        if not c.execute("select to_regclass('public.fls_itl') is not null").fetchone()[0]:
+            raise LookupError("⛔ có bảng fls_itl (chưa di trú?)")
+        print(c.execute("select count(*) from fls_itl").fetchone()[0])
+    finally:
+        c.close()
+except Exception as e:
+    print(f"LOI {type(e).__name__}: {' '.join(str(e).split())[:200]}")
+    sys.exit(1)
+PY
+)"
+RONG_DONG="$(loi_hoac_cuoi "$RONG")"
+if [ "$RONG_DONG" = 0 ]; then
+  dat "kho $TEN_KHO RỖNG" "fls_itl = 0 dòng (kết nối chỉ đọc)"
+else
+  do_ "kho $TEN_KHO RỖNG" "mong: fls_itl = 0 dòng — đo: '${RONG_DONG:-⛔ có venv}'"
+fi
+
+# ═════════════════════════════════════════════════════════════════ ĐƯỜNG NỀN pytest (SO tập đỏ)
+# ⭐ S0-R1-02 · đường nền là CỔNG chỉ khi có MÁY so tập đỏ hiện tại với tập đã ghi theo node id,
+#    đỏ cả hai chiều. Tệp `$DUONG_NEN_DO`: mỗi dòng một node id (đã sắp, ⛔ chú thích) — ghi ở S0
+#    từ §4.1 của DUONG_NEN.md (26 bài đọc SỔ THẬT tự đỏ trên kho rỗng). Bảng markdown là BIÊN BẢN.
+#    Tách node id từ phần `short test summary info` của `-rfE`: dòng `FAILED <id>[ - <câu>]` /
+#    `ERROR <id>[ - <câu>]`; cắt ở ` - ` ĐẦU TIÊN — một node id tự chứa ` - ` sẽ bị cắt sai ⇒ lệch
+#    tập ⇒ ĐỎ (lỗi an toàn: đỏ giả, ⛔ xanh giả).
+so_tap_do() {   # $1 = nhãn · $2 = log · $3 = tiền tố node id của lượt (rỗng = toàn bộ)
+  local nhan="$1" log="$2" tien_to="$3" hien mong them bot n_hien n_mong
+  if [ ! -f "$DUONG_NEN_DO" ]; then
+    do_ "đường nền $nhan" "mong: có tệp $DUONG_NEN_DO — đo: ⛔ có (⛔ so được = ĐỎ)"; return
+  fi
+  hien="$(mktemp "${TMPDIR:-/tmp}/fls_isp_hien.XXXXXX")"; mong="$(mktemp "${TMPDIR:-/tmp}/fls_isp_mong.XXXXXX")"
+  awk '/^=+ short test summary info =+$/ {v = 1; next} v && /^(FAILED|ERROR) /' "$log" \
+    | sed -E 's/^(FAILED|ERROR) //; s/ - .*$//' | LC_ALL=C sort -u > "$hien"
+  awk -v p="$tien_to" 'NF && (p == "" || index($0, p) == 1)' "$DUONG_NEN_DO" | LC_ALL=C sort -u > "$mong"
+  them="$(LC_ALL=C comm -13 "$mong" "$hien")"; bot="$(LC_ALL=C comm -23 "$mong" "$hien")"
+  n_hien=$(wc -l < "$hien"); n_mong=$(wc -l < "$mong")
+  rm -f "$hien" "$mong"
+  if [ -z "$them" ] && [ -z "$bot" ]; then
+    dat "đường nền $nhan" "tập đỏ = đường nền: $n_hien = $n_mong node id (thêm 0 · bớt 0)"
+  else
+    do_ "đường nền $nhan" "mong: tập đỏ = $n_mong node id của $(basename "$DUONG_NEN_DO")${tien_to:+ (tiền tố $tien_to)} — đo: $n_hien · thêm $(printf '%s' "$them" | grep -c .) · bớt $(printf '%s' "$bot" | grep -c .)"
+    [ -z "$them" ] || printf '%s\n' "$them" | sed 's/^/        + THÊM  /'
+    [ -z "$bot" ]  || printf '%s\n' "$bot"  | sed 's/^/        − BỚT   /'
+  fi
+}
+
+chay_pytest() {   # $1 = nhãn · $2 = tiền tố node id (rỗng = toàn bộ) · còn lại = đối số pytest
+  local nhan="$1" tien_to="$2"; shift 2
   local log; log="$(mktemp "${TMPDIR:-/tmp}/fls_isp_pytest.XXXXXX")"
   # ⛔ thêm `-q`: pyproject.toml đã có `-q`, thêm nữa là `-qq` và MẤT dòng tổng kết.
   "$PY" -m pytest -rfE "$@" >"$log" 2>&1
@@ -320,23 +530,34 @@ chay_pytest() {   # $1 = nhãn · còn lại = đối số pytest
   local tong; tong="$(grep -E '^(=+ )?[0-9]+ (passed|failed|error|skipped|deselected|xfailed|xpassed)|^=+ .*(passed|failed|error).* =+$|no tests ran' "$log" | tail -1)"
   echo "  ── pytest $nhan · exit $ma · log $log"
   echo "     $tong"
-  grep -E '^(FAILED|ERROR) ' "$log" | sed 's/^/     /'
   case "$ma" in
-    0|1) ;;                                      # đo được (1 = có bài đỏ — đường nền, ⛔ lỗi môi trường)
-    *)   do_ "pytest $nhan" "mong: chạy nổi (exit 0 hoặc 1) — đo: exit $ma" ;;
+    0|1) ;;                                      # đo được (1 = có bài đỏ — so với đường nền dưới)
+    *)   do_ "pytest $nhan" "mong: chạy nổi (exit 0 hoặc 1) — đo: exit $ma"; return ;;
   esac
+  if [ -z "$tong" ]; then do_ "pytest $nhan" "mong: có dòng tổng kết — đo: ⛔ có"; return; fi
+  so_tap_do "$nhan" "$log" "$tien_to"
 }
 
 if [ "$CHE_DO" = "duong_nen" ]; then
   echo
-  echo "══ ĐƯỜNG NỀN pytest (bài đỏ CÓ SẴN ≠ lỗi môi trường — ghi tên ở DUONG_NEN.md, ⛔ sửa)"
+  echo "══ ĐƯỜNG NỀN pytest (bài đỏ CÓ SẴN ≠ lỗi môi trường — SO theo node id với $(basename "$DUONG_NEN_DO"))"
   if [ -x "$PY" ]; then
-    chay_pytest "toàn bộ"
-    chay_pytest "tests/web" tests/web
+    chay_pytest "toàn bộ" ""
+    chay_pytest "tests/web" "tests/web/" tests/web
   else
     do_ "pytest" "mong: có venv — đo: ⛔"
   fi
 fi
+
+# ═════════════════════════════════════════════════════════════════ DÙNG (Q1 · in sẵn cho agent)
+# Hai dòng export trỏ đúng cụm của lượt: kho `fls` (hoặc kho của PG_DSN) + kho test `fls_test` —
+# tên kho test GIỮ vì 19 tệp bài ghim nó. Mật khẩu in rõ CHỈ khi là mặc định công khai `fls`.
+in_xuat() { if [[ $1 =~ ^postgresql://fls:fls@ ]]; then printf '%s\n' "$1"; else che "$1"; fi; }
+echo
+echo "══ DÙNG cụm cổng $CONG — chép vào shell của agent (chạy từ gốc worktree):"
+echo "   export PG_DSN='$(in_xuat "$PG_DSN")'"
+echo "   export PG_DSN_TEST='$(in_xuat "$DSN_TEST_IN")'"
+echo "   export PYTHONUTF8=1"
 
 echo
 if [ "$DO" = 0 ]; then
