@@ -52,15 +52,33 @@ ISP 3.1.2 · Step 2 · `C1` *(`WO-075`)* — làn **BE-CF**. Khuôn bảng *(AP 
    *(`NGUON_TINH` — 4 tháng **TỔNG HỢP**, số bịa có chủ đích)* là một tệp đi cùng
    gói, ⛔ phải kho. `C5` đổi nguồn sang kho config chỉ-thêm qua
    `fls/repo/cau_hinh_repo.py` và **GỠ** tệp tĩnh; `kiem` giữ nguyên.
+
+── ⛔⛔ Vòng sửa sau R1 *(`KQ-077`, 16/11)* — ba lối vào từng đi qua IM LẶNG hay MÉO ──
+   R1 dò thuần trên bản sao *(31 ca biên + 13 đột biến)*; mã cũ đúng ở mọi ca spec có,
+   nhưng:
+     · **`C1-R1-02`** — `doc_tep` đọc `_GOC_REPO / duong`: `Path / '/etc/hostname'` LÀ
+       `/etc/hostname`, `..` ra ngoài repo ⇒ nay đi qua `nguon_tinh.giai` *(luật đường
+       MỘT chỗ, chung với hai cổng bảng tuyến)*;
+     · **`C1-R1-06`** ⓐ khoá JSON TRÙNG trong một dòng ⇒ `json.loads` giữ **bản cuối**,
+       im lặng *(cùng họ "hai giá trị, giữ một" mà `trung` chặn ở mức tháng)*; ⓑ
+       `Decimal` nhận số mũ *(`'1e4'` ⇒ ra JSON tuyến thành `"1E+4"`)* và chữ số
+       Unicode *(`'１２３'` ⇒ `123`)*; ⓒ khuôn tháng `\\d` cũng nhận chữ số Unicode, và
+       năm `0000` lọt *(`'000001'` ⇒ `lac = [1]`)*. ⇒ từ chối, **gọi tên** từng lối;
+     · **`C1-R1-04`** — mỗi chốt *(`is_finite` · chặn `bool`)* nay trả một **lý do có
+       tên** riêng: chốt nào bị gỡ thì câu nổ đổi, và có bài đỏ *(xem `_thang`)*.
+   Lõi đọc tách thành `doc_van_ban` để bài thử khỏi phải ghi tệp vào thư mục tĩnh —
+   thư mục DUY NHẤT `doc_tep` nay chịu đọc.
 """
 from __future__ import annotations
 
 import json
 import re
+from collections import Counter
 from dataclasses import dataclass
 from decimal import Decimal, InvalidOperation
-from pathlib import Path
 from typing import Any, Iterable, Mapping
+
+from fls.cau_hinh import nguon_tinh
 
 BANG = "IX.FX"
 # AP §3.2.1 — khoá · cột của `IX.FX`. Thứ tự = thứ tự cột của `9.2.Exchange Rate`.
@@ -75,10 +93,24 @@ CHUA_KY = "chua_ky"
 # ⭐ Đường nguồn tĩnh — khai **MỘT chỗ, ở đây** *(tương đối gốc repo, dạng POSIX)*.
 #   `fls/api/bang_tuyen.py` khai `nguon_tinh` bằng CHÍNH hằng này, và hàm xử lý
 #   gọi `doc_tep()` với mặc định là nó ⇒ ⛔ chuỗi đường nào gõ lại ở chỗ thứ hai.
+#   ⚠ Phải nằm NGAY dưới `nguon_tinh.THU_MUC` *(luật đường — `C1-R1-02`)*.
+#   ⚠ `tools/soi_bang_tuyen.py` đòi chuỗi này hiện NGUYÊN VĂN trong một hàm của
+#   đường gọi `ty_gia` *(tham số mặc định của `doc_tep` — giữ nó là hằng chuỗi trơn,
+#   ⛔ ghép bằng f-string)*.
 NGUON_TINH = "fls/cau_hinh/tinh/ix_fx_mau.json"
-_GOC_REPO = Path(__file__).resolve().parents[2]
 
-_YYYYMM = re.compile(r"^(\d{4})(0[1-9]|1[0-2])$")
+# ⭐ `C1-R1-06` ⓒ: năm **2000…2099**, tháng `01…12`, chữ số **ASCII** *(khuôn cũ
+#   `^(\d{4})…$` — `\d` của `re` trên `str` nhận MỌI chữ số Unicode, nên
+#   `'２０２４06'` thành `202406`; và năm `0000` lọt: `'000001'` ⇒ `lac = [1]`)*.
+#   Biên năm là chốt HÌNH *(cùng loại với "tháng 01…12")*, ⛔ luật nghiệp vụ: sổ ITL
+#   bắt đầu `2023` *(dòng lạc `202306`, AP §3.2.1)*, ảnh thật tới `202612` — năm ngoài
+#   `20YY` chỉ có thể là gõ nhầm.
+_YYYYMM = re.compile(r"20[0-9]{2}(?:0[1-9]|1[0-2])", re.ASCII)
+# ⭐ `C1-R1-06` ⓑ: tỷ giá là thập phân **ASCII trơn** — ⛔ số mũ, ⛔ dấu `+`, ⛔ chữ số
+#   ngoài ASCII *(`Decimal('１２３') == 123`, `Decimal('1e4')` in ra `'1E+4'`)*. Ảnh
+#   thật `DT2` *(37 dòng × 5 tiền tệ, `tests/fixture/cau_hinh/ix_fx.json` nhánh DT2)*
+#   đo 16/11: **185/185** ô khớp khuôn này.
+_SO_THAP_PHAN = re.compile(r"[0-9]+(?:\.[0-9]+)?", re.ASCII)
 
 
 class LoiFX(ValueError):
@@ -111,32 +143,58 @@ def _mot_dong_mot_cau(s: Any) -> str:
     return " ".join(repr(s).split())
 
 
-def _thang(v: Any) -> int | None:
-    """`yyyymm` hợp lệ ⇒ **`int`** *(vd `202407`)*; ngược lại `None`.
+def _thang(v: Any) -> tuple[int | None, str]:
+    """`yyyymm` hợp lệ ⇒ `(int, "")` *(vd `202407`)*; ngược lại `(None, lý do)`.
 
-    Nhận `int` hay chuỗi 6 chữ số. ⛔ Nhận `bool`: `True` là `int` trong Python và
-    sẽ lọt thành *"tháng 1"* nếu ⛔ chặn tường minh.
+    Nhận `int` hay chuỗi 6 chữ số ASCII. ⛔ Nhận `bool`.
+
+    ⚠ Câu cũ ở đây *("`True` … sẽ lọt thành tháng 1 nếu ⛔ chặn tường minh")* **SAI
+      cơ chế** — `C1-R1-04`: hàm đọc qua `str(v)` ⇒ `'True'` vốn trượt khuôn, có chốt
+      hay ⛔. R1 gỡ chốt `bool` ⇒ 22/22 bài vẫn xanh: một chốt ⛔ bài nào canh. Cái
+      chốt THẬT SỰ làm được là **gọi đúng tên nguyên nhân** — một ô `bool` *(ô tick ở
+      sheet)* lọt vào cột tháng — thay cho câu chung chung *"⛔ đúng khuôn"* *(luật
+      `S0-R1-04`)*. Bài `test_R1_04_bool_o_cot_THANG_…` ghim đúng điều ấy.
     """
-    if isinstance(v, bool) or not isinstance(v, (str, int)):
-        return None
+    if isinstance(v, bool):
+        return None, "bool (ô tick?) ⛔ phải tháng"
+    if not isinstance(v, (str, int)):
+        return None, f"kiểu {type(v).__name__} ⛔ phải yyyymm (int hay chuỗi 6 chữ số)"
     s = str(v).strip()
-    return int(s) if _YYYYMM.match(s) else None
+    if not _YYYYMM.fullmatch(s):
+        return None, "⛔ đúng khuôn yyyymm (năm 2000…2099 · tháng 01…12 · chữ số ASCII)"
+    return int(s), ""
 
 
-def _so(v: Any) -> Decimal | None:
-    """Tỷ giá ⇒ `Decimal` hữu hạn **> 0**; ngược lại `None`.
+def _so(v: Any) -> tuple[Decimal | None, str]:
+    """Tỷ giá ⇒ `(Decimal hữu hạn > 0, "")`; ngược lại `(None, lý do)`.
 
     ⛔ Nhận `float`: một số đã qua `float` là số đã có thể mất chữ số
       *(`fls/api/bao.py`)* — nguồn phải đưa CHUỖI, hay JSON đọc bằng
-      `parse_float=Decimal` *(đúng cách `doc_tep` đọc)*.
+      `parse_float=Decimal` *(đúng cách `doc_van_ban` đọc)*.
+    ⭐ Thứ tự chốt CỐ Ý *(`C1-R1-04`)*: đọc số → **hữu hạn** → `> 0` → **khuôn**. Đặt
+      khuôn lên đầu thì `NaN`/`Infinity` ⛔ bao giờ tới `is_finite()` — chốt ấy thành
+      mã chết, gỡ đi ⛔ bài nào đỏ *(đúng thứ R1 đo được: đột biến M2 SỐNG)*. Đặt
+      sau ⇒ gỡ `is_finite()` thì `'NaN'` ném `InvalidOperation` ở phép `<= 0` và
+      `'Infinity'` mang lý do *"khuôn"* — bài `test_R1_01c_…` đỏ.
     """
-    if isinstance(v, bool) or not isinstance(v, (str, int, Decimal)):
-        return None
+    if isinstance(v, bool):
+        return None, "bool (ô tick?) ⛔ phải số"
+    if not isinstance(v, (str, int, Decimal)):
+        return None, (f"kiểu {type(v).__name__} ⛔ nhận (⛔ float — qua float là mất "
+                      f"chữ số; ⛔ rỗng)")
+    s = str(v).strip()
     try:
-        d = Decimal(str(v).strip())
+        d = Decimal(s)
     except InvalidOperation:
-        return None
-    return d if d.is_finite() and d > 0 else None
+        return None, "⛔ phải số (⛔ rỗng)"
+    if not d.is_finite():
+        return None, "⛔ hữu hạn (NaN/Infinity)"
+    if d <= 0:
+        return None, "⛔ > 0"
+    if not _SO_THAP_PHAN.fullmatch(s):
+        return None, ("⛔ đúng khuôn thập phân ASCII [0-9]+(.[0-9]+)? (⛔ số mũ · "
+                      "⛔ dấu + · ⛔ chữ số ngoài ASCII)")
+    return d, ""
 
 
 def _thang_ke(m: int) -> int:
@@ -152,9 +210,9 @@ def kiem(dong: Iterable[Mapping[str, Any]], *, thang_dau: int | str,
     `nguon` — đi nguyên vào `BangFX.nguon` *(⛔ suy, ⛔ sửa)*.
     """
     ly_do: list[str] = []
-    dau = _thang(thang_dau)
+    dau, ly = _thang(thang_dau)
     if dau is None:
-        ly_do.append(f"thang_dau={_mot_dong_mot_cau(thang_dau)} ⛔ phải yyyymm")
+        ly_do.append(f"thang_dau={_mot_dong_mot_cau(thang_dau)} {ly}")
 
     ky: list[DongFX] = []
     cot = {"yyyymm", *TIEN_TE}
@@ -162,10 +220,10 @@ def kiem(dong: Iterable[Mapping[str, Any]], *, thang_dau: int | str,
         if not isinstance(r, Mapping):
             ly_do.append(f"dòng {i}: ⛔ phải một đối tượng")
             continue
-        m = _thang(r.get("yyyymm"))
+        m, ly = _thang(r.get("yyyymm"))
         ten = m if m is not None else _mot_dong_mot_cau(r.get("yyyymm"))
         if m is None:
-            ly_do.append(f"dòng {i} ({ten}): yyyymm ⛔ đúng khuôn yyyymm")
+            ly_do.append(f"dòng {i} ({ten}): yyyymm {ly}")
         la = sorted(k for k in r if k not in cot)
         if la:
             ly_do.append(f"dòng {i} ({ten}): cột lạ {la}")
@@ -174,10 +232,9 @@ def kiem(dong: Iterable[Mapping[str, Any]], *, thang_dau: int | str,
             if te not in r:
                 ly_do.append(f"dòng {i} ({ten}): thiếu cột {te}")
                 continue
-            d = _so(r[te])
+            d, ly = _so(r[te])
             if d is None:
-                ly_do.append(f"dòng {i} ({ten}): {te}={_mot_dong_mot_cau(r[te])}"
-                             f" ⛔ phải số > 0 (⛔ float, ⛔ rỗng)")
+                ly_do.append(f"dòng {i} ({ten}): {te}={_mot_dong_mot_cau(r[te])} {ly}")
                 continue
             ty_gia[te] = d
         if TIEN_TE_GOC in ty_gia and ty_gia[TIEN_TE_GOC] != 1:
@@ -195,12 +252,17 @@ def kiem(dong: Iterable[Mapping[str, Any]], *, thang_dau: int | str,
         raise LoiFX([f"0 tháng ≥ thang_dau={dau} (đọc {len(ky)} dòng) ⇒ "
                      f"⛔ có bảng để kiểm"])
 
-    dem: dict[str, int] = {}
+    dem: dict[int, int] = {}          # ⚠ khoá là `int` *(cũ ghi `str` — `C1-R1-04`)*
     for d in ky:
         dem[d.yyyymm] = dem.get(d.yyyymm, 0) + 1
     trung = tuple(sorted(m for m, n in dem.items() if n >= 2))
     lac = tuple(sorted(m for m in dem if m < dau))
 
+    # ⚠ GIỚI HẠN đã biết *(`C1-R1-05`, ⛔ sửa ở C1)*: dải kiểm ⛔ có BIÊN CUỐI do nguồn
+    #   khai — nó dừng ở tháng LỚN NHẤT có dòng, nên tháng cuối chưa nhập ⛔ bao giờ vào
+    #   `thieu` và một dòng gõ nhầm SAU dải làm phình `thieu` *(R1: `+202504` ⇒ 6 tháng)*
+    #   ⇒ `fx_cua()` của `C7` phải CHẶN theo **tháng được hỏi** *(∉ `ky` hay chưa ký)*,
+    #   ⛔ dựa vào `thieu` — orchestrator ghi vào phiếu `C7`.
     thieu: list[int] = []
     m = dau
     co = set(trong_dai)
@@ -215,14 +277,45 @@ def kiem(dong: Iterable[Mapping[str, Any]], *, thang_dau: int | str,
                   thieu=tuple(thieu), trung=trung, lac=lac)
 
 
+def doc_van_ban(van_ban: str, *, nguon: str) -> BangFX:
+    """Lõi đọc: VĂN BẢN JSON `{bang: 'IX.FX', thang_dau, dong: [...]}` ⇒ `kiem`.
+
+    ⭐ `parse_float=Decimal`: một tỷ giá ghi bằng số JSON ⛔ đi qua `float`.
+    ⛔ `C1-R1-06` ⓐ: khoá TRÙNG trong một đối tượng *(`{"USD": "1", "USD": "999"}`)*
+      — `json.loads` mặc định giữ **bản CUỐI, im lặng**. Móc `object_pairs_hook` thấy
+      MỌI cặp trước khi `dict` nuốt mất ⇒ gom hết, NỔ một lần, nói khoá nào · dòng nào.
+    """
+    trung: list[str] = []
+
+    def _khong_trung(cap: list[tuple[str, Any]]) -> dict[str, Any]:
+        lap = sorted(k for k, n in Counter(k for k, _ in cap).items() if n >= 2)
+        if lap:
+            o = next((v for k, v in cap if k == "yyyymm"), None)
+            noi = (f"dòng yyyymm={_mot_dong_mot_cau(o)}" if o is not None
+                   else "đối tượng ⛔ có yyyymm (vỏ tệp?)")
+            trung.append(f"{noi}: khoá JSON trùng {lap} — json.loads giữ bản CUỐI "
+                         f"im lặng")
+        return dict(cap)
+
+    tho = json.loads(van_ban, parse_float=Decimal, object_pairs_hook=_khong_trung)
+    if trung:
+        raise LoiFX([f"{nguon}: {x}" for x in trung])
+    if not isinstance(tho, dict) or tho.get("bang") != BANG \
+            or not isinstance(tho.get("dong"), list):
+        raise LoiFX([f"{nguon}: ⛔ phải {{bang: '{BANG}', thang_dau, dong: [...]}}"])
+    return kiem(tho["dong"], thang_dau=tho.get("thang_dau"), nguon=nguon)
+
+
 def doc_tep(duong: str = NGUON_TINH) -> BangFX:
     """Nạp nguồn tĩnh *(tương đối gốc repo)* rồi `kiem`. `nguon` = chính `duong`.
 
-    ⭐ `parse_float=Decimal`: một tỷ giá ghi bằng số JSON ⛔ đi qua `float`.
+    ⛔ `C1-R1-02`: CHỈ đọc tệp NGAY dưới `nguon_tinh.THU_MUC` *(luật đường một chỗ —
+      ⛔ tuyệt đối, ⛔ `..`, ⛔ liên kết mềm ra ngoài)*. Bản cũ đọc `_GOC_REPO / duong`,
+      và `Path / '/etc/hostname'` **là** `/etc/hostname`. Đường hỏng ⇒ `LoiFX` một
+      dòng, ⛔ đọc gì.
     """
-    tho = json.loads((_GOC_REPO / duong).read_text(encoding="utf-8"),
-                     parse_float=Decimal)
-    if not isinstance(tho, dict) or tho.get("bang") != BANG \
-            or not isinstance(tho.get("dong"), list):
-        raise LoiFX([f"{duong}: ⛔ phải {{bang: '{BANG}', thang_dau, dong: [...]}}"])
-    return kiem(tho["dong"], thang_dau=tho.get("thang_dau"), nguon=duong)
+    try:
+        p = nguon_tinh.giai(duong)
+    except nguon_tinh.LoiNguonTinh as e:
+        raise LoiFX([str(e)]) from None
+    return doc_van_ban(p.read_text(encoding="utf-8"), nguon=duong)

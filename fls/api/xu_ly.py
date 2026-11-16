@@ -1009,10 +1009,28 @@ HAM.update({"lenh_cho": lenh_cho, "lenh_cho_tom": lenh_cho_tom,
 #   gọi — và `MA_LOI` ⛔ có mã riêng cho nó *(thêm mã là việc của `BA-07` §5)*.
 # ⭐ `data_status = flash`: số tổng hợp ⛔ được khoác `reconciled`/`signed`
 #   *(`INV-I14`)*; ký tháng là `C7`.
+# ⛔⛔ Vòng sửa sau R1 *(`C1-R1-07`, `KQ-077`)* — R1 gọi máy thật
+#    `GET /config/fx?run_id=NAP-2026-01-01-X` ⇒ `200`, `meta.pham_vi = 'lan nap
+#    NAP-2026-01-01-X'` · `meta.run_id = 'NAP-2026-01-01-X'`, mà `data` TRÙNG KHÍT
+#    lượt trơn: bảng tỷ giá ⛔ theo lần nạp, nên `meta` *(lời khai VỀ số — `INV-I14`)*
+#    nói một phạm vi **⛔ được áp**. Hai cách chữa; chọn **TỪ CHỐI** `run_id`
+#    *(`400 FLS-BAD-REQUEST`)*, ⛔ trả `pham_vi = 'tinh'`, vì:
+#      ⓐ người gọi gửi `run_id` là đang hỏi *"số của LẦN NẠP này"* — trả số chung kèm
+#         200 là trả lời một câu KHÁC, im lặng; 400 nói thẳng câu ấy ⛔ có nghĩa ở đây;
+#      ⓑ `meta.pham_vi` do `cua.py` dựng từ `PhamVi` *(ba kiểu, "va chi ba" —
+#         `fls/repo/pham_vi.py`)*: thêm kiểu `tinh` là đổi hai tệp ngoài làn BE-CF, đã
+#         qua rà soát `P4`;
+#      ⓒ vẫn đúng sau `C5`: kho config chỉ-thêm cũng ⛔ theo lần nạp.
+#    ⚠ Còn lại *(ngoài làn, ghi ở `BG-076`)*: lượt TRƠN vẫn mang `meta.pham_vi = 'chi
+#      lan nap that'` — nhãn mặc định của MỌI tuyến, cũng ⛔ áp lên bảng tĩnh.
 def ty_gia(yc: YeuCau):
     """`GET /config/fx` — hợp đồng ISP 3.1.2 Step 2 mục 2, **nguyên văn**:
     `{bang, nguon, ky:[{yyyymm, USD, SGD, COP, VND, HKD, trang_thai}], thieu,
     trung, lac}`."""
+    if yc.pv.kieu != "nap_that":
+        raise LoiCua("FLS-BAD-REQUEST",
+                     f"bang ty gia ⛔ theo lan nap — bo `run_id` "
+                     f"({yc.pv.mo_ta()}): `meta` ⛔ duoc khai mot pham vi ⛔ ap")
     b = fx.doc_tep()
     return {"bang": fx.BANG, "nguon": b.nguon,
             "ky": [{"yyyymm": d.yyyymm,

@@ -205,3 +205,150 @@ def test_cong_soi_DO_khi_nguon_tinh_KHONG_ton_tai():
                             nguon_tinh=("fls/cau_hinh/tinh/khong_co_that.json",))
     loi, _ = sbt.soi((t,))
     assert any("khong_co_that.json" in x for x in loi), loi
+
+
+# ══ Vòng sửa sau R1 (`KQ-077`) ══════════════════════════════════════════════
+#
+# ── C1-R1-02 *(NÊN SỬA)*: ngoại lệ `nguon_tinh` từng NỚI cổng ⓓ ────────────
+#
+# ⛔⛔ R1 dựng tuyến cố ý khai sai rồi hỏi hai cổng *(bản sao, ⛔ kho)* — trên bản
+#    `5582246`: **A** ⇒ `kiem_bang_tuyen` XANH · **B**, **D** ⇒ **cả hai** XANH ·
+#    **C** ⇒ `kiem_bang_tuyen` XANH, `soi` **32** câu rác. Ngoại lệ chỉ hỏi *"tệp có
+#    tồn tại"* — một câu về **hình**, ⛔ về **sự thật** *(hàm có đọc tệp ấy không)*.
+#    Luật phòng tái phạm của R1: *"một ngoại lệ mới của cổng phải có phép canh SỰ
+#    THẬT như phép canh cũ, và phải được hỏi lại bằng tuyến CỐ Ý khai sai"*.
+def _xau(nhan: str) -> bt.Tuyen:
+    """Tuyến cố ý khai sai — **A…D chép nguyên R1** (`KQ-077` §Phép phá), E · A2 thêm."""
+    so = next(t for t in bt.BANG_TUYEN if t.ham == "so")
+    return {
+        # A: hàm ĐỌC KHO khai `bang=()` + một tệp có thật bất kỳ.
+        "A": bt.Tuyen("GET", f"{V}/x", "so", (), nguon_tinh=("pyproject.toml",)),
+        # A2: khai CẢ bảng kho LẪN nguồn tĩnh — tuyến tĩnh hay tuyến kho, ⛔ cả hai.
+        "A2": bt.Tuyen("GET", f"{V}/x", "so", so.bang, nguon_tinh=(NGUON_TINH,)),
+        # A3: bản khai TỰ NHẤT QUÁN *(`bang=()`, đường đúng khuôn)* mà hàm đọc kho.
+        "A3": bt.Tuyen("GET", f"{V}/x", "so", (), nguon_tinh=(NGUON_TINH,)),
+        # B: hàm đúng, tệp có thật nhưng ⛔ phải nguồn của hàm.
+        "B": bt.Tuyen("GET", DUONG, "ty_gia", (), nguon_tinh=("CLAUDE.md",)),
+        # C: CHUỖI thay tuple — quên dấu phẩy.
+        "C": bt.Tuyen("GET", DUONG, "ty_gia", (), nguon_tinh=NGUON_TINH),
+        # D: ra ngoài repo.
+        "D": bt.Tuyen("GET", DUONG, "ty_gia", (),
+                      nguon_tinh=("../../../../../../../../etc/hostname",)),
+        # E: thư mục thay cho tệp.
+        "E": bt.Tuyen("GET", DUONG, "ty_gia", (), nguon_tinh=("fls/cau_hinh/tinh",)),
+    }[nhan]
+
+
+@pytest.mark.parametrize("nhan", ["A", "A2", "A3", "B", "C", "D", "E"])
+def test_R1_02_tuyen_khai_SAI_nguon_tinh_thi_HAI_cong_cung_DO(nhan):
+    """Mỗi tuyến cố ý khai sai ⇒ **CẢ HAI** cổng đỏ, câu nói `nguon_tinh`, **một dòng**.
+
+    ⭐ Vì sao đòi CẢ HAI *(⛔ "ít nhất một")*: `kiem_bang_tuyen` chạy lúc DỰNG MÁY
+      *(`cua.dung_may`)* — tuyến khai sai ⛔ được lên máy; `soi` chạy ở cổng — nó đo
+      SỰ THẬT *(hàm có đọc tệp ấy, có chạm kho)*. Một lớp là một lớp có thể bị gỡ.
+    """
+    t = _xau(nhan)
+    k = [x for x in bt.kiem_bang_tuyen((t,)) if "nguon_tinh" in x]
+    s = [x for x in sbt.soi((t,))[0] if "nguon_tinh" in x]
+    assert k, f"⛔ {nhan}: `kiem_bang_tuyen` XANH — {bt.kiem_bang_tuyen((t,))}"
+    assert s, f"⛔ {nhan}: `soi` XANH — {sbt.soi((t,))[0]}"
+    assert all("\n" not in x for x in k + s), k + s
+
+
+@pytest.mark.parametrize("nhan", ["A", "B", "D", "E"])
+def test_R1_02_soi_noi_RO_LUAT_DUONG_bi_pham(nhan):
+    """Mỗi nhánh của ⓔ phải có bài của RIÊNG nó: B · D còn đỏ nhờ ⓔ2 *(hàm ⛔ mang
+    chuỗi)*, E còn đỏ nhờ *"tệp ⛔ có thật"* — gỡ phép canh luật đường mà ⛔ bài
+    nào đổi màu là một nhánh ⛔ ai canh."""
+    loi = sbt.soi((_xau(nhan),))[0]
+    assert any("sai luat duong" in x for x in loi), loi
+
+
+def test_R1_02_soi_noi_RO_tep_KHONG_co_that():
+    """Như trên, cho nhánh *"tệp ⛔ có thật"* — bài cũ
+    `test_cong_soi_DO_khi_nguon_tinh_KHONG_ton_tai` chỉ đòi tên tệp có mặt trong câu,
+    mà nay câu ⓔ2 cũng mang tên ấy."""
+    t = dataclasses.replace(_tuyen_fx()[0],
+                            nguon_tinh=("fls/cau_hinh/tinh/khong_co_that.json",))
+    loi, _ = sbt.soi((t,))
+    assert any("khong_co_that.json" in x and "co that" in x for x in loi), loi
+
+
+def test_R1_02_C_nguon_tinh_la_CHUOI_thi_MOT_cau_moi_cong_KHONG_32_cau_rac():
+    """R1 · C: `soi` cũ lặp trên CHUỖI ⇒ một câu MỖI KÝ TỰ *(32)*. Sai kiểu ⇒ **một**
+    câu mỗi cổng, nói kiểu đo được."""
+    t = _xau("C")
+    k = [x for x in bt.kiem_bang_tuyen((t,)) if "nguon_tinh" in x]
+    s = [x for x in sbt.soi((t,))[0] if "nguon_tinh" in x]
+    assert len(k) == 1 and "str" in k[0], k
+    assert len(s) == 1 and "str" in s[0], s
+
+
+def test_R1_02_tuyen_TINH_ma_ham_DOC_KHO_thi_HAI_cong_DO_bang_cau_RIENG():
+    """A3 — khai **nhất quán** *(`bang=()`, nguồn tĩnh đúng khuôn)* mà hàm THẬT đọc kho.
+
+    Bản khai ⛔ tự mâu thuẫn ⇒ luật HÌNH ⛔ thấy gì. Hai câu RIÊNG của tuyến tĩnh:
+      · `kiem_bang_tuyen` ⓓ''': hàm xử lý gọi tên **`conn`** *(cửa duy nhất tới kho —
+        hợp đồng tầng 7)*;
+      · `soi` ⓔ3: SQL thật trên đồ thị gọi chạm `fls_itl` — ⛔ chỉ nhờ câu ⓐ cũ
+        *("SQL cham … ma `bang` ⛔ khong khai")*, vì ⓐ IM khi bản khai cũng ghi bảng.
+    """
+    t = _xau("A3")
+    assert any("conn" in x and "`so`" in x for x in bt.kiem_bang_tuyen((t,))), (
+        bt.kiem_bang_tuyen((t,)))
+    loi = sbt.soi((t,))[0]
+    assert any("nguon_tinh" in x and "fls_itl" in x for x in loi), loi
+    # Đ5 chiều kia: hàm THẬT của tuyến tĩnh ⛔ chạm `conn` ⇒ ⛔ đỏ nhầm.
+    assert bt.kiem_bang_tuyen(tuple(_tuyen_fx())) == []
+
+
+def test_R1_02_kiem_DO_khi_khai_CA_bang_LAN_nguon_tinh_du_ham_SACH():
+    """Luật *"tuyến TĨNH hay tuyến KHO, ⛔ cả hai"* phải có bài RIÊNG: với A2 *(hàm
+    `so`)* luật `conn` cũng đỏ, nên gỡ luật này ⛔ bài nào đổi màu *(đột biến G2 — đo
+    ở vòng sửa)*. Ở đây hàm SẠCH *(`ty_gia`)*: chỉ bản khai sai."""
+    t = bt.Tuyen("GET", DUONG, "ty_gia", ("fls_itl",), nguon_tinh=(NGUON_TINH,))
+    loi = bt.kiem_bang_tuyen((t,))
+    assert any("CUNG `bang`" in x for x in loi), loi
+
+
+def test_R1_02_ham_cua_tuyen_TINH_KHONG_co_trong_HAM_thi_DO__do_khong_duoc():
+    """`Đ5`: ⛔ tìm thấy hàm ⇒ ⛔ đo được nó có chạm `conn` ⇒ ĐỎ, ⛔ "không thấy"."""
+    t = bt.Tuyen("GET", f"{V}/x", "ham_khong_co_that", (), nguon_tinh=(NGUON_TINH,))
+    assert any("ham_khong_co_that" in x and "do duoc" in x
+               for x in bt.kiem_bang_tuyen((t,))), bt.kiem_bang_tuyen((t,))
+
+
+def test_R1_02_soi_do_THAT_thay_ham_ty_gia_mang_chuoi_NGUON_TINH():
+    """`Đ3`: phép canh *"hàm có đọc tệp khai"* chỉ có nghĩa khi phép đo THẤY được
+    chuỗi ấy ở tuyến thật — ⛔ thì mọi tuyến đều đỏ, hay *(tệ hơn)* phép canh bị viết
+    lỏng cho xanh. Mẫu số: tập chuỗi của `ty_gia` phải KHÁC RỖNG và chứa đúng đường."""
+    chuoi = sbt.chuoi_cua_tuyen("ty_gia")
+    assert len(chuoi) > 0
+    assert NGUON_TINH in chuoi, sorted(c for c in chuoi if "cau_hinh" in c)
+    # Và một hàm KHÔNG đọc tệp ⇒ ⛔ mang chuỗi ấy *(phép đo ⛔ trả "mọi chuỗi")*.
+    assert NGUON_TINH not in sbt.chuoi_cua_tuyen("so")
+
+
+def test_R1_02_soi_DO_khi_ham_KHONG_doc_tep_khai():
+    """Tuyến đúng khuôn, tệp có thật — nhưng phép đo ⛔ thấy hàm nào trong `vet`
+    mang đường ấy ⇒ bản đồ vẽ một nguồn hàm ⛔ đọc *(`BG-076` yếu #3)*. Bơm phép đo
+    giả *(cùng cách `test_soi_bang_tuyen.py` bơm `do_sql`)*."""
+    t = _tuyen_fx()[0]
+    loi, _ = sbt.soi((t,), do_chuoi=lambda _ham: {"fls/cau_hinh/tinh/khac.json"})
+    assert any("nguon_tinh" in x and NGUON_TINH in x for x in loi), loi
+
+
+# ── C1-R1-07 *(GHI NHẬN — làm luôn)*: `meta` khai một phạm vi ⛔ được áp ─────
+@pytest.mark.pg
+def test_R1_07_run_id_o_tuyen_TINH_thi_400_KHONG_tra_so_khoac_pham_vi_lan_nap(may):
+    """R1 gọi máy thật `GET /config/fx?run_id=NAP-2026-01-01-X` ⇒ `200` với
+    `meta.pham_vi = 'lan nap NAP-2026-01-01-X'` mà `data` **trùng khít** lượt trơn
+    *(bảng tĩnh ⛔ theo lần nạp)* ⇒ `meta` *(lời khai VỀ số — `INV-I14`)* nói một phạm
+    vi ⛔ được áp. Chọn: **từ chối** `run_id` — xem lý do ở `fls/api/xu_ly.py:ty_gia`.
+    """
+    ma, r = _goi(may, f"{DUONG}?run_id=NAP-2026-01-01-X")
+    assert ma == 400 and r["error"]["code"] == "FLS-BAD-REQUEST", (ma, r)
+    assert r["data"] is None, r
+    # Đ5 chiều kia: lượt trơn vẫn 200 *(⛔ chặn nhầm mọi lượt gọi)*.
+    ma, r = _goi(may, DUONG)
+    assert ma == 200 and r["meta"]["run_id"] is None, (ma, r["meta"])
