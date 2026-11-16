@@ -141,3 +141,46 @@ forbidden_modules =
     fls.oracle
     fls.adapters
     psycopg
+
+# ⭐⭐ Hai hop dong duoi day ra doi o ISP 3.1.2 Step 0 (`S0`, `WO-065`, 16/11) CUNG LUC
+# voi hai goi RONG `fls/cau_hinh` va `fls/bao_cao` — chu ⛔ khong doi den luc goi co ma.
+#
+# ⚠ Vi sao khai SOM, trai voi loi dau tep ("danh sach lon dan theo pha thay vi khai
+#   truoc mot loat package rong"): hai goi nay thuoc HAI LAN chay SONG SONG (`BE-CF`
+#   viet `cau_hinh`, `BE-HC` viet `bao_cao`). Neu moi lan tu them hop dong cua minh khi
+#   can thi hai worktree cung sua mot tep `.importlinter` ⇒ xung dot gop moi lan. ISP
+#   §2.1 tuan tu hoa tep nay ve `S0`: khai MOT lan, o day, roi hai lan chi viet ma.
+#   Goi rong van la goi that (co `__init__.py`), nen import-linter ⛔ bao "module
+#   chua ton tai".
+#
+# ⛔ Ca hai cam DUNG BA THU — `psycopg`, `fls.repo`, `fls.db` — vi ca hai la HAM THUAN:
+#   so lieu (dong so · config da ky) duoc TRUYEN VAO. Mot tang tinh toan tu mo duoc ket
+#   noi la tang tu chon duoc "doc ban nao" — va cong parity HD2 mat nghia.
+#   ⛔ Phep pha thu da chay 16/11 (Đ5): them `import psycopg` vao tung goi ⇒ hop dong
+#   tuong ung VO; go ra ⇒ giu. Xem `docs/ITL/03_Dev/isp-3.1/DUONG_NEN.md`.
+
+# `fls.cau_hinh` — config thuan (IX.FX · IX.HD · IX.ORG · IX.PER · IX.VEN · IX.DRV ·
+# IX.ALR · IX.PL · IX.TMP): nap + kiem. Kho config chi-them la viec cua
+# `fls/repo/cau_hinh_repo.py`, ⛔ cua goi nay.
+[importlinter:contract:10]
+name = fls.cau_hinh la config thuan, khong duoc biet tang kho
+type = forbidden
+source_modules =
+    fls.cau_hinh
+forbidden_modules =
+    psycopg
+    fls.repo
+    fls.db
+
+# `fls.bao_cao` — engine bao cao / phan bo thuan (CA.GL · SO.CFA · SO.PLA · AL.PLT ·
+# AL.KEY · RP.CF/PL). Mot engine tu di lay so thi cong parity ⛔ con chung minh duoc
+# "cung dau vao ⇒ cung con so".
+[importlinter:contract:11]
+name = fls.bao_cao la engine bao cao/phan bo thuan, khong duoc biet tang kho
+type = forbidden
+source_modules =
+    fls.bao_cao
+forbidden_modules =
+    psycopg
+    fls.repo
+    fls.db

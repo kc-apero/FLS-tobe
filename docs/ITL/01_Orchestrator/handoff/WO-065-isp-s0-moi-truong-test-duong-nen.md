@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Trạng thái** | `DANG_LAM` |
+| **Trạng thái** | `CHO_TEST` *(16/11 — `fls-dev` phát `BG-066`; chờ R1 `KQ-067`)* |
 | **Phát bởi** | orchestrator (phiên điều phối ISP, thay `fls-ba` phát phiếu) · 2026-11-16 |
 | **Nhận** | `fls-dev` — agent làn **BE-CF** |
 | **Dải phiếu** | `BG-066` (bàn giao) · `KQ-067` (R1) · `KQ-068` (R2) · `KQ-069` (R3) |
