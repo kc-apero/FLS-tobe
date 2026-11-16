@@ -128,3 +128,107 @@
 - **Q1 · Khuôn tệp nhãn DT1b.** ⓐ *(khuyến nghị)* orchestrator chuyển §"Hợp đồng tệp nhãn mà H2 ĐỌC" vào phiếu DT1b **ngay** — giá: DT1b bị buộc một khuôn, nhưng khuôn ấy là khuôn DT1a nó đã có *(bài `…tep_DT1a_dung_lam_tep_nhan_hop_le_0_nhan` chứng minh)*; được: gộp ⛔ đỏ. ⓑ để DT1b tự chọn, H2 sửa vòng 2 khi tệp về — giá: một vòng R1–R3 nữa + đỏ lúc gộp. Kèm: sau khi gộp DT1b phải chạy `python tools/do_voi_so_luong.py --ghi` *(hiện vật đổi `tep_nhan.co`)*.
 - **Q2 · "5/23" ↔ Figure 5.3.3 "0/23".** ⓐ *(đã làm — khuyến nghị)* giữ phép của lời giao *(dòng ∨ ký) ∧ ô*, CG1 in nhãn đủ *("5/23 kỳ đạt — ⛔ gồm tự sinh")*, `H15` thêm vế tự sinh theo kỳ — giá: hai con số HD1 cùng sống tới H15, phải luôn kèm nhãn. ⓑ thêm vế tự sinh ngay ⇒ **0/23** *(chỉ 2026-03 đo được, mà 2026-03 thiếu 5 dòng)* — giá: H2-B1/B2 của ISP thành sai *(5 → 0, 6 → 0)*, cần ISP sửa.
 - **Q3 · Chữ ký buộc vào TẬP dòng.** ⓐ giữ bốn khoá ISP *(đã làm)* — giá: mù trước đổi chỗ *(yếu #2)*. ⓑ *(khuyến nghị, TRƯỚC khi O8 ký thật)* thêm khoá `van_tay_dong` *(sha256 của các `dong_sheet` mang nhãn — công cụ in sẵn để owner chép)* — giá: một bước vá nhỏ + ISP thêm một trường; được: chữ ký chết khi tập dòng đổi. ⓒ thêm `ky` *(ký theo kỳ)* — giá: owner ký nhiều dòng hơn; được: miễn trừ hẹp hơn.
+
+## Vòng sửa sau R1 (`KQ-092`) *(chỉ THÊM — phần trên giữ nguyên làm biên bản vòng 1)*
+
+| | |
+|---|---|
+| **Phát bởi** | `fls-dev` *(làn **BE-HC**, phiên MỚI)* · 2026-11-16 · orchestrator giao *(brief `sua_h2`)* |
+| **Commit mã** | nhánh **cục bộ** `isp/H2` @ **`c552773`** *(mã + bài + hai JSON)* trên `5e63a90` *(KQ-092)*; mục này ở commit kế tiếp *(chỉ giấy)*. ⛔ đẩy *(O2 = A)* |
+| **Nhận** | `fls-test` — R2 `KQ-093` · R3 `KQ-094` |
+| **Nguồn sửa** | `KQ-092` *(bảng `H2-R1-01…07`, ca K1′ · K4c · K5b, đột biến R1-M3 · M15 · M17–M19)* · sổ `SO_PHAT_HIEN_ISP-3.1_H2.md` *(7 hàng)* · quyết định orchestrator ghi errata ⑩ ⑬ cho bản vá ISP: `-01` = ⓐ · `-02` = ⓑ · `-06` Dev + quyết định thay BA · `-03` `-04` bài · `-05` `-07` chỉ khai |
+| **Cổng vào** | `git log -1` = `5e63a90 KQ-092: …` · `git status` sạch · `pg_isready -p 5435` *accepting connections* |
+
+### Phát hiện → trạng thái *(mỗi dòng: đỏ TRƯỚC trên mã `5e63a90`, xanh SAU trên `c552773`)*
+| Mã | Trạng thái | Đã làm | ĐỎ-trước *(đo)* | XANH-sau *(đo)* |
+|---|---|---|---|---|
+| `H2-R1-01` | **ĐÃ SỬA** *(ⓐ)* | Kỳ ĐẠT ⇔ **[dòng]** ∧ **[ô]**, [ô] = mẫu số ô trên **MỌI** dòng > 0 ∧ *(ô `Final = f(Cls, MID)` khớp trên MỌI dòng **∨** mọi dòng tự-soi loại của kỳ có nhãn ĐÃ KÝ)*. Ô MỌI dòng đếm ở `Counter` riêng *(`theo_ky`/`tong` cũ y nguyên)*; `MONG["o_moi_dong"] = (69706, 69769)` khai trước *(KQ-092 phép (b) + `test_parity_ca_so` 63 ô = 60 + 3)*. Tệp nhãn nhận dòng loại *(tập hợp lệ = thiếu ∪ loại)*; `dat_hd1.dong_tu_soi_loai` công bố TẬP 37 dòng; `theo_ky[k]` thêm `loai_tu_soi` · `loai_co_nhan` · `loai_da_ky` · `o_moi_dong` · `o_moi_dong_khop`; `o_100` giữ tên, nghĩa mới = vế [ô] *(khai trong `_luat`)*; CLI `②` `④` in dòng loại | K1′ qua `do()` của bản sao `5e63a90`: `exit 0 · so_ky_dat 6 · 2026-07 dat True · o_100 True · da_ky 23` *(63 ô lệch ⛔ nhãn mà kỳ "đạt")*. R1-M3 *(bỏ `and o_100`)* chỉ chết bằng `theo_ky` tổng hợp | cùng đầu vào trên `c552773`: `exit 0 · so_ky_dat 5 · 2026-07 dat False · o_100 False · da_ky 23 · loai_da_ky 1/37 · ô 4739/4802`; ký thêm 36 dòng loại *(+1 dòng vừa thiếu vừa loại đã là A)* ⇒ `so_ky_dat 6 · 2026-07 dat True · loai_da_ky 37/37`. R1-M3 nay chết ở **3** bài, trong đó **1 bài đường thật** `do()` |
+| `H2-R1-02` | **ĐÃ SỬA** *(ⓑ)* | `KHOA_CHU_KY` = 5 khoá *(+ `van_tay_dong`)*; mỗi chữ ký so **cả** số dòng **và** `_van_tay_dong(tập dòng mang nhãn)` — lệch ⇒ ĐỎ một dòng `… — chữ ký cũ, ký lại`; `dat_hd1.theo_nhan` + CLI `⑤` in sẵn `so_dong` · `van_tay_dong` mỗi nhãn để owner CHÉP | K5b trên bản sao `5e63a90` *(A·23 + C·14 đã ký, đổi chỗ dòng 8826 ↔ 4517, MONG = tập trước đổi chỗ)*: `exit 0 · so_ky_dat 7` — vô hình | K5b trên `c552773`: `exit 1` · hai dòng `sổ lý do: chữ ký 'R1_A' (… ) ghi số dòng 23 · vân tay dòng b8de8a8914412407 — tệp nhãn có 23 dòng (thiếu ∪ tự-soi loại) mang nhãn ấy · vân tay dòng 8e43b3938552f30d — chữ ký cũ, ký lại` + tương tự `'R1_C'` *(14 dòng)*; ⛔ phán kỳ nào |
+| `H2-R1-03` | **ĐÃ SỬA** | Bài `test_H2_ghi_XANH_dut_giua_chung_KHONG_lam_cut_hien_vat` *(bài R1 đề xuất, ⛔ đổi lo)* + `test_H2_ghi_XANH_ra_DUNG_byte_tep_da_commit`; `--ghi` dọn `.tam` khi đứt *(`try/except BaseException` → `unlink` → `raise`)*; dòng `đã ghi` in `_duong(RA)` *(đích ngoài gốc ⛔ còn `ValueError`)* | M15 **SỐNG** `46 passed` *(KQ-092)*; bài mới trên mã cũ: đỏ `voi_so_luong.json.tam` sót lại + `ValueError … is not in the subpath` | M15 **BỊ GIẾT** `1 failed` — đích bị ghi cụt; N13 *(bỏ dọn `.tam`)* **BỊ GIẾT** |
+| `H2-R1-04` | **ĐÃ SỬA** | Bài CLI đòi ĐỦ năm dòng `HD1 · ①…⑤`, đúng thứ tự, mỗi dòng một lần, kèm số *(`② … 0/122 · … 0/122 · … 0/37 · … 0/37` · `④ kỳ đỏ 18/23 … 2026-07 23·0·0 loại 37·0·0 ô 4739/4802`)*; `CA_PHA` thêm `so_ngay_khuon_co_ban` *(`20261116`)* + `so_ngay_khuon_tuan` *(`2026-W47-1`)* | R1-M17 · R1-M18 · R1-M19 **SỐNG** *(KQ-092)* | R1-M17 · R1-M18 **BỊ GIẾT** *(bài CLI)*; R1-M19 **BỊ GIẾT** `2 failed` *(hai ca phá)* |
+| `H2-R1-05` | **ĐÃ KHAI** | `_luat` + docstring: chiều ngược ⛔ vào phán; số đo ở `dat_hd1.ngoai_phan.dong_fls_khong_co_dong_so` = **147** *(= DT1a `dong_nguoc`, bài so hai nguồn)* + dòng `①` *"⛔ xét 147 dòng FLS ⛔ có dòng sổ (chiều ngược — ảnh ⛔ có ngày)"* | `_luat` ⛔ nói *(KQ-092)* | bài `test_H2_B1_luat_KHAI_chieu_nguoc…` XANH; CLI `①` mang số 147 |
+| `H2-R1-06` | **ĐÃ SỬA** *(ⓐ ⓑ)* · ⓒ **còn mở** | ⓐ ⛔ ký nhãn `KHAC` — so sau `_goc_nhan` *(bỏ dấu NFKD, `Đ`→`D`, bỏ cách, hoa)* ⇒ `KHAC` · ` Khác ` cùng bị chặn; nhãn `KHAC` vẫn được GÁN *(chỉ ⛔ ký)*. ⓑ `ngay` > hôm nay ⇒ ĐỎ; `do(hom_nay=…)` · `phan_hd1(…, hom_nay=…)` *(mặc định `date.today()`)*. ⓒ người ký từ config: ⛔ có trong quyết định ⇒ ⛔ làm | K4c *(`2099-12-31`)* trên bản sao `5e63a90`: `exit 0 · so_ky_dat 6` *(chỉ đỏ vì MONG)*; ký `KHAC` đúng số dòng: `exit 0` | K4c: `exit 1 · sổ lý do: chu_ky[0] ngày 2099-12-31 sau hôm nay 2026-11-16 — ⛔ ký trước (H2-R1-06)`; `KHAC`: `exit 1 · sổ lý do: chu_ky[0] nhãn 'KHAC' ⛔ ký được — …`. Ký đúng HÔM NAY vẫn hợp lệ *(đối chứng; N4b `>=` BỊ GIẾT 44 bài)* |
+| `H2-R1-07` | **ĐÃ KHAI** | `_luat` + docstring + `_vi_sao` của hợp đồng: *"dòng VẮNG trong tệp nhãn = chưa có nhãn"*; bài `test_H2_B1_tep_nhan_THIEU_dong_la_HOP_LE…` GHIM hành vi *(23/122 dòng ⇒ hợp lệ, 5 kỳ)* — đổi sang "đòi đủ" khi DT1b về thì bài phải ĐỎ | hợp đồng ⛔ nói *(K4e)* | bài XANH |
+
+### Đã đổi *(commit `c552773`)*
+| Tệp | Vì sao |
+|---|---|
+| `tools/do_voi_so_luong.py` | luật mới của `phan_hd1` *(tham số bắt buộc `loai=` — ⛔ mặc định: quên truyền mà "rỗng" thì vế ô lặng lẽ thành 0/0 — đúng bẫy cũ)*; `_goc_nhan` · `NHAN_CAM_KY`; `_doc_so(…, hom_nay)` kiểm khuôn `van_tay_dong` · `KHAC` · ngày tương lai; phòng thủ chồng thêm `loai_tu_soi ↔ dòng loại liệt kê`, gộp "kỳ ngoài bảng" cho thiếu ∪ loại; `do()` đếm ô MỌI dòng + tập dòng loại, `kiem("ô Final trên MỌI dòng (o_moi_dong)")` dùng `MONG.get` *(mất khoá ⇒ ĐỎ một dòng)*; `ngoai_phan`; CLI `①…⑤`; `--ghi` dọn `.tam` |
+| `tests/oracle/test_do_voi_hd1.py` | **46 → 65** node *(+19: B1 +3 · B2 +1 · B3 +4 · B4 +1 · `--ghi` +2 · `CA_PHA` +8)*. Viết lại GIỮ lo gốc *(ghi lý do trong docstring)*: `…so_rong_ky_dat_DUNG_5…` *(`o_100` 2026-07 nay False — tiền đề R1 "23/23" là tautology)* · `…o_chua_100_thi_chu_ky_KHONG_cuu_duoc_ky` *(vế ô đọc `o_moi_dong*`; ký CẢ 37 dòng loại để bài còn chứng minh)* · hai bài B2 *(mong MỚI errata ⑩)*. Tập 37 dòng loại + ô MỌI dòng đo LẠI ở bài bằng phép **độc lập** *(chỉ hằng `MA_LOI`, ⛔ import tool/`tu_soi`/`final_rule`)* |
+| `docs/ITL/_tools/voi_so_luong.json` | `--ghi` lại *(`git diff --numstat` `192 26` — 26 dòng "bớt" là dấu phẩy/`_luat`/`dong_thieu`/`da_ky` đổi dòng do thêm khoá)* |
+| `docs/ITL/_tools/so_ly_do_hd1.json` | `_vi_sao` năm khoá *(chép từ `theo_nhan`)*, ⛔ `KHAC`, ngày ≤ hôm nay, phủ thiếu ∪ loại; **vẫn `chu_ky: []`** |
+
+### Hình dạng `voi_so_luong.json` *(hợp đồng CG1 — so dict `5e63a90` ↔ `c552773`)*
+- khoá gốc y nguyên **thứ tự + giá trị** ngoài `dat_hd1` *(`True`)*; `dat_hd1` khoá mất **0**, thêm `dong_tu_soi_loai` · `ngoai_phan` · `theo_nhan`; `mau_so` thêm `dong_tu_soi_loai` · `o_moi_dong`, mất 0.
+- khoá CG1 đọc: `so_ky_dat` **5 → 5** · `ky_dat` `2024-10 · 2024-11 · 2024-12 · 2025-03 · 2025-04` **= trước** · `mau_so.so_ky` 23 → 23 · `theo_ky[k].dat` / `.thieu` lệch **0/23** kỳ.
+- giá trị cũ đổi **duy nhất**: `theo_ky["2026-07"].o_100` `true → false` *(nghĩa mới — 63 ô lệch ở 37 dòng loại chưa nhãn)*. `dem` khoá cũ đổi 0.
+
+### Cổng *(nguyên văn — `PG_DSN=…:5435/fls` · `PG_DSN_TEST=…:5435/fls_test` · `PYTHONUTF8=1`, venv `/home/user/FLS-tobe/.venv`, trên `c552773`)*
+| Lệnh | Kết quả |
+|---|---|
+| `python -m pytest tests/oracle/test_do_voi_hd1.py` | exit 0 · `65 passed in 28.10s` |
+| `python -m pytest tests/du_lieu tests/oracle` | exit 0 · `174 passed in 30.17s` *(= 155 + 19)* |
+| `python tools/do_voi_so_luong.py` | exit 0 · `Σ          9967   9845    3341    2700  30756  22290    112   13  69510/69510` *(y nguyên)* · `HD1 · ① MẪU SỐ: 23 kỳ · 9967 dòng sổ · 122 dòng thiếu (sổ ⛔ ghép 1-1) · 37 dòng tự-soi loại · 69769 ô Final trên MỌI dòng · … · 0 chữ ký · ⛔ xét 147 dòng FLS ⛔ có dòng sổ (chiều ngược — ảnh ⛔ có ngày)` · `HD1 · ② dòng thiếu có nhãn 0/122 · có nhãn ĐÃ KÝ 0/122 · dòng tự-soi loại có nhãn 0/37 · có nhãn ĐÃ KÝ 0/37` · `HD1 · ③ … 5/23 · 2024-10 · 2024-11 · 2024-12 · 2025-03 · 2025-04` · `HD1 · ④ kỳ đỏ 18/23 … 2026-07 23·0·0 loại 37·0·0 ô 4739/4802 · 2026-08 13·0·0` · `HD1 · ⑤ … — (0 nhãn)` |
+| `python tools/phan_loai_dong_thieu.py` *(DT1a import `_sha` + `MONG`)* | exit 0 · `KẾT: ĐẠT — mọi phép so khớp MONG · 122 dòng thiếu + 147 dòng ngược · nhan = null (DT1b điền)` |
+| `/home/user/FLS-tobe/.venv/bin/lint-imports` | exit 0 · `Contracts: 11 kept, 0 broken.` |
+| `python -m fls.db.pg_migrate` | exit 0 · `khong co gi de ap` · `pg_verify: khop` *(⛔ chạm schema)* |
+| `bash tools/dung_moi_truong_isp.sh --duong-nen --cong 5435` | exit 0 · `══ KẾT: ĐẠT — mọi phép kiểm khớp mong` — 7/7 `[ĐẠT]` *(gồm `HD1 do_voi_so_luong chay 9845 / co 9967 (exit 0)` · `lint-imports Contracts: 11 kept, 0 broken.` · `di trú + pg_verify 26/26 di trú áp · pg_verify khớp 25 bảng/view (0 lệch)` · `kho fls RỖNG fls_itl = 0 dòng`)*; toàn bộ `12 failed, 2513 passed, 2 xfailed, 14 errors in 341.17s (0:05:41)` · `[ĐẠT] … 26 = 26 node id (thêm 0 · bớt 0)`; web `3 failed, 661 passed in 181.82s (0:03:01)` · `3 = 3 node id (thêm 0 · bớt 0)`. Grep `test_do_voi_hd1` · `tests/(du_lieu⁄oracle)` · `wo032_man_cua_that` trong dòng `FAILED`/`ERROR` của cả hai log = **0 · 0 · 0** |
+| `python -m pytest --collect-only` *(toàn bộ)* | `2541 tests collected` *(= 2.522 của BG-091 + 19; khớp mẫu số đường nền 12 + 2.513 + 2 + 14)* |
+| `python tools/kiem_so_song.py` | **⛔ CHƯA ĐO ĐƯỢC** — exit 1 · `FileNotFoundError: … .venv/Scripts/lint-imports.exe` *(đỏ nền, `DUONG_NEN.md:432`; ⛔ do bước này)* |
+| `python docs/ITL/_tools/kiem_tai_lieu.py` | xem dòng cuối mục này *(chạy SAU khi thêm mục)* |
+| `python docs/ITL/_tools/khop_owner.py --kiem` | exit 1 · `⇒ 11/16 khop · 5 lech   (da do 16/20 phep)` · `B3` `B4` `C5` `C5b` *KHONG DO DUOC* · `A1` `B1` `C6` *DOI TRANG THAI* — **trùng khít** đường nền *(kho rỗng)* |
+| `python tools/soi_bang_tuyen.py` | exit 0 · `✅ ban khai KHOP SQL that o ca 40 tuyen` |
+| `python tools/kiem_thuyet_minh.py` | exit 0 · `✅ CONG THUYET MINH DAT — 31/31 nut co mat trong CA 2 ban` |
+
+### Log ĐỎ → XANH
+**① Đỏ trước mã** *(bài mới, mã tool còn ở `5e63a90` — `pytest tests/oracle/test_do_voi_hd1.py -rA`)*: exit 1 · `58 failed, 7 passed in 17.88s`. Đếm theo dòng `E` — **mọi đỏ vì THIẾU hành vi**, ⛔ lỗi cú pháp/dựng:
+- 41 × ``AssertionError: ⛔ voi_so_luong.json chưa có `dat_hd1.dong_tu_soi_loai` — tập dòng tự-soi loại (H2-R1-01) chưa công bố``
+- 7 × ``AssertionError: ⛔ voi_so_luong.json chưa có `dat_hd1.theo_ky[2024-10].o_moi_dong` — vế ô trên MỌI dòng (H2-R1-01) chưa có``
+- 3 × ``TypeError: do() got an unexpected keyword argument 'hom_nay'``
+- 1 mỗi câu: ``⛔ MONG chưa khai `o_moi_dong` `` · ``KeyError: 'ngoai_phan'`` · ``⛔ CLI phải in ĐÚNG một dòng `HD1 · ⑤` — có 0`` · `mau_so` thiếu `dong_tu_soi_loai`/`o_moi_dong` · `.tam` sót lại sau khi đứt · ``ValueError: … is not in the subpath …`` *(`--ghi` XANH ra đích tạm)* · phá `MONG['o_moi_dong']` mà exit 0
+- **7 bài xanh sẵn** *(đúng)*: 6 bài ⛔ đổi *(sổ RỖNG · hai nguồn 5 kỳ · `json_DA_GHI` · B4 phá MONG · sổ VẮNG · tệp nhãn HỎNG)* + `…van_tay_tap_dong_TRUNG_DT1a` *(dòng thêm chỉ chứng minh công thức `_van_tay` viết lại ở BÀI = DT1a — ⛔ gọi hành vi mới)*.
+
+**② Xanh**: sau mã + `--ghi` ⇒ `65 passed in 28.67s`.
+
+### Chứng minh ĐỎ — đột biến mã *(script `hc_h2_sua/dot_bien.py`, trên BẢN SAO `git ls-files` của worktree — ⛔ chạm worktree; mỗi đột biến chạy `tests/oracle/test_do_voi_hd1.py`; cuối: `SỐNG 0/25 · trả nguyên bản sao: True`)*
+| Đột biến | Kết |
+|---|---|
+| **M15** `--ghi` ghi thẳng lên đích | **BỊ GIẾT** `1 failed` — `…dut_giua_chung_KHONG_lam_cut_hien_vat` |
+| **R1-M17** bỏ in `②` · **R1-M18** bỏ in `④` · N14 bỏ in `⑤` · N19 `④` ⛔ in phần "loại" | **BỊ GIẾT** `1 failed` mỗi cái — bài CLI |
+| **R1-M19** bỏ regex ngày | **BỊ GIẾT** `2 failed` — `so_ngay_khuon_co_ban` · `so_ngay_khuon_tuan` |
+| **R1-M3** bỏ `and o_100` | **BỊ GIẾT** `3 failed` — B2 đơn vị · **B2 đường thật** · B3 ô |
+| N1 vế ô quay về `o_parity` *(tập đã lọc — chính lỗi `H2-R1-01`)* | **BỊ GIẾT** `7 failed` |
+| N5 tệp nhãn ⛔ nhận dòng loại | **BỊ GIẾT** `37 failed` |
+| N6 bỏ "ô dòng tự nhất quán khớp" *(miễn suông)* · N9 ô `0/0` = 100 % | **BỊ GIẾT** `1 failed` mỗi cái — B3 ô |
+| N7 bỏ "mọi dòng loại đã ký" | **BỊ GIẾT** `6 failed` |
+| N8 bỏ vế trái "khớp trên MỌI dòng" | **BỊ GIẾT** `1 failed` — `…o_khop_tren_MOI_dong_thi_dong_loai_KHONG_can_ky` |
+| N10 bỏ phòng thủ `loai_tu_soi ↔ liệt kê` · N11 bỏ cổng `MONG o_moi_dong` | **BỊ GIẾT** `1 failed` mỗi cái |
+| N12 ô "MỌI dòng" lại bỏ dòng loại | **BỊ GIẾT** `11 failed` |
+| N2 chỉ so số dòng *(⛔ vân tay)* · N2b chỉ so vân tay *(⛔ số dòng)* | **BỊ GIẾT** `2 failed` mỗi cái — N2: K5b + `so_van_tay_dong_lech_tap`; N2b: B3 lệch số dòng + `so_lech_so_dong` |
+| N16 bỏ kiểm khuôn `van_tay_dong` · N17 khoá chữ ký về 4 khoá ISP | **BỊ GIẾT** `1` · `44 failed` |
+| N3 bỏ cấm `KHAC` · N3b so `KHAC` nguyên chữ *(⛔ bỏ dấu/hoa)* | **BỊ GIẾT** `2` · `1 failed` *(`so_nhan_Khac_co_dau`)* |
+| N4 bỏ chặn ngày tương lai · N4b ký đúng hôm nay cũng đỏ *(`>=`)* | **BỊ GIẾT** `1` · `44 failed` |
+| N13 đứt giữa chừng ⛔ dọn `.tam` | **BỊ GIẾT** `1 failed` |
+
+### `MONG_PYTEST_TOAN_BO` *(Q8)*
+- **⛔ có trên `isp/H2`**: `git grep -c MONG_PYTEST_TOAN_BO isp/H2 -- tools tests` = **0** *(nhánh tách từ `isp/base-w2` @ `2664e25`, trước khi S0 thêm biến)*. Biến sống ở `isp/base-w3` · `isp/CG1` *(`tools/dung_moi_truong_isp.sh:394` `MONG_PYTEST_TOAN_BO=2460` + bài ghim `tests/test_dung_moi_truong_isp.py:380`)* ⇒ **⛔ sửa ở bước này** *(tệp ngoài làn, nhánh khác)*.
+- Số để orchestrator nâng lúc gộp: bước này **+19** node *(`pytest --collect-only tests/oracle/test_do_voi_hd1.py`: `46` → `65`)*; toàn bộ `isp/H2` `2522` → **`2541`** *(`pytest --collect-only` toàn bộ: `2541 tests collected`)*. ⚠ `2460` của `base-w3` đếm theo cách khác *(pytest chạy với `PYTEST_ADDOPTS` bị gỡ — `dung_moi_truong_isp.sh:61` ở `base-w3`)* ⇒ cộng **+19** vào con số của nhánh gộp, ⛔ chép `2541`.
+
+### Dev tự thấy còn yếu *(vòng 2)*
+1. **Vế phải của [ô] tôi thêm một vế kèm** *"ô của dòng tự nhất quán khớp hết"* (`o_parity_khop == o_parity`) — **⛔ có nguyên chữ trong errata ⑩**. Lý do: không có nó, kỳ ⛔ có dòng loại nào thì *"mọi dòng loại đã ký"* đúng suông (0 = 0) và miễn được ô lệch bất kỳ *(N6 chứng minh bài bắt)*. Trên mọi đầu vào `do()` sinh ra, vế kèm **đúng sẵn** *(tập dòng loại = tập dòng có ô lệch — đo 37 = 37 · `soi_mot_dong` loại mọi dòng có một ô lệch)* ⇒ tương đương chữ errata; khác chữ chỉ trên `theo_ky` tổng hợp. Orchestrator xem có chép vế ấy vào errata ⑩ ⇒ **Q-a**.
+2. **⛔ ai gán nhãn cho 37 dòng loại**: DT1b *(ISP Step 5 · `:784`)* chỉ nói 122 dòng thiếu. Tới khi có chủ, 2026-07 **⛔ thể** đạt — đúng errata ⑩ nhưng là việc treo ⇒ **Q-b**.
+3. Tệp nhãn mang dòng loại trong **chính danh sách `dong_thieu`** *(giữ khuôn DT1a cho DT1b khỏi đổi)* ⇒ tên khoá thành sai nghĩa với 37 dòng ấy. Tập 37 dòng ⛔ khoá bằng vân tay trong tệp nhãn *(chỉ `thieu`/`nguoc`)*; khoá gián tiếp: checksum ảnh + `MONG["dong_loai_tu_soi"] = 37` + `van_tay_dong` của mỗi chữ ký. Nếu `soi_mot_dong` đổi mà vẫn 37 dòng *(tập khác)*: nhãn đã ký ⇒ ĐỎ *(vân tay dòng)*; nhãn chưa ký cho dòng cũ ⇒ "ngoài tập" ĐỎ — chiều an toàn, nhưng ⛔ có ca phá riêng.
+4. **`hom_nay` của CLI = `date.today()` theo đồng hồ MÁY** — container chạy UTC: owner ký sáng sớm giờ VN *(UTC+7)* với `ngay` = ngày VN thì trong ~7 giờ đầu ngày, máy UTC thấy "sau hôm nay" ⇒ ĐỎ giả *(chiều an toàn, tự hết sau 07:00 VN)*.
+5. `KHAC` là danh sách cấm **một** phần tử *(so sau bỏ dấu/cách/hoa)* — nhãn gom viết khác hẳn *(`LY_DO_KHAC`, `OTHER`)* vẫn ký được; chặn thật cần danh mục nhãn DT1b đóng ⇒ thuộc Q1 của BG-091.
+6. `H2-R1-06` ⓒ *(người ký từ config)* **⛔ làm** — ⛔ có trong quyết định; `nguoi_ky` vẫn chữ tự do *(yếu #3 vòng 1 còn nguyên)* ⇒ **Q-c**.
+7. `ngoai_phan` chỉ gắn trong `do()` *(cần tập `nguoc` của ảnh bank)* — gọi `phan_hd1` rời thì ⛔ có khoá ấy; CLI + JSON đi qua `do()` nên đủ.
+8. Bài `--ghi` đứt giữa chừng vá `Path.write_text` **toàn cục** trong thân bài — đổi cách ghi *(ví dụ `open().write`)* thì bài vỡ ỒN *(⛔ xanh lặng)*, nhưng phải sửa bài.
+9. Bộ bài từ ~15 s lên **~28 s** *(+4 lần `do()` thật · 1 tiến trình con · 2 lần `main()` trong tiến trình · 1 lượt đo độc lập trên 9.967 dòng)*.
+10. K5b của bài chỉ đổi chỗ **một** cặp dòng *(đủ để chứng minh vân tay bắt — mọi đổi tập đều đổi sha256 danh sách đã sắp)*.
+
+### Câu hỏi *(`KHONG_CHAN` cả ba — gửi orchestrator)*
+- **Q-a · vế kèm của [ô].** ⓐ *(khuyến nghị, đã làm)* giữ vế kèm `o_parity_khop == o_parity` và chép vào errata ⑩ — giá: một vế ⛔ có trong chữ quyết định; được: ⛔ miễn suông 0/0 *(Đ3)*, tương đương chữ errata trên mọi đầu vào thật. ⓑ bỏ vế kèm cho đúng chữ — giá: đột biến N6 thành "tương đương" trên dữ liệu thật nhưng lỗ mở trên dữ liệu tổng hợp/tương lai.
+- **Q-b · nơi gán nhãn cho 37 dòng tự-soi loại.** ⓐ *(khuyến nghị)* phiếu DT1b thêm: tập hợp lệ = 122 dòng thiếu ∪ 37 dòng `dat_hd1.dong_tu_soi_loai`, cùng danh sách `dong_thieu` — giá: DT1b thêm 36 dòng *(1 dòng đã thuộc 122)* **và đổi spec** — ISP Step 5 `:784` đòi *"cổng đỏ khi … Σ ≠ 122"* *(grep `tự-soi`/`tu_soi` trong ISP v3.1.2 = 2 chỗ, ⛔ chỗ nào ở Step 5)*; được: 2026-07 có đường tới "đạt". ⓑ để H3 *(sửa mã ghép)* — giá: 2026-07 đỏ tới H3.
+- **Q-c · `H2-R1-06` ⓒ người ký từ config.** ⓐ *(khuyến nghị)* để GHI NHẬN tới trước chữ ký thật đầu tiên, làm trong cùng bước vá chữ ký O8 — giá: tới lúc ấy ai sửa được tệp thì "ký" được *(bằng chứng thật vẫn là commit + review)*. ⓑ làm ngay — giá: thêm config ngoài mục 7 của ISP.
+
+`python docs/ITL/_tools/kiem_tai_lieu.py` *(SAU khi thêm mục này)*: exit 0 · `✅ cong tai lieu DAT — va no da do duoc that (179 file, 1888 bang, 727 o ngay, 104 ma QD), khong chi 'khong thay loi'` · `OK K3 bang markdown khong lech     (da do: 1888 bang)` *(trước khi thêm mục: `179 file, 1883 bang` — +5 bảng = đúng 5 bảng của mục này; tệp đã có nên +0 file)*
