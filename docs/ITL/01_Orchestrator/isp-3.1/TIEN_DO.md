@@ -8,7 +8,7 @@
 
 | Thứ | Quy ước | Vì sao |
 |---|---|---|
-| Kho test | mỗi agent một kho: `PG_DSN_TEST=postgresql://fls:fls@localhost:5433/fls_test_<làn>` (`cf` · `hc` · `fe` · `data`); reviewer: `fls_test_r_<bước>` | `tests/conftest.py` **DROP rồi CREATE** kho test đầu mỗi lượt — hai lượt chung một kho là giẫm nhau |
+| Kho test | ⛔ **Đổi 16/11 (S0-Q1 = A):** mỗi agent một **CỤM PostgreSQL riêng theo cổng**, tên kho giữ `fls` / `fls_test` — agent BE-CF `5434` · BE-HC `5435` · FE `5436` · DATA `5437`; reviewer theo làn của bước đang kiểm `5444` · `5445` · `5446` · `5447`; cụm `5433` = cụm gốc của S0. Đặt cả `PG_DSN` lẫn `PG_DSN_TEST` vào cổng của mình. ~~`fls_test_<làn>` trên một cụm~~ — bỏ: 24 dòng trong 19 tệp bài ghim `== "fls_test"` ⇒ +131 bài đỏ giả (đo ở S0) | `tests/conftest.py` **DROP rồi CREATE** kho test đầu mỗi lượt — hai lượt chung một kho là giẫm nhau (S0 AC-6: đối chứng chung kho ⇒ `3 failed`) |
 | venv | `/home/user/FLS-tobe/.venv` dùng chung (đã `gitignore`), mỗi worktree gọi bằng đường dẫn tuyệt đối | gói `fls` lấy từ thư mục làm việc của worktree, ⛔ cài vào venv |
 | Nhánh | worktree riêng mỗi bước, nhánh cục bộ `isp/<bước>` (⛔ push); orchestrator gộp vào `claude/laughing-bohr-331pt0` sau R3 rồi push | O2 = A |
 | Phiếu | orchestrator cấp trước dải số cho mỗi bước (WO · BG · KQ-R1 · KQ-R2 · KQ-R3) | dãy số chung — agent song song tự lấy số sẽ trùng |
@@ -18,7 +18,7 @@
 
 | Step | ID | Tên | Agent làm | Wave | Phụ thuộc | Ước lượng | Trạng thái | Phiếu |
 |---|---|---|---|---|---|---|---|---|
-| 0 | `S0` | Môi trường test + đường nền cổng + khung hai gói mới | fls-dev #CF | W0 | — | 2–3h | `in_progress` | WO-065 |
+| 0 | `S0` | Môi trường test + đường nền cổng + khung hai gói mới | fls-dev #CF | W0 | — | 2–3h | `review(R1)` | WO-065 · BG-066 · KQ-067 |
 | 1 | `H1` | CA.GL thuần trên dòng tổng hợp (Nợ/Có × 5 tiền tệ → bVND · mUSD) | fls-dev #HC | W1 | S0 | 3–4h | `planned` | — |
 | 2 | `C1` | IX.FX đọc tĩnh: kiểm tỷ giá + GET /config/fx | fls-dev #CF | W1 | S0 | 3–4h | `planned` | — |
 | 3 | `DT1a` | HD1 · kiểm kê 122 dòng sổ chưa 1-1 (offline, trên ảnh đóng băng) | fls-dev #DATA | W1 | S0 | 2–3h | `planned` | — |
@@ -74,3 +74,5 @@
 | 2026-11-16 | người dùng xác nhận ISP 3.1.2 + mọi khuyến nghị; phát `WO-065` (Step 0) cho agent BE-CF; dải phiếu S0: WO-065 · BG-066 · KQ-067/068/069 |
 | 2026-11-16 | **O7 thăm dò (chỉ đọc, connector của phiên):** thư mục Drive AS-IS có **25 mục** (đếm 2 trang tìm): 22 sheet `[COPY]` + 1 sheet `[FS2] PD Now – Logic & Rules script` (phiên 13/11 tạo) + 1 tài liệu nháp + 1 thư mục `[COPY] Payroll`; mọi mục tạo 13/11. `[COPY] APERO \| FS2 (nguồn tỷ giá)` → sheet `9.2.Exchange Rate` **đọc được giá trị**: 37 dòng dữ liệu (202401…202512 = 24 · 202306 lạc · 202601…202612 = 12) — khớp AP §3.2.1. ⛔⛔ **Bẫy cho DT2:** `get_values` trả số **ĐÃ ĐỊNH DẠNG** — SGD 202507 hiện `20,692` mà `effectiveValue` = **20691.51** ⇒ đóng băng phải đọc `effectiveValue` (`get_spreadsheet` + `includeGridData`), ⛔ đọc chuỗi hiển thị. |
 | 2026-11-16 | **O10 thăm dò:** sheet RAW GỐC `1md85t…` ⇒ **Permission denied** với tài khoản connector. Bản sao `[COPY] ITL I Input Transaction Ledger File 1/2 (RAW)` đọc được metadata: có `Transaction Mapping L1` (lưới 12.888 hàng) · `Mapping Master` (4.464 × 40). Cột khoá phía sổ (`ITL Ledge`) nằm ở bản ADJUSTED — `GAP-ORA-08` (ADJUSTED ⛔ trả giá trị qua API) chưa thử trên bản sao. ⇒ DT1b: thử bản sao ADJUSTED trước; bản sao là của 13/11 còn ảnh là 26/08 ⇒ ghép theo KHOÁ, ⛔ theo vị trí dòng; hỏng thì về máy owner (O10 = A). |
+| 2026-11-16 | **S0 bàn giao** (`BG-066`, nhánh `isp/S0` @ `d6cc31d`): AC-1…AC-6 đạt theo agent. Đường nền: pytest `12 failed · 2402 passed · 2 xfailed · 14 errors` trên **2.430 bài thu thập** — 26 bài đỏ đều là bài đọc SỔ THẬT đỏ vì kho `fls` cục bộ rỗng; tập đỏ trùng khít bản gốc `39524c5` (26 = 26 theo node id) · `tests/web` `3 failed · 661 passed` · `lint-imports` 11 kept · 26/26 di trú · `kiem_so_song` ⛔ ĐO ĐƯỢC ở container (gọi cứng `.venv/Scripts/lint-imports.exe`, đọc kho thật) · `khop_owner --kiem` 11/16 (5 phép đếm từ kho rỗng). Phát `R1` (`KQ-067`). |
+| 2026-11-16 | **Quyết định orchestrator trên 4 câu của S0:** Q1 = **A** (cụm theo cổng — sửa trong vòng sau R1, nằm trong phạm vi S0 'môi trường test'); B (đổi 24 dòng bài sang `ten_kho(dsn_test())`) để sau, cần WO riêng có `fls-test` vì chạm `nghiem_thu`. Q2: số ghim `9 kept` ở dashboard:137 · `08_MIGRATION_ROADMAP.md:45` · `CLAUDE.md` sẽ lệch 11 sau gộp — chờ máy owner chạy `dong_bo_so_song --ghi`; `CLAUDE.md` để người dùng quyết. Q3: chấp nhận đo AC-4 trên hàng `Σ`. Q4 (`fls.kiem` ⛔ có hợp đồng tầng) ngoài ISP — đề xuất việc riêng. |
