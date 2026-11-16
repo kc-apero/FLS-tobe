@@ -214,7 +214,13 @@ def _chay(kich_ban: str, *, phien: dict | None = None, dong=None,
     r = subprocess.run(lenh, capture_output=True, text=True, encoding="utf-8",
                        cwd=pv.THU_MUC, timeout=90)
     assert r.returncode == 0, f"⛔ node NO:\n{r.stdout}\n{r.stderr}"
-    return json.loads(r.stdout.strip().splitlines()[-1])
+    # ⛔⛔ Tách dòng **chỉ ở `"\n"`**, ⛔ `splitlines()`. `splitlines()` còn cắt
+    #   ở `U+0085` · `U+2028` · `U+2029` — **3** ký tự `JSON.stringify` để
+    #   TRẦN. Dòng tiền `curr = "VND" + chr(0x85)` của `KQ-041` lọt vào thân
+    #   cửa ⇒ dòng JSON bị cắt đôi ⇒ `test_wo032_man_cua_that.py` `AC3`·`AC7`
+    #   ĐỎ **1/4** lượt `pytest` toàn bộ *(rà ISP Step 0, 16/11)*. Bài canh:
+    #   `test_khung_node_dong_cuoi_chi_tach_o_LF.py`.
+    return json.loads(r.stdout.strip().split("\n")[-1])
 
 
 _VE = """
