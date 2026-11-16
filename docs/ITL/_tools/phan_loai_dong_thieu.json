@@ -1,6 +1,6 @@
 {
  "_vi_sao": "Sinh bởi `python tools/phan_loai_dong_thieu.py --ghi` từ ba ảnh đóng băng tests/fixture/ (ISP 3.1.2 Step 3 · DT1a · WO-080). ⛔ sửa tay — bài tests/du_lieu/test_phan_loai_dong_thieu.py đòi tệp này BẰNG lần đo hiện tại. `nhan` = null: LÝ DO là việc của DT1b.",
- "khong_mang_PII": "⛔ Diễn giải · Số chứng từ · Tài khoản · tiền · email — chỉ số dòng, kỳ và 9 ô phân loại.",
+ "khong_mang_PII": "Máy chặn TRƯỚC khi ghi (kiem_rieng_tu) đúng ba thứ: khoá có tên chứa diengiai · sochungtu · email (so trên tên đã bỏ dấu, thường hoá) · giá trị dạng email · ô lỗi #N/A nhúng mã giao dịch. Ngoài phép chặn ấy là CẤU TRÚC: mỗi dòng thiếu chỉ mang dong_sheet · ky · hd_classifying · hd_mid · hd_final · pay_type_classifying · pay_type_mid · pay_type_final · cdt1_classifying · cdt1_mid · cdt1_final · nhan; mỗi dòng ngược chỉ dong_canon · nhan.",
  "nguon": {
   "so": "Input_Raw/[Master] ITL_Ledge_raw.xlsx > ITL Ledge (owner dan 2026-08-26 17:55)",
   "so_dong_bang": "2026-08-26",
