@@ -21,6 +21,7 @@ from decimal import Decimal, InvalidOperation
 from typing import Any, Callable
 
 from fls.adapters.pm_join import canon_ref
+from fls.cau_hinh import fx
 from fls.repo import do_mau_so as dms
 from fls.repo import doc_bao_cao as bc
 from fls.repo import lenh_cho as lc
@@ -992,3 +993,35 @@ HAM.update({"lenh_cho": lenh_cho, "lenh_cho_tom": lenh_cho_tom,
             #   **404 im lang**, va cong `soi_bang_tuyen` da bat dung
             #   loi ay **hai lan** roi.
             "lenh_da_gan": lenh_da_gan})
+
+
+# ══ ⭐⭐ ISP 3.1.2 · `C1` (`WO-075`) — LÕI CONFIG: `IX.FX` tỷ giá tháng ══
+#
+# ⛔ Hàm này chỉ ĐỌC + DỌN HÌNH: nạp/kiểm *(một dòng/tháng · VND = 1 · 5 tiền tệ ·
+#   thiếu/trùng/lạc)* nằm ở `fls/cau_hinh/fx.py` — đúng luật đầu tệp *"router mỏng,
+#   ⛔ chứa luật"*. Tỷ giá đi ra là `Decimal` ⇒ vỏ `bao.py` in thành **CHUỖI**
+#   *(⛔ `float`)*.
+# ⚠ `yc.conn` ⛔ dùng: số đến từ nguồn TĨNH *(4 tháng TỔNG HỢP)* cho tới `C5`.
+#   Cửa vẫn mở một kết nối CHỈ ĐỌC cho mọi tuyến — vô hại, và ⛔ đáng một nhánh
+#   riêng trong `cua.py` *(tệp đã qua rà soát `P4`)* cho một tuyến sống tới `C5`.
+# ⚠ Nguồn tĩnh hỏng ⇒ `fx.LoiFX` lọt lên `cua.py` ⇒ `500 FLS-INTERNAL` + một
+#   dòng nhật ký mang đủ lý do: tệp đi cùng mã hỏng là lỗi CỦA MÁY, ⛔ của người
+#   gọi — và `MA_LOI` ⛔ có mã riêng cho nó *(thêm mã là việc của `BA-07` §5)*.
+# ⭐ `data_status = flash`: số tổng hợp ⛔ được khoác `reconciled`/`signed`
+#   *(`INV-I14`)*; ký tháng là `C7`.
+def ty_gia(yc: YeuCau):
+    """`GET /config/fx` — hợp đồng ISP 3.1.2 Step 2 mục 2, **nguyên văn**:
+    `{bang, nguon, ky:[{yyyymm, USD, SGD, COP, VND, HKD, trang_thai}], thieu,
+    trung, lac}`."""
+    b = fx.doc_tep()
+    return {"bang": fx.BANG, "nguon": b.nguon,
+            "ky": [{"yyyymm": d.yyyymm,
+                    **{te: d.ty_gia[te] for te in fx.TIEN_TE},
+                    "trang_thai": d.trang_thai} for d in b.ky],
+            "thieu": list(b.thieu), "trung": list(b.trung),
+            "lac": list(b.lac)}, "flash"
+
+
+# ⛔ Quên dòng dưới là một đường **404 im lặng** — lỗi `soi_bang_tuyen` đã bắt
+#   ba lần ở tệp này *(xem trên)*.
+HAM.update({"ty_gia": ty_gia})
