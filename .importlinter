@@ -141,3 +141,31 @@ forbidden_modules =
     fls.oracle
     fls.adapters
     psycopg
+
+# ⛔⛔ `fls.kiem` — tang DO/SOAT THUAN (`soat_nap` · `thu_tu_ngay` · `nguon_song`
+# · `do_luong`). Moi module tu khai *"thuan, ⛔ khong kho, ⛔ khong mang"*: du
+# lieu duoc TRUYEN VAO, cai tra ve la BANG CHUNG — ⛔ khong phai mot quyet dinh.
+#
+# ⚠ Vi sao rang buoc nay quan trong: chieu phu thuoc la `repo -> kiem`, ⛔ khong
+# nguoc lai (`repo/khai_cot.py` nhap `THU_TU_HOP_LE` tu `kiem.thu_tu_ngay` ·
+# `repo/nap_lo.py` nhap `chan_lai` tu `kiem.soat_nap`). Neu `kiem` nhap nguoc
+# `repo`/`db` thi ⓐ thanh vong phu thuoc, va ⓑ mot phep DO doc duoc kho se tu
+# di lay so — luc do bai `tests/kiem/` ⛔ khong con chay offline duoc, va
+# ⛔ khong con chung minh duoc no DO tren tap nao.
+#
+# ⛔ Truoc 16/11 luat nay CHI SONG trong chu thich (`fls/kiem/thu_tu_ngay.py`
+# dong 49-51) — ⛔ khong co gi chan. Do luc them: `fls/kiem/` 5 tep, 14 lenh
+# import *(4 `__future__` · 7 stdlib · 3 vao `fls`: `adapters.sao_ke` ×2,
+# `canon.validate` ×1)*, ⛔ 0 lenh tro toi `fls.repo`/`fls.db`/`psycopg`.
+# Da chung minh DO cho CA BA dong cam: them `import fls.repo` · `import fls.db`
+# · `import psycopg` *(trong HAM)* vao `fls/kiem/do_luong.py` ⇒ BROKEN; tra
+# nguyen ⇒ KEPT.
+[importlinter:contract:10]
+name = fls.kiem khong duoc biet tang kho (phep do thuan, du lieu truyen vao)
+type = forbidden
+source_modules =
+    fls.kiem
+forbidden_modules =
+    fls.repo
+    fls.db
+    psycopg

@@ -70,7 +70,7 @@ python docs/ITL/_tools/kiem_tai_lieu.py          # K1–K5 (giấy)
 python docs/ITL/_tools/khop_owner.py --kiem      # C1 · bảng đối chiếu audit
 python tools/soi_bang_tuyen.py                   # 37 tuyến ↔ SQL thật
 python tools/kiem_thuyet_minh.py                 # 31 nút
-.venv/Scripts/lint-imports.exe                   # 9 hợp đồng tầng
+.venv/Scripts/lint-imports.exe                   # 10 hợp đồng tầng
 python -m fls.db.pg_migrate                      # di trú → tự chạy pg_verify
 ```
 

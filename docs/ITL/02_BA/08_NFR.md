@@ -1,6 +1,6 @@
 # 08 — NFR: yêu cầu phi chức năng đo được *(dự án ITL)*
 
-**Version:** v1.4 | **Chủ sở hữu:** BA/PO + Tech Lead | **Mốc đo:** 2026-09-21 *(`NFR-I01`/`I04`: 2026-10-01 · `NFR-I29`: 2026-10-02 · `NFR-I30`: 2026-10-05)*
+**Version:** v1.4 | **Chủ sở hữu:** BA/PO + Tech Lead | **Mốc đo:** 2026-09-21 *(`NFR-I01`/`I04`: 2026-10-01 · `NFR-I29`: 2026-10-02 · `NFR-I30`: 2026-10-05 · `NFR-I16`: 2026-11-16)*
 
 > ⭐⭐ **Mỗi dòng dưới đây có MỘT CON SỐ ĐO ĐƯỢC hay MỘT CƠ CHẾ ĐÃ CHẠY.** Chỗ
 > nào chưa đo được thì ghi thẳng **⛔ chưa đo** — ⛔ không điền một con số mong
@@ -48,7 +48,7 @@ xem trong `git log`.
 | ID | Yêu cầu | Đo được |
 |---|---|---|
 | `NFR-I15` | Bộ phép thử | **1024 bài** · ⛔ **5 đỏ có sẵn** *(đều là `NFR-I09`)*. ⭐ Luật số một: *"cổng chưa từng thấy đỏ là cổng chưa biết có sống"* ⇒ mọi cổng mới phải **bị phá có chủ ý** và **đỏ thật** trước khi tin |
-| `NFR-I16` | Ranh giới tầng | **9** hợp đồng `import-linter`, **0** vi phạm *(~~8~~ — đo lại 17/09: `9 kept · 0 broken`)*. Then chốt: `fls.api` ⛔ không được biết tầng kho · `fls.web` chỉ được gọi `fls.api` |
+| `NFR-I16` | Ranh giới tầng | **10** hợp đồng `import-linter`, **0** vi phạm *(~~9~~ — đo 16/11 sau khi thêm hợp đồng `fls.kiem` ⛔ không được biết `repo`/`db`/`psycopg`: `10 kept · 0 broken`; ~~8~~ — đo lại 17/09)*. Then chốt: `fls.api` ⛔ không được biết tầng kho · `fls.web` chỉ được gọi `fls.api` |
 | `NFR-I17` ⭐ | **Tài liệu ⛔ không được già hơn máy** | **63 phép so SỐ SỐNG** *(`tools/kiem_so_song.py`)* — mỗi phép khớp **đúng một lần** và khớp **đúng con số máy đo**; nó **tự đếm cả chính nó** |
 | `NFR-I18` | Một nguồn tên cột | tiêu đề lưới **sinh từ** `ledge_spec` + `canon/spec` ⇒ ⛔ **không một tên cột tiếng Việt nào gõ tay**; cổng đối chiếu **hai chiều** với cửa thật |
 | `NFR-I19` | Một nguồn mã màu | **1** tệp được phép có mã màu *(`tokens.css`)*; bài quét NO nếu tệp khác có `#rrggbb` |
