@@ -65,6 +65,11 @@ MONG = {
     "dong_theo_hinh": {"A": 2272, "B": 29, "C": 400, "D": 27, "E": 199, "F": 428},
     "parity_o": (69510, 69510),      # test_parity_100_phan_tram_tung_o_tren_CA_SO
     "dong_loai_tu_soi": 37,
+    # ⭐ 16/11 (owner: "How done quan trọng nhất là mapping được 100%, giống các dữ liệu quá khứ"):
+    "hd_parity": (9930, 9930),       # khối 1 HD, chế độ oracle (đọc MID của sổ) — đo 16/11 rồi ghim
+    "tu_sinh_o": (4088, 4088),       # chế độ TỰ SINH 2026-03: FLS tự tính MID từ Manual input (tinh_mid) → Final
+    "tu_sinh_hd": (584, 584),
+    "tu_sinh_mid": (4020, 4088),     # MID tự tính = MID của sổ ở 4.020 ô (Final vẫn khớp đủ vì Classifying có trả lời)
     "checksum": {"itl_ledge_adjustment.json": "575c53379074c759",
                  "classifying_vs_canon.json": "7226ef112dbd00f7",
                  "pm_join.json": "6ec10945e6c1636a"},
@@ -184,11 +189,20 @@ def do() -> dict:
             tinh = tinh_final(_chuan(cls) or None, _chuan(mid) or None)
             tong_o += 1
             x["o_parity"] += 1
-            if _chuan(tinh) == _chuan(fin):
+            trung = _chuan(tinh) == _chuan(fin)
+            if trung:
                 khop_o += 1
                 x["o_parity_khop"] += 1
+            if kh == "hd":
+                x["hd_parity"] += 1
+                x["hd_parity_khop"] += trung
     kiem("parity ô", (khop_o, tong_o), MONG["parity_o"])
     kiem("dòng tu_soi loại", loai, MONG["dong_loai_tu_soi"])
+    kiem("parity khối HD", (sum(o[k]["hd_parity_khop"] for k in cac_ky), sum(o[k]["hd_parity"] for k in cac_ky)), MONG["hd_parity"])
+    tu_sinh = do_tu_sinh()
+    kiem("tự sinh ô Final 2026-03", tu_sinh["o"], MONG["tu_sinh_o"])
+    kiem("tự sinh khối HD 2026-03", tu_sinh["hd"], MONG["tu_sinh_hd"])
+    kiem("tự sinh MID 2026-03", tu_sinh["mid"], MONG["tu_sinh_mid"])
 
     # mapping FLS + PM line theo kỳ (bank → dòng canon → dòng sổ → kỳ)
     bank_khong_ky = 0
@@ -225,10 +239,36 @@ def do() -> dict:
         "tong": dict(tong),
         "pm_tong": {"so_dong_pm": len(pm), "pm_noi_tong": len(set().union(*line_ky.values())),
                     "pm_co_ref": sum(1 for x in pm if x.ref)},
+        "tu_sinh": tu_sinh,
         "bank_tong": {"dong_bank": tk.dong_bank, "khong_co_ma": tk.khong_co_ma,
                       "khong_thay_ma_PM": tk.khong_thay_ma_PM, "dong_theo_hinh": dict(tk.dong_theo_hinh),
                       "bank_khong_ky": bank_khong_ky},
     }
+
+
+def do_tu_sinh() -> dict:
+    """Chế độ TỰ SINH trên tháng duy nhất có cột Manual input (itl_ledge_2026_03.json, 584 dòng):
+    MID_fls = tinh_mid(Classifying, Manual, mặc định khối) → Final_fls = tinh_final(Classifying, MID_fls), so Final sổ.
+    ⛔ đọc MID của sổ — đây mới là phép đo "FLS tự mapping ra đúng quá khứ"."""
+    from fls.ledger.final_rule import tinh_mid
+    d = _nap("itl_ledge_2026_03.json")
+    if len(d["dong"]) != d["so_dong"] or d["ky"] != "2026-03":
+        raise SystemExit("⛔ ảnh 2026-03 khác khai")
+    tong = khop = hd_t = hd_k = mid_k = 0
+    for r in d["dong"]:
+        for k in KHOI:
+            cls, man, mid, fin = (r[f"{k}_{c}"] for c in ("classifying", "manual", "mid", "final"))
+            if any(la_o_loi(_chuan(v)) for v in (cls, mid, fin) if v is not None):
+                continue
+            m2 = tinh_mid(_chuan(cls) or None, _chuan(man) or None, MAC_DINH_THEO_KHOI[k])
+            f2 = tinh_final(_chuan(cls) or None, m2)
+            tong += 1
+            ok = _chuan(f2) == _chuan(fin)
+            khop += ok
+            mid_k += _chuan(m2) == _chuan(mid)
+            if k == "hd":
+                hd_t, hd_k = hd_t + 1, hd_k + ok
+    return {"ky": "2026-03", "o": (khop, tong), "hd": (hd_k, hd_t), "mid": (mid_k, tong)}
 
 
 def main() -> None:
