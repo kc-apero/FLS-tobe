@@ -246,7 +246,8 @@ def soi(bang: tuple = (), do_sql=None) -> tuple[list[str], list[dict]]:
         do.append({"duong": t.duong, "ham": t.ham,
                    "khai": sorted(khai), "that": sorted(cham),
                    "khai_ghi": sorted(khai_ghi), "that_ghi": sorted(ghi),
-                   "thieu": thieu, "thua": thua, "vet": vet})
+                   "thieu": thieu, "thua": thua, "vet": vet,
+                   "nguon_tinh": list(t.nguon_tinh)})
 
         # ⓐ ⛔⛔ Cai chinh: SQL cham mot bang ma ban khai ⛔ khong noi.
         if thieu:
@@ -268,6 +269,16 @@ def soi(bang: tuple = (), do_sql=None) -> tuple[list[str], list[dict]]:
             loi.append(
                 f"{t.phuong_thuc} {t.duong}: `bang` khai {thua} ma SQL ⛔ "
                 f"khong cham — ban do ve mot duong ⛔ khong co")
+        # ⓔ ⭐ ISP 3.1.2 · `C1` (`WO-075`) — tuyến **NGUỒN TĨNH** khai `bang=()`
+        #    ⇒ ⓐ–ⓓ so *"khai 0 bảng"* với *"SQL 0 bảng"*: **xanh trên tập rỗng**
+        #    (`Đ3`). Phép canh dương duy nhất cổng TĨNH làm được là: tệp khai
+        #    phải **CÓ THẬT**. ⛔ Có ⇒ bản đồ vẽ một nguồn ⛔ tồn tại — và cửa sẽ
+        #    `500` ở lần gọi đầu, ⛔ ở lúc chạy cổng.
+        for tep in t.nguon_tinh:
+            if not os.path.isfile(os.path.join(GOC, *tep.split("/"))):
+                loi.append(
+                    f"{t.phuong_thuc} {t.duong}: `nguon_tinh` khai {tep} ma "
+                    f"tep ⛔ co that — ban do ve mot nguon ⛔ ton tai")
     return loi, do
 
 
@@ -285,6 +296,8 @@ def main() -> int:
             print(f"     THIEU: {d['thieu']}")
         if d["thua"]:
             print(f"     THUA : {d['thua']}")
+        if d["nguon_tinh"]:
+            print(f"     TINH : {d['nguon_tinh']} · vet {len(d['vet'])} ham")
     if loi:
         print(f"\n⛔ BAN KHAI LECH SQL — {len(loi)} vi pham:")
         for x in loi:
