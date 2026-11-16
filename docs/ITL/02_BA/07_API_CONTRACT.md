@@ -1,6 +1,6 @@
 # 07 — API CONTRACT: FLS
 
-**Version:** v3.14 · **Ngày:** 2026-10-06 · **Chủ sở hữu:** BA/PO + Tech Lead
+**Version:** v3.15 · **Ngày:** 2026-11-16 · **Chủ sở hữu:** BA/PO + Tech Lead
 **Thay thế:** v0.1 *(bản copy chương trình, prefix `/api/voi/`)* — đã khai tử.
 
 **Căn cứ:** `04_DB_IMPLEMENTATION` v1.0 *(schema `fls_itl`)* · `QĐ-ITL-38` *(app là nơi thao tác)* · `QĐ-ITL-45` *(FLS độc lập)* · `FLS-vs-FPS` §7 *(append-only event-log)*.
@@ -841,6 +841,26 @@ LY_DO_MAC_DINH_BO_GHEP = "(may dien) bo ghep tren man - nguoi bam khong ghi ly d
 
 ---
 
+## §4i · ⭐⭐ Nhóm CẤU HÌNH + bản báo cáo ký — tuyến của ISP 3.1 *(mới 2026-11-16, ISP `IncrementalStepPlan-FLS-Voi_v3.1.2` · AP Voi FLS v3.1.2 Part 3)*
+
+> Khai TRƯỚC, một lần, cho mọi tuyến ISP 3.1 sẽ mở — để bước mở tuyến ⛔ phải chờ một lượt sửa `BA-07` riêng (bài `test_ba07_phu_het_tuyen.py` đòi mọi tuyến THẬT có mặt ở đây). Hợp đồng lấy nguyên từ mục 7 của từng bước ISP; bước nào mở tuyến thì lúc gộp đổi ⬜ → ✅ ở chính dòng ấy. Ghi bởi orchestrator ISP thay `fls-ba` (người dùng 16/11: *"Xác nhận ISP. Bắt đầu triển khai"*). Mọi tuyến qua cửa THẺ như §1 (`actor` từ thẻ); tiền ra JSON là chuỗi; `data_status` = `flash`.
+
+| Tuyến | Bước ISP | Hợp đồng | Trạng thái |
+|---|---|---|---|
+| `GET /api/fls/v1/config/fx` | C1 → C5 (kho) | `{bang:'IX.FX', nguon, ky:[{yyyymm (số nguyên), USD, SGD, COP, VND, HKD (chuỗi), trang_thai ∈ chua_ky/da_ky}], thieu:[yyyymm], trung:[yyyymm], lac:[yyyymm]}` — tháng thiếu/trùng/lạc ở trường riêng, ⛔ cộng đôi, ⛔ thành 0 | ⬜ chưa xây (C1 đã dựng trên nhánh `isp/C1`, chờ 3 vòng review) |
+| `GET /api/fls/v1/config/hd` | C4 | cây IX.HD 74 nút · 6 nhóm + danh sách chênh với Mapping Master (73 mã); cây hỏng ⇒ lỗi có tên (`HD_CHU_TRINH` · `HD_CHA_VANG`) | ⬜ chưa xây |
+| `GET /api/fls/v1/config/per` | C6 | ngày đầu cột (2024-10-21) · luật ghi nhận kỳ (A = dồn ngày 1 tháng PL start, D4) | ⬜ chưa xây |
+| `POST /api/fls/v1/config/fx/{yyyymm}/sign` | C7 | niêm phong tháng; người ký = người trong THẺ; ký lại ⇒ `409`; `bang_ghi` = bảng config (⛔ `fls_itl`) | ⬜ chưa xây |
+| `GET /api/fls/v1/config/ven` | C9 | Vendor & Network Block 1 (36 dòng) · mã 'cách tính' cho 5 vendor riêng | ⬜ chưa xây |
+| `GET /api/fls/v1/config/drv` | C10 | driver (loại, CDT1, tháng); tháng thiếu ⇒ `DRV_THIEU` | ⬜ chưa xây |
+| `GET /api/fls/v1/config/alr` | C11 | luật phân bổ theo HD + hiệu lực theo kỳ + cờ (mặc định TẮT, D2) | ⬜ chưa xây |
+| `GET /api/fls/v1/report/snapshot/{ky}` | C13 | danh sách phiên bản bản Daily Report 3 (checksum · trạng thái · người ký) | ⬜ chưa xây |
+| `POST /api/fls/v1/report/snapshot/{ky}/sign` | C13 | ký phiên bản mới nhất; phiên bản cũ đã ký giữ nguyên | ⬜ chưa xây |
+
+⭐ Cổng HD1/HD2 (CG1 · CG2) **⛔ mở tuyến mới**: chúng thêm cổng vào `GET /gates` sẵn có (§2) — `FINAL` thành số đo, thêm `HD1_THANG` và `HD2_WP_C2…C5`; ba trạng thái `dat` ∈ `true` / `false` / `null` như cũ.
+
+---
+
 ## §5 · Mã lỗi
 
 | Mã | Khi | HTTP |
@@ -896,6 +916,7 @@ LY_DO_MAC_DINH_BO_GHEP = "(may dien) bo ghep tren man - nguoi bam khong ghi ly d
 ---
 
 ## Changelog
+- **v3.15** *(2026-11-16, orchestrator ISP 3.1 thay `fls-ba`; trong thẩm quyền: KHAI TRƯỚC tuyến đã có trong ISP đã duyệt — ⛔ đổi tuyến cũ, ⛔ đổi luật)*: thêm **`§4i`** — 9 tuyến cấu hình + bản báo cáo ký của ISP 3.1, mọi dòng `⬜ chưa xây`; bước mở tuyến đổi ⬜ → ✅ lúc gộp. Gốc: bước C1 mở `GET /config/fx` thì bài `test_ba07_phu_het_tuyen.py` đỏ (`BA-07` ⛔ nhắc `config`: grep 0 dòng) — lỗi sẽ lặp ở C4 · C6 · C7 · C9 · C10 · C11 · C13.
 - **v3.14** *(2026-10-06, `fls-ba`, xếp `KQ-061 F-2`; trong thẩm quyền spec: hợp đồng cửa đọc thêm trường áp **một luật đã có** — `BA-05` v0.32 *"Final = `fls_sua_tay` ∪ cột nguồn"*, ⛔ đổi luật, ⛔ đổi sổ, ⛔ đổi trường cũ)*: `GET /ledger` thêm `<f>_final` + `<f>_nguon` cho năm trường lưới gõ được; tuyến đọc thêm `fls_sua_tay`. Gốc: lưới `F02` in cột thô ⇒ ô người vừa gõ hiện `chưa gán` sau khi tải lại và phép hỏi lại gọi chính người gõ là *"người khác"* *(sổ thật cột nguồn rỗng **8.387 / 8.387** ⇒ gặp **100%** ở phiên sửa thật đầu tiên)*. Mã ⇒ **`WO-062`**.
 - **v3.13** *(2026-10-05, `fls-ba`, xếp phát hiện ngoài phạm vi `WO-023` — `BG-053` mục 3 · `BG-057` mục 2; trong thẩm quyền spec: **mô tả** một mã lỗi đã có + ghi nợ — ⛔ đổi mã, ⛔ đổi HTTP, ⛔ tuyến mới, ⛔ đổi sổ)*: ⭐ **`§5` đính chính dòng `FLS-DQ-FAILED`** — mã ấy ⛔ bao giờ là *"`ACC-1…4` không đạt"*: **0** đường ném nó từ cổng, **5** lớp lỗi của cửa ghi mang nó *(khác tiền tệ · lệch tổng · chưa duyệt · thiếu lý do · lớp gốc)*. Câu màn + `bao.py` theo ⇒ **`WO-060`** ⓐ *(`BA-06` v4.23 `ⓦ` ⑧)*. ⭐ **`GAP-API-12`** mới *(nợ)*: `la_ban_dao` nối theo `at` trùng mà ⛔ ràng buộc máy canh.
 - **v3.12** *(2026-10-05, `fls-ba`, nghiệm thu PO `WO-042` + xếp `KQ-046 F-1`; trong thẩm quyền spec: danh sách chỗ áp một luật đã có — ⛔ đổi luật, ⛔ đổi sổ, ⛔ tuyến mới, ⛔ khoá mới)*: ⭐ **`§4g` đoạn v3.12 — kiểm kê ĐỦ** mọi phép so / gom tiền tệ *(grep `upper(`/`lower(`/`btrim(`/`.strip()`/`==` trên `curr`)*: lớp ⓐ so giữa hai nguồn — `doc_bao_cao.py:309`/`:310`/`:317` *(chiều ngược `ung_vien_pm`, `upper(l.curr)` trần — `KQ-046` lệch **5/5** ca biên, kể cả `' vnd '`)* ＋ `man_ghep.py:631` *(`khoa_bang_chung`, so chuỗi thô — `fls-ba` tìm thêm)* · lớp ⓑ gom để đếm — `do_mau_so.py:297` ⇒ **áp**; lớp ⓒ xếp/lọc hàng chờ *(`QĐ-ITL-58`, khứ hồi tự nhất quán)* · ⓓ cùng nguồn · ⓔ `tools/demo_dong.py` ⇒ **ngoài, có lý do**. Sổ thật **0** ca. Mã ⇒ **`WO-047`**.
