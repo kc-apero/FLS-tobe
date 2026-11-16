@@ -1,0 +1,368 @@
+{
+ "bang": "IX.FX",
+ "khuon": "ix_fx",
+ "nguon": "Drive [COPY] APERO | FS2 (nguồn tỷ giá) · id 1rEky336gOxomnGjMhq69G0U-F6Ve41PQwOddBYv9nPY · sheet '9.2.Exchange Rate'!A1:F38",
+ "cach_doc": "Sheets API spreadsheets.get includeGridData, fields effectiveValue (⛔ formattedValue: SGD 202507 hiện '20,692' mà giá trị 20691.51)",
+ "ngay_dong_bang": "2026-11-16",
+ "khong_mang_PII": "⛔ KHÔNG mang cột riêng tư: máy soát 6 tên cột của bản thô với PM_COT_RIENG_TU ['Email Address'] — 0 trùng (gộp khoảng trắng, ⛔ phân biệt hoa thường). Ảnh chỉ giữ khoá `Month` + 5 cột chọn; 0 cột bản thô ⛔ chọn (tên ở `cot_khong_chon`).",
+ "khoa": "Month",
+ "kieu_khoa": "yyyymm",
+ "cot": [
+  "USD",
+  "SGD",
+  "COP",
+  "VND",
+  "HKD"
+ ],
+ "cot_khong_chon": [],
+ "so_dong": 37,
+ "trung": [],
+ "thieu": [],
+ "lac": [
+  "202306"
+ ],
+ "khoa_hong": [],
+ "o_rong": [],
+ "cong": {
+  "mong": 37,
+  "so_dong": 37,
+  "dat": true,
+  "ly_do": []
+ },
+ "checksum_noi_dung": "b6d1f9e9074951f1",
+ "dong": [
+  {
+   "thu_tu": 1,
+   "Month": "202401",
+   "USD": "25066",
+   "SGD": "19319",
+   "COP": "6",
+   "VND": "1",
+   "HKD": "3324"
+  },
+  {
+   "thu_tu": 2,
+   "Month": "202402",
+   "USD": "25066",
+   "SGD": "19319",
+   "COP": "6",
+   "VND": "1",
+   "HKD": "3324"
+  },
+  {
+   "thu_tu": 3,
+   "Month": "202403",
+   "USD": "25066",
+   "SGD": "19319",
+   "COP": "6",
+   "VND": "1",
+   "HKD": "3324"
+  },
+  {
+   "thu_tu": 4,
+   "Month": "202404",
+   "USD": "25066",
+   "SGD": "19319",
+   "COP": "6",
+   "VND": "1",
+   "HKD": "3324"
+  },
+  {
+   "thu_tu": 5,
+   "Month": "202405",
+   "USD": "25066",
+   "SGD": "19319",
+   "COP": "6",
+   "VND": "1",
+   "HKD": "3324"
+  },
+  {
+   "thu_tu": 6,
+   "Month": "202406",
+   "USD": "25066",
+   "SGD": "19319",
+   "COP": "6",
+   "VND": "1",
+   "HKD": "3324"
+  },
+  {
+   "thu_tu": 7,
+   "Month": "202407",
+   "USD": "25066",
+   "SGD": "19319",
+   "COP": "6",
+   "VND": "1",
+   "HKD": "3324"
+  },
+  {
+   "thu_tu": 8,
+   "Month": "202408",
+   "USD": "25066",
+   "SGD": "19319",
+   "COP": "6",
+   "VND": "1",
+   "HKD": "3324"
+  },
+  {
+   "thu_tu": 9,
+   "Month": "202409",
+   "USD": "25066",
+   "SGD": "19319",
+   "COP": "6",
+   "VND": "1",
+   "HKD": "3324"
+  },
+  {
+   "thu_tu": 10,
+   "Month": "202410",
+   "USD": "25066",
+   "SGD": "19319",
+   "COP": "6",
+   "VND": "1",
+   "HKD": "3324"
+  },
+  {
+   "thu_tu": 11,
+   "Month": "202411",
+   "USD": "25066",
+   "SGD": "19319",
+   "COP": "6",
+   "VND": "1",
+   "HKD": "3324"
+  },
+  {
+   "thu_tu": 12,
+   "Month": "202412",
+   "USD": "25066",
+   "SGD": "19319",
+   "COP": "6",
+   "VND": "1",
+   "HKD": "3324"
+  },
+  {
+   "thu_tu": 13,
+   "Month": "202501",
+   "USD": "25390",
+   "SGD": "19068",
+   "COP": "6.197",
+   "VND": "1",
+   "HKD": "3293"
+  },
+  {
+   "thu_tu": 14,
+   "Month": "202502",
+   "USD": "25370",
+   "SGD": "19166.05",
+   "COP": "6.27",
+   "VND": "1",
+   "HKD": "3286.92"
+  },
+  {
+   "thu_tu": 15,
+   "Month": "202503",
+   "USD": "25740",
+   "SGD": "19744.785",
+   "COP": "6.01",
+   "VND": "1",
+   "HKD": "3338.02"
+  },
+  {
+   "thu_tu": 16,
+   "Month": "202504",
+   "USD": "25750",
+   "SGD": "19941.919",
+   "COP": "6.18",
+   "VND": "1",
+   "HKD": "3317.26"
+  },
+  {
+   "thu_tu": 17,
+   "Month": "202505",
+   "USD": "25883",
+   "SGD": "20293.644",
+   "COP": "6.359",
+   "VND": "1",
+   "HKD": "3322.489"
+  },
+  {
+   "thu_tu": 18,
+   "Month": "202506",
+   "USD": "25970",
+   "SGD": "20379.968",
+   "COP": "6.505",
+   "VND": "1",
+   "HKD": "3333.488"
+  },
+  {
+   "thu_tu": 19,
+   "Month": "202507",
+   "USD": "25500",
+   "SGD": "20691.51",
+   "COP": "6",
+   "VND": "1",
+   "HKD": "3324"
+  },
+  {
+   "thu_tu": 20,
+   "Month": "202508",
+   "USD": "25500",
+   "SGD": "20691.51",
+   "COP": "6",
+   "VND": "1",
+   "HKD": "3324"
+  },
+  {
+   "thu_tu": 21,
+   "Month": "202509",
+   "USD": "25500",
+   "SGD": "20691.51",
+   "COP": "6",
+   "VND": "1",
+   "HKD": "3324"
+  },
+  {
+   "thu_tu": 22,
+   "Month": "202510",
+   "USD": "25500",
+   "SGD": "20691.51",
+   "COP": "6",
+   "VND": "1",
+   "HKD": "3324"
+  },
+  {
+   "thu_tu": 23,
+   "Month": "202511",
+   "USD": "25500",
+   "SGD": "20691.51",
+   "COP": "6",
+   "VND": "1",
+   "HKD": "3324"
+  },
+  {
+   "thu_tu": 24,
+   "Month": "202512",
+   "USD": "25500",
+   "SGD": "20691.51",
+   "COP": "6",
+   "VND": "1",
+   "HKD": "3324"
+  },
+  {
+   "thu_tu": 25,
+   "Month": "202306",
+   "USD": "26000",
+   "SGD": "20691.51",
+   "COP": "6",
+   "VND": "1",
+   "HKD": "3324"
+  },
+  {
+   "thu_tu": 26,
+   "Month": "202601",
+   "USD": "25500",
+   "SGD": "20691.51",
+   "COP": "6",
+   "VND": "1",
+   "HKD": "3324"
+  },
+  {
+   "thu_tu": 27,
+   "Month": "202602",
+   "USD": "26000",
+   "SGD": "20692",
+   "COP": "6",
+   "VND": "1",
+   "HKD": "3324"
+  },
+  {
+   "thu_tu": 28,
+   "Month": "202603",
+   "USD": "26200",
+   "SGD": "20692",
+   "COP": "6",
+   "VND": "1",
+   "HKD": "3324"
+  },
+  {
+   "thu_tu": 29,
+   "Month": "202604",
+   "USD": "26200",
+   "SGD": "20692",
+   "COP": "6",
+   "VND": "1",
+   "HKD": "3324"
+  },
+  {
+   "thu_tu": 30,
+   "Month": "202605",
+   "USD": "26200",
+   "SGD": "20692",
+   "COP": "6",
+   "VND": "1",
+   "HKD": "3324"
+  },
+  {
+   "thu_tu": 31,
+   "Month": "202606",
+   "USD": "26200",
+   "SGD": "20692",
+   "COP": "6",
+   "VND": "1",
+   "HKD": "3324"
+  },
+  {
+   "thu_tu": 32,
+   "Month": "202607",
+   "USD": "26200",
+   "SGD": "20692",
+   "COP": "6",
+   "VND": "1",
+   "HKD": "3324"
+  },
+  {
+   "thu_tu": 33,
+   "Month": "202608",
+   "USD": "26200",
+   "SGD": "20692",
+   "COP": "6",
+   "VND": "1",
+   "HKD": "3324"
+  },
+  {
+   "thu_tu": 34,
+   "Month": "202609",
+   "USD": "26200",
+   "SGD": "20692",
+   "COP": "6",
+   "VND": "1",
+   "HKD": "3324"
+  },
+  {
+   "thu_tu": 35,
+   "Month": "202610",
+   "USD": "26200",
+   "SGD": "20692",
+   "COP": "6",
+   "VND": "1",
+   "HKD": "3324"
+  },
+  {
+   "thu_tu": 36,
+   "Month": "202611",
+   "USD": "26200",
+   "SGD": "20692",
+   "COP": "6",
+   "VND": "1",
+   "HKD": "3324"
+  },
+  {
+   "thu_tu": 37,
+   "Month": "202612",
+   "USD": "26200",
+   "SGD": "20692",
+   "COP": "6",
+   "VND": "1",
+   "HKD": "3324"
+  }
+ ]
+}
