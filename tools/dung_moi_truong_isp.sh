@@ -30,7 +30,8 @@
 #
 #  ② ⛔ GHI KHO THẬT. `FLS_CHO_GHI_THAT` đặt ⇒ TỪ CHỐI. `PG_DSN` (và `PG_DSN_TEST` nếu đặt) phải
 #    khớp NGUYÊN CHUỖI `postgresql://<user>:<pass>@(localhost|127.0.0.1):<cổng của lượt>/<[a-z0-9_]+>`
-#    — ⛔ query string, ⛔ host khác; và ⛔ biến `PGHOST`/`PGHOSTADDR`/`PGPORT`/`PGSERVICE`/
+#    — ⛔ query string, ⛔ host khác, `<user>`/`<pass>` ⛔ chứa `@ / ? #` hay khoảng trắng (MỘT lớp
+#    ký tự `LOP_USER`/`LOP_MK` dùng chung với hàm che — S0-R2-02); và ⛔ biến `PGHOST`/`PGHOSTADDR`/`PGPORT`/`PGSERVICE`/
 #    `PGSERVICEFILE` nào được đặt. ⛔⛔ Bản đầu so bằng glob `case` (`postgresql://*@localhost:5433/*`)
 #    và R1 (`KQ-067` · `S0-R1-01`) đo được BA đường "trông cục bộ mà nối đi chỗ khác":
 #      ⓐ `…@localhost:5433/fls?port=5999`              — libpq gộp query string ⇒ nối 127.0.0.1:5999
@@ -56,8 +57,14 @@
 #    phải BẰNG tập đã ghi ở `docs/ITL/03_Dev/isp-3.1/duong_nen_bai_do.txt` (node id) — THÊM hay
 #    BỚT một bài đều `[ĐỎ]` (S0-R1-02: bản đầu chỉ đỏ khi pytest ⛔ chạy nổi, nên một bài đỏ MỚI
 #    vẫn `KẾT: ĐẠT`). pytest ⛔ chạy nổi (mã thoát ∉ {0, 1}) hay ⛔ có dòng tổng kết ⇒ `[ĐỎ]`.
+#    ⭐ MẪU SỐ cũng có `mong` (S0-R2-03): `skipped = 0` · `deselected = 0` · số bài CHẠY ≥
+#    `MONG_PYTEST_TOAN_BO` / `MONG_PYTEST_WEB`, và pytest chạy với `PYTEST_ADDOPTS` bị GỠ — tập
+#    đỏ bằng nhau trên một bộ bài teo (`--lf`: 26/2.460) là xanh giả. ⭐ Phép kiểm định danh đã
+#    ĐỎ thì ⛔ bước GHI nào sau nó (S0-R2-04): dựng / K2 / K7 ĐỎ ⇒ ⛔ chạy pytest (conftest DROP +
+#    CREATE kho test) — `[ĐỎ] pytest · bỏ qua`.
 #
-#  ⛔ In mật khẩu của DSN: mọi chỗ in DSN đều che `://user:***@` (S0-R1-06), kể cả dòng từ chối.
+#  ⛔ In mật khẩu của DSN: mọi chỗ in DSN đều che `://user:***@` (S0-R1-06), kể cả dòng từ chối —
+#    tới `@` CUỐI dòng, user ngoài lớp ⇒ `://***@`, `password=` ⇒ che tới hết dòng (S0-R2-02).
 #    Ngoại lệ DUY NHẤT: hai dòng `export` cuối lượt in mật khẩu khi nó là mặc định CÔNG KHAI
 #    `fls` (`fls/db/kho.py:44` · `CLAUDE.md` §Cổng · `CREATE ROLE … PASSWORD 'fls'` dưới đây) —
 #    để agent chép được nguyên dòng; mật khẩu khác ⇒ vẫn che.
@@ -77,7 +84,11 @@ CONG_ISP="5433 5434 5435 5436 5437 5444 5445 5446 5447"
 
 # ── CLI · từ chối MỌI đối số ⛔ khai (S0-R1-03: bản đầu chỉ soát `$1` ⇒ `--chi-kiem --la` exit 0,
 #    `--duong-nen --chi-kiem` thì DỰNG dù người gọi muốn chỉ kiểm).
-CHE_DO=""; CO_CHE_DO=""; CONG_DOI_SO=""; N_DOI_SO=$#
+#    ⛔⛔ S0-R2-01: `--cong ''` (giá trị RỖNG) bản trước ⛔ từ chối — `CONG_DOI_SO` rỗng ⇒ rơi về
+#    FLS_PG_PORT rồi 5433 (cụm gốc S0, của người khác); và chốt "hai lần" hỏi `-n "$CONG_DOI_SO"`
+#    nên `--cong '' --cong 5435` lọt. Đường thật: `--cong "$BIEN"` với biến rỗng. ⇒ giá trị rỗng
+#    là LỖI ĐẦU VÀO (exit 2), và "đã thấy --cong" là một cờ RIÊNG, ⛔ suy từ giá trị.
+CHE_DO=""; CO_CHE_DO=""; CONG_DOI_SO=""; CO_CONG=""; N_DOI_SO=$#
 while [ "$#" -gt 0 ]; do
   case "$1" in
     --duong-nen|--chi-kiem)
@@ -87,9 +98,12 @@ while [ "$#" -gt 0 ]; do
       CO_CHE_DO="$1"
       if [ "$1" = --duong-nen ]; then CHE_DO="duong_nen"; else CHE_DO="chi_kiem"; fi ;;
     --cong)
-      if [ -n "$CONG_DOI_SO" ]; then echo "⛔ --cong đưa hai lần — từ chối" >&2; exit 2; fi
+      if [ -n "$CO_CONG" ]; then echo "⛔ --cong đưa hai lần — từ chối" >&2; exit 2; fi
       if [ "$#" -lt 2 ]; then echo "⛔ --cong thiếu giá trị (xem --help)" >&2; exit 2; fi
-      CONG_DOI_SO="$2"; shift ;;
+      if [ -z "$2" ]; then
+        echo "⛔ --cong '' — giá trị RỖNG (biến cổng chưa đặt?) — từ chối, ⛔ rơi về FLS_PG_PORT/5433 (cụm của người khác)" >&2; exit 2
+      fi
+      CO_CONG=1; CONG_DOI_SO="$2"; shift ;;
     -h|--help)
       if [ "$N_DOI_SO" != 1 ]; then echo "⛔ --help ⛔ đi kèm đối số khác — từ chối" >&2; exit 2; fi
       sed -n '2,8p' "$0"; exit 0 ;;
@@ -100,6 +114,11 @@ done
 CHE_DO="${CHE_DO:-dung}"
 
 # ── cổng của lượt: --cong ⇒ FLS_PG_PORT ⇒ 5433; ⛔ thuộc tập ISP ⇒ từ chối.
+#    S0-R2-01 (cùng lớp, nguồn thứ hai): FLS_PG_PORT ĐẶT mà RỖNG (`FLS_PG_PORT=$BIEN` với biến
+#    rỗng) cũng là lỗi đầu vào — hỏi "có ĐẶT không" (`+x`), ⛔ để `:-` nuốt thành "không đặt".
+if [ -n "${FLS_PG_PORT+x}" ] && [ -z "$FLS_PG_PORT" ]; then
+  echo "⛔ FLS_PG_PORT đặt mà RỖNG — từ chối, ⛔ rơi về 5433 (cụm của người khác). Gỡ biến hoặc đặt cổng." >&2; exit 2
+fi
 CONG_BIEN="${FLS_PG_PORT:-}"
 if [ -n "$CONG_DOI_SO" ] && [ -n "$CONG_BIEN" ] && [ "$CONG_DOI_SO" != "$CONG_BIEN" ]; then
   echo "⛔ --cong $CONG_DOI_SO ≠ FLS_PG_PORT=$CONG_BIEN — hai nguồn cổng mâu thuẫn, từ chối" >&2; exit 2
@@ -127,11 +146,34 @@ DUONG_NEN_DO="${FLS_DUONG_NEN_DO:-$GOC/docs/ITL/03_Dev/isp-3.1/duong_nen_bai_do.
 export PG_DSN="${PG_DSN:-postgresql://fls:fls@localhost:$CONG/fls}"
 export PYTHONUTF8=1 PYTHONIOENCODING=utf-8
 
-# ── S0-R1-06 · che mật khẩu mọi chỗ in DSN. `[^@]*` (⛔ `[^@/]*`): mật khẩu có `/` vẫn bị che.
-#    Dạng từ khoá `password=…` cũng che (dạng ấy bị chốt từ chối, nhưng dòng từ chối có in nó).
+# ── S0-R2-02 · MỘT lớp ký tự cho userinfo của DSN, DÙNG CHUNG bởi khuôn chốt `RE_DSN` (② dưới)
+#    và hàm che `che_dong`. ⛔⛔ R2 (`KQ-068`) đo HAI lớp khác nhau: khuôn nhận mật khẩu `[^@/?#]+`
+#    (CÓ khoảng trắng), hàm che dừng ở khoảng trắng `[^@[:space:]]*` ⇒ `fls:bi mat@…` QUA chốt và
+#    in nguyên mật khẩu 4 dòng (tiêu đề ×2 · `export` ×2); `fls:ab@cdXYZ@…` bị từ chối nhưng câu
+#    từ chối lộ đuôi `cdXYZ`; `password='a b'` ⇒ `password=*** b'`. (Chú thích bản trước còn ghi
+#    `[^@]*` trong khi mã là `[^@[:space:]]*` — lệch thêm một lớp nữa.)
+#    ⭐ Khoảng trắng nằm NGOÀI lớp (libpq vốn từ chối: psycopg báo `unexpected spaces found`).
+#    ⭐ Đọc theo BYTE (`LC_ALL=C`) ở CẢ HAI nơi: Python đặt `LC_CTYPE=C.UTF-8` cho tiến trình con
+#       (PEP 538) còn shell container là POSIX — cùng script chạy hai locale; và `sed` ở locale
+#       UTF-8 ⛔ khớp `.` qua một byte UTF-8 lẻ ⇒ lọt (đo khi viết bài: `Kq7\xa0Wx9` in nguyên).
+LOP_USER='[^:@/?#[:space:]]'   # tên user: ⛔ `:` `@` `/` `?` `#`, ⛔ khoảng trắng
+LOP_MK='[^@/?#[:space:]]'      # mật khẩu: ⛔ `@` `/` `?` `#`, ⛔ khoảng trắng
+# ── S0-R1-06 · che mật khẩu MỌI chỗ in DSN — kể cả dòng từ chối, nơi giá trị có thể ở NGOÀI lớp:
+#    ① user trong lớp ⇒ giữ user, che từ sau `://<user>:` tới `@` CUỐI dòng (`.*@`, ⛔ `[^@]*@`:
+#       mật khẩu có `@` thô ⇒ ⛔ lộ đuôi). Mọi mật khẩu khuôn CHẤP NHẬN đều nằm trọn trong đoạn ấy.
+#    ② user NGOÀI lớp (khoảng trắng, `@`, `/`…) ⇒ che trọn `://***@` tới `@` cuối (có `:` ở giữa).
+#    ③ dạng từ khoá: che từ `password=` tới HẾT dòng (`password='a b'` có nháy + khoảng trắng).
+#    `che` (một GIÁ TRỊ): xuống dòng in thành `\n` TRƯỚC khi che — bản trước che theo DÒNG nên
+#    `fls:ab<LF>cd@…` lộ nửa đầu. Che thừa (mất host khi dòng có hai `@`) là lỗi an toàn.
 #    Dấu phân cách `|`, ⛔ `#`: biểu thức có `#` trong ngoặc vuông.
-che() { printf '%s\n' "$1" | che_dong; }
-che_dong() { sed -E 's|(://[^:@/?#[:space:]]*):[^@[:space:]]*@|\1:***@|g; s|(password=)[^[:space:]]*|\1***|g'; }
+che() { local v="${1//$'\n'/\\n}"; printf '%s\n' "${v//$'\r'/\\r}" | che_dong; }
+che_dong() {
+  LC_ALL=C sed -E \
+    -e "s|(://${LOP_USER}*):.*@|\\1:***@|" -e 't tu_khoa' \
+    -e 's|://.*:.*@|://***@|' \
+    -e ':tu_khoa' \
+    -e 's/(password[[:space:]]*=).*/\1***/I'
+}
 
 # Đ5 — bộ đếm ĐỎ dùng chung cho cả DỰNG lẫn KIỂM. ⭐ Bước dựng hỏng cũng là ĐỎ: ⛔ để một phép
 # kiểm xanh "nhờ" một cụm/kho KHÁC che đi việc cụm của tệp này ⛔ dựng được (đo 16/11 khi soát lại
@@ -139,6 +181,11 @@ che_dong() { sed -E 's|(://[^:@/?#[:space:]]*):[^@[:space:]]*@|\1:***@|g; s|(pas
 DO=0
 dat() { printf '  [ĐẠT] %-26s %s\n' "$1" "$2"; }
 do_() { printf '  [ĐỎ]  %-26s %s\n' "$1" "$2"; DO=$((DO + 1)); }
+# S0-R2-04 · lý do ⛔ được chạy bước GHI kế tiếp — pytest (`tests/conftest.py` DROP + CREATE kho
+#   test). ⛔⛔ Bản trước in `[ĐỎ]` ở dựng/K2 rồi VẪN chạy pytest: R2 đo OID `fls_test` đổi trên
+#   một cụm mà K2 vừa chứng minh ⛔ phải của mình — phép kiểm chỉ in mà ⛔ chặn là biên bản.
+CHAN_GHI=""
+chan_ghi() { CHAN_GHI="${CHAN_GHI:+$CHAN_GHI · }$1"; }
 
 # ── ② chốt an toàn — chạy TRƯỚC mọi thứ (kể cả ở chế độ chỉ kiểm), TRƯỚC dòng tiêu đề.
 if [ -n "${FLS_CHO_GHI_THAT:-}" ]; then
@@ -153,11 +200,13 @@ for BIEN in PGHOST PGHOSTADDR PGPORT PGSERVICE PGSERVICEFILE; do
     exit 2
   fi
 done
-# ⓐ ⓑ — khuôn NGUYÊN CHUỖI: `[^@/?#]` chặn `/` trước `@` (ⓑ), `$` sau tên kho chặn query (ⓐ).
-RE_DSN='^postgresql://([^:@/?#]+):([^@/?#]+)@(localhost|127\.0\.0\.1):([0-9]+)/([a-z0-9_]+)$'
+# ⓐ ⓑ — khuôn NGUYÊN CHUỖI: lớp `LOP_USER`/`LOP_MK` (⛔ `@ / ? #`, ⛔ khoảng trắng — S0-R2-02)
+#     chặn `/` trước `@` (ⓑ), `$` sau tên kho chặn query (ⓐ).
+RE_DSN="^postgresql://(${LOP_USER}+):(${LOP_MK}+)@(localhost|127\\.0\\.0\\.1):([0-9]+)/([a-z0-9_]+)\$"
 kiem_dsn() {   # $1 = tên biến · $2 = giá trị — lệch ⇒ exit 2; khớp ⇒ đặt KHO_DSN = tên kho
+  local LC_ALL=C   # đọc theo BYTE như `che_dong` (S0-R2-02) — `local` trả locale cũ khi ra hàm
   if ! [[ $2 =~ $RE_DSN ]]; then
-    echo "⛔ $1=$(che "$2") ⛔ khớp NGUYÊN CHUỖI postgresql://<user>:<pass>@(localhost|127.0.0.1):<cổng>/<tên kho [a-z0-9_]> — ⛔ query string, ⛔ host khác. Từ chối (kho ở đây phải là kho RỖNG cục bộ)." >&2
+    echo "⛔ $1=$(che "$2") ⛔ khớp NGUYÊN CHUỖI postgresql://<user>:<pass>@(localhost|127.0.0.1):<cổng>/<tên kho [a-z0-9_]> — ⛔ query string, ⛔ host khác, ⛔ khoảng trắng hay @ / ? # trong user/mật khẩu. Từ chối (kho ở đây phải là kho RỖNG cục bộ)." >&2
     exit 2
   fi
   if [ "${BASH_REMATCH[4]}" != "$CONG" ]; then
@@ -326,6 +375,7 @@ if [ "$CHE_DO" != "chi_kiem" ]; then
   else
     do_ "dựng · cụm" "bước dựng hỏng hoặc bị từ chối — ⛔ tạo role/kho, ⛔ chạy di trú"
   fi
+  [ "$DO" = 0 ] || chan_ghi "dựng ĐỎ ($DO bước)"
 fi
 
 # ═════════════════════════════════════════════════════════════════ KIỂM (Đ5: `mong` khai trước)
@@ -336,6 +386,13 @@ MONG_LINT_BROKEN=0
 # ⭐ `mong` của HD1 (tools/do_voi_so_luong.py · MONG so_dong_so / so_dong_ghep_canon — ghim 16/11).
 MONG_HD1_CO=9967
 MONG_HD1_CHAY=9845
+# ⭐ `mong` MẪU SỐ của đường nền (S0-R2-03) — số bài pytest CHẠY tối thiểu mỗi lượt `--duong-nen`.
+#    Đo ở lượt chính thức sau vòng sửa R1 (cây `5be45f5`, 16/11): toàn bộ `12 failed, 2432 passed,
+#    2 xfailed, 14 errors` = 2.460 bài (2.430 của §4 DUONG_NEN + 30 bài tests/test_dung_moi_truong_isp.py)
+#    · `tests/web` `3 failed, 661 passed` = 664 bài. Mong là "≥" — bước sau THÊM bài vẫn đạt; BỚT
+#    (skip · deselect · `--lf` · `-k`) thì ĐỎ. Bước nào XOÁ bài có chủ đích ⇒ sửa số Ở ĐÂY + ghi lý do.
+MONG_PYTEST_TOAN_BO=2460
+MONG_PYTEST_WEB=664
 
 echo
 echo "══ KIỂM"
@@ -388,6 +445,7 @@ if [ -z "$K2_LY_DO" ]; then
   dat "cụm PG localhost:$CONG" "cụm CỦA MÌNH: pg_ctl status 0 · postmaster.pid cổng $CONG · pg_isready 0 · PG_DSN phục vụ bởi postmaster $PID_CUM"
 else
   do_ "cụm PG localhost:$CONG" "mong: cụm $PGDATA_ISP chạy, nghe $CONG, phục vụ PG_DSN — đo: $K2_LY_DO"
+  chan_ghi "K2 ĐỎ (cụm ở cổng $CONG ⛔ chứng minh được là của mình)"
 fi
 
 # K3 · role fls đăng nhập được bằng chính PG_DSN và có CREATEDB (conftest DROP + CREATE kho test)
@@ -491,6 +549,7 @@ if [ "$RONG_DONG" = 0 ]; then
   dat "kho $TEN_KHO RỖNG" "fls_itl = 0 dòng (kết nối chỉ đọc)"
 else
   do_ "kho $TEN_KHO RỖNG" "mong: fls_itl = 0 dòng — đo: '${RONG_DONG:-⛔ có venv}'"
+  chan_ghi "K7 ĐỎ (kho $TEN_KHO ⛔ chứng minh được là RỖNG)"
 fi
 
 # ═════════════════════════════════════════════════════════════════ ĐƯỜNG NỀN pytest (SO tập đỏ)
@@ -500,11 +559,34 @@ fi
 #    Tách node id từ phần `short test summary info` của `-rfE`: dòng `FAILED <id>[ - <câu>]` /
 #    `ERROR <id>[ - <câu>]`; cắt ở ` - ` ĐẦU TIÊN — một node id tự chứa ` - ` sẽ bị cắt sai ⇒ lệch
 #    tập ⇒ ĐỎ (lỗi an toàn: đỏ giả, ⛔ xanh giả).
-so_tap_do() {   # $1 = nhãn · $2 = log · $3 = tiền tố node id của lượt (rỗng = toàn bộ)
-  local nhan="$1" log="$2" tien_to="$3" hien mong them bot n_hien n_mong
+# ⭐⭐ S0-R2-03 · cổng so TẬP phải canh cả MẪU SỐ. R2 đo: `PYTEST_ADDOPTS=--lf … --duong-nen` ⇒
+#    toàn bộ `12 failed, 14 errors in 0.94s` (26 / 2.460 bài) ⇒ `[ĐẠT] … 26 = 26` · `KẾT: ĐẠT`
+#    exit 0; log cùng 26 id mà `2000 skipped` / `2434 deselected` cũng ĐẠT. Cùng lớp: `--deselect
+#    <bài vừa đỏ>`, `-k "not …"`, `@pytest.mark.skip` lên bài vừa làm hỏng ⇒ bài ấy ⛔ còn đỏ ⇒ ⛔
+#    THÊM ⇒ ĐẠT. ⇒ ĐẠT chỉ khi tập khớp VÀ dòng tổng kết có `skipped = 0` · `deselected = 0` · số
+#    bài CHẠY (passed + failed + errors + xfailed + xpassed) ≥ `mong` — in số ấy CẠNH `26 = 26`.
+so_tap_do() {   # $1 nhãn · $2 log · $3 tiền tố node id (rỗng = toàn bộ) · $4 dòng tổng kết · $5 mong số bài chạy
+  local nhan="$1" log="$2" tien_to="$3" tong="$4" mong_chay="$5" hien mong them bot n_hien n_mong
+  local n_chay n_skip n_desel mau_so_dat=""
   if [ ! -f "$DUONG_NEN_DO" ]; then
     do_ "đường nền $nhan" "mong: có tệp $DUONG_NEN_DO — đo: ⛔ có (⛔ so được = ĐỎ)"; return
   fi
+  # mong ⛔ khai / ⛔ phải số dương ⇒ ⛔ so được ⇒ ĐỎ (Đ5), ⛔ coi là "không có ngưỡng"
+  if ! [[ ${mong_chay:-} =~ ^[1-9][0-9]*$ ]]; then
+    do_ "đường nền $nhan" "mong: số bài chạy tối thiểu là số dương — đo: '${mong_chay:-<trống>}' (⛔ so được = ĐỎ)"; return
+  fi
+  # Đếm từ dòng tổng kết: `12 failed, 2432 passed, 2 xfailed, 14 errors in 311.47s (0:05:11)` — có
+  #   hay ⛔ có viền `=====`; `1 warning` ⛔ phải bài; `no tests ran` ⇒ chạy 0.
+  read -r n_chay n_skip n_desel <<<"$(printf '%s\n' "$tong" | awk '{
+    for (i = 1; i < NF; i++) {
+      v = $(i + 1); gsub(/[,=]/, "", v)
+      if ($i !~ /^[0-9]+$/) continue
+      if (v ~ /^(passed|failed|errors?|xfailed|xpassed)$/) c += $i
+      else if (v == "skipped") s += $i
+      else if (v == "deselected") d += $i
+    }
+    printf "%d %d %d\n", c, s, d }')"
+  [ "$n_skip" = 0 ] && [ "$n_desel" = 0 ] && [ "$n_chay" -ge "$mong_chay" ] && mau_so_dat=1
   hien="$(mktemp "${TMPDIR:-/tmp}/fls_isp_hien.XXXXXX")"; mong="$(mktemp "${TMPDIR:-/tmp}/fls_isp_mong.XXXXXX")"
   awk '/^=+ short test summary info =+$/ {v = 1; next} v && /^(FAILED|ERROR) /' "$log" \
     | sed -E 's/^(FAILED|ERROR) //; s/ - .*$//' | LC_ALL=C sort -u > "$hien"
@@ -512,20 +594,23 @@ so_tap_do() {   # $1 = nhãn · $2 = log · $3 = tiền tố node id của lư�
   them="$(LC_ALL=C comm -13 "$mong" "$hien")"; bot="$(LC_ALL=C comm -23 "$mong" "$hien")"
   n_hien=$(wc -l < "$hien"); n_mong=$(wc -l < "$mong")
   rm -f "$hien" "$mong"
-  if [ -z "$them" ] && [ -z "$bot" ]; then
-    dat "đường nền $nhan" "tập đỏ = đường nền: $n_hien = $n_mong node id (thêm 0 · bớt 0)"
+  if [ -z "$them" ] && [ -z "$bot" ] && [ -n "$mau_so_dat" ]; then
+    dat "đường nền $nhan" "tập đỏ = đường nền: $n_hien = $n_mong node id (thêm 0 · bớt 0) · chạy $n_chay bài (mong ≥ $mong_chay) · skipped 0 · deselected 0"
   else
-    do_ "đường nền $nhan" "mong: tập đỏ = $n_mong node id của $(basename "$DUONG_NEN_DO")${tien_to:+ (tiền tố $tien_to)} — đo: $n_hien · thêm $(printf '%s' "$them" | grep -c .) · bớt $(printf '%s' "$bot" | grep -c .)"
+    do_ "đường nền $nhan" "mong: tập đỏ = $n_mong node id của $(basename "$DUONG_NEN_DO")${tien_to:+ (tiền tố $tien_to)} · chạy ≥ $mong_chay bài · skipped 0 · deselected 0 — đo: $n_hien · thêm $(printf '%s' "$them" | grep -c .) · bớt $(printf '%s' "$bot" | grep -c .) · chạy $n_chay · skipped $n_skip · deselected $n_desel"
     [ -z "$them" ] || printf '%s\n' "$them" | sed 's/^/        + THÊM  /'
     [ -z "$bot" ]  || printf '%s\n' "$bot"  | sed 's/^/        − BỚT   /'
   fi
 }
 
-chay_pytest() {   # $1 = nhãn · $2 = tiền tố node id (rỗng = toàn bộ) · còn lại = đối số pytest
-  local nhan="$1" tien_to="$2"; shift 2
+chay_pytest() {   # $1 = nhãn · $2 = tiền tố node id (rỗng = toàn bộ) · $3 = mong số bài CHẠY tối thiểu · còn lại = đối số pytest
+  local nhan="$1" tien_to="$2" mong_chay="$3"; shift 3
   local log; log="$(mktemp "${TMPDIR:-/tmp}/fls_isp_pytest.XXXXXX")"
   # ⛔ thêm `-q`: pyproject.toml đã có `-q`, thêm nữa là `-qq` và MẤT dòng tổng kết.
-  "$PY" -m pytest -rfE "$@" >"$log" 2>&1
+  # ⛔⛔ S0-R2-03 · `env -u PYTEST_ADDOPTS`: biến của shell người gọi (`--lf` · `-k` · `--deselect`
+  #   · `-x`) đổi BỘ BÀI mà ⛔ hiện trên dòng lệnh — R2 đo `--lf` ⇒ 26/2.460 bài, `KẾT: ĐẠT`. Cổng
+  #   mẫu số ở `so_tap_do` vẫn canh mọi đường khác (plugin, conftest, mark).
+  env -u PYTEST_ADDOPTS "$PY" -m pytest -rfE "$@" >"$log" 2>&1
   local ma=$?
   local tong; tong="$(grep -E '^(=+ )?[0-9]+ (passed|failed|error|skipped|deselected|xfailed|xpassed)|^=+ .*(passed|failed|error).* =+$|no tests ran' "$log" | tail -1)"
   echo "  ── pytest $nhan · exit $ma · log $log"
@@ -535,15 +620,22 @@ chay_pytest() {   # $1 = nhãn · $2 = tiền tố node id (rỗng = toàn bộ)
     *)   do_ "pytest $nhan" "mong: chạy nổi (exit 0 hoặc 1) — đo: exit $ma"; return ;;
   esac
   if [ -z "$tong" ]; then do_ "pytest $nhan" "mong: có dòng tổng kết — đo: ⛔ có"; return; fi
-  so_tap_do "$nhan" "$log" "$tien_to"
+  so_tap_do "$nhan" "$log" "$tien_to" "$tong" "$mong_chay"
 }
 
 if [ "$CHE_DO" = "duong_nen" ]; then
   echo
   echo "══ ĐƯỜNG NỀN pytest (bài đỏ CÓ SẴN ≠ lỗi môi trường — SO theo node id với $(basename "$DUONG_NEN_DO"))"
-  if [ -x "$PY" ]; then
-    chay_pytest "toàn bộ" ""
-    chay_pytest "tests/web" "tests/web/" tests/web
+  if [ -n "${PYTEST_ADDOPTS+x}" ]; then
+    echo "  ── PYTEST_ADDOPTS của shell người gọi = '$(che "$PYTEST_ADDOPTS")' ⇒ GỠ cho mọi lượt pytest dưới (S0-R2-03)"
+  fi
+  # S0-R2-04 · dựng / K2 / K7 ĐỎ ⇒ ⛔ chạy pytest: conftest sẽ DROP + CREATE kho test trên một cụm
+  #   (hay cạnh một kho) mà phép kiểm vừa ⛔ chứng minh được là của mình. ĐỎ, ⛔ im lặng bỏ qua.
+  if [ -n "$CHAN_GHI" ]; then
+    do_ "pytest · bỏ qua" "mong: dựng + K2 + K7 ĐẠT trước khi pytest GHI (tests/conftest.py DROP + CREATE kho test) — đo: $CHAN_GHI ⇒ ⛔ chạy pytest"
+  elif [ -x "$PY" ]; then
+    chay_pytest "toàn bộ"   ""           "$MONG_PYTEST_TOAN_BO"
+    chay_pytest "tests/web" "tests/web/" "$MONG_PYTEST_WEB" tests/web
   else
     do_ "pytest" "mong: có venv — đo: ⛔"
   fi
