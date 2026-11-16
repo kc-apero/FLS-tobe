@@ -13,7 +13,7 @@
 | Phiên bản ISP | 3.1.1 (= AP) |
 | Duyệt AP | người dùng phiên 16/11: *"Duyệt AP, đồng ý với các recommendation"* → 15 nhãn RECOMMENDED thành DECIDED (§2.1.1 · §2.1.2 · D1–D5 · Q1–Q6) ở v3.1.1; ThuongCT ký trước merge (O6) |
 | Project instructions | `CLAUDE.md` (Đ1–Đ5, cổng, bẫy, riêng tư) · `docs/ITL/01_Orchestrator/10_HOP_DONG_AGENT.md` (vai, phiếu WO/HOI·TL/BG/KQ) |
-| Repo / nhánh | `kc-apero/FLS-tobe` · nhánh làm việc `claude/laughing-bohr-331pt0` (hiện đi trước remote 2 commit + bản này — push 403, O1) · main ⛔ commit thẳng |
+| Repo / nhánh | `kc-apero/FLS-tobe` · nhánh làm việc `claude/laughing-bohr-331pt0` (đồng bộ remote — đo 16/11: push `5b35284..0ce05f8` thành công, lỗi 403 cũ đã hết) · main ⛔ commit thẳng |
 | Trạng thái hệ thống | **đang có, có lỗi đã đo**: 40 dòng `Tuyen(` ở `fls/api/bang_tuyen.py` · di trú 0001–0026 · 17 bảng · màn F01 (3 tệp) · F02 · F03 · F04 · 6 ảnh đóng băng ở `tests/fixture/` · ~1.677 bài test (số của CLAUDE.md, **chưa đo ở container**) |
 | HD1 hôm nay (đo) | dòng ghép 1-1 **9.845/9.967** (5/23 kỳ đủ) · ô Final 7 khối 69.510/69.510 (23/23) · khối HD 9.930/9.930 · tự sinh 2026-03: HD 584/584, MID 4.020/4.088 — `voi_so_luong.json` |
 | 122 dòng thiếu (đo 16/11, chỉ đọc ảnh) | rải 18/23 kỳ (2026-07: 23 · 2025-11: 14 · 2026-08: 13 …) · 121/122 có `hd_classifying = Need to manual input` · hd Final: OGA 74 · GI 25 · DEP 8 · ITE 7 · khác 8 · chiều ngược: 9.992 − 9.845 = **147** dòng FLS ⛔ có dòng sổ |
@@ -22,7 +22,7 @@
 | Nguồn đã đọc | AP v3.1.1 §1.3 · §2.1–§2.5 · §3.1–§3.5 · §4.3–§4.5 · §5.1–§5.5 · `CLAUDE.md` · `10_HOP_DONG_AGENT.md` §1–§4 · `.importlinter` (9 hợp đồng) · `fls/api/bang_tuyen.py` · `fls/api/xu_ly.py` · `fls/ledger/allocate.py` · `fls/oracle/cong_parity.py` · `tests/conftest.py` · danh sách `tests/**` · 3 ảnh fixture HD1 · `06_SCREEN_SPEC.md` (mã màn) |
 | Nguồn nhắc tới, chưa đọc lại ở lượt này | sheet Drive AS-IS (đã đọc ở phiên dựng AP v3.0.0 — giá trị sẽ đóng băng ở DT2…DT12) · `docs/ITL/03_Dev/01_TECH_DESIGN.md` |
 | agent_count | **4** — BE-HC (hard code) · BE-CF (config) · FE · DATA; mỗi agent một bước đang chạy |
-| review_rounds | **3** — R1 quét toàn diff + process-issues (O3) · R2 chỉ phần đổi sau R1 · R3 chỉ phần đổi sau R2 · rồi push tự động (khi O1 xong) |
+| review_rounds | **3** — R1 quét toàn diff + process-issues (O3) · R2 chỉ phần đổi sau R1 · R3 chỉ phần đổi sau R2 · rồi push tự động lên nhánh làm việc |
 | Đơn vị ước lượng | giờ làm việc của agent; **nửa ngày = 4 giờ** (giả định lập kế hoạch — dự án chưa khai quy ước); một ô wave = nửa ngày |
 | Tổng | 51 bước · 141–203 giờ-agent · 18 wave (máy xếp) · theo làn: BE-CF 15 · BE-HC 16 · FE 7 · DATA 13 |
 
@@ -40,7 +40,7 @@
 
 | Mã | Câu | A | B | Khuyến nghị | Chặn gì |
 |---|---|---|---|---|---|
-| O1 | Push bị chặn 403 (`push_denied`) — 2 commit AP đang chờ, mọi bước sẽ chờ theo | A · nối lại GitHub bằng tài khoản có quyền ghi trước Wave 1 (claude.ai/connect-github) — được: push tự động sau R3 chạy đúng luật · mất: cần owner thao tác một lần | B · chạy hết, orchestrator gửi patch theo wave — được: ⛔ chờ · mất: 'tự push sau 3 vòng' ⛔ thực hiện được; rủi ro lệch nhánh | A | Chặn mọi bước ở trạng thái `review → done-pushed`; bước vẫn code + review được |
+| O1 | ✅ ĐÃ GỠ 16/11 — push từng bị chặn 403; đo lúc nộp ISP: push `5b35284..0ce05f8` thành công | — | — | — (giữ luật: chỉ push nhánh làm việc, chỉ sau R3) | không còn chặn |
 | O2 | Nhánh làm việc | A · mỗi agent một worktree cục bộ, nhánh cục bộ `isp/<bước>` (⛔ push); sau R3 orchestrator gộp vào `claude/laughing-bohr-331pt0` rồi push; PR vào main chỉ khi bạn duyệt | B · push từng nhánh `claude/laughing-bohr-331pt0-<bước>` lên remote — được: thấy trên GitHub · mất: cần bạn cho phép push nhánh khác | A | B cần quyền rõ ràng (luật phiên: chỉ push nhánh đã giao) |
 | O3 | `/process-issues` cần bảng ReportIssue + gấp vào AP; dự án ⛔ có bảng ấy | A · R1 chạy triage A1/A2/B1/B2 của process-issues trên phát hiện review, ghi `docs/ITL/04_Test/review/SO_PHAT_HIEN_ISP-3.1.1.md` + một dòng 'luật phòng tái phạm' cho bước sau đọc; chỉ phát hiện làm đổi AP mới gấp vào bản AP vá (gom theo wave, ISP cùng số §A.30) | B · mỗi phát hiện một bản AP mới — được: đúng nguyên skill · mất: ~50 bản AP, nhiễu | A | Sổ phát hiện là bằng chứng 'đã chạy process-issues' của R1 |
 | O4 | Nơi chạy test | A · container cloud này: PG16 cục bộ :5433 (đo: có binary, PyPI vào được) — được: cô lập, lặp lại được · mất: ⛔ phải `fls-pg-1` thật | B · máy Windows của owner với `fls-pg-1` — được: kho thật · mất: agent cloud ⛔ chạm được | A cho mọi bước + chạy lại I2 trên máy owner trước merge | Ảnh hưởng S0 và điều kiện merge |
@@ -318,7 +318,7 @@ flowchart LR
 | 4 | agent | sửa theo khuyến nghị R1; chạy lại test bị ảnh hưởng | commit sửa |
 | 5 | R2 · fls-test phiên mới | chỉ quét phần đổi SAU R1 | KQ-R2 |
 | 6 | R3 · fls-test phiên mới | chỉ quét phần đổi SAU R2; còn phát hiện chặn ⇒ sửa rồi R3 lại (⛔ push khi còn chặn) | KQ-R3 |
-| 7 | orchestrator | gộp `isp/<bước>` vào `claude/laughing-bohr-331pt0`, chạy lại cổng CLAUDE.md, push (sau O1); ghi §5 dashboard; `review → done` | commit trên nhánh làm việc |
+| 7 | orchestrator | gộp `isp/<bước>` vào `claude/laughing-bohr-331pt0`, chạy lại cổng CLAUDE.md, push; ghi §5 dashboard; `review → done` | commit trên nhánh làm việc |
 | 8 | người dùng | merge vào main chỉ qua PR bạn duyệt + ThuongCT ký (O6) | PR |
 
 Theo dõi: `docs/ITL/01_Orchestrator/isp-3.1.1/TIEN_DO.md` — trạng thái `planned → ready → in_progress → review(R1/R2/R3) → done` hoặc `blocked` kèm nguyên nhân; tiến độ theo bằng chứng (exit criteria), ⛔ gán phần trăm.
@@ -387,7 +387,7 @@ Một lệnh dựng được môi trường và in đường nền: số bài py
 - [ ] S0-B1…B4, S0-F1 chạy được và kết quả THẬT được ghi (bài đỏ có sẵn ≠ lỗi bước này)
 - [ ] phép phá thử S0-B3 đã thấy ĐỎ rồi trả nguyên
 - [ ] 3 vòng review xong
-- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0, O1 đã gỡ
+- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0
 
 ### Substep 1 — Test cases và handoff cho một thay đổi nhỏ
 
@@ -475,7 +475,7 @@ N/A — bước mở tuyến API; màn tiêu thụ tuyến này ở bước FE r
 - [ ] C1-B1…B5 xanh, đỏ trước khi có mã
 - [ ] regression `tests/api` xanh
 - [ ] 3 vòng review xong
-- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0, O1 đã gỡ
+- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0
 
 ### Substep 1 — Test cases và handoff cho một thay đổi nhỏ
 
@@ -556,7 +556,7 @@ N/A — lát cắt là lệnh/cổng (đường vào = CLI, đầu ra = JSON + e
 
 - [ ] H1-B1…B4 xanh, đỏ trước khi có mã
 - [ ] 3 vòng review xong
-- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0, O1 đã gỡ
+- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0
 
 ### Substep 1 — Test cases và handoff cho một thay đổi nhỏ
 
@@ -642,7 +642,7 @@ Mở màn Đối chiếu thấy lưới 23 kỳ × hàng (CÓ · CHẠY · MAP �
 - [ ] F1-F1…F4 xanh, đỏ trước khi có mã
 - [ ] bộ `tests/web` xanh
 - [ ] 3 vòng review xong
-- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0, O1 đã gỡ
+- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0
 
 ### Substep 1 — Test cases và handoff cho một thay đổi nhỏ
 
@@ -725,7 +725,7 @@ N/A — bước dữ liệu: đầu ra là ảnh đóng băng + cổng kiểm; n
 - [ ] DT1-B1…B4 xanh; DT1-B2 đã thấy đỏ
 - [ ] bảng đếm theo nhãn có MONG khai trong tool (Đ5)
 - [ ] 3 vòng review xong
-- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0, O1 đã gỡ
+- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0
 
 ### Substep 1 — Test cases và handoff cho một thay đổi nhỏ
 
@@ -807,7 +807,7 @@ N/A — bước mở tuyến API; màn tiêu thụ tuyến này ở bước FE r
 - [ ] C2-B1…B4 xanh
 - [ ] `soi_bang_tuyen` xanh
 - [ ] 3 vòng review xong
-- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0, O1 đã gỡ
+- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0
 
 ### Substep 1 — Test cases và handoff cho một thay đổi nhỏ
 
@@ -888,7 +888,7 @@ N/A — lát cắt là lệnh/cổng (đường vào = CLI, đầu ra = JSON + e
 
 - [ ] H2-B1…B4 đúng
 - [ ] 3 vòng review xong
-- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0, O1 đã gỡ
+- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0
 
 ### Substep 1 — Test cases và handoff cho một thay đổi nhỏ
 
@@ -971,7 +971,7 @@ N/A — bước dữ liệu: đầu ra là ảnh đóng băng + cổng kiểm; n
 - [ ] DT2-B1…B3 xanh; cổng đã thấy đỏ
 - [ ] ảnh ⛔ mang khoá PII (quét = 0)
 - [ ] 3 vòng review xong
-- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0, O1 đã gỡ
+- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0
 
 ### Substep 1 — Test cases và handoff cho một thay đổi nhỏ
 
@@ -1051,7 +1051,7 @@ N/A — bước mở tuyến API; màn tiêu thụ tuyến này ở bước FE r
 
 - [ ] C3-B1…B3 xanh
 - [ ] 3 vòng review xong
-- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0, O1 đã gỡ
+- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0
 
 ### Substep 1 — Test cases và handoff cho một thay đổi nhỏ
 
@@ -1131,7 +1131,7 @@ N/A — lát cắt là lệnh/cổng (đường vào = CLI, đầu ra = JSON + e
 
 - [ ] H3-B1…B3 xanh
 - [ ] 3 vòng review xong
-- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0, O1 đã gỡ
+- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0
 
 ### Substep 1 — Test cases và handoff cho một thay đổi nhỏ
 
@@ -1212,7 +1212,7 @@ Chạy máy chủ thử và mở SCR-F09 thấy đúng 23 kỳ, đúng 5 kỳ xa
 
 - [ ] F2-F1, F2 xanh
 - [ ] 3 vòng review xong
-- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0, O1 đã gỡ
+- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0
 
 ### Substep 1 — Test cases và handoff cho một thay đổi nhỏ
 
@@ -1289,7 +1289,7 @@ N/A — bước dữ liệu: đầu ra là ảnh đóng băng + cổng kiểm; n
 
 - [ ] DT3-B1, DT3-B2 xanh/đỏ đúng
 - [ ] 3 vòng review xong
-- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0, O1 đã gỡ
+- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0
 
 ### Substep 1 — Test cases và handoff cho một thay đổi nhỏ
 
@@ -1369,7 +1369,7 @@ N/A — ⛔ có màn cây trong AP v3.1.1; cây được dùng bởi engine H5.
 
 - [ ] C4-B1…B4 xanh
 - [ ] 3 vòng review xong
-- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0, O1 đã gỡ
+- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0
 
 ### Substep 1 — Test cases và handoff cho một thay đổi nhỏ
 
@@ -1450,7 +1450,7 @@ Bấm ô kỳ đỏ 2026-07 mở ngăn kéo liệt kê 23 dòng chưa 1-1 kèm n
 
 - [ ] F3-F1…F3 xanh
 - [ ] 3 vòng review xong
-- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0, O1 đã gỡ
+- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0
 
 ### Substep 1 — Test cases và handoff cho một thay đổi nhỏ
 
@@ -1529,7 +1529,7 @@ N/A — bước dữ liệu: đầu ra là ảnh đóng băng + cổng kiểm; n
 
 - [ ] DT4-B1…B3 đúng
 - [ ] 3 vòng review xong
-- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0, O1 đã gỡ
+- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0
 
 ### Substep 1 — Test cases và handoff cho một thay đổi nhỏ
 
@@ -1613,7 +1613,7 @@ N/A — hợp đồng tuyến ⛔ đổi; F4 dùng lại nguyên.
 - [ ] C5-B1…B4 xanh
 - [ ] bộ `tests/db` xanh
 - [ ] 3 vòng review xong
-- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0, O1 đã gỡ
+- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0
 
 ### Substep 1 — Test cases và handoff cho một thay đổi nhỏ
 
@@ -1699,7 +1699,7 @@ N/A — lát cắt là lệnh/cổng (đường vào = CLI, đầu ra = JSON + e
 - [ ] H4-B1…B3 đúng
 - [ ] lệch còn lại (nếu có) mỗi cái có tên lý do trong JSON
 - [ ] 3 vòng review xong
-- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0, O1 đã gỡ
+- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0
 
 ### Substep 1 — Test cases và handoff cho một thay đổi nhỏ
 
@@ -1777,7 +1777,7 @@ N/A — bước dữ liệu: đầu ra là ảnh đóng băng + cổng kiểm; n
 
 - [ ] DT5-B1, B2 đúng
 - [ ] 3 vòng review xong
-- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0, O1 đã gỡ
+- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0
 
 ### Substep 1 — Test cases và handoff cho một thay đổi nhỏ
 
@@ -1857,7 +1857,7 @@ N/A — ⛔ có màn kỳ trong AP; engine H6 tiêu thụ.
 
 - [ ] C6-B1…B4 xanh
 - [ ] 3 vòng review xong
-- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0, O1 đã gỡ
+- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0
 
 ### Substep 1 — Test cases và handoff cho một thay đổi nhỏ
 
@@ -1937,7 +1937,7 @@ N/A — lát cắt là lệnh/cổng (đường vào = CLI, đầu ra = JSON + e
 
 - [ ] H5-B1, B2 đúng + chứng minh đỏ
 - [ ] 3 vòng review xong
-- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0, O1 đã gỡ
+- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0
 
 ### Substep 1 — Test cases và handoff cho một thay đổi nhỏ
 
@@ -2020,7 +2020,7 @@ Mở màn Cấu hình thấy bảng tỷ giá theo tháng từ `GET /config/fx`,
 
 - [ ] F4-F1…F3 xanh
 - [ ] 3 vòng review xong
-- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0, O1 đã gỡ
+- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0
 
 ### Substep 1 — Test cases và handoff cho một thay đổi nhỏ
 
@@ -2097,7 +2097,7 @@ N/A — bước dữ liệu: đầu ra là ảnh đóng băng + cổng kiểm; n
 
 - [ ] DT8-B1, B2 đúng + chứng minh đỏ
 - [ ] 3 vòng review xong
-- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0, O1 đã gỡ
+- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0
 
 ### Substep 1 — Test cases và handoff cho một thay đổi nhỏ
 
@@ -2175,7 +2175,7 @@ N/A — ⛔ màn trong AP; engine H9/H10 tiêu thụ.
 
 - [ ] C9-B1, B2 xanh
 - [ ] 3 vòng review xong
-- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0, O1 đã gỡ
+- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0
 
 ### Substep 1 — Test cases và handoff cho một thay đổi nhỏ
 
@@ -2253,7 +2253,7 @@ N/A — lát cắt là lệnh/cổng (đường vào = CLI, đầu ra = JSON + e
 
 - [ ] H6-B1, B2 đúng
 - [ ] 3 vòng review xong
-- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0, O1 đã gỡ
+- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0
 
 ### Substep 1 — Test cases và handoff cho một thay đổi nhỏ
 
@@ -2330,7 +2330,7 @@ N/A — bước dữ liệu: đầu ra là ảnh đóng băng + cổng kiểm; n
 
 - [ ] DT6-B1, B2 đúng
 - [ ] 3 vòng review xong
-- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0, O1 đã gỡ
+- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0
 
 ### Substep 1 — Test cases và handoff cho một thay đổi nhỏ
 
@@ -2409,7 +2409,7 @@ N/A — màn hàng chờ hiện có đọc `GET /queue`; ⛔ màn mới.
 - [ ] C8-B1, B2 xanh
 - [ ] regression `tests/api/test_cua_lenh_cho_pg.py` xanh
 - [ ] 3 vòng review xong
-- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0, O1 đã gỡ
+- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0
 
 ### Substep 1 — Test cases và handoff cho một thay đổi nhỏ
 
@@ -2490,7 +2490,7 @@ N/A — lát cắt là lệnh/cổng (đường vào = CLI, đầu ra = JSON + e
 
 - [ ] H9-B1…B3 đúng
 - [ ] 3 vòng review xong
-- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0, O1 đã gỡ
+- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0
 
 ### Substep 1 — Test cases và handoff cho một thay đổi nhỏ
 
@@ -2566,7 +2566,7 @@ N/A — bước dữ liệu: đầu ra là ảnh đóng băng + cổng kiểm; n
 
 - [ ] DT10-B1 đúng + chứng minh đỏ
 - [ ] 3 vòng review xong
-- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0, O1 đã gỡ
+- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0
 
 ### Substep 1 — Test cases và handoff cho một thay đổi nhỏ
 
@@ -2645,7 +2645,7 @@ N/A — engine H12 tiêu thụ.
 
 - [ ] C10-B1, B2 xanh
 - [ ] 3 vòng review xong
-- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0, O1 đã gỡ
+- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0
 
 ### Substep 1 — Test cases và handoff cho một thay đổi nhỏ
 
@@ -2723,7 +2723,7 @@ N/A — lát cắt là lệnh/cổng (đường vào = CLI, đầu ra = JSON + e
 
 - [ ] H10-B1…B3 đúng
 - [ ] 3 vòng review xong
-- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0, O1 đã gỡ
+- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0
 
 ### Substep 1 — Test cases và handoff cho một thay đổi nhỏ
 
@@ -2799,7 +2799,7 @@ N/A — bước dữ liệu: đầu ra là ảnh đóng băng + cổng kiểm; n
 
 - [ ] DT7-B1 đúng + đã chứng minh đỏ
 - [ ] 3 vòng review xong
-- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0, O1 đã gỡ
+- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0
 
 ### Substep 1 — Test cases và handoff cho một thay đổi nhỏ
 
@@ -2879,7 +2879,7 @@ N/A — ⛔ màn cờ trong AP v3.1.1; engine H12 tiêu thụ.
 
 - [ ] C11-B1…B3 xanh
 - [ ] 3 vòng review xong
-- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0, O1 đã gỡ
+- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0
 
 ### Substep 1 — Test cases và handoff cho một thay đổi nhỏ
 
@@ -2958,7 +2958,7 @@ N/A — lát cắt là lệnh/cổng (đường vào = CLI, đầu ra = JSON + e
 
 - [ ] H7-B1, B2 đúng
 - [ ] 3 vòng review xong
-- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0, O1 đã gỡ
+- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0
 
 ### Substep 1 — Test cases và handoff cho một thay đổi nhỏ
 
@@ -3034,7 +3034,7 @@ N/A — bước dữ liệu: đầu ra là ảnh đóng băng + cổng kiểm; n
 
 - [ ] DT9-B1 đúng + chứng minh đỏ
 - [ ] 3 vòng review xong
-- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0, O1 đã gỡ
+- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0
 
 ### Substep 1 — Test cases và handoff cho một thay đổi nhỏ
 
@@ -3113,7 +3113,7 @@ N/A — engine H13 tiêu thụ.
 
 - [ ] C12-B1…B3 xanh
 - [ ] 3 vòng review xong
-- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0, O1 đã gỡ
+- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0
 
 ### Substep 1 — Test cases và handoff cho một thay đổi nhỏ
 
@@ -3190,7 +3190,7 @@ N/A — lát cắt là lệnh/cổng (đường vào = CLI, đầu ra = JSON + e
 
 - [ ] H11-B1 đúng + chứng minh đỏ
 - [ ] 3 vòng review xong
-- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0, O1 đã gỡ
+- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0
 
 ### Substep 1 — Test cases và handoff cho một thay đổi nhỏ
 
@@ -3267,7 +3267,7 @@ N/A — bước dữ liệu: đầu ra là ảnh đóng băng + cổng kiểm; n
 
 - [ ] DT12-B1 đúng + chứng minh đỏ
 - [ ] 3 vòng review xong
-- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0, O1 đã gỡ
+- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0
 
 ### Substep 1 — Test cases và handoff cho một thay đổi nhỏ
 
@@ -3345,7 +3345,7 @@ N/A — bước mở tuyến API; màn tiêu thụ tuyến này ở bước FE r
 
 - [ ] C14-B1, B2 xanh
 - [ ] 3 vòng review xong
-- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0, O1 đã gỡ
+- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0
 
 ### Substep 1 — Test cases và handoff cho một thay đổi nhỏ
 
@@ -3425,7 +3425,7 @@ N/A — lát cắt là lệnh/cổng (đường vào = CLI, đầu ra = JSON + e
 
 - [ ] H8-B1, B2 đúng
 - [ ] 3 vòng review xong
-- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0, O1 đã gỡ
+- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0
 
 ### Substep 1 — Test cases và handoff cho một thay đổi nhỏ
 
@@ -3501,7 +3501,7 @@ N/A — bước dữ liệu: đầu ra là ảnh đóng băng + cổng kiểm; n
 
 - [ ] DT11-B1 đúng + chứng minh đỏ
 - [ ] 3 vòng review xong
-- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0, O1 đã gỡ
+- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0
 
 ### Substep 1 — Test cases và handoff cho một thay đổi nhỏ
 
@@ -3582,7 +3582,7 @@ N/A — bước mở tuyến API; màn tiêu thụ tuyến này ở bước FE r
 
 - [ ] C7-B1…B5 xanh
 - [ ] 3 vòng review xong
-- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0, O1 đã gỡ
+- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0
 
 ### Substep 1 — Test cases và handoff cho một thay đổi nhỏ
 
@@ -3666,7 +3666,7 @@ N/A — lát cắt là lệnh/cổng (đường vào = CLI, đầu ra = JSON + e
 
 - [ ] H12-B1…B3 đúng
 - [ ] 3 vòng review xong
-- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0, O1 đã gỡ
+- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0
 
 ### Substep 1 — Test cases và handoff cho một thay đổi nhỏ
 
@@ -3746,7 +3746,7 @@ Màn Đối chiếu có khối HD2 liệt kê từng gói với ô so · khớp 
 
 - [ ] F6-F1, F2 xanh
 - [ ] 3 vòng review xong
-- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0, O1 đã gỡ
+- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0
 
 ### Substep 1 — Test cases và handoff cho một thay đổi nhỏ
 
@@ -3823,7 +3823,7 @@ N/A — bước mở tuyến API; màn tiêu thụ tuyến này ở bước FE r
 
 - [ ] C13-B1, B2 xanh
 - [ ] 3 vòng review xong
-- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0, O1 đã gỡ
+- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0
 
 ### Substep 1 — Test cases và handoff cho một thay đổi nhỏ
 
@@ -3901,7 +3901,7 @@ N/A — lát cắt là lệnh/cổng (đường vào = CLI, đầu ra = JSON + e
 
 - [ ] H13-B1 đúng + chứng minh đỏ
 - [ ] 3 vòng review xong
-- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0, O1 đã gỡ
+- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0
 
 ### Substep 1 — Test cases và handoff cho một thay đổi nhỏ
 
@@ -3982,7 +3982,7 @@ Bấm 'Ký tháng' ở một tháng chưa ký, xác nhận trong hộp thoại, 
 
 - [ ] F5-F1…F3 xanh
 - [ ] 3 vòng review xong
-- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0, O1 đã gỡ
+- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0
 
 ### Substep 1 — Test cases và handoff cho một thay đổi nhỏ
 
@@ -4060,7 +4060,7 @@ N/A — lát cắt là lệnh/cổng (đường vào = CLI, đầu ra = JSON + e
 
 - [ ] H15-B1, B2 đúng
 - [ ] 3 vòng review xong
-- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0, O1 đã gỡ
+- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0
 
 ### Substep 1 — Test cases và handoff cho một thay đổi nhỏ
 
@@ -4140,7 +4140,7 @@ SCR-F09 ký bản Daily Report 3 (IX.TMP snapshot)
 
 - [ ] F7-F1 xanh
 - [ ] 3 vòng review xong
-- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0, O1 đã gỡ
+- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0
 
 ### Substep 1 — Test cases và handoff cho một thay đổi nhỏ
 
@@ -4220,7 +4220,7 @@ N/A — lát cắt là lệnh/cổng (đường vào = CLI, đầu ra = JSON + e
 
 - [ ] H14-B1, B2 đúng
 - [ ] 3 vòng review xong
-- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0, O1 đã gỡ
+- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0
 
 ### Substep 1 — Test cases và handoff cho một thay đổi nhỏ
 
@@ -4305,7 +4305,7 @@ Một bài tích hợp chạy từ ba ảnh đóng băng qua ghép FLS, cổng H
 - [ ] I1-B1, B2, F1, F2 xanh
 - [ ] toàn bộ cổng CLAUDE.md chạy, kết quả thật dán vào BG
 - [ ] 3 vòng review xong
-- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0, O1 đã gỡ
+- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0
 
 ### Substep 1 — Test cases và handoff cho một thay đổi nhỏ
 
@@ -4393,7 +4393,7 @@ Một bài tích hợp nạp config vào kho, ký tỷ giá các tháng, chạy 
 - [ ] toàn bộ cổng CLAUDE.md xanh hoặc đỏ-có-sẵn đã ghi ở S0
 - [ ] 3 vòng review xong
 - [ ] điều kiện MERGE (khác điều kiện xong): chạy lại trên máy owner + ThuongCT ký (O6)
-- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0, O1 đã gỡ
+- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0
 
 ### Substep 1 — Test cases và handoff cho một thay đổi nhỏ
 
@@ -4449,7 +4449,6 @@ Nguồn sự thật duy nhất: **Step 50 · I2** ở trên. Một bước; ⛔ 
 ### 4.2 Việc cần bạn chốt trước Wave 0
 
 1. **Xác nhận breakdown này** (51 bước, 4 làn, 3 vòng review).
-2. **O1** — nối lại GitHub có quyền ghi (khuyến nghị A), nếu không thì mọi bước dừng ở `review` chờ push.
-3. **O2 · O3 · O4 · O5 · O7 · O9** — khuyến nghị A cho cả sáu; **O6 · O8** — xác nhận ThuongCT là người ký (merge và sổ lý do HD1).
+2. **O2 · O3 · O4 · O5 · O7 · O9** — khuyến nghị A cho cả sáu; **O6 · O8** — xác nhận ThuongCT là người ký (merge và sổ lý do HD1). O1 (push) đã tự gỡ.
 
 <sub>Kiểm bởi bộ sinh: 51 bước · đủ 8 trường + 2 substep · DAG ⛔ chu trình · ước lượng ≤ 4h · AP sha256 khớp.</sub>

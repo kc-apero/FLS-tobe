@@ -750,10 +750,8 @@ step(id="I2", lan="BE-HC", ten="Tích hợp HD2 xuyên suốt: config ký trong 
 
 # ───────────────────────── quyết định mở ─────────────────────────
 QD = [
-    ("O1", "Push bị chặn 403 (`push_denied`) — 2 commit AP đang chờ, mọi bước sẽ chờ theo",
-     "A · nối lại GitHub bằng tài khoản có quyền ghi trước Wave 1 (claude.ai/connect-github) — được: push tự động sau R3 chạy đúng luật · mất: cần owner thao tác một lần",
-     "B · chạy hết, orchestrator gửi patch theo wave — được: ⛔ chờ · mất: 'tự push sau 3 vòng' ⛔ thực hiện được; rủi ro lệch nhánh",
-     "A", "Chặn mọi bước ở trạng thái `review → done-pushed`; bước vẫn code + review được"),
+    ("O1", "✅ ĐÃ GỠ 16/11 — push từng bị chặn 403; đo lúc nộp ISP: push `5b35284..0ce05f8` thành công",
+     "—", "—", "— (giữ luật: chỉ push nhánh làm việc, chỉ sau R3)", "không còn chặn"),
     ("O2", "Nhánh làm việc",
      "A · mỗi agent một worktree cục bộ, nhánh cục bộ `isp/<bước>` (⛔ push); sau R3 orchestrator gộp vào `claude/laughing-bohr-331pt0` rồi push; PR vào main chỉ khi bạn duyệt",
      "B · push từng nhánh `claude/laughing-bohr-331pt0-<bước>` lên remote — được: thấy trên GitHub · mất: cần bạn cho phép push nhánh khác",
@@ -914,7 +912,7 @@ def sinh() -> str:
         ("Phiên bản ISP", "3.1.1 (= AP)"),
         ("Duyệt AP", "người dùng phiên 16/11: *\"Duyệt AP, đồng ý với các recommendation\"* → 15 nhãn RECOMMENDED thành DECIDED (§2.1.1 · §2.1.2 · D1–D5 · Q1–Q6) ở v3.1.1; ThuongCT ký trước merge (O6)"),
         ("Project instructions", "`CLAUDE.md` (Đ1–Đ5, cổng, bẫy, riêng tư) · `docs/ITL/01_Orchestrator/10_HOP_DONG_AGENT.md` (vai, phiếu WO/HOI·TL/BG/KQ)"),
-        ("Repo / nhánh", "`kc-apero/FLS-tobe` · nhánh làm việc `claude/laughing-bohr-331pt0` (hiện đi trước remote 2 commit + bản này — push 403, O1) · main ⛔ commit thẳng"),
+        ("Repo / nhánh", "`kc-apero/FLS-tobe` · nhánh làm việc `claude/laughing-bohr-331pt0` (đồng bộ remote — đo 16/11: push `5b35284..0ce05f8` thành công, lỗi 403 cũ đã hết) · main ⛔ commit thẳng"),
         ("Trạng thái hệ thống", "**đang có, có lỗi đã đo**: 40 dòng `Tuyen(` ở `fls/api/bang_tuyen.py` · di trú 0001–0026 · 17 bảng · màn F01 (3 tệp) · F02 · F03 · F04 · 6 ảnh đóng băng ở `tests/fixture/` · ~1.677 bài test (số của CLAUDE.md, **chưa đo ở container**)"),
         ("HD1 hôm nay (đo)", "dòng ghép 1-1 **9.845/9.967** (5/23 kỳ đủ) · ô Final 7 khối 69.510/69.510 (23/23) · khối HD 9.930/9.930 · tự sinh 2026-03: HD 584/584, MID 4.020/4.088 — `voi_so_luong.json`"),
         ("122 dòng thiếu (đo 16/11, chỉ đọc ảnh)", "rải 18/23 kỳ (2026-07: 23 · 2025-11: 14 · 2026-08: 13 …) · 121/122 có `hd_classifying = Need to manual input` · hd Final: OGA 74 · GI 25 · DEP 8 · ITE 7 · khác 8 · chiều ngược: 9.992 − 9.845 = **147** dòng FLS ⛔ có dòng sổ"),
@@ -923,7 +921,7 @@ def sinh() -> str:
         ("Nguồn đã đọc", "AP v3.1.1 §1.3 · §2.1–§2.5 · §3.1–§3.5 · §4.3–§4.5 · §5.1–§5.5 · `CLAUDE.md` · `10_HOP_DONG_AGENT.md` §1–§4 · `.importlinter` (9 hợp đồng) · `fls/api/bang_tuyen.py` · `fls/api/xu_ly.py` · `fls/ledger/allocate.py` · `fls/oracle/cong_parity.py` · `tests/conftest.py` · danh sách `tests/**` · 3 ảnh fixture HD1 · `06_SCREEN_SPEC.md` (mã màn)"),
         ("Nguồn nhắc tới, chưa đọc lại ở lượt này", "sheet Drive AS-IS (đã đọc ở phiên dựng AP v3.0.0 — giá trị sẽ đóng băng ở DT2…DT12) · `docs/ITL/03_Dev/01_TECH_DESIGN.md`"),
         ("agent_count", "**4** — BE-HC (hard code) · BE-CF (config) · FE · DATA; mỗi agent một bước đang chạy"),
-        ("review_rounds", "**3** — R1 quét toàn diff + process-issues (O3) · R2 chỉ phần đổi sau R1 · R3 chỉ phần đổi sau R2 · rồi push tự động (khi O1 xong)"),
+        ("review_rounds", "**3** — R1 quét toàn diff + process-issues (O3) · R2 chỉ phần đổi sau R1 · R3 chỉ phần đổi sau R2 · rồi push tự động lên nhánh làm việc"),
         ("Đơn vị ước lượng", "giờ làm việc của agent; **nửa ngày = 4 giờ** (giả định lập kế hoạch — dự án chưa khai quy ước); một ô wave = nửa ngày"),
         ("Tổng", f"{len(B)} bước · {tong_lo}–{tong_hi} giờ-agent · {so_wave} wave (máy xếp) · theo làn: " + " · ".join(f"{l} {n}" for l, n in theo_lan.items())),
     ]))
@@ -1001,7 +999,7 @@ def sinh() -> str:
         ("4", "agent", "sửa theo khuyến nghị R1; chạy lại test bị ảnh hưởng", "commit sửa"),
         ("5", "R2 · fls-test phiên mới", "chỉ quét phần đổi SAU R1", "KQ-R2"),
         ("6", "R3 · fls-test phiên mới", "chỉ quét phần đổi SAU R2; còn phát hiện chặn ⇒ sửa rồi R3 lại (⛔ push khi còn chặn)", "KQ-R3"),
-        ("7", "orchestrator", "gộp `isp/<bước>` vào `claude/laughing-bohr-331pt0`, chạy lại cổng CLAUDE.md, push (sau O1); ghi §5 dashboard; `review → done`", "commit trên nhánh làm việc"),
+        ("7", "orchestrator", "gộp `isp/<bước>` vào `claude/laughing-bohr-331pt0`, chạy lại cổng CLAUDE.md, push; ghi §5 dashboard; `review → done`", "commit trên nhánh làm việc"),
         ("8", "người dùng", "merge vào main chỉ qua PR bạn duyệt + ThuongCT ký (O6)", "PR"),
     ]))
     A("")
@@ -1051,7 +1049,7 @@ def sinh() -> str:
         A("### 8. Exit criteria\n")
         for t in b["ex"]:
             A(f"- [ ] {t}")
-        A("- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0, O1 đã gỡ")
+        A("- [ ] điều kiện PUSH (khác điều kiện xong code): đủ R1 · R2 · R3, phát hiện chặn = 0")
         A("")
         ids_t = [t[0] for t in b["tb"] if not t[0].endswith("B1") or not t[1].startswith("N/A")] + ([t[0] for t in b["tf"]] if not isinstance(b["tf"], str) else [])
         A("### Substep 1 — Test cases và handoff cho một thay đổi nhỏ\n")
@@ -1095,8 +1093,7 @@ def sinh() -> str:
     A("### 4.2 Việc cần bạn chốt trước Wave 0")
     A("")
     A("1. **Xác nhận breakdown này** (51 bước, 4 làn, 3 vòng review).")
-    A("2. **O1** — nối lại GitHub có quyền ghi (khuyến nghị A), nếu không thì mọi bước dừng ở `review` chờ push.")
-    A("3. **O2 · O3 · O4 · O5 · O7 · O9** — khuyến nghị A cho cả sáu; **O6 · O8** — xác nhận ThuongCT là người ký (merge và sổ lý do HD1).")
+    A("2. **O2 · O3 · O4 · O5 · O7 · O9** — khuyến nghị A cho cả sáu; **O6 · O8** — xác nhận ThuongCT là người ký (merge và sổ lý do HD1). O1 (push) đã tự gỡ.")
     A("")
     A(f"<sub>Kiểm bởi bộ sinh: {len(B)} bước · đủ 8 trường + 2 substep · DAG ⛔ chu trình · ước lượng ≤ 4h · AP sha256 khớp.</sub>")
     return "\n".join(out) + "\n"
