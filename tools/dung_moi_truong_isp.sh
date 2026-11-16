@@ -391,7 +391,10 @@ MONG_HD1_CHAY=9845
 #    2 xfailed, 14 errors` = 2.460 bài (2.430 của §4 DUONG_NEN + 30 bài tests/test_dung_moi_truong_isp.py)
 #    · `tests/web` `3 failed, 661 passed` = 664 bài. Mong là "≥" — bước sau THÊM bài vẫn đạt; BỚT
 #    (skip · deselect · `--lf` · `-k`) thì ĐỎ. Bước nào XOÁ bài có chủ đích ⇒ sửa số Ở ĐÂY + ghi lý do.
-MONG_PYTEST_TOAN_BO=2460
+#    ⭐ Q8 = A (orchestrator 16/11): bước THÊM bài nâng số này trong CÙNG commit; orchestrator cộng
+#    lúc gộp. +33 · CG1 (`WO-101`, `tests/api/test_isp_gates_hd1.py` — `pytest --collect-only`
+#    tệp ấy: 33 bài; toàn bộ 2.567 → 2.600) ⇒ 2460 + 33 = 2493.
+MONG_PYTEST_TOAN_BO=2493
 MONG_PYTEST_WEB=664
 
 echo

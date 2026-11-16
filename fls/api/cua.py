@@ -27,6 +27,7 @@ duong nao tu mo ket noi ghi duoc, ke ca khi ai do go nham.
 from __future__ import annotations
 
 import json
+import os
 import sys
 import urllib.parse
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -72,9 +73,13 @@ class _May(ThreadingHTTPServer):
 
     def __init__(self, dia_chi, xu_ly, mo_doc: MoKetNoi,
                  mo_ghi: MoKetNoi | None, k: bytes,
-                 phuc_vu_tep: PhucVuTep | None = None):
+                 phuc_vu_tep: PhucVuTep | None = None,
+                 tep_do: str | os.PathLike | None = None):
         super().__init__(dia_chi, xu_ly)
         self.mo_doc = mo_doc
+        # ⭐ CG1 (`WO-101`): tệp đo của cổng HD1 — TRUYỀN VÀO như `mo_doc`, ⛔ cửa tự chọn.
+        # `None` ⇒ `FINAL` + `HD1_THANG` "CHƯA ĐO ĐƯỢC" (⛔ xanh). Xem `xu_ly.YeuCau.tep_do`.
+        self.tep_do = tep_do
         # `None` ⇒ may chay o che do CHI DOC: moi tuyen ghi tra 405. Khai tuong
         # minh, ⛔ khong am tham cho ghi bang ket noi doc (se loi kho, kho hieu).
         self.mo_ghi = mo_ghi
@@ -307,7 +312,7 @@ class _Tay(BaseHTTPRequestHandler):
             with mo() as conn:
                 data, trang_thai = HAM[tuyen.ham](YeuCau(
                     conn=conn, pv=pv, q=q, tham=tham, actor=nguoi.actor,
-                    than=than))
+                    than=than, tep_do=self.server.tep_do))
         except LoiCua as e:
             return self._loi(e.ma, pv.mo_ta(), e.chi_tiet, **e.them)
         except Exception as e:                                   # noqa: BLE001
@@ -368,11 +373,17 @@ def kiem_phuc_vu_tep(dia_chi: str) -> None:
 def dung_may(mo_doc: MoKetNoi, cong: int = 8088,
              dia_chi: str = "127.0.0.1",
              mo_ghi: MoKetNoi | None = None,
-             phuc_vu_tep: PhucVuTep | None = None) -> _May:
+             phuc_vu_tep: PhucVuTep | None = None,
+             tep_do: str | os.PathLike | None = None) -> _May:
     """Dung may (chua chay). ⛔ NO neu thieu khoa hay ket noi sai loai.
 
     `mo_ghi=None` ⇒ che do **CHI DOC**: moi tuyen ghi tra `405`. Khai tuong minh,
     ⛔ khong am tham cho ghi bang duong doc.
+
+    ⭐ `tep_do` *(ISP 3.1.2 · Step 7 · CG1)*: đường dẫn tệp đo của cổng HD1 *(`FINAL` ·
+    `HD1_THANG` trong `GET /gates`)*. ⛔ Mặc định nào ở tầng này — `None` ⇒ hai cổng
+    ấy `dat=None` kèm lý do. Tệp vắng/hỏng lúc chạy ⛔ làm máy từ chối chạy: đó là
+    một trạng thái ĐO ĐƯỢC của cổng *("chưa đo được")*, ⛔ phải lỗi cấu hình của cửa.
 
     ⛔ Mac dinh chi nghe `127.0.0.1`: cua nay chua qua ra soat an ninh nao va
     dang doc so tien that. Muon mo ra mang thi phai go tuong minh.
@@ -393,7 +404,7 @@ def dung_may(mo_doc: MoKetNoi, cong: int = 8088,
     loi = bang_tuyen.kiem_bang_tuyen()
     if loi:
         raise RuntimeError("⛔ bang tuyen vi pham:\n  - " + "\n  - ".join(loi))
-    return _May((dia_chi, cong), _Tay, mo_doc, mo_ghi, k, phuc_vu_tep)
+    return _May((dia_chi, cong), _Tay, mo_doc, mo_ghi, k, phuc_vu_tep, tep_do)
 
 
 def _in_bang_tuyen() -> str:

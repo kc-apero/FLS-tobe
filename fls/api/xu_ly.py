@@ -49,6 +49,11 @@ class YeuCau:
     tham: dict[str, str]
     actor: str = ""
     than: dict[str, Any] = field(default_factory=dict)
+    # ⭐ ISP 3.1.2 · Step 7 · CG1 (`WO-101`): đường dẫn TỆP ĐO của cổng HD1 (`FINAL` ·
+    #   `HD1_THANG` — ảnh đóng băng do `tools/do_voi_so_luong.py --ghi` sinh). ⛔⛔ TRUYỀN VÀO, y
+    #   khuôn `conn`: tầng cửa ⛔ tự chọn tệp nào để đo, cũng như ⛔ tự mở được kết nối (hợp đồng
+    #   tầng 7). `None` ⇒ hai cổng ấy `dat=None` *"CHƯA ĐO ĐƯỢC"* kèm lý do — ⛔ bao giờ "xanh".
+    tep_do: Any = None
 
 
 def pham_vi_cua_yeu_cau(q: dict[str, str]) -> PhamVi:
@@ -195,7 +200,7 @@ def nhat_ky(yc: YeuCau):
 
 
 def cong(yc: YeuCau):
-    c = bc.doc_cong(yc.conn, yc.pv)
+    c = bc.doc_cong(yc.conn, yc.pv, tep_do=yc.tep_do)
     ra = [{"ma": x.ma, "ten": x.ten, "dat": x.dat, "nhan": x.nhan,
            "da_do": x.da_do, "ly_do": x.ly_do} for x in c]
     return {"cong": ra,
