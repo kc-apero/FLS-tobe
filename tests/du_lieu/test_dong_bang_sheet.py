@@ -816,11 +816,20 @@ def _chuoi_trong_ma(p: pathlib.Path) -> set[str]:
 
 def test_KHUON_ix_fx_la_mot_tep_va_cong_cu_KHONG_mang_du_lieu_khuon():
     """Khuôn `ix_fx` nằm ở `tools/khuon_dong_bang/ix_fx.py`; gói có `__init__.py` **0 byte**;
-    công cụ tìm thấy đúng `['ix_fx']`; và MÃ công cụ ⛔ còn mang dữ liệu khuôn nào *(tên bảng,
-    khoá, tiền tệ, đường ảnh)* — còn là còn phải sửa công cụ khi thêm khuôn. ĐỎ trên `eb94901`."""
+    công cụ tìm thấy `ix_fx` *(và ĐÚNG mọi tệp khuôn của thư mục)*; và MÃ công cụ ⛔ còn mang dữ
+    liệu khuôn nào *(tên bảng, khoá, tiền tệ, đường ảnh)* — còn là còn phải sửa công cụ khi thêm
+    khuôn. ĐỎ trên `eb94901`.
+
+    ⚠ DT3 *(`WO-106`)*: bản đầu ghim `danh_sach_khuon() == ['ix_fx']` — đúng khi `ix_fx` là khuôn
+    DUY NHẤT. DT3 thêm ba tệp khuôn *(`atl_cay` · `mapping_master_cfg` · `cdt_correct` — đúng điều
+    bài này canh: thêm khuôn = thêm TỆP)* ⇒ bài ĐỎ `['atl_cay', …] == ['ix_fx']`, tiền đề "một
+    khuôn" hết đúng. Lo gốc GIỮ: `ix_fx` được tìm thấy, và công cụ thấy ĐÚNG tập tệp khuôn —
+    ⛔ bỏ sót tệp nào, ⛔ thấy tệp ⛔ có."""
     assert (THU_MUC_KHUON / "__init__.py").read_bytes() == b""
     assert (THU_MUC_KHUON / "ix_fx.py").is_file()
-    assert _nap_cong_cu().danh_sach_khuon() == ["ix_fx"]
+    co = _nap_cong_cu().danh_sach_khuon()
+    assert "ix_fx" in co
+    assert co == sorted(p.stem for p in THU_MUC_KHUON.glob("*.py") if not p.stem.startswith("_"))
     lot = _chuoi_trong_ma(TOOL) & {"IX.FX", "Month", "USD", "VND", "tests/fixture/cau_hinh/ix_fx.json"}
     assert lot == set(), f"công cụ còn mang dữ liệu khuôn: {sorted(lot)}"
 

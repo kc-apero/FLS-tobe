@@ -1,0 +1,1296 @@
+{
+ "bang": "IX.HD",
+ "khuon": "atl_cay",
+ "nguon": "Drive [COPY] Report I General Ledger | P&L Report · id 19NNTbXJ6SmwA8AFnaUQlc0-WKjM_YPAkUaa2-shEU2g · 'Report I PLA3 Y H Q M | PM + HR | ATL'!A7:F88 (hàng 6 = tiêu đề L1·L2·L3·L4·Period)",
+ "cach_doc": "get_values (chuỗi hiển thị). Cột A = số mUSD ĐÃ ĐỊNH DẠNG (1 chữ số lẻ) — chỉ dùng CẤU TRÚC; giá trị lấy lại bằng effectiveValue khi làm đáp án",
+ "ngay_dong_bang": "2026-11-16",
+ "khong_mang_PII": "⛔ KHÔNG mang cột riêng tư: máy soát 6 tên cột của bản thô với PM_COT_RIENG_TU ['Email Address'] — 0 trùng (gộp khoảng trắng, ⛔ phân biệt hoa thường). Ảnh chỉ giữ khoá `ma` + 5 cột chọn; 0 cột bản thô ⛔ chọn (tên ở `cot_khong_chon`). Bản thô qua `chuan_bi` của khuôn: 6 tên cột trên là của BẢNG khuôn dựng; soát thêm 4 tên cột của 2 bảng phụ — 0 trùng. Ô bản thô mà khuôn ⛔ mang/băm: xem `ghi_chu_khuon`.",
+ "ghi_chu_khuon": "Cây ATL đọc 81 hàng (dòng sheet 7…87) = 74 dòng mã + 6 tiêu đề nhóm (bảng phụ `nhom`) + 1 dòng trống (bảng phụ `dong_trong`). Cột A (số mUSD đã định dạng) ⛔ vào ảnh — chỉ CẤU TRÚC. cap = cap_cot + 1 (L1…L4); cha = dòng mã gần nhất phía trên có cấp nhỏ hơn, TRONG nhóm (tiêu đề nhóm xoá ngăn, dòng trống ⛔ đụng); ⛔ kiểm cha–con (C4).",
+ "khoa": "ma",
+ "kieu_khoa": "ma",
+ "cot": [
+  "ten",
+  "cha",
+  "cap",
+  "nhom",
+  "dong_sheet"
+ ],
+ "cot_khong_chon": [],
+ "so_dong": 74,
+ "trung": [],
+ "thieu": [],
+ "lac": [],
+ "khoa_hong": [],
+ "o_rong": [],
+ "cong": {
+  "mong": 74,
+  "so_dong": 74,
+  "dat": true,
+  "ly_do": []
+ },
+ "checksum_noi_dung": "77ca9d6c74f4254a",
+ "dong": [
+  {
+   "thu_tu": 1,
+   "ma": {
+    "chu": "GI"
+   },
+   "ten": {
+    "chu": "Gross Inflow"
+   },
+   "cha": null,
+   "cap": "1",
+   "nhom": {
+    "chu": "HDO"
+   },
+   "dong_sheet": "8"
+  },
+  {
+   "thu_tu": 2,
+   "ma": {
+    "chu": "OPC"
+   },
+   "ten": {
+    "chu": "Operating Cost"
+   },
+   "cha": null,
+   "cap": "1",
+   "nhom": {
+    "chu": "HDO"
+   },
+   "dong_sheet": "9"
+  },
+  {
+   "thu_tu": 3,
+   "ma": {
+    "chu": "CAC"
+   },
+   "ten": {
+    "chu": "Customer Acquisition Cost"
+   },
+   "cha": {
+    "chu": "OPC"
+   },
+   "cap": "2",
+   "nhom": {
+    "chu": "HDO"
+   },
+   "dong_sheet": "10"
+  },
+  {
+   "thu_tu": 4,
+   "ma": {
+    "chu": "MAC"
+   },
+   "ten": {
+    "chu": "Marketing Cost"
+   },
+   "cha": {
+    "chu": "CAC"
+   },
+   "cap": "3",
+   "nhom": {
+    "chu": "HDO"
+   },
+   "dong_sheet": "11"
+  },
+  {
+   "thu_tu": 5,
+   "ma": {
+    "chu": "OMC"
+   },
+   "ten": {
+    "chu": "Online Marketing Cost"
+   },
+   "cha": {
+    "chu": "MAC"
+   },
+   "cap": "4",
+   "nhom": {
+    "chu": "HDO"
+   },
+   "dong_sheet": "12"
+  },
+  {
+   "thu_tu": 6,
+   "ma": {
+    "chu": "MC"
+   },
+   "ten": {
+    "chu": "Maketer Cost"
+   },
+   "cha": {
+    "chu": "MAC"
+   },
+   "cap": "4",
+   "nhom": {
+    "chu": "HDO"
+   },
+   "dong_sheet": "13"
+  },
+  {
+   "thu_tu": 7,
+   "ma": {
+    "chu": "OTMC"
+   },
+   "ten": {
+    "chu": "Other Marketing Cost"
+   },
+   "cha": {
+    "chu": "MAC"
+   },
+   "cap": "4",
+   "nhom": {
+    "chu": "HDO"
+   },
+   "dong_sheet": "14"
+  },
+  {
+   "thu_tu": 8,
+   "ma": {
+    "chu": "COT"
+   },
+   "ten": {
+    "chu": "CAC - Other"
+   },
+   "cha": {
+    "chu": "CAC"
+   },
+   "cap": "3",
+   "nhom": {
+    "chu": "HDO"
+   },
+   "dong_sheet": "15"
+  },
+  {
+   "thu_tu": 9,
+   "ma": {
+    "chu": "COS"
+   },
+   "ten": {
+    "chu": "Cost of Servies"
+   },
+   "cha": {
+    "chu": "OPC"
+   },
+   "cap": "2",
+   "nhom": {
+    "chu": "HDO"
+   },
+   "dong_sheet": "16"
+  },
+  {
+   "thu_tu": 10,
+   "ma": {
+    "chu": "PS"
+   },
+   "ten": {
+    "chu": "Profit Share"
+   },
+   "cha": {
+    "chu": "COS"
+   },
+   "cap": "3",
+   "nhom": {
+    "chu": "HDO"
+   },
+   "dong_sheet": "17"
+  },
+  {
+   "thu_tu": 11,
+   "ma": {
+    "chu": "API"
+   },
+   "ten": {
+    "chu": "API"
+   },
+   "cha": {
+    "chu": "COS"
+   },
+   "cap": "3",
+   "nhom": {
+    "chu": "HDO"
+   },
+   "dong_sheet": "18"
+  },
+  {
+   "thu_tu": 12,
+   "ma": {
+    "chu": "SC"
+   },
+   "ten": {
+    "chu": "Server Cost"
+   },
+   "cha": {
+    "chu": "COS"
+   },
+   "cap": "3",
+   "nhom": {
+    "chu": "HDO"
+   },
+   "dong_sheet": "19"
+  },
+  {
+   "thu_tu": 13,
+   "ma": {
+    "chu": "LC"
+   },
+   "ten": {
+    "chu": "License Cost"
+   },
+   "cha": {
+    "chu": "COS"
+   },
+   "cap": "3",
+   "nhom": {
+    "chu": "HDO"
+   },
+   "dong_sheet": "20"
+  },
+  {
+   "thu_tu": 14,
+   "ma": {
+    "chu": "DC"
+   },
+   "ten": {
+    "chu": "Dev Cost (Maintain App)"
+   },
+   "cha": {
+    "chu": "COS"
+   },
+   "cap": "3",
+   "nhom": {
+    "chu": "HDO"
+   },
+   "dong_sheet": "21"
+  },
+  {
+   "thu_tu": 15,
+   "ma": {
+    "chu": "CSO"
+   },
+   "ten": {
+    "chu": "Service Cost - Other"
+   },
+   "cha": {
+    "chu": "COS"
+   },
+   "cap": "3",
+   "nhom": {
+    "chu": "HDO"
+   },
+   "dong_sheet": "22"
+  },
+  {
+   "thu_tu": 16,
+   "ma": {
+    "chu": "GAC"
+   },
+   "ten": {
+    "chu": "General Admin Cost"
+   },
+   "cha": null,
+   "cap": "1",
+   "nhom": {
+    "chu": "HDO"
+   },
+   "dong_sheet": "23"
+  },
+  {
+   "thu_tu": 17,
+   "ma": {
+    "chu": "OFR"
+   },
+   "ten": {
+    "chu": "Office Rental Cost"
+   },
+   "cha": {
+    "chu": "GAC"
+   },
+   "cap": "2",
+   "nhom": {
+    "chu": "HDO"
+   },
+   "dong_sheet": "24"
+  },
+  {
+   "thu_tu": 18,
+   "ma": {
+    "chu": "GAH"
+   },
+   "ten": {
+    "chu": "GA HR Cost"
+   },
+   "cha": {
+    "chu": "GAC"
+   },
+   "cap": "2",
+   "nhom": {
+    "chu": "HDO"
+   },
+   "dong_sheet": "25"
+  },
+  {
+   "thu_tu": 19,
+   "ma": {
+    "chu": "BRC"
+   },
+   "ten": {
+    "chu": "Branding Cost"
+   },
+   "cha": {
+    "chu": "GAC"
+   },
+   "cap": "2",
+   "nhom": {
+    "chu": "HDO"
+   },
+   "dong_sheet": "26"
+  },
+  {
+   "thu_tu": 20,
+   "ma": {
+    "chu": "HCC"
+   },
+   "ten": {
+    "chu": "HR Culture Activities Cost"
+   },
+   "cha": {
+    "chu": "GAC"
+   },
+   "cap": "2",
+   "nhom": {
+    "chu": "HDO"
+   },
+   "dong_sheet": "27"
+  },
+  {
+   "thu_tu": 21,
+   "ma": {
+    "chu": "REC"
+   },
+   "ten": {
+    "chu": "Recruitment Cost"
+   },
+   "cha": {
+    "chu": "GAC"
+   },
+   "cap": "2",
+   "nhom": {
+    "chu": "HDO"
+   },
+   "dong_sheet": "28"
+  },
+  {
+   "thu_tu": 22,
+   "ma": {
+    "chu": "BON"
+   },
+   "ten": {
+    "chu": "Bonus"
+   },
+   "cha": {
+    "chu": "GAC"
+   },
+   "cap": "2",
+   "nhom": {
+    "chu": "HDO"
+   },
+   "dong_sheet": "29"
+  },
+  {
+   "thu_tu": 23,
+   "ma": {
+    "chu": "BUT"
+   },
+   "ten": {
+    "chu": "Travel Cost"
+   },
+   "cha": {
+    "chu": "GAC"
+   },
+   "cap": "2",
+   "nhom": {
+    "chu": "HDO"
+   },
+   "dong_sheet": "30"
+  },
+  {
+   "thu_tu": 24,
+   "ma": {
+    "chu": "OPO"
+   },
+   "ten": {
+    "chu": "Operating - Other"
+   },
+   "cha": {
+    "chu": "GAC"
+   },
+   "cap": "2",
+   "nhom": {
+    "chu": "HDO"
+   },
+   "dong_sheet": "31"
+  },
+  {
+   "thu_tu": 25,
+   "ma": {
+    "chu": "CXA"
+   },
+   "ten": {
+    "chu": "Product Cost In-House Development App"
+   },
+   "cha": {
+    "chu": "GAC"
+   },
+   "cap": "2",
+   "nhom": {
+    "chu": "HDO"
+   },
+   "dong_sheet": "32"
+  },
+  {
+   "thu_tu": 26,
+   "ma": {
+    "chu": "OGA"
+   },
+   "ten": {
+    "chu": "GAC - Other"
+   },
+   "cha": {
+    "chu": "GAC"
+   },
+   "cap": "2",
+   "nhom": {
+    "chu": "HDO"
+   },
+   "dong_sheet": "33"
+  },
+  {
+   "thu_tu": 27,
+   "ma": {
+    "chu": "CDC"
+   },
+   "ten": {
+    "chu": "Capex and Depreciation"
+   },
+   "cha": null,
+   "cap": "1",
+   "nhom": {
+    "chu": "HDO"
+   },
+   "dong_sheet": "34"
+  },
+  {
+   "thu_tu": 28,
+   "ma": {
+    "chu": "CXP"
+   },
+   "ten": {
+    "chu": "Partnership Development"
+   },
+   "cha": {
+    "chu": "CDC"
+   },
+   "cap": "2",
+   "nhom": {
+    "chu": "HDO"
+   },
+   "dong_sheet": "36"
+  },
+  {
+   "thu_tu": 29,
+   "ma": {
+    "chu": "CXI"
+   },
+   "ten": {
+    "chu": "Infrastructure"
+   },
+   "cha": {
+    "chu": "CDC"
+   },
+   "cap": "2",
+   "nhom": {
+    "chu": "HDO"
+   },
+   "dong_sheet": "37"
+  },
+  {
+   "thu_tu": 30,
+   "ma": {
+    "chu": "OSF"
+   },
+   "ten": {
+    "chu": "Office Setup Fee"
+   },
+   "cha": {
+    "chu": "CXI"
+   },
+   "cap": "3",
+   "nhom": {
+    "chu": "HDO"
+   },
+   "dong_sheet": "38"
+  },
+  {
+   "thu_tu": 31,
+   "ma": {
+    "chu": "FNS"
+   },
+   "ten": {
+    "chu": "Facilities for New Staff"
+   },
+   "cha": {
+    "chu": "CXI"
+   },
+   "cap": "3",
+   "nhom": {
+    "chu": "HDO"
+   },
+   "dong_sheet": "39"
+  },
+  {
+   "thu_tu": 32,
+   "ma": {
+    "chu": "CIO"
+   },
+   "ten": {
+    "chu": "Infrastructure - Other"
+   },
+   "cha": {
+    "chu": "CXI"
+   },
+   "cap": "3",
+   "nhom": {
+    "chu": "HDO"
+   },
+   "dong_sheet": "40"
+  },
+  {
+   "thu_tu": 33,
+   "ma": {
+    "chu": "CXB"
+   },
+   "ten": {
+    "chu": "Biz Development"
+   },
+   "cha": {
+    "chu": "CDC"
+   },
+   "cap": "2",
+   "nhom": {
+    "chu": "HDO"
+   },
+   "dong_sheet": "41"
+  },
+  {
+   "thu_tu": 34,
+   "ma": {
+    "chu": "CXO"
+   },
+   "ten": {
+    "chu": "CPX - Other"
+   },
+   "cha": {
+    "chu": "CDC"
+   },
+   "cap": "2",
+   "nhom": {
+    "chu": "HDO"
+   },
+   "dong_sheet": "42"
+  },
+  {
+   "thu_tu": 35,
+   "ma": {
+    "chu": "ITE"
+   },
+   "ten": {
+    "chu": "Interest"
+   },
+   "cha": null,
+   "cap": "1",
+   "nhom": {
+    "chu": "HDO"
+   },
+   "dong_sheet": "43"
+  },
+  {
+   "thu_tu": 36,
+   "ma": {
+    "chu": "CFI"
+   },
+   "ten": {
+    "chu": "Issuance of Stock"
+   },
+   "cha": null,
+   "cap": "1",
+   "nhom": {
+    "chu": "HDO"
+   },
+   "dong_sheet": "44"
+  },
+  {
+   "thu_tu": 37,
+   "ma": {
+    "chu": "LMN"
+   },
+   "ten": {
+    "chu": "Loan/Borrowing"
+   },
+   "cha": null,
+   "cap": "1",
+   "nhom": {
+    "chu": "HDO"
+   },
+   "dong_sheet": "45"
+  },
+  {
+   "thu_tu": 38,
+   "ma": {
+    "chu": "OMN"
+   },
+   "ten": {
+    "chu": "Repayment of Loan"
+   },
+   "cha": null,
+   "cap": "1",
+   "nhom": {
+    "chu": "HDO"
+   },
+   "dong_sheet": "46"
+  },
+  {
+   "thu_tu": 39,
+   "ma": {
+    "chu": "NIS"
+   },
+   "ten": {
+    "chu": "Net Income Staff"
+   },
+   "cha": null,
+   "cap": "1",
+   "nhom": {
+    "chu": "HDH"
+   },
+   "dong_sheet": "48"
+  },
+  {
+   "thu_tu": 40,
+   "ma": {
+    "chu": "INT"
+   },
+   "ten": {
+    "chu": "Insurance Total"
+   },
+   "cha": null,
+   "cap": "1",
+   "nhom": {
+    "chu": "HDH"
+   },
+   "dong_sheet": "49"
+  },
+  {
+   "thu_tu": 41,
+   "ma": {
+    "chu": "PIT"
+   },
+   "ten": {
+    "chu": "PIT Total"
+   },
+   "cha": null,
+   "cap": "1",
+   "nhom": {
+    "chu": "HDH"
+   },
+   "dong_sheet": "50"
+  },
+  {
+   "thu_tu": 42,
+   "ma": {
+    "chu": "COM"
+   },
+   "ten": {
+    "chu": "COM Total"
+   },
+   "cha": null,
+   "cap": "1",
+   "nhom": {
+    "chu": "HDH"
+   },
+   "dong_sheet": "51"
+  },
+  {
+   "thu_tu": 43,
+   "ma": {
+    "chu": "DEP"
+   },
+   "ten": {
+    "chu": "Deposit"
+   },
+   "cha": null,
+   "cap": "1",
+   "nhom": {
+    "chu": "HDAP"
+   },
+   "dong_sheet": "53"
+  },
+  {
+   "thu_tu": 44,
+   "ma": {
+    "chu": "NB"
+   },
+   "ten": {
+    "chu": "Lưu chuyển nội bộ"
+   },
+   "cha": null,
+   "cap": "1",
+   "nhom": {
+    "chu": "HDT"
+   },
+   "dong_sheet": "55"
+  },
+  {
+   "thu_tu": 45,
+   "ma": {
+    "chu": "TAC"
+   },
+   "ten": {
+    "chu": "Tax Cash"
+   },
+   "cha": null,
+   "cap": "1",
+   "nhom": {
+    "chu": "HDC"
+   },
+   "dong_sheet": "57"
+  },
+  {
+   "thu_tu": 46,
+   "ma": {
+    "chu": "CIT"
+   },
+   "ten": {
+    "chu": "Corporate Incomes Tax"
+   },
+   "cha": null,
+   "cap": "1",
+   "nhom": {
+    "chu": "HDC"
+   },
+   "dong_sheet": "58"
+  },
+  {
+   "thu_tu": 47,
+   "ma": {
+    "chu": "AR"
+   },
+   "ten": {
+    "chu": "Adjustment Revenue"
+   },
+   "cha": null,
+   "cap": "1",
+   "nhom": {
+    "chu": "HDC"
+   },
+   "dong_sheet": "59"
+  },
+  {
+   "thu_tu": 48,
+   "ma": {
+    "chu": "CP1.1 (PL2)"
+   },
+   "ten": {
+    "chu": "Contribution Profit 11"
+   },
+   "cha": null,
+   "cap": "1",
+   "nhom": {
+    "chu": "HDC"
+   },
+   "dong_sheet": "60"
+  },
+  {
+   "thu_tu": 49,
+   "ma": {
+    "chu": "CP1.2"
+   },
+   "ten": {
+    "chu": "Contribution Profit 12"
+   },
+   "cha": null,
+   "cap": "1",
+   "nhom": {
+    "chu": "HDC"
+   },
+   "dong_sheet": "61"
+  },
+  {
+   "thu_tu": 50,
+   "ma": {
+    "chu": "CP2"
+   },
+   "ten": {
+    "chu": "Contribution Profit 2"
+   },
+   "cha": null,
+   "cap": "1",
+   "nhom": {
+    "chu": "HDC"
+   },
+   "dong_sheet": "62"
+  },
+  {
+   "thu_tu": 51,
+   "ma": {
+    "chu": "CP3"
+   },
+   "ten": {
+    "chu": "Contribution Profit 3"
+   },
+   "cha": null,
+   "cap": "1",
+   "nhom": {
+    "chu": "HDC"
+   },
+   "dong_sheet": "63"
+  },
+  {
+   "thu_tu": 52,
+   "ma": {
+    "chu": "EBITDA"
+   },
+   "ten": {
+    "chu": "EBITDA"
+   },
+   "cha": null,
+   "cap": "1",
+   "nhom": {
+    "chu": "HDC"
+   },
+   "dong_sheet": "64"
+  },
+  {
+   "thu_tu": 53,
+   "ma": {
+    "chu": "EBIT"
+   },
+   "ten": {
+    "chu": "EBIT"
+   },
+   "cha": null,
+   "cap": "1",
+   "nhom": {
+    "chu": "HDC"
+   },
+   "dong_sheet": "65"
+  },
+  {
+   "thu_tu": 54,
+   "ma": {
+    "chu": "EBT"
+   },
+   "ten": {
+    "chu": "EBT"
+   },
+   "cha": null,
+   "cap": "1",
+   "nhom": {
+    "chu": "HDC"
+   },
+   "dong_sheet": "66"
+  },
+  {
+   "thu_tu": 55,
+   "ma": {
+    "chu": "NP"
+   },
+   "ten": {
+    "chu": "NP"
+   },
+   "cha": null,
+   "cap": "1",
+   "nhom": {
+    "chu": "HDC"
+   },
+   "dong_sheet": "67"
+  },
+  {
+   "thu_tu": 56,
+   "ma": {
+    "chu": "NPC"
+   },
+   "ten": {
+    "chu": "Net Profit Cumulative"
+   },
+   "cha": null,
+   "cap": "1",
+   "nhom": {
+    "chu": "HDC"
+   },
+   "dong_sheet": "68"
+  },
+  {
+   "thu_tu": 57,
+   "ma": {
+    "chu": "NCF"
+   },
+   "ten": {
+    "chu": "Net Cashflow (Burn Rate)"
+   },
+   "cha": null,
+   "cap": "1",
+   "nhom": {
+    "chu": "HDC"
+   },
+   "dong_sheet": "69"
+  },
+  {
+   "thu_tu": 58,
+   "ma": {
+    "chu": "NCFO"
+   },
+   "ten": {
+    "chu": "Net Cashflow from Operating"
+   },
+   "cha": null,
+   "cap": "1",
+   "nhom": {
+    "chu": "HDC"
+   },
+   "dong_sheet": "70"
+  },
+  {
+   "thu_tu": 59,
+   "ma": {
+    "chu": "CRO"
+   },
+   "ten": {
+    "chu": "Cash Received from Operating"
+   },
+   "cha": {
+    "chu": "NCFO"
+   },
+   "cap": "2",
+   "nhom": {
+    "chu": "HDC"
+   },
+   "dong_sheet": "71"
+  },
+  {
+   "thu_tu": 60,
+   "ma": {
+    "chu": "COO"
+   },
+   "ten": {
+    "chu": "Cash Outflow from Operating"
+   },
+   "cha": {
+    "chu": "NCFO"
+   },
+   "cap": "2",
+   "nhom": {
+    "chu": "HDC"
+   },
+   "dong_sheet": "72"
+  },
+  {
+   "thu_tu": 61,
+   "ma": {
+    "chu": "NCFI"
+   },
+   "ten": {
+    "chu": "Net Cashflow from Investing"
+   },
+   "cha": null,
+   "cap": "1",
+   "nhom": {
+    "chu": "HDC"
+   },
+   "dong_sheet": "73"
+  },
+  {
+   "thu_tu": 62,
+   "ma": {
+    "chu": "CRI"
+   },
+   "ten": {
+    "chu": "Cash Received from Investing"
+   },
+   "cha": {
+    "chu": "NCFI"
+   },
+   "cap": "2",
+   "nhom": {
+    "chu": "HDC"
+   },
+   "dong_sheet": "74"
+  },
+  {
+   "thu_tu": 63,
+   "ma": {
+    "chu": "COI"
+   },
+   "ten": {
+    "chu": "Cash Outflow from Investing"
+   },
+   "cha": {
+    "chu": "NCFI"
+   },
+   "cap": "2",
+   "nhom": {
+    "chu": "HDC"
+   },
+   "dong_sheet": "75"
+  },
+  {
+   "thu_tu": 64,
+   "ma": {
+    "chu": "NCFF"
+   },
+   "ten": {
+    "chu": "Net Cashflow from Financing"
+   },
+   "cha": null,
+   "cap": "1",
+   "nhom": {
+    "chu": "HDC"
+   },
+   "dong_sheet": "76"
+  },
+  {
+   "thu_tu": 65,
+   "ma": {
+    "chu": "CRF"
+   },
+   "ten": {
+    "chu": "Cash Received from Financing"
+   },
+   "cha": {
+    "chu": "NCFF"
+   },
+   "cap": "2",
+   "nhom": {
+    "chu": "HDC"
+   },
+   "dong_sheet": "77"
+  },
+  {
+   "thu_tu": 66,
+   "ma": {
+    "chu": "COF"
+   },
+   "ten": {
+    "chu": "Cash Outflow from Financing"
+   },
+   "cha": {
+    "chu": "NCFF"
+   },
+   "cap": "2",
+   "nhom": {
+    "chu": "HDC"
+   },
+   "dong_sheet": "78"
+  },
+  {
+   "thu_tu": 67,
+   "ma": {
+    "chu": "CFO"
+   },
+   "ten": {
+    "chu": "NCFF - Other"
+   },
+   "cha": {
+    "chu": "NCFF"
+   },
+   "cap": "2",
+   "nhom": {
+    "chu": "HDC"
+   },
+   "dong_sheet": "79"
+  },
+  {
+   "thu_tu": 68,
+   "ma": {
+    "chu": "PL2"
+   },
+   "ten": {
+    "chu": "= GI - OMC"
+   },
+   "cha": null,
+   "cap": "1",
+   "nhom": {
+    "chu": "HDCI"
+   },
+   "dong_sheet": "81"
+  },
+  {
+   "thu_tu": 69,
+   "ma": {
+    "chu": "PL3"
+   },
+   "ten": {
+    "chu": "= PL2 - Tech Service Cost (none HR: server, API.. + Tools)"
+   },
+   "cha": null,
+   "cap": "1",
+   "nhom": {
+    "chu": "HDCI"
+   },
+   "dong_sheet": "82"
+  },
+  {
+   "thu_tu": 70,
+   "ma": {
+    "chu": "PL4"
+   },
+   "ten": {
+    "chu": "= PL3 - Profit share (Partners)"
+   },
+   "cha": null,
+   "cap": "1",
+   "nhom": {
+    "chu": "HDCI"
+   },
+   "dong_sheet": "83"
+  },
+  {
+   "thu_tu": 71,
+   "ma": {
+    "chu": "PL5"
+   },
+   "ten": {
+    "chu": "= PL4 - COM"
+   },
+   "cha": null,
+   "cap": "1",
+   "nhom": {
+    "chu": "HDCI"
+   },
+   "dong_sheet": "84"
+  },
+  {
+   "thu_tu": 72,
+   "ma": {
+    "chu": "PL6"
+   },
+   "ten": {
+    "chu": "= PL5 - Other Venture cost (Marketer + product dev + Tech dev)"
+   },
+   "cha": null,
+   "cap": "1",
+   "nhom": {
+    "chu": "HDCI"
+   },
+   "dong_sheet": "85"
+  },
+  {
+   "thu_tu": 73,
+   "ma": {
+    "chu": "PL7"
+   },
+   "ten": {
+    "chu": "= PL6 - HQ Cost"
+   },
+   "cha": null,
+   "cap": "1",
+   "nhom": {
+    "chu": "HDCI"
+   },
+   "dong_sheet": "86"
+  },
+  {
+   "thu_tu": 74,
+   "ma": {
+    "chu": "PL8"
+   },
+   "ten": {
+    "chu": "= PL7 - Tax (CIT)"
+   },
+   "cha": null,
+   "cap": "1",
+   "nhom": {
+    "chu": "HDCI"
+   },
+   "dong_sheet": "87"
+  }
+ ],
+ "phu": {
+  "dong_trong": {
+   "mong": 1,
+   "so_dong": 1,
+   "dong": [
+    {
+     "thu_tu": 1,
+     "dong_sheet": "35"
+    }
+   ]
+  },
+  "nhom": {
+   "mong": 6,
+   "so_dong": 6,
+   "dong": [
+    {
+     "thu_tu": 1,
+     "ma": {
+      "chu": "HDO"
+     },
+     "ten": {
+      "chu": "HD Original"
+     },
+     "dong_sheet": "7"
+    },
+    {
+     "thu_tu": 2,
+     "ma": {
+      "chu": "HDH"
+     },
+     "ten": {
+      "chu": "HD HR"
+     },
+     "dong_sheet": "47"
+    },
+    {
+     "thu_tu": 3,
+     "ma": {
+      "chu": "HDAP"
+     },
+     "ten": {
+      "chu": "HD Account Payable"
+     },
+     "dong_sheet": "52"
+    },
+    {
+     "thu_tu": 4,
+     "ma": {
+      "chu": "HDT"
+     },
+     "ten": {
+      "chu": "HD Tempo"
+     },
+     "dong_sheet": "54"
+    },
+    {
+     "thu_tu": 5,
+     "ma": {
+      "chu": "HDC"
+     },
+     "ten": {
+      "chu": "HD Calculated"
+     },
+     "dong_sheet": "56"
+    },
+    {
+     "thu_tu": 6,
+     "ma": {
+      "chu": "HDCI"
+     },
+     "ten": {
+      "chu": "HD Calculated Internal"
+     },
+     "dong_sheet": "80"
+    }
+   ]
+  }
+ }
+}

@@ -31,6 +31,31 @@ tệp ⇒ phải xếp hàng. Giờ công cụ tìm khuôn theo tên tệp; khu�
   · **khuôn** giữ phần RIÊNG của bảng — chọn cột nào, và *thiếu/lạc nghĩa là gì*. Khuôn `ix_fx`
     GỌI `kiem` của C1 *(`DT2-R1-03`: một định nghĩa — xem docstring `ix_fx.py`)*.
 
+⭐⭐ **DT3 — bốn mục TUỲ CHỌN của giao kèo** *(ISP 3.1.2 Step 10 · `WO-106` AC-4: "⛔ sửa công cụ
+trừ khi bài đòi — khai lý do")*. **Lý do — bài đòi:** ba nguồn DT3 *(cây ATL · Mapping Master ·
+CDT Correct)* đều là bảng **CHỮ** *(mã · tên · ánh xạ)*, mà bản DT2 chỉ biết khoá `yyyymm` và
+đòi mọi ô cột chọn là SỐ — ô chữ ⇒ *"ô ⛔ số"* ⇒ ĐỎ, khoá chữ ⇒ TỪ CHỐI *(đo: 20 bài
+`test_GIAO_KEO_*` của `tests/du_lieu/test_anh_cau_hinh.py` ĐỎ `KIEU_KHOA='ma' ⛔ thuộc
+['yyyymm']`)*. Hai nguồn còn ⛔ ở hình `{cot, dong}`: cây ATL là hàng `{A, cap_cot, o}` phải SUY
+cha/cấp/nhóm; Mapping Master là lưới thô A…P phải đi qua `fls.adapters.mapping_master.doc_cot`
+*(⛔ khuôn đọc thứ hai)*. Chính chú thích cũ của `KIEU_KHOA_BIET` đã hẹn: *"Kiểu khác ⇒ thêm khi
+có bước cần, ⛔ khai trước"* — DT3 là bước cần. Khuôn ⛔ khai mục nào thì công cụ chạy **y như
+cũ** — ảnh `ix_fx` giữ từng byte *(bài `test_DT2_B1_anh_IX_FX_TAI_TAO_…` canh)*:
+  · `KIEU_KHOA = "ma"` — khoá CHỮ: hợp lệ = ô chữ khác rỗng; trùng so sau khi GỘP khoảng trắng
+    *(`"A1 "` trùng `"A1"` — bên tra theo mã sẽ gộp, nên hai dòng ấy là một khoá hai giá trị)*.
+  · `KIEU_COT = {cột: "chu" | "chu?"}` — cột CHỮ *(`chu` ⛔ rỗng · `chu?` được rỗng)*; cột ⛔
+    khai giữ luật SỐ cũ. Ô số/bool ở cột chữ ⇒ *"ô ⛔ chữ"* ⇒ ĐỎ — đối xứng với *"ô ⛔ số"*.
+  · `chuan_bi(tho) -> {cot, dong, phu?, ghi_chu?}` — bản thô HÌNH DẠNG orchestrator → bảng của
+    công cụ. `ValueError` ⇒ TỪ CHỐI *(bản thô ⛔ dùng được)*; nổ/trả sai hình ⇒ LỖI exit 3.
+    Bảng phụ `phu` *(vd: 6 dòng tiêu đề nhóm của cây ATL)* vào ảnh dưới `phu.<tên>`, ô mã hoá như
+    dòng chính, dòng mang `thu_tu`, và **vào checksum** — bảng phụ ⛔ vào checksum thì sửa nó là
+    IM LẶNG *(bài `test_GIAO_KEO_checksum_DOI_khi_chi_BANG_PHU_doi`)*. `ghi_chu` *(khuôn tự giải
+    thích phép biến đổi — băm gì, bỏ cột nào)* ⇒ `ghi_chu_khuon`.
+  · `PHU_MONG = {tên: số dòng}` — Đ5 cho bảng phụ: khác ⇒ ĐỎ. Mỗi bảng phụ PHẢI khai *(bảng phụ
+    ⛔ khai ⇒ lỗi khuôn)*; `0` là mong hợp lệ cho bảng phụ *(bảng LỖI — mẫu số là bảng chính,
+    vốn đã bị `--mong ≥ 1` chặn rỗng)*.
+  Soát riêng tư phủ cả tên cột bảng phụ; bản thô có `cot` thì soát TRƯỚC khi khuôn đọc giá trị.
+
 ⛔⛔ **Đọc Drive ⛔ ở đây** *(O7 = A: orchestrator đọc, agent nhận tệp)*. Đầu vào là JSON
 `{nguon, doc_luc, cach_doc, cot, dong}` — `cot` là hàng tiêu đề, `dong` là các hàng giá trị theo
 **thứ tự của sheet**. Vì thế `fls.oracle.doc.doc_dan` *(đọc dần, retry)* và
@@ -96,7 +121,7 @@ import re
 import sys
 import tempfile
 import traceback
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import date
 from decimal import Decimal
 from pathlib import Path
@@ -113,7 +138,11 @@ THU_MUC_KHUON = Path(__file__).resolve().parent / "khuon_dong_bang"
 #: Tên khuôn hợp lệ — loại `__init__` và tệp `_…` *(⛔ phải khuôn)*.
 _TEN_KHUON = re.compile(r"[a-z][a-z0-9_]*")
 #: Kiểu khoá công cụ biết kiểm *(khoá hỏng)*. Kiểu khác ⇒ thêm khi có bước cần, ⛔ khai trước.
-KIEU_KHOA_BIET = ("yyyymm",)
+#: `ma` thêm ở DT3 *(khoá CHỮ của cây ATL · Mapping Master · CDT Correct — xem docstring)*.
+KIEU_KHOA_BIET = ("yyyymm", "ma")
+#: Kiểu cột chọn *(DT3)*: `so` = luật DT2 *(ô SỐ, ⛔ rỗng)* · `chu` = ô CHỮ ⛔ rỗng · `chu?` = ô
+#: chữ hoặc rỗng. Cột ⛔ khai ở `KIEU_COT` của khuôn = `so` ⇒ khuôn DT2 chạy y như cũ.
+KIEU_COT_BIET = ("so", "chu", "chu?")
 
 
 @dataclass(frozen=True)
@@ -130,6 +159,16 @@ class Khuon:
     cot: tuple[str, ...]
     ra: str                 # tương đối với gốc repo
     thieu_lac: Callable[[list[dict[str, Any]]], dict[str, Any]]
+    # ── tuỳ chọn *(DT3)* — khuôn ⛔ khai ⇒ y như DT2 ──
+    kieu_cot: dict[str, str] = field(default_factory=dict, compare=False)
+    chuan_bi: Callable[[dict], dict] | None = field(default=None, compare=False)
+    phu_mong: dict[str, int] = field(default_factory=dict, compare=False)
+
+    def cot_theo_kieu(self) -> tuple[list[str], list[str], list[str]]:
+        """→ (cột ⛔ được rỗng, cột SỐ, cột CHỮ) — theo thứ tự `cot`, mỗi cột ở đúng chỗ của nó."""
+        k = {c: self.kieu_cot.get(c, "so") for c in self.cot}
+        return ([c for c in self.cot if k[c] != "chu?"], [c for c in self.cot if k[c] == "so"],
+                [c for c in self.cot if k[c] != "so"])
 
 
 _YYYYMM = re.compile(r"\d{6}")
@@ -181,10 +220,27 @@ def nap_khuon(ten: str) -> Khuon:
         sai.append("COT ⛔ phải tuple tên cột khác rỗng")
     if not callable(getattr(m, "thieu_lac", None)):
         sai.append("thieu_lac ⛔ phải hàm")
+    # ── mục tuỳ chọn *(DT3)*: khai SAI ⇒ từ chối, ⛔ rơi im lặng về mặc định ──
+    kieu_cot = getattr(m, "KIEU_COT", {})
+    if not isinstance(kieu_cot, dict) or not all(
+            isinstance(cot, tuple) and c in cot and k in KIEU_COT_BIET
+            for c, k in kieu_cot.items()):
+        sai.append(f"KIEU_COT ⛔ phải {{cột thuộc COT: kiểu thuộc {list(KIEU_COT_BIET)}}}")
+    chuan_bi = getattr(m, "chuan_bi", None)
+    if chuan_bi is not None and not callable(chuan_bi):
+        sai.append("chuan_bi ⛔ phải hàm")
+    phu_mong = getattr(m, "PHU_MONG", {})
+    if not isinstance(phu_mong, dict) or not all(
+            isinstance(k, str) and k.strip() and type(v) is int and v >= 0
+            for k, v in phu_mong.items()):
+        sai.append("PHU_MONG ⛔ phải {tên bảng phụ: số dòng ≥ 0}")
+    elif phu_mong and chuan_bi is None:
+        sai.append("PHU_MONG ⛔ có chuan_bi — bảng phụ chỉ đến từ chuan_bi")
     if sai:
         raise TuChoi(f"khuôn `{ten}` ({p.name}) sai giao kèo: " + " · ".join(sai))
     return Khuon(ten=ten, bang=m.BANG, khoa=m.KHOA, kieu_khoa=m.KIEU_KHOA, cot=tuple(cot),
-                 ra=m.RA, thieu_lac=m.thieu_lac)
+                 ra=m.RA, thieu_lac=m.thieu_lac, kieu_cot=dict(kieu_cot), chuan_bi=chuan_bi,
+                 phu_mong=dict(phu_mong))
 
 
 # ── đọc ───────────────────────────────────────────────────────────────────────
@@ -221,6 +277,12 @@ def _khong_so(v: Any) -> bool:
     return isinstance(v, bool) or (isinstance(v, dict) and bool(v["chu"].strip()))
 
 
+def _khong_chu(v: Any) -> bool:
+    """Ô ảnh ⛔ CHỮ mà ⛔ rỗng: ô số *(chuỗi chữ số)* hay `bool` *(DT3 — đối xứng `_khong_so`:
+    rỗng ∩ ⛔ chữ = ∅ ⇒ mỗi ô cột chữ rơi vào ĐÚNG một trong chữ · rỗng · ⛔ chữ)*."""
+    return isinstance(v, (str, bool))
+
+
 def _khong_hang_so(c: str) -> Any:
     raise TuChoi(f"bản thô có hằng `{c}` ⛔ phải số JSON")
 
@@ -247,9 +309,15 @@ def doc_ban_tho(p: Path) -> dict:
         date.fromisoformat(tho["doc_luc"])
     except ValueError:
         raise TuChoi(f"`doc_luc` ⛔ phải ngày YYYY-MM-DD có thật: {tho['doc_luc']!r}") from None
+    return tho
+
+
+def _kiem_bang(tho: dict) -> None:
+    """`{cot, dong}` của BẢNG công cụ — kiểm SAU `chuan_bi` *(DT3: bản thô cây ATL · Mapping
+    Master ⛔ có `cot`; khuôn dựng nó)*. Khuôn ⛔ có `chuan_bi` ⇒ đúng phép kiểm cũ của
+    `doc_ban_tho`, cùng lời, cùng chỗ trong chuỗi *(trước mọi thứ đọc giá trị)*."""
     if not isinstance(tho.get("cot"), list) or not isinstance(tho.get("dong"), list):
         raise TuChoi("bản thô thiếu `cot` *(danh sách)* hoặc `dong` *(danh sách hàng)*")
-    return tho
 
 
 # ── đóng băng ─────────────────────────────────────────────────────────────────
@@ -266,20 +334,69 @@ def _soat_rieng_tu(cot: list[str]) -> None:
                      "kho nên cũng ⛔ vào ảnh; bỏ cột khỏi lượt đọc rồi đóng băng lại")
 
 
-def _khoa_hop_le(v: Any) -> bool:
+def _khoa_hop_le(v: Any, kieu: str = "yyyymm") -> bool:
     """Khoá `yyyymm` hợp lệ = ô SỐ *(chuỗi đúng chữ số)* 6 chữ số, tháng 01–12. Ô chữ
-    `{"chu": "202401"}` là khoá HỎNG *(`DT2-R1-02`)*."""
+    `{"chu": "202401"}` là khoá HỎNG *(`DT2-R1-02`)*. Khoá `ma` *(DT3)* hợp lệ = ô CHỮ có nội
+    dung — ô số, `bool`, rỗng, chỉ-khoảng-trắng đều HỎNG."""
+    if kieu == "ma":
+        return isinstance(v, dict) and bool(v["chu"].strip())
     return isinstance(v, str) and bool(_YYYYMM.fullmatch(v)) and 1 <= int(v[4:]) <= 12
 
 
-def phan_tich_khoa(khoa: list[Any]) -> dict[str, Any]:
+def _gia_tri_khoa(v: Any, kieu: str) -> str:
+    """Giá trị đem ĐẾM TRÙNG: `yyyymm` ⇒ nguyên chuỗi; `ma` ⇒ chữ đã GỘP khoảng trắng."""
+    return " ".join(v["chu"].split()) if kieu == "ma" else v
+
+
+def phan_tich_khoa(khoa: list[Any], kieu: str = "yyyymm") -> dict[str, Any]:
     """Phần CHUNG của khoá → hỏng · trùng. *(Thiếu/lạc: của khuôn — `Khuon.thieu_lac`.)*"""
-    hong = [k for k in khoa if not _khoa_hop_le(k)]
+    hong = [k for k in khoa if not _khoa_hop_le(k, kieu)]
     dem: dict[str, int] = {}
     for k in khoa:
-        if _khoa_hop_le(k):
-            dem[k] = dem.get(k, 0) + 1
+        if _khoa_hop_le(k, kieu):
+            g = _gia_tri_khoa(k, kieu)
+            dem[g] = dem.get(g, 0) + 1
     return {"khoa_hong": hong, "trung": sorted(k for k, n in dem.items() if n >= 2)}
+
+
+_META = ("nguon", "doc_luc", "cach_doc")
+
+
+def _chuan_bi(kh: Khuon, tho: dict) -> tuple[dict, dict[str, list[dict]], str | None]:
+    """Gọi `chuan_bi` của khuôn trên BẢN SAO bản thô → (bảng công cụ, bảng phụ, ghi chú) *(DT3)*.
+
+    `ValueError` ⇒ `TuChoi` *(bản thô ⛔ dùng được — in LỜI khuôn; khuôn ⛔ được đưa giá trị ô
+    vào lời ấy)*; lỗi khác hay trả sai hình ⇒ `LoiKhuon` *(exit 3)*. `nguon · doc_luc · cach_doc`
+    lấy từ BẢN THÔ — khuôn ⛔ đổi được xuất xứ của ảnh; khoá khác của bản thô *(vd
+    `canh_bao_rieng_tu`, `ghi_chu` của orchestrator)* ⛔ bao giờ vào ảnh.
+    """
+    try:
+        ra = kh.chuan_bi(copy.deepcopy(tho))
+    except ValueError as e:
+        raise TuChoi(f"khuôn `{kh.ten}` ⛔ dựng được bảng từ bản thô: {e}") from None
+    except Exception as e:
+        raise LoiKhuon(f"khuôn `{kh.ten}` nổ khi chuẩn bị bản thô: {type(e).__name__}: {e}") from e
+    sai: list[str] = []
+    if not isinstance(ra, dict):
+        sai.append(f"trả {type(ra).__name__} ⛔ phải dict")
+        ra = {}
+    if not isinstance(ra.get("cot"), list) or not isinstance(ra.get("dong"), list):
+        sai.append("`cot` · `dong` ⛔ phải danh sách")
+    phu = ra.get("phu", {})
+    if not isinstance(phu, dict) or not all(
+            isinstance(h, list) and all(isinstance(r, dict) and "thu_tu" not in r for r in h)
+            for h in phu.values()):
+        sai.append("`phu` ⛔ phải {tên: [dòng dict ⛔ khoá thu_tu]}")
+        phu = {}
+    elif set(phu) != set(kh.phu_mong):
+        sai.append(f"bảng phụ {sorted(phu)} ≠ PHU_MONG {sorted(kh.phu_mong)}")
+    ghi_chu = ra.get("ghi_chu")
+    if ghi_chu is not None and not (isinstance(ghi_chu, str) and ghi_chu.strip()):
+        sai.append("`ghi_chu` ⛔ phải chuỗi khác rỗng")
+    if sai:
+        raise LoiKhuon(f"khuôn `{kh.ten}`: chuan_bi phải trả {{cot, dong, phu?, ghi_chu?}} — "
+                       + " · ".join(sai))
+    return {**{k: tho[k] for k in _META}, "cot": ra["cot"], "dong": ra["dong"]}, phu, ghi_chu
 
 
 def _thieu_lac(kh: Khuon, dong: list[dict[str, Any]]) -> tuple[list | None, list | None, str,
@@ -306,8 +423,19 @@ def dong_bang(kh: Khuon, tho: dict, mong: int) -> tuple[dict, list[str]]:
 
     ⛔ Mọi `TuChoi` phải nổ ở ĐÂY, trước khi chạm đĩa.
     """
+    phu_tho: dict[str, list[dict]] = {}
+    ghi_chu: str | None = None
+    # Đ4: số HÀNG của bản thô ⛔ phải số dòng bảng khi khuôn có `chuan_bi` (cây ATL: 81 ≠ 74)
+    hang_tho = len(tho["dong"]) if isinstance(tho.get("dong"), list) else None
+    if kh.chuan_bi is not None:
+        if isinstance(tho.get("cot"), list):
+            _soat_rieng_tu(tho["cot"])               # bản thô có tiêu đề ⇒ soát TRƯỚC khi khuôn đọc
+        tho, phu_tho, ghi_chu = _chuan_bi(kh, tho)
+    _kiem_bang(tho)
     cot = [_ten(c) for c in tho["cot"]]
     _soat_rieng_tu(tho["cot"])                       # ⛔ trước mọi thứ đọc giá trị
+    for hang in phu_tho.values():                    # … và tên cột của mọi bảng phụ (DT3)
+        _soat_rieng_tu(sorted({_ten(k) for h in hang for k in h}))
 
     nhan = [c for c in cot if c]
     trung_ten = sorted({c for c in nhan if nhan.count(c) > 1})
@@ -342,13 +470,23 @@ def dong_bang(kh: Khuon, tho: dict, mong: int) -> tuple[dict, list[str]]:
             d[c] = _o(h[j]) if j < len(h) else None
         dong.append(d)
 
-    pt = phan_tich_khoa([d[kh.khoa] for d in dong])
+    pt = phan_tich_khoa([d[kh.khoa] for d in dong], kh.kieu_khoa)
     thieu, lac, dai, khong_do = _thieu_lac(kh, dong)
+    # ⚠ DT3: mỗi phép đếm ô có MẪU SỐ của riêng nó *(Đ4)* — khuôn ⛔ khai `KIEU_COT` thì ba tập
+    #   cột trùng `kh.cot` / rỗng như DT2 ⇒ thứ tự, số và lời in giữ từng byte.
+    cot_day, cot_so, cot_chu = kh.cot_theo_kieu()
     o_rong = [{"thu_tu": d["thu_tu"], "cot": c}
-              for d in dong for c in kh.cot if _rong(d[c])]
+              for d in dong for c in kh.cot if c in cot_day and _rong(d[c])]
     o_khong_so = [{"thu_tu": d["thu_tu"], "cot": c}
-                  for d in dong for c in kh.cot if _khong_so(d[c])]
-    mau_o = len(dong) * len(kh.cot)
+                  for d in dong for c in kh.cot if c in cot_so and _khong_so(d[c])]
+    o_khong_chu = [{"thu_tu": d["thu_tu"], "cot": c}
+                   for d in dong for c in kh.cot if c in cot_chu and _khong_chu(d[c])]
+    mau_rong, mau_so, mau_chu = (len(dong) * len(x) for x in (cot_day, cot_so, cot_chu))
+    phu: dict[str, dict[str, Any]] = {}
+    for ten in sorted(phu_tho):
+        hang = [{"thu_tu": i, **{k: _o(v) for k, v in r.items()}}
+                for i, r in enumerate(phu_tho[ten], 1)]
+        phu[ten] = {"mong": kh.phu_mong[ten], "so_dong": len(hang), "dong": hang}
 
     ly_do: list[str] = []
     if len(dong) != mong:
@@ -360,21 +498,35 @@ def dong_bang(kh: Khuon, tho: dict, mong: int) -> tuple[dict, list[str]]:
     if pt["khoa_hong"]:
         ly_do.append(f"khoá hỏng {len(pt['khoa_hong'])}")
     if o_rong:
-        ly_do.append(f"ô rỗng {len(o_rong)}/{mau_o}")
+        ly_do.append(f"ô rỗng {len(o_rong)}/{mau_rong}")
     if o_khong_so:
-        ly_do.append(f"ô ⛔ số {len(o_khong_so)}/{mau_o}")
+        ly_do.append(f"ô ⛔ số {len(o_khong_so)}/{mau_so}")
+    if o_khong_chu:
+        ly_do.append(f"ô ⛔ chữ {len(o_khong_chu)}/{mau_chu}")
+    for ten, b in phu.items():
+        if b["so_dong"] != b["mong"]:
+            ly_do.append(f"phụ `{ten}` {b['so_dong']} dòng ≠ mong {b['mong']}")
     if khong_do is not None:                 # lý do DÀI (lời của khuôn) — đứng cuối
         ly_do.append(f"thiếu/lạc ⛔ đo được — {khong_do}")
 
     ngay = date.fromisoformat(tho["doc_luc"]).isoformat()
+    # ⭐ DT3: dòng bảng phụ VÀO checksum, bọc `{"phu", "dong"}` ⇒ ⛔ lẫn với dòng chính. Khuôn ⛔
+    #   có bảng phụ ⇒ `them = ()` ⇒ checksum đúng phép của DT2 *(ảnh `ix_fx` giữ số ghim)*.
+    them = tuple({"phu": ten, "dong": r} for ten, b in phu.items() for r in b["dong"])
     checksum = AnhChup(run_id=f"dong_bang_sheet:{kh.ten}", ngay=date.fromisoformat(ngay),
-                       nguon=tho["nguon"], dong=tuple(dong)).checksum()[:16]
+                       nguon=tho["nguon"], dong=tuple(dong) + them).checksum()[:16]
     khong_chon = [c for c in cot if c and c not in can]
     rieng_tu = sorted(PM_COT_RIENG_TU)
     # ⚠ Câu này nằm TRONG ảnh: khi ⛔ có cột tiêu đề rỗng, nó phải giữ ĐÚNG từng chữ của bản
     #   đầu ⇒ ảnh đã commit ⛔ đổi byte nào. Cột tiêu đề rỗng chỉ THÊM một mệnh đề (DT2-R1-08).
     them_rong = (f" {len(cot_rong)} cột tiêu đề rỗng (mọi ô rỗng — đã soát, ⛔ vào ảnh)."
                  if cot_rong else "")
+    # ⚠ Như trên: khuôn ⛔ `chuan_bi` ⇒ câu ⛔ đổi chữ nào. Có ⇒ nói THẬT `cot` là của ai (DT3).
+    so_ten_phu = sum(len({k for r in b["dong"] for k in r if k != "thu_tu"}) for b in phu.values())
+    if kh.chuan_bi is not None:
+        them_rong += (f" Bản thô qua `chuan_bi` của khuôn: {len(cot)} tên cột trên là của BẢNG "
+                      f"khuôn dựng; soát thêm {so_ten_phu} tên cột của {len(phu)} bảng phụ — 0 "
+                      "trùng. Ô bản thô mà khuôn ⛔ mang/băm: xem `ghi_chu_khuon`.")
 
     anh = {
         "bang": kh.bang,
@@ -387,6 +539,7 @@ def dong_bang(kh: Khuon, tho: dict, mong: int) -> tuple[dict, list[str]]:
             f"PM_COT_RIENG_TU {rieng_tu} — 0 trùng (gộp khoảng trắng, ⛔ phân biệt hoa "
             f"thường). Ảnh chỉ giữ khoá `{kh.khoa}` + {len(kh.cot)} cột chọn; "
             f"{len(khong_chon)} cột bản thô ⛔ chọn (tên ở `cot_khong_chon`).{them_rong}"),
+        **({"ghi_chu_khuon": ghi_chu} if ghi_chu is not None else {}),
         "khoa": kh.khoa,
         "kieu_khoa": kh.kieu_khoa,
         "cot": list(kh.cot),
@@ -400,6 +553,7 @@ def dong_bang(kh: Khuon, tho: dict, mong: int) -> tuple[dict, list[str]]:
         "cong": {"mong": mong, "so_dong": len(dong), "dat": not ly_do, "ly_do": ly_do},
         "checksum_noi_dung": checksum,
         "dong": dong,
+        **({"phu": phu} if kh.phu_mong else {}),
     }
 
     def hien(x: Any) -> str:
@@ -412,24 +566,38 @@ def dong_bang(kh: Khuon, tho: dict, mong: int) -> tuple[dict, list[str]]:
         return " ".join(f"[dòng {o['thu_tu']} · {o['cot']}]" for o in os_[:10])
 
     chu_khoa = sum(isinstance(k, dict) for k in pt["khoa_hong"])
+    dem_chu = f" · chữ {chu_khoa})" if kh.kieu_khoa == "yyyymm" else ")"
     bao = [
         f"══ dong_bang_sheet · {kh.ten} ({kh.bang})",
         f"  nguồn      : {tho['nguon']}",
         f"  cách đọc   : {tho['cach_doc']}",
         f"  ngày đọc   : {ngay}  (= ngay_dong_bang)",
         # Đ4 — con số phải CỘNG LẠI: N cột tiêu đề = khoá + chọn + ⛔ chọn + tiêu đề rỗng
-        f"  bản thô    : {len(cot)} cột tiêu đề = khoá 1 + chọn {len(kh.cot)} + ⛔ chọn "
-        f"{len(khong_chon)} + tiêu đề rỗng {len(cot_rong)} · {len(dong)} dòng",
-        f"  soát PII   : {len(cot)}/{len(cot)} tên cột · 0 thuộc PM_COT_RIENG_TU {rieng_tu}",
+        (f"  bản thô    : {len(cot)} cột tiêu đề = khoá 1 + chọn {len(kh.cot)} + ⛔ chọn "
+         f"{len(khong_chon)} + tiêu đề rỗng {len(cot_rong)} · {len(dong)} dòng"
+         if kh.chuan_bi is None else
+         f"  bản thô    : {hang_tho} hàng ⇒ chuan_bi dựng bảng {len(cot)} cột = khoá 1 + chọn "
+         f"{len(kh.cot)} + ⛔ chọn {len(khong_chon)} · {len(dong)} dòng + bảng phụ "
+         f"{sum(b['so_dong'] for b in phu.values())} dòng"),
+        f"  soát PII   : {len(cot)}/{len(cot)} tên cột"
+        f"{f' + {so_ten_phu} tên cột bảng phụ' if phu else ''} · 0 thuộc PM_COT_RIENG_TU "
+        f"{rieng_tu}",
         f"  cột chọn   : khoá {kh.khoa} + {len(kh.cot)} {list(kh.cot)} · "
         f"⛔ chọn {len(khong_chon)} {khong_chon}",
-        f"  khoá hỏng: {ds(pt['khoa_hong'])}  ({len(pt['khoa_hong'])}/{len(dong)} dòng · "
-        f"chữ {chu_khoa})",
-        f"  ô rỗng: {len(o_rong)}/{mau_o}  ({len(dong)} dòng × {len(kh.cot)} cột) "
-        f"{vi(o_rong)}".rstrip(),
-        f"  ô ⛔ số: {len(o_khong_so)}/{mau_o}  (chữ/bool ở cột chọn) {vi(o_khong_so)}".rstrip(),
-        f"  trùng: {ds(pt['trung'])}",
+        f"  khoá hỏng: {ds(pt['khoa_hong'])}  ({len(pt['khoa_hong'])}/{len(dong)} dòng"
+        f"{dem_chu}",
+        f"  ô rỗng: {len(o_rong)}/{mau_rong}  ({len(dong)} dòng × {len(cot_day)} cột"
+        f"{' ⛔ được rỗng' if cot_chu else ''}) {vi(o_rong)}".rstrip(),
+        f"  ô ⛔ số: {len(o_khong_so)}/{mau_so}  (chữ/bool ở cột {'số' if cot_chu else 'chọn'}) "
+        f"{vi(o_khong_so)}".rstrip(),
     ]
+    if cot_chu:
+        bao.append(f"  ô ⛔ chữ: {len(o_khong_chu)}/{mau_chu}  (số/bool ở cột chữ) "
+                   f"{vi(o_khong_chu)}".rstrip())
+    bao.append(f"  trùng: {ds(pt['trung'])}")
+    if phu:
+        bao.append("  bảng phụ: " + " · ".join(f"{ten} {b['so_dong']}/{b['mong']}"
+                                               for ten, b in phu.items()))
     if khong_do is None:
         bao += [f"  thiếu: {ds(thieu)}  (dải {dai})",
                 f"  lạc: {ds(lac)}  (định nghĩa của khuôn `{kh.ten}` — ghi nhận, ⛔ đỏ)"]
@@ -500,7 +668,8 @@ def main(argv: list[str] | None = None) -> int:
         print("⛔ TỪ CHỐI: " + " ".join(str(e).split()) + " — ⛔ ghi tệp nào", file=sys.stderr)
         return 2
     except LoiKhuon as e:
-        traceback.print_exception(e.__cause__, file=sys.stderr)
+        if e.__cause__ is not None:        # LỖI do kiểm hình dạng (DT3) ⛔ có traceback
+            traceback.print_exception(e.__cause__, file=sys.stderr)
         print("⛔ LỖI: " + " ".join(str(e).split()) + " — ⛔ ghi tệp nào; sửa khuôn",
               file=sys.stderr)
         return 3
@@ -524,10 +693,13 @@ def main(argv: list[str] | None = None) -> int:
         return 3
     print("\n".join(bao))
     print(f"  ghi        : {_hien_duong(ra)}{ghi_chu}")
-    mau = c["so_dong"] * len(kh.cot)
+    m_rong, m_so, m_chu = (c["so_dong"] * len(x) for x in kh.cot_theo_kieu())
     if c["dat"]:
+        # ⚠ khuôn ⛔ cột chữ · ⛔ bảng phụ ⇒ đúng từng chữ dòng ĐẠT của DT2
+        them = (f" · ô ⛔ chữ 0/{m_chu}" if kh.cot_theo_kieu()[2] else "") + "".join(
+            f" · phụ {ten} {b['so_dong']} = mong" for ten, b in anh.get("phu", {}).items())
         print(f"[ĐẠT] cổng --mong {c['mong']}: {c['so_dong']} dòng = mong · trùng 0 · thiếu 0 · "
-              f"khoá hỏng 0 · ô rỗng 0/{mau} · ô ⛔ số 0/{mau}")
+              f"khoá hỏng 0 · ô rỗng 0/{m_rong} · ô ⛔ số 0/{m_so}{them}")
         return 0
     print(f"[ĐỎ] cổng --mong {c['mong']}: " + " · ".join(c["ly_do"])
           + " — ảnh đã ghi ĐÚNG NGUỒN, ⛔ sửa; ⛔ dùng ảnh này khi cổng chưa đạt")
