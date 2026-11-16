@@ -131,7 +131,11 @@ def test_C1_B4_GET_config_fx_200_DUNG_hop_dong(may):
         assert k["VND"] == "1", (k["yyyymm"], k["VND"])
         assert k["trang_thai"] == "chua_ky", k
     thang = [k["yyyymm"] for k in ky]
-    assert thang == sorted(set(thang)), thang
+    # ⭐ `yyyymm` là SỐ NGUYÊN JSON *(⛔ chuỗi, ⛔ `bool`)* — hợp đồng liên làn với
+    #   engine H1 `fls/bao_cao/gl.py` *(khoá tỷ giá theo `int` yyyymm — orchestrator
+    #   16/11)*. Tháng ⛔ phải tiền: `202612` nằm xa ngưỡng mất chữ số của `float64`.
+    assert all(type(m) is int for m in thang), thang
+    assert thang == [202406, 202407, 202408, 202409], thang
 
     assert (d["thieu"], d["trung"], d["lac"]) == ([], [], [])
     # ⛔ số TỔNG HỢP ⛔ được khoác nhãn đã đối soát/đã ký (`INV-I14`).

@@ -41,6 +41,13 @@ ISP 3.1.2 · Step 2 · `C1` *(`WO-075`)* — làn **BE-CF**. Khuôn bảng *(AP 
        ⛔ hứa giữ.
    Câu hỏi đã nêu ở `BG-076`; đổi định nghĩa chỉ đổi **một hàm** `kiem`.
 
+⭐ **`yyyymm` là SỐ NGUYÊN** *(`202407`, ⛔ `"202407"`)* — hợp đồng liên làn do
+   orchestrator chốt 16/11: engine H1 `fls/bao_cao/gl.py` nhận tỷ giá dạng
+   `{int yyyymm: {tiền tệ: Decimal}}`. Nguồn ghi tháng bằng chuỗi 6 chữ số *(ô văn
+   bản ở sheet)* vẫn nạp được và được **chuẩn về `int`** ở đây — một chỗ duy nhất;
+   ⛔ hàm chuyển nào cho H1 ở tệp này *(nối hai bên là việc của H4)*. ⚠ ISP mục 6
+   viết `trung = ['202407']` có dấu nháy — lệch kiểu với chốt này, ghi ở `BG-076`.
+
 ⛔ **Tầng này ⛔ biết kho** *(`.importlinter` hợp đồng 10)*: nguồn TĨNH của `C1`
    *(`NGUON_TINH` — 4 tháng **TỔNG HỢP**, số bịa có chủ đích)* là một tệp đi cùng
    gói, ⛔ phải kho. `C5` đổi nguồn sang kho config chỉ-thêm qua
@@ -85,7 +92,7 @@ class LoiFX(ValueError):
 
 @dataclass(frozen=True)
 class DongFX:
-    yyyymm: str
+    yyyymm: int
     ty_gia: Mapping[str, Decimal]
     trang_thai: str = CHUA_KY
 
@@ -94,9 +101,9 @@ class DongFX:
 class BangFX:
     nguon: str
     ky: tuple[DongFX, ...]
-    thieu: tuple[str, ...]
-    trung: tuple[str, ...]
-    lac: tuple[str, ...]
+    thieu: tuple[int, ...]
+    trung: tuple[int, ...]
+    lac: tuple[int, ...]
 
 
 def _mot_dong_mot_cau(s: Any) -> str:
@@ -104,12 +111,16 @@ def _mot_dong_mot_cau(s: Any) -> str:
     return " ".join(repr(s).split())
 
 
-def _thang(v: Any) -> str | None:
-    """`yyyymm` hợp lệ ⇒ chuỗi 6 chữ số; ngược lại `None`. Nhận `str` hay `int`."""
+def _thang(v: Any) -> int | None:
+    """`yyyymm` hợp lệ ⇒ **`int`** *(vd `202407`)*; ngược lại `None`.
+
+    Nhận `int` hay chuỗi 6 chữ số. ⛔ Nhận `bool`: `True` là `int` trong Python và
+    sẽ lọt thành *"tháng 1"* nếu ⛔ chặn tường minh.
+    """
     if isinstance(v, bool) or not isinstance(v, (str, int)):
         return None
     s = str(v).strip()
-    return s if _YYYYMM.match(s) else None
+    return int(s) if _YYYYMM.match(s) else None
 
 
 def _so(v: Any) -> Decimal | None:
@@ -128,12 +139,12 @@ def _so(v: Any) -> Decimal | None:
     return d if d.is_finite() and d > 0 else None
 
 
-def _thang_ke(m: str) -> str:
-    n, t = int(m[:4]), int(m[4:])
-    return f"{n + 1}01" if t == 12 else f"{n}{t + 1:02d}"
+def _thang_ke(m: int) -> int:
+    n, t = divmod(m, 100)
+    return (n + 1) * 100 + 1 if t == 12 else m + 1
 
 
-def kiem(dong: Iterable[Mapping[str, Any]], *, thang_dau: str,
+def kiem(dong: Iterable[Mapping[str, Any]], *, thang_dau: int | str,
          nguon: str) -> BangFX:
     """Kiểm **thuần** một bảng tỷ giá. Dòng hỏng ⇒ `LoiFX`; còn lại ⇒ `BangFX`.
 
@@ -152,7 +163,7 @@ def kiem(dong: Iterable[Mapping[str, Any]], *, thang_dau: str,
             ly_do.append(f"dòng {i}: ⛔ phải một đối tượng")
             continue
         m = _thang(r.get("yyyymm"))
-        ten = m or _mot_dong_mot_cau(r.get("yyyymm"))
+        ten = m if m is not None else _mot_dong_mot_cau(r.get("yyyymm"))
         if m is None:
             ly_do.append(f"dòng {i} ({ten}): yyyymm ⛔ đúng khuôn yyyymm")
         la = sorted(k for k in r if k not in cot)
@@ -190,7 +201,7 @@ def kiem(dong: Iterable[Mapping[str, Any]], *, thang_dau: str,
     trung = tuple(sorted(m for m, n in dem.items() if n >= 2))
     lac = tuple(sorted(m for m in dem if m < dau))
 
-    thieu: list[str] = []
+    thieu: list[int] = []
     m = dau
     co = set(trong_dai)
     while m <= trong_dai[-1]:

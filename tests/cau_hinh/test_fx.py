@@ -48,7 +48,7 @@ def _fx():
     return importlib.import_module("fls.cau_hinh.fx")
 
 
-def _dong(yyyymm: str, k: int = 1, **doi: object) -> dict:
+def _dong(yyyymm: int | str, k: int = 1, **doi: object) -> dict:
     """Một dòng TỔNG HỢP. `doi` ghi đè/thêm ô; `doi[x] = BO` ⇒ gỡ hẳn cột `x`."""
     d: dict = {"yyyymm": yyyymm, "USD": f"2000{k}", "SGD": f"900{k}",
                "COP": f"7.0{k}", "VND": "1", "HKD": f"300{k}"}
@@ -61,7 +61,9 @@ def _dong(yyyymm: str, k: int = 1, **doi: object) -> dict:
 
 
 BO = object()                     # dấu "gỡ cột" cho `_dong`
-BON_THANG = ("202406", "202407", "202408", "202409")
+# ⭐ `yyyymm` là SỐ NGUYÊN *(hợp đồng liên làn: engine H1 `fls/bao_cao/gl.py` khoá
+#   tỷ giá theo `int` yyyymm — orchestrator 16/11)*.
+BON_THANG = (202406, 202407, 202408, 202409)
 
 
 def _bon() -> list[dict]:
@@ -85,6 +87,8 @@ def test_C1_B1_nap_BON_thang_hop_le_tu_nguon_tinh():
     assert thang == sorted(thang), f"⛔ `ky` phải theo thứ tự tháng: {thang}"
 
     for d in b.ky:
+        # ⭐ SỐ NGUYÊN *(⛔ `bool`)* — hợp đồng liên làn với engine H1.
+        assert type(d.yyyymm) is int, (d.yyyymm, type(d.yyyymm))
         assert set(d.ty_gia) == set(fx.TIEN_TE), (d.yyyymm, sorted(d.ty_gia))
         assert d.ty_gia["VND"] == D(1), (d.yyyymm, d.ty_gia["VND"])
         # ⛔ `float` ⛔ bao giờ đứng giữa nguồn và kho — luật `fls/api/bao.py`.
@@ -110,12 +114,12 @@ def test_C1_B1_nguon_tinh_TU_KHAI_la_so_TONG_HOP():
 # ── C1-B2 ─────────────────────────────────────────────────────────────────
 def test_C1_B2_thang_202407_HAI_dong_thi_TRUNG_va_KHONG_cong_doi():
     fx = _fx()
-    dong = _bon() + [_dong("202407", k=8)]
-    b = fx.kiem(dong, thang_dau="202406", nguon="bai-thu")
+    dong = _bon() + [_dong(202407, k=8)]
+    b = fx.kiem(dong, thang_dau=202406, nguon="bai-thu")
 
-    assert b.trung == ("202407",)
+    assert b.trung == (202407,)
     # ⭐ CẢ HAI dòng hiện ra — ⛔ im lặng chọn một, ⛔ gộp thành một.
-    hai = [d for d in b.ky if d.yyyymm == "202407"]
+    hai = [d for d in b.ky if d.yyyymm == 202407]
     assert len(hai) == 2, [d.yyyymm for d in b.ky]
     assert sorted(d.ty_gia["USD"] for d in hai) == [D("20002"), D("20008")]
     # ⛔⛔ CỘNG ĐÔI: đúng lỗi `SUMIFS` của AS-IS (AP §3.2.4).
@@ -128,12 +132,12 @@ def test_C1_B2_thang_202407_HAI_dong_thi_TRUNG_va_KHONG_cong_doi():
 # ── C1-B3 ─────────────────────────────────────────────────────────────────
 def test_C1_B3_thieu_202408_GIUA_dai_thi_THIEU():
     fx = _fx()
-    dong = [d for d in _bon() if d["yyyymm"] != "202408"]
-    b = fx.kiem(dong, thang_dau="202406", nguon="bai-thu")
+    dong = [d for d in _bon() if d["yyyymm"] != 202408]
+    b = fx.kiem(dong, thang_dau=202406, nguon="bai-thu")
 
-    assert b.thieu == ("202408",)
+    assert b.thieu == (202408,)
     # ⛔ ⛔ bịa một dòng `0` cho 202408 — đúng lỗi `SUMIFS = 0` của AS-IS.
-    assert [d.yyyymm for d in b.ky] == ["202406", "202407", "202409"]
+    assert [d.yyyymm for d in b.ky] == [202406, 202407, 202409]
     assert (b.trung, b.lac) == ((), ())
 
 
@@ -144,24 +148,24 @@ def test_phu_thang_LAC_truoc_thang_dau_hien_ra_rieng_va_KHONG_lam_phinh_thieu():
     `202307…202405` vào `thieu`.
     """
     fx = _fx()
-    b = fx.kiem(_bon() + [_dong("202306", k=6)], thang_dau="202406",
+    b = fx.kiem(_bon() + [_dong(202306, k=6)], thang_dau=202406,
                 nguon="bai-thu")
-    assert b.lac == ("202306",)
+    assert b.lac == (202306,)
     assert b.thieu == (), f"⛔ dòng lạc làm phình `thieu`: {b.thieu}"
     # ⭐ dòng lạc vẫn HIỆN trong `ky` — ⛔ vứt im lặng.
-    assert "202306" in [d.yyyymm for d in b.ky]
+    assert 202306 in [d.yyyymm for d in b.ky]
     assert b.trung == ()
 
 
 @pytest.mark.parametrize("thang,doi,phai_noi", [
-    ("202407", {"VND": "2"}, "VND"),            # VND ⛔ = 1
-    ("202408", {"HKD": BO}, "HKD"),             # thiếu hẳn cột tiền tệ
-    ("202408", {"HKD": ""}, "HKD"),             # ô rỗng ⛔ thành 0
-    ("202408", {"HKD": None}, "HKD"),
-    ("202409", {"USD": "abc"}, "USD"),          # ⛔ phải số
-    ("202409", {"USD": "-5"}, "USD"),           # tỷ giá ≤ 0
-    ("202409", {"USD": 20001.5}, "USD"),        # ⛔ float — qua float là mất chữ số
-    ("202406", {"EUR": "1"}, "EUR"),            # cột lạ ⛔ bỏ qua im lặng
+    (202407, {"VND": "2"}, "VND"),            # VND ⛔ = 1
+    (202408, {"HKD": BO}, "HKD"),             # thiếu hẳn cột tiền tệ
+    (202408, {"HKD": ""}, "HKD"),             # ô rỗng ⛔ thành 0
+    (202408, {"HKD": None}, "HKD"),
+    (202409, {"USD": "abc"}, "USD"),          # ⛔ phải số
+    (202409, {"USD": "-5"}, "USD"),           # tỷ giá ≤ 0
+    (202409, {"USD": 20001.5}, "USD"),        # ⛔ float — qua float là mất chữ số
+    (202406, {"EUR": "1"}, "EUR"),            # cột lạ ⛔ bỏ qua im lặng
 ])
 def test_phu_dong_SAI_thi_NO_co_ten_thang_va_cot(thang, doi, phai_noi):
     """⛔ Một ô sai ⛔ được thành `0` hay bị bỏ qua: NỔ, và câu nổ nói **tháng nào ·
@@ -171,28 +175,41 @@ def test_phu_dong_SAI_thi_NO_co_ten_thang_va_cot(thang, doi, phai_noi):
     dong = [_dong(d["yyyymm"], k=i + 1, **doi) if d["yyyymm"] == thang else d
             for i, d in enumerate(_bon())]
     with pytest.raises(fx.LoiFX) as e:
-        fx.kiem(dong, thang_dau="202406", nguon="bai-thu")
+        fx.kiem(dong, thang_dau=202406, nguon="bai-thu")
     cau = str(e.value)
-    assert thang in cau and phai_noi in cau, cau
+    assert str(thang) in cau and phai_noi in cau, cau
     assert "\n" not in cau, f"⛔ câu nổ phải MỘT dòng: {cau!r}"
 
 
-def test_phu_thang_SAI_khuon_thi_NO():
+@pytest.mark.parametrize("sai", [202413, "202413", "2024-07", 2024071, True])
+def test_phu_thang_SAI_khuon_thi_NO(sai):
+    """⛔ `True` là `int` trong Python — ⛔ được lọt thành tháng `1`."""
     fx = _fx()
     with pytest.raises(fx.LoiFX) as e:
-        fx.kiem(_bon() + [_dong("202413")], thang_dau="202406", nguon="bai-thu")
-    assert "202413" in str(e.value)
+        fx.kiem(_bon() + [_dong(sai)], thang_dau=202406, nguon="bai-thu")
+    assert str(sai) in str(e.value), str(e.value)
+
+
+def test_phu_yyyymm_CHUOI_sau_chu_so_chuan_ve_SO_NGUYEN():
+    """Nguồn có thể ghi tháng là chuỗi `"202407"` *(ô văn bản ở sheet)* — mô hình
+    luôn ra `int`, và kết quả TRÙNG KHÍT bản nạp bằng số nguyên."""
+    fx = _fx()
+    chuoi = [dict(d, yyyymm=str(d["yyyymm"])) for d in _bon()]
+    a = fx.kiem(chuoi, thang_dau="202406", nguon="bai-thu")
+    b = fx.kiem(_bon(), thang_dau=202406, nguon="bai-thu")
+    assert [type(d.yyyymm) for d in a.ky] == [int] * 4
+    assert a == b
 
 
 @pytest.mark.parametrize("dong", [
     [],                                   # ⛔ dòng nào
-    [_dong("202306")],                    # có dòng nhưng ⛔ tháng nào ≥ thang_dau
+    [_dong(202306)],                      # có dòng nhưng ⛔ tháng nào ≥ thang_dau
 ])
 def test_phu_tap_RONG_thi_NO_chu_KHONG_xanh_tren_tap_rong(dong):
     """`Đ3`: *"thiếu = trùng = lạc = rỗng"* trên **0** tháng là xanh trên tập rỗng."""
     fx = _fx()
     with pytest.raises(fx.LoiFX):
-        fx.kiem(dong, thang_dau="202406", nguon="bai-thu")
+        fx.kiem(dong, thang_dau=202406, nguon="bai-thu")
 
 
 # ── C1-B5 ─────────────────────────────────────────────────────────────────

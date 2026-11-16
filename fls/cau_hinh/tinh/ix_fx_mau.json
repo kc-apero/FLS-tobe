@@ -2,11 +2,11 @@
   "bang": "IX.FX",
   "tong_hop": true,
   "ghi_chu": "⛔ SỐ TỔNG HỢP — bịa có chủ đích, ⛔ phải tỷ giá thật. Nguồn tĩnh của ISP 3.1.2 Step 2 · C1 (WO-075) để dựng tuyến GET /api/fls/v1/config/fx trước khi có kho config. Khuôn số cố ý lộ là bịa: USD 1000k · SGD 700k · COP 5.0k · HKD 130k (k = 1…4), VND = 1. Tỷ giá thật (sheet 9.2.Exchange Rate) chỉ vào qua ảnh đóng băng DT2 → kho C5; C5 GỠ tệp này.",
-  "thang_dau": "202406",
+  "thang_dau": 202406,
   "dong": [
-    {"yyyymm": "202406", "USD": "10001", "SGD": "7001", "COP": "5.01", "VND": "1", "HKD": "1301"},
-    {"yyyymm": "202407", "USD": "10002", "SGD": "7002", "COP": "5.02", "VND": "1", "HKD": "1302"},
-    {"yyyymm": "202408", "USD": "10003", "SGD": "7003", "COP": "5.03", "VND": "1", "HKD": "1303"},
-    {"yyyymm": "202409", "USD": "10004", "SGD": "7004", "COP": "5.04", "VND": "1", "HKD": "1304"}
+    {"yyyymm": 202406, "USD": "10001", "SGD": "7001", "COP": "5.01", "VND": "1", "HKD": "1301"},
+    {"yyyymm": 202407, "USD": "10002", "SGD": "7002", "COP": "5.02", "VND": "1", "HKD": "1302"},
+    {"yyyymm": 202408, "USD": "10003", "SGD": "7003", "COP": "5.03", "VND": "1", "HKD": "1303"},
+    {"yyyymm": 202409, "USD": "10004", "SGD": "7004", "COP": "5.04", "VND": "1", "HKD": "1304"}
   ]
 }
