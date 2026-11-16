@@ -39,6 +39,20 @@ nhóm bài dưới canh một lỗ và đã chứng minh ĐỎ trên bản `fec4
 Bài của `S0-R2-03` gọi hàm `chay_pytest` **NGUYÊN VĂN** của script *(trích bằng `_trich`, ⛔
 chép lại)* với một `python` GIẢ in log dựng sẵn — vì sau `S0-R2-04` pytest chỉ chạy khi K2
 đạt, tức cần một cụm thật; phần đầu-cuối của đường nền đo ở `DUONG_NEN.md` §4.3.
+
+⛔⛔ **Vòng sửa sau R3** *(`KQ-069` — 1 NÊN SỬA + 4 GHI NHẬN)*. R3 đo thêm ba lỗ ở mã, mỗi nhóm
+bài dưới canh một lỗ và đã chứng minh ĐỎ trên bản `fb79f7e` trước khi sửa:
+
+    S0-R3-01  `xfailed` đếm là "đã chạy" mà ⛔ có `mong` theo TÊN: làm hỏng một bài
+              xanh rồi gắn `xfail(strict=True)` ⇒ `[ĐẠT] 26 = 26` · `KẾT: ĐẠT`         ⛔ mong xfail
+    S0-R3-02  sàn `MONG_PYTEST_TOAN_BO = 2460` < 2.481 bài thu thập ⇒ bỏ im lặng 20
+              bài vẫn ĐẠT                                                              sàn lỏng
+    S0-R3-03  DSN gõ SAI lược đồ (`fls:<mk>@…` · `postgresql:/…` · `postgresql:…`)
+              bị từ chối nhưng câu từ chối in NGUYÊN mật khẩu                          in mật khẩu
+
+Bài `S0-R3-01` chạy `chay_pytest` + khối `KẾT` NGUYÊN VĂN của script: một lần với `python` giả
+in short summary dựng từ tệp đường nền THẬT, một lần với pytest THẬT trên một cây bài nhỏ ở
+`tmp_path` và một plugin `PYTEST_PLUGINS` đổi bài xanh thành xfail *(đường R3 đã dùng)*.
 """
 from __future__ import annotations
 
@@ -247,6 +261,19 @@ _KY_TU_LA = ([c for c in map(chr, range(0x20, 0x7F)) if not c.isalnum()]
              + ["\t", "\n", "\r", "\u00a0", "\udca0"])
 
 
+# S0-R3-03 · ca biến CẤU TRÚC, ⛔ chỉ biến ký tự. R3 (`KQ-069` F-3) đo: hàm che chỉ nhận ra mật
+# khẩu khi chuỗi có `://` ⇒ DSN gõ SAI lược đồ bị chốt từ chối (đúng) nhưng câu từ chối in NGUYÊN
+# mật khẩu — `⛔ PG_DSN=fls:<mk>@localhost:5433/fls_thu ⛔ khớp NGUYÊN CHUỖI …`; có từ bản
+# `fec4dd0` ⇒ ⛔ hồi quy, chỉ là khe của phép quét ký tự. Ba ca đầu là ba dạng R3 đo; ca thứ tư
+# (`thiếu @` — gõ `/` thay `@`) là hạng "thiếu @" mà luật phòng tái phạm của sổ nêu tên.
+_CAU_TRUC_SAI = (
+    ("thiếu lược đồ", "fls:Kq7Wx9@localhost:5433/fls_thu"),
+    ("lược đồ một gạch", "postgresql:/fls:Kq7Wx9@localhost:5433/fls_thu"),
+    ("lược đồ ⛔ gạch", "postgresql:fls:Kq7Wx9@localhost:5433/fls_thu"),
+    ("thiếu @", "postgresql://fls:Kq7Wx9/localhost:5433/fls_thu"),
+)
+
+
 def test_S0_R2_02_moi_ky_tu_la_hoac_bi_chot_tu_choi_hoac_bi_che_tron(tmp_path):
     """Mỗi ký tự lạ, ở mật khẩu RỒI ở tên user: ⛔ một mảnh mật khẩu nào ra stdout/stderr.
 
@@ -254,26 +281,35 @@ def test_S0_R2_02_moi_ky_tu_la_hoac_bi_chot_tu_choi_hoac_bi_che_tron(tmp_path):
     đuôi" (`@` thô) lẫn "lộ nửa đầu" (xuống dòng: bản cũ che theo DÒNG). Ca nào QUA chốt
     (exit 1 — môi trường giả vắng) thì dòng tiêu đề + hai dòng `export` phải che; ca nào bị
     từ chối (exit 2) thì câu từ chối phải che.
+
+    ⛔⛔ Vòng sửa sau R3 (`S0-R3-03`): thêm các ca `_CAU_TRUC_SAI` — mật khẩu `Kq7Wx9` trong một
+    DSN SAI CẤU TRÚC; mỗi ca phải bị chốt TỪ CHỐI (exit 2) và ⛔ lộ mảnh nào.
     """
-    def mot(ca: tuple[str, str]) -> tuple[str, str, int, list[str]]:
-        noi, c = ca
-        dsn = (f"postgresql://fls:Kq7{c}Wx9@localhost:5433/fls_thu" if noi == "mật khẩu"
-               else f"postgresql://f{c}u:Kq7Wx9@localhost:5433/fls_thu")
+    def mot(ca: tuple[str, str, str]) -> tuple[str, str, int, list[str]]:
+        noi, c, dsn = ca
         kq = _chay(["--chi-kiem"], {"PG_DSN": dsn}, tmp_path)
         ra = kq.stdout + kq.stderr
         return noi, c, kq.returncode, [d for d in ra.splitlines() if "Kq7" in d or "Wx9" in d]
 
-    ca = [(noi, c) for noi in ("mật khẩu", "tên user") for c in _KY_TU_LA]
+    ca = [(noi, c, f"postgresql://fls:Kq7{c}Wx9@localhost:5433/fls_thu" if noi == "mật khẩu"
+           else f"postgresql://f{c}u:Kq7Wx9@localhost:5433/fls_thu")
+          for noi in ("mật khẩu", "tên user") for c in _KY_TU_LA]
+    ca += [("cấu trúc", nhan, dsn) for nhan, dsn in _CAU_TRUC_SAI]
     with concurrent.futures.ThreadPoolExecutor(max_workers=8) as tp:
         kq = list(tp.map(mot, ca))
-    assert len(kq) == 2 * len(_KY_TU_LA) == 76          # mẫu số (Đ3): 33 + 5 ký tự × 2 nơi
+    # mẫu số (Đ3): 33 + 5 ký tự × 2 nơi = 76 · cộng 4 ca cấu trúc (S0-R3-03)
+    assert len(kq) == 2 * len(_KY_TU_LA) + len(_CAU_TRUC_SAI) == 76 + 4
     lo = [(noi, repr(c), ma, dong) for noi, c, ma, dong in kq if dong]
     assert not lo, lo
     la_ma = [(noi, repr(c), ma) for noi, c, ma, _ in kq if ma not in (1, 2)]
     assert not la_ma, la_ma
     # khoảng trắng nằm NGOÀI lớp ký tự (libpq vốn từ chối) ⇒ chốt từ chối, ⛔ cho qua
-    qua = [(noi, repr(c)) for noi, c, ma, _ in kq if c in " \t\n\r" and ma != 2]
+    qua = [(noi, repr(c)) for noi, c, ma, _ in kq
+           if noi != "cấu trúc" and c in " \t\n\r" and ma != 2]
     assert not qua, qua
+    # tiền đề của ca cấu trúc: chốt TỪ CHỐI — ⛔ xanh vì chuỗi đi qua rồi chết ở bước sau
+    qua_cau_truc = [(c, ma) for noi, c, ma, _ in kq if noi == "cấu trúc" and ma != 2]
+    assert not qua_cau_truc, qua_cau_truc
 
 
 # ── S0-R2-03 · cổng so TẬP phải canh cả MẪU SỐ ─────────────────────────────────
@@ -375,9 +411,15 @@ def test_S0_R2_03_PYTEST_ADDOPTS_cua_nguoi_goi_bi_go(tmp_path):
 
 
 def test_S0_R2_03_hang_mau_so_khai_MOT_cho():
-    """2.460 = 12 + 2432 + 2 + 14 (lượt toàn bộ chính thức R2); 664 = 3 + 661 (`tests/web`)."""
+    """2.460 = 12 + 2432 + 2 + 14 (lượt toàn bộ chính thức R2); 664 = 3 + 661 (`tests/web`).
+
+    ⛔⛔ S0-R3-02 (Q8 = A): ghim nâng 2460 → **2490** = số bài THU THẬP của nhánh sau vòng sửa R3
+    (`pytest --collect-only`: 2.481 của R3 + 9 bài mới · 211 tệp) — số 2460 là của vòng R1 bị để
+    lại ở R2 (+21 bài) ⇒ khoảng dư 21 mà R3 lách bằng 20 bài bỏ im lặng. Bài ghim GIỮ việc gốc:
+    hằng khai MỘT chỗ, đúng giá trị, hai dòng gọi dùng hằng; `test_S0_R3_02_…` đòi hằng = thu thập.
+    """
     van = SCRIPT.read_text(encoding="utf-8")
-    assert re.findall(r"^MONG_PYTEST_TOAN_BO=(\d+)$", van, re.M) == ["2460"]
+    assert re.findall(r"^MONG_PYTEST_TOAN_BO=(\d+)$", van, re.M) == ["2490"]
     assert re.findall(r"^MONG_PYTEST_WEB=(\d+)$", van, re.M) == ["664"]
     goi = [d.strip() for d in van.splitlines() if d.strip().startswith("chay_pytest ")]
     assert len(goi) == 2 and '"$MONG_PYTEST_TOAN_BO"' in goi[0] and '"$MONG_PYTEST_WEB"' in goi[1], goi
@@ -405,3 +447,228 @@ def test_S0_R2_04_dung_hoac_K2_DO_thi_KHONG_chay_pytest(tmp_path):
     assert goi, "python giả phải được gọi ở bước dựng/kiểm"
     assert not [g for g in goi if g.startswith("-m pytest")], goi
     assert re.search(r"\[ĐỎ\]\s+pytest.*bỏ qua", kq.stdout), kq.stdout[-1500:]
+
+
+# ═════════════════════════════════════════════════ vòng sửa sau R3 (`KQ-069`)
+
+# ── S0-R3-01 · `xfailed` có `mong` theo TÊN — và theo LOẠI ────────────────────
+#    R3 đo đầu-cuối (cụm 5433, plugin qua `PYTEST_PLUGINS`): làm HỎNG `tests/web/test_wo022_…`
+#    (đang xanh) rồi gắn `xfail(strict=True)` ⇒ toàn bộ `12 failed, 2432 passed, 3 xfailed,
+#    14 errors` ⇒ `[ĐẠT] 26 = 26 · chạy 2461` · web `[ĐẠT] 3 = 3 · chạy 664 (mong ≥ 664)` ·
+#    `KẾT: ĐẠT` exit 0. Gốc: `-rfE` ⛔ liệt kê `XFAIL`, và `xfailed` cộng vào "chạy" mà ⛔ có
+#    `mong` về SỐ hay TÊN — `xfail(strict)` lại là CHÍNH thành ngữ "bài đỏ đã biết" của repo.
+#    ⇒ `-rfEx`; tệp đường nền khai từng node xfail bằng dòng `XFAIL <id>` (cùng chữ pytest in ở
+#    short summary); tập đo = `<id>` của FAILED/ERROR + `XFAIL <id>` — so theo TÊN và LOẠI.
+_NEN_THAT = GOC / "docs" / "ITL" / "03_Dev" / "isp-3.1" / "duong_nen_bai_do.txt"
+# hai dấu `xfail(strict=True)` đang sống — `2 xfailed` ở mọi lượt toàn bộ từ 16/11 (DUONG_NEN §4)
+_XF_NEN = (
+    "tests/nghiem_thu/test_kq046_chieu_nguoc_ung_vien_pm_mot_tap.py"
+    "::test_F1_chieu_nguoc_ung_vien_pm_BANG_ma_tien_te",
+    "tests/nghiem_thu/test_kq061_f02_het_gio_lo_luu.py"
+    "::test_F1_HET_GIO_lo_luu_F02_KHONG_noi_o_CHUA_vao_so",
+)
+# bài XANH mà R3 làm hỏng rồi gắn xfail ở lượt đầu-cuối
+_XF_MOI = "tests/web/test_wo022_tien_theo_tien_te.py::test_AC1_tien_MUOI_HAI_ca_dung_tung_byte"
+
+
+def _ket() -> str:
+    """Khối KẾT cuối script NGUYÊN VĂN (từ `if [ "$DO" = 0 ]; then` tới hết tệp): exit 0 +
+    `KẾT: ĐẠT` khi DO = 0, exit 1 + `KẾT: ĐỎ` khi khác — bài đòi đúng dòng agent đọc, ⛔ chỉ `DO`."""
+    dong = SCRIPT.read_text(encoding="utf-8").splitlines()
+    vt = [k for k, d in enumerate(dong) if d == 'if [ "$DO" = 0 ]; then']
+    assert len(vt) == 1, vt
+    return "\n".join(dong[vt[0]:])
+
+
+def _chay_duong_nen(tmp_path: pathlib.Path, py: str, nen: pathlib.Path, goi: str,
+                    bien: dict[str, str] | None = None,
+                    cwd: pathlib.Path | None = None) -> subprocess.CompletedProcess:
+    """Hằng `MONG_…` + `dat` · `do_` · `so_tap_do` · `chay_pytest` + dòng gọi `goi` + khối KẾT —
+    tất cả NGUYÊN VĂN của script (`_trich` · `_ket`), với `PY` = `py`, tệp đường nền = `nen`."""
+    ma = "\n".join([
+        "set -uo pipefail",
+        _trich("DO", "MONG_PYTEST_TOAN_BO", "MONG_PYTEST_WEB", "dat", "do_", "so_tap_do", "chay_pytest"),
+        f"PY={shlex.quote(py)}; DUONG_NEN_DO={shlex.quote(str(nen))}",
+        goi,
+        _ket(),
+    ])
+    env = {k: v for k, v in os.environ.items() if k not in ("PYTEST_ADDOPTS", "PYTEST_PLUGINS")}
+    env["TMPDIR"] = str(tmp_path)
+    env.update(bien or {})
+    return subprocess.run(["bash", "-c", ma], cwd=cwd or tmp_path, env=env,
+                          capture_output=True, text=True, timeout=120)
+
+
+def _dong_duong_nen(kq: subprocess.CompletedProcess, nhan: str = "toàn bộ") -> str:
+    dong = [d for d in kq.stdout.splitlines() if f"đường nền {nhan}" in d]
+    assert len(dong) == 1, (kq.returncode, kq.stdout, kq.stderr)
+    return dong[0]
+
+
+def test_S0_R3_01_tep_duong_nen_khai_hai_xfail_theo_TEN():
+    """Tệp đường nền khai ĐÚNG hai node xfail đang sống — theo TÊN (⛔ chỉ số), và lời khai ấy
+    THẬT: mỗi tên mang dấu `@pytest.mark.xfail(strict=True …)` ngay trên `def` trong nguồn."""
+    dong = [d for d in _NEN_THAT.read_text(encoding="utf-8").splitlines() if d.strip()]
+    xf = [d.removeprefix("XFAIL ") for d in dong if d.startswith("XFAIL ")]
+    assert sorted(xf) == sorted(_XF_NEN), xf
+    for nid in _XF_NEN:
+        tep, ten = nid.split("::")
+        van = (GOC / tep).read_text(encoding="utf-8")
+        assert re.search(rf"@pytest\.mark\.xfail\(strict=True(?:(?!\ndef ).)*\ndef {ten}\(",
+                         van, re.S), nid
+
+
+@pytest.mark.parametrize("ca,them,bot", [
+    # đối chứng (Đ5 — chiều XANH): đúng đường nền THẬT — 26 đỏ + 2 xfail, chạy = mong (sàn KHÍT)
+    pytest.param("doi_chung", 0, 0, id="duong_nen_that_DAT"),
+    # R3: bước sau làm HỎNG một bài xanh rồi gắn xfail(strict) — số bài chạy ⛔ đổi
+    pytest.param("them_xfail", 1, 0, id="bai_xanh_hong_roi_gan_xfail_DO"),
+    # chiều ngược: một xfail tự xanh (xpass ⛔ strict) hay bị gỡ khỏi bộ — đường nền ⛔ ghi lại
+    pytest.param("bot_xfail", 0, 1, id="mot_xfail_bien_mat_DO"),
+    # đổi LOẠI: xfail(strict) tự qua ⇒ pytest in `FAILED … [XPASS(strict)]` — cùng TÊN, khác loại
+    pytest.param("xfail_thanh_do", 1, 1, id="xfail_strict_tu_qua_thanh_FAILED_DO"),
+    # đổi LOẠI chiều kia: một bài đỏ có sẵn bị gắn xfail — "chấp nhận" mà ⛔ sửa tệp đường nền
+    pytest.param("do_thanh_xfail", 1, 1, id="bai_do_co_san_bi_gan_xfail_DO"),
+])
+def test_S0_R3_01_tap_xfail_co_mong_theo_TEN_va_LOAI(ca, them, bot, tmp_path):
+    """`chay_pytest "toàn bộ" …` đúng DÒNG GỌI của script, với hằng `MONG_PYTEST_TOAN_BO` và tệp
+    đường nền THẬT; `python` giả in short summary dựng từ tệp ấy. Tổng chạy giữ = mong ở MỌI ca
+    — chỉ TÊN/LOẠI đổi — để thấy cổng tập bắt được, ⛔ nhờ cổng mẫu số."""
+    van = SCRIPT.read_text(encoding="utf-8")
+    mong = int(re.search(r"^MONG_PYTEST_TOAN_BO=(\d+)$", van, re.M).group(1))
+    goi = [d.strip() for d in van.splitlines() if d.strip().startswith('chay_pytest "toàn bộ"')]
+    assert len(goi) == 1, goi
+    do = [d for d in _NEN_THAT.read_text(encoding="utf-8").splitlines()
+          if d.strip() and not d.startswith("XFAIL ")]
+    assert len(do) >= 26, len(do)                                   # mẫu số (Đ3)
+    xf = list(_XF_NEN)
+    mong_dong: list[str] = []
+    if ca == "them_xfail":
+        xf.append(_XF_MOI)
+        mong_dong = [f"+ THÊM  XFAIL {_XF_MOI}"]
+    elif ca == "bot_xfail":
+        mong_dong = [f"− BỚT   XFAIL {xf.pop()}"]
+    elif ca == "xfail_thanh_do":
+        do.append(xf.pop())
+        mong_dong = [f"+ THÊM  {do[-1]}", f"− BỚT   XFAIL {do[-1]}"]
+    elif ca == "do_thanh_xfail":
+        xf.append(do.pop(0))
+        mong_dong = [f"+ THÊM  XFAIL {xf[-1]}", f"− BỚT   {xf[-1]}"]
+    log = tmp_path / "log_gia.txt"
+    log.write_text(
+        "=========================== short test summary info ============================\n"
+        + "".join(f"FAILED {i} - AssertionError: nen\n" for i in do)
+        + "".join(f"XFAIL {i} - ly do\n" for i in xf)
+        + f"{len(do)} failed, {mong - len(do) - len(xf)} passed, {len(xf)} xfailed in 300.00s\n",
+        encoding="utf-8")
+    py = tmp_path / "python_gia"
+    py.write_text('#!/usr/bin/env bash\nprintf "%s\\n" "$*" >> "$PY_GIA_GHI"\ncat "$PY_GIA_LOG"; exit 1\n',
+                  encoding="utf-8")
+    py.chmod(0o755)
+    ghi = tmp_path / "py_gia.ghi"
+    kq = _chay_duong_nen(tmp_path, str(py), _NEN_THAT, goi[0],
+                         {"PY_GIA_LOG": str(log), "PY_GIA_GHI": str(ghi)})
+    dong = _dong_duong_nen(kq)
+    assert f"chạy {mong} bài" in dong or f"chạy {mong} ·" in dong, dong
+    if ca == "doi_chung":
+        assert kq.returncode == 0 and "══ KẾT: ĐẠT" in kq.stdout, kq.stdout
+        assert dong.startswith("  [ĐẠT]") and "XFAIL 2 = 2" in dong, dong
+    else:
+        assert kq.returncode == 1 and "══ KẾT: ĐỎ" in kq.stdout, kq.stdout
+        assert dong.startswith("  [ĐỎ]") and f"thêm {them} · bớt {bot}" in dong, dong
+        thieu = [m for m in mong_dong if m not in kq.stdout]
+        assert not thieu, (thieu, kq.stdout)
+    # `-rfEx`: ⛔ `x` thì pytest THẬT ⛔ in dòng XFAIL nào — log giả ở đây vẫn in, nên khẳng định
+    # cờ (sau hành vi: bản cũ phải ĐỎ vì HÀNH VI trước, ⛔ vì cờ)
+    assert ghi.read_text(encoding="utf-8").split()[:3] == ["-m", "pytest", "-rfEx"], ghi.read_text()
+
+
+# Cây bài NHỎ cho pytest THẬT: một bài xanh · một bài đỏ có sẵn · một xfail(strict) có sẵn.
+_MINI = '''import pytest
+
+
+def test_xanh():
+    assert 1 + 1 == 2
+
+
+def test_do_co_san():
+    assert 0, "đỏ có sẵn"
+
+
+@pytest.mark.xfail(strict=True, reason="lỗi đã biết - có gạch giữa")
+def test_xf_co_san():
+    assert 0
+'''
+
+# Đúng đường R3 dùng: plugin nạp qua `PYTEST_PLUGINS` (`env -u PYTEST_ADDOPTS` ⛔ chặn) làm HỎNG
+# bài xanh rồi gắn `xfail(strict=True)` lên nó.
+_PLUGIN_LACH = '''import pytest
+
+
+def pytest_collection_modifyitems(session, config, items):
+    for i in items:
+        if i.name == "test_xanh":
+            i.add_marker(pytest.mark.xfail(strict=True, reason="giả lập: hồi quy được che bằng xfail"))
+
+
+@pytest.hookimpl(tryfirst=True)
+def pytest_pyfunc_call(pyfuncitem):
+    if pyfuncitem.name == "test_xanh":
+        raise AssertionError("giả lập: hồi quy")
+'''
+
+
+@pytest.mark.parametrize("lach", [
+    pytest.param(False, id="doi_chung_DAT"),
+    pytest.param(True, id="plugin_doi_bai_xanh_thanh_xfail_KET_DO"),
+])
+def test_S0_R3_01_pytest_THAT_plugin_doi_bai_xanh_thanh_xfail(lach, tmp_path):
+    """pytest THẬT (venv) chạy qua `chay_pytest` NGUYÊN VĂN — chứng minh cờ `-r` của script làm
+    pytest IN dòng `XFAIL <id>` và cổng đọc được nó, ⛔ chỉ tin log dựng tay."""
+    mini = tmp_path / "mini"
+    mini.mkdir()
+    (mini / "pytest.ini").write_text("[pytest]\naddopts = -q -p no:cacheprovider\n", encoding="utf-8")
+    (mini / "test_mini.py").write_text(_MINI, encoding="utf-8")
+    plug = tmp_path / "plug"
+    plug.mkdir()
+    (plug / "r3_lach_mini.py").write_text(_PLUGIN_LACH, encoding="utf-8")
+    nen = tmp_path / "duong_nen_mini.txt"
+    nen.write_text("XFAIL test_mini.py::test_xf_co_san\ntest_mini.py::test_do_co_san\n", encoding="utf-8")
+    bien = {"PYTHONPATH": str(plug)}
+    if lach:
+        bien["PYTEST_PLUGINS"] = "r3_lach_mini"
+    kq = _chay_duong_nen(tmp_path, sys.executable, nen, 'chay_pytest "toàn bộ" "" 3', bien, cwd=mini)
+    dong = _dong_duong_nen(kq)
+    assert "chạy 3" in dong, dong                 # số bài chạy ⛔ đổi — lỗ ⛔ nhờ cổng mẫu số
+    if not lach:
+        assert kq.returncode == 0 and "══ KẾT: ĐẠT" in kq.stdout, kq.stdout
+        assert dong.startswith("  [ĐẠT]") and "2 = 2 node id" in dong, dong
+    else:
+        assert kq.returncode == 1 and "══ KẾT: ĐỎ" in kq.stdout, kq.stdout
+        assert dong.startswith("  [ĐỎ]") and "thêm 1 · bớt 0" in dong, dong
+        assert "+ THÊM  XFAIL test_mini.py::test_xanh" in kq.stdout, kq.stdout
+
+
+# ── S0-R3-02 · hằng mẫu số = số bài THU THẬP của nhánh (Q8 = A) ─────────────────
+#    R3 đo: vòng sửa R2 thêm 21 bài, nhánh thu thập 2.481 bài (211 tệp) mà sàn vẫn 2460 ⇒ bỏ
+#    IM LẶNG cả `tests/adapters/test_bank.py` (20 bài, ⛔ dòng `deselected`) ⇒ `chạy 2461 bài
+#    (mong ≥ 2460)` ⇒ `[ĐẠT]`. Q8 = A: bước nào thêm bài thì nâng hằng TRONG CÙNG commit — bài này
+#    làm luật ấy thành máy: thêm/bớt một bài mà ⛔ sửa hằng ⇒ ĐỎ.
+def test_S0_R3_02_hang_mau_so_bang_so_bai_THU_THAP():
+    van = SCRIPT.read_text(encoding="utf-8")
+    mong_tb = int(re.search(r"^MONG_PYTEST_TOAN_BO=(\d+)$", van, re.M).group(1))
+    mong_web = int(re.search(r"^MONG_PYTEST_WEB=(\d+)$", van, re.M).group(1))
+    # đo CÂY bài, ⛔ đo cấu hình phiên của người gọi (`--lf` · plugin bỏ chọn)
+    env = {k: v for k, v in os.environ.items() if k not in ("PYTEST_ADDOPTS", "PYTEST_PLUGINS")}
+    kq = subprocess.run([sys.executable, "-m", "pytest", "--collect-only", "-p", "no:cacheprovider"],
+                        cwd=GOC, env=env, capture_output=True, text=True, timeout=300)
+    assert kq.returncode == 0, kq.stdout[-1500:]
+    nid = [d for d in kq.stdout.splitlines() if d.startswith("tests/") and "::" in d]
+    tong = re.findall(r"^(\d+) tests? collected", kq.stdout, re.M)
+    assert tong == [str(len(nid))], (tong, len(nid))                # hai cách đếm khớp nhau
+    tep = {d.split("::")[0] for d in nid}
+    assert len(tep) > 100, len(tep)                                 # mẫu số (Đ3)
+    web = [d for d in nid if d.startswith("tests/web/")]
+    assert (mong_tb, mong_web) == (len(nid), len(web)), (
+        f"MONG_PYTEST_TOAN_BO = {mong_tb} · MONG_PYTEST_WEB = {mong_web} ≠ thu thập "
+        f"{len(nid)} ({len(tep)} tệp) · tests/web {len(web)}")

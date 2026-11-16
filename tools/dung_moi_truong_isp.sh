@@ -62,9 +62,14 @@
 #    đỏ bằng nhau trên một bộ bài teo (`--lf`: 26/2.460) là xanh giả. ⭐ Phép kiểm định danh đã
 #    ĐỎ thì ⛔ bước GHI nào sau nó (S0-R2-04): dựng / K2 / K7 ĐỎ ⇒ ⛔ chạy pytest (conftest DROP +
 #    CREATE kho test) — `[ĐỎ] pytest · bỏ qua`.
+#    ⭐⭐ `xfailed` cũng là bài ⛔ được đo xanh (S0-R3-01): tệp đường nền khai từng node xfail bằng
+#    dòng `XFAIL <id>`, pytest chạy `-rfEx`, và tập so gồm cả LOẠI — thêm/bớt một xfail, hay một
+#    node đổi loại (đỏ ⇄ xfail), đều `[ĐỎ]`. Mọi tập "được miễn" phải có `mong` theo TÊN.
 #
 #  ⛔ In mật khẩu của DSN: mọi chỗ in DSN đều che `://user:***@` (S0-R1-06), kể cả dòng từ chối —
-#    tới `@` CUỐI dòng, user ngoài lớp ⇒ `://***@`, `password=` ⇒ che tới hết dòng (S0-R2-02).
+#    tới `@` CUỐI dòng, user ngoài lớp ⇒ `://***@`, `password=` ⇒ che tới hết dòng (S0-R2-02);
+#    ⛔ có `://` (lược đồ gõ sai/thiếu) ⇒ che từ `:` ĐẦU tới `@` cuối; dòng từ chối của một giá trị
+#    ⛔ có `@` ⇒ ⛔ in giá trị, chỉ in độ dài (S0-R3-03).
 #    Ngoại lệ DUY NHẤT: hai dòng `export` cuối lượt in mật khẩu khi nó là mặc định CÔNG KHAI
 #    `fls` (`fls/db/kho.py:44` · `CLAUDE.md` §Cổng · `CREATE ROLE … PASSWORD 'fls'` dưới đây) —
 #    để agent chép được nguyên dòng; mật khẩu khác ⇒ vẫn che.
@@ -74,7 +79,7 @@
 #   FLS_VENV         venv dùng chung        (mặc định <checkout chính>/.venv)
 #   FLS_PGDATA       thư mục dữ liệu cụm    (mặc định /home/user/fls-pg16 cho 5433, /home/user/fls-pg16-<N> — NGOÀI repo)
 #   FLS_PGBIN        binary PostgreSQL 16   (mặc định /usr/lib/postgresql/16/bin)
-#   FLS_DUONG_NEN_DO tệp node id bài đỏ có sẵn (mặc định docs/ITL/03_Dev/isp-3.1/duong_nen_bai_do.txt)
+#   FLS_DUONG_NEN_DO tệp node id bài đỏ có sẵn + dòng `XFAIL <id>` (mặc định docs/ITL/03_Dev/isp-3.1/duong_nen_bai_do.txt)
 #   PG_DSN           kho `fls` cục bộ       (mặc định postgresql://fls:fls@localhost:<N>/fls — trùng fls/db/kho.py ở 5433)
 #   PG_DSN_TEST      kho test               (bỏ trống ⇒ `fls_test` cùng cụm, do fls/db/kho.py suy từ PG_DSN)
 set -uo pipefail
@@ -166,13 +171,28 @@ LOP_MK='[^@/?#[:space:]]'      # mật khẩu: ⛔ `@` `/` `?` `#`, ⛔ khoảng
 #    `che` (một GIÁ TRỊ): xuống dòng in thành `\n` TRƯỚC khi che — bản trước che theo DÒNG nên
 #    `fls:ab<LF>cd@…` lộ nửa đầu. Che thừa (mất host khi dòng có hai `@`) là lỗi an toàn.
 #    Dấu phân cách `|`, ⛔ `#`: biểu thức có `#` trong ngoặc vuông.
+#    ⛔⛔ S0-R3-03 · ① ② đều neo vào `://` ⇒ R3 (`KQ-069`) đo DSN gõ SAI lược đồ — `fls:<mk>@…` ·
+#       `postgresql:/fls:<mk>@…` · `postgresql:fls:<mk>@…` — bị chốt từ chối (đúng) nhưng câu từ
+#       chối in NGUYÊN mật khẩu (có từ `fec4dd0`: phép quét 76 ca chỉ biến KÝ TỰ, ⛔ biến CẤU TRÚC).
+#    ④ dòng ⛔ khớp ① ② (⛔ `://`, hay `://` mà ⛔ có `:` trước `@`) ⇒ che từ `:` ĐẦU dòng tới `@`
+#       CUỐI. Che thừa (`postgresql://fls@h…` ⛔ mật khẩu cũng thành `postgresql:***@h…`) là lỗi an toàn.
 che() { local v="${1//$'\n'/\\n}"; printf '%s\n' "${v//$'\r'/\\r}" | che_dong; }
 che_dong() {
   LC_ALL=C sed -E \
     -e "s|(://${LOP_USER}*):.*@|\\1:***@|" -e 't tu_khoa' \
-    -e 's|://.*:.*@|://***@|' \
+    -e 's|://.*:.*@|://***@|' -e 't tu_khoa' \
+    -e 's|^([^:@]*):.*@|\1:***@|' \
     -e ':tu_khoa' \
     -e 's/(password[[:space:]]*=).*/\1***/I'
+}
+# S0-R3-03 · giá trị BỊ TỪ CHỐI là chuỗi HỎNG — ⛔ biết mật khẩu nằm đâu. Mọi luật che neo vào `@`
+#   (mật khẩu đứng TRƯỚC `@` cuối); giá trị ⛔ có `@` (gõ `/` thay `@` · dạng từ khoá) ⇒ ⛔ in giá trị,
+#   chỉ in độ dài theo byte — đường từ chối an toàn nhất là ⛔ in (luật sổ `S0-R3-03`).
+che_tu_choi() {
+  case "$1" in
+    *@*) che "$1" ;;
+    *)   printf '<%s byte · ⛔ có @ ⇒ ⛔ in giá trị (có thể mang mật khẩu)>\n' "${#1}" ;;
+  esac
 }
 
 # Đ5 — bộ đếm ĐỎ dùng chung cho cả DỰNG lẫn KIỂM. ⭐ Bước dựng hỏng cũng là ĐỎ: ⛔ để một phép
@@ -206,7 +226,7 @@ RE_DSN="^postgresql://(${LOP_USER}+):(${LOP_MK}+)@(localhost|127\\.0\\.0\\.1):([
 kiem_dsn() {   # $1 = tên biến · $2 = giá trị — lệch ⇒ exit 2; khớp ⇒ đặt KHO_DSN = tên kho
   local LC_ALL=C   # đọc theo BYTE như `che_dong` (S0-R2-02) — `local` trả locale cũ khi ra hàm
   if ! [[ $2 =~ $RE_DSN ]]; then
-    echo "⛔ $1=$(che "$2") ⛔ khớp NGUYÊN CHUỖI postgresql://<user>:<pass>@(localhost|127.0.0.1):<cổng>/<tên kho [a-z0-9_]> — ⛔ query string, ⛔ host khác, ⛔ khoảng trắng hay @ / ? # trong user/mật khẩu. Từ chối (kho ở đây phải là kho RỖNG cục bộ)." >&2
+    echo "⛔ $1=$(che_tu_choi "$2") ⛔ khớp NGUYÊN CHUỖI postgresql://<user>:<pass>@(localhost|127.0.0.1):<cổng>/<tên kho [a-z0-9_]> — ⛔ query string, ⛔ host khác, ⛔ khoảng trắng hay @ / ? # trong user/mật khẩu. Từ chối (kho ở đây phải là kho RỖNG cục bộ)." >&2
     exit 2
   fi
   if [ "${BASH_REMATCH[4]}" != "$CONG" ]; then
@@ -391,7 +411,13 @@ MONG_HD1_CHAY=9845
 #    2 xfailed, 14 errors` = 2.460 bài (2.430 của §4 DUONG_NEN + 30 bài tests/test_dung_moi_truong_isp.py)
 #    · `tests/web` `3 failed, 661 passed` = 664 bài. Mong là "≥" — bước sau THÊM bài vẫn đạt; BỚT
 #    (skip · deselect · `--lf` · `-k`) thì ĐỎ. Bước nào XOÁ bài có chủ đích ⇒ sửa số Ở ĐÂY + ghi lý do.
-MONG_PYTEST_TOAN_BO=2460
+# ⛔⛔ S0-R3-02 · số trên là của vòng R1 và bị ĐỂ LẠI ở vòng R2 (+21 bài ⇒ nhánh thu thập 2.481): R3
+#    (`KQ-069`) bỏ IM LẶNG cả `tests/adapters/test_bank.py` (20 bài, ⛔ dòng `deselected`) ⇒ `chạy
+#    2461 bài (mong ≥ 2460)` ⇒ `[ĐẠT]`. Q8 = A: hằng = số bài THU THẬP của nhánh (`pytest
+#    --collect-only` — đường nền: 0 skipped · 0 deselected ⇒ thu thập = chạy), nâng TRONG CÙNG commit
+#    thêm bài; bài `tests/test_dung_moi_truong_isp.py::test_S0_R3_02_…` đòi hằng = thu thập ⇒ quên
+#    nâng là ĐỎ. Sau vòng sửa R3: 2.481 + 9 bài mới = 2.490 bài ở 211 tệp · `tests/web` 664 ở 56 tệp.
+MONG_PYTEST_TOAN_BO=2490
 MONG_PYTEST_WEB=664
 
 echo
@@ -558,16 +584,27 @@ fi
 #    từ §4.1 của DUONG_NEN.md (26 bài đọc SỔ THẬT tự đỏ trên kho rỗng). Bảng markdown là BIÊN BẢN.
 #    Tách node id từ phần `short test summary info` của `-rfE`: dòng `FAILED <id>[ - <câu>]` /
 #    `ERROR <id>[ - <câu>]`; cắt ở ` - ` ĐẦU TIÊN — một node id tự chứa ` - ` sẽ bị cắt sai ⇒ lệch
-#    tập ⇒ ĐỎ (lỗi an toàn: đỏ giả, ⛔ xanh giả).
+#    tập ⇒ ĐỎ (lỗi an toàn: đỏ giả, ⛔ xanh giả). (S0-R3-01: nay `-rfEx` + dòng `XFAIL <id>` — dưới.)
 # ⭐⭐ S0-R2-03 · cổng so TẬP phải canh cả MẪU SỐ. R2 đo: `PYTEST_ADDOPTS=--lf … --duong-nen` ⇒
 #    toàn bộ `12 failed, 14 errors in 0.94s` (26 / 2.460 bài) ⇒ `[ĐẠT] … 26 = 26` · `KẾT: ĐẠT`
 #    exit 0; log cùng 26 id mà `2000 skipped` / `2434 deselected` cũng ĐẠT. Cùng lớp: `--deselect
 #    <bài vừa đỏ>`, `-k "not …"`, `@pytest.mark.skip` lên bài vừa làm hỏng ⇒ bài ấy ⛔ còn đỏ ⇒ ⛔
 #    THÊM ⇒ ĐẠT. ⇒ ĐẠT chỉ khi tập khớp VÀ dòng tổng kết có `skipped = 0` · `deselected = 0` · số
 #    bài CHẠY (passed + failed + errors + xfailed + xpassed) ≥ `mong` — in số ấy CẠNH `26 = 26`.
+# ⭐⭐ S0-R3-01 · `xfailed` cộng vào "chạy" mà ⛔ có `mong` về SỐ hay TÊN, và `-rfE` ⛔ liệt kê `XFAIL`.
+#    R3 (`KQ-069`) đo đầu-cuối: plugin `PYTEST_PLUGINS` làm HỎNG một bài web đang xanh rồi gắn
+#    `xfail(strict=True)` — chính thành ngữ "bài đỏ đã biết" của repo — ⇒ toàn bộ `12 failed, 2432
+#    passed, 3 xfailed, 14 errors` ⇒ `[ĐẠT] 26 = 26 · chạy 2461` · web `chạy 664 (mong ≥ 664)` ⇒
+#    `KẾT: ĐẠT` exit 0 (sàn web KHÍT ⇒ lỗ ⛔ nhờ khoảng dư). Chiều ngược (một xfail biến mất) cũng ĐẠT.
+#    ⇒ `-rfEx` (`chay_pytest`); dòng `XFAIL <id>[ - <lý do>]` vào tập đo, GIỮ chữ `XFAIL` làm LOẠI
+#    (dòng FAILED/ERROR chỉ còn `<id>`); tệp đường nền khai xfail bằng đúng dòng `XFAIL <id>`. So
+#    theo TÊN + LOẠI: thêm/bớt một xfail ⇒ `+ THÊM  XFAIL <id>` / `− BỚT   XFAIL <id>`; một node đổi
+#    loại (xfail(strict) tự qua ⇒ pytest in `FAILED … [XPASS(strict)]`; bài đỏ có sẵn bị gắn xfail)
+#    ⇒ cùng TÊN mà khác LOẠI ⇒ thêm 1 · bớt 1 ⇒ ĐỎ. ⚠ `x` ⛔ gồm `X`: XPASS ⛔ strict ⛔ có tên ở đây
+#    (bài QUA — ⛔ phải hồi quy); một xfail đường nền tự xpass thì BỚT ⇒ vẫn ĐỎ.
 so_tap_do() {   # $1 nhãn · $2 log · $3 tiền tố node id (rỗng = toàn bộ) · $4 dòng tổng kết · $5 mong số bài chạy
   local nhan="$1" log="$2" tien_to="$3" tong="$4" mong_chay="$5" hien mong them bot n_hien n_mong
-  local n_chay n_skip n_desel mau_so_dat=""
+  local n_chay n_skip n_desel mau_so_dat="" n_xf_hien n_xf_mong
   if [ ! -f "$DUONG_NEN_DO" ]; then
     do_ "đường nền $nhan" "mong: có tệp $DUONG_NEN_DO — đo: ⛔ có (⛔ so được = ĐỎ)"; return
   fi
@@ -588,16 +625,20 @@ so_tap_do() {   # $1 nhãn · $2 log · $3 tiền tố node id (rỗng = toàn b
     printf "%d %d %d\n", c, s, d }')"
   [ "$n_skip" = 0 ] && [ "$n_desel" = 0 ] && [ "$n_chay" -ge "$mong_chay" ] && mau_so_dat=1
   hien="$(mktemp "${TMPDIR:-/tmp}/fls_isp_hien.XXXXXX")"; mong="$(mktemp "${TMPDIR:-/tmp}/fls_isp_mong.XXXXXX")"
-  awk '/^=+ short test summary info =+$/ {v = 1; next} v && /^(FAILED|ERROR) /' "$log" \
+  # S0-R3-01: FAILED/ERROR ⇒ `<id>`; XFAIL ⇒ `XFAIL <id>` (giữ LOẠI) — rồi cắt ` - <câu>`.
+  awk '/^=+ short test summary info =+$/ {v = 1; next} v && /^(FAILED|ERROR|XFAIL) /' "$log" \
     | sed -E 's/^(FAILED|ERROR) //; s/ - .*$//' | LC_ALL=C sort -u > "$hien"
-  awk -v p="$tien_to" 'NF && (p == "" || index($0, p) == 1)' "$DUONG_NEN_DO" | LC_ALL=C sort -u > "$mong"
+  # tiền tố (lượt `tests/web`) so trên node id — dòng khai `XFAIL <id>` so phần sau `XFAIL `
+  awk -v p="$tien_to" 'NF && (p == "" || index($0, p) == 1 || index($0, "XFAIL " p) == 1)' "$DUONG_NEN_DO" \
+    | LC_ALL=C sort -u > "$mong"
   them="$(LC_ALL=C comm -13 "$mong" "$hien")"; bot="$(LC_ALL=C comm -23 "$mong" "$hien")"
   n_hien=$(wc -l < "$hien"); n_mong=$(wc -l < "$mong")
+  n_xf_hien=$(grep -c '^XFAIL ' "$hien"); n_xf_mong=$(grep -c '^XFAIL ' "$mong")
   rm -f "$hien" "$mong"
   if [ -z "$them" ] && [ -z "$bot" ] && [ -n "$mau_so_dat" ]; then
-    dat "đường nền $nhan" "tập đỏ = đường nền: $n_hien = $n_mong node id (thêm 0 · bớt 0) · chạy $n_chay bài (mong ≥ $mong_chay) · skipped 0 · deselected 0"
+    dat "đường nền $nhan" "tập đỏ + XFAIL = đường nền: $n_hien = $n_mong node id (trong đó XFAIL $n_xf_hien = $n_xf_mong · thêm 0 · bớt 0) · chạy $n_chay bài (mong ≥ $mong_chay) · skipped 0 · deselected 0"
   else
-    do_ "đường nền $nhan" "mong: tập đỏ = $n_mong node id của $(basename "$DUONG_NEN_DO")${tien_to:+ (tiền tố $tien_to)} · chạy ≥ $mong_chay bài · skipped 0 · deselected 0 — đo: $n_hien · thêm $(printf '%s' "$them" | grep -c .) · bớt $(printf '%s' "$bot" | grep -c .) · chạy $n_chay · skipped $n_skip · deselected $n_desel"
+    do_ "đường nền $nhan" "mong: tập đỏ + XFAIL = $n_mong node id (XFAIL $n_xf_mong) của $(basename "$DUONG_NEN_DO")${tien_to:+ (tiền tố $tien_to)} · chạy ≥ $mong_chay bài · skipped 0 · deselected 0 — đo: $n_hien (XFAIL $n_xf_hien) · thêm $(printf '%s' "$them" | grep -c .) · bớt $(printf '%s' "$bot" | grep -c .) · chạy $n_chay · skipped $n_skip · deselected $n_desel"
     [ -z "$them" ] || printf '%s\n' "$them" | sed 's/^/        + THÊM  /'
     [ -z "$bot" ]  || printf '%s\n' "$bot"  | sed 's/^/        − BỚT   /'
   fi
@@ -608,9 +649,14 @@ chay_pytest() {   # $1 = nhãn · $2 = tiền tố node id (rỗng = toàn bộ)
   local log; log="$(mktemp "${TMPDIR:-/tmp}/fls_isp_pytest.XXXXXX")"
   # ⛔ thêm `-q`: pyproject.toml đã có `-q`, thêm nữa là `-qq` và MẤT dòng tổng kết.
   # ⛔⛔ S0-R2-03 · `env -u PYTEST_ADDOPTS`: biến của shell người gọi (`--lf` · `-k` · `--deselect`
-  #   · `-x`) đổi BỘ BÀI mà ⛔ hiện trên dòng lệnh — R2 đo `--lf` ⇒ 26/2.460 bài, `KẾT: ĐẠT`. Cổng
-  #   mẫu số ở `so_tap_do` vẫn canh mọi đường khác (plugin, conftest, mark).
-  env -u PYTEST_ADDOPTS "$PY" -m pytest -rfE "$@" >"$log" 2>&1
+  #   · `-x`) đổi BỘ BÀI mà ⛔ hiện trên dòng lệnh — R2 đo `--lf` ⇒ 26/2.460 bài, `KẾT: ĐẠT`.
+  # ⛔⛔ S0-R3-01 · câu cũ ở đây viết "cổng mẫu số ở `so_tap_do` vẫn canh mọi đường khác (plugin,
+  #   conftest, mark)" — SAI với `xfail`: R3 gắn `xfail(strict)` qua plugin lên một bài vừa làm hỏng
+  #   ⇒ `KẾT: ĐẠT`. Đúng sau sửa: đường `env -u` ⛔ chặn (plugin `PYTEST_PLUGINS`, `conftest`, mark)
+  #   bị `so_tap_do` bắt KHI nó đổi BỘ BÀI (skip · deselect · bỏ im lặng xuống dưới `mong`) hoặc đổi
+  #   TẬP FAILED/ERROR/XFAIL theo TÊN + LOẠI (`-rfEx` — `x` = xfailed). ⛔ bắt: plugin biến đỏ thành
+  #   QUA (passed), hay gắn xfail ⛔ strict lên bài vẫn qua (XPASS — `x` ⛔ gồm `X`).
+  env -u PYTEST_ADDOPTS "$PY" -m pytest -rfEx "$@" >"$log" 2>&1
   local ma=$?
   local tong; tong="$(grep -E '^(=+ )?[0-9]+ (passed|failed|error|skipped|deselected|xfailed|xpassed)|^=+ .*(passed|failed|error).* =+$|no tests ran' "$log" | tail -1)"
   echo "  ── pytest $nhan · exit $ma · log $log"

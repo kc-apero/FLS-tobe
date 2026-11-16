@@ -1,3 +1,5 @@
+XFAIL tests/nghiem_thu/test_kq046_chieu_nguoc_ung_vien_pm_mot_tap.py::test_F1_chieu_nguoc_ung_vien_pm_BANG_ma_tien_te
+XFAIL tests/nghiem_thu/test_kq061_f02_het_gio_lo_luu.py::test_F1_HET_GIO_lo_luu_F02_KHONG_noi_o_CHUA_vao_so
 tests/api/test_mui_thu_luoi.py::test_1_dieu_huong_ban_phim__ca_nam_phim
 tests/api/test_mui_thu_luoi.py::test_2_dan_mot_vung__tach_ca_tab_LAN_newline
 tests/api/test_mui_thu_luoi.py::test_3_keo_xuong
