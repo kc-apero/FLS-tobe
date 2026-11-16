@@ -1103,5 +1103,222 @@
    "D": 27
   },
   "bank_khong_ky": 147
+ },
+ "dat_hd1": {
+  "_luat": "kỳ ĐẠT HD1 ⇔ (dòng 1-1 100 % hoặc mọi dòng thiếu của kỳ có nhãn ĐÃ KÝ trong sổ lý do) ∧ (ô Final 7 khối 100 %, mẫu số > 0). ⛔ gồm chế độ tự sinh (H15). AP v3.1.2 §5.3.1 HD1.",
+  "mau_so": {
+   "so_ky": 23,
+   "dong_so": 9967,
+   "dong_thieu": 122
+  },
+  "tep_nhan": {
+   "duong": "docs/ITL/_tools/phan_loai_ly_do.json",
+   "co": false
+  },
+  "so_ly_do": "docs/ITL/_tools/so_ly_do_hd1.json",
+  "so_chu_ky": 0,
+  "van_tay": {
+   "thieu": "18047e0eb0319ea1",
+   "nguoc": "6ac2463a190ff631"
+  },
+  "dem": {
+   "thieu": 122,
+   "co_nhan": 0,
+   "da_ky": 0
+  },
+  "so_ky_dat": 5,
+  "ky_dat": [
+   "2024-10",
+   "2024-11",
+   "2024-12",
+   "2025-03",
+   "2025-04"
+  ],
+  "theo_ky": {
+   "2024-10": {
+    "dat": true,
+    "thieu": 0,
+    "co_nhan": 0,
+    "da_ky": 0,
+    "dong_100": true,
+    "o_100": true
+   },
+   "2024-11": {
+    "dat": true,
+    "thieu": 0,
+    "co_nhan": 0,
+    "da_ky": 0,
+    "dong_100": true,
+    "o_100": true
+   },
+   "2024-12": {
+    "dat": true,
+    "thieu": 0,
+    "co_nhan": 0,
+    "da_ky": 0,
+    "dong_100": true,
+    "o_100": true
+   },
+   "2025-01": {
+    "dat": false,
+    "thieu": 1,
+    "co_nhan": 0,
+    "da_ky": 0,
+    "dong_100": false,
+    "o_100": true
+   },
+   "2025-02": {
+    "dat": false,
+    "thieu": 2,
+    "co_nhan": 0,
+    "da_ky": 0,
+    "dong_100": false,
+    "o_100": true
+   },
+   "2025-03": {
+    "dat": true,
+    "thieu": 0,
+    "co_nhan": 0,
+    "da_ky": 0,
+    "dong_100": true,
+    "o_100": true
+   },
+   "2025-04": {
+    "dat": true,
+    "thieu": 0,
+    "co_nhan": 0,
+    "da_ky": 0,
+    "dong_100": true,
+    "o_100": true
+   },
+   "2025-05": {
+    "dat": false,
+    "thieu": 1,
+    "co_nhan": 0,
+    "da_ky": 0,
+    "dong_100": false,
+    "o_100": true
+   },
+   "2025-06": {
+    "dat": false,
+    "thieu": 3,
+    "co_nhan": 0,
+    "da_ky": 0,
+    "dong_100": false,
+    "o_100": true
+   },
+   "2025-07": {
+    "dat": false,
+    "thieu": 4,
+    "co_nhan": 0,
+    "da_ky": 0,
+    "dong_100": false,
+    "o_100": true
+   },
+   "2025-08": {
+    "dat": false,
+    "thieu": 4,
+    "co_nhan": 0,
+    "da_ky": 0,
+    "dong_100": false,
+    "o_100": true
+   },
+   "2025-09": {
+    "dat": false,
+    "thieu": 4,
+    "co_nhan": 0,
+    "da_ky": 0,
+    "dong_100": false,
+    "o_100": true
+   },
+   "2025-10": {
+    "dat": false,
+    "thieu": 9,
+    "co_nhan": 0,
+    "da_ky": 0,
+    "dong_100": false,
+    "o_100": true
+   },
+   "2025-11": {
+    "dat": false,
+    "thieu": 14,
+    "co_nhan": 0,
+    "da_ky": 0,
+    "dong_100": false,
+    "o_100": true
+   },
+   "2025-12": {
+    "dat": false,
+    "thieu": 5,
+    "co_nhan": 0,
+    "da_ky": 0,
+    "dong_100": false,
+    "o_100": true
+   },
+   "2026-01": {
+    "dat": false,
+    "thieu": 4,
+    "co_nhan": 0,
+    "da_ky": 0,
+    "dong_100": false,
+    "o_100": true
+   },
+   "2026-02": {
+    "dat": false,
+    "thieu": 5,
+    "co_nhan": 0,
+    "da_ky": 0,
+    "dong_100": false,
+    "o_100": true
+   },
+   "2026-03": {
+    "dat": false,
+    "thieu": 5,
+    "co_nhan": 0,
+    "da_ky": 0,
+    "dong_100": false,
+    "o_100": true
+   },
+   "2026-04": {
+    "dat": false,
+    "thieu": 8,
+    "co_nhan": 0,
+    "da_ky": 0,
+    "dong_100": false,
+    "o_100": true
+   },
+   "2026-05": {
+    "dat": false,
+    "thieu": 5,
+    "co_nhan": 0,
+    "da_ky": 0,
+    "dong_100": false,
+    "o_100": true
+   },
+   "2026-06": {
+    "dat": false,
+    "thieu": 12,
+    "co_nhan": 0,
+    "da_ky": 0,
+    "dong_100": false,
+    "o_100": true
+   },
+   "2026-07": {
+    "dat": false,
+    "thieu": 23,
+    "co_nhan": 0,
+    "da_ky": 0,
+    "dong_100": false,
+    "o_100": true
+   },
+   "2026-08": {
+    "dat": false,
+    "thieu": 13,
+    "co_nhan": 0,
+    "da_ky": 0,
+    "dong_100": false,
+    "o_100": true
+   }
+  }
  }
 }
