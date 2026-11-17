@@ -86,3 +86,57 @@ checksum `e98f3a699e2de469`)* qua cổng `[ĐẠT] --mong 7883`.
 
 ## Câu còn treo
 - Hai chỗ lệch số đo ở trên *(21→19 · 6 hàng=12 ô)* — Dev khai số ĐO ĐƯỢC + khuyến nghị A/B; chờ R1 xác nhận, ⛔ chặn.
+
+---
+
+## Vòng sửa sau R1 (KQ-113) — `fls-dev` làn DATA *(phiên cloud · Opus 4.8)* · 2026-11-17
+
+> Mục này **chỉ THÊM** *(⛔ sửa dòng cũ ở trên)*. `KQ-113` TRƯỢT nhẹ — **0 CHẶN · 1 NÊN SỬA (`F-1`) · 6 GHI NHẬN**; dữ liệu khớp nguồn **157.648/157.648**. Orchestrator quyết: `F-1` = **A** *(sửa khuôn + khai lệch có tên)*; `F-2`·`F-3`·`F-4`·`F-6` = GHI NHẬN rẻ làm luôn; `F-5`·`F-7` ⛔ của Dev.
+
+### Đã sửa *(mỗi phát hiện — bằng chứng đo + ĐỎ-trước)*
+
+| F | Mức | Sửa gì | Bằng chứng ĐẠT | ĐỎ-TRƯỚC *(đo trên công cụ TRƯỚC sửa)* |
+|---|---|---|---|---|
+| **`F-1` `DT4-R1-01`** | **NÊN SỬA** | `gl_406.py`: `itl_id` phải khớp `^ITL#\d+$`; **4** hàng `#N/A ()` *(`dong_sheet` 6684·6836·7500·7832)* khai thành **LỆCH CÓ TÊN** ở **bảng phụ `itl_id_lech`** *(`PHU_MONG` mong = **4**; khác ⇒ cổng bảng phụ ĐỎ)* — ⛔ sửa giá trị nguồn, ⛔ âm thầm cho qua. Khai 4 `dong_sheet` + giá trị thô để H4 thấy 4 dòng ⛔ nối được. | `test_DT4_R1_itl_id_lech_co_ten_4_hang`: bảng phụ 4 hàng = `{6684,6836,7500,7832}`; bảng CHÍNH **7879/7883** khớp `^ITL#\d+$`. **Đọc lại nguồn SA** *(1 lượt `batchGet` A·D·R·BM:BT, ⛔ B:C)* xác nhận y **4** hàng ấy; bảng chính + `nguon` + `cong_thuc` **TRÙNG TỪNG BYTE** ảnh gốc *(7883×11)*. | `test_DT4_R1_itl_id_lech_khac_4_thi_DO` *(2 ca)*: thêm hàng `#N/A` thứ 5 ⇒ `itl_id_lech 5≠4` **ĐỎ** exit 1; bỏ 1 ⇒ `3≠4` **ĐỎ**. Công cụ TRƯỚC: cả hai qua `[ĐẠT]` exit 0. |
+| `F-2` `DT4-R1-02` | GHI NHẬN | *(bài)* ghim `_ky_tu_serial` ở **hai phía ranh giới tháng** bằng serial VIẾT TAY *(⛔ chung `EPOCH` với mã)*. | `test_DT4_R1_ky_tu_serial_ghim_ranh_gioi_thang`: `45688→202501` *(2025-01-31)* · `45689→202502` · `45657→202412` · `45717→202503`. | Đột biến M7 *(`EPOCH`+1)* xưa 25/25 xanh; nay serial ngày CUỐI tháng ⇒ kỳ kế ⇒ **ĐỎ**. |
+| `F-3` `DT4-R1-03` | GHI NHẬN | `gl_406.py`: `D` ghim **TẬP ĐÓNG** `TIEN_TE = {USD,SGD,COP,VND,HKD}` — giá trị lạ *(⛔ rỗng)* ⇒ `thieu_lac` báo `D_la@<dong_sheet>` ⇒ ĐỎ. *(Bài)* quét PII cả **GIÁ TRỊ** ô `itl_id`/`D` *(⛔ chỉ tên cột)*. | `test_DT4_R1_quet_PII_GIA_TRI_o_itl_id_va_D`: mẫu số **2·7883** ô, **0** khớp Diễn giải/Số CT/Email; ca phá CẮN. `D ∈ {USD 4085·VND·SGD·HKD}` + 6 rỗng *(⛔ COP trong dữ liệu)*. | `test_DT4_R1_D_ngoai_tap_tien_te_thi_DO`: `D = "Diễn giải lạc cột D"` ⇒ `thieu=[D_la@10]` **ĐỎ** exit 1, ⛔ in giá trị. Công cụ TRƯỚC: `[ĐẠT]` exit 0. |
+| `F-4` `DT4-R1-04` | GHI NHẬN | `dong_bang_sheet.py` `_khoa_hop_le` *(khoá `dong_sheet`)*: `fullmatch(r"[0-9]+")` thay `str.isdigit()`. | `test_DT4_khoa_dong_sheet_hop_le` *(mở rộng)*: `"٣"`·`"٧"`-full-width ⇒ `False` *(⛔ nhận nhầm)*; `"²"` ⇒ `False` *(⛔ `int()` NỔ)*. | `isdigit()` xưa: `"٣"`→`True` · `int("²")`→`ValueError` traceback. |
+| `F-5` `DT4-R1-05` | GHI NHẬN | **⛔ việc Dev** — vá ISP `:1355` + sàn `MONG_PYTEST_TOAN_BO` = việc orchestrator. | — | — |
+| `F-6` `DT4-R1-06` | GHI NHẬN | **Đính chính số** *(dưới)*. | `--collect-only` đo lại: xem bảng số. | — |
+| `F-7` `DT4-R1-07` | chấp nhận | **⛔ đổi** hình dạng công cụ chung *(ảnh dạng dict là hợp đồng DT2·DT3)*. | — | — |
+
+### Đính chính *(theo `F-1` · `F-6`; ⛔ sửa dòng cũ — ghi đúng ở đây)*
+- **`F-1`** — câu mục *"Kết quả đóng băng"* ở trên: *"`itl_id`: `ITL#1…ITL#7883`, 0 rỗng"* **SAI** *(khoảng đoán, ⛔ số đo)*. **Đúng:** `itl_id` **7879/7883** hàng khớp `^ITL#\d+$`; **4** hàng mang chuỗi lỗi Sheets `#N/A ()` *(`dong_sheet` 6684·6836·7500·7832 — ⇒ 3 khoá trùng giá trị)*. 0 ô rỗng *(đúng)*, nhưng ⛔ phải dải `ITL#1…ITL#7883`.
+- **`F-6`** — AC-6 + *"Số bài trước → sau"* ở trên ghi **lệch nhau 1**. **Đúng** *(đo `--collect-only` đếm `::` trên `cf5156e` → `isp/DT4` nền, trước vòng sửa này)*: `tests/du_lieu` **162 → 188 (+26)** · TOÀN BỘ **2652 → 2678 (+26)** *(= 25 bài DT4 + 1 node `[gl_406]` của bài DT2-R2-02 tham số hoá)*. Bỏ hai số `163→188 (+25)` và `2653→2678 (+25)`.
+
+### Số bài `--collect-only` *(đếm `::` — vòng sửa R1 thêm 7)*
+| Mốc | `test_dap_an_406` | `tests/du_lieu` | TOÀN BỘ |
+|---|---|---|---|
+| nền `cf5156e` *(trước DT4)* | 0 | 162 | 2652 |
+| `isp/DT4` sau R1 *(trước vòng sửa)* | 25 | 188 | 2678 |
+| **sau vòng sửa R1 *(phiếu này)*** | **32** *(+7)* | **195** *(+7)* | **2685** *(+7)* |
+
+*(+7 = `itl_id_lech` 4 hàng×0… thực: 1 cấu trúc + 2 ĐỎ-trước itl_id + 1 ĐỎ-trước D + 1 quét-giá-trị + 1 ca-phá + 1 ghim-serial. `F-4` mở rộng bài CÓ SẴN ⇒ ⛔ thêm node.)*
+
+### Checksum ảnh `gl_406.json`
+- **trước:** `e98f3a699e2de469` → **sau:** `53a243b42101c314`. Đổi **CHỈ** do bảng phụ `itl_id_lech` mới *(`nguon` · `dong` 7883×11 · `cong_thuc` giữ **từng byte** — đọc lại SA 1 lượt `batchGet` xác nhận 0 lệch)*.
+
+### Cổng *(nguyên văn — chạy trên `isp/DT4` sau vòng sửa, cổng 5437)*
+| Lệnh | Kết quả |
+|---|---|
+| `pytest tests/du_lieu/test_dap_an_406.py` | `32 passed` |
+| `pytest tests/du_lieu` | `195 passed` |
+| `dung_moi_truong_isp.sh --duong-nen` *(script NHÁNH, một mình)* | `KẾT: ĐẠT` · `12 failed, 2657 passed, 2 xfailed, 14 errors` · tập đỏ **26 = 26** *(thêm 0·bớt 0)* · `tests/web 3 = 3` |
+| `lint-imports` | `Contracts: 11 kept, 0 broken.` |
+| `kiem_tai_lieu.py` | `✅ cổng tài liệu ĐẠT` |
+| `ix_fx.json` + 3 ảnh DT3 | **đúng từng byte** *(`git diff tests/fixture/cau_hinh/` rỗng; `test_DT4_giu_anh_IX_FX…` xanh)* |
+
+### Đổi tệp *(4 — `git diff --stat cf5156e→phiếu` phần vòng sửa)*
+- `tools/khuon_dong_bang/gl_406.py` — `F-1` *(bảng phụ `itl_id_lech`, `ITL_ID_RE`, `LECH_ITL_ID`)* + `F-3` *(`TIEN_TE`, cổng `D`)*.
+- `tools/dong_bang_sheet.py` — `F-4` *(`_khoa_hop_le` `dong_sheet` dùng `fullmatch`)*.
+- `tests/fixture/dap_an/gl_406.json` — đóng băng lại từ SA *(bảng phụ `itl_id_lech`)*.
+- `tests/du_lieu/test_dap_an_406.py` — +7 bài *(F-1·F-2·F-3)* + mở rộng `F-4` + checksum mới.
+
+### Câu còn treo cho orchestrator
+1. **BG `chỉ THÊM` ⟂ `F-1`/`F-6` "Sửa câu/số":** Dev đọc *"chỉ THÊM"* là **mạnh hơn** ⇒ đính chính Ở MỤC NÀY *(⛔ sửa dòng lịch sử)*. **(A)** *(đã làm — khuyên)* giữ dòng cũ, đính chính ở đây. **(B)** sửa thẳng dòng `itl_id: ITL#1…ITL#7883` + hai số AC-6 inline. Chờ orchestrator chọn.
+2. `F-5` *(ISP `:1355` "5 tiền tệ" · sàn `MONG_PYTEST_TOAN_BO` +26)* — việc orchestrator, ⛔ đụng tới.
