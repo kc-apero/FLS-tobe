@@ -66,6 +66,19 @@ LE_PHAP_NHAN = frozenset({
 #: ⭐ HẰNG giả danh hoá — thay CẢ `A` lẫn `B` của hàng tài khoản cá nhân *(⛔ chuỗi riêng nào)*.
 AN_DANH = "an_danh:tk_ca_nhan"
 
+#: ⭐ Giá trị CHO PHÉP ở cột THÔ `D:G` *(`DT3-R2-02`)* — RÚT TỪ ẢNH HIỆN TẠI đã commit
+#: *(`tests/fixture/cau_hinh/mapping_master_cfg.json`, `phu.tho` cột D:G — đo 17/11)*: `x` = dấu
+#: cấp L1…L4 *(73 ô, hàng dữ liệu)* + **19** nhãn CẤU TRÚC của cây HD *(tiêu đề vùng + nhãn cột +
+#: tên 6 nhóm HD, ⛔ tên người)*. Cột `D:G` được chép THÔ ⇒ ⛔ danh sách thì một chuỗi lạ *(có thể
+#: tên người)* lọt vào ảnh khi TÁI đóng băng mà cổng số dòng ⛔ thấy *(thăm dò P4b của `KQ-109`)*.
+#: Giá trị `D:G` ngoài tập này *(và ⛔ rỗng)* ⇒ TỪ CHỐI *(Đ5: nguồn đổi hình ⇒ cổng ĐỎ, buộc khai
+#: lại)*. ⛔ chỉ cấm tên ĐÃ BIẾT — đóng khi LẠ.
+GIA_TRI_DG_CHO_PHEP = frozenset({
+    "x",
+    "Mapping HD via COA", "HD", "Level", "L1", "L2", "L3", "L4",
+    "HDO", "HD Original", "HDC", "HD Calculated", "HDH", "HD HR",
+    "HDAP", "HD Account Payable", "HDT", "HD Tempo", "HDCI", "HD Calculated Internal"})
+
 _VUNG = re.compile(r"!([A-Z]+)(\d+):([A-Z]+)(\d+)")
 
 
@@ -110,6 +123,10 @@ def chuan_bi(tho: dict[str, Any]) -> dict[str, Any]:
     an_danh_ra: list[dict[str, Any]] = []
     for r in range(1, len(hang) + 1):
         d = {c: o(r, c) for c in COT_THO}
+        for c in "DEFG":
+            if d[c] is not None and d[c] not in GIA_TRI_DG_CHO_PHEP:
+                raise ValueError(f"ô {c}{r}: giá trị cột D:G ngoài danh sách cho phép đã đo 17/11 "
+                                 "— chuỗi lạ (có thể PII) ⛔ được vào ảnh thô (DT3-R2-02)")
         if r >= DONG_DAU_LE and (d["A"] is not None or d["B"] is not None) \
                 and not (d["B"] is not None and d["B"].strip() in LE_PHAP_NHAN):
             cot_an = [c for c in "AB" if d[c] is not None]

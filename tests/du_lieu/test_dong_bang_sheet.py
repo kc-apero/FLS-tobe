@@ -753,6 +753,9 @@ def test_R1_05_D12_dia_DAY_giua_chung_thi_exit_3_anh_cu_NGUYEN_va_0_tep_tam(ban_
     pytest.param("2026-02-30T04:00:00", id="ngay_khong_co_co_gio"),
     pytest.param("16/11/2026", id="kieu_VN"),
     pytest.param("2026-11-16 04:00:00", id="cach_KHONG_T"),
+    # `DT3-R2-03`ⓒ: `_NGAY_GIO` phải CHẶT *(ngày-giờ có gạch + hai chấm)*. ĐỎ trên M11 *(nới
+    # `_NGAY_GIO` thành `.*T.*`)*: `datetime.fromisoformat` nhận dạng gọn `20261117T040829` ⇒ exit 0.
+    pytest.param("20261117T040829", id="ISO_gon_co_gio_KHONG_dau"),
 ])
 def test_R1_06_doc_luc_KHONG_phai_YYYY_MM_DD_thi_TU_CHOI(tmp_path, doc_luc):
     """`DT2-R1-06`: `date.fromisoformat` *(Python ≥ 3.11)* nhận cả `2026-W46-1` lẫn `20261116`,

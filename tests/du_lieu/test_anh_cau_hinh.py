@@ -4,9 +4,9 @@ Master · CDT Correct, đóng băng qua CHÍNH đường ống DT2 *(`tools/dong
 ⭐ **Vì sao có tệp này.** Bước sau *(C4 cây HD · C8 IX.ORG · C12 dòng PL)* cần ba ẢNH đứng yên
 của ba nguồn đang nằm ở sheet NOW, mỗi ảnh có checksum + một cổng khai `mong` *(Đ5)*:
 
-    cây ATL       `'Report I PLA3 Y H Q M | PM + HR | ATL'!A7:F88` ⇒ 74 dòng MÃ · 6 nhóm
+    cây ATL       `'Report I PLA3 Y H Q M | PM + HR | ATL'!A7:F90` ⇒ 74 dòng MÃ · 6 nhóm
     Mapping Master `'Mapping Master'!A1:P120` *(RAW)*            ⇒ 73 mã `hd` *(đầu ra `doc_cot`)*
-    CDT Correct   `'Report I H1000 Ledge … | For PL Report'!BR11:BS23` ⇒ 13 dòng
+    CDT Correct   `'Report I H1000 Ledge … | For PL Report'!BR11:BS32` ⇒ 13 dòng
 
 Mỗi con số đếm MỘT vật *(Đ4)*:
   · **74** = dòng MÃ của cây *(nhãn `MÃ | Tên`)* — ⛔ kể 6 dòng tiêu đề nhóm `MÃ|Tên` và 1 dòng
@@ -63,7 +63,7 @@ ANH_CDT = CAU_HINH / "cdt_correct.json"
 MONG_ATL = 74          # dòng MÃ của cây ATL
 MONG_NHOM_ATL = 6      # dòng tiêu đề nhóm
 MONG_MM = 73           # mã hd của doc_cot
-MONG_CDT = 13          # dòng có dữ liệu BR11:BS23
+MONG_CDT = 13          # dòng có dữ liệu (vùng đọc BR11:BS32, biên dư sau dòng 23)
 
 #: ⭐ Cây HD của AP v3.1.2 §3.2.5 — chép từ bảng *"nhóm · cấp L1 → L4"*, THỨ TỰ như AP. Đây là
 #: phép so ĐỘC LẬP với khuôn *(khuôn suy nhóm/thứ tự từ sheet; bài đọc từ AP)*.
@@ -623,6 +623,10 @@ ATL_CHOT = [
     pytest.param(_xoa(48), 1, "thiếu 2", id="nhom_khai_ma_0_dong_ma"),
     pytest.param(lambda t: t["values"].__setitem__(28, [0, "HDO", "HD Original"]), 1,
                  "phụ `nhom` 7 dòng ≠ mong 6", id="them_mot_tieu_de_nhom"),
+    # `DT3-R2-03`ⓑ: tiêu đề nhóm đòi ô `C` *(tên)*. Xoá `C` ⇒ hàng B-only ⇒ "khác" (rác). ĐỎ trên
+    # M18 *(bỏ đòi ô C)*: hàng B-only bị coi là tiêu đề nhóm ten=None ⇒ nhận, exit 0.
+    pytest.param(lambda t: t["values"][0].__setitem__(2, ""), 2, "dạng nào",
+                 id="tieu_de_nhom_thieu_o_C_ten"),
 ]
 
 
@@ -932,6 +936,63 @@ def test_R1_03_atl_cay_nhan_LUOI_o_cua_sheet_ra_cung_74_dong(tmp_path):
     moi = _doc(ra)
     khoa = lambda a: [(_chu(d["ma"]), _chu(d["cha"]), d["cap"], _chu(d["nhom"])) for d in a["dong"]]
     assert khoa(moi) == khoa(anh) and len(moi["dong"]) == MONG_ATL
+
+
+# ══ Vòng sửa sau R2 (KQ-109) ═════════════════════════════════════════════════════════════════
+
+def test_R2_01_hang_chi_co_A_B_rong_VAN_duoc_an_danh(km):
+    """`DT3-R2-01` *(NÊN SỬA)*: nhánh *"hàng chỉ có `A`, `B` rỗng"* của luật ẩn danh. Tài khoản PO
+    cá nhân có thể chỉ điền `A` *(B rỗng)* — đuôi tên sheet của `A` mang tên NGƯỜI. Đột biến M22
+    `(A≠∅ hoặc B≠∅)` → `(B≠∅)` bỏ qua hàng A-only ⇒ chuỗi rõ lọt vào ảnh. Dữ liệu TỔNG HỢP: lưới
+    MM + hàng chỉ `A` ở dòng 80 *(A:B đang trống)* ⇒ `an_danh` +1 `cot=A`, `A` = hằng, chuỗi tổng
+    hợp ⛔ ở đâu trong kết quả `chuan_bi`. *(ĐỎ trên đột biến M22 — R2 chứng minh phá lại.)*"""
+    tho = _tho_mm_tu_anh(_doc(ANH_MM))
+    gia = "GIALAPONLYA"
+    assert gia not in km.LE_PHAP_NHAN
+    tho["values"][79][0] = f"R | 99999999_PO USD_{gia}"    # chỉ `A` (dòng sheet 80)
+    assert not tho["values"][79][1]                        # `B` để RỖNG ⇒ nhánh A-only
+    kq = km.chuan_bi(tho)
+    moi = [d for d in kq["phu"]["an_danh"] if d["dong_sheet"] == 80]
+    assert len(kq["phu"]["an_danh"]) == 8 and len(moi) == 1 and moi[0]["cot"] == "A", \
+        kq["phu"]["an_danh"]
+    hang = next(d for d in kq["phu"]["tho"] if d["dong_sheet"] == 80)
+    assert hang["A"] == km.AN_DANH and hang["B"] is None
+    khoa, chuoi = [], []
+    _di(kq, khoa, chuoi)
+    assert gia not in "\n".join(chuoi), "chuỗi rõ của hàng A-only lọt vào kết quả chuan_bi"
+
+
+def test_R2_02_cot_DG_chuoi_LA_ngoai_danh_sach_cho_phep_thi_TU_CHOI(tmp_path):
+    """`DT3-R2-02` *(NÊN SỬA)*: cột `D:G` của `phu.tho` chép THÔ. Thay MỘT ô `x` sẵn có bằng chuỗi
+    LẠ *(số dòng ⛔ đổi — cổng `--mong`/`phu` ⛔ thấy, như thăm dò P4b của R2)* ⇒ khuôn đòi mỗi ô
+    `D:G` ∈ danh sách giá trị đã đo 17/11 ⇒ TỪ CHỐI exit 2 *(⛔ ghi ảnh)*. ĐỎ-trước *(⛔ danh
+    sách)*: exit 0 `[ĐẠT]`, chuỗi lạ vào ảnh. Lời lỗi ⛔ mang giá trị ô *(nguồn CÓ tên người)*."""
+    tho = _tho_mm_tu_anh(_doc(ANH_MM))
+    assert tho["values"][6][3] == "x"                      # dòng sheet 7, cột `D` = dấu cấp `x`
+    gia = "CHUOILA_COTHE_TEN_NGUOI"
+    tho["values"][6][3] = gia
+    ra = tmp_path / "moi" / "mm.json"
+    kq = _chay("mapping_master_cfg", str(_ghi(tmp_path / "t.json", tho)), "--mong", str(MONG_MM),
+               "--ra", str(ra))
+    assert kq.returncode == 2, (kq.returncode, kq.stdout[-600:], kq.stderr[-600:])
+    dong = _dong_loi(kq.stderr, "⛔ TỪ CHỐI")
+    assert len(dong) == 1 and "mapping_master_cfg" in dong[0] and "danh sách" in dong[0], dong
+    assert not ra.parent.exists()
+    assert gia not in kq.stdout + kq.stderr                # lời lỗi ⛔ in giá trị ô
+
+
+def test_R2_03a_cdt_correct_vung_SAI_COT_khong_phai_BR_BS_thi_TU_CHOI(tmp_path):
+    """`DT3-R2-03`ⓐ *(GHI NHẬN)*: khuôn CDT đòi vùng ĐÚNG cột `BR:BS`. Đột biến M17 *(bỏ kiểm
+    cột)* ⇒ vùng cột KHÁC *(vd `BX:BY`)* lọt qua *(biên dư vẫn khớp)*. Đổi `nguon` sang
+    `!BX11:BY32` ⇒ TỪ CHỐI exit 2 *(ĐỎ trên M17: exit 0)*."""
+    tho = _tho_cdt_tu_anh(_doc(ANH_CDT))
+    tho["nguon"] = tho["nguon"].replace("!BR11:BS32", "!BX11:BY32")
+    ra = tmp_path / "moi" / "c.json"
+    kq = _chay("cdt_correct", str(_ghi(tmp_path / "t.json", tho)), "--mong", str(MONG_CDT),
+               "--ra", str(ra))
+    assert kq.returncode == 2, (kq.returncode, kq.stdout[-400:], kq.stderr[-400:])
+    assert "BR:BS" in _dong_loi(kq.stderr, "⛔ TỪ CHỐI")[0]
+    assert not ra.parent.exists()
 
 
 #: Tệp MÃ SẢN XUẤT của DT3 — công cụ + ba khuôn *(bài THẢO LUẬN `MUOI`/băm trong chú thích ⇒
