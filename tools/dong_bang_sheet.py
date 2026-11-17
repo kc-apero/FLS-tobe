@@ -24,8 +24,9 @@ dùng lại được cho các ảnh DT3…DT11 *(xem "Khuôn" dưới)*, ⛔ vi�
 ⭐⭐ **Khuôn = MỘT TỆP** ở `tools/khuon_dong_bang/<tên>.py` *(orchestrator 16/11)*. Bản đầu khai
 khuôn trong bảng `KHUON` ngay tệp này — các bước DT3…DT12 thêm khuôn SONG SONG thì cùng sửa một
 tệp ⇒ phải xếp hàng. Giờ công cụ tìm khuôn theo tên tệp; khuôn lạ ⇒ TỪ CHỐI như cũ. Giao kèo
-*(kiểm lúc nạp — `nap_khuon`)*: hằng `BANG · KHOA · KIEU_KHOA · COT · RA` + hàm
-`thieu_lac(dong) → {"thieu", "lac", "dai"}` *(`ValueError` = ⛔ đo được)*. Chia việc:
+*(kiểm lúc nạp — `nap_khuon`)*: hằng `BANG · KHOA · KIEU_KHOA · COT · RA` *(KHOA + COT đôi một
+khác tên — `DT2-R2-03`)* + hàm `thieu_lac(dong) → {"thieu", "lac", "dai"}` *(`thieu`/`lac` là
+`list`/`tuple`; `ValueError` = ⛔ đo được)*. Chia việc:
   · **công cụ** giữ phần CHUNG — đếm `--mong` · khoá hỏng · khoá trùng · ô rỗng · ô ⛔ số · soát
     riêng tư · checksum · ghi;
   · **khuôn** giữ phần RIÊNG của bảng — chọn cột nào, và *thiếu/lạc nghĩa là gì*. Khuôn `ix_fx`
@@ -158,15 +159,23 @@ def nap_khuon(ten: str) -> Khuon:
 
     ⚠ Nạp bằng ĐƯỜNG TỆP *(⛔ `import khuon_dong_bang.x`)*: ⛔ phụ thuộc `sys.path` lúc chạy —
     chạy như script *(`sys.path[0]` = `tools/`)* hay nạp từ bài thử đều ra cùng một khuôn.
+
+    ⛔⛔ Module khuôn được ĐĂNG KÝ `sys.modules` TRƯỚC khi chạy *(`DT2-R2-01`)*: bản đầu ⛔ đăng
+    ký ⇒ khuôn có `@dataclass` + `from __future__ import annotations` *(lối viết của 41/41 tệp
+    `fls/`+`tools/` có `@dataclass` — R2 đếm)* bị TỪ CHỐI `AttributeError: 'NoneType' object has
+    no attribute '__dict__'`, vì `dataclasses` tra `sys.modules[cls.__module__]`. Nạp lỗi
+    **hay sai giao kèo** ⇒ GỠ ra, ⛔ để lại module dở / bị khước từ cho lần nạp sau.
     """
     p = THU_MUC_KHUON / f"{ten}.py"
     if not _TEN_KHUON.fullmatch(ten) or not p.is_file():
         raise TuChoi(f"khuôn `{ten}` ⛔ có ở {THU_MUC_KHUON.name}/ (có: {danh_sach_khuon()})")
     spec = importlib.util.spec_from_file_location(f"khuon_dong_bang_{ten}", p)
     m = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = m
     try:
         spec.loader.exec_module(m)
     except Exception as e:                 # SyntaxError · ImportError · … — khuôn ⛔ dùng được
+        sys.modules.pop(spec.name, None)
         raise TuChoi(f"khuôn `{ten}` ({p.name}) nạp lỗi: {type(e).__name__}: {e}") from None
 
     sai: list[str] = []
@@ -179,9 +188,16 @@ def nap_khuon(ten: str) -> Khuon:
     if not isinstance(cot, tuple) or not cot \
             or not all(isinstance(c, str) and c.strip() for c in cot):
         sai.append("COT ⛔ phải tuple tên cột khác rỗng")
+    elif isinstance(getattr(m, "KHOA", None), str) and len({m.KHOA, *cot}) != 1 + len(cot):
+        # DT2-R2-03: R2 đo khuôn có KHOA ∈ COT ⇒ dòng báo `3 cột tiêu đề = khoá 1 + chọn 2 +
+        #   ⛔ chọn 1 + tiêu đề rỗng 0` (4 ≠ 3 — Đ4); COT trùng ⇒ mẫu số ô `0/6` trên 3 ô thật.
+        ten_cot = [m.KHOA, *cot]
+        trung = sorted({c for c in ten_cot if ten_cot.count(c) > 1})
+        sai.append(f"KHOA + COT ⛔ được trùng tên: {trung}")
     if not callable(getattr(m, "thieu_lac", None)):
         sai.append("thieu_lac ⛔ phải hàm")
     if sai:
+        sys.modules.pop(spec.name, None)   # khuôn bị khước từ cũng ⛔ nằm lại (bài …SAI_GIAO_KEO…)
         raise TuChoi(f"khuôn `{ten}` ({p.name}) sai giao kèo: " + " · ".join(sai))
     return Khuon(ten=ten, bang=m.BANG, khoa=m.KHOA, kieu_khoa=m.KIEU_KHOA, cot=tuple(cot),
                  ra=m.RA, thieu_lac=m.thieu_lac)
@@ -295,6 +311,13 @@ def _thieu_lac(kh: Khuon, dong: list[dict[str, Any]]) -> tuple[list | None, list
     except Exception as e:
         raise LoiKhuon(f"khuôn `{kh.ten}` nổ khi tính thiếu/lạc: {type(e).__name__}: {e}") from e
     try:
+        # ⛔⛔ DT2-R2-03: chuỗi và set cũng LẶP được — `"thieu": "202402"` thành `thiếu: [2, 0, 2,
+        #   4, 0, 2]`, `"lac": "202306"` qua `[ĐẠT]` (lạc chỉ ghi nhận), set lặp theo băm ⇒ ảnh
+        #   ⛔ tất định. ⇒ thieu/lac phải DANH SÁCH; sai ⇒ TypeError ⇒ LoiKhuon (exit 3) như
+        #   mọi sai hình khác của kết quả khuôn.
+        for k in ("thieu", "lac"):
+            if not isinstance(r[k], (list, tuple)):
+                raise TypeError(f"`{k}` là {type(r[k]).__name__} ⛔ phải list/tuple")
         return [str(x) for x in r["thieu"]], [str(x) for x in r["lac"]], str(r["dai"]), None
     except Exception as e:
         raise LoiKhuon(f"khuôn `{kh.ten}`: thieu_lac phải trả {{thieu, lac, dai}} — "

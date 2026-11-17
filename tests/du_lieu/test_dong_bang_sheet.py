@@ -185,8 +185,12 @@ def test_DT2_B1_checksum_DOI_khi_mot_o_hoac_thu_tu_doi(ban_tho_37, tmp_path):
     """Đ5: checksum ổn định chỉ có nghĩa khi nó **ĐỔI** lúc nội dung đổi.
 
     ⭐ `AnhChup.checksum()` cố ý ĐỘC LẬP thứ tự đọc *(đọc dần/cắt lát)*. Nhưng ở đây thứ tự
-    hàng của sheet LÀ dữ liệu *(dòng lạc 202306 chỉ "lạc" vì nó đứng sau 202512)* ⇒ mỗi dòng
-    mang `thu_tu`, nên đổi chỗ hai hàng cũng đổi checksum.
+    hàng của sheet LÀ dữ liệu *(dòng `202306` đứng sau `202512` — đúng chỗ nó nằm ở sheet)* ⇒
+    mỗi dòng mang `thu_tu`, nên đổi chỗ hai hàng cũng đổi checksum.
+
+    ⚠ `DT2-R2-06`: câu cũ ở đây KHAI *"dòng lạc 202306 chỉ 'lạc' vì nó đứng sau 202512"* — định
+    nghĩa *lạc* theo thứ tự sheet đã BỎ ở `DT2-R1-03` *(nay lạc = tháng < `thang_dau` của C1)*.
+    Thứ tự vào CHECKSUM, ⛔ vào định nghĩa lạc. ⛔ đổi `assert` nào.
     """
     goc_ra = tmp_path / "goc.json"
     assert _chay("ix_fx", str(ban_tho_37), "--mong", "37", "--ra", str(goc_ra)).returncode == 0
@@ -816,11 +820,23 @@ def _chuoi_trong_ma(p: pathlib.Path) -> set[str]:
 
 def test_KHUON_ix_fx_la_mot_tep_va_cong_cu_KHONG_mang_du_lieu_khuon():
     """Khuôn `ix_fx` nằm ở `tools/khuon_dong_bang/ix_fx.py`; gói có `__init__.py` **0 byte**;
-    công cụ tìm thấy đúng `['ix_fx']`; và MÃ công cụ ⛔ còn mang dữ liệu khuôn nào *(tên bảng,
-    khoá, tiền tệ, đường ảnh)* — còn là còn phải sửa công cụ khi thêm khuôn. ĐỎ trên `eb94901`."""
+    công cụ tìm thấy `ix_fx` *(và ĐÚNG mọi tệp khuôn của thư mục)*; và MÃ công cụ ⛔ còn mang dữ
+    liệu khuôn nào *(tên bảng, khoá, tiền tệ, đường ảnh)* — còn là còn phải sửa công cụ khi thêm
+    khuôn. ĐỎ trên `eb94901`.
+
+    ⚠ `DT2-R2-02` *(R2 `KQ-088`)*: bản đầu ghim `danh_sach_khuon() == ['ix_fx']` — đúng khi
+    `ix_fx` là khuôn DUY NHẤT, nhưng chính việc tách khuôn sinh ra để DT3…DT12 THÊM tệp song
+    song ⇒ thêm MỘT khuôn là bài này ĐỎ *(R2 đo: `['ix_fx', 'zz_gia'] == ['ix_fx']`)* và mỗi
+    bước phải sửa CÙNG dòng này ⇒ xung đột gộp. Lo gốc GIỮ: ① `ix_fx` được tìm thấy; ② công
+    cụ thấy ĐÚNG tập tệp khuôn — ⛔ bỏ sót tệp nào *(tệp bị bỏ sót thì bài tham số hoá
+    `test_R2_02_MOI_khuon_…` cũng ⛔ canh nó)*, ⛔ thấy tệp ⛔ có; ③ mã công cụ ⛔ mang dữ liệu
+    khuôn. Giao kèo của TỪNG khuôn: bài tham số hoá ấy."""
     assert (THU_MUC_KHUON / "__init__.py").read_bytes() == b""
     assert (THU_MUC_KHUON / "ix_fx.py").is_file()
-    assert _nap_cong_cu().danh_sach_khuon() == ["ix_fx"]
+    co = _nap_cong_cu().danh_sach_khuon()
+    assert "ix_fx" in co, co
+    # Đếm ĐỘC LẬP bằng glob của bài — tệp `_…` là tệp phụ, ⛔ phải khuôn (docstring công cụ).
+    assert co == sorted(p.stem for p in THU_MUC_KHUON.glob("*.py") if not p.stem.startswith("_"))
     lot = _chuoi_trong_ma(TOOL) & {"IX.FX", "Month", "USD", "VND", "tests/fixture/cau_hinh/ix_fx.json"}
     assert lot == set(), f"công cụ còn mang dữ liệu khuôn: {sorted(lot)}"
 
@@ -923,3 +939,274 @@ def test_KHUON_ix_fx_nhan_BAN_SAO_anh_KHONG_sua_duoc_anh(tmp_path, monkeypatch):
     anh = _doc(ra)
     goc = copy.deepcopy(anh["dong"])
     assert (goc[0]["A"], goc[1]["B"]) == ("1", {"chu": "chu"}), "khuôn đã sửa được ẢNH"
+
+
+# ══ Vòng sửa sau R2 (`KQ-088`) ═════════════════════════════════════════════════════════════════
+# Mỗi bài dưới đây ghi rõ nó ĐỎ trên `8e2fc95` *(trước mã của vòng này)* hay là bài canh một chốt
+# CÓ SẴN *(xanh sẵn — được chứng minh cắn bằng đột biến R2-M1…M7, log ở `BG-086` mục vòng sửa)*.
+
+# ── DT2-R2-01 · khuôn viết theo lối CHUẨN của repo *(`@dataclass` + `__future__`)* phải nạp được ──
+
+#: Khuôn GIẢ có `@dataclass` + `from __future__ import annotations` — lối viết của **41/41** tệp
+#: `fls/`+`tools/` có `@dataclass` *(R2 đếm)*, kể cả chính công cụ. `cha: Nut | None` buộc
+#: `typing.get_type_hints` tra `Nut` trong module CỦA KHUÔN lúc CHẠY *(⛔ chỉ lúc nạp)*.
+KHUON_DATACLASS = '''"""Khuôn GIẢ LẬP của bài thử — có @dataclass (⛔ dữ liệu thật)."""
+from __future__ import annotations
+
+import typing
+from dataclasses import dataclass
+
+BANG = "GIA.DC"
+KHOA = "Thang"
+KIEU_KHOA = "yyyymm"
+COT = ("A", "B")
+RA = "khong_bao_gio_ghi/gia_dc.json"
+
+
+@dataclass(frozen=True)
+class Nut:
+    ma: str
+    cha: Nut | None = None
+
+
+def thieu_lac(dong):
+    goi_y = typing.get_type_hints(Nut)["cha"]
+    return {"thieu": [], "lac": [], "dai": f"giả lập · {Nut('x', Nut('y')).cha.ma} · {goi_y}"}
+'''
+
+
+def test_R2_01_khuon_co_dataclass_va_future_annotations_NAP_DUOC(tmp_path, monkeypatch, capsys):
+    """`DT2-R2-01`: `nap_khuon` nạp khuôn theo ĐƯỜNG TỆP mà ⛔ đăng ký `sys.modules` ⇒ `@dataclass`
+    *(cùng `from __future__ import annotations`)* tra `sys.modules[cls.__module__]` ra `None` ⇒
+    khuôn HỢP LỆ bị TỪ CHỐI: ``khuôn `gia_dc` (gia_dc.py) nạp lỗi: AttributeError: 'NoneType'
+    object has no attribute '__dict__'`` exit 2. Bẫy ấy bài này đã biết ở `_nap_cong_cu` *(đăng ký
+    `sys.modules` cho chính công cụ)* — nhưng mã ⛔ áp. ĐỎ trên `8e2fc95`.
+
+    Mong: exit 0; khuôn chạy được cả phần cần module của nó LÚC CHẠY *(`get_type_hints`)*; và
+    module khuôn CÒN ở `sys.modules` sau khi nạp — đúng hàm `thieu_lac` công cụ đang giữ.
+    """
+    mod = _nap_cong_cu()
+    monkeypatch.setattr(mod, "THU_MUC_KHUON", _goc_khuon_gia(tmp_path, KHUON_DATACLASS, "gia_dc"))
+    ra = tmp_path / "gia_dc.json"
+    kq = mod.main(["gia_dc", str(_tho_gia(tmp_path / "tho.json")), "--mong", "3", "--ra", str(ra)])
+    ra_man = capsys.readouterr()
+    assert kq == 0, ra_man.err[-800:]
+    assert "giả lập · y · " in ra_man.out, ra_man.out[-800:]
+    assert _doc(ra)["bang"] == "GIA.DC"
+
+    kh = mod.nap_khuon("gia_dc")
+    assert sys.modules[kh.thieu_lac.__module__].thieu_lac is kh.thieu_lac
+
+
+def test_R2_01_khuon_NAP_LOI_thi_KHONG_de_lai_module_trong_sys_modules(tmp_path, monkeypatch,
+                                                                       capsys):
+    """Đi cùng `DT2-R2-01`: đăng ký `sys.modules` TRƯỚC khi chạy khuôn thì khuôn nổ giữa chừng
+    phải được GỠ — ⛔ để lại một module dở *(nửa tên đã định nghĩa)* cho lần nạp sau / bài sau
+    vớ phải. Xanh sẵn trên `8e2fc95` *(khi ấy ⛔ đăng ký gì)*; canh dòng `pop` của bản vá — gỡ
+    dòng ấy là ĐỎ *(đột biến R2-N2, `BG-086`)*."""
+    mod = _nap_cong_cu()
+    no = KHUON_GIA + '\nraise RuntimeError("khuôn nổ lúc nạp")\n'
+    # tên RIÊNG của bài này ⇒ ⛔ bài nào trước đó nạp thành công một khuôn cùng tên
+    monkeypatch.setattr(mod, "THU_MUC_KHUON", _goc_khuon_gia(tmp_path, no, "gia_no_luc_nap"))
+    truoc = set(sys.modules)
+    with pytest.raises(mod.TuChoi, match=r"nạp lỗi: RuntimeError: khuôn nổ lúc nạp"):
+        mod.nap_khuon("gia_no_luc_nap")
+    assert set(sys.modules) - truoc == set()
+    assert mod.main(["gia_no_luc_nap", str(_tho_gia(tmp_path / "tho.json")), "--mong", "3"]) == 2
+    assert len(_dong_loi(capsys.readouterr().err, "⛔ TỪ CHỐI")) == 1
+    assert set(sys.modules) - truoc == set()
+
+
+def test_R2_01_khuon_SAI_GIAO_KEO_thi_cung_KHONG_de_lai_module_trong_sys_modules(tmp_path,
+                                                                               monkeypatch):
+    """Đi cùng bài trên — nhánh THỨ HAI của "khuôn ⛔ dùng được": chạy hết mà SAI GIAO KÈO
+    *(thiếu `COT`)*. WIP `5e962d7` chỉ gỡ ở nhánh nạp lỗi ⇒ khuôn bị TỪ CHỐI vì giao kèo vẫn nằm
+    lại `sys.modules` — một module mà công cụ đã khước từ, ⛔ ai dùng, cho bài sau vớ phải. ĐỎ
+    trên `5e962d7` *(`{'khuon_dong_bang_gia_sai_giao_keo'}` ≠ `set()`)*; xanh sẵn trên
+    `8e2fc95` *(khi ấy ⛔ đăng ký gì)*."""
+    mod = _nap_cong_cu()
+    sai = KHUON_GIA.replace('COT = ("A", "B")\n', "")
+    monkeypatch.setattr(mod, "THU_MUC_KHUON", _goc_khuon_gia(tmp_path, sai, "gia_sai_giao_keo"))
+    truoc = set(sys.modules)
+    with pytest.raises(mod.TuChoi, match=r"sai giao kèo: COT"):
+        mod.nap_khuon("gia_sai_giao_keo")
+    assert set(sys.modules) - truoc == set()
+
+
+# ── DT2-R2-02 · MỌI khuôn có mặt *(của DT2 lẫn DT3…DT12)* đều nạp được và khai đủ giao kèo ──────
+
+#: Khuôn CÓ MẶT lúc thu thập — lấy từ CHÍNH `danh_sach_khuon()` của công cụ, ⛔ danh sách gõ tay:
+#: bước sau THÊM một tệp khuôn ⇒ bài dưới tự có thêm một ca, ⛔ sửa dòng nào ở đây *(`DT2-R2-02`)*.
+#: Công cụ bỏ sót tệp ⇒ bài `test_KHUON_ix_fx_la_mot_tep…` ĐỎ *(so với glob độc lập)*.
+KHUON_CO_MAT = _nap_cong_cu().danh_sach_khuon()
+
+
+@pytest.mark.parametrize("ten", KHUON_CO_MAT or [pytest.param(None, id="RONG")])
+def test_R2_02_MOI_khuon_co_mat_NAP_DUOC_va_khai_DU_giao_keo(ten):
+    """Mỗi tệp `tools/khuon_dong_bang/<tên>.py` ⇒ một ca: qua `nap_khuon` *(⛔ `TuChoi`)* VÀ khai
+    đủ giao kèo — bài kiểm ĐỘC LẬP từng điều khoản trên `Khuon` trả về, ⛔ tin lời `nap_khuon`
+    *(R2 đo: bỏ soát `BANG/KHOA/RA` · `thieu_lac` · phần tử `COT` ⇒ 63/63 vẫn xanh)*.
+
+    ⚠ Đ3: tập rỗng *(`danh_sach_khuon()` = `[]`)* ⇒ ca `RONG` ĐỎ, ⛔ để pytest bỏ qua lặng lẽ
+    *(tham số rỗng ⇒ `skipped`)*.
+    ⚠ Viết cho cả khi gộp DT3…DT12: kiểu khoá so với `KIEU_KHOA_BIET` của CHÍNH công cụ *(DT3
+    thêm `ma`)*; mục tuỳ chọn của bước sau ⛔ bị đòi ở đây. ĐỎ trên `8e2fc95`: ⛔ — `ix_fx` khai
+    đủ; bài này là phần "giao kèo cho MỌI phần tử" của luật phòng tái phạm `DT2-R2-02`.
+    """
+    assert ten is not None, "danh_sach_khuon() rỗng — ⛔ khuôn nào để canh (Đ3)"
+    mod = _nap_cong_cu()
+    assert (THU_MUC_KHUON / f"{ten}.py").is_file()
+    try:
+        kh = mod.nap_khuon(ten)
+    except mod.TuChoi as e:
+        pytest.fail(f"khuôn `{ten}` bị TỪ CHỐI: {e}")
+    assert kh.ten == ten
+    for truong in ("bang", "khoa", "ra"):
+        v = getattr(kh, truong)
+        assert isinstance(v, str) and v.strip(), (ten, truong, v)
+    assert kh.kieu_khoa in mod.KIEU_KHOA_BIET, (ten, kh.kieu_khoa)
+    assert isinstance(kh.cot, tuple) and kh.cot, (ten, kh.cot)
+    assert all(isinstance(c, str) and c.strip() for c in kh.cot), (ten, kh.cot)
+    # DT2-R2-03: khoá + cột chọn đôi một KHÁC tên — trùng thì một cột bị đếm hai lần (Đ4)
+    assert len({kh.khoa, *kh.cot}) == 1 + len(kh.cot), (ten, kh.khoa, kh.cot)
+    assert not pathlib.PurePath(kh.ra).is_absolute(), f"RA `{kh.ra}` phải tương đối gốc repo"
+    assert callable(kh.thieu_lac)
+
+
+# ── DT2-R2-03 · mỗi điều khoản giao kèo khuôn có MỘT ca phá riêng ───────────────────────────────
+
+@pytest.mark.parametrize("noi_dung, phai_noi", [
+    pytest.param(KHUON_GIA.replace('BANG = "GIA.LAP"\n', ""), "BANG", id="M1_thieu_BANG"),
+    pytest.param(KHUON_GIA.replace('KHOA = "Thang"', 'KHOA = "  "'), "KHOA", id="M1_KHOA_rong"),
+    pytest.param(KHUON_GIA.replace('RA = "khong_bao_gio_ghi/gia.json"', "RA = 5"), "RA",
+                 id="M1_RA_khong_chuoi"),
+    pytest.param(KHUON_GIA.replace("def thieu_lac(dong):", "thieu_lac = 1\n\n\ndef _cu(dong):"),
+                 "thieu_lac", id="M2_thieu_lac_khong_ham"),
+    pytest.param(KHUON_GIA.replace("def thieu_lac(dong):", "def thieu_lac_cu(dong):"),
+                 "thieu_lac", id="M2_thieu_thieu_lac"),
+    pytest.param(KHUON_GIA.replace('COT = ("A", "B")', 'COT = ("A", " ")'), "COT",
+                 id="M3_COT_phan_tu_rong"),
+    pytest.param(KHUON_GIA.replace('COT = ("A", "B")', 'COT = ("A", 2)'), "COT",
+                 id="M3_COT_phan_tu_khong_chuoi"),
+    # vòng sửa R2: đột biến R2-M9 (bỏ vế `not cot`) SỐNG — tuple rỗng là điều khoản ⛔ có ca
+    pytest.param(KHUON_GIA.replace('COT = ("A", "B")', "COT = ()"), "COT", id="M9_COT_rong"),
+    pytest.param(KHUON_GIA.replace('COT = ("A", "B")', 'COT = ("Thang", "B")'), "trùng tên",
+                 id="KHOA_nam_trong_COT"),
+    pytest.param(KHUON_GIA.replace('COT = ("A", "B")', 'COT = ("A", "A")'), "trùng tên",
+                 id="COT_trung"),
+])
+def test_R2_03_moi_dieu_khoan_giao_keo_co_CA_PHA_rieng_exit_2(tmp_path, monkeypatch, capsys,
+                                                               noi_dung, phai_noi):
+    """`DT2-R2-03` *(tái phạm lớp `DT2-R1-04`)*: R2 đột biến MỊN mã mới, **6/14** sống — trong đó
+    bỏ soát `BANG/KHOA/RA` *(M1)* · bỏ soát `thieu_lac` là hàm *(M2)* · `COT` nhận phần tử rỗng
+    *(M3)*: mỗi điều khoản giao kèo là một chốt ⇒ một ca phá riêng, đòi exit 2 + MỘT dòng nói
+    tên khuôn + ĐÚNG điều khoản, ⛔ ghi.
+
+    Hai ca ĐỎ trên `8e2fc95` *(lỗ giao kèo R2 đo được, exit 0)*: `KHOA_nam_trong_COT` ⇒ dòng báo
+    `3 cột tiêu đề = khoá 1 + chọn 2 + ⛔ chọn 1 + tiêu đề rỗng 0` *(1+2+1+0 = 4 ≠ 3 — Đ4)*;
+    `COT_trung` ⇒ mẫu số ô `3 dòng × 2 cột = 6` trong khi bản thô chỉ có 3 ô của cột ấy.
+    Bảy ca còn lại xanh sẵn — canh chốt có sẵn *(đột biến M1 · M2 · M3 ⇒ ĐỎ)*.
+    """
+    mod = _nap_cong_cu()
+    monkeypatch.setattr(mod, "THU_MUC_KHUON", _goc_khuon_gia(tmp_path, noi_dung))
+    ra = tmp_path / "moi" / "gia.json"
+    kq = mod.main(["gia", str(_tho_gia(tmp_path / "tho.json")), "--mong", "3", "--ra", str(ra)])
+    ra_man = capsys.readouterr()
+    assert kq == 2, (kq, ra_man.out[-800:], ra_man.err[-800:])
+    dong = _dong_loi(ra_man.err, "⛔ TỪ CHỐI")
+    assert len(dong) == 1 and "khuôn `gia`" in dong[0] and phai_noi in dong[0], dong
+    assert not ra.parent.exists()
+
+
+@pytest.mark.parametrize("tra_ve, phai_noi", [
+    pytest.param("None", "TypeError", id="M4_tra_None"),
+    pytest.param('{"thieu": [], "dai": "x"}', "KeyError", id="M4_thieu_khoa_lac"),
+    pytest.param('{"thieu": "202402", "lac": [], "dai": "x"}', "`thieu` là str",
+                 id="thieu_la_CHUOI"),
+    pytest.param('{"thieu": [], "lac": "202306", "dai": "x"}', "`lac` là str", id="lac_la_CHUOI"),
+    pytest.param('{"thieu": [], "lac": {"b", "a"}, "dai": "x"}', "`lac` là set", id="lac_la_SET"),
+])
+def test_R2_03_thieu_lac_tra_SAI_HINH_thi_LOI_exit_3_KHONG_ghi(tmp_path, monkeypatch, capsys,
+                                                               tra_ve, phai_noi):
+    """`thieu_lac` phải trả `{thieu, lac, dai}` với `thieu`/`lac` là DANH SÁCH *(`list`/`tuple`)*.
+
+    ⛔⛔ R2 đo: khuôn trả `"thieu": "202402"` *(chuỗi — cũng LẶP được)* ⇒ công cụ ghi
+    `thiếu: [2, 0, 2, 4, 0, 2]` — ĐỎ nhưng SAI NỘI DUNG; còn `"lac": "202306"` thì tệ hơn: lạc
+    chỉ GHI NHẬN ⇒ exit **0** `[ĐẠT]` với `lạc: [2, 0, 2, 3, 0, 6]`. `set` lặp theo băm ⇒ ảnh
+    ⛔ tất định *(checksum đổi giữa hai lần chạy)*. ⇒ sai hình là LỖI KHUÔN: exit 3, một dòng
+    `⛔ LỖI`, ⛔ ghi. Ba ca `…CHUOI`/`…SET` ĐỎ trên `8e2fc95`; `M4_…` xanh sẵn *(canh `except`
+    quanh phép đọc kết quả — R2-M4 hẹp nó lại thì `None` thành traceback exit 1)*."""
+    mod = _nap_cong_cu()
+    sai = KHUON_GIA.replace('return {"thieu": [], "lac": [], "dai": "giả lập"}',
+                            f"return {tra_ve}")
+    monkeypatch.setattr(mod, "THU_MUC_KHUON", _goc_khuon_gia(tmp_path, sai))
+    ra = tmp_path / "moi" / "gia.json"
+    kq = mod.main(["gia", str(_tho_gia(tmp_path / "tho.json")), "--mong", "3", "--ra", str(ra)])
+    ra_man = capsys.readouterr()
+    assert kq == 3, (kq, ra_man.out[-800:], ra_man.err[-800:])
+    dong = _dong_loi(ra_man.err, "⛔ LỖI")
+    assert len(dong) == 1 and "khuôn `gia`" in dong[0] and phai_noi in dong[0], dong
+    assert not ra.parent.exists()
+
+
+def test_R2_03_khuon_NO_thi_TRACEBACK_chi_toi_DONG_cua_tep_khuon(tmp_path, monkeypatch, capsys):
+    """R2-M6 *(bỏ `traceback.print_exception` của `LoiKhuon`)* SỐNG vì bài cũ chỉ đòi chữ
+    `TypeError` — mà chính dòng `⛔ LỖI` đã chứa chữ ấy. Lời hứa ở docstring công cụ là
+    *"traceback GIỮ để sửa khuôn"* ⇒ đòi traceback THẬT, và nó chỉ tới đúng tệp + hàm của khuôn.
+    Xanh sẵn trên `8e2fc95` — canh chốt có sẵn."""
+    mod = _nap_cong_cu()
+    no = KHUON_GIA.replace('return {"thieu": [], "lac": [], "dai": "giả lập"}',
+                           'return len(None)')
+    thu_muc = _goc_khuon_gia(tmp_path, no)
+    monkeypatch.setattr(mod, "THU_MUC_KHUON", thu_muc)
+    assert mod.main(["gia", str(_tho_gia(tmp_path / "tho.json")), "--mong", "3",
+                     "--ra", str(tmp_path / "gia.json")]) == 3
+    err = capsys.readouterr().err
+    assert "Traceback (most recent call last)" in err, err[-800:]
+    assert f'File "{thu_muc / "gia.py"}"' in err and "in thieu_lac" in err, err[-800:]
+
+
+@pytest.mark.parametrize("ten, sua, mong, phai_co", [
+    pytest.param("thieu", lambda h: h.pop(19), "36", "thiếu 1", id="thieu"),
+    pytest.param("trung", lambda h: h[20].__setitem__(0, "202408"), "37", "trùng 1", id="trung"),
+    pytest.param("khoa_hong", lambda h: h[3].__setitem__(0, "2024-04"), "37", "khoá hỏng 1",
+                 id="khoa_hong"),
+    pytest.param("o_rong", lambda h: h[5].__setitem__(4, None), "37", "ô rỗng 1/185",
+                 id="o_rong"),
+])
+def test_R2_03_cong_ly_do_NEU_DUNG_tung_nguyen_nhan(tmp_path, ten, sua, mong, phai_co):
+    """Vòng sửa sau R2 — đột biến dựng lại *(log R1 mất cùng scratchpad cũ)* thấy **4 chốt cổng
+    SỐNG**: gỡ hẳn dòng `ly_do.append` của *thiếu* · *trùng* · *khoá hỏng* · *ô rỗng* ⇒ 83/83 vẫn
+    xanh. Vì sao *(đo `cong.ly_do` từng ca)*: khoá hỏng / ô rỗng ⇒ `kiem` của C1 TỪ CHỐI cả bảng
+    *(từ `DT2-R1-03`)* ⇒ cổng vẫn ĐỎ qua *"thiếu/lạc ⛔ đo được"*; trùng `202408` thay `202509`
+    ⇒ cổng vẫn ĐỎ qua `thiếu 1`; thiếu một tháng ⇒ ĐỎ qua `--mong` lệch. Mọi bài cũ chỉ đòi exit 1
+    + dòng in *(dòng in có cả khi lý do ⛔ vào cổng)*, ⛔ đòi `cong.ly_do` nêu ĐÚNG nguyên nhân —
+    một cổng ĐỎ vì lý do KHÁC là cổng chưa được chứng minh *(Đ5)*.
+
+    ⇒ mỗi nguyên nhân một ca, đòi `cong.ly_do` CÓ đúng mục ấy *(kèm mẫu số — Đ3)*; ca *thiếu*
+    đặt `--mong 36` = số dòng ⇒ thiếu là lý do DUY NHẤT. Xanh sẵn — canh chốt có sẵn
+    *(đột biến D8 · D9 · D12 · D13 ⇒ ĐỎ, `BG-086` mục vòng sửa sau R2)*."""
+    hang = _hang_tong_hop(THU_TU_SHEET)
+    sua(hang)
+    tho = _viet_ban_tho(tmp_path / f"tho_{ten}.json", [KHOA, *TIEN_TE], hang)
+    ra = tmp_path / "ix_fx.json"
+    kq = _chay("ix_fx", str(tho), "--mong", mong, "--ra", str(ra))
+    assert kq.returncode == 1, (kq.stdout[-1500:], kq.stderr[-1500:])
+    ly_do = _doc(ra)["cong"]["ly_do"]
+    assert phai_co in ly_do, ly_do
+    if ten == "thieu":
+        assert ly_do == ["thiếu 1"], ly_do
+
+
+def test_R2_03_cot_tieu_de_RONG_o_CHI_KHOANG_TRANG_la_RONG_thi_NHAN(tmp_path):
+    """R2-M7 *(cột tiêu đề rỗng: ô `"   "` tính là CÓ dữ liệu)* SỐNG — bài R1-08 chỉ dùng ô `null`.
+    Luật `DT2-R1-08`: cột ⛔ tên mà MỌI ô rỗng ⇒ nhận; ô chỉ-khoảng-trắng là RỖNG *(như `_rong`
+    ở cột chọn — bài `test_R1_04_o_CHI_KHOANG_TRANG…`)* ⇒ ⛔ mất gì, ⛔ được từ chối.
+    Xanh sẵn trên `8e2fc95` — canh chốt có sẵn."""
+    hang = [h[:-1] + ', "   "]' for h in _hang_json()]
+    tho = _tho_json(tmp_path / "tho.json", hang, cot=[KHOA, *TIEN_TE, ""])
+    ra = tmp_path / "a.json"
+    kq = _chay("ix_fx", str(tho), "--mong", "37", "--ra", str(ra))
+    assert kq.returncode == 0, (kq.stdout[-1500:], kq.stderr[-800:])
+    assert "7 cột tiêu đề = khoá 1 + chọn 5 + ⛔ chọn 0 + tiêu đề rỗng 1 · 37 dòng" in kq.stdout
+    assert "1 cột tiêu đề rỗng" in _doc(ra)["khong_mang_PII"]
