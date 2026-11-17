@@ -962,15 +962,30 @@ def test_R2_01_hang_chi_co_A_B_rong_VAN_duoc_an_danh(km):
     assert gia not in "\n".join(chuoi), "chuỗi rõ của hàng A-only lọt vào kết quả chuan_bi"
 
 
-def test_R2_02_cot_DG_chuoi_LA_ngoai_danh_sach_cho_phep_thi_TU_CHOI(tmp_path):
-    """`DT3-R2-02` *(NÊN SỬA)*: cột `D:G` của `phu.tho` chép THÔ. Thay MỘT ô `x` sẵn có bằng chuỗi
-    LẠ *(số dòng ⛔ đổi — cổng `--mong`/`phu` ⛔ thấy, như thăm dò P4b của R2)* ⇒ khuôn đòi mỗi ô
-    `D:G` ∈ danh sách giá trị đã đo 17/11 ⇒ TỪ CHỐI exit 2 *(⛔ ghi ảnh)*. ĐỎ-trước *(⛔ danh
-    sách)*: exit 0 `[ĐẠT]`, chuỗi lạ vào ảnh. Lời lỗi ⛔ mang giá trị ô *(nguồn CÓ tên người)*."""
+#: Ô dấu cấp `x` sẵn có ở MỖI cột `D·E·F·G` *(đo 17/11 từ ảnh)* — `(cột, dòng sheet, hàng lưới,
+#: chỉ số cột 0-based)*. Tham số hoá để CẢ BỐN cột cùng được canh *(`DT3-R3-02`: chỉ canh `D` thì
+#: đột biến `"DEFG"`→`"D"`/`"DEF"` sống — một chuỗi lạ ở `E·F·G` vẫn lọt vào ảnh thô)*.
+_O_X_DG = [
+    pytest.param("D", 7, 6, 3, id="cot_D"),
+    pytest.param("E", 9, 8, 4, id="cot_E"),
+    pytest.param("F", 10, 9, 5, id="cot_F"),
+    pytest.param("G", 11, 10, 6, id="cot_G"),
+]
+
+
+@pytest.mark.parametrize("cot, dong_sheet, hang_i, cot_j", _O_X_DG)
+def test_R2_02_cot_DG_chuoi_LA_ngoai_danh_sach_cho_phep_thi_TU_CHOI(
+        tmp_path, cot, dong_sheet, hang_i, cot_j):
+    """`DT3-R2-02` *(NÊN SỬA)* + `DT3-R3-02`: cột `D:G` của `phu.tho` chép THÔ. Thay MỘT ô `x` sẵn
+    có ở TỪNG cột `D·E·F·G` bằng chuỗi LẠ *(số dòng ⛔ đổi — cổng `--mong`/`phu` ⛔ thấy, như thăm
+    dò P4b của R2)* ⇒ khuôn đòi mỗi ô `D:G` ∈ danh sách giá trị đã đo 17/11 ⇒ TỪ CHỐI exit 2
+    *(⛔ ghi ảnh)*. ĐỎ-trước *(⛔ danh sách)*: exit 0 `[ĐẠT]`, chuỗi lạ vào ảnh. Lời lỗi ⛔ mang giá
+    trị ô *(nguồn CÓ tên người)*. Tham số `E·F·G` giết đột biến `"DEFG"`→`"D"` *(M3, chỉ canh `D`)*
+    và `"DEFG"`→`"DEF"` *(M4, bỏ `G` — chỉ `cot_G` cắn)*."""
     tho = _tho_mm_tu_anh(_doc(ANH_MM))
-    assert tho["values"][6][3] == "x"                      # dòng sheet 7, cột `D` = dấu cấp `x`
+    assert tho["values"][hang_i][cot_j] == "x", (cot, dong_sheet)   # dấu cấp `x` của cột ấy
     gia = "CHUOILA_COTHE_TEN_NGUOI"
-    tho["values"][6][3] = gia
+    tho["values"][hang_i][cot_j] = gia
     ra = tmp_path / "moi" / "mm.json"
     kq = _chay("mapping_master_cfg", str(_ghi(tmp_path / "t.json", tho)), "--mong", str(MONG_MM),
                "--ra", str(ra))
@@ -993,6 +1008,53 @@ def test_R2_03a_cdt_correct_vung_SAI_COT_khong_phai_BR_BS_thi_TU_CHOI(tmp_path):
     assert kq.returncode == 2, (kq.returncode, kq.stdout[-400:], kq.stderr[-400:])
     assert "BR:BS" in _dong_loi(kq.stderr, "⛔ TỪ CHỐI")[0]
     assert not ra.parent.exists()
+
+
+# ══ Vòng sửa sau R3 (KQ-110) ═════════════════════════════════════════════════════════════════
+
+def test_R3_01_hang_chi_co_B_A_rong_VAN_duoc_an_danh(km):
+    """`DT3-R3-01` *(NÊN SỬA)*: nhánh *"hàng chỉ có `B`, `A` rỗng"* của luật ẩn danh — đối xứng với
+    `test_R2_01` *(hàng chỉ có `A`)*. Một LE ⛔ khai có thể chỉ điền `B` *(tên viết tắt NGƯỜI)* mà
+    `A` *(số TK + tên)* còn trống. Đột biến M2 `(A≠∅ hoặc B≠∅)` → `(A≠∅)` bỏ nhánh `B` ⇒ hàng
+    B-only ⛔ được ẩn danh ⇒ chuỗi rõ lọt vào ảnh. Dữ liệu TỔNG HỢP: lưới MM + hàng chỉ `B` ở dòng
+    80 *(A:B đang trống)* ⇒ `an_danh` +1 `cot=B`, `B` = hằng, `A` vẫn None, chuỗi tổng hợp ⛔ ở đâu
+    trong kết quả `chuan_bi`. *(ĐỎ trên M2 — R3 chứng minh phá lại.)*"""
+    tho = _tho_mm_tu_anh(_doc(ANH_MM))
+    gia = "GIALAPONLYB"
+    assert gia not in km.LE_PHAP_NHAN
+    tho["values"][79][1] = gia                             # chỉ `B` (dòng sheet 80)
+    assert not tho["values"][79][0]                        # `A` để RỖNG ⇒ nhánh B-only
+    kq = km.chuan_bi(tho)
+    moi = [d for d in kq["phu"]["an_danh"] if d["dong_sheet"] == 80]
+    assert len(kq["phu"]["an_danh"]) == 8 and len(moi) == 1 and moi[0]["cot"] == "B", \
+        kq["phu"]["an_danh"]
+    hang = next(d for d in kq["phu"]["tho"] if d["dong_sheet"] == 80)
+    assert hang["B"] == km.AN_DANH and hang["A"] is None
+    khoa, chuoi = [], []
+    _di(kq, khoa, chuoi)
+    assert gia not in "\n".join(chuoi), "chuỗi rõ của hàng B-only lọt vào kết quả chuan_bi"
+
+
+def test_R3_03_bien_duoi_DONG_DAU_LE_hang_dau_tien_duoc_an_danh(km):
+    """`DT3-R3-03` *(GHI NHẬN)*: biên DƯỚI của luật ẩn danh = `DONG_DAU_LE` *(4)* — dòng dữ liệu
+    `A:B` đầu tiên *(1…3 là tiêu đề)*. Đột biến M7 `r >= DONG_DAU_LE` → `r >= DONG_DAU_LE + 1` bỏ
+    ĐÚNG dòng 4; trên dữ liệu thật dòng 4 là pháp nhân *(⛔ ẩn danh dù sao)* nên M7 sống. Dữ liệu
+    TỔNG HỢP: thay `A:B` dòng 4 bằng LE ⛔ khai ⇒ dòng 4 PHẢI ẩn danh *(biên bao gồm chính nó)*.
+    Trên M7 dòng 4 lọt ⇒ `B` còn chuỗi rõ ⇒ bài ĐỎ."""
+    tho = _tho_mm_tu_anh(_doc(ANH_MM))
+    assert km.DONG_DAU_LE == 4
+    gia = "GIALAPBIEN4"
+    assert gia not in km.LE_PHAP_NHAN
+    tho["values"][3][0] = f"R | 99999999_PO USD_{gia}"     # `A` dòng 4 (tổng hợp — ⛔ TK thật)
+    tho["values"][3][1] = gia                              # `B` dòng 4 = LE ⛔ khai
+    kq = km.chuan_bi(tho)
+    moi = [d for d in kq["phu"]["an_danh"] if d["dong_sheet"] == 4]
+    assert len(moi) == 1 and moi[0]["cot"] == "A·B", kq["phu"]["an_danh"]
+    hang = next(d for d in kq["phu"]["tho"] if d["dong_sheet"] == 4)
+    assert hang["A"] == km.AN_DANH and hang["B"] == km.AN_DANH, hang
+    khoa, chuoi = [], []
+    _di(kq, khoa, chuoi)
+    assert gia not in "\n".join(chuoi), "chuỗi rõ của hàng biên (dòng 4) lọt vào kết quả chuan_bi"
 
 
 #: Tệp MÃ SẢN XUẤT của DT3 — công cụ + ba khuôn *(bài THẢO LUẬN `MUOI`/băm trong chú thích ⇒
