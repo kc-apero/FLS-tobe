@@ -52,6 +52,7 @@ from __future__ import annotations
 
 import datetime
 import json
+import re
 from pathlib import Path
 from typing import Any
 
@@ -64,8 +65,22 @@ COT = ("ky", "itl_id", "D", "BM", "BN", "BO", "BP", "BQ", "BR", "BS", "BT")
 #: Cột ⛔ khai *(ky · BM · BN · BQ · BR · BS · BT)* = `so` *(strict)*.
 KIEU_COT = {"itl_id": "chu", "D": "chu?", "BO": "so?", "BP": "so?"}
 RA = "tests/fixture/dap_an/gl_406.json"
-#: Bảng phụ `cong_thuc` giữ TÓM TẮT vùng công thức thừa *(⑤)* — đúng 1 dòng, vào checksum.
-PHU_MONG = {"cong_thuc": 1}
+#: Bảng phụ: `cong_thuc` *(⑤)* + `itl_id_lech` *(⑥ · F-1 vòng sửa R1)* — mỗi cái vào checksum.
+#: `itl_id_lech` mong = **4** *(đo 17/11)*; khác ⇒ cổng bảng phụ ĐỎ *(DT4-R1-01)*.
+PHU_MONG = {"cong_thuc": 1, "itl_id_lech": 4}
+
+#: ⭐⑥ *(F-1 · KQ-113)* `itl_id` *(cột R)* mang theo để H4 NỐI dòng 406 ↔ dòng sổ ⇒ PHẢI khớp
+#: `^ITL#\d+$`. Đo 17/11 *(lưới SA, 7883 hàng — đọc lại vòng sửa R1 xác nhận y hệt)*: **4** hàng
+#: mang chuỗi LỖI Sheets `#N/A ()` *(`dong_sheet` 6684·6836·7500·7832)* ⇒ H4 ⛔ nối được. Cổng
+#: `chu` nhận mọi chuỗi ⛔ rỗng nên 4 ô ấy LỌT — ⛔ tên, ⛔ đếm *(DT4-R1-01)*. Giờ khuôn KHAI chúng
+#: thành LỆCH CÓ TÊN ở bảng phụ `itl_id_lech`, ⛔ sửa giá trị nguồn, ⛔ âm thầm cho qua.
+ITL_ID_RE = re.compile(r"ITL#\d+")
+#: 4 `dong_sheet` itl_id lệch CÓ TÊN *(đo 17/11; để bài ghim — khác tập ⇒ checksum đổi)*.
+LECH_ITL_ID = (6684, 6836, 7500, 7832)
+#: ⭐ *(F-3 · KQ-113)* `D` *(Đơn vị tiền tệ, cột D)* có TẬP ĐÓNG = 5 tiền tệ của AP *(đo 17/11:
+#: USD·SGD·COP·VND·HKD; + 6 hàng rỗng, cho phép)*. Giá trị KHÁC *(⛔ rỗng)* ⇒ cột chữ tự do rò PII
+#: mà quét TÊN cột ⛔ thấy *(Diễn giải/Số CT lạc sang `D`)* ⇒ `thieu_lac` báo ⇒ ĐỎ *(DT4-R1-03)*.
+TIEN_TE = ("USD", "SGD", "COP", "VND", "HKD")
 
 #: Cột của LƯỚI bản thô *(hình orchestrator đưa)* — vị trí cố định.
 COT_THO = ("dong_sheet", "A", "D", "R", "BM", "BN", "BO", "BP", "BQ", "BR", "BS", "BT")
@@ -136,17 +151,30 @@ def chuan_bi(tho: dict[str, Any]) -> dict[str, Any]:
                          "RỖNG — bằng chứng ⛔ phải dòng sổ; False ⇒ ⛔ dám bỏ)*")
 
     thieu_tt = sum(1 for r in dong if r[3] is None)       # hàng thiếu tiền tệ D
+    # ⑥ F-1: hàng itl_id CÓ chữ mà ⛔ khớp `^ITL#\d+$` ⇒ LỆCH CÓ TÊN *(bảng phụ, liệt kê
+    #   `dong_sheet`)*. itl_id RỖNG ⇒ `o_rong` của cột `chu` bắt *(⛔ vào đây)*; ở đây chỉ ô có
+    #   chữ sai mẫu *(vd `#N/A ()`)*. ⛔ sửa giá trị nguồn — khai y nguyên để H4 thấy 4 dòng ấy.
+    itl_lech = sorted(
+        ({"dong_sheet": d[0], "itl_id_tho": d[2]}
+         for d in dong if isinstance(d[2], str) and not ITL_ID_RE.fullmatch(d[2])),
+        key=lambda x: x["dong_sheet"])
     return {
         "cot": [KHOA, *COT],
         "dong": dong,
-        "phu": {"cong_thuc": [{"so_dong": hc["so_dong"], "dai_hang": hc["dai_hang"]}]},
+        "phu": {
+            "cong_thuc": [{"so_dong": hc["so_dong"], "dai_hang": hc["dai_hang"]}],
+            "itl_id_lech": itl_lech,
+        },
         "ghi_chu": (
             f"Bảng chính = {len(dong)} hàng dữ liệu 406 *(cột A có ngày)*, khoá dong_sheet "
             f"{DONG_DAU_SHEET}…{DONG_DAU_SHEET + len(dong) - 1} liên tục; ky suy từ cột A "
-            f"*(⛔ mang cột A)*, itl_id = cột R, D = tiền tệ. ⛔ mang cột B (Số chứng từ) · C "
-            f"(Diễn giải) — vùng đọc ⛔ phủ B:C (AC-3). {thieu_tt} hàng thiếu tiền tệ D ⇒ BO/BP "
-            f"rỗng (so?). Vùng công thức thừa: {hc['so_dong']} hàng {hc['dai_hang']} (cột A RỖNG) "
-            f"ĐẾM + khai ở bảng phụ `cong_thuc`, ⛔ vào bảng chính (AC-5)."),
+            f"*(⛔ mang cột A)*, itl_id = cột R *(khớp ^ITL#\\d+$)*, D = tiền tệ {list(TIEN_TE)}. "
+            f"⛔ mang cột B (Số chứng từ) · C (Diễn giải) — vùng đọc ⛔ phủ B:C (AC-3). {thieu_tt} "
+            f"hàng thiếu tiền tệ D ⇒ BO/BP rỗng (so?). {len(itl_lech)} hàng itl_id ⛔ khớp "
+            f"^ITL#\\d+$ *(chuỗi lỗi Sheets)* ⇒ LỆCH CÓ TÊN ở bảng phụ `itl_id_lech` (mong 4; "
+            f"khác ⇒ ĐỎ) — H4 ⛔ nối được 4 dòng ấy (F-1). Vùng công thức thừa: {hc['so_dong']} "
+            f"hàng {hc['dai_hang']} (cột A RỖNG) ĐẾM + khai ở bảng phụ `cong_thuc`, ⛔ vào bảng "
+            f"chính (AC-5)."),
     }
 
 
@@ -182,11 +210,20 @@ def thieu_lac(dong: list[dict[str, Any]]) -> dict[str, Any]:
     mong_406 = {k: LECH_CO_TEN.get(k, v) for k, v in ledger.items()}
     thieu = sorted(set(thuc) | set(mong_406))
     thieu = [str(k) for k in thieu if thuc.get(k, 0) != mong_406.get(k)]
+    # F-3: D CÓ chữ mà ⛔ thuộc TẬP ĐÓNG tiền tệ ⇒ LỆCH *(có thể Diễn giải/Số CT lạc cột D)* ⇒ ĐỎ.
+    #   Ô rỗng cho phép *(chu?)*. ⛔ IN GIÁ TRỊ — marker chỉ mang `dong_sheet`.
+    d_la = sorted(
+        (d["dong_sheet"] for d in dong
+         if isinstance(d.get("D"), dict) and d["D"]["chu"].strip()
+         and d["D"]["chu"].strip() not in TIEN_TE),
+        key=int)
+    thieu = thieu + [f"D_la@{ds}" for ds in d_la]
     lac = [str(k) for k in sorted(LECH_CO_TEN)]
     khop = sum(1 for k, v in mong_406.items() if thuc.get(k, 0) == v and k not in LECH_CO_TEN)
     return {
         "thieu": thieu,
         "lac": lac,
         "dai": (f"{khop} kỳ khớp phan_bo_ky CHÍNH XÁC · {len(LECH_CO_TEN)} kỳ lệch có tên "
-                f"(bản sao 406 dừng giữa 2026-05) · nguồn {NGUON_PHAN_BO.name}"),
+                f"(bản sao 406 dừng giữa 2026-05) · D ngoài {list(TIEN_TE)}: {len(d_la)} · "
+                f"nguồn {NGUON_PHAN_BO.name}"),
     }

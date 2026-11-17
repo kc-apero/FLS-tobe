@@ -45,7 +45,11 @@ NGUON_PHAN_BO = GOC / "tests" / "fixture" / "itl_ledge_adjustment.json"
 THU_MUC_KHUON = GOC / "tools" / "khuon_dong_bang"
 
 #: Checksum ghim của ảnh đã commit *(đổi ⇒ phải có lượt đóng băng mới + lý do)*.
-CHECKSUM_ANH = "e98f3a699e2de469"
+#: ⚠ Vòng sửa R1 (`KQ-113` · F-1): THÊM bảng phụ `itl_id_lech` ⇒ checksum đổi
+#: `e98f3a699e2de469` → `53a243b42101c314`. `nguon` + bảng CHÍNH *(dong)* + `cong_thuc` TRÙNG
+#: TỪNG BYTE ảnh cũ *(đọc lại SA 1 lượt batchGet xác nhận 7883×11 = 0 lệch)*; checksum đổi CHỈ do
+#: bảng phụ `itl_id_lech` mới *(nguon · dong · cong_thuc đều giữ nguyên ⇒ delta = itl_id_lech)*.
+CHECKSUM_ANH = "53a243b42101c314"
 MONG = 7883
 DONG_DAU_SHEET = 10
 EPOCH = datetime.date(1899, 12, 30)
@@ -357,8 +361,11 @@ def test_DT4_khuon_gl_406_la_tep_rieng_dung_giao_keo():
     assert m.BANG == "PD.406" and m.KHOA == "dong_sheet" and m.KIEU_KHOA == "dong_sheet"
     assert m.COT == ("ky", "itl_id", "D", "BM", "BN", "BO", "BP", "BQ", "BR", "BS", "BT")
     assert m.KIEU_COT == {"itl_id": "chu", "D": "chu?", "BO": "so?", "BP": "so?"}
-    assert m.PHU_MONG == {"cong_thuc": 1}
+    assert m.PHU_MONG == {"cong_thuc": 1, "itl_id_lech": 4}              # F-1: +itl_id_lech
     assert m.LECH_CO_TEN == LECH_CO_TEN
+    assert m.LECH_ITL_ID == (6684, 6836, 7500, 7832)                    # F-1: 4 dong_sheet ghim
+    assert m.TIEN_TE == ("USD", "SGD", "COP", "VND", "HKD")             # F-3: tập đóng D
+    assert m.ITL_ID_RE.fullmatch("ITL#123") and not m.ITL_ID_RE.fullmatch("#N/A ()")
     assert callable(m.chuan_bi) and callable(m.thieu_lac)
 
 
@@ -385,6 +392,10 @@ def test_DT4_khoa_dong_sheet_hop_le():
     hl = lambda v: m._khoa_hop_le(v, "dong_sheet")
     assert hl("10") and hl("7892") and hl("1")
     assert not hl("0") and not hl("-5") and not hl({"chu": "10"}) and not hl(None) and not hl("10.5")
+    # DT4-R1-04: `isdigit()` nhận chữ số NGOÀI ASCII và nổ `int()` — `fullmatch` chặn cả hai
+    assert not hl("٣")          # chữ số Ả Rập: isdigit()=True ⇒ xưa nhận nhầm, nay HỎNG
+    assert not hl("²")          # mũ 2: isdigit()=True nhưng int("²") NỔ ⇒ nay HỎNG (⛔ traceback)
+    assert not hl("７")          # chữ số full-width: cũng ngoài ASCII
 
 
 def test_DT4_dong_sheet_KHONG_lien_tuc_thi_TU_CHOI(luoi, tmp_path):
@@ -462,3 +473,97 @@ def test_DT4_sau_hang_thieu_tien_te_D_BO_BP_rong():
     assert o_rong_bo_bp == 12                               # 6 hàng × 2 ô
     assert all(d["itl_id"] is not None for d in anh["dong"])
     assert len(anh["dong"]) == MONG
+
+
+# ══ VÒNG SỬA SAU R1 (KQ-113) ═══════════════════════════════════════════════════════════════════
+# F-1 (DT4-R1-01 · NÊN SỬA) · F-3 (DT4-R1-03) · F-2 (DT4-R1-02) · F-4 (DT4-R1-04 ở test khoá trên).
+
+def test_DT4_R1_itl_id_lech_co_ten_4_hang():
+    """F-1 (DT4-R1-01): 4 hàng itl_id = chuỗi LỖI Sheets `#N/A ()` khai thành LỆCH CÓ TÊN ở bảng
+    phụ `itl_id_lech` *(mong 4, liệt kê dong_sheet)* — ⛔ lọt cổng `chu` im lặng. Đọc lại nguồn SA
+    *(vòng sửa R1)* xác nhận ĐÚNG 4 hàng ấy *(6684·6836·7500·7832)*; bảng chính TRÙNG byte ảnh cũ."""
+    anh = _doc(ANH)
+    il = anh["phu"]["itl_id_lech"]
+    assert il["mong"] == il["so_dong"] == 4
+    assert [int(r["dong_sheet"]) for r in il["dong"]] == [6684, 6836, 7500, 7832]
+    pat = re.compile(r"ITL#\d+")
+    assert all(not pat.fullmatch(_chu(r["itl_id_tho"])) for r in il["dong"])
+    # bảng CHÍNH: đúng 7879 hàng khớp ^ITL#\d+$; 4 hàng lệch = đúng tập itl_id_lech (Đ3 mẫu số>0)
+    khop = [d for d in anh["dong"] if pat.fullmatch(_chu(d["itl_id"]) or "")]
+    assert len(khop) == MONG - 4 == 7879
+    lech_ds = sorted(int(d["dong_sheet"]) for d in anh["dong"]
+                     if not pat.fullmatch(_chu(d["itl_id"]) or ""))
+    assert lech_ds == [6684, 6836, 7500, 7832]
+    assert "itl_id_lech" in anh["ghi_chu_khuon"] and "^ITL#" in anh["ghi_chu_khuon"]
+
+
+@pytest.mark.parametrize("sua, mong_so, ten", [
+    pytest.param("them_na_5", 5, "thêm hàng #N/A thứ 5", id="them_NA_thu_5"),
+    pytest.param("bo_na_1", 3, "bỏ 1 hàng #N/A", id="bo_1_NA"),
+])
+def test_DT4_R1_itl_id_lech_khac_4_thi_DO(luoi, tmp_path, sua, mong_so, ten):
+    """F-1/Đ5 ĐỎ-TRƯỚC: số hàng itl_id ⛔ khớp `^ITL#\\d+$` KHÁC 4 ⇒ cổng bảng phụ ĐỎ *(thừa HAY
+    thiếu)*. *(Đo 17/11: công cụ TRƯỚC sửa cho cả hai ca qua `[ĐẠT]` exit 0 — cổng `chu` mù.)*"""
+    rows = [list(r) for r in luoi]
+    iR = COT_THO.index("R")
+    if sua == "them_na_5":
+        for r in rows:
+            if isinstance(r[iR], str) and r[iR].startswith("ITL#"):
+                r[iR] = "#N/A ()"; break
+    else:
+        for r in rows:
+            if r[iR] == "#N/A ()":
+                r[iR] = "ITL#999999"; break
+    tho = _viet_luoi(tmp_path / "tho.json", rows)
+    ra = tmp_path / "a.json"
+    kq = _chay("gl_406", str(tho), "--mong", str(MONG), "--ra", str(ra))
+    assert kq.returncode == 1, (ten, kq.stdout[-1200:], kq.stderr[-800:])
+    assert ("`itl_id_lech` %d dòng ≠ mong 4" % mong_so) in kq.stdout
+    assert _doc(ra)["phu"]["itl_id_lech"]["so_dong"] == mong_so
+
+
+def test_DT4_R1_D_ngoai_tap_tien_te_thi_DO(luoi, tmp_path):
+    """F-3 (DT4-R1-03) ĐỎ-TRƯỚC: `D` CÓ chữ mà ⛔ thuộc {USD,SGD,COP,VND,HKD} ⇒ ĐỎ *(Diễn giải/Số
+    CT lạc sang cột D là đường rò PII mà quét TÊN cột ⛔ thấy)*. Rỗng vẫn cho phép. ⛔ in giá trị."""
+    rows = [list(r) for r in luoi]
+    iD = COT_THO.index("D")
+    rows[0][iD] = "Diễn giải lạc cột D"            # giá trị PII giả lạc vào D (dong_sheet 10)
+    tho = _viet_luoi(tmp_path / "tho.json", rows)
+    ra = tmp_path / "a.json"
+    kq = _chay("gl_406", str(tho), "--mong", str(MONG), "--ra", str(ra))
+    assert kq.returncode == 1, (kq.stdout[-1200:], kq.stderr[-800:])
+    assert "D_la@10" in _doc(ra)["thieu"]
+    assert "Diễn giải lạc" not in kq.stdout        # cổng ⛔ in GIÁ TRỊ lạ (chỉ dong_sheet)
+
+
+def test_DT4_R1_quet_PII_GIA_TRI_o_itl_id_va_D():
+    """F-3 (DT4-R1-03): quét GIÁ TRỊ ô cột chữ tự do `itl_id` + `D` *(bia -03: xưa chỉ quét TÊN
+    cột)*. Ảnh thật: 0 giá trị khớp mẫu Diễn giải/Số CT/Email. Mẫu số = 2·7883 ô *(Đ3)*."""
+    anh = _doc(ANH)
+    gia_tri = [v for d in anh["dong"] for c in ("itl_id", "D")
+               if (v := _chu(d[c])) is not None]
+    assert len(gia_tri) > MONG                      # mẫu số > 0 (Đ3)
+    assert _quet_pii(gia_tri) == []
+    for r in anh["phu"]["itl_id_lech"]["dong"]:     # cả bảng phụ
+        assert _quet_pii([_chu(r["itl_id_tho"])]) == []
+
+
+def test_DT4_R1_quet_PII_GIA_TRI_CAN_ca_pha():
+    """⭐ Ca phá: quét GIÁ TRỊ phải CẮN chuỗi Diễn giải/Số CT/Email lạc vào ô *(⛔ cổng mù — Đ5)*."""
+    assert _quet_pii(["ITL#12", "Diễn giải abc", "USD", "số chứng từ X"]) == \
+        ["Diễn giải abc", "số chứng từ X"]
+
+
+def test_DT4_R1_ky_tu_serial_ghim_ranh_gioi_thang():
+    """F-2 (DT4-R1-02): `_ky_tu_serial` ghim ở HAI phía ranh giới tháng bằng serial VIẾT TAY
+    *(⛔ dùng chung EPOCH với mã)*. Đột biến `EPOCH`±1 ngày ⇒ đẩy ngày cuối/đầu tháng sang kỳ kế ⇒
+    bài này ĐỎ *(bia: bài tái tạo lưới cũ suy serial bằng cùng EPOCH ⇒ đối xứng sai, M7 xanh)*."""
+    import importlib.util
+    spec = importlib.util.spec_from_file_location("gl406_f2", THU_MUC_KHUON / "gl_406.py")
+    m = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(m)
+    # serial Google Sheets VIẾT TAY (1899-12-30 = 0) — tra bảng, ⛔ tính từ EPOCH của mã:
+    assert m._ky_tu_serial(45688) == 202501     # 2025-01-31 ngày CUỐI tháng (bắt EPOCH+1)
+    assert m._ky_tu_serial(45689) == 202502     # 2025-02-01 ngày ĐẦU tháng (bắt EPOCH-1)
+    assert m._ky_tu_serial(45657) == 202412     # 2024-12-31 cuối NĂM
+    assert m._ky_tu_serial(45717) == 202503     # 2025-03-01 đầu tháng 3

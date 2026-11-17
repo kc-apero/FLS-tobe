@@ -376,11 +376,15 @@ def _khoa_hop_le(v: Any, kieu: str = "yyyymm") -> bool:
     `{"chu": "202401"}` là khoá HỎNG *(`DT2-R1-02`)*. Khoá `ma` *(DT3)* hợp lệ = ô CHỮ có nội
     dung — ô số, `bool`, rỗng, chỉ-khoảng-trắng đều HỎNG. Khoá `dong_sheet` *(DT4)* hợp lệ = ô SỐ
     chữ số NGUYÊN ≥ 1 *(hàng sheet)* — ô chữ `{"chu": "10"}`, rỗng, `bool`, số âm/0/thập phân đều
-    HỎNG *(đối xứng `yyyymm`: khoá phải là SỐ, ⛔ chữ)*."""
+    HỎNG *(đối xứng `yyyymm`: khoá phải là SỐ, ⛔ chữ)*.
+
+    ⚠ `DT4-R1-04`: `dong_sheet` dùng `fullmatch(r"[0-9]+")`, ⛔ `str.isdigit()` — `isdigit()` nhận
+    chữ số NGOÀI ASCII *(`"٣".isdigit()` = `True` ⇒ nhận nhầm)* và còn nổ `int()` với ký tự số-mà-
+    ⛔-chuyển-được *(`"²".isdigit()` = `True` nhưng `int("²")` ⇒ `ValueError` traceback)*."""
     if kieu == "ma":
         return isinstance(v, dict) and bool(v["chu"].strip())
     if kieu == "dong_sheet":
-        return isinstance(v, str) and v.isdigit() and int(v) >= 1
+        return isinstance(v, str) and bool(re.fullmatch(r"[0-9]+", v)) and int(v) >= 1
     return isinstance(v, str) and bool(_YYYYMM.fullmatch(v)) and 1 <= int(v[4:]) <= 12
 
 

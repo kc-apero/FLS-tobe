@@ -2,10 +2,10 @@
  "bang": "PD.406",
  "khuon": "gl_406",
  "nguon": "[COPY] Report I General Ledger | P&L Report · sheet 'Report I General Ledger' · A·D·R·BM:BT · hàng 10..7892 (lát kỳ)",
- "cach_doc": "Sheets API v4 values · UNFORMATTED_VALUE · SERIAL_NUMBER · khoá SA chỉ-đọc · đọc theo lát kỳ (cột A lập dải; mỗi lát kiểm số hàng)",
+ "cach_doc": "Sheets API v4 values:batchGet · UNFORMATTED_VALUE · SERIAL_NUMBER · khoá SA chỉ-đọc · vòng sửa R1 (KQ-113): đọc lại A·D·R·BM:BT 1 lượt batchGet (⛔ lát kỳ như lần đầu), bảng CHÍNH tái lập TRÙNG BYTE ảnh gốc",
  "ngay_dong_bang": "2026-11-17",
- "khong_mang_PII": "⛔ KHÔNG mang cột riêng tư: máy soát 12 tên cột của bản thô với PM_COT_RIENG_TU ['Email Address'] — 0 trùng (gộp khoảng trắng, ⛔ phân biệt hoa thường). Ảnh chỉ giữ khoá `dong_sheet` + 11 cột chọn; 0 cột bản thô ⛔ chọn (tên ở `cot_khong_chon`). Bản thô qua `chuan_bi` của khuôn: 12 tên cột trên là của BẢNG khuôn dựng; soát thêm 2 tên cột của 1 bảng phụ — 0 trùng. Ô bản thô mà khuôn ⛔ mang/băm: xem `ghi_chu_khuon`.",
- "ghi_chu_khuon": "Bảng chính = 7883 hàng dữ liệu 406 *(cột A có ngày)*, khoá dong_sheet 10…7892 liên tục; ky suy từ cột A *(⛔ mang cột A)*, itl_id = cột R, D = tiền tệ. ⛔ mang cột B (Số chứng từ) · C (Diễn giải) — vùng đọc ⛔ phủ B:C (AC-3). 6 hàng thiếu tiền tệ D ⇒ BO/BP rỗng (so?). Vùng công thức thừa: 9843 hàng 7893..17735 (cột A RỖNG) ĐẾM + khai ở bảng phụ `cong_thuc`, ⛔ vào bảng chính (AC-5).",
+ "khong_mang_PII": "⛔ KHÔNG mang cột riêng tư: máy soát 12 tên cột của bản thô với PM_COT_RIENG_TU ['Email Address'] — 0 trùng (gộp khoảng trắng, ⛔ phân biệt hoa thường). Ảnh chỉ giữ khoá `dong_sheet` + 11 cột chọn; 0 cột bản thô ⛔ chọn (tên ở `cot_khong_chon`). Bản thô qua `chuan_bi` của khuôn: 12 tên cột trên là của BẢNG khuôn dựng; soát thêm 4 tên cột của 2 bảng phụ — 0 trùng. Ô bản thô mà khuôn ⛔ mang/băm: xem `ghi_chu_khuon`.",
+ "ghi_chu_khuon": "Bảng chính = 7883 hàng dữ liệu 406 *(cột A có ngày)*, khoá dong_sheet 10…7892 liên tục; ky suy từ cột A *(⛔ mang cột A)*, itl_id = cột R *(khớp ^ITL#\\d+$)*, D = tiền tệ ['USD', 'SGD', 'COP', 'VND', 'HKD']. ⛔ mang cột B (Số chứng từ) · C (Diễn giải) — vùng đọc ⛔ phủ B:C (AC-3). 6 hàng thiếu tiền tệ D ⇒ BO/BP rỗng (so?). 4 hàng itl_id ⛔ khớp ^ITL#\\d+$ *(chuỗi lỗi Sheets)* ⇒ LỆCH CÓ TÊN ở bảng phụ `itl_id_lech` (mong 4; khác ⇒ ĐỎ) — H4 ⛔ nối được 4 dòng ấy (F-1). Vùng công thức thừa: 9843 hàng 7893..17735 (cột A RỖNG) ĐẾM + khai ở bảng phụ `cong_thuc`, ⛔ vào bảng chính (AC-5).",
  "khoa": "dong_sheet",
  "kieu_khoa": "dong_sheet",
  "cot": [
@@ -39,7 +39,7 @@
   "dat": true,
   "ly_do": []
  },
- "checksum_noi_dung": "e98f3a699e2de469",
+ "checksum_noi_dung": "53a243b42101c314",
  "dong": [
   {
    "thu_tu": 1,
@@ -149817,6 +149817,40 @@
      "so_dong": "9843",
      "dai_hang": {
       "chu": "7893..17735"
+     }
+    }
+   ]
+  },
+  "itl_id_lech": {
+   "mong": 4,
+   "so_dong": 4,
+   "dong": [
+    {
+     "thu_tu": 1,
+     "dong_sheet": "6684",
+     "itl_id_tho": {
+      "chu": "#N/A ()"
+     }
+    },
+    {
+     "thu_tu": 2,
+     "dong_sheet": "6836",
+     "itl_id_tho": {
+      "chu": "#N/A ()"
+     }
+    },
+    {
+     "thu_tu": 3,
+     "dong_sheet": "7500",
+     "itl_id_tho": {
+      "chu": "#N/A ()"
+     }
+    },
+    {
+     "thu_tu": 4,
+     "dong_sheet": "7832",
+     "itl_id_tho": {
+      "chu": "#N/A ()"
      }
     }
    ]
