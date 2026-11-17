@@ -142,7 +142,7 @@ Làn BE-HC hiện rảnh (H3 chờ nhãn thật; H4 chờ DT4).
 
 | Mục | Giá trị |
 |---|---|
-| Khoá | JSON service account (project `fp-a-project`), người dùng đã tạo + chia sẻ quyền Viewer. Đặt vào **environment của account mới** (Edit → Network secrets, hoặc biến môi trường) tên **`FLS_GSHEETS_SA_JSON`** = toàn bộ nội dung JSON. ⛔ dán vào chat · ⛔ ghi ra tệp trong repo · ⛔ in ra log |
+| Khoá | JSON service account (project `fp-a-project`), người dùng đã tạo + chia sẻ quyền Viewer. Đặt vào **environment của account mới** theo MỘT trong hai cách: ⓐ **Network secrets** (app cũ: *API credentials*) tên **`FLS_GSHEETS_SA_JSON`** = nguyên JSON — nên dùng · ⓑ chỉ có ô *Biến môi trường* (định dạng `.env`, MỘT dòng `KEY=value`; dán JSON nhiều dòng ⇒ lỗi "Dòng 1 không hợp lệ", đo 17/11) ⇒ **`FLS_GSHEETS_SA_JSON_B64`** = base64 một dòng của tệp JSON (PowerShell: `[Convert]::ToBase64String([IO.File]::ReadAllBytes("<tệp>.json")) · Set-Clipboard`). ⚠ ô Biến môi trường ai dùng environment cũng XEM được — base64 ⛔ phải mã hoá. Phiên mới đọc: có `FLS_GSHEETS_SA_JSON` thì `json.loads` nó, ⛔ thì `json.loads(base64.b64decode(os.environ["FLS_GSHEETS_SA_JSON_B64"]))`; ⛔ cả hai ⇒ báo người dùng. ⛔ dán vào chat · ⛔ ghi ra tệp trong repo · ⛔ in ra log |
 | Network | nếu Limited: thêm `sheets.googleapis.com` · `oauth2.googleapis.com` vào Allowed domains (giữ ô package managers) |
 | Đọc | Sheets API v4 `spreadsheets.values.get`/`batchGet` với **`valueRenderOption=UNFORMATTED_VALUE`** + `dateTimeRenderOption=SERIAL_NUMBER`, scope `spreadsheets.readonly`, **theo lát kỳ** (lát hỏng = ĐỎ, ⛔ "không thấy lệch"). Python: `google-auth` (`service_account.Credentials.from_service_account_info(json.loads(os.environ["FLS_GSHEETS_SA_JSON"]), scopes=[…])` + `AuthorizedSession`). Lỗi TLS ⇒ đọc `/root/.ccr/README.md` |
 | O7 | orchestrator đọc → scratchpad (⛔ commit bản thô) → agent DATA đóng băng bằng `tools/dong_bang_sheet.py` + khuôn `tools/khuon_dong_bang/<tên>.py` (mỗi nguồn một tệp) |
@@ -166,7 +166,7 @@ Bản thô ở scratchpad phiên cũ (ix_fx · mapping_master · atl · cdt) **�
 
 ## 9. Việc đầu tiên của phiên mới (theo thứ tự)
 1. Đọc §1–§8; khôi phục nhánh + worktree (§2); dựng 9 cụm (§3) — chạy `dung_moi_truong_isp.sh --cong N` từ worktree `isp-s0` cho N ∈ 5433–5437, 5444–5447; kiểm `pg_isready`.
-2. Kiểm khoá SA (§7): biến `FLS_GSHEETS_SA_JSON` có mặt (⛔ in nội dung) + đọc thử 1 ô. Hỏng ⇒ báo người dùng tên host bị chặn / lỗi quyền, kèm khuyến nghị.
+2. Kiểm khoá SA (§7): biến `FLS_GSHEETS_SA_JSON` hoặc `FLS_GSHEETS_SA_JSON_B64` có mặt (⛔ in nội dung) + đọc thử 1 ô. Hỏng ⇒ báo người dùng tên host bị chặn / lỗi quyền, kèm khuyến nghị.
 3. Phát lượt 8 phiên đã dừng (§5): R3b S0 · R3 H1 · R2 H2 · R1 CG1 · R1 DT3 · làm nốt sửa C1 · làm nốt sửa DT2 · sửa DT1b — dùng `chuyen_giao/brief/*.md`.
 4. SA thông ⇒ đọc trước nguồn DT4 (406 CALC ZONE BM–BT theo dòng × kỳ) vào scratchpad, phát `WO-111` DT4 (làn DATA) theo ISP Step 12.
 5. R3b S0 ĐẠT ⇒ gộp S0 (§6.2), rồi DT1a, rồi các bước đạt R3; báo người dùng sau mỗi wave.
