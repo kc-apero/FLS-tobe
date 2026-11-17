@@ -151,7 +151,9 @@ def _the(ve: dict, ten: str) -> dict:
 @kn.can_node
 def test_FG_F1_tep_do_that_FINAL_dat_HD1_khong_dat_5_tren_23():
     """Mở F03 qua máy thật + `tep_do` THẬT: thẻ `FINAL` ĐẠT; `HD1_THANG` KHÔNG
-    ĐẠT kèm `5/23`; số 'chưa đo được' trên màn = số tuyến trả."""
+    ĐẠT kèm `5/23`; **danh sách kỳ đỏ trong `ly_do` có mặt ĐẦY ĐỦ trên thẻ HD1**
+    (FG-R2-01 · `KQ-119`); và **cả ba** số dòng tóm (`đạt`/`không đạt`/`chưa đo
+    được`) = số tuyến trả (FG-R2-02 · `KQ-119` — Đ4: mỗi số một nhãn)."""
     with _may(REAL_TEP_DO) as (m, tok):
         env = _gates(m, tok)
     d = env["data"]
@@ -176,7 +178,22 @@ def test_FG_F1_tep_do_that_FINAL_dat_HD1_khong_dat_5_tren_23():
     assert "KHÔNG ĐẠT" in hd1["txt"]
     assert g["HD1_THANG"]["da_do"] in hd1["txt"], hd1["txt"]   # "5/23 kỳ đạt"
 
-    # ── ③ số 'chưa đo được' TRÊN MÀN = số TUYẾN trả (⛔ hằng số gõ tay) ────
+    # ── FG-R2-01 (`KQ-119`): danh sách kỳ đỏ trong `ly_do` có mặt ĐẦY ĐỦ trên
+    #    thẻ HD1 — so với CHÍNH chuỗi tuyến trả (⛔ hằng gõ tay). Trước R2, bài
+    #    chỉ canh `da_do` ("5/23") chứ ⛔ `ly_do`, nên đột biến N9 (bỏ cả khối
+    #    `ly_do` khỏi `_the_cong`) / N11 (`ly_do.slice(0,40)`) SỐNG — xanh trên
+    #    một thẻ ⛔ còn lý do 23 kỳ nào. Đ3: tuyến phải trả `ly_do` KHÔNG rỗng
+    #    trước đã, nếu không `"" in txt` là phép so xanh trên tập rỗng.
+    ly_do = g["HD1_THANG"]["ly_do"]
+    assert ly_do and len(ly_do) >= 50, ly_do                   # mẫu số ⛔ rỗng (Đ3)
+    assert ly_do in hd1["txt"], (ly_do, hd1["txt"])
+
+    # ── ③ ba số DÒNG TÓM = số TUYẾN trả (⛔ hằng số gõ tay). Đ4: dòng tóm ba số
+    #    ⇒ canh CẢ BA. FG-R2-02 (`KQ-119`): số `đạt`/`không đạt` trước R2 ⛔ có
+    #    bài ⇒ đột biến N10 (chip 'đạt' in `data.khong_dat`) SỐNG. `đạt` ≠
+    #    `không đạt` ở nền (tuyến trả `dat=1 · khong_dat=2`) ⇒ N10 ⇒ ĐỎ.
+    assert ("%d đạt" % d["dat"]) in ve["note"], ve["note"]
+    assert ("%d không đạt" % d["khong_dat"]) in ve["note"], ve["note"]
     assert ("%d ⛔ chưa đo được" % d["chua_do_duoc"]) in ve["note"], ve["note"]
 
 
@@ -295,11 +312,20 @@ def test_FG_F3_ly_do_23_ky_khong_tran_ngang_o_390px():
     (Đ5: đột biến phải phủ cả hai chiều của lớp lỗi)."""
     with _may(REAL_TEP_DO) as (m, tok):
         url = "http://%s:%d/" % m.server_address
+        env = _gates(m, tok)          # CHÍNH chuỗi tuyến trả (⛔ hằng gõ tay)
         res = _do_tran(url, 390)
+    g_hd1 = {x["ma"]: x for x in env["data"]["cong"]}["HD1_THANG"]
 
     hd1 = [x for x in res["gates"] if _TEN_HD1 in x["txt"]]
     assert len(hd1) == 1, [x["txt"][:48] for x in res["gates"]]
     assert "5/23" in hd1[0]["txt"], hd1[0]["txt"][:120]        # tập ⛔ rỗng
+    # ── FG-R2-01 (`KQ-119`): thẻ HD1 THẬT mang danh sách kỳ đỏ (`ly_do` ĐẦY ĐỦ)
+    #    TRƯỚC khi đo tràn — ⛔ đo tràn trên một thẻ đã cụt lý do (Đ3). Bài tên
+    #    "lý do 23 kỳ ⛔ tràn" phải khẳng định lý do 23 kỳ CÓ trên thẻ, so với
+    #    CHÍNH chuỗi `GET /gates` trả. N9/N11 (xem FG-F1) ⇒ ĐỎ cả ở đây.
+    ly_do = g_hd1["ly_do"]
+    assert ly_do and len(ly_do) >= 50, ly_do
+    assert ly_do in hd1[0]["txt"], (ly_do, hd1[0]["txt"][:200])
     # ── vế ①: nội dung ⛔ vượt THẺ ────────────────────────────────────────
     assert hd1[0]["over"] is False, (
         "thẻ HD1 TRÀN ngang ở 390 px: sw=%(sw)d > cw=%(cw)d" % hd1[0])
