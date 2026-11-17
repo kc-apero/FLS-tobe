@@ -197,3 +197,51 @@ Khoá k = 5 trường đã chuẩn hoá; ghép gốc = khoá + *"seq trùng"* �
 - **Q3 · `CAM_MO` (`nguon.py:53`) ↔ O10.** ⓐ *(khuyến nghị)* ghi vào `WO-095` một ngoại lệ có phạm vi: owner chỉ ĐỌC cột B·D·E·F·G *(⛔ ngày, ⛔ `ITL#`)* của `ITL Ledge` trong tệp ấy — cùng nguồn với phép ghép gốc · ⓑ đọc phía SO từ ADJUSTED sống — giá: `GAP-ORA-08` *(hết giờ 60 s)* và hàng có thể ⛔ cùng hệ `dong_sheet` của ảnh 26/08 *(K11 sẽ ĐỎ)*.
 - **Q4 · Nâng "Số CT dạng khoa học phía SO = 0" thành cổng K13?** ⓐ *(khuyến nghị — ở vòng sửa sau R1 nếu orchestrator nhận)* thêm một phép + một ca phá *(~10 dòng)* — chặn bản xuất hỏng thay vì nhắc · ⓑ giữ chẩn đoán + hướng dẫn owner — giá: dựa vào mắt người đọc dòng ②.
 - *(ghi nhận, ⛔ hỏi)* ISP `:94` / `:141` / `:788` / `:836` vẫn ghi tệp cũ — vá ISP theo `DT1a-R1-08` là việc `fls-ba` / orchestrator.
+
+## Vòng sửa sau R1 *(KQ-097)* — chỉ THÊM
+*(`fls-dev`, làn DATA, phiên cloud CON ngoài máy orchestrator · sau R1 `KQ-097` · trước R2 `KQ-098`. Phạm vi: **5 NÊN SỬA** `DT1b-R1-01 · -02 · -04 · -05 · -06` + GHI NHẬN rẻ **`-03` · `-10` · `-11`**. ⛔ chạm `WO` · dashboard · `TIEN_DO.md` · changelog · sổ phát hiện — R2/orchestrator đổi trạng thái sổ. Mọi lệnh ở worktree `isp-dt1b`, cụm PG 5437, venv `/home/user/FLS-tobe/.venv`, `PYTHONUTF8=1`.)*
+
+### Đã đổi *(2 tệp mã + tệp bài mới)*
+| Tệp | Vì sao |
+|---|---|
+| `tools/phan_loai_ly_do.py` *(+~60 dòng)* | **R7** *(`-04`)*: `kiem()` đóng cả GIÁ TRỊ — mọi LÁ = hằng *(`_vi_sao` · `khong_mang_PII` · `nguon.tep_dt1a`/`anh_so`)* · mẫu *(`nguon.ban_doc_sha256_16` hex16)* · tập đóng + int ≥ 0 *(`mau_so.khoa_hong` · `dang_khoa_hoc`)* · int *(5 số đếm `mau_so`)*; câu lỗi nêu TÊN LÁ, **⛔ in giá trị**. **K13** *(`-05`)*: `MONG["van_tay_nhan"]` + `_van_tay_nhan()` = sha256-16 của tập `[dong_sheet, nhan, lech, ghi_chu]` đã sắp; `None` ⇒ góp mã 4 *(cùng cơ chế `phan_bo_nhan`)*. **R8** *(`-06`)*: `_trong_repo_khong_ignore()` — bản đọc khoá trong repo mà ⛔ bị `.gitignore` ⇒ **mã 2**. **`-11`**: đường dẫn là thư mục ⇒ mã 2 *(⛔ 3)*; câu mã 3 in **đường tuyệt đối**. **`-03`**: khai D27 *"phòng thủ chồng"* ở docstring `_ghi`. Hai hằng `NGUON_TEP_DT1A`/`NGUON_ANH_SO` (một nguồn cho `do()` + R7). `import subprocess` |
+| `tests/du_lieu/test_phan_loai_ly_do.py` *(+~40 dòng)* | `_chay_trong` ghim `van_tay_nhan` CÙNG lượt `phan_bo_nhan` *(K13 — nếu hằng độc lập sai thì MỌI bài happy ĐỎ, cổng hai nguồn)*; hằng `VT_NHAN_TONG_HOP = c5c55c272e02b414`; bài `…R1_05_van_tay_nhan_TONG_HOP_dung_thiet_ke` *(tự tính lại từ thiết kế `_dung`, ⛔ chép công cụ)*; bài `…R1_11_duong_dan_la_thu_muc_la_2`; sửa `…tep_nhan_THAT…` *(`-10`: tệp thật có mà chưa ghim ⇒ `pytest.fail`, ⛔ `xfail`)* |
+| `tests/du_lieu/test_phan_loai_ly_do_vong_sua_r1.py` *(mới, 26 bài)* | `KQ-097` §Bài thử đề xuất ①–⑭ *(17 `test_R1_*` giết đột biến + 8 `test_R1_DE_XUAT_*` phát hiện)* + bài `-06` `git init`. ⚠ **Lệch CÓ Ý** §KQ-097: ⑬ lá `ban_doc_sha256_16` dùng mã `FT25123456789` *(có chữ ⇒ ⛔ hex16)* thay `4366191234567890` — số 16 chữ số thập phân KHỚP `^[0-9a-f]{16}$` nên cổng mẫu ⛔ bắt *(xem §Giới hạn còn lại)* |
+
+### Bằng chứng từng phát hiện *(ĐỎ-trước đo trên `8a18599`, mã Dev)*
+| Mã | Kết | Bằng chứng *(lệnh · exit · dòng)* | ĐỎ-trước |
+|---|---|---|:-:|
+| `-01` | **ĐẠT** | 6 bài đơn vị gọi thẳng `phan_loai` *(①–⑥)*. Đột biến BIÊN trên tool MỚI *(`/tmp/mut_dt1b`, trả nguyên)*: **10/10** CHẾT — D01·D02 *(①)* · D04 *(②)* · D07·D08 *(③, 6/6 `PYTHONHASHSEED` 0–5)* · D0506·D11 *(④)* · D15 *(⑤)* · D13·D14 *(⑥)*, mỗi killer `rc=1 FAILED` | có *(mã cũ các killer XANH — mã ĐÚNG; thiếu là bài)* |
+| `-02` | **ĐẠT** | 3 bài R5 qua đường đo thật *(⑦)* + 3 ca `PHA` *(⑧)*. Đột biến: **6/6** CHẾT — D17 *(⑦ tien)* · D19 *(⑦ thô)* · D18 *(⑦ chuẩn hoá)* · D20 *(⑧ Số CT)* · D21 *(⑧ email)* · D22 *(⑧ email ở TÊN khoá)* | có |
+| `-03` | **ĐẠT** | 5 bài ⑨–⑫ *(D23·D24·D28·D30·D31)* + khai D27 phòng thủ chồng ở docstring `_ghi`. Các bài này XANH trên mã cũ *(giết đột biến)* | n/a *(giết đột biến)* |
+| `-04` | **ĐẠT** | `…DE_XUAT_la_chuoi_TU_DO_bi_chan` **7/7** ĐỎ trên `8a18599` *(exit 0)* → XANH sau R7 *(exit 1)*; thêm `assert` giá trị *(SO_CT·DG)* **⛔** trong stderr | **ĐỎ × 7** → XANH |
+| `-05` | **ĐẠT** | `…DE_XUAT_doi_nhan_HAI_dong_cung_ky` ĐỎ trên `8a18599` *(đổi chỗ nhãn 2 dòng cùng kỳ `2026-07` giữ nguyên số đếm ⇒ exit 0)* → exit 1 `vân tay danh tính nhãn (K13)` sau sửa | **ĐỎ** → XANH |
+| `-06` | **ĐẠT** | `…ban_doc_khoa_trong_repo_khong_gitignore` ĐỎ trên `8a18599` *(CSV ở gốc repo ⇒ exit 0)* → exit **2** `bị .gitignore` sau R8; CSV ở `hien_vat/` ⇒ đo bình thường. CLI thật: `--khoa <thư mục>` exit 2, `--khoa /tmp/…/khong_co.csv` mã 3 in đường tuyệt đối | **ĐỎ** → XANH |
+| `-10` | **ĐẠT** | `…tep_nhan_THAT…`: tệp thật có mà `MONG` chưa ghim ⇒ `pytest.fail` *(⛔ `xfail` — `S0-R3-01`)*; container `RA_THAT` vắng ⇒ exit 3 *(⛔ đổi)* | — |
+| `-11` | **ĐẠT** | `…duong_dan_la_thu_muc_la_2` ĐỎ trên `8a18599` *(thư mục ⇒ 3)* → exit **2** sau sửa; câu mã 3 in đường tuyệt đối | **ĐỎ** → XANH |
+
+### Đính chính *(chỉ THÊM — ⛔ sửa dòng gốc)*
+- **`BG-096:176`** *(§Hướng dẫn owner bước 5)* — câu *"từ đó cổng trả 0, và **mọi** thay đổi nhãn về sau (H3 sửa mã) đều ĐỎ cho tới khi ghi lại bản khai"* **đúng một nửa khi viết**: với CHỈ `phan_bo_nhan` ghim, một thay đổi **giữ số đếm** *(đổi chỗ nhãn hai dòng cùng kỳ — `DT1b-R1-05`)* vẫn XANH. ⇒ `-05` thêm **K13 `van_tay_nhan`** *(ghim CÙNG lượt, cùng nguồn với `phan_bo_nhan`)*; từ nay câu ấy ĐÚNG — mọi thay đổi danh tính nhãn, kể cả giữ tổng, đều ĐỎ. Bước ghim của owner *(bước 5)* nay ghim **cả hai** `phan_bo_nhan` + `van_tay_nhan` *(cùng dòng ③ + tập `[dong_sheet, nhan, lech, ghi_chu]`)*.
+- **Va chạm tên `K13`:** `BG-096` **Q4** đề xuất *"cổng K13"* cho *"Số CT dạng khoa học phía SO = 0"*; sổ phát hiện `-05` *(fls-test)* đặt *"phép K13"* cho **vân tay nhãn**. Vòng này theo sổ ⇒ **K13 = vân tay danh tính nhãn**. Nếu orchestrator nhận Q4, cổng Số CT khoa học nên đánh số **K14** để ⛔ trùng.
+
+### Giới hạn còn lại *(nói thẳng — Đ1/Đ5)*
+1. **`ban_doc_sha256_16` chỉ canh được MẪU hex16 ở chế độ cổng** *(⛔ tái tính sha ở `--tep` — ⛔ có bản đọc thô)*: một Số CT **16 chữ số thập phân** vẫn khớp `^[0-9a-f]{16}$` ⇒ ⛔ phân biệt được với sha. Chế độ ĐO *(`--khoa`)* ⛔ dính *(R5 `quet_token` quét cả lá này với tập Số CT thật của bản đọc)* — rủi ro chỉ ở tệp owner gửi về bị sửa tay. Các lá còn lại *(6/7 của ⑬)* đóng bằng HẰNG / tập đóng / int — ⛔ dính.
+2. **Câu `so()` *(K1·K2·K3·K5·K9·K10)* vẫn in `đo {co!r}`** — R7 đã chặn PII ở 7 lá tự do + guard kiểu `khoa_hong`/`dang_khoa_hoc`; nhưng nếu một giá trị lạ lọt vào `dem_nhan`/`nhan_theo_ky`/`van_tay` *(đều int/hex ở tệp hợp lệ)* và vượt được guard thì `so()` in lại. Sạch hoàn toàn `so()` sẽ bớt chẩn đoán cho lệch vân tay thật — để orchestrator cân *(⛔ trong ⑬)*.
+
+### GHI NHẬN ⛔ sửa vòng này *(lý do)*
+- **`-07`** *(DEV·orch)* — ① chẩn đoán "cắt 6 chữ số" ở dòng ② + ② ca tổng hợp **mất chữ số**: sửa bộ dựng `_dung` để sinh mã 16 chữ số mất chữ số **thật** đụng nhãn mong của 20 `TRUNG_SEQ` + 10 `KHOP` *(đang dựa `(100000+d)×10¹⁰` khớp lại được)* ⇒ rủi ro cả suite B1/B2/B3, **> 15 dòng**, lấn phạm vi; ③ cần orchestrator trả nghĩa *"khớp bản số thường"* *(ISP `:814`)*. Chuyển orchestrator / `WO` riêng.
+- **`-08`** *(DEV)* — đếm ô tiền mơ hồ `^\d{1,3},\d{3}$` in ở dòng ② đụng chuỗi mà bài `…MAU_SO_in_TRUOC_ty_le` canh; hướng dẫn owner là chữ BG; lõi *(`parse_so` locale VN)* ở làn **BE-HC** *(nhiều nơi dùng — ⛔ sửa)*. Giá trị thấp vòng này ⇒ để `WO` riêng.
+- **`-09`** *(orch·BA)* HMAC khoá owner · **`-12`** *(orch)* ghi `WO-095` + vá ISP — **⛔ việc DEV**.
+
+### Q8 — số bài thu thập *(nhánh `isp/DT1B` tách TRƯỚC S0 ⇒ ⛔ có `MONG_PYTEST_TOAN_BO`; orchestrator đặt sàn lúc gộp)*
+`python -m pytest --collect-only` toàn bộ: **TRƯỚC** vòng sửa `2.524` → **SAU** `2.552` *(+28 = 26 tệp mới + 2 bài thêm ở tệp cũ; đo bằng tổng dòng `tệp: n` của `--collect-only -q`)*. `tests/du_lieu`: `64` → `92`. `tests/du_lieu/test_phan_loai_ly_do.py`: `48` → `50`.
+
+### Xác minh cuối *(nguyên văn)*
+| Lệnh | Kết quả |
+|---|---|
+| `pytest tests/du_lieu/test_phan_loai_ly_do_vong_sua_r1.py tests/du_lieu/test_phan_loai_ly_do.py` | `76 passed` *(mã đã sửa)* |
+| `pytest tests/du_lieu` *(hồi quy DT1a + DT1b)* | `92 passed` |
+| đột biến `/tmp/mut_dt1b` *(tool MỚI + killer mới, trả nguyên)* | `16/16` đột biến BIÊN CHẾT · tool trả nguyên khớp byte |
+| `bash …/isp-s0/tools/dung_moi_truong_isp.sh --duong-nen --cong 5437` *(từ worktree `isp-dt1b`)* | *(ghi ở báo cáo phiên — đường nền của script S0 vs nhánh tách-trước-S0)* |
+| `.venv/bin/lint-imports` | `Contracts: 11 kept, 0 broken.` |
+| `python tools/phan_loai_ly_do.py` *(cổng mặc định)* | exit **3** *(câu mặc định byte y nguyên — ⛔ đổi `_che_do_cong`)* |
