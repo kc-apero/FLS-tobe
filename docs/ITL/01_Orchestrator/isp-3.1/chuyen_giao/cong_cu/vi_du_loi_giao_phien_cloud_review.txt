@@ -1,0 +1,47 @@
+Bạn là một phiên cloud CON do orchestrator ISP 3.1.2 của dự án FLS (repo kc-apero/FLS-tobe) tạo, để chạy MỘT vòng review độc lập (KQ-093, Step H2) ngoài máy của orchestrator. Người dùng đã duyệt việc này. Đọc ISP để hiểu bước: `docs/ITL/02_BA/Artifacts/IncrementalStepPlan-FLS-Voi_v3.1.2.md` (mục Step của H2 + §1–§2), và `CLAUDE.md` (Đ1–Đ5, Bẫy, Riêng tư), và tệp vai `.claude/agents/fls-test.md` (luật vai bắt buộc; bỏ qua đường Windows/Docker/PowerShell trong đó — đây là container Linux).
+
+## Bước 0 — dựng môi trường (làm đúng thứ tự)
+Đặt R = gốc repo clone của bạn (thường `/home/user/FLS-tobe`; nếu khác, thay MỌI `/home/user/FLS-tobe` trong brief bên dưới bằng R). ⛔ `cd` trong lệnh shell — dùng `git -C` và đường dẫn tuyệt đối.
+```
+git -C $R fetch origin 'refs/heads/claude/laughing-bohr-331pt0-isp/*:refs/remotes/origin/isp-chuyen/*'
+for s in S0 H2 H2; do git -C $R branch -f isp/$s origin/isp-chuyen/$s; done
+grep -qx '.claude/worktrees/' $R/.git/info/exclude || echo '.claude/worktrees/' >> $R/.git/info/exclude
+git -C $R worktree add $R/.claude/worktrees/isp-s0 isp/S0
+git -C $R worktree add $R/.claude/worktrees/isp-h2 isp/H2
+mkdir -p /var/run/postgresql && chown postgres:postgres /var/run/postgresql
+env -C $R/.claude/worktrees/isp-s0 bash $R/.claude/worktrees/isp-s0/tools/dung_moi_truong_isp.sh --cong 5447
+```
+Lệnh cuối tạo venv `$R/.venv` + cụm PG 16 cổng 5447; phải in `KẾT: ĐẠT` (⛔ thì DỪNG, báo lỗi trong tin nhắn cuối). Kiểm `pg_isready -h localhost -p 5447`. Sha mong: `isp/S0` = c1cf29b · `isp/H2` = b701ebb · `isp/CG1` = 84bcdbf.
+Lưu ý: `--duong-nen` trong brief chạy bằng script CỦA NHÁNH được kiểm (`tools/dung_moi_truong_isp.sh` trong worktree isp-h2); nếu script nhánh cũ hơn bản S0 và khác hành vi, chạy thêm bản S0 và ghi rõ cả hai.
+
+## Brief (nguyên văn của orchestrator, đã chỉnh cho phiên cloud)
+Bạn là reviewer **R2** (agent `fls-test`, phiên MỚI, độc lập) cho **Step 4 · H2** của ISP 3.1.2 dự án FLS. Phiên điều phối (orchestrator) giao; báo cáo cuối gửi orchestrator. ⛔ sửa mã hệ thống (`fls/**`, `tools/**`, `tests/**` ngoài `tests/nghiem_thu/**`) — vai của bạn là KIỂM.
+
+## Đối tượng
+- Nhánh `isp/H2` ở worktree `/home/user/FLS-tobe/.claude/worktrees/isp-h2` (đọc trực tiếp bằng đường dẫn tuyệt đối; ⛔ checkout trong checkout chính).
+- Phạm vi diff: ``git diff 5e63a90 isp/H2` (vòng sửa `c552773` + mục BG `b701ebb`)` — R2: chỉ thay đổi SAU R1 (`KQ-092`). Quyết định orchestrator đã giao (ghi ở `/home/user/FLS-tobe/docs/ITL/01_Orchestrator/isp-3.1/TIEN_DO.md` nhật ký 16/11 'Quyết định orchestrator — H2'): `H2-R1-01` = ⓐ (vế ô trên MỌI dòng sổ của kỳ ∨ mọi dòng tự-soi loại có nhãn ĐÃ KÝ; `H2-B2` mong MỚI: ký 23 dòng thiếu 2026-07 ⇒ VẪN ĐỎ, ký thêm 37 dòng tự-soi ⇒ ĐẠT, tổng 6) · `-02` = ⓑ (`van_tay_dong` bắt buộc; ca K5b phải ĐỎ) · `-06` ⛔ ký `KHAC` + `ngay` > hôm nay ⇒ ĐỎ · `-03/-04` đột biến M15 · M17 · M18 · M19 phải CHẾT · `-05/-07` chỉ khai. Thêm: hợp đồng với CG1 — 5 khoá `dat_hd1` (`so_ky_dat` · `mau_so.so_ky` · `ky_dat` · `theo_ky[k].dat` · `theo_ky[k].thieu`) giữ nguyên tên; hôm nay vẫn 5/23.
+- Spec duy nhất: `docs/ITL/02_BA/Artifacts/IncrementalStepPlan-FLS-Voi_v3.1.2.md` mục `## Step 4 · H2` · phiếu `WO-090` · bàn giao `BG-091` · `CLAUDE.md` (Đ1–Đ5).
+
+## Việc
+1. ⛔ tin con số trong BG — tự chạy lại: `/home/user/FLS-tobe/.venv/bin/python -m pytest tests/oracle/test_do_voi_hd1.py` · `python tools/do_voi_so_luong.py` · lặp lại K1′ · K4c · K4d · K5b của R1 trên mã mới · `bash tools/dung_moi_truong_isp.sh --duong-nen --cong 5447` (cổng hồi quy toàn bộ: đòi `KẾT: ĐẠT`) · `/home/user/FLS-tobe/.venv/bin/lint-imports` (11 kept) · 
+   - Môi trường: venv `/home/user/FLS-tobe/.venv/bin/python`; `export PG_DSN='postgresql://fls:fls@localhost:5447/fls' PG_DSN_TEST='postgresql://fls:fls@localhost:5447/fls_test' PYTHONUTF8=1`; chạy từ thư mục worktree.
+2. Đối chiếu TỪNG dòng mục 8 (Exit criteria) + từng test ID mục 6 với bằng chứng; Đ1 (câu phủ định phải grep cả `docs/` lẫn `fls/`+`tools/`), Đ3 (phép ra 0/100% phải có mẫu số), Đ4 (số có nhãn), Đ5 (cổng khai `mong`, đã chứng minh đỏ).
+3. Tìm: lỗi, lệch spec, phạm vi lấn sang bước khác, refactor không do test đòi, tệp ngoài quyền làn (`TIEN_DO.md` §Quy ước · ISP §2.1), PII (Email Address, Diễn giải, Số chứng từ, tên người), bí mật.
+3b. Chỉ xét THAY ĐỔI sau vòng trước: mỗi phát hiện vòng trước ⇒ `ĐÃ SỬA` (tái hiện ĐỎ trên bản cũ, XANH trên bản mới) / `CHƯA SỬA` / `CHẤP NHẬN` (orchestrator đã quyết); tìm hồi quy do chính vòng sửa đưa vào. Cập nhật sổ riêng `docs/ITL/04_Test/review/SO_PHAT_HIEN_ISP-3.1_H2.md`: chỉ đổi ô Trạng thái hàng cũ + thêm hàng mới, phân loại A1/A2/B1/B2 + luật phòng tái phạm.
+4. Viết phiếu **`docs/ITL/01_Orchestrator/handoff/KQ-093-kiem-h2-r2.md`** theo `docs/ITL/01_Orchestrator/handoff/_mau/KQ.md`: mỗi tiêu chí `ĐẠT / TRƯỢT / ⛔ KHÔNG ĐO ĐƯỢC` + bằng chứng (lệnh, exit code, dòng tổng kết); mỗi phát hiện: mã, mức (CHẶN / NÊN SỬA / GHI NHẬN), tệp:dòng, khuyến nghị sửa cụ thể. Commit phiếu lên CHÍNH nhánh `isp/H2` trong worktree ấy (chỉ thêm tệp phiếu + sổ phát hiện riêng (cập nhật)), message kết thúc bằng:
+   (hai dòng trailer mà CHÍNH phiên của bạn được cấp: `Co-Authored-By: …` + `Claude-Session: <URL phiên của bạn>`)
+
+## Báo cáo cuối
+- Kết luận một dòng: `ĐẠT` (0 phát hiện CHẶN) hoặc `TRƯỢT` + số phát hiện theo mức.
+- Bảng phát hiện (mã · mức · tệp:dòng · khuyến nghị) — để agent tác giả sửa theo.
+- Sha commit phiếu.
+
+## Cụm PG của bạn
+- Cổng **5447** (cụm reviewer riêng, đang chạy; kiểm `pg_isready -h localhost -p 5447`). ⛔ chạm cụm khác; ⛔ chạy pytest khi CHƯA export cả `PG_DSN` lẫn `PG_DSN_TEST` (bài học `S0-R3-05`: một phiên thiếu DSN rơi về mặc định 5433 và DROP kho test của làn khác). Cụm tắt ⇒ báo orchestrator, ⛔ tự `initdb`.
+- Tệp nháp: `<thư mục nháp NGOÀI repo của bạn, vd /tmp/r2_h2/>` (tạo nếu chưa có).
+
+
+## Bước cuối — push (người dùng đã duyệt ĐÚNG MỘT nhánh)
+- Sau khi commit phiếu trên `isp/H2` (chỉ thêm tệp phiếu + sổ phát hiện; ⛔ đổi mã), push: `git -C $R/.claude/worktrees/isp-h2 push origin isp/H2:refs/heads/claude/bold-galileo-zukpaf-isp/H2` (lỗi mạng ⇒ thử lại tối đa 4 lần, chờ 2/4/8/16 s). ⛔ push nhánh nào khác; ⛔ force; ⛔ tạo PR; ⛔ comment GitHub.
+- Đọc Drive/Sheets: ⛔ cần cho vòng này.
+- Báo cáo cuối (theo mục "Báo cáo cuối" ở brief) viết trong TIN NHẮN CUỐI của bạn, kèm sha commit phiếu và dòng `git ls-remote origin claude/bold-galileo-zukpaf-isp/H2`. Chỗ mơ hồ ⇒ ⛔ đoán: ghi câu hỏi kèm khuyến nghị A/B trong tin nhắn cuối và dừng.
