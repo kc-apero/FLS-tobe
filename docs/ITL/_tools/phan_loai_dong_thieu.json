@@ -1,0 +1,3298 @@
+{
+ "_vi_sao": "Sinh bởi `python tools/phan_loai_dong_thieu.py --ghi` từ ba ảnh đóng băng tests/fixture/ (ISP 3.1.2 Step 3 · DT1a · WO-080). ⛔ sửa tay — bài tests/du_lieu/test_phan_loai_dong_thieu.py đòi tệp này BẰNG lần đo hiện tại. `nhan` = null: LÝ DO là việc của DT1b.",
+ "khong_mang_PII": "Máy chặn TRƯỚC khi ghi (kiem_rieng_tu) đúng ba thứ: khoá có tên chứa diengiai · sochungtu · email (so trên tên đã bỏ dấu, thường hoá) · giá trị dạng email · ô lỗi #N/A nhúng mã giao dịch. Ngoài phép chặn ấy là CẤU TRÚC: mỗi dòng thiếu chỉ mang dong_sheet · ky · hd_classifying · hd_mid · hd_final · pay_type_classifying · pay_type_mid · pay_type_final · cdt1_classifying · cdt1_mid · cdt1_final · nhan; mỗi dòng ngược chỉ dong_canon · nhan.",
+ "nguon": {
+  "so": "Input_Raw/[Master] ITL_Ledge_raw.xlsx > ITL Ledge (owner dan 2026-08-26 17:55)",
+  "so_dong_bang": "2026-08-26",
+  "ghep": "[Master] ITL_Ledge_raw.xlsx > ITL Ledge  ×  1md85t… > Transaction Mapping L1 (doc LIVE 2026-08-26)",
+  "bank": "1md85t… > [Importrange]PM_Unpivot (tieu de dong 2, du lieu dong 3) x Transaction Mapping L1 — doc LIVE 2026-08-27",
+  "checksum": {
+   "itl_ledge_adjustment.json": "575c53379074c759",
+   "classifying_vs_canon.json": "7226ef112dbd00f7",
+   "pm_join.json": "6ec10945e6c1636a"
+  }
+ },
+ "mau_so": {
+  "so_dong_so": 9967,
+  "so_dong_ghep": 9845,
+  "so_dong_canon": 9992
+ },
+ "dem": {
+  "thieu": 122,
+  "nguoc": 147,
+  "so_ky": 23,
+  "so_ky_co_thieu": 18
+ },
+ "theo_ky": {
+  "2024-10": {
+   "so_dong_so": 6,
+   "thieu": 0
+  },
+  "2024-11": {
+   "so_dong_so": 3,
+   "thieu": 0
+  },
+  "2024-12": {
+   "so_dong_so": 6,
+   "thieu": 0
+  },
+  "2025-01": {
+   "so_dong_so": 748,
+   "thieu": 1
+  },
+  "2025-02": {
+   "so_dong_so": 283,
+   "thieu": 2
+  },
+  "2025-03": {
+   "so_dong_so": 297,
+   "thieu": 0
+  },
+  "2025-04": {
+   "so_dong_so": 332,
+   "thieu": 0
+  },
+  "2025-05": {
+   "so_dong_so": 408,
+   "thieu": 1
+  },
+  "2025-06": {
+   "so_dong_so": 350,
+   "thieu": 3
+  },
+  "2025-07": {
+   "so_dong_so": 549,
+   "thieu": 4
+  },
+  "2025-08": {
+   "so_dong_so": 537,
+   "thieu": 4
+  },
+  "2025-09": {
+   "so_dong_so": 501,
+   "thieu": 4
+  },
+  "2025-10": {
+   "so_dong_so": 487,
+   "thieu": 9
+  },
+  "2025-11": {
+   "so_dong_so": 477,
+   "thieu": 14
+  },
+  "2025-12": {
+   "so_dong_so": 566,
+   "thieu": 5
+  },
+  "2026-01": {
+   "so_dong_so": 471,
+   "thieu": 4
+  },
+  "2026-02": {
+   "so_dong_so": 439,
+   "thieu": 5
+  },
+  "2026-03": {
+   "so_dong_so": 584,
+   "thieu": 5
+  },
+  "2026-04": {
+   "so_dong_so": 600,
+   "thieu": 8
+  },
+  "2026-05": {
+   "so_dong_so": 537,
+   "thieu": 5
+  },
+  "2026-06": {
+   "so_dong_so": 613,
+   "thieu": 12
+  },
+  "2026-07": {
+   "so_dong_so": 686,
+   "thieu": 23
+  },
+  "2026-08": {
+   "so_dong_so": 487,
+   "thieu": 13
+  }
+ },
+ "phan_bo_thuoc_tinh": {
+  "hd_classifying": [
+   [
+    "Need to manual input",
+    121
+   ],
+   [
+    "GI | Gross Inflow",
+    1
+   ]
+  ],
+  "hd_mid": [
+   [
+    "OGA | GAC - Other",
+    75
+   ],
+   [
+    "GI | Gross Inflow",
+    24
+   ],
+   [
+    "DEP | Deposit",
+    8
+   ],
+   [
+    "ITE | ITE Interest",
+    7
+   ],
+   [
+    "LC | License Cost",
+    2
+   ],
+   [
+    "OMC | Online Marketing Cost",
+    2
+   ],
+   [
+    null,
+    1
+   ],
+   [
+    "BON | Bonus",
+    1
+   ],
+   [
+    "LMN | Loan/Borrowing",
+    1
+   ],
+   [
+    "NB | Lưu chuyển nội bộ",
+    1
+   ]
+  ],
+  "hd_final": [
+   [
+    "OGA | GAC - Other",
+    74
+   ],
+   [
+    "GI | Gross Inflow",
+    25
+   ],
+   [
+    "DEP | Deposit",
+    8
+   ],
+   [
+    "ITE | ITE Interest",
+    7
+   ],
+   [
+    "LC | License Cost",
+    2
+   ],
+   [
+    "NB | Lưu chuyển nội bộ",
+    2
+   ],
+   [
+    "OMC | Online Marketing Cost",
+    2
+   ],
+   [
+    "BON | Bonus",
+    1
+   ],
+   [
+    "LMN | Loan/Borrowing",
+    1
+   ]
+  ],
+  "pay_type_classifying": [
+   [
+    "Need to manual input",
+    121
+   ],
+   [
+    "Thu tiền",
+    1
+   ]
+  ],
+  "pay_type_mid": [
+   [
+    "Thanh toán (Regular)",
+    71
+   ],
+   [
+    "Thu tiền",
+    50
+   ],
+   [
+    null,
+    1
+   ]
+  ],
+  "pay_type_final": [
+   [
+    "Thanh toán (Regular)",
+    71
+   ],
+   [
+    "Thu tiền",
+    51
+   ]
+  ],
+  "cdt1_classifying": [
+   [
+    "Need to manual input",
+    121
+   ],
+   [
+    "SHQ2 | Headquarters2",
+    1
+   ]
+  ],
+  "cdt1_mid": [
+   [
+    "SHQ1 | Headquarters1",
+    60
+   ],
+   [
+    "SHQ2 | Headquarters2",
+    48
+   ],
+   [
+    "COR | TeraSofts",
+    9
+   ],
+   [
+    null,
+    1
+   ],
+   [
+    "CAH | Astronex",
+    1
+   ],
+   [
+    "SHQ1| Headquarters1",
+    1
+   ],
+   [
+    "SHQ2 | Headquarters1",
+    1
+   ],
+   [
+    "TOR | Project A",
+    1
+   ]
+  ],
+  "cdt1_final": [
+   [
+    "SHQ1 | Headquarters1",
+    60
+   ],
+   [
+    "SHQ2 | Headquarters2",
+    49
+   ],
+   [
+    "COR | TeraSofts",
+    9
+   ],
+   [
+    "CAH | Astronex",
+    1
+   ],
+   [
+    "SHQ1| Headquarters1",
+    1
+   ],
+   [
+    "SHQ2 | Headquarters1",
+    1
+   ],
+   [
+    "TOR | Project A",
+    1
+   ]
+  ]
+ },
+ "thuoc_tinh_theo_ky": {
+  "hd_classifying": {
+   "2025-01": [
+    [
+     "GI | Gross Inflow",
+     1
+    ]
+   ],
+   "2025-02": [
+    [
+     "Need to manual input",
+     2
+    ]
+   ],
+   "2025-05": [
+    [
+     "Need to manual input",
+     1
+    ]
+   ],
+   "2025-06": [
+    [
+     "Need to manual input",
+     3
+    ]
+   ],
+   "2025-07": [
+    [
+     "Need to manual input",
+     4
+    ]
+   ],
+   "2025-08": [
+    [
+     "Need to manual input",
+     4
+    ]
+   ],
+   "2025-09": [
+    [
+     "Need to manual input",
+     4
+    ]
+   ],
+   "2025-10": [
+    [
+     "Need to manual input",
+     9
+    ]
+   ],
+   "2025-11": [
+    [
+     "Need to manual input",
+     14
+    ]
+   ],
+   "2025-12": [
+    [
+     "Need to manual input",
+     5
+    ]
+   ],
+   "2026-01": [
+    [
+     "Need to manual input",
+     4
+    ]
+   ],
+   "2026-02": [
+    [
+     "Need to manual input",
+     5
+    ]
+   ],
+   "2026-03": [
+    [
+     "Need to manual input",
+     5
+    ]
+   ],
+   "2026-04": [
+    [
+     "Need to manual input",
+     8
+    ]
+   ],
+   "2026-05": [
+    [
+     "Need to manual input",
+     5
+    ]
+   ],
+   "2026-06": [
+    [
+     "Need to manual input",
+     12
+    ]
+   ],
+   "2026-07": [
+    [
+     "Need to manual input",
+     23
+    ]
+   ],
+   "2026-08": [
+    [
+     "Need to manual input",
+     13
+    ]
+   ]
+  },
+  "hd_final": {
+   "2025-01": [
+    [
+     "GI | Gross Inflow",
+     1
+    ]
+   ],
+   "2025-02": [
+    [
+     "ITE | ITE Interest",
+     1
+    ],
+    [
+     "NB | Lưu chuyển nội bộ",
+     1
+    ]
+   ],
+   "2025-05": [
+    [
+     "OGA | GAC - Other",
+     1
+    ]
+   ],
+   "2025-06": [
+    [
+     "OGA | GAC - Other",
+     3
+    ]
+   ],
+   "2025-07": [
+    [
+     "OGA | GAC - Other",
+     4
+    ]
+   ],
+   "2025-08": [
+    [
+     "OGA | GAC - Other",
+     3
+    ],
+    [
+     "LMN | Loan/Borrowing",
+     1
+    ]
+   ],
+   "2025-09": [
+    [
+     "OGA | GAC - Other",
+     4
+    ]
+   ],
+   "2025-10": [
+    [
+     "DEP | Deposit",
+     4
+    ],
+    [
+     "OGA | GAC - Other",
+     4
+    ],
+    [
+     "GI | Gross Inflow",
+     1
+    ]
+   ],
+   "2025-11": [
+    [
+     "ITE | ITE Interest",
+     6
+    ],
+    [
+     "DEP | Deposit",
+     4
+    ],
+    [
+     "OGA | GAC - Other",
+     3
+    ],
+    [
+     "GI | Gross Inflow",
+     1
+    ]
+   ],
+   "2025-12": [
+    [
+     "OGA | GAC - Other",
+     3
+    ],
+    [
+     "BON | Bonus",
+     1
+    ],
+    [
+     "GI | Gross Inflow",
+     1
+    ]
+   ],
+   "2026-01": [
+    [
+     "OGA | GAC - Other",
+     3
+    ],
+    [
+     "GI | Gross Inflow",
+     1
+    ]
+   ],
+   "2026-02": [
+    [
+     "OGA | GAC - Other",
+     3
+    ],
+    [
+     "GI | Gross Inflow",
+     1
+    ],
+    [
+     "OMC | Online Marketing Cost",
+     1
+    ]
+   ],
+   "2026-03": [
+    [
+     "OGA | GAC - Other",
+     3
+    ],
+    [
+     "GI | Gross Inflow",
+     1
+    ],
+    [
+     "LC | License Cost",
+     1
+    ]
+   ],
+   "2026-04": [
+    [
+     "OGA | GAC - Other",
+     5
+    ],
+    [
+     "GI | Gross Inflow",
+     1
+    ],
+    [
+     "LC | License Cost",
+     1
+    ],
+    [
+     "OMC | Online Marketing Cost",
+     1
+    ]
+   ],
+   "2026-05": [
+    [
+     "OGA | GAC - Other",
+     5
+    ]
+   ],
+   "2026-06": [
+    [
+     "OGA | GAC - Other",
+     8
+    ],
+    [
+     "GI | Gross Inflow",
+     4
+    ]
+   ],
+   "2026-07": [
+    [
+     "OGA | GAC - Other",
+     13
+    ],
+    [
+     "GI | Gross Inflow",
+     9
+    ],
+    [
+     "NB | Lưu chuyển nội bộ",
+     1
+    ]
+   ],
+   "2026-08": [
+    [
+     "OGA | GAC - Other",
+     9
+    ],
+    [
+     "GI | Gross Inflow",
+     4
+    ]
+   ]
+  },
+  "pay_type_final": {
+   "2025-01": [
+    [
+     "Thu tiền",
+     1
+    ]
+   ],
+   "2025-02": [
+    [
+     "Thanh toán (Regular)",
+     1
+    ],
+    [
+     "Thu tiền",
+     1
+    ]
+   ],
+   "2025-05": [
+    [
+     "Thanh toán (Regular)",
+     1
+    ]
+   ],
+   "2025-06": [
+    [
+     "Thanh toán (Regular)",
+     2
+    ],
+    [
+     "Thu tiền",
+     1
+    ]
+   ],
+   "2025-07": [
+    [
+     "Thanh toán (Regular)",
+     2
+    ],
+    [
+     "Thu tiền",
+     2
+    ]
+   ],
+   "2025-08": [
+    [
+     "Thu tiền",
+     3
+    ],
+    [
+     "Thanh toán (Regular)",
+     1
+    ]
+   ],
+   "2025-09": [
+    [
+     "Thanh toán (Regular)",
+     2
+    ],
+    [
+     "Thu tiền",
+     2
+    ]
+   ],
+   "2025-10": [
+    [
+     "Thanh toán (Regular)",
+     8
+    ],
+    [
+     "Thu tiền",
+     1
+    ]
+   ],
+   "2025-11": [
+    [
+     "Thanh toán (Regular)",
+     10
+    ],
+    [
+     "Thu tiền",
+     4
+    ]
+   ],
+   "2025-12": [
+    [
+     "Thanh toán (Regular)",
+     4
+    ],
+    [
+     "Thu tiền",
+     1
+    ]
+   ],
+   "2026-01": [
+    [
+     "Thanh toán (Regular)",
+     3
+    ],
+    [
+     "Thu tiền",
+     1
+    ]
+   ],
+   "2026-02": [
+    [
+     "Thanh toán (Regular)",
+     3
+    ],
+    [
+     "Thu tiền",
+     2
+    ]
+   ],
+   "2026-03": [
+    [
+     "Thanh toán (Regular)",
+     3
+    ],
+    [
+     "Thu tiền",
+     2
+    ]
+   ],
+   "2026-04": [
+    [
+     "Thanh toán (Regular)",
+     4
+    ],
+    [
+     "Thu tiền",
+     4
+    ]
+   ],
+   "2026-05": [
+    [
+     "Thu tiền",
+     3
+    ],
+    [
+     "Thanh toán (Regular)",
+     2
+    ]
+   ],
+   "2026-06": [
+    [
+     "Thanh toán (Regular)",
+     7
+    ],
+    [
+     "Thu tiền",
+     5
+    ]
+   ],
+   "2026-07": [
+    [
+     "Thanh toán (Regular)",
+     12
+    ],
+    [
+     "Thu tiền",
+     11
+    ]
+   ],
+   "2026-08": [
+    [
+     "Thu tiền",
+     7
+    ],
+    [
+     "Thanh toán (Regular)",
+     6
+    ]
+   ]
+  },
+  "cdt1_final": {
+   "2025-01": [
+    [
+     "SHQ2 | Headquarters2",
+     1
+    ]
+   ],
+   "2025-02": [
+    [
+     "SHQ2 | Headquarters2",
+     2
+    ]
+   ],
+   "2025-05": [
+    [
+     "SHQ2 | Headquarters2",
+     1
+    ]
+   ],
+   "2025-06": [
+    [
+     "SHQ2 | Headquarters2",
+     3
+    ]
+   ],
+   "2025-07": [
+    [
+     "SHQ2 | Headquarters2",
+     4
+    ]
+   ],
+   "2025-08": [
+    [
+     "SHQ2 | Headquarters2",
+     4
+    ]
+   ],
+   "2025-09": [
+    [
+     "SHQ1 | Headquarters1",
+     2
+    ],
+    [
+     "SHQ2 | Headquarters2",
+     2
+    ]
+   ],
+   "2025-10": [
+    [
+     "SHQ1 | Headquarters1",
+     3
+    ],
+    [
+     "SHQ2 | Headquarters2",
+     3
+    ],
+    [
+     "COR | TeraSofts",
+     2
+    ],
+    [
+     "CAH | Astronex",
+     1
+    ]
+   ],
+   "2025-11": [
+    [
+     "SHQ1 | Headquarters1",
+     7
+    ],
+    [
+     "SHQ2 | Headquarters2",
+     6
+    ],
+    [
+     "COR | TeraSofts",
+     1
+    ]
+   ],
+   "2025-12": [
+    [
+     "SHQ2 | Headquarters2",
+     3
+    ],
+    [
+     "COR | TeraSofts",
+     1
+    ],
+    [
+     "SHQ1 | Headquarters1",
+     1
+    ]
+   ],
+   "2026-01": [
+    [
+     "SHQ2 | Headquarters2",
+     3
+    ],
+    [
+     "SHQ1 | Headquarters1",
+     1
+    ]
+   ],
+   "2026-02": [
+    [
+     "SHQ2 | Headquarters2",
+     3
+    ],
+    [
+     "COR | TeraSofts",
+     1
+    ],
+    [
+     "SHQ1 | Headquarters1",
+     1
+    ]
+   ],
+   "2026-03": [
+    [
+     "SHQ2 | Headquarters2",
+     4
+    ],
+    [
+     "SHQ2 | Headquarters1",
+     1
+    ]
+   ],
+   "2026-04": [
+    [
+     "SHQ1 | Headquarters1",
+     3
+    ],
+    [
+     "SHQ2 | Headquarters2",
+     3
+    ],
+    [
+     "COR | TeraSofts",
+     1
+    ],
+    [
+     "TOR | Project A",
+     1
+    ]
+   ],
+   "2026-05": [
+    [
+     "SHQ1 | Headquarters1",
+     3
+    ],
+    [
+     "SHQ1| Headquarters1",
+     1
+    ],
+    [
+     "SHQ2 | Headquarters2",
+     1
+    ]
+   ],
+   "2026-06": [
+    [
+     "SHQ1 | Headquarters1",
+     8
+    ],
+    [
+     "COR | TeraSofts",
+     3
+    ],
+    [
+     "SHQ2 | Headquarters2",
+     1
+    ]
+   ],
+   "2026-07": [
+    [
+     "SHQ1 | Headquarters1",
+     19
+    ],
+    [
+     "SHQ2 | Headquarters2",
+     4
+    ]
+   ],
+   "2026-08": [
+    [
+     "SHQ1 | Headquarters1",
+     12
+    ],
+    [
+     "SHQ2 | Headquarters2",
+     1
+    ]
+   ]
+  }
+ },
+ "van_tay": {
+  "thieu": "18047e0eb0319ea1",
+  "nguoc": "6ac2463a190ff631"
+ },
+ "dong_thieu": [
+  {
+   "dong_sheet": 744,
+   "ky": "2025-01",
+   "hd_classifying": "GI | Gross Inflow",
+   "hd_mid": null,
+   "hd_final": "GI | Gross Inflow",
+   "pay_type_classifying": "Thu tiền",
+   "pay_type_mid": null,
+   "pay_type_final": "Thu tiền",
+   "cdt1_classifying": "SHQ2 | Headquarters2",
+   "cdt1_mid": null,
+   "cdt1_final": "SHQ2 | Headquarters2",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 968,
+   "ky": "2025-02",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "ITE | ITE Interest",
+   "hd_final": "ITE | ITE Interest",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thu tiền",
+   "pay_type_final": "Thu tiền",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ2 | Headquarters2",
+   "cdt1_final": "SHQ2 | Headquarters2",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 969,
+   "ky": "2025-02",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "NB | Lưu chuyển nội bộ",
+   "hd_final": "NB | Lưu chuyển nội bộ",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thanh toán (Regular)",
+   "pay_type_final": "Thanh toán (Regular)",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ2 | Headquarters2",
+   "cdt1_final": "SHQ2 | Headquarters2",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 1685,
+   "ky": "2025-05",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "OGA | GAC - Other",
+   "hd_final": "OGA | GAC - Other",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thanh toán (Regular)",
+   "pay_type_final": "Thanh toán (Regular)",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ2 | Headquarters2",
+   "cdt1_final": "SHQ2 | Headquarters2",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 2093,
+   "ky": "2025-06",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "OGA | GAC - Other",
+   "hd_final": "OGA | GAC - Other",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thanh toán (Regular)",
+   "pay_type_final": "Thanh toán (Regular)",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ2 | Headquarters2",
+   "cdt1_final": "SHQ2 | Headquarters2",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 2166,
+   "ky": "2025-06",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "OGA | GAC - Other",
+   "hd_final": "OGA | GAC - Other",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thu tiền",
+   "pay_type_final": "Thu tiền",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ2 | Headquarters2",
+   "cdt1_final": "SHQ2 | Headquarters2",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 2256,
+   "ky": "2025-06",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "OGA | GAC - Other",
+   "hd_final": "OGA | GAC - Other",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thanh toán (Regular)",
+   "pay_type_final": "Thanh toán (Regular)",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ2 | Headquarters2",
+   "cdt1_final": "SHQ2 | Headquarters2",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 2444,
+   "ky": "2025-07",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "OGA | GAC - Other",
+   "hd_final": "OGA | GAC - Other",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thanh toán (Regular)",
+   "pay_type_final": "Thanh toán (Regular)",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ2 | Headquarters2",
+   "cdt1_final": "SHQ2 | Headquarters2",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 2470,
+   "ky": "2025-07",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "OGA | GAC - Other",
+   "hd_final": "OGA | GAC - Other",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thanh toán (Regular)",
+   "pay_type_final": "Thanh toán (Regular)",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ2 | Headquarters2",
+   "cdt1_final": "SHQ2 | Headquarters2",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 2556,
+   "ky": "2025-07",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "OGA | GAC - Other",
+   "hd_final": "OGA | GAC - Other",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thu tiền",
+   "pay_type_final": "Thu tiền",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ2 | Headquarters2",
+   "cdt1_final": "SHQ2 | Headquarters2",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 2561,
+   "ky": "2025-07",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "OGA | GAC - Other",
+   "hd_final": "OGA | GAC - Other",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thu tiền",
+   "pay_type_final": "Thu tiền",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ2 | Headquarters2",
+   "cdt1_final": "SHQ2 | Headquarters2",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 3007,
+   "ky": "2025-08",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "OGA | GAC - Other",
+   "hd_final": "OGA | GAC - Other",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thanh toán (Regular)",
+   "pay_type_final": "Thanh toán (Regular)",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ2 | Headquarters2",
+   "cdt1_final": "SHQ2 | Headquarters2",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 3045,
+   "ky": "2025-08",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "LMN | Loan/Borrowing",
+   "hd_final": "LMN | Loan/Borrowing",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thu tiền",
+   "pay_type_final": "Thu tiền",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ2 | Headquarters2",
+   "cdt1_final": "SHQ2 | Headquarters2",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 3081,
+   "ky": "2025-08",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "OGA | GAC - Other",
+   "hd_final": "OGA | GAC - Other",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thu tiền",
+   "pay_type_final": "Thu tiền",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ2 | Headquarters2",
+   "cdt1_final": "SHQ2 | Headquarters2",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 3104,
+   "ky": "2025-08",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "OGA | GAC - Other",
+   "hd_final": "OGA | GAC - Other",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thu tiền",
+   "pay_type_final": "Thu tiền",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ2 | Headquarters2",
+   "cdt1_final": "SHQ2 | Headquarters2",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 3531,
+   "ky": "2025-09",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "OGA | GAC - Other",
+   "hd_final": "OGA | GAC - Other",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thanh toán (Regular)",
+   "pay_type_final": "Thanh toán (Regular)",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ1 | Headquarters1",
+   "cdt1_final": "SHQ1 | Headquarters1",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 3537,
+   "ky": "2025-09",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "OGA | GAC - Other",
+   "hd_final": "OGA | GAC - Other",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thanh toán (Regular)",
+   "pay_type_final": "Thanh toán (Regular)",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ1 | Headquarters1",
+   "cdt1_final": "SHQ1 | Headquarters1",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 3597,
+   "ky": "2025-09",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "OGA | GAC - Other",
+   "hd_final": "OGA | GAC - Other",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thu tiền",
+   "pay_type_final": "Thu tiền",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ2 | Headquarters2",
+   "cdt1_final": "SHQ2 | Headquarters2",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 3609,
+   "ky": "2025-09",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "OGA | GAC - Other",
+   "hd_final": "OGA | GAC - Other",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thu tiền",
+   "pay_type_final": "Thu tiền",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ2 | Headquarters2",
+   "cdt1_final": "SHQ2 | Headquarters2",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 4033,
+   "ky": "2025-10",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "OGA | GAC - Other",
+   "hd_final": "OGA | GAC - Other",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thanh toán (Regular)",
+   "pay_type_final": "Thanh toán (Regular)",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ1 | Headquarters1",
+   "cdt1_final": "SHQ1 | Headquarters1",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 4102,
+   "ky": "2025-10",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "OGA | GAC - Other",
+   "hd_final": "OGA | GAC - Other",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thanh toán (Regular)",
+   "pay_type_final": "Thanh toán (Regular)",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "CAH | Astronex",
+   "cdt1_final": "CAH | Astronex",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 4106,
+   "ky": "2025-10",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "OGA | GAC - Other",
+   "hd_final": "OGA | GAC - Other",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thu tiền",
+   "pay_type_final": "Thu tiền",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ2 | Headquarters2",
+   "cdt1_final": "SHQ2 | Headquarters2",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 4380,
+   "ky": "2025-10",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "GI | Gross Inflow",
+   "hd_final": "GI | Gross Inflow",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thanh toán (Regular)",
+   "pay_type_final": "Thanh toán (Regular)",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "COR | TeraSofts",
+   "cdt1_final": "COR | TeraSofts",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 4381,
+   "ky": "2025-10",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "OGA | GAC - Other",
+   "hd_final": "OGA | GAC - Other",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thanh toán (Regular)",
+   "pay_type_final": "Thanh toán (Regular)",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "COR | TeraSofts",
+   "cdt1_final": "COR | TeraSofts",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 4382,
+   "ky": "2025-10",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "DEP | Deposit",
+   "hd_final": "DEP | Deposit",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thanh toán (Regular)",
+   "pay_type_final": "Thanh toán (Regular)",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ2 | Headquarters2",
+   "cdt1_final": "SHQ2 | Headquarters2",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 4383,
+   "ky": "2025-10",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "DEP | Deposit",
+   "hd_final": "DEP | Deposit",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thanh toán (Regular)",
+   "pay_type_final": "Thanh toán (Regular)",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ2 | Headquarters2",
+   "cdt1_final": "SHQ2 | Headquarters2",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 4429,
+   "ky": "2025-10",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "DEP | Deposit",
+   "hd_final": "DEP | Deposit",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thanh toán (Regular)",
+   "pay_type_final": "Thanh toán (Regular)",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ1 | Headquarters1",
+   "cdt1_final": "SHQ1 | Headquarters1",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 4430,
+   "ky": "2025-10",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "DEP | Deposit",
+   "hd_final": "DEP | Deposit",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thanh toán (Regular)",
+   "pay_type_final": "Thanh toán (Regular)",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ1 | Headquarters1",
+   "cdt1_final": "SHQ1 | Headquarters1",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 4517,
+   "ky": "2025-11",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "OGA | GAC - Other",
+   "hd_final": "OGA | GAC - Other",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thanh toán (Regular)",
+   "pay_type_final": "Thanh toán (Regular)",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "COR | TeraSofts",
+   "cdt1_final": "COR | TeraSofts",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 4564,
+   "ky": "2025-11",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "OGA | GAC - Other",
+   "hd_final": "OGA | GAC - Other",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thu tiền",
+   "pay_type_final": "Thu tiền",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ1 | Headquarters1",
+   "cdt1_final": "SHQ1 | Headquarters1",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 4838,
+   "ky": "2025-11",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "DEP | Deposit",
+   "hd_final": "DEP | Deposit",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thanh toán (Regular)",
+   "pay_type_final": "Thanh toán (Regular)",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ1 | Headquarters1",
+   "cdt1_final": "SHQ1 | Headquarters1",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 4839,
+   "ky": "2025-11",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "ITE | ITE Interest",
+   "hd_final": "ITE | ITE Interest",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thanh toán (Regular)",
+   "pay_type_final": "Thanh toán (Regular)",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ1 | Headquarters1",
+   "cdt1_final": "SHQ1 | Headquarters1",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 4842,
+   "ky": "2025-11",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "GI | Gross Inflow",
+   "hd_final": "GI | Gross Inflow",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thu tiền",
+   "pay_type_final": "Thu tiền",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ2 | Headquarters2",
+   "cdt1_final": "SHQ2 | Headquarters2",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 4843,
+   "ky": "2025-11",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "OGA | GAC - Other",
+   "hd_final": "OGA | GAC - Other",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thu tiền",
+   "pay_type_final": "Thu tiền",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ2 | Headquarters2",
+   "cdt1_final": "SHQ2 | Headquarters2",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 4844,
+   "ky": "2025-11",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "ITE | ITE Interest",
+   "hd_final": "ITE | ITE Interest",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thanh toán (Regular)",
+   "pay_type_final": "Thanh toán (Regular)",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ1 | Headquarters1",
+   "cdt1_final": "SHQ1 | Headquarters1",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 4845,
+   "ky": "2025-11",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "DEP | Deposit",
+   "hd_final": "DEP | Deposit",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thu tiền",
+   "pay_type_final": "Thu tiền",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ2 | Headquarters2",
+   "cdt1_final": "SHQ2 | Headquarters2",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 4846,
+   "ky": "2025-11",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "ITE | ITE Interest",
+   "hd_final": "ITE | ITE Interest",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thanh toán (Regular)",
+   "pay_type_final": "Thanh toán (Regular)",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ1 | Headquarters1",
+   "cdt1_final": "SHQ1 | Headquarters1",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 4924,
+   "ky": "2025-11",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "DEP | Deposit",
+   "hd_final": "DEP | Deposit",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thanh toán (Regular)",
+   "pay_type_final": "Thanh toán (Regular)",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ1 | Headquarters1",
+   "cdt1_final": "SHQ1 | Headquarters1",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 4925,
+   "ky": "2025-11",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "ITE | ITE Interest",
+   "hd_final": "ITE | ITE Interest",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thanh toán (Regular)",
+   "pay_type_final": "Thanh toán (Regular)",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ1 | Headquarters1",
+   "cdt1_final": "SHQ1 | Headquarters1",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 4950,
+   "ky": "2025-11",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "ITE | ITE Interest",
+   "hd_final": "ITE | ITE Interest",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thanh toán (Regular)",
+   "pay_type_final": "Thanh toán (Regular)",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ2 | Headquarters2",
+   "cdt1_final": "SHQ2 | Headquarters2",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 4951,
+   "ky": "2025-11",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "DEP | Deposit",
+   "hd_final": "DEP | Deposit",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thanh toán (Regular)",
+   "pay_type_final": "Thanh toán (Regular)",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ2 | Headquarters2",
+   "cdt1_final": "SHQ2 | Headquarters2",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 4952,
+   "ky": "2025-11",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "ITE | ITE Interest",
+   "hd_final": "ITE | ITE Interest",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thanh toán (Regular)",
+   "pay_type_final": "Thanh toán (Regular)",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ2 | Headquarters2",
+   "cdt1_final": "SHQ2 | Headquarters2",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 5006,
+   "ky": "2025-12",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "OGA | GAC - Other",
+   "hd_final": "OGA | GAC - Other",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thanh toán (Regular)",
+   "pay_type_final": "Thanh toán (Regular)",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ1 | Headquarters1",
+   "cdt1_final": "SHQ1 | Headquarters1",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 5013,
+   "ky": "2025-12",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "BON | Bonus",
+   "hd_final": "BON | Bonus",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thanh toán (Regular)",
+   "pay_type_final": "Thanh toán (Regular)",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "COR | TeraSofts",
+   "cdt1_final": "COR | TeraSofts",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 5067,
+   "ky": "2025-12",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "OGA | GAC - Other",
+   "hd_final": "OGA | GAC - Other",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thu tiền",
+   "pay_type_final": "Thu tiền",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ2 | Headquarters2",
+   "cdt1_final": "SHQ2 | Headquarters2",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 5399,
+   "ky": "2025-12",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "GI | Gross Inflow",
+   "hd_final": "GI | Gross Inflow",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thanh toán (Regular)",
+   "pay_type_final": "Thanh toán (Regular)",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ2 | Headquarters2",
+   "cdt1_final": "SHQ2 | Headquarters2",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 5400,
+   "ky": "2025-12",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "OGA | GAC - Other",
+   "hd_final": "OGA | GAC - Other",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thanh toán (Regular)",
+   "pay_type_final": "Thanh toán (Regular)",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ2 | Headquarters2",
+   "cdt1_final": "SHQ2 | Headquarters2",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 5563,
+   "ky": "2026-01",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "OGA | GAC - Other",
+   "hd_final": "OGA | GAC - Other",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thanh toán (Regular)",
+   "pay_type_final": "Thanh toán (Regular)",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ2 | Headquarters2",
+   "cdt1_final": "SHQ2 | Headquarters2",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 5608,
+   "ky": "2026-01",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "OGA | GAC - Other",
+   "hd_final": "OGA | GAC - Other",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thanh toán (Regular)",
+   "pay_type_final": "Thanh toán (Regular)",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ2 | Headquarters2",
+   "cdt1_final": "SHQ2 | Headquarters2",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 5900,
+   "ky": "2026-01",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "GI | Gross Inflow",
+   "hd_final": "GI | Gross Inflow",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thu tiền",
+   "pay_type_final": "Thu tiền",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ2 | Headquarters2",
+   "cdt1_final": "SHQ2 | Headquarters2",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 5901,
+   "ky": "2026-01",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "OGA | GAC - Other",
+   "hd_final": "OGA | GAC - Other",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thanh toán (Regular)",
+   "pay_type_final": "Thanh toán (Regular)",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ1 | Headquarters1",
+   "cdt1_final": "SHQ1 | Headquarters1",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 6033,
+   "ky": "2026-02",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "OGA | GAC - Other",
+   "hd_final": "OGA | GAC - Other",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thanh toán (Regular)",
+   "pay_type_final": "Thanh toán (Regular)",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ2 | Headquarters2",
+   "cdt1_final": "SHQ2 | Headquarters2",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 6098,
+   "ky": "2026-02",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "OGA | GAC - Other",
+   "hd_final": "OGA | GAC - Other",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thu tiền",
+   "pay_type_final": "Thu tiền",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ2 | Headquarters2",
+   "cdt1_final": "SHQ2 | Headquarters2",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 6382,
+   "ky": "2026-02",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "GI | Gross Inflow",
+   "hd_final": "GI | Gross Inflow",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thu tiền",
+   "pay_type_final": "Thu tiền",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "COR | TeraSofts",
+   "cdt1_final": "COR | TeraSofts",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 6383,
+   "ky": "2026-02",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "OGA | GAC - Other",
+   "hd_final": "OGA | GAC - Other",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thanh toán (Regular)",
+   "pay_type_final": "Thanh toán (Regular)",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ1 | Headquarters1",
+   "cdt1_final": "SHQ1 | Headquarters1",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 6439,
+   "ky": "2026-02",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "OMC | Online Marketing Cost",
+   "hd_final": "OMC | Online Marketing Cost",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thanh toán (Regular)",
+   "pay_type_final": "Thanh toán (Regular)",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ2 | Headquarters2",
+   "cdt1_final": "SHQ2 | Headquarters2",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 6481,
+   "ky": "2026-03",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "OGA | GAC - Other",
+   "hd_final": "OGA | GAC - Other",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thanh toán (Regular)",
+   "pay_type_final": "Thanh toán (Regular)",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ2 | Headquarters2",
+   "cdt1_final": "SHQ2 | Headquarters2",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 6482,
+   "ky": "2026-03",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "OGA | GAC - Other",
+   "hd_final": "OGA | GAC - Other",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thanh toán (Regular)",
+   "pay_type_final": "Thanh toán (Regular)",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ2 | Headquarters2",
+   "cdt1_final": "SHQ2 | Headquarters2",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 6549,
+   "ky": "2026-03",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "OGA | GAC - Other",
+   "hd_final": "OGA | GAC - Other",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thu tiền",
+   "pay_type_final": "Thu tiền",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ2 | Headquarters1",
+   "cdt1_final": "SHQ2 | Headquarters1",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 6899,
+   "ky": "2026-03",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "GI | Gross Inflow",
+   "hd_final": "GI | Gross Inflow",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thu tiền",
+   "pay_type_final": "Thu tiền",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ2 | Headquarters2",
+   "cdt1_final": "SHQ2 | Headquarters2",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 6900,
+   "ky": "2026-03",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "LC | License Cost",
+   "hd_final": "LC | License Cost",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thanh toán (Regular)",
+   "pay_type_final": "Thanh toán (Regular)",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ2 | Headquarters2",
+   "cdt1_final": "SHQ2 | Headquarters2",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 7062,
+   "ky": "2026-04",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "OGA | GAC - Other",
+   "hd_final": "OGA | GAC - Other",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thanh toán (Regular)",
+   "pay_type_final": "Thanh toán (Regular)",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ1 | Headquarters1",
+   "cdt1_final": "SHQ1 | Headquarters1",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 7076,
+   "ky": "2026-04",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "OGA | GAC - Other",
+   "hd_final": "OGA | GAC - Other",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thanh toán (Regular)",
+   "pay_type_final": "Thanh toán (Regular)",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ1 | Headquarters1",
+   "cdt1_final": "SHQ1 | Headquarters1",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 7106,
+   "ky": "2026-04",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "LC | License Cost",
+   "hd_final": "LC | License Cost",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thanh toán (Regular)",
+   "pay_type_final": "Thanh toán (Regular)",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ2 | Headquarters2",
+   "cdt1_final": "SHQ2 | Headquarters2",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 7107,
+   "ky": "2026-04",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "OGA | GAC - Other",
+   "hd_final": "OGA | GAC - Other",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thu tiền",
+   "pay_type_final": "Thu tiền",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ2 | Headquarters2",
+   "cdt1_final": "SHQ2 | Headquarters2",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 7108,
+   "ky": "2026-04",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "OGA | GAC - Other",
+   "hd_final": "OGA | GAC - Other",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thu tiền",
+   "pay_type_final": "Thu tiền",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ2 | Headquarters2",
+   "cdt1_final": "SHQ2 | Headquarters2",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 7320,
+   "ky": "2026-04",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "OMC | Online Marketing Cost",
+   "hd_final": "OMC | Online Marketing Cost",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thu tiền",
+   "pay_type_final": "Thu tiền",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "TOR | Project A",
+   "cdt1_final": "TOR | Project A",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 7520,
+   "ky": "2026-04",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "GI | Gross Inflow",
+   "hd_final": "GI | Gross Inflow",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thu tiền",
+   "pay_type_final": "Thu tiền",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "COR | TeraSofts",
+   "cdt1_final": "COR | TeraSofts",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 7521,
+   "ky": "2026-04",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "OGA | GAC - Other",
+   "hd_final": "OGA | GAC - Other",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thanh toán (Regular)",
+   "pay_type_final": "Thanh toán (Regular)",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ1 | Headquarters1",
+   "cdt1_final": "SHQ1 | Headquarters1",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 7655,
+   "ky": "2026-05",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "OGA | GAC - Other",
+   "hd_final": "OGA | GAC - Other",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thanh toán (Regular)",
+   "pay_type_final": "Thanh toán (Regular)",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ1 | Headquarters1",
+   "cdt1_final": "SHQ1 | Headquarters1",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 7659,
+   "ky": "2026-05",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "OGA | GAC - Other",
+   "hd_final": "OGA | GAC - Other",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thanh toán (Regular)",
+   "pay_type_final": "Thanh toán (Regular)",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ1 | Headquarters1",
+   "cdt1_final": "SHQ1 | Headquarters1",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 7709,
+   "ky": "2026-05",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "OGA | GAC - Other",
+   "hd_final": "OGA | GAC - Other",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thu tiền",
+   "pay_type_final": "Thu tiền",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ1 | Headquarters1",
+   "cdt1_final": "SHQ1 | Headquarters1",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 7726,
+   "ky": "2026-05",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "OGA | GAC - Other",
+   "hd_final": "OGA | GAC - Other",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thu tiền",
+   "pay_type_final": "Thu tiền",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ2 | Headquarters2",
+   "cdt1_final": "SHQ2 | Headquarters2",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 7783,
+   "ky": "2026-05",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "OGA | GAC - Other",
+   "hd_final": "OGA | GAC - Other",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thu tiền",
+   "pay_type_final": "Thu tiền",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ1| Headquarters1",
+   "cdt1_final": "SHQ1| Headquarters1",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 8191,
+   "ky": "2026-06",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "OGA | GAC - Other",
+   "hd_final": "OGA | GAC - Other",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thanh toán (Regular)",
+   "pay_type_final": "Thanh toán (Regular)",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ1 | Headquarters1",
+   "cdt1_final": "SHQ1 | Headquarters1",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 8233,
+   "ky": "2026-06",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "OGA | GAC - Other",
+   "hd_final": "OGA | GAC - Other",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thu tiền",
+   "pay_type_final": "Thu tiền",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ1 | Headquarters1",
+   "cdt1_final": "SHQ1 | Headquarters1",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 8284,
+   "ky": "2026-06",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "OGA | GAC - Other",
+   "hd_final": "OGA | GAC - Other",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thanh toán (Regular)",
+   "pay_type_final": "Thanh toán (Regular)",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ1 | Headquarters1",
+   "cdt1_final": "SHQ1 | Headquarters1",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 8327,
+   "ky": "2026-06",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "GI | Gross Inflow",
+   "hd_final": "GI | Gross Inflow",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thu tiền",
+   "pay_type_final": "Thu tiền",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "COR | TeraSofts",
+   "cdt1_final": "COR | TeraSofts",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 8328,
+   "ky": "2026-06",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "OGA | GAC - Other",
+   "hd_final": "OGA | GAC - Other",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thanh toán (Regular)",
+   "pay_type_final": "Thanh toán (Regular)",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ1 | Headquarters1",
+   "cdt1_final": "SHQ1 | Headquarters1",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 8422,
+   "ky": "2026-06",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "GI | Gross Inflow",
+   "hd_final": "GI | Gross Inflow",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thu tiền",
+   "pay_type_final": "Thu tiền",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "COR | TeraSofts",
+   "cdt1_final": "COR | TeraSofts",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 8423,
+   "ky": "2026-06",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "OGA | GAC - Other",
+   "hd_final": "OGA | GAC - Other",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thanh toán (Regular)",
+   "pay_type_final": "Thanh toán (Regular)",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ1 | Headquarters1",
+   "cdt1_final": "SHQ1 | Headquarters1",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 8469,
+   "ky": "2026-06",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "OGA | GAC - Other",
+   "hd_final": "OGA | GAC - Other",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thanh toán (Regular)",
+   "pay_type_final": "Thanh toán (Regular)",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ2 | Headquarters2",
+   "cdt1_final": "SHQ2 | Headquarters2",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 8509,
+   "ky": "2026-06",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "GI | Gross Inflow",
+   "hd_final": "GI | Gross Inflow",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thu tiền",
+   "pay_type_final": "Thu tiền",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ1 | Headquarters1",
+   "cdt1_final": "SHQ1 | Headquarters1",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 8510,
+   "ky": "2026-06",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "OGA | GAC - Other",
+   "hd_final": "OGA | GAC - Other",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thanh toán (Regular)",
+   "pay_type_final": "Thanh toán (Regular)",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ1 | Headquarters1",
+   "cdt1_final": "SHQ1 | Headquarters1",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 8665,
+   "ky": "2026-06",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "GI | Gross Inflow",
+   "hd_final": "GI | Gross Inflow",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thu tiền",
+   "pay_type_final": "Thu tiền",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "COR | TeraSofts",
+   "cdt1_final": "COR | TeraSofts",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 8666,
+   "ky": "2026-06",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "OGA | GAC - Other",
+   "hd_final": "OGA | GAC - Other",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thanh toán (Regular)",
+   "pay_type_final": "Thanh toán (Regular)",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ1 | Headquarters1",
+   "cdt1_final": "SHQ1 | Headquarters1",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 8826,
+   "ky": "2026-07",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "OGA | GAC - Other",
+   "hd_final": "OGA | GAC - Other",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thanh toán (Regular)",
+   "pay_type_final": "Thanh toán (Regular)",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ1 | Headquarters1",
+   "cdt1_final": "SHQ1 | Headquarters1",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 8831,
+   "ky": "2026-07",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "OGA | GAC - Other",
+   "hd_final": "OGA | GAC - Other",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thanh toán (Regular)",
+   "pay_type_final": "Thanh toán (Regular)",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ1 | Headquarters1",
+   "cdt1_final": "SHQ1 | Headquarters1",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 8832,
+   "ky": "2026-07",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "OGA | GAC - Other",
+   "hd_final": "OGA | GAC - Other",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thanh toán (Regular)",
+   "pay_type_final": "Thanh toán (Regular)",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ1 | Headquarters1",
+   "cdt1_final": "SHQ1 | Headquarters1",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 8858,
+   "ky": "2026-07",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "GI | Gross Inflow",
+   "hd_final": "GI | Gross Inflow",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thu tiền",
+   "pay_type_final": "Thu tiền",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ2 | Headquarters2",
+   "cdt1_final": "SHQ2 | Headquarters2",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 8859,
+   "ky": "2026-07",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "OGA | GAC - Other",
+   "hd_final": "OGA | GAC - Other",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thanh toán (Regular)",
+   "pay_type_final": "Thanh toán (Regular)",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ2 | Headquarters2",
+   "cdt1_final": "SHQ2 | Headquarters2",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 8884,
+   "ky": "2026-07",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "OGA | GAC - Other",
+   "hd_final": "OGA | GAC - Other",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thu tiền",
+   "pay_type_final": "Thu tiền",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ2 | Headquarters2",
+   "cdt1_final": "SHQ2 | Headquarters2",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 8886,
+   "ky": "2026-07",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "OGA | GAC - Other",
+   "hd_final": "NB | Lưu chuyển nội bộ",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thu tiền",
+   "pay_type_final": "Thu tiền",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ2 | Headquarters2",
+   "cdt1_final": "SHQ2 | Headquarters2",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 8991,
+   "ky": "2026-07",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "OGA | GAC - Other",
+   "hd_final": "OGA | GAC - Other",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thanh toán (Regular)",
+   "pay_type_final": "Thanh toán (Regular)",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ1 | Headquarters1",
+   "cdt1_final": "SHQ1 | Headquarters1",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 8992,
+   "ky": "2026-07",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "GI | Gross Inflow",
+   "hd_final": "GI | Gross Inflow",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thu tiền",
+   "pay_type_final": "Thu tiền",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ1 | Headquarters1",
+   "cdt1_final": "SHQ1 | Headquarters1",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 9121,
+   "ky": "2026-07",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "GI | Gross Inflow",
+   "hd_final": "GI | Gross Inflow",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thu tiền",
+   "pay_type_final": "Thu tiền",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ1 | Headquarters1",
+   "cdt1_final": "SHQ1 | Headquarters1",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 9122,
+   "ky": "2026-07",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "OGA | GAC - Other",
+   "hd_final": "OGA | GAC - Other",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thanh toán (Regular)",
+   "pay_type_final": "Thanh toán (Regular)",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ1 | Headquarters1",
+   "cdt1_final": "SHQ1 | Headquarters1",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 9239,
+   "ky": "2026-07",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "OGA | GAC - Other",
+   "hd_final": "OGA | GAC - Other",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thanh toán (Regular)",
+   "pay_type_final": "Thanh toán (Regular)",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ1 | Headquarters1",
+   "cdt1_final": "SHQ1 | Headquarters1",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 9240,
+   "ky": "2026-07",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "GI | Gross Inflow",
+   "hd_final": "GI | Gross Inflow",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thu tiền",
+   "pay_type_final": "Thu tiền",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ1 | Headquarters1",
+   "cdt1_final": "SHQ1 | Headquarters1",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 9267,
+   "ky": "2026-07",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "GI | Gross Inflow",
+   "hd_final": "GI | Gross Inflow",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thu tiền",
+   "pay_type_final": "Thu tiền",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ1 | Headquarters1",
+   "cdt1_final": "SHQ1 | Headquarters1",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 9268,
+   "ky": "2026-07",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "OGA | GAC - Other",
+   "hd_final": "OGA | GAC - Other",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thanh toán (Regular)",
+   "pay_type_final": "Thanh toán (Regular)",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ1 | Headquarters1",
+   "cdt1_final": "SHQ1 | Headquarters1",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 9298,
+   "ky": "2026-07",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "GI | Gross Inflow",
+   "hd_final": "GI | Gross Inflow",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thu tiền",
+   "pay_type_final": "Thu tiền",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ1 | Headquarters1",
+   "cdt1_final": "SHQ1 | Headquarters1",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 9299,
+   "ky": "2026-07",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "OGA | GAC - Other",
+   "hd_final": "OGA | GAC - Other",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thanh toán (Regular)",
+   "pay_type_final": "Thanh toán (Regular)",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ1 | Headquarters1",
+   "cdt1_final": "SHQ1 | Headquarters1",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 9368,
+   "ky": "2026-07",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "GI | Gross Inflow",
+   "hd_final": "GI | Gross Inflow",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thu tiền",
+   "pay_type_final": "Thu tiền",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ1 | Headquarters1",
+   "cdt1_final": "SHQ1 | Headquarters1",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 9369,
+   "ky": "2026-07",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "OGA | GAC - Other",
+   "hd_final": "OGA | GAC - Other",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thanh toán (Regular)",
+   "pay_type_final": "Thanh toán (Regular)",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ1 | Headquarters1",
+   "cdt1_final": "SHQ1 | Headquarters1",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 9424,
+   "ky": "2026-07",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "OGA | GAC - Other",
+   "hd_final": "OGA | GAC - Other",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thanh toán (Regular)",
+   "pay_type_final": "Thanh toán (Regular)",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ1 | Headquarters1",
+   "cdt1_final": "SHQ1 | Headquarters1",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 9425,
+   "ky": "2026-07",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "GI | Gross Inflow",
+   "hd_final": "GI | Gross Inflow",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thu tiền",
+   "pay_type_final": "Thu tiền",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ1 | Headquarters1",
+   "cdt1_final": "SHQ1 | Headquarters1",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 9426,
+   "ky": "2026-07",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "OGA | GAC - Other",
+   "hd_final": "OGA | GAC - Other",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thanh toán (Regular)",
+   "pay_type_final": "Thanh toán (Regular)",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ1 | Headquarters1",
+   "cdt1_final": "SHQ1 | Headquarters1",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 9427,
+   "ky": "2026-07",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "GI | Gross Inflow",
+   "hd_final": "GI | Gross Inflow",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thu tiền",
+   "pay_type_final": "Thu tiền",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ1 | Headquarters1",
+   "cdt1_final": "SHQ1 | Headquarters1",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 9505,
+   "ky": "2026-08",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "OGA | GAC - Other",
+   "hd_final": "OGA | GAC - Other",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thanh toán (Regular)",
+   "pay_type_final": "Thanh toán (Regular)",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ1 | Headquarters1",
+   "cdt1_final": "SHQ1 | Headquarters1",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 9506,
+   "ky": "2026-08",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "OGA | GAC - Other",
+   "hd_final": "OGA | GAC - Other",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thanh toán (Regular)",
+   "pay_type_final": "Thanh toán (Regular)",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ1 | Headquarters1",
+   "cdt1_final": "SHQ1 | Headquarters1",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 9507,
+   "ky": "2026-08",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "OGA | GAC - Other",
+   "hd_final": "OGA | GAC - Other",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thanh toán (Regular)",
+   "pay_type_final": "Thanh toán (Regular)",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ1 | Headquarters1",
+   "cdt1_final": "SHQ1 | Headquarters1",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 9590,
+   "ky": "2026-08",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "OGA | GAC - Other",
+   "hd_final": "OGA | GAC - Other",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thu tiền",
+   "pay_type_final": "Thu tiền",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ1 | Headquarters1",
+   "cdt1_final": "SHQ1 | Headquarters1",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 9638,
+   "ky": "2026-08",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "OGA | GAC - Other",
+   "hd_final": "OGA | GAC - Other",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thu tiền",
+   "pay_type_final": "Thu tiền",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ2 | Headquarters2",
+   "cdt1_final": "SHQ2 | Headquarters2",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 9721,
+   "ky": "2026-08",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "GI | Gross Inflow",
+   "hd_final": "GI | Gross Inflow",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thu tiền",
+   "pay_type_final": "Thu tiền",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ1 | Headquarters1",
+   "cdt1_final": "SHQ1 | Headquarters1",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 9722,
+   "ky": "2026-08",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "OGA | GAC - Other",
+   "hd_final": "OGA | GAC - Other",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thanh toán (Regular)",
+   "pay_type_final": "Thanh toán (Regular)",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ1 | Headquarters1",
+   "cdt1_final": "SHQ1 | Headquarters1",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 9740,
+   "ky": "2026-08",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "GI | Gross Inflow",
+   "hd_final": "GI | Gross Inflow",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thu tiền",
+   "pay_type_final": "Thu tiền",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ1 | Headquarters1",
+   "cdt1_final": "SHQ1 | Headquarters1",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 9741,
+   "ky": "2026-08",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "OGA | GAC - Other",
+   "hd_final": "OGA | GAC - Other",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thu tiền",
+   "pay_type_final": "Thu tiền",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ1 | Headquarters1",
+   "cdt1_final": "SHQ1 | Headquarters1",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 9819,
+   "ky": "2026-08",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "GI | Gross Inflow",
+   "hd_final": "GI | Gross Inflow",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thu tiền",
+   "pay_type_final": "Thu tiền",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ1 | Headquarters1",
+   "cdt1_final": "SHQ1 | Headquarters1",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 9820,
+   "ky": "2026-08",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "OGA | GAC - Other",
+   "hd_final": "OGA | GAC - Other",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thanh toán (Regular)",
+   "pay_type_final": "Thanh toán (Regular)",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ1 | Headquarters1",
+   "cdt1_final": "SHQ1 | Headquarters1",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 9866,
+   "ky": "2026-08",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "GI | Gross Inflow",
+   "hd_final": "GI | Gross Inflow",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thu tiền",
+   "pay_type_final": "Thu tiền",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ1 | Headquarters1",
+   "cdt1_final": "SHQ1 | Headquarters1",
+   "nhan": null
+  },
+  {
+   "dong_sheet": 9867,
+   "ky": "2026-08",
+   "hd_classifying": "Need to manual input",
+   "hd_mid": "OGA | GAC - Other",
+   "hd_final": "OGA | GAC - Other",
+   "pay_type_classifying": "Need to manual input",
+   "pay_type_mid": "Thanh toán (Regular)",
+   "pay_type_final": "Thanh toán (Regular)",
+   "cdt1_classifying": "Need to manual input",
+   "cdt1_mid": "SHQ1 | Headquarters1",
+   "cdt1_final": "SHQ1 | Headquarters1",
+   "nhan": null
+  }
+ ],
+ "dong_nguoc": [
+  {
+   "dong_canon": 739,
+   "nhan": null
+  },
+  {
+   "dong_canon": 963,
+   "nhan": null
+  },
+  {
+   "dong_canon": 964,
+   "nhan": null
+  },
+  {
+   "dong_canon": 1680,
+   "nhan": null
+  },
+  {
+   "dong_canon": 2088,
+   "nhan": null
+  },
+  {
+   "dong_canon": 2161,
+   "nhan": null
+  },
+  {
+   "dong_canon": 2251,
+   "nhan": null
+  },
+  {
+   "dong_canon": 2439,
+   "nhan": null
+  },
+  {
+   "dong_canon": 2465,
+   "nhan": null
+  },
+  {
+   "dong_canon": 2551,
+   "nhan": null
+  },
+  {
+   "dong_canon": 2556,
+   "nhan": null
+  },
+  {
+   "dong_canon": 3002,
+   "nhan": null
+  },
+  {
+   "dong_canon": 3040,
+   "nhan": null
+  },
+  {
+   "dong_canon": 3076,
+   "nhan": null
+  },
+  {
+   "dong_canon": 3099,
+   "nhan": null
+  },
+  {
+   "dong_canon": 3526,
+   "nhan": null
+  },
+  {
+   "dong_canon": 3532,
+   "nhan": null
+  },
+  {
+   "dong_canon": 3592,
+   "nhan": null
+  },
+  {
+   "dong_canon": 3604,
+   "nhan": null
+  },
+  {
+   "dong_canon": 4028,
+   "nhan": null
+  },
+  {
+   "dong_canon": 4097,
+   "nhan": null
+  },
+  {
+   "dong_canon": 4101,
+   "nhan": null
+  },
+  {
+   "dong_canon": 4375,
+   "nhan": null
+  },
+  {
+   "dong_canon": 4376,
+   "nhan": null
+  },
+  {
+   "dong_canon": 4377,
+   "nhan": null
+  },
+  {
+   "dong_canon": 4378,
+   "nhan": null
+  },
+  {
+   "dong_canon": 4424,
+   "nhan": null
+  },
+  {
+   "dong_canon": 4425,
+   "nhan": null
+  },
+  {
+   "dong_canon": 4512,
+   "nhan": null
+  },
+  {
+   "dong_canon": 4559,
+   "nhan": null
+  },
+  {
+   "dong_canon": 4833,
+   "nhan": null
+  },
+  {
+   "dong_canon": 4834,
+   "nhan": null
+  },
+  {
+   "dong_canon": 4837,
+   "nhan": null
+  },
+  {
+   "dong_canon": 4838,
+   "nhan": null
+  },
+  {
+   "dong_canon": 4839,
+   "nhan": null
+  },
+  {
+   "dong_canon": 4840,
+   "nhan": null
+  },
+  {
+   "dong_canon": 4841,
+   "nhan": null
+  },
+  {
+   "dong_canon": 4919,
+   "nhan": null
+  },
+  {
+   "dong_canon": 4920,
+   "nhan": null
+  },
+  {
+   "dong_canon": 4945,
+   "nhan": null
+  },
+  {
+   "dong_canon": 4946,
+   "nhan": null
+  },
+  {
+   "dong_canon": 4947,
+   "nhan": null
+  },
+  {
+   "dong_canon": 5001,
+   "nhan": null
+  },
+  {
+   "dong_canon": 5008,
+   "nhan": null
+  },
+  {
+   "dong_canon": 5062,
+   "nhan": null
+  },
+  {
+   "dong_canon": 5394,
+   "nhan": null
+  },
+  {
+   "dong_canon": 5395,
+   "nhan": null
+  },
+  {
+   "dong_canon": 5558,
+   "nhan": null
+  },
+  {
+   "dong_canon": 5603,
+   "nhan": null
+  },
+  {
+   "dong_canon": 5895,
+   "nhan": null
+  },
+  {
+   "dong_canon": 5896,
+   "nhan": null
+  },
+  {
+   "dong_canon": 6028,
+   "nhan": null
+  },
+  {
+   "dong_canon": 6093,
+   "nhan": null
+  },
+  {
+   "dong_canon": 6377,
+   "nhan": null
+  },
+  {
+   "dong_canon": 6378,
+   "nhan": null
+  },
+  {
+   "dong_canon": 6434,
+   "nhan": null
+  },
+  {
+   "dong_canon": 6476,
+   "nhan": null
+  },
+  {
+   "dong_canon": 6477,
+   "nhan": null
+  },
+  {
+   "dong_canon": 6544,
+   "nhan": null
+  },
+  {
+   "dong_canon": 6894,
+   "nhan": null
+  },
+  {
+   "dong_canon": 6895,
+   "nhan": null
+  },
+  {
+   "dong_canon": 7057,
+   "nhan": null
+  },
+  {
+   "dong_canon": 7071,
+   "nhan": null
+  },
+  {
+   "dong_canon": 7101,
+   "nhan": null
+  },
+  {
+   "dong_canon": 7102,
+   "nhan": null
+  },
+  {
+   "dong_canon": 7103,
+   "nhan": null
+  },
+  {
+   "dong_canon": 7315,
+   "nhan": null
+  },
+  {
+   "dong_canon": 7515,
+   "nhan": null
+  },
+  {
+   "dong_canon": 7516,
+   "nhan": null
+  },
+  {
+   "dong_canon": 7650,
+   "nhan": null
+  },
+  {
+   "dong_canon": 7654,
+   "nhan": null
+  },
+  {
+   "dong_canon": 7704,
+   "nhan": null
+  },
+  {
+   "dong_canon": 7721,
+   "nhan": null
+  },
+  {
+   "dong_canon": 7778,
+   "nhan": null
+  },
+  {
+   "dong_canon": 8186,
+   "nhan": null
+  },
+  {
+   "dong_canon": 8228,
+   "nhan": null
+  },
+  {
+   "dong_canon": 8279,
+   "nhan": null
+  },
+  {
+   "dong_canon": 8322,
+   "nhan": null
+  },
+  {
+   "dong_canon": 8323,
+   "nhan": null
+  },
+  {
+   "dong_canon": 8417,
+   "nhan": null
+  },
+  {
+   "dong_canon": 8418,
+   "nhan": null
+  },
+  {
+   "dong_canon": 8464,
+   "nhan": null
+  },
+  {
+   "dong_canon": 8504,
+   "nhan": null
+  },
+  {
+   "dong_canon": 8505,
+   "nhan": null
+  },
+  {
+   "dong_canon": 8660,
+   "nhan": null
+  },
+  {
+   "dong_canon": 8661,
+   "nhan": null
+  },
+  {
+   "dong_canon": 8821,
+   "nhan": null
+  },
+  {
+   "dong_canon": 8826,
+   "nhan": null
+  },
+  {
+   "dong_canon": 8827,
+   "nhan": null
+  },
+  {
+   "dong_canon": 8853,
+   "nhan": null
+  },
+  {
+   "dong_canon": 8854,
+   "nhan": null
+  },
+  {
+   "dong_canon": 8879,
+   "nhan": null
+  },
+  {
+   "dong_canon": 8881,
+   "nhan": null
+  },
+  {
+   "dong_canon": 8986,
+   "nhan": null
+  },
+  {
+   "dong_canon": 8987,
+   "nhan": null
+  },
+  {
+   "dong_canon": 9116,
+   "nhan": null
+  },
+  {
+   "dong_canon": 9117,
+   "nhan": null
+  },
+  {
+   "dong_canon": 9234,
+   "nhan": null
+  },
+  {
+   "dong_canon": 9235,
+   "nhan": null
+  },
+  {
+   "dong_canon": 9262,
+   "nhan": null
+  },
+  {
+   "dong_canon": 9263,
+   "nhan": null
+  },
+  {
+   "dong_canon": 9293,
+   "nhan": null
+  },
+  {
+   "dong_canon": 9294,
+   "nhan": null
+  },
+  {
+   "dong_canon": 9363,
+   "nhan": null
+  },
+  {
+   "dong_canon": 9364,
+   "nhan": null
+  },
+  {
+   "dong_canon": 9419,
+   "nhan": null
+  },
+  {
+   "dong_canon": 9420,
+   "nhan": null
+  },
+  {
+   "dong_canon": 9421,
+   "nhan": null
+  },
+  {
+   "dong_canon": 9422,
+   "nhan": null
+  },
+  {
+   "dong_canon": 9500,
+   "nhan": null
+  },
+  {
+   "dong_canon": 9501,
+   "nhan": null
+  },
+  {
+   "dong_canon": 9502,
+   "nhan": null
+  },
+  {
+   "dong_canon": 9585,
+   "nhan": null
+  },
+  {
+   "dong_canon": 9633,
+   "nhan": null
+  },
+  {
+   "dong_canon": 9716,
+   "nhan": null
+  },
+  {
+   "dong_canon": 9717,
+   "nhan": null
+  },
+  {
+   "dong_canon": 9735,
+   "nhan": null
+  },
+  {
+   "dong_canon": 9736,
+   "nhan": null
+  },
+  {
+   "dong_canon": 9814,
+   "nhan": null
+  },
+  {
+   "dong_canon": 9815,
+   "nhan": null
+  },
+  {
+   "dong_canon": 9861,
+   "nhan": null
+  },
+  {
+   "dong_canon": 9862,
+   "nhan": null
+  },
+  {
+   "dong_canon": 9972,
+   "nhan": null
+  },
+  {
+   "dong_canon": 9973,
+   "nhan": null
+  },
+  {
+   "dong_canon": 9974,
+   "nhan": null
+  },
+  {
+   "dong_canon": 9975,
+   "nhan": null
+  },
+  {
+   "dong_canon": 9976,
+   "nhan": null
+  },
+  {
+   "dong_canon": 9977,
+   "nhan": null
+  },
+  {
+   "dong_canon": 9978,
+   "nhan": null
+  },
+  {
+   "dong_canon": 9979,
+   "nhan": null
+  },
+  {
+   "dong_canon": 9980,
+   "nhan": null
+  },
+  {
+   "dong_canon": 9981,
+   "nhan": null
+  },
+  {
+   "dong_canon": 9982,
+   "nhan": null
+  },
+  {
+   "dong_canon": 9983,
+   "nhan": null
+  },
+  {
+   "dong_canon": 9984,
+   "nhan": null
+  },
+  {
+   "dong_canon": 9985,
+   "nhan": null
+  },
+  {
+   "dong_canon": 9986,
+   "nhan": null
+  },
+  {
+   "dong_canon": 9987,
+   "nhan": null
+  },
+  {
+   "dong_canon": 9988,
+   "nhan": null
+  },
+  {
+   "dong_canon": 9989,
+   "nhan": null
+  },
+  {
+   "dong_canon": 9990,
+   "nhan": null
+  },
+  {
+   "dong_canon": 9991,
+   "nhan": null
+  },
+  {
+   "dong_canon": 9992,
+   "nhan": null
+  },
+  {
+   "dong_canon": 9993,
+   "nhan": null
+  },
+  {
+   "dong_canon": 9994,
+   "nhan": null
+  },
+  {
+   "dong_canon": 9995,
+   "nhan": null
+  },
+  {
+   "dong_canon": 9996,
+   "nhan": null
+  }
+ ]
+}
