@@ -84,9 +84,11 @@ Cổng (Đ5 — khai MONG trước, NO khi khác; mỗi phép một ca phá RIÊ
   R4  chuỗi `Did not find value` (ô `#N/A` nhúng mã)        · PHA `o_loi_nhung_ma`
   R6  tên khoá ở MỌI tầng chứa `diengiai` · `sochungtu` · `soct` · `email` (bỏ dấu, thường hoá) — chốt RIÊNG
       của công cụ này, ⛔ mượn `KHOA_CAM` của DT1a (orchestrator 16/11) · PHA `khoa_cam_Dien_giai`
-  R7  (vòng sửa R1 — DT1b-R1-04) đóng GIÁ TRỊ, ⛔ chỉ tên khoá: mọi LÁ = hằng (`_vi_sao` · `khong_mang_PII` ·
-      `nguon.tep_dt1a`/`anh_so`) · mẫu (`nguon.ban_doc_sha256_16` hex16) · tập đóng + int ≥ 0 (`mau_so.khoa_hong` ·
-      `dang_khoa_hoc`) · int (số đếm `mau_so`). Câu lỗi nêu TÊN LÁ, ⛔ in giá trị · bài `…DE_XUAT_la_chuoi_TU_DO…`
+  R7  (vòng sửa R1 — DT1b-R1-04 · vòng sửa R2 — DT1b-R2-01) đóng GIÁ TRỊ, ⛔ chỉ tên khoá: mọi LÁ = hằng
+      (`_vi_sao` · `khong_mang_PII` · `nguon.tep_dt1a`/`anh_so`) · mẫu (`nguon.ban_doc_sha256_16` hex16) ·
+      tập đóng + số nguyên 0 ≤ n < `TRAN_DEM` (`mau_so.khoa_hong` · `dang_khoa_hoc` · số đếm `mau_so`): TRẦN
+      độ lớn, ⛔ chỉ kiểu (Số CT 16 chữ số DẠNG INT cũng là int — lọt ở cổng nếu chỉ kiểm kiểu). Câu lỗi
+      nêu TÊN LÁ, ⛔ in giá trị · bài `…DE_XUAT_la_chuoi_TU_DO…` · `…DE_XUAT_la_so_nguyen_co_tran_do_lon`
   R8  (vòng sửa R1 — DT1b-R1-06) từ chối bản đọc khoá nằm TRONG repo mà ⛔ bị `.gitignore` (mã 2) · bài `…trong_repo…`
   K4b `dong_sheet` là số nguyên, ⛔ bool (hợp đồng H2)    · PHA `dong_sheet_bool`
   R5  (lúc đo) token trùng Số CT ≥ 6 ký tự (thô / chuẩn hoá) hoặc tiền ≥ 6 chữ số của đầu vào
@@ -176,6 +178,12 @@ MAU_EMAIL = re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9-]+(?:\.[A-Za-z0-9-]+)+")
 MAU_REF_TRONG_LOI = "Did not find value"         # `#N/A (Did not find value 'FT…' …)` nhúng mã giao dịch
 MAU_KHOA_HOC = re.compile(r"^\d(?:\.\d+)?E\+\d+$", re.I)   # chỉ để ĐẾM ô Số CT dạng khoa học (chẩn đoán)
 DAI_TOI_THIEU = 6                                # token ≥ 6 ký tự mới so (số dòng · số đếm ≤ 5 chữ số)
+# R7 (vòng sửa R2 — DT1b-R2-01) — TRẦN ĐỘ LỚN cho LÁ SỐ của mẫu số: số đếm dòng lớn nhất đo được là
+#   `so_dong_so` = 9.967 (≈ 10⁴); mọi lá số phải < 10**DAI_TOI_THIEU = 1.000.000. Vì sao gắn với
+#   `DAI_TOI_THIEU`: một token ≥ DAI_TOI_THIEU chữ số là Số CT / tiền (luật R5 cấm), ⛔ phải số đếm — nên
+#   một lá số ≥ ngưỡng ấy là giá trị thô lọt, ⛔ con số đếm. `int >= 0` một mình để Số CT 16 chữ số DẠNG
+#   INT (`4366191234567890`) lọt ở chế độ cổng `--tep` (R5 chỉ chạy ở chế độ ĐO) — R7 đóng cả ĐỘ LỚN.
+TRAN_DEM = 10 ** DAI_TOI_THIEU                    # 1.000.000 — lá số đếm phải 0 ≤ n < TRAN_DEM
 
 VI_SAO = ("Sinh bởi `python tools/phan_loai_ly_do.py --khoa <bản đọc> --ghi` (ISP 3.1.2 Step 5 · DT1b · "
           "BG-096) từ khoá đọc ở nguồn trên máy owner (O10). ⛔ sửa tay — `python tools/phan_loai_ly_do.py` "
@@ -477,9 +485,11 @@ def kiem(kq: dict, dt1a: dict) -> list[str]:
         return loi
 
     # R7 (DT1b-R1-04) — "lược đồ ĐÓNG" phải đóng cả GIÁ TRỊ, ⛔ chỉ TÊN khoá: mọi LÁ tự do của tệp ra
-    #   = hằng · ∈ tập đóng · khớp mẫu. Câu lỗi nêu TÊN LÁ, ⛔ in lại giá trị vừa bắt (⛔ chuyển PII ra màn
-    #   owner được dặn gửi về). `ban_doc_sha256_16` chỉ canh được MẪU (hex16 — ⛔ tái tính được ở chế độ cổng):
-    #   Số CT 16 chữ số thập phân vẫn khớp hex16 — giới hạn đã khai (BG vòng sửa R1).
+    #   = hằng · ∈ tập đóng · khớp mẫu · (vòng sửa R2 — DT1b-R2-01) LÁ SỐ có TRẦN độ lớn `< TRAN_DEM`,
+    #   ⛔ chỉ `int` (Số CT 16 chữ số DẠNG INT cũng là int — chỉ kiểu thì lọt ở chế độ cổng). Câu lỗi nêu
+    #   TÊN LÁ, ⛔ in lại giá trị vừa bắt (⛔ chuyển PII ra màn owner được dặn gửi về). `ban_doc_sha256_16`
+    #   chỉ canh được MẪU (hex16 — ⛔ tái tính được ở chế độ cổng): Số CT 16 chữ số thập phân vẫn khớp
+    #   hex16 — giới hạn đã khai (BG vòng sửa R1).
     if kq.get("_vi_sao") != VI_SAO:
         loi.append("riêng tư: /_vi_sao ⛔ đúng hằng khai")
     if kq.get("khong_mang_PII") != KHONG_MANG_PII:
@@ -492,14 +502,14 @@ def kiem(kq: dict, dt1a: dict) -> list[str]:
     if not (isinstance(ng.get("ban_doc_sha256_16"), str) and MAU_HEX16.match(ng["ban_doc_sha256_16"])):
         loi.append("riêng tư: /nguon/ban_doc_sha256_16 ⛔ phải 16 ký tự hex (sha256)")
     ms0 = kq["mau_so"]
-    for ten in ("khoa_hong", "dang_khoa_hoc"):
+    for ten in ("khoa_hong", "dang_khoa_hoc"):   # lá số: int + TRẦN độ lớn (DT1b-R2-01) — ⛔ chỉ kiểu
         d = ms0.get(ten)
         if not (isinstance(d, dict) and set(d) == {"SO", "L1"}
-                and all(type(v) is int and v >= 0 for v in d.values())):
-            loi.append(f"riêng tư: /mau_so/{ten} ⛔ đúng {{SO, L1}} số nguyên ≥ 0")
+                and all(type(v) is int and 0 <= v < TRAN_DEM for v in d.values())):
+            loi.append(f"riêng tư: /mau_so/{ten} ⛔ đúng {{SO, L1}} số nguyên 0 ≤ n < {TRAN_DEM}")
     for ten in ("thieu", "so_dong_so", "so_dong_l1", "so_dong_ghep_dt1a", "tai_lap"):
-        if ten in ms0 and type(ms0[ten]) is not int:
-            loi.append(f"riêng tư: /mau_so/{ten} ⛔ phải số nguyên")
+        if ten in ms0 and not (type(ms0[ten]) is int and 0 <= ms0[ten] < TRAN_DEM):
+            loi.append(f"riêng tư: /mau_so/{ten} ⛔ phải số nguyên 0 ≤ n < {TRAN_DEM}")
 
     so("vân tay ghi trong tệp nhãn (van_tay)", kq["van_tay"], MONG["van_tay"])                       # K3
 
@@ -667,17 +677,19 @@ def _mot_dong(e: Exception) -> str:
 
 
 def _trong_repo_khong_ignore(duong: Path) -> bool:
-    """R8 (DT1b-R1-06) — True nếu `duong` nằm TRONG repo mà ⛔ bị `.gitignore` (⇒ giá trị THÔ có nguy cơ
-    lên git). `git check-ignore -q` trả 0 khi BỊ bỏ qua (an toàn), ≠ 0 khi ⛔ bỏ qua (nguy). ⛔ trong repo
-    hoặc ⛔ chạy được git ⇒ chốt này ⛔ lo (nhánh khác xử)."""
+    """R8 (DT1b-R1-06 · fail-đóng DT1b-R2-03) — True nếu `duong` nằm TRONG repo mà CHƯA chứng minh được là
+    đã bị `.gitignore` (⇒ giá trị THÔ có nguy cơ lên git ⇒ caller TỪ CHỐI). `git check-ignore -q` trả 0 khi
+    BỊ bỏ qua (an toàn), ≠ 0 khi ⛔ bỏ qua (nguy). ⛔ trong repo ⇒ chốt này ⛔ lo (nhánh khác xử). Nhưng
+    nếu `duong` TRONG repo mà `git` ⛔ chạy được (OSError) ⇒ ⛔ chứng minh được `.gitignore` che ⇒ FAIL-ĐÓNG,
+    coi như nguy (Đ5: phép ⛔ đo được là ĐỎ) — ⛔ im lặng cho tệp đi qua."""
     try:
         duong.resolve().relative_to(GOC)
     except (ValueError, OSError):
-        return False
+        return False                 # ⛔ xác định được là trong repo ⇒ chốt khác lo
     try:
         r = subprocess.run(["git", "-C", str(GOC), "check-ignore", "-q", str(duong.resolve())])
     except OSError:
-        return False
+        return True                  # DT1b-R2-03 — TRONG repo mà git ⛔ chạy được ⇒ ⛔ chứng minh an toàn ⇒ từ chối
     return r.returncode != 0
 
 
