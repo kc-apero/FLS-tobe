@@ -347,6 +347,24 @@ def soi(bang: tuple = (), do_sql=None,
                         f"{t.phuong_thuc} {t.duong}: tuyen `nguon_tinh` ma SQL that "
                         f"cham {sorted(cham)} — tuyen TINH ⛔ duoc doc kho (C5 doi "
                         f"sang `bang` thi GO `nguon_tinh`)")
+        # ⓔ4 *(vòng sửa R2 · `C1-R2-04`, `KQ-078`)* — chiều NGƯỢC của ⓔ2. ⓔ2 đòi
+        #    đường KHAI ⊆ chuỗi của đồ thị gọi; tới R2 ⛔ có chiều *"đồ thị MANG một
+        #    đường dưới `THU_MUC/` mà tuyến ⛔ khai"* ⇒ R2 bơm `ix_fx_mau.json` vào
+        #    đồ thị của tuyến kho `so` *(`nguon_tinh=()`)*: `soi` XANH. Đúng bẫy `Đ5`
+        #    *"cổng khai ↔ thật phải đỏ CẢ HAI chiều"* — ⓐ/ⓓ đã làm đủ hai chiều cho
+        #    `bang`, ngoại lệ mới phải theo. Áp cho MỌI tuyến *(kể cả `nt == ()`)*;
+        #    `nt` sai kiểu ⇒ bỏ qua *(câu kiểu ở trên đã đỏ — giữ MỘT câu, R1 · C)*.
+        #    ⚠ So TIỀN TỐ `THU_MUC + "/"`: chính hằng `THU_MUC` nằm trong đồ thị của
+        #    `ty_gia` *(qua `nguon_tinh.giai`)*. Mẫu số đo 17/11: 1/41 tuyến mang chuỗi
+        #    như thế *(`ty_gia` — đúng đường nó khai)*.
+        if isinstance(nt, tuple):
+            for tep in sorted(x for x in do_chuoi(t.ham)
+                              if x.startswith(nguon_tinh.THU_MUC + "/")
+                              and x not in nt):
+                loi.append(
+                    f"{t.phuong_thuc} {t.duong}: ham trong vet ({len(vet)} ham) mang "
+                    f"duong tinh {tep!r} ma `nguon_tinh` ⛔ khai — ban do ⛔ ve mot "
+                    f"nguon ham doc")
     return loi, do
 
 

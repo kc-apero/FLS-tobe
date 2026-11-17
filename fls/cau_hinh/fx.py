@@ -176,6 +176,10 @@ def _so(v: Any) -> tuple[Decimal | None, str]:
       mã chết, gỡ đi ⛔ bài nào đỏ *(đúng thứ R1 đo được: đột biến M2 SỐNG)*. Đặt
       sau ⇒ gỡ `is_finite()` thì `'NaN'` ném `InvalidOperation` ở phép `<= 0` và
       `'Infinity'` mang lý do *"khuôn"* — bài `test_R1_01c_…` đỏ.
+    ⭐ Chốt `> 0` — việc RIÊNG của nó là số **0** *(`C1-R2-01`, `KQ-078`)*: số âm thì
+      khuôn *(⛔ dấu `-`)* cũng bắt, nhưng `'0'` · `'0.0'` · `0` khớp khuôn ⇒ gỡ chốt
+      là tỷ giá **0** lọt im lặng — đúng lỗi *"`SUMIFS = 0`"* của AP §3.2.4. R2 đo:
+      `<= → <` và gỡ hẳn chốt đều `150 passed` ⇒ nay ghim bằng `test_R2_01_…`.
     """
     if isinstance(v, bool):
         return None, "bool (ô tick?) ⛔ phải số"
