@@ -19,6 +19,12 @@ import functools
 import re
 from dataclasses import dataclass
 
+# ⭐ ISP 3.1.2 · `C1` *(`WO-075`)*: đường nguồn tĩnh của `IX.FX` khai ở
+#   `fls.cau_hinh.fx` — bảng này dùng CHÍNH hằng ấy *(⛔ gõ lại chuỗi đường)*.
+#   Luật ĐƯỜNG nguồn tĩnh *(vòng sửa R1 · `C1-R1-02`)* ở `fls.cau_hinh.nguon_tinh`
+#   — một chỗ, chung với `soi_bang_tuyen` và `fx.doc_tep`.
+from fls.cau_hinh import fx, nguon_tinh
+
 TIEN_TO = "/api/fls/v1"
 
 # Phuong thuc ⛔ KHONG BAO GIO duoc nham vao so. `INV-I03`/`INV-I08`: sua chi
@@ -161,6 +167,32 @@ class Tuyen:
         return self.ghi if self.doc_than is None else self.doc_than
     ghi_nhat_ky: bool = False
     mo_ta: str = ""
+    # ⭐⭐ ISP 3.1.2 · `C1` *(`WO-075`, 16/11)* — **NGUỒN TĨNH**: tuyến đọc một TỆP
+    #    đi cùng gói, ⛔ đọc kho.
+    #
+    # ⛔⛔ Cho tới `C1`, mọi tuyến đều chạm ≥ 1 bảng `fls_*`, và cổng ⓓ của
+    #    `kiem_bang_tuyen` từ chối *"một đường ⛔ nói nó chạm gì"* — ĐÚNG, và phải
+    #    giữ *(bài `test_cong_BAT_duong_khong_khai_bang_nao`)*. `GET /config/fx`
+    #    đọc `IX.FX` từ tệp tĩnh *(tới `C5` mới có kho config)* ⇒ nó **có** chạm
+    #    một thứ, chỉ là thứ ấy ⛔ phải bảng.
+    #
+    # ⛔ Cách chữa SAI: gõ tên tệp vào `bang` *(`BANG_CHO_PHEP` chỉ nhận `fls_*`,
+    #   và `soi_bang_tuyen` sẽ báo "khai THỪA" — đúng)*, hay nới cổng ⓓ *(mọi tuyến
+    #   khác mất phép canh)*. ⇒ Một trường RIÊNG, và ngoại lệ phải **HẸP**: chỉ
+    #   `GET` ⛔ ghi *(một tệp tĩnh ⛔ ghi được)*; `soi_bang_tuyen` đòi tệp
+    #   **có thật**. `C5` đổi tuyến sang `bang=(kho config…)` và gỡ trường này.
+    #
+    # ⛔⛔ Vòng sửa sau R1 *(`C1-R1-02`, `KQ-077`)* — **"HẸP" ở trên là lời hứa CHƯA
+    #    giữ**: phép canh duy nhất là *"tệp có tồn tại"*. R1 dựng tuyến cố ý khai sai:
+    #    hàm `so` *(đọc sổ)* · `bang=()` · `nguon_tinh=('pyproject.toml',)` ⇒ cổng này
+    #    XANH; `('CLAUDE.md',)` và `('../../../../../../../../etc/hostname',)` ⇒ **cả
+    #    hai cổng** XANH; một CHUỖI thay tuple ⇒ cổng này XANH, `soi` 32 câu rác.
+    #    ⇒ Nay: ⓐ kiểu `tuple[str, ...]` *(sai kiểu ⇒ MỘT câu)*; ⓑ mỗi đường qua luật
+    #    `nguon_tinh.kiem_duong` *(NGAY dưới `fls/cau_hinh/tinh/`, `*.json`, ⛔ `..`,
+    #    ⛔ tuyệt đối, giải đường thật)*; ⓒ ⛔ khai CÙNG `bang` *(tuyến tĩnh hay tuyến
+    #    kho, ⛔ cả hai)*. Phép canh SỰ THẬT *(hàm có mang chuỗi đường · có chạm kho)*
+    #    ở `soi_bang_tuyen` ⓔ — cổng này chỉ đọc BẢN KHAI.
+    nguon_tinh: tuple[str, ...] = ()
 
     def khop(self, duong: str) -> dict[str, str] | None:
         m = _mau(self.duong).match(duong)
@@ -634,6 +666,20 @@ BANG_TUYEN: tuple[Tuyen, ...] = (
           mo_ta="nap that ⇒ `run_id` + CUNG mot bien ban voi xem-truoc. Hang "
                 "CHAN do ⇒ 422 va ⛔ 0 dong vao so; hang CO do ⇒ 201 va dong "
                 "bi co vao HANG CHO CO LY DO (chung la tien that)"),
+
+    # ── ⭐⭐ ISP 3.1.2 · `C1` (`WO-075`) — LÕI CONFIG: `IX.FX` tỷ giá tháng ─────
+    #
+    # ⛔⛔ AP v3.1.2 §3.2.4: ở AS-IS, tháng thiếu ⇒ `SUMIFS = 0` ⇒ **mất số không
+    #    báo**; tháng nhập hai dòng ⇒ **cộng đôi**. Tuyến này trả bảng tỷ giá KÈM
+    #    ba danh sách `thieu` · `trung` · `lac` — chỗ lệch là **trường có tên**,
+    #    ⛔ một con số `0`.
+    # ⚠ `bang=()` + `nguon_tinh`: số là **4 tháng TỔNG HỢP** từ tệp tĩnh cho tới
+    #   `C5` *(kho config chỉ-thêm)*. `GET`, ⛔ ghi — ký tháng là `C7`, tuyến KHÁC.
+    Tuyen("GET", f"{TIEN_TO}/config/fx", "ty_gia", (),
+          nguon_tinh=(fx.NGUON_TINH,),
+          mo_ta="IX.FX ty gia thang × 5 tien te (VND = 1) + `thieu`/`trung`/"
+                "`lac` thanh TRUONG RIENG — ⛔ thanh 0, ⛔ cong doi. Nguon TINH "
+                "(so TONG HOP) toi C5"),
 )
 
 
@@ -707,9 +753,26 @@ def kiem_bang_tuyen(bang: tuple[Tuyen, ...] = BANG_TUYEN) -> list[str]:
         if la:
             loi.append(f"{t.duong} cham bang ngoai `fls_*`: {la} — "
                        f"`QĐ-ITL-45` FLS chi doc kho rieng")
-        if not t.bang:
+        # ⚠ `nguon_tinh` (ISP 3.1.2 · `C1`) cũng là một câu *"tôi chạm cái này"*
+        #   ⇒ ⛔ bảng **VÀ** ⛔ nguồn tĩnh mới là *"⛔ nói chạm gì"*.
+        if not t.bang and not t.nguon_tinh:
             loi.append(f"{t.duong} khong khai bang nao — mot duong khong noi no "
                        f"cham gi la mot duong cong khong quet duoc")
+        # ⓓ' Ngoại lệ nguồn tĩnh phải HẸP: một tệp đi cùng gói ⛔ ghi được.
+        if t.nguon_tinh and (t.phuong_thuc != "GET" or t.ghi or t.bang_ghi):
+            loi.append(f"{t.phuong_thuc} {t.duong}: `nguon_tinh` chi cho `GET` "
+                       f"⛔ ghi — mot tep tinh ⛔ ghi duoc; tuyen ghi phai khai "
+                       f"`bang`/`bang_ghi` trong kho")
+        # ⓓ'' *(vòng sửa R1 · `C1-R1-02`)* — ⛔ `if t.nguon_tinh:`: `None`/`[]` là
+        #     falsy mà vẫn SAI KIỂU; mọi giá trị khác `()` đều phải qua luật.
+        if t.nguon_tinh != ():
+            for x in nguon_tinh.kiem_khai(t.nguon_tinh):
+                loi.append(f"{t.phuong_thuc} {t.duong}: `nguon_tinh` {x}")
+            if t.bang:
+                loi.append(f"{t.phuong_thuc} {t.duong}: `nguon_tinh` CUNG `bang` "
+                           f"{list(t.bang)} — tuyen TINH hay tuyen KHO, ⛔ ca hai "
+                           f"(C5 doi sang `bang` thi GO `nguon_tinh`)")
+            loi += _tinh_ma_cham_ket_noi(t)
         # ⓔ trung
         khoa = (t.phuong_thuc, t.duong)
         if khoa in thay:
@@ -719,3 +782,46 @@ def kiem_bang_tuyen(bang: tuple[Tuyen, ...] = BANG_TUYEN) -> list[str]:
         if t.phuong_thuc not in {"GET", "POST", "PUT", "DELETE", "PATCH"}:
             loi.append(f"phuong thuc la: {t.phuong_thuc!r}")
     return loi
+
+
+def _ten_trong_ma(ma) -> set[str]:
+    """Mọi TÊN mà một khối mã gọi tới *(toàn cục + thuộc tính — `co_names`)*, kể cả
+    khối lồng *(hàm/lambda/biểu thức sinh trong `co_consts`)*."""
+    ra = set(ma.co_names)
+    for c in ma.co_consts:
+        if hasattr(c, "co_names"):
+            ra |= _ten_trong_ma(c)
+    return ra
+
+
+def _tinh_ma_cham_ket_noi(t: Tuyen) -> list[str]:
+    """ⓓ''' *(vòng sửa R1 · `C1-R1-02`)* — tuyến TĨNH mà hàm xử lý **chạm `conn`**.
+
+    ⛔⛔ Vì sao một cổng ĐỌC BẢN KHAI lại nhìn vào hàm: bản khai *"`bang=()` +
+       `nguon_tinh` hợp lệ"* **tự nhất quán** dù hàm thật đọc kho *(R1 · A, dựng lại
+       với đường đúng khuôn)* — các luật ở trên ⛔ thấy gì để đỏ. Orchestrator đòi:
+       *"tuyến có `nguon_tinh` mà đọc bảng kho ⇒ `kiem_bang_tuyen` VÀ `soi` cùng ĐỎ"*.
+    ⭐ Phép đo rẻ mà CÓ CĂN CỨ: hàm xử lý chỉ tới được kho qua **`yc.conn`** — hợp đồng
+       tầng 7 *(`fls.api` ⛔ biết tầng kho, "ket noi phai truyen vao")*. Hàm của tuyến
+       tĩnh mà mã của nó ⛔ gọi tên `conn` thì ⛔ trao được kết nối cho `fls.repo.*`.
+    ⚠ Giới hạn, khai thẳng: đo **MỘT tầng** *(chính hàm xử lý + khối lồng)* — một
+      hàm trao NGUYÊN `yc` cho hàm phụ rồi hàm phụ chạm `yc.conn` thì lọt ở đây; phép
+      đo bắc cầu là việc của `soi_bang_tuyen` ⓔ3 *(SQL thật trên cả đồ thị gọi)*.
+      Mẫu số *(`C1-R2-03`, đo 17/11)*: **3/41** hàm của `HAM` ⛔ gọi tên `conn` ở
+      tầng đầu = `ty_gia` + **2** hàm ĐỌC KHO qua hàm phụ `xem_truoc` · `lo_xem_truoc`
+      *(trao `yc` cho `_dung_lo`/`_soat_lo`)* — tức **2** trong **40** hàm còn lại
+      lọt luật này *(`soi` ⓔ3 vẫn thấy SQL của chúng)*; giới hạn được GHIM ở
+      `test_R2_03_…` *(`tests/api/test_isp_config_fx.py`)* — sửa luật thì sửa cả bài.
+    ⛔ `Đ5`: hàm ⛔ có trong `HAM` ⇒ ⛔ đo được ⇒ ĐỎ, ⛔ "không thấy chạm".
+    """
+    from fls.api.xu_ly import HAM      # trễ: `xu_ly` ⛔ import bảng này — ⛔ vòng
+
+    ham = HAM.get(t.ham)
+    if ham is None or not hasattr(ham, "__code__"):
+        return [f"{t.phuong_thuc} {t.duong}: `nguon_tinh` ma ham `{t.ham}` ⛔ co "
+                f"trong HAM — ⛔ do duoc ham co cham kho (`conn`) hay khong"]
+    if "conn" in _ten_trong_ma(ham.__code__):
+        return [f"{t.phuong_thuc} {t.duong}: `nguon_tinh` ma ham `{t.ham}` cham "
+                f"`conn` — tuyen TINH ⛔ duoc doc kho (C5 doi sang `bang` thi GO "
+                f"`nguon_tinh`)"]
+    return []

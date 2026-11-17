@@ -21,6 +21,7 @@ from decimal import Decimal, InvalidOperation
 from typing import Any, Callable
 
 from fls.adapters.pm_join import canon_ref
+from fls.cau_hinh import fx
 from fls.repo import do_mau_so as dms
 from fls.repo import doc_bao_cao as bc
 from fls.repo import lenh_cho as lc
@@ -992,3 +993,53 @@ HAM.update({"lenh_cho": lenh_cho, "lenh_cho_tom": lenh_cho_tom,
             #   **404 im lang**, va cong `soi_bang_tuyen` da bat dung
             #   loi ay **hai lan** roi.
             "lenh_da_gan": lenh_da_gan})
+
+
+# ══ ⭐⭐ ISP 3.1.2 · `C1` (`WO-075`) — LÕI CONFIG: `IX.FX` tỷ giá tháng ══
+#
+# ⛔ Hàm này chỉ ĐỌC + DỌN HÌNH: nạp/kiểm *(một dòng/tháng · VND = 1 · 5 tiền tệ ·
+#   thiếu/trùng/lạc)* nằm ở `fls/cau_hinh/fx.py` — đúng luật đầu tệp *"router mỏng,
+#   ⛔ chứa luật"*. Tỷ giá đi ra là `Decimal` ⇒ vỏ `bao.py` in thành **CHUỖI**
+#   *(⛔ `float`)*.
+# ⚠ `yc.conn` ⛔ dùng: số đến từ nguồn TĨNH *(4 tháng TỔNG HỢP)* cho tới `C5`.
+#   Cửa vẫn mở một kết nối CHỈ ĐỌC cho mọi tuyến — vô hại, và ⛔ đáng một nhánh
+#   riêng trong `cua.py` *(tệp đã qua rà soát `P4`)* cho một tuyến sống tới `C5`.
+# ⚠ Nguồn tĩnh hỏng ⇒ `fx.LoiFX` lọt lên `cua.py` ⇒ `500 FLS-INTERNAL` + một
+#   dòng nhật ký mang đủ lý do: tệp đi cùng mã hỏng là lỗi CỦA MÁY, ⛔ của người
+#   gọi — và `MA_LOI` ⛔ có mã riêng cho nó *(thêm mã là việc của `BA-07` §5)*.
+# ⭐ `data_status = flash`: số tổng hợp ⛔ được khoác `reconciled`/`signed`
+#   *(`INV-I14`)*; ký tháng là `C7`.
+# ⛔⛔ Vòng sửa sau R1 *(`C1-R1-07`, `KQ-077`)* — R1 gọi máy thật
+#    `GET /config/fx?run_id=NAP-2026-01-01-X` ⇒ `200`, `meta.pham_vi = 'lan nap
+#    NAP-2026-01-01-X'` · `meta.run_id = 'NAP-2026-01-01-X'`, mà `data` TRÙNG KHÍT
+#    lượt trơn: bảng tỷ giá ⛔ theo lần nạp, nên `meta` *(lời khai VỀ số — `INV-I14`)*
+#    nói một phạm vi **⛔ được áp**. Hai cách chữa; chọn **TỪ CHỐI** `run_id`
+#    *(`400 FLS-BAD-REQUEST`)*, ⛔ trả `pham_vi = 'tinh'`, vì:
+#      ⓐ người gọi gửi `run_id` là đang hỏi *"số của LẦN NẠP này"* — trả số chung kèm
+#         200 là trả lời một câu KHÁC, im lặng; 400 nói thẳng câu ấy ⛔ có nghĩa ở đây;
+#      ⓑ `meta.pham_vi` do `cua.py` dựng từ `PhamVi` *(ba kiểu, "va chi ba" —
+#         `fls/repo/pham_vi.py`)*: thêm kiểu `tinh` là đổi hai tệp ngoài làn BE-CF, đã
+#         qua rà soát `P4`;
+#      ⓒ vẫn đúng sau `C5`: kho config chỉ-thêm cũng ⛔ theo lần nạp.
+#    ⚠ Còn lại *(ngoài làn, ghi ở `BG-076`)*: lượt TRƠN vẫn mang `meta.pham_vi = 'chi
+#      lan nap that'` — nhãn mặc định của MỌI tuyến, cũng ⛔ áp lên bảng tĩnh.
+def ty_gia(yc: YeuCau):
+    """`GET /config/fx` — hợp đồng ISP 3.1.2 Step 2 mục 2, **nguyên văn**:
+    `{bang, nguon, ky:[{yyyymm, USD, SGD, COP, VND, HKD, trang_thai}], thieu,
+    trung, lac}`."""
+    if yc.pv.kieu != "nap_that":
+        raise LoiCua("FLS-BAD-REQUEST",
+                     f"bang ty gia ⛔ theo lan nap — bo `run_id` "
+                     f"({yc.pv.mo_ta()}): `meta` ⛔ duoc khai mot pham vi ⛔ ap")
+    b = fx.doc_tep()
+    return {"bang": fx.BANG, "nguon": b.nguon,
+            "ky": [{"yyyymm": d.yyyymm,
+                    **{te: d.ty_gia[te] for te in fx.TIEN_TE},
+                    "trang_thai": d.trang_thai} for d in b.ky],
+            "thieu": list(b.thieu), "trung": list(b.trung),
+            "lac": list(b.lac)}, "flash"
+
+
+# ⛔ Quên dòng dưới là một đường **404 im lặng** — lỗi `soi_bang_tuyen` đã bắt
+#   ba lần ở tệp này *(xem trên)*.
+HAM.update({"ty_gia": ty_gia})
