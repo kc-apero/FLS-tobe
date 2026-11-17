@@ -48,7 +48,7 @@ xem trong `git log`.
 | ID | Yêu cầu | Đo được |
 |---|---|---|
 | `NFR-I15` | Bộ phép thử | **1024 bài** · ⛔ **5 đỏ có sẵn** *(đều là `NFR-I09`)*. ⭐ Luật số một: *"cổng chưa từng thấy đỏ là cổng chưa biết có sống"* ⇒ mọi cổng mới phải **bị phá có chủ ý** và **đỏ thật** trước khi tin |
-| `NFR-I16` | Ranh giới tầng | **9** hợp đồng `import-linter`, **0** vi phạm *(~~8~~ — đo lại 17/09: `9 kept · 0 broken`)*. Then chốt: `fls.api` ⛔ không được biết tầng kho · `fls.web` chỉ được gọi `fls.api` |
+| `NFR-I16` | Ranh giới tầng | **11** hợp đồng `import-linter`, **0** vi phạm *(~~8~~ — đo lại 17/09: `9 kept · 0 broken`; ~~9~~ — đo lại 17/11 ISP 3.1.2 S0: `11 kept · 0 broken`)*. Then chốt: `fls.api` ⛔ không được biết tầng kho · `fls.web` chỉ được gọi `fls.api` |
 | `NFR-I17` ⭐ | **Tài liệu ⛔ không được già hơn máy** | **63 phép so SỐ SỐNG** *(`tools/kiem_so_song.py`)* — mỗi phép khớp **đúng một lần** và khớp **đúng con số máy đo**; nó **tự đếm cả chính nó** |
 | `NFR-I18` | Một nguồn tên cột | tiêu đề lưới **sinh từ** `ledge_spec` + `canon/spec` ⇒ ⛔ **không một tên cột tiếng Việt nào gõ tay**; cổng đối chiếu **hai chiều** với cửa thật |
 | `NFR-I19` | Một nguồn mã màu | **1** tệp được phép có mã màu *(`tokens.css`)*; bài quét NO nếu tệp khác có `#rrggbb` |

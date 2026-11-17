@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Trạng thái** | `DANG_LAM` |
+| **Trạng thái** | `DONG` *(17/11 — R3b `KQ-100` ĐẠT 0 CHẶN · 0 NÊN SỬA; orchestrator gộp `isp/S0` @ `d082672` vào nhánh làm việc. ~~`CHO_TEST` 16/11~~)* |
 | **Phát bởi** | orchestrator (phiên điều phối ISP, thay `fls-ba` phát phiếu) · 2026-11-16 |
 | **Nhận** | `fls-dev` — agent làn **BE-CF** |
 | **Dải phiếu** | `BG-066` (bàn giao) · `KQ-067` (R1) · `KQ-068` (R2) · `KQ-069` (R3) |
