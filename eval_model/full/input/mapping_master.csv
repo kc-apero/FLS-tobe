@@ -1,0 +1,17 @@
+H_hd,nhom_pl,K_can_phan_bo,L_phuong_phap
+GI | Gross Inflow,GI,,
+OMC | Online Marketing Cost,OMC,,
+API | API,API,,
+SC | Server Cost,SC,,
+LC | License Cost,LC,,
+PS | Platform Service,PS,,
+NIS | Net Income Salary,HR,Need to Allocate to CFA2,By NOEM
+INT | Insurance,HR,Need to Allocate to CFA2,By NOEM
+COM | Commission,HR,Need to Allocate to CFA2,By NOEM
+PIT | Personal Income Tax,HR,Need to Allocate to CFA2,By NOEM
+MC | Marketing Cost,MC,Need to Allocate to CFA2,By GI
+OGA | GAC - Other,GAC,Need to Allocate to CFA2,By NOEM
+FI | Financial Income,FI,,
+BF | Bank Fee,BF,Need to Allocate to CFA2,By LE
+CIT | Corporate Income Tax,CIT,,
+NB | Lưu chuyển nội bộ,NB,,

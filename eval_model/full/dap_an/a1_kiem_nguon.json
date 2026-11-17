@@ -1,0 +1,55 @@
+{
+ "sheet": [
+  {
+   "ma_sheet": "S1",
+   "tk": "112001",
+   "ngan_hang": "ACB",
+   "cur": "VND",
+   "le": "HQ1",
+   "thay_doi": [],
+   "so_dong": 60
+  },
+  {
+   "ma_sheet": "S2",
+   "tk": "112002",
+   "ngan_hang": "VCB",
+   "cur": "USD",
+   "le": "HQ1",
+   "thay_doi": [
+    {
+     "loai": "doi_vi_tri",
+     "cot": "*"
+    }
+   ],
+   "so_dong": 12
+  },
+  {
+   "ma_sheet": "S3",
+   "tk": "112003",
+   "ngan_hang": "TCB",
+   "cur": "VND",
+   "le": "SG2",
+   "thay_doi": [
+    {
+     "loai": "them",
+     "cot": "Ghi chú"
+    }
+   ],
+   "so_dong": 29
+  },
+  {
+   "ma_sheet": "S4",
+   "tk": "111001",
+   "ngan_hang": "QUY",
+   "cur": "VND",
+   "le": "HQ1",
+   "thay_doi": [],
+   "so_dong": 9
+  }
+ ],
+ "pe_lines": 79,
+ "pi_lines": 48,
+ "pm_lines": 79,
+ "h1000_lines": 12,
+ "plt_lines": 14
+}

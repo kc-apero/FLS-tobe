@@ -1,0 +1,220 @@
+{
+ "A1_KIEM_NGUON": {
+  "diem": 1.0,
+  "chi_tiet": {
+   "dung": 29,
+   "tong": 29,
+   "vi_du_lech": []
+  }
+ },
+ "A2_LEDGER": {
+  "diem": 1.0,
+  "chi_tiet": {
+   "khoa_dung": 109,
+   "khoa_thua": 0,
+   "khoa_thieu": 0,
+   "o_dung": 763,
+   "o_tong": 763,
+   "dung_theo_cot": {
+    "ps_no": "109/109",
+    "ps_co": "109/109",
+    "ngay": "109/109",
+    "tk": "109/109",
+    "le": "109/109",
+    "cur": "109/109",
+    "ref": "109/109"
+   },
+   "vi_du_lech": []
+  }
+ },
+ "A2_GHEP": {
+  "diem": 0.9978,
+  "chi_tiet": {
+   "khoa_dung": 91,
+   "khoa_thua": 0,
+   "khoa_thieu": 0,
+   "o_dung": 363,
+   "o_tong": 364,
+   "dung_theo_cot": {
+    "so_bank": "91/91",
+    "so_nguon": "91/91",
+    "nguon": "91/91",
+    "hinh": "90/91"
+   },
+   "vi_du_lech": [
+    {
+     "khoa": "FT26315401451956",
+     "cot": "hinh",
+     "dap_an": "D",
+     "model": "A"
+    }
+   ]
+  }
+ },
+ "A3_ITL": {
+  "diem": 0.9995,
+  "chi_tiet": {
+   "khoa_dung": 129,
+   "khoa_thua": 0,
+   "khoa_thieu": 0,
+   "o_dung": 3223,
+   "o_tong": 3225,
+   "dung_theo_cot": {
+    "ps_no": "129/129",
+    "ps_co": "129/129",
+    "ngay": "129/129",
+    "tk": "129/129",
+    "le": "129/129",
+    "cur": "129/129",
+    "nguon": "129/129",
+    "hd_T": "129/129",
+    "hd_V": "128/129",
+    "pay_type_T": "129/129",
+    "pay_type_V": "129/129",
+    "cdt1_T": "129/129",
+    "cdt1_V": "129/129",
+    "svc_start_T": "129/129",
+    "svc_start_V": "128/129",
+    "svc_end_T": "129/129",
+    "svc_end_V": "129/129",
+    "id_payee_T": "129/129",
+    "id_payee_V": "129/129",
+    "invoice_T": "129/129",
+    "invoice_V": "129/129",
+    "AU": "129/129",
+    "AV": "129/129",
+    "AW": "129/129",
+    "work_status": "129/129"
+   },
+   "vi_du_lech": [
+    {
+     "khoa": "S1-6",
+     "cot": "svc_start_V",
+     "dap_an": "202610",
+     "model": ""
+    },
+    {
+     "khoa": "S3-12",
+     "cot": "hd_V",
+     "dap_an": "OGA | GAC - Other",
+     "model": "SC | Server Cost"
+    }
+   ],
+   "Final_7_khoi": {
+    "hd": "128/129",
+    "pay_type": "129/129",
+    "cdt1": "129/129",
+    "svc_start": "128/129",
+    "svc_end": "129/129",
+    "id_payee": "129/129",
+    "invoice": "129/129"
+   }
+  }
+ },
+ "A3_HANG_CHO": {
+  "diem": 0.9231,
+  "chi_tiet": {
+   "dung": 6,
+   "bao_thua": [],
+   "bo_sot": [
+    "('S3-12', 'khong_can_cu')"
+   ],
+   "so_thua": 0,
+   "so_sot": 1
+  }
+ },
+ "R1_SO_DU": {
+  "diem": 0.9905,
+  "chi_tiet": {
+   "khoa_dung": 28,
+   "khoa_thua": 0,
+   "khoa_thieu": 0,
+   "o_dung": 166,
+   "o_tong": 168,
+   "dung_theo_cot": {
+    "dau_ky": "28/28",
+    "ps_no": "28/28",
+    "ps_co": "28/28",
+    "cuoi_ky": "28/28",
+    "ccr_go": "27/28",
+    "dif": "27/28"
+   },
+   "vi_du_lech": [
+    {
+     "khoa": "('112003', '2026-10-04')",
+     "cot": "ccr_go",
+     "dap_an": "4791850000",
+     "model": "4791750000"
+    },
+    {
+     "khoa": "('112003', '2026-10-04')",
+     "cot": "dif",
+     "dap_an": "-100000",
+     "model": "0"
+    }
+   ]
+  }
+ },
+ "R2_CF": {
+  "diem": 1.0,
+  "chi_tiet": {
+   "khoa_dung": 29,
+   "khoa_thua": 0,
+   "khoa_thieu": 0,
+   "o_dung": 232,
+   "o_tong": 232,
+   "dung_theo_cot": {
+    "2026-10-01": "29/29",
+    "2026-10-02": "29/29",
+    "2026-10-03": "29/29",
+    "2026-10-04": "29/29",
+    "2026-10-05": "29/29",
+    "2026-10-06": "29/29",
+    "2026-10-07": "29/29",
+    "tong": "29/29"
+   },
+   "vi_du_lech": []
+  }
+ },
+ "R3_PL": {
+  "diem": 0.9944,
+  "chi_tiet": {
+   "khoa_dung": 18,
+   "khoa_thua": 0,
+   "khoa_thieu": 0,
+   "o_dung": 143,
+   "o_tong": 144,
+   "dung_theo_cot": {
+    "2026-10-01": "18/18",
+    "2026-10-02": "18/18",
+    "2026-10-03": "18/18",
+    "2026-10-04": "18/18",
+    "2026-10-05": "18/18",
+    "2026-10-06": "18/18",
+    "2026-10-07": "17/18",
+    "tong": "18/18"
+   },
+   "vi_du_lech": [
+    {
+     "khoa": "FI",
+     "cot": "2026-10-07",
+     "dap_an": "0.00004694",
+     "model": "0"
+    }
+   ]
+  }
+ },
+ "A4_AUDIT": {
+  "diem": 0.9091,
+  "chi_tiet": {
+   "dung": 5,
+   "bao_thua": [],
+   "bo_sot": [
+    "('DIF', '112003|2026-10-04')"
+   ],
+   "so_thua": 0,
+   "so_sot": 1
+  }
+ },
+ "TONG": 0.9815
+}

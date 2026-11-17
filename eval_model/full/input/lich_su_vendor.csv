@@ -1,0 +1,25 @@
+vendor,hd,cdt1
+VDX001,SC | Server Cost,CMN | Media Network
+VDX002,LC | License Cost,SHQ2 | Headquarters2
+VDX003,LC | License Cost,CAH | Apps Hub
+VDX004,OGA | GAC - Other,ASA | Asia Studio
+VDX005,OGA | GAC - Other,ASA | Asia Studio
+VDX006,API | API,CVL | Venture Lab
+VDX007,SC | Server Cost,CAH | Apps Hub
+VDX008,OGA | GAC - Other,CMN | Media Network
+VDX009,API | API,CMN | Media Network
+VDX010,API | API,CSM | Studio M
+VDX011,API | API,ASA | Asia Studio
+VDX012,SC | Server Cost,ASA | Asia Studio
+VDX013,API | API,CAH | Apps Hub
+VDX014,SC | Server Cost,COR | Core Apps
+VDX015,API | API,CVL | Venture Lab
+VDX016,OMC | Online Marketing Cost,COR | Core Apps
+VDX017,LC | License Cost,CAH | Apps Hub
+VDX018,MC | Marketing Cost,COR | Core Apps
+VDX019,API | API,CAH | Apps Hub
+VDX020,LC | License Cost,CVL | Venture Lab
+VDX021,OMC | Online Marketing Cost,CAH | Apps Hub
+VDX022,OMC | Online Marketing Cost,SHQ2 | Headquarters2
+VDX023,SC | Server Cost,CAH | Apps Hub
+VDX024,API | API,SHQ2 | Headquarters2

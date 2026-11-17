@@ -1,0 +1,80 @@
+ID PESlip,ID PELine,Ngày đề nghị,Mã đối tác,Budget Code (HDCode),Chủ dự toán (CDT1),Loại giao dịch,Số tiền,Tiền tệ,ID PILine
+PE-0001,PE-0001-1,2026-10-01,VDX036,OMC | Online Marketing Cost,CSM | Studio M,Tạm ứng (Advance),81000000,VND,PI-0001-1
+PE-0002,PE-0002-1,2026-10-01,VDX023,SC | Server Cost,CAH | Apps Hub,Thanh toán (Regular),44750000,VND,
+PE-0003,PE-0003-1,2026-10-01,VDX019,API | API,CAH | Apps Hub,Khẩn (Urgent),51500000,VND,PI-0003-1
+PE-0004,PE-0004-1,2026-10-01,VDX032,API | API,SHQ2 | Headquarters2,Thanh toán (Regular),6250000,VND,
+PE-0005,PE-0005-1,2026-10-01,VDX001,SC | Server Cost,CMN | Media Network,Thanh toán (Regular),65250000,VND,PI-0005-1
+PE-0006,PE-0006-1,2026-10-01,VDX033,OMC | Online Marketing Cost,CSM | Studio M,Tạm ứng (Advance),42000000,VND,
+PE-0007,PE-0007-1,2026-10-01,VDX033,OMC | Online Marketing Cost,CSM | Studio M,Tạm ứng (Advance),96500000,VND,
+PE-0008,PE-0008-1,2026-10-01,VDX003,LC | License Cost,CAH | Apps Hub,Thanh toán (Regular),95500000,VND,PI-0008-1
+PE-0009,PE-0009-1,2026-10-01,VDX029,API | API,ASA | Asia Studio,Thanh toán (Regular),4179.03,USD,
+PE-0010,PE-0010-1,2026-10-01,VDX038,OGA | GAC - Other,CAH | Apps Hub,Khẩn (Urgent),51500000,VND,PI-0010-1
+PE-0011,PE-0011-1,2026-10-01,VDX003,LC | License Cost,CAH | Apps Hub,Khẩn (Urgent),59000000,VND,PI-0011-1
+PE-0012,PE-0012-1,2026-10-01,VDX017,LC | License Cost,CAH | Apps Hub,Tạm ứng (Advance),44750000,VND,
+PE-0013,PE-0013-1,2026-10-02,VDX037,SC | Server Cost,COR | Core Apps,Khẩn (Urgent),87500000,VND,PI-0013-1
+PE-0014,PE-0014-1,2026-10-02,VDX011,API | API,ASA | Asia Studio,Thanh toán (Regular),70000000,VND,PI-0014-1
+PE-0015,PE-0015-1,2026-10-02,VDX032,API | API,SHQ2 | Headquarters2,Thanh toán (Regular),39000000,VND,PI-0015-1
+PE-0016,PE-0016-1,2026-10-02,VDX020,LC | License Cost,CVL | Venture Lab,Tạm ứng (Advance),24500000,VND,PI-0016-1
+PE-0017,PE-0017-1,2026-10-02,VDX028,API | API,CSM | Studio M,Thanh toán (Regular),38250000,VND,PI-0017-1
+PE-0018,PE-0018-1,2026-10-02,VDX012,SC | Server Cost,ASA | Asia Studio,Thanh toán (Regular),72250000,VND,PI-0018-1
+PE-0019,PE-0019-1,2026-10-02,VDX018,MC | Marketing Cost,COR | Core Apps,Thanh toán (Regular),24750000,VND,
+PE-0020,PE-0020-1,2026-10-02,VDX016,OMC | Online Marketing Cost,COR | Core Apps,Thanh toán (Regular),34750000,VND,
+PE-0021,PE-0021-1,2026-10-02,VDX030,LC | License Cost,SHQ2 | Headquarters2,Thanh toán (Regular),2115.22,USD,PI-0021-1
+PE-0022,PE-0022-1,2026-10-02,VDX035,MC | Marketing Cost,CSM | Studio M,Thanh toán (Regular),60250000,VND,
+PE-0022,PE-0022-2,2026-10-02,VDX035,MC | Marketing Cost,CSM | Studio M,Khẩn (Urgent),60750000,VND,PI-0022-2
+PE-0022,PE-0022-3,2026-10-02,VDX035,MC | Marketing Cost,ASA | Asia Studio,Tạm ứng (Advance),65250000,VND,PI-0022-3
+PE-0023,PE-0023-1,2026-10-03,VDX008,OGA | GAC - Other,CMN | Media Network,Khẩn (Urgent),64500000,VND,PI-0023-1
+PE-0024,PE-0024-1,2026-10-03,VDX018,MC | Marketing Cost,COR | Core Apps,Thanh toán (Regular),91250000,VND,PI-0024-1
+PE-0025,PE-0025-1,2026-10-03,VDX011,API | API,ASA | Asia Studio,Khẩn (Urgent),64250000,VND,
+PE-0026,PE-0026-1,2026-10-03,VDX001,SC | Server Cost,CMN | Media Network,Tạm ứng (Advance),50500000,VND,PI-0026-1
+PE-0027,PE-0027-1,2026-10-03,VDX020,LC | License Cost,CVL | Venture Lab,Tạm ứng (Advance),15500000,VND,
+PE-0028,PE-0028-1,2026-10-03,VDX019,API | API,CAH | Apps Hub,Thanh toán (Regular),35750000,VND,
+PE-0029,PE-0029-1,2026-10-03,VDX025,OMC | Online Marketing Cost,SHQ2 | Headquarters2,Khẩn (Urgent),99750000,VND,PI-0029-1
+PE-0030,PE-0030-1,2026-10-03,VDX029,API | API,ASA | Asia Studio,Khẩn (Urgent),1500000,VND,PI-0030-1
+PE-0031,PE-0031-1,2026-10-03,VDX003,LC | License Cost,CAH | Apps Hub,Tạm ứng (Advance),134.32,USD,PI-0031-1
+PE-0032,PE-0032-1,2026-10-03,VDX002,LC | License Cost,SHQ2 | Headquarters2,Thanh toán (Regular),480000000,VND,PI-0032-1
+PE-0033,PE-0033-1,2026-10-04,VDX033,OMC | Online Marketing Cost,CSM | Studio M,Thanh toán (Regular),23500000,VND,PI-0033-1
+PE-0034,PE-0034-1,2026-10-04,VDX023,SC | Server Cost,CAH | Apps Hub,Thanh toán (Regular),95500000,VND,
+PE-0035,PE-0035-1,2026-10-04,VDX006,API | API,CVL | Venture Lab,Thanh toán (Regular),1000000,VND,PI-0035-1
+PE-0036,PE-0036-1,2026-10-04,VDX001,SC | Server Cost,CMN | Media Network,Tạm ứng (Advance),8250000,VND,PI-0036-1
+PE-0037,PE-0037-1,2026-10-04,VDX039,MC | Marketing Cost,ASA | Asia Studio,Thanh toán (Regular),59750000,VND,
+PE-0038,PE-0038-1,2026-10-04,VDX003,LC | License Cost,CAH | Apps Hub,Thanh toán (Regular),42750000,VND,PI-0038-1
+PE-0039,PE-0039-1,2026-10-04,VDX028,API | API,CSM | Studio M,Khẩn (Urgent),10250000,VND,PI-0039-1
+PE-0040,PE-0040-1,2026-10-04,VDX025,OMC | Online Marketing Cost,SHQ2 | Headquarters2,Khẩn (Urgent),50500000,VND,
+PE-0041,PE-0041-1,2026-10-04,VDX039,MC | Marketing Cost,ASA | Asia Studio,Khẩn (Urgent),3009.69,USD,PI-0041-1
+PE-0042,PE-0042-1,2026-10-04,VDX001,SC | Server Cost,CMN | Media Network,Thanh toán (Regular),5750000,VND,PI-0042-1
+PE-0043,PE-0043-1,2026-10-04,VDX027,XYZ | Hạng mục chưa khai,CAH | Apps Hub,Tạm ứng (Advance),81750000,VND,
+PE-0044,PE-0044-1,2026-10-05,VDX034,SC | Server Cost,CAH | Apps Hub,Thanh toán (Regular),63500000,VND,PI-0044-1
+PE-0045,PE-0045-1,2026-10-05,VDX015,API | API,CVL | Venture Lab,Tạm ứng (Advance),87250000,VND,
+PE-0046,PE-0046-1,2026-10-05,VDX026,API | API,SHQ2 | Headquarters2,Tạm ứng (Advance),87750000,VND,PI-0046-1
+PE-0047,PE-0047-1,2026-10-05,VDX024,API | API,SHQ2 | Headquarters2,Tạm ứng (Advance),26250000,VND,
+PE-0048,PE-0048-1,2026-10-05,VDX035,MC | Marketing Cost,CAH | Apps Hub,Khẩn (Urgent),11500000,VND,PI-0048-1
+PE-0049,PE-0049-1,2026-10-05,VDX028,API | API,CSM | Studio M,Khẩn (Urgent),31250000,VND,
+PE-0050,PE-0050-1,2026-10-05,VDX032,API | API,SHQ2 | Headquarters2,Thanh toán (Regular),59000000,VND,
+PE-0051,PE-0051-1,2026-10-05,VDX038,OGA | GAC - Other,CAH | Apps Hub,Tạm ứng (Advance),2250000,VND,PI-0051-1
+PE-0052,PE-0052-1,2026-10-05,VDX033,OMC | Online Marketing Cost,CSM | Studio M,Tạm ứng (Advance),3546.26,USD,PI-0052-1
+PE-0053,PE-0053-1,2026-10-05,VDX035,MC | Marketing Cost,SHQ2 | Headquarters2,Khẩn (Urgent),30000000,VND,PI-0053-1
+PE-0053,PE-0053-2,2026-10-05,VDX035,MC | Marketing Cost,COR | Core Apps,Khẩn (Urgent),30000000,VND,
+PE-0054,PE-0054-1,2026-10-05,VDX037,SC | Server Cost,COR | Core Apps,Tạm ứng (Advance),45500000,VND,PI-0054-1
+PE-0055,PE-0055-1,2026-10-06,VDX010,API | API,CSM | Studio M,Khẩn (Urgent),15000000,VND,PI-0055-1
+PE-0056,PE-0056-1,2026-10-06,VDX004,OGA | GAC - Other,ASA | Asia Studio,Tạm ứng (Advance),47750000,VND,PI-0056-1
+PE-0057,PE-0057-1,2026-10-06,VDX029,API | API,ASA | Asia Studio,Tạm ứng (Advance),22750000,VND,PI-0057-1
+PE-0058,PE-0058-1,2026-10-06,VDX014,SC | Server Cost,COR | Core Apps,Thanh toán (Regular),31750000,VND,
+PE-0059,PE-0059-1,2026-10-06,VDX034,SC | Server Cost,CAH | Apps Hub,Khẩn (Urgent),21750000,VND,
+PE-0060,PE-0060-1,2026-10-06,VDX004,OGA | GAC - Other,ASA | Asia Studio,Khẩn (Urgent),91750000,VND,
+PE-0061,PE-0061-1,2026-10-06,VDX021,OMC | Online Marketing Cost,CAH | Apps Hub,Khẩn (Urgent),81500000,VND,
+PE-0062,PE-0062-1,2026-10-06,VDX029,API | API,ASA | Asia Studio,Thanh toán (Regular),26500000,VND,
+PE-0063,PE-0063-1,2026-10-06,VDX030,LC | License Cost,SHQ2 | Headquarters2,Khẩn (Urgent),722.42,USD,PI-0063-1
+PE-0064,PE-0064-1,2026-10-06,VDX011,API | API,ASA | Asia Studio,Tạm ứng (Advance),665.76,USD,PI-0064-1
+PE-0065,PE-0065-1,2026-10-07,VDX018,MC | Marketing Cost,COR | Core Apps,Khẩn (Urgent),16750000,VND,PI-0065-1
+PE-0066,PE-0066-1,2026-10-07,VDX011,API | API,ASA | Asia Studio,Tạm ứng (Advance),80500000,VND,
+PE-0067,PE-0067-1,2026-10-07,VDX008,OGA | GAC - Other,CMN | Media Network,Thanh toán (Regular),71000000,VND,
+PE-0068,PE-0068-1,2026-10-07,VDX004,OGA | GAC - Other,ASA | Asia Studio,Tạm ứng (Advance),13250000,VND,
+PE-0069,PE-0069-1,2026-10-07,VDX009,API | API,CMN | Media Network,Tạm ứng (Advance),22500000,VND,PI-0069-1
+PE-0070,PE-0070-1,2026-10-07,VDX012,SC | Server Cost,ASA | Asia Studio,Tạm ứng (Advance),12500000,VND,PI-0070-1
+PE-0071,PE-0071-1,2026-10-07,VDX021,OMC | Online Marketing Cost,CAH | Apps Hub,Tạm ứng (Advance),80750000,VND,PI-0071-1
+PE-0072,PE-0072-1,2026-10-07,VDX025,OMC | Online Marketing Cost,SHQ2 | Headquarters2,Thanh toán (Regular),29250000,VND,
+PE-0073,PE-0073-1,2026-10-07,VDX024,API | API,SHQ2 | Headquarters2,Tạm ứng (Advance),3547.76,USD,PI-0073-1
+PE-0074,PE-0074-1,2026-10-07,VDX032,API | API,SHQ2 | Headquarters2,Khẩn (Urgent),37750000,VND,
+PE-0075,PE-0075-1,2026-10-07,VDX026,API | API,SHQ2 | Headquarters2,Tạm ứng (Advance),50250000,VND,PI-0075-1
+PE-0076,PE-0076-1,2026-10-07,VDX024,API | API,SHQ2 | Headquarters2,Khẩn (Urgent),54500000,VND,PI-0076-1
