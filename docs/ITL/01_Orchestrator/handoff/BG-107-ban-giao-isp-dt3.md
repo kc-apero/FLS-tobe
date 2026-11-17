@@ -205,3 +205,38 @@ Orchestrator quyết **A** *(Q2 của `KQ-109`)*: Dev sửa **2 NÊN SỬA** tr�
 
 ### Câu hỏi
 ⛔ chỗ mơ hồ mới. *(Q1·Q2 của `KQ-109` là việc orchestrator; vòng này thực thi Q2 = A.)*
+
+
+## Vòng sửa sau R3 (KQ-110) — *(`fls-dev`, phiên cloud mới · 2026-11-17)*
+
+Orchestrator quyết **A** *(Q1 của `KQ-110`)*: Dev thêm **2 bài** cho hai NÊN SỬA *(`DT3-R3-01` hàng chỉ `B` · `DT3-R3-02` tham số hoá `test_R2_02` trên `D·E·F·G`)*; GHI NHẬN rẻ *(`DT3-R3-03`)* làm luôn; R3 chỉ chạy lại M2·M3·M4 *(⛔ R4 đầy đủ)* rồi gộp. Mã ngọn ĐÚNG — cả ba đều LỖ BÀI *(thêm bài, ⛔ đổi mã)*. Chỉ THÊM — ⛔ đụng ảnh *(byte-trùng)*, ⛔ `TIEN_DO.md`/dashboard/changelog chung. Nền `isp/DT3` @ `61c0e20` *(= `KQ-110`)*; cụm PG cổng **5446**; worktree `.claude/worktrees/isp-dt3`. ⛔ đọc lại SA *(ảnh giữ nguyên byte)*.
+
+### Từng phát hiện → *(TDD: ĐỎ-trước chứng minh bằng ĐỘT BIẾN trên mã ngọn — phá → chạy → cắn → `git checkout` trả nguyên)*
+| Mã | Mức | Trạng thái | Sửa | Bằng chứng ĐỎ-trước *(đột biến của `KQ-110`, trên ngọn `61c0e20`)* |
+|---|---|---|---|---|
+| `DT3-R3-01` | NÊN SỬA | **ĐÃ SỬA** | Bài `test_R3_01_hang_chi_co_B_A_rong_VAN_duoc_an_danh` *(đối xứng `test_R2_01`)* — lưới MM + hàng **chỉ `B`** TỔNG HỢP `GIALAPONLYB` ở dòng 80 *(A rỗng)* ⇒ `an_danh` +1 `cot=B`, `B`=hằng, `A` vẫn None, chuỗi tổng hợp ⛔ ở đâu trong kết quả `chuan_bi` | **M2** `(A≠∅ hoặc B≠∅)`→`(A≠∅)` *(bỏ nhánh `B`)* ⇒ `test_R3_01` **ĐỎ** *(`1 failed`)*; trả nguyên ⇒ XANH. Mã SẠCH sau mỗi lượt |
+| `DT3-R3-02` | NÊN SỬA | **ĐÃ SỬA** | Tham số hoá `test_R2_02_cot_DG_chuoi_LA_…` trên CẢ BỐN cột `D·E·F·G` *(ô dấu `x` sẵn: `D`=dòng 7 · `E`=9 · `F`=10 · `G`=11)*; mỗi cột thay 1 ô `x` bằng chuỗi lạ ⇒ đòi TỪ CHỐI exit 2 | **M3** `"DEFG"`→`"D"` *(chỉ canh `D`)* ⇒ `cot_D` XANH · `cot_E·F·G` **ĐỎ** *(`3 failed, 1 passed`)*. **M4** `"DEFG"`→`"DEF"` *(bỏ `G`)* ⇒ `cot_D·E·F` XANH · `cot_G` **ĐỎ** *(`1 failed, 3 passed`)*. Trả nguyên ⇒ cả 4 XANH |
+| `DT3-R3-03` | GHI NHẬN | **ĐÃ SỬA** *(rẻ)* | Bài `test_R3_03_bien_duoi_DONG_DAU_LE_hang_dau_tien_duoc_an_danh` — biên DƯỚI `DONG_DAU_LE = 4`: thay `A:B` dòng 4 bằng LE ⛔ khai TỔNG HỢP `GIALAPBIEN4` ⇒ dòng 4 PHẢI ẩn danh *(biên bao gồm chính nó)* | **M7** `r >= DONG_DAU_LE`→`r >= DONG_DAU_LE + 1` *(bỏ dòng 4)* ⇒ `test_R3_03` **ĐỎ** *(`1 failed`)*; trả nguyên ⇒ XANH. *(M7 sống ở R3 vì dòng 4 thật là pháp nhân — dữ liệu tổng hợp lộ biên)* |
+| `DT3-R3-04` | NHE | **⛔ ĐỤNG — ngoài DT3** | — | 3 số TK cá nhân ở `docs/…/Ket-qua-Phan-loai-4-loai-o.md` là tệp NỀN *(từ `aa1fe94`, ⛔ do DT3)* ⇒ việc `BA`/owner. Lời giao R3 nêu rõ ⛔ thuộc bước này |
+| `DT3-R3-05` | NHE | **⛔ cần — việc orchestrator** | — | Lệnh `merge-base --is-ancestor` của phiếu cũ exit 128 *(tập rỗng, Đ3)*; bằng chứng thay = các phép quét PII dưới |
+
+### Ảnh GIỮ NGUYÊN byte
+`git diff ngọn` = **1 tệp** *(`tests/du_lieu/test_anh_cau_hinh.py` — chỉ thêm/sửa BÀI)*; ⛔ chạm `tools/khuon_dong_bang/mapping_master_cfg.py`, ⛔ tệp `.json` nào ở `tests/fixture/cau_hinh/` ⇒ ba ảnh TRÙNG TỪNG BYTE. Đột biến chỉ áp tạm vào mã ngọn khi chứng minh ĐỎ, `git checkout` trả nguyên NGAY *(`git diff tools/` sạch sau mỗi lượt)*. ⇒ ⛔ bản thô SA ở `/tmp` *(mẫu số raw = 0 — ⛔ đọc lại)*.
+
+### Số bài trước → sau *(Q8: nhánh ⛔ có `MONG_PYTEST_TOAN_BO` — ghi số, ⛔ đặt hằng; grep tool = 0)*
+- `tests/du_lieu/test_anh_cau_hinh.py`: **71 → 76** *(+5: `test_R3_01` · `test_R3_03` · `test_R2_02` từ 1 → 4 ca tham số `cot_D·E·F·G`)*.
+- `tests/du_lieu/test_dong_bang_sheet.py`: **96 → 96** *(⛔ đổi)*.
+- `pytest --collect-only` TOÀN BỘ: **2657 → 2662** *(+5)* — orchestrator đặt số trên cây đã gộp.
+- `tests/du_lieu/` đầy đủ: **172 passed** *(8,22 s)*.
+- `--duong-nen` *(script CỦA NHÁNH, `GOC = …/isp-dt3`, một mình trên cụm 5446)*: **`KẾT: ĐẠT`** — tập đỏ = đường nền **toàn bộ 26 = 26** · **tests/web 3 = 3** *(thêm 0 · bớt 0)* · `12 failed · 2634 passed · 2 xfailed · 14 errors in 328.89s` *(+5 passed so R2: 2629 → 2634)*; `lint-imports` **11 kept, 0 broken**; `docs/ITL/_tools/kiem_tai_lieu.py` ✅ ĐẠT *(184 file · 104 mã QĐ)*.
+
+### Quét PII trước commit *(số đếm, ⛔ chuỗi)*
+- `git diff` dòng `+` của bài: chuỗi dạng tài khoản/tên = chỉ **TỔNG HỢP** *(`GIALAPONLYB` · `GIALAPBIEN4` · `CHUOILA_COTHE_TEN_NGUOI` · `R | 99999999_…`)* — ⛔ tên thật, ⛔ số TK thật *(số ≥6 chữ duy nhất = `99999999` giả)*.
+- `sha256_16:` · `MUOI` · `def bam` · `hashlib` · `MA_BAM` ở dòng `+` của diff + bài ⇒ **0 · 0 · 0 · 0 · 0** *(biên bản nêu tên pattern trong backtick làm NHÃN — Đ2: khai ≠ biên bản)*.
+- 3 số TK cá nhân của `DT3-R3-04` *(tệp nền, ⛔ đụng)* ⇒ **0** ở diff + 2 message commit.
+
+### Hai commit
+① bài *(`tests/du_lieu/test_anh_cau_hinh.py`)*; ② phiếu này *(chỉ THÊM mục này)*. Push đúng MỘT nhánh `claude/bold-galileo-zukpaf-isp/DT3` *(fast-forward từ `61c0e20`)*.
+
+### Câu hỏi
+⛔ chỗ mơ hồ mới. *(`DT3-R3-04` = `BA`/owner · `DT3-R3-05` = orchestrator — cả hai ngoài phạm vi vòng sửa này.)*
