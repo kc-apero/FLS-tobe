@@ -245,3 +245,45 @@ Khoá k = 5 trường đã chuẩn hoá; ghép gốc = khoá + *"seq trùng"* �
 | `bash …/isp-s0/tools/dung_moi_truong_isp.sh --duong-nen --cong 5437` *(từ worktree `isp-dt1b`)* | *(ghi ở báo cáo phiên — đường nền của script S0 vs nhánh tách-trước-S0)* |
 | `.venv/bin/lint-imports` | `Contracts: 11 kept, 0 broken.` |
 | `python tools/phan_loai_ly_do.py` *(cổng mặc định)* | exit **3** *(câu mặc định byte y nguyên — ⛔ đổi `_che_do_cong`)* |
+
+## Vòng sửa sau R2 *(KQ-098)* — chỉ THÊM
+*(`fls-dev`, làn DATA, phiên cloud CON ngoài máy orchestrator · sau R2 `KQ-098` · trước R3. Phạm vi: **2 NÊN SỬA** `DT1b-R2-01 · -02` + **`-03`** *(gộp vào vòng này — orchestrator quyết)* + GHI NHẬN rẻ **`-04` · `-05`**. ⛔ chạm `WO` · dashboard · `TIEN_DO.md` · changelog chung · sổ phát hiện — R3/orchestrator đổi trạng thái sổ. Mọi lệnh ở worktree `isp-dt1b`, cụm PG 5437, venv `/home/user/FLS-tobe/.venv`, `PYTHONUTF8=1`.)*
+
+### Đã đổi *(1 tệp mã + 1 tệp bài mới)*
+| Tệp | Vì sao |
+|---|---|
+| `tools/phan_loai_ly_do.py` *(+~12 dòng)* | **R7 trần độ lớn** *(`-01`)*: thêm hằng `TRAN_DEM = 10 ** DAI_TOI_THIEU` *(= 1.000.000)*; `kiem()` đòi mọi LÁ SỐ của `mau_so` *(`khoa_hong.SO/L1` · `dang_khoa_hoc.SO/L1` · 5 số đếm gồm `so_dong_l1`)* thoả `0 ≤ n < TRAN_DEM`, ⛔ chỉ `type is int`. Vì sao con số: số đếm dòng lớn nhất đo được là `so_dong_so` = 9.967 *(≈ 10⁴)*; một token ≥ `DAI_TOI_THIEU` chữ số là Số CT / tiền *(luật R5 cấm)*, ⛔ phải số đếm ⇒ Số CT 16 chữ số DẠNG INT *(`4366191234567890`)* nay bị chặn ở cổng `--tep`. Câu lỗi nêu TÊN LÁ + ngưỡng, **⛔ in giá trị**. **R8 fail-đóng** *(`-03`)*: `_trong_repo_khong_ignore()` — `except OSError` nay `return True` *(⛔ `False`)*: tệp TRONG repo mà `git` ⛔ chạy được ⇒ ⛔ chứng minh được `.gitignore` che ⇒ TỪ CHỐI *(mã 2)*, Đ5. Docstring R7 + R8 cập nhật *(chỉ THÊM ý "trần độ lớn" · "fail-đóng")* |
+| `tests/du_lieu/test_phan_loai_ly_do_vong_sua_r2.py` *(mới, 14 bài)* | 2 `test_R2_DE_XUAT_*` *(phát hiện `-01` · `-03` — ĐỎ trên `4a45173`)* + 12 `test_R2_*` *(giết đột biến BIÊN của `-02` nhánh phan_xu/R8, `-04` mẫu hex16 + `sorted`, `-05` lech `tien_te`)*. ⛔ chạm tệp bài R1 *(sổ luật: vòng sau thêm tệp/hàng, ⛔ sửa)* |
+
+### Bằng chứng từng phát hiện *(ĐỎ-trước đo trên `4a45173`, mã R2)*
+| Mã | Mức | Kết | Bằng chứng *(lệnh · exit · dòng)* | ĐỎ-trước |
+|---|---|---|---|:-:|
+| `-01` | NÊN SỬA | **ĐÃ SỬA** | `…DE_XUAT_la_so_nguyen_co_tran_do_lon` **5/5** lá *(so_dong_l1 · khoa_hong.SO/L1 · dang_khoa_hoc.SO/L1)* ĐỎ trên `4a45173` *(Số CT 16 chữ số dạng int ⇒ exit 0)* → XANH sau trần *(exit 1 `/mau_so/…`)*; `assert str(SO_CT_INT) not in err` *(⛔ in giá trị)*. `…tran_do_lon_dung_nguong`: lá = `TRAN_DEM` ⇒ ĐỎ · = `TRAN_DEM − 1` ⇒ qua *(cô lập `so_dong_l1` ⛔ bị MONG ghim)*. Đột biến: bỏ trần *(chỉ `int`)* 2 vế CHẾT · `<`→`<=` CHẾT | **ĐỎ × 6** → XANH |
+| `-02` | NÊN SỬA | **ĐÃ SỬA** *(3 bài khoá hành vi đúng)* | *(a)* `…phan_bo_ghim_van_tay_nhan_None_la_ma_4`: chỉ `phan_bo_nhan` ghim, `van_tay_nhan=None` ⇒ **mã 4** *(⛔ 0)*; đột biến `if mong is None or mong_vt is None` → bỏ `or mong_vt is None` CHẾT. *(b)* `…R8_duong_TUONG_DOI…`: `monkeypatch.chdir(repo)` + đường tương đối ⇒ **mã 2**; đột biến bỏ `.resolve()` *(ValueError ⇒ lọt)* CHẾT. *(c)* `…R8_khong_phai_git_repo_tra_128…`: thư mục ⛔ git ⇒ check-ignore 128 ⇒ **mã 2**; đột biến `!= 0` → `== 1` CHẾT | n/a *(giết đột biến; mã đúng, thiếu bài)* |
+| `-03` | GHI NHẬN *(gộp)* | **ĐÃ SỬA** | `…DE_XUAT_git_khong_chay_duoc_la_TU_CHOI`: `PATH=/nonexistent` + CSV tổng hợp trong `docs/ITL/_tools/` ⇒ **mã 2** sau sửa *(trên `4a45173`: OSError→False ⇒ mã 0, ghi ra — ĐỎ-trước)*; đột biến `return True` → `return False` CHẾT | **ĐỎ** → XANH |
+| `-04` | GHI NHẬN | **ĐÃ SỬA** *(rẻ)* | `…khoa_bam_MAU_hex16_neo_hai_dau`: khoa_bam 17 ký tự *(bỏ `$`)* · hex chữ HOA *(thêm `re.I`)* ⇒ exit 1; đột biến tương ứng **2/2** CHẾT. `…van_tay_nhan_doc_lap_thu_tu_dong`: `_van_tay_nhan(dong) == _van_tay_nhan(reversed)`; đột biến bỏ `sorted` CHẾT. *(Trần `DAI_TOI_THIEU` 6→8 ở ngưỡng token-cấm `doc_khoa` — chế độ ĐO — còn khai GHI NHẬN, xem §Giới hạn)* | n/a *(giết đột biến)* |
+| `-05` | GHI NHẬN | **ĐÃ SỬA** *(rẻ)* | `…KHOA_LECH_truong_tien_te`: hai khoá chỉ khác `tien_te` cùng Số CT ⇒ `lech == ['tien_te']`; đột biến `range(5)` → `range(4)` *(bỏ `tien_te`)* CHẾT | n/a *(giết đột biến)* |
+
+### Chứng minh đột biến *(sao lưu tool → vá → chạy bài đích → trả nguyên; `cmp` khớp byte sau mỗi lượt)*
+**11/11** đột biến BIÊN CHẾT *(`rc=1 FAILED` ở đúng bài đích)*: R2-02a·b·c · R2-03 · R2-01 *(bỏ trần `khoa_hong` · bỏ trần `so_dong_l1` · `<`→`<=`)* · R2-04 *(bỏ `$` · thêm `re.I` · bỏ `sorted`)* · R2-05 *(`range(5)`→`range(4)`)*. Tool trả nguyên khớp byte sau cả 11 lượt.
+
+### GHI NHẬN ⛔ sửa vòng này *(lý do)*
+- **`-06`** *(orch·BA)* — cổng Số CT dạng khoa học phía SO **K14** *(ISP đánh số)* chưa có mã: dựng K14 là **TÍNH NĂNG MỚI** *(cổng + `MONG` khai trước)*, và phụ thuộc orchestrator trả nghĩa *"khớp bản số thường"* *(ISP `:814`, còn mở ở `-07`)* ⇒ **lấn phạm vi**. Chuyển orchestrator *(cùng `-07`)*.
+- **`-04` phần còn lại** — `DAI_TOI_THIEU` 6→8 ở ngưỡng token-cấm của `doc_khoa` *(cam_ct/cam_tien, chế độ ĐO)*: giết cần ca token Số CT 6–7 ký tự qua đường đo thật, chồng lớp với `-07` *(bộ dựng `_dung`)*; `MAU_HEX16` ở `ban_doc_sha256_16` *(giới hạn #1 R1 — ⛔ phân biệt được sha với 16 chữ số thập phân ở cổng)* ⛔ đóng thêm được ở chế độ cổng. Để GHI NHẬN.
+- **`-07`** *(duong-nen nhạy tải)* — ⛔ lỗi mã DT1b; nhắc R3/orchestrator chạy `--duong-nen` **một mình** trên cụm *(⛔ chồng pytest khác dùng chung `fls_test`)*. Vòng này đã chạy một mình *(xem §Xác minh cuối)*.
+
+### Q8 — số bài thu thập *(nhánh `isp/DT1B` ⛔ có `MONG_PYTEST_TOAN_BO`; orchestrator đặt sàn lúc gộp)*
+`python -m pytest --collect-only` toàn bộ: **TRƯỚC** vòng sửa R2 `2.552` → **SAU** `2.566` *(+14 = tệp bài mới; đo bằng tổng dòng `tệp: n` của `--collect-only -q`)*. `tests/du_lieu`: `92` → `106`. `tests/du_lieu/test_phan_loai_ly_do_vong_sua_r2.py`: `14`.
+
+### Xác minh cuối *(nguyên văn)*
+| Lệnh | Kết quả |
+|---|---|
+| `pytest tests/du_lieu/test_phan_loai_ly_do_vong_sua_r2.py` | `14 passed` |
+| `pytest tests/du_lieu` *(hồi quy DT1a + DT1b)* | `106 passed` |
+| đột biến *(sao lưu tool, vá, trả nguyên)* | `11/11` đột biến BIÊN CHẾT · tool trả nguyên khớp byte |
+| `bash …/isp-dt1b/tools/dung_moi_truong_isp.sh --duong-nen --cong 5437` *(script NHÁNH, chạy MỘT MÌNH)* | `26 = 26` node id *(toàn bộ · thêm 0 · bớt 0)* · `3 = 3` node id *(tests/web)* · `KẾT: ĐẠT` *(chạy MỘT MÌNH trên cụm — log `12 failed, 2538 passed, 2 xfailed, 14 errors`; đỏ CÓ SẴN = đường nền)* |
+| `.venv/bin/lint-imports` | `Contracts: 11 kept, 0 broken.` |
+| `python docs/ITL/_tools/kiem_tai_lieu.py` | `K1` ĐỎ **ở tệp ngoài lane Dev** *(`SO_PHAT_HIEN_ISP-3.1_DT1b.md` header `v0.1` < changelog `v0.2` — fls-test R2, có từ `4a45173`, Dev ⛔ đụng)*; `K2`–`K6` ĐẠT. Xem §Câu hỏi cho orchestrator |
+
+### Câu hỏi cho orchestrator
+- **Q(R2)-1 — K1 doc-gate ĐỎ ở sổ phát hiện của fls-test.** `kiem_tai_lieu.py` K1 báo `SO_PHAT_HIEN_ISP-3.1_DT1b.md`: header `**Version:** v0.1` *(:3)* < changelog `v0.2` *(:39)*. Có từ commit `4a45173` *(KQ-098, trước vòng này)*; Dev ⛔ sửa tệp này *(ngoài lane · sổ luật: fls-test/orchestrator đổi)*. **Khuyến nghị A** *(nên)*: fls-test / orchestrator bump header tệp sổ lên `v0.2` *(một dòng)* để cổng xanh. **B**: orchestrator ghi lý do chấp nhận K1 ĐỎ tạm cho tệp sổ-riêng *(chờ gộp vào `SO_PHAT_HIEN_ISP-3.1.md`)*. Dev chờ chỉ dẫn, ⛔ tự đụng tệp sổ.
