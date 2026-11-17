@@ -163,7 +163,11 @@ def test_phu_thang_LAC_truoc_thang_dau_hien_ra_rieng_va_KHONG_lam_phinh_thieu():
     (202408, {"HKD": ""}, "HKD"),             # ô rỗng ⛔ thành 0
     (202408, {"HKD": None}, "HKD"),
     (202409, {"USD": "abc"}, "USD"),          # ⛔ phải số
-    (202409, {"USD": "-5"}, "USD"),           # tỷ giá ≤ 0
+    # Tỷ giá ÂM ⇒ bị TỪ CHỐI — ca này chỉ hỏi tháng + cột, ⛔ hỏi LÝ DO: mã hôm nay
+    # chặn bằng chốt `> 0`; gỡ chốt ấy thì khuôn thập phân *(⛔ dấu `-`)* bắt thay và
+    # ca này vẫn xanh *(R2 `C1-R2-01`: nhãn cũ "tỷ giá ≤ 0" hứa biên `0` mà ⛔ đưa `0`)*.
+    # Biên `0` + lý do `> 0` ⇒ `test_R2_01_ty_gia_BANG_0_thi_NO_va_NOI_lon_hon_0`.
+    (202409, {"USD": "-5"}, "USD"),
     (202409, {"USD": 20001.5}, "USD"),        # ⛔ float — qua float là mất chữ số
     (202406, {"EUR": "1"}, "EUR"),            # cột lạ ⛔ bỏ qua im lặng
 ])
@@ -442,3 +446,74 @@ def test_R1_02_doc_tep_CHI_doc_duoi_thu_muc_tinh(duong):
         fx.doc_tep(duong)
     cau = str(e.value)
     assert duong in cau and "\n" not in cau, cau
+
+
+# ══ Vòng sửa sau R2 (`KQ-078`) ══════════════════════════════════════════════
+#
+# ⛔⛔ Vì sao khối này tồn tại: R2 đột biến bản sao `59d4a39` *(bộ 150 bài offline)* —
+#    **`d <= 0 → d < 0`** và **gỡ hẳn** chốt `> 0` của `_so` đều `150 passed`. Dưới cả
+#    hai, tỷ giá **`'0'`** khớp khuôn `[0-9]+` ⇒ được NHẬN thành **0** — đúng lỗi AP
+#    §3.2.4 *"tháng thiếu ⇒ `SUMIFS = 0` ⇒ mất số không báo"* mà bước này sinh ra để
+#    chặn, chỉ là đi cửa khác *(một ô `0`, ⛔ phải một tháng thiếu)*. Vòng sửa R1 đặt
+#    `<= 0` TRƯỚC khuôn, mà khuôn đã từ chối dấu `-` ⇒ việc **RIÊNG** của chốt chỉ còn
+#    là số **0** — và grep `tests/` ca tỷ giá `"0"` = **0** chỗ *(R2 đo)*.
+#    Mỗi bài dưới ghi **đột biến nó giết** *(log: `BG-076` mục "Vòng sửa sau R2")*.
+
+
+# ── C1-R2-01 · biên `0` của tỷ giá *(NÊN SỬA)* ────────────────────────────────
+@pytest.mark.parametrize("x", [
+    "0", "00", "0.0", "0.00",      # chuỗi — 4 ca R2 đề xuất, chép nguyên
+    0,                             # SỐ JSON `0` ⇒ `json.loads` trả `int` 0
+    D("0.0"),                      # SỐ JSON `0.0` ⇒ `parse_float=Decimal` trả `Decimal`
+], ids=["s0", "s00", "s0.0", "s0.00", "int0", "Decimal0.0"])
+def test_R2_01_ty_gia_BANG_0_thi_NO_va_NOI_lon_hon_0(x):
+    """Tỷ giá **đúng tại biên** `0` ⇒ `LoiFX`, câu nói tháng · cột · **lý do `> 0`**
+    *(giết R2-f7 `d <= 0 → d < 0` và R2-f9 gỡ hẳn chốt)*.
+
+    ⭐ Vì sao đòi chữ **`> 0`** *(⛔ chỉ tháng + cột như ca `-5`)*: luật phòng tái
+      phạm `C1-R2-01` — *"ngưỡng của bộ kiểm phải có bài ĐÚNG TẠI BIÊN và bài phải hỏi
+      LÝ DO có tên; ca xa biên có thể bị chốt khác bắt thay mà ⛔ ai thấy"*. Ca `-5`
+      chính là ca ấy: gỡ chốt `> 0` thì khuôn bắt nó, bài vẫn xanh.
+    ⭐ Hai ca SỐ *(`int` · `Decimal`)*: nguồn JSON ghi `"USD": 0` hay `0.0` *(⛔ nháy)*
+      đi vào `_so` dưới dạng số, ⛔ chuỗi — cùng biên, lối vào khác.
+    """
+    fx = _fx()
+    with pytest.raises(fx.LoiFX) as e:
+        fx.kiem([_dong(202406, USD=x)], thang_dau=202406, nguon="bai-thu")
+    cau = str(e.value)
+    assert "202406" in cau and "USD" in cau and "> 0" in cau, cau
+    assert "\n" not in cau, f"⛔ câu nổ phải MỘT dòng: {cau!r}"
+
+
+def test_R2_01_ty_gia_0_DAU_PHAY_thap_phan_thi_NO_co_ten():
+    """`'0,00'` *(số 0 viết kiểu dấu phẩy thập phân — ô sheet theo vùng VN/EU)* ⇒
+    `LoiFX` có tên, ⛔ thành `0`.
+
+    Khác bốn ca trên ở **LÝ DO**: `Decimal('0,00')` ⛔ đọc được ⇒ chốt đầu tiên
+    *"⛔ phải số"* bắt, ⛔ tới `> 0`. Khuôn tỷ giá là thập phân ASCII **dấu chấm**
+    *(`C1-R1-06` ⓑ — ảnh `DT2` 185/185 ô dùng dấu chấm)* ⇒ dấu phẩy ⛔ được chuẩn hoá
+    ngầm thành dấu chấm. Bài ghim: câu nói giá trị **nguyên văn** + lý do *"phải số"*.
+    """
+    fx = _fx()
+    with pytest.raises(fx.LoiFX) as e:
+        fx.kiem([_dong(202406, USD="0,00")], thang_dau=202406, nguon="bai-thu")
+    cau = str(e.value)
+    assert "202406" in cau and "USD='0,00'" in cau and "phải số" in cau, cau
+
+
+# ── C1-R2-02 · `strip()` là CỐ Ý — ghim *(GHI NHẬN — làm luôn)* ────────────────
+def test_R2_02c_khoang_trang_DAU_CUOI_o_thang_va_ty_gia_duoc_NHAN_co_y():
+    """`_thang`/`_so` cắt khoảng trắng đầu/cuối **có chủ đích** *(`BG-076` yếu #4 vòng
+    R1: ô sheet hay dính dấu cách)* — R2 đột biến bỏ `strip()` ở từng hàm *(R2-f2 ·
+    R2-f3)* ⇒ `150 passed`: một quyết định ⛔ bài nào ghim. Giết cả hai.
+
+    ⚠ Hai mức khắt khe khác nhau, cố ý: luật ĐƯỜNG `nguon_tinh` thì ⛔ nhận khoảng
+      trắng *(`fls/cau_hinh/nguon_tinh.py`)*. Ảnh thật `DT2`: **0/185** ô có khoảng
+      trắng *(R2 đo)* ⇒ hôm nay 0 tác động; bài này chỉ để quyết định ⛔ đổi im lặng.
+    """
+    fx = _fx()
+    b = fx.kiem([_dong(" 202406 ", USD=" 20001 ")], thang_dau=202406,
+                nguon="bai-thu")
+    assert [d.yyyymm for d in b.ky] == [202406], [d.yyyymm for d in b.ky]
+    usd = b.ky[0].ty_gia["USD"]
+    assert usd == D("20001") and str(usd) == "20001", repr(usd)

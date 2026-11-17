@@ -807,6 +807,11 @@ def _tinh_ma_cham_ket_noi(t: Tuyen) -> list[str]:
     ⚠ Giới hạn, khai thẳng: đo **MỘT tầng** *(chính hàm xử lý + khối lồng)* — một
       hàm trao NGUYÊN `yc` cho hàm phụ rồi hàm phụ chạm `yc.conn` thì lọt ở đây; phép
       đo bắc cầu là việc của `soi_bang_tuyen` ⓔ3 *(SQL thật trên cả đồ thị gọi)*.
+      Mẫu số *(`C1-R2-03`, đo 17/11)*: **3/41** hàm của `HAM` ⛔ gọi tên `conn` ở
+      tầng đầu = `ty_gia` + **2** hàm ĐỌC KHO qua hàm phụ `xem_truoc` · `lo_xem_truoc`
+      *(trao `yc` cho `_dung_lo`/`_soat_lo`)* — tức **2** trong **40** hàm còn lại
+      lọt luật này *(`soi` ⓔ3 vẫn thấy SQL của chúng)*; giới hạn được GHIM ở
+      `test_R2_03_…` *(`tests/api/test_isp_config_fx.py`)* — sửa luật thì sửa cả bài.
     ⛔ `Đ5`: hàm ⛔ có trong `HAM` ⇒ ⛔ đo được ⇒ ĐỎ, ⛔ "không thấy chạm".
     """
     from fls.api.xu_ly import HAM      # trễ: `xu_ly` ⛔ import bảng này — ⛔ vòng

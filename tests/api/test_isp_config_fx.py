@@ -352,3 +352,116 @@ def test_R1_07_run_id_o_tuyen_TINH_thi_400_KHONG_tra_so_khoac_pham_vi_lan_nap(ma
     # Đ5 chiều kia: lượt trơn vẫn 200 *(⛔ chặn nhầm mọi lượt gọi)*.
     ma, r = _goi(may, DUONG)
     assert ma == 200 and r["meta"]["run_id"] is None, (ma, r["meta"])
+
+
+# ══ Vòng sửa sau R2 (`KQ-078`) ══════════════════════════════════════════════
+#
+# ⛔⛔ Vì sao khối này tồn tại: R2 đột biến bản sao `59d4a39` — **7** đột biến SỐNG trên
+#    bộ 150 bài; ba cái ở hai cổng bảng tuyến là **chốt mà CHÚ THÍCH hứa** nhưng ⛔ bài
+#    ghim *(tái phạm đúng luật `C1-R1-04`)*: `!= ()` → truthy ở `kiem_bang_tuyen`
+#    *(R2-g1)* và ở `soi` *(R2-s1)* · bỏ đệ quy khối lồng của `_ten_trong_ma` *(R2-g2)*.
+#    Thêm hai mép R2 dò ra: luật `conn` đo **một tầng** *(`C1-R2-03` — mẫu số)* và ⓔ
+#    chỉ đo **một chiều** *(`C1-R2-04` — Đ5)*. Mỗi bài ghi đột biến nó giết.
+
+
+# ── C1-R2-02 · chốt chú thích hứa *(GHI NHẬN — làm luôn; bài R2 đề xuất, chép)* ──
+@pytest.mark.parametrize("gt", [None, []], ids=["None", "list_rong"])
+def test_R2_02a_nguon_tinh_None_hay_RONG_o_tuyen_CO_bang_thi_HAI_cong_DO(gt):
+    """`bang_tuyen.py` ⓓ'' hứa *"⛔ `if t.nguon_tinh:` — `None`/`[]` falsy mà vẫn SAI
+    KIỂU"* ⇒ giết R2-g1 *(`!= ()` → truthy ở `kiem_bang_tuyen`)* và R2-s1 *(ở `soi`)*.
+
+    Vì sao phải là tuyến **CÓ `bang`**: với `bang=()` luật cũ *"⛔ khai bảng nào"* đỏ
+    thay *(`not t.bang and not t.nguon_tinh`)* — chốt `!= ()` ⛔ còn là thứ duy nhất
+    đứng giữa. Dưới hai đột biến, tuyến kho `so` + `nguon_tinh=None` ⇒ **cả hai cổng
+    XANH** *(R2 đo)*.
+    """
+    so = next(t for t in bt.BANG_TUYEN if t.ham == "so")
+    t = bt.Tuyen("GET", f"{V}/x", "so", so.bang, nguon_tinh=gt)
+    assert any("nguon_tinh" in x for x in bt.kiem_bang_tuyen((t,))), (
+        bt.kiem_bang_tuyen((t,)))
+    assert any("nguon_tinh" in x for x in sbt.soi((t,))[0]), sbt.soi((t,))[0]
+
+
+def _h_long(yc):
+    return (lambda: yc.conn)()          # `conn` CHỈ ở khối lồng
+
+
+def test_R2_02b_luat_conn_THAY_ca_KHOI_LONG(monkeypatch):
+    """`_ten_trong_ma` hứa *"kể cả khối lồng (hàm/lambda/biểu thức sinh)"* ⇒ giết R2-g2
+    *(bỏ đệ quy `co_consts`)*: hàm mà tên `conn` chỉ nằm trong một `lambda` vẫn phải
+    bị luật ⓓ''' gọi tên."""
+    monkeypatch.setitem(HAM, "r2_h_long", _h_long)
+    t = bt.Tuyen("GET", f"{V}/x", "r2_h_long", (), nguon_tinh=(NGUON_TINH,))
+    assert any("conn" in x for x in bt.kiem_bang_tuyen((t,))), (
+        bt.kiem_bang_tuyen((t,)))
+
+
+# ── C1-R2-03 · luật `conn` đo MỘT tầng — ghim GIỚI HẠN + mẫu số ─────────────────
+@pytest.mark.parametrize("ham", ["xem_truoc", "lo_xem_truoc"])
+def test_R2_03_ham_trao_NGUYEN_yc_cho_ham_phu_LOT_luat_conn__chi_soi_bat(ham):
+    """Giới hạn ĐÃ KHAI của ⓓ''' *(`bang_tuyen.py:_tinh_ma_cham_ket_noi`, `BG-076` yếu
+    #1 vòng R1)* — nay **ghim**, ⛔ chỉ khai *(luật `C1-R2-03`)*.
+
+    Mẫu số *(đo trên `HAM` thật, cây vòng sửa R2)*: **3/41** hàm ⛔ gọi tên `conn` ở
+    tầng đầu = `ty_gia` *(đúng — tuyến tĩnh)* + **2** hàm ĐỌC KHO `xem_truoc` ·
+    `lo_xem_truoc` *(trao nguyên `yc` cho `_dung_lo` / `_soat_lo` ở `nap_cua.py`)* ⇒
+    **2** trong **40** hàm còn lại *(41 trừ `ty_gia`)* lọt ⓓ'''. Khai một trong hai
+    thành tuyến tĩnh đúng khuôn:
+      · `kiem_bang_tuyen` **XANH** — giới hạn; nếu bài này đỏ ở vế ấy vì ⓓ''' đã bám
+        được hàm phụ thì đó là TIẾN BỘ: viết lại vế này + câu giới hạn trong mã;
+      · `soi` **ĐỎ** bằng câu ⓔ3 *(SQL thật trên cả đồ thị gọi chạm bảng)* — lưới đỡ.
+    ⇒ Câu *"CẢ HAI cổng cùng đỏ"* của `test_R1_02_…` đúng cho tập tuyến R1 *(hàm `so`
+      gọi tên `conn`)*, ⛔ cho mọi hàm — bài này nói phần còn lại.
+    """
+    assert ham in HAM, f"⛔ `{ham}` ⛔ còn trong `HAM` — mẫu số đổi, đo lại"
+    t = bt.Tuyen("GET", f"{V}/x", ham, (), nguon_tinh=(NGUON_TINH,))
+    assert bt.kiem_bang_tuyen((t,)) == [], (
+        f"ⓓ''' nay THẤY `{ham}` chạm kho — tiến bộ: viết lại vế này + câu giới hạn ở "
+        f"`_tinh_ma_cham_ket_noi`: {bt.kiem_bang_tuyen((t,))}")
+    loi = sbt.soi((t,))[0]
+    assert any("tuyen `nguon_tinh` ma SQL that cham" in x for x in loi), loi
+
+
+# ── C1-R2-04 · ⓔ4: đồ thị gọi MANG đường tĩnh mà tuyến ⛔ khai *(Đ5 hai chiều)* ──
+@pytest.mark.parametrize("nhan", ["kho_khong_khai", "tinh_khai_thieu"])
+def test_R2_04_soi_DO_khi_do_thi_MANG_duong_tinh_ma_tuyen_KHONG_khai(nhan):
+    """ⓔ2 đo chiều **khai ⊆ thật** *(đường khai phải có trong đồ thị gọi)*; chiều
+    **thật ⊆ khai** ⛔ có tới R2 *(grep `tools/` + `fls/` = 0)*: R2 bơm đường
+    `ix_fx_mau.json` vào đồ thị của tuyến kho `so` *(`nguon_tinh=()`)* ⇒ `soi` XANH ·
+    `kiem_bang_tuyen` XANH. Hai ca:
+      · `kho_khong_khai` — bài R2 đề xuất, chép: tuyến KHO ⛔ khai nguồn tĩnh nào;
+      · `tinh_khai_thieu` — tuyến TĨNH khai một tệp mà đồ thị mang thêm tệp thứ hai.
+    """
+    khac = "fls/cau_hinh/tinh/khac.json"
+    if nhan == "kho_khong_khai":
+        so = next(t for t in bt.BANG_TUYEN if t.ham == "so")
+        t, bom = bt.Tuyen("GET", f"{V}/x", "so", so.bang), NGUON_TINH
+    else:
+        t, bom = _tuyen_fx()[0], khac
+    that = sbt.sql_cua_tuyen(t.ham)
+    loi, _ = sbt.soi((t,), do_sql=lambda _h: that,
+                     do_chuoi=lambda h: sbt.chuoi_cua_tuyen(h) | {bom})
+    assert any("nguon_tinh" in x and bom in x for x in loi), loi
+    assert all("\n" not in x for x in loi), loi
+
+
+def test_R2_04_e4_KHONG_do_nham_tren_bang_THAT__mau_so_khac_rong():
+    """`Đ5` chiều kia + `Đ3`: trên bảng thật ⓔ4 ⛔ đỏ nhầm, **và** tập nó so ⛔ rỗng —
+    đo ở vòng sửa R2: **1/41** tuyến có hàm mang chuỗi dưới `fls/cau_hinh/tinh/`
+    *(`ty_gia`, đúng đường nó khai)*. Hằng `THU_MUC` *(⛔ dấu `/` cuối)* cũng nằm trong
+    đồ thị của `ty_gia` ⇒ ⓔ4 so TIỀN TỐ `THU_MUC + '/'`, ⛔ chuỗi con.
+
+    ⚠ Cố ý ⛔ ghim *"đúng 1 tuyến"*: `C4` *(tĩnh từ ảnh)* sẽ thêm tuyến tĩnh thứ hai —
+      bài này chỉ đòi mẫu số ≥ 1 ở chính tuyến `C1` *(bằng chứng DƯƠNG)*; cổng thật là
+      `soi()` xanh trên MỌI tuyến.
+    """
+    from fls.cau_hinh import nguon_tinh
+    tien_to = nguon_tinh.THU_MUC + "/"
+    mang = {t.duong: sorted(x for x in sbt.chuoi_cua_tuyen(t.ham)
+                            if x.startswith(tien_to))
+            for t in bt.BANG_TUYEN}
+    mang = {k: v for k, v in mang.items() if v}
+    assert mang.get(DUONG) == [NGUON_TINH], (
+        f"⛔ mẫu số ⓔ4 ở tuyến C1 lệch — {len(mang)}/{len(bt.BANG_TUYEN)} tuyến: {mang}")
+    assert nguon_tinh.THU_MUC in sbt.chuoi_cua_tuyen("ty_gia")
+    assert sbt.soi()[0] == []
