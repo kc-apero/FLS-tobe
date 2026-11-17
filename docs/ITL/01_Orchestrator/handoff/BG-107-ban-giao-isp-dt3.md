@@ -165,3 +165,43 @@ Khoá ở biến môi trường, ⛔ in / ⛔ ghi tệp / ⛔ log / ⛔ commit. 
 
 ### Quét PII trước commit
 7 tên + số TK cá nhân *(lấy từ bản thô SA ở `/tmp`, ⛔ in)* đếm trong **10 tệp đã đổi + 2 message commit** ⇒ **0** *(mẫu số 7 × 12 = 84)*; `sha256_16:` *(mã băm thật)* trong ảnh ⇒ **0**; `MUOI` · `def bam` · `hashlib` trong công cụ + 3 khuôn ⇒ **0**. `merge-base --is-ancestor 2a31f76 isp/DT3` ⇒ exit 1 *(lịch sử MỚI ⛔ chứa `2a31f76`)*.
+
+
+## Vòng sửa sau R2 (KQ-109) — *(`fls-dev`, phiên cloud mới · 2026-11-17)*
+
+Orchestrator quyết **A** *(Q2 của `KQ-109`)*: Dev sửa **2 NÊN SỬA** trước R3; GHI NHẬN làm nếu rẻ. Chỉ THÊM — ⛔ đụng ảnh *(byte-trùng)*, ⛔ `TIEN_DO.md`/dashboard/changelog chung. Nền `isp/DT3` @ `e733915` *(= `KQ-109`)*; cụm PG cổng **5446**; worktree `.claude/worktrees/isp-dt3`. ⛔ đọc lại SA *(ảnh giữ nguyên byte)*.
+
+### Từng phát hiện → *(TDD: ĐỎ-trước chứng minh)*
+| Mã | Mức | Trạng thái | Sửa | Bằng chứng ĐỎ-trước |
+|---|---|---|---|---|
+| `DT3-R2-01` | NÊN SỬA | **ĐÃ SỬA** | Bài `test_R2_01_hang_chi_co_A_B_rong_VAN_duoc_an_danh` — lưới MM + hàng **chỉ `A`** TỔNG HỢP ở dòng 80 *(B rỗng)* ⇒ `an_danh` +1 `cot=A`, `A`=hằng, chuỗi tổng hợp ⛔ ở đâu trong kết quả `chuan_bi` *(mã ngọn ĐÚNG — lỗ chỉ ở bài)* | Đột biến **M22** `(A≠∅ hoặc B≠∅)`→`(B≠∅)` trên ngọn ⇒ bài **ĐỎ** *(`an_danh` 7≠8, chuỗi rõ lọt)*; trả nguyên ⇒ XANH |
+| `DT3-R2-02` | NÊN SỬA | **ĐÃ SỬA** | `mapping_master_cfg.py`: `GIA_TRI_DG_CHO_PHEP` *(**20** giá trị RÚT từ ảnh hiện tại: `x` + **19** nhãn cấu trúc cây HD)*; `chuan_bi` đòi mỗi ô `D:G` ∈ tập ⇒ khác ⇒ `ValueError` *(TỪ CHỐI exit 2, ⛔ ghi ảnh, lời lỗi ⛔ mang giá trị ô)*. Bài `test_R2_02_cot_DG_chuoi_LA_…` *(thăm dò P4b: thay 1 ô `x` bằng chuỗi lạ, số dòng ⛔ đổi)* | ⛔ danh sách *(ngọn trước sửa)* ⇒ exit **0** `[ĐẠT]`, chuỗi lạ **vào ảnh** *(đo trực tiếp)*; thêm danh sách ⇒ exit 2 |
+| `DT3-R2-03`ⓐ | GHI NHẬN | **ĐÃ SỬA** *(rẻ)* | Bài `test_R2_03a_cdt_correct_vung_SAI_COT_…` — `nguon` cột khác `BR:BS` *(`BX:BY`)* ⇒ TỪ CHỐI exit 2 | **M17** *(CDT bỏ kiểm cột)* ⇒ ĐỎ |
+| `DT3-R2-03`ⓑ | GHI NHẬN | **ĐÃ SỬA** *(rẻ)* | Ca mới trong `ATL_CHOT` *(`tieu_de_nhom_thieu_o_C_ten`)* — xoá ô `C` của tiêu đề nhóm ⇒ "rác giữa bảng" ⇒ TỪ CHỐI exit 2 | **M18** *(ATL bỏ đòi ô `C`)* ⇒ ĐỎ |
+| `DT3-R2-03`ⓒ | GHI NHẬN | **ĐÃ SỬA** *(rẻ)* | Ca mới trong `test_R1_06` *(`20261117T040829`)* ⇒ `doc_luc` TỪ CHỐI exit 2 | **M11** *(`_NGAY_GIO`→`.*T.*`)* ⇒ ĐỎ |
+| `DT3-R2-04` | GHI NHẬN | **ĐÃ SỬA** | Docstring `test_anh_cau_hinh.py`: dòng 7 `A7:F88`→`A7:F90`; dòng 9 `BR11:BS23`→`BR11:BS32`; `MONG_CDT` *(dòng 66)* ghi rõ vùng ĐỌC `BR11:BS32` *(biên dư)*. GIỮ dòng nói phạm vi DỮ LIỆU *(17·403·472 + test_R1_02)* | — *(docstring; ⛔ đổi hành vi)* |
+| `DT3-R2-05` | GHI NHẬN | **GHI NHẬN — ⛔ sửa mã** *(lý do dưới)* | — | — |
+
+**`DT3-R2-05` — lý do ⛔ sửa mã:** ⓐ `test_R1_01` phần "tấn công từ điển" luôn `[]` *(hình thức)* — sức nặng ở 3 assert `hasattr`·`gia∉ảnh`·`A=B=hằng`, đã ĐỎ khi R2 phá lại *(M1·M2)*; đổi bản khai "tấn công" chỉ làm YẾU, ⛔ thêm sức. ⓑ `doc_luc` thập phân giây `…:29.123456+00:00` bị TỪ CHỐI exit 2 là **an toàn**; đây là lưu ý **VẬN HÀNH** cho orchestrator *(lưới SA thật nên ghi `timespec='seconds'` hoặc `Z`)*, ⛔ phải lỗi mã.
+
+### Ảnh GIỮ NGUYÊN byte
+`git diff ngọn` = **3 tệp** *(2 tệp bài + `mapping_master_cfg.py`)*; ⛔ tệp `.json` nào ở `tests/fixture/cau_hinh/` ⇒ ba ảnh TRÙNG TỪNG BYTE *(bảng chính 74·73·13)*. Allow-list `D:G` chỉ TỪ CHỐI đầu vào LẠ; đầu ra hợp lệ ⛔ đổi ⇒ `test_DT3_B1_anh_TAI_TAO_dung_tung_byte` vẫn XANH. ⇒ ⛔ bản thô MM ở `/tmp` *(mẫu số raw = 0)*.
+
+### Số bài trước → sau *(Q8: nhánh ⛔ có `MONG_PYTEST_TOAN_BO` — ghi số, ⛔ đặt hằng; grep tool = 0)*
+- `tests/du_lieu/test_anh_cau_hinh.py`: **67 → 71** *(+4: `test_R2_01` · `test_R2_02` · `test_R2_03a` · ca `ATL_CHOT[tieu_de_nhom_thieu_o_C_ten]`)*.
+- `tests/du_lieu/test_dong_bang_sheet.py`: **95 → 96** *(+1: ca `test_R1_06[ISO_gon_co_gio_KHONG_dau]`)*.
+- `pytest --collect-only` TOÀN BỘ: **2652 → 2657** *(+5)* — Q8 (A, đã chốt): ⛔ thêm `MONG_PYTEST_TOAN_BO`; orchestrator đặt số trên cây đã gộp.
+- `tests/du_lieu/` đầy đủ: **167 passed**.
+- `--duong-nen` *(script CỦA NHÁNH, `GOC = …/isp-dt3`, một mình trên cụm)*: **`KẾT: ĐẠT`** — tập đỏ = đường nền **toàn bộ 26 = 26** · **tests/web 3 = 3** *(thêm 0 · bớt 0)* · `12 failed · 2629 passed · 2 xfailed · 14 errors`; `lint-imports` **11 kept, 0 broken**; `docs/ITL/_tools/kiem_tai_lieu.py` ✅ DAT *(183 file · 104 mã QĐ)*.
+
+### Quét PII trước commit *(số đếm, ⛔ chuỗi)*
+- `sha256_16:` · `MUOI` · `def bam` · `hashlib` · `MA_BAM` ở `tools/dong_bang_sheet.py` + `tools/khuon_dong_bang/` ⇒ **0 · 0 · 0 · 0 · 0**.
+- Cùng các chuỗi ở dòng `+` của `git diff` *(hai commit)* ⇒ **0** *(biên bản phiếu này nêu tên pattern trong backtick làm NHÃN — Đ2: khai ≠ biên bản; ⛔ mã băm/muối thật)*.
+- Chuỗi dạng tài khoản ở dòng `+` = chỉ **TỔNG HỢP** *(`R | 99999999_…`, `CHUOILA_…`, `GIALAP…`)* — ⛔ tên thật, ⛔ số TK thật. Nhãn `D:G` của allow-list = nhãn cấu trúc cây HD *(`HDO`·`HD Original`…)*, đã có trong ảnh đã commit.
+- ⛔ bản thô MM ở `/tmp` ⇒ check "7 tên + số TK" mẫu số raw = **0**; quét trên diff = **0**.
+
+### Hai commit
+① mã + bài *(`tools/khuon_dong_bang/mapping_master_cfg.py` + `tests/du_lieu/test_anh_cau_hinh.py` + `tests/du_lieu/test_dong_bang_sheet.py`)*; ② phiếu này *(chỉ THÊM mục này)*. Push đúng MỘT nhánh `claude/bold-galileo-zukpaf-isp/DT3` *(fast-forward từ `e733915`)*.
+
+### Câu hỏi
+⛔ chỗ mơ hồ mới. *(Q1·Q2 của `KQ-109` là việc orchestrator; vòng này thực thi Q2 = A.)*
