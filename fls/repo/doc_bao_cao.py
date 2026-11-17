@@ -32,8 +32,11 @@ USD 4.492 dong vs VND 2.987, gop lai thi toan bo dong USD bi dim xuong duoi.
 """
 from __future__ import annotations
 
+import json
+import os
 from dataclasses import dataclass
 from decimal import Decimal
+from pathlib import Path
 from typing import Any
 
 from fls.adapters.mapping_master import TRUONG as TRUONG_MM
@@ -46,6 +49,9 @@ from fls.canon.tien_te import ma_tien_te
 # JS se lech o dung hai cho ay.
 from fls.canon.spec import CANON_COLS
 from fls.ledger.allocate import suy_allocate
+# ⭐ CG1 (`WO-101`): bảy khối vùng chỉnh tay — để cổng `FINAL` NÓI được nó đếm ô của mấy khối
+# (Đ4). ⛔ Một danh sách thứ hai: đây là bản luật mà `tinh_final` chạy trên đó.
+from fls.ledger.final_rule import BAY_KHOI
 # ⚠ Chi lay HANG SO (`TRUONG_HOP_DONG`), ⛔ khong ham ghi nao — luat
 # ranh gioi cua `import-linter`: tang doc ⛔ khong duoc goi tang ghi.
 from fls.repo.anh_pm import anh_pm_hieu_luc
@@ -847,6 +853,12 @@ class Cong:
 # Bon cong ke toan cua `BA-07` §2. FLS ⛔ chua do duoc cai nao vi ca bon deu can
 # nguon ngoai chua noi vao. ⇒ Khai TUONG MINH la "chua do duoc" kem ly do, ⛔
 # khong de chung xuat hien nhu cong xanh, va ⛔ khong an chung di.
+#
+# ⭐ CG1 (ISP 3.1.2 · Step 7 · `WO-101`, 16/11): `FINAL` RỜI danh sách này. Nó từng nằm ở
+#   đây với lý do *"cong nay chay ngoai kho tren anh chup so goc (`fls/oracle/cong_parity.py`),
+#   ⛔ khong doc duoc tu mot cau SQL"* — lý do ấy VẪN đúng, nên cổng ⛔ chuyển sang SQL: nó đọc
+#   TỆP ĐO được truyền vào (`doc_cong_tep_do`). Tệp vắng/hỏng ⇒ nó VẪN `dat=None` kèm lý do.
+#   ⇒ Luật *"⛔ bao giờ toàn xanh"* giữ nguyên: ba cổng kế toán còn lại + `BON_DUONG` LUÔN `None`.
 _CHUA_DO_DUOC: tuple[tuple[str, str, str], ...] = (
     ("DIF_BANK", "DIF ngan hang (dong 226)",
      "can ket qua A-CCR tren BigQuery — chua noi (`GAP-ORA-05`)"),
@@ -854,9 +866,6 @@ _CHUA_DO_DUOC: tuple[tuple[str, str, str], ...] = (
      "can nguon vi/P100 — FLS chi doc `fls_*`, chua co adapter (`QĐ-ITL-45`)"),
     ("DONG_BO", "Dong bo nguon",
      "can bang `fls_source` co du lieu — pipeline chua ghi manifest"),
-    ("FINAL", "Luat Final tai hien tung o",
-     "cong nay chay ngoai kho tren anh chup so goc"
-     " (`fls/oracle/cong_parity.py`), ⛔ khong doc duoc tu mot cau SQL"),
     # ⭐ Them 27/08 sau khi phat hien cong "bon duong" cu la mot phep so vong
     # tron. Bon duong la `vao = so + loai + RONG + TRUNG`, ma **`rong` va
     # `trung` ⛔ khong duoc luu o dau ca** — chung chi ton tai trong bien in ra
@@ -868,12 +877,200 @@ _CHUA_DO_DUOC: tuple[tuple[str, str, str], ...] = (
 )
 
 
-def doc_cong(conn, pv: PhamVi) -> list[Cong]:
+# ── cổng đọc từ TỆP ĐO (ngoài kho) — ISP 3.1.2 · Step 7 · CG1 · `WO-101` ─────────────────
+#
+# ⭐ Hai cổng HD1 *(AP v3.1.2 §5.3.1 HD1 ★ · §5.3.2 AC10)* ⛔ đọc được từ một câu SQL: số của
+#   chúng là phép chạy MÃ FLS lên ẢNH ĐÓNG BĂNG của sổ AS-IS (`tools/do_voi_so_luong.py` — cổng
+#   `mong` riêng của nó, lệch ⇒ ⛔ ghi tệp). Cổng ở đây chỉ ĐỌC tệp đo ấy.
+#
+# ⛔⛔ Đường dẫn tệp đo TRUYỀN VÀO (`tep_do`) — y khuôn kết nối kho (hợp đồng tầng 7 của
+#   `.importlinter`): `tools/chay_cua.py` → `cua.dung_may(tep_do=…)` → `YeuCau.tep_do` → đây.
+#   ⛔ Mặc định nào ở `fls/`: một đường gõ cứng là một cổng TỰ CHỌN "đo bản nào" — và một bài
+#   thử truyền tệp khác sẽ ⛔ bao giờ biết tuyến có đọc tệp ấy hay không.
+#
+# ⛔ CG1 ⛔ tự tính lại luật kỳ (`WO-101` §Hợp đồng với H2): `HD1_THANG` chỉ ĐỌC
+#   `dat_hd1.so_ky_dat` · `mau_so.so_ky` · `theo_ky[k].dat` · `theo_ky[k].thieu` · `ky_dat`
+#   (+ `nguon.so_dong_bang` = ngày ảnh). Luật phán kỳ là của H2 — vòng sửa `H2-R1-01` đổi LUẬT
+#   ⛔ đổi HÌNH, nên cổng này ⛔ phải sửa theo. Nhưng ⛔ tin MÙ: một tệp TỰ MÂU THUẪN *(số đếm ≠
+#   danh sách)* hay SAI KIỂU ⇒ `dat=None` kèm lý do (Đ5: phép ⛔ đo được là ĐỎ, ⛔ "không thấy lệch").
+#
+# ⚠⚠ Đ4 — `FINAL` đếm Ô GÌ. `tong.o_parity_khop / tong.o_parity` = ô Final FLS tính lại
+#   (`final_rule.tinh_final`) khớp Final AS-IS, trên 7 khối × các dòng GIỮ sau tự soi
+#   (`tu_soi.soi_mot_dong`) — ⛔ trên MỌI dòng sổ. Đo lại 16/11 bằng script độc lập đọc thẳng
+#   `tests/fixture/itl_ledge_adjustment.json` *(⛔ qua tool)*: **69.510/69.510** = 7 × **9.930**
+#   dòng giữ *(9.967 dòng sổ − **37** tự soi loại, cả 37 ở 2026-07; ô lỗi Sheets 0)*; CÙNG phép
+#   trên MỌI dòng: **69.706/69.769** *(= `KQ-092` đo (b))*. Hai mẫu số, hai con số, cùng "Final"
+#   ⇒ nhãn đi CÙNG con số trong `da_do`, phần bị bỏ khỏi mẫu số NÓI RA trong `ly_do`.
+_TEN_FINAL = "Luat Final tai hien tung o"
+_TEN_HD1 = ("HD1 theo tháng: dòng 1-1 + ô Final 100 %, hoặc mỗi lệch có tên lý do"
+            " và owner ký")
+
+
+class _TepDoHong(ValueError):
+    """Tệp đo đọc được mà ⛔ dùng được — mang MỘT câu lý do, ⛔ vết ngăn xếp."""
+
+
+def _vn(n: int) -> str:
+    """Số kiểu tài liệu (`69.510`). ⛔ Chỉ đổi dấu trên CON SỐ, ⛔ trên câu đã ghép —
+    bài học `tools/don_ly_do_sai.vn`: quét cả câu thì ăn luôn dấu phẩy của câu văn."""
+    return f"{n:,}".replace(",", ".")
+
+
+def _dem(khoi: dict, ten: str, *, vang_la_0: bool = False) -> int:
+    """Một số ĐẾM của tệp đo: `int` ≥ 0. ⛔ `bool` (`True` là `1` trong Python) · chuỗi · âm.
+
+    `vang_la_0` CHỈ cho khối `tong`: tool dựng nó bằng `dict(Counter)` — khoá đếm chỉ sinh ra
+    khi > 0, nên VẮNG đúng nghĩa là `0` của tool *(và `0` ô thì cổng ra "chưa đo được", Đ3)*.
+    """
+    v = khoi.get(ten)
+    if v is None and vang_la_0:
+        return 0
+    if type(v) is not int or v < 0:
+        raise _TepDoHong(f"`{ten}` = {v!r} ⛔ phải một số đếm")
+    return v
+
+
+def _doc_tep_do(tep_do) -> tuple[dict | None, str]:
+    """`(nội dung, lý do ⛔ dùng được)`.
+
+    ⚠ Lý do đi ra HTTP *(`GET /gates`)* ⇒ chỉ TÊN tệp, ⛔ đường dẫn: một đường dẫn tuyệt đối là
+    một mẩu bản đồ máy — cùng lý do `cua._di` ⛔ trả vết ngăn xếp ra ngoài.
+    """
+    if tep_do is None:
+        return None, ("tệp đo ⛔ được truyền vào (`dung_may(tep_do=…)` · "
+                      "`tools/chay_cua.py --tep-do`) ⇒ ⛔ đo được gì")
+    p = Path(os.fspath(tep_do))
+    try:
+        tho = p.read_bytes()
+    except FileNotFoundError:
+        return None, f"tệp đo vắng: `{p.name}` ⇒ ⛔ đo được gì"
+    except OSError as e:
+        return None, f"tệp đo `{p.name}` ⛔ đọc được ({type(e).__name__})"
+    try:
+        d = json.loads(tho.decode("utf-8"))
+    except (UnicodeDecodeError, json.JSONDecodeError) as e:
+        return None, f"tệp đo `{p.name}` ⛔ phải JSON UTF-8 ({type(e).__name__})"
+    if not isinstance(d, dict):
+        return None, f"tệp đo `{p.name}` ⛔ phải một đối tượng JSON"
+    return d, ""
+
+
+def _ngay_anh(d: dict) -> str:
+    """ISP §3: *"số là của ảnh 26/08 — `ly_do` ghi ngày ảnh"*. Vắng ⇒ NÓI vắng, ⛔ im."""
+    nguon = d.get("nguon")
+    n = nguon.get("so_dong_bang") if isinstance(nguon, dict) else None
+    if isinstance(n, str) and n.strip():
+        return f"số của ảnh sổ đóng băng ngày {n.strip()} (⛔ kho sống)"
+    return ("ngày ảnh: ⛔ tệp đo ⛔ ghi (`nguon.so_dong_bang`) — ⛔ biết số này"
+            " của lúc nào")
+
+
+def _cong_final(d: dict, ngay: str) -> Cong:
+    t = d.get("tong")
+    k = len(BAY_KHOI)
+    try:
+        if not isinstance(t, dict):
+            raise _TepDoHong("thiếu khối `tong`")
+        o = _dem(t, "o_parity", vang_la_0=True)
+        khop = _dem(t, "o_parity_khop", vang_la_0=True)
+        co = _dem(t, "co", vang_la_0=True)
+        loai = _dem(t, "loai_tu_soi", vang_la_0=True)
+        giu = co - loai
+        o_loi = giu * k - o            # ô lỗi Sheets bị bỏ trên các dòng giữ
+        # ⛔ tính lại parity — chỉ đòi bốn số ĐẾM của tệp nói cùng một chuyện
+        if khop > o or giu < 0 or o_loi < 0:
+            raise _TepDoHong(
+                f"tự mâu thuẫn: khớp {khop} · ô so {o} · {co} dòng − {loai} tự soi"
+                f" loại, × {k} khối")
+    except _TepDoHong as e:
+        return Cong(ma="FINAL", ten=_TEN_FINAL, dat=None,
+                    ly_do=f"tệp đo hỏng ở khối `tong`: {e} · {ngay}")
+    if o == 0:
+        return Cong(ma="FINAL", ten=_TEN_FINAL, dat=None,
+                    ly_do=f"0 ô Final được so ⇒ ⛔ đo được gì (Đ3: 0/0 ⛔ phải"
+                          f" 100 %) · {ngay}")
+    ly_do = (f"{ngay} · sổ có {_vn(co * k)} ô = {_vn(co)} dòng × {k} khối;"
+             f" {_vn(co * k - o)} ô ⛔ vào mẫu số = {_vn(loai)} dòng tự soi loại"
+             f" × {k} + {_vn(o_loi)} ô lỗi Sheets")
+    if khop != o:
+        ly_do = f"{_vn(o - khop)}/{_vn(o)} ô LỆCH · {ly_do}"
+    return Cong(
+        ma="FINAL", ten=_TEN_FINAL, dat=khop == o,
+        da_do=(f"{_vn(khop)}/{_vn(o)} ô (ô Final FLS tính lại = Final AS-IS · {k} khối"
+               f" × {_vn(giu)} dòng giữ sau tự soi)"),
+        ly_do=ly_do)
+
+
+def _cong_hd1(d: dict, ngay: str) -> Cong:
+    h = d.get("dat_hd1")
+    try:
+        if not isinstance(h, dict):
+            raise _TepDoHong("thiếu khối `dat_hd1` (H2 · `tools/do_voi_so_luong.py --ghi`)")
+        ms = h.get("mau_so")
+        if not isinstance(ms, dict):
+            raise _TepDoHong("thiếu `mau_so`")
+        so_ky = _dem(ms, "so_ky")
+        so_dat = _dem(h, "so_ky_dat")
+        ky_dat, theo_ky = h.get("ky_dat"), h.get("theo_ky")
+        if not isinstance(ky_dat, list) or not all(isinstance(x, str) for x in ky_dat):
+            raise _TepDoHong("`ky_dat` ⛔ phải danh sách kỳ")
+        if not isinstance(theo_ky, dict):
+            raise _TepDoHong("`theo_ky` ⛔ phải bảng theo kỳ")
+        ky: dict[str, tuple[bool, int]] = {}
+        for x, v in theo_ky.items():
+            if not isinstance(v, dict) or type(v.get("dat")) is not bool:
+                raise _TepDoHong(f"`theo_ky[{x}].dat` ⛔ phải true/false")
+            ky[x] = (v["dat"], _dem(v, "thieu"))
+        # ⛔ tính lại luật kỳ — chỉ đòi các phần ĐẾM của khối nói cùng một chuyện
+        dat_ky = {x for x, (dat, _n) in ky.items() if dat}
+        if len(ky) != so_ky:
+            raise _TepDoHong(f"tự mâu thuẫn: `mau_so.so_ky` {so_ky} ≠ {len(ky)} kỳ"
+                             f" trong `theo_ky`")
+        if (so_dat != len(ky_dat) or len(set(ky_dat)) != len(ky_dat)
+                or set(ky_dat) != dat_ky):
+            raise _TepDoHong(f"tự mâu thuẫn: `so_ky_dat` {so_dat} · `ky_dat`"
+                             f" {len(ky_dat)} kỳ · `theo_ky` {len(dat_ky)} kỳ đạt")
+    except _TepDoHong as e:
+        return Cong(ma="HD1_THANG", ten=_TEN_HD1, dat=None,
+                    ly_do=f"tệp đo hỏng ở khối `dat_hd1`: {e} · {ngay}")
+    if so_ky == 0:
+        return Cong(ma="HD1_THANG", ten=_TEN_HD1, dat=None,
+                    ly_do=f"0 kỳ trong mẫu số ⇒ ⛔ đo được gì (Đ3) · {ngay}")
+    # Kỳ đỏ theo thời gian, mỗi kỳ kèm SỐ DÒNG THIẾU *(dòng sổ ⛔ ghép 1-1)*. Một kỳ đỏ với 0
+    # dòng thiếu *(đỏ ở vế ô — sau `H2-R1-01` là có thể)* VẪN được kể tên: ⛔ lọc theo `thieu`.
+    do_ = sorted((x, n) for x, (dat, n) in ky.items() if not dat)
+    phan = []
+    if do_:
+        phan.append(f"kỳ đỏ {len(do_)}/{so_ky} — kỳ: số dòng thiếu (sổ ⛔ ghép 1-1) — "
+                    + " · ".join(f"{x}: {n}" for x, n in do_)
+                    + f" (Σ {_vn(sum(n for _x, n in do_))} dòng)")
+    phan += [ngay, "⛔ gồm chế độ tự sinh (H15) — luật kỳ do H2 phán, cổng này chỉ"
+                   " đọc `dat_hd1`"]
+    return Cong(ma="HD1_THANG", ten=_TEN_HD1, dat=so_dat == so_ky,
+                da_do=f"{so_dat}/{so_ky} kỳ đạt", ly_do=" · ".join(phan))
+
+
+def doc_cong_tep_do(tep_do) -> list[Cong]:
+    """`[FINAL, HD1_THANG]` đọc từ tệp đo `tep_do` *(`None` / vắng / hỏng ⇒ cả hai `dat=None`
+    kèm lý do)*. Hàm thuần — ⛔ chạm kho; hai cổng hai khối, hỏng khối này ⛔ kéo cổng kia."""
+    d, ly = _doc_tep_do(tep_do)
+    if d is None:
+        return [Cong(ma="FINAL", ten=_TEN_FINAL, dat=None, ly_do=ly),
+                Cong(ma="HD1_THANG", ten=_TEN_HD1, dat=None, ly_do=ly)]
+    ngay = _ngay_anh(d)
+    return [_cong_final(d, ngay), _cong_hd1(d, ngay)]
+
+
+def doc_cong(conn, pv: PhamVi, tep_do: str | os.PathLike | None = None) -> list[Cong]:
     """Cac cong doc duoc tu kho, cong bon cong ke toan khai la **chua do duoc**.
 
     ⛔ Ham nay ⛔ khong bao gio tra danh sach toan xanh: bon cong `_CHUA_DO_DUOC`
     luon co mat voi `dat=None`. Mot man hinh *"4/4 cong xanh"* trong khi bon
     cong ke toan chua he do la con so noi doi tho nhat cua ca he.
+
+    ⭐ CG1 (`WO-101`): `tep_do` = đường dẫn tệp đo của hai cổng HD1 (`FINAL` · `HD1_THANG`,
+    xem `doc_cong_tep_do`) — TRUYỀN VÀO như `conn`, ⛔ mặc định. `None` ⇒ hai cổng ấy
+    `dat=None`, nên `chua_do_duoc` của tuyến tăng ĐÚNG 2 so với lúc tệp đọc được.
     """
     from fls.repo import kho_sach
 
@@ -975,6 +1172,10 @@ def doc_cong(conn, pv: PhamVi) -> list[Cong]:
                 f"{r['run_id']} (lan {r['lan']}): chot {r['row_count']}"
                 f" != nay {r['trong_so']}"
                 f" — co ai doi so sau khi nap (`INV-I08`)" for r in xau)))
+
+    # ⓓ ⭐ CG1 — hai cổng HD1 đọc từ TỆP ĐO truyền vào (ngoài kho, ⛔ theo phạm vi lần nạp:
+    #    số của ẢNH đóng băng, `ly_do` ghi ngày ảnh).
+    ra += doc_cong_tep_do(tep_do)
 
     ra += [Cong(ma=m, ten=t, dat=None, ly_do=l) for m, t, l in _CHUA_DO_DUOC]
     return ra
