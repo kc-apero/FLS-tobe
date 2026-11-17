@@ -16,3 +16,6 @@ sao_luu/
 # git, va khi gui cho ai thi phai biet minh dang gui du lieu ke toan that.
 hien_vat/
 .nhip/
+
+# Ảnh ĐỎ của tools/dong_bang_sheet.py (lượt cổng đỏ ⛔ --ra) — ⛔ commit (DT2 Q6 = ⓐ, orchestrator 17/11)
+tests/fixture/**/*.DO.json
