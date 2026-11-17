@@ -378,11 +378,13 @@ def test_S0_R2_03_hang_mau_so_khai_MOT_cho():
     """2.460 = 12 + 2432 + 2 + 14 (lượt toàn bộ chính thức R2); 664 = 3 + 661 (`tests/web`).
 
     ⭐ Q8 = A: bước thêm bài nâng sàn + bài ghim này trong CÙNG commit — +33 CG1 (`WO-101`,
-    `tests/api/test_isp_gates_hd1.py`) ⇒ 2.493. Lo gốc giữ nguyên: số khai MỘT chỗ, ghim đúng số.
+    `tests/api/test_isp_gates_hd1.py`) ⇒ 2.493; +3 FG (`WO-116`, ISP 3.1.2 · Step 9,
+    `tests/web/test_isp_f03_hd.py` — FG-F1·F2·F3) ⇒ 2.496 · `tests/web` 664 → 667. Lo gốc giữ
+    nguyên: số khai MỘT chỗ, ghim đúng số.
     """
     van = SCRIPT.read_text(encoding="utf-8")
-    assert re.findall(r"^MONG_PYTEST_TOAN_BO=(\d+)$", van, re.M) == ["2493"]
-    assert re.findall(r"^MONG_PYTEST_WEB=(\d+)$", van, re.M) == ["664"]
+    assert re.findall(r"^MONG_PYTEST_TOAN_BO=(\d+)$", van, re.M) == ["2496"]
+    assert re.findall(r"^MONG_PYTEST_WEB=(\d+)$", van, re.M) == ["667"]
     goi = [d.strip() for d in van.splitlines() if d.strip().startswith("chay_pytest ")]
     assert len(goi) == 2 and '"$MONG_PYTEST_TOAN_BO"' in goi[0] and '"$MONG_PYTEST_WEB"' in goi[1], goi
 

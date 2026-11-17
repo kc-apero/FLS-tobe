@@ -394,8 +394,13 @@ MONG_HD1_CHAY=9845
 #    ⭐ Q8 = A (orchestrator 16/11): bước THÊM bài nâng số này trong CÙNG commit; orchestrator cộng
 #    lúc gộp. +33 · CG1 (`WO-101`, `tests/api/test_isp_gates_hd1.py` — `pytest --collect-only`
 #    tệp ấy: 33 bài; toàn bộ 2.567 → 2.600) ⇒ 2460 + 33 = 2493.
-MONG_PYTEST_TOAN_BO=2493
-MONG_PYTEST_WEB=664
+#    ⭐ +3 · FG (`WO-116`, ISP 3.1.2 · Step 9, `tests/web/test_isp_f03_hd.py` — `pytest
+#    --collect-only` tệp ấy: 3 bài FG-F1·F2·F3). ⚠ FG-F3 chạy Chromium thật; nó BỎ QUA khi
+#    thiếu Chromium/node/playwright ⇒ lúc đó `skipped > 0` làm cổng `--duong-nen` ĐỎ (đúng: một
+#    phép pixel ⛔ đo được là ĐỎ, Đ5). Môi trường cloud của phiên có đủ ⇒ `skipped 0`.
+#    ⇒ `tests/web` 664 → 667 · toàn bộ 2.493 → 2.496.
+MONG_PYTEST_TOAN_BO=2496
+MONG_PYTEST_WEB=667
 
 echo
 echo "══ KIỂM"
