@@ -68,3 +68,52 @@
   - **Phương án B:** chuyển FG-F3 thành bài **cấu trúc** dom_gia *(khẳng định lý do là khối chữ xuống-dòng-được, ⛔ `nowrap`)* + chuyển câu pixel 390 px sang `B7 · UAT`. Nhẹ phụ thuộc, nhưng là cổng **ĐẠI DIỆN**, ⛔ đo pixel thật *(rủi ro Đ4)*.
   - R1 chọn A hay B? Mặc định giữ **A**.
 - **Giới hạn đo được *(ngoài phạm vi, ⛔ thuộc AC-3)*:** ở 390 px **cả trang** F03 tràn ngang *(`documentElement.scrollWidth=690 > 390`)* — do bố cục rail/shell `.wrap` *(`grid-template-columns: var(--rail-w) …`)* + bảng `mẫu số`/`độ phủ`, ⛔ do thẻ cổng HD1 *(thẻ `scrollWidth==clientWidth`)*. Đây là việc đáp ứng responsive của cả màn, WO loại trừ *(⛔ màn mới · ⛔ khoan từng dòng)* — nêu để R1 biết, ⛔ sửa trong bước này.
+
+## Vòng sửa sau R1 (`KQ-118`)
+
+> Phiên cloud CON của `fls-dev` *(làn FE)*, 2026-11-17, sau R1 `KQ-118` *(ĐẠT · 0 CHẶN · 1 NÊN SỬA · 3 GHI NHẬN)*. Nền worktree `isp/FG` @ `8aa379d` *(ngọn R1)*, cụm PG riêng **5436**. Mục này **chỉ THÊM** — ⛔ viết lại phần trên. Trọng tài phát hiện của R1: `docs/ITL/04_Test/review/SO_PHAT_HIEN_ISP-3.1_FG.md`.
+
+### Việc orchestrator giao
+| Phát hiện | Quyết | Làm gì ở vòng này |
+|---|---|---|
+| `FG-R1-01` *(NÊN SỬA)* | **A — vá ngay** | Mạnh hoá `FG-F3`: đo thêm **vế ②** *(thẻ ⛔ vượt khung nhìn)* |
+| `FG-R1-03` *(GHI NHẬN, rẻ)* | **vá** | Thêm biến môi trường ghi đè đường công cụ; giữ mặc định + chuỗi *thiếu ⇒ ĐỎ* |
+| `FG-R1-02` *(GHI NHẬN)* | **B — chỉ ghi backlog** | ⛔ sửa ở bước này *(xem §backlog dưới)* |
+| `FG-R1-04` *(GHI NHẬN)* | **việc orchestrator** | ⛔ chạm *(mức cộng sàn lúc gộp)* |
+
+### Đã đổi *(chỉ một tệp — `fls/` diff vẫn 0; sàn giữ nguyên)*
+| Tệp | Vì sao |
+|---|---|
+| `tests/web/test_isp_f03_hd.py` *(+38 −8)* | **① `FG-R1-01`:** `_do_tran` trả thêm `iw` *(`window.innerWidth`)* + mỗi thẻ `r`/`l` *(`getBoundingClientRect().right`/`.left`)*; `test_FG_F3` thêm hai khẳng định cho thẻ HD1: `r ≤ iw` *(⛔ vượt mép phải)* và `l ≥ 0` *(⛔ tràn mép trái)* — đo **vế ②** của 'tràn' mà R1 chỉ ra `over` một mình mù. **② `FG-R1-03`:** `_pw_index`/`_chromium` nhận biến ghi đè `FLS_PW_INDEX`/`FLS_CHROMIUM`; đường ⛔ hợp lệ ⇒ rơi về dò mặc định *(giữ chuỗi thiếu ⇒ `None` ⇒ skip ⇒ `--duong-nen` ĐỎ — Đ5)*. |
+
+- **⛔ thêm bài** *(`--collect-only` giữ nguyên)*: `test_isp_f03_hd.py` = **3** · `tests/web` = **667** · toàn bộ **2.496** *(không đổi)*. `FG-R1-01` mạnh hoá bài sẵn có; `FG-R1-03` sửa hàm trợ giúp *(⛔ nút bài mới)* ⇒ **sàn `MONG_PYTEST_*` giữ 2496/667**, ⛔ chạm `tools/dung_moi_truong_isp.sh` · bài ghim. ⇒ **mức cộng FG lúc gộp vẫn +3** *(`FG-R1-04` ⛔ đổi)*.
+- `man_f03.js` **KHÔNG sửa** — thẻ thật `[35, 355]` trong 390 px *(`right=355 ≤ innerWidth=390`)*, vế ② xanh trên bố cục hiện tại ⇒ ISP §3 *(sửa tối thiểu NẾU vỡ)* ⇒ ⛔ sửa.
+
+### Chứng minh ĐỎ *(phá → chạy → cắn → trả nguyên — trên BẢN SAO `git archive`, ⛔ chạm worktree)*
+| Cổng | Phá | Chạy | Cắn | Trả |
+|---|---|---|---|---|
+| `FG-R1-01` *(vế ②)* | **M4** `.gate{min-width:520px}` thêm vào `hinh.css` *(bản sao)* — thẻ rộng hơn màn mà tự giãn *(`sw==cw`, `over=False`)* | `pytest …::test_FG_F3…` *(bản sao có bài đã mạnh hoá)* | `1 failed` · `test_isp_f03_hd.py:307 AssertionError: thẻ HD1 vượt mép PHẢI khung nhìn ở 390 px: right=555.0 > innerWidth=390` | bản sao vứt ⇒ worktree xanh *(`3 passed`)* |
+| `FG-R1-03` *(thiếu Chromium ⇒ ĐỎ giữ)* | glob mặc định trỏ `/opt/KHONG-CO/…` *(bản sao)*, ⛔ đặt env | `pytest tests/web/test_isp_f03_hd.py -rs` | `2 passed, 1 skipped` *(F3 SKIP)* ⇒ `--duong-nen` thấy `skipped>0` ⇒ `do_` ĐỎ | chuỗi *thiếu ⇒ skip ⇒ ĐỎ* nguyên vẹn |
+
+**Kiểm ghi đè `FG-R1-03`** *(gọi thẳng `_pw_index`/`_chromium`, env trỏ tệp giả)*:
+- env trỏ đường **hợp lệ** ⇒ dùng đường ấy *(`pw = /tmp/.../pw_index.js` · `cr = /tmp/.../chrome`)*.
+- env trỏ đường **rác** ⇒ **rơi về mặc định** *(`/opt/node-tools/…` · `/opt/pw-browsers/chromium-1243/…`)* — ⛔ chốt đường rác *(giữ chuỗi thiếu ⇒ skip ⇒ ĐỎ cả khi env rác + mặc định thiếu: vẫn `1 skipped`)*.
+- **⛔ đặt env** ⇒ mặc định cloud *(hành vi cũ nguyên vẹn)*.
+
+### Cổng chạy lại *(`PG_DSN=…:5436/fls` · `PG_DSN_TEST=…:5436/fls_test` · `PYTHONUTF8=1`)*
+| Lệnh | Kết quả |
+|---|---|
+| `pytest tests/web/test_isp_f03_hd.py -rs` | exit 0 · `3 passed in 2.86s` · 0 skip |
+| `pytest tests/web --collect-only` | `tests/web` = **667** *(không đổi)* |
+| `bash tools/dung_moi_truong_isp.sh --duong-nen --cong 5436` *(script NHÁNH · GOC = …/isp-fg · chạy MỘT MÌNH)* | `══ KẾT: ĐẠT`; toàn bộ `12 failed, 2575 passed, 2 xfailed, 14 errors in 354.06s` · `26 = 26 node id (thêm 0 · bớt 0)` · `chạy 2603 bài (mong ≥ 2496)` · skipped 0 · deselected 0; `tests/web` `3 failed, 664 passed in 184.33s` · `3 = 3 node id (thêm 0 · bớt 0)` · `chạy 667 bài (mong ≥ 667)` · skipped 0 · deselected 0 |
+| `.venv/bin/lint-imports` | exit 0 · `Contracts: 11 kept, 0 broken.` |
+| `docs/ITL/_tools/kiem_tai_lieu.py` | K1–K6 `OK` *(189 file · 1.948 bảng · 736 ô ngày · 104 mã QĐ)* |
+| `git diff 4dfb7bd HEAD -- fls` | **0 dòng** *(`man_f03.js` ⛔ đổi)* |
+
+Tập đỏ đường nền **không đổi** so R1 *(`26 = 26` · `3 = 3` · thêm 0 · bớt 0)* — bằng chứng mạnh hoá bài ⛔ sinh/mất nút nào.
+
+### `FG-R1-02` — backlog UIUX *(chỉ ghi, ⛔ sửa — orchestrator/BA)*
+Ở 390 px **cả trang** F03 tràn ngang *(`documentElement.scrollWidth ≈ 692 > 390`; phần tử vượt khung đầu tiên là `TABLE` mẫu số/độ phủ, `right ≈ 429`; **9/9 thẻ `.gate` nằm `[35, 355]` — ⛔ thủ phạm)*. Ngoài AC-3 *(AC-3 nói về **lý do** thẻ HD1, ⛔ về trang)* và ISP §3 loại trừ *(⛔ màn mới · ⛔ khoan từng dòng)* ⇒ ⛔ việc của FG. Là **nợ responsive thật** của F03 trên điện thoại. **Đề nghị orchestrator/BA:** ghi một việc responsive F03 *(rail/shell `--rail-w` + bảng 429 px thu gọn/cuộn riêng)* vào backlog UIUX **nếu 390 px thuộc NFR**. ⛔ có tệp backlog UIUX chuyên dụng trong repo ⇒ ghi tại đây *(kênh dev → orchestrator)*, ⛔ tự chạm spec BA.
+
+### Dev tự thấy / câu hỏi *(kèm khuyến nghị)*
+- **TDD cho `FG-R1-03` — ⛔ thêm bài riêng.** Ghi đè env là sửa **hàm trợ giúp của bài** *(⛔ mã `fls/`)*; đường mặc định đã được `test_FG_F3` phủ, đường ghi đè chứng minh bằng *phá → chạy → cắn → trả* ở trên. Thêm một bài đơn vị cho ghi đè sẽ **+1 sàn** *(2497/668)* và đổi **mức cộng FG** mà `FG-R1-04` *(việc orchestrator)* đang ghim ở **+3**. **Khuyến nghị A *(đã làm)*:** giữ **+3**, ⛔ thêm bài — chứng minh bằng demo trên bản sao *(đã ghi)*. **Phương án B:** thêm bài đơn vị ghi đè ⇒ sàn 2497/668 + cập nhật bài ghim + báo orchestrator đổi mức cộng FG thành +4. Mặc định giữ **A**.
