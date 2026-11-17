@@ -60,3 +60,6 @@ Bản sao `[COPY] Report I General Ledger | P&L Report` · id `19NNTbXJ6SmwA8AFn
 
 ## Câu còn treo
 - không có.
+
+## Đính chính (orchestrator, 2026-11-17 — chỉ THÊM; câu cũ ở trên GIỮ làm biên bản)
+- Lỗi đếm của orchestrator, tác giả DT4 đo đúng: (1) "khớp ĐÚNG … ở **21 kỳ** 2024-10 … 2026-04" ⇒ dải ấy là **19 kỳ** (3 kỳ 2024 + 12 kỳ 2025 + 4 kỳ 2026); tổng kỳ = 19 khớp + 4 lệch có tên = 23. (2) "**6** ô rỗng (đều ở BO · BP)" ⇒ là **6 HÀNG = 12 Ô** (BO 6 + BP 6). AC-1 và mục "Ô rỗng BO/BP" đọc theo số đính chính.
