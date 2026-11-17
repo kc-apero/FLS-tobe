@@ -749,21 +749,41 @@ def test_R1_05_D12_dia_DAY_giua_chung_thi_exit_3_anh_cu_NGUYEN_va_0_tep_tam(ban_
 @pytest.mark.parametrize("doc_luc", [
     pytest.param("2026-W46-1", id="tuan_ISO"),
     pytest.param("20261116", id="ISO_gon"),
-    pytest.param("2026-11-16T00:00:00", id="co_gio"),
     pytest.param("2026-02-30", id="ngay_khong_co"),
+    pytest.param("2026-02-30T04:00:00", id="ngay_khong_co_co_gio"),
     pytest.param("16/11/2026", id="kieu_VN"),
+    pytest.param("2026-11-16 04:00:00", id="cach_KHONG_T"),
+    # `DT3-R2-03`ⓒ: `_NGAY_GIO` phải CHẶT *(ngày-giờ có gạch + hai chấm)*. ĐỎ trên M11 *(nới
+    # `_NGAY_GIO` thành `.*T.*`)*: `datetime.fromisoformat` nhận dạng gọn `20261117T040829` ⇒ exit 0.
+    pytest.param("20261117T040829", id="ISO_gon_co_gio_KHONG_dau"),
 ])
 def test_R1_06_doc_luc_KHONG_phai_YYYY_MM_DD_thi_TU_CHOI(tmp_path, doc_luc):
     """`DT2-R1-06`: `date.fromisoformat` *(Python ≥ 3.11)* nhận cả `2026-W46-1` lẫn `20261116`,
     và công cụ cũ ghi NGUYÊN chuỗi ấy vào `ngay_dong_bang` — quyết định ③ hứa một NGÀY. Mong:
-    chỉ `YYYY-MM-DD` có thật. ĐỎ trên `eb94901` ở `tuan_ISO` · `ISO_gon` *(exit 0)*; ba ca còn
-    lại là chốt đã có, giữ để canh."""
+    chỉ `YYYY-MM-DD` có thật, hoặc dấu thời gian ISO-8601 CHẶT *(`DT3-R1-03`, xem bài dưới)*. Mọi
+    dạng lỏng khác ⇒ TỪ CHỐI. ĐỎ trên `eb94901` ở `tuan_ISO` · `ISO_gon` *(exit 0)*."""
     tho = _tho_json(tmp_path / "tho.json", _hang_json(), doc_luc=doc_luc)
     ra = tmp_path / "moi" / "a.json"
     kq = _chay("ix_fx", str(tho), "--mong", "37", "--ra", str(ra))
     _da_tu_choi(kq)
     assert "doc_luc" in _dong_loi(kq.stderr, "⛔ TỪ CHỐI")[0]
     assert not ra.exists()
+
+
+@pytest.mark.parametrize("doc_luc, ngay", [
+    pytest.param("2026-11-16T00:00:00", "2026-11-16", id="co_gio_khong_mui"),
+    pytest.param("2026-11-17T04:08:29+00:00", "2026-11-17", id="SA_co_mui_gio"),
+    pytest.param("2026-11-17T23:59:59Z", "2026-11-17", id="co_Z"),
+])
+def test_R1_03_doc_luc_dau_thoi_gian_ISO_duoc_lay_NGAY(tmp_path, doc_luc, ngay):
+    """`DT3-R1-03`: lưới SA ghi `doc_luc` là DẤU THỜI GIAN ISO-8601 *(vd
+    `2026-11-17T04:08:29+00:00`)*. Công cụ NHẬN và lấy phần NGÀY vào `ngay_dong_bang` *(⛔ thì
+    freeze SA trượt ngay ở cổng `doc_luc`)*. ĐỎ trên nền trước R1-03: `co_gio` từng bị TỪ CHỐI."""
+    tho = _tho_json(tmp_path / "tho.json", _hang_json(), doc_luc=doc_luc)
+    ra = tmp_path / "a.json"
+    kq = _chay("ix_fx", str(tho), "--mong", "37", "--ra", str(ra))
+    assert kq.returncode == 0, (kq.stdout[-500:], kq.stderr[-500:])
+    assert json.loads(ra.read_text(encoding="utf-8"))["ngay_dong_bang"] == ngay
 
 
 # ── DT2-R1-08 · cột tiêu đề RỖNG mà có dữ liệu ──────────────────────────────────────────────
