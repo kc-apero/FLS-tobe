@@ -208,6 +208,12 @@ NODE = shutil.which("node")
 
 
 def _pw_index() -> str | None:
+    # FG-R1-03 (`KQ-118`): đường gõ cứng Linux có thể GHI ĐÈ bằng `FLS_PW_INDEX`
+    #   (máy owner / bố cục khác). Đường ⛔ hợp lệ ⇒ rơi về dò mặc định — giữ
+    #   nguyên chuỗi *thiếu ⇒ None ⇒ skip ⇒ `--duong-nen` ĐỎ* (Đ5).
+    rieng = os.environ.get("FLS_PW_INDEX")
+    if rieng and os.path.isfile(rieng):
+        return rieng
     for p in ("/opt/node-tools/node_modules/playwright/index.js",):
         if os.path.isfile(p):
             return p
@@ -224,6 +230,11 @@ def _pw_index() -> str | None:
 
 
 def _chromium() -> str | None:
+    # FG-R1-03 (`KQ-118`): ghi đè bằng `FLS_CHROMIUM`. ⛔ đặt hoặc đường ⛔ chạy
+    #   được ⇒ rơi về glob mặc định — giữ chuỗi *thiếu ⇒ None ⇒ skip ⇒ ĐỎ* (Đ5).
+    rieng = os.environ.get("FLS_CHROMIUM")
+    if rieng and os.access(rieng, os.X_OK):
+        return rieng
     hits = sorted(h for h in glob.glob(
         "/opt/pw-browsers/chromium-*/chrome-linux64/chrome") if os.access(h, os.X_OK))
     return hits[-1] if hits else None
@@ -237,8 +248,10 @@ can_browser = pytest.mark.skipif(
 
 
 def _do_tran(url: str, w: int) -> dict:
-    """Mở F03 bằng Chromium thật ở bề rộng `w` px; trả thẻ `.gate` kèm cờ TRÀN
-    (`scrollWidth > clientWidth`) — đo của CHÍNH thẻ, ⛔ của cả trang."""
+    """Mở F03 bằng Chromium thật ở bề rộng `w` px; trả `iw` (`innerWidth`) và các
+    thẻ `.gate` kèm HAI vế của 'tràn': `over` (`scrollWidth > clientWidth` — nội
+    dung vượt THẺ) và `r`/`l` (`getBoundingClientRect().right`/`.left` — mép thẻ
+    so với KHUNG NHÌN). Đo của CHÍNH thẻ, ⛔ của cả trang."""
     mjs = (
         "import pkg from %(pw)s; const { chromium } = pkg;\n"
         "const b = await chromium.launch({ executablePath: %(cr)s,"
@@ -248,10 +261,13 @@ def _do_tran(url: str, w: int) -> dict:
         "await pg.goto(%(url)s);\n"
         "await pg.waitForSelector('#than-f03 .gate', { timeout: 15000 });\n"
         "const res = await pg.evaluate(() => ({\n"
-        "  gates: [...document.querySelectorAll('#than-f03 .gate')].map(g => ({\n"
-        "    cls: g.className, over: g.scrollWidth > g.clientWidth,\n"
-        "    sw: g.scrollWidth, cw: g.clientWidth, txt: (g.textContent || '')\n"
-        "  }))\n"
+        "  iw: window.innerWidth,\n"
+        "  gates: [...document.querySelectorAll('#than-f03 .gate')].map(g => {\n"
+        "    const rc = g.getBoundingClientRect();\n"
+        "    return { cls: g.className, over: g.scrollWidth > g.clientWidth,\n"
+        "      sw: g.scrollWidth, cw: g.clientWidth,\n"
+        "      r: rc.right, l: rc.left, txt: (g.textContent || '') };\n"
+        "  })\n"
         "}));\n"
         "console.log(JSON.stringify(res));\n"
         "await b.close();\n"
@@ -268,8 +284,15 @@ def _do_tran(url: str, w: int) -> dict:
 @can_browser
 def test_FG_F3_ly_do_23_ky_khong_tran_ngang_o_390px():
     """Lý do HD1 (18/23 kỳ đỏ, ~400 ký tự) ở bề rộng 390 px ⇒ thẻ HD1 ⛔ tràn
-    ngang. ⭐ Đo CHÍNH thẻ (`scrollWidth ≤ clientWidth`), và bắt thẻ ấy THẬT mang
-    chuỗi 23-kỳ (`5/23`) để phép so ⛔ xanh trên một thẻ rỗng (Đ3)."""
+    ngang. ⭐ Đo CHÍNH thẻ, và bắt thẻ ấy THẬT mang chuỗi 23-kỳ (`5/23`) để phép
+    so ⛔ xanh trên một thẻ rỗng (Đ3).
+
+    ⭐ 'tràn ngang' có HAI vế (FG-R1-01 · `KQ-118`): ① nội dung ⛔ vượt THẺ
+    (`scrollWidth ≤ clientWidth`) **và** ② thẻ ⛔ vượt KHUNG NHÌN
+    (`getBoundingClientRect().right ≤ innerWidth`, `left ≥ 0`). Chỉ đo vế ① thì
+    phép so XANH cả khi thẻ rộng hơn màn mà tự giãn (min-width ⇒ `sw == cw` mãi);
+    đột biến M4 (`.gate{min-width:520px}`) sống đúng vì thế — phải đo cả hai vế
+    (Đ5: đột biến phải phủ cả hai chiều của lớp lỗi)."""
     with _may(REAL_TEP_DO) as (m, tok):
         url = "http://%s:%d/" % m.server_address
         res = _do_tran(url, 390)
@@ -277,5 +300,12 @@ def test_FG_F3_ly_do_23_ky_khong_tran_ngang_o_390px():
     hd1 = [x for x in res["gates"] if _TEN_HD1 in x["txt"]]
     assert len(hd1) == 1, [x["txt"][:48] for x in res["gates"]]
     assert "5/23" in hd1[0]["txt"], hd1[0]["txt"][:120]        # tập ⛔ rỗng
+    # ── vế ①: nội dung ⛔ vượt THẺ ────────────────────────────────────────
     assert hd1[0]["over"] is False, (
         "thẻ HD1 TRÀN ngang ở 390 px: sw=%(sw)d > cw=%(cw)d" % hd1[0])
+    # ── vế ②: thẻ ⛔ vượt KHUNG NHÌN (FG-R1-01) ───────────────────────────
+    assert hd1[0]["r"] <= res["iw"], (
+        "thẻ HD1 vượt mép PHẢI khung nhìn ở 390 px: right=%.1f > innerWidth=%d"
+        % (hd1[0]["r"], res["iw"]))
+    assert hd1[0]["l"] >= 0, (
+        "thẻ HD1 tràn mép TRÁI khung nhìn ở 390 px: left=%.1f < 0" % hd1[0]["l"])
