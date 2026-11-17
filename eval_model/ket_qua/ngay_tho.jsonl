@@ -1,0 +1,57 @@
+{"ncc": "ngay_tho", "ca": "A1-03", "bai": "A1", "lan": 0, "diem": 0.3333, "chi_tiet": {"drift_dung": 0.0, "ref_dung": 1.0, "dem_dung": 0.0}, "usage": {}, "usd": 0.0, "giay": 0.0}
+{"ncc": "ngay_tho", "ca": "A1-01", "bai": "A1", "lan": 0, "diem": 0.619, "chi_tiet": {"drift_dung": 1.0, "ref_dung": 0.8571428571428571, "dem_dung": 0.0}, "usage": {}, "usd": 0.0, "giay": 0.0}
+{"ncc": "ngay_tho", "ca": "A1-07", "bai": "A1", "lan": 0, "diem": 0.1481, "chi_tiet": {"drift_dung": 0.0, "ref_dung": 0.4444444444444444, "dem_dung": 0.0}, "usage": {}, "usd": 0.0, "giay": 0.0}
+{"ncc": "ngay_tho", "ca": "A1-10", "bai": "A1", "lan": 0, "diem": 0.0952, "chi_tiet": {"drift_dung": 0.0, "ref_dung": 0.2857142857142857, "dem_dung": 0.0}, "usage": {}, "usd": 0.0, "giay": 0.0}
+{"ncc": "ngay_tho", "ca": "A1-02", "bai": "A1", "lan": 0, "diem": 0.2917, "chi_tiet": {"drift_dung": 0.0, "ref_dung": 0.875, "dem_dung": 0.0}, "usage": {}, "usd": 0.0, "giay": 0.0}
+{"ncc": "ngay_tho", "ca": "A1-05", "bai": "A1", "lan": 0, "diem": 0.3333, "chi_tiet": {"drift_dung": 0.0, "ref_dung": 1.0, "dem_dung": 0.0}, "usage": {}, "usd": 0.0, "giay": 0.0}
+{"ncc": "ngay_tho", "ca": "A1-06", "bai": "A1", "lan": 0, "diem": 0.5, "chi_tiet": {"drift_dung": 1.0, "ref_dung": 0.5, "dem_dung": 0.0}, "usage": {}, "usd": 0.0, "giay": 0.0}
+{"ncc": "ngay_tho", "ca": "A1-04", "bai": "A1", "lan": 0, "diem": 0.5926, "chi_tiet": {"drift_dung": 1.0, "ref_dung": 0.7777777777777778, "dem_dung": 0.0}, "usage": {}, "usd": 0.0, "giay": 0.0}
+{"ncc": "ngay_tho", "ca": "A1-11", "bai": "A1", "lan": 0, "diem": 0.6667, "chi_tiet": {"drift_dung": 1.0, "ref_dung": 1.0, "dem_dung": 0.0}, "usage": {}, "usd": 0.0, "giay": 0.0}
+{"ncc": "ngay_tho", "ca": "A1-13", "bai": "A1", "lan": 0, "diem": 0.1481, "chi_tiet": {"drift_dung": 0.0, "ref_dung": 0.4444444444444444, "dem_dung": 0.0}, "usage": {}, "usd": 0.0, "giay": 0.0}
+{"ncc": "ngay_tho", "ca": "A1-14", "bai": "A1", "lan": 0, "diem": 0.5926, "chi_tiet": {"drift_dung": 1.0, "ref_dung": 0.7777777777777778, "dem_dung": 0.0}, "usage": {}, "usd": 0.0, "giay": 0.0}
+{"ncc": "ngay_tho", "ca": "A1-15", "bai": "A1", "lan": 0, "diem": 0.3333, "chi_tiet": {"drift_dung": 0.0, "ref_dung": 1.0, "dem_dung": 0.0}, "usage": {}, "usd": 0.0, "giay": 0.0}
+{"ncc": "ngay_tho", "ca": "A2-01", "bai": "A2", "lan": 0, "diem": 0.5, "chi_tiet": {"nhom_dung": 4, "tong": 7, "ma_thua": 1, "ghep_bua (D/E/F->A/B/C)": 2}, "usage": {}, "usd": 0.0, "giay": 0.0}
+{"ncc": "ngay_tho", "ca": "A2-02", "bai": "A2", "lan": 0, "diem": 0.2727, "chi_tiet": {"nhom_dung": 3, "tong": 8, "ma_thua": 3, "ghep_bua (D/E/F->A/B/C)": 1}, "usage": {}, "usd": 0.0, "giay": 0.0}
+{"ncc": "ngay_tho", "ca": "A2-03", "bai": "A2", "lan": 0, "diem": 0.0909, "chi_tiet": {"nhom_dung": 1, "tong": 7, "ma_thua": 4, "ghep_bua (D/E/F->A/B/C)": 1}, "usage": {}, "usd": 0.0, "giay": 0.0}
+{"ncc": "ngay_tho", "ca": "A2-04", "bai": "A2", "lan": 0, "diem": 0.2, "chi_tiet": {"nhom_dung": 2, "tong": 8, "ma_thua": 2, "ghep_bua (D/E/F->A/B/C)": 2}, "usage": {}, "usd": 0.0, "giay": 0.0}
+{"ncc": "ngay_tho", "ca": "A2-05", "bai": "A2", "lan": 0, "diem": 0.0909, "chi_tiet": {"nhom_dung": 1, "tong": 8, "ma_thua": 3, "ghep_bua (D/E/F->A/B/C)": 4}, "usage": {}, "usd": 0.0, "giay": 0.0}
+{"ncc": "ngay_tho", "ca": "A2-06", "bai": "A2", "lan": 0, "diem": 0.3636, "chi_tiet": {"nhom_dung": 4, "tong": 8, "ma_thua": 3, "ghep_bua (D/E/F->A/B/C)": 1}, "usage": {}, "usd": 0.0, "giay": 0.0}
+{"ncc": "ngay_tho", "ca": "A2-07", "bai": "A2", "lan": 0, "diem": 0.2, "chi_tiet": {"nhom_dung": 2, "tong": 7, "ma_thua": 3, "ghep_bua (D/E/F->A/B/C)": 2}, "usage": {}, "usd": 0.0, "giay": 0.0}
+{"ncc": "ngay_tho", "ca": "A2-08", "bai": "A2", "lan": 0, "diem": 0.2222, "chi_tiet": {"nhom_dung": 2, "tong": 7, "ma_thua": 2, "ghep_bua (D/E/F->A/B/C)": 1}, "usage": {}, "usd": 0.0, "giay": 0.0}
+{"ncc": "ngay_tho", "ca": "A2-09", "bai": "A2", "lan": 0, "diem": 0.4444, "chi_tiet": {"nhom_dung": 4, "tong": 7, "ma_thua": 2, "ghep_bua (D/E/F->A/B/C)": 1}, "usage": {}, "usd": 0.0, "giay": 0.0}
+{"ncc": "ngay_tho", "ca": "A2-10", "bai": "A2", "lan": 0, "diem": 0.3, "chi_tiet": {"nhom_dung": 3, "tong": 7, "ma_thua": 3, "ghep_bua (D/E/F->A/B/C)": 1}, "usage": {}, "usd": 0.0, "giay": 0.0}
+{"ncc": "ngay_tho", "ca": "A2-11", "bai": "A2", "lan": 0, "diem": 0.3333, "chi_tiet": {"nhom_dung": 3, "tong": 8, "ma_thua": 1, "ghep_bua (D/E/F->A/B/C)": 4}, "usage": {}, "usd": 0.0, "giay": 0.0}
+{"ncc": "ngay_tho", "ca": "A2-12", "bai": "A2", "lan": 0, "diem": 0.1, "chi_tiet": {"nhom_dung": 1, "tong": 7, "ma_thua": 3, "ghep_bua (D/E/F->A/B/C)": 2}, "usage": {}, "usd": 0.0, "giay": 0.0}
+{"ncc": "ngay_tho", "ca": "A2-13", "bai": "A2", "lan": 0, "diem": 0.4, "chi_tiet": {"nhom_dung": 4, "tong": 8, "ma_thua": 2, "ghep_bua (D/E/F->A/B/C)": 2}, "usage": {}, "usd": 0.0, "giay": 0.0}
+{"ncc": "ngay_tho", "ca": "A2-14", "bai": "A2", "lan": 0, "diem": 0.2, "chi_tiet": {"nhom_dung": 2, "tong": 7, "ma_thua": 3, "ghep_bua (D/E/F->A/B/C)": 2}, "usage": {}, "usd": 0.0, "giay": 0.0}
+{"ncc": "ngay_tho", "ca": "A2-15", "bai": "A2", "lan": 0, "diem": 0.3333, "chi_tiet": {"nhom_dung": 3, "tong": 8, "ma_thua": 1, "ghep_bua (D/E/F->A/B/C)": 2}, "usage": {}, "usd": 0.0, "giay": 0.0}
+{"ncc": "ngay_tho", "ca": "A3-01", "bai": "A3", "lan": 0, "diem": 0.7386, "chi_tiet": {"V_dung": 0.9286, "U_dung": 0.7714, "de_xuat_dung": 0.4, "doan_thay_vi_day_nguoi": 2, "day_nguoi_thua": 0}, "usage": {}, "usd": 0.0, "giay": 0.0}
+{"ncc": "ngay_tho", "ca": "A3-02", "bai": "A3", "lan": 0, "diem": 0.6943, "chi_tiet": {"V_dung": 0.9714, "U_dung": 0.7429, "de_xuat_dung": 0.2, "doan_thay_vi_day_nguoi": 7, "day_nguoi_thua": 0}, "usage": {}, "usd": 0.0, "giay": 0.0}
+{"ncc": "ngay_tho", "ca": "A3-03", "bai": "A3", "lan": 0, "diem": 0.6586, "chi_tiet": {"V_dung": 0.9571, "U_dung": 0.9, "de_xuat_dung": 0.0, "doan_thay_vi_day_nguoi": 5, "day_nguoi_thua": 0}, "usage": {}, "usd": 0.0, "giay": 0.0}
+{"ncc": "ngay_tho", "ca": "A3-04", "bai": "A3", "lan": 0, "diem": 0.6846, "chi_tiet": {"V_dung": 0.9571, "U_dung": 0.8429, "de_xuat_dung": 0.125, "doan_thay_vi_day_nguoi": 6, "day_nguoi_thua": 0}, "usage": {}, "usd": 0.0, "giay": 0.0}
+{"ncc": "ngay_tho", "ca": "A3-05", "bai": "A3", "lan": 0, "diem": 0.86, "chi_tiet": {"V_dung": 0.9714, "U_dung": 0.8714, "de_xuat_dung": 0.6667, "doan_thay_vi_day_nguoi": 1, "day_nguoi_thua": 0}, "usage": {}, "usd": 0.0, "giay": 0.0}
+{"ncc": "ngay_tho", "ca": "A3-06", "bai": "A3", "lan": 0, "diem": 0.6875, "chi_tiet": {"V_dung": 0.9571, "U_dung": 0.8571, "de_xuat_dung": 0.125, "doan_thay_vi_day_nguoi": 5, "day_nguoi_thua": 0}, "usage": {}, "usd": 0.0, "giay": 0.0}
+{"ncc": "ngay_tho", "ca": "A3-07", "bai": "A3", "lan": 0, "diem": 0.7371, "chi_tiet": {"V_dung": 0.9571, "U_dung": 0.8429, "de_xuat_dung": 0.3, "doan_thay_vi_day_nguoi": 6, "day_nguoi_thua": 0}, "usage": {}, "usd": 0.0, "giay": 0.0}
+{"ncc": "ngay_tho", "ca": "A3-08", "bai": "A3", "lan": 0, "diem": 0.7914, "chi_tiet": {"V_dung": 0.9143, "U_dung": 0.8143, "de_xuat_dung": 0.5714, "doan_thay_vi_day_nguoi": 2, "day_nguoi_thua": 0}, "usage": {}, "usd": 0.0, "giay": 0.0}
+{"ncc": "ngay_tho", "ca": "A3-09", "bai": "A3", "lan": 0, "diem": 0.6762, "chi_tiet": {"V_dung": 0.9429, "U_dung": 0.8571, "de_xuat_dung": 0.1111, "doan_thay_vi_day_nguoi": 6, "day_nguoi_thua": 0}, "usage": {}, "usd": 0.0, "giay": 0.0}
+{"ncc": "ngay_tho", "ca": "A3-10", "bai": "A3", "lan": 0, "diem": 0.6967, "chi_tiet": {"V_dung": 0.9286, "U_dung": 0.8286, "de_xuat_dung": 0.2222, "doan_thay_vi_day_nguoi": 6, "day_nguoi_thua": 0}, "usage": {}, "usd": 0.0, "giay": 0.0}
+{"ncc": "ngay_tho", "ca": "A3-11", "bai": "A3", "lan": 0, "diem": 0.7919, "chi_tiet": {"V_dung": 0.9857, "U_dung": 0.8286, "de_xuat_dung": 0.4444, "doan_thay_vi_day_nguoi": 3, "day_nguoi_thua": 0}, "usage": {}, "usd": 0.0, "giay": 0.0}
+{"ncc": "ngay_tho", "ca": "A3-12", "bai": "A3", "lan": 0, "diem": 0.7429, "chi_tiet": {"V_dung": 0.9571, "U_dung": 0.8714, "de_xuat_dung": 0.3, "doan_thay_vi_day_nguoi": 4, "day_nguoi_thua": 0}, "usage": {}, "usd": 0.0, "giay": 0.0}
+{"ncc": "ngay_tho", "ca": "A4-01", "bai": "A4", "lan": 0, "diem": 0.6667, "chi_tiet": {"dung": 1, "bao_sai": 0, "bo_sot": 1, "precision": 1.0, "recall": 0.5}, "usage": {}, "usd": 0.0, "giay": 0.0}
+{"ncc": "ngay_tho", "ca": "A4-02", "bai": "A4", "lan": 0, "diem": 1.0, "chi_tiet": {"dung": 0, "bao_sai": 0, "bo_sot": 0, "precision": 1.0, "recall": 1.0}, "usage": {}, "usd": 0.0, "giay": 0.0}
+{"ncc": "ngay_tho", "ca": "A4-03", "bai": "A4", "lan": 0, "diem": 1.0, "chi_tiet": {"dung": 0, "bao_sai": 0, "bo_sot": 0, "precision": 1.0, "recall": 1.0}, "usage": {}, "usd": 0.0, "giay": 0.0}
+{"ncc": "ngay_tho", "ca": "A4-04", "bai": "A4", "lan": 0, "diem": 1.0, "chi_tiet": {"dung": 0, "bao_sai": 0, "bo_sot": 0, "precision": 1.0, "recall": 1.0}, "usage": {}, "usd": 0.0, "giay": 0.0}
+{"ncc": "ngay_tho", "ca": "A4-05", "bai": "A4", "lan": 0, "diem": 0.5, "chi_tiet": {"dung": 1, "bao_sai": 0, "bo_sot": 2, "precision": 1.0, "recall": 0.333}, "usage": {}, "usd": 0.0, "giay": 0.0}
+{"ncc": "ngay_tho", "ca": "A4-06", "bai": "A4", "lan": 0, "diem": 0.0, "chi_tiet": {"dung": 0, "bao_sai": 0, "bo_sot": 1, "precision": 1.0, "recall": 0.0}, "usage": {}, "usd": 0.0, "giay": 0.0}
+{"ncc": "ngay_tho", "ca": "A4-07", "bai": "A4", "lan": 0, "diem": 0.0, "chi_tiet": {"dung": 0, "bao_sai": 0, "bo_sot": 2, "precision": 1.0, "recall": 0.0}, "usage": {}, "usd": 0.0, "giay": 0.0}
+{"ncc": "ngay_tho", "ca": "A4-08", "bai": "A4", "lan": 0, "diem": 0.6667, "chi_tiet": {"dung": 2, "bao_sai": 0, "bo_sot": 2, "precision": 1.0, "recall": 0.5}, "usage": {}, "usd": 0.0, "giay": 0.0}
+{"ncc": "ngay_tho", "ca": "A4-09", "bai": "A4", "lan": 0, "diem": 0.4, "chi_tiet": {"dung": 1, "bao_sai": 0, "bo_sot": 3, "precision": 1.0, "recall": 0.25}, "usage": {}, "usd": 0.0, "giay": 0.0}
+{"ncc": "ngay_tho", "ca": "A4-10", "bai": "A4", "lan": 0, "diem": 0.0, "chi_tiet": {"dung": 0, "bao_sai": 0, "bo_sot": 1, "precision": 1.0, "recall": 0.0}, "usage": {}, "usd": 0.0, "giay": 0.0}
+{"ncc": "ngay_tho", "ca": "A4-11", "bai": "A4", "lan": 0, "diem": 0.6667, "chi_tiet": {"dung": 1, "bao_sai": 0, "bo_sot": 1, "precision": 1.0, "recall": 0.5}, "usage": {}, "usd": 0.0, "giay": 0.0}
+{"ncc": "ngay_tho", "ca": "A4-12", "bai": "A4", "lan": 0, "diem": 0.6667, "chi_tiet": {"dung": 1, "bao_sai": 0, "bo_sot": 1, "precision": 1.0, "recall": 0.5}, "usage": {}, "usd": 0.0, "giay": 0.0}
+{"ncc": "ngay_tho", "ca": "A4-13", "bai": "A4", "lan": 0, "diem": 0.5, "chi_tiet": {"dung": 1, "bao_sai": 0, "bo_sot": 2, "precision": 1.0, "recall": 0.333}, "usage": {}, "usd": 0.0, "giay": 0.0}
+{"ncc": "ngay_tho", "ca": "A4-14", "bai": "A4", "lan": 0, "diem": 0.4, "chi_tiet": {"dung": 1, "bao_sai": 0, "bo_sot": 3, "precision": 1.0, "recall": 0.25}, "usage": {}, "usd": 0.0, "giay": 0.0}
+{"ncc": "ngay_tho", "ca": "A4-15", "bai": "A4", "lan": 0, "diem": 0.0, "chi_tiet": {"dung": 0, "bao_sai": 0, "bo_sot": 1, "precision": 1.0, "recall": 0.0}, "usage": {}, "usd": 0.0, "giay": 0.0}
+{"ncc": "ngay_tho", "ca": "A1-12", "bai": "A1", "lan": 0, "diem": 0.25, "chi_tiet": {"drift_dung": 0.0, "ref_dung": 0.75, "dem_dung": 0.0}, "usage": {}, "usd": 0.0, "giay": 0.0}
+{"ncc": "ngay_tho", "ca": "A1-08", "bai": "A1", "lan": 0, "diem": 0.1667, "chi_tiet": {"drift_dung": 0.0, "ref_dung": 0.5, "dem_dung": 0.0}, "usage": {}, "usd": 0.0, "giay": 0.0}
+{"ncc": "ngay_tho", "ca": "A1-09", "bai": "A1", "lan": 0, "diem": 0.5417, "chi_tiet": {"drift_dung": 1.0, "ref_dung": 0.625, "dem_dung": 0.0}, "usage": {}, "usd": 0.0, "giay": 0.0}

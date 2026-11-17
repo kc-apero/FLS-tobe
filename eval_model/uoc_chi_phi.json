@@ -1,0 +1,245 @@
+{
+ "gia": {
+  "Opus 5.5": {
+   "inp": 4.0,
+   "out": 20.0,
+   "cache_read": 0.2,
+   "cache_write": 5.0,
+   "kieu": "claude"
+  },
+  "Opus 5": {
+   "inp": 5.0,
+   "out": 25.0,
+   "cache_read": 0.5,
+   "cache_write": 6.25,
+   "kieu": "claude"
+  },
+  "Gemini 3.8 Flash": {
+   "inp": 0.75,
+   "out": 3.75,
+   "cache_read": 0.075,
+   "cache_write": null,
+   "kieu": "gemini"
+  },
+  "Gemini 3.8 Flash (tu 01/2027)": {
+   "inp": 1.5,
+   "out": 7.5,
+   "cache_read": 0.15,
+   "cache_write": null,
+   "kieu": "gemini"
+  },
+  "Gemini 3.1 Pro": {
+   "inp": 2.0,
+   "out": 12.0,
+   "cache_read": 0.2,
+   "cache_write": null,
+   "kieu": "gemini"
+  }
+ },
+ "kich_ban": {
+  "thap (20 dong/ngay)": {
+   "n": 20,
+   "token": {
+    "A1 Collect_raw_data": {
+     "luot": 9,
+     "vao_doc_cache": 148000,
+     "vao_moi": 27500,
+     "ra": 4500
+    },
+    "A2 Group Ledger + SI.MAP": {
+     "luot": 8,
+     "vao_doc_cache": 168700,
+     "vao_moi": 34900,
+     "ra": 5600
+    },
+    "A3 ITL Adjust (7 khoi)": {
+     "luot": 6,
+     "vao_doc_cache": 220500,
+     "vao_moi": 60000,
+     "ra": 10800
+    },
+    "A4 Auditor (cong moi buoc)": {
+     "luot": 8,
+     "vao_doc_cache": 207900,
+     "vao_moi": 45300,
+     "ra": 7200
+    }
+   },
+   "usd_ngay": {
+    "Opus 5.5": 1.859424,
+    "Opus 5": 2.5478099999999997,
+    "Gemini 3.8 Flash": 0.4651452,
+    "Gemini 3.8 Flash (tu 01/2027)": 0.9302904,
+    "Gemini 3.1 Pro": 1.3078272
+   },
+   "usd_theo_agent": {
+    "Opus 5.5": {
+     "A1 Collect_raw_data": 0.30851999999999996,
+     "A2 Group Ledger + SI.MAP": 0.384288,
+     "A3 ITL Adjust (7 khoi)": 0.67212,
+     "A4 Auditor (cong moi buoc)": 0.494496
+    },
+    "Opus 5": {
+     "A1 Collect_raw_data": 0.43005,
+     "A2 Group Ledger + SI.MAP": 0.5309699999999999,
+     "A3 ITL Adjust (7 khoi)": 0.9062999999999999,
+     "A4 Auditor (cong moi buoc)": 0.6804899999999999
+    },
+    "Gemini 3.8 Flash": {
+     "A1 Collect_raw_data": 0.082296,
+     "A2 Group Ledger + SI.MAP": 0.09912239999999999,
+     "A3 ITL Adjust (7 khoi)": 0.158166,
+     "A4 Auditor (cong moi buoc)": 0.1255608
+    },
+    "Gemini 3.8 Flash (tu 01/2027)": {
+     "A1 Collect_raw_data": 0.164592,
+     "A2 Group Ledger + SI.MAP": 0.19824479999999997,
+     "A3 ITL Adjust (7 khoi)": 0.316332,
+     "A4 Auditor (cong moi buoc)": 0.2511216
+    },
+    "Gemini 3.1 Pro": {
+     "A1 Collect_raw_data": 0.230256,
+     "A2 Group Ledger + SI.MAP": 0.2777664,
+     "A3 ITL Adjust (7 khoi)": 0.44769600000000004,
+     "A4 Auditor (cong moi buoc)": 0.3521088
+    }
+   }
+  },
+  "co so (35 dong/ngay)": {
+   "n": 35,
+   "token": {
+    "A1 Collect_raw_data": {
+     "luot": 9,
+     "vao_doc_cache": 148000,
+     "vao_moi": 27500,
+     "ra": 4500
+    },
+    "A2 Group Ledger + SI.MAP": {
+     "luot": 10,
+     "vao_doc_cache": 241200,
+     "vao_moi": 40300,
+     "ra": 7000
+    },
+    "A3 ITL Adjust (7 khoi)": {
+     "luot": 8,
+     "vao_doc_cache": 345800,
+     "vao_moi": 70600,
+     "ra": 14400
+    },
+    "A4 Auditor (cong moi buoc)": {
+     "luot": 9,
+     "vao_doc_cache": 253200,
+     "vao_moi": 49200,
+     "ra": 8100
+    }
+   },
+   "usd_ngay": {
+    "Opus 5.5": 2.178768,
+    "Opus 5": 3.01992,
+    "Gemini 3.8 Flash": 0.5708664,
+    "Gemini 3.8 Flash (tu 01/2027)": 1.1417328,
+    "Gemini 3.1 Pro": 1.6039104
+   },
+   "usd_theo_agent": {
+    "Opus 5.5": {
+     "A1 Collect_raw_data": 0.30851999999999996,
+     "A2 Group Ledger + SI.MAP": 0.46768799999999994,
+     "A3 ITL Adjust (7 khoi)": 0.852192,
+     "A4 Auditor (cong moi buoc)": 0.550368
+    },
+    "Opus 5": {
+     "A1 Collect_raw_data": 0.43005,
+     "A2 Group Ledger + SI.MAP": 0.65697,
+     "A3 ITL Adjust (7 khoi)": 1.16898,
+     "A4 Auditor (cong moi buoc)": 0.76392
+    },
+    "Gemini 3.8 Flash": {
+     "A1 Collect_raw_data": 0.082296,
+     "A2 Group Ledger + SI.MAP": 0.12855239999999998,
+     "A3 ITL Adjust (7 khoi)": 0.2154816,
+     "A4 Auditor (cong moi buoc)": 0.14453639999999998
+    },
+    "Gemini 3.8 Flash (tu 01/2027)": {
+     "A1 Collect_raw_data": 0.164592,
+     "A2 Group Ledger + SI.MAP": 0.25710479999999997,
+     "A3 ITL Adjust (7 khoi)": 0.4309632,
+     "A4 Auditor (cong moi buoc)": 0.28907279999999996
+    },
+    "Gemini 3.1 Pro": {
+     "A1 Collect_raw_data": 0.230256,
+     "A2 Group Ledger + SI.MAP": 0.3596064,
+     "A3 ITL Adjust (7 khoi)": 0.6091776,
+     "A4 Auditor (cong moi buoc)": 0.4048704
+    }
+   }
+  },
+  "dinh (90 dong/ngay)": {
+   "n": 90,
+   "token": {
+    "A1 Collect_raw_data": {
+     "luot": 11,
+     "vao_doc_cache": 205000,
+     "vao_moi": 31500,
+     "ra": 5500
+    },
+    "A2 Group Ledger + SI.MAP": {
+     "luot": 15,
+     "vao_doc_cache": 469700,
+     "vao_moi": 53800,
+     "ra": 10500
+    },
+    "A3 ITL Adjust (7 khoi)": {
+     "luot": 13,
+     "vao_doc_cache": 751800,
+     "vao_moi": 97100,
+     "ra": 23400
+    },
+    "A4 Auditor (cong moi buoc)": {
+     "luot": 12,
+     "vao_doc_cache": 412500,
+     "vao_moi": 60900,
+     "ra": 10800
+    }
+   },
+   "usd_ngay": {
+    "Opus 5.5": 3.10596,
+    "Opus 5": 4.43415,
+    "Gemini 3.8 Flash": 0.9082979999999999,
+    "Gemini 3.8 Flash (tu 01/2027)": 1.8165959999999999,
+    "Gemini 3.1 Pro": 2.542608
+   },
+   "usd_theo_agent": {
+    "Opus 5.5": {
+     "A1 Collect_raw_data": 0.3702,
+     "A2 Group Ledger + SI.MAP": 0.687528,
+     "A3 ITL Adjust (7 khoi)": 1.324632,
+     "A4 Auditor (cong moi buoc)": 0.7235999999999999
+    },
+    "Opus 5": {
+     "A1 Collect_raw_data": 0.52425,
+     "A2 Group Ledger + SI.MAP": 1.0003199999999999,
+     "A3 ITL Adjust (7 khoi)": 1.8813299999999997,
+     "A4 Auditor (cong moi buoc)": 1.02825
+    },
+    "Gemini 3.8 Flash": {
+     "A1 Collect_raw_data": 0.10476,
+     "A2 Group Ledger + SI.MAP": 0.21403439999999999,
+     "A3 ITL Adjust (7 khoi)": 0.38214359999999997,
+     "A4 Auditor (cong moi buoc)": 0.20736000000000002
+    },
+    "Gemini 3.8 Flash (tu 01/2027)": {
+     "A1 Collect_raw_data": 0.20952,
+     "A2 Group Ledger + SI.MAP": 0.42806879999999997,
+     "A3 ITL Adjust (7 khoi)": 0.7642871999999999,
+     "A4 Auditor (cong moi buoc)": 0.41472000000000003
+    },
+    "Gemini 3.1 Pro": {
+     "A1 Collect_raw_data": 0.29256,
+     "A2 Group Ledger + SI.MAP": 0.5959584,
+     "A3 ITL Adjust (7 khoi)": 1.0752096,
+     "A4 Auditor (cong moi buoc)": 0.57888
+    }
+   }
+  }
+ }
+}
