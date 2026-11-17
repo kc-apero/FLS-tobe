@@ -140,10 +140,15 @@ THU_MUC_KHUON = Path(__file__).resolve().parent / "khuon_dong_bang"
 _TEN_KHUON = re.compile(r"[a-z][a-z0-9_]*")
 #: Kiểu khoá công cụ biết kiểm *(khoá hỏng)*. Kiểu khác ⇒ thêm khi có bước cần, ⛔ khai trước.
 #: `ma` thêm ở DT3 *(khoá CHỮ của cây ATL · Mapping Master · CDT Correct — xem docstring)*.
-KIEU_KHOA_BIET = ("yyyymm", "ma")
+#: `dong_sheet` thêm ở DT4 *(bài đòi — `WO-111` AC-4)*: ảnh đáp án 406 khoá theo HÀNG SHEET
+#: *(số nguyên)*, ⛔ theo `yyyymm`/mã; hợp lệ = ô SỐ chữ số nguyên ≥ 1 *(xem khuôn `gl_406`)*.
+KIEU_KHOA_BIET = ("yyyymm", "ma", "dong_sheet")
 #: Kiểu cột chọn *(DT3)*: `so` = luật DT2 *(ô SỐ, ⛔ rỗng)* · `chu` = ô CHỮ ⛔ rỗng · `chu?` = ô
 #: chữ hoặc rỗng. Cột ⛔ khai ở `KIEU_COT` của khuôn = `so` ⇒ khuôn DT2 chạy y như cũ.
-KIEU_COT_BIET = ("so", "chu", "chu?")
+#: `so?` thêm ở DT4 *(bài đòi — `WO-111` AC-4)*: ô SỐ hoặc RỖNG — cột `BO`/`BP` của 406 là
+#: `iferror(INDEX/MATCH…)` ⇒ RỖNG khi thiếu tỷ giá *(đo 17/11: 6 hàng, cả BO lẫn BP)*; rỗng CHO
+#: PHÉP *(⛔ đỏ)* nhưng ô có giá trị vẫn phải SỐ *(⛔ số ⇒ "ô ⛔ số" ⇒ ĐỎ, đối xứng `so`)*.
+KIEU_COT_BIET = ("so", "chu", "chu?", "so?")
 
 
 @dataclass(frozen=True)
@@ -166,10 +171,16 @@ class Khuon:
     phu_mong: dict[str, int] = field(default_factory=dict, compare=False)
 
     def cot_theo_kieu(self) -> tuple[list[str], list[str], list[str]]:
-        """→ (cột ⛔ được rỗng, cột SỐ, cột CHỮ) — theo thứ tự `cot`, mỗi cột ở đúng chỗ của nó."""
+        """→ (cột ⛔ được rỗng, cột SỐ, cột CHỮ) — theo thứ tự `cot`, mỗi cột ở đúng chỗ của nó.
+
+        ⚠ `chu?` *(DT3)* và `so?` *(DT4)* được RỖNG ⇒ ⛔ nằm ở tập "⛔ được rỗng". `so?` vẫn phải
+        SỐ khi CÓ giá trị ⇒ nằm ở tập cột SỐ *(ô chữ/bool ⇒ "ô ⛔ số" ⇒ ĐỎ như `so`)*; `so` = DT2.
+        Khuôn ⛔ có `so?`/`chu?` ⇒ ba tập trùng y bản DT2 *(so/chu/chu? là mọi kiểu ⇒ "not chu?" =
+        "not in (chu?)" , "== so" = "in (so)", "!= so" = "in (chu, chu?)")* ⇒ ảnh cũ giữ từng byte."""
         k = {c: self.kieu_cot.get(c, "so") for c in self.cot}
-        return ([c for c in self.cot if k[c] != "chu?"], [c for c in self.cot if k[c] == "so"],
-                [c for c in self.cot if k[c] != "so"])
+        return ([c for c in self.cot if k[c] not in ("chu?", "so?")],
+                [c for c in self.cot if k[c] in ("so", "so?")],
+                [c for c in self.cot if k[c] in ("chu", "chu?")])
 
 
 _YYYYMM = re.compile(r"\d{6}")
@@ -363,9 +374,13 @@ def _soat_rieng_tu(cot: list[str]) -> None:
 def _khoa_hop_le(v: Any, kieu: str = "yyyymm") -> bool:
     """Khoá `yyyymm` hợp lệ = ô SỐ *(chuỗi đúng chữ số)* 6 chữ số, tháng 01–12. Ô chữ
     `{"chu": "202401"}` là khoá HỎNG *(`DT2-R1-02`)*. Khoá `ma` *(DT3)* hợp lệ = ô CHỮ có nội
-    dung — ô số, `bool`, rỗng, chỉ-khoảng-trắng đều HỎNG."""
+    dung — ô số, `bool`, rỗng, chỉ-khoảng-trắng đều HỎNG. Khoá `dong_sheet` *(DT4)* hợp lệ = ô SỐ
+    chữ số NGUYÊN ≥ 1 *(hàng sheet)* — ô chữ `{"chu": "10"}`, rỗng, `bool`, số âm/0/thập phân đều
+    HỎNG *(đối xứng `yyyymm`: khoá phải là SỐ, ⛔ chữ)*."""
     if kieu == "ma":
         return isinstance(v, dict) and bool(v["chu"].strip())
+    if kieu == "dong_sheet":
+        return isinstance(v, str) and v.isdigit() and int(v) >= 1
     return isinstance(v, str) and bool(_YYYYMM.fullmatch(v)) and 1 <= int(v[4:]) <= 12
 
 
