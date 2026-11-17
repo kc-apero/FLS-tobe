@@ -84,12 +84,18 @@ Cổng (Đ5 — khai MONG trước, NO khi khác; mỗi phép một ca phá RIÊ
   R4  chuỗi `Did not find value` (ô `#N/A` nhúng mã)        · PHA `o_loi_nhung_ma`
   R6  tên khoá ở MỌI tầng chứa `diengiai` · `sochungtu` · `soct` · `email` (bỏ dấu, thường hoá) — chốt RIÊNG
       của công cụ này, ⛔ mượn `KHOA_CAM` của DT1a (orchestrator 16/11) · PHA `khoa_cam_Dien_giai`
+  R7  (vòng sửa R1 — DT1b-R1-04) đóng GIÁ TRỊ, ⛔ chỉ tên khoá: mọi LÁ = hằng (`_vi_sao` · `khong_mang_PII` ·
+      `nguon.tep_dt1a`/`anh_so`) · mẫu (`nguon.ban_doc_sha256_16` hex16) · tập đóng + int ≥ 0 (`mau_so.khoa_hong` ·
+      `dang_khoa_hoc`) · int (số đếm `mau_so`). Câu lỗi nêu TÊN LÁ, ⛔ in giá trị · bài `…DE_XUAT_la_chuoi_TU_DO…`
+  R8  (vòng sửa R1 — DT1b-R1-06) từ chối bản đọc khoá nằm TRONG repo mà ⛔ bị `.gitignore` (mã 2) · bài `…trong_repo…`
   K4b `dong_sheet` là số nguyên, ⛔ bool (hợp đồng H2)    · PHA `dong_sheet_bool`
   R5  (lúc đo) token trùng Số CT ≥ 6 ký tự (thô / chuẩn hoá) hoặc tiền ≥ 6 chữ số của đầu vào
-                                                            · bài `…NOI_vao_duong_do_that` ①
+                                                            · bài `…NOI_vao_duong_do_that` ① · `…R5_moi_dang…` ⑦
   M   phân bố nhãn ↔ `MONG["phan_bo_nhan"]` — `None` ⇒ mã 4 · bài `…phan_bo_KHAC…` · `…CHUA_GHIM…`
-  ⚠ `MONG["phan_bo_nhan"] = None`: ⛔ phép đo độc lập nào có trước lượt thật của owner — ghim SAU lượt ấy
-     (orchestrator chốt), kèm nguồn; tới lúc đó công cụ trả 4, ⛔ bao giờ 0.
+  K13 (vòng sửa R1 — DT1b-R1-05) vân tay DANH TÍNH nhãn ↔ `MONG["van_tay_nhan"]` — `None` ⇒ mã 4; đổi chỗ nhãn
+      hai dòng cùng kỳ giữ nguyên MỌI số đếm nhưng cắn ở đây · bài `…DE_XUAT_doi_nhan_HAI_dong_cung_ky…`
+  ⚠ `MONG["phan_bo_nhan"] = None` · `MONG["van_tay_nhan"] = None`: ⛔ phép đo độc lập nào có trước lượt thật của
+     owner — ghim CÙNG lượt (orchestrator chốt), kèm nguồn; tới lúc đó công cụ trả 4, ⛔ bao giờ 0.
 
 ⛔ Riêng tư: tệp ra ⛔ mang giá trị khoá — chỉ `khoa_bam` = sha256 (16 ký tự đầu) của bộ 5 trường ĐÃ chuẩn
    hoá, ⛔ băm từng trường (một trường tiền / TK đơn lẻ dò ngược được trong tích tắc). Câu `khong_mang_PII`
@@ -99,8 +105,9 @@ Chạy (từ gốc repo):
   python tools/phan_loai_ly_do.py --khoa <bản_đọc.csv>          # ĐO trên bản đọc khoá, in bảng, ⛔ ghi
   python tools/phan_loai_ly_do.py --khoa <bản_đọc.csv> --ghi    # + ghi docs/ITL/_tools/phan_loai_ly_do.json
   python tools/phan_loai_ly_do.py [--tep <tệp nhãn>]           # CỔNG: kiểm tệp nhãn đã có (mặc định tệp repo)
-Mã thoát: 0 ĐẠT · 1 ĐỎ (khác MONG / ⛔ đo được / đầu vào sai định dạng) · 2 sai cách gọi ·
-          3 ⛔ CHƯA ĐO ĐƯỢC (⛔ có bản đọc khoá / ⛔ có tệp nhãn) · 4 ĐO ĐƯỢC nhưng MONG phân bố CHƯA GHIM.
+Mã thoát: 0 ĐẠT · 1 ĐỎ (khác MONG / ⛔ đo được / đầu vào sai định dạng) · 2 sai cách gọi (gồm đường dẫn là
+          thư mục · bản đọc khoá nằm trong repo ⛔ bị .gitignore — R8) · 3 ⛔ CHƯA ĐO ĐƯỢC (⛔ có bản đọc
+          khoá / ⛔ có tệp nhãn) · 4 ĐO ĐƯỢC nhưng MONG phân bố / vân tay nhãn CHƯA GHIM.
 """
 from __future__ import annotations
 
@@ -110,6 +117,7 @@ import hashlib
 import json
 import os
 import re
+import subprocess
 import sys
 import unicodedata
 from collections import Counter, defaultdict
@@ -128,6 +136,9 @@ from fls.canon.validate import parse_so  # noqa: E402
 DT1A = GOC / "docs" / "ITL" / "_tools" / "phan_loai_dong_thieu.json"
 ANH_SO = GOC / "tests" / "fixture" / "itl_ledge_adjustment.json"
 RA = GOC / "docs" / "ITL" / "_tools" / "phan_loai_ly_do.json"
+# Hằng đường dẫn khai trong `nguon` của tệp ra — R7 (DT1b-R1-04) đóng GIÁ TRỊ hai lá này bằng chính chúng.
+NGUON_TEP_DT1A = "docs/ITL/_tools/phan_loai_dong_thieu.json"
+NGUON_ANH_SO = "tests/fixture/itl_ledge_adjustment.json"
 
 DAT, DO, SAI_GOI, CHUA_DO_DUOC, CHUA_GHIM = 0, 1, 2, 3, 4
 
@@ -146,6 +157,11 @@ MONG = {
     "van_tay": {"thieu": "18047e0eb0319ea1", "nguoc": "6ac2463a190ff631"},   # BG-081 · KQ-082
     # ⛔ CHƯA GHIM — khoá thật ⛔ đọc được ở container; ghim sau lượt thật của owner (O10), kèm nguồn.
     "phan_bo_nhan": None,
+    # ⛔ CHƯA GHIM — K13 (DT1b-R1-05): vân tay DANH TÍNH nhãn từng dòng (sha256-16 của tập
+    #   [dong_sheet, nhan, lech, ghi_chu] đã sắp). Ghim CÙNG lượt, CÙNG nguồn với `phan_bo_nhan`.
+    #   Phân bố một mình ⛔ giữ được lời hứa "mọi thay đổi nhãn về sau đều ĐỎ" (đổi chỗ nhãn 2 dòng
+    #   cùng kỳ giữ nguyên số đếm) — vân tay danh tính mới cắn.
+    "van_tay_nhan": None,
 }
 
 KHOA_TRAN = ("_vi_sao", "khong_mang_PII", "nguon", "mau_so", "dem_nhan", "nhan_theo_ky", "van_tay", "dong_thieu")
@@ -216,6 +232,14 @@ def _van_tay(so_dong: list[int]) -> str:
     """Y cách DT1a băm tập dòng (`tools/phan_loai_dong_thieu.py` `_van_tay`) — chép 1 dòng, ⛔ import:
     tệp ấy đang được phiên khác sửa; lệch cách băm thì K1/K2 ĐỎ ngay (ồn, ⛔ im lặng)."""
     return hashlib.sha256(json.dumps(so_dong, separators=(",", ":")).encode()).hexdigest()[:16]
+
+
+def _van_tay_nhan(dong: list) -> str:
+    """K13 (DT1b-R1-05) — vân tay DANH TÍNH nhãn: sha256-16 của tập [dong_sheet, nhan, lech, ghi_chu]
+    đã SẮP. Khoá sắp là `dong_sheet` (số nguyên, duy nhất) ⇒ ⛔ so None < str. Đổi chỗ nhãn hai dòng
+    cùng kỳ giữ nguyên MỌI số đếm nhưng ĐỔI vân tay này ⇒ cổng cắn thứ phân bố ⛔ thấy."""
+    bo = sorted([r.get("dong_sheet"), r.get("nhan"), r.get("lech") or [], r.get("ghi_chu")] for r in dong)
+    return hashlib.sha256(json.dumps(bo, ensure_ascii=False, separators=(",", ":")).encode("utf-8")).hexdigest()[:16]
 
 
 # ═════════════════════════════════════════════════════════════════════════ đọc bản đọc khoá
@@ -356,8 +380,8 @@ def do(duong: Path) -> tuple[dict, list[str]]:
     kq = {
         "_vi_sao": VI_SAO,
         "khong_mang_PII": KHONG_MANG_PII,
-        "nguon": {"tep_dt1a": "docs/ITL/_tools/phan_loai_dong_thieu.json",
-                  "anh_so": "tests/fixture/itl_ledge_adjustment.json",
+        "nguon": {"tep_dt1a": NGUON_TEP_DT1A,
+                  "anh_so": NGUON_ANH_SO,
                   "ban_doc_sha256_16": vao["sha"]},
         "mau_so": mau_so,
         "dem_nhan": {n: sum(1 for r in dong if r["nhan"] == n) for n in NHAN},
@@ -451,6 +475,32 @@ def kiem(kq: dict, dt1a: dict) -> list[str]:
             loi.append(f"riêng tư: ô lỗi nhúng mã giao dịch ở {duong}")
     if not tiep:
         return loi
+
+    # R7 (DT1b-R1-04) — "lược đồ ĐÓNG" phải đóng cả GIÁ TRỊ, ⛔ chỉ TÊN khoá: mọi LÁ tự do của tệp ra
+    #   = hằng · ∈ tập đóng · khớp mẫu. Câu lỗi nêu TÊN LÁ, ⛔ in lại giá trị vừa bắt (⛔ chuyển PII ra màn
+    #   owner được dặn gửi về). `ban_doc_sha256_16` chỉ canh được MẪU (hex16 — ⛔ tái tính được ở chế độ cổng):
+    #   Số CT 16 chữ số thập phân vẫn khớp hex16 — giới hạn đã khai (BG vòng sửa R1).
+    if kq.get("_vi_sao") != VI_SAO:
+        loi.append("riêng tư: /_vi_sao ⛔ đúng hằng khai")
+    if kq.get("khong_mang_PII") != KHONG_MANG_PII:
+        loi.append("riêng tư: /khong_mang_PII ⛔ đúng hằng khai")
+    ng = kq["nguon"]
+    if ng.get("tep_dt1a") != NGUON_TEP_DT1A:
+        loi.append("riêng tư: /nguon/tep_dt1a ⛔ đúng đường dẫn hằng")
+    if ng.get("anh_so") != NGUON_ANH_SO:
+        loi.append("riêng tư: /nguon/anh_so ⛔ đúng đường dẫn hằng")
+    if not (isinstance(ng.get("ban_doc_sha256_16"), str) and MAU_HEX16.match(ng["ban_doc_sha256_16"])):
+        loi.append("riêng tư: /nguon/ban_doc_sha256_16 ⛔ phải 16 ký tự hex (sha256)")
+    ms0 = kq["mau_so"]
+    for ten in ("khoa_hong", "dang_khoa_hoc"):
+        d = ms0.get(ten)
+        if not (isinstance(d, dict) and set(d) == {"SO", "L1"}
+                and all(type(v) is int and v >= 0 for v in d.values())):
+            loi.append(f"riêng tư: /mau_so/{ten} ⛔ đúng {{SO, L1}} số nguyên ≥ 0")
+    for ten in ("thieu", "so_dong_so", "so_dong_l1", "so_dong_ghep_dt1a", "tai_lap"):
+        if ten in ms0 and type(ms0[ten]) is not int:
+            loi.append(f"riêng tư: /mau_so/{ten} ⛔ phải số nguyên")
+
     so("vân tay ghi trong tệp nhãn (van_tay)", kq["van_tay"], MONG["van_tay"])                       # K3
 
     dong = kq["dong_thieu"]                                                                             # K4
@@ -571,25 +621,40 @@ def in_bao_cao(kq: dict, nguon: str) -> None:
 
 
 def phan_xu(kq: dict, loi: list[str]) -> int:
-    """Phán cuối: lệch ⇒ 1 · MONG phân bố chưa ghim ⇒ 4 · khớp ⇒ 0 (M)."""
+    """Phán cuối: lệch ⇒ 1 · MONG phân bố / vân tay nhãn chưa ghim ⇒ 4 · khớp ⇒ 0 (M · K13)."""
     mong = MONG["phan_bo_nhan"]
+    mong_vt = MONG["van_tay_nhan"]
     if mong is not None and isinstance(kq.get("dem_nhan"), dict) and kq["dem_nhan"] != mong:
         loi.append(f"phân bố nhãn của {MONG['thieu']} dòng sổ thiếu: đo {kq['dem_nhan']} · mong {mong}")
+    if mong_vt is not None:                       # K13 — DANH TÍNH nhãn, ⛔ chỉ phân bố (DT1b-R1-05)
+        try:
+            vt = _van_tay_nhan(kq["dong_thieu"])
+        except Exception:
+            vt = None                             # ⛔ tính được vân tay cũng là ĐỎ (Đ5), ⛔ "không thấy lệch"
+        if vt != mong_vt:
+            loi.append(f"vân tay danh tính nhãn (K13): đo {vt!r} · mong {mong_vt!r} — "
+                       f"tổng có thể y nguyên mà danh tính nhãn từng dòng đã khác")
     if loi:
         print(f"⛔ PHÂN LOẠI LÝ DO ĐỎ — {len(loi)} chỗ khác MONG (⛔ ghi JSON):", file=sys.stderr)
         for x in loi:
             print("  " + x, file=sys.stderr)
         return DO
-    if mong is None:
-        print(f"KẾT: ĐO ĐƯỢC — ⛔ CHƯA GHIM MONG phân bố nhãn (mã {CHUA_GHIM}, ⛔ phải ĐẠT): mọi bất biến cấu trúc "
-              f"đạt · {_so(MONG['thieu'])} dòng mỗi dòng đúng một nhãn — gửi tệp nhãn + bảng ③④ về orchestrator để ghim")
+    if mong is None or mong_vt is None:
+        thieu_ghim = [t for t, v in (("phân bố nhãn", mong), ("vân tay danh tính nhãn", mong_vt)) if v is None]
+        print(f"KẾT: ĐO ĐƯỢC — ⛔ CHƯA GHIM MONG {' · '.join(thieu_ghim)} (mã {CHUA_GHIM}, ⛔ phải ĐẠT): mọi bất "
+              f"biến cấu trúc đạt · {_so(MONG['thieu'])} dòng mỗi dòng đúng một nhãn — gửi tệp nhãn + bảng ③④ "
+              f"về orchestrator để ghim")
         return CHUA_GHIM
     print(f"KẾT: ĐẠT — mọi phép so khớp MONG · {_so(MONG['thieu'])} dòng sổ thiếu, mỗi dòng đúng một nhãn")
     return DAT
 
 
 def _ghi(kq: dict) -> None:
-    """Tệp tạm + kiểm đọc lại + `os.replace` — ⛔ `write_text` thẳng lên đích (luật `DT1a-R1-07`)."""
+    """Tệp tạm + kiểm đọc lại + `os.replace` — ⛔ `write_text` thẳng lên đích (luật `DT1a-R1-07`).
+
+    Phép "kiểm đọc lại" (so `json.loads(tam)` với `kq`) là PHÒNG THỦ CHỒNG (DT1b-R1-03 · đột biến D27 bỏ
+    nó vẫn SỐNG): `json.dumps`→`json.loads` khứ hồi với dữ liệu thuần đã đạt lược đồ thì luôn khớp. Giữ để
+    bắt hỏng đĩa / ghi dở lúc thay tệp — ⛔ chứng minh riêng được bằng bài, khai rõ ở đây."""
     tam = RA.with_name(RA.name + ".tam")
     tam.write_text(json.dumps(kq, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
     if json.loads(tam.read_text(encoding="utf-8")) != kq:
@@ -601,11 +666,34 @@ def _mot_dong(e: Exception) -> str:
     return f"LOI {type(e).__name__}: " + " ".join(str(e).split())        # S0-R1-04 — ⛔ traceback
 
 
+def _trong_repo_khong_ignore(duong: Path) -> bool:
+    """R8 (DT1b-R1-06) — True nếu `duong` nằm TRONG repo mà ⛔ bị `.gitignore` (⇒ giá trị THÔ có nguy cơ
+    lên git). `git check-ignore -q` trả 0 khi BỊ bỏ qua (an toàn), ≠ 0 khi ⛔ bỏ qua (nguy). ⛔ trong repo
+    hoặc ⛔ chạy được git ⇒ chốt này ⛔ lo (nhánh khác xử)."""
+    try:
+        duong.resolve().relative_to(GOC)
+    except (ValueError, OSError):
+        return False
+    try:
+        r = subprocess.run(["git", "-C", str(GOC), "check-ignore", "-q", str(duong.resolve())])
+    except OSError:
+        return False
+    return r.returncode != 0
+
+
 def _che_do_do(duong: Path, ghi: bool) -> int:
-    if not duong.is_file():
-        print(f"⛔ CHƯA ĐO ĐƯỢC — ⛔ có bản đọc khoá {duong.name!r}: khoá THẬT chỉ có trên máy owner (O10 · B-DATA-2) "
-              f"— xem BG-096 §Hướng dẫn owner chạy lượt thật", file=sys.stderr)
+    if duong.exists() and not duong.is_file():   # DT1b-R1-11 — thư mục / ⛔ tệp thường là SAI CÁCH GỌI (2), ⛔ "chưa đo"
+        print(f"⛔ TỪ CHỐI: {duong.resolve()} CÓ nhưng ⛔ phải TỆP thường (bản đọc khoá CSV)", file=sys.stderr)
+        return SAI_GOI
+    if not duong.is_file():                      # DT1b-R1-11 — nói thiếu gì, Ở ĐÂU (đường tuyệt đối), ⛔ đoán vì sao
+        print(f"⛔ CHƯA ĐO ĐƯỢC — ⛔ thấy bản đọc khoá tại {duong.resolve()}: khoá THẬT chỉ có trên máy owner "
+              f"(O10 · B-DATA-2) — xem BG-096 §Hướng dẫn owner chạy lượt thật", file=sys.stderr)
         return CHUA_DO_DUOC
+    if _trong_repo_khong_ignore(duong):          # DT1b-R1-06 — chặn ở MÁY, ⛔ ở lời dặn BG-096:155
+        print(f"⛔ TỪ CHỐI: bản đọc khoá mang giá trị THÔ nằm trong repo mà ⛔ bị .gitignore "
+              f"({duong.resolve()}) — chuyển vào hien_vat/ (một `git add -A` là Số CT + tiền thật lên lịch sử)",
+              file=sys.stderr)
+        return SAI_GOI
     try:
         kq, loi = do(duong)
     except Exception as e:                       # Đ5: ⛔ đo được / sai định dạng là ĐỎ — nguyên nhân MỘT dòng
@@ -620,6 +708,9 @@ def _che_do_do(duong: Path, ghi: bool) -> int:
 
 
 def _che_do_cong(tep: Path) -> int:
+    if tep.exists() and not tep.is_file():       # DT1b-R1-11 — thư mục / ⛔ tệp thường là SAI CÁCH GỌI (2)
+        print(f"⛔ TỪ CHỐI: {tep.resolve()} CÓ nhưng ⛔ phải TỆP thường (tệp nhãn JSON)", file=sys.stderr)
+        return SAI_GOI
     if not tep.is_file():
         print(f"⛔ CHƯA ĐO ĐƯỢC — ⛔ có tệp nhãn {tep.name!r}: lượt gán nhãn THẬT chưa chạy (khoá thật chỉ có trên "
               f"máy owner — O10 · B-DATA-2)", file=sys.stderr)

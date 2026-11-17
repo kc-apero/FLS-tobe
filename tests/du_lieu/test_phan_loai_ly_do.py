@@ -69,6 +69,10 @@ COT_VAO = ("bang", "dong", "so_ct", "ps_no", "ps_co", "tk", "tien_te")  # địn
 # Thiết kế bộ dựng `_dung` (đếm DÒNG trong 122): 60 ⛔ có sao kê · 15 lệch PS Nợ + 15 lệch Số CT ·
 # 20 trùng khoá với một dòng đã ghép · 10 khớp khi ghép lại + 2 ô PS Nợ là ô lỗi.
 MONG_TONG_HOP = {"KHONG_CO_SAO_KE": 60, "KHOA_LECH": 30, "TRUNG_SEQ": 20, "KHAC": 12}
+# K13 (DT1b-R1-05) — vân tay DANH TÍNH nhãn của bản đọc TỔNG HỢP: sha256-16 của sorted([dong_sheet, nhan,
+# lech, ghi_chu]) theo THIẾT KẾ `_dung` (⛔ chép từ công cụ — bài `…van_tay_nhan_TONG_HOP_dung_thiet_ke`
+# tự tính lại từ `mong` của `_dung` và đối chiếu). Đổi chỗ nhãn 2 dòng cùng kỳ giữ nguyên số đếm nhưng ĐỔI số này.
+VT_NHAN_TONG_HOP = "c5c55c272e02b414"
 SO_L1_MOI = 300            # dòng L1 "mới sau 26/08" — bản sao 13/11 DÀI hơn ảnh (⛔ ghép với ai)
 KHOA_DONG = {"dong_sheet", "ky", "nhan", "khoa_bam", "lech", "ghi_chu"}   # lược đồ một dòng ra
 GHI_CHU_KHOP = "KHOP_KHI_GHEP_LAI"                                       # ghi chú của `KHAC` (bảng đóng)
@@ -216,6 +220,8 @@ def _chay_trong(monkeypatch, capsys, *argv: str, ra: Path, dt1a: Path = DT1A,
     monkeypatch.setattr(tool, "RA", ra)
     if mong_nhan != "giu":
         monkeypatch.setitem(tool.MONG, "phan_bo_nhan", mong_nhan)
+        # K13 (DT1b-R1-05) — ghim vân tay danh tính CÙNG lượt với phân bố; chưa ghim thì cổng trả 4
+        monkeypatch.setitem(tool.MONG, "van_tay_nhan", VT_NHAN_TONG_HOP)
     ma = tool.main(list(argv))
     o = capsys.readouterr()
     return ma, o.out, o.err
@@ -278,6 +284,7 @@ def test_DT1b_B1_MONG_khai_TRONG_tool_va_phan_bo_CHUA_GHIM_la_ma_4(tmp_path, mon
     # Chưa có lượt THẬT nào (khoá thật ⛔ đọc được ở container) ⇒ phân bố nhãn CHƯA GHIM. Khi owner chạy
     # lượt thật (O10) và orchestrator chốt ghim, bài này đổi theo kèm nguồn của số — Đ5: một bản khai.
     assert tool.MONG["phan_bo_nhan"] is None
+    assert tool.MONG["van_tay_nhan"] is None    # K13 ghim CÙNG lượt với phân bố (DT1b-R1-05)
     ma, out, err, ra = _do_tong_hop(tmp_path, monkeypatch, capsys)
     assert ma == 4, err
     assert "CHƯA GHIM" in out and "KẾT: ĐẠT" not in out
@@ -603,13 +610,46 @@ def test_DT1b_B4_thieu_dau_vao_la_CHUA_DO_DUOC_ma_3(tmp_path):
 
 
 def test_DT1b_B4_tep_nhan_THAT_cua_repo_vang_la_3_co_thi_khong_DO():
-    """Hai nhánh, cả hai đều đòi một điều: ở container (⛔ khoá thật) tệp vắng ⇒ 3; owner đã nộp ⇒ ⛔ ĐỎ."""
+    """Hai nhánh, cả hai đều đòi một điều: ở container (⛔ khoá thật) tệp vắng ⇒ 3; owner đã nộp ⇒ ⛔ ĐỎ.
+
+    DT1b-R1-10: khi tệp thật ĐÃ có mà MONG chưa ghim, mã công cụ trả 4 (`⛔ phải ĐẠT`). ⛔ chấp nhận 4 như
+    ĐẠT (`xfail` bị đếm là "chạy" — `S0-R3-01`): còn chưa ghim ⇒ `pytest.fail` (ĐỎ thật, đường nền ghi tên)."""
     r = _chay()
     if RA_THAT.exists():
-        assert r.returncode in (0, 4), r.stderr
+        tool = _tool()
+        if tool.MONG["phan_bo_nhan"] is not None and tool.MONG["van_tay_nhan"] is not None:
+            assert r.returncode == 0, r.stderr
+        else:
+            pytest.fail("tệp nhãn thật ĐÃ có mà MONG[phan_bo_nhan]/[van_tay_nhan] chưa ghim — mở WO ghim "
+                        "(DT1b-R1-10); ⛔ để pytest XANH ở trạng thái 'đo được nhưng ⛔ ĐẠT'")
     else:
         assert r.returncode == 3, (r.stdout, r.stderr)
         assert "CHƯA ĐO ĐƯỢC" in r.stdout + r.stderr
+
+
+def test_DT1b_R1_05_van_tay_nhan_TONG_HOP_dung_thiet_ke(tmp_path, monkeypatch, capsys):
+    """DT1b-R1-05 — hằng `VT_NHAN_TONG_HOP` của bài tự tính lại từ THIẾT KẾ `_dung` (⛔ chép công cụ) và
+    đối chiếu với vân tay của tệp ra thật. Hai nguồn — như MONG số dòng/vân tay DT1a."""
+    _, mong, _ = _dung(7)
+    bo = sorted([d, n, l, gc] for d, (n, l, gc) in mong.items())
+    tu_thiet_ke = hashlib.sha256(json.dumps(bo, ensure_ascii=False, separators=(",", ":")).encode("utf-8")).hexdigest()[:16]
+    assert tu_thiet_ke == VT_NHAN_TONG_HOP, tu_thiet_ke
+    ma, out, err, ra = _do_tong_hop(tmp_path, monkeypatch, capsys, mong_nhan=dict(MONG_TONG_HOP))
+    assert ma == 0, err
+    dong = json.loads(ra.read_text(encoding="utf-8"))["dong_thieu"]
+    bo2 = sorted([r["dong_sheet"], r["nhan"], r["lech"], r["ghi_chu"]] for r in dong)
+    vt_tep = hashlib.sha256(json.dumps(bo2, ensure_ascii=False, separators=(",", ":")).encode("utf-8")).hexdigest()[:16]
+    assert vt_tep == VT_NHAN_TONG_HOP, vt_tep
+
+
+def test_DT1b_R1_11_duong_dan_la_thu_muc_la_2_khong_phai_3(tmp_path):
+    """DT1b-R1-11 — đường dẫn CÓ mà ⛔ phải tệp thường (thư mục) là SAI CÁCH GỌI (2), ⛔ 'chưa đo' (3)."""
+    d = tmp_path / "thu_muc"
+    d.mkdir()
+    for doi_so in (("--khoa", str(d)), ("--tep", str(d))):
+        r = _chay(*doi_so)
+        assert r.returncode == 2, (doi_so, r.stdout, r.stderr)
+        assert "phải TỆP thường" in r.stderr, r.stderr
 
 
 def test_DT1b_B4_luot_DO_KHONG_ghi_va_tap_dong_sheet_lech_la_DO(tmp_path, monkeypatch, capsys):
