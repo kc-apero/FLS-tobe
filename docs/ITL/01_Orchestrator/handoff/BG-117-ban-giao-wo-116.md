@@ -117,3 +117,49 @@ Tập đỏ đường nền **không đổi** so R1 *(`26 = 26` · `3 = 3` · th
 
 ### Dev tự thấy / câu hỏi *(kèm khuyến nghị)*
 - **TDD cho `FG-R1-03` — ⛔ thêm bài riêng.** Ghi đè env là sửa **hàm trợ giúp của bài** *(⛔ mã `fls/`)*; đường mặc định đã được `test_FG_F3` phủ, đường ghi đè chứng minh bằng *phá → chạy → cắn → trả* ở trên. Thêm một bài đơn vị cho ghi đè sẽ **+1 sàn** *(2497/668)* và đổi **mức cộng FG** mà `FG-R1-04` *(việc orchestrator)* đang ghim ở **+3**. **Khuyến nghị A *(đã làm)*:** giữ **+3**, ⛔ thêm bài — chứng minh bằng demo trên bản sao *(đã ghi)*. **Phương án B:** thêm bài đơn vị ghi đè ⇒ sàn 2497/668 + cập nhật bài ghim + báo orchestrator đổi mức cộng FG thành +4. Mặc định giữ **A**.
+
+## Vòng sửa sau R2 (`KQ-119`)
+
+> Phiên cloud CON của `fls-dev` *(làn FE)*, 2026-11-17, sau R2 `KQ-119` *(ĐẠT · 0 CHẶN · 1 NÊN SỬA `FG-R2-01` · 1 GHI NHẬN `FG-R2-02`)*. Nền worktree `isp/FG` @ `c037297` *(ngọn R2 — commit `KQ-119`)*, cụm PG riêng **5436**. Mục này **chỉ THÊM** — ⛔ viết lại phần trên. Trọng tài phát hiện của R2: `docs/ITL/04_Test/review/SO_PHAT_HIEN_ISP-3.1_FG.md` *(v0.2)* · `KQ-119-kiem-fg-r2.md`.
+
+### Việc orchestrator giao *(quyết **A cho cả hai**)*
+| Phát hiện | Quyết | Làm gì ở vòng này |
+|---|---|---|
+| `FG-R2-01` *(NÊN SỬA)* | **A — vá ngay** | Khẳng định `ly_do` *(danh sách kỳ đỏ)* mà `GET /gates` trả cho `HD1_THANG` có mặt **ĐẦY ĐỦ** trong thẻ HD1 trên màn — so với CHÍNH chuỗi tuyến *(⛔ hằng gõ tay)*. Chứng minh **N9** + **N11** CHẾT trên bản sao |
+| `FG-R2-02` *(GHI NHẬN)* | **A — làm luôn** | Thêm khẳng định số `đạt`/`không đạt` trên dòng tóm = số tuyến trả *(vào F1)*. Chứng minh **N10** CHẾT |
+
+### Đã đổi *(chỉ một tệp — `tests/web/test_isp_f03_hd.py`; `fls/` diff vẫn 0; sàn giữ nguyên)*
+| Tệp | Vì sao |
+|---|---|
+| `tests/web/test_isp_f03_hd.py` *(+28 −2)* | **① `FG-R2-01`:** thêm vào **cả hai** bài sẵn có *(⛔ bài mới)*. `test_FG_F1` *(node headless — LUÔN chạy)*: `ly_do = g["HD1_THANG"]["ly_do"]` lấy từ tuyến, Đ3 canh `len ≥ 50` *(mẫu số ⛔ rỗng)*, rồi `assert ly_do in hd1["txt"]`. `test_FG_F3` *(Chromium — bài tên "lý do 23 kỳ")*: thêm `env = _gates(m, tok)` trong khối `_may`, `assert ly_do in hd1[0]["txt"]` **trước** phép đo tràn *(⛔ đo tràn trên thẻ cụt lý do — Đ3)*. **② `FG-R2-02`:** `test_FG_F1` khối ③ canh **CẢ BA** số dòng tóm *(`đạt`/`không đạt`/`chưa đo được`)* = số tuyến trả *(Đ4: mỗi số một nhãn)* — trước R2 chỉ canh `chưa đo được`. |
+
+- **⛔ thêm bài** *(`--collect-only` giữ nguyên)*: `test_isp_f03_hd.py` = **3** · `tests/web` = **667** · toàn bộ **2.496** *(không đổi)* ⇒ **sàn `MONG_PYTEST_*` giữ 2496/667**, ⛔ chạm `tools/dung_moi_truong_isp.sh` · bài ghim ⇒ **mức cộng FG lúc gộp vẫn +3**.
+- `man_f03.js` **KHÔNG sửa** — nền ĐÚNG *(thẻ HD1 mang đủ `ly_do` 431 ký tự; dòng tóm in đúng `data.dat`/`data.khong_dat`)*; đây là **lỗ hổng BÀI**, ⛔ lỗi mã. `git diff 4dfb7bd HEAD -- fls` = 0 dòng.
+
+### Chứng minh ĐỎ *(phá → chạy → cắn → trả nguyên — trên BẢN SAO `git archive HEAD` + bài đã sửa ở `/tmp/fg_sua_r2/copy/`, ⛔ chạm worktree)*
+| Phát hiện | Đột biến *(bản sao `man_f03.js`)* | Chạy | Cắn | Trả |
+|---|---|---|---|---|
+| `FG-R2-01` | **N9** — bỏ cả khối `ly_do` khỏi `_the_cong` *(`:34-35`)* | `pytest test_isp_f03_hd.py` | `2 failed, 1 passed` — `test_FG_F1` *(`:189`)* + `test_FG_F3` *(`:328`)*: `AssertionError … 'kỳ đỏ 18/23 … dat_hd1' in '<div…>5/23 kỳ đạt</…>'` *(thẻ còn 112 ký tự, lý do vắng)* | bản sao trả nguyên ⇒ `3 passed` |
+| `FG-R2-01` | **N11** — `TP.chu(c.ly_do.slice(0,40))` *(`:34`)* | `pytest test_isp_f03_hd.py` | `2 failed, 1 passed` — F1 *(`:189`)* + F3 *(`:328`)*: thẻ chỉ còn `"…kỳ đỏ 18/23 — kỳ: số dòng thiếu (sổ ⛔ gh"` *(40 ký tự)* ⇒ `ly_do` 431 ký tự ⛔ ⊂ thẻ | trả nguyên ⇒ `3 passed` |
+| `FG-R2-02` | **N10** — `TP.chip('ok', data.khong_dat + ' đạt')` *(`:50`)* | `pytest test_isp_f03_hd.py` | `1 failed, 2 passed` — `test_FG_F1` *(`:195`)*: `AssertionError: ('%d đạt' % 1) in '…<span class="chip ok">2 đạt</span>…'` *(chip in `khong_dat=2` thay `dat=1`)* | trả nguyên ⇒ `3 passed` |
+
+- Mẫu số **⛔ rỗng** *(Đ3)*: tuyến THẬT trả `ly_do` = **431** ký tự *(18 kỳ đỏ)*, `dat=1 · khong_dat=2 · chua_do_duoc=6` *(kho `fls_test` 5436 RỖNG, tệp đo nhánh)* — `đạt` ≠ `không đạt` nên N10 cắn được.
+- Kill chọn lọc đúng: N9/N11 ⇒ F2 *(tệp vắng, thẻ `.gate.unk` ⛔ lý do)* vẫn xanh; N10 ⇒ F3 *(⛔ canh dòng tóm)* vẫn xanh — mỗi khẳng định bắt đúng vật của nó.
+
+### Cổng chạy lại *(`PG_DSN=…:5436/fls` · `PG_DSN_TEST=…:5436/fls_test` · `PYTHONUTF8=1`)*
+| Lệnh | Kết quả |
+|---|---|
+| `pytest tests/web/test_isp_f03_hd.py -rs` | exit 0 · `3 passed in 3.23s` · 0 skip |
+| `pytest tests/web/test_isp_f03_hd.py --collect-only -q` | `tests/web/test_isp_f03_hd.py: 3` *(không đổi)* |
+| `pytest tests/web` | `3 failed, 664 passed in 183.52s` *(3 đỏ = nợ có sẵn, so node id ở `--duong-nen`)* |
+| `bash tools/dung_moi_truong_isp.sh --duong-nen --cong 5436` *(script NHÁNH · GOC = …/isp-fg · chạy MỘT MÌNH)* | `══ KẾT: ĐẠT`; toàn bộ `12 failed, 2575 passed, 2 xfailed, 14 errors in 346.76s` · `26 = 26 node id (thêm 0 · bớt 0)` · `chạy 2603 bài (mong ≥ 2496)` · skipped 0 · deselected 0; `tests/web` `3 failed, 664 passed in 183.57s` · `3 = 3 node id (thêm 0 · bớt 0)` · `chạy 667 bài (mong ≥ 667)` · skipped 0 · deselected 0 |
+| `.venv/bin/lint-imports` | exit 0 · `Contracts: 11 kept, 0 broken.` |
+| `docs/ITL/_tools/kiem_tai_lieu.py` | K1–K6 `OK` *(190 file · 1.959 bảng · 737 ô ngày · 104 mã QĐ)* |
+| `git diff 4dfb7bd HEAD -- fls` | **0 dòng** *(`man_f03.js` ⛔ đổi)* |
+
+Tập đỏ đường nền **không đổi** so R2 *(`26 = 26` · `3 = 3` · thêm 0 · bớt 0)* — bằng chứng thêm khẳng định ⛔ sinh/mất nút nào.
+
+### Dev tự thấy còn yếu *(trung thực — Test soi trước)*
+- **`FG-R2-01` canh ĐẦY ĐỦ chuỗi, ⛔ từng "kỳ đỏ".** `assert ly_do in hd1["txt"]` khẳng định cả 431 ký tự *(gồm danh sách 18 kỳ đỏ)* có mặt — N11 *(cắt 40)* và N9 *(bỏ hẳn)* đều chết. Nhưng một đột biến **bỏ đúng một kỳ ở giữa** *(ví dụ xoá `· 2026-07: 23`)* thì `ly_do` tuyến đổi theo *(do tuyến sinh cả chuỗi)* nên bài vẫn so ĐẦY ĐỦ — ⛔ phải lỗ hổng mới, vì mã màn **chỉ in nguyên chuỗi tuyến** *(`TP.chu(c.ly_do)`)*, ⛔ tự dựng danh sách kỳ. Nếu sau này màn tự parse/định dạng từng kỳ thì cần bài theo từng kỳ.
+- **`đạt` ≠ `không đạt` là điều kiện để N10 cắn.** Ở nền `dat=1 · khong_dat=2` *(khác nhau)* nên N10 chết chắc. Nếu môi trường gộp cho `dat == khong_dat` thì N10 thoát — nhưng khẳng định vẫn ĐÚNG *(so số tuyến)*, chỉ là lúc ấy ⛔ phân biệt được hai chip. Rủi ro thấp *(tệp đo nhánh cố định)*; nêu để R3 biết.
+- **F3 phụ thuộc Chromium.** Khẳng định `ly_do` ở F3 chỉ chạy khi có Chromium *(thiếu ⇒ skip ⇒ `--duong-nen` ĐỎ — Đ5)*; nhưng F1 *(node, LUÔN chạy)* đã phủ cùng lỗ hổng N9/N11 ⇒ gộp vẫn bắt được dù môi trường thiếu Chromium.
