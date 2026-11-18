@@ -101,6 +101,8 @@ BANG_TEP: tuple[Tep, ...] = (
     Tep("/man_f04.js", "man_f04.js",
         mo_ta="man F04 nap sao ke — 5 trang thai, bien ban 9 luat, "
               "`CHAN` thi nut Nhan TAT (task `6`)"),
+    Tep("/man_f08.js", "man_f08.js",
+        mo_ta="man F08 Cau hinh — bang IX.FX CHI DOC (GET /config/fx), ⛔ ky"),
     Tep("/ung_dung.js", "ung_dung.js", mo_ta="khoi dong vo + chon man"),
     Tep("/danh_muc.js", "danh_muc.js", sinh=True,
         mo_ta="⛔ SINH LUC KHOI DONG tu `fls_mapping_master`: danh muc "
