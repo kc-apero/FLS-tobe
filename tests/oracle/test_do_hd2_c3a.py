@@ -19,15 +19,26 @@ import dataclasses
 import json
 import pathlib
 import sys
+from datetime import date
 from decimal import Decimal as D
 
+import psycopg
 import pytest
 
 GOC = pathlib.Path(__file__).resolve().parents[2]
 if str(GOC) not in sys.path:
     sys.path.insert(0, str(GOC))
 
+from fls.cau_hinh import ky  # noqa: E402
+from fls.db.kho import dsn_test  # noqa: E402
+from fls.repo import cau_hinh_repo as chc  # noqa: E402
 from tools import do_hd2  # noqa: E402
+
+NGUON_PER = "bai-test-h6:ISP-3.1.2-Step20 (IX.PER kho = 21/10, C6)"
+
+
+def _lich(ngay_dau=date(2024, 10, 21)):
+    return ky.LichKy(nguon=NGUON_PER, ngay_dau=ngay_dau, luat=ky.LUAT_A)
 
 
 @pytest.fixture(scope="module")
@@ -38,7 +49,7 @@ def nguon():
 
 @pytest.fixture(scope="module")
 def tq_that(nguon):
-    return do_hd2.so_sanh_c3a(*nguon, do_hd2.mong_c3a_mac_dinh())
+    return do_hd2.so_sanh_c3a(*nguon, _lich(), do_hd2.mong_c3a_mac_dinh())
 
 
 def _chu(x):
@@ -87,7 +98,7 @@ def test_H5_B2_hd2_cong_tep_THEM_goi_C3a_giu_nguyen_C2():
 def test_H5_Đ3_dap_an_rong_thi_DO(nguon):
     vao, da, fx, cay = nguon
     rong = dict(da, dong=[])
-    tq = do_hd2.so_sanh_c3a(vao, rong, fx, cay, do_hd2.mong_c3a_mac_dinh())
+    tq = do_hd2.so_sanh_c3a(vao, rong, fx, cay, _lich(), do_hd2.mong_c3a_mac_dinh())
     assert not tq.phan_xu.dat
 
 
@@ -96,7 +107,7 @@ def test_H5_Đ5_mot_o_dap_an_lech_thi_DO_dung_o_ay(nguon):
     da2 = copy.deepcopy(da)
     r = next(r for r in da2["dong"] if _chu(r["le"]) == "SGO1" and _chu(r["ma_hd"]) == "GI")
     r["gt"] = str(D(r["gt"]) + D("1e-12"))
-    tq = do_hd2.so_sanh_c3a(vao, da2, fx, cay, do_hd2.mong_c3a_mac_dinh())
+    tq = do_hd2.so_sanh_c3a(vao, da2, fx, cay, _lich(), do_hd2.mong_c3a_mac_dinh())
     assert not tq.phan_xu.dat
     assert [(x["le"], x["ma"], x["ngay"]) for x in tq.lech] == [("SGO1", "GI", int(r["ngay"]))]
 
@@ -106,7 +117,7 @@ def test_H5_Đ5_mong_lech_co_ten_khac_thi_DO_ca_hai_chieu(nguon):
     bot = dataclasses.replace(m, thieu_D=m.thieu_D[1:])
     them = dataclasses.replace(m, hd_khac_hoa=m.hd_khac_hoa + 1)
     for mm in (bot, them):
-        tq = do_hd2.so_sanh_c3a(*nguon, mm)
+        tq = do_hd2.so_sanh_c3a(*nguon, _lich(), mm)
         assert not tq.phan_xu.dat
 
 
@@ -128,7 +139,7 @@ def test_H5_AC3_dot_bien_mot_dong_so_do_dung_la_va_to_tien(nguon):
     while nut[chuoi[-1]].cha is not None:
         chuoi.append(nut[chuoi[-1]].cha)
     r["E"] = str(D(r["E"]) + 1)          # +1 nguyên tệ ≥ ~4e-11 mUSD (VND) ≫ atol 1e-14
-    tq = do_hd2.so_sanh_c3a(vao2, da, fx, cay, do_hd2.mong_c3a_mac_dinh())
+    tq = do_hd2.so_sanh_c3a(vao2, da, fx, cay, _lich(), do_hd2.mong_c3a_mac_dinh())
     ngay = int(r["ngay"])
     mong = {(k, m, ngay) for k in ("GROUP", "SGO2") for m in chuoi}
     assert len(chuoi) >= 3
@@ -154,7 +165,7 @@ def test_H5_AC4_dap_an_khong_phai_dau_vao__xoa_gia_tri_dap_an_luoi_y_nguyen(nguo
     da0 = copy.deepcopy(da)
     for r in da0["dong"]:
         r["gt"] = "0"
-    tq = do_hd2.so_sanh_c3a(vao, da0, fx, cay, do_hd2.mong_c3a_mac_dinh())
+    tq = do_hd2.so_sanh_c3a(vao, da0, fx, cay, _lich(), do_hd2.mong_c3a_mac_dinh())
     assert tq.luoi == tq_that.luoi                        # engine ⛔ đọc đáp án
     assert not tq.phan_xu.dat                             # …nhưng cổng ĐỎ (mong là thật)
 
@@ -164,7 +175,7 @@ def test_H5_AC4_doi_ty_gia_thi_luoi_doi(nguon, tq_that):
     fx2 = {t: dict(v) for t, v in fx.items()}
     t0 = 202410                                           # tháng có dòng sổ đầu tiên
     fx2[t0]["USD"] = fx2[t0]["USD"] * 2
-    tq = do_hd2.so_sanh_c3a(vao, da, fx2, cay, do_hd2.mong_c3a_mac_dinh())
+    tq = do_hd2.so_sanh_c3a(vao, da, fx2, cay, _lich(), do_hd2.mong_c3a_mac_dinh())
     assert tq.luoi != tq_that.luoi
 
 
@@ -175,3 +186,50 @@ MA_KPI_GHIM = ("EBITDA", "EBIT", "EBT", "NP", "NPC", "NCF", "NCFO", "CRO", "COO"
 
 def test_H5_R1_03_MA_KPI_ghim_20_ma():
     assert do_hd2.MA_KPI == MA_KPI_GHIM and len(set(MA_KPI_GHIM)) == 20
+
+
+# ── H6-R1-02 · trục WP-C3a TỪ IX.PER (kho), ⛔ từ đáp án 409 ─────────────────────────
+
+def test_H6_R1_02_truc_C3a_khong_doc_dap_an_409(nguon, tq_that):
+    """Xoá `phu.ngay_truc` của đáp án ⇒ kết quả Y NGUYÊN *(trục không còn đến từ 409)*."""
+    vao, da, fx, cay = nguon
+    da2 = copy.deepcopy(da)
+    da2.get("phu", {}).pop("ngay_truc", None)
+    tq = do_hd2.so_sanh_c3a(vao, da2, fx, cay, _lich(), do_hd2.mong_c3a_mac_dinh())
+    assert tq.phan_xu.dat, tq.phan_xu.ly_do
+    assert (tq.khop, tq.tong_o) == (tq_that.khop, tq_that.tong_o) == (205175, 205175)
+
+
+def test_H6_R1_02_IX_PER_doi_ngay_dau_thi_truc_C3a_doi_va_DO(nguon):
+    """Ngày đầu IX.PER 25/10 ⇒ cột đầu 24/10 *(= ngày đầu − 1, errata ㉑)* ≠ mong 20/10 ⇒ ĐỎ."""
+    tq = do_hd2.so_sanh_c3a(*nguon, _lich(date(2024, 10, 25)), do_hd2.mong_c3a_mac_dinh())
+    assert tq.hd2_cong["truc_ngay"]["dau"] == "2024-10-24"
+    assert not tq.phan_xu.dat and any("ngày đầu trục" in x for x in tq.phan_xu.ly_do)
+
+
+def test_H6_R1_02_chay_wp_c3a_doc_IX_PER_tu_kho_DAT_205175():
+    with psycopg.connect(dsn_test(), autocommit=True) as c:
+        chc.nap_ix_per(c, actor="bo-test-h6-r1", ngay_dau="2024-10-21", luat="A", nguon=NGUON_PER)
+    tq = do_hd2.chay_wp_c3a(dsn=dsn_test())
+    assert tq.phan_xu.dat, tq.phan_xu.ly_do
+    assert tq.khop == tq.tong_o == 205175
+    assert tq.hd2_cong["truc_ngay"]["so_cot"] == 760
+
+
+def test_H6_R1_02_chay_wp_c3a_kho_doi_IX_PER_thi_truc_doi():
+    with psycopg.connect(dsn_test(), autocommit=True) as c:
+        chc.nap_ix_per(c, actor="bo-test-h6-r1", ngay_dau="2024-10-25", luat="A", nguon=NGUON_PER + " · 25/10")
+    try:
+        tq = do_hd2.chay_wp_c3a(dsn=dsn_test())
+        assert tq.hd2_cong["truc_ngay"]["dau"] == "2024-10-24" and not tq.phan_xu.dat
+    finally:
+        with psycopg.connect(dsn_test(), autocommit=True) as c:
+            chc.nap_ix_per(c, actor="bo-test-h6-r1", ngay_dau="2024-10-21", luat="A", nguon=NGUON_PER)
+
+
+def test_H6_R1_02_kho_chua_khai_IX_PER_thi_C3a_DO(monkeypatch):
+    def _nem(_c):
+        raise chc.ChuaKhai("IX.PER chua co")
+    monkeypatch.setattr(chc, "doc_per", _nem)
+    tq = do_hd2.chay_wp_c3a(dsn=dsn_test())
+    assert not tq.phan_xu.dat and any("IX.PER" in x for x in tq.phan_xu.ly_do)
