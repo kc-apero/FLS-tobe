@@ -701,6 +701,13 @@ BANG_TUYEN: tuple[Tuyen, ...] = (
           ("fls_cau_hinh_ban", "fls_cau_hinh_dong"),
           mo_ta="IX.PER lich ky: ngay dau cot + luat ghi nhan (A: don ngay 1 thang PL "
                 "start) doc tu KHO config (C6); luat B chua mo ⇒ LUAT_CHUA_KY"),
+    # ⭐⭐ `C9` (`WO-172`): `IX.VEN` Block 1 (vendor · network · tai khoan) + cot `cach_tinh`
+    #    (5 ma rieng = NHAN, phep tinh o H10) + 7 CDT1 doc tu KHO config. `GET`, ⛔ ghi.
+    Tuyen("GET", f"{TIEN_TO}/config/ven", "cau_hinh_ven",
+          ("fls_cau_hinh_ban", "fls_cau_hinh_dong"),
+          mo_ta="IX.VEN vendor · network · tai khoan (Block 1) + cot cach_tinh (5 ma "
+                "rieng VD341·VD444·VD428·Max·VD62 chi la NHAN, phep tinh o H10) + 7 CDT1; "
+                "doc tu KHO config chi-them (C9)"),
 )
 
 

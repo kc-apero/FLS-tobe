@@ -21,7 +21,7 @@ from decimal import Decimal, InvalidOperation
 from typing import Any, Callable
 
 from fls.adapters.pm_join import canon_ref
-from fls.cau_hinh import fx, hd, ky
+from fls.cau_hinh import fx, hd, ky, vendor
 from fls.repo import cau_hinh_repo as chc
 from fls.repo import do_mau_so as dms
 from fls.repo import doc_bao_cao as bc
@@ -1143,3 +1143,33 @@ def cau_hinh_per(yc: YeuCau):
 
 
 HAM.update({"cau_hinh_per": cau_hinh_per})
+
+
+# ══ ⭐⭐ ISP 3.1.2 · `C9` (`WO-172`) — LÕI CONFIG: `IX.VEN` vendor · network · cách tính ══
+# Khuôn `ty_gia`/`cay_hd`: đọc KHO, `run_id` ⇒ 400, lỗi có TÊN. `cach_tinh` chỉ là NHÃN
+# *(phép tính riêng ở `H10`)*.
+def cau_hinh_ven(yc: YeuCau):
+    """`GET /config/ven` — `{bang, nguon, so_dong, dong:[…], nhan_rieng, cdt1}`."""
+    if yc.pv.kieu != "nap_that":
+        raise LoiCua("FLS-BAD-REQUEST",
+                     f"bang IX.VEN ⛔ theo lan nap — bo `run_id` "
+                     f"({yc.pv.mo_ta()}): `meta` ⛔ duoc khai mot pham vi ⛔ ap")
+    try:
+        b = chc.doc_ven(yc.conn)
+    except chc.ChuaKhai as e:
+        raise LoiCua("FLS-CAUHINH-CHUA-KHAI", str(e)) from e
+    except chc.BangLa as e:
+        raise LoiCua("FLS-CAUHINH-BANG-LA", str(e)) from e
+    except chc.BanHong as e:
+        raise LoiCua("FLS-CAUHINH-BAN-HONG",
+                     "ban cau hinh trong kho ⛔ doc ra duoc — bao nguoi dung he") from e
+    return {"bang": vendor.BANG, "nguon": b.nguon, "so_dong": len(b.dong),
+            "dong": [{"thu_tu": d.thu_tu, "dong_sheet": d.dong_sheet, "No": d.no,
+                      "vendor": d.vendor, "network": d.network, "account": d.account,
+                      "pct": d.pct, "cashin_month": d.cashin_month,
+                      "cashin_day": d.cashin_day, "cach_tinh": d.cach_tinh}
+                     for d in b.dong],
+            "nhan_rieng": list(b.nhan_rieng), "cdt1": list(b.cdt1)}, "flash"
+
+
+HAM.update({"cau_hinh_ven": cau_hinh_ven})
