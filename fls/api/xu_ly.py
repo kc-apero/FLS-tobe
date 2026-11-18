@@ -21,7 +21,7 @@ from decimal import Decimal, InvalidOperation
 from typing import Any, Callable
 
 from fls.adapters.pm_join import canon_ref
-from fls.cau_hinh import fx, hd
+from fls.cau_hinh import fx, hd, ky
 from fls.repo import cau_hinh_repo as chc
 from fls.repo import do_mau_so as dms
 from fls.repo import doc_bao_cao as bc
@@ -1112,3 +1112,34 @@ def cay_hd(yc: YeuCau):
 
 
 HAM.update({"cay_hd": cay_hd})
+
+
+# ══ ⭐⭐ ISP 3.1.2 · `C6` (`WO-152`) — `IX.PER`: lịch kỳ ══
+# Ngày đầu + luật ghi nhận ĐỌC TỪ KHO `fls_cau_hinh_*` (⛔ gõ cứng ở mã). `GET`, ⛔ ghi.
+# `?run_id=` ⇒ `400` — cùng lý do `C1-R1-07` (config ⛔ theo lần nạp).
+def cau_hinh_per(yc: YeuCau):
+    """`GET /config/per` ⇒ `{bang, nguon, ngay_dau, ky_dau, luat:{ma,ten}, luat_chua_ky}`.
+    Kho chưa nạp ⇒ `409 FLS-CAUHINH-CHUA-KHAI`; luật `B` trong kho ⇒ `409 LUAT_CHUA_KY`."""
+    if yc.pv.kieu != "nap_that":
+        raise LoiCua("FLS-BAD-REQUEST",
+                     f"lich ky IX.PER ⛔ theo lan nap — bo `run_id` "
+                     f"({yc.pv.mo_ta()}): `meta` ⛔ duoc khai mot pham vi ⛔ ap")
+    try:
+        lich = chc.doc_per(yc.conn)
+    except chc.ChuaKhai as e:
+        raise LoiCua("FLS-CAUHINH-CHUA-KHAI", str(e)) from e
+    except chc.BangLa as e:
+        raise LoiCua("FLS-CAUHINH-BANG-LA", str(e)) from e
+    except chc.BanHong as e:
+        raise LoiCua("FLS-CAUHINH-BAN-HONG",
+                     "ban cau hinh trong kho ⛔ doc ra duoc — bao nguoi dung he") from e
+    except ky.LoiKy as e:
+        raise LoiCua(e.ma, str(e)) from e
+    k = ky.ky_cua(lich.ngay_dau)
+    return {"bang": ky.BANG, "nguon": lich.nguon, "ngay_dau": lich.ngay_dau.isoformat(),
+            "ky_dau": {"nam": k.nam, "nua": k.nua, "quy": k.quy, "thang": k.thang},
+            "luat": {"ma": lich.luat, "ten": ky.TEN_LUAT[lich.luat]},
+            "luat_chua_ky": list(ky.LUAT_CHUA_MO)}, "flash"
+
+
+HAM.update({"cau_hinh_per": cau_hinh_per})
