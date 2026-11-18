@@ -100,8 +100,10 @@ def test_DV_B3_so_du_dau_5_o_cong_thuc_verbatim_va_hang(anh):
     assert thuc == SO_DU_DAU_GHIM
 
 
-#: Lỗi Sheets — TẬP ĐÓNG cho cột R *(H4-R1-04)*: `#N/A ()`, `#REF!`, `#DIV/0!`, …
-LOI_SHEETS_RE = re.compile(r"#[A-Z/0-9!?]+( \(\))?")
+#: Lỗi Sheets — TẬP ĐÓNG cho cột R *(H4-R1-04 · H4-R2-03: liệt kê, ⛔ lớp ký tự)*.
+from tools.khuon_dong_bang import gl_406_dau_vao as _M  # noqa: E402
+
+LOI_SHEETS_HOP_LE = _M.ITL_LOI_HOP_LE
 
 
 def test_DV_B4_itl_id_lech_4_hang(anh):
@@ -111,12 +113,11 @@ def test_DV_B4_itl_id_lech_4_hang(anh):
     for r in phu["dong"]:
         v = _chu(r["itl_id_tho"])
         assert not re.fullmatch(r"ITL#\d+", v)
-        # H4-R1-04: cột R MỞ ⇒ phải là LỖI Sheets, ⛔ chuỗi tự do *(PII)* — tập đóng.
-        assert LOI_SHEETS_RE.fullmatch(v), f"itl_id_tho ⛔ lỗi Sheets: {v!r}"
+        # H4-R1-04 · H4-R2-03: cột R MỞ ⇒ phải ∈ TẬP ĐÓNG lỗi Sheets, ⛔ chuỗi tự do *(PII)*.
+        assert v in LOI_SHEETS_HOP_LE, f"itl_id_tho ⛔ ∈ tập đóng lỗi Sheets: {v!r}"
 
 
 # ── H4-R1-04 · khuôn `gl_406_dau_vao` TỪ CHỐI cột R tự do + D đuôi trắng ────────────
-from tools.khuon_dong_bang import gl_406_dau_vao as _M  # noqa: E402
 
 
 def _raw(values):
@@ -146,6 +147,16 @@ def test_DV_B4_frame_D_duoi_trang_thi_TU_CHOI():
     """`D = "USD "` *(đuôi trắng)* ⇒ TỪ CHỐI — ⛔ chuẩn hoá ngầm để strip() thấy khớp."""
     with pytest.raises(ValueError, match="trắng"):
         _M.chuan_bi(_raw([[10, 45000, "USD ", "100", "", "ITL#1"]]))
+
+
+def test_DV_B4_frame_cot_R_chu_HOA_lien_thi_TU_CHOI():
+    """H4-R2-03: `#NGUYENVANA0912345678` *(chữ HOA + số liền)* LỌT regex lớp ký tự cũ
+    `#[A-Z/0-9!?]+` nhưng ⛔ ∈ TẬP ĐÓNG ⇒ TỪ CHỐI *(PII lọt — red-first ngay trong test)*."""
+    assert re.fullmatch(r"#[A-Z/0-9!?]+( \(\))?", "#NGUYENVANA0912345678")   # regex CŨ: lọt
+    assert "#NGUYENVANA0912345678" not in _M.ITL_LOI_HOP_LE                   # tập đóng: chặn
+    with pytest.raises(ValueError, match="itl_id_lech"):
+        _M.chuan_bi(_raw([[10, 45000, "VND", "100", "", "ITL#1"],
+                          [11, 45000, "USD", "", "50", "#NGUYENVANA0912345678"]]))
 
 
 def test_DV_B5_cross_check_voi_gl_406_0_lech():

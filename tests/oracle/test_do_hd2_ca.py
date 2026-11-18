@@ -289,3 +289,70 @@ def test_H4_R1_03_no_op_vo_thi_DO(that):
     assert 4962 in tq.no_op_lech
     assert not tq.phan_xu.dat
     assert any("no-op" in l for l in tq.phan_xu.ly_do), tq.phan_xu.ly_do
+
+
+# ── Vòng sửa sau R2 (KQ-135) — H4-R2-01/02 trên ẢNH THẬT ─────────────────────────
+# Mỗi bài ĐỎ-trước: chứng cổng CŨ (rtol chung 1e-9 / ô bỏ chỉ IN) XANH, cổng MỚI ĐỎ.
+
+def _mong_rtol_cu():
+    """`mong_mac_dinh` nhưng MỌI cột về `rtol 1e-9` CŨ (giữ atol mới) — chứng rtol load-bearing
+    *(H4-R2-01; red-first trong chính test)*."""
+    dsc = {c: do_hd2.DungSaiCot(atol=do_hd2.DUNG_SAI_COT[c].atol, rtol=D("1e-9"))
+           for c in do_hd2.COT_BMBT}
+    return dataclasses.replace(do_hd2.mong_mac_dinh(), dung_sai=dsc)
+
+
+# H4-R2-01 — hạ rtol THEO CỘT ──────────────────────────────────────────────────────
+
+def test_H4_R2_01_BM_lech_1_VND_thi_DO__rtol_cu_thi_XANH(that):
+    """`BM +1 VND` ở hàng |BM| LỚN nhất *(≈2,98e11)*: `rtol 2e-12` ⇒ tol đuôi ~0,6 VND ⇒ ĐỎ;
+    `rtol 1e-9` cũ ⇒ tol ~298 VND ⇒ XANH *(H4-R2-01: lỗ `rtol` đã bịt — Đ5)*."""
+    vao, da, fx, pb = that
+    ds_max, bm_max = None, D(0)
+    for r in da["dong"]:
+        v = do_hd2._so(r.get("BM"))
+        if v is not None and abs(v) > abs(bm_max):
+            bm_max, ds_max = v, int(do_hd2._so(r["dong_sheet"]))
+    da2 = _ban_sao_da(da)
+    _dat_o(da2, ds_max, "BM", str(bm_max + D("1")))
+    tq = _chay(vao, da2, fx, pb)
+    assert not tq.phan_xu.dat
+    assert any(x["cot"] == "BM" and int(x["dong_sheet"]) == ds_max for x in tq.lech), tq.lech[:3]
+    assert _chay(vao, da2, fx, pb, _mong_rtol_cu()).phan_xu.dat      # red-first (rtol cũ XANH)
+
+
+def test_H4_R2_01_BQ_lech_1e_9_o_hang_nho_thi_DO__rtol_cu_thi_XANH(that):
+    """`BQ +1e-9` *(≈1 VND)* ở hàng |BQ| nhỏ *(1 ≤ |BQ| < 24)*: `atol 1e-11`/`rtol 4e-11` bắt
+    ⇒ ĐỎ; `rtol 1e-9` cũ ⇒ tol ≥ 1e-9 ⇒ XANH *(H4-R2-01: `atol` BQ hết là mã chết)*."""
+    vao, da, fx, pb = that
+    ds_t = bq = None
+    for r in da["dong"]:
+        v = do_hd2._so(r.get("BQ"))
+        dsn = int(do_hd2._so(r["dong_sheet"]))
+        if v is not None and D(1) <= abs(v) < D(24) and dsn not in do_hd2.MONG_THIEU_D:
+            ds_t, bq = dsn, v
+            break
+    assert ds_t is not None, "⛔ thấy hàng |BQ| trong [1,24)"
+    da2 = _ban_sao_da(da)
+    _dat_o(da2, ds_t, "BQ", str(bq + D("1e-9")))
+    tq = _chay(vao, da2, fx, pb)
+    assert not tq.phan_xu.dat
+    assert any(x["cot"] == "BQ" and int(x["dong_sheet"]) == ds_t for x in tq.lech)
+    assert _chay(vao, da2, fx, pb, _mong_rtol_cu()).phan_xu.dat      # red-first
+
+
+# H4-R2-02 — khoá ô đáp án BỎ ───────────────────────────────────────────────────────
+
+def test_H4_R2_02_xoa_o_dap_an_hang_thieu_D_thi_DO__khong_khoa_thi_XANH(that):
+    """Xoá `BN[4962]` *(hàng thiếu D)* ⇒ `o_dap_an_bo 36→35`: khoá `MONG_O_DAP_AN_BO` ⇒ ĐỎ;
+    ⛔ khoá *(mong None)* ⇒ XANH *(parity ⛔ đổi — hàng thiếu D bỏ khỏi so; H4-R2-02)*."""
+    vao, da, fx, pb = that
+    da2 = _ban_sao_da(da)
+    _dat_o(da2, 4962, "BN", None)
+    tq = _chay(vao, da2, fx, pb)
+    assert tq.o_dap_an_bo == 35
+    assert tq.tong_o == do_hd2.MONG_TONG_O            # parity KHÔNG đổi (hàng thiếu D ⛔ vào so)
+    assert not tq.phan_xu.dat
+    assert any("ô đáp án bỏ" in l for l in tq.phan_xu.ly_do), tq.phan_xu.ly_do
+    mong0 = dataclasses.replace(do_hd2.mong_mac_dinh(), mong_o_dap_an_bo=None)
+    assert _chay(vao, da2, fx, pb, mong0).phan_xu.dat    # red-first (⛔ khoá ⇒ XANH)

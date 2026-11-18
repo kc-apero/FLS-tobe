@@ -91,10 +91,13 @@ VAO_BIET = ("ton", "bvnd_ton", "musd_ton")
 
 #: ⑤ `itl_id` *(cột R)* PHẢI khớp `^ITL#\d+$`. 4 hàng mang chuỗi LỖI Sheets `#N/A ()`.
 ITL_ID_RE = re.compile(r"ITL#\d+")
-#: ⑤ *(H4-R1-04)* Cột R MỞ *(công thức trả `ITL#n` HOẶC chuỗi lỗi Sheets)*; giá trị ⛔ khớp
-#: `ITL#\d+` phải là lỗi Sheets `#…` *(TẬP ĐÓNG)*, ⛔ chuỗi tự do — nếu không, PII *(Diễn giải/tên)*
-#: lạc sang R lọt vào ảnh mà vẫn đủ 4 hàng *(đo 18/11: 4 giá trị hiện tại đều `#N/A ()`)*.
-ITL_LOI_RE = re.compile(r"#[A-Z/0-9!?]+( \(\))?")
+#: ⑤ *(H4-R1-04 · H4-R2-03)* Cột R MỞ *(công thức trả `ITL#n` HOẶC chuỗi lỗi Sheets)*; giá trị ⛔
+#: khớp `ITL#\d+` phải ∈ **TẬP ĐÓNG liệt kê** lỗi Google Sheets *(⛔ lớp ký tự: regex cũ
+#: `#[A-Z/0-9!?]+` LỌT `#NGUYENVANA0912345678` — PII chữ HOA liền)*. Đo 18/11: 4 giá trị hiện tại
+#: đều `#N/A ()`. Tập = toàn bộ lỗi Sheets hữu hạn mà công thức cột R có thể trả.
+ITL_LOI_HOP_LE = frozenset({
+    "#N/A ()", "#N/A", "#REF!", "#DIV/0!", "#VALUE!", "#NAME?", "#NUM!", "#NULL!", "#ERROR!",
+})
 #: 4 `dong_sheet` itl_id lệch CÓ TÊN *(đo 18/11; để bài ghim — khác tập ⇒ checksum đổi)*.
 LECH_ITL_ID = (6684, 6836, 7500, 7832)
 #: ③/④ `D` *(Đơn vị tiền tệ)* có TẬP ĐÓNG = 5 tiền tệ của AP *(đo 18/11: VND·USD·SGD·HKD + 6 rỗng;
@@ -201,9 +204,9 @@ def chuan_bi(tho: dict[str, Any]) -> dict[str, Any]:
     # ⑤ *(H4-R1-04)* TẬP ĐÓNG: mỗi itl_id lệch phải là LỖI Sheets `#…`, ⛔ chuỗi tự do *(PII lọt)*.
     #   ⛔ IN giá trị vào lời lỗi — chỉ `dong_sheet`.
     for x in itl_lech:
-        if not ITL_LOI_RE.fullmatch(x["itl_id_tho"]):
-            raise ValueError(f"itl_id_lech ds={x['dong_sheet']}: cột R ⛔ phải lỗi Sheets `#…` "
-                             f"*(chuỗi tự do ⇒ PII lọt — H4-R1-04)*")
+        if x["itl_id_tho"] not in ITL_LOI_HOP_LE:
+            raise ValueError(f"itl_id_lech ds={x['dong_sheet']}: cột R ⛔ ∈ tập đóng lỗi Sheets "
+                             f"*(chuỗi tự do/PII lọt — H4-R1-04 · H4-R2-03)*")
 
     so_du_dau = _doc_so_du_dau(tho.get("so_du_dau"))
 

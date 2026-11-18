@@ -82,6 +82,7 @@ MONG_THANG_THIEU_TY_GIA: tuple[int, ...] = ()        # ix_fx phủ cả dải �
 MONG_DONG_SO = 7877                  #: dòng sổ vào engine = 7883 − 6 hàng thiếu D (Đ4)
 MONG_TONG_O = 8 * MONG_DONG_SO       #: 63.016 = 8 cột BM…BT × dòng feed
 MONG_SO_DONG_DAP_AN = 7883           #: số hàng đáp án 406 (hàng 10…7892) — bắt xoá/nhân đôi hàng
+MONG_O_DAP_AN_BO = 36                #: ô đáp án khác rỗng của 6 hàng thiếu D (6×6) — KHOÁ (H4-R2-02)
 
 
 @dataclass(frozen=True)
@@ -94,33 +95,39 @@ class DungSaiCot:
     `BT≈2,3` ⇒ `rtol·|BT|≈2e-9 ≪ atol` nên BT do `atol` quyết định.
     """
     atol: Decimal
-    rtol: Decimal = Decimal("1e-9")      # theo độ lớn — chỉ CẮN ở BM (~1e11); sàn vô hại cho cột nhỏ
+    rtol: Decimal = Decimal("1e-9")      # MẶC ĐỊNH = rtol CŨ (chung 1e-9); DUNG_SAI_COT khai THEO CỘT (H4-R2-01)
 
     def khop(self, got: Decimal, exp: Decimal) -> bool:
         return abs(got - exp) <= self.atol + self.rtol * abs(exp)
 
 
 # ── Dung sai THEO CỘT — đo 18/11 trên 7.877 dòng (so engine ↔ đáp án, KHÔNG áp dung sai) ──────────
-#   cột  đơn vị          max|lệch| thật   max rel      ngưỡng atol   biên atol/noise
-#   BM   VND  ~2,98e11    3,14e-04 (ulp)   1,60e-13    1e-3*         rtol 1e-9 canh (≈57 VND ở đuôi)
-#   BN   mUSD ~11,5       1,22e-14         1,60e-13    1e-12         ×82
-#   BO   bVND ~115,6      1,00e-14         3,03e-16    1e-12         ×100   ← đột biến +9e-7 (900 VND)
-#   BP   bVND ~128,9      1,27e-14         2,38e-16    1e-12         ×79
-#   BQ   bVND ~296,3      1,09e-12         3,19e-12    1e-11         ×9     (cộng dồn — noise sát 1e-12)
-#   BR   mUSD ~4,5        1,00e-15         3,38e-16    1e-12         ×1000
-#   BS   mUSD ~5,1        1,00e-15         3,72e-16    1e-12         ×1000
-#   BT   mUSD ~11,5       7,35e-14         2,04e-12    1e-12         ×14    (cộng dồn)
-#   * BM: |exp| ≥ 6e7 luôn ⇒ `rtol·|exp| ≥ 0,06 ≫ noise ulp 3,1e-4`; atol 1e-3 chỉ là sàn gần-0.
-# Chứng ĐỎ (Đ5): `atol 1e-6` cũ ⇒ `BO +9e-7` XANH; dung sai này ⇒ `BO +9e-7` và `BO +1 VND` ĐỎ.
+# Lệch engine↔đáp án là CỐ ĐỊNH (chạy 2 lần cùng kết — xác định; khác-triển-khai Excel↔Python, ⛔
+# noise ngẫu nhiên BLAS). Hai knob, cả hai CÓ ĐO: `atol` = sàn tuyệt đối (ôm max|lệch| cộng dồn);
+# `rtol` = sàn tương đối theo độ lớn (ôm max rel). ⭐ **H4-R2-01**: `rtol` CŨ chung `1e-9` rộng
+# **≥ 10⁴×** noise đo (rel max 1,6e-13) ⇒ BM lọt `+50 VND`, đuôi BO lỏng tới `1,16e-7`; `atol` của
+# BQ/BT thành mã chết vì `rtol·|exp| ≫ atol`. Hạ `rtol` THEO CỘT = ~10–40× max rel đo (biên in cạnh).
+#   cột  đơn vị        max|lệch|      max rel     atol(sàn 0)  rtol MỚI   biên rtol/rel  knob CẮN
+#   BM   VND  ~2,98e11  3,14e-04 ulp   1,60e-13    1e-3         2e-12      ×12,5          rtol (|exp|~1e11)
+#   BN   mUSD ~11,5     1,22e-14       1,60e-13    1e-12        2e-12      ×12,5          rtol (≥|exp|~0,5)
+#   BO   bVND ~115,6    1,00e-14       3,03e-16    1e-12        1e-14      ×33            rtol (≥|exp|~100)
+#   BP   bVND ~128,9    1,27e-14       2,38e-16    1e-12        1e-14      ×42            rtol (≥|exp|~100)
+#   BQ   bVND ~296,3    1,09e-12       3,19e-12    1e-11        4e-11      ×12,5          atol+rtol (cộng dồn)
+#   BR   mUSD ~4,5      1,00e-15       3,38e-16    1e-12        1e-14      ×29,6          atol (|exp|≤4,5)
+#   BS   mUSD ~5,1      1,00e-15       3,72e-16    1e-12        1e-14      ×26,9          atol (|exp|≤5,1)
+#   BT   mUSD ~11,5     7,35e-14       2,04e-12    1e-12        4e-11      ×19,6          atol+rtol (cộng dồn)
+# BR/BS: |exp| quá nhỏ ⇒ `rtol·|exp| < atol` ⇒ knob thật là `atol` (noise tuyệt đối < atol); rtol chỉ
+# sàn tương đối phụ. Chứng ĐỎ (Đ5): `rtol 1e-9` cũ ⇒ `BM +50 VND` · `BQ +1e-9` XANH; dung sai này ⇒
+# `BM +1 VND` ĐỎ (tol đuôi ~0,6 VND) · `BQ +1e-9` ĐỎ ở hàng |BQ| nhỏ (tol ~atol 1e-11); `BO +9e-7` ĐỎ.
 DUNG_SAI_COT: dict[str, DungSaiCot] = {
-    "BM": DungSaiCot(atol=Decimal("1e-3")),
-    "BN": DungSaiCot(atol=Decimal("1e-12")),
-    "BO": DungSaiCot(atol=Decimal("1e-12")),
-    "BP": DungSaiCot(atol=Decimal("1e-12")),
-    "BQ": DungSaiCot(atol=Decimal("1e-11")),
-    "BR": DungSaiCot(atol=Decimal("1e-12")),
-    "BS": DungSaiCot(atol=Decimal("1e-12")),
-    "BT": DungSaiCot(atol=Decimal("1e-12")),
+    "BM": DungSaiCot(atol=Decimal("1e-3"), rtol=Decimal("2e-12")),
+    "BN": DungSaiCot(atol=Decimal("1e-12"), rtol=Decimal("2e-12")),
+    "BO": DungSaiCot(atol=Decimal("1e-12"), rtol=Decimal("1e-14")),
+    "BP": DungSaiCot(atol=Decimal("1e-12"), rtol=Decimal("1e-14")),
+    "BQ": DungSaiCot(atol=Decimal("1e-11"), rtol=Decimal("4e-11")),
+    "BR": DungSaiCot(atol=Decimal("1e-12"), rtol=Decimal("1e-14")),
+    "BS": DungSaiCot(atol=Decimal("1e-12"), rtol=Decimal("1e-14")),
+    "BT": DungSaiCot(atol=Decimal("1e-12"), rtol=Decimal("4e-11")),
 }
 
 
@@ -143,13 +150,14 @@ class Mong:
     mong_dong_so: int | None = None            # dòng sổ vào engine (Đ4)
     mong_tong_o: int | None = None             # 8 × dòng feed — mẫu số parity
     mong_so_dong_dap_an: int | None = None     # số hàng đáp án 406
+    mong_o_dap_an_bo: int | None = None        # ô đáp án bỏ (6 hàng thiếu D) — khoá (H4-R2-02)
 
 
 def mong_mac_dinh() -> Mong:
     return Mong(thieu_D=MONG_THIEU_D, itl_na=MONG_ITL_NA, ky_vang=dict(MONG_KY_VANG),
                thang_thieu_ty_gia=MONG_THANG_THIEU_TY_GIA, dung_sai=dung_sai_mac_dinh(),
                mong_dong_so=MONG_DONG_SO, mong_tong_o=MONG_TONG_O,
-               mong_so_dong_dap_an=MONG_SO_DONG_DAP_AN)
+               mong_so_dong_dap_an=MONG_SO_DONG_DAP_AN, mong_o_dap_an_bo=MONG_O_DAP_AN_BO)
 
 
 @dataclass
@@ -325,7 +333,7 @@ def so_sanh(anh_dau_vao: dict, anh_dap_an: dict, fx: Mapping[int, Mapping[str, D
 
     # ── phân xử *(cong_parity + khớp MONG cả hai chiều)* ──
     px = _phan_xu(tong_o, khop, len(feed_ds), lech, lech_co_ten, mong, loi_engine,
-                  so_dong_dap_an, no_op_lech)
+                  so_dong_dap_an, no_op_lech, o_dap_an_bo)
 
     hd2_cong = _hop_dong(tong_o, khop, so_o_dap_an_so_duoc, lech, lech_co_ten, mau_so_thang,
                          len(feed_ds), ds, px, so_dong_dap_an, o_dap_an_bo, no_op_lech)
@@ -337,7 +345,7 @@ def so_sanh(anh_dau_vao: dict, anh_dap_an: dict, fx: Mapping[int, Mapping[str, D
 
 def _phan_xu(tong_o: int, khop: int, dong_doc: int, lech: list, lech_co_ten: dict,
              mong: Mong, loi_engine: str | None, so_dong_dap_an: int,
-             no_op_lech: list[int]) -> PhanXu:
+             no_op_lech: list[int], o_dap_an_bo: int) -> PhanXu:
     # lõi: ≥1 ô · ⛔ lát bỏ · 0 ô lệch *(cong_parity — toi_thieu_o=1 theo AC-1 "số ô > 0")*
     px = danh_gia(tong_o=tong_o, khop=khop, lat_truot=0, dong_doc=dong_doc,
                   dong_mong_doi=dong_doc, toi_thieu_o=1)
@@ -353,6 +361,9 @@ def _phan_xu(tong_o: int, khop: int, dong_doc: int, lech: list, lech_co_ten: dic
     if mong.mong_so_dong_dap_an is not None and so_dong_dap_an != mong.mong_so_dong_dap_an:
         ly.append(f"số hàng đáp án {so_dong_dap_an} ≠ mong {mong.mong_so_dong_dap_an} "
                   f"(xoá/thừa/nhân đôi hàng)")
+    # ── H4-R2-02: ô đáp án BỎ (6 hàng thiếu D × 6 ô khác rỗng = 36) khai TRƯỚC — con số in phải có mong ──
+    if mong.mong_o_dap_an_bo is not None and o_dap_an_bo != mong.mong_o_dap_an_bo:
+        ly.append(f"ô đáp án bỏ (6 hàng thiếu D) {o_dap_an_bo} ≠ mong {mong.mong_o_dap_an_bo}")
     # ── H4-R1-03: no-op của 6 hàng thiếu D phải ĐO được (BM·BQ·BT = hàng trên), lệch ⇒ ĐỎ ──
     if no_op_lech:
         ly.append(f"hàng thiếu D ⛔ no-op (BM·BQ·BT ≠ hàng trên): {sorted(no_op_lech)}")
@@ -385,9 +396,11 @@ def _hop_dong(tong_o, khop, so_o_dap_an, lech, lech_co_ten, mau_so_thang, dong_s
         # H4-R1-01: dung sai THEO CỘT (atol có căn cứ đo; rtol 1e-9 chỉ cắn ở BM ~1e11).
         "dung_sai_theo_cot": {c: {"atol": str(ds[c].atol), "rtol": str(ds[c].rtol)}
                               for c in COT_BMBT},
-        "dung_sai_ghi_chu": "atol THEO CỘT = ~10× noise đo 18/11 (BM: VND 1e11 ⇒ rtol 1e-9 canh, "
-                            "atol 1e-3 là sàn gần-0; BQ: 1e-11 vì cộng dồn; 6 cột khác 1e-12). "
-                            "Chứng ĐỎ: BO +9e-7 (900 VND) ⇒ lệch; atol 1e-6 cũ ⇒ XANH.",
+        "dung_sai_ghi_chu": "atol = sàn tuyệt đối (ôm max|lệch| cộng dồn); rtol THEO CỘT = ~10–40× "
+                            "max rel đo 18/11 (H4-R2-01: hạ từ 1e-9 chung — BM·BN 2e-12 · "
+                            "BO·BP·BR·BS 1e-14 · BQ·BT 4e-11). Chứng ĐỎ: rtol cũ 1e-9 ⇒ BM +50 VND · "
+                            "BQ +1e-9 XANH; rtol này ⇒ BM +1 VND · BQ +1e-9 ĐỎ; BO +9e-7 ĐỎ, "
+                            "atol 1e-6 cũ ⇒ XANH.",
         "dong_so": dong_so,
         "mong_dong_so": MONG_DONG_SO,
         "tong_o": tong_o,
@@ -402,6 +415,7 @@ def _hop_dong(tong_o, khop, so_o_dap_an, lech, lech_co_ten, mau_so_thang, dong_s
         "mau_so_thang": mau_so_thang,
         # H4-R1-03: ô đáp án BỎ (6 hàng thiếu D × 6 ô khác rỗng = 36) đếm được + no-op đã đo.
         "o_dap_an_bo_hang_thieu_D": o_dap_an_bo,
+        "mong_o_dap_an_bo": MONG_O_DAP_AN_BO,       # H4-R2-02: con số in ra phải khai mong (Đ5)
         "no_op_hang_thieu_D": {"kiem": "BM·BQ·BT[ds] == [ds−1]", "lech": sorted(no_op_lech)},
         "so_du_dau": "5 ô gõ tay hàng 24 (errata ⑳: FLS chưa có khái niệm số dư đầu kỳ; nguồn "
                      "chính thức = câu hỏi BA/owner) — gieo qua tinh_gl(so_du_dau=…)",
@@ -425,8 +439,8 @@ def _in_bao(tq: ThanhQua) -> None:
     print(f"  ô so / khớp   : {tq.khop}/{tq.tong_o}  (mẫu số mong {MONG_TONG_O} = 8 × {MONG_DONG_SO}; "
           f"= số ô đáp án so được {tq.so_o_dap_an_so_duoc})")
     print(f"  hàng đáp án   : {tq.so_dong_dap_an} (mong {MONG_SO_DONG_DAP_AN})")
-    print(f"  ô đáp án bỏ   : {tq.o_dap_an_bo} (6 hàng thiếu D × 6 ô khác rỗng — H4-R1-03; "
-          f"no-op lệch: {tq.no_op_lech})")
+    print(f"  ô đáp án bỏ   : {tq.o_dap_an_bo} (mong {MONG_O_DAP_AN_BO}; 6 hàng thiếu D × 6 ô khác "
+          f"rỗng — H4-R1-03/R2-02; no-op lệch: {tq.no_op_lech})")
     print(f"  ô lệch ngoài tên: {len(tq.lech)}")
     for x in tq.lech[:10]:
         print(f"      [ds {x['dong_sheet']} · {x['ky']} · {x['cot']}] exp {x['exp']} got {x['got']}")
