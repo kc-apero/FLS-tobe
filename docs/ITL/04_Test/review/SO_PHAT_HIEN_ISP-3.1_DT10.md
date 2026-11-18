@@ -1,6 +1,6 @@
 # SỔ PHÁT HIỆN REVIEW — ISP 3.1 · phần `DT10` *(tệp riêng, chờ gộp vào `SO_PHAT_HIEN_ISP-3.1.md`)*
 
-**Version:** v0.1 · **Ngày:** 2026-11-18 · **Chủ sở hữu:** `fls-test` *(R1 `KQ-198`)* · **Nguồn:** `IncrementalStepPlan-FLS-Voi_v3.1.2.md` Step 27 · DT10 · `WO-196` · `BG-197` · nhánh `isp/DT10` @ `e3fe912`
+**Version:** v0.2 · **Ngày:** 2026-11-18 · **Chủ sở hữu:** `fls-test` *(R1 `KQ-198` · R2 `KQ-199`)* · **Nguồn:** `IncrementalStepPlan-FLS-Voi_v3.1.2.md` Step 27 · DT10 · `WO-196` · `BG-197` · nhánh `isp/DT10` @ `e3fe912`
 
 > **Luật của sổ:** sổ **chỉ THÊM**; vòng sau chỉ đổi ô `Trạng thái` của hàng đã có và thêm hàng mới.
 > Lớp: **A1** lỗi mã · **B1** lệch spec / thiếu bài · **B2** spec/ISP/hợp đồng sai — chuyển orchestrator. Mức: **CHẶN** · **NÊN SỬA** · **GHI NHẬN**.
@@ -35,6 +35,8 @@
 | `DT10-R1-03` | DT10 | R1 | B1 | GHI NHẬN | `tests/du_lieu/test_dap_an_atl.py:332` | Bài AC4 `…ghim_phan_bo` đọc `loi_mong`/`loi_theo_cot` **khai trong ảnh**, ⛔ đếm lại từ `dong`. Đột biến M10 *(đổi 1 ô `#N/A` thành `0`)* chỉ bị **checksum** cắn *(1 bài đỏ)*; luật `DT5-R1-04` vẫn giữ nhờ checksum, nhưng bài ghim phân bố không tự đo. | Thêm 1 phép đếm lại ô lỗi từ `anh["dong"]` so `loi_mong`. | — | Mở |
 | `DT10-R1-04` | DT10 | R1 | A1 | GHI NHẬN | `tools/dong_bang_sheet.py:866` | `KeyError` đo **thật**: bỏ khoá `y2026_m12` khỏi `LOI_MONG` ⇒ khuôn chạy ĐẠT nhưng crash ở dòng tổng kết, **exit 1 *(trùng mã cổng ĐỎ)*** *sau khi ảnh đã ghi*. Hướng **an toàn** *(đỏ giả, ⛔ xanh giả)*; khuôn `atl` đã khai đủ 57 cột. Mức: thấp. | Bước nhỏ riêng: `anh["loi_mong"].get(c2, 0)` — ⛔ sửa ở bước này *(sha ghim)*. | Bài khuôn thiếu khoá ⇒ lỗi có tên | Mở |
 | `DT10-R1-05` | DT10 | R1 | B1 | GHI NHẬN | `tools/khuon_dong_bang/atl.py` ① *(chọn hàng)* · `BG-197` §AC-3/4 | Nhãn Đ4: "**829** hàng" = hàng có ≥ 1 ô **khác rỗng kể cả `-`**; trong đó **5** hàng *(sheet 998–1002)* chỉ có `-` *(0 ô số)* ⇒ hàng **có giá trị** thật = **824**. Khớp `MONG_KY` *(824)*, ⛔ sai số; chỉ nhãn "829 hàng dữ liệu" thiếu chữ. | Ghi "829 = 824 hàng có giá trị + 5 hàng chỉ gạch" ở `ghi_chu`. | — | Mở |
+| `DT10-R2-01` | DT10 | R2 | B2 | GHI NHẬN | `fls/cau_hinh/luat_pb.py:48` (`DRIVER`) ↔ `ix_drv` cột `driver` | Cây gộp thử (+`C11`): `IX.ALR` **không có cột CDT1** (chỉ `{hd,tu_ky,nhan_mm,bat,ngoai_le}`); tên driver khác ảnh: ALR `PE`/`NOEM` ↔ ảnh `GI_PE`/`GI_PM`/`NOEM`. `NOEM` **trùng**; `PE` ↔ `GI_PE` **lệch tên**; `GI_PM` ⛔ HD nào tham chiếu *(D3: By GI ⇒ `PE`; H1000 ⇒ ⛔ qua ALLOCATE)*. 17 HD khớp *(8 By GI · 5 By NOEM · 4 H1000)*; 5 By NOEM = OFR·HCC·REC·BON·OGA; ngoại lệ `OFR`⇒`CAH` ∈ 7 CDT1 của ảnh. Khoá nối H12 = `(driver, cdt1)`. | H12 khai bảng ánh xạ `PE→GI_PE` *(+ quyết `GI_PM`)* và gắn với `-R1-02` *(CMN→SHQ1/SHQ2)*; ⛔ sửa ảnh. | Bài H12: mọi `DRIVER` của ALR ∈ tập `driver` của ảnh | Mở |
+| `DT10-R2-02` | DT10 | R2 | B1 | GHI NHẬN | `docs/ITL/04_Test/review/SO_PHAT_HIEN_ISP-3.1_DT10.md` *(R1)* · `tools/dung_moi_truong_isp.sh:420` | Gộp thử xung đột **2 tệp** *(script + bài ghim sàn)* như dự báo; giữ bản nhánh làm việc rồi nâng sàn = số THU THẬP cây gộp **3616** *(3585 + 29 bài DT10 + 2 lệch nền có từ trước, khớp lời nhánh DT10 "3559 đo ≠ 3557")*. Nhánh DT10 tự nâng `3588` ⇒ **sai** trên cây gộp. | Orchestrator khi gộp thật: đặt `3616` *(đo lại sau gộp)*. | Luật 17/11 giữ | Mở |
 
 ## Ghi chú kiểm *(⛔ phát hiện)*
 - Tập con `test_dap_an_atl.py` + `test_dung_moi_truong_isp.py` chạy riêng đỏ **1** bài `S0_R3_02` *(đếm bài THU THẬP toàn cây)* — đúng thiết kế, `--duong-nen` toàn bộ xanh.
@@ -44,3 +46,4 @@
 
 ## Changelog
 - **v0.1** *(2026-11-18, `fls-test` R1 của `DT10`, `KQ-198`)*: khởi tạo — **5** phát hiện `DT10-R1-01…05` *(**0 CHẶN** · **0 NÊN SỬA** · 5 GHI NHẬN: B2 ×2 · B1 ×2 · A1 ×1)*. Nguồn khớp **100 %** *(51.398 + 252 + 3.648 ô)*; đột biến **20/20 cắn**.
+- **v0.2** *(2026-11-18, `fls-test` R2 của `DT10`, `KQ-199`)*: THÊM **2** hàng `DT10-R2-01…02` *(**0 CHẶN** · **0 NÊN SỬA** · 2 GHI NHẬN)*. Cây gộp thử `isp/DT10` + nhánh làm việc `6afb0ce`: bài + cổng xanh; đột biến checksum ảnh ⇒ ĐỎ.
