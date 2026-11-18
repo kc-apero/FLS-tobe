@@ -31,3 +31,11 @@ Lỗi có tên ↔ bài: `ALR_HONG` · `KY_HONG` (7 ca) · `CAN_CDT1` · `BanHon
 ## Sàn Q8 & cổng cuối
 `MONG_PYTEST_TOAN_BO` **3466 → 3520** (+54) + bài ghim cùng commit; web 675 giữ.
 `--duong-nen --cong 5434` (một lần): **ĐẠT** — tập đỏ + XFAIL 28 = 28 (thêm 0 · bớt 0), chạy 3520 · web 3 = 3, 675. `lint-imports` 11 kept/0 broken · `soi_bang_tuyen` KHỚP 45 tuyến · `kiem_tai_lieu` ĐẠT.
+
+## Vòng sửa sau R1 (KQ-182)
+R1 = 0 CHẶN · 1 NÊN SỬA · 2 GHI NHẬN; người dùng đã duyệt sửa. Bài ĐỎ trước, XANH sau.
+- **`C11-R1-01` (NÊN SỬA) — ĐÃ SỬA.** `nap_ix_alr` nay TÍCH LUỸ: bản mới = dòng bản liền trước + dòng lần này (cùng `hd@tu_ky` ⇒ bản mới thắng, ⛔ nhân đôi). Kho vẫn chỉ-thêm, ⛔ di trú. Bản liền trước đọc KHÔNG ra *(SQL tay)* ⇒ ⛔ chở theo, bản tốt kế tiếp thắng. Bài `test_C11_R1_01_hieu_luc_TICH_LUY_…` đi qua `nap` 2 lần *(202501 → 202507)*: đỏ trước đúng kịch bản R1 *(`tu_ky` chỉ còn `{202507}`)*; xanh sau: `luat_cua("LC", 202503)` = bản 202501, `("LC", 202508)` = bản 202507, 34 dòng *(17 HD × 2 mốc)*.
+- **`C11-R1-03` (GHI NHẬN, làm kèm) — ĐÃ SỬA.** `cdt1` rỗng/khoảng trắng = THIẾU ⇒ `CAN_CDT1`; `kiem` từ chối `ngoai_le` ≠ [] ở HD ngoài `NGOAI_LE_AP` *(chỉ `OFR`)* — lỗi có tên. 9 bài mới, 7 ca đỏ trước.
+- **`C11-R1-02` (GHI NHẬN) — ⇒ backlog** *(Scope "ghi chú ATL B2:C4": orchestrator bỏ hoặc giao bước sau)*.
+- **Sàn Q8:** `MONG_PYTEST_TOAN_BO` **3520 → 3530** (+10 = 9 `test_luat_pb.py` + 1 `test_luat_pb_pg.py`) + bài ghim cùng commit; web 675 giữ.
+- **Cổng:** `--duong-nen --cong 5434` (một lần): **ĐẠT** — tập đỏ + XFAIL 28 = 28 (thêm 0 · bớt 0), chạy 3530; web 3 = 3, 675. `lint-imports` 11 kept/0 broken.
