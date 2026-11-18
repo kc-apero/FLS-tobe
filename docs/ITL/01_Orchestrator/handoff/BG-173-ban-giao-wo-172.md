@@ -29,3 +29,11 @@ Lệnh đỏ: `pytest tests/cau_hinh/test_vendor.py tests/cau_hinh/test_vendor_p
 `MONG_PYTEST_TOAN_BO` **3407 → 3447** (+40) + bài ghim cùng commit; web 675 giữ.
 `--duong-nen --cong 5434` (một lần): chạy **3447**, tests/web ĐẠT; toàn bộ **ĐỎ** vì tập đỏ đo 29 vs đường nền 28 — node thêm = `test_C5R1_05…` (do mục 2, đã sửa; chạy riêng `tests/cau_hinh` + tuyến + `test_dung_moi_truong_isp` ⇒ 265 xanh; ⛔ chạy lại `--duong-nen` lần hai theo lệnh). `lint-imports` 11 kept/0 broken · `soi_bang_tuyen` KHỚP · `kiem_tai_lieu` ĐẠT.
 Ghi chú: `CLAUDE.md` còn ghi "37 tuyến" — số sống nay 38 (⛔ sửa ở đây).
+
+## Vòng sửa sau R1 (KQ-174)
+R1 = 0 CHẶN · **1** NÊN SỬA `C9-R1-01` · 3 GHI NHẬN `C9-R1-02…04` ⇒ backlog *(⛔ làm, theo lệnh orchestrator)*.
+- **`C9-R1-01` — ĐÃ SỬA** *(commit `5ed5ed2`)*: `test_C5R1_05` đổi `IX.DRV` → **`IX.ALR`** *(bang HỢP LỆ, chưa kiểm riêng, ⛔ bài nào đo rỗng; grep `tests/` + `fls/` `IX.ALR` = chỉ danh mục `BANG_HOP_LE`)*. `IX.DRV` trả về đúng vai *"giữ rỗng"* của `test_AC5_…` + `test_C5R1_03` *(chú thích cả ba bài ghi rõ)*. Quyết định 2 ở trên **được thay**: bảng mẫu là `IX.ALR`, ⛔ `IX.DRV`.
+- **Đột biến R1 nay ĐỎ**: `ORDER BY phien_ban DESC` → `ASC` ở `cau_hinh_repo.py:256` *(`khong_doi` so bản ĐẦU)* ⇒ `test_C5R1_05` `1 failed, 17 passed`; trả nguyên ⇒ `18 passed`. Chạy đảo thứ tự `C5R1_05` → `AC5` ⇒ `2 passed` *(hết ghép nối ẩn)*.
+- Q8: ⛔ thêm bài ⇒ sàn `MONG_PYTEST_TOAN_BO` giữ **3447**.
+- Cổng: `--duong-nen --cong 5434` — số bài đỏ nay **28 = 28** đường nền *(thêm 0 · bớt 0; trước vòng sửa là 29)*; chạy **3447** (≥ sàn) · web **3 = 3** *(675 bài)* · `lint-imports` 11 kept/0 broken · KẾT **ĐẠT**. *(Lần chạy đầu bị cắt ở giai đoạn web vì timeout công cụ của phiên — chạy lại MỘT lần trọn.)*
+- `C9-R1-02…04`: ⛔ đụng — chờ backlog/gộp.
