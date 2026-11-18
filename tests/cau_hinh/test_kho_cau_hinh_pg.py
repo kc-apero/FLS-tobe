@@ -19,12 +19,13 @@ from __future__ import annotations
 
 import json
 import os
+from datetime import datetime, timezone
 from pathlib import Path
 
 import psycopg
 import pytest
 
-from fls.cau_hinh import fx
+from fls.cau_hinh import fx, hd
 from fls.db.kho import dsn_test
 from fls.repo import cau_hinh_repo as chr
 
@@ -179,3 +180,117 @@ def test_AC6b_hd_va_mm_la_HAI_bang_config_RIENG(conn):
     """Cây ATL *(`IX.HD`)* và Mapping Master *(`IX.HD · IX.ORG`)* phiên bản ĐỘC LẬP."""
     assert chr.BANG_HD == "IX.HD" and chr.BANG_MM == "IX.HD · IX.ORG"
     assert chr.BANG_HD in chr.BANG_HOP_LE and chr.BANG_MM in chr.BANG_HOP_LE
+
+
+# ══ Vòng sửa sau R1 (KQ-144) ══════════════════════════════════════════════════════
+#
+# Bốn NÊN SỬA + hai GHI NHẬN của `KQ-144` *(sổ: docs/ITL/04_Test/review/
+# SO_PHAT_HIEN_ISP-3.1_C5.md)*. Mỗi bài GHI đột biến R1 nó giết *(Đ5: cổng mới được
+# chứng minh ĐỎ — phá nguồn, chạy, xem cắn, trả nguyên)*.
+def _dem(conn, bang: str) -> tuple[int, int]:
+    """`(#ban, #dong)` của một `bang` — đo MỨC, ⛔ hằng *(kho dùng chung, chỉ-thêm)*."""
+    with conn.cursor() as cur:
+        cur.execute("SELECT count(*) FROM fls_cau_hinh_ban WHERE bang = %s", (bang,))
+        nb = int(cur.fetchone()[0])
+        cur.execute("SELECT count(*) FROM fls_cau_hinh_dong d JOIN fls_cau_hinh_ban b "
+                    "ON b.ban_id = d.ban_id WHERE b.bang = %s", (bang,))
+        nd = int(cur.fetchone()[0])
+    return nb, nd
+
+
+# ── C5-R1-02 · MM canh NỘI DUNG `gia_tri` *(tập khoá)*, ⛔ chỉ đếm hàng ────────────
+def test_C5R1_02_MM_gia_tri_DUNG_tap_khoa_hd_code_thu_tu_KHONG_bang_phu_tho(conn):
+    """Giết R1-M8′ *(ghi thêm `"tho": anh["phu"]["tho"]` vào MỖI `gia_tri` — vẫn 73
+    hàng ⇒ bài đếm hàng SỐNG)*. AC-6b: kho **chỉ** lưu khoá cần cho tuyến ⇒ tập khoá
+    của mỗi `gia_tri` phải ĐÚNG `{hd_code, thu_tu}`, và `gia_tri::text` ⛔ mang `tho`.
+    `Đ3`: 73 hàng *(tập ⛔ rỗng)* rồi mới kết luận."""
+    anh = json.loads(ANH_MM.read_text(encoding="utf-8"))
+    assert "tho" in anh.get("phu", {}), "⛔ tiền đề: ảnh MM có bảng phụ tho"
+    ban = chr.nap_mapping_master(conn, str(ANH_MM), actor="ke.toan")
+    with conn.cursor() as cur:
+        cur.execute(
+            "SELECT khoa, gia_tri, gia_tri::text FROM fls_cau_hinh_dong WHERE ban_id = "
+            "(SELECT ban_id FROM fls_cau_hinh_ban WHERE bang = %s AND phien_ban = %s)",
+            (chr.BANG_MM, ban.phien_ban))
+        hang = cur.fetchall()
+    assert len(hang) == 73, f"⛔ MM lưu ĐÚNG 73 hd_code, đo {len(hang)}"
+    for khoa, gt, gt_text in hang:
+        assert set(gt) == {"hd_code", "thu_tu"}, (khoa, sorted(gt))
+        assert "tho" not in gt_text, (khoa, gt_text)
+
+
+# ── C5-R1-03 · "đủ-hoặc-không" ĐẾM hai bảng trước/sau nạp HỎNG giữa chừng ──────────
+def test_C5R1_03_du_hoac_khong_DEM_hai_bang_quanh_nap_hong_giua_chung(conn):
+    """Giết R1-M7 *(`with conn.transaction()` → `if True:` trên kết nối autocommit ⇒
+    bản DỞ — một `fls_cau_hinh_ban`, 0 `_dong` — thành bản MỚI NHẤT)*. Nạp một `cap`
+    QUA được phép kiểm nội dung nhưng NỔ khi ghi dòng *(`gia_tri` chứa `set` ⛔
+    serialize ⇒ `json.dumps` NÉM `TypeError` SAU khi `ban` đã INSERT)* ⇒ `(ban, dong)`
+    trước = sau. `Đ5`: ⛔ chỉ `raises`, mà ĐẾM hai bảng."""
+    bang = "IX.DRV"       # bang HỢP LỆ ⛔ bước nào dùng — nạp luôn HỎNG ⇒ giữ rỗng
+    truoc = _dem(conn, bang)
+    with pytest.raises(TypeError):
+        chr.nap(conn, bang, [("A", {"ok": 1}), ("B", {"xau": {1, 2}})],
+                nguon="x", actor="z")
+    assert _dem(conn, bang) == truoc, (
+        f"⛔ nạp hỏng giữa chừng để lại bản DỞ: trước {truoc}, sau {_dem(conn, bang)}")
+
+
+# ── C5-R1-04 · `nap` công khai KIỂM nội dung TRƯỚC khi ghi *(kho chỉ-thêm ⛔ lùi)* ──
+def test_C5R1_04_nap_TU_CHOI_ban_FX_RONG_truoc_khi_ghi(conn):
+    """Kho chỉ-thêm ⛔ có đường lùi ⇒ một bản RỖNG thành bản mới nhất ⛔ xoá được.
+    `nap(IX.FX, [])` ⇒ lỗi CÓ TÊN *(khuôn ⓑ)*, và ⛔ ghi phiên bản mới."""
+    v0 = _max_phien(conn, fx.BANG)
+    with pytest.raises((chr.LoiCauHinh, fx.LoiFX)):
+        chr.nap(conn, fx.BANG, [], nguon="x", actor="z")
+    assert _max_phien(conn, fx.BANG) == v0, "⛔ bản rỗng ⇒ KHÔNG ghi phiên bản mới"
+
+
+def test_C5R1_04_nap_TU_CHOI_hd_ban_BAN_truoc_khi_ghi(conn):
+    """Ảnh HD thiếu trường *(chỉ `ten`)* ⇒ `nap` NỔ `LoiHD` CÓ TÊN *(⛔ ghi rồi mới
+    KeyError lúc ĐỌC)*, và ⛔ tăng phiên bản."""
+    v0 = _max_phien(conn, chr.BANG_HD)
+    with pytest.raises(hd.LoiHD):
+        chr.nap(conn, chr.BANG_HD, [("ZZ", {"ten": "x"})], nguon="x", actor="z")
+    assert _max_phien(conn, chr.BANG_HD) == v0
+
+
+def test_C5R1_04_tai_dung_fx_ban_RONG_ra_LoiFX():
+    """Lõi đọc `_fx_tu_cap([])` ⇒ `fx.LoiFX` *(thang_dau=None)* — kiểm cả lúc ĐỌC."""
+    with pytest.raises(fx.LoiFX):
+        chr._fx_tu_cap([], nguon="x")
+
+
+def test_C5R1_04_tai_dung_hd_ban_BAN_ra_LoiHD_khong_KeyError():
+    """`_hd_tu_cap` dựng lại CAP bằng `.get()` + `hd.kiem` ⇒ bản thiếu `cha` ra
+    `LoiHD` *(có TÊN)*, ⛔ `KeyError: 'cha'` *(nguyên nhân 500 FLS-INTERNAL ở R1)*."""
+    with pytest.raises(hd.LoiHD):
+        chr._hd_tu_cap([("ZZ", {"ten": "x"})], nguon="x")
+
+
+def test_C5R1_04_doc_hd_ban_HONG_ra_BanHong_CO_TEN_khong_KeyError(monkeypatch):
+    """Nếu LỠ có bản bẩn trong kho *(ghi thẳng SQL, ⛔ qua `nap`)*, `doc_hd` phải ra
+    `BanHong` *(mã `FLS-CAUHINH-BAN-HONG`)*, ⛔ `KeyError`. Bơm `_doc_ban` trả một bản
+    thiếu trường ⇒ ⛔ đầu độc `fls_test` dùng chung bằng một bản bẩn THẬT."""
+    hong = chr.BanCauHinh(bang=chr.BANG_HD, phien_ban=9_999, nguon="x", checksum="x",
+                          luc=datetime(2026, 1, 1, tzinfo=timezone.utc), actor="x",
+                          khong_doi=False, dong=(("ZZ", {"ten": "x"}),))
+    monkeypatch.setattr(chr, "_doc_ban", lambda _c, _b: hong)
+    with pytest.raises(chr.BanHong) as e:
+        chr.doc_hd(None)
+    assert e.value.ma == "FLS-CAUHINH-BAN-HONG"
+
+
+# ── C5-R1-05 · GHI NHẬN: `khong_doi` so bản LIỀN TRƯỚC *(⛔ bản đầu)* ───────────────
+def test_C5R1_05_khong_doi_so_ban_LIEN_TRUOC_khong_phai_ban_DAU(conn):
+    """Giết R1-M4 *(`khong_doi` so với bản ĐẦU thay bản kề trước ⇒ SỐNG khi nạp < 3
+    lần)*. Nạp A, B, A: bản thứ ba KHÁC bản kề trước *(B)* ⇒ `khong_doi=False`; chỉ so
+    bản ĐẦU *(A)* mới nhầm thành True."""
+    bang = "IX.VEN"
+    A = [("x", {"v": "1"})]
+    B = [("x", {"v": "2"})]
+    chr.nap(conn, bang, A, nguon="n", actor="a")
+    b2 = chr.nap(conn, bang, B, nguon="n", actor="a")
+    b3 = chr.nap(conn, bang, A, nguon="n", actor="a")
+    assert b2.khong_doi is False, "⛔ B khác A ⇒ khong_doi=False"
+    assert b3.khong_doi is False, (
+        "⛔ A(3) khác B(2) kề trước ⇒ False; chỉ so bản ĐẦU (A) mới nhầm True")

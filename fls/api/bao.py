@@ -61,6 +61,12 @@ MA_LOI: dict[str, tuple[int, str]] = {
     "FLS-CAUHINH-BANG-LA": (404, "bang config ⛔ co trong danh muc (nguon la)"),
     "FLS-CAUHINH-CHUA-KHAI": (
         409, "bang config CO nhung ⛔ chua ai nap no — ⛔ roi ve anh tinh"),
+    # ⭐⭐ `C5-R1-04`: bang CO, da nap, nhung ban moi nhat ⛔ DOC ra duoc (thieu
+    #    truong / sai hinh — chi toi khi co ban ghi THANG SQL ⛔ qua `nap`, vi `nap`
+    #    nay kiem noi dung TRUOC khi ghi). **500 CO TEN** ⛔ `FLS-INTERNAL` tron: mot
+    #    vet ngan xep / `KeyError` giau mat day la **du lieu kho hong**, ⛔ loi may.
+    "FLS-CAUHINH-BAN-HONG": (
+        500, "ban config trong kho ⛔ doc ra duoc — co ban ghi thang ⛔ qua `nap`?"),
     # ⭐⭐ `QĐ-ITL-110` — lan ANH CHUP. HAI ma, ⛔ KHONG mot, va cung ly do da
     #    tach `FLS-NGUON-LA` (404) khoi `FLS-KHAI-KHONG-CO` (409):
     #      · ⛔ khong co anh chup ay          → **404**, di sua `chup_id`;

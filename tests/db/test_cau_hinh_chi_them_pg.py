@@ -124,3 +124,37 @@ def test_dong_FK_ban_KHONG_co_that_BI_CHAN(conn):
         with pytest.raises(psycopg.errors.ForeignKeyViolation):
             cur.execute("INSERT INTO fls_cau_hinh_dong (ban_id, khoa, gia_tri) "
                         "VALUES (%s,'k',%s)", (10**15, '{}'))
+
+
+# ══ Vòng sửa sau R1 (KQ-144) ══════════════════════════════════════════════════════
+def test_C5R1_05_luc_xap_xi_now_KHONG_phai_hang_chet(conn):
+    """GHI NHẬN `C5-R1-05`: giết R1-M24 *(`DEFAULT now()` → `'2000-01-01'` ⇒ `luc`
+    thành hằng CHẾT mà bài `is not None` ⛔ bắt)*. `luc` do MÁY đặt ⇒ phải XẤP XỈ
+    `now()` của chính kho *(cùng chiều `fls_khai_cot.hieu_luc_tu`)*."""
+    with conn.cursor() as cur:
+        bid, _ = _mot_ban(cur)
+        cur.execute("SELECT luc, now() FROM fls_cau_hinh_ban WHERE ban_id = %s", (bid,))
+        luc, bay_gio = cur.fetchone()
+    assert abs((bay_gio - luc).total_seconds()) < 300, (luc, bay_gio)
+
+
+def test_C5R1_06_pg_verify_BAT_khi_trigger_bi_TAT(conn):
+    """GHI NHẬN `C5-R1-06`: chủ bảng *(⛔ superuser)* `ALTER TABLE … DISABLE TRIGGER`
+    rồi UPDATE/DELETE — một LỐI VÒNG qua `INV-I08`. ⛔ sửa quyền ở bước này; chỉ đòi
+    `pg_verify` **BẮT** mọi trigger người dùng bị TẮT *(Đ5 hai chiều: tắt ⇒ đỏ, bật
+    lại ⇒ ⛔ đỏ nhầm)*."""
+    from fls.db import pg_verify
+    tt = "trg_fls_cau_hinh_dong_chi_them"
+
+    def _tat_trong_lech():
+        return [x for x in pg_verify.so_sanh_voi_db(conn) if tt in x and "TAT" in x]
+
+    assert _tat_trong_lech() == [], "⛔ tiền đề: trigger đang BẬT"
+    with conn.cursor() as cur:
+        cur.execute(f"ALTER TABLE fls_cau_hinh_dong DISABLE TRIGGER {tt}")
+    try:
+        assert _tat_trong_lech(), "⛔ pg_verify ⛔ bắt trigger bị TẮT"
+    finally:
+        with conn.cursor() as cur:
+            cur.execute(f"ALTER TABLE fls_cau_hinh_dong ENABLE TRIGGER {tt}")
+    assert _tat_trong_lech() == [], "⛔ bật lại ⇒ ⛔ còn đỏ"

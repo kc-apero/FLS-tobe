@@ -1049,6 +1049,9 @@ def ty_gia(yc: YeuCau):
         raise LoiCua("FLS-CAUHINH-CHUA-KHAI", str(e)) from e
     except chc.BangLa as e:      # ⛔ xảy ra (`bang` cố định) — ⛔ nuốt lỗi
         raise LoiCua("FLS-CAUHINH-BANG-LA", str(e)) from e
+    except chc.BanHong as e:     # bản bẩn ⇒ lỗi CÓ TÊN, ⛔ 500 FLS-INTERNAL (C5-R1-04)
+        raise LoiCua("FLS-CAUHINH-BAN-HONG",
+                     "ban cau hinh trong kho ⛔ doc ra duoc — bao nguoi dung he") from e
     return {"bang": fx.BANG, "nguon": b.nguon,
             "ky": [{"yyyymm": d.yyyymm,
                     **{te: d.ty_gia[te] for te in fx.TIEN_TE},
@@ -1093,6 +1096,9 @@ def cay_hd(yc: YeuCau):
         raise LoiCua("FLS-CAUHINH-CHUA-KHAI", str(e)) from e
     except chc.BangLa as e:      # ⛔ xảy ra (`bang` cố định) — ⛔ nuốt lỗi
         raise LoiCua("FLS-CAUHINH-BANG-LA", str(e)) from e
+    except chc.BanHong as e:     # bản bẩn ⇒ lỗi CÓ TÊN, ⛔ 500 FLS-INTERNAL (C5-R1-04)
+        raise LoiCua("FLS-CAUHINH-BAN-HONG",
+                     "ban cau hinh trong kho ⛔ doc ra duoc — bao nguoi dung he") from e
     atl_ma = {n.ma for n in cay.nut}
     return {"bang": hd.BANG, "nguon": cay.nguon, "nguon_mm": mm.nguon,
             "so_atl": len(cay.nut), "so_mapping_master": len(mm.ma),

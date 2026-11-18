@@ -410,6 +410,21 @@ def test_AC5_handler_dich_ChuaKhai_409_va_BangLa_404_KHONG_roi_ve_anh_tinh(monke
     assert e2.value.ma == "FLS-CAUHINH-BANG-LA" and bao.MA_LOI[e2.value.ma][0] == 404
 
 
+# ══ Vòng sửa sau R1 (KQ-144) ══════════════════════════════════════════════════════
+#
+# `C5-R1-04`: một bản `IX.FX` BẨN trong kho *(ghi thẳng SQL, ⛔ qua `nap`)* ⇒ tuyến
+# ra lỗi CÓ TÊN, ⛔ `500 FLS-INTERNAL`. Sổ: SO_PHAT_HIEN_ISP-3.1_C5.md.
+def test_C5R1_04_handler_ty_gia_BAN_HONG_loi_CO_TEN_khong_500(monkeypatch):
+    """`doc_fx` ra `BanHong` ⇒ `ty_gia` dịch `LoiCua FLS-CAUHINH-BAN-HONG` *(500 có
+    TÊN)*, ⛔ lọt `except Exception` ⇒ `FLS-INTERNAL` *(R1: `LoiFX` trần ⇒ 500 câm)*."""
+    from fls.api import bao, xu_ly
+    yc = xu_ly.YeuCau(conn=None, pv=xu_ly.pham_vi_cua_yeu_cau({}), q={}, tham={})
+    monkeypatch.setattr(chc, "doc_fx", _nem(chc.BanHong("ban IX.FX hong")))
+    with pytest.raises(xu_ly.LoiCua) as e:
+        xu_ly.ty_gia(yc)
+    assert e.value.ma == "FLS-CAUHINH-BAN-HONG" and bao.MA_LOI[e.value.ma][0] == 500
+
+
 # ══ Vòng sửa sau R2 (`KQ-078`) ══════════════════════════════════════════════
 #
 # ⛔⛔ Vì sao khối này tồn tại: R2 đột biến bản sao `59d4a39` — **7** đột biến SỐNG trên

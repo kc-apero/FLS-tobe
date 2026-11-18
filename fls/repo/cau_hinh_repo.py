@@ -81,6 +81,18 @@ class ChuaKhai(LoiCauHinh):
     ma = "FLS-CAUHINH-CHUA-KHAI"
 
 
+class BanHong(LoiCauHinh):
+    """Một bản config trong kho **⛔ ĐỌC ra được** *(thiếu trường · sai hình)* — **500
+    CÓ TÊN**, ⛔ `KeyError`/`FLS-INTERNAL` trần *(`C5-R1-04`)*.
+
+    ⛔ xảy ra qua `nap` *(nay kiểm nội dung TRƯỚC khi ghi — kho chỉ-thêm ⛔ có đường
+    lùi)*; chỉ tới khi có bản ghi **THẲNG SQL** ⛔ qua `nap`. Phục hồi = nạp một bản
+    TỐT kế tiếp *(bản mới nhất thắng)*. Tuyến dịch mã này ⇒ người dựng hệ biết đây là
+    **dữ liệu kho hỏng**, ⛔ một lỗi máy ngẫu nhiên."""
+
+    ma = "FLS-CAUHINH-BAN-HONG"
+
+
 @dataclass(frozen=True)
 class BanCauHinh:
     """Một lần nạp *(một `phien_ban`)* của một `bang`, kèm các dòng theo thứ tự ghi."""
@@ -114,6 +126,83 @@ def _soi_bang(bang: str) -> None:
             "*'chưa khai'*" % (bang, sorted(BANG_HOP_LE)))
 
 
+# ── Dựng lại ĐỐI TƯỢNG miền từ `cap` đã lưu — DÙNG CHUNG cho ① `nap` *(kiểm TRƯỚC khi
+#    ghi — kho chỉ-thêm ⛔ có đường lùi)* và ② `doc_fx`/`doc_hd` *(kiểm cả lúc ĐỌC —
+#    khuôn `khai_cot.doc_khai`)*. MỘT lõi, ⛔ hai bản kiểm *(docstring tệp)*. `.get()` ⇒
+#    bản thiếu trường ra `LoiFX`/`LoiHD` CÓ TÊN, ⛔ `KeyError` trần *(`C5-R1-04`)*.
+def _fx_tu_cap(cap: Iterable[tuple[str, Any]], nguon: str) -> fx.BangFX:
+    thang_dau: Any = None
+    dong: list[Any] = []
+    for khoa, gt in cap:
+        if khoa == _THANG_DAU:
+            thang_dau = gt                        # fx.kiem tự kiểm (None ⇒ LoiFX)
+        elif isinstance(gt, Mapping):
+            dong.append({"yyyymm": khoa, **gt})
+        else:
+            dong.append(gt)                       # ⛔ Mapping ⇒ fx.kiem bắt "⛔ đối tượng"
+    return fx.kiem(dong, thang_dau=thang_dau, nguon=nguon)
+
+
+def _hd_tu_cap(cap: Iterable[tuple[str, Any]], nguon: str) -> hd.CayHD:
+    dong: list[Any] = []
+    for k, v in cap:
+        if not isinstance(v, Mapping):
+            dong.append(v)                        # ⛔ Mapping ⇒ hd.kiem bắt "⛔ đối tượng"
+            continue
+        r = {"ma": k, "ten": v.get("ten"), "cha": v.get("cha"),
+             "cap": v.get("cap"), "nhom": v.get("nhom"),
+             "dong_sheet": v.get("dong_sheet")}
+        if "thu_tu" in v:                         # `thu_tu` TÙY CHỌN ở `hd.kiem`
+            r["thu_tu"] = v["thu_tu"]
+        dong.append(r)
+    return hd.kiem(dong, nguon=nguon)
+
+
+def _kiem_mm(cap: Iterable[tuple[str, Any]]) -> None:
+    """MM ⛔ có lõi `kiem` dựng-lại riêng *(`hd.doc_mm_van_ban` ăn VĂN BẢN)* ⇒ kiểm HÌNH
+    đã lưu: mỗi `gia_tri` ĐÚNG tập khoá `{hd_code, thu_tu}`, `hd_code` ⛔ rỗng, `thu_tu`
+    là số *(AC-6b: ⛔ ô bảng phụ `tho` lọt vào kho)*."""
+    loi: list[str] = []
+    for m, v in cap:
+        if not isinstance(v, Mapping) or set(v) != {"hd_code", "thu_tu"}:
+            loi.append("%r: `gia_tri` phải đúng {hd_code, thu_tu}, đo %r"
+                       % (m, sorted(v) if isinstance(v, Mapping) else type(v).__name__))
+            continue
+        if not str(v.get("hd_code") or "").strip():
+            loi.append("%r: hd_code rỗng" % m)
+        try:
+            int(v["thu_tu"])
+        except (TypeError, ValueError):
+            loi.append("%r: thu_tu ⛔ số: %r" % (m, v.get("thu_tu")))
+    if loi:
+        raise LoiCauHinh("⛔ ảnh Mapping Master sai hình:\n  - " + "\n  - ".join(loi))
+
+
+def _kiem_noi_dung(bang: str, cap: list[tuple[str, Any]]) -> None:
+    """⛔ GHI một bản RỖNG/BẨN — kiểm **TRƯỚC** khi chạm kho *(khuôn ⓑ; kho chỉ-thêm
+    ⛔ có đường lùi ⇒ một bản ghi sai là **vĩnh viễn** và thành bản MỚI NHẤT ⛔ xoá
+    được)*. Dùng lại CHÍNH `fx.kiem`/`hd.kiem` *(⛔ một bản kiểm thứ hai)*; `bang` khác
+    chỉ kiểm HÌNH chung *(rỗng · khoá rỗng · khoá trùng)*."""
+    if not cap:
+        raise LoiCauHinh(
+            "⛔ nạp bản RỖNG cho %r — kho chỉ-thêm ⛔ nhận bản 0 dòng *(nó sẽ thành bản "
+            "mới nhất, một mặc định im lặng ⛔ xoá được — khuôn ⓓ)*" % bang)
+    khoa = [k for k, _ in cap]
+    if any(not str(k or "").strip() for k in khoa):
+        raise LoiCauHinh("⛔ có khoá RỖNG trong bản nạp %r" % bang)
+    trung = sorted({k for k in khoa if khoa.count(k) >= 2})
+    if trung:
+        raise LoiCauHinh(
+            "⛔ khoá TRÙNG %s trong một bản %r — hai câu trả lời cho một câu hỏi "
+            "*(cùng luật `UNIQUE(ban_id, khoa)`)*" % (trung, bang))
+    if bang == BANG_FX:
+        _fx_tu_cap(cap, nguon="(kiem truoc khi ghi)")
+    elif bang == BANG_HD:
+        _hd_tu_cap(cap, nguon="(kiem truoc khi ghi)")
+    elif bang == BANG_MM:
+        _kiem_mm(cap)
+
+
 def nap(conn, bang: str, cap: list[tuple[str, Any]], *,
         nguon: str, actor: str) -> BanCauHinh:
     """Ghi một phiên bản MỚI của `bang`. ⛔ Sửa bản cũ *(trigger chặn)*.
@@ -128,6 +217,10 @@ def nap(conn, bang: str, cap: list[tuple[str, Any]], *,
         raise LoiCauHinh(
             "⛔ thiếu `actor`. Nạp config là **hành vi của người** — một bản nạp "
             "⛔ ai đứng tên thì ⛔ ai giải thích được vì sao config lại đổi")
+    # ⛔⛔ Kho chỉ-thêm ⛔ có đường lùi ⇒ KIỂM nội dung TRƯỚC khi chạm kho *(`C5-R1-04`:
+    #    `nap` công khai từng nhận bản rỗng/bẩn ⇒ bản mới nhất ⛔ xoá được, rồi `doc_*`
+    #    nổ `KeyError`/`500` lúc đọc)*. Dùng lại `fx.kiem`/`hd.kiem`.
+    _kiem_noi_dung(bang, cap)
 
     checksum = _checksum(bang, cap)
     with conn.transaction():
@@ -213,16 +306,15 @@ def nap_ix_fx(conn, duong: str, *, actor: str, thang_dau: int,
 
 def doc_fx(conn) -> fx.BangFX:
     """`IX.FX` phiên bản mới nhất, dựng lại **qua `fx.kiem`** *(kiểm cả lúc ĐỌC —
-    khuôn `khai_cot.doc_khai`)*. `ChuaKhai` nếu kho rỗng."""
+    khuôn `khai_cot.doc_khai`)*. `ChuaKhai` nếu kho rỗng; bản BẨN ⇒ `BanHong` CÓ TÊN
+    *(⛔ `LoiFX` trần lọt tuyến thành `500 FLS-INTERNAL` — `C5-R1-04`)*."""
     ban = _doc_ban(conn, BANG_FX)
-    thang_dau: int | None = None
-    dong: list[Mapping[str, Any]] = []
-    for khoa, gt in ban.dong:
-        if khoa == _THANG_DAU:
-            thang_dau = int(gt)
-        else:
-            dong.append({"yyyymm": int(khoa), **gt})
-    return fx.kiem(dong, thang_dau=thang_dau, nguon=ban.nguon)
+    try:
+        return _fx_tu_cap(ban.dong, ban.nguon)
+    except fx.LoiFX as e:
+        raise BanHong(
+            "⛔ bản `IX.FX` phiên bản %s trong kho ⛔ ĐỌC ra được *(⛔ qua `nap`?)*"
+            % ban.phien_ban) from e
 
 
 # ── IX.HD — cây hợp đồng (ATL) ────────────────────────────────────────────────
@@ -239,13 +331,16 @@ def nap_ix_hd(conn, duong: str, *, actor: str,
 
 
 def doc_hd(conn) -> hd.CayHD:
-    """`IX.HD` phiên bản mới nhất, dựng lại **qua `hd.kiem`**. `ChuaKhai` nếu rỗng."""
+    """`IX.HD` phiên bản mới nhất, dựng lại **qua `hd.kiem`**. `ChuaKhai` nếu rỗng; bản
+    BẨN *(thiếu trường)* ⇒ `BanHong` CÓ TÊN *(⛔ `KeyError: 'cha'` ⇒ `500 FLS-INTERNAL`
+    — `C5-R1-04`)*."""
     ban = _doc_ban(conn, BANG_HD)
-    dong = [{"ma": k, "ten": v["ten"], "cha": v["cha"], "cap": v["cap"],
-             "nhom": v["nhom"], "dong_sheet": v["dong_sheet"],
-             "thu_tu": v["thu_tu"]}
-            for k, v in ban.dong]
-    return hd.kiem(dong, nguon=ban.nguon)
+    try:
+        return _hd_tu_cap(ban.dong, ban.nguon)
+    except hd.LoiHD as e:
+        raise BanHong(
+            "⛔ bản `IX.HD` phiên bản %s trong kho ⛔ ĐỌC ra được *(⛔ qua `nap`?)*"
+            % ban.phien_ban) from e
 
 
 # ── IX.HD · IX.ORG — Mapping Master ───────────────────────────────────────────
@@ -282,5 +377,11 @@ def doc_mm(conn) -> KhoMM:
     """Mã HD của Mapping Master *(phiên bản mới nhất, theo thứ tự ảnh)* — `C4` DÙNG
     để LIỆT KÊ chênh với ATL. `ChuaKhai` nếu rỗng."""
     ban = _doc_ban(conn, BANG_MM)
-    xep = sorted(ban.dong, key=lambda kv: int(kv[1].get("thu_tu", 0)))
-    return KhoMM(nguon=ban.nguon, ma=tuple(k for k, _ in xep))
+    try:
+        xep = sorted(ban.dong, key=lambda kv: int(kv[1]["thu_tu"]))
+        ma = tuple(k for k, _ in xep)
+    except (KeyError, TypeError, ValueError, AttributeError) as e:
+        raise BanHong(
+            "⛔ bản Mapping Master phiên bản %s trong kho ⛔ ĐỌC ra được "
+            "*(⛔ qua `nap`?)*" % ban.phien_ban) from e
+    return KhoMM(nguon=ban.nguon, ma=ma)

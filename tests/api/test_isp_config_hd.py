@@ -261,3 +261,57 @@ def test_AC5_handler_cay_hd_dich_ChuaKhai_409_va_BangLa_404(monkeypatch):
     with pytest.raises(xu_ly.LoiCua) as e2:
         xu_ly.cay_hd(yc)
     assert e2.value.ma == "FLS-CAUHINH-BANG-LA" and bao.MA_LOI[e2.value.ma][0] == 404
+
+
+# ══ Vòng sửa sau R1 (KQ-144) ══════════════════════════════════════════════════════
+#
+# `C5-R1-01` *(AC-8 còn nợ `C4-R3-01` · `C4-R3-02`)* + `C5-R1-04` *(bản bẩn ⇒ lỗi CÓ
+# TÊN, ⛔ 500)*. Sổ: docs/ITL/04_Test/review/SO_PHAT_HIEN_ISP-3.1_C5.md.
+
+
+# ── C5-R1-01 · AC-8 `C4-R3-01`: ghim GIÁ TRỊ ten/nhom/dong_sheet của nút THẬT ──────
+@pytest.mark.pg
+def test_C4_R3_01_GET_config_hd_GHIM_ten_nhom_dong_sheet_nut_that(may):
+    """Giết R1-M13 *(`"ten": n.ma`)* · R1-M14 *(`"nhom": n.ten`)* và đột biến
+    `"dong_sheet"`. Ghim GIÁ TRỊ *(⛔ chỉ tập khoá — `Đ3`/`Đ4`: mỗi số nói nó đếm gì)*
+    của hai nút THẬT, đo trên ảnh DT3 qua `hd.doc_van_ban`: OPC · GI."""
+    ma, r = _goi(may, DUONG)
+    assert ma == 200, (ma, r)
+    tm = {n["ma"]: n for n in r["data"]["nut"]}
+    assert (tm["OPC"]["ten"], tm["OPC"]["nhom"], tm["OPC"]["dong_sheet"]) == \
+        ("Operating Cost", "HDO", "9"), tm["OPC"]
+    assert (tm["GI"]["ten"], tm["GI"]["nhom"], tm["GI"]["dong_sheet"]) == \
+        ("Gross Inflow", "HDO", "8"), tm["GI"]
+
+
+# ── C5-R1-01 · AC-8 `C4-R3-02`: `chenh_mapping_master` theo thứ tự `sorted` ────────
+def test_C4_R3_02_chenh_mapping_master_SAP_sorted_nhieu_ma_nguoc(monkeypatch):
+    """Giết R1-M15 *(`sorted(atl_ma - set(mm.ma))` → `list(...)` ⇒ thứ tự theo set,
+    đổi theo PYTHONHASHSEED)*. Dựng ATL 14 mã gốc mà MM KHÔNG có *(khai NGƯỢC)* ⇒
+    `chenh` 14 phần tử; đòi ĐÚNG `sorted`. `list(set)` trùng đúng sorted ≈ 1/14! ⇒
+    2⁻ⁿ lọt *(cùng khuôn `tests/du_lieu/test_phan_loai_ly_do_vong_sua_r1.py`)*."""
+    from fls.api import xu_ly
+    dong = [{"ma": f"Z{i:02d}", "ten": f"t{i}", "cha": None, "cap": 1,
+             "nhom": "HDO", "dong_sheet": str(i), "thu_tu": i}
+            for i in range(13, -1, -1)]
+    cay = hd.kiem(dong, nguon="x")
+    monkeypatch.setattr(chc, "doc_hd", lambda _c: cay)
+    monkeypatch.setattr(chc, "doc_mm", lambda _c: chc.KhoMM(nguon="m", ma=()))
+    yc = xu_ly.YeuCau(conn=None, pv=xu_ly.pham_vi_cua_yeu_cau({}), q={}, tham={})
+    data, _ = xu_ly.cay_hd(yc)
+    mong = sorted(f"Z{i:02d}" for i in range(14))
+    assert data["chenh_mapping_master"] == mong, data["chenh_mapping_master"]
+
+
+# ── C5-R1-04 · bản bẩn đọc ở tuyến ⇒ lỗi CÓ TÊN, ⛔ 500 FLS-INTERNAL / KeyError ────
+def test_C5R1_04_handler_cay_hd_BAN_HONG_loi_CO_TEN_khong_500(monkeypatch):
+    """`doc_hd`/`doc_mm` ra `BanHong` *(bản bẩn)* ⇒ `cay_hd` dịch `LoiCua
+    FLS-CAUHINH-BAN-HONG` CÓ TÊN, ⛔ lọt `except Exception` ⇒ `500 FLS-INTERNAL`
+    *(R1: `KeyError` trần)*."""
+    from fls.api import bao, xu_ly
+    yc = xu_ly.YeuCau(conn=None, pv=xu_ly.pham_vi_cua_yeu_cau({}), q={}, tham={})
+    monkeypatch.setattr(chc, "doc_hd", _nem(chc.BanHong("ban IX.HD hong")))
+    with pytest.raises(xu_ly.LoiCua) as e:
+        xu_ly.cay_hd(yc)
+    assert e.value.ma == "FLS-CAUHINH-BAN-HONG" and e.value.ma in bao.MA_LOI
+    assert e.value.ma != "FLS-INTERNAL"

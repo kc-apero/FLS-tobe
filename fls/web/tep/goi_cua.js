@@ -79,6 +79,12 @@ const FLS = (function () {
       lam_gi: 'Nạp ảnh cấu hình một lần, rồi mở lại. Máy ⛔ rơi về số cũ đi '
         + 'cùng gói — một mặc định im lặng là chỗ đẻ ra lỗi ⛔ ai thấy.'
     },
+    // ⭐⭐ `C5-R1-04`: bản cấu hình có trong kho nhưng đọc không ra (thiếu trường /
+    //    sai hình). ⛔ số nửa vời: màn ⛔ dùng, báo người dựng hệ — nạp lại bản đúng.
+    'FLS-CAUHINH-BAN-HONG': {
+      cau: 'Bản cấu hình trong kho đọc không ra — số trên màn ⛔ dùng được.',
+      lam_gi: '⛔ Đừng dùng số này. Báo người dựng hệ — nạp lại một bản cấu hình đúng.'
+    },
     'FLS-KHAI-THIEU': {
       cau: 'Bản khai còn thiếu trường — máy ⛔ không nạp một phần.',
       lam_gi: 'Chỉ đủ cả 6 trường mới đi tiếp được. Thiếu một cột mà vẫn nạp '
