@@ -1,0 +1,99 @@
+{
+ "bang": "HD2.WP-C2",
+ "goi": "WP-C2",
+ "mo_ta": "parity CA.GL (tinh_gl trên E/F + ix_fx, gieo số dư đầu kỳ hàng 24) ↔ đáp án 406 BM…BT, nối dong_sheet",
+ "khoa": "dong_sheet + cot(BM…BT)",
+ "cot_so": [
+  "BM",
+  "BN",
+  "BO",
+  "BP",
+  "BQ",
+  "BR",
+  "BS",
+  "BT"
+ ],
+ "dung_sai_theo_cot": {
+  "BM": {
+   "atol": "0.001",
+   "rtol": "2E-12"
+  },
+  "BN": {
+   "atol": "1E-12",
+   "rtol": "2E-12"
+  },
+  "BO": {
+   "atol": "1E-12",
+   "rtol": "1E-14"
+  },
+  "BP": {
+   "atol": "1E-12",
+   "rtol": "1E-14"
+  },
+  "BQ": {
+   "atol": "1E-11",
+   "rtol": "4E-11"
+  },
+  "BR": {
+   "atol": "1E-12",
+   "rtol": "1E-14"
+  },
+  "BS": {
+   "atol": "1E-12",
+   "rtol": "1E-14"
+  },
+  "BT": {
+   "atol": "1E-12",
+   "rtol": "4E-11"
+  }
+ },
+ "dung_sai_ghi_chu": "atol = sàn tuyệt đối (ôm max|lệch| cộng dồn); rtol THEO CỘT = ~10–40× max rel đo 18/11 (H4-R2-01: hạ từ 1e-9 chung — BM·BN 2e-12 · BO·BP·BR·BS 1e-14 · BQ·BT 4e-11). Chứng ĐỎ: rtol cũ 1e-9 ⇒ BM +50 VND · BQ +1e-9 XANH; rtol này ⇒ BM +1 VND · BQ +1e-9 ĐỎ; BO +9e-7 ĐỎ, atol 1e-6 cũ ⇒ XANH.",
+ "dong_so": 7877,
+ "mong_dong_so": 7877,
+ "tong_o": 63016,
+ "mong_tong_o": 63016,
+ "so_dong_dap_an": 7883,
+ "mong_so_dong_dap_an": 7883,
+ "khop": 63016,
+ "so_o_dap_an_so_duoc": 63016,
+ "lech_ngoai_ten": 0,
+ "lech_co_ten": {
+  "thieu_tien_te_D": 6,
+  "itl_id_na": 4,
+  "ky_vang_406": 4,
+  "thang_thieu_ty_gia": 0
+ },
+ "lech_co_ten_chi_tiet": {
+  "thieu_tien_te_D": [
+   4962,
+   4963,
+   6073,
+   6507,
+   6949,
+   7631
+  ],
+  "itl_id_na": [
+   6684,
+   6836,
+   7500,
+   7832
+  ],
+  "ky_vang_406": [
+   "202605",
+   "202606",
+   "202607",
+   "202608"
+  ],
+  "thang_thieu_ty_gia": []
+ },
+ "mau_so_thang": 20,
+ "o_dap_an_bo_hang_thieu_D": 36,
+ "mong_o_dap_an_bo": 36,
+ "no_op_hang_thieu_D": {
+  "kiem": "BM·BQ·BT[ds] == [ds−1]",
+  "lech": []
+ },
+ "so_du_dau": "5 ô gõ tay hàng 24 (errata ⑳: FLS chưa có khái niệm số dư đầu kỳ; nguồn chính thức = câu hỏi BA/owner) — gieo qua tinh_gl(so_du_dau=…)",
+ "dat": true,
+ "ly_do": []
+}

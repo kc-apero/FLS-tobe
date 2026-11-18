@@ -5,7 +5,9 @@ C = R / "docs/ITL/04_Test/review/SO_PHAT_HIEN_ISP-3.1.md"
 P = R / f"docs/ITL/04_Test/review/SO_PHAT_HIEN_ISP-3.1_{ID}.md"
 _tat = P.read_text(encoding="utf-8").split("\n")
 _hd = next(l for l in _tat if l.startswith("|---"))  # dòng kẻ của bảng phát hiện ĐẦU TIÊN
-rieng = [l for l in _tat if l.startswith(f"| `{ID}-") and l.count("|") == _hd.count("|")]
+import re as _re
+_ong = lambda l: len(_re.findall(r"(?<!\\)\|", l))  # đếm "|" KHÔNG thoát — ô có `\|` (bia: gộp H4 18/11 rơi 3 hàng)
+rieng = [l for l in _tat if l.startswith(f"| `{ID}-") and _ong(l) == _ong(_hd)]
 assert rieng, "sổ riêng 0 hàng"
 dong = C.read_text(encoding="utf-8").split("\n")
 i2 = dong.index("## 2. Phát hiện"); iC = dong.index("## Changelog")
