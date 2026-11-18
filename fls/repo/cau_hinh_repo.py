@@ -43,6 +43,7 @@ from pathlib import Path
 from typing import Any, Iterable, Mapping
 
 from fls.cau_hinh import fx, hd, ky, to_chuc
+from fls.repo import ghi_tay
 
 BANG_FX = fx.BANG                 # "IX.FX"
 BANG_HD = hd.BANG                 # "IX.HD"
@@ -473,14 +474,5 @@ def cdt_cua_ghi(conn, itl_id: int, cdt_nguon: str, *, actor: str) -> to_chuc.Ket
     if r.la:
         ly_do = "CDT lạ %r — ⛔ có trong CDT Correct, ⛔ mặc định SHQ2" % (cdt_nguon,)
         with conn.transaction():
-            with conn.cursor() as cur:
-                cur.execute("SELECT pg_advisory_xact_lock(hashtext(%s)::bigint)",
-                            ("CDT_LA:%s" % itl_id,))
-                cur.execute(
-                    "INSERT INTO fls_queue_event (itl_id, evt_type, reason, actor) "
-                    "SELECT %s, %s, %s, %s WHERE NOT EXISTS (SELECT 1 FROM "
-                    "fls_queue_event WHERE itl_id = %s AND evt_type = %s "
-                    "AND reason = %s)",
-                    (itl_id, to_chuc.LOAI_SU_KIEN, ly_do, actor, itl_id,
-                     to_chuc.LOAI_SU_KIEN, ly_do))
+            ghi_tay.ghi_cdt_la(conn, itl_id=itl_id, ly_do=ly_do, actor=actor)
     return r

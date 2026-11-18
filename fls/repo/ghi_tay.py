@@ -396,6 +396,24 @@ def _them_su_kien(conn, *, itl_id: int, evt_type: str, actor: str,
         return cur.fetchone()[0]
 
 
+def ghi_cdt_la(conn, *, itl_id: int, ly_do: str, actor: str) -> bool:
+    """`C8` (WO-176): MỘT sự kiện `evt_type='CDT_LA'` — CDT ⛔ có trong CDT Correct.
+    ⭐ Ghi ở ĐÂY vì `fls_queue_event` chỉ có MỘT chỗ ghi *(`test_chi_mot_cho_ghi_tay`)*.
+    ⛔ `reason` *(trộn việc máy vào cú bấm người — `danh_muc_actor`)*. Cùng `(itl_id,
+    ly_do)` ⛔ ghi thêm ⇒ `False`. Gọi trong giao dịch của người gọi."""
+    if not (actor or "").strip():
+        raise LoiGhi("⛔ thieu `actor`")
+    with conn.cursor() as cur:
+        cur.execute("SELECT pg_advisory_xact_lock(hashtext(%s)::bigint)",
+                    ("CDT_LA:%s" % itl_id,))
+        cur.execute("SELECT 1 FROM fls_queue_event WHERE itl_id = %s"
+                    " AND evt_type = 'CDT_LA' AND reason = %s", (itl_id, ly_do))
+        if cur.fetchone():
+            return False
+    _them_su_kien(conn, itl_id=itl_id, evt_type="CDT_LA", actor=actor, reason=ly_do)
+    return True
+
+
 # ── bon thao tac ─────────────────────────────────────────────────────────
 KY_KHUON = re.compile(r"\A\d{4}(0[1-9]|1[0-2])\Z")
 O_KY: frozenset[str] = frozenset({"svc_start", "svc_end"})
