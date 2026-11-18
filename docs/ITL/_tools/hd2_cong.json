@@ -161,7 +161,9 @@
    "so_cot": 760,
    "ngay_so_cuoi": "2026-11-11",
    "cot_chua_co_so": 7,
-   "ghi_chu": "cột đầu 2024-10-20 (errata ㉑, ⛔ 21/10 của spec); trục TẠM lấy từ đáp án tới H6 đọc IX.PER (C6 lưu 21/10)"
+   "ngay_dau_ix_per": "2024-10-21",
+   "nguon_ngay_dau": "bai-test-h6:ISP-3.1.2-Step20 (IX.PER kho = 21/10, C6)",
+   "ghi_chu": "trục từ IX.PER KHO (H6; C6 lưu 21/10) lùi 1 cột = 2024-10-20 (errata ㉑, ⛔ 21/10 của spec); ⛔ đọc phu.ngay_truc của đáp án 409"
   },
   "lech_co_ten": {
    "thieu_tien_te_D": [

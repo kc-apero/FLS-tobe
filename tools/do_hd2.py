@@ -43,6 +43,7 @@ MINH `tinh_gl(..., so_du_dau=…)` ⇒ cả 8 cột về 0 trong dung sai. FLS C
 from __future__ import annotations
 
 import argparse
+import dataclasses
 import datetime
 import json
 import sys
@@ -466,7 +467,8 @@ def _in_bao(tq: ThanhQua) -> None:
 # = Σ BR − Σ BS theo (ngày A, nhãn V); khối LE thêm `P = mã LE`; hàng cha `=sum(con)`. Ảnh đầu vào
 # `gl_cf_dau_vao.json` *(A·D·E·F·P·R·V, ⛔ B:C·G)*. BR/BS do `tinh_gl` tính lại từ E/F + `ix_fx`
 # *(⛔ đọc BR/BS của sheet — vòng tròn)*; cộng theo cây do `fls.bao_cao.cfa.cfa1_daily`. Đáp án 409
-# CHỈ cấp giá trị mong + trục ngày *(tạm, tới H6 đọc IX.PER)*.
+# CHỈ cấp giá trị mong. ⭐ Trục ngày lấy từ IX.PER ĐỌC TỪ KHO *(H6 · H6-R1-02)* như WP-C3b, ⛔ từ
+# `phu.ngay_truc` của đáp án.
 # ⛔ Số dư đầu kỳ *(5 ô hàng 24 của H4)* KHÔNG dùng: CFA1 Daily là PHÁT SINH theo ngày *(BR/BS
 # từng dòng)*, ⛔ tồn luỹ kế — `tinh_gl` gọi KHÔNG `so_du_dau` ⇒ BR/BS ⛔ đổi.
 
@@ -496,6 +498,10 @@ MONG_C3A_HD_NGOAI_CAY = {"ITE | ITE Interest": 152, "ITE | ITE Interest ": 1, "S
 MONG_C3A_HD_KHAC_HOA = 5               #: 4 `oga | GAC - Other` ⇒ OGA + 1 `ofR | Office Rental Cost` ⇒ OFR (SUMIFS ⛔ phân biệt hoa thường)
 MONG_C3A_SO_NGAY = 760                 #: cột ngày ≤ ngày đọc 2026-11-18
 MONG_C3A_NGAY_DAU = 45585              #: 2024-10-20 — errata ㉑ (⛔ 21/10 của spec)
+#: errata ㉑: đáp án 409 có THÊM 1 cột TRƯỚC ngày đầu IX.PER *(C6 lưu 21/10, 409 bắt đầu 20/10)*. Khai
+#: ở đây như MONG *(⛔ đọc từ đáp án)*: cột đầu trục C3a = `IX.PER.ngay_dau` − 1; đổi IX.PER ⇒ cột đầu
+#: đổi ⇒ lệch `MONG_C3A_NGAY_DAU` ⇒ ĐỎ.
+C3A_NGAY_TRUOC_PER = 1
 MONG_C3A_NGAY_SO_CUOI = 46337          #: 2026-11-11 — dòng sổ cuối ⇒ 7 cột cuối "chưa có số"
 MONG_C3A_SO_DONG_DAP_AN = 33355        #: ô ≠ 0 của đáp án (dòng chính thưa)
 MONG_C3A_O_LOI = 25                    #: ô "-" của đáp án (phu.o_loi) — LOẠI khỏi so, đếm
@@ -566,7 +572,7 @@ def _iso(serial: int) -> str:
 
 
 def so_sanh_c3a(anh_vao: dict, anh_dap_an: dict, fx: Mapping[int, Mapping[str, Decimal]],
-                cay: CayHD, mong: MongC3a) -> ThanhQuaC3a:
+                cay: CayHD, lich: LichKy, mong: MongC3a) -> ThanhQuaC3a:
     """Dòng sổ CF → `tinh_gl` *(BR/BS)* → `cfa1_daily` *(lá + cây)* → so TỪNG Ô với đáp án 409."""
     ly: list[str] = []
     # ── 1 · feed tinh_gl (bỏ dòng thiếu D — lệch có tên, ⛔ quy đổi được) ──
@@ -592,10 +598,12 @@ def so_sanh_c3a(anh_vao: dict, anh_dap_an: dict, fx: Mapping[int, Mapping[str, D
     dong_cfa = [DongCFA(ngay=n, le=le, hd=h, musd_no=k.musd_no, musd_co=k.musd_co)
                 for (n, le, h), k in zip(meta, kq_gl)]
 
-    # ── 2 · trục ngày (tạm từ đáp án — ISP: tới H6 đọc IX.PER) ──
-    truc = [int(_so(x["ngay"])) for x in anh_dap_an.get("phu", {}).get("ngay_truc", {}).get("dong", [])]
-    if not truc or truc != list(range(truc[0], truc[0] + len(truc))):
-        ly.append(f"trục ngày đáp án ⛔ liên tục/rỗng ({len(truc)} cột)")
+    # ── 2 · trục ngày: IX.PER (kho) + 1 cột errata ㉑, đến ngày đọc của ẢNH ĐẦU VÀO *(⛔ đáp án 409)* ──
+    den = datetime.date.fromisoformat(str(anh_vao["ngay_dong_bang"]))
+    dau = lich.ngay_dau - datetime.timedelta(days=C3A_NGAY_TRUOC_PER)
+    truc = truc_ngay(dataclasses.replace(lich, ngay_dau=dau), den) if den >= dau else []
+    if not truc:
+        ly.append(f"trục ngày IX.PER ⛔ rỗng: ngày đọc {den} < cột đầu {dau}")
 
     # ── 3 · engine ──
     kq = cfa1_daily(dong_cfa, cay, ngay=truc, khoi=KHOI_CFA1)
@@ -700,8 +708,9 @@ def so_sanh_c3a(anh_vao: dict, anh_dap_an: dict, fx: Mapping[int, Mapping[str, D
         "truc_ngay": {"dau": _iso(truc[0]) if truc else None, "so_cot": len(truc),
                       "ngay_so_cuoi": _iso(ngay_so_cuoi) if ngay_so_cuoi else None,
                       "cot_chua_co_so": sum(1 for t in truc if t > ngay_so_cuoi),
-                      "ghi_chu": "cột đầu 2024-10-20 (errata ㉑, ⛔ 21/10 của spec); trục TẠM lấy "
-                                 "từ đáp án tới H6 đọc IX.PER (C6 lưu 21/10)"},
+                      "ngay_dau_ix_per": lich.ngay_dau.isoformat(), "nguon_ngay_dau": lich.nguon,
+                      "ghi_chu": "trục từ IX.PER KHO (H6; C6 lưu 21/10) lùi 1 cột = 2024-10-20 "
+                                 "(errata ㉑, ⛔ 21/10 của spec); ⛔ đọc phu.ngay_truc của đáp án 409"},
         "lech_co_ten": lech_co_ten,
         "so_du_dau": "KHÔNG dùng — CFA1 Daily là phát sinh theo ngày (BR/BS từng dòng), ⛔ tồn luỹ kế",
         "dat": px.dat, "ly_do": list(px.ly_do),
@@ -710,8 +719,15 @@ def so_sanh_c3a(anh_vao: dict, anh_dap_an: dict, fx: Mapping[int, Mapping[str, D
                        o_kpi=o_kpi, o_loi=o_loi, phan_xu=px, hd2_cong=hd2, luoi=luoi)
 
 
-def chay_wp_c3a() -> ThanhQuaC3a:
-    return so_sanh_c3a(nap_anh(ANH_GL_CF), nap_anh(ANH_CFA1), nap_fx(), nap_cay(),
+def chay_wp_c3a(dsn: str | None = None) -> ThanhQuaC3a:
+    """IX.PER TỪ KHO *(như `chay_wp_c3b`)*; kho tắt / chưa khai ⇒ ĐỎ có lý do, ⛔ rơi về ngày tạm."""
+    lich, loi = _lich_tu_kho(dsn)
+    if lich is None:
+        px = PhanXu(False, (loi or "IX.PER rỗng",))
+        return ThanhQuaC3a(tong_o=0, khop=0, lech=[], lech_co_ten={}, o_kpi=0, o_loi=0, phan_xu=px,
+                           hd2_cong={"bang": "HD2.WP-C3a", "goi": "WP-C3a", "dat": False,
+                                     "ly_do": list(px.ly_do)}, luoi={})
+    return so_sanh_c3a(nap_anh(ANH_GL_CF), nap_anh(ANH_CFA1), nap_fx(), nap_cay(), lich,
                        mong_c3a_mac_dinh())
 
 

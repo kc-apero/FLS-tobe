@@ -184,6 +184,24 @@ def test_H6_AC3_IX_PER_doc_tu_kho_C6(nguon):
     assert tq.phan_xu.dat, tq.phan_xu.ly_do
 
 
+def test_H6_R1_01_chay_wp_c3b_doc_ngay_dau_TU_KHO_doi_kho_thi_truc_doi():
+    """H6-R1-01 — đường DƯƠNG của `_lich_tu_kho`: nạp IX.PER ≠ 21/10 vào kho test ⇒ trục đổi theo.
+    ĐỎ khi mã gõ cứng/ghi đè ngày đầu *(đột biến M9: `ngay_dau = 2024-10-20`)*. Mẫu số: `so_ngay` > 0."""
+    ngay = "2024-10-25"
+    with psycopg.connect(dsn_test(), autocommit=True) as c:
+        chc.nap_ix_per(c, actor="bo-test-h6-r1", ngay_dau=ngay, luat="A", nguon=NGUON_PER + " · 25/10")
+    try:
+        tq = do_hd2.chay_wp_c3b(dsn=dsn_test())
+        t = tq.hd2_cong["truc"]
+        assert t["ngay_dau"] == ngay and t["so_ngay"] > 0, t
+        assert t["nguon_ngay_dau"].endswith("25/10")
+        assert not tq.phan_xu.dat                      # ≠ mong 21/10 ⇒ ĐỎ (Đ5), nhưng trục ĐÃ đổi theo kho
+    finally:                                           # trả nguyên: bản mới nhất = 21/10
+        with psycopg.connect(dsn_test(), autocommit=True) as c:
+            chc.nap_ix_per(c, actor="bo-test-h6-r1", ngay_dau="2024-10-21", luat="A", nguon=NGUON_PER)
+    assert do_hd2.chay_wp_c3b(dsn=dsn_test()).hd2_cong["truc"]["ngay_dau"] == "2024-10-21"
+
+
 def test_H6_AC3_IX_PER_khac_ngay_dau_khai_thi_DO(nguon):
     tq = do_hd2.so_sanh_c3b(*nguon, _lich(date(2024, 10, 20)), do_hd2.mong_c3b_mac_dinh())
     assert not tq.phan_xu.dat
