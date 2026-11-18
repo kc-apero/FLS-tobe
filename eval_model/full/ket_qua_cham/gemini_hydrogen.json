@@ -1,0 +1,440 @@
+{
+ "A1_KIEM_NGUON": {
+  "diem": 1.0,
+  "chi_tiet": {
+   "dung": 29,
+   "tong": 29,
+   "vi_du_lech": []
+  }
+ },
+ "A2_LEDGER": {
+  "diem": 1.0,
+  "chi_tiet": {
+   "khoa_dung": 109,
+   "khoa_thua": 0,
+   "khoa_thieu": 0,
+   "o_dung": 763,
+   "o_tong": 763,
+   "dung_theo_cot": {
+    "ps_no": "109/109",
+    "ps_co": "109/109",
+    "ngay": "109/109",
+    "tk": "109/109",
+    "le": "109/109",
+    "cur": "109/109",
+    "ref": "109/109"
+   },
+   "vi_du_lech": []
+  }
+ },
+ "A2_GHEP": {
+  "diem": 1.0,
+  "chi_tiet": {
+   "khoa_dung": 91,
+   "khoa_thua": 0,
+   "khoa_thieu": 0,
+   "o_dung": 364,
+   "o_tong": 364,
+   "dung_theo_cot": {
+    "so_bank": "91/91",
+    "so_nguon": "91/91",
+    "nguon": "91/91",
+    "hinh": "91/91"
+   },
+   "vi_du_lech": []
+  }
+ },
+ "A3_ITL": {
+  "diem": 0.998,
+  "chi_tiet": {
+   "khoa_dung": 129,
+   "khoa_thua": 0,
+   "khoa_thieu": 0,
+   "o_dung": 3217,
+   "o_tong": 3225,
+   "dung_theo_cot": {
+    "ps_no": "129/129",
+    "ps_co": "129/129",
+    "ngay": "129/129",
+    "tk": "129/129",
+    "le": "129/129",
+    "cur": "129/129",
+    "nguon": "129/129",
+    "hd_T": "129/129",
+    "hd_V": "129/129",
+    "pay_type_T": "129/129",
+    "pay_type_V": "129/129",
+    "cdt1_T": "129/129",
+    "cdt1_V": "129/129",
+    "svc_start_T": "129/129",
+    "svc_start_V": "129/129",
+    "svc_end_T": "129/129",
+    "svc_end_V": "129/129",
+    "id_payee_T": "125/129",
+    "id_payee_V": "125/129",
+    "invoice_T": "129/129",
+    "invoice_V": "129/129",
+    "AU": "129/129",
+    "AV": "129/129",
+    "AW": "129/129",
+    "work_status": "129/129"
+   },
+   "vi_du_lech": [
+    {
+     "khoa": "S3-12",
+     "cot": "id_payee_T",
+     "dap_an": "Input here",
+     "model": "VDX036"
+    },
+    {
+     "khoa": "S3-12",
+     "cot": "id_payee_V",
+     "dap_an": "VD0",
+     "model": "VDX036"
+    },
+    {
+     "khoa": "S3-21",
+     "cot": "id_payee_T",
+     "dap_an": "Input here",
+     "model": "VDX035"
+    },
+    {
+     "khoa": "S3-21",
+     "cot": "id_payee_V",
+     "dap_an": "VD0",
+     "model": "VDX035"
+    },
+    {
+     "khoa": "S3-22",
+     "cot": "id_payee_T",
+     "dap_an": "Input here",
+     "model": "VDX035"
+    },
+    {
+     "khoa": "S3-22",
+     "cot": "id_payee_V",
+     "dap_an": "VD0",
+     "model": "VDX035"
+    },
+    {
+     "khoa": "S3-27",
+     "cot": "id_payee_T",
+     "dap_an": "Input here",
+     "model": "VDX039"
+    },
+    {
+     "khoa": "S3-27",
+     "cot": "id_payee_V",
+     "dap_an": "VD0",
+     "model": "VDX039"
+    }
+   ],
+   "Final_7_khoi": {
+    "hd": "129/129",
+    "pay_type": "129/129",
+    "cdt1": "129/129",
+    "svc_start": "129/129",
+    "svc_end": "129/129",
+    "id_payee": "125/129",
+    "invoice": "129/129"
+   }
+  }
+ },
+ "A3_HANG_CHO": {
+  "diem": 1.0,
+  "chi_tiet": {
+   "dung": 7,
+   "bao_thua": [],
+   "bo_sot": [],
+   "so_thua": 0,
+   "so_sot": 0
+  }
+ },
+ "R1_SO_DU": {
+  "diem": 0.9762,
+  "chi_tiet": {
+   "khoa_dung": 28,
+   "khoa_thua": 0,
+   "khoa_thieu": 0,
+   "o_dung": 163,
+   "o_tong": 168,
+   "dung_theo_cot": {
+    "dau_ky": "27/28",
+    "ps_no": "28/28",
+    "ps_co": "26/28",
+    "cuoi_ky": "27/28",
+    "ccr_go": "28/28",
+    "dif": "27/28"
+   },
+   "vi_du_lech": [
+    {
+     "khoa": "('112003', '2026-10-04')",
+     "cot": "ps_co",
+     "dap_an": "111250000",
+     "model": "111150000"
+    },
+    {
+     "khoa": "('112003', '2026-10-04')",
+     "cot": "cuoi_ky",
+     "dap_an": "4791750000",
+     "model": "4791850000"
+    },
+    {
+     "khoa": "('112003', '2026-10-04')",
+     "cot": "dif",
+     "dap_an": "-100000",
+     "model": "0"
+    },
+    {
+     "khoa": "('112003', '2026-10-05')",
+     "cot": "dau_ky",
+     "dap_an": "4791750000",
+     "model": "4791850000"
+    },
+    {
+     "khoa": "('112003', '2026-10-05')",
+     "cot": "ps_co",
+     "dap_an": "2039500000",
+     "model": "2039600000"
+    }
+   ]
+  }
+ },
+ "R2_CF": {
+  "diem": 0.8931,
+  "chi_tiet": {
+   "khoa_dung": 29,
+   "khoa_thua": 0,
+   "khoa_thieu": 0,
+   "o_dung": 201,
+   "o_tong": 232,
+   "dung_theo_cot": {
+    "2026-10-01": "27/29",
+    "2026-10-02": "26/29",
+    "2026-10-03": "25/29",
+    "2026-10-04": "23/29",
+    "2026-10-05": "27/29",
+    "2026-10-06": "27/29",
+    "2026-10-07": "26/29",
+    "tong": "20/29"
+   },
+   "vi_du_lech": [
+    {
+     "khoa": "('HQ1', 'API | API')",
+     "cot": "2026-10-01",
+     "dap_an": "-0.00637485",
+     "model": "-0.00235741"
+    },
+    {
+     "khoa": "('HQ1', 'API | API')",
+     "cot": "2026-10-02",
+     "dap_an": "-0.00566920",
+     "model": "-0.00411597"
+    },
+    {
+     "khoa": "('HQ1', 'API | API')",
+     "cot": "2026-10-03",
+     "dap_an": "-0.00245817",
+     "model": "-0.00244297"
+    },
+    {
+     "khoa": "('HQ1', 'API | API')",
+     "cot": "2026-10-06",
+     "dap_an": "-0.00210112",
+     "model": "-0.00293192"
+    },
+    {
+     "khoa": "('HQ1', 'API | API')",
+     "cot": "2026-10-07",
+     "dap_an": "-0.00746411",
+     "model": "-0.00738698"
+    },
+    {
+     "khoa": "('HQ1', 'API | API')",
+     "cot": "tong",
+     "dap_an": "-0.03175757",
+     "model": "-0.02692536"
+    },
+    {
+     "khoa": "('HQ1', 'LC | License Cost')",
+     "cot": "2026-10-02",
+     "dap_an": "-0.00490990",
+     "model": "-0.00405202"
+    },
+    {
+     "khoa": "('HQ1', 'LC | License Cost')",
+     "cot": "2026-10-03",
+     "dap_an": "-0.00832824",
+     "model": "-0.00832879"
+    },
+    {
+     "khoa": "('HQ1', 'LC | License Cost')",
+     "cot": "tong",
+     "dap_an": "-0.03070010",
+     "model": "-0.02984278"
+    },
+    {
+     "khoa": "('HQ1', 'MC | Marketing Cost')",
+     "cot": "2026-10-04",
+     "dap_an": "-0.00528155",
+     "model": "-0.00528182"
+    },
+    {
+     "khoa": "('HQ1', 'MC | Marketing Cost')",
+     "cot": "tong",
+     "dap_an": "-0.01690705",
+     "model": "-0.01690731"
+    },
+    {
+     "khoa": "('HQ1', 'OGA | GAC - Other')",
+     "cot": "2026-10-07",
+     "dap_an": "-0.00320342",
+     "model": "-0.00326046"
+    },
+    {
+     "khoa": "('HQ1', 'OGA | GAC - Other')",
+     "cot": "tong",
+     "dap_an": "-0.00948669",
+     "model": "-0.00954372"
+    },
+    {
+     "khoa": "('HQ1', 'OMC | Online Marketing Cost')",
+     "cot": "2026-10-04",
+     "dap_an": "-0.00859034",
+     "model": "-0.00858999"
+    },
+    {
+     "khoa": "('HQ1', 'OMC | Online Marketing Cost')",
+     "cot": "tong",
+     "dap_an": "-0.01521644",
+     "model": "-0.01521610"
+    }
+   ]
+  }
+ },
+ "R3_PL": {
+  "diem": 0.65,
+  "chi_tiet": {
+   "khoa_dung": 18,
+   "khoa_thua": 0,
+   "khoa_thieu": 0,
+   "o_dung": 81,
+   "o_tong": 144,
+   "dung_theo_cot": {
+    "2026-10-01": "12/18",
+    "2026-10-02": "11/18",
+    "2026-10-03": "10/18",
+    "2026-10-04": "9/18",
+    "2026-10-05": "11/18",
+    "2026-10-06": "12/18",
+    "2026-10-07": "11/18",
+    "tong": "5/18"
+   },
+   "vi_du_lech": [
+    {
+     "khoa": "OMC",
+     "cot": "2026-10-04",
+     "dap_an": "-0.01051049",
+     "model": "-0.01050991"
+    },
+    {
+     "khoa": "OMC",
+     "cot": "tong",
+     "dap_an": "-0.03479819",
+     "model": "-0.03479762"
+    },
+    {
+     "khoa": "API",
+     "cot": "2026-10-01",
+     "dap_an": "-0.00637485",
+     "model": "-0.00235741"
+    },
+    {
+     "khoa": "API",
+     "cot": "2026-10-02",
+     "dap_an": "-0.00566920",
+     "model": "-0.00411597"
+    },
+    {
+     "khoa": "API",
+     "cot": "2026-10-03",
+     "dap_an": "-0.00387452",
+     "model": "-0.00385932"
+    },
+    {
+     "khoa": "API",
+     "cot": "2026-10-06",
+     "dap_an": "-0.00310873",
+     "model": "-0.00393952"
+    },
+    {
+     "khoa": "API",
+     "cot": "2026-10-07",
+     "dap_an": "-0.00746411",
+     "model": "-0.00738698"
+    },
+    {
+     "khoa": "API",
+     "cot": "tong",
+     "dap_an": "-0.03800282",
+     "model": "-0.03317060"
+    },
+    {
+     "khoa": "SC",
+     "cot": "2026-10-03",
+     "dap_an": "-0.00192015",
+     "model": "-0.00191992"
+    },
+    {
+     "khoa": "SC",
+     "cot": "2026-10-04",
+     "dap_an": "-0.00431179",
+     "model": "-0.00423954"
+    },
+    {
+     "khoa": "SC",
+     "cot": "2026-10-05",
+     "dap_an": "-0.01491036",
+     "model": "-0.01955708"
+    },
+    {
+     "khoa": "SC",
+     "cot": "tong",
+     "dap_an": "-0.03390846",
+     "model": "-0.03848270"
+    },
+    {
+     "khoa": "LC",
+     "cot": "2026-10-02",
+     "dap_an": "-0.00490990",
+     "model": "-0.00405202"
+    },
+    {
+     "khoa": "LC",
+     "cot": "2026-10-03",
+     "dap_an": "-0.00832824",
+     "model": "-0.00832879"
+    },
+    {
+     "khoa": "LC",
+     "cot": "tong",
+     "dap_an": "-0.03765827",
+     "model": "-0.03680095"
+    }
+   ]
+  }
+ },
+ "A4_AUDIT": {
+  "diem": 0.9091,
+  "chi_tiet": {
+   "dung": 5,
+   "bao_thua": [],
+   "bo_sot": [
+    "('DIF', '112003|2026-10-04')"
+   ],
+   "so_thua": 0,
+   "so_sot": 1
+  }
+ },
+ "TONG": 0.9651
+}
