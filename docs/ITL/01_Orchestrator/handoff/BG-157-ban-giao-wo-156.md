@@ -68,3 +68,42 @@ Mốc: SO = CSV Drive `1U-IQVOXBbGE6X6n0i0mi3IG9VWc9J_Ap` (đọc 18/11 09:3x UT
 ## Dev tự thấy còn yếu
 - Ảnh mốc nói "khớp" theo thứ tự `dong` trong nhóm khoá (dòng SO thứ i ↔ L1 thứ i): khi nhóm trùng khoá có thiếu, dòng nào bị gọi "thiếu" là dòng seq cuối — đúng luật khoá+seq của mã gốc nhưng người kiểm tay có thể thấy dòng khác trong nhóm. 19 dòng hiện đều không trùng lớn (`TRUNG_SEQ` = 0).
 - `dong_sheet` mốc mới = số bản ghi CSV (⛔ đối chiếu với `dong` xlsx cũ — hệ khác, mốc 26/08 9.967 dòng ≠ 12.590).
+
+## Vòng sửa sau R1 (KQ-158) — `DT1BM-R1-01`
+*(chỉ THÊM; các mục trên là bản ghim ĐẦU, giữ làm biên bản — số "12.571 · 19" ở trên là số của lần đọc đủ số lẻ)*
+
+**Lỗi:** SO mốc mới là CSV HIỂN THỊ (tiền làm tròn 2 số lẻ), L1 đọc `UNFORMATTED_VALUE` (đủ số lẻ) ⇒ cả 19 dòng "thiếu" chỉ lệch dưới 1 xu — ảo do làm tròn, ⛔ lệch thật.
+**Sửa (MÃ):** `tools/phan_loai_ly_do.py` — khi đo mốc mới, `ps_no`/`ps_co` làm tròn `ROUND_HALF_UP` trên `Decimal` về 2 số lẻ **ở cả hai phía** trước khi băm khoá; ảnh mốc khai `do_chinh_xac_tien = 2` (cổng canh: thiếu khoá hay ≠ 2 ⇒ ĐỎ). Mốc 26/08 (xlsx) ⛔ đổi hành vi (`dp=None`, lời gọi y cũ).
+**Đỏ-trước:** 7/11 bài mới ĐỎ trên mã cũ (4 ca `x.xx` ↔ `x.xx3` · 1 ca `-0,003`/`-0,999…` · khai `do_chinh_xac_tien` · mốc 26/08 giữ nguyên) — 4 ca "lệch ≥ 0,01 ⇒ vẫn `KHOA_LECH`" xanh cả hai bên (đúng: chúng canh chiều ngược). Sau sửa 22/22 bài `test_phan_loai_ly_do_moc_moi.py` xanh.
+
+### BẢNG TÓM TẮT MỚI *(CHỈ số đếm + `dong_sheet`; ⛔ giá trị ô)*
+Cùng hai nguồn (SO CSV Drive `1U-IQVO…` 10.606.726 B · L1 `1xaD1R…` cột `B` `D:G`, `UNFORMATTED_VALUE`, đọc lại 18/11 qua khoá SA; ⛔ cột `C`).
+
+| Chỉ số | Số | Đếm gì (Đ4) |
+|---|---|---|
+| Dòng SO dùng | 12.590 | hàng có ≥1 ô khoá (= bản đầu) |
+| Dòng L1 | 12.590 | hàng có ≥1 ô khoá |
+| **Khớp 1-1** (khoá + seq, tiền ở 2 số lẻ) | **12.590** | tái lập 12.590 / 12.590 = 100 % (2 đường: Σ min theo nhóm ↔ duyệt theo seq) |
+| **Thiếu** | **0** | cũ 19 |
+| Nhãn `KHONG_CO_SAO_KE` · `KHOA_LECH` · `TRUNG_SEQ` · `KHAC` | 0 · 0 · 0 · 0 | cũ 12 · 7 · 0 · 0 |
+| Khoá hỏng SO · L1 | 0 · 0 | |
+| Đối chứng (Đ3) | cùng dữ liệu, KHÔNG làm tròn ⇒ **19 thiếu**, 19/19 đúng tập `dong_sheet` cũ; `khoa_bam` 12.590/12.590 trùng ảnh cũ ⇒ dữ liệu ⛔ đổi, chỉ luật so đổi | 0 là KẾT QUẢ trên mẫu số 12.590 > 0, ⛔ tập rỗng |
+
+**`dong_sheet` thiếu theo nhãn: ⛔ còn dòng nào** (0/12.590). 19 dòng bản đầu — nay KHỚP — để người kiểm mở đối chiếu tay (chỉ chữ "Cách kiểm" đổi):
+- bản đầu gọi `KHONG_CO_SAO_KE` (12): 704 · 771 · 1024 · 1054 · 1055 · 1352 · 1602 · 1684 · 1863 · 2022 · 2371 · 2439 — cả 12 có **Số CT rỗng** (đo: 12/12) nên ⛔ bị bắt thành `KHOA_LECH` (không có Số CT để ghép ứng viên), còn tiền lệch < 1 xu (6 dòng `PS Nợ`, 6 dòng `PS Có` khác 0);
+- bản đầu gọi `KHOA_LECH` (7, trường `ps_co`): 2566 · 4735 · 4736 · 4737 · 6248 · 6249 · 6250 — Số CT cùng, `PS Có` lệch < 1 xu.
+- **Cách kiểm (sửa chữ):** `KHONG_CO_SAO_KE` (nếu còn về sau) ⇒ L1 **⛔ có Số CT ấy** (hoặc dòng Số CT rỗng không có bạn khoá); `KHOA_LECH` ⇒ L1 có dòng cùng Số CT nhưng tiền khác **từ 0,01 trở lên**. Lệch dưới 1 xu KHÔNG phải lệch.
+
+### Đã đổi (vòng này)
+`tools/phan_loai_ly_do.py` (`_tien(dp)` · `chuan_hoa_khoa(dp)` · `doc_khoa(dp)` · `DO_CHINH_XAC_TIEN_MOC` · `KHOA_ANH` + `do_chinh_xac_tien` · cho `thieu = 0` ở mốc mới) · `tests/fixture/dt1b_moc_20261118.json` (ghi lại: `so_khop` 12.590 · `so_thieu` 0 · `do_chinh_xac_tien` 2) · `docs/ITL/_tools/phan_loai_ly_do_moc_20261118.json` (`dong_thieu: []`) · `MONG_MOC` ghim lại `{12.590 · 12.590 · 0}` · vân tay ảnh `f40b0e92d11eeff6` · vân tay nhãn `4f53cda18c2baa0c` · `tests/du_lieu/test_phan_loai_ly_do_moc_moi.py` (+11 bài; bài ghim thật đổi: thêm 1 nhãn ⇒ ĐỎ, vì ⛔ còn dòng nào để đổi nhãn) · sàn `MONG_PYTEST_TOAN_BO` **3307 → 3318** cùng commit (Q8).
+**Lệch chữ chốt (báo orchestrator):** (a) dự kiến "thiếu 12, `KHOA_LECH` 0" — đo ra **0 · 0**: 12 dòng `KHONG_CO_SAO_KE` cũng chỉ là lệch tiền < 1 xu của dòng Số CT rỗng; (b) vì thế cho phép `so_thieu = 0` ở mốc mới (trước đó công cụ coi tập thiếu rỗng là ĐỎ — mẫu số đúng là SO · L1 · ghép, đã kiểm > 0; vân tay ảnh + MONG_MOC canh ⇒ bản đọc sai ra 0 thiếu vẫn ĐỎ).
+**Ghi nhận ⇒ backlog (⛔ làm):** `DT1BM-R1-02…04` theo `KQ-158`.
+**Bản thô:** `/tmp/dt1bm_sua/` (700) — đã xoá khi xong; ⛔ commit.
+
+### Cổng vòng sửa *(nguyên văn)*
+| Lệnh | Kết quả |
+|---|---|
+| `python tools/phan_loai_ly_do.py` · `… --khoa <khoá> --moc tests/fixture/dt1b_moc_20261118.json` | `KẾT: ĐẠT — … 0 dòng sổ thiếu` (mã 0) cả hai |
+| `--duong-nen --cong 5437` (MỘT lần, một mình) | `[ĐẠT] … 28 = 28 node id (XFAIL 2 = 2 · thêm 0 · bớt 0) · chạy 3318 bài (mong ≥ 3318) · skipped 0 · deselected 0` · `tests/web 3 = 3 · 667 bài` · `KẾT: ĐẠT` |
+| `lint-imports` | `Contracts: 11 kept, 0 broken.` |
+| `kiem_tai_lieu.py` | K1–K2, K4–K6 OK; ⛔ **K3 ĐỎ 1 lỗi có từ trước, ngoài phạm vi**: `isp-3.1/TIEN_DO.md:155` `cot 4 != 2` (dòng "Lượt 08:43" của phiên khác; tệp này ⛔ chạm ở vòng này) — báo orchestrator |
