@@ -17,5 +17,10 @@ sao_luu/
 hien_vat/
 .nhip/
 
+# ⛔⛔ Du lieu THO owner dua vao (DT1b · O10): `[Master] ITL_Ledge_raw.xlsx` (so `ITL Ledge`) + CSV
+# `Transaction Mapping L1`. Mang So CT + tien + TK THAT ⇒ cung loai nguy voi `sao_luu/`, `hien_vat/`:
+# mot `git add -A` la ca so that len lich su. Owner dat tep tho vao `Input_Raw\` (DT1BT-R1-09).
+Input_Raw/
+
 # Ảnh ĐỎ của tools/dong_bang_sheet.py (lượt cổng đỏ ⛔ --ra) — ⛔ commit (DT2 Q6 = ⓐ, orchestrator 17/11)
 tests/fixture/**/*.DO.json
