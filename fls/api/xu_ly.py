@@ -1134,7 +1134,7 @@ def cau_hinh_per(yc: YeuCau):
         raise LoiCua("FLS-CAUHINH-BAN-HONG",
                      "ban cau hinh trong kho ⛔ doc ra duoc — bao nguoi dung he") from e
     except ky.LoiKy as e:
-        raise LoiCua(e.ma, str(e)) from e
+        raise LoiCua("FLS-CAUHINH-LUAT-CHUA-KY", str(e)) from e
     k = ky.ky_cua(lich.ngay_dau)
     return {"bang": ky.BANG, "nguon": lich.nguon, "ngay_dau": lich.ngay_dau.isoformat(),
             "ky_dau": {"nam": k.nam, "nua": k.nua, "quy": k.quy, "thang": k.thang},

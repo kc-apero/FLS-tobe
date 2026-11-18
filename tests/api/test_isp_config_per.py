@@ -172,4 +172,5 @@ def test_C6_AC4_handler_luat_chua_ky_dich_loi_CO_TEN(monkeypatch):
     monkeypatch.setattr(chc, "doc_per", _nem(ky.LoiKy(ky.LUAT_CHUA_KY, "luat B chua mo")))
     with pytest.raises(xu_ly.LoiCua) as e:
         xu_ly.cau_hinh_per(_yc())
-    assert e.value.ma == "LUAT_CHUA_KY" and e.value.ma in bao.MA_LOI
+    assert e.value.ma == "FLS-CAUHINH-LUAT-CHUA-KY" and e.value.ma in bao.MA_LOI
+    assert "LUAT_CHUA_KY" in e.value.chi_tiet

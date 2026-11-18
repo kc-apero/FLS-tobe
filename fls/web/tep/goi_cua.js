@@ -85,6 +85,11 @@ const FLS = (function () {
       cau: 'Bản cấu hình trong kho đọc không ra — số trên màn ⛔ dùng được.',
       lam_gi: '⛔ Đừng dùng số này. Báo người dựng hệ — nạp lại một bản cấu hình đúng.'
     },
+    // ⭐ `C6` (`WO-152`): luật ghi nhận kỳ `B` (chia đều PL start→end, D4) chưa mở.
+    'FLS-CAUHINH-LUAT-CHUA-KY': {
+      cau: 'Luật ghi nhận kỳ trong cấu hình chưa được mở — hiện chỉ luật A chạy.',
+      lam_gi: '⛔ Đừng dùng số này. Báo người dựng hệ — nạp lại cấu hình IX.PER với luật A.'
+    },
     'FLS-KHAI-THIEU': {
       cau: 'Bản khai còn thiếu trường — máy ⛔ không nạp một phần.',
       lam_gi: 'Chỉ đủ cả 6 trường mới đi tiếp được. Thiếu một cột mà vẫn nạp '

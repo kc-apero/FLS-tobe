@@ -67,7 +67,7 @@ MA_LOI: dict[str, tuple[int, str]] = {
     #    vet ngan xep / `KeyError` giau mat day la **du lieu kho hong**, ⛔ loi may.
     # ⭐ `C6` (`WO-152`): luat ghi nhan ky `B` (chia deu PL start→end, D4) co that nhung
     #    CHUA mo ⇒ **409 CO TEN** (⛔ lang le roi ve luat A).
-    "LUAT_CHUA_KY": (409, "luat ghi nhan ky chua mo (D4 B) — chi luat A chay"),
+    "FLS-CAUHINH-LUAT-CHUA-KY": (409, "luat ghi nhan ky chua mo (D4 B) — chi luat A chay"),
     "FLS-CAUHINH-BAN-HONG": (
         500, "ban config trong kho ⛔ doc ra duoc — co ban ghi thang ⛔ qua `nap`?"),
     # ⭐⭐ `QĐ-ITL-110` — lan ANH CHUP. HAI ma, ⛔ KHONG mot, va cung ly do da
