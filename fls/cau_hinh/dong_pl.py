@@ -10,8 +10,8 @@ IX.PL · §3.2.4 "dòng PL viết trong ô ATL … hai định nghĩa" · ISP 3.
 ⛔ Giá trị HD thiếu ⇒ `PL_THIEU_GIA_TRI`, ⛔ ngầm `0` *(`Đ3`: CHECK xanh trên tập rỗng)*.
 
 ⚠ **Chênh định nghĩa ATL ↔ Mapping Master** *(`CHENH_VOI_MM`)*: ghi thành DANH SÁCH cho owner,
-   ⛔ tự hoà giải. Nguồn của `DINH_NGHIA` là hàng "606" của ISP 3.1.2 *(công thức ô ATL đã
-   đọc ở AP)*; ảnh MM `mapping_master_cfg.json` chỉ giữ LỜI MÔ TẢ chữ của mỗi dòng PL.
+   ⛔ tự hoà giải. Nguồn của `DINH_NGHIA` là CÔNG THỨC Ô THẬT của sheet ATL *(dòng 81…87, xem chú thích
+   ở `DINH_NGHIA`; `C12-R1-01`)*, ⛔ hàng "606" mô tả; ảnh MM `mapping_master_cfg.json` chỉ giữ LỜI MÔ TẢ chữ của mỗi dòng PL.
 """
 from __future__ import annotations
 
@@ -28,15 +28,23 @@ PL_MA_LA = "PL_MA_LA"                     # mã ⛔ có trong cây HD (hay ⛔ t
 PL_CHU_TRINH = "PL_CHU_TRINH"             # PL2 → PL3 → PL2
 PL_THIEU_GIA_TRI = "PL_THIEU_GIA_TRI"     # cây có mã nhưng ⛔ có giá trị đưa vào
 
-# ⭐ Bản ATL *(một định nghĩa)* — dòng `PL` ở HDCI, mã còn lại ở cây HD.
+# ⭐ Bản ATL *(một định nghĩa)* = ĐÚNG công thức ô sheet ATL `[COPY] Report I General Ledger ·
+#   P&L Report` › tab `Report I PLA3 Y H Q M | PM + HR | ATL`, cột G, dòng sheet 81…87, `FORMULA`
+#   *(SA chỉ-đọc 17/11; giống nhau ở 46/46 cột; dịch dòng→mã bằng `atl_cay.json`)* — `C12-R1-01`.
+# ⭐ QUY ƯỚC DẤU = DẤU SHEET *(`C12-R1-02`)*: sheet lưu CHI PHÍ ÂM và CỘNG *(`PL2 = GI + OMC`,
+#   OMC âm 27/27 cột ≠ 0)* ⇒ giá trị HD của chi phí phải mang dấu ÂM; ⛔ nhập dương thì PL sai
+#   88–107 (đo trên 46 cột). ⚠ PL6 đi qua PL4 *(⛔ qua PL5 — COM bị bỏ khỏi chuỗi, đúng ô sheet)*;
+#   PL8 cộng `TAC` *(Tax Cash, dòng 57)* ⛔ `CIT` *(dòng 58)*.
+# ⚠ PL5: sheet ⛔ CÓ công thức ô *(tháng N:Y rỗng, G84 = sumifs trên vùng rỗng)* ⇒ giữ lời mô tả
+#   dòng sheet "PL5 = PL4 − COM" dưới dấu sheet *(COM âm ⇒ `PL4 + COM`)*; ⛔ ghim như nguồn.
 DINH_NGHIA: dict[str, str] = {
-    "PL2": "GI - OMC",
-    "PL3": "PL2 - API - SC - LC",
-    "PL4": "PL3 - PS",
-    "PL5": "PL4 - COM",
-    "PL6": "PL5 - MC - OTMC - DC - CSO",
-    "PL7": "PL6 - GAC - CDC - ITE",
-    "PL8": "PL7 - CIT",
+    "PL2": "GI + OMC",
+    "PL3": "PL2 + API + SC + LC",
+    "PL4": "PL3 + PS",
+    "PL5": "PL4 + COM",
+    "PL6": "PL4 + MC + OTMC + DC + CSO",
+    "PL7": "PL6 + GAC + CDC + ITE",
+    "PL8": "PL7 + TAC",
 }
 
 # (dòng PL, mã, lý do) — ATL GIỮ mã; MM mô tả chữ ⛔ nêu nó. ⛔ tự hoà giải.
