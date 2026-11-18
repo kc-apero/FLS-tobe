@@ -23,3 +23,13 @@ Xanh sau: `14 passed` (8 đơn vị + 6 pg). Hồi quy `tests/api/test_cua_lenh_
 1. TK→CDT1 **⛔ có trong ảnh** (A:B chỉ TK→LE; AA:AD rỗng) ⇒ `cdt_cua(kho, cdt_nguon)` + `le_cua(kho, tk)` tách đôi.
 2. CDT đã là CDT1 chuẩn (`SHQ1 | Headquarters1`) tính là BIẾT dù ⛔ nằm cột nguồn.
 3. Sự kiện gắn `itl_id` (bảng bắt buộc FK) ⇒ chỉ dòng ITL có CDT lạ mới ghi được.
+
+## Vòng sửa sau R1 (KQ-178)
+`0 CHẶN · 3 NÊN SỬA` ⇒ sửa cả 3; `C8-R1-04…06` ⇒ backlog/orchestrator *(⛔ làm; ⛔ sửa ảnh DT3)*. Commit `c5a89ea`.
+| Mã | Sửa | Đỏ trước *(đột biến trên mã gốc; nền `19 passed`)* |
+|---|---|---|
+| `C8-R1-01` | `test_RIENG_TU_…` ĐỌC hàng `CN`/`Cash Treasury` từ ảnh DT3 lúc chạy *(mẫu số ≥ 4 ≠ 0, Đ3)*; ⛔ chép số TK nào vào bài | M7 *(`_KHONG_PHAI_PHAP_NHAN` rỗng)* ⇒ `3 failed` |
+| `C8-R1-02` | bài pg gieo 2 sự kiện `CDT_LA` *(cũ + mới)* cho 1 `itl_id`: `/queue` ra MỚI NHẤT, oracle khớp *(mẫu số 1 hàng ≠ NULL)* | M5 *(lấy CŨ nhất)* ⇒ `1 failed` |
+| `C8-R1-03` | `TK_TRUNG` · `TK_RONG` có bài; `nap` từ chối 4 bản rác *(khoá/tiền tố/rỗng)* và số phiên bản ⛔ đổi; `actor` rỗng ⇒ `LoiCauHinh` + 0 sự kiện | M10 *(bỏ `TK_TRUNG`)* · M11 *(bỏ `_kiem_org`)* · M12 *(bỏ chặn `actor`)* ⇒ mỗi cái `1 failed` |
+Q8: `MONG_PYTEST_TOAN_BO` **3421 → 3426** *(+5: đơn vị 2 · pg 3)* + bài ghim cùng commit. Quét PII `git diff ffe06b8..HEAD`: **0** chuỗi ≥ 8 chữ số liền trong dòng `+`.
+Cổng: `--duong-nen --cong 5446` một lần ⇒ `KẾT: ĐẠT` · `12 failed · 3398 passed · 2 xfailed · 14 errors` = nền **28 = 28** *(thêm 0 · bớt 0)*, chạy 3426 · `tests/web` 3 = 3, chạy 675 · `lint-imports` 11/0.
