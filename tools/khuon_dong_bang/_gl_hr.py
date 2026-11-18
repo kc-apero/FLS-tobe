@@ -90,7 +90,9 @@ TAP_DONG: dict[str, tuple[str, ...]] = {
     "D": TIEN_TE, "G": TAI_KHOAN, "H": PAYMENT_TYPE, "I": HD_CODE, "J": CDT1, "P": LE,
     "V": HD_FINAL, "Z": PAYMENT_TYPE, "AD": CDT1,
 }
-ITL_ID_RE = re.compile(r"ITL#\d+")
+#: `DT6-R1-01`: chặn độ dài — ảnh có ≤ 4 chữ số sau `ITL#`; `{1,6}` chừa dư mà ⛔ cho lọt `ITL#<số dài>`
+#: *(số dài ⇒ giống số tài khoản)*. Nới ra `.*` ⇒ bài `…R_la…` ĐỎ.
+ITL_ID_RE = re.compile(r"ITL#\d{1,6}")
 #: Số tài khoản ngân hàng ở Payment Type: `R | <chữ số>_…` ⇒ CHE về tiền tố `R`.
 _TK_NGAN_HANG = re.compile(r"(R) \| \d+_.+")
 
@@ -108,7 +110,7 @@ def _la_so(v: Any) -> bool:
 
 
 def che_tai_khoan(v: Any) -> Any:
-    """`R | 355…_VPB VND_TÊN` → `R`; giá trị khác giữ nguyên. Trả cả cờ *(đã che?)*."""
+    """`R | <số>_<NH>_<ĐƠN VỊ>` → `R`; giá trị khác giữ nguyên. Trả cả cờ *(đã che?)*."""
     if isinstance(v, str):
         m = _TK_NGAN_HANG.fullmatch(v)
         if m:
@@ -244,8 +246,9 @@ def thieu_lac(dong: list[dict[str, Any]], *, pd: str, ky_mong: dict[int, int],
     """Cổng GL HR *(Đ5 — khai `mong`, NO cả hai chiều)*. ĐỎ *(`thieu` ⛔ rỗng)* khi:
 
       ⒜ số dòng mỗi kỳ ≠ `ky_mong` *(thừa · thiếu · kỳ lạ)*;
-      ⒝ ô chữ ngoài TẬP ĐÓNG của cột *(PII lạc cột)* / `R` ⛔ khớp `ITL#\\d+` / chứa số tài khoản
-         *(≥ 6 chữ số liền ở cột ⛔ phải mã)* — marker chỉ mang `dong_sheet` + cột;
+      ⒝ ô chữ ngoài TẬP ĐÓNG của cột *(PII lạc cột)* / `R` ⛔ khớp `ITL#\\d{1,6}` *(chặn cả số
+         dài giống số tài khoản)* — `DT6-R1-03`: ⛔ còn nhánh "≥ 6 chữ số" riêng, vì 9 cột chữ có tập
+         đóng + `R` có regex ⇒ không đường nào tới nó *(mã chết, đột biến `M13` sống)* — marker chỉ mang `dong_sheet` + cột;
       ⒞ phân bố ô LỖI Sheets theo cột ≠ `loi_mong` *(thêm `#REF!`/đổi tập ⇒ ĐỎ, `DT5-R1-04`)*;
       ⒟ đoạn A-rỗng ≠ `doan_mong` *(thiếu ngữ cảnh ⇒ ĐỎ, Đ3/Đ5)*.
 
@@ -271,8 +274,6 @@ def thieu_lac(dong: list[dict[str, Any]], *, pd: str, ky_mong: dict[int, int],
                     thieu.append(f"R_la@{ds}")
             elif c in TAP_DONG and s not in TAP_DONG[c]:
                 thieu.append(f"{c}_la@{ds}")
-            elif re.search(r"\d{6,}", s) and c not in ("I",):
-                thieu.append(f"{c}_so_dai@{ds}")
     mong_loi = {(c, s): n for c, m in loi_mong.items() for s, n in m.items()}
     if dict(loi) != mong_loi:
         tong = lambda m: sum(m.values())                                   # noqa: E731

@@ -242,6 +242,33 @@ def test_DT6_B2_may_quet_PII_co_CA_PHA_va_loi_KHONG_in_gia_tri(chen, tmp_path):
     assert bi_mat not in kq.stdout + kq.stderr             # ⛔ in giá trị ô
 
 
+@pytest.mark.parametrize("chen", ["ten_nguoi", "itl_so_dai"])
+def test_DT6_R1_01_cot_R_ITL_ID_co_CA_PHA_rieng_va_loi_KHONG_in_gia_tri(chen, tmp_path):
+    """`DT6-R1-01`: `R` canh bằng regex *(⛔ tập đóng)* ⇒ phải có ca phá riêng. Đột biến nới
+    `ITL_ID_RE` ra `.*` ⇒ bài này ĐỎ. `itl_so_dai` = `ITL#` + 12 chữ số *(giống số TK)*."""
+    anh = _doc(DAP_AN / "gl_hr_407.json")
+    v = _luoi_gl(anh)
+    ix = {c: i for i, c in enumerate(GL.COT_THO)}
+    bi_mat = "Nguyen Van Thanh" if chen == "ten_nguoi" else "987654321012"
+    v[3][ix["R"]] = bi_mat if chen == "ten_nguoi" else "ITL#" + bi_mat
+    tho = _ghi(tmp_path / "t.json", _hdr_gl(anh), v)
+    kq = _chay("gl_hr_407", tho, "--mong", 9421, "--ra", tmp_path / "r.json")
+    assert kq.returncode == 1 and "R_la@10" in kq.stdout, (kq.returncode, kq.stdout[-400:])
+    assert bi_mat not in kq.stdout + kq.stderr
+    assert GL.ITL_ID_RE.fullmatch("ITL#1234") and not GL.ITL_ID_RE.fullmatch("ITL#1234567")
+
+
+def test_DT6_R1_02_hai_nhanh_DO_chua_co_bai_NGU_CANH_thieu_va_luoi_khong_co_ngay():
+    """`DT6-R1-02` *(đột biến `M9`·`M10`)*: gọi thẳng hàm, ⛔ qua CLI."""
+    kq = GL.thieu_lac([], pd="khong_ton_tai", ky_mong={}, loi_mong={}, doan_mong=[])
+    assert "NGU_CANH@thiếu" in kq["thieu"]                            # Đ5: ⛔ đo được = ĐỎ
+    anh = _doc(DAP_AN / "gl_hr_407.json")
+    v = _luoi_gl(anh)
+    v = [r if i < 3 else [""] + r[1:] for i, r in enumerate(v)]
+    with pytest.raises(ValueError, match="⛔ có hàng nào cột A có ngày"):
+        GL.chuan_bi(dict(_hdr_gl(anh), values=v), "gl_hr_407")
+
+
 # ══ ca phá cổng (Đ5 hai chiều · Đ3) ══════════════════════════════════════
 
 def test_DT6_cong_DO_khi_mot_ky_thieu_mot_dong_va_khi_doi_so_dong_mong(tmp_path):
