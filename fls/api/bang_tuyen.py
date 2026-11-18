@@ -695,6 +695,12 @@ BANG_TUYEN: tuple[Tuyen, ...] = (
                 "con_cua/la; cay hong ⇒ loi co TEN (HD_CHU_TRINH·HD_CHA_VANG·"
                 "HD_CAP_NHAY). Doi chieu 73 ma Mapping Master: LIET KE chenh "
                 "(= {NCF}), ⛔ hoa giai. Nguon TINH (anh dong bang) toi C5"),
+    # ⭐⭐ `C6` (`WO-152`): lich ky `IX.PER` — ngay dau + luat ghi nhan doc tu KHO config
+    #    chi-them (⛔ go cung ngay). `GET`, ⛔ ghi. Luat B → LUAT_CHUA_KY.
+    Tuyen("GET", f"{TIEN_TO}/config/per", "cau_hinh_per",
+          ("fls_cau_hinh_ban", "fls_cau_hinh_dong"),
+          mo_ta="IX.PER lich ky: ngay dau cot + luat ghi nhan (A: don ngay 1 thang PL "
+                "start) doc tu KHO config (C6); luat B chua mo ⇒ LUAT_CHUA_KY"),
 )
 
 

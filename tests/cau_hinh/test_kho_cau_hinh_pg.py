@@ -106,13 +106,14 @@ def test_AC5_chua_nap_thi_ChuaKhai_co_ten_KHONG_la_BangLa(conn):
     ⛔ trả bản mặc định *(khuôn `khai_cot` ⓓ)*.
 
     ⚠ `fls_test` dùng chung ⇒ `IX.FX`/`IX.HD` có thể đã có bản. Đo trên một `bang`
-       HỢP LỆ **chưa dùng tới** trong bộ test: `IX.PER` *(pháp nhân — chưa bước nào
-       nạp)*. Mẫu số `Đ3`: khẳng định nó RỖNG trước khi kết luận.
+       HỢP LỆ **chưa dùng tới** trong bộ test: `IX.DRV` *(chưa bước nào nạp)*. `IX.PER`
+       từng là mẫu này — `C6` *(WO-152)* nạp nó nên đổi sang `IX.DRV`. Mẫu số `Đ3`:
+       khẳng định nó RỖNG trước khi kết luận.
     """
-    assert "IX.PER" in chr.BANG_HOP_LE
-    assert _max_phien(conn, "IX.PER") == 0, "⛔ tiền đề: IX.PER chưa ai nạp"
+    assert "IX.DRV" in chr.BANG_HOP_LE
+    assert _max_phien(conn, "IX.DRV") == 0, "⛔ tiền đề: IX.DRV chưa ai nạp"
     with pytest.raises(chr.ChuaKhai) as e:
-        chr._doc_ban(conn, "IX.PER")
+        chr._doc_ban(conn, "IX.DRV")
     assert e.value.ma == "FLS-CAUHINH-CHUA-KHAI"
     assert not isinstance(e.value, chr.BangLa)
 

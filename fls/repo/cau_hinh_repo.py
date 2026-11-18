@@ -38,15 +38,16 @@ from __future__ import annotations
 import hashlib
 import json
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import date, datetime
 from pathlib import Path
 from typing import Any, Iterable, Mapping
 
-from fls.cau_hinh import fx, hd
+from fls.cau_hinh import fx, hd, ky
 
 BANG_FX = fx.BANG                 # "IX.FX"
 BANG_HD = hd.BANG                 # "IX.HD"
 BANG_MM = hd.BANG_MM             # "IX.HD · IX.ORG" — ảnh Mapping Master
+BANG_PER = ky.BANG               # "IX.PER" — lịch kỳ (`C6`)
 
 # ⭐ Danh mục `bang` config HỢP LỆ *(AP: IX.FX · IX.HD · IX.ORG · IX.PER · IX.VEN ·
 #   IX.DRV · IX.ALR · IX.PL · IX.TMP — `.importlinter` khối `C5`)*. Một `bang` ⛔ ở
@@ -201,6 +202,8 @@ def _kiem_noi_dung(bang: str, cap: list[tuple[str, Any]]) -> None:
         _hd_tu_cap(cap, nguon="(kiem truoc khi ghi)")
     elif bang == BANG_MM:
         _kiem_mm(cap)
+    elif bang == BANG_PER:
+        ky.kiem(dict(cap), nguon="(kiem truoc khi ghi)")   # `LoiKy` CÓ TÊN, ⛔ bọc lại
 
 
 def nap(conn, bang: str, cap: list[tuple[str, Any]], *,
@@ -385,3 +388,31 @@ def doc_mm(conn) -> KhoMM:
             "⛔ bản Mapping Master phiên bản %s trong kho ⛔ ĐỌC ra được "
             "*(⛔ qua `nap`?)*" % ban.phien_ban) from e
     return KhoMM(nguon=ban.nguon, ma=ma)
+
+
+# ── IX.PER — lịch kỳ (`C6` · `WO-152`) ────────────────────────────────────────
+def nap_ix_per(conn, *, actor: str, ngay_dau: "str | date", luat: str = ky.LUAT_A,
+               nguon: str) -> BanCauHinh:
+    """Nạp `IX.PER` ⇒ phiên bản mới. `ngay_dau` là **GIÁ TRỊ CẤU HÌNH do người gọi khai**
+    *(⛔ gõ cứng ở mã; `nguon` ⛔ rỗng — truy được số đến từ đâu)*. Kiểm bằng CHÍNH
+    `ky.kiem` TRƯỚC khi ghi: luật `B` ⇒ `LoiKy LUAT_CHUA_KY`, ngày hỏng ⇒ `PER_HONG`."""
+    if not str(nguon or "").strip():
+        raise LoiCauHinh("⛔ thiếu `nguon` cho `IX.PER` — ngày đầu phải truy được nguồn")
+    ngay = ngay_dau.isoformat() if isinstance(ngay_dau, date) else ngay_dau
+    cap: list[tuple[str, Any]] = [(ky.KHOA_NGAY_DAU, {"ngay": ngay}),
+                                  (ky.KHOA_LUAT, {"ma": luat})]
+    return nap(conn, BANG_PER, cap, nguon=nguon, actor=actor)
+
+
+def doc_per(conn) -> ky.LichKy:
+    """`IX.PER` phiên bản mới nhất, dựng lại **qua `ky.kiem`**. `ChuaKhai` nếu kho chưa nạp;
+    bản bẩn ⇒ `BanHong` CÓ TÊN; luật `B` trong kho ⇒ `LoiKy LUAT_CHUA_KY` *(⛔ nuốt)*."""
+    ban = _doc_ban(conn, BANG_PER)
+    try:
+        return ky.kiem(dict(ban.dong), nguon=ban.nguon)
+    except ky.LoiKy as e:
+        if e.ma == ky.LUAT_CHUA_KY:
+            raise
+        raise BanHong(
+            "⛔ bản `IX.PER` phiên bản %s trong kho ⛔ ĐỌC ra được: %s" % (ban.phien_ban, e)
+        ) from e
