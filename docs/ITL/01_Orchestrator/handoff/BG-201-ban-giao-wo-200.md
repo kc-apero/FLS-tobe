@@ -50,3 +50,25 @@
 
 ## Lệch
 - Không có lệch ĐO *(chưa đo được — xem chặn)*. Engine chưa có CLI/`do_hd2 --goi WP-C4a` — chờ ảnh.
+
+## Sau DT8b *(chỉ THÊM — gộp `claude/bold-galileo-zukpaf-isp/DT8B` @ `833a273`, BG-205; orchestrator chốt 18/11)*
+Chặn ① ② gỡ: MID3 có khoá `(vendor, thang)` *(209 hàng)*, ảnh `tests/fixture/dau_vao/gi_cfa1.json` *(PD 504, 408 dòng)* cho O = Σ `pe`, P = Σ `pm` số theo Vendor-tháng. Chặn ③ là **KẾT QUẢ** *(Đ3)*, ⛔ lỗi.
+
+**Cổng WP-C4a = `python tools/do_hd2.py --goi WP-C4a --dsn "$PG_DSN_TEST"` ⇒ `DAT`** *(IX.VEN đọc TỪ KHO test; kho chưa khai ⇒ ĐỎ có tên; ⛔ ghi kho thật)*. Hợp đồng ở `docs/ITL/_tools/hd2_cong.json` khoá `WP-C4a`. Mong khai TRƯỚC *(`MongC4a`, lấy từ số đo BG-205)* — đo ra **khớp cả 8**:
+
+| Nhãn *(Đ4)* | Đo | Mong |
+|---|---|---|
+| Vendor-tháng thường *(4 vendor × 11 tháng)* | 44 | 44 |
+| ô so *(44 × 14 − ô PM ⛔ so được)* | 420 | 420 |
+| ô ⛔ so được — P = chữ `Need to manual input` *(⛔ hoá 0)*: 28 Vendor-tháng × (P + 6 PM_cdt) | 196 | 196 |
+| **ô ≠ 0** — **tập toàn 0: đo được nhưng ⛔ chứng minh RATE** | **0** | 0 |
+| lệch | 0 | 0 |
+| bỏ qua có tên: `Max` 132 · `VD341` 11 · `VD428` 11 · `VD444` 11 · `VD62` 11 Vendor-tháng | 5 nhãn · **15** vendor | 5 · 15 |
+
+**Đ5 hai chiều** *(bài `tests/oracle/test_do_hd2_c4a.py`, 12)*: một Vendor-tháng thường bỗng ≠ 0 ở đầu vào ⇒ engine `LoiPhanBo` *(PE theo CDT1 — Looker PD 502 — ⛔ có ảnh)* ⇒ ĐỎ buộc khai lại; một ô đáp án đổi ⇒ ĐÚNG ô ấy lệch + `o_khac_0` ≠ mong ⇒ ĐỎ; mỗi `mong` sai ⇒ ĐỎ; bỏ chữ P ⇒ ô so 616 ≠ 420 ⇒ ĐỎ; MID3 mất khoá ⇒ ĐỎ có tên. Phá nguồn *(⛔ đếm ô ≠ 0 · ⛔ loại ô PM chữ)* ⇒ mỗi lần 1 bài ĐỎ, trả nguyên.
+
+**KS.AL trên ảnh thật** *(chỉ báo)*: đo **44** Vendor-tháng thường, lệch 0, nhưng tiền ≠ 0 = 0 *(tập 0)*. **165** Vendor-tháng đặc biệt *(15 vendor)*: engine ⛔ áp *(bỏ qua theo nhãn; thiếu PE theo CDT1)* ⇒ KS.AL ⛔ chạy — việc H10.
+
+**Chuyển H10** *(câu cho WO H10)*: phép so ô ≠ 0 của RATE *(MID3 ô ≠ 0 đều ở vendor đặc biệt — PE ≠ 0 165/165, BG-205)* + đầu vào **PE theo CDT1** *(Source Looker PD 502, hoặc chốt dùng MID1 cột T làm đầu vào)* — ⛔ có ảnh thì RATE ⛔ đo được ở bất kỳ vendor nào.
+
+Bài ghim cũ `test_H9_B3_CHAN_MID3_khong_mang_khoa_vendor_thang` ĐỎ sau gộp *(Đ5 cắn đúng)* ⇒ khai lại thành `…_sau_DT8b_MID3_CO_khoa_vendor_thang_209_hang`. Q8: sàn 3602 *(DT8b)* + 15 *(H9 ①)* = 3617 ở commit gộp → **3629** *(+12 bài C4a)*.
