@@ -1,0 +1,25 @@
+# SỔ PHÁT HIỆN REVIEW — ISP 3.1 · phần `DT1BM` *(tệp riêng, chờ gộp vào `SO_PHAT_HIEN_ISP-3.1.md`)*
+
+**Version:** v0.1 · **Ngày:** 2026-11-18 · **Chủ sở hữu:** `fls-test` *(R1 `KQ-158`)* · **Nguồn:** `WO-156` · `BG-157` · nhánh `isp/DT1BM` @ `dbb54c2`
+
+> Tệp riêng vì cùng lý do các sổ `_H2`/`_H4`: sổ chung sống ở nhánh khác. Thang lớp *(A1 · A2 · B1 · B2)* và mức *(CHẶN · NÊN SỬA · GHI NHẬN)* y như §1 sổ chung. Sổ **chỉ THÊM**.
+>
+> Mọi số tự đo bằng mã **tự viết** *(⛔ gọi `phan_loai_ly_do.py`)* trên dữ liệu thật 18/11; bản thô chỉ ở `/tmp/r1_dt1bm/` và **đã xoá**. Sổ này ⛔ mang giá trị ô — chỉ số đếm và `dong_sheet`.
+
+## Phát hiện
+
+| Mã | Bước | Vòng | Lớp | Mức | Tệp:dòng | Mô tả | Khuyến nghị | Luật phòng tái phạm | Trạng thái |
+|---|---|---|---|---|---|---|---|---|---|
+| `DT1BM-R1-01` | DT1b | R1 | B1 | **NÊN SỬA** | `docs/ITL/_tools/phan_loai_ly_do_moc_20261118.json` `dong_thieu[*]` *(7 dòng `KHOA_LECH`)* · `BG-157` bảng "Cách kiểm" | **7/7 dòng `KHOA_LECH` chỉ lệch `ps_co` dưới 1 xu** *(đo độc lập: dòng 2566 \|Δ\| ≈ `1e-10` = nhiễu số thực L1; sáu dòng 4735–4737 · 6248–6250 \|Δ\| ≈ `3e-3`, SO là chuỗi hiển thị làm tròn 2 số lẻ, L1 giữ nguyên)* — cả 7 cùng `ps_no`/`tk`/tiền tệ. BG bảo người kiểm "`PS Có` khác"; mở sheet ở 2 số lẻ họ sẽ thấy **bằng nhau**. Nhãn đúng theo luật khoá chính xác nhưng đánh đồng *sai số làm tròn* với *lệch thật*. | Ghi vào BG/`ghi_chu` **bậc** của lệch *(không in giá trị)*; hoặc tách lớp "làm tròn < 0,01" khỏi `KHOA_LECH` khi H3 dùng nhãn. Không đổi số đếm. | Lệch số thực khai bằng bậc, không bằng "khác" | Mở |
+| `DT1BM-R1-02` | DT1b | R1 | B1 | GHI NHẬN | `tools/phan_loai_ly_do.py` `_tien` *(so `Decimal` chính xác)* · `tools/xuat_khoa_dt1b.py` `doc_so_csv` | Bài học `FORMATTED_VALUE` **còn sống ở phía SO**: CSV Drive là **chuỗi hiển thị** *(đo: tiền SO có 2 dạng, có/không dấu phẩy; 6/7 dòng lệch ở -01 do làm tròn)*, L1 `UNFORMATTED`. Khớp chỉ đúng khi SO hiển thị đủ số lẻ L1 có — 12.571 dòng khớp cho thấy hầu hết thoả, nhưng ⛔ có cổng nào bắt "SO làm tròn, L1 đủ". | Ghim vào ảnh mốc cách đọc *(đã khai một nửa: L1 `UNFORMATTED`; thêm "SO = CSV hiển thị")*. Đã có nguồn nhắc ở `BG-157` mục 3 — chỉ thiếu nửa SO. | — | Mở *(backlog)* |
+| `DT1BM-R1-03` | DT1b | R1 | B2 | GHI NHẬN | `tools/phan_loai_ly_do.py` `canon_ref` *(dạng khoa học `%.0f`)* · `MAU_SO.dang_khoa_hoc` | **43 hàng SO / 43 hàng L1 có Số CT là CHUỖI dạng khoa học** *(mantissa 5–6 chữ số; chỉ **9 giá trị riêng** mỗi phía)*. Là chữ trong ô cả hai nguồn nên khớp 43/43 và ⛔ dòng nào trong 19 thiếu thuộc nhóm này *(đo: giao = 0)*; nhưng nhiều chứng từ thật khác nhau có thể đã **sụp về cùng chuỗi** từ trước ⇒ khớp giả không nhận ra được. Số mất chữ số ở mỗi phía: ⛔ L1 có ô số thực ≥ 1e15 *(0)*. | Khai nhãn "Số CT khoa học: 43 hàng/9 giá trị" ở BG R2 *(đã có số 43 — thêm số 9)*. Không chặn. | — | Mở *(backlog)* |
+| `DT1BM-R1-04` | DT1b | R1 | B2 | GHI NHẬN | `tools/xuat_khoa_dt1b.py` `doc_so_csv` · `BG-157` "Đã đổi" | Loại 22 hàng đuôi: **xác nhận** bằng đo độc lập — hàng dữ liệu `10…12599` liền mạch *(0 hàng trống giữa, 12.590 = 12.599−10+1)* ⇒ 22 hàng bị loại đúng là `12600–12621`. Nhưng luật "≥1 ô khoá" ⛔ có cổng **chặn đuôi nhảy cách** *(hàng khoá-rỗng nằm giữa sổ vẫn bị loại im lặng)*; ảnh mốc chỉ ghi `so_dong`. | Thêm vào ảnh mốc `dong_sheet_max` hoặc khai "không hàng trống giữa" khi H3 cần. | — | Mở *(backlog)* |
+
+## Đã kiểm — sạch
+- **Tái lập độc lập 5/5 khớp BG-157** *(xem `KQ-158`)*; mã tự viết, hai đường *(duyệt theo `seq` ↔ Σ min theo nhóm)* cùng 12.571.
+- **Đột biến 16/16 ĐỎ** trên bản sao `git archive` *(phá ảnh mốc ×4, nhãn ×4, `MONG_MOC` ×3, PII ×2, mã ×2, mặc định 26/08 ×1)* — đỏ đúng lý do ở mọi chỗ đã soi thông điệp.
+- **Mốc 26/08:** `tests/du_lieu` + `tests/oracle/test_do_voi_hd1.py` **502 xanh**; `git diff 498bd06..HEAD` **rỗng** trên `tests/fixture/itl_ledge_adjustment.json` · `docs/ITL/_tools/phan_loai_ly_do.json` · `tests/oracle/`.
+- **PII:** 0 token Số CT/tiền *(≥5 chữ số, 15.042 token từ SO)* trong tệp nhãn · `BG-157` · bài; trong ảnh mốc 56 trùng đều là `dong_sheet` 10–12621 *(trùng ngẫu nhiên, 0 chuỗi không-phải-số)*; `khoa_bam` 16 hex, 12.298 giá trị riêng, ⛔ phải băm trực tiếp một token.
+
+## Changelog
+- **v0.1** *(2026-11-18, `fls-test` R1 của `DT1BM`, `KQ-158`)*: khởi tạo tệp riêng — **4** phát hiện `DT1BM-R1-01…04` *(0 CHẶN · **1** NÊN SỬA · 3 GHI NHẬN; lớp B1 ×2 · B2 ×2)*.
