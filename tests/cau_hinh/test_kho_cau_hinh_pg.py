@@ -106,7 +106,9 @@ def test_AC5_chua_nap_thi_ChuaKhai_co_ten_KHONG_la_BangLa(conn):
     ⛔ trả bản mặc định *(khuôn `khai_cot` ⓓ)*.
 
     ⚠ `fls_test` dùng chung ⇒ `IX.FX`/`IX.HD` có thể đã có bản. Đo trên một `bang`
-       HỢP LỆ **chưa dùng tới** trong bộ test: `IX.DRV` *(chưa bước nào nạp)*. `IX.PER`
+       HỢP LỆ **chưa dùng tới** trong bộ test: `IX.DRV` *(chưa bước nào nạp)*.
+       ⛔ `IX.DRV` ⛔ ai được GHI ở bộ này *(C9-R1-01: bài khác nạp vào đây thì tiền đề
+       dưới đỏ theo THỨ TỰ chạy)* — `test_C5R1_05` dùng `IX.ALR`. `IX.PER`
        từng là mẫu này — `C6` *(WO-152)* nạp nó nên đổi sang `IX.DRV`. Mẫu số `Đ3`:
        khẳng định nó RỖNG trước khi kết luận.
     """
@@ -227,7 +229,7 @@ def test_C5R1_03_du_hoac_khong_DEM_hai_bang_quanh_nap_hong_giua_chung(conn):
     QUA được phép kiểm nội dung nhưng NỔ khi ghi dòng *(`gia_tri` chứa `set` ⛔
     serialize ⇒ `json.dumps` NÉM `TypeError` SAU khi `ban` đã INSERT)* ⇒ `(ban, dong)`
     trước = sau. `Đ5`: ⛔ chỉ `raises`, mà ĐẾM hai bảng."""
-    bang = "IX.DRV"       # bang HỢP LỆ ⛔ bước nào dùng — nạp luôn HỎNG ⇒ giữ rỗng
+    bang = "IX.DRV"       # bang HỢP LỆ ⛔ bước nào dùng — nạp luôn HỎNG ⇒ giữ rỗng (⛔ bài nào GHI thật vào đây)
     truoc = _dem(conn, bang)
     with pytest.raises(TypeError):
         chr.nap(conn, bang, [("A", {"ok": 1}), ("B", {"xau": {1, 2}})],
@@ -286,7 +288,10 @@ def test_C5R1_05_khong_doi_so_ban_LIEN_TRUOC_khong_phai_ban_DAU(conn):
     """Giết R1-M4 *(`khong_doi` so với bản ĐẦU thay bản kề trước ⇒ SỐNG khi nạp < 3
     lần)*. Nạp A, B, A: bản thứ ba KHÁC bản kề trước *(B)* ⇒ `khong_doi=False`; chỉ so
     bản ĐẦU *(A)* mới nhầm thành True."""
-    bang = "IX.DRV"   # ⭐ C9: IX.VEN nay có kiểm riêng ⇒ dùng bang CHƯA có kiểm (IX.DRV, C10)
+    # ⭐ C9-R1-01: bang HỢP LỆ, CHƯA có kiểm riêng (⛔ như IX.VEN) VÀ ⛔ bài nào đo là RỖNG
+    #   (IX.DRV bị `AC5`/`C5R1_03` đo rỗng, `C10` sẽ nạp). Grep `tests/`+`fls/` `IX.ALR`: chỉ
+    #   danh mục `BANG_HOP_LE` ⇒ bài này là người ghi DUY NHẤT; ⛔ ai đo `IX.ALR` rỗng.
+    bang = "IX.ALR"
     A = [("x", {"v": "1"})]
     B = [("x", {"v": "2"})]
     chr.nap(conn, bang, A, nguon="n", actor="a")
