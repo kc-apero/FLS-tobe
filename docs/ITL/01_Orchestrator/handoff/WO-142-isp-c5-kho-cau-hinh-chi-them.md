@@ -31,6 +31,7 @@
 | AC-5 | IX.HD cũng đọc từ kho (`/config/hd` giữ hợp đồng C4: 74 nút · 73 MM · `chenh_mapping_master`); kho RỖNG (chưa nạp) ⇒ lỗi "chưa khai" có tên, ≠ lỗi "nguồn lạ"; ⛔ rơi về ảnh tĩnh | pytest | — |
 | AC-6 | GỠ `fls/cau_hinh/tinh/ix_fx_mau.json` + mọi tham chiếu (`fx.py:100` · `tests/api/test_isp_config_fx.py` · `tests/cau_hinh/test_nguon_tinh.py` · `tools/soi_bang_tuyen.py`); `soi_bang_tuyen.py` ĐẠT với tuyến khai nguồn KHO; `?run_id=` ⇒ `400` giữ nguyên | `soi` + pytest | — |
 | AC-6b (`C4-R1-05(a)`, orchestrator 18/11) | gỡ luôn hai ảnh tĩnh trong gói của C4: `fls/cau_hinh/tinh/ix_hd_cay.json` + `ix_mapping_master.json` (ảnh MM gói mang bảng phụ `tho` 84 hàng — 51 hàng có chuỗi ≥ 6 chữ số — mà C4 ⛔ đọc). Kho chỉ lưu khoá cần cho tuyến (MM: `hd_code`); nạp đọc ảnh DT3 ở `tests/fixture/cau_hinh/` qua đường TRUYỀN VÀO. Nếu một bài/tuyến buộc phải giữ tệp tĩnh ⇒ khai lý do trong BG | `git ls-files fls/cau_hinh/tinh` + pytest | — |
+| AC-8 (nợ C4 — orchestrator 18/11) | `C4-R2-01`: mọi ô hỏng ⇒ `LoiHD(HD_HONG)` có tên, kể cả chuỗi số ≥ 4.301 chữ số (`ValueError` của `int()`), số JSON 5.000 chữ số, `'['*100000` (`RecursionError`) · `C4-R2-02`: câu lỗi cắt giá trị dài · `C4-R2-03`: bài biên `_so` (`'+3'` · `'3_0'` · `''` · `'３'`) · `C4-R3-01`: ghim `ten`/`nhom`/`dong_sheet` của một nút thật trên `/config/hd` · `C4-R3-02`: bài hai mã chênh MM (thứ tự `sorted`) | pytest, mỗi bài ĐỎ trước | — |
 | AC-7 (Q8) | nâng `MONG_PYTEST_TOAN_BO` + bài ghim cùng commit | `--duong-nen` | — |
 
 ## Ràng buộc
