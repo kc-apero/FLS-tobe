@@ -205,3 +205,31 @@ def test_C11_bay_VLOOKUP_o_Method_rong_van_hien_0_khong_phai_No_need():
     r = allocate.suy_allocate("SHQ2", "X", {"need_cfa2": "Need to Allocate to CFA2",
                                            "method_cfa2": None})
     assert r.method == "0" and r.method != allocate.CO_KHONG_CAN
+
+
+# ── C11-R1-03 · cdt1 rỗng = THIẾU · ngoai_le chỉ ở HD AP khai ─────────────────────────
+@pytest.mark.parametrize("cdt", ["", "   ", "\t"])
+def test_C11_R1_03_cdt1_rong_hay_khoang_trang_coi_nhu_THIEU_CAN_CDT1(cdt):
+    with pytest.raises(lp.LoiLuatPB) as e:
+        _bang().luat_cua("OFR", 202503, cdt1=cdt)
+    assert e.value.ma == lp.CAN_CDT1, e.value                # ⛔ trả By NOEM (đoán)
+
+
+def test_C11_R1_03_cdt1_that_van_chay_sau_khi_siet_rong():
+    b = _bang()
+    assert b.luat_cua("OFR", 202503, cdt1="CAH").phuong_phap is None
+    assert b.luat_cua("OFR", 202503, cdt1="SHQ2").phuong_phap == lp.BY_NOEM
+
+
+@pytest.mark.parametrize("nhan,hd", [("By GI", "G00"), ("H1000 Ledger", "G00"),
+                                     ("By NOEM", "G00"), ("By NOEM", "ZZZ")])
+def test_C11_R1_03_ngoai_le_o_HD_ma_AP_khong_khai_thi_loi_CO_TEN(nhan, hd):
+    with pytest.raises(lp.LoiLuatPB) as e:
+        lp.kiem([_dong(hd=hd, nhan_mm=nhan, ngoai_le=["CAH"])], nguon=NGUON)
+    assert "ngoai_le" in str(e.value) and hd in str(e.value), e.value
+
+
+def test_C11_R1_03_ngoai_le_dung_HD_va_CDT1_AP_khai_van_qua():
+    b = lp.kiem([_dong(hd="OFR", nhan_mm="By NOEM", ngoai_le=["CAH"])], nguon=NGUON)
+    assert b.luat[0].ngoai_le_cdt1 == ("CAH",)
+    lp.kiem([_dong(hd="OFR", nhan_mm="By NOEM", ngoai_le=[])], nguon=NGUON)   # rỗng luôn được

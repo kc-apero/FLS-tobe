@@ -116,3 +116,19 @@ def test_C11_ban_ghi_thang_SQL_hong_doc_ra_BanHong_CO_TEN(conn):
     assert e.value.ma == "FLS-CAUHINH-BAN-HONG"
     _nap(conn)                       # phục hồi: bản TỐT kế tiếp thắng (kho chỉ-thêm)
     assert len(chc.doc_alr(conn).luat) == 17
+
+
+def test_C11_R1_01_hieu_luc_TICH_LUY_qua_hai_lan_nap_202501_roi_202507(conn):
+    """`C11-R1-01` — kịch bản R1: nạp `tu_ky=202501` rồi `202507` ⇒ đọc theo KỲ, ⛔ chỉ bản mới."""
+    _nap(conn, tu_ky=202501)
+    _nap(conn, tu_ky=202507)
+    b = chc.doc_alr(conn)
+    assert {x.tu_ky for x in b.luat} == {202501, 202507}, "⛔ tích luỹ: cả hai mốc phải còn"
+    assert len(b.luat) == 34, len(b.luat)                    # 17 HD × 2 mốc (đếm dòng luật)
+    cu = b.luat_cua("LC", 202503)
+    assert cu is not None and cu.tu_ky == 202501 and cu.phuong_phap == lp.BY_GI
+    assert b.luat_cua("LC", 202508).tu_ky == 202507          # mới nhất có tu_ky ≤ kỳ
+    assert b.luat_cua("LC", 202412) is None
+    assert b.luat_cua("OFR", 202503, cdt1="CAH").tu_ky == 202501
+    _nap(conn, tu_ky=202507)                                 # nạp lại mốc cũ ⇒ ⛔ nhân đôi
+    assert len(chc.doc_alr(conn).luat) == 34

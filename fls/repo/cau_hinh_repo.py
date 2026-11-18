@@ -543,14 +543,27 @@ def nap_ix_alr(conn, duong_mm: str, *, tu_ky: int, actor: str,
     bảng `fls_mapping_master` của cụm đo 0 dòng ⇒ ⛔ nguồn)* ⇒ phiên bản mới của `IX.ALR`.
 
     `tu_ky` *(`yyyymm`)* là **GIÁ TRỊ CẤU HÌNH do người gọi khai** *(⛔ gõ cứng ở mã)*: luật hiệu
-    lực từ kỳ ấy. Mọi luật `bat = false` *(D2)*. Kiểm bằng CHÍNH `luat_pb.dung_tu_mm`/`kiem`."""
+    lực từ kỳ ấy; các lần nạp TÍCH LUỸ *(`C11-R1-01`: bản mới = bản trước + mốc mới)*, đọc theo kỳ
+    bằng `luat_cua`. Mọi luật `bat = false` *(D2)*. Kiểm bằng CHÍNH `luat_pb.dung_tu_mm`/`kiem`."""
     def chu(o: Any) -> Any:
         return o.get("chu") if isinstance(o, Mapping) else o
     anh = json.loads(Path(duong_mm).read_text(encoding="utf-8"))
     mm = [{"hd_code": chu(r.get("hd_code")), "need_cfa2": chu(r.get("need_cfa2")),
            "method_cfa2": chu(r.get("method_cfa2"))} for r in anh["dong"]]
-    cap = [(luat_pb.khoa_cua(r["hd"], r["tu_ky"]), dict(r))
+    moi = [(luat_pb.khoa_cua(r["hd"], r["tu_ky"]), dict(r))
            for r in luat_pb.dung_tu_mm(mm, tu_ky=tu_ky)]     # `tu_ky` hỏng ⇒ `kiem` trong `nap`
+    # ⭐ `C11-R1-01` — hiệu lực theo kỳ TÍCH LUỸ: mỗi phiên bản là bản ĐẦY ĐỦ = dòng của bản liền
+    #    trước *(giữ `hd@tu_ky` cũ, ⛔ mất mốc)* + dòng lần này *(cùng `hd@tu_ky` ⇒ bản mới thắng,
+    #    ⛔ nhân đôi)*. Kho vẫn chỉ-thêm *(⛔ sửa bản cũ)*; bản liền trước ĐỌC KHÔNG ra *(⛔ qua
+    #    `nap`)* thì ⛔ chở theo — nó vẫn nằm nguyên trong kho, bản tốt kế tiếp thắng.
+    try:
+        truoc = _doc_ban(conn, BANG_ALR)
+        _alr_tu_cap(truoc.dong, truoc.nguon)
+        cap_d = dict(truoc.dong)
+    except (ChuaKhai, luat_pb.LoiLuatPB):
+        cap_d = {}
+    cap_d.update(moi)
+    cap = list(cap_d.items())
     return nap(conn, BANG_ALR, cap, nguon=nguon or duong_mm, actor=actor)
 
 

@@ -100,7 +100,7 @@ class BangALR:
         x = max(ung, key=lambda y: y.tu_ky)
         if not x.ngoai_le_cdt1:
             return x
-        if cdt1 is None:
+        if cdt1 is None or not str(cdt1).strip():        # `C11-R1-03`: "" / khoảng trắng = THIẾU
             raise LoiLuatPB(f"HD {hd!r} có ngoại lệ theo CDT1 {list(x.ngoai_le_cdt1)} — phải "
                             f"khai cdt1, ⛔ đoán", CAN_CDT1)
         if cdt1 in x.ngoai_le_cdt1:
@@ -160,6 +160,9 @@ def kiem(dong: Iterable[Mapping[str, Any]], *, nguon: str) -> BangALR:
         if not isinstance(nl, list) or any(not isinstance(c, str) or not c.strip() for c in nl) \
                 or len(set(nl)) != len(nl):
             ly.append(f"dòng {i}: ngoai_le={_mot(nl)} ⛔ danh sách CDT1 không rỗng, không trùng")
+        if isinstance(nl, list) and nl and isinstance(hd, str) and hd not in NGOAI_LE_AP:
+            ly.append(f"dòng {i}: ngoai_le={_mot(nl)} ⛔ ở hd={hd!r} — chỉ HD AP khai "
+                      f"{sorted(NGOAI_LE_AP)} mới có ngoại lệ (AP §3.2.5)")   # `C11-R1-03`
         if "khoa" in r and len(ly) == n0 and r["khoa"] != khoa_cua(hd, tu_ky):
             ly.append(f"dòng {i}: khoá {_mot(r['khoa'])} ≠ {khoa_cua(hd, tu_ky)!r} (hd@tu_ky)")
         if len(ly) == n0:
