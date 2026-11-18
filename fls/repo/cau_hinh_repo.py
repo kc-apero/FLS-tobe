@@ -42,12 +42,13 @@ from datetime import date, datetime
 from pathlib import Path
 from typing import Any, Iterable, Mapping
 
-from fls.cau_hinh import fx, hd, ky
+from fls.cau_hinh import fx, hd, ky, vendor
 
 BANG_FX = fx.BANG                 # "IX.FX"
 BANG_HD = hd.BANG                 # "IX.HD"
 BANG_MM = hd.BANG_MM             # "IX.HD · IX.ORG" — ảnh Mapping Master
 BANG_PER = ky.BANG               # "IX.PER" — lịch kỳ (`C6`)
+BANG_VEN = vendor.BANG           # "IX.VEN" — vendor · network · cách tính (`C9`)
 
 # ⭐ Danh mục `bang` config HỢP LỆ *(AP: IX.FX · IX.HD · IX.ORG · IX.PER · IX.VEN ·
 #   IX.DRV · IX.ALR · IX.PL · IX.TMP — `.importlinter` khối `C5`)*. Một `bang` ⛔ ở
@@ -62,6 +63,7 @@ BANG_HOP_LE: frozenset[str] = frozenset({
 
 # ⛔ Khoá META *(⛔ phải khoá dữ liệu)* — bắt đầu bằng `@`, ⛔ trùng `yyyymm`/mã HD.
 _THANG_DAU = "@thang_dau"
+_CDT1 = "@cdt1"          # `IX.VEN`: danh mục 7 CDT1 (meta, ⛔ khoá dữ liệu)
 
 
 class LoiCauHinh(Exception):
@@ -159,6 +161,19 @@ def _hd_tu_cap(cap: Iterable[tuple[str, Any]], nguon: str) -> hd.CayHD:
     return hd.kiem(dong, nguon=nguon)
 
 
+def _ven_tu_cap(cap: Iterable[tuple[str, Any]], nguon: str) -> vendor.BangVen:
+    cdt1: Any = None
+    dong: list[Any] = []
+    for khoa, gt in cap:
+        if khoa == _CDT1:
+            cdt1 = gt
+        elif isinstance(gt, Mapping):
+            dong.append({"dong_sheet": khoa, **gt})
+        else:
+            dong.append(gt)                       # ⛔ Mapping ⇒ vendor.kiem bắt "⛔ đối tượng"
+    return vendor.kiem(dong, cdt1=cdt1 if isinstance(cdt1, list) else [], nguon=nguon)
+
+
 def _kiem_mm(cap: Iterable[tuple[str, Any]]) -> None:
     """MM ⛔ có lõi `kiem` dựng-lại riêng *(`hd.doc_mm_van_ban` ăn VĂN BẢN)* ⇒ kiểm HÌNH
     đã lưu: mỗi `gia_tri` ĐÚNG tập khoá `{hd_code, thu_tu}`, `hd_code` ⛔ rỗng, `thu_tu`
@@ -202,6 +217,8 @@ def _kiem_noi_dung(bang: str, cap: list[tuple[str, Any]]) -> None:
         _hd_tu_cap(cap, nguon="(kiem truoc khi ghi)")
     elif bang == BANG_MM:
         _kiem_mm(cap)
+    elif bang == BANG_VEN:
+        _ven_tu_cap(cap, nguon="(kiem truoc khi ghi)")
     elif bang == BANG_PER:
         ky.kiem(dict(cap), nguon="(kiem truoc khi ghi)")   # `LoiKy` CÓ TÊN, ⛔ bọc lại
 
@@ -416,3 +433,36 @@ def doc_per(conn) -> ky.LichKy:
         raise BanHong(
             "⛔ bản `IX.PER` phiên bản %s trong kho ⛔ ĐỌC ra được: %s" % (ban.phien_ban, e)
         ) from e
+
+
+# ── IX.VEN — vendor · network · cách tính (`C9`) ──────────────────────────────
+def nap_ix_ven(conn, duong: str, *, duong_cdt1: str, actor: str,
+               nguon: str | None = None) -> BanCauHinh:
+    """Nạp ảnh DT8 `ix_ven.json` + danh mục CDT1 *(lấy từ ảnh `cdt_correct.json` — các
+    `cdt1_chuan` KHÁC NHAU, ⛔ gõ cứng; cả hai đường TRUYỀN VÀO)* ⇒ phiên bản mới của `IX.VEN`.
+    Khoá kho = `dong_sheet`; kiểm bằng CHÍNH `vendor.kiem`."""
+    def chu(o: Any) -> Any:
+        return o.get("chu") if isinstance(o, Mapping) else o
+    anh = json.loads(Path(duong).read_text(encoding="utf-8"))
+    cdt_anh = json.loads(Path(duong_cdt1).read_text(encoding="utf-8"))
+    cdt1 = sorted({chu(r["cdt1_chuan"]) for r in cdt_anh["dong"]})
+    cap: list[tuple[str, Any]] = [(_CDT1, cdt1)]
+    for r in anh["dong"]:
+        cap.append((str(r["dong_sheet"]), {
+            "thu_tu": r["thu_tu"], "No": chu(r["No"]), "vendor": chu(r["vendor"]),
+            "network": chu(r["network"]), "account": chu(r["account"]),
+            "pct": chu(r["pct"]), "cashin_month": chu(r["cashin_month"]),
+            "cashin_day": chu(r["cashin_day"]), "cach_tinh": chu(r["cach_tinh"])}))
+    return nap(conn, BANG_VEN, cap, nguon=nguon or duong, actor=actor)
+
+
+def doc_ven(conn) -> vendor.BangVen:
+    """`IX.VEN` mới nhất, dựng lại **qua `vendor.kiem`**. `ChuaKhai` nếu rỗng; bản BẨN ⇒
+    `BanHong` CÓ TÊN."""
+    ban = _doc_ban(conn, BANG_VEN)
+    try:
+        return _ven_tu_cap(ban.dong, ban.nguon)
+    except vendor.LoiVen as e:
+        raise BanHong(
+            "⛔ bản `IX.VEN` phiên bản %s trong kho ⛔ ĐỌC ra được *(⛔ qua `nap`?)*"
+            % ban.phien_ban) from e
