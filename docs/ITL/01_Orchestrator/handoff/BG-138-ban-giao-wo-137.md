@@ -113,3 +113,33 @@ sheet và ảnh khai rõ *(`ghi_chu_khuon` + bài ghi cả hai mốc)*.
 - `PHU_MONG`/`--mong` là số ĐO 18/11 *(như `gl_406.MONG`)*; re-read ngày khác ⇒ cập nhật hằng +
   đóng băng lại *(báo cáo daily mọc thêm cột ngày)*.
 - Câu hỏi mốc 2024-10-20 vs 21 *(§5)* — chờ chốt.
+
+---
+
+## 8. Vòng sửa sau R1 (`KQ-139` · `DT5-R1-01…06`) — chỉ THÊM
+
+| | |
+|---|---|
+| **Bởi** | phiên cloud con *(Opus 4.8)* · cụm PG **5437** · nhánh `isp/DT5` · 2026-11-18 |
+| **Nền** | sha `38bbd8a` *(ngọn R1: mã+bài+ảnh `dc6b16f` + `BG-138` + `KQ-139`)* |
+| **Duyệt** | người dùng duyệt vòng sửa; orchestrator chốt **A** cho `DT5-R1-01` *(vá trước R2)* |
+| **Công cụ chung** | `tools/dong_bang_sheet.py` **0 dòng đổi** *(git diff rỗng)* — `ix_fx` + 3 ảnh DT3 + `gl_406` giữ đúng từng byte *(`test_giu_anh_DT2_DT3_DT4_dung_tung_byte` xanh)* |
+| **Ảnh đáp án** | `cfa1_daily.json` · `cfa1_yhqm.json` **⛔ đổi byte** — checksum giữ `6e01ee2b0f2207a3` · `ff9e76976cda1401`. Mọi cổng mới XANH trên dữ liệu THẬT *(bản khai khớp)* nên ⛔ cần đóng băng lại; nguồn thật ⛔ dính |
+
+### Phát hiện đã sửa *(mỗi cổng mới chứng minh ĐỎ hai chiều — Đ5)*
+
+| F | Mức | Sửa | Bằng chứng (bài) · ĐỎ-trước |
+|---|---|---|---|
+| **`DT5-R1-01`** | NÊN SỬA | `_cfa1.cong_hd` đo THÊM trên cây ĐẦY ĐỦ `phu.hd` *(qua `ghi_ngu_canh`, ⛔ đổi hợp đồng `thieu_lac(dong)` của công cụ chung)*: **mỗi khối LE ⇒ tập mã == cây ATL 74 CHÍNH XÁC** — `lạ`·`vắng`·`trùng` đều ĐỎ. Nêu mẫu số **hàng toàn-0** ở dòng `dải` *(Đ3)* | `test_DT5_R1_01_ma_hang_toan_0_la_thi_DO` *(mã GROUP toàn-0 → `ZZZ` ⇒ exit 1 `GROUP:lạ@ZZZ`+`vắng`; trả nguyên XANH)* · `…hai_hang_cung_ma…` *(trùng+vắng ⇒ ĐỎ)* · `…dem_mau_so` *(dải khai `hàng toàn-0 369`)*. Cổng cũ MÙ 164/370 hàng toàn-0 |
+| **`DT5-R1-02`** | GHI NHẬN | Lời lỗi nêu **vị trí + loại** qua `_cfa1._an_toan` *(mã/token ngắn `[#A-Za-z0-9/.!?-]{1,16}` hiện nguyên; email/tên ⇒ CHE)* ở `_cfa1.py:132` *(mã LE)* · `:154` *(nhóm)* · `cfa1_yhqm.py:81` *(Period)* — ⛔ `{ô!r}` | `test_DT5_R1_02_loi_ma_LE_khong_in_o_ban_tho` · `…loi_Period…` *(giả-email ở cột A / ô Period ⇒ TỪ CHỐI, chuỗi ⛔ trong stdout/stderr)* |
+| **`DT5-R1-03`** | GHI NHẬN | Nhãn trục ĐỐI CHIẾU chéo: `cfa1_daily` serial phải NGUYÊN *(⛔ `int()` cắt im lặng)* · `dow == (serial+6)%7`; `cfa1_yhqm._khoa_ky` chặn tháng ∉ 1…12 và ⛔ Period lẻ · kiểm **thứ tự Y/H/Q/M** trong năm *(`_KY_CHUAN`)* | `…serial_khong_nguyen…` · `…dow_sai…` · `…period_ngoai_1_12…` *(Period 2023 ⇒ ⛔ `2024M2023`)* · `…hoan_nhan_thang…` *(3↔4 ⇒ thứ tự lệch)* — đều TỪ CHỐI |
+| **`DT5-R1-04`** | GHI NHẬN | `O_LOI_GIA = {"-": 25}` ghim **phân bố giá trị** ô lỗi *(⛔ chỉ ĐẾM)*; cổng `cong_hd` so `o_loi` thực ↔ bản khai ⇒ `#REF!` thay một `-` ⇒ ĐỎ *(Đ5 buộc ghi lại bản khai)* | `test_DT5_R1_04_REF_thay_dash_thi_DO` *(25 `-` XANH; đổi 1 → `#REF!` ⇒ exit 1 `o_loi_gia@khác`)* |
+| **`DT5-R1-05`** | GHI NHẬN *(orchestrator)* | **Nhãn Đ4 cho 760:** `ngay_truc` = **cột ngày ≤ ngày đọc** *(⛔ = ngày có số)*; ngày có ≥ 1 ô ≠ 0 cuối = **2026-11-11** ⇒ 7 cột cuối *(2026-11-12…11-18)* toàn 0 ⇒ **753/760** ngày có dữ liệu *(R1 đo)*. H5/H6 ⛔ coi 7 cột cuối là "số 0 đã chốt". Errata ISP/AP: orchestrator lo | — *(ghi chú; mã ⛔ đổi)* |
+| **`DT5-R1-06`** | GHI NHẬN *(chấp nhận)* | **Nguyên nhân kích thước 6,8 MB:** ⛔ dữ liệu thừa — ô ≠ 0 THƯA **11,9 %** *(33.355/281.200)* nhân khoá LẶP *(`o_id = le#ma#ngay` dẫn xuất 23 %, `le`/`ma_hd` lặp bọc `{"chu":…}`)*; `dong` là hợp đồng chung của công cụ *(⛔ lỗi DT5)* | — *(ghi chú; hình `dong` ⛔ đổi trong DT5)* |
+
+### Q8 + hồi quy
+
+- **Sàn pytest:** `MONG_PYTEST_TOAN_BO` **3123 → 3133** *(+10 bài `tests/du_lieu/test_dap_an_cfa1.py`)* cùng commit; `MONG_PYTEST_WEB` **667** *(⛔ đổi)*. Bài ghim `test_S0_R3_02_…` + `…R2_03…` cập nhật, ĐẠT.
+- `tests/du_lieu/test_dap_an_cfa1.py`: **21 → 31 passed**; `tests/du_lieu`: **358 → 368 passed**.
+- `--duong-nen` *(một mình, cổng 5437)*: **KẾT: ĐẠT** — toàn bộ `12 failed · 3105 passed · 2 xfailed · 14 errors`; tập đỏ + XFAIL **28 = 28** *(thêm 0 · bớt 0)*; `tests/web` **3 = 3** *(664 passed)*; chạy **3133** *(mong ≥ 3133)* · skipped 0 · deselected 0.
+- `lint-imports` **11 kept, 0 broken**; `kiem_tai_lieu.py` **ĐẠT** *(251 file · 2.323 bảng · 104 mã QĐ)*; `pg_migrate → pg_verify` **khớp**.
