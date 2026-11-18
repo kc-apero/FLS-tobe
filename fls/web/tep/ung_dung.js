@@ -85,7 +85,8 @@
     'man-f02': { than: '#than-f02', ve: () => F02.ve() },
     // ⭐ `F04` neo vao `#f04-chon` *(o cua trang thai ①)*, ⛔ khong mot the
     //   `#than-f04` — man nay co **nam khoi**, ⛔ khong phai mot than duy nhat.
-    'man-f04': { than: '#nap-chon', ve: () => F04.ve() }
+    'man-f04': { than: '#nap-chon', ve: () => F04.ve() },
+    'man-f08': { than: '#than-f08', ve: () => F08.ve(TP.$('#than-f08')) }
   };
 
   /* ⭐ Mo mot man **tu ma khac** — `F04` bam *"Mo hang cho"* thi phai sang

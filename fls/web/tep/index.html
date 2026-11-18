@@ -49,6 +49,7 @@
     <button data-s="man-ghep">②b Gán lệnh chi</button>
     <button data-s="man-f02">③ Sổ ITL · F02</button>
     <button data-s="man-f04">④ Nạp sao kê · F04</button>
+    <button data-s="man-f08">⑥ Cấu hình · F08</button>
     <button data-s="man-f06" disabled>⑤ Danh mục · F06 <span class="faint">(B6)</span></button>
   </div>
 
@@ -253,6 +254,16 @@
 
 </div>
 
+  <!-- ⭐ F08 · CAU HINH (`ISP 3.1.2` Step 18) — bang `IX.FX` CHI DOC. ⛔ Khong nut. -->
+  <section class="screen" id="man-f08">
+    <div class="stack">
+      <div class="card">
+        <header><h3>Cấu hình · tỷ giá IX.FX</h3></header>
+        <div id="than-f08"></div>
+      </div>
+    </div>
+  </section>
+
 <!-- ⭐ SINH TU `fls/api/cot_so.py` — 23 tieu de luoi + 38 vi tri canon.
      ⛔ Khong mot ten cot tieng Viet nao go tay trong `man_f02.js`. -->
 <script src="/cot.js"></script>
@@ -268,6 +279,7 @@
 <script src="/man_f01_ghep.js"></script>
 <script src="/man_f02.js"></script>
 <script src="/man_f04.js"></script>
+<script src="/man_f08.js"></script>
 <script src="/ung_dung.js"></script>
 </body>
 </html>
