@@ -23,7 +23,7 @@
 | C8-B1 | CDT biết ⇒ CDT1 đúng + `0` sự kiện *(đơn vị + pg)*; TK→LE qua Mapping Master | ĐẠT *(xem `C8-R1-05`: TK→CDT1 ⛔ có trong ảnh)* |
 | C8-B2 | `XYZ` ⇒ `cdt1=None, la=True`, đúng `1` sự kiện, thấy ở `GET /queue` *(mẫu số 1 hàng ≠ 0)*; gọi lại ⇒ vẫn `1`; dòng khác ⇒ `cdt_la = None` | ĐẠT |
 | Hồi quy | `test_cua_lenh_cho_pg.py` | ĐẠT |
-| Số đo *(Đ4)* | CDT Correct **13** dòng ảnh *(ISP 18 = bề vùng sheet)* · **7** CDT1 chuẩn khác nhau *(ISP 8)* · **69** hàng `R |` = **59** pháp nhân *(19 mã LE)* + **8** `CN` + **2** `Cash Treasury` — đo lại bằng script độc lập ⇒ khớp | ĐẠT |
+| Số đo *(Đ4)* | CDT Correct **13** dòng ảnh *(ISP 18 = bề vùng sheet)* · **7** CDT1 chuẩn khác nhau *(ISP 8)* · **69** hàng `R \|` = **59** pháp nhân *(19 mã LE)* + **8** `CN` + **2** `Cash Treasury` — đo lại bằng script độc lập ⇒ khớp | ĐẠT |
 | Chỉ-thêm `0027` · lỗi có tên | ⛔ di trú mới; `nap` chỉ-thêm *(phiên bản +1, `khong_doi`)*; `ORG_HONG`/`CDT_RONG`/`CDT_TRUNG`/`TK_RONG`/`TK_TRUNG` có tên *(⛔ `TK_TRUNG` có bài — `C8-R1-03`)* | ĐẠT một phần |
 
 ## Riêng tư — `CN`
