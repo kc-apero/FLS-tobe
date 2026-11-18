@@ -1,0 +1,727 @@
+{
+ "bang": "IX.VEN",
+ "khuon": "ix_ven",
+ "nguon": "'Vendor & Network Mapping'!M3:V40",
+ "cach_doc": "Sheets API v4 values.get · UNFORMATTED_VALUE · SERIAL_NUMBER · khoá SA chỉ-đọc · Block 1 M:S cột KHÔNG PII",
+ "ngay_dong_bang": "2026-11-18",
+ "khong_mang_PII": "⛔ KHÔNG mang cột riêng tư: máy soát 9 tên cột của bản thô với PM_COT_RIENG_TU ['Email Address'] — 0 trùng (gộp khoảng trắng, ⛔ phân biệt hoa thường). Ảnh chỉ giữ khoá `dong_sheet` + 8 cột chọn; 0 cột bản thô ⛔ chọn (tên ở `cot_khong_chon`). Bản thô qua `chuan_bi` của khuôn: 9 tên cột trên là của BẢNG khuôn dựng; soát thêm 0 tên cột của 0 bảng phụ — 0 trùng. Ô bản thô mà khuôn ⛔ mang/băm: xem `ghi_chu_khuon`.",
+ "ghi_chu_khuon": "Block 1 = 36 hàng *(sheet 4…39)* vùng M:S; MappingBlock2.gs nhân × 7 CDT1 *(C9/H9 tiêu thụ)*. Cột `cach_tinh` SUY *(⛔ đọc từ sheet)*: Network 'Max' ⇒ 'Max', ngược lại Vendor ∈ ['VD341', 'VD428', 'VD444', 'VD62'] ⇒ chính mã, ngược lại 'thường'. 5 nhãn riêng = ['Max', 'VD341', 'VD428', 'VD444', 'VD62'] *(mong ['Max', 'VD341', 'VD428', 'VD444', 'VD62']; khác ⇒ cổng ĐỎ)*. Cột `account` = Tên tài khoản *(owner GIỮ 11/09 — chỉ 'Email Address' bị cấm)*. ⛔ mang cột ngoài M:S.",
+ "khoa": "dong_sheet",
+ "kieu_khoa": "dong_sheet",
+ "cot": [
+  "No",
+  "vendor",
+  "network",
+  "account",
+  "pct",
+  "cashin_month",
+  "cashin_day",
+  "cach_tinh"
+ ],
+ "cot_khong_chon": [],
+ "so_dong": 36,
+ "trung": [],
+ "thieu": [],
+ "lac": [
+  "Max",
+  "VD341",
+  "VD428",
+  "VD444",
+  "VD62"
+ ],
+ "khoa_hong": [],
+ "o_rong": [],
+ "cong": {
+  "mong": 36,
+  "so_dong": 36,
+  "dat": true,
+  "ly_do": []
+ },
+ "checksum_noi_dung": "9a6bc3cac0bf496c",
+ "dong": [
+  {
+   "thu_tu": 1,
+   "dong_sheet": "4",
+   "No": "1",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "network": {
+    "chu": "Admob"
+   },
+   "account": {
+    "chu": "Admob Trananhlinh"
+   },
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "23",
+   "cach_tinh": {
+    "chu": "VD341"
+   }
+  },
+  {
+   "thu_tu": 2,
+   "dong_sheet": "5",
+   "No": "2",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "network": {
+    "chu": "Admob"
+   },
+   "account": {
+    "chu": "Admob TaiNguyen"
+   },
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "23",
+   "cach_tinh": {
+    "chu": "VD341"
+   }
+  },
+  {
+   "thu_tu": 3,
+   "dong_sheet": "6",
+   "No": "3",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "network": {
+    "chu": "Admob"
+   },
+   "account": {
+    "chu": "Sài Gòn 2 - NLXBG"
+   },
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "23",
+   "cach_tinh": {
+    "chu": "VD341"
+   }
+  },
+  {
+   "thu_tu": 4,
+   "dong_sheet": "7",
+   "No": "4",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "network": {
+    "chu": "Admob"
+   },
+   "account": {
+    "chu": "Admob Haicoihy"
+   },
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "23",
+   "cach_tinh": {
+    "chu": "VD341"
+   }
+  },
+  {
+   "thu_tu": 5,
+   "dong_sheet": "8",
+   "No": "5",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "network": {
+    "chu": "Admob"
+   },
+   "account": {
+    "chu": "Admob Game - TuanLA"
+   },
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "23",
+   "cach_tinh": {
+    "chu": "VD341"
+   }
+  },
+  {
+   "thu_tu": 6,
+   "dong_sheet": "9",
+   "No": "6",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "network": {
+    "chu": "Admob"
+   },
+   "account": {
+    "chu": "Admob trantiepneu 10 năm tuổi"
+   },
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "23",
+   "cach_tinh": {
+    "chu": "VD341"
+   }
+  },
+  {
+   "thu_tu": 7,
+   "dong_sheet": "10",
+   "No": "1",
+   "vendor": {
+    "chu": "VD57"
+   },
+   "network": {
+    "chu": "Max"
+   },
+   "account": {
+    "chu": "Max Mediation"
+   },
+   "pct": "0.08333333333333333",
+   "cashin_month": "1",
+   "cashin_day": "20",
+   "cach_tinh": {
+    "chu": "Max"
+   }
+  },
+  {
+   "thu_tu": 8,
+   "dong_sheet": "11",
+   "No": "1",
+   "vendor": {
+    "chu": "VD429"
+   },
+   "network": {
+    "chu": "Max"
+   },
+   "account": {
+    "chu": "Max Mediation"
+   },
+   "pct": "0.08333333333333333",
+   "cashin_month": "1",
+   "cashin_day": "20",
+   "cach_tinh": {
+    "chu": "Max"
+   }
+  },
+  {
+   "thu_tu": 9,
+   "dong_sheet": "12",
+   "No": "1",
+   "vendor": {
+    "chu": "VD426"
+   },
+   "network": {
+    "chu": "Max"
+   },
+   "account": {
+    "chu": "Max Mediation"
+   },
+   "pct": "0.08333333333333333",
+   "cashin_month": "1",
+   "cashin_day": "20",
+   "cach_tinh": {
+    "chu": "Max"
+   }
+  },
+  {
+   "thu_tu": 10,
+   "dong_sheet": "13",
+   "No": "1",
+   "vendor": {
+    "chu": "VD557"
+   },
+   "network": {
+    "chu": "Max"
+   },
+   "account": {
+    "chu": "Max Mediation"
+   },
+   "pct": "0.08333333333333333",
+   "cashin_month": "1",
+   "cashin_day": "20",
+   "cach_tinh": {
+    "chu": "Max"
+   }
+  },
+  {
+   "thu_tu": 11,
+   "dong_sheet": "14",
+   "No": "1",
+   "vendor": {
+    "chu": "VD111"
+   },
+   "network": {
+    "chu": "Max"
+   },
+   "account": {
+    "chu": "Max Mediation"
+   },
+   "pct": "0.08333333333333333",
+   "cashin_month": "1",
+   "cashin_day": "20",
+   "cach_tinh": {
+    "chu": "Max"
+   }
+  },
+  {
+   "thu_tu": 12,
+   "dong_sheet": "15",
+   "No": "1",
+   "vendor": {
+    "chu": "VD427"
+   },
+   "network": {
+    "chu": "Max"
+   },
+   "account": {
+    "chu": "Max Mediation"
+   },
+   "pct": "0.08333333333333333",
+   "cashin_month": "1",
+   "cashin_day": "20",
+   "cach_tinh": {
+    "chu": "Max"
+   }
+  },
+  {
+   "thu_tu": 13,
+   "dong_sheet": "16",
+   "No": "1",
+   "vendor": {
+    "chu": "VD417"
+   },
+   "network": {
+    "chu": "Max"
+   },
+   "account": {
+    "chu": "Max Mediation"
+   },
+   "pct": "0.08333333333333333",
+   "cashin_month": "1",
+   "cashin_day": "20",
+   "cach_tinh": {
+    "chu": "Max"
+   }
+  },
+  {
+   "thu_tu": 14,
+   "dong_sheet": "17",
+   "No": "1",
+   "vendor": {
+    "chu": "VD430"
+   },
+   "network": {
+    "chu": "Max"
+   },
+   "account": {
+    "chu": "Max Mediation"
+   },
+   "pct": "0.08333333333333333",
+   "cashin_month": "1",
+   "cashin_day": "20",
+   "cach_tinh": {
+    "chu": "Max"
+   }
+  },
+  {
+   "thu_tu": 15,
+   "dong_sheet": "18",
+   "No": "1",
+   "vendor": {
+    "chu": "VD63"
+   },
+   "network": {
+    "chu": "Max"
+   },
+   "account": {
+    "chu": "Max Mediation"
+   },
+   "pct": "0.08333333333333333",
+   "cashin_month": "1",
+   "cashin_day": "20",
+   "cach_tinh": {
+    "chu": "Max"
+   }
+  },
+  {
+   "thu_tu": 16,
+   "dong_sheet": "19",
+   "No": "1",
+   "vendor": {
+    "chu": "VD424"
+   },
+   "network": {
+    "chu": "Max"
+   },
+   "account": {
+    "chu": "Max Mediation"
+   },
+   "pct": "0.08333333333333333",
+   "cashin_month": "1",
+   "cashin_day": "20",
+   "cach_tinh": {
+    "chu": "Max"
+   }
+  },
+  {
+   "thu_tu": 17,
+   "dong_sheet": "20",
+   "No": "1",
+   "vendor": {
+    "chu": "VD64"
+   },
+   "network": {
+    "chu": "Max"
+   },
+   "account": {
+    "chu": "Max Mediation"
+   },
+   "pct": "0.08333333333333333",
+   "cashin_month": "1",
+   "cashin_day": "20",
+   "cach_tinh": {
+    "chu": "Max"
+   }
+  },
+  {
+   "thu_tu": 18,
+   "dong_sheet": "21",
+   "No": "1",
+   "vendor": {
+    "chu": "VD62"
+   },
+   "network": {
+    "chu": "Max"
+   },
+   "account": {
+    "chu": "Max Mediation"
+   },
+   "pct": "0.08333333333333333",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "Max"
+   }
+  },
+  {
+   "thu_tu": 19,
+   "dong_sheet": "22",
+   "No": "1",
+   "vendor": {
+    "chu": "VD428"
+   },
+   "network": {
+    "chu": "Apple_store"
+   },
+   "account": null,
+   "pct": "1",
+   "cashin_month": "2",
+   "cashin_day": "5",
+   "cach_tinh": {
+    "chu": "VD428"
+   }
+  },
+  {
+   "thu_tu": 20,
+   "dong_sheet": "23",
+   "No": "2",
+   "vendor": {
+    "chu": "VD428"
+   },
+   "network": {
+    "chu": "IAP_tracking"
+   },
+   "account": null,
+   "pct": "1",
+   "cashin_month": "2",
+   "cashin_day": "5",
+   "cach_tinh": {
+    "chu": "VD428"
+   }
+  },
+  {
+   "thu_tu": 21,
+   "dong_sheet": "24",
+   "No": "1",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "network": {
+    "chu": "Ggplay_store"
+   },
+   "account": {
+    "chu": "Apero VisionLab"
+   },
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "19",
+   "cach_tinh": {
+    "chu": "VD444"
+   }
+  },
+  {
+   "thu_tu": 22,
+   "dong_sheet": "25",
+   "No": "2",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "network": {
+    "chu": "Ggplay_store"
+   },
+   "account": {
+    "chu": "Trusted Office"
+   },
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "19",
+   "cach_tinh": {
+    "chu": "VD444"
+   }
+  },
+  {
+   "thu_tu": 23,
+   "dong_sheet": "26",
+   "No": "3",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "network": {
+    "chu": "Ggplay_store"
+   },
+   "account": {
+    "chu": "Super Minds"
+   },
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "19",
+   "cach_tinh": {
+    "chu": "VD444"
+   }
+  },
+  {
+   "thu_tu": 24,
+   "dong_sheet": "27",
+   "No": "4",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "network": {
+    "chu": "Ggplay_store"
+   },
+   "account": {
+    "chu": "FeaturedApp"
+   },
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "19",
+   "cach_tinh": {
+    "chu": "VD444"
+   }
+  },
+  {
+   "thu_tu": 25,
+   "dong_sheet": "28",
+   "No": "5",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "network": {
+    "chu": "Ggplay_store"
+   },
+   "account": {
+    "chu": "Terasoft"
+   },
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "19",
+   "cach_tinh": {
+    "chu": "VD444"
+   }
+  },
+  {
+   "thu_tu": 26,
+   "dong_sheet": "29",
+   "No": "6",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "network": {
+    "chu": "Ggplay_store"
+   },
+   "account": {
+    "chu": "NLX AI Solutions"
+   },
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "19",
+   "cach_tinh": {
+    "chu": "VD444"
+   }
+  },
+  {
+   "thu_tu": 27,
+   "dong_sheet": "30",
+   "No": "7",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "network": {
+    "chu": "Ggplay_store"
+   },
+   "account": {
+    "chu": "Astronex"
+   },
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "19",
+   "cach_tinh": {
+    "chu": "VD444"
+   }
+  },
+  {
+   "thu_tu": 28,
+   "dong_sheet": "31",
+   "No": "8",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "network": {
+    "chu": "Ggplay_store"
+   },
+   "account": {
+    "chu": "Trusted App"
+   },
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "19",
+   "cach_tinh": {
+    "chu": "VD444"
+   }
+  },
+  {
+   "thu_tu": 29,
+   "dong_sheet": "32",
+   "No": "1",
+   "vendor": {
+    "chu": "VD336"
+   },
+   "network": null,
+   "account": null,
+   "pct": null,
+   "cashin_month": "1",
+   "cashin_day": "20",
+   "cach_tinh": {
+    "chu": "thường"
+   }
+  },
+  {
+   "thu_tu": 30,
+   "dong_sheet": "33",
+   "No": "1",
+   "vendor": {
+    "chu": "VD113"
+   },
+   "network": null,
+   "account": null,
+   "pct": null,
+   "cashin_month": "1",
+   "cashin_day": "20",
+   "cach_tinh": {
+    "chu": "thường"
+   }
+  },
+  {
+   "thu_tu": 31,
+   "dong_sheet": "34",
+   "No": "2",
+   "vendor": {
+    "chu": "VD62"
+   },
+   "network": null,
+   "account": null,
+   "pct": null,
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "VD62"
+   }
+  },
+  {
+   "thu_tu": 32,
+   "dong_sheet": "35",
+   "No": "1",
+   "vendor": {
+    "chu": "VD61"
+   },
+   "network": null,
+   "account": null,
+   "pct": null,
+   "cashin_month": "1",
+   "cashin_day": "19",
+   "cach_tinh": {
+    "chu": "thường"
+   }
+  },
+  {
+   "thu_tu": 33,
+   "dong_sheet": "36",
+   "No": "2",
+   "vendor": {
+    "chu": "VD61"
+   },
+   "network": null,
+   "account": null,
+   "pct": null,
+   "cashin_month": "1",
+   "cashin_day": "19",
+   "cach_tinh": {
+    "chu": "thường"
+   }
+  },
+  {
+   "thu_tu": 34,
+   "dong_sheet": "37",
+   "No": "3",
+   "vendor": {
+    "chu": "VD428"
+   },
+   "network": null,
+   "account": null,
+   "pct": null,
+   "cashin_month": "2",
+   "cashin_day": "5",
+   "cach_tinh": {
+    "chu": "VD428"
+   }
+  },
+  {
+   "thu_tu": 35,
+   "dong_sheet": "38",
+   "No": "2",
+   "vendor": {
+    "chu": "VD57"
+   },
+   "network": null,
+   "account": null,
+   "pct": null,
+   "cashin_month": "1",
+   "cashin_day": "20",
+   "cach_tinh": {
+    "chu": "thường"
+   }
+  },
+  {
+   "thu_tu": 36,
+   "dong_sheet": "39",
+   "No": "1",
+   "vendor": {
+    "chu": "VD58"
+   },
+   "network": null,
+   "account": null,
+   "pct": null,
+   "cashin_month": "1",
+   "cashin_day": "20",
+   "cach_tinh": {
+    "chu": "thường"
+   }
+  }
+ ]
+}
