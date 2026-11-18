@@ -225,7 +225,7 @@ BANG_TUYEN: tuple[Tuyen, ...] = (
     Tuyen("GET", f"{TIEN_TO}/queue", "hang_cho",
           # ⚠ `fls_da_xong` them 03/09 (`GAP-API-05`): dieu kien "da bam xong"
           # nam TRONG cau con `q` tu `QĐ-ITL-71` ma ban khai ⛔ khong theo kip.
-          ("fls_itl", "fls_queue_state", "fls_da_xong"),
+          ("fls_itl", "fls_queue_state", "fls_da_xong", "fls_queue_event"),
           mo_ta="hang cho xep theo TIEN trong tung tien te (QĐ-ITL-58)"),
     Tuyen("GET", f"{TIEN_TO}/queue/summary", "hang_cho_tom",
           ("fls_itl", "fls_da_xong"),
