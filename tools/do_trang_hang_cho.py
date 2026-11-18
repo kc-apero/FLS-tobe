@@ -83,7 +83,12 @@ WITH q AS (
 )
 SELECT x.itl_id, x.doc_date, x.doc_no, x.curr, x.le, x.memo, x.tien,
        x.hang, x.luy_ke_pct,
-       s.reason, s.defer_until, s.defer_count
+       s.reason, s.defer_until, s.defer_count,
+       -- `C8` (WO-176): cột THÊM duy nhất so với câu của `9af99c4` — công thức ĐỘC LẬP
+       -- với mã (truy vấn tương quan, ⛔ CTE `cl`): sự kiện CDT_LA mới nhất của dòng.
+       (SELECT e.reason FROM fls_queue_event e
+         WHERE e.itl_id = x.itl_id AND e.evt_type = 'CDT_LA'
+         ORDER BY e.at DESC, e.evt_id DESC LIMIT 1) AS cdt_la
 FROM x LEFT JOIN fls_queue_state s ON s.itl_id = x.itl_id
 WHERE TRUE {them}
 ORDER BY x.curr, x.hang

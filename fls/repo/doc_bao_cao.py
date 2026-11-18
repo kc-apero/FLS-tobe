@@ -598,6 +598,10 @@ _SQL_HANG_CHO = _CTE_HANG_CHO + """
 , st AS MATERIALIZED (
   SELECT v.itl_id, v.reason, v.defer_until, v.defer_count
   FROM fls_queue_state v
+), cl AS MATERIALIZED (
+  -- `C8` (WO-176): CDT lạ — sự kiện `CDT_LA`, ⛔ `reason` (không trộn máy vào cú bấm người)
+  SELECT e.itl_id, (ARRAY_AGG(e.reason ORDER BY e.at DESC, e.evt_id DESC))[1] AS cdt_la
+  FROM fls_queue_event e WHERE e.evt_type = 'CDT_LA' GROUP BY e.itl_id
 ), trang AS MATERIALIZED (
   SELECT x.* FROM x
   WHERE TRUE {them}
@@ -606,9 +610,10 @@ _SQL_HANG_CHO = _CTE_HANG_CHO + """
 )
 SELECT t.itl_id, t.doc_date, t.doc_no, t.curr, t.le, t.memo, t.tien,
        t.hang, t.luy_ke_pct,
-       s.reason, s.defer_until, s.defer_count
+       s.reason, s.defer_until, s.defer_count, c.cdt_la
 FROM trang t
 LEFT JOIN st s ON s.itl_id = t.itl_id
+LEFT JOIN cl c ON c.itl_id = t.itl_id
 ORDER BY t.curr, t.hang
 """
 

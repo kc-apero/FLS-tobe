@@ -42,12 +42,13 @@ from datetime import date, datetime
 from pathlib import Path
 from typing import Any, Iterable, Mapping
 
-from fls.cau_hinh import fx, hd, ky
+from fls.cau_hinh import fx, hd, ky, to_chuc
 
 BANG_FX = fx.BANG                 # "IX.FX"
 BANG_HD = hd.BANG                 # "IX.HD"
 BANG_MM = hd.BANG_MM             # "IX.HD · IX.ORG" — ảnh Mapping Master
 BANG_PER = ky.BANG               # "IX.PER" — lịch kỳ (`C6`)
+BANG_ORG = to_chuc.BANG          # "IX.ORG" — CDT Correct + TK→LE (`C8`)
 
 # ⭐ Danh mục `bang` config HỢP LỆ *(AP: IX.FX · IX.HD · IX.ORG · IX.PER · IX.VEN ·
 #   IX.DRV · IX.ALR · IX.PL · IX.TMP — `.importlinter` khối `C5`)*. Một `bang` ⛔ ở
@@ -179,6 +180,19 @@ def _kiem_mm(cap: Iterable[tuple[str, Any]]) -> None:
         raise LoiCauHinh("⛔ ảnh Mapping Master sai hình:\n  - " + "\n  - ".join(loi))
 
 
+def _kiem_org(cap: Iterable[tuple[str, Any]]) -> None:
+    """`IX.ORG` ⇒ mỗi khoá `cdt:…` mang `{cdt1}`, `tk:…` mang `{le}`; ⛔ khoá khác."""
+    loi: list[str] = []
+    for k, v in cap:
+        truong = ("cdt1" if k.startswith(to_chuc.TIEN_TO_CDT)
+                  else "le" if k.startswith(to_chuc.TIEN_TO_TK) else None)
+        if truong is None or not isinstance(v, Mapping) or set(v) != {truong} \
+                or not str(v.get(truong) or "").strip():
+            loi.append("%r: khoá phải `cdt:`/`tk:` với gia_tri {cdt1}/{le} ⛔ rỗng" % k)
+    if loi:
+        raise LoiCauHinh("⛔ bản IX.ORG sai hình:\n  - " + "\n  - ".join(loi))
+
+
 def _kiem_noi_dung(bang: str, cap: list[tuple[str, Any]]) -> None:
     """⛔ GHI một bản RỖNG/BẨN — kiểm **TRƯỚC** khi chạm kho *(khuôn ⓑ; kho chỉ-thêm
     ⛔ có đường lùi ⇒ một bản ghi sai là **vĩnh viễn** và thành bản MỚI NHẤT ⛔ xoá
@@ -202,6 +216,8 @@ def _kiem_noi_dung(bang: str, cap: list[tuple[str, Any]]) -> None:
         _hd_tu_cap(cap, nguon="(kiem truoc khi ghi)")
     elif bang == BANG_MM:
         _kiem_mm(cap)
+    elif bang == BANG_ORG:
+        _kiem_org(cap)
     elif bang == BANG_PER:
         ky.kiem(dict(cap), nguon="(kiem truoc khi ghi)")   # `LoiKy` CÓ TÊN, ⛔ bọc lại
 
@@ -416,3 +432,55 @@ def doc_per(conn) -> ky.LichKy:
         raise BanHong(
             "⛔ bản `IX.PER` phiên bản %s trong kho ⛔ ĐỌC ra được: %s" % (ban.phien_ban, e)
         ) from e
+
+
+# ── IX.ORG — CDT Correct + TK→LE (`C8` · `WO-176`) ───────────────────────────
+def nap_ix_org(conn, duong_cdt: str, duong_mm: str, *, actor: str,
+               nguon: str | None = None) -> BanCauHinh:
+    """Nạp ảnh `cdt_correct.json` + Mapping Master `tho` ⇒ phiên bản mới của `IX.ORG`
+    *(kiểm bằng CHÍNH `to_chuc.doc_anh`; kho CHỈ giữ TK pháp nhân — ⛔ TK cá nhân)*."""
+    van_cdt = Path(duong_cdt).read_text(encoding="utf-8")
+    van_mm = Path(duong_mm).read_text(encoding="utf-8")
+    ten = nguon or f"{duong_cdt} + {duong_mm}"
+    cdt = to_chuc.doc_cdt_correct(van_cdt, nguon=ten)
+    tk = to_chuc.doc_tk_le(van_mm, nguon=ten)
+    cap: list[tuple[str, Any]] = [(to_chuc.TIEN_TO_CDT + n, {"cdt1": c}) for n, c in cdt]
+    cap += [(to_chuc.TIEN_TO_TK + t, {"le": le}) for t, le in tk]
+    return nap(conn, BANG_ORG, cap, nguon=ten, actor=actor)
+
+
+def doc_org(conn) -> to_chuc.ToChuc:
+    """`IX.ORG` mới nhất. `ChuaKhai` nếu kho chưa nạp — ⛔ rơi về `SHQ2`."""
+    ban = _doc_ban(conn, BANG_ORG)
+    try:
+        cdt = tuple((k[len(to_chuc.TIEN_TO_CDT):], v["cdt1"]) for k, v in ban.dong
+                    if k.startswith(to_chuc.TIEN_TO_CDT))
+        tk = tuple((k[len(to_chuc.TIEN_TO_TK):], v["le"]) for k, v in ban.dong
+                   if k.startswith(to_chuc.TIEN_TO_TK))
+    except (KeyError, TypeError) as e:
+        raise BanHong("⛔ bản `IX.ORG` phiên bản %s trong kho ⛔ ĐỌC ra được"
+                      % ban.phien_ban) from e
+    return to_chuc.dung(cdt, tk, nguon=ban.nguon)
+
+
+def cdt_cua_ghi(conn, itl_id: int, cdt_nguon: str, *, actor: str) -> to_chuc.KetQuaCDT:
+    """CDT1 của `cdt_nguon` theo `IX.ORG` trong kho. CDT **lạ** ⇒ MỘT sự kiện hàng chờ
+    `evt_type='CDT_LA'` gắn dòng `itl_id` *(⛔ trả `SHQ2`)*; gọi lại cùng `(itl_id, CDT)`
+    ⛔ ghi thêm. ⛔ `reason` *(sổ ⛔ trộn việc máy vào cú bấm người — `danh_muc_actor`)*."""
+    if not str(actor or "").strip():
+        raise LoiCauHinh("⛔ thiếu `actor` cho sự kiện CDT_LA")
+    r = to_chuc.cdt_cua(doc_org(conn), cdt_nguon)
+    if r.la:
+        ly_do = "CDT lạ %r — ⛔ có trong CDT Correct, ⛔ mặc định SHQ2" % (cdt_nguon,)
+        with conn.transaction():
+            with conn.cursor() as cur:
+                cur.execute("SELECT pg_advisory_xact_lock(hashtext(%s)::bigint)",
+                            ("CDT_LA:%s" % itl_id,))
+                cur.execute(
+                    "INSERT INTO fls_queue_event (itl_id, evt_type, reason, actor) "
+                    "SELECT %s, %s, %s, %s WHERE NOT EXISTS (SELECT 1 FROM "
+                    "fls_queue_event WHERE itl_id = %s AND evt_type = %s "
+                    "AND reason = %s)",
+                    (itl_id, to_chuc.LOAI_SU_KIEN, ly_do, actor, itl_id,
+                     to_chuc.LOAI_SU_KIEN, ly_do))
+    return r
