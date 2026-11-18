@@ -117,9 +117,13 @@ def _ws_xml(grid: dict[tuple[int, int], object], shared: dict[str, int]) -> str:
 
 
 def _lam_xlsx(path: Path, grid_ledge: dict, grid_bia: dict | None = None,
-              ten_sheet: str = "ITL Ledge") -> Path:
+              ten_sheet: str = "ITL Ledge", rels_ledge_tuyet_doi: bool = False) -> Path:
     """Dựng .xlsx TỐI THIỂU HỢP LỆ: sheet decoy `Bìa` (ĐỨNG TRƯỚC) + sheet `ten_sheet` mang `grid_ledge`.
-    ⇒ công cụ phải TÌM SHEET THEO TÊN, ⛔ lấy sheet đầu."""
+    ⇒ công cụ phải TÌM SHEET THEO TÊN, ⛔ lấy sheet đầu.
+
+    `rels_ledge_tuyet_doi=True`: đích rels của sheet `ten_sheet` viết TUYỆT ĐỐI `"/xl/worksheets/sheet2.xml"`
+    (dạng openpyxl & vài thư viện/dịch vụ sinh) thay vì tương đối `"worksheets/sheet2.xml"` (dạng Excel) —
+    `DT1BT-R1-01`: công cụ phải đọc được CẢ HAI dạng."""
     shared: dict[str, int] = {}
     ws_bia = _ws_xml(grid_bia or {}, shared)
     ws_ledge = _ws_xml(grid_ledge, shared)
@@ -131,10 +135,11 @@ def _lam_xlsx(path: Path, grid_ledge: dict, grid_bia: dict | None = None,
                 f'<sheet name="Bìa" sheetId="1" r:id="rId1"/>'
                 f'<sheet name="{_esc(ten_sheet)}" sheetId="2" r:id="rId2"/>'
                 f'</sheets></workbook>')
+    tgt_ledge = "/xl/worksheets/sheet2.xml" if rels_ledge_tuyet_doi else "worksheets/sheet2.xml"
     rels = (f'<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
             f'<Relationships xmlns="{NS_PKG}">'
             f'<Relationship Id="rId1" Type="{NS_WS}" Target="worksheets/sheet1.xml"/>'
-            f'<Relationship Id="rId2" Type="{NS_WS}" Target="worksheets/sheet2.xml"/>'
+            f'<Relationship Id="rId2" Type="{NS_WS}" Target="{tgt_ledge}"/>'
             f'<Relationship Id="rId3" Type="{NS_SST}" Target="sharedStrings.xml"/>'
             f'</Relationships>')
     ct = (f'<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
@@ -379,3 +384,246 @@ def test_AC4_xuat_roi_phan_loai_chay_duoc(tmp_path):
     assert kq.returncode in (1, 3, 4), (kq.returncode, kq.stdout, kq.stderr)
     assert "Traceback" not in kq.stderr              # ⛔ sập — chẩn đoán một dòng
     assert "MẪU SỐ" in kq.stdout or "mẫu số" in kq.stderr or "dong_sheet" in kq.stderr
+
+
+# ╔═══════════════════════════════════════════════════════════════════════════════════════════════╗
+# ║  VÒNG SỬA SAU R1 (KQ-129) — DT1BT-R1-01 · -02 · -03 · -04 · -05                                 ║
+# ╚═══════════════════════════════════════════════════════════════════════════════════════════════╝
+SENTINEL = "SECRET_GIA_TRI_O_9988"      # chuỗi canh: giá trị ô THÔ — ⛔ BAO GIỜ được lên stdout/stderr
+
+
+def _xlsx_thay_phan(src: Path, path: Path, thay: dict[str, bytes | None]) -> Path:
+    """Chép mọi phần của `src` sang `path`, THAY (hoặc BỎ nếu None) các phần trong `thay`. Dựng tệp .xlsx
+    HỎNG MỘT PHẦN (workbook/worksheet/sst XML hỏng · rels thiếu) để đo đường LỖI."""
+    with zipfile.ZipFile(src) as zin:
+        ten = zin.namelist()
+        noi = {n: zin.read(n) for n in ten}
+    with zipfile.ZipFile(path, "w", zipfile.ZIP_DEFLATED) as zout:
+        for n in ten:
+            if n in thay:
+                if thay[n] is None:
+                    continue                      # BỎ phần này (vd rels thiếu)
+                zout.writestr(n, thay[n])
+            else:
+                zout.writestr(n, noi[n])
+    return path
+
+
+def _l1_ok(tmp_path: Path) -> Path:
+    return _lam_l1(tmp_path / "l1_ok.csv", [list(TIEU_DE.values()), ["x", "1", "2", "1121", "VND"]])
+
+
+def _xlsx_co_sentinel(tmp_path: Path, ten_sheet: str = "ITL Ledge") -> Path:
+    """xlsx HỢP LỆ, nhưng ô dữ liệu (10,1) mang SENTINEL ⇒ nếu công cụ in giá trị ở đường lỗi thì lộ."""
+    g = dict(_TD_LEDGE)
+    g.update({(10, 1): SENTINEL, (10, 3): "VND", (10, 4): "1", (10, 5): "2", (10, 6): "1121"})
+    return _lam_xlsx(tmp_path / "ledge.xlsx", g, ten_sheet=ten_sheet)
+
+
+# ── casau LỖI: mỗi hàm dựng (xlsx, l1) với MỘT đầu vào hỏng; sentinel nằm trong tệp hỏng ───────────
+def _ca_workbook_xml_hong(tmp_path):
+    ok = _xlsx_co_sentinel(tmp_path)
+    xlsx = _xlsx_thay_phan(ok, tmp_path / "hong.xlsx",
+                           {"xl/workbook.xml": f"<workbook>{SENTINEL}<broken".encode()})
+    return xlsx, _l1_ok(tmp_path)
+
+
+def _ca_worksheet_xml_hong(tmp_path):
+    ok = _xlsx_co_sentinel(tmp_path)
+    xlsx = _xlsx_thay_phan(ok, tmp_path / "hong.xlsx",
+                           {"xl/worksheets/sheet2.xml": f'<worksheet><v>{SENTINEL}</v><broken'.encode()})
+    return xlsx, _l1_ok(tmp_path)
+
+
+def _ca_sharedstrings_hong(tmp_path):
+    ok = _xlsx_co_sentinel(tmp_path)
+    xlsx = _xlsx_thay_phan(ok, tmp_path / "hong.xlsx",
+                           {"xl/sharedStrings.xml": f'<sst><si><t>{SENTINEL}</t><broken'.encode()})
+    return xlsx, _l1_ok(tmp_path)
+
+
+def _ca_rels_thieu(tmp_path):
+    ok = _xlsx_co_sentinel(tmp_path)
+    xlsx = _xlsx_thay_phan(ok, tmp_path / "hong.xlsx", {"xl/_rels/workbook.xml.rels": None})
+    return xlsx, _l1_ok(tmp_path)
+
+
+def _ca_zip_hong(tmp_path):
+    p = tmp_path / "hong.xlsx"
+    p.write_bytes(f"PK-gia-{SENTINEL}-khong-phai-zip".encode())     # ⛔ phải zip ⇒ BadZipFile
+    return p, _l1_ok(tmp_path)
+
+
+def _ca_thieu_sheet(tmp_path):
+    return _xlsx_co_sentinel(tmp_path, ten_sheet="Sheet La"), _l1_ok(tmp_path)
+
+
+def _ca_thieu_cot(tmp_path):
+    g = dict(_TD_LEDGE)
+    del g[(7, 6)]                                     # bỏ tiêu đề 'Tài khoản'
+    g.update({(10, 1): SENTINEL, (10, 3): "VND", (10, 4): "1", (10, 5): "2"})
+    return _lam_xlsx(tmp_path / "ledge.xlsx", g), _l1_ok(tmp_path)
+
+
+def _ca_l1_khong_utf8(tmp_path):
+    p = tmp_path / "l1_bad.csv"
+    p.write_bytes(("Số chứng từ,PS Nợ,PS Có,Tài khoản,Đơn vị tiền tệ\n" + SENTINEL + ",").encode("utf-8")
+                  + b"\xf4\xf4,2,1121,VND\n")         # byte 0xf4 ⇒ ⛔ UTF-8
+    return _lam_xlsx(tmp_path / "ledge.xlsx", _ledge_ba_dong()), p
+
+
+def _ca_l1_co_nul(tmp_path):
+    p = tmp_path / "l1_nul.csv"
+    p.write_bytes(("Số chứng từ,PS Nợ,PS Có,Tài khoản,Đơn vị tiền tệ\n" + SENTINEL).encode("utf-8")
+                  + b"\x00X,1,2,1121,VND\n")           # ký tự NUL ⇒ csv.Error
+    return _lam_xlsx(tmp_path / "ledge.xlsx", _ledge_ba_dong()), p
+
+
+def _ca_l1_truong_qua_dai(tmp_path):
+    dai = SENTINEL + "A" * 200000                      # > 131 072 ký tự ⇒ _csv.Error
+    p = _lam_l1(tmp_path / "l1_dai.csv",
+                [list(TIEU_DE.values()), [dai, "1", "2", "1121", "VND"]])
+    return _lam_xlsx(tmp_path / "ledge.xlsx", _ledge_ba_dong()), p
+
+
+# DT1BT-R1-03: quét giá trị ô cho ĐƯỜNG LỖI (≥ các ca R1 dùng). Mỗi ca nhúng SENTINEL ⇒ 0 lần ở màn.
+_CA_RORI = {
+    "xml_workbook_hong": _ca_workbook_xml_hong,
+    "xml_worksheet_hong": _ca_worksheet_xml_hong,
+    "zip_hong": _ca_zip_hong,
+    "thieu_sheet": _ca_thieu_sheet,
+    "thieu_cot": _ca_thieu_cot,
+    "csv_khong_utf8": _ca_l1_khong_utf8,
+    "csv_co_nul": _ca_l1_co_nul,
+}
+
+
+@pytest.mark.parametrize("ten_ca", list(_CA_RORI))
+def test_DT1BT_R1_03_duong_loi_khong_lo_gia_tri_o(tmp_path, ten_ca):
+    """RIÊNG TƯ — đường LỖI ⛔ lộ giá trị ô. Mỗi tệp hỏng mang SENTINEL; khẳng định SENTINEL ∉ stdout+stderr
+    và mã thoát ≠ 0. ĐỎ dưới M6 (câu lỗi nối hàng dữ liệu) · M14 (nhánh `except` in giá trị)."""
+    xlsx, l1 = _CA_RORI[ten_ca](tmp_path)
+    kq = _chay("--xlsx", str(xlsx), "--l1", str(l1), "--ra", str(tmp_path / "k.csv"))
+    assert kq.returncode != 0, (ten_ca, kq.returncode, kq.stdout, kq.stderr)
+    man = kq.stdout + kq.stderr
+    assert SENTINEL not in man, f"[{ten_ca}] giá trị ô {SENTINEL!r} LỌT ra màn: {man!r}"
+    assert not (tmp_path / "k.csv").exists(), f"[{ten_ca}] tệp ra ⛔ được tạo khi lỗi"
+
+
+# DT1BT-R1-04: mọi tệp hỏng ⇒ MỘT dòng lỗi CÓ TÊN + mã ≠ 0, ⛔ Traceback; UnicodeDecodeError ⛔ in byte/vị trí.
+_CA_HONG = {
+    "xml_workbook_hong": _ca_workbook_xml_hong,
+    "xml_worksheet_hong": _ca_worksheet_xml_hong,
+    "xml_sharedstrings_hong": _ca_sharedstrings_hong,
+    "rels_thieu": _ca_rels_thieu,
+    "zip_hong": _ca_zip_hong,
+    "csv_khong_utf8": _ca_l1_khong_utf8,
+    "csv_co_nul": _ca_l1_co_nul,
+    "csv_truong_qua_dai": _ca_l1_truong_qua_dai,
+}
+
+
+@pytest.mark.parametrize("ten_ca", list(_CA_HONG))
+def test_DT1BT_R1_04_tep_hong_mot_dong_khong_traceback(tmp_path, ten_ca):
+    xlsx, l1 = _CA_HONG[ten_ca](tmp_path)
+    kq = _chay("--xlsx", str(xlsx), "--l1", str(l1), "--ra", str(tmp_path / "k.csv"))
+    assert kq.returncode == 1, (ten_ca, kq.returncode, kq.stdout, kq.stderr)
+    assert "Traceback" not in kq.stderr, f"[{ten_ca}] có Traceback:\n{kq.stderr}"
+    assert kq.stderr.startswith("LOI"), f"[{ten_ca}] câu lỗi ⛔ bắt đầu bằng 'LOI': {kq.stderr!r}"
+    # MỘT dòng (1 ký tự xuống dòng ở cuối, ⛔ chồng ngăn xếp nhiều dòng)
+    assert kq.stderr.strip().count("\n") == 0, f"[{ten_ca}] lỗi NHIỀU dòng:\n{kq.stderr}"
+
+
+def test_DT1BT_R1_04_unicode_khong_lo_byte_vi_tri(tmp_path):
+    """`UnicodeDecodeError` ⛔ in byte (vd `0xf4`) / vị trí — chỉ câu chữa (Sheets › Tải xuống › CSV)."""
+    xlsx, l1 = _ca_l1_khong_utf8(tmp_path)
+    kq = _chay("--xlsx", str(xlsx), "--l1", str(l1), "--ra", str(tmp_path / "k.csv"))
+    assert kq.returncode == 1, (kq.returncode, kq.stdout, kq.stderr)
+    low = kq.stderr.lower()
+    assert "0x" not in low and "position" not in low and "vị trí" not in low and "byte" not in low, kq.stderr
+    assert "utf-8" in low, kq.stderr                 # câu chữa CÓ nhắc UTF-8
+
+
+# DT1BT-R1-01: đọc được rels đích TUYỆT ĐỐI lẫn TƯƠNG ĐỐI.
+@pytest.mark.parametrize("tuyet_doi", [False, True], ids=["rels_tuong_doi", "rels_tuyet_doi"])
+def test_DT1BT_R1_01_rels_tuyet_doi_va_tuong_doi(tmp_path, tuyet_doi):
+    """`Target="/xl/worksheets/sheet2.xml"` (openpyxl) ⇒ xưa nối thành `xl/xl/…` ⇒ exit 1. Nay đọc được
+    CẢ HAI dạng ⇒ exit 0 + 3 hàng SO đúng."""
+    xlsx = _lam_xlsx(tmp_path / "ledge.xlsx", _ledge_ba_dong(), rels_ledge_tuyet_doi=tuyet_doi)
+    l1 = _lam_l1(tmp_path / "l1.csv", [list(TIEU_DE.values())])
+    ra = tmp_path / "khoa.csv"
+    kq = _chay("--xlsx", str(xlsx), "--l1", str(l1), "--ra", str(ra))
+    assert kq.returncode == 0, (tuyet_doi, kq.returncode, kq.stdout, kq.stderr)
+    so = [r for r in _doc_csv(ra) if r[0] == "SO"]
+    assert [r[1] for r in so] == ["10", "11", "12"], so
+
+
+def test_DT1BT_R1_01_chuan_dich_rels_don_vi():
+    mod = _tool()
+    assert mod._chuan_dich_rels("worksheets/sheet1.xml") == "xl/worksheets/sheet1.xml"   # tương đối ⇒ nối xl/
+    assert mod._chuan_dich_rels("/xl/worksheets/sheet1.xml") == "xl/worksheets/sheet1.xml"  # tuyệt đối ⇒ bỏ /
+    assert mod._chuan_dich_rels("/xl/sharedStrings.xml") == "xl/sharedStrings.xml"
+
+
+# DT1BT-R1-02: in SỐ ĐẾM chẩn đoán "hàng có ≥1 ô khoá / hàng 0 ô khoá" (CHỈ số — ⛔ giá trị).
+def test_DT1BT_R1_02_in_so_dem_hang_khoa_khong_lo_gia_tri(tmp_path):
+    """Hàng 11 CHỈ có ô ở cột NGOÀI 5 khoá (Email, công thức) ⇒ thành 'hàng dữ liệu' nhưng 0 ô khoá.
+    Công cụ in `SO: 1 / 1` (≥1 khoá / 0 khoá) — số, ⛔ giá trị `FORMULA_SECRET`."""
+    g = dict(_TD_LEDGE)
+    g.update({(10, 1): "SYN10", (10, 3): "VND", (10, 4): "1", (10, 5): "2", (10, 6): "1121"})
+    g[(11, 20)] = ("str", "FORMULA_SECRET")           # chỉ ô ở cột 20 (Email, ngoài khoá) — 0 ô khoá
+    xlsx = _lam_xlsx(tmp_path / "ledge.xlsx", g)
+    l1 = _lam_l1(tmp_path / "l1.csv", [list(TIEU_DE.values()), ["x", "1", "2", "1121", "VND"]])
+    ra = tmp_path / "khoa.csv"
+    kq = _chay("--xlsx", str(xlsx), "--l1", str(l1), "--ra", str(ra))
+    assert kq.returncode == 0, (kq.stdout, kq.stderr)
+    assert "hàng có ≥1 ô khoá / hàng 0 ô khoá — SO: 1 / 1" in kq.stdout, kq.stdout
+    assert "L1: 1 / 0" in kq.stdout, kq.stdout
+    assert "FORMULA_SECRET" not in (kq.stdout + kq.stderr)    # chỉ SỐ ĐẾM, ⛔ giá trị ô
+
+
+# DT1BT-R1-05: ghim M8 (tiêu đề hai hàng) · M12 (đường ra là thư mục) · M16 (khoảng trắng tiêu đề L1).
+def test_DT1BT_R1_05_M8_tieu_de_rai_hai_hang(tmp_path):
+    """Tiêu đề rải HÀNG 7 (Số CT · Đơn vị) + HÀNG 8 (PS Nợ · PS Có · Tài khoản) ⇒ `hang_tieu_de` = 8.
+    Dữ liệu từ hàng 10. M8 (`max`→`min`) ⇒ hàng 8 (còn tiêu đề) thành 'dữ liệu' ⇒ ĐỎ."""
+    g = {(7, 1): "Số chứng từ", (7, 3): "Đơn vị tiền tệ",
+         (8, 4): "PS Nợ", (8, 5): "PS Có", (8, 6): "Tài khoản"}
+    g.update({(10, 1): "SYN10", (10, 3): "VND", (10, 4): "1", (10, 5): "2", (10, 6): "1121"})
+    g.update({(11, 1): "SYN11", (11, 3): "USD", (11, 4): "0", (11, 5): "5", (11, 6): "3311"})
+    xlsx = _lam_xlsx(tmp_path / "ledge.xlsx", g)
+    hang = _tool().doc_xlsx_ledge(xlsx)
+    assert [h["dong"] for h in hang] == [10, 11], hang      # hàng 8 ⛔ thành dữ liệu
+    assert all(h["dong"] != 8 for h in hang)
+
+
+def test_DT1BT_R1_05_M12_ra_la_thu_muc_ma_2(tmp_path):
+    """`--ra` trỏ THƯ MỤC ⇒ exit 2 'TỪ CHỐI'. M12 (bỏ chốt 'đường ra là thư mục') ⇒ sập khi ghi ⇒ ĐỎ."""
+    xlsx = _lam_xlsx(tmp_path / "ledge.xlsx", _ledge_ba_dong())
+    l1 = _lam_l1(tmp_path / "l1.csv", _l1_hinh_sheets())
+    thu_muc = tmp_path / "ra_dir"
+    thu_muc.mkdir()
+    kq = _chay("--xlsx", str(xlsx), "--l1", str(l1), "--ra", str(thu_muc))
+    assert kq.returncode == 2, (kq.returncode, kq.stdout, kq.stderr)
+    assert "TỪ CHỐI" in kq.stderr and "Traceback" not in kq.stderr, kq.stderr
+
+
+def test_DT1BT_R1_05_M16_l1_tieu_de_co_khoang_trang(tmp_path):
+    """Tiêu đề L1 có khoảng trắng thừa ('  Tài khoản ') vẫn KHỚP (`.strip()` tiêu đề). M16 (bỏ strip) ⇒
+    ⛔ thấy cột ⇒ exit 1 ⇒ ĐỎ."""
+    xlsx = _lam_xlsx(tmp_path / "ledge.xlsx", _ledge_ba_dong())
+    hdr = [" Số chứng từ ", "Diễn giải", "Đơn vị tiền tệ  ", "PS Nợ", "PS Có", "  Tài khoản"]
+    l1 = _lam_l1(tmp_path / "l1.csv", [hdr, ["4.36619E+15", "mô tả", "VND", "2730128", "0", "1121"]])
+    ra = tmp_path / "khoa.csv"
+    kq = _chay("--xlsx", str(xlsx), "--l1", str(l1), "--ra", str(ra))
+    assert kq.returncode == 0, (kq.returncode, kq.stdout, kq.stderr)
+    l1r = [r for r in _doc_csv(ra) if r[0] == "L1"]
+    assert len(l1r) == 1 and l1r[0][5] == "1121", l1r      # cột 'Tài khoản' khớp dù có khoảng trắng
+
+
+# DT1BT-R1-09: dữ liệu thô owner đặt ở `Input_Raw/` phải BỊ `.gitignore` (cùng tinh thần `hien_vat/`).
+def test_DT1BT_R1_09_input_raw_bi_gitignore():
+    """`git check-ignore` cho một đường mẫu: `Input_Raw/[Master] ITL_Ledge_raw.xlsx` + CSV bất kỳ phải
+    ignored (⛔ một `git add -A` đưa sổ thật lên git); `hien_vat/` vẫn ignored."""
+    assert mod_ignore(GOC / "Input_Raw" / "[Master] ITL_Ledge_raw.xlsx"), "Input_Raw/xlsx ⛔ bị gitignore"
+    assert mod_ignore(GOC / "Input_Raw" / "bat_ky.csv"), "Input_Raw/*.csv ⛔ bị gitignore"
+    assert mod_ignore(GOC / "hien_vat" / "khoa_dt1b.csv"), "hien_vat/ ⛔ còn bị gitignore"

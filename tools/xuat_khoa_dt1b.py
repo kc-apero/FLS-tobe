@@ -30,8 +30,8 @@ ISP 3.1.2 · Step 5 · DT1b · phiếu `WO-127` / `BG-128`. Công cụ RIÊNG (�
    công cụ này ⛔ chuẩn hoá gì — chỉ xuất THÔ, để `phan_loai_ly_do.py` giữ một bản khai chuẩn hoá duy nhất.
 
 ⛔ Riêng tư (CLAUDE.md §Riêng tư & tiền thật · WO-127):
-   · ⛔ IN giá trị ô — chỉ in SỐ ĐẾM (số hàng SO · L1, số ô rỗng mỗi cột). Giá trị thô chỉ sống trong
-     bộ nhớ và trong tệp ra.
+   · ⛔ IN giá trị ô — chỉ in SỐ ĐẾM (số hàng SO · L1, số hàng có ≥1 ô khoá / 0 ô khoá `DT1BT-R1-02`,
+     số ô rỗng mỗi cột). Giá trị thô chỉ sống trong bộ nhớ và trong tệp ra.
    · Đường ra mặc định `hien_vat/khoa_dt1b.csv` (`.gitignore:17` — "để gửi đi" nên bị bỏ qua). TỪ CHỐI
      ghi vào chỗ TRONG repo mà ⛔ bị `.gitignore` (một `git add -A` là Số CT + tiền thật lên lịch sử) —
      y luật R8 của `phan_loai_ly_do.py` (`_trong_repo_khong_ignore`), fail-ĐÓNG: ⛔ chứng minh được
@@ -102,12 +102,36 @@ def _text_si(si: ET.Element) -> str:
     return "".join(t.text or "" for t in si.iter(_q("t")))
 
 
+def _parse_xml(data: bytes, mo_ta: str) -> ET.Element:
+    """`ET.fromstring` CÓ BỌC: XML hỏng ⇒ `LoiDoc` MỘT DÒNG (`DT1BT-R1-04`). `ParseError` để tràn ra
+    sẽ in Traceback mà owner (⛔ lập trình viên) ⛔ đọc được; `from None` cắt chuỗi ngoại lệ (⛔ byte dữ liệu)."""
+    try:
+        return ET.fromstring(data)
+    except ET.ParseError:
+        raise LoiDoc(f"{mo_ta}: XML hỏng — ⛔ phải tệp .xlsx hợp lệ") from None
+
+
+def _chuan_dich_rels(tgt: str) -> str:
+    """Chuẩn hoá đích `Target` của rels về đường trong zip (gốc = thư mục chứa archive).
+    · TUYỆT ĐỐI `"/xl/worksheets/sheet1.xml"` (openpyxl & một số thư viện/dịch vụ sinh) ⇒ đã là đường
+      gốc zip ⇒ CHỈ bỏ `/` đầu.
+    · TƯƠNG ĐỐI `"worksheets/sheet1.xml"` (dạng Excel) ⇒ tương đối với thư mục `xl/` của `workbook.xml`
+      ⇒ nối `xl/`.
+    `DT1BT-R1-01`: bản cũ nối `xl/` cho CẢ hai dạng ⇒ tuyệt đối thành `xl/xl/worksheets/sheet1.xml`
+    ⇒ `exit 1` trên tệp do openpyxl sinh (bước (c) của owner chết ngay nếu `[Master] …xlsx` ⛔ do Excel ghi)."""
+    tgt = tgt.strip()
+    if tgt.startswith("/"):
+        return tgt.lstrip("/")
+    return "xl/" + tgt
+
+
 def _tim_duong_sheet(z: zipfile.ZipFile, ten_sheet: str) -> str:
     """Tìm đường tệp worksheet của sheet TÊN `ten_sheet`, qua `workbook.xml` + rels. ⛔ "sheet đầu"."""
     try:
-        wb = ET.fromstring(z.read("xl/workbook.xml"))
+        raw_wb = z.read("xl/workbook.xml")
     except KeyError:
         raise LoiDoc("xlsx ⛔ có xl/workbook.xml — ⛔ phải tệp .xlsx hợp lệ") from None
+    wb = _parse_xml(raw_wb, "xl/workbook.xml")
     rid = None
     for s in wb.iter(_q("sheet")):
         if (s.get("name") or "").strip() == ten_sheet:
@@ -116,19 +140,23 @@ def _tim_duong_sheet(z: zipfile.ZipFile, ten_sheet: str) -> str:
     if rid is None:
         ten_co = [(s.get("name") or "").strip() for s in wb.iter(_q("sheet"))]
         raise LoiDoc(f"⛔ thấy sheet tên {ten_sheet!r}; sheet có: {ten_co}")
-    rels = ET.fromstring(z.read("xl/_rels/workbook.xml.rels"))
+    try:
+        raw_rels = z.read("xl/_rels/workbook.xml.rels")
+    except KeyError:
+        raise LoiDoc("xlsx ⛔ có xl/_rels/workbook.xml.rels — ⛔ phải tệp .xlsx hợp lệ") from None
+    rels = _parse_xml(raw_rels, "xl/_rels/workbook.xml.rels")
     for r in rels.iter(f"{{{NS_PKG}}}Relationship"):
         if r.get("Id") == rid:
-            tgt = r.get("Target") or ""
-            return "xl/" + tgt.lstrip("/") if not tgt.startswith("xl/") else tgt.lstrip("/")
+            return _chuan_dich_rels(r.get("Target") or "")
     raise LoiDoc(f"rels ⛔ có quan hệ {rid!r} cho sheet {ten_sheet!r}")
 
 
 def _shared_strings(z: zipfile.ZipFile) -> list[str]:
     try:
-        sst = ET.fromstring(z.read("xl/sharedStrings.xml"))
+        raw = z.read("xl/sharedStrings.xml")
     except KeyError:
         return []
+    sst = _parse_xml(raw, "xl/sharedStrings.xml")
     return [_text_si(si) for si in sst.findall(_q("si"))]
 
 
@@ -161,9 +189,10 @@ def doc_xlsx_ledge(duong: Path, ten_sheet: str = "ITL Ledge") -> list[dict]:
         duong_sheet = _tim_duong_sheet(z, ten_sheet)
         shared = _shared_strings(z)
         try:
-            ws = ET.fromstring(z.read(duong_sheet))
+            raw_ws = z.read(duong_sheet)
         except KeyError:
             raise LoiDoc(f"xlsx ⛔ có tệp worksheet {duong_sheet!r}") from None
+        ws = _parse_xml(raw_ws, "worksheet")
         rows = ws.find(_q("sheetData"))
         if rows is None:
             raise LoiDoc(f"sheet {ten_sheet!r} ⛔ có <sheetData>")
@@ -215,8 +244,21 @@ def doc_l1_csv(duong: Path) -> list[dict]:
 
     Cột theo TÊN TIÊU ĐỀ (12 hàng đầu); `dong` = số hàng CSV = số hàng sheet (CHỈ để định danh trong tệp).
     """
-    with duong.open(encoding="utf-8-sig", newline="") as f:
-        hang = list(csv.reader(f))
+    # Ký tự NUL ⇒ TỪ CHỐI MINH BẠCH: `csv.reader` (Python 3.13) NUỐT NUL vào trong trường thay vì báo lỗi
+    # ⇒ một tệp hỏng lọt qua im lặng (Đ5 — phép ⛔ chứng minh sạch là ĐỎ). `DT1BT-R1-03`/`-04`: một dòng, ⛔ byte.
+    if b"\x00" in duong.read_bytes():
+        raise LoiDoc(f"{duong.name}: CSV có ký tự NUL — ⛔ phải CSV văn bản sạch, tải lại từ Sheets") from None
+    try:
+        with duong.open(encoding="utf-8-sig", newline="") as f:
+            hang = list(csv.reader(f))
+    except UnicodeDecodeError:
+        # `DT1BT-R1-04`: ⛔ in `e.object`/byte/vị trí — chỉ câu chữa. Một tệp "CSV" Excel Windows có thể
+        # là cp1258/BOM lạ ⇒ tải lại đúng CSV UTF-8 từ Sheets.
+        raise LoiDoc(f"{duong.name}: CSV ⛔ phải UTF-8 — ở Google Sheets dùng Tệp › Tải xuống › "
+                     f"Giá trị phân tách bằng dấu phẩy (.csv), ⛔ xuất từ Excel sang mã khác") from None
+    except csv.Error:
+        # trường > 131 072 ký tự, hay ô mang ký tự NUL ⇒ `_csv.Error`. Một dòng, ⛔ giá trị ô.
+        raise LoiDoc(f"{duong.name}: CSV hỏng (trường quá dài hoặc có ký tự NUL) — tải lại từ Sheets") from None
     if not hang:
         raise LoiDoc(f"{duong.name}: CSV rỗng")
     cot: dict[str, int] = {}
@@ -275,6 +317,16 @@ def _dem_rong(hang: list[dict]) -> dict[str, int]:
     return {k: sum(1 for r in hang if not (r[k] or "").strip()) for k in COT_KHOA}
 
 
+def _dem_khoa(hang: list[dict]) -> tuple[int, int]:
+    """(số hàng có ≥1 trong 5 ô khoá ⛔ rỗng, số hàng 0 ô khoá). CHỈ SỐ ĐẾM — ⛔ giá trị ô.
+
+    `DT1BT-R1-02`: định nghĩa "hàng dữ liệu" GIỮ NGUYÊN (≥1 ô BẤT KỲ ⛔ rỗng), nhưng in thêm số này để
+    owner/orchestrator thấy K11 lệch vì đâu *không cần* mở tệp: nếu `K11` ĐỎ ở bước (d) mà "hàng 0 khoá" > 0
+    thì đuôi sổ mang ô công thức ở cột NGOÀI 5 khoá đã bị đếm thành "hàng dữ liệu" (Đ4 — số nói nó đếm gì)."""
+    co = sum(1 for r in hang if any((r[k] or "").strip() for k in COT_KHOA))
+    return co, len(hang) - co
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(
         description="XUẤT bản đọc khoá cho DT1b (ITL Ledge .xlsx + Transaction Mapping L1 .csv) → CSV 7 cột.")
@@ -309,9 +361,12 @@ def main(argv: list[str] | None = None) -> int:
         return 1
 
     ghi_csv(a.ra, so, l1)
-    # ⛔ IN giá trị ô — chỉ SỐ ĐẾM: số hàng mỗi bảng + số ô rỗng mỗi cột.
+    # ⛔ IN giá trị ô — chỉ SỐ ĐẾM: số hàng mỗi bảng + chẩn đoán hàng-khoá + số ô rỗng mỗi cột.
     rs, rl = _dem_rong(so), _dem_rong(l1)
+    ks_co, ks_khong = _dem_khoa(so)
+    kl_co, kl_khong = _dem_khoa(l1)
     print(f"✅ xuất {a.ra} — SO {len(so)} hàng · L1 {len(l1)} hàng (7 cột {','.join(COT_RA)})")
+    print(f"   hàng có ≥1 ô khoá / hàng 0 ô khoá — SO: {ks_co} / {ks_khong} · L1: {kl_co} / {kl_khong}")
     print("   ô rỗng/cột — SO: " + " · ".join(f"{k} {rs[k]}" for k in COT_KHOA))
     print("   ô rỗng/cột — L1: " + " · ".join(f"{k} {rl[k]}" for k in COT_KHOA))
     print(f"   ▶ bước kế: python tools/phan_loai_ly_do.py --khoa {a.ra}")

@@ -418,10 +418,12 @@ def test_S0_R2_03_hang_mau_so_khai_MOT_cho():
     lại ở R2 (+21 bài) ⇒ khoảng dư 21 mà R3 lách bằng 20 bài bỏ im lặng. Bài ghim GIỮ việc gốc:
     hằng khai MỘT chỗ, đúng giá trị, hai dòng gọi dùng hằng; `test_S0_R3_02_…` đòi hằng = thu thập.
     Gộp (orchestrator, luật 17/11: sàn = số thu thập CÂY GỘP, ⛔ cộng tay): + `isp/DT1A` ⇒ **2530** · + `isp/H1` ⇒ **2579** · + `isp/C1` ⇒ **2704** · + `isp/DT2` ⇒ **2792** · + `isp/H2` ⇒ **2857** · + `isp/CG1` ⇒ **2890** (xung đột script + bài ghim ⇒ giữ bản nhánh làm việc — `CG1-R2-01`) · + `isp/DT1B` ⇒ **2980** · + `isp/DT3` ⇒ **3064** · + `isp/FG` ⇒ **3067** (web 664 ⇒ **667**: FG thêm bài `tests/web`) · +
-    `isp/DT1BT` ⇒ **3081** (WO-127 · `tests/du_lieu/test_xuat_khoa_dt1b.py` 14 bài; web ⛔ đổi).
+    `isp/DT1BT` ⇒ **3081** (WO-127 · `tests/du_lieu/test_xuat_khoa_dt1b.py` 14 bài; web ⛔ đổi) · vòng
+    sửa sau R1 `KQ-129` ⇒ **3105** (+24 bài `DT1BT-R1-01…05` · `-09`: rels tuyệt/tương đối · đường lỗi ⛔
+    lộ ô · tệp hỏng ⛔ Traceback · số đếm hàng-khoá · ghim M8/M12/M16 · `Input_Raw` gitignore; web ⛔ đổi).
     """
     van = SCRIPT.read_text(encoding="utf-8")
-    assert re.findall(r"^MONG_PYTEST_TOAN_BO=(\d+)$", van, re.M) == ["3081"]
+    assert re.findall(r"^MONG_PYTEST_TOAN_BO=(\d+)$", van, re.M) == ["3105"]
     assert re.findall(r"^MONG_PYTEST_WEB=(\d+)$", van, re.M) == ["667"]
     goi = [d.strip() for d in van.splitlines() if d.strip().startswith("chay_pytest ")]
     assert len(goi) == 2 and '"$MONG_PYTEST_TOAN_BO"' in goi[0] and '"$MONG_PYTEST_WEB"' in goi[1], goi

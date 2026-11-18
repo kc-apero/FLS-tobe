@@ -419,7 +419,7 @@ MONG_HD1_CHAY=9845
 #    nâng là ĐỎ. Sau vòng sửa R3: 2.481 + 9 bài mới = 2.490 bài ở 211 tệp · `tests/web` 664 ở 56 tệp.
 # ⭐ WO-127 (DT1b · 18/11) — THÊM `tests/du_lieu/test_xuat_khoa_dt1b.py` (14 bài) ⇒ 3.067 → 3.081 (225
 #    tệp); `tests/web` ⛔ đổi (667). Nâng hằng TRONG CÙNG commit với bài mới (Q8 = A).
-MONG_PYTEST_TOAN_BO=3081
+MONG_PYTEST_TOAN_BO=3105
 MONG_PYTEST_WEB=667
 
 echo
