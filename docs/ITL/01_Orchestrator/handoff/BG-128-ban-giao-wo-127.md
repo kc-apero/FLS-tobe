@@ -103,3 +103,50 @@ R1 `KQ-129`: **0 CHẶN · 6 NÊN SỬA · 3 GHI NHẬN**, người dùng duyệ
 ### Còn để lại cho vòng/owner sau *(không đo được ở container Linux)*
 - `-06`/`-07`: hành vi PowerShell `-LiteralPath`, `Move-Item`, `Remove-Item` là **kiến thức** — cần owner xác nhận trên Windows (container không có `pwsh`).
 - `-01`/`-02`: chỉ **đo thật** được khi owner chạy trên `[Master] ITL_Ledge_raw.xlsx` (O10): nhà sinh xlsx thật, và "hàng 0 khoá" thật so với mẫu số 9.967 ở K11.
+
+---
+
+## Vòng sửa sau R2 (KQ-130) — `fls-dev` (phiên cloud con · 2026-11-18)
+
+**Nền:** `isp/DT1BT` @ `29db42b` (ngọn khi giao — gồm vòng sửa R1 + `KQ-130`/sổ v0.2). Orchestrator chốt
+R2 `KQ-130`: **0 CHẶN · 3 NÊN SỬA** (`-01` · `-04` · `-05`, đều ở hướng dẫn) · **3 GHI NHẬN** (`-02` · `-03` · `-06`),
+người dùng duyệt. Chốt Q1 = A (sửa hướng dẫn) · Q2 = A (sửa mã `-02`+`-03` cùng vòng) · Q3 = A (owner chạy
+**sau** khi nhánh này gộp vào nhánh làm việc ⇒ giữ bước (a) `git pull`). Vòng này làm **cả 6** phát hiện R2.
+
+### Đã sửa (theo quyết của orchestrator)
+| Phát hiện | Quyết | Đã làm | Bằng chứng (bài) · ĐỎ-trước |
+|---|---|---|---|
+| `DT1BT-R2-01` *(hướng dẫn chưa nói (0)/(g) chưa thử trên Windows)* | A (NÊN SỬA) | Thêm khung ⚠ đầu hướng dẫn + ghi chú ở (0) và (g): *"(0)/(g) chưa thử trên Windows; chạy thử trước khi chạy thật, khác Mong ⇒ DỪNG, chỉ gửi True/False/số, không gửi nội dung tệp"*. | Hướng dẫn v1.2 (chữ — hành vi PowerShell không đo được ở container Linux). |
+| `DT1BT-R2-02` *(rels `xl/`-tiền-tố ⇒ `xl/xl/…`; `../`·`./`·`%20` chưa chuẩn hoá)* | A (GHI NHẬN) | `_chuan_dich_rels`: `unquote` (`%20`) · tiền tố `xl/` sẵn ⇒ ⛔ nối lần nữa · `posixpath.normpath` gộp `./`·`../`·`//`, chặn thoát gốc gói (`..`) ⇒ `LoiDoc`. | `test_DT1BT_R2_02_chuan_dich_rels_dang_ngoai` (7 khẳng định) · `test_DT1BT_R2_02_rels_dang_ngoai_doc_duoc` (3 ca nối: `xl/`-tiền-tố · `./` · `../xl/`). **ĐỎ-trước:** bản cũ nối `xl/` cứng ⇒ 4/4 ĐỎ (đo trước khi sửa: 6 FAILED). |
+| `DT1BT-R2-03` *(`zlib.error` luồng nén ⇒ Traceback — lớp lỗi lặp của R1-04)* | A (GHI NHẬN) | Helper `_doc_phan_zip` bọc **mọi** `z.read(phần)` trong `(BadZipFile, zlib.error, EOFError)` ⇒ `LoiDoc` một dòng (workbook · rels · sharedStrings · worksheet). `BadZipFile` xưa chỉ bắt lúc **mở**, nay cả lúc **đọc**. | Ca `zlib_hong` (lật 8 byte giữa luồng nén worksheet) thêm vào `_CA_RORI` (7→8) + `_CA_HONG` (8→9) ⇒ chạy qua `test_DT1BT_R1_03`/`_R1_04`; thêm `test_DT1BT_R2_03_zlib_luong_nen_mot_dong`. **ĐỎ-trước:** `[zlib_hong]` ĐỎ (Traceback `zlib.error: Error -3 … invalid distance too far back`). Thoả gợi ý "quét chung mọi ngoại lệ đọc ⇒ một dòng" qua `_CA_HONG`. |
+| `DT1BT-R2-04` *(bước (g) đường tương đối, không `cd` ⇒ xanh giả cửa sổ mới)* | A (NÊN SỬA) | Khai `$REPO` ở *Chuẩn bị*; **mọi** bước mở đầu `Set-Location -LiteralPath $REPO` (tự đủ), đặc biệt (g); (g) thêm `Get-ChildItem -LiteralPath hien_vat` liệt kê còn lại; Mong "False/False/0 + hien_vat không còn khoa_dt1b.csv/l1.csv". | Hướng dẫn v1.2 (`grep -c 'Set-Location -LiteralPath \$REPO'` = 12; bare `cd` = 0). |
+| `DT1BT-R2-05` *(cổng (f) viết "Changes to be committed" — không bao giờ có trước `add`)* | A (NÊN SỬA) | Cổng (f) đổi sang `git status --porcelain`, Mong **một dòng** `?? docs/ITL/_tools/phan_loai_ly_do.json` (hoặc ` M` nếu đã theo dõi); nói rõ trước `add` không có "Changes to be committed", tệp ở "Untracked files"/"Changes not staged"; bảng "Nếu thấy" theo dòng porcelain. | Hướng dẫn v1.2. Đo container: `git ls-files` ⇒ json **chưa theo dõi** ⇒ `??`. |
+| `DT1BT-R2-06` *(ví dụ Mong tương đối vs thật tuyệt đối · "9.967" vs `9967` · `Move-Item` thiếu `-Force`)* | A (GHI NHẬN) | (c) Mong in **đường đầy đủ** như công cụ (`C:\Users\...\hien_vat\khoa_dt1b.csv`) + chú "chỉ cần `SO 9967 hàng`"; (d) đổi "9.967"→`9967` (công cụ in không dấu chấm); (b) `Move-Item -Force` + hàng "đích đã tồn tại ⇒ chạy (g) rồi làm lại (b)". | Hướng dẫn v1.2. |
+
+### Tệp đổi (vòng này)
+| Tệp | Đổi |
+|---|---|
+| `tools/xuat_khoa_dt1b.py` | `_chuan_dich_rels` chuẩn hoá `unquote`+`normpath`+tiền tố `xl/` (-02) · helper `_doc_phan_zip` bọc đọc zip `(BadZipFile, zlib.error, EOFError)` ở 4 chỗ đọc (-03) · import `posixpath`, `zlib`, `urllib.parse.unquote`. |
+| `tests/du_lieu/test_xuat_khoa_dt1b.py` | +7 node: `R2_02` đơn vị + 3 ca nối (thêm tham số `rels_ledge_tgt` cho `_lam_xlsx`) · `_xlsx_lat_byte_nen` + `_ca_zlib_hong` vào `_CA_RORI`/`_CA_HONG` + `R2_03` riêng (38 → 45). |
+| `docs/ITL/03_Dev/isp-3.1/HUONG_DAN_NHAN_THAT_DT1b.md` | v1.2: khung chạy thử (0)/(g) (-01) · `$REPO` + `Set-Location` mỗi bước (-04) · cổng (f) `git status --porcelain` (-05) · Mong đường đầy đủ + `9967` + `Move-Item -Force` (-06). |
+| `tools/dung_moi_truong_isp.sh` | `MONG_PYTEST_TOAN_BO` 3105 → **3112** (+7 bài). |
+| `tests/test_dung_moi_truong_isp.py` | Bài ghim `== ["3105"]` → `== ["3112"]` + narrative vòng R2. |
+
+### Cổng (cụm PG cổng 5437)
+| Lệnh | Kết quả |
+|---|---|
+| `pytest tests/du_lieu/test_xuat_khoa_dt1b.py` | `45 passed` |
+| `pytest tests/du_lieu/` | `347 passed` (340 → 347, +7) |
+| `pytest tests/test_dung_moi_truong_isp.py` | `60 passed` |
+| `dung_moi_truong_isp.sh --duong-nen --cong 5437` *(chạy MỘT MÌNH)* | `KẾT: ĐẠT` — toàn bộ `12 failed, 3084 passed, 2 xfailed, 14 errors in 375.55s` · đỏ+XFAIL **28 = 28** node id *(XFAIL 2=2 · thêm 0 · bớt 0)* · chạy **3112** (mong ≥ 3112) · skipped 0 · deselected 0 · web `3 failed, 664 passed` · đỏ **3 = 3** · chạy **667**. (+7 bài mới đều XANH: passed 3077 → 3084.) |
+| `.venv/bin/lint-imports` | `Contracts: 11 kept, 0 broken.` |
+| `python docs/ITL/_tools/kiem_tai_lieu.py` | `✅ DAT (246 file, 2303 bảng, 779 ô ngày, 104 mã QĐ)` |
+
+### Sàn pytest: cũ → mới
+- `MONG_PYTEST_TOAN_BO` **3105 → 3112** (+7 bài `DT1BT-R2-02` · `-03`) · `MONG_PYTEST_WEB` **667 (không đổi)**.
+
+### Kho thật
+- `KHONG_CHAM` — thuần mã + bài tổng hợp `tmp_path`; không đọc kho · không Drive · không mạng.
+
+### ĐỎ-trước (chứng minh Đ5)
+- `R2-02`+`R2-03`+bài ghim: trước khi sửa, chạy 6 node R2 trên mã cũ ⇒ **6 FAILED** (3 R2-02 nối + R2-02 đơn vị + R2-03 + `R1_04[zlib_hong]`); bài ghim lùi sàn về 3105 ⇒ **FAILED**, trả 3112 ⇒ XANH. Sau sửa: 45 passed.
