@@ -42,6 +42,7 @@ nguon, doc_luc, cach_doc, dong_dau_sheet, cot, values}`:
 """
 from __future__ import annotations
 
+import re
 from decimal import Decimal, InvalidOperation
 from typing import Any
 
@@ -52,18 +53,34 @@ KIEU_KHOA = "dong_sheet"
 #: *(11 hàng đáp án: đo 0 ô rỗng, 0 ô ⛔ số)* — ô lỗi ở hàng đáp án ⇒ ĐỎ.
 COT = ("pe", "pm",
        "cvl_pe", "cvl_pm", "cor_pe", "cor_pm", "shq1_pe", "shq1_pm",
-       "csm_pe", "csm_pm", "cah_pe", "cah_pm", "asa_pe", "asa_pm")
+       "csm_pe", "csm_pm", "cah_pe", "cah_pm", "asa_pe", "asa_pm",
+       "vendor", "thang")
+#: ⭐ DT8b *(`WO-204` AC-1)*: THÊM `vendor` *(H · Mã đối tác = Vendor ID)* và `thang` *(F · `yyyymm`)* —
+#: hai cột khoá để H9 biết hàng nào thuộc Vendor-tháng nào. 44 hàng tổng ⛔ khoá ⇒ RỖNG cho phép
+#: *(`chu?` · `so?`)*; ô có giá trị vẫn phải chữ/số. 14 cột số cũ GIỮ TỪNG BYTE *(bài ghim sha)*.
+KIEU_COT = {"vendor": "chu?", "thang": "so?"}
 RA = "tests/fixture/dap_an/gi_mid3.json"
 
 #: Cột LƯỚI bản thô *(vùng O:AF)* — vị trí cố định.
-COT_THO = ("O", "P", "S", "T", "U", "V", "W", "X", "Y", "Z", "AA", "AB", "AC", "AD", "AE", "AF")
+#: DT8b: thêm `H` *(Vendor ID — chữ `VD…`)* và `F` *(tháng `yyyymm`)* ở CUỐI ⇒ chỉ số cũ giữ nguyên.
+#: ⛔ `G` *(= `F` trên 253/253)* · ⛔ `K L M` *(LE · No · ITL ID — RỖNG cả 264 hàng ⇒ MID3 ⛔ có ITL ID)*.
+COT_THO = ("O", "P", "S", "T", "U", "V", "W", "X", "Y", "Z", "AA", "AB", "AC", "AD", "AE", "AF",
+           "H", "F")
 DONG_DAU_SHEET = 10
 #: Chỉ số *(trong COT_THO)* của 6 PE_cdt và 6 PM_cdt — cặp `S/T U/V W/X Y/Z AA/AB AC/AD`.
 I_PE = (2, 4, 6, 8, 10, 12)
 I_PM = (3, 5, 7, 9, 11, 13)
 I_O, I_P, I_AE, I_AF = 0, 1, 14, 15
+I_VEN, I_THANG = 16, 17
+#: Đ5 *(DT8b)*: 209 hàng mang khoá = 19 Vendor × 11 tháng *(đo 18/11)*; 44 hàng tổng ⛔ khoá.
+MONG_CO_KHOA = 209
+VENDOR_RE = re.compile(r"VD[0-9]+")
 #: Dung sai cổng `Σ chia = O / P` *(②)*.
 TOL = Decimal("0.000001")
+
+
+def _rong(v: Any) -> bool:
+    return v is None or (isinstance(v, str) and v.strip() == "")
 
 
 def _la_so(v: Any) -> bool:
@@ -76,7 +93,7 @@ def chuan_bi(tho: dict[str, Any]) -> dict[str, Any]:
     Chọn hàng có `O` là SỐ *(⛔ `AE/AF`)*. ⛔ lời lỗi mang giá trị ô; `ValueError` ⇒ TỪ CHỐI."""
     cot_tho = tho.get("cot")
     if cot_tho != list(COT_THO):
-        raise ValueError(f"`cot` phải đúng {list(COT_THO)} *(vùng O:AF, ⛔ phủ A:N = PII)*")
+        raise ValueError(f"`cot` phải đúng {list(COT_THO)} *(vùng O:AF + H,F; ⛔ phủ A:N còn lại = PII)*")
     dau = tho.get("dong_dau_sheet")
     if dau != DONG_DAU_SHEET:
         raise ValueError(f"`dong_dau_sheet` phải {DONG_DAU_SHEET}")
@@ -88,7 +105,7 @@ def chuan_bi(tho: dict[str, Any]) -> dict[str, Any]:
     so_check = 0                                         # hàng số có CHECK ALLOCATE True ∧ True
     for i, h in enumerate(values):
         if not isinstance(h, list) or len(h) != len(COT_THO):
-            raise ValueError(f"hàng {i + 1} phải {len(COT_THO)} ô *(đủ O:AF)*")
+            raise ValueError(f"hàng {i + 1} phải {len(COT_THO)} ô *(đủ O:AF + H,F)*")
         if _la_so(h[I_O]):                               # hàng SỐ (⛔ hàng ngăn, ⛔ theo AE/AF)
             if h[I_AE] is True and h[I_AF] is True:
                 so_check += 1
@@ -96,6 +113,8 @@ def chuan_bi(tho: dict[str, Any]) -> dict[str, Any]:
             cols = [ds, h[I_O], h[I_P]]
             for j in range(2, 14):                       # S..AD theo thứ tự COT_THO
                 cols.append(h[j])
+            cols.append(None if _rong(h[I_VEN]) else h[I_VEN])      # DT8b: khoá Vendor ID (H)
+            cols.append(None if _rong(h[I_THANG]) else h[I_THANG])  # DT8b: tháng yyyymm (F)
             dong.append(cols)
 
     return {
@@ -106,7 +125,10 @@ def chuan_bi(tho: dict[str, Any]) -> dict[str, Any]:
             f"từ'; {so_check}/{len(dong)} hàng mang CHECK ALLOCATE True = tổng-tháng, còn lại chi "
             f"tiết; {len(values) - len(dong)} hàng ngăn ⛔ chọn)*, khoá dong_sheet. Mỗi hàng = PE Amount (O) · PM Amount (P) · "
             f"6 cặp CDT1 PE/PM *(CVL·COR·SHQ1·CSM·CAH·ASA)*. Cổng Σ chia = O/P *(TOL {TOL})* ở "
-            f"`thieu_lac`. ⛔ mang cột A:N *(Số CT · Diễn giải · Tài khoản · … PII)*."),
+            f"`thieu_lac`. DT8b: THÊM `vendor` (H) + `thang` (F, yyyymm) — khoá Vendor-tháng cho WP-C4a "
+            f"({sum(1 for r in dong if not _rong(r[-2]))} hàng có khoá, {sum(1 for r in dong if _rong(r[-2]))} hàng "
+            f"tổng ⛔ khoá); ⛔ `G` (= F trên mọi hàng) · ⛔ `K L M` = LE · No · ITL ID, RỖNG cả 264 hàng "
+            f"⇒ MID3 ⛔ có ITL ID. ⛔ mang cột A:N còn lại *(Số CT · Diễn giải · Tài khoản · … PII)*."),
     }
 
 
@@ -148,11 +170,36 @@ def thieu_lac(dong: list[dict[str, Any]]) -> dict[str, Any]:
         if abs(o - spe) > TOL or abs(p - spm) > TOL:
             ds = d["dong_sheet"]
             lech.append(f"dong_sheet@{ds}")
+    # DT8b: cổng KHOÁ Vendor-tháng *(Đ5 hai chiều; ⛔ in giá trị ô — chỉ nhãn + dong_sheet)*.
+    co_khoa = 0
+    thay: set[tuple[str, str]] = set()
+    for d in dong:
+        ds = d["dong_sheet"]
+        v, t = d.get("vendor"), d.get("thang")
+        v = v.get("chu") if isinstance(v, dict) else v          # ô chữ ở khuôn đến dạng {"chu": …}
+        if v is None and t is None:
+            continue
+        if v is None:
+            lech.append(f"vendor_thieu@{ds}")
+        elif not VENDOR_RE.fullmatch(v):
+            lech.append(f"vendor_la@{ds}")
+        if t is None:
+            lech.append(f"thang_thieu@{ds}")
+        elif not re.fullmatch(r"20[0-9]{2}(0[1-9]|1[0-2])", t):
+            lech.append(f"thang_la@{ds}")
+        if v is not None and t is not None:
+            co_khoa += 1
+            if (v, t) in thay:
+                lech.append(f"khoa_trung@{ds}")
+            thay.add((v, t))
+    if co_khoa != MONG_CO_KHOA:
+        lech.append(f"co_khoa_lech@{co_khoa}≠{MONG_CO_KHOA}")
     return {
         "thieu": lech,
         "lac": [],
         "dai": (f"Σ chia = O/P trên {len(dong)} hàng số · lệch {len(lech)} *(mong 0)* · "
-                f"dư lớn nhất {du_max} *(TOL {TOL})* · mẫu số từng vế — "
+                f"dư lớn nhất {du_max} *(TOL {TOL})* · khoá Vendor-tháng {co_khoa} hàng *(mong {MONG_CO_KHOA})* · "
+                f"mẫu số từng vế — "
                 f"PE: {khac0_pe}/{mau_ve} ô ≠ 0"
                 + (" — vế này chưa đo được trên dữ liệu thật" if khac0_pe == 0 else "")
                 + f" · PM: {khac0_pm}/{mau_ve} ô ≠ 0"
