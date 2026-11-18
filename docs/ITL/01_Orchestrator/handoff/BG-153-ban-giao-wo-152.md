@@ -47,3 +47,14 @@ Ngày đầu là **giá trị cấu hình do người nạp khai** *(bài nạp 
 - `07_API_CONTRACT.md` ⛔ sửa theo lệnh: dòng `/config/per` + mã `FLS-CAUHINH-LUAT-CHUA-KY` *(409)* chờ orchestrator.
 - Mã HTTP đặt `FLS-CAUHINH-LUAT-CHUA-KY` *(khuôn họ `FLS-CAUHINH-*` + cổng web đòi tiền tố `FLS-`)*; tên `LUAT_CHUA_KY` giữ ở `LoiKy.ma` và trong `chi_tiet`.
 - Chưa có đường nạp `IX.PER` từ ngoài *(chỉ hàm repo)* — ngoài phạm vi WO.
+
+## Vòng sửa sau R1 (KQ-154)
+`KQ-154`: 0 CHẶN · 2 NÊN SỬA *(đều là BÀI THIẾU, mã đúng)*. Mã ⛔ đổi.
+| Mã | Việc | Đo *(đỏ trước → xanh sau)* |
+|---|---|---|
+| `C6-R1-01` | `test_ky.py`: thêm 3 ca biên `2026-09-30`→Q3·M9 · `2026-10-01`→Q4·M10 · `2024-02-29`→Y2024·H1·Q1·M2 | đột biến **M3** *(`quy` tháng 9 ⇒ 4)* và **M4** *(29/02 lùi năm)* ⇒ mỗi cái **1 đỏ** *(gói `test_ky`+`test_isp_config_per`, 34 bài)*, trước đó SỐNG |
+| `C6-R1-02` | `test_isp_config_per.py`: (a) qua tuyến nạp thêm bản `2024-10-20`/A ⇒ `/config/per` trả `2024-10-20` + `nguon` mới, cuối bài nạp lại `2024-10-21` *(chỉ-THÊM)*; (b) handler với `LichKy` luật `Z` *(mở tạm ở `TEN_LUAT`)* ⇒ `luat.ma == "Z"` | **M7** *(gõ cứng ngày)* ⇒ **2 đỏ** · **M8** *(gõ cứng `"A"`)* ⇒ **1 đỏ**; trước đó SỐNG. *(M8 phải qua handler: kho chỉ nạp được luật A)* |
+| `C6-R1-03` | GHI NHẬN ⇒ **backlog**, ⛔ làm *(M6 · M15 · M16)* | — |
+| `C6-R1-04` | Ngày đầu giữ **`2024-10-21`**; H5 chốt 20/21 sau, đổi bằng nạp bản mới, ⛔ đổi mã *(bài `…-20` ở trên chứng minh đường đó chạy)* | — |
+
+Sàn *(Q8, cùng commit)*: `MONG_PYTEST_TOAN_BO` **3325 → 3330** *(thu thập 3330 = 3325 + 5: 3 ca tham số + 2 bài)*, bài ghim cập nhật. `--duong-nen --cong 5434` *(một mình)*: `KẾT: ĐẠT` · web 3 = 3 · 667 · `lint-imports` 11 kept, 0 broken.
