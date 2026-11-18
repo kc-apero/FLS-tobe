@@ -159,15 +159,26 @@ def _chu(o: Any) -> tuple[str | None, str]:
     return None, f"kiểu ô {type(o).__name__} ⛔ nhận (⛔ phải {{'chu': str}} hay chuỗi)"
 
 
-def _cap(v: Any) -> tuple[int | None, str]:
-    """`cap` ⇒ số nguyên ≥ 1. Nhận `int` hay chuỗi chữ số; ⛔ `bool`, ⛔ 0/âm."""
+def _so(v: Any) -> tuple[int | None, str]:
+    """`int` hay chuỗi chữ số **ASCII** ⇒ số nguyên; ⛔ `bool`, ⛔ chữ số ngoài ASCII.
+
+    ⚠ `isdigit()` nhận cả `'²'` *(`int('²')` NÉM `ValueError`)* và `'١'` *(chữ số Ả
+      Rập — `int('١')` lặng lẽ = 1)*; cả hai ⛔ phải chuỗi `0-9` ⇒ kèm `isascii()`
+      *(`C4-R1-01`: `isdigit()` ⛔ đủ cho `int()`)*. Hỏng ⇒ `(None, lý do một dòng)`.
+    """
     if isinstance(v, bool):
-        return None, "cap là bool ⛔ phải số"
+        return None, f"{_mot_dong(v)} là bool ⛔ phải số"
     if isinstance(v, int):
-        n = v
-    elif isinstance(v, str) and v.strip().isdigit():
-        n = int(v.strip())
-    else:
+        return v, ""
+    if isinstance(v, str) and (s := v.strip()).isascii() and s.isdigit():
+        return int(s), ""
+    return None, f"{_mot_dong(v)} ⛔ phải số nguyên"
+
+
+def _cap(v: Any) -> tuple[int | None, str]:
+    """`cap` ⇒ số nguyên ≥ 1 *(qua `_so` — ⛔ `bool`, ⛔ chữ số ngoài ASCII)*; ⛔ 0/âm."""
+    n, _ = _so(v)
+    if n is None:
         return None, f"cap={_mot_dong(v)} ⛔ phải số nguyên ≥ 1"
     if n < 1:
         return None, f"cap={n} ⛔ ≥ 1"
@@ -213,11 +224,17 @@ def kiem(dong: Iterable[Mapping[str, Any]], *, nguon: str) -> CayHD:
         cap, ly = _cap(r.get("cap"))
         if cap is None:
             loi.append((HD_HONG, f"dòng {i} ({ten_hien}): {ly}"))
+        # `thu_tu` TÙY CHỌN *(⛔ trong COT)*: vắng ⇒ vị trí dòng; có mà hỏng ⇒ `HD_HONG`
+        #   *(⛔ `int(...)` trơn: `thu_tu='abc'`→`ValueError`, `None`→`TypeError` — `C4-R1-01`)*.
+        tt: int | None = i
+        if "thu_tu" in r:
+            tt, ly = _so(r["thu_tu"])
+            if tt is None:
+                loi.append((HD_HONG, f"dòng {i} ({ten_hien}): thu_tu {ly}"))
         # Chỉ dựng nút khi đủ trường — một nút hỏng ⛔ được lẻn vào phép kiểm cây.
-        if ma and cap is not None:
+        if ma and cap is not None and tt is not None:
             nut.append(NutHD(ma=ma, ten=ten or "", cha=cha, cap=cap,
-                             nhom=nhom or "", dong_sheet=ds or "",
-                             thu_tu=int(r.get("thu_tu", i))))
+                             nhom=nhom or "", dong_sheet=ds or "", thu_tu=tt))
 
     # `HD_MA_TRUNG` — khoá cây ⛔ xác định *(`json`/`dict` giữ bản cuối im lặng)*.
     dem = Counter(n.ma for n in nut)
@@ -245,7 +262,11 @@ def kiem(dong: Iterable[Mapping[str, Any]], *, nguon: str) -> CayHD:
     for n0 in nut:
         tham: list[str] = []
         cur: str | None = n0.ma
-        while cur is not None and cur in theo_ma:
+        # `len(tham) <= len(theo_ma)` = LƯỚI PHỤ *(`C4-R1-04`)*: một cây `k` nút đi theo
+        #   `cha` ⛔ thể quá `k` bước mà chưa gặp lại nút. Nếu phép dò `cur in tham` lỡ
+        #   hỏng, chặn này giữ vòng DỪNG thay vì phình tới khi OS `kill -9` *(OOM — ngốn
+        #   bộ nhớ cả phiên pytest)*; cây đúng ⛔ bao giờ chạm chặn *(gặp lại trước)*.
+        while cur is not None and cur in theo_ma and len(tham) <= len(theo_ma):
             if cur in tham:
                 vong = tham[tham.index(cur):]
                 khoa = frozenset(vong)
@@ -277,8 +298,14 @@ def kiem(dong: Iterable[Mapping[str, Any]], *, nguon: str) -> CayHD:
 
 
 def doc_van_ban(van_ban: str, *, nguon: str) -> CayHD:
-    """Lõi đọc ẢNH ATL: VĂN BẢN JSON `{bang:'IX.HD', …, dong:[...]}` ⇒ `kiem`."""
-    tho = json.loads(van_ban)
+    """Lõi đọc ẢNH ATL: VĂN BẢN JSON `{bang:'IX.HD', …, dong:[...]}` ⇒ `kiem`.
+
+    JSON hỏng ⇒ `LoiHD(HD_HONG)` *(⛔ `JSONDecodeError` trơn — `C4-R1-01`)*.
+    """
+    try:
+        tho = json.loads(van_ban)
+    except json.JSONDecodeError as e:
+        raise LoiHD([(HD_HONG, f"{nguon}: JSON hỏng — {_mot_dong(str(e))}")]) from None
     if not isinstance(tho, dict) or tho.get("bang") != BANG \
             or not isinstance(tho.get("dong"), list):
         raise LoiHD([(HD_HONG,
@@ -307,22 +334,23 @@ def _ma_mm(hd_code: str) -> str:
     return hd_code.split("|", 1)[0].strip()
 
 
-def doc_mm(duong: str = NGUON_MM) -> tuple[str, ...]:
-    """Nạp ảnh Mapping Master, trả **mã HD** *(⛔ COA/HR — ⛔ việc của C4)*.
+def doc_mm_van_ban(van_ban: str, *, nguon: str) -> tuple[str, ...]:
+    """Lõi đọc ẢNH Mapping Master: VĂN BẢN JSON ⇒ **mã HD** *(theo thứ tự ảnh)*.
 
-    ⭐ **Chỉ các mã, theo thứ tự ảnh** — `C4` DÙNG để LIỆT KÊ chênh với ATL, ⛔ hoà
-      giải *(`74 ↔ 73`, `ATL − MM = {NCF}` — `BG-107`)*. Mã trùng/rỗng ⇒ `LoiHD`
-      *(`Đ3`: ⛔ so trên tập rỗng — ảnh 0 dòng cũng NỔ)*.
+    ⭐ Song song `doc_van_ban` của ATL — tách lõi khỏi việc đọc tệp ⇒ bài thử nạp
+      ảnh TỔNG HỢP cố ý hỏng *(mã trùng · 0 dòng · `hd_code` rỗng)* mà ⛔ chạm hệ tệp
+      *(`C4-R1-02`: ba nhánh `raise` của `doc_mm` phải có bài ĐỎ — `Đ5`)*.
+    JSON hỏng ⇒ `LoiHD(HD_HONG)` *(⛔ `JSONDecodeError` trơn — `C4-R1-01`)*. Mã
+      trùng/rỗng/0 dòng ⇒ `LoiHD` *(`Đ3`: ⛔ so trên tập rỗng)*.
     """
     try:
-        p = nguon_tinh.giai(duong)
-    except nguon_tinh.LoiNguonTinh as e:
-        raise LoiHD([(HD_HONG, str(e))]) from None
-    tho = json.loads(p.read_text(encoding="utf-8"))
+        tho = json.loads(van_ban)
+    except json.JSONDecodeError as e:
+        raise LoiHD([(HD_HONG, f"{nguon}: JSON hỏng — {_mot_dong(str(e))}")]) from None
     if not isinstance(tho, dict) or tho.get("bang") != BANG_MM \
             or not isinstance(tho.get("dong"), list):
         raise LoiHD([(HD_HONG,
-                      f"{duong}: ⛔ phải {{bang: '{BANG_MM}', dong: [...]}}")])
+                      f"{nguon}: ⛔ phải {{bang: '{BANG_MM}', dong: [...]}}")])
     loi: list[tuple[str, str]] = []
     ma: list[str] = []
     for i, r in enumerate(tho["dong"], start=1):
@@ -335,10 +363,23 @@ def doc_mm(duong: str = NGUON_MM) -> tuple[str, ...]:
             continue
         ma.append(_ma_mm(c))
     if not ma:
-        loi.append((HD_HONG, f"{duong}: 0 mã đọc được ⇒ ⛔ có gì để đối chiếu"))
+        loi.append((HD_HONG, f"{nguon}: 0 mã đọc được ⇒ ⛔ có gì để đối chiếu"))
     for m, n in sorted(Counter(ma).items()):
         if n >= 2:
             loi.append((HD_MA_TRUNG, f"Mapping Master: mã {m!r} xuất hiện {n} lần"))
     if loi:
         raise LoiHD(loi)
     return tuple(ma)
+
+
+def doc_mm(duong: str = NGUON_MM) -> tuple[str, ...]:
+    """Nạp ảnh Mapping Master *(tương đối gốc repo)*, trả **mã HD** *(⛔ COA/HR)*.
+
+    ⭐ **Chỉ các mã, theo thứ tự ảnh** — `C4` DÙNG để LIỆT KÊ chênh với ATL, ⛔ hoà
+      giải *(`74 ↔ 73`, `ATL − MM = {NCF}` — `BG-107`)*. Lõi: `doc_mm_van_ban`.
+    """
+    try:
+        p = nguon_tinh.giai(duong)
+    except nguon_tinh.LoiNguonTinh as e:
+        raise LoiHD([(HD_HONG, str(e))]) from None
+    return doc_mm_van_ban(p.read_text(encoding="utf-8"), nguon=duong)

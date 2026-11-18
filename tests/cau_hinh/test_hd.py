@@ -12,6 +12,7 @@
 """
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 import pytest
@@ -212,3 +213,109 @@ def _doc_atl_ten() -> frozenset[str]:
         return frozenset()
     except hd.LoiHD as e:          # pragma: no cover — ảnh thật phải sạch
         return e.ten
+
+
+# ════════════════════════════════════════════════════════════════════════════
+# Vòng sửa sau R1 (KQ-124) — `C4-R1-01` · `C4-R1-02` · `C4-R1-03`
+# ════════════════════════════════════════════════════════════════════════════
+def _dong_tot(**ghi_de):
+    """Một dòng ATL hợp lệ *(gốc cấp 1)*; `ghi_de` thay đúng một ô để cô lập lỗi."""
+    d = {"ma": {"chu": "R"}, "ten": {"chu": "r"}, "cha": None,
+         "cap": "1", "nhom": {"chu": "G"}, "dong_sheet": "1"}
+    d.update(ghi_de)
+    return d
+
+
+def _mm_van(*hd_codes: str) -> str:
+    """Văn bản ảnh MM TỔNG HỢP từ các `hd_code` cho trước *(⛔ chạm hệ tệp)*."""
+    return json.dumps({"bang": hd.BANG_MM,
+                       "dong": [{"hd_code": {"chu": c}} for c in hd_codes]})
+
+
+# ── C4-R1-01 · mọi lối đổi chuỗi→số / JSON mang TÊN, ⛔ `ValueError` trơn ─────
+@pytest.mark.parametrize("cap_xau", ["²", "١"])
+def test_C4_R1_01_cap_isdigit_ngoai_ASCII_la_HD_HONG_khong_ValueError(cap_xau):
+    """`'²'`(ⁿ) ⇒ `int()` NÉM · `'١'`(Ả Rập) ⇒ `int()` lặng lẽ =1: cả hai
+    `isdigit()`=True. ⛔ `ValueError` trơn, ⛔ nhận oan — phải `HD_HONG` có tên
+    *(WO-122: lỗi cây có TÊN; `_so` kèm `isascii()`)*."""
+    with pytest.raises(hd.LoiHD) as e:
+        hd.kiem([_dong_tot(cap=cap_xau)], nguon="tong_hop")
+    assert hd.HD_HONG in e.value.ten, e.value.ten
+
+
+@pytest.mark.parametrize("tt_xau", ["abc", None])
+def test_C4_R1_01_thu_tu_hong_la_HD_HONG_khong_ValueError(tt_xau):
+    """`thu_tu` hỏng ⇒ `HD_HONG` *(⛔ `int(...)` trơn: `'abc'`→`ValueError`,
+    `None`→`TypeError`)*."""
+    with pytest.raises(hd.LoiHD) as e:
+        hd.kiem([_dong_tot(thu_tu=tt_xau)], nguon="tong_hop")
+    assert hd.HD_HONG in e.value.ten, e.value.ten
+
+
+def test_C4_R1_01_thu_tu_tot_duoc_dung_lam_khoa_sap():
+    """`Đ5` chiều kia: `thu_tu` hợp lệ *(⛔ vị trí dòng)* phải được tôn trọng khi sắp."""
+    dong = [_dong_tot(ma={"chu": "R"}, cha=None, cap="1", thu_tu=9, dong_sheet="1"),
+            _dong_tot(ma={"chu": "C"}, cha={"chu": "R"}, cap="2", thu_tu=1,
+                      dong_sheet="2")]
+    cay = hd.kiem(dong, nguon="tong_hop")
+    assert tuple(n.ma for n in cay.nut) == ("C", "R")   # sắp theo thu_tu 1 < 9
+
+
+def test_C4_R1_01_doc_van_ban_JSON_hong_la_HD_HONG():
+    """ATL: JSON hỏng ⇒ `HD_HONG` *(⛔ `JSONDecodeError` trơn)*."""
+    with pytest.raises(hd.LoiHD) as e:
+        hd.doc_van_ban("{ ⛔ khong phai JSON", nguon="tong_hop")
+    assert hd.HD_HONG in e.value.ten, e.value.ten
+
+
+def test_C4_R1_01_doc_mm_van_ban_JSON_hong_la_HD_HONG():
+    """MM: JSON hỏng ⇒ `HD_HONG` *(⛔ `JSONDecodeError` trơn)*."""
+    with pytest.raises(hd.LoiHD) as e:
+        hd.doc_mm_van_ban("{ ⛔ khong phai JSON", nguon="tong_hop")
+    assert hd.HD_HONG in e.value.ten, e.value.ten
+
+
+# ── C4-R1-02 · ba nhánh `raise` của `doc_mm` được CHỨNG MINH ĐỎ (Đ5) ─────────
+def test_C4_R1_02_doc_mm_ma_trung_la_HD_MA_TRUNG():
+    """Ảnh MM hai dòng cùng mã ⇒ `HD_MA_TRUNG` *(giết M27: `n>=2`)*."""
+    with pytest.raises(hd.LoiHD) as e:
+        hd.doc_mm_van_ban(_mm_van("GI | Gross", "GI | Gross 2"), nguon="tong_hop")
+    assert hd.HD_MA_TRUNG in e.value.ten, e.value.ten
+
+
+def test_C4_R1_02_doc_mm_0_ma_la_HD_HONG_khong_xanh_tren_tap_rong():
+    """Ảnh MM 0 dòng ⇒ `HD_HONG` *(giết M28 + `Đ3`: ⛔ đối chiếu trên tập rỗng)*."""
+    with pytest.raises(hd.LoiHD) as e:
+        hd.doc_mm_van_ban(_mm_van(), nguon="tong_hop")
+    assert hd.HD_HONG in e.value.ten, e.value.ten
+
+
+def test_C4_R1_02_doc_mm_hd_code_rong_la_HD_HONG():
+    """`hd_code` rỗng ⇒ `HD_HONG` *(nhánh thứ ba của `doc_mm`)*."""
+    van = json.dumps({"bang": hd.BANG_MM, "dong": [{"hd_code": {"chu": ""}}]})
+    with pytest.raises(hd.LoiHD) as e:
+        hd.doc_mm_van_ban(van, nguon="tong_hop")
+    assert hd.HD_HONG in e.value.ten, e.value.ten
+
+
+def test_C4_R1_02_doc_mm_van_ban_hop_le_tach_ma__Đ5_chieu_kia():
+    """`Đ5` chiều kia: ảnh MM hợp lệ ⇒ trả đúng mã, ⛔ đỏ oan *(lõi == `doc_mm`)*."""
+    assert hd.doc_mm_van_ban(_mm_van("GI | Gross", "NCF | Net"),
+                             nguon="tong_hop") == ("GI", "NCF")
+
+
+# ── C4-R1-03 · nhánh HD_HONG của `kiem` (cấp sai kiểu/giá trị · cột lạ) ──────
+@pytest.mark.parametrize("cap_xau", [0, True, -1])
+def test_C4_R1_03_cap_sai_la_HD_HONG(cap_xau):
+    """`cap` = 0 / `True`(bool) / âm ⇒ `HD_HONG` *(giết M22 `cap=0`, M23 `cap=True`
+    — cả hai SỐNG ở R1: `cap=0` nhận ⇒ đổi tên sang `HD_CAP_NHAY`, ⛔ `HD_HONG`)*."""
+    with pytest.raises(hd.LoiHD) as e:
+        hd.kiem([_dong_tot(cap=cap_xau)], nguon="tong_hop")
+    assert hd.HD_HONG in e.value.ten, e.value.ten
+
+
+def test_C4_R1_03_cot_la_la_HD_HONG():
+    """Cột lạ ngoài `COT`(+`thu_tu`) ⇒ `HD_HONG` *(giết M26: bỏ `if thua`)*."""
+    with pytest.raises(hd.LoiHD) as e:
+        hd.kiem([_dong_tot(cot_khong_co_trong_COT="x")], nguon="tong_hop")
+    assert hd.HD_HONG in e.value.ten, e.value.ten
