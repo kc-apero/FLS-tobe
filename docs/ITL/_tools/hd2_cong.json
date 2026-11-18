@@ -1,0 +1,59 @@
+{
+ "bang": "HD2.WP-C2",
+ "goi": "WP-C2",
+ "mo_ta": "parity CA.GL (tinh_gl trên E/F + ix_fx, gieo số dư đầu kỳ hàng 24) ↔ đáp án 406 BM…BT, nối dong_sheet",
+ "khoa": "dong_sheet + cot(BM…BT)",
+ "cot_so": [
+  "BM",
+  "BN",
+  "BO",
+  "BP",
+  "BQ",
+  "BR",
+  "BS",
+  "BT"
+ ],
+ "dung_sai": {
+  "atol": "0.000001",
+  "rtol": "1E-9",
+  "ghi_chu": "IEEE-754 ↔ Decimal; BT theo độ lớn lũy kế (rtol)"
+ },
+ "dong_so": 7877,
+ "tong_o": 63016,
+ "khop": 63016,
+ "so_o_dap_an_so_duoc": 63016,
+ "lech_ngoai_ten": 0,
+ "lech_co_ten": {
+  "thieu_tien_te_D": 6,
+  "itl_id_na": 4,
+  "ky_vang_406": 4,
+  "thang_thieu_ty_gia": 0
+ },
+ "lech_co_ten_chi_tiet": {
+  "thieu_tien_te_D": [
+   4962,
+   4963,
+   6073,
+   6507,
+   6949,
+   7631
+  ],
+  "itl_id_na": [
+   6684,
+   6836,
+   7500,
+   7832
+  ],
+  "ky_vang_406": [
+   "202605",
+   "202606",
+   "202607",
+   "202608"
+  ],
+  "thang_thieu_ty_gia": []
+ },
+ "mau_so_thang": 20,
+ "so_du_dau": "5 ô gõ tay hàng 24 (errata ⑳: FLS chưa có khái niệm số dư đầu kỳ; nguồn chính thức = câu hỏi BA/owner) — gieo qua tinh_gl(so_du_dau=…)",
+ "dat": true,
+ "ly_do": []
+}

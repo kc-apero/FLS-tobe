@@ -134,7 +134,7 @@ dòng HR 407/408 *(H7)* · cột `CA` Cash/Bank qua `IX.ORG` *(C8)* · đọc `I
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from decimal import ROUND_HALF_EVEN, Context, Decimal, localcontext
 from typing import Iterable, Mapping
 
@@ -266,15 +266,43 @@ class KetQuaDongGL:
     musd_ton: Decimal     # BT — luỹ kế BR − BS
 
 
+@dataclass(frozen=True)
+class SoDuDau:
+    """SỐ DƯ ĐẦU KỲ gõ tay — hằng CỘNG THÊM vào tồn/luỹ kế tại MỘT vị trí dòng *(`H4` · WO-132)*.
+
+    ⭐ **Vì sao có.** AS-IS 406 *(sheet `Report I General Ledger`)* có **5 ô GÕ TAY ở hàng 24**
+    *(R-chẩn orchestrator 18/11: quét công thức `AX10:BT7892` = 181.263 ô, ĐÚNG 5 ô lệch khuôn
+    CALC_ZONE, cả 5 ở hàng 24)* — số dư đầu kỳ nhập cứng, THAY/CỘNG vào công thức dòng:
+      · `AX24=+1235500+7189` *(USD Nợ)* · `BA24=985537` *(SGD Nợ)* · `BG24=…+6653796781` *(VND)*
+        ⇒ cộng vào `ton[tiền tệ]` *(đánh giá lại ở BM/BN theo tỷ giá từng tháng về sau)*;
+      · `BQ24=…+56842628558/10^9` ⇒ cộng `bvnd_ton` *(BQ, luỹ kế)*; `BT24=…+2.267718` ⇒ cộng
+        `musd_ton` *(BT)*. Hai hằng này là bVND/mUSD của chính số dư trên, nhập CỨNG *(⛔ suy lại
+        từ `ton`)* nên khai riêng.
+    FLS CHƯA có khái niệm số dư đầu kỳ — nguồn chính thức là câu hỏi cho BA/owner *(errata ⑳)*.
+    H4 GIEO đúng như sheet để parity về 0; đây là THAM SỐ TƯỜNG MINH, mặc định ⛔ có *(bài H1 cũ
+    ⛔ đụng)*. `ton_them` khoá là tiền tệ *(qua `ma_tien_te`, phải thuộc `TIEN_TE_GL`)*.
+    """
+
+    ton_them: Mapping[str, Decimal] = field(default_factory=dict)
+    bvnd_ton_them: Decimal = _KHONG      # cộng vào BQ (bvnd_ton luỹ kế)
+    musd_ton_them: Decimal = _KHONG      # cộng vào BT (musd_ton luỹ kế)
+
+
 def tinh_gl(
     dong: Iterable[DongGL],
     fx: Mapping[int, Mapping[str, Decimal]],
+    so_du_dau: Mapping[int, SoDuDau] | None = None,
 ) -> list[KetQuaDongGL]:
     """Quy đổi từng dòng theo công thức ô NOW 406 *(docstring tệp)*; trả MỘT kết quả mỗi dòng.
 
     `fx`: tháng `yyyymm` → tiền tệ → số VND cho 1 đơn vị *(hình `IX.FX`; khoá tiền tệ cũng qua
     `ma_tien_te`)*. Thiếu tỷ giá ở BẤT KỲ dòng nào ⇒ `ThieuTyGia` cho cả lượt; tiền tệ ngoài
     5 cột ⇒ `TienTeNgoaiGL`; tiền ⛔ hữu hạn ⇒ `TienKhongHuuHan`; float ⇒ `TypeError`.
+
+    `so_du_dau`: *(tuỳ chọn, `H4`)* `{vị_trí_dòng (đếm từ 1) → SoDuDau}` — số dư đầu kỳ GÕ TAY
+    cộng thêm vào `ton`/`bvnd_ton`/`musd_ton` NGAY SAU khi xử dòng ở vị trí ấy *(trước khi tính
+    BM/BN của chính dòng ấy)*, đúng như ô hàng 24 của AS-IS. Mặc định `None` ⇒ hành vi H1 thuần.
+    Tiền tệ lạ trong `ton_them` ⇒ `TienTeNgoaiGL`.
     """
     ton = {t: _KHONG for t in TIEN_TE_GL}
     bvnd_ton = _KHONG                               # BQ luỹ kế
@@ -305,6 +333,21 @@ def tinh_gl(
             musd_co = bvnd_co / ty_gia_usd * _MOT_NGHIN   # BS = BP ÷ USD × 10^3
             bvnd_ton = bvnd_ton + bvnd_no - bvnd_co    # BQ = BQ trên + BO − BP
             musd_ton = musd_ton + musd_no - musd_co    # BT = BT trên + BR − BS
+
+            # ⭐ SỐ DƯ ĐẦU KỲ gõ tay (H4): cộng NGAY SAU dòng, TRƯỚC BM/BN — đúng thứ tự ô hàng 24
+            #   (`BG24=…+hằng` cộng vào tồn VND trước khi BM đánh giá lại; `BQ24/BT24=…+hằng`). Nhờ
+            #   cộng vào `ton`, các dòng SAU vẫn đánh giá lại số dư ấy theo tỷ giá từng tháng (đúng
+            #   độ trôi offset đã đo). ⛔ đụng khi `so_du_dau` None.
+            if so_du_dau is not None and (sd := so_du_dau.get(vi_tri)) is not None:
+                for t, v in sd.ton_them.items():
+                    mt = ma_tien_te(t)
+                    if mt not in TIEN_TE_GL:
+                        raise TienTeNgoaiGL(
+                            f"⛔ so_du_dau dòng thứ {vi_tri}: tiền tệ {t!r} (ma_tien_te ⇒ {mt!r}) "
+                            f"— GL chỉ có 5 cột {' · '.join(TIEN_TE_GL)}")
+                    ton[mt] = ton[mt] + v
+                bvnd_ton = bvnd_ton + sd.bvnd_ton_them
+                musd_ton = musd_ton + sd.musd_ton_them
 
             # BM = AZ×USD + BC×SGD + BF×COP + BI + BL×HKD — tỷ giá THÁNG CỦA DÒNG đang xét;
             # chỉ tiền tệ có tồn ≠ 0 mới cần tỷ giá (② · ⓐ). VND cộng thẳng.
