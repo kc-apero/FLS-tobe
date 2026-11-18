@@ -3,15 +3,15 @@
 
 ⭐ **Vì sao có tệp này.** Bước **AL.PLT/H9/H10** *(AP v3.1.2 §3.2.2 IX.VEN · §3.4.1 PD 503–507 ·
 §3.5.4 WP-C4)* phân bổ chi phí nền tảng GI xuống 7 CDT1. Cần bốn ẢNH đứng yên:
-  · `ix_ven.json`   — Block 1 *(36 dòng `M:S`)* + cột `cach_tinh` *(5 nhóm riêng)*.
-  · `gi_mid1.json`  — MID1 phân bổ 7 CDT1 *(2.856 hàng)* · `#N/A` ITL ID giữ nguyên.
+  · `ix_ven.json`   — Block 1 *(**42** dòng `M:S` hàng 4–45; AP ghi 36 ⇒ errata)* + `cach_tinh`.
+  · `gi_mid1.json`  — MID1 phân bổ 7 CDT1 *(2.856 hàng)* · `#N/A` ITL ID giữ nguyên · `U`/`V` `so!`.
   · `gi_mid2.json`  — MID2 RATE *(1.463 hàng)* · `#DIV/0!` giữ nguyên *(cột `so!`)*.
-  · `gi_mid3.json`  — MID3 đáp án tháng *(11 hàng)* · cổng `Σ chia = O / P`.
+  · `gi_mid3.json`  — MID3 **253** hàng số *(11 tổng-tháng + 242 chi tiết)* · cổng `Σ chia = O / P`.
 
 Sáu bài của ISP *(mục 6)* + đối chứng Đ3/Đ4/Đ5:
 
     DT8-B1  ix_ven: 36 dòng Block 1; 5 nhãn `cach_tinh` ≠ 'thường' = {Max,VD341,VD428,VD444,VD62}
-    DT8-B2  gi_mid3: Σ 6 PE_cdt = O ∧ Σ 6 PM_cdt = P trên 11 hàng *(đo lại ĐỘC LẬP, lệch = 0)*
+    DT8-B2  gi_mid3: Σ 6 PE_cdt = O ∧ Σ 6 PM_cdt = P trên 253 hàng *(đo lại ĐỘC LẬP, lệch = 0)*
     AC-3    `#N/A`/`#DIV/0!` ở nguồn GHI NGUYÊN + ĐẾM *(ITL ID 176 · RATE 308)*, ⛔ hoá 0
     AC-4    PII: 0 cột cấm, máy quét có ca phá, lời lỗi ⛔ in giá trị ô; `mã ∈ tập tham chiếu`
             đo trên TẬP ĐẦY ĐỦ *(cdt1 ∈ 7 CDT1)*
@@ -23,9 +23,10 @@ Sáu bài của ISP *(mục 6)* + đối chứng Đ3/Đ4/Đ5:
 dựng lưới TỪ ảnh rồi SỬA một ô, ⛔ số thật.
 
 ⭐ **Số đo 18/11 *(khoá SA chỉ-đọc, phiên cloud — mỗi số đếm MỘT vật, Đ4)*:**
-  · IX.VEN Block 1 = 36 hàng *(sheet 4…39)*; nhãn riêng: Max 12 · VD341 6 · VD444 8 · VD428 3 ·
-    VD62 1 · thường 6 ⇒ **5** nhãn ≠ thường.
-  · MID3 = 11 hàng đáp án *(AE/AF CHECK True — sheet 10…20)*; dư Σ chia lớn nhất Decimal 5,1e-9.
+  · IX.VEN Block 1 = **42** dòng *(sheet 4…45)*; nhãn riêng: Max 12 · VD341 **12** · VD444 8 · VD428
+    3 · VD62 1 · thường 6 ⇒ **5** nhãn ≠ thường.
+  · MID3 = **253** hàng số *(11 tổng-tháng sheet 10…20 + 242 chi tiết)*; dư Σ chia lớn nhất 5,085e-9;
+    vế PM **0/1.771** ô ≠ 0 *(chưa đo được trên dữ liệu thật — bài tổng hợp ghim vế PM)*.
   · MID1 = 2.856 hàng phân bổ + 4.494 hàng đệm; **176** hàng ITL ID `#N/A`.
   · MID2 = 1.463 hàng; **308** ô RATE `#DIV/0!`; 7 CDT1 × 209 hàng.
 """
@@ -57,12 +58,14 @@ ANH = {
 }
 #: checksum_noi_dung ghim *(đổi ⇒ phải có lượt đóng băng mới + lý do)*.
 CHECKSUM = {
-    "ix_ven": "9a6bc3cac0bf496c",
-    "gi_mid1": "5e054cfd05257bb7",
-    "gi_mid2": "73887970320d39a3",
-    "gi_mid3": "a43341bb8aea0c1c",
+    "ix_ven": "77f81455901c3667",
+    "gi_mid1": "515868c0b100ba35",
+    "gi_mid2": "eb36e99f5a9cee7d",
+    "gi_mid3": "3b93f232a0bedc0a",
 }
-MONG = {"ix_ven": 36, "gi_mid1": 2856, "gi_mid2": 1463, "gi_mid3": 11}
+#: ⭐ vòng sửa R1 `KQ-149`: ix_ven 36→**42** *(`DT8-R1-01`: nguồn liền tới hàng 45)* · gi_mid3 11→**253**
+#: *(`DT8-R1-03`: 253 hàng số = 11 tổng-tháng + 242 chi tiết)*. Mỗi số đếm **dòng ảnh**, ⛔ cột.
+MONG = {"ix_ven": 42, "gi_mid1": 2856, "gi_mid2": 1463, "gi_mid3": 253}
 
 #: 5 nhãn `cach_tinh` ≠ 'thường' *(AP §3.2.2/§3.2.4)*.
 NHOM_RIENG = {"Max", "VD341", "VD428", "VD444", "VD62"}
@@ -132,8 +135,8 @@ def _viet_luoi(p: pathlib.Path, anh: dict, *, cot: list[str], dong_dau: int,
 
 COT_THO = {
     "ix_ven": ["No", "vendor", "network", "account", "pct", "cashin_month", "cashin_day"],
-    "gi_mid1": ["D", "J", "K", "Q", "M", "R", "T"],
-    "gi_mid2": ["D", "J", "K", "M", "T", "AA"],
+    "gi_mid1": ["D", "J", "K", "Q", "M", "R", "T", "U", "V"],
+    "gi_mid2": ["D", "J", "K", "M", "T", "AA", "U", "V"],
     "gi_mid3": ["O", "P", "S", "T", "U", "V", "W", "X", "Y", "Z", "AA", "AB", "AC", "AD", "AE", "AF"],
 }
 
@@ -147,16 +150,27 @@ def _luoi(ten: str, anh: dict) -> list[list]:
     if ten == "gi_mid1":
         # hàng phân bổ thật rồi 4.494 hàng đệm (D='USD' do công thức, 5 cột phân bổ rỗng).
         real = [[_chu(r["currency"]), _chu(r["cdt1"]), _chu(r["thang"]), _chu(r["no"]),
-                 _chu(r["vendor"]), _chu(r["itl_id"]), _chu(r["pe"])] for r in d]
+                 _chu(r["vendor"]), _chu(r["itl_id"]), _chu(r["pe"]), _chu(r["u"]), _chu(r["v"])]
+                for r in d]
         dem = int(_chu(anh["phu"]["dem"]["dong"][0]["so_dong"]))
-        return real + [["USD", None, None, None, None, None, None]] * dem
+        return real + [["USD", None, None, None, None, None, None, None, None]] * dem
     if ten == "gi_mid2":
         return [[_chu(r["currency"]), _chu(r["cdt1"]), _chu(r["thang"]), _chu(r["vendor"]),
-                 _chu(r["pe"]), _chu(r["rate"])] for r in d]
+                 _chu(r["pe"]), _chu(r["rate"]), _chu(r["u"]), _chu(r["v"])] for r in d]
     if ten == "gi_mid3":
         pe_pm = ["cvl_pe", "cvl_pm", "cor_pe", "cor_pm", "shq1_pe", "shq1_pm",
                  "csm_pe", "csm_pm", "cah_pe", "cah_pm", "asa_pe", "asa_pm"]
-        return [[_chu(r["pe"]), _chu(r["pm"]), *[_chu(r[c]) for c in pe_pm], True, True] for r in d]
+        # ⭐ R1-03: ảnh = 253 hàng SỐ; nguồn còn 11 hàng NGĂN *(O ⛔ số)* ở cuối mỗi khối — dựng lại
+        #   đúng chỗ *(khoảng trống `dong_sheet`)* để tái tạo ra ĐÚNG từng byte. Hàng tổng-tháng
+        #   *(10…20)* mang AE/AF = True; hàng chi tiết ⛔ *(chuỗi rỗng — đo: 242/242)*.
+        out: list[list] = []
+        for r in d:
+            while len(out) + 10 < int(_chu(r["dong_sheet"])):
+                out.append([True, True, *[None] * 12, None, None])      # hàng ngăn: O ⛔ số
+            ds = int(_chu(r["dong_sheet"]))
+            ck = True if ds <= 20 else None
+            out.append([_chu(r["pe"]), _chu(r["pm"]), *[_chu(r[c]) for c in pe_pm], ck, ck])
+        return out
     raise AssertionError(ten)
 
 
@@ -203,15 +217,35 @@ def test_anh_TAI_TAO_dung_tung_byte(ten, tmp_path):
 
 # ══ DT8-B1 · ix_ven: 36 dòng Block 1 + 5 nhãn cach_tinh ════════════════════════
 
-def test_DT8_B1_ix_ven_36_dong_5_nhom_rieng():
+def test_DT8_B1_ix_ven_42_dong_5_nhom_rieng():
     anh = _doc(ANH["ix_ven"])
-    assert anh["bang"] == "IX.VEN" and anh["so_dong"] == 36
+    assert anh["bang"] == "IX.VEN" and anh["so_dong"] == 42
     rieng = {r["cach_tinh"]["chu"] for r in anh["dong"] if r["cach_tinh"]["chu"] != "thường"}
     assert rieng == NHOM_RIENG, f"5 nhãn riêng; đo {sorted(rieng)}"
-    # Đ4 — mỗi nhãn đếm một vật: Max 12 · VD341 6 · VD444 8 · VD428 3 · VD62 1 · thường 6.
+    # Đ4 — mỗi nhãn đếm số DÒNG: Max 12 · VD341 **12** · VD444 8 · VD428 3 · VD62 1 · thường 6 = 42.
     from collections import Counter
     dem = Counter(r["cach_tinh"]["chu"] for r in anh["dong"])
-    assert dem == {"Max": 12, "VD341": 6, "VD444": 8, "VD428": 3, "VD62": 1, "thường": 6}
+    assert dem == {"Max": 12, "VD341": 12, "VD444": 8, "VD428": 3, "VD62": 1, "thường": 6}
+
+
+def test_DT8_R1_01_ix_ven_dai_lien_hang_4_den_45_VD341_No_toi_12():
+    """`DT8-R1-01`: Block 1 = ĐỦ dải liền hàng sheet 4…45 *(42 dòng — ⛔ cắt ở 36 theo số AP)*;
+    `VD341` mang `No` 1…12 *(MID1 dùng tới `No` 12)*; ảnh khai 'AP ghi 36 ⇒ errata'."""
+    anh = _doc(ANH["ix_ven"])
+    ds = [int(_chu(r["dong_sheet"])) for r in anh["dong"]]
+    assert ds == list(range(4, 46)), "liền tay hàng 4…45, ⛔ hàng trống ngăn"
+    no341 = sorted(int(_chu(r["No"])) for r in anh["dong"] if _chu(r["vendor"]) == "VD341")
+    assert no341 == list(range(1, 13))
+    assert "errata" in anh["ghi_chu_khuon"] and "36" in anh["ghi_chu_khuon"]
+
+
+def test_DT8_R1_01_PHA_cat_o_36_hang_thi_DO(tmp_path):
+    """Phá: lưới chỉ 36 hàng *(cắt theo số AP)* mà `--mong 42` ⇒ ĐỎ *(cổng canh SỐ DÒNG)*."""
+    anh = _doc(ANH["ix_ven"])
+    bt = _viet_luoi(tmp_path / "tho.json", anh, cot=COT_THO["ix_ven"], dong_dau=4,
+                    values=_luoi("ix_ven", anh)[:36])
+    kq = _chay("ix_ven", str(bt), "--mong", "42", "--ra", str(tmp_path / "ra.json"))
+    assert kq.returncode == 1 and "36 dòng ≠ mong 42" in kq.stdout, (kq.stdout[-500:],)
 
 
 def test_DT8_B1_PHA_mot_nhom_rieng_thi_DO(tmp_path):
@@ -222,7 +256,7 @@ def test_DT8_B1_PHA_mot_nhom_rieng_thi_DO(tmp_path):
         if h[1] == "VD341":
             h[1] = "VD999"
     bt = _viet_luoi(tmp_path / "tho.json", anh, cot=COT_THO["ix_ven"], dong_dau=4, values=luoi)
-    kq = _chay("ix_ven", str(bt), "--mong", "36", "--ra", str(tmp_path / "ra.json"))
+    kq = _chay("ix_ven", str(bt), "--mong", "42", "--ra", str(tmp_path / "ra.json"))
     assert kq.returncode == 1, (kq.stdout[-600:], kq.stderr[-300:])
     assert "thiếu" in kq.stdout and "VD341" in kq.stdout
 
@@ -230,10 +264,10 @@ def test_DT8_B1_PHA_mot_nhom_rieng_thi_DO(tmp_path):
 # ══ DT8-B2 · gi_mid3: Σ chia = O / P ═══════════════════════════════════════════
 
 def test_DT8_B2_mid3_sigma_chia_bang_O_P_doc_lap():
-    """Đo LẠI độc lập: Σ 6 PE_cdt = O ∧ Σ 6 PM_cdt = P trên 11 hàng *(⛔ tin cổng của ảnh)*."""
+    """Đo LẠI độc lập: Σ 6 PE_cdt = O ∧ Σ 6 PM_cdt = P trên **253** hàng số *(⛔ tin cổng của ảnh)*."""
     from decimal import Decimal
     anh = _doc(ANH["gi_mid3"])
-    assert anh["so_dong"] == 11
+    assert anh["so_dong"] == 253
     pe = ("cvl_pe", "cor_pe", "shq1_pe", "csm_pe", "cah_pe", "asa_pe")
     pm = ("cvl_pm", "cor_pm", "shq1_pm", "csm_pm", "cah_pm", "asa_pm")
     lech = 0
@@ -243,6 +277,85 @@ def test_DT8_B2_mid3_sigma_chia_bang_O_P_doc_lap():
         if abs(o - spe) > Decimal("0.000001") or abs(p - spm) > Decimal("0.000001"):
             lech += 1
     assert lech == 0, f"MONG lệch = 0; đo {lech}"
+    # Đ3 *(R1-02)*: mẫu số TỪNG vế — vế PM *(P + 6 PM)* đo 0/1.771 ô ≠ 0 ⇒ `lech 0` ở vế ấy là
+    #   `0 = 0` trên tập rỗng, ⛔ bằng chứng. Vế PE: 1.275/1.771 ô ≠ 0 *(vế có tín hiệu thật)*.
+    pm_cot = ("pm", *pm)
+    pe_cot = ("pe", *pe)
+    assert sum(1 for r in anh["dong"] for c in pm_cot if Decimal(_chu(r[c])) != 0) == 0
+    assert sum(1 for r in anh["dong"] for c in pe_cot if Decimal(_chu(r[c])) != 0) == 1275
+
+
+def test_DT8_R1_02_cong_KHAI_mau_so_ve_PM_chua_do_duoc(tmp_path):
+    """`DT8-R1-02`/Đ3: cổng in số ô ≠ 0 của TỪNG vế cạnh `lệch 0`; vế PM rỗng ⇒ nói thẳng
+    *'chưa đo được trên dữ liệu thật'* *(⛔ để `lệch 0` đứng một mình)*."""
+    anh = _doc(ANH["gi_mid3"])
+    bt = _tai_tao("gi_mid3", tmp_path / "tho.json", anh)
+    kq = _chay("gi_mid3", str(bt), "--mong", "253", "--ra", str(tmp_path / "ra.json"))
+    assert kq.returncode == 0, (kq.stdout[-600:], kq.stderr[-300:])
+    assert "PE: 1275/1771 ô ≠ 0" in kq.stdout, kq.stdout[-900:]
+    assert "PM: 0/1771 ô ≠ 0 — vế này chưa đo được trên dữ liệu thật" in kq.stdout, kq.stdout[-900:]
+
+
+def _luoi_pm_tong_hop(anh: dict) -> list[list]:
+    """Lưới MID3 mà hàng đầu có PM ≠ 0: P = 600 = 6 × 100 *(tổng hợp — ⛔ số thật)*."""
+    luoi = _luoi("gi_mid3", anh)
+    luoi[0][1] = "600"                      # P
+    for j in (3, 5, 7, 9, 11, 13):          # 6 PM_cdt
+        luoi[0][j] = "100"
+    return luoi
+
+
+def test_DT8_R1_02_ve_PM_cat_tren_du_lieu_tong_hop_khop_thi_XANH(tmp_path):
+    """Bài TỔNG HỢP có PM ≠ 0 và Σ chia = P ⇒ XANH, và cổng KHÔNG còn nói 'chưa đo được'."""
+    anh = _doc(ANH["gi_mid3"])
+    bt = _viet_luoi(tmp_path / "tho.json", anh, cot=COT_THO["gi_mid3"], dong_dau=10,
+                    values=_luoi_pm_tong_hop(anh))
+    kq = _chay("gi_mid3", str(bt), "--mong", "253", "--ra", str(tmp_path / "ra.json"))
+    assert kq.returncode == 0, (kq.stdout[-700:], kq.stderr[-300:])
+    assert "PM: 7/1771 ô ≠ 0" in kq.stdout and "chưa đo được" not in kq.stdout
+
+
+def test_DT8_R1_02_ve_PM_cat_tren_du_lieu_tong_hop_lech_thi_DO(tmp_path):
+    """Phá vế PM: Σ 6 PM = 601 ≠ P = 600 *(PE nguyên vẹn)* ⇒ ĐỎ. Bỏ vế PM khỏi cổng ⇒ bài ĐỎ
+    *(đột biến `-02`: 189/189 xanh ⇒ nay cắn — Đ5)*."""
+    anh = _doc(ANH["gi_mid3"])
+    luoi = _luoi_pm_tong_hop(anh)
+    luoi[0][13] = "101"                     # asa_pm 100 → 101
+    bt = _viet_luoi(tmp_path / "tho.json", anh, cot=COT_THO["gi_mid3"], dong_dau=10, values=luoi)
+    kq = _chay("gi_mid3", str(bt), "--mong", "253", "--ra", str(tmp_path / "ra.json"))
+    assert kq.returncode == 1 and "dong_sheet@10" in kq.stdout, (kq.stdout[-600:],)
+
+
+def test_DT8_R1_02_PHA_mot_o_PM_thi_DO(tmp_path):
+    """Phá: +1000 vào `CVL_PM` của hàng đầu *(dữ liệu thật — P = 0)* ⇒ Σ PM ≠ P ⇒ ĐỎ."""
+    anh = _doc(ANH["gi_mid3"])
+    luoi = _luoi("gi_mid3", anh)
+    luoi[0][3] = "1000"                     # cvl_pm
+    bt = _viet_luoi(tmp_path / "tho.json", anh, cot=COT_THO["gi_mid3"], dong_dau=10, values=luoi)
+    kq = _chay("gi_mid3", str(bt), "--mong", "253", "--ra", str(tmp_path / "ra.json"))
+    assert kq.returncode == 1 and "dong_sheet@10" in kq.stdout, (kq.stdout[-600:],)
+
+
+def test_DT8_R1_03_mid3_253_hang_so_gom_tong_thang_va_chi_tiet():
+    """`DT8-R1-03` *(A)*: ảnh = **253** hàng số *(11 tổng-tháng sheet 10–20 + 242 chi tiết)*; chọn
+    bằng 'O là số', ⛔ bằng AE/AF; 11 hàng NGĂN *(sheet 21,44,…,251)* ⛔ vào ảnh."""
+    anh = _doc(ANH["gi_mid3"])
+    ds = [int(_chu(r["dong_sheet"])) for r in anh["dong"]]
+    ngan = list(range(21, 252, 23))
+    assert len(ngan) == 11 and ds == [x for x in range(10, 274) if x not in ngan]
+    assert len(ds) == 253 and sum(1 for x in ds if x <= 20) == 11
+    assert "253" in anh["ghi_chu_khuon"] and "11/253" in anh["ghi_chu_khuon"]
+
+
+def test_DT8_R1_03_PHA_mot_hang_chi_tiet_thi_DO(tmp_path):
+    """Phá: +1000 vào `CVL_PE` của HÀNG CHI TIẾT *(sheet 273 — ⛔ trong 11 hàng tổng cũ)* ⇒ ĐỎ.
+    Bản cũ chỉ phủ 11/253 hàng ⇒ lệch ở 242 hàng chi tiết lọt."""
+    anh = _doc(ANH["gi_mid3"])
+    luoi = _luoi("gi_mid3", anh)
+    luoi[-1][2] = str(float(luoi[-1][2]) + 1000.0)
+    bt = _viet_luoi(tmp_path / "tho.json", anh, cot=COT_THO["gi_mid3"], dong_dau=10, values=luoi)
+    kq = _chay("gi_mid3", str(bt), "--mong", "253", "--ra", str(tmp_path / "ra.json"))
+    assert kq.returncode == 1 and "dong_sheet@273" in kq.stdout, (kq.stdout[-600:],)
 
 
 def test_DT8_B2_PHA_mot_o_chia_thi_DO(tmp_path):
@@ -252,19 +365,19 @@ def test_DT8_B2_PHA_mot_o_chia_thi_DO(tmp_path):
     # cot thô: O,P,S(cvl_pe=idx2),... ⇒ sửa idx2 của hàng 0.
     luoi[0][2] = str(float(luoi[0][2]) + 1000.0)
     bt = _viet_luoi(tmp_path / "tho.json", anh, cot=COT_THO["gi_mid3"], dong_dau=10, values=luoi)
-    kq = _chay("gi_mid3", str(bt), "--mong", "11", "--ra", str(tmp_path / "ra.json"))
+    kq = _chay("gi_mid3", str(bt), "--mong", "253", "--ra", str(tmp_path / "ra.json"))
     assert kq.returncode == 1, (kq.stdout[-600:], kq.stderr[-300:])
     assert "thiếu" in kq.stdout and "dong_sheet@10" in kq.stdout
 
 
 def test_DT8_B2_PHA_tap_rong_thi_DO(tmp_path):
-    """Đ3: 0 hàng đáp án *(AE/AF ⛔ True)* ⇒ `thieu_lac` ValueError ⇒ ĐỎ, ⛔ nền xanh."""
+    """Đ3: 0 hàng số *(O ⛔ số ở mọi hàng)* ⇒ ĐỎ, ⛔ nền xanh."""
     anh = _doc(ANH["gi_mid3"])
     luoi = _luoi("gi_mid3", anh)
     for h in luoi:
-        h[14] = False                               # AE = False ⇒ ⛔ hàng nào được chọn
+        h[0] = None                                 # O ⛔ số ⇒ ⛔ hàng nào được chọn
     bt = _viet_luoi(tmp_path / "tho.json", anh, cot=COT_THO["gi_mid3"], dong_dau=10, values=luoi)
-    kq = _chay("gi_mid3", str(bt), "--mong", "11", "--ra", str(tmp_path / "ra.json"))
+    kq = _chay("gi_mid3", str(bt), "--mong", "253", "--ra", str(tmp_path / "ra.json"))
     # 0 hàng chọn ⇒ bản thô 0 dòng ⇒ TỪ CHỐI (exit 2) — mẫu số 0 là kết quả, ⛔ ảnh rỗng.
     assert kq.returncode == 2, (kq.stdout[-500:], kq.stderr[-400:])
     assert "0 dòng" in kq.stderr
@@ -285,11 +398,12 @@ def test_AC3_mid1_itl_id_NA_ghi_nguyen_va_dem():
 
 def test_AC3_mid2_rate_DIV0_so_mu_ghim_phan_bo():
     anh = _doc(ANH["gi_mid2"])
-    assert anh["loi_mong"] == {"rate": 308}
+    assert anh["loi_mong"]["rate"] == 308
     # phân bố ghim: đúng một giá trị lỗi, 308 lần *(DT5-R1-04)*.
     pb = anh["loi_theo_cot"]["rate"]
     assert sum(pb.values()) == 308 and all(k.startswith("#DIV/0!") for k in pb)
-    assert len(anh["o_loi"]) == 308
+    assert sum(1 for o in anh["o_loi"] if o["cot"] == "rate") == 308      # +2.548 ô lỗi U/V (R1-04)
+    assert len(anh["o_loi"]) == 308 + 1274 + 1274
     # ghi NGUYÊN: ô RATE lỗi trong cột chính = {"chu": "#DIV/0! ..."} *(⛔ hoá 0)*.
     so_div0 = sum(1 for r in anh["dong"]
                   if isinstance(r["rate"], dict) and r["rate"]["chu"].startswith("#DIV/0!"))
@@ -310,6 +424,71 @@ def test_AC3_mid2_PHA_doi_mot_DIV0_thanh_so_thi_DO(tmp_path):
     kq = _chay("gi_mid2", str(bt), "--mong", "1463", "--ra", str(tmp_path / "ra.json"))
     assert kq.returncode == 1, (kq.stdout[-600:], kq.stderr[-300:])
     assert "ô lỗi ≠ mong" in kq.stdout and "rate 307≠308" in kq.stdout
+
+
+# ══ DT8-R1-04 · cột U/V *(MID)* vào ảnh dạng `so!` + phân bố lỗi ghim *(đo 18/11, nguồn thật)* ═══
+#: Đo hàng DỮ LIỆU của ảnh *(MID1 2.856 hàng · MID2 1.463 hàng)* — ⛔ cả lưới *(MID1 U toàn lưới còn
+#: 4.636 `#DIV/0!` ở 4.494 hàng ĐỆM ⇒ ngoài ảnh)*. `#REF!`/`#N/A` = 0 ở U/V cả hai sheet.
+LOI_UV = {
+    "gi_mid1": {"u": {"#VALUE!": 754, "#DIV/0!": 784}, "v": {"#VALUE!": 733, "#DIV/0!": 780}},
+    "gi_mid2": {"u": {"#VALUE!": 1008, "#DIV/0!": 266}, "v": {"#VALUE!": 1008, "#DIV/0!": 266}},
+}
+
+
+def _tok(s: str) -> str:
+    return s.split(" ")[0]
+
+
+@pytest.mark.parametrize("ten", ["gi_mid1", "gi_mid2"])
+def test_DT8_R1_04_anh_mang_U_V_va_ghim_phan_bo_loi(ten):
+    anh = _doc(ANH[ten])
+    assert anh["cot"][-2:] == ["u", "v"]
+    for c, mong in LOI_UV[ten].items():
+        thuc: dict[str, int] = {}
+        for k, n in anh["loi_theo_cot"][c].items():
+            thuc[_tok(k)] = thuc.get(_tok(k), 0) + n
+        assert thuc == mong, (ten, c, thuc)
+        assert anh["loi_mong"][c] == mong                    # khai Đ5: PHÂN BỐ, ⛔ chỉ tổng
+        assert not {"#REF!", "#N/A"} & set(thuc)             # ⛔ `#REF!` ở nguồn — đính chính ISP
+    if ten == "gi_mid2":
+        assert anh["loi_mong"]["rate"] == 308
+
+
+@pytest.mark.parametrize("ten,idx,cu,moi", [
+    ("gi_mid1", 7, "#VALUE!", "#DIV/0! (Function DIVIDE parameter 2 cannot be zero.)"),   # chuyển loại
+    ("gi_mid1", 8, "#VALUE!", "0.5"),                                                      # lỗi → số
+    ("gi_mid2", 6, "#VALUE!", "#N/A"),                                                     # loại lạ
+    ("gi_mid2", 7, "#DIV/0!", "#REF!"),                                                    # `#REF!` lọt
+])
+def test_DT8_R1_04_PHA_phan_bo_loi_UV_lech_thi_DO(ten, idx, cu, moi, tmp_path):
+    """Phá: đổi MỘT ô lỗi U/V sang loại khác / số ⇒ phân bố ≠ mong ⇒ ĐỎ *(Đ5 — cả tổng LẪN loại)*.
+    Ca 1 giữ nguyên TỔNG *(754+784)* chỉ đổi LOẠI: cổng chỉ-đếm-tổng ⇒ xanh *(đột biến sống)*."""
+    anh = _doc(ANH[ten])
+    luoi = _luoi(ten, anh)
+    for h in luoi:
+        if isinstance(h[idx], str) and h[idx].startswith(cu):
+            h[idx] = moi
+            break
+    else:
+        raise AssertionError("⛔ có ô lỗi để phá")
+    bt = _viet_luoi(tmp_path / "tho.json", anh, cot=COT_THO[ten], dong_dau=10, values=luoi)
+    kq = _chay(ten, str(bt), "--mong", str(MONG[ten]), "--ra", str(tmp_path / "ra.json"))
+    assert kq.returncode == 1 and "ô lỗi ≠ mong" in kq.stdout, (kq.stdout[-700:], kq.stderr[-300:])
+
+
+def test_DT8_R1_04_LOI_MONG_phan_bo_sai_bi_tu_choi():
+    """Giao kèo: `LOI_MONG[cột]` = số ≥ 0 HOẶC {loại lỗi: số ≥ 0}; giá trị âm/⛔ nguyên ⇒ TỪ CHỐI."""
+    for xau_loi in ('{"a": {"#VALUE!": -1}}', '{"a": {"#VALUE!": "x"}}', '{"a": {"": 1}}'):
+        xau = THU_MUC_KHUON / "zz_loi_phan_bo_sai.py"
+        xau.write_text(
+            'BANG="X"\nKHOA="dong_sheet"\nKIEU_KHOA="dong_sheet"\nCOT=("a",)\n'
+            'KIEU_COT={"a":"so!"}\nLOI_MONG=' + xau_loi + '\nRA="tests/fixture/dap_an/_x.json"\n'
+            'def thieu_lac(d): return {"thieu":[],"lac":[],"dai":""}\n', encoding="utf-8")
+        try:
+            kq = _chay("zz_loi_phan_bo_sai", str(ANH["gi_mid2"]), "--mong", "1")
+            assert kq.returncode == 2 and "LOI_MONG" in kq.stderr, (xau_loi, kq.stderr[-300:])
+        finally:
+            xau.unlink(missing_ok=True)
 
 
 # ══ so! · kiểu cột mới: số HOẶC lỗi; ô ⛔số⛔rỗng⛔lỗi ⇒ ĐỎ ══════════════════════

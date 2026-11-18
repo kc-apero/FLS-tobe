@@ -9,10 +9,11 @@ CDT1 theo Vendor-tháng`; MID3 dùng RATE × O / × P. Ảnh đóng băng RATE +
 bỏ MỌI cột PII *(vùng đọc ⛔ phủ `A:C` · `G` · `N:O`)*.
 
 Hợp đồng bản thô *(phiên cloud DATA đọc bằng khoá SA chỉ-đọc, ⛔ commit)* — **LƯỚI SA sáu cột
-KHÔNG PII** `D,J,K,M,T,AA`, hình `{spreadsheet_id, nguon, doc_luc, cach_doc, dong_dau_sheet, cot,
+KHÔNG PII** `D,J,K,M,T,AA,U,V`, hình `{spreadsheet_id, nguon, doc_luc, cach_doc, dong_dau_sheet, cot,
 values}`:
-  · `cot` = `("D","J","K","M","T","AA")` — `D` Đơn vị tiền tệ · `J` Chủ dự toán *(CDT1)* · `K`
-    Thời điểm bắt đầu *(yyyymm)* · `M` Mã đối tác *(Vendor ID)* · `T` PE Amount · `AA` RATE ALLOCATE.
+  · `cot` = `("D","J","K","M","T","AA","U","V")` — `D` Đơn vị tiền tệ · `J` Chủ dự toán *(CDT1)* · `K`
+    Thời điểm bắt đầu *(yyyymm)* · `M` Mã đối tác *(Vendor ID)* · `T` PE Amount · `AA` RATE ALLOCATE ·
+    `U` MID · `V` Final *(`so!`, ③)*.
   · `values` = hàng dữ liệu sheet *(10…)*; `dong_dau_sheet` = **10**.
 
 ⭐ **Hai quyết định của bước** *(mỗi cái một con số đo 18/11 — Đ4/Đ5)*:
@@ -25,6 +26,11 @@ values}`:
   ② **Cổng `mã ∈ tập tham chiếu` ĐO TRÊN TẬP ĐẦY ĐỦ** *(AC-4 · `DT5-R1-01`)* = `thieu_lac`. MỌI
     hàng: `cdt1 (J) ∈ CDT1_7` · `vendor (M)` khớp `VD[0-9]+`. Một mã lạ ⇒ `thieu` ⇒ ĐỎ. MONG = 0.
     *(1.463 hàng — đo 18/11: ⛔ hàng đệm, mọi hàng có Vendor ID.)*
+
+  ③ **`U`/`V` = `so!` + PHÂN BỐ lỗi ghim** *(vòng sửa `DT8-R1-04`)*. Đo 18/11 trên 1.463 hàng:
+    `U` = 189 rỗng · `#VALUE!` **1.008** · `#DIV/0!` **266** *(0 số)*; `V` y hệt. `#REF!` = 0,
+    `#N/A` = 0 ⇒ câu "U3 `#REF!`" của ISP ⛔ khớp nguồn *(errata)*. `LOI_MONG` khai PHÂN BỐ theo
+    LOẠI lỗi *(Đ5)*; `rate` giữ tổng 308.
 """
 from __future__ import annotations
 
@@ -34,15 +40,17 @@ from typing import Any
 BANG = "PD.506"
 KHOA = "dong_sheet"
 KIEU_KHOA = "dong_sheet"
-COT = ("currency", "cdt1", "thang", "vendor", "pe", "rate")
+COT = ("currency", "cdt1", "thang", "vendor", "pe", "rate", "u", "v")
 #: `currency`/`cdt1`/`vendor` = chữ ⛔ rỗng · `pe` = `so` strict *(đo 1.463/1.463 số)* · `rate` =
 #: `so!` *(số HOẶC lỗi Sheets — ①)*. `thang` ⛔ khai ⇒ `so` strict.
-KIEU_COT = {"currency": "chu", "cdt1": "chu", "vendor": "chu", "pe": "so", "rate": "so!"}
+KIEU_COT = {"currency": "chu", "cdt1": "chu", "vendor": "chu", "pe": "so", "rate": "so!",
+            "u": "so!", "v": "so!"}
 RA = "tests/fixture/dap_an/gi_mid2.json"
 #: Đ5: số ô lỗi MONG của cột `rate` *(đo 18/11: 308 × `#DIV/0!`)*; khác ⇒ cổng ĐỎ.
-LOI_MONG = {"rate": 308}
+LOI_MONG = {"rate": 308, "u": {"#VALUE!": 1008, "#DIV/0!": 266},
+            "v": {"#VALUE!": 1008, "#DIV/0!": 266}}
 
-COT_THO = ("D", "J", "K", "M", "T", "AA")
+COT_THO = ("D", "J", "K", "M", "T", "AA", "U", "V")
 DONG_DAU_SHEET = 10
 #: ⭐ 7 CDT1 — tập tham chiếu ĐÓNG *(đo 18/11: MID2 209 hàng/CDT1 × 7; AC-4)*.
 CDT1_7 = frozenset({
@@ -70,12 +78,13 @@ def chuan_bi(tho: dict[str, Any]) -> dict[str, Any]:
     dong: list[list[Any]] = []
     for i, h in enumerate(values):
         if not isinstance(h, list) or len(h) != len(COT_THO):
-            raise ValueError(f"hàng {i + 1} phải {len(COT_THO)} ô *(đủ D,J,K,M,T,AA)*")
-        d_tt, cdt1, thang, vendor, pe, rate = h
+            raise ValueError(f"hàng {i + 1} phải {len(COT_THO)} ô *(đủ D,J,K,M,T,AA,U,V)*")
+        d_tt, cdt1, thang, vendor, pe, rate, u, v = h
         if _rong(vendor):
             raise ValueError(f"hàng {i + 1}: Vendor ID RỖNG — MID2 ⛔ hàng đệm, mỗi hàng phải có mã")
         ds = DONG_DAU_SHEET + i
-        dong.append([ds, d_tt, cdt1, thang, vendor, pe, rate])
+        dong.append([ds, d_tt, cdt1, thang, vendor, pe, rate,
+                     None if _rong(u) else u, None if _rong(v) else v])
 
     return {
         "cot": [KHOA, *COT],
@@ -83,7 +92,7 @@ def chuan_bi(tho: dict[str, Any]) -> dict[str, Any]:
         "ghi_chu": (
             f"{len(dong)} hàng phân bổ MID2 *(mỗi hàng có Vendor ID — ⛔ hàng đệm)*, khoá "
             f"dong_sheet. `AA` RATE = `so!`: số HOẶC `#DIV/0!` *(Σ PE = 0)* giữ NGUYÊN + đếm + ghim "
-            f"*(mong 308)*. Cổng `mã ∈ tập tham chiếu` *(cdt1 ∈ 7 CDT1 · vendor VD…)* ĐO TRÊN "
+            f"*(mong 308)*; `U`/`V` = `so!` ghim PHÂN BỐ lỗi *(`#VALUE!` 1008 · `#DIV/0!` 266 mỗi cột)*. Cổng `mã ∈ tập tham chiếu` *(cdt1 ∈ 7 CDT1 · vendor VD…)* ĐO TRÊN "
             f"{len(dong)} hàng ở `thieu_lac`. ⛔ mang cột A:C · G · N:O — PII."),
     }
 

@@ -1,12 +1,13 @@
 """Khuôn đóng băng `ix_ven` — ẢNH IX.VEN Block 1 *(Vendor & Network Mapping, PD 503)* + cột
 `cach_tinh` *(ISP 3.1.2 · DT8 · `WO-147` AC-1)*.
 
-    python tools/dong_bang_sheet.py ix_ven <bản_thô.json> --mong 36
+    python tools/dong_bang_sheet.py ix_ven <bản_thô.json> --mong 42
         ⇒ tests/fixture/cau_hinh/ix_ven.json
 
 ⭐ **Vì sao có khuôn này.** AP v3.1.2 §3.2.2 *(IX.VEN)* · §3.2.4 *(dòng "block 7 dòng CDT1 … block
 36 dòng MID3" và "VD341 · VD444 · VD428 · 'Max' · VD62 tính riêng")* · §3.4.1 PD 503. `Vendor &
-Network Mapping` *(sổ GI · OMC)* có **Block 1 = 36 dòng** *(vùng `M:S` hàng sheet 4–39)* ánh xạ
+Network Mapping` *(sổ GI · OMC)* có **Block 1 = 42 dòng liền** *(vùng `M:S` hàng sheet 4–45;
+AP ghi "36" = hàng 4–39 ⇒ **errata**, vòng sửa `DT8-R1-01`)* ánh xạ
 `Vendor ↔ Network ↔ Account ↔ %`; script `MappingBlock2.gs` nhân **× 7 CDT1**. Năm nhóm vendor
 *(VD341 · VD444 · VD428 · 'Max' · VD62)* **tính riêng gõ cứng trong công thức** của CFA1/MID *(PD
 504 "VD444 · VD341 · VD428 · 'Max' tính riêng")* ⇒ engine TO-BE *(H10)* phải đọc từ config, ⛔ gõ
@@ -17,7 +18,7 @@ hình `{spreadsheet_id, nguon, doc_luc, cach_doc, dong_dau_sheet, cot, values}`:
   · `cot` = `("No", "vendor", "network", "account", "pct", "cashin_month", "cashin_day")` — bảy
     cột Block 1 *(M No/Vendor · N Vendor ID · O Network · P Account · Q % · R Cash-in +Month · S
     Cash-in Day)*. ⛔ cột nào khác — vùng đọc CHỈ `M:S` *(⛔ phủ cột PII/khác)*.
-  · `values` = **36 hàng** *(sheet 4…39)* theo thứ tự sheet, mỗi hàng 7 ô.
+  · `values` = **42 hàng** *(sheet 4…45)* theo thứ tự sheet, mỗi hàng 7 ô.
   · `dong_dau_sheet` = **4** *(Block 1 bắt đầu hàng sheet 4; hàng 3 là tiêu đề)*.
 
 ⭐ **Hai quyết định của bước** *(mỗi cái một con số đo 18/11 — Đ4/Đ5)*:
@@ -28,8 +29,11 @@ hình `{spreadsheet_id, nguon, doc_luc, cach_doc, dong_dau_sheet, cot, values}`:
       · ngược lại Vendor `N ∈ {VD341, VD444, VD428, VD62}` ⇒ chính mã ấy;
       · ngược lại `'thường'`.
     Network đi TRƯỚC *(VD62 nằm cả dưới Max hàng 21 lẫn đứng riêng hàng 34 — hàng 21 thuộc gộp
-    Max)*. Đo 18/11 trên 36 hàng: **5** nhãn ≠ `thường` = `{Max, VD341, VD428, VD444, VD62}`
-    *(Max 12 · VD341 6 · VD444 8 · VD428 3 · VD62 1 · thường 6)*.
+    Max)*. Đo 18/11 trên **42 dòng**: **5** nhãn ≠ `thường` = `{Max, VD341, VD428, VD444, VD62}`
+    *(số DÒNG mỗi nhãn: Max 12 · **VD341 12** · VD444 8 · VD428 3 · VD62 1 · thường 6 = 42)*.
+    ⭐ `DT8-R1-01`: bản đầu cắt ở 36 dòng theo số AP ⇒ `VD341` chỉ `No` 1–6 trong khi nguồn
+    **liền tiếp** hàng 40–45 *(`VD341` `No` 7–12, ⛔ hàng trống ngăn)* và `MID1` dùng tới `No` 12.
+    Đo vùng `M3:S50`: hàng 46–50 **0** ô có dữ liệu ⇒ dải liền kết thúc ở hàng 45.
 
   ② **Cổng = `thieu_lac`** *(Đ5: khai `mong`, NO cả hai chiều)*. Tập nhãn ≠ `thường` PHẢI đúng
     `{Max, VD341, VD428, VD444, VD62}`. Thiếu một nhãn *(vendor đổi mã ⇒ lọt)* hoặc thừa một nhãn
@@ -109,8 +113,8 @@ def chuan_bi(tho: dict[str, Any]) -> dict[str, Any]:
         "cot": [KHOA, *COT],
         "dong": dong,
         "ghi_chu": (
-            f"Block 1 = {len(dong)} hàng *(sheet {DONG_DAU_SHEET}…{DONG_DAU_SHEET + len(dong) - 1})* "
-            f"vùng M:S; MappingBlock2.gs nhân × 7 CDT1 *(C9/H9 tiêu thụ)*. Cột `cach_tinh` SUY "
+            f"Block 1 = {len(dong)} hàng liền *(sheet {DONG_DAU_SHEET}…{DONG_DAU_SHEET + len(dong) - 1}; "
+            f"AP ghi 36 = hàng 4–39 ⇒ errata, DT8-R1-01)* vùng M:S; MappingBlock2.gs nhân × 7 CDT1 *(C9/H9 tiêu thụ)*. Cột `cach_tinh` SUY "
             f"*(⛔ đọc từ sheet)*: Network 'Max' ⇒ 'Max', ngược lại Vendor ∈ {list(NHOM_RIENG)} ⇒ "
             f"chính mã, ngược lại 'thường'. {len(rieng)} nhãn riêng = {rieng} *(mong "
             f"{sorted(MONG_RIENG)}; khác ⇒ cổng ĐỎ)*. Cột `account` = Tên tài khoản *(owner GIỮ "

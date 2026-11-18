@@ -10,11 +10,12 @@ CDT1. Ảnh đóng băng các dòng phân bổ ấy *(khoá `dong_sheet`)* để
 *(vùng đọc ⛔ phủ `A:C` = Ngày/Số chứng từ/Diễn giải · `G` Tài khoản · `N:O` File đính kèm)*.
 
 Hợp đồng bản thô *(phiên cloud DATA đọc bằng khoá SA chỉ-đọc, ⛔ commit)* — **LƯỚI SA bảy cột
-KHÔNG PII** `D,J,K,Q,M,R,T`, hình `{spreadsheet_id, nguon, doc_luc, cach_doc, dong_dau_sheet, cot,
+KHÔNG PII** `D,J,K,Q,M,R,T,U,V`, hình `{spreadsheet_id, nguon, doc_luc, cach_doc, dong_dau_sheet, cot,
 values}`:
-  · `cot` = `("D","J","K","Q","M","R","T")` — `D` Đơn vị tiền tệ · `J` Chủ dự toán *(CDT1)* ·
+  · `cot` = `("D","J","K","Q","M","R","T","U","V")` — `D` Đơn vị tiền tệ · `J` Chủ dự toán *(CDT1)* ·
     `K` Thời điểm bắt đầu *(yyyymm)* · `Q` No Transactions Per Vendor · `M` Mã đối tác *(Vendor
-    ID)* · `R` ITL ID · `T` PE Amount *(allocate)*.
+    ID)* · `R` ITL ID · `T` PE Amount *(allocate)* ·
+    `U` MID · `V` Final *(đáp án MID của nguồn — `so!`, ④)*.
   · `values` = hàng dữ liệu sheet *(10…)* theo thứ tự; `dong_dau_sheet` = **10**.
 
 ⭐ **Ba quyết định của bước** *(mỗi cái một con số đo 18/11 — Đ4/Đ5)*:
@@ -33,6 +34,13 @@ values}`:
     `thieu_lac`. MỌI hàng: `cdt1 (J) ∈ CDT1_7` · `vendor (M)` khớp `VD[0-9]+` · `itl_id (R)` khớp
     `ITL#[0-9]+` HOẶC lỗi Sheets HOẶC rỗng. Một mã lạ *(Diễn giải lạc cột, CDT1 sai)* ⇒ `thieu`
     ⇒ ĐỎ. MONG lệch = 0.
+
+  ④ **`U`/`V` = `so!` + PHÂN BỐ lỗi ghim** *(vòng sửa `DT8-R1-04` · `AC-3`)*. Đo 18/11 trên **2.856
+    hàng ảnh** *(⛔ cả lưới: `U` toàn lưới còn 4.636 `#DIV/0!` ở 4.494 hàng ĐỆM ⇒ ngoài ảnh)*:
+    `U` = 946 số · 372 rỗng · `#VALUE!` **754** · `#DIV/0!` **784**; `V` = 1.178 số · 165 rỗng ·
+    `#VALUE!` **733** · `#DIV/0!` **780**. `#REF!` = 0, `#N/A` = 0 ở `U`/`V` *(⇒ câu "U3 `#REF!`"
+    của ISP ⛔ khớp nguồn — errata)*. `LOI_MONG` khai PHÂN BỐ theo LOẠI lỗi *(Đ5: đổi loại giữ
+    nguyên tổng cũng ĐỎ)*.
 """
 from __future__ import annotations
 
@@ -44,15 +52,18 @@ from fls.canon.o_loi import la_o_loi      # ô lỗi = tập ĐÓNG, 1 bản kha
 BANG = "PD.505"
 KHOA = "dong_sheet"
 KIEU_KHOA = "dong_sheet"
-COT = ("currency", "cdt1", "thang", "no", "vendor", "itl_id", "pe")
+COT = ("currency", "cdt1", "thang", "no", "vendor", "itl_id", "pe", "u", "v")
 #: `currency`/`cdt1`/`vendor` = chữ ⛔ rỗng · `itl_id` = chữ HOẶC rỗng *(giữ `#N/A` thô — ②)* ·
 #: `pe` = số HOẶC rỗng *(77 hàng PE rỗng — đo 18/11)*. `thang`/`no` ⛔ khai ⇒ `so` strict.
-KIEU_COT = {"currency": "chu", "cdt1": "chu", "vendor": "chu", "itl_id": "chu?", "pe": "so?"}
+KIEU_COT = {"currency": "chu", "cdt1": "chu", "vendor": "chu", "itl_id": "chu?", "pe": "so?",
+            "u": "so!", "v": "so!"}
+#: Đ5 *(④)*: PHÂN BỐ lỗi `U`/`V` MONG *(đo 18/11, 2.856 hàng ảnh)* — khác ⇒ ĐỎ cả tổng LẪN loại.
+LOI_MONG = {"u": {"#VALUE!": 754, "#DIV/0!": 784}, "v": {"#VALUE!": 733, "#DIV/0!": 780}}
 RA = "tests/fixture/dap_an/gi_mid1.json"
 #: Bảng phụ: `dem` *(1 dòng — số hàng đệm ①)* · `itl_id_loi` *(176 hàng `#N/A` ②)*.
 PHU_MONG = {"dem": 1, "itl_id_loi": 176}
 
-COT_THO = ("D", "J", "K", "Q", "M", "R", "T")
+COT_THO = ("D", "J", "K", "Q", "M", "R", "T", "U", "V")
 DONG_DAU_SHEET = 10
 #: ⭐ 7 CDT1 — tập tham chiếu ĐÓNG *(đo 18/11: MID1 408 hàng/CDT1 × 7; khác ⇒ ĐỎ — AC-4)*.
 CDT1_7 = frozenset({
@@ -83,10 +94,11 @@ def chuan_bi(tho: dict[str, Any]) -> dict[str, Any]:
     itl_loi: list[dict[str, Any]] = []
     for i, h in enumerate(values):
         if not isinstance(h, list) or len(h) != len(COT_THO):
-            raise ValueError(f"hàng {i + 1} phải {len(COT_THO)} ô *(đủ D,J,K,Q,M,R,T)*")
-        d_tt, cdt1, thang, no, vendor, itl, pe = h
+            raise ValueError(f"hàng {i + 1} phải {len(COT_THO)} ô *(đủ D,J,K,Q,M,R,T,U,V)*")
+        d_tt, cdt1, thang, no, vendor, itl, pe, u, v = h
         ds = DONG_DAU_SHEET + i
         if _rong(vendor):                      # hàng ĐỆM — cột phân bổ phải rỗng (①)
+            # `U`/`V` ở hàng đệm ⛔ kiểm *(đo: 4.636 `#DIV/0!` của `U` nằm ở đây — ngoài ảnh, ④)*.
             # `D` *(Đơn vị tiền tệ)* có thể còn 'USD' do công thức *(đo 18/11: 2.565/4.494)* —
             #   bằng chứng hàng đệm là 5 cột PHÂN BỔ rỗng: cdt1 · thang · no · itl · pe.
             if not all(_rong(x) for x in (cdt1, thang, no, itl, pe)):
@@ -97,7 +109,8 @@ def chuan_bi(tho: dict[str, Any]) -> dict[str, Any]:
         if la_o_loi(itl):                      # ô lỗi Sheets *(tập đóng — ⛔ "#…" gõ tay)*
             itl_loi.append({"dong_sheet": ds, "itl_id_tho": itl})
         dong.append([ds, d_tt, cdt1, thang, no, vendor,
-                     None if _rong(itl) else itl, None if _rong(pe) else pe])
+                     None if _rong(itl) else itl, None if _rong(pe) else pe,
+                     None if _rong(u) else u, None if _rong(v) else v])
 
     return {
         "cot": [KHOA, *COT],
@@ -108,7 +121,7 @@ def chuan_bi(tho: dict[str, Any]) -> dict[str, Any]:
         },
         "ghi_chu": (
             f"{len(dong)} hàng phân bổ MID1 *(có Vendor ID)*, khoá dong_sheet; {so_dem} hàng đệm "
-            f"*(bảng phụ `dem`)*. Mỗi hàng chia 7 CDT1 mang PE Amount (T). `R` ITL ID giữ `#N/A` "
+            f"*(bảng phụ `dem`)*. Mỗi hàng chia 7 CDT1 mang PE Amount (T) + MID (U) · Final (V) dạng `so!` *(lỗi giữ nguyên, phân bố ghim ở `loi_mong`)*. `R` ITL ID giữ `#N/A` "
             f"thô *(⛔ hoá 0)*; {len(itl_loi)} hàng `#N/A` ở bảng phụ `itl_id_loi` *(mong 176)*. "
             f"Cổng `mã ∈ tập tham chiếu` *(cdt1 ∈ 7 CDT1 · vendor VD… · itl_id ITL#…/lỗi/rỗng)* "
             f"ĐO TRÊN {len(dong)} hàng ở `thieu_lac`. ⛔ mang cột A:C (Ngày/Số CT/Diễn giải) · G "
