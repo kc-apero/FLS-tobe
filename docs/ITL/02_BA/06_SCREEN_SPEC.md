@@ -1,6 +1,6 @@
 # 06 — SCREEN SPEC: FLS
 
-**Version:** v4.24 · **Ngày:** 2026-10-06 · **Chủ sở hữu:** BA/PO
+**Version:** v4.25 · **Ngày:** 2026-11-18 · **Chủ sở hữu:** BA/PO
 **Thay thế:** v0.1 *(bản copy chương trình, 15 màn M0–M6)* — đã khai tử. Đóng `GAP-ITL-53`.
 
 **Căn cứ:** `QĐ-ITL-38` *(app thay Google Sheets — nơi kế toán thao tác)* · `07_API_CONTRACT` v1.0 · demo `Artifacts/Demo-MVP-So-may-ITL.html` *(bản v5 — **spec hành vi sống**, đã đối chiếu 45 US)*.
@@ -55,6 +55,7 @@ Dựng wireframe tương tác `SCR-F02`/`F01`/`F05` *(2026-08-24)* lộ ra ba ch
 | `SCR-F02` | **Sổ ITL** — lưới quét + drawer đối soát, sửa **7 trường** *(`QĐ-ITL-64`)*; vùng phân bổ 🔒 **chỉ đọc** | `AC-B` | `US-025/026/030` | `GET /ledger` · `POST /adjust` · `/reverse` · ⭐ **`/done`** · **`/reopen`** |
 | `SCR-F03` | **Cổng hôm nay** — 4 cổng + độ phủ + *báo cáo tuần (xuất)* | `AC-A` | `US-008/029/038` | `GET /gates` · `/coverage` |
 | `SCR-F06` | **Danh mục · Nguồn** — nguồn/TK/ánh xạ + cảnh báo | `AC-C` | `US-001/018/031` | `GET /catalog` |
+| `SCR-F08` ⬜ | ⭐ **Cấu hình** — *(mới 2026-11-18, `O9`, ISP 3.1.2)* bảng tỷ giá `IX.FX` **chỉ đọc**, ba nhãn riêng cho tháng bất thường; vùng ký *(`F5`/`F7`)* **chưa xây** — xem `§9` | `AC-C` | *(ISP `Step 18/37/40` — chưa có `US` riêng)* | `GET /config/fx` *(đã có)* · `POST /config/fx/{yyyymm}/sign` ⬜ |
 | *(xuyên suốt)* | **Nhật ký** — drawer 7 trường theo dòng | mọi vai | `US-030` | `GET /journal` |
 
 **Đã bỏ khỏi sidebar kế toán** *(không mất thông tin)*:
@@ -1434,6 +1435,7 @@ chờ rỗng là màn đẹp nhất *(`UI-F2`)*.
 | F01/F02 · nút ⭐ **Xong** | `POST /queue/{id}/done` | `da_co · thieu_truong[] · ky_da_chot · ghi_de_ket_luan_may` | ⛔ **Không đòi lý do** *(`QĐ-ITL-72`)*. Bấm lại ⇒ `da_co=true` kèm **ai đã bấm · lúc nào** ⇒ hiện *"đã xong bởi X"* thay vì báo lỗi |
 | F01/F02 · nút ⭐ **Mở lại** | `POST /queue/{id}/reopen` | `mo_lai_cua · xong_boi · xong_luc` | `reason` **BẮT BUỘC** · `409` nếu dòng ⛔ chưa từng xong |
 | **F02** · lưới sổ | `GET /ledger?...` | ⭐ **24 cột nền** + **28 vị trí canon** *(tên tiếng Việt lấy từ khuôn canon qua `nhan_cua` — **một nguồn duy nhất**; danh sách ở `cot_so.CANON_LEN_LUOI`)* | **52 cột** = `len(cot_so.BANG_COT)` *(`QĐ-ITL-65`)*; `UNMAPPED` ⇒ `chưa gán` **nền vàng**, ⛔ không giá trị mặc định |
+| ⭐ **F08** · bảng `IX.FX` chỉ đọc ⬜ | `GET /config/fx` | `ky[].yyyymm · USD · SGD · COP · VND · HKD · trang_thai` ＋ `thieu[] · trung[] · lac[]` | ⭐ Chi tiết `§9`. Ba mảng ở trường **riêng**, màn ⛔ cộng đôi, ⛔ thành `0` *(`BA-07 §4i`)* |
 
 > ⛔⛔ **Ô trên từng ghi *"38 cột canon + 14 cột hợp đồng"* — TỔNG đúng, CÁCH CỘNG sai, và hai phép cộng ấy **cùng ra `52`** nên ⛔ không ai bắt được.** Đo thẳng ở mã 17/09: `BANG_COT` có **24** cột ⛔ không mang `canon=` và **28** cột mang — ⛔ **không phải** cả `38` vị trí canon *(lưới cố ý bỏ `9` vị trí `A·B·C·D·E·F·G·L·AG` vì chúng **đã là cột nền** — chú thích có sẵn trong `cot_so.py`)*, và ⛔ **không có** khối *"14 cột hợp đồng"* nào trên lưới. ⇒ Phép `C7` của `khop_owner.py` canh chỗ này.
 | F02 · drawer nhóm 1–3 *(bối cảnh)* | `GET /ledger/{id}` | giao dịch gốc · chuỗi lệnh · đối soát pháp nhân | ⛔ Chỉ đọc. Thiếu bối cảnh thì ô sửa chỉ là **một dropdown đoán mò** |
@@ -1471,7 +1473,46 @@ và đó là **việc thật của `P6`** — ⛔ không phải thứ để dev 
 
 ---
 
+## §9 · ⭐ `SCR-F08` **Cấu hình** — ⬜ **CHƯA DỰNG** *(mới 2026-11-18, `O9`, ISP `3.1.2`)*
+
+> ⭐ **Vì sao có mục này.** Step `18 · F4` của ISP `3.1.2` mở màn `SCR-F08` mà **chưa có mã màn** ở sổ nào — ISP ghi thẳng *"mã F08 cần BA đăng ký (`O9`)"*. Đây là bản đăng ký ⇒ **mã `SCR-F08` từ nay CHỈ có nghĩa màn Cấu hình**. Chưa đụng mã: `man_f08.js` do `fls-dev #FE` dựng ở `F4`.
+>
+> ⚠ **Đã đo `Đ1` 18/11:** `SCR-F08` trước mục này xuất hiện **0** lần trong `docs/ITL/02_BA/*.md` *(chỉ có ở ISP/AP)* — ⛔ không va chạm danh tính kiểu `F04`.
+
+**Mục đích.** Một chỗ để kế toán **nhìn** — rồi sau đó **ký** — các bảng cấu hình của `ISP 3.1` *(`AP 3.2.4`: engine ⛔ được gõ lại chỗ AS-IS gõ cứng; nó đọc **config**)*. Bản này mới có **một** bảng: `IX.FX`.
+
+**Vai · API.** `AC-C` *(cùng vai `SCR-F06`)* · `GET /api/fls/v1/config/fx` *(✅ `BA-07 §4i`, gộp 17/11)*.
+
+#### ⓐ Vùng 1 — bảng `IX.FX` chỉ đọc *(`Step 18 · F4`)*
+
+| Thứ | Luật |
+|---|---|
+| Hàng | **37** dòng, `202401` → `202612`, **kể cả** dòng lạc `202306` *(`AP §3.2.1`)*. Cột: tháng · `USD` · `SGD` · `COP` · `VND` *(=1)* · `HKD` · trạng thái |
+| Tháng **thiếu** | nhãn **`CHẶN`** *(`AP §3.2.4`: thiếu tháng ⇒ `SUMIFS = 0` ⇒ mất số không báo)*. Bài ISP: kho thiếu `202408` ⇒ `CHẶN` ở `202408` *(`F4-F2`)* |
+| Tháng **trùng** | nhãn **`TRÙNG`** *(nhập hai dòng một tháng ⇒ cộng đôi)* — ⛔ màn **không** cộng, ⛔ không chọn hộ một dòng |
+| Tháng **lạc** | nhãn **`LẠC`** — `202306` nằm **ngoài** dải `202401…202612` *(`F4-F1`: `202306` nhãn `LẠC`)* |
+| Nguồn của ba nhãn | mảng `thieu[]` · `trung[]` · `lac[]` của cửa — màn **đọc**, ⛔ tự suy |
+| Bốn trạng thái | `đang tải` · `rỗng` · `lỗi` · `có dữ liệu` đi qua **`fls/web/tep/trang_thai.js`** — ⛔ tự vẽ khung riêng |
+| Màu | **chỉ** token `tokens.css` *(bài `test_khong_ma_mau_go_tay.py`)* — ⛔ mã hex gõ tay |
+| Hành động | ⛔ **không có nút nào** ở vùng này — `Step 18` loại trừ ký |
+
+#### ⓑ Vùng sau — ⬜ **CHƯA XÂY**, chỉ giữ chỗ
+
+| Vùng | Step | Ghi |
+|---|---|---|
+| **Ký tháng tỷ giá** `D1` | `37 · F5` *(phụ thuộc `F4`, `C7`)* | ký có **hộp xác nhận**; cửa `POST /config/fx/{yyyymm}/sign` ⬜ *(`BA-07 §4i`, `C7`)*. `AP §3.5.3 D1`: bảng `IX.FX` kế toán khai, **owner ký mỗi tháng**; thiếu tháng = **CHẶN** |
+| **Ký bản Daily Report 3** | `40 · F7` *(phụ thuộc `F5`, `C13`)* | ký bản `IX.TMP` có phiên bản *(snapshot sign-off)*; bản chính thức theo `D5` *(bản A-CCR)*. ⛔ Chưa có cửa đọc bản ký ở `BA-07` ngoài `§4i` |
+
+⛔ Spec field-level của hai vùng này **viết khi tới `F5`/`F7`** — không đoán trước ở đây *(tránh viết lại như `SCR-F07`)*.
+
+#### ⓒ Truy vết
+
+`ISP 3.1.2` `Step 18 · F4` · `Step 37 · F5` · `Step 40 · F7` ↔ `AP v3.1.2` `§3.2.1 IX.FX` · `§3.2.4` · `§3.5.3 D1` ↔ `BA-07 §4i` *(`config/fx`, `config/fx/{yyyymm}/sign`)*. ⚠ `US` riêng cho màn Cấu hình: **chưa có** *(`03_USER_STORY` v1.5 ⛔ không có story cấu hình)* — mở nợ cho `fls-ba` khi tới `F5`.
+
+---
+
 ## Changelog
+- **v4.25** *(2026-11-18, `fls-ba`, ISP `3.1.2` việc `O9` — mở `Step 18 · F4`; trong thẩm quyền spec: đăng ký mã màn — ⛔ mã, ⛔ token, ⛔ tuyến mới)*: ⭐ **Thêm `§9` — đăng ký `SCR-F08` Cấu hình** *(⬜ chưa dựng)*: vùng 1 bảng `IX.FX` chỉ đọc từ `GET /config/fx` *(`37` dòng · `CHẶN`/`TRÙNG`/`LẠC` · bốn trạng thái qua `trang_thai.js` · màu chỉ từ token)*; vùng ký tháng `D1` *(`F5`)* + ký bản `Daily Report 3` *(`F7`)* giữ chỗ. `§2` thêm hàng `SCR-F08`; `§8` thêm hàng binding `F08`. Số lấy từ ISP/AP, ⛔ số đo mới.
 - **v4.24** *(2026-10-06, `fls-ba`, nghiệm thu PO `WO-023` + xếp `KQ-061` `F-1` · `F-2` · nghi ⓖ; trong thẩm quyền spec: hành vi trạng thái màn + chữ màn in + hợp đồng cửa một trường **thêm** — ⛔ token, ⛔ lớp CSS mới, ⛔ tuyến mới, ⛔ đổi sổ, ⛔ đổi luật Final của cửa ghi)*: ⭐⭐ **§3c ⑪ mới** — năm ô sửa được của lưới `F02` *(và hai cột Quét)* in **FINAL** *(bút toán người hiệu lực ?? cột nguồn; gợi ý máy ⛔ bao giờ)*, đọc `<f>_final` của `GET /ledger` *(`BA-07` v3.14)*; `title` *"người sửa — sổ gốc nói: …"*; ảnh chụp cho phép hỏi lại `ⓒ` = Final; `tay` bằng giá trị đang ghi ⇒ ⛔ va chạm *(`F-2` — sổ thật cột nguồn rỗng **8.387 / 8.387** ở cả năm trường ⇒ phiên sửa thật đầu tiên `C1` gặp **100%**)*; câu treo *"người xoá ô thì Final"* ghi lại, ⛔ chặn. ⭐ **`ⓕ3` đính chính phép đếm "2 nơi"** — đếm khẳng định, ⛔ chuỗi: lô lưu `F02` hết giờ in riêng ô đang bay *"CHƯA RÕ đã vào sổ chưa"*, ô sau giữ *"CHƯA vào sổ"*; kiểm kê **18** chỗ `FLS.ghi(` theo nghĩa *(`F-1`)*. ⭐ **`§4.5 ⓦ` ⑨ mới** — kết quả cú `Gán` thuộc lệnh của nó *(nghi ⓖ chưa chứng — tái hiện trước)*. Mã ⇒ **`WO-062`** *(⑪ + `ⓕ3`)* · **`WO-060` `(f)`** *(⑨)*. `WO-023` ✅ `DONG` *(`KQ-061` 17/17)*.
 - **v4.23** *(2026-10-05, `fls-ba`, `TL-056` + `TL-058` + xếp phát hiện ngoài phạm vi `WO-023` *(`BG-052` mục 5/6 · `BG-053` mục 3 · `BG-054` mục 1/2 · `BG-057` mục 2/5)*; trong thẩm quyền spec: chữ màn in + hành vi trạng thái màn — ⛔ token, ⛔ lớp CSS mới, ⛔ tuyến, ⛔ đổi sổ)*: ⭐ `ⓕ3` + `ⓦ` ⑤ ⓐ — cú `Gán` hết giờ `FLS-HET-GIO` in *"Chưa rõ gán đã xảy ra chưa — Cửa lỗi: <e.cau>"* *(phương án 1 `HOI-056` — Dev đã làm)*; khuôn chung cho mọi tiền tố *"<Việc> chưa xảy ra — "* *(hôm nay **2** nơi)*. `TL-058`: dòng *"F02 · nhật ký"* v4.12 **⛔ đổi** — bài nghiệm thu đọc oracle v4.8 phải theo v4.12. ⭐ `§4.5 ⓦ` ⑧ mới — ⓐ câu + `lam_gi` `FLS-DQ-FAILED` *(**0** đường từ cổng `ACC-1…4`, **5** lớp cửa ghi)* · ⓑ chế độ chỉ đọc khoá `F01G` `Gán`/`Bỏ gán` + `F02` `Đảo` *(**đính chính** `ⓦ` ② *"như nay"*)* · ⓒ chip *"đã bị đảo bởi #M"* thay nút `Đảo` *(sổ thật **2**)* · ⓓ cổng quét `HT.nuot_phim` phủ cả `.onkeydown =` *(**2** chỗ ⛔ hỏi mà `BG-054` đếm sót)* · ⓔ `ST.dg_mo` theo `itl_id`; nợ `GAP-API-12` *(`BA-07` v3.13)*. Mã ⇒ **`WO-060`**. ⛔ Vòng 2 `WO-023`.
 - **v4.22** *(2026-10-05, `fls-ba`, nghiệm thu PO `WO-045` + xếp `KQ-050` `F-1` · `F-3`; trong thẩm quyền spec: hành vi trạng thái màn + chữ màn in — ⛔ token, ⛔ lớp CSS mới, ⛔ tuyến, ⛔ đổi sổ)*: ⭐ `§4.5 ⓦ` ⑥ mới — lựa chọn ứng viên `F01G` gắn theo **`itl_id`**: danh sách bị lượt mới nhất thay ⇒ **giữ** nếu `itl_id` còn, **bỏ** nếu ⛔; `ST.xac_nhan` luôn về `false`; `gan`/`Enter` tìm theo `itl_id`, ⛔ thấy ⇒ 0 `POST` *(`KQ-050 F-3`; mức nâng **`NANG`** vì cửa ghi nhận cặp trong dung sai — ① `KQ-050`)* ⇒ `WO-023` `(i)`. ⭐ `ⓦ` ⑦ mới — `F01` `Xem thêm` khung chờ `Đang tải thêm…` + lỗi ⛔ xoá lưới + `Thử lại` *(`KQ-050 F-1`; trang 2 `VND` **104,33 s** đo lại)*; ngân sách `NFR-I30` *(`BA-08` v1.4)* ⇒ `WO-051`.
