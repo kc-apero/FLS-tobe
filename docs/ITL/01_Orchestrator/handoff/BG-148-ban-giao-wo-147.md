@@ -90,6 +90,55 @@ cổng `[ĐẠT]`:
 - **"U3 #REF!" (giới hạn ISP)**: cột `U` *(MID computed)* của MID1 mang `#VALUE!` ở nguồn — **⛔
   mang vào ảnh** *(⛔ cột đáp án)*; giới hạn còn ở nguồn, đúng như ISP Step 19 §3 khai.
 
+
+## Vòng sửa sau R1 (KQ-149)
+
+> *(Thêm 2026-11-18 · `fls-dev` làn DATA · nhánh `isp/DT8` · commit ① `57118ff` = khuôn + bài + ảnh + sàn; commit ② = mục này. Phần trên **giữ nguyên** — các số `36` · `11` · `3173` ở trên là của bản đầu.)* Orchestrator chốt 4 mục NÊN SỬA; 8 GHI NHẬN `-05…-12` ⇒ backlog, ⛔ làm.
+
+| Mã | Chốt | Đã sửa | Đỏ-trước *(cổng ⛔ đỏ ⇒ bài đỏ)* |
+|---|---|---|---|
+| `DT8-R1-01` | Đóng băng ĐỦ dải liền hàng **4…45 = 42 dòng** | `ix_ven` `--mong 42`; `VD341` `No` 1–12; ảnh + khuôn khai *"AP ghi 36 ⇒ errata"* | `test_DT8_R1_01_ix_ven_dai_lien…` đỏ trên ảnh 36 dòng; `…PHA_cat_o_36_hang` *(lưới cắt 36 ⇒ `36 dòng ≠ mong 42` ⇒ ĐỎ)* |
+| `DT8-R1-02` | Khai mẫu số vế PM + bài PM ≠ 0 | `thieu_lac` in `PE: 1275/1771 ô ≠ 0 · PM: 0/1771 ô ≠ 0 — vế này chưa đo được trên dữ liệu thật` | `…cong_KHAI_mau_so…` đỏ trước; bài tổng hợp *(P = 600 = 6 × 100)* XANH + *(Σ PM = 601)* ĐỎ; **bỏ vế PM ⇒ 2 bài ĐỎ** *(đột biến 189/189 xanh ⇒ nay cắn)* |
+| `DT8-R1-03` | **A**: 253 hàng số, cổng đo đủ 253 | chọn hàng bằng *"`O` là số"* ⛔ `AE ∧ AF`; `--mong 253`; hàng ngăn *(sheet 21, 44, …, 251)* ⛔ vào ảnh | `…253_hang_so…` · `…PHA_mot_hang_chi_tiet` *(+1000 ở sheet 273 ⇒ ĐỎ — bản cũ ⛔ thấy)*; đột biến chọn lại theo AE∧AF ⇒ 2 bài ĐỎ |
+| `DT8-R1-04` | **A**: `U`/`V` vào ảnh `so!` + `LOI_MONG` phân bố | MID1/MID2 thêm cột `u`,`v`; công cụ `LOI_MONG[cột]` = `int` HOẶC `{loại lỗi: số}` *(đổi loại giữ nguyên tổng cũng ĐỎ)* | `…anh_mang_U_V…` ×2 · `…PHA_phan_bo_loi_UV_lech` ×4 *(loại→loại · lỗi→số · `#N/A` · `#REF!`)* · giao kèo ×1; đột biến "chỉ đếm tổng" ⇒ 3/4 ca ĐỎ |
+
+### Số đo *(nguồn thật, khoá SA chỉ-đọc, 18/11 — mỗi số đếm MỘT vật)*
+| Phép đo | Mẫu số | Kết quả |
+|---|---|---|
+| `IX.VEN` Block 1, vùng `M3:S60` | hàng sheet 4–45 liền, 0 hàng trống ngăn | **42 dòng** *(Max 12 · VD341 **12** · VD444 8 · VD428 3 · VD62 1 · thường 6)*; hàng 46–51 rỗng *(6 hàng)*; hàng 52+ = bảng CDT1 *(9 hàng có dữ liệu tới hàng 60)* |
+| `MID3` `O10:AF273` | 264 hàng | **253** hàng `O` là số *(11 tổng-tháng sheet 10–20 + 242 chi tiết)* + **11** hàng ngăn; 0 ô rỗng/⛔ số trong 14 cột × 253 |
+| `MID3` Σ chia | 253 hàng | lệch **0** · dư lớn nhất `5,085e-9` *(PE)* |
+| `MID3` mẫu số vế | 253 × 7 = **1.771** ô mỗi vế | PE ≠ 0: **1.275** · **PM ≠ 0: 0** |
+| `MID1` `U` / `V` *(2.856 hàng ảnh)* | 2.856 ô mỗi cột | `U`: số 946 · rỗng 372 · `#VALUE!` **754** · `#DIV/0!` **784** — `V`: số 1.178 · rỗng 165 · `#VALUE!` **733** · `#DIV/0!` **780** |
+| `MID2` `U` / `V` *(1.463 hàng)* | 1.463 ô mỗi cột | mỗi cột: rỗng 189 · `#VALUE!` **1.008** · `#DIV/0!` **266** *(0 số)* |
+| Lỗi `#REF!` · `#N/A` ở `U`/`V` | cả hai sheet | **0** · **0** |
+| Cột cũ của 4 ảnh đọc lại | mọi `dong_sheet` cũ | **0** ô đổi *(chỉ THÊM hàng/cột)* |
+
+⚠ **Khác số R1**: `KQ-149` nêu `MID1` `U` = 754 + 4.636 trên 6.336 ô *(đo cả **lưới**, kể cả 4.494 hàng ĐỆM ngoài ảnh)*; ảnh chỉ mang 2.856 hàng thật ⇒ `#DIV/0!` của `U` ở ảnh là **784**, ⛔ 4.636 *(phần còn lại nằm ở hàng đệm)*. Dùng số đo trên hàng ảnh.
+
+### Errata cho orchestrator ghi *(ISP / AP — ⛔ Dev ghi)*
+1. **AP/ISP "Block 1 = 36 dòng"** ⇒ nguồn liền tới hàng 45 = **42 dòng** *(6 hàng `VD341` `No` 7–12; `MID1` dùng tới `No` 12)*. `BG` bản đầu ghi `nguon = M3:V40` — vùng thật là `M4:S45`.
+2. **ISP "U3 `#REF!`"** ⇒ phân bố thật ở `U`/`V`: `#VALUE!` + `#DIV/0!`; `#REF!` = 0, `#N/A` = 0. *(`BG` bản đầu chỉ nêu `#VALUE!` — thiếu `#DIV/0!`, phần lớn.)*
+3. **Đ4**: `×7` của `WO-147` AC-1 đếm **cột** `M:S`, ⛔ CDT1 *(`-11` — ghi nhận, ⛔ sửa ở đây)*.
+
+### Ảnh · sàn
+| Ảnh | Dòng | `checksum_noi_dung` | Kích thước |
+|---|---|---|---|
+| `ix_ven.json` | **42** | `77f81455901c3667` | 14 KB |
+| `gi_mid1.json` | 2.856 *(+4.494 đệm)* | `515868c0b100ba35` | 1,65 MB |
+| `gi_mid2.json` | 1.463 | `eb36e99f5a9cee7d` | 1,26 MB |
+| `gi_mid3.json` | **253** | `3b93f232a0bedc0a` | 97 KB |
+
+Sàn `MONG_PYTEST_TOAN_BO` **3173 → 3188** *(+15 bài: `test_dap_an_gi.py` 28 → 43)* + bài ghim `test_dung_moi_truong_isp.py` cùng commit ①. Ảnh DT2…DT5 **không đổi một byte** *(`git diff` chỉ 4 ảnh của DT8; `tests/du_lieu` xanh)*. Bản thô `/tmp/dt8_sua/` — ⛔ commit.
+
+### Cổng *(chạy MỘT lần ở cuối)*
+| Lệnh | Kết quả |
+|---|---|
+| `pytest tests/du_lieu` | xanh *(gồm `test_dap_an_gi.py` 43 bài)* |
+| `dung_moi_truong_isp.sh --duong-nen --cong 5437` *(một mình)* | `KẾT: ĐẠT` — toàn bộ: tập đỏ = đường nền **28 = 28** *(thêm 0 · bớt 0)* · chạy **3188** bài *(mong ≥ 3188)* · `tests/web` **3 = 3** · chạy 667 |
+| `.venv/bin/lint-imports` | `Contracts: 11 kept, 0 broken.` |
+| `kiem_tai_lieu.py` | `✅ cong tai lieu DAT (258 file · 2366 bang)` |
+
 ---
 Co-Authored-By: Claude Opus 4.8 <noreply@anthropic.com>
 Claude-Session: https://claude.ai/code/session_01EC3zCUYYd4w2PCe9b1GKUs
