@@ -1,6 +1,6 @@
 # 13 — THUYẾT MINH MÀN HÌNH: từng nút, từng ô, và `US` nào đứng sau
 
-**Version:** v1.9 · **Ngày:** 2026-10-05 · **Chủ sở hữu:** BA
+**Version:** v1.10 · **Ngày:** 2026-11-18 · **Chủ sở hữu:** BA
 **Vì sao có tệp này:** owner hỏi *"tại từng màn hình, thuyết minh ý nghĩa của từng `UC`/`US` và các nút bấm, hiển thị"*. `BA-06` đặc tả **màn phải có gì**; tệp này đi ngược lại — nó đọc **mã đang chạy** rồi nói **mỗi thứ đang có nghĩa là gì**.
 
 **Căn cứ:** trích thẳng từ `fls/web/tep/man_f0*.js` ngày `2026-09-14` · số đo trên kho `fls` cùng ngày.
@@ -497,6 +497,12 @@ Tôi nói: *"hai cột **Nội dung ghi ở bank** và **Tên tài khoản** đi
 
 ---
 
+## §6b · `SCR-F08` Cấu hình — **⛔ CHƯA DỰNG** *(đăng ký 2026-11-18, `O9`)*
+
+⛔ `man_f08.js` **chưa tồn tại** *(dựng ở ISP `Step 18 · F4`)* ⇒ tệp này **chưa có nút nào để thuyết minh** và `kiem_thuyet_minh` **⛔ đòi dòng nào** cho F08. Spec: `BA-06 §9` — vùng 1 bảng `IX.FX` **chỉ đọc**, ⛔ nút; nút **ký** *(`F5` · `F7`)* thêm vào đây **cùng lúc** nhãn nút vào `man_f08.js`.
+
+---
+
 ## §7 · Nội dung **các hộp thoại** hiện ra
 
 ⭐⭐ **Chỗ đáng nhìn nhất ⛔ không phải cái hộp HỎI, mà cái hộp BÁO LẠI.** Bốn hộp *"Đã …"* tồn tại để nói ra thứ máy **⛔ KHÔNG làm** — và nếu chúng im, kế toán sẽ tưởng máy đã dọn sạch mọi thứ.
@@ -580,6 +586,7 @@ Tôi nói: *"hai cột **Nội dung ghi ở bank** và **Tên tài khoản** đi
 
 
 ## Changelog
+- **v1.10** *(2026-11-18, `fls-ba`, `O9`)*: thêm `§6b` — giữ chỗ `SCR-F08` Cấu hình *(⛔ chưa dựng, ⛔ nút)*, trỏ `BA-06 §9`.
 - **v1.9** *(2026-10-05, `fls-ba`, xếp `KQ-041`)*: `F01L ⓪` bốn chuỗi `F01L` *(hàng `may` · ghi chú băng · `note ok` · nhãn lọc)* ⛔ còn hứa *"lệch tiền"* / *"chỉ DUYỆT"* cho cả rổ `may` *(đúng **78 / 120**)* ＋ chip `②b` đếm theo lượt tải mới nhất *(`F-3`: **2.955** thay **2.219**)*. Spec `BA-06` **v4.18** `§4.5 ⓤ` + `ⓥ`. Mã ⇒ `WO-042`.
 - **v1.8** *(2026-10-02, `fls-ba`, `TL-038`)*: `F01L ⓪` băng *Việc của bạn hôm nay* — dòng 2 tách hai câu theo `nguoi_khac_tien_te` *(câu cũ sai **84 / 616**)* · dòng ghi chú `may − tu_chung` ⛔ còn nói *"lệch tiền"* *(đúng **78 / 120**)*. Spec `BA-06` **v4.17** `§4.5 ⓤ` · `BA-07` **v3.10**. Mã ⇒ `WO-037` vòng 2.
 - **v1.7** *(2026-10-02, `fls-ba`, `TL-033`)*: `F01G ⓑ` Toàn sổ thêm bậc `≠ khác tiền tệ` *(mã `9c100ac`)* + ghi hai chỗ màn đang nói sai/thiếu *(khối *"Đang gán"* `①` **0 / 2.219** · chú giải bậc ⛔ dựng)*. Mã ⇒ `WO-032` vòng 2.
