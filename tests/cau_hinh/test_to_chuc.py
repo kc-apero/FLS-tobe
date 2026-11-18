@@ -11,6 +11,7 @@
 """
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 import pytest
@@ -63,10 +64,43 @@ def test_so_dem_dung_nhan_Đ4():
     assert len(set(k.tk_le.values())) == 19                   # pháp nhân khác nhau
 
 
+def _hang_khong_phai_phap_nhan() -> list[str]:
+    """TK của các hàng nhãn `CN`/`Cash Treasury` **đọc từ chính ảnh DT3 lúc chạy** —
+    ⛔ chép số TK vào bài *(`C8-R1-01`: bài canh riêng tư ⛔ chứa dữ liệu riêng tư)*."""
+    d = json.loads((ANH / "mapping_master_cfg.json").read_text(encoding="utf-8"))
+    ra = []
+    for r in d["phu"]["tho"]["dong"]:
+        a, b = to_chuc._chu(r.get("A")), to_chuc._chu(r.get("B"))
+        if a and a.startswith("R | ") and to_chuc.ma_le(b) in {"CN", "Cash Treasury"} \
+                and a != to_chuc._AN_DANH:
+            ra.append(a)
+    return ra
+
+
 def test_RIENG_TU_khong_TK_ca_nhan_vao_kho():
     k = _kho()
-    assert not any("an_danh" in t for t in k.tk_le)
-    assert not any(t.endswith("_CN") or "03088010516666" in t for t in k.tk_le)
+    cam = _hang_khong_phai_phap_nhan()
+    assert len(cam) >= 4, len(cam)          # Đ3: mẫu số ≠ 0 *(ảnh có sẵn 4 + 2 hàng)*
+    assert not set(cam) & set(k.tk_le)
+    assert not any("an_danh" in t or t.endswith("_CN") for t in k.tk_le)
+
+
+def _mm(*hang: tuple[str, str]) -> str:
+    return json.dumps({"dong": [], "phu": {"tho": {"dong": [
+        {"A": {"chu": "R | " + t}, "B": {"chu": le}} for t, le in hang]}}})
+
+
+def test_TK_TRUNG_la_loi_co_ten():
+    # TK GIẢ — ⛔ số thật
+    with pytest.raises(to_chuc.LoiToChuc) as e:
+        to_chuc.doc_tk_le(_mm(("GIA_01_X", "VGOH"), ("GIA_01_X", "VVOV")), nguon="x")
+    assert e.value.ma == to_chuc.TK_TRUNG
+
+
+def test_TK_RONG_la_loi_co_ten():
+    with pytest.raises(to_chuc.LoiToChuc) as e:
+        to_chuc.doc_tk_le(_mm(("GIA_02_X", "CN")), nguon="x")
+    assert e.value.ma == to_chuc.TK_RONG
 
 
 def test_RONG_la_loi_co_ten():

@@ -162,3 +162,46 @@ def test_nap_ix_org_chi_them_va_ban_moi(conn):
     ks = [k for k, _ in b.dong]
     assert sum(k.startswith("cdt:") for k in ks) == 13
     assert sum(k.startswith("tk:") for k in ks) == 59
+
+
+def test_C8_R1_02_hai_CDT_la_thi_queue_ra_MOI_NHAT_va_oracle_khop(conn, itl, may):
+    """Oracle `cdt_la` đo trên tập KHÔNG rỗng *(Đ3)* và chọn đúng sự kiện MỚI NHẤT."""
+    from fls.repo.pham_vi import mot_lan_nap
+    from tools.do_trang_hang_cho import oracle_hang_cho
+    run, itl_id = itl
+    _nap(conn)
+    chr.cdt_cua_ghi(conn, itl_id, "CU_LA_01", actor="c8@test")
+    chr.cdt_cua_ghi(conn, itl_id, "MOI_LA_02", actor="c8@test")
+    assert _dem(conn, itl_id) == 2
+    s, d = _queue(may, run)
+    dong = [x for x in d["rows"] if x["itl_id"] == itl_id]
+    assert s == 200 and len(dong) == 1
+    assert "MOI_LA_02" in dong[0]["cdt_la"] and "CU_LA_01" not in dong[0]["cdt_la"]
+    orc = [x for x in oracle_hang_cho(conn, mot_lan_nap(run), None)
+           if x["itl_id"] == itl_id]
+    assert len(orc) == 1 and orc[0]["cdt_la"] == dong[0]["cdt_la"]   # mẫu số: 1 ≠ NULL
+
+
+def test_C8_R1_03_nap_tu_choi_ban_rac_TRUOC_khi_ghi(conn):
+    """Kho chỉ-thêm ⇒ bản rác là VĨNH VIỄN: `nap` phải từ chối trước khi ghi."""
+    def _so():
+        with conn.cursor() as cur:
+            cur.execute("SELECT count(*) FROM fls_cau_hinh_ban WHERE bang = %s", (chr.BANG_ORG,))
+            return cur.fetchone()[0]
+    _nap(conn)
+    truoc = _so()
+    for rac in ([("cdt:GIA", {"le": "VGOH"})],          # khoá cdt: mang {le}
+                [("tk:GIA", {"cdt1": "SHQ1"})],         # khoá tk: mang {cdt1}
+                [("lung:GIA", {"cdt1": "SHQ1"})],       # tiền tố lạ
+                [("cdt:GIA", {"cdt1": " "})]):          # rỗng
+        with pytest.raises(chr.LoiCauHinh):
+            chr.nap(conn, chr.BANG_ORG, rac, nguon="rac", actor="c8@test")
+    assert _so() == truoc                                # ⛔ ghi gì
+
+
+def test_C8_R1_03_actor_rong_la_loi_va_0_su_kien(conn, itl):
+    _, itl_id = itl
+    _nap(conn)
+    with pytest.raises(chr.LoiCauHinh):
+        chr.cdt_cua_ghi(conn, itl_id, "XYZ", actor="")
+    assert _dem(conn, itl_id) == 0
