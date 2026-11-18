@@ -122,6 +122,9 @@ Thay dung sai `atol 1e-6` chung bằng **dung sai THEO CỘT có căn cứ đo**
 ### Mẫu số khai TRƯỚC *(Đ2/Đ5 — cổng ⛔ tự đếm rồi tự so với chính nó)*
 `MONG_DONG_SO = 7877` *(= 7883 − 6 hàng thiếu D)* · `MONG_TONG_O = 8 × 7877 = 63016` · `MONG_SO_DONG_DAP_AN = 7883`. `_phan_xu` ĐỎ khi `dong_doc`/`tong_o`/`so_dong_dap_an` ≠ mong. Bài tautology `tong_o == so_o_dap_an_so_duoc` *(hai biến tăng cùng chỗ)* → `tong_o == 8 × dong_so == 63016`.
 
+### Nguồn gốc `phu.so_du_dau` *(chốt orchestrator — trả lời Q1 của BG gốc; ⛔ đổi mã/hằng)*
+5 hằng số dư đầu kỳ *(hàng 24 = ngày **2024-12-31**)* = số dư 31/12/2024 của tab `2. CCR` + `2. CCR Cash`, **LOẠI pháp nhân VVOO** *(số dư VVOO = lũy kế dòng sổ hàng 10…24 = 184.184.303)*; 3 hằng bVND/mUSD = 3 hằng tiền tệ × tỷ giá 2024-12 *(khớp từng đồng; lệch chỉ do làm tròn + VND gõ thừa 2)*. Chi tiết soát: `CALC_ZONE_406.md` mục *"Đính chính + soát logic từng ô hàng 24"* *(nhánh làm việc — chờ gộp cùng H4, như `H4-R1-05`)*. **GIỮ 5 hằng y sheet 406** *(parity AS-IS)*; H4 ⛔ đổi mã/hằng ở vòng sửa này.
+
 ### H4-R1-03 — ô bỏ + no-op thành phép ĐO
 `ô đáp án bỏ = 36` *(6 hàng thiếu D, mỗi hàng 6 ô khác rỗng `BM·BN·BQ·BR·BS·BT`; tổng ô đáp án khác rỗng `63052` − so `63016` = `36`)* in ở `_in_bao` + `hd2_cong.json`. No-op đo: `BM·BQ·BT[ds] == [ds−1]` ở **6/6** hàng *(BR=0)* ⇒ `no_op_lech=[]`; lệch ⇒ ĐỎ.
 
