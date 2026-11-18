@@ -17,6 +17,7 @@ import contextlib
 import http.client
 import json
 import os
+import subprocess
 import threading
 import time
 from pathlib import Path
@@ -196,3 +197,57 @@ def test_AC3_bon_trang_thai_qua_trang_thai_js():
     assert ra["loi"] is True and "FLS-CAUHINH-CHUA-KHAI" in ra["loi_ten"], ra
     assert ra["loi_hang"] == 0 and ra["loi_bang"] == 0, ra   # ⛔ bảng trống im lặng
     assert ra["co"] == 1, ra
+
+
+# ══ F4-R1-01 · `KQ-162` — Chromium thật, 390 px ═════════════════════════════
+def _do_390() -> dict:
+    """Mở trang thật ở 390 px, bấm tab ⑥, đợi 37 hàng; đo CẢ TRANG
+    (`documentElement`) và CHÍNH khung bọc bảng. Dùng lại bộ dò node/playwright/
+    Chromium của `test_isp_f03_hd.py` (một nguồn)."""
+    from tests.web import test_isp_f03_hd as f3
+    if f3.NODE is None or f3.PW is None or f3.CHROME is None:
+        pytest.skip("thiếu node / playwright / Chromium")
+    mjs = (
+        "import pkg from %(pw)s; const { chromium } = pkg;\n"
+        "const b = await chromium.launch({ executablePath: %(cr)s,"
+        " args: ['--no-sandbox'], headless: true });\n"
+        "const pg = await b.newPage({ viewport: { width: 390, height: 820 },"
+        " deviceScaleFactor: 1 });\n"
+        "await pg.goto(%(url)s);\n"
+        "await pg.click('button[data-s=\"man-f08\"]');\n"
+        "await pg.waitForSelector('#than-f08 [data-thang]', { timeout: 15000 });\n"
+        "const res = await pg.evaluate(() => {\n"
+        "  const de = document.documentElement;\n"
+        "  const t = document.querySelector('#than-f08 table');\n"
+        "  const kh = t.parentElement;\n"
+        "  return { iw: window.innerWidth, sw: de.scrollWidth, cw: de.clientWidth,\n"
+        "    hang: document.querySelectorAll('#than-f08 [data-thang]').length,\n"
+        "    bang_w: t.getBoundingClientRect().width,\n"
+        "    kh_sw: kh.scrollWidth, kh_cw: kh.clientWidth,\n"
+        "    kh_ox: getComputedStyle(kh).overflowX };\n"
+        "});\n"
+        "console.log(JSON.stringify(res));\n"
+        "await b.close();\n"
+        % {"pw": json.dumps(f3.PW), "cr": json.dumps(f3.CHROME),
+           "url": json.dumps(_do_390.url)}
+    )
+    r = subprocess.run([f3.NODE, "--input-type=module", "-e", mjs],
+                       capture_output=True, text=True, encoding="utf-8",
+                       timeout=90)
+    assert r.returncode == 0, f"⛔ node/chromium NO:\n{r.stdout}\n{r.stderr}"
+    return json.loads(r.stdout.strip().splitlines()[-1])
+
+
+def test_F4_R1_01_bang_IXFX_khong_tran_ngang_o_390px():
+    """⛔ Trang ⛔ tràn ngang ở 390 px (mã cũ: `scrollWidth 475 > clientWidth 390`).
+    Bảng 7 cột rộng hơn màn ⇒ phải cuộn TRONG khung riêng. Đo ba thứ: trang
+    (`sw ≤ cw`), 37 hàng thật (Đ3: ⛔ đo trên bảng rỗng), và bảng THẬT rộng hơn
+    khung `kh_cw` (⇒ khung đang cuộn thật, ⛔ bảng bị cắt/ép nhỏ — Đ5 hai chiều)."""
+    with _may() as (m, _tok):
+        _do_390.url = "http://%s:%d/" % m.server_address
+        res = _do_390()
+    assert res["hang"] == 37, res                        # Đ3: mẫu số ≠ 0
+    assert res["bang_w"] > res["kh_cw"], res             # bảng thật rộng hơn khung
+    assert res["kh_ox"] in ("auto", "scroll"), res       # khung cuộn riêng
+    assert res["sw"] <= res["cw"], (
+        "trang TRÀN ngang ở 390 px: scrollWidth=%(sw)d > clientWidth=%(cw)d" % res)

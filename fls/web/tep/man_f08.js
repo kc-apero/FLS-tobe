@@ -84,7 +84,11 @@ const F08 = (function () {
       tb.appendChild(_hang(h.thang, h.ky, nhan));
     });
     b.appendChild(tb);
-    o.appendChild(b);
+    // F4-R1-01 (`KQ-162`): bảng 7 cột rộng 474 px > màn 390 px ⇒ trang tràn ngang.
+    // Bọc trong `.ngang` (hinh.css:504, có sẵn) ⇒ cuộn TRONG khung, ⛔ cả trang.
+    const kn = TP.el('div', 'ngang');
+    kn.appendChild(b);
+    o.appendChild(kn);
 
     const tom = TP.el('div', 'note');
     tom.innerHTML =
