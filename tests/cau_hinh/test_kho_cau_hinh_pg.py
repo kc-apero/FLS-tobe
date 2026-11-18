@@ -286,7 +286,7 @@ def test_C5R1_05_khong_doi_so_ban_LIEN_TRUOC_khong_phai_ban_DAU(conn):
     """Giết R1-M4 *(`khong_doi` so với bản ĐẦU thay bản kề trước ⇒ SỐNG khi nạp < 3
     lần)*. Nạp A, B, A: bản thứ ba KHÁC bản kề trước *(B)* ⇒ `khong_doi=False`; chỉ so
     bản ĐẦU *(A)* mới nhầm thành True."""
-    bang = "IX.VEN"
+    bang = "IX.DRV"   # ⭐ C9: IX.VEN nay có kiểm riêng ⇒ dùng bang CHƯA có kiểm (IX.DRV, C10)
     A = [("x", {"v": "1"})]
     B = [("x", {"v": "2"})]
     chr.nap(conn, bang, A, nguon="n", actor="a")
