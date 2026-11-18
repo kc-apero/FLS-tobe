@@ -23,7 +23,7 @@ from dataclasses import dataclass
 #   `fls.cau_hinh.fx` — bảng này dùng CHÍNH hằng ấy *(⛔ gõ lại chuỗi đường)*.
 #   Luật ĐƯỜNG nguồn tĩnh *(vòng sửa R1 · `C1-R1-02`)* ở `fls.cau_hinh.nguon_tinh`
 #   — một chỗ, chung với `soi_bang_tuyen` và `fx.doc_tep`.
-from fls.cau_hinh import fx, nguon_tinh
+from fls.cau_hinh import fx, hd, nguon_tinh
 
 TIEN_TO = "/api/fls/v1"
 
@@ -680,6 +680,16 @@ BANG_TUYEN: tuple[Tuyen, ...] = (
           mo_ta="IX.FX ty gia thang × 5 tien te (VND = 1) + `thieu`/`trung`/"
                 "`lac` thanh TRUONG RIENG — ⛔ thanh 0, ⛔ cong doi. Nguon TINH "
                 "(so TONG HOP) toi C5"),
+    # ⭐⭐ ISP 3.1.2 · `C4` *(`WO-122`)* — tuyen TINH thu HAI: cay `IX.HD` tu ANH
+    #    DONG BANG THAT (⛔ so tong hop nhu C1). Doc HAI anh: ATL (74 nut) + Mapping
+    #    Master (73 ma) ⇒ `nguon_tinh` mang CA HAI duong. `GET`, ⛔ ghi — kho config
+    #    la C5. ⛔ hoa giai 74 ↔ 73: tuyen chi LIET KE `chenh_mapping_master`.
+    Tuyen("GET", f"{TIEN_TO}/config/hd", "cay_hd", (),
+          nguon_tinh=(hd.NGUON_TINH, hd.NGUON_MM),
+          mo_ta="IX.HD cay ATL 74 nut · 6 nhom (HDO·HDH·HDAP·HDT·HDC·HDCI) + "
+                "con_cua/la; cay hong ⇒ loi co TEN (HD_CHU_TRINH·HD_CHA_VANG·"
+                "HD_CAP_NHAY). Doi chieu 73 ma Mapping Master: LIET KE chenh "
+                "(= {NCF}), ⛔ hoa giai. Nguon TINH (anh dong bang) toi C5"),
 )
 
 

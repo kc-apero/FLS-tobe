@@ -1,6 +1,6 @@
 # 07 — API CONTRACT: FLS
 
-**Version:** v3.16 · **Ngày:** 2026-11-17 · **Chủ sở hữu:** BA/PO + Tech Lead
+**Version:** v3.17 · **Ngày:** 2026-11-18 · **Chủ sở hữu:** BA/PO + Tech Lead
 **Thay thế:** v0.1 *(bản copy chương trình, prefix `/api/voi/`)* — đã khai tử.
 
 **Căn cứ:** `04_DB_IMPLEMENTATION` v1.0 *(schema `fls_itl`)* · `QĐ-ITL-38` *(app là nơi thao tác)* · `QĐ-ITL-45` *(FLS độc lập)* · `FLS-vs-FPS` §7 *(append-only event-log)*.
@@ -848,7 +848,7 @@ LY_DO_MAC_DINH_BO_GHEP = "(may dien) bo ghep tren man - nguoi bam khong ghi ly d
 | Tuyến | Bước ISP | Hợp đồng | Trạng thái |
 |---|---|---|---|
 | `GET /api/fls/v1/config/fx` | C1 → C5 (kho) | `{bang:'IX.FX', nguon, ky:[{yyyymm (số nguyên), USD, SGD, COP, VND, HKD (chuỗi), trang_thai ∈ chua_ky/da_ky}], thieu:[yyyymm], trung:[yyyymm], lac:[yyyymm]}` — tháng thiếu/trùng/lạc ở trường riêng, ⛔ cộng đôi, ⛔ thành 0. Bảng TĨNH ⛔ theo lần nạp ⇒ `?run_id=` ⇒ `400 FLS-BAD-REQUEST` *(⛔ trả số khoác phạm vi lần nạp — `C1-R1-07`)* | ✅ *(C1 — gộp 17/11 sau R3 `KQ-079`)* |
-| `GET /api/fls/v1/config/hd` | C4 | cây IX.HD 74 nút · 6 nhóm + danh sách chênh với Mapping Master (73 mã); cây hỏng ⇒ lỗi có tên (`HD_CHU_TRINH` · `HD_CHA_VANG`) | ⬜ chưa xây |
+| `GET /api/fls/v1/config/hd` | C4 | cây IX.HD 74 nút · 6 nhóm + danh sách chênh với Mapping Master (73 mã); cây hỏng ⇒ lỗi có tên (`HD_CHU_TRINH` · `HD_CHA_VANG` · `HD_CAP_NHAY` · `HD_HONG`). Bảng TĨNH ⇒ `?run_id=` ⇒ `400 FLS-BAD-REQUEST` (khuôn C1) | ✅ *(C4 — gộp 18/11 sau R3 `KQ-126`; C5 đổi nguồn sang kho)* |
 | `GET /api/fls/v1/config/per` | C6 | ngày đầu cột (2024-10-21) · luật ghi nhận kỳ (A = dồn ngày 1 tháng PL start, D4) | ⬜ chưa xây |
 | `POST /api/fls/v1/config/fx/{yyyymm}/sign` | C7 | niêm phong tháng; người ký = người trong THẺ; ký lại ⇒ `409`; `bang_ghi` = bảng config (⛔ `fls_itl`) | ⬜ chưa xây |
 | `GET /api/fls/v1/config/ven` | C9 | Vendor & Network Block 1 (36 dòng) · mã 'cách tính' cho 5 vendor riêng | ⬜ chưa xây |
@@ -916,6 +916,7 @@ LY_DO_MAC_DINH_BO_GHEP = "(may dien) bo ghep tren man - nguoi bam khong ghi ly d
 ---
 
 ## Changelog
+- **v3.17** *(2026-11-18, orchestrator ISP 3.1 — gộp C4)*: `§4i` dòng `GET /config/hd` ⬜ → ✅ + tên lỗi `HD_CAP_NHAY` · `HD_HONG` + câu `?run_id=` ⇒ `400`.
 - **v3.16** *(2026-11-17, orchestrator ISP 3.1 — gộp C1)*: `§4i` dòng `GET /config/fx` ⬜ → ✅ + câu `?run_id=` ⇒ `400` *(`C1-R1-03` · `C1-R2-05`)*.
 - **v3.15** *(2026-11-16, orchestrator ISP 3.1 thay `fls-ba`; trong thẩm quyền: KHAI TRƯỚC tuyến đã có trong ISP đã duyệt — ⛔ đổi tuyến cũ, ⛔ đổi luật)*: thêm **`§4i`** — 9 tuyến cấu hình + bản báo cáo ký của ISP 3.1, mọi dòng `⬜ chưa xây`; bước mở tuyến đổi ⬜ → ✅ lúc gộp. Gốc: bước C1 mở `GET /config/fx` thì bài `test_ba07_phu_het_tuyen.py` đỏ (`BA-07` ⛔ nhắc `config`: grep 0 dòng) — lỗi sẽ lặp ở C4 · C6 · C7 · C9 · C10 · C11 · C13.
 - **v3.14** *(2026-10-06, `fls-ba`, xếp `KQ-061 F-2`; trong thẩm quyền spec: hợp đồng cửa đọc thêm trường áp **một luật đã có** — `BA-05` v0.32 *"Final = `fls_sua_tay` ∪ cột nguồn"*, ⛔ đổi luật, ⛔ đổi sổ, ⛔ đổi trường cũ)*: `GET /ledger` thêm `<f>_final` + `<f>_nguon` cho năm trường lưới gõ được; tuyến đọc thêm `fls_sua_tay`. Gốc: lưới `F02` in cột thô ⇒ ô người vừa gõ hiện `chưa gán` sau khi tải lại và phép hỏi lại gọi chính người gõ là *"người khác"* *(sổ thật cột nguồn rỗng **8.387 / 8.387** ⇒ gặp **100%** ở phiên sửa thật đầu tiên)*. Mã ⇒ **`WO-062`**.
