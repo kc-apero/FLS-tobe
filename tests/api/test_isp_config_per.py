@@ -113,6 +113,42 @@ def test_C6_B4_GET_config_per_200_ngay_dau_va_luat_A_TU_KHO(may):
 
 
 @pytest.mark.pg
+def test_C6_R1_02_tuyen_doc_ngay_la_TU_KHO_khong_go_cung(may):
+    """`C6-R1-02` *(Đ5)*: nạp THÊM bản ngày LẠ `2024-10-20` ⇒ tuyến trả đúng ngày lạ.
+    Gõ cứng ngày ở handler *(M7)* ⇒ ĐỎ. Cuối bài nạp lại `2024-10-21` *(chỉ-THÊM ⇒ bản mới
+    nhất lại là 21)* để bài khác trong tệp không bị lệch."""
+    nguon_la = NGUON + ":ngay-la"
+    with psycopg.connect(dsn_test(), autocommit=True) as c:
+        chc.nap_ix_per(c, actor="bo-test-c6", ngay_dau="2024-10-20", luat="A",
+                       nguon=nguon_la)
+    try:
+        ma, r = _goi(may, DUONG)
+        assert ma == 200, (ma, r)
+        d = r["data"]
+        assert d["ngay_dau"] == "2024-10-20" and d["nguon"] == nguon_la, d
+        assert d["ky_dau"] == {"nam": 2024, "nua": 2, "quy": 4, "thang": 10}, d["ky_dau"]
+    finally:
+        with psycopg.connect(dsn_test(), autocommit=True) as c:
+            chc.nap_ix_per(c, actor="bo-test-c6", ngay_dau="2024-10-21", luat="A",
+                           nguon=NGUON)
+    ma, r = _goi(may, DUONG)
+    assert ma == 200 and r["data"]["ngay_dau"] == "2024-10-21", (ma, r)
+
+
+def test_C6_R1_02_handler_luat_la_TU_KHO_khong_go_cung_A(monkeypatch):
+    """`C6-R1-02` *(M8)*: kho khai luật khác `A` ⇒ `luat.ma` phải theo kho. Luật thứ hai
+    chưa có thật ⇒ mở tạm một mã trong `TEN_LUAT` *(monkeypatch, tự trả)*."""
+    from datetime import date
+    from fls.api import xu_ly
+    monkeypatch.setitem(ky.TEN_LUAT, "Z", "luat gia cho bai")
+    monkeypatch.setattr(chc, "doc_per", lambda _c: ky.LichKy(
+        nguon="n", ngay_dau=date(2031, 2, 3), luat="Z"))
+    d, _ = xu_ly.cau_hinh_per(_yc())
+    assert d["luat"] == {"ma": "Z", "ten": "luat gia cho bai"}, d["luat"]
+    assert d["ngay_dau"] == "2031-02-03" and d["ky_dau"]["quy"] == 1, d
+
+
+@pytest.mark.pg
 def test_C6_B4_run_id_thi_400_khuon_C1(may):
     ma, r = _goi(may, f"{DUONG}?run_id=NAP-2026-01-01-X")
     assert ma == 400 and r["error"]["code"] == "FLS-BAD-REQUEST", (ma, r)
