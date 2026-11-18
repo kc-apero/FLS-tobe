@@ -132,6 +132,7 @@ GOC = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(GOC))
 
 from fls.adapters.pm_join import PM_COT_RIENG_TU  # noqa: E402
+from fls.canon.o_loi import la_o_loi              # noqa: E402  (DT8: ô lỗi = tập ĐÓNG, 1 bản khai)
 from fls.oracle.anh_chup import AnhChup           # noqa: E402
 
 #: Thư mục khuôn — mỗi tệp `<tên>.py` là MỘT khuôn *(tên tệp = tên khuôn ở dòng lệnh)*.
@@ -148,7 +149,13 @@ KIEU_KHOA_BIET = ("yyyymm", "ma", "dong_sheet")
 #: `so?` thêm ở DT4 *(bài đòi — `WO-111` AC-4)*: ô SỐ hoặc RỖNG — cột `BO`/`BP` của 406 là
 #: `iferror(INDEX/MATCH…)` ⇒ RỖNG khi thiếu tỷ giá *(đo 17/11: 6 hàng, cả BO lẫn BP)*; rỗng CHO
 #: PHÉP *(⛔ đỏ)* nhưng ô có giá trị vẫn phải SỐ *(⛔ số ⇒ "ô ⛔ số" ⇒ ĐỎ, đối xứng `so`)*.
-KIEU_COT_BIET = ("so", "chu", "chu?", "so?")
+#: `so!` thêm ở DT8 *(bài đòi — `WO-147` AC-3 · luật `DT5-R1-04`)*: ô SỐ, RỖNG, hoặc **ô LỖI
+#: Sheets** *(chuỗi bắt đầu `#` — `#N/A`, `#DIV/0!`, `#REF!`, `#VALUE!`)*. Cột `RATE ALLOCATE`
+#: của MID2 là `PE_cdt / Σ PE` ⇒ `#DIV/0!` khi Σ PE = 0 *(đo 18/11: 308 ô)*; `ITL ID` của MID1 là
+#: `VLOOKUP` ⇒ `#N/A` khi ⛔ tra được *(176 ô)*. Ô lỗi GHI NGUYÊN chuỗi vào ảnh + ĐẾM theo cột +
+#: ghim phân bố ở `loi_theo_cot` *(⛔ hoá 0 — `DT5-R1-04`)*; số lỗi mỗi cột khai `LOI_MONG` *(Đ5:
+#: khác ⇒ ĐỎ cả hai chiều)*. Ô ⛔ số ⛔ rỗng ⛔ lỗi *(chữ thường/bool)* ⇒ "ô ⛔ số!" ⇒ ĐỎ.
+KIEU_COT_BIET = ("so", "chu", "chu?", "so?", "so!")
 
 
 @dataclass(frozen=True)
@@ -169,18 +176,25 @@ class Khuon:
     kieu_cot: dict[str, str] = field(default_factory=dict, compare=False)
     chuan_bi: Callable[[dict], dict] | None = field(default=None, compare=False)
     phu_mong: dict[str, int] = field(default_factory=dict, compare=False)
+    loi_mong: dict[str, int] = field(default_factory=dict, compare=False)   # DT8: số ô lỗi / cột so!
 
     def cot_theo_kieu(self) -> tuple[list[str], list[str], list[str]]:
         """→ (cột ⛔ được rỗng, cột SỐ, cột CHỮ) — theo thứ tự `cot`, mỗi cột ở đúng chỗ của nó.
 
-        ⚠ `chu?` *(DT3)* và `so?` *(DT4)* được RỖNG ⇒ ⛔ nằm ở tập "⛔ được rỗng". `so?` vẫn phải
-        SỐ khi CÓ giá trị ⇒ nằm ở tập cột SỐ *(ô chữ/bool ⇒ "ô ⛔ số" ⇒ ĐỎ như `so`)*; `so` = DT2.
-        Khuôn ⛔ có `so?`/`chu?` ⇒ ba tập trùng y bản DT2 *(so/chu/chu? là mọi kiểu ⇒ "not chu?" =
-        "not in (chu?)" , "== so" = "in (so)", "!= so" = "in (chu, chu?)")* ⇒ ảnh cũ giữ từng byte."""
+        ⚠ `chu?` *(DT3)* · `so?` *(DT4)* · `so!` *(DT8)* được RỖNG ⇒ ⛔ nằm ở tập "⛔ được rỗng".
+        `so?` vẫn phải SỐ khi CÓ giá trị ⇒ nằm ở tập cột SỐ *(ô chữ/bool ⇒ "ô ⛔ số" ⇒ ĐỎ như `so`)*;
+        `so!` *(số HOẶC lỗi Sheets)* tách riêng ⇒ ⛔ nằm ở tập SỐ *(ô lỗi ⛔ được là "ô ⛔ số")* —
+        xem `cot_so_loi`. `so` = DT2. Khuôn ⛔ có `so?`/`chu?`/`so!` ⇒ ba tập trùng y bản DT2 ⇒ ảnh
+        cũ giữ từng byte *(`so!` ⛔ thuộc tập nào trong ba, nên chỉ THÊM cột vào `cot_so_loi`)*."""
         k = {c: self.kieu_cot.get(c, "so") for c in self.cot}
-        return ([c for c in self.cot if k[c] not in ("chu?", "so?")],
+        return ([c for c in self.cot if k[c] not in ("chu?", "so?", "so!")],
                 [c for c in self.cot if k[c] in ("so", "so?")],
                 [c for c in self.cot if k[c] in ("chu", "chu?")])
+
+    def cot_so_loi(self) -> list[str]:
+        """→ cột `so!` *(số HOẶC lỗi Sheets)* theo thứ tự `cot` *(DT8)*. Khuôn ⛔ có `so!` ⇒ `[]`
+        ⇒ ảnh + báo giữ từng byte *(mọi thứ của `so!` chỉ sinh ra khi danh sách này ⛔ rỗng)*."""
+        return [c for c in self.cot if self.kieu_cot.get(c, "so") == "so!"]
 
 
 _YYYYMM = re.compile(r"\d{6}")
@@ -265,12 +279,20 @@ def nap_khuon(ten: str) -> Khuon:
         sai.append("PHU_MONG ⛔ phải {tên bảng phụ: số dòng ≥ 0}")
     elif phu_mong and chuan_bi is None:
         sai.append("PHU_MONG ⛔ có chuan_bi — bảng phụ chỉ đến từ chuan_bi")
+    # ── DT8: LOI_MONG = {cột so!: số ô lỗi mong} — khoá PHẢI là cột khai `so!` ──
+    loi_mong = getattr(m, "LOI_MONG", {})
+    cot_so_loi = {c for c, k in kieu_cot.items() if k == "so!"} if isinstance(kieu_cot, dict) else set()
+    if not isinstance(loi_mong, dict) or not all(
+            isinstance(k, str) and k in cot_so_loi and _loi_mong_hop_le(v)
+            for k, v in loi_mong.items()):
+        sai.append(f"LOI_MONG ⛔ phải {{cột khai so! {sorted(cot_so_loi)}: số ô lỗi ≥ 0 HOẶC "
+                   "{loại lỗi (chữ ⛔ rỗng): số ô ≥ 0}}")
     if sai:
         sys.modules.pop(spec.name, None)   # khuôn bị khước từ cũng ⛔ nằm lại (bài …SAI_GIAO_KEO…)
         raise TuChoi(f"khuôn `{ten}` ({p.name}) sai giao kèo: " + " · ".join(sai))
     return Khuon(ten=ten, bang=m.BANG, khoa=m.KHOA, kieu_khoa=m.KIEU_KHOA, cot=tuple(cot),
                  ra=m.RA, thieu_lac=m.thieu_lac, kieu_cot=dict(kieu_cot), chuan_bi=chuan_bi,
-                 phu_mong=dict(phu_mong))
+                 phu_mong=dict(phu_mong), loi_mong=dict(loi_mong))
 
 
 # ── đọc ───────────────────────────────────────────────────────────────────────
@@ -311,6 +333,36 @@ def _khong_chu(v: Any) -> bool:
     """Ô ảnh ⛔ CHỮ mà ⛔ rỗng: ô số *(chuỗi chữ số)* hay `bool` *(DT3 — đối xứng `_khong_so`:
     rỗng ∩ ⛔ chữ = ∅ ⇒ mỗi ô cột chữ rơi vào ĐÚNG một trong chữ · rỗng · ⛔ chữ)*."""
     return isinstance(v, (str, bool))
+
+
+def _loi_mong_hop_le(v: Any) -> bool:
+    """`LOI_MONG[cột]` hợp lệ *(DT8 vòng sửa `DT8-R1-04`)*: số ô lỗi `int ≥ 0` *(chỉ TỔNG)* HOẶC
+    `{loại lỗi: số ô ≥ 0}` *(PHÂN BỐ — loại = chuỗi lỗi tới dấu cách đầu: `#DIV/0!`, `#VALUE!`…)*."""
+    if type(v) is int:
+        return v >= 0
+    return isinstance(v, dict) and all(
+        isinstance(k, str) and k.strip() and type(n) is int and n >= 0 for k, n in v.items())
+
+
+def _tong_loi_mong(v: Any) -> int:
+    return v if type(v) is int else sum(v.values())
+
+
+def _loai_loi(chuoi: str) -> str:
+    """Loại lỗi = chuỗi tới dấu cách đầu *(`#DIV/0! (Function DIVIDE …)` ⇒ `#DIV/0!`)*."""
+    return chuoi.split(" ")[0]
+
+
+def _la_loi(v: Any) -> bool:
+    """Ô ảnh là LỖI Sheets *(DT8)*: ô chữ `{"chu": s}` mà `s` thuộc TẬP ĐÓNG `fls.canon.o_loi`
+    *(⛔ "bắt đầu bằng #" — kế toán gõ `##LAI NHAP VON#` ⛔ phải lỗi; MỘT bản khai cho cả hệ)*."""
+    return isinstance(v, dict) and la_o_loi(v["chu"])
+
+
+def _khong_so_loi(v: Any) -> bool:
+    """Ô cột `so!` KHÔNG hợp lệ *(DT8)*: ⛔ số, ⛔ rỗng, ⛔ lỗi ⇒ ô chữ-thường hay `bool` ⇒ ĐỎ.
+    Rỗng ∩ số ∩ lỗi ∩ (cái này) phủ kín mọi ô ⇒ mỗi ô cột `so!` rơi vào ĐÚNG một nhóm."""
+    return _khong_so(v) and not _la_loi(v)
 
 
 def _khong_hang_so(c: str) -> Any:
@@ -540,6 +592,42 @@ def dong_bang(kh: Khuon, tho: dict, mong: int) -> tuple[dict, list[str]]:
     o_khong_chu = [{"thu_tu": d["thu_tu"], "cot": c}
                    for d in dong for c in kh.cot if c in cot_chu and _khong_chu(d[c])]
     mau_rong, mau_so, mau_chu = (len(dong) * len(x) for x in (cot_day, cot_so, cot_chu))
+    # ── DT8: cột `so!` — ô LỖI Sheets GHI NGUYÊN + ĐẾM theo cột + ghim phân bố; ô ⛔số⛔rỗng⛔lỗi ⇒ ĐỎ.
+    #   Khuôn ⛔ có `so!` ⇒ `cot_so_loi = []` ⇒ mọi biến dưới rỗng ⇒ ảnh + báo giữ TỪNG BYTE (DT2…DT5).
+    cot_so_loi = kh.cot_so_loi()
+    o_loi = [{"thu_tu": d["thu_tu"], "cot": c, "gia_tri": d[c]["chu"]}
+             for d in dong for c in kh.cot if c in cot_so_loi and _la_loi(d[c])]
+    o_khong_so_loi = [{"thu_tu": d["thu_tu"], "cot": c}
+                      for d in dong for c in kh.cot if c in cot_so_loi and _khong_so_loi(d[c])]
+    mau_loi = len(dong) * len(cot_so_loi)
+    # phân bố giá trị lỗi theo cột *(ghim — `DT5-R1-04`)*: {cột: {chuỗi lỗi: số lần}} đã sắp.
+    loi_theo_cot: dict[str, dict[str, int]] = {}
+    for c in cot_so_loi:
+        dem: dict[str, int] = {}
+        for o in o_loi:
+            if o["cot"] == c:
+                dem[o["gia_tri"]] = dem.get(o["gia_tri"], 0) + 1
+        loi_theo_cot[c] = {k: dem[k] for k in sorted(dem)}
+    # Đ5: số ô lỗi mỗi cột so! phải khớp `LOI_MONG` *(khác ⇒ ĐỎ cả hai chiều)*; cột ⛔ khai LOI_MONG
+    #   ⇒ mong 0 *(⛔ cho lỗi lọt im lặng — như `so` strict)*.
+    #   `LOI_MONG[c]` là `dict` ⇒ so CẢ PHÂN BỐ theo LOẠI lỗi *(`DT8-R1-04`: chuyển một ô
+    #   `#VALUE!` ⇒ `#DIV/0!` giữ nguyên TỔNG mà ĐỎ; `#REF!`/`#N/A` lọt ⇒ ĐỎ)*.
+    def _pb_loai(c: str) -> dict[str, int]:
+        pb: dict[str, int] = {}
+        for o in o_loi:
+            if o["cot"] == c:
+                k = _loai_loi(o["gia_tri"])
+                pb[k] = pb.get(k, 0) + 1
+        return pb
+
+    def _loi_lech_cot(c: str) -> bool:
+        mong_c = kh.loi_mong.get(c, 0)
+        n = sum(1 for o in o_loi if o["cot"] == c)
+        if n != _tong_loi_mong(mong_c):
+            return True
+        return isinstance(mong_c, dict) and {k: v for k, v in mong_c.items() if v} != _pb_loai(c)
+
+    loi_lech = sorted(c for c in cot_so_loi if _loi_lech_cot(c))
     phu: dict[str, dict[str, Any]] = {}
     for ten in sorted(phu_tho):
         hang = [{"thu_tu": i, **{k: _o(v) for k, v in r.items()}}
@@ -561,6 +649,14 @@ def dong_bang(kh: Khuon, tho: dict, mong: int) -> tuple[dict, list[str]]:
         ly_do.append(f"ô ⛔ số {len(o_khong_so)}/{mau_so}")
     if o_khong_chu:
         ly_do.append(f"ô ⛔ chữ {len(o_khong_chu)}/{mau_chu}")
+    if o_khong_so_loi:                       # DT8: ô cột so! ⛔ số ⛔ rỗng ⛔ lỗi ⇒ ĐỎ
+        ly_do.append(f"ô ⛔ số! {len(o_khong_so_loi)}/{mau_loi}")
+    if loi_lech:                             # DT8 · Đ5: số ô lỗi ≠ LOI_MONG (cả hai chiều)
+        ly_do.append("ô lỗi ≠ mong: " + " ".join(
+            f"{c} {sum(1 for o in o_loi if o['cot'] == c)}≠{_tong_loi_mong(kh.loi_mong.get(c, 0))}"
+            + (f" phân bố {_pb_loai(c)}≠{kh.loi_mong[c]}"
+               if isinstance(kh.loi_mong.get(c), dict) else "")
+            for c in loi_lech))
     for ten, b in phu.items():
         if b["so_dong"] != b["mong"]:
             ly_do.append(f"phụ `{ten}` {b['so_dong']} dòng ≠ mong {b['mong']}")
@@ -608,6 +704,10 @@ def dong_bang(kh: Khuon, tho: dict, mong: int) -> tuple[dict, list[str]]:
         "lac": lac,
         "khoa_hong": pt["khoa_hong"],
         "o_rong": o_rong,
+        # DT8: chỉ THÊM khi có cột so! ⇒ ảnh DT2…DT5 giữ từng byte. `o_loi` = ô lỗi GHI NGUYÊN
+        #   chuỗi (⛔ hoá 0); `loi_theo_cot` = phân bố đã ghim; `loi_mong` = khai Đ5.
+        **({"o_loi": o_loi, "loi_theo_cot": loi_theo_cot, "loi_mong": dict(kh.loi_mong)}
+           if cot_so_loi else {}),
         "cong": {"mong": mong, "so_dong": len(dong), "dat": not ly_do, "ly_do": ly_do},
         "checksum_noi_dung": checksum,
         "dong": dong,
@@ -652,6 +752,12 @@ def dong_bang(kh: Khuon, tho: dict, mong: int) -> tuple[dict, list[str]]:
     if cot_chu:
         bao.append(f"  ô ⛔ chữ: {len(o_khong_chu)}/{mau_chu}  (số/bool ở cột chữ) "
                    f"{vi(o_khong_chu)}".rstrip())
+    if cot_so_loi:                           # DT8: cột so! — ô lỗi (ghi nguyên) + ô ⛔ số!
+        bao.append(f"  ô lỗi so!: {len(o_loi)}/{mau_loi}  (lỗi Sheets ở cột {cot_so_loi}) " + " · ".join(
+            f"{c} {sum(1 for o in o_loi if o['cot'] == c)}/mong {_tong_loi_mong(kh.loi_mong.get(c, 0))} "
+            f"{dict(loi_theo_cot[c])}" for c in cot_so_loi))
+        bao.append(f"  ô ⛔ số!: {len(o_khong_so_loi)}/{mau_loi}  (⛔số ⛔rỗng ⛔lỗi) "
+                   f"{vi(o_khong_so_loi)}".rstrip())
     bao.append(f"  trùng: {ds(pt['trung'])}")
     if phu:
         bao.append("  bảng phụ: " + " · ".join(f"{ten} {b['so_dong']}/{b['mong']}"
@@ -752,9 +858,13 @@ def main(argv: list[str] | None = None) -> int:
     print("\n".join(bao))
     print(f"  ghi        : {_hien_duong(ra)}{ghi_chu}")
     m_rong, m_so, m_chu = (c["so_dong"] * len(x) for x in kh.cot_theo_kieu())
+    m_loi = c["so_dong"] * len(kh.cot_so_loi())
     if c["dat"]:
-        # ⚠ khuôn ⛔ cột chữ · ⛔ bảng phụ ⇒ đúng từng chữ dòng ĐẠT của DT2
-        them = (f" · ô ⛔ chữ 0/{m_chu}" if kh.cot_theo_kieu()[2] else "") + "".join(
+        # ⚠ khuôn ⛔ cột chữ · ⛔ bảng phụ · ⛔ cột so! ⇒ đúng từng chữ dòng ĐẠT của DT2
+        them = (f" · ô ⛔ chữ 0/{m_chu}" if kh.cot_theo_kieu()[2] else "") + (
+            f" · ô ⛔ số! 0/{m_loi} · ô lỗi " + "+".join(
+                str(_tong_loi_mong(anh["loi_mong"][c2])) for c2 in kh.cot_so_loi()) + " = mong"
+            if kh.cot_so_loi() else "") + "".join(
             f" · phụ {ten} {b['so_dong']} = mong" for ten, b in anh.get("phu", {}).items())
         print(f"[ĐẠT] cổng --mong {c['mong']}: {c['so_dong']} dòng = mong · trùng 0 · thiếu 0 · "
               f"khoá hỏng 0 · ô rỗng 0/{m_rong} · ô ⛔ số 0/{m_so}{them}")
