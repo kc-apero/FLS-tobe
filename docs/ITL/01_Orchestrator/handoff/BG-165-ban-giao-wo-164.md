@@ -96,3 +96,12 @@ Trục TẠM lấy từ ảnh đáp án *(cột đầu 2024-10-20 · CN)*; spec/
 - 153 dòng `ITE | ITE Interest` rơi khỏi CFA1 ở cả AS-IS lẫn FLS — parity đúng nhưng **số có thể sai nghiệp vụ**.
 - Ảnh đầu vào là MỘT lần đọc 18/11 của bản sao CF report; nguồn chính thức cho LE theo dòng *(cột P)* trong FLS
   chưa có — câu hỏi cho BA *(map từ Tài khoản? IX.ORG?)*.
+
+## Vòng sửa sau R1 (KQ-166)
+| Mã | Sửa | ĐỎ trước | Xanh sau |
+|---|---|---|---|
+| `H5-R1-01` *(NÊN SỬA)* | bài PII `test_GLCF_B2_cot_dung_khong_PII` quét khoá cấm ở CẢ khoá từng dòng `anh["dong"]` *(⛔ chỉ `cot` + bảng phụ)* + đòi mỗi dòng ĐÚNG tập khoá khai; bài mới `test_GLCF_B2_quet_khoa_TUNG_DONG_bat_dot_bien_M12[C,G]` tái lập M12/M16 | phép quét cũ ⇒ `2 failed` *(M12 `C` · M16 `G` lọt)* | `8 passed` |
+| `H5-R1-03` | ghim 20 mã `MA_KPI` *(`test_H5_R1_03_MA_KPI_ghim_20_ma`)* | bớt `PL8` tạm ⇒ `1 failed` | xanh |
+| `H5-R1-02` | nhãn Đ4: **205.175 ô SO, trong đó 10.540 ô có giá trị đáp án ≠ 0** *(lá 5.507 · cha 5.033)*; 194.635 ô còn lại là 0 ↔ 0 | — | — |
+
+Q8: `MONG_PYTEST_TOAN_BO` 3423 → **3426** *(+3 bài)*. Đường nền chạy MỘT lần cuối *(`--duong-nen --cong 5435` trên cây `f34149f`)*: **`KẾT: ĐẠT`** — toàn bộ `12 failed, 3398 passed, 2 xfailed, 14 errors` *(tập đỏ + XFAIL = 28 = đường nền · chạy 3426)* · `tests/web` `3 failed, 664 passed` *(= đường nền)*; bài thêm ở lượt đầu *(`test_CHI_MOT_BAN_KHAI`)* nay XANH.
