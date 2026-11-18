@@ -417,10 +417,10 @@ def test_S0_R2_03_hang_mau_so_khai_MOT_cho():
     (`pytest --collect-only`: 2.481 của R3 + 9 bài mới · 211 tệp) — số 2460 là của vòng R1 bị để
     lại ở R2 (+21 bài) ⇒ khoảng dư 21 mà R3 lách bằng 20 bài bỏ im lặng. Bài ghim GIỮ việc gốc:
     hằng khai MỘT chỗ, đúng giá trị, hai dòng gọi dùng hằng; `test_S0_R3_02_…` đòi hằng = thu thập.
-    Gộp (orchestrator, luật 17/11: sàn = số thu thập CÂY GỘP, ⛔ cộng tay): + `isp/DT1A` ⇒ **2530** · + `isp/H1` ⇒ **2579** · + `isp/C1` ⇒ **2704** · + `isp/DT2` ⇒ **2792** · + `isp/H2` ⇒ **2857** · + `isp/CG1` ⇒ **2890** (xung đột script + bài ghim ⇒ giữ bản nhánh làm việc — `CG1-R2-01`) · + `isp/DT1B` ⇒ **2980** · + `isp/DT3` ⇒ **3064** · + `isp/FG` ⇒ **3067** (web 664 ⇒ **667**: FG thêm bài `tests/web`) · + `isp/DT4` ⇒ **3100** · + `isp/H4` ⓪ (H1-R3: 6 bài `test_gl_h1_r3.py`) ⇒ **3106** · + `isp/H4` ① (H4: 8 `test_do_hd2_ca` + 5 `test_gl_so_du_dau` + 8 `test_dap_an_406_dau_vao` + 1 case khuôn mới `gl_406_dau_vao`) ⇒ **3128**.
+    Gộp (orchestrator, luật 17/11: sàn = số thu thập CÂY GỘP, ⛔ cộng tay): + `isp/DT1A` ⇒ **2530** · + `isp/H1` ⇒ **2579** · + `isp/C1` ⇒ **2704** · + `isp/DT2` ⇒ **2792** · + `isp/H2` ⇒ **2857** · + `isp/CG1` ⇒ **2890** (xung đột script + bài ghim ⇒ giữ bản nhánh làm việc — `CG1-R2-01`) · + `isp/DT1B` ⇒ **2980** · + `isp/DT3` ⇒ **3064** · + `isp/FG` ⇒ **3067** (web 664 ⇒ **667**: FG thêm bài `tests/web`) · + `isp/DT4` ⇒ **3100** · + `isp/H4` ⓪ (H1-R3: 6 bài `test_gl_h1_r3.py`) ⇒ **3106** · + `isp/H4` ① (H4: 8 `test_do_hd2_ca` + 5 `test_gl_so_du_dau` + 8 `test_dap_an_406_dau_vao` + 1 case khuôn mới `gl_406_dau_vao`) ⇒ **3128** · + `isp/H4` **vòng sửa R1 (KQ-134)** (+8 `test_do_hd2_ca`: H4-R1-01 dung sai theo cột ×2 · H4-R1-02 khoá mẫu số ×4 *(bài de-tautology thay bài cũ, +0)* · H4-R1-03 no-op/ô bỏ ×2; +3 `test_dap_an_406_dau_vao`: H4-R1-04 khuôn từ chối R tự do · D đuôi trắng · lỗi Sheets hợp lệ) ⇒ **3139**.
     """
     van = SCRIPT.read_text(encoding="utf-8")
-    assert re.findall(r"^MONG_PYTEST_TOAN_BO=(\d+)$", van, re.M) == ["3128"]
+    assert re.findall(r"^MONG_PYTEST_TOAN_BO=(\d+)$", van, re.M) == ["3139"]
     assert re.findall(r"^MONG_PYTEST_WEB=(\d+)$", van, re.M) == ["667"]
     goi = [d.strip() for d in van.splitlines() if d.strip().startswith("chay_pytest ")]
     assert len(goi) == 2 and '"$MONG_PYTEST_TOAN_BO"' in goi[0] and '"$MONG_PYTEST_WEB"' in goi[1], goi

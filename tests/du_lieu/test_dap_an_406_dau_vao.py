@@ -100,12 +100,52 @@ def test_DV_B3_so_du_dau_5_o_cong_thuc_verbatim_va_hang(anh):
     assert thuc == SO_DU_DAU_GHIM
 
 
+#: Lỗi Sheets — TẬP ĐÓNG cho cột R *(H4-R1-04)*: `#N/A ()`, `#REF!`, `#DIV/0!`, …
+LOI_SHEETS_RE = re.compile(r"#[A-Z/0-9!?]+( \(\))?")
+
+
 def test_DV_B4_itl_id_lech_4_hang(anh):
     phu = anh["phu"]["itl_id_lech"]
     assert phu["mong"] == 4 and phu["so_dong"] == 4
     assert sorted(int(_chu(r["dong_sheet"])) for r in phu["dong"]) == [6684, 6836, 7500, 7832]
     for r in phu["dong"]:
-        assert not re.fullmatch(r"ITL#\d+", _chu(r["itl_id_tho"]))
+        v = _chu(r["itl_id_tho"])
+        assert not re.fullmatch(r"ITL#\d+", v)
+        # H4-R1-04: cột R MỞ ⇒ phải là LỖI Sheets, ⛔ chuỗi tự do *(PII)* — tập đóng.
+        assert LOI_SHEETS_RE.fullmatch(v), f"itl_id_tho ⛔ lỗi Sheets: {v!r}"
+
+
+# ── H4-R1-04 · khuôn `gl_406_dau_vao` TỪ CHỐI cột R tự do + D đuôi trắng ────────────
+from tools.khuon_dong_bang import gl_406_dau_vao as _M  # noqa: E402
+
+
+def _raw(values):
+    """Lưới thô tối thiểu hợp lệ cho `chuan_bi` *(so_du_dau 5 ô hợp lệ, ds liên tục từ 10)*."""
+    sdd = [{"o": "AX24", "ds": 24, "cong_thuc": "=1", "vao": "ton", "tien_te": "USD", "hang_so": "1"},
+           {"o": "BA24", "ds": 24, "cong_thuc": "=1", "vao": "ton", "tien_te": "SGD", "hang_so": "1"},
+           {"o": "BG24", "ds": 24, "cong_thuc": "=1", "vao": "ton", "tien_te": "VND", "hang_so": "1"},
+           {"o": "BQ24", "ds": 24, "cong_thuc": "=1", "vao": "bvnd_ton", "tien_te": "", "hang_so": "1"},
+           {"o": "BT24", "ds": 24, "cong_thuc": "=1", "vao": "musd_ton", "tien_te": "", "hang_so": "1"}]
+    return {"cot": list(_M.COT_THO), "dong_dau_sheet": 10, "values": values, "so_du_dau": sdd}
+
+
+def test_DV_B4_frame_itl_loi_sheets_hop_le_thi_OK():
+    out = _M.chuan_bi(_raw([[10, 45000, "VND", "100", "", "ITL#1"],
+                            [11, 45000, "USD", "", "50", "#N/A ()"]]))
+    assert [r["itl_id_tho"] for r in out["phu"]["itl_id_lech"]] == ["#N/A ()"]
+
+
+def test_DV_B4_frame_cot_R_chuoi_tu_do_thi_TU_CHOI():
+    """PII *(tên/SĐT)* lạc sang cột R mà vẫn đủ 4 hàng ⇒ phải TỪ CHỐI *(⛔ lọt vào ảnh)*."""
+    with pytest.raises(ValueError, match="itl_id_lech"):
+        _M.chuan_bi(_raw([[10, 45000, "VND", "100", "", "ITL#1"],
+                          [11, 45000, "USD", "", "50", "Nguyen Van A 0912345678"]]))
+
+
+def test_DV_B4_frame_D_duoi_trang_thi_TU_CHOI():
+    """`D = "USD "` *(đuôi trắng)* ⇒ TỪ CHỐI — ⛔ chuẩn hoá ngầm để strip() thấy khớp."""
+    with pytest.raises(ValueError, match="trắng"):
+        _M.chuan_bi(_raw([[10, 45000, "USD ", "100", "", "ITL#1"]]))
 
 
 def test_DV_B5_cross_check_voi_gl_406_0_lech():
