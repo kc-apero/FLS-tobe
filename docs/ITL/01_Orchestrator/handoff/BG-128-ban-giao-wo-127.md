@@ -54,3 +54,52 @@
 
 ## Câu hỏi cho orchestrator *(kèm khuyến nghị)*
 - **Luồng checkout của owner.** Hướng dẫn bước (a) cho owner `git checkout claude/bold-galileo-zukpaf` (nhánh làm việc) — giả định WO-127 ĐÃ gộp vào nhánh ấy trước khi owner chạy. **Khuyến nghị A (mặc định đã viết):** owner chạy SAU khi R1/R2/R3 ĐẠT + orchestrator gộp `…-isp/DT1BT` vào nhánh làm việc. **B:** nếu owner cần chạy TRƯỚC gộp, sửa bước (a) sang `git checkout claude/bold-galileo-zukpaf-isp/DT1BT`. Chọn A/B?
+
+---
+
+## Vòng sửa sau R1 (KQ-129) — `fls-dev` (phiên cloud con · 2026-11-18)
+
+**Nền:** `isp/DT1BT` @ `5f5d3b4` (ngọn khi giao — gồm commit mã `606ad89` + `KQ-129`/sổ). Orchestrator chốt
+R1 `KQ-129`: **0 CHẶN · 6 NÊN SỬA · 3 GHI NHẬN**, người dùng duyệt. Vòng này làm **cả 9** phát hiện.
+
+### Đã sửa (theo quyết của orchestrator)
+| Phát hiện | Quyết | Đã làm | Bằng chứng (bài) · ĐỎ-trước |
+|---|---|---|---|
+| `DT1BT-R1-01` *(rels tuyệt đối ⇒ `xl/xl/…`)* | A: sửa ngay | Thêm `_chuan_dich_rels`: đích **tuyệt đối** (`/xl/…`) bỏ `/` đầu · **tương đối** nối `xl/`. | `test_DT1BT_R1_01_rels_tuyet_doi_va_tuong_doi` (CẢ HAI dạng) · `test_DT1BT_R1_01_chuan_dich_rels_don_vi`. **ĐỎ-trước:** phục bản cũ ⇒ `[rels_tuyet_doi]` ĐỎ (`xl/xl/…` exit 1), `[rels_tuong_doi]` xanh. |
+| `DT1BT-R1-02` *(định nghĩa "hàng dữ liệu")* | Cả hai | GIỮ định nghĩa (≥1 ô bất kỳ) · THÊM in **số đếm** `hàng có ≥1 ô khoá / hàng 0 ô khoá` cho SO+L1 (chỉ số, không giá trị) · hướng dẫn owner thêm hàng (d): K11 lệch mà "hàng 0 khoá" > 0 ⇒ dừng, báo hai số. | `test_DT1BT_R1_02_in_so_dem_hang_khoa_khong_lo_gia_tri` (hàng chỉ-công-thức ngoài khoá ⇒ `SO: 1 / 1`; giá trị `FORMULA_SECRET` không lên màn). |
+| `DT1BT-R1-03` *(quét giá trị ô đường LỖI)* | NÊN SỬA | Bài quét sentinel cho mọi đường lỗi (XML workbook/worksheet hỏng · zip hỏng · thiếu sheet · thiếu cột · CSV không UTF-8 · CSV có NUL). | `test_DT1BT_R1_03_duong_loi_khong_lo_gia_tri_o` (7 ca). **ĐỎ-trước:** M6 *(câu lỗi nối hàng dữ liệu)* ⇒ `[thieu_cot]` ĐỎ (sentinel lọt) · M14 *(nhánh in giá trị)* ⇒ `[thieu_cot]` ĐỎ. ⇒ M6·M14 nay **CHẾT**. |
+| `DT1BT-R1-04` *(tệp hỏng ⇒ một dòng, không Traceback)* | GHI NHẬN, làm | Bọc `ET.fromstring` (`_parse_xml`) · bọc đọc rels KeyError · bọc đọc CSV `UnicodeDecodeError`/`csv.Error` · chặn NUL minh bạch ⇒ `LoiDoc` **một dòng có tên**, mã 1. `UnicodeDecodeError` **không** in byte/vị trí (`from None`, không `str(e)`). | `test_DT1BT_R1_04_tep_hong_mot_dong_khong_traceback` (8 ca: không "Traceback", stderr một dòng, exit 1) · `test_DT1BT_R1_04_unicode_khong_lo_byte_vi_tri`. **ĐỎ-trước:** gỡ `_parse_xml` ⇒ 3 ca XML ĐỎ (Traceback) · in `str(e)` ⇒ unicode ĐỎ (lộ byte). |
+| `DT1BT-R1-05` *(ghim đột biến sống)* | GHI NHẬN, làm | Bài ghim M8 *(tiêu đề 2 hàng)* · M12 *(đường ra là thư mục ⇒ exit 2)* · M16 *(khoảng trắng tiêu đề CSV — `strip()` tiêu đề, khai ở đây)*. | `test_DT1BT_R1_05_M8_…` · `_M12_…` · `_M16_…`. **ĐỎ-trước:** `max→min` ⇒ M8 ĐỎ · bỏ chốt thư mục ⇒ M12 ĐỎ · bỏ `.strip()` tiêu đề L1 ⇒ M16 ĐỎ. |
+| `DT1BT-R1-06` *(PowerShell `-LiteralPath`)* | NÊN SỬA | Hướng dẫn: **mọi** lệnh chạm đường có `[ ]` dùng `-LiteralPath` (13 chỗ) · thêm **bước (0)**: `Test-Path -LiteralPath $XLSX` ⇒ True + `Resolve-Path -LiteralPath` so tiền tố để biết xlsx trong/ngoài repo. | Hướng dẫn `HUONG_DAN_NHAN_THAT_DT1b.md` v1.1. *(Hành vi PowerShell: không đo được ở container Linux — kiến thức.)* |
+| `DT1BT-R1-07` *(dọn tệp thô mọi nhánh)* | NÊN SỬA | `Copy-Item → Move-Item` *(không để bản ở Downloads)* · bước (g) là **lệnh** `Remove-Item -LiteralPath` cho tệp xuất + L1 ở thư mục làm việc + bản Downloads · khung "chạy (g) ở MỌI trường hợp kết thúc, kể cả dừng giữa chừng" + ba dòng kiểm `mong: False/False/0`. | Hướng dẫn v1.1 bước (b) + (g). |
+| `DT1BT-R1-08` *(bỏ ký hiệu nội bộ)* | NÊN SỬA | Bỏ **toàn bộ** ký hiệu `⛔` trong hướng dẫn (còn 0) · viết "không"/"đừng" chữ thường · sửa hàng bảng (e) khớp dòng **Mong** ("**không** thấy dòng `✅ đã ghi…` dù exit=4"). | Hướng dẫn v1.1 (`grep -c ⛔` = 0). |
+| `DT1BT-R1-09` *(Input_Raw gitignore)* | GHI NHẬN, làm | Thêm `Input_Raw/` vào `.gitignore` (cùng tinh thần `sao_luu/`, `hien_vat/`) + bài `git check-ignore` · hướng dẫn bước (0) nói trong/ngoài repo, bước (f) chỉ đổi `phan_loai_ly_do.json`. | `test_DT1BT_R1_09_input_raw_bi_gitignore`. |
+
+### Tệp đổi (vòng này)
+| Tệp | Đổi |
+|---|---|
+| `tools/xuat_khoa_dt1b.py` | `_chuan_dich_rels` (-01) · `_parse_xml` + bọc rels/CSV + chặn NUL (-04) · `_dem_khoa` + in số đếm hàng-khoá (-02). |
+| `tests/du_lieu/test_xuat_khoa_dt1b.py` | +24 bài `DT1BT-R1-01…05` · `-09` (14 → 38). Thêm tham số `rels_ledge_tuyet_doi` cho `_lam_xlsx`. |
+| `docs/ITL/03_Dev/isp-3.1/HUONG_DAN_NHAN_THAT_DT1b.md` | v1.1: bước (0), `-LiteralPath`, `Move-Item`, bước (g) lệnh + khung mọi-nhánh, bỏ `⛔`, hàng (e), trong/ngoài repo (-06·-07·-08·-09·-02). |
+| `.gitignore` | `Input_Raw/` (-09). |
+| `tools/dung_moi_truong_isp.sh` | `MONG_PYTEST_TOAN_BO` 3081 → **3105** (+24 bài). |
+| `tests/test_dung_moi_truong_isp.py` | Bài ghim `== ["3081"]` → `== ["3105"]` + narrative. |
+
+### Cổng (cụm PG cổng 5437)
+| Lệnh | Kết quả |
+|---|---|
+| `pytest tests/du_lieu/test_xuat_khoa_dt1b.py` | `38 passed` |
+| `pytest tests/test_dung_moi_truong_isp.py` | `60 passed` |
+| `dung_moi_truong_isp.sh --duong-nen --cong 5437` *(chạy MỘT MÌNH)* | `KẾT: ĐẠT` — toàn bộ `12 failed, 3077 passed, 2 xfailed, 14 errors in 432.16s` · đỏ+XFAIL **28 = 28** node id *(XFAIL 2=2 · thêm 0 · bớt 0)* · chạy **3105** (mong ≥ 3105) · skipped 0 · deselected 0 · web `3 failed, 664 passed` · đỏ **3 = 3** · chạy **667**. (+24 bài mới đều XANH: passed 3053 → 3077.) |
+| `.venv/bin/lint-imports` | `Contracts: 11 kept, 0 broken.` |
+| `python docs/ITL/_tools/kiem_tai_lieu.py` | `✅ cong tai lieu DAT (245 file, 2291 bang, 778 o ngay, 104 ma QD)` |
+
+### Sàn pytest: cũ → mới
+- `MONG_PYTEST_TOAN_BO` **3081 → 3105** (+24 bài) · `MONG_PYTEST_WEB` **667 (không đổi)**. Thu thập (`pytest --collect-only`): **3105**.
+
+### Kho thật
+- `KHONG_CHAM` — thuần mã + bài tổng hợp `tmp_path`; không đọc kho · không Drive · không mạng.
+
+### Còn để lại cho vòng/owner sau *(không đo được ở container Linux)*
+- `-06`/`-07`: hành vi PowerShell `-LiteralPath`, `Move-Item`, `Remove-Item` là **kiến thức** — cần owner xác nhận trên Windows (container không có `pwsh`).
+- `-01`/`-02`: chỉ **đo thật** được khi owner chạy trên `[Master] ITL_Ledge_raw.xlsx` (O10): nhà sinh xlsx thật, và "hàng 0 khoá" thật so với mẫu số 9.967 ở K11.
