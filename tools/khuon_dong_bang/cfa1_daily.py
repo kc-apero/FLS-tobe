@@ -52,12 +52,18 @@ RA = "tests/fixture/dap_an/cfa1_daily.json"
 #: Đ5 — số dòng mỗi bảng phụ *(đo 18/11; re-read đổi ⇒ cập nhật + đóng băng lại, như `gl_406.MONG`)*.
 #: `ngay_truc` = số cột ngày ≤ ngày đọc *(= số ngày 2024-10-20 → 2026-11-18)*; khác ⇒ cổng ĐỎ.
 PHU_MONG = {"hd": 370, "ngay_truc": 760, "o_loi": 25}
+#: Đ5 — **phân bố giá trị** ô lỗi *(⛔ chỉ ĐẾM như `PHU_MONG`)*: đo 18/11 tập ⛔ số = `{"-"}` ×25.
+#: Thêm `#REF!`/`#N/A` hay đổi tập ⇒ cổng ĐỎ *(bia `DT5-R1-04` — buộc ghi lại bản khai)*.
+O_LOI_GIA = {"-": 25}
 
 #: Serial cột ngày ĐẦU của sheet *(2024-10-20 — mốc THẬT; spec khai 21/10, lệch 1 ngày, xem đầu tệp)*.
 SERIAL_MOC = 45585
 #: Hàng tiêu đề *(0-based)*: Day = hàng 5 *(index 4)*, Days-of-week = hàng 6 *(index 5)*; dữ liệu từ
 #: cột G *(index 6)*.
 I_DAY, I_DOW, COT_DAU = 4, 5, 6
+#: Thứ ngày *(hàng 'Days of the week')* ↔ chỉ số `(serial + 6) % 7` *(serial 45585 = CN = 0)*. Nhãn
+#: trục KHÔNG được TIN mù *(bia `DT5-R1-03`)*: `dow` phải khớp phép tính từ serial, lệch ⇒ TỪ CHỐI.
+_DOW_IDX = {"Sun": 0, "Mon": 1, "Tue": 2, "Wed": 3, "Thu": 4, "Fri": 5, "Sat": 6}
 
 def chuan_bi(tho: dict[str, Any]) -> dict[str, Any]:
     """LƯỚI 409 → bảng `{o_id, le, ma_hd, ngay, gt}` *(thưa, ≠ 0)* + bảng phụ `hd`·`ngay_truc`·
@@ -70,7 +76,15 @@ def chuan_bi(tho: dict[str, Any]) -> dict[str, Any]:
 
     # ── trục NGÀY: serial ở hàng Day, từ cột G ──
     day = values[I_DAY]
-    sers = [(j, int(day[j])) for j in range(COT_DAU, len(day)) if _cfa1._la_so(day[j])]
+    sers: list[tuple[int, int]] = []
+    for j in range(COT_DAU, len(day)):
+        v = day[j]
+        if not _cfa1._la_so(v):
+            continue
+        if int(v) != v:                                        # ⛔ `int()` cắt im lặng (bia `DT5-R1-03`)
+            raise ValueError(f"serial ngày cột {j + 1} ⛔ nguyên *(trục ngày phải số nguyên — "
+                             "serial lẻ ⇒ ô lệch khỏi ngày)*")
+        sers.append((j, int(v)))
     if not sers:
         raise ValueError("hàng Day *(hàng 5)* ⛔ có serial ngày nào từ cột G")
     if sers[0][1] != SERIAL_MOC:
@@ -89,9 +103,16 @@ def chuan_bi(tho: dict[str, Any]) -> dict[str, Any]:
     cot_giu = [(j, str(s), s) for j, s in giu]                 # nhãn o_id = serial str; ô trục = INT
     dong, o_loi = _cfa1.boc_o(values, hd, cot_giu, "ngay")
 
-    ngay_truc = [{"ngay": s, "ngay_iso": _cfa1.ngay_tu_serial(s).isoformat(),
-                  "dow": (values[I_DOW][j] if j < len(values[I_DOW]) else None)}
-                 for j, s in giu]
+    # ⚠ Nhãn thứ ngày ⛔ TIN mù: `dow` phải khớp `(serial + 6) % 7` *(bia `DT5-R1-03`)*.
+    ngay_truc = []
+    for j, s in giu:
+        dw = values[I_DOW][j] if j < len(values[I_DOW]) else None
+        if not isinstance(dw, str) or _DOW_IDX.get(dw) != (s + 6) % 7:
+            # ⛔ in `dw` *(ô bản thô)* — nói vị trí + serial (số, an toàn)
+            raise ValueError(f"thứ ngày cột {j + 1} *(serial {s})* ⛔ khớp (serial+6)%7 — hàng "
+                             "'Days of the week' sai hoặc trục ngày lệch")
+        ngay_truc.append({"ngay": s, "ngay_iso": _cfa1.ngay_tu_serial(s).isoformat(), "dow": dw})
+    _cfa1.ghi_ngu_canh(hd, o_loi, O_LOI_GIA)                   # cổng `thieu_lac` đọc cây đầy đủ + o_loi
     d_cuoi = _cfa1.ngay_tu_serial(giu[-1][1])
     return {
         "cot": [KHOA, *COT],

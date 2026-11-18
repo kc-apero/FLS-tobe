@@ -52,6 +52,7 @@ NGAY_DOC = datetime.date(2026, 11, 18)    # = doc_luc của bản thô SA (ngày
 LE5 = ("GROUP", "SGO2", "SGO1", "HGO6", "BGO2")
 MONG_D, OLOI_D, HD_N, NGAY_N = 33355, 25, 370, 760
 MONG_Y, OLOI_Y, KY_N = 5655, 25, 57
+COT_DAU = 6                               # cột dữ liệu đầu *(sau A…F)* trong lưới tổng hợp
 
 #: ⛔ Đổi 1 byte ảnh cấu hình DT2/DT3 hay đáp án 406 là ĐỎ *(công cụ chung ⛔ đụng ⇒ giữ từng byte)*.
 SHA_GIU = {
@@ -124,6 +125,11 @@ def _serials(n, start=SERIAL_MOC):
     return [start + i for i in range(n)]
 
 
+def _wd(s):
+    """Nhãn thứ ngày khớp phép `(serial + 6) % 7` của khuôn *(C locale: Sun…Sat)*."""
+    return (EPOCH + datetime.timedelta(days=int(s))).strftime("%a")
+
+
 def _luoi_daily(serials=None, *, gia=None, oloi=None, break_code=None, break_le=None,
                 future=(), future_gia=None, extra_col=None, extra_val=None):
     """Lưới CFA1 Daily tổng hợp. `serials=None` ⇒ trục đầy đủ 760 ngày + TỰ 25 ô `"-"` *(khớp
@@ -156,7 +162,8 @@ def _luoi_daily(serials=None, *, gia=None, oloi=None, break_code=None, break_le=
     values = [[None] * 5 + [lab] + [0] * nd_cols + ([None] if px else [])
               for lab in ("Year", "Half", "Quarter", "Month")]
     values.append([None] * 5 + ["Day"] + all_ser + px)                       # hàng 5 = Day
-    values.append([None, "L1", "L2", "L3", "L4", "Days of the week"] + ["d"] * nd_cols + px)
+    values.append([None, "L1", "L2", "L3", "L4", "Days of the week"]
+                  + [_wd(s) for s in all_ser] + px)              # thứ ngày KHỚP serial (DT5-R1-03)
     for bi, le in enumerate(LE5):
         le_hien = break_le[1] if (break_le and break_le[0] == bi) else le
         prev, first = None, True
@@ -368,6 +375,189 @@ def test_AC4_thieu_khoi_LE_thi_TU_CHOI(tmp_path):
     raw["values"] = vals[:idx[4]]
     kq, ra = _freeze(tmp_path, raw, 1)
     _da_tu_choi(kq, ra, "khối LE")
+
+
+# ══ lưới TỔNG HỢP Y/H/Q/M từ cây ATL — ca phá vòng sửa R1 ══════════════════════
+
+def _ky_cot_nam(nam):
+    """19 kỳ CHUẨN của một năm → [(ô Period, token)]: Năm · H1 H2 · Q1…Q4 · tháng 1…12."""
+    out = [(nam, "Y"), ("H1", "H1"), ("H2", "H2")]
+    out += [(f"Q{q}", f"Q{q}") for q in range(1, 5)]
+    out += [(m, f"M{m:02d}") for m in range(1, 13)]
+    return out
+
+
+def _luoi_yhqm(nams=(2024, 2025, 2026), *, gia=None, swap_thang=None, period_override=None,
+               break_code=None):
+    """Lưới CFA1 Y/H/Q/M tổng hợp *(5 LE × 74, ⛔ số thật)*. `gia`={(le, ma, chỉ_số_cột): số};
+    `swap_thang`=(năm, m1, m2) hoán ô Period hai cột tháng *(⇒ thứ tự khoá lệch)*; `period_override`
+    =(chỉ_số_cột, ô_mới); `break_code`=(khối, ma_cũ, ma_mới). Tự 25 ô `"-"` cho ca XANH."""
+    gia = dict(gia or {})
+    nodes = _cay_nodes()
+    cols = []                                                   # (nam, ô Period, token)
+    for nam in nams:
+        kc = _ky_cot_nam(nam)
+        if swap_thang and swap_thang[0] == nam:
+            idx = {tok: i for i, (pc, tok) in enumerate(kc)}
+            i1, i2 = idx[f"M{swap_thang[1]:02d}"], idx[f"M{swap_thang[2]:02d}"]
+            kc[i1], kc[i2] = (kc[i2][0], kc[i1][1]), (kc[i1][0], kc[i2][1])   # hoán ô Period
+        cols += [(nam, pc, tok) for pc, tok in kc]
+    if period_override:
+        ci, ncell = period_override
+        cols[ci] = (cols[ci][0], ncell, cols[ci][2])
+    ncol = len(cols)
+    oloi = {("GROUP", nd["ma"], 0): "-" for nd in nodes[-OLOI_Y:]}           # 25 ô "-" ở cột 0
+
+    def drow(le, ma):
+        row = [0.0] * ncol
+        for k in range(ncol):
+            if (le, ma, k) in gia:
+                row[k] = gia[(le, ma, k)]
+            elif (le, ma, k) in oloi:
+                row[k] = oloi[(le, ma, k)]
+        return row
+
+    values = [[None] * 6 + [0] * ncol for _ in range(4)]
+    values.append([None] * 5 + ["Year"] + [nam for nam, pc, tok in cols])   # hàng 5 = Year
+    values.append([None] * 5 + ["Period"] + [pc for nam, pc, tok in cols])  # hàng 6 = Period
+    for bi, le in enumerate(LE5):
+        prev, first = None, True
+        for nd in nodes:
+            ma, ten, cap, nhom = nd["ma"], nd["ten"], nd["cap"], nd["nhom"]
+            if nhom != prev:
+                values.append([(le if first else 0), nhom, _TEN_NHOM[nhom], None, None, None]
+                              + [0] * ncol)
+                first, prev = False, nhom
+            ma_hien = (break_code[2] if break_code and break_code[0] == bi
+                       and ma == break_code[1] else ma)
+            row = [1.0, None, None, None, None, None]
+            row[cap] = f"{ma_hien} | {ten}"
+            values.append(row + drow(le, ma))
+    return {"nguon": "'Report I CFA1 Y H Q M'!A1:TONG_HOP", "doc_luc": NGAY_DOC.isoformat(),
+            "cach_doc": "TỔNG HỢP yhqm · bài DT5 (⛔ số thật)", "values": values}
+
+
+def _freeze_y(tmp, raw, mong, ra="y.json"):
+    out = tmp / ra
+    return _chay("cfa1_yhqm", _viet(tmp, raw), mong, out), out
+
+
+# ══ DT5-R1-01 · cổng đo trên CÂY ĐẦY ĐỦ (hàng toàn-0, ⛔ chỉ hàng có số) ════════
+
+def test_DT5_R1_01_ma_hang_toan_0_la_thi_DO(tmp_path):
+    """`DT5-R1-01`: mã LẠ ở hàng HD **TOÀN-0** *(⛔ ô ≠ 0 nào)* phải ĐỎ — cổng cũ MÙ 164/370 hàng
+    toàn-0. Lưới đầy đủ + 1 ô ≠ 0 ở mã KHÁC ⇒ XANH; đổi một mã GROUP toàn-0 → `ZZZ` ⇒ cổng ĐỎ
+    *(`thieu` có `GROUP:lạ@ZZZ` + `GROUP:vắng@<mã cũ>`)*; trả nguyên ⇒ XANH. ⭐ ĐỎ hai chiều Đ5."""
+    codes = [n["ma"] for n in _cay_nodes()]
+    ma0 = codes[0]                                             # mã GROUP đầu — toàn-0 (⛔ trong 25 ô "-")
+    gia = {("SGO2", "OPC", _serials(NGAY_N)[1]): 1.5}         # 1 ô ≠ 0 ở mã KHÁC
+    kq0, ra0 = _freeze(tmp_path, _luoi_daily(gia=gia), 1, "base.json")
+    assert kq0.returncode == 0, (kq0.stdout[-1200:], kq0.stderr[-1200:])
+
+    kq1, ra1 = _freeze(tmp_path, _luoi_daily(gia=gia, break_code=(0, ma0, "ZZZ")), 1, "pha.json")
+    assert kq1.returncode == 1, (kq1.stdout[-1500:], kq1.stderr[-1500:])
+    th = _doc(ra1)["thieu"]
+    assert f"GROUP:lạ@ZZZ" in th and f"GROUP:vắng@{ma0}" in th, th
+    assert "ZZZ" not in {_chu(d["ma_hd"]) for d in _doc(ra1)["dong"]}        # ⛔ vào dòng chính (toàn-0)
+
+    kq2, ra2 = _freeze(tmp_path, _luoi_daily(gia=gia), 1, "lai.json")
+    assert kq2.returncode == 0, (kq2.stdout[-1200:], kq2.stderr[-800:])
+
+
+def test_DT5_R1_01_hai_hang_cung_ma_thi_DO(tmp_path):
+    """`DT5-R1-01`: hai hàng cùng mã ở khối *(ATL vắng 1 + trùng 1, vẫn 74 hàng/khối)* phải ĐỎ.
+    Đổi mã GROUP `codes[0]` → `codes[1]` ⇒ `codes[1]` TRÙNG, `codes[0]` VẮNG ⇒ cổng ĐỎ."""
+    codes = [n["ma"] for n in _cay_nodes()]
+    gia = {("SGO2", "OPC", _serials(NGAY_N)[1]): 1.5}
+    kq, ra = _freeze(tmp_path, _luoi_daily(gia=gia, break_code=(0, codes[0], codes[1])), 1)
+    assert kq.returncode == 1, (kq.stdout[-1500:], kq.stderr[-1500:])
+    th = _doc(ra)["thieu"]
+    assert f"GROUP:trùng@{codes[1]}" in th and f"GROUP:vắng@{codes[0]}" in th, th
+
+
+def test_DT5_R1_01_cong_neu_cây_toan_0_dem_mau_so(tmp_path):
+    """`DT5-R1-01` *(Đ3)*: cổng NÊU mẫu số hàng toàn-0 ở dòng `dải` — lưới baseline *(chỉ 1 ô ≠ 0)*
+    có 369 hàng toàn-0 *(370 − 1)*. Chứng minh phép đo trên tập KHÔNG rỗng."""
+    gia = {("SGO2", "OPC", _serials(NGAY_N)[1]): 1.5}
+    kq, ra = _freeze(tmp_path, _luoi_daily(gia=gia), 1)
+    assert kq.returncode == 0, (kq.stdout[-1200:], kq.stderr[-800:])
+    assert "hàng toàn-0 369" in kq.stdout, kq.stdout
+
+
+# ══ DT5-R1-02 · lời lỗi ⛔ in GIÁ TRỊ ô bản thô (có thể PII) ════════════════════
+
+def test_DT5_R1_02_loi_ma_LE_khong_in_o_ban_tho(tmp_path):
+    """`DT5-R1-02`: ô cột A *(mã LE)* mang chuỗi giả-PII ⇒ TỪ CHỐI nhưng lời lỗi ⛔ in lại chuỗi
+    *(`_cfa1.py:132` dùng `_an_toan`, ⛔ `!r`)*."""
+    pii = "ketoan@vi-du.invalid"
+    kq, ra = _freeze(tmp_path, _luoi_daily(_serials(3), break_le=(0, pii)), 1)
+    _da_tu_choi(kq, ra, "mã LE")
+    assert pii not in kq.stdout + kq.stderr and "vi-du.invalid" not in kq.stdout + kq.stderr
+
+
+def test_DT5_R1_02_loi_Period_khong_in_o_ban_tho(tmp_path):
+    """`DT5-R1-02`: ô Period mang chuỗi giả-PII ⇒ TỪ CHỐI nhưng lời lỗi ⛔ in lại chuỗi
+    *(`cfa1_yhqm.py:81` dùng `_an_toan`, ⛔ `!r`)*."""
+    pii = "nguoi@vi-du.invalid"
+    kq, ra = _freeze_y(tmp_path, _luoi_yhqm(period_override=(10, pii)), 1)
+    assert kq.returncode == 2, (kq.returncode, kq.stdout[-800:], kq.stderr[-800:])
+    assert "Period" in kq.stderr and pii not in kq.stdout + kq.stderr
+    assert "vi-du.invalid" not in kq.stdout + kq.stderr and not ra.exists()
+
+
+# ══ DT5-R1-03 · nhãn trục ĐỐI CHIẾU chéo (serial · thứ · kỳ) ═══════════════════
+
+def test_DT5_R1_03_serial_khong_nguyen_thi_TU_CHOI(tmp_path):
+    """`DT5-R1-03`: serial ngày LẺ *(`.5`)* ⇒ TỪ CHỐI *(⛔ `int()` cắt im lặng)*."""
+    raw = _luoi_daily(_serials(3))
+    raw["values"][4][COT_DAU + 1] = SERIAL_MOC + 1.5          # hàng Day, cột thứ 2
+    kq, ra = _freeze(tmp_path, raw, 1)
+    _da_tu_choi(kq, ra, "nguyên")
+
+
+def test_DT5_R1_03_dow_sai_thi_TU_CHOI(tmp_path):
+    """`DT5-R1-03`: nhãn thứ ngày SAI *(đổi một ô 'Days of the week')* ⇒ TỪ CHỐI *(⛔ khớp
+    `(serial+6)%7`)*."""
+    raw = _luoi_daily(_serials(3))
+    j = COT_DAU                                               # cột ngày đầu (2024-10-20 = Sun)
+    raw["values"][5][j] = "Fri"                               # Sun → Fri
+    kq, ra = _freeze(tmp_path, raw, 1)
+    _da_tu_choi(kq, ra, "thứ ngày")
+
+
+def test_DT5_R1_03_period_ngoai_1_12_thi_TU_CHOI(tmp_path):
+    """`DT5-R1-03`: Period SỐ ∉ 1…12 và ≠ năm *(vd `2023` ở cột `Year=2024`)* ⇒ TỪ CHỐI *(⛔ khoá
+    rác `2024M2023`)*."""
+    kq, ra = _freeze_y(tmp_path, _luoi_yhqm(period_override=(10, 2023)), 1)   # cột tháng của 2024
+    assert kq.returncode == 2, (kq.returncode, kq.stderr[-800:])
+    assert "tháng 1…12" in kq.stderr and not ra.exists()
+
+
+def test_DT5_R1_03_hoan_nhan_thang_thi_TU_CHOI(tmp_path):
+    """`DT5-R1-03`: hoán nhãn tháng 3↔4 của một năm ⇒ thứ tự kỳ lệch ⇒ TỪ CHỐI."""
+    kq, ra = _freeze_y(tmp_path, _luoi_yhqm(swap_thang=(2024, 3, 4)), 1)
+    assert kq.returncode == 2, (kq.returncode, kq.stderr[-800:])
+    assert "thứ tự kỳ" in kq.stderr and not ra.exists()
+
+
+# ══ DT5-R1-04 · cổng o_loi ghim PHÂN BỐ giá trị lỗi (⛔ chỉ đếm) ════════════════
+
+def test_DT5_R1_04_REF_thay_dash_thi_DO(tmp_path):
+    """`DT5-R1-04`: đổi một ô `"-"` → `#REF!` *(vẫn đếm 25)* phải ĐỎ — `o_loi_gia` ghim phân bố
+    `{"-": 25}`, Đ5 buộc ghi lại bản khai. Baseline 25 `"-"` ⇒ XANH."""
+    codes = [n["ma"] for n in _cay_nodes()]
+    gia = {("SGO2", "OPC", _serials(NGAY_N)[1]): 1.5}
+    kq0, _ = _freeze(tmp_path, _luoi_daily(gia=gia), 1, "base.json")
+    assert kq0.returncode == 0, (kq0.stdout[-1200:], kq0.stderr[-800:])
+
+    # một ô "-" (trên 25 nút CUỐI của GROUP) → "#REF!"
+    oloi = {("GROUP", nd["ma"], SERIAL_MOC): "-" for nd in _cay_nodes()[-OLOI_D:]}
+    ma_ref = _cay_nodes()[-1]["ma"]
+    oloi[("GROUP", ma_ref, SERIAL_MOC)] = "#REF!"
+    kq1, ra1 = _freeze(tmp_path, _luoi_daily(gia=gia, oloi=oloi), 1, "ref.json")
+    assert kq1.returncode == 1, (kq1.stdout[-1500:], kq1.stderr[-1500:])
+    assert any("o_loi_gia@khác" in t for t in _doc(ra1)["thieu"]), _doc(ra1)["thieu"]
+    assert "#REF!" in kq1.stdout                               # token lỗi an toàn ⇒ hiện
 
 
 # ══ Khuôn là TỆP RIÊNG + giữ ảnh cũ từng byte (AC-4) ═══════════════════════════

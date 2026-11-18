@@ -42,17 +42,31 @@ KIEU_COT = {"le": "chu", "ma_hd": "chu", "ky": "chu", "gt": "so"}
 RA = "tests/fixture/dap_an/cfa1_yhqm.json"
 #: Đ5 *(đo 18/11)*. `ky_truc` = số cột kỳ ≤ năm đọc *(3 năm × 19 = 57)*; khác ⇒ cổng ĐỎ.
 PHU_MONG = {"hd": 370, "ky_truc": 57, "o_loi": 25}
+#: Đ5 — phân bố giá trị ô lỗi *(như `cfa1_daily.O_LOI_GIA`)*: tập ⛔ số = `{"-"}` ×25.
+O_LOI_GIA = {"-": 25}
 
 I_YEAR, I_PERIOD, COT_DAU = 4, 5, 6
+
+#: Thứ tự CHUẨN 19 kỳ TRONG một năm *(AP v3.1.2 §3.2.x)*: Năm · `H1` `H2` · `Q1`…`Q4` · tháng
+#: `M01`…`M12`. Nhãn kỳ ⛔ TIN mù *(bia `DT5-R1-03`)*: thứ tự khoá dựng phải đúng chuỗi này,
+#: hoán nhãn tháng ⇒ TỪ CHỐI.
+_KY_CHUAN = ("Y", "H1", "H2", "Q1", "Q2", "Q3", "Q4") + tuple(f"M{m:02d}" for m in range(1, 13))
 
 
 def _khoa_ky(nam: int, p: Any) -> tuple[str, str]:
     """(`year`, ô Period) → (khoá kỳ, loại). Năm ⇒ `"2024"`/`Y`; nửa `H1`/`H2` ⇒ `"2024H1"`/`H`;
-    quý `Q1`…`Q4` ⇒ `"2024Q1"`/`Q`; tháng SỐ ⇒ `"2024M01"`/`M`."""
+    quý `Q1`…`Q4` ⇒ `"2024Q1"`/`Q`; tháng SỐ 1…12 ⇒ `"2024M01"`/`M`.
+
+    ⛔ TIN số Period mù *(bia `DT5-R1-03`)*: phải NGUYÊN, và nếu ≠ năm thì phải là tháng 1…12 —
+    `Period = 2023` ở cột `Year = 2024` từng cho khoá rác `2024M2023`."""
     if _cfa1._la_so(p):
+        if int(p) != p:
+            raise ValueError("Period số ⛔ nguyên *(ô Period lẻ ⇒ khoá kỳ rác)*")
         ip = int(p)
         if ip == nam:
             return f"{nam}", "Y"
+        if not (1 <= ip <= 12):
+            raise ValueError(f"Period số {ip} ⛔ là tháng 1…12 *(và ≠ năm {nam})* ⇒ khoá kỳ rác")
         return f"{nam}M{ip:02d}", "M"
     s = str(p).strip()
     loai = "H" if s in ("H1", "H2") else "Q" if s in ("Q1", "Q2", "Q3", "Q4") else "?"
@@ -78,7 +92,8 @@ def chuan_bi(tho: dict[str, Any]) -> dict[str, Any]:
         nam = int(yr[j])
         khoa, loai = _khoa_ky(nam, per[j])
         if loai == "?":
-            raise ValueError(f"cột kỳ {j}: Period {per[j]!r} ⛔ thuộc năm·H·Q·tháng")
+            # ⛔ `{per[j]!r}` — ô Period có thể mang PII *(bia `DT5-R1-02`)*.
+            raise ValueError(f"cột kỳ {j}: Period {_cfa1._an_toan(per[j])} ⛔ thuộc năm·H·Q·tháng")
         cols.append((j, nam, khoa, loai))
     if not cols:
         raise ValueError("hàng Period *(hàng 6)* ⛔ có cột kỳ nào từ cột G")
@@ -86,17 +101,25 @@ def chuan_bi(tho: dict[str, Any]) -> dict[str, Any]:
     giu = [c for c in cols if c[1] <= read_year]
     tuong_lai = [c[0] for c in cols if c[1] > read_year]
     # ② đủ Y/H/Q/M mỗi năm giữ *(19 cột/năm)* — hụt ⇒ lát kỳ hỏng ⇒ TỪ CHỐI
-    from collections import Counter
-    dem_nam = Counter(c[1] for c in giu)
-    thieu_nam = [f"{n}:{k}" for n, k in sorted(dem_nam.items()) if k != 19]
-    if thieu_nam:
-        raise ValueError(f"năm giữ ⛔ đủ 19 cột Y/H/Q/M: {thieu_nam} — lát kỳ hỏng")
+    from collections import OrderedDict
+    seq: OrderedDict[int, list[str]] = OrderedDict()
+    for j, nam, khoa, loai in giu:                         # thứ tự CỘT (khoá dựng, ⛔ ô bản thô)
+        tok = "Y" if khoa == str(nam) else khoa[len(str(nam)):]
+        seq.setdefault(nam, []).append(tok)
+    for nam, toks in seq.items():
+        if len(toks) != 19:
+            raise ValueError(f"năm {nam} giữ {len(toks)} cột ≠ 19 Y/H/Q/M — lát kỳ hỏng")
+        if tuple(toks) != _KY_CHUAN:                      # ⚠ hoán nhãn tháng ⇒ thứ tự lệch
+            i = next(k for k in range(19) if toks[k] != _KY_CHUAN[k])
+            raise ValueError(f"năm {nam}: thứ tự kỳ ⛔ chuẩn Y/H/Q/M ở vị trí {i} "
+                             f"*(mong {_KY_CHUAN[i]})* — nhãn kỳ bị hoán/sai")
 
     hd = _cfa1.dung_cay(values)                            # ① ④
     _cfa1.kiem_tuong_lai_rong(values, hd, tuong_lai)      # ③
 
     cot_giu = [(j, khoa, khoa) for j, nam, khoa, loai in giu]
     dong, o_loi = _cfa1.boc_o(values, hd, cot_giu, "ky")
+    _cfa1.ghi_ngu_canh(hd, o_loi, O_LOI_GIA)              # cổng `thieu_lac` đọc cây đầy đủ + o_loi
     ky_truc = [{"ky": khoa, "nam": nam, "loai": loai} for j, nam, khoa, loai in giu]
     return {
         "cot": [KHOA, *COT],

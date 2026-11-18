@@ -77,6 +77,30 @@ def _la_so(v: Any) -> bool:
     return isinstance(v, (int, Decimal)) and not isinstance(v, bool)
 
 
+#: Ô CẤU TRÚC an toàn để hiện trong lời lỗi: mã/nhãn/token lỗi ngắn — chữ, số và vài dấu của mã
+#: `#REF!`, `#DIV/0!`, `-`. ⛔ khớp email *(có `@`)* hay tên *(có khoảng trắng)*.
+_O_AN_TOAN = re.compile(r"[#A-Za-z0-9/.!?\-]{1,16}")
+
+
+def _an_toan(v: Any) -> str:
+    """Hiện ô trong lời lỗi mà ⛔ rò GIÁ TRỊ bản thô có thể mang PII *(bia `DT5-R1-02`)*.
+
+    Số ⛔ bao giờ là PII *(PII là tên · email = CHUỖI)* ⇒ hiện nguyên. Chuỗi: chỉ hiện khi là
+    MÃ/NHÃN ngắn `[#A-Za-z0-9/.!?\\-]{1,16}` *(mã LE · nhóm · token lỗi)*; còn lại *(email có `@`,
+    tên có khoảng trắng, chuỗi dài)* ⇒ CHE, chỉ nói loại + độ dài.
+    """
+    if v is None:
+        return "∅"
+    if isinstance(v, bool):
+        return str(v)
+    if _la_so(v):
+        return str(v)
+    if isinstance(v, str) and _O_AN_TOAN.fullmatch(v):
+        return v
+    n = len(v) if isinstance(v, str) else len(str(v))
+    return f"⟨{type(v).__name__}·{n} ký tự ⛔ hiện⟩"
+
+
 def _loai_hang(row: list) -> tuple[str, int | None]:
     """Phân loại hàng lưới từ CHÍNH ô `B…E` *(⛔ nhãn dựng sẵn — như `atl_cay`)* →
     (`ma`|`nhom`|`trong`|`khac`, cột nhãn `B=1…E=4`)."""
@@ -129,8 +153,9 @@ def dung_cay(values: list[list]) -> list[dict[str, Any]]:
         end = hdo[bi + 1] if bi + 1 < len(hdo) else len(values)
         le = _chuoi(values[start], 0)
         if le != LE[bi]:
-            raise ValueError(f"khối {bi}: mã LE cột A = {le!r} ≠ mong {LE[bi]!r} "
-                             f"*(thứ tự khối LE là {list(LE)})*")
+            # ⛔ `{le!r}` — ô cột A có thể mang PII *(bia `DT5-R1-02`)*; hiện qua `_an_toan`.
+            raise ValueError(f"khối {bi} *(hàng sheet {start + 1}, cột A)*: mã LE = "
+                             f"{_an_toan(le)} ≠ mong {LE[bi]!r} *(thứ tự khối LE là {list(LE)})*")
         ngan: list[tuple[int, str]] = []
         nhom_hien: str | None = None
         du_lieu_xong = False
@@ -151,7 +176,8 @@ def dung_cay(values: list[list]) -> list[dict[str, Any]]:
             if lo == "nhom":
                 nhom_hien = _chuoi(r, 1)
                 if nhom_hien not in NHOM:
-                    raise ValueError(f"dòng sheet {dong_sheet}: nhóm {nhom_hien!r} ⛔ thuộc "
+                    # ⛔ `{nhom_hien!r}` — ô cột B có thể mang PII *(bia `DT5-R1-02`)*.
+                    raise ValueError(f"dòng sheet {dong_sheet}: nhóm {_an_toan(nhom_hien)} ⛔ thuộc "
                                      f"{list(NHOM)} *(AP v3.1.2 §3.2.5)*")
                 ngan = []
                 continue
@@ -211,28 +237,83 @@ def _chu_cua(v: Any) -> str:
     return v["chu"].strip() if isinstance(v, dict) else str(v)
 
 
+#: NGỮ CẢNH của lượt `chuan_bi` gần nhất — `chuan_bi` GHI *(cuối hàm)*, cổng `cong_hd` ĐỌC.
+#:
+#: ⭐ **Vì sao một global** *(bia `DT5-R1-01` · `-04`)*. Cổng của công cụ CHUNG có hợp đồng cứng
+#: `thieu_lac(dong)` *(⛔ đổi — DT2/DT3/DT4 dùng chung)*; `dong` chỉ là DÒNG CHÍNH *(ô ≠ 0)* ⇒
+#: cổng MÙ trên **164/370 hàng HD toàn-0** *(lạ/vắng/trùng ở hàng toàn-0 lọt qua ĐẠT — `F-1`)*,
+#: và cũng ⛔ thấy `o_loi`. Cây ĐẦY ĐỦ `phu.hd` + phân bố `o_loi` nằm ở đây, do `chuan_bi` dựng
+#: NGAY TRƯỚC khi cổng chạy *(cùng tiến trình: `_chuan_bi` → `_thieu_lac` trong `dong_bang`)*.
+#: Mỗi lần đóng băng là MỘT tiến trình con *(bài gọi `subprocess`)* ⇒ ⛔ nhiễm chéo. `chuan_bi`
+#: nổ trước khi ghi ⇒ cổng ⛔ chạy *(⛔ dùng ngữ cảnh cũ)*.
+_NGU_CANH: dict[str, Any] | None = None
+
+
+def ghi_ngu_canh(hd: list[dict[str, Any]], o_loi: list[dict[str, Any]],
+                 o_loi_gia_mong: dict[str, int]) -> None:
+    """`chuan_bi` GHI cây đầy đủ + ô lỗi + bản khai phân bố lỗi cho cổng `cong_hd` đọc."""
+    global _NGU_CANH
+    _NGU_CANH = {"hd": hd, "o_loi": o_loi, "o_loi_gia_mong": dict(o_loi_gia_mong)}
+
+
 def cong_hd(dong: list[dict[str, Any]]) -> dict[str, Any]:
-    """Cổng DT5-B1 *(Đ5)* DÙNG CHUNG hai khuôn: mọi mã HD ∈ cây ATL 74; mọi LE ∈ 5 khối.
-    `thieu` = mã/LE LẠ ⇒ ĐỎ *(DT5-B2 chứng minh)*. ⛔ `lac` *(thứ tự là dữ liệu)*. Nguồn cây hỏng
-    ⇒ `ValueError` *(Đ3: ⛔ đo được = ĐỎ)*."""
+    """Cổng DT5-B1/B2 *(Đ5)* DÙNG CHUNG hai khuôn. ĐỎ *(`thieu` ⛔ rỗng)* khi một trong:
+
+      ⒜ mã HD ở DÒNG CHÍNH *(ô ≠ 0)* ⛔ ∈ cây ATL, hoặc LE ⛔ ∈ 5 khối *(giữ hành vi cũ —
+         mã lạ ở hàng CÓ số ĐỎ ngay, kể cả khi thiếu ngữ cảnh)*;
+      ⒝ CÂY ĐẦY ĐỦ `phu.hd`: MỖI khối LE ⇒ tập mã == cây ATL 74 **CHÍNH XÁC** *(lạ · vắng · trùng
+         đều ĐỎ)* — ⒜ một mình MÙ trên **164/370** hàng toàn-0 *(bia `DT5-R1-01`)*; nêu mẫu số
+         hàng toàn-0 *(Đ3)*;
+      ⒞ phân bố ô lỗi `o_loi` == **bản khai** `o_loi_gia` *(thêm `#REF!` hay đổi tập ⇒ ĐỎ — bia
+         `DT5-R1-04`, Đ5: sửa một chỗ cũng ĐỎ, buộc ghi lại bản khai)*.
+
+    ⛔ `lac` *(thứ tự là dữ liệu)*. Nguồn cây hỏng, hay THIẾU ngữ cảnh ⇒ ĐỎ *(Đ3/Đ5: ⛔ đo được
+    = ĐỎ)*."""
+    from collections import Counter
     cay = ma_cay_atl()                                        # ValueError ⇒ ⛔ đo được
+    thieu: list[str] = []
+    # ⒜ dòng chính thưa — mẫu số hàng CÓ số là tập (LE, mã) xuất hiện ở `dong`.
+    co_so: set[tuple[str, str]] = set()
     ma_co: list[str] = []
     le_co: list[str] = []
     for d in dong:
-        m = _chu_cua(d["ma_hd"])
+        m, l = _chu_cua(d["ma_hd"]), _chu_cua(d["le"])
+        co_so.add((l, m))
         if m not in ma_co:
             ma_co.append(m)
-        l = _chu_cua(d["le"])
         if l not in le_co:
             le_co.append(l)
-    ma_la = sorted(m for m in ma_co if m not in cay)
-    le_la = sorted(l for l in le_co if l not in LE)
-    return {
-        "thieu": ma_la + [f"LE_la@{l}" for l in le_la],
-        "lac": [],
-        "dai": (f"{len(ma_co)} mã HD *(trên {len(dong)} ô ≠ 0)* · {len(ma_co) - len(ma_la)} ∈ cây "
-                f"ATL {len(cay)} · {len(le_co)} LE ∈ {list(LE)} · nguồn {NGUON_CAY.name}"),
-    }
+    thieu += sorted(m for m in ma_co if m not in cay)
+    thieu += [f"LE_la@{l}" for l in sorted(l for l in le_co if l not in LE)]
+    # ⒝⒞ cây ĐẦY ĐỦ + phân bố o_loi — ngữ cảnh `chuan_bi` dựng (cùng tiến trình)
+    nc = _NGU_CANH
+    toan_0: int | None = None
+    n_khai: int | None = None
+    if nc is None:
+        thieu.append("NGU_CANH@thiếu")                        # Đ5: ⛔ đo được = ĐỎ
+    else:
+        hd = nc["hd"]
+        for le in LE:
+            ma_khoi = [_chu_cua(r["ma"]) for r in hd if _chu_cua(r["le"]) == le]
+            c = Counter(ma_khoi)
+            thieu += [f"{le}:lạ@{m}" for m in sorted(m for m in c if m not in cay)]
+            thieu += [f"{le}:trùng@{m}" for m in sorted(m for m, n in c.items() if n > 1)]
+            thieu += [f"{le}:vắng@{m}" for m in sorted(cay - set(ma_khoi))]
+        rows = {(_chu_cua(r["le"]), _chu_cua(r["ma"])) for r in hd}
+        toan_0 = sum(1 for r in rows if r not in co_so)       # Đ3: mẫu số hàng toàn-0
+        thuc = Counter(_chu_cua(x["gia"]) for x in nc["o_loi"])
+        mong = nc["o_loi_gia_mong"]
+        n_khai = sum(mong.values())
+        if dict(thuc) != dict(mong):
+            def _d(m: dict) -> str:
+                return "{" + ", ".join(f"{_an_toan(k)}:{v}" for k, v in sorted(m.items())) + "}"
+            thieu.append(f"o_loi_gia@khác: khai {_d(mong)} ≠ thực {_d(dict(thuc))}")
+    dai = (f"{len(ma_co)} mã HD *(trên dòng chính ≠ 0)* · cây đầy đủ "
+           f"{'?' if nc is None else len(nc['hd'])} hàng, mỗi khối == ATL {len(cay)} · hàng "
+           f"toàn-0 {'?' if toan_0 is None else toan_0} *(Đ3 mẫu số)* · o_loi khai "
+           f"{'?' if n_khai is None else n_khai} · {len(le_co)} LE ∈ {list(LE)} · nguồn "
+           f"{NGUON_CAY.name}")
+    return {"thieu": thieu, "lac": [], "dai": dai}
 
 
 def boc_o(values: list[list], hd: list[dict], cot_giu: list[tuple[int, str, Any]],
