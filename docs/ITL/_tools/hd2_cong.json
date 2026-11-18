@@ -314,5 +314,74 @@
   },
   "dat": true,
   "ly_do": []
+ },
+ "WP-C4a": {
+  "bang": "HD2.WP-C4a",
+  "goi": "WP-C4a",
+  "mo_ta": "AL.PLT GI vendor thường: IX.VEN kho + CFA1 GI → chia_nen_tang → KS.AL ↔ MID3 (vendor, tháng) từng ô",
+  "nguon_dau_vao": "tests/fixture/dau_vao/gi_cfa1.json (PD 504) + IX.VEN kho",
+  "dap_an": "tests/fixture/dap_an/gi_mid3.json (PD 507, 209 hàng có khoá)",
+  "khoa": "(vendor, thang) × 14 cột (O · P · 6 CDT1 × PE/PM)",
+  "vm_thuong": 44,
+  "vendor_thuong": [
+   "VD113",
+   "VD336",
+   "VD58",
+   "VD61"
+  ],
+  "o_so": 420,
+  "o_khong_so": 196,
+  "o_khong_so_ly_do": "P = chữ 'Need to manual input' (⛔ hoá 0)",
+  "vm_p_chu": 28,
+  "o_khac_0": 0,
+  "o_khac_0_nhan": "tập toàn 0 — đo được nhưng ⛔ chứng minh RATE (phép so ô ≠ 0 ⇒ H10)",
+  "lech": 0,
+  "ks_al_vm": 44,
+  "bo_qua": {
+   "Max": 132,
+   "VD341": 11,
+   "VD428": 11,
+   "VD444": 11,
+   "VD62": 11
+  },
+  "vendor_bo_qua": 15,
+  "mong": {
+   "vm_thuong": 44,
+   "vendor_thuong": [
+    "VD113",
+    "VD336",
+    "VD58",
+    "VD61"
+   ],
+   "o_so": 420,
+   "o_khong_so": 196,
+   "o_khac_0": 0,
+   "lech": 0,
+   "bo_qua": [
+    [
+     "Max",
+     132
+    ],
+    [
+     "VD341",
+     11
+    ],
+    [
+     "VD428",
+     11
+    ],
+    [
+     "VD444",
+     11
+    ],
+    [
+     "VD62",
+     11
+    ]
+   ],
+   "vendor_bo_qua": 15
+  },
+  "dat": true,
+  "ly_do": []
  }
 }

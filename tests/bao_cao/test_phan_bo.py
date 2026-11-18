@@ -3,7 +3,7 @@
 
 AC-1 `H9-B1` RATE + Σ chia = O = P · AC-2 `H9-B2` O = 0 ∧ P > 0 ⇒ tổng tháng · AC-3 lỗi CÓ TÊN ·
 AC-5 đột biến MỘT ô đầu vào ⇒ ĐÚNG Vendor-tháng ấy đổi. Đầu vào TỔNG HỢP *(⛔ MID3 đáp án)*.
-AC-4 `H9-B3` *(cổng WP-C4a)* ⛔ dựng được — xem `BG-201`: hai bài cuối GHIM số đo chặn *(Đ5)*.
+AC-4 `H9-B3` *(cổng WP-C4a)* — sau DT8b ở `tests/oracle/test_do_hd2_c4a.py` *(BG-201 «Sau DT8b»)*.
 """
 from __future__ import annotations
 
@@ -139,7 +139,7 @@ def test_AC5_dot_bien_MOT_o_dau_vao_chi_doi_DUNG_vendor_thang_ay():
     assert doi == {("VA", "202502")}, doi
 
 
-# ── AC-4 `H9-B3` · WP-C4a — CHẶN, ghim số đo *(Đ3 · Đ5: khác ⇒ ĐỎ, buộc xét lại BG-201)* ──
+# ── AC-4 `H9-B3` · WP-C4a — ghim số đo nền *(Đ3 · Đ5)*; cổng: tests/oracle/test_do_hd2_c4a.py ──
 
 def _anh(ten):
     return json.loads((GOC / "tests" / "fixture" / ten).read_text(encoding="utf-8"))
@@ -149,9 +149,11 @@ def _chu(x):
     return x.get("chu") if isinstance(x, dict) else x
 
 
-def test_H9_B3_CHAN_MID3_khong_mang_khoa_vendor_thang():
+def test_H9_B3_sau_DT8b_MID3_CO_khoa_vendor_thang_209_hang():
+    """Bản đầu ghim "MID3 ⛔ khoá" ⇒ ĐỎ khi DT8b thêm khoá (Đ5 cắn đúng) ⇒ khai lại: 209 có khoá."""
     m3 = _anh("dap_an/gi_mid3.json")
-    assert m3["so_dong"] == 253 and "vendor" not in m3["cot"] and "thang" not in m3["cot"], m3["cot"]
+    assert m3["so_dong"] == 253 and "vendor" in m3["cot"] and "thang" in m3["cot"], m3["cot"]
+    assert sum(r["vendor"] is not None for r in m3["dong"]) == 209
     assert [c for c in m3["cot"] if c.endswith("_pe")] == [f"{c.lower()}_pe" for c in C6]  # 6 CDT1
 
 
