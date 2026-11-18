@@ -117,3 +117,36 @@ def test_khong_vong_tron_xoa_dap_an_engine_Y_NGUYEN(ven, anh):
 def test_kho_CHUA_khai_IX_VEN_thi_DO_co_ten():
     tq = do_hd2.chay_wp_c4a("postgresql://fls:fls@localhost:1/khong_co")
     assert not tq.phan_xu.dat and "IX.VEN ⛔ đọc được từ kho" in tq.phan_xu.mot_dong
+
+
+# ───────── Vòng sửa sau R1 (KQ-202) ─────────
+def test_H9_R1_01_dot_bien_dap_an_o_Vendor_thang_P_chu_thi_DO_co_ten(ven, anh):
+    """Đúng đột biến R1: `cvl_pm` VD336·202506 *(P = chữ ⇒ ô ⛔ so được)* = 1 từng XANH."""
+    cfa1, mid3 = anh[0], copy.deepcopy(anh[1])
+    assert _dong(cfa1, "VD336", "202506")[0]["pm_ghi_chu"] is not None      # đúng Vendor-tháng P-chữ
+    _dong(mid3, "VD336", "202506")[0]["cvl_pm"] = "1"
+    tq = _chay(ven, cfa1, mid3)
+    assert not tq.phan_xu.dat and tq.hd2_cong["o_khong_so_khac_0"] == 1
+    assert "o_khong_so_khac_0: đo 1 ≠ mong 0" in tq.phan_xu.mot_dong
+
+
+def test_H9_R1_01_anh_that_196_o_dap_an_deu_0_va_mong_khac_thi_DO(ven, anh):
+    tq = _chay(ven, *anh)
+    assert tq.hd2_cong["o_khong_so"] == 196 and tq.hd2_cong["o_khong_so_khac_0"] == 0   # mẫu số 196 ≠ 0 (Đ3)
+    assert tq.hd2_cong["mong"]["o_khong_so_khac_0"] == 0
+    assert not _chay(ven, *anh, o_khong_so_khac_0=1).phan_xu.dat                   # Đ5 chiều ngược
+
+
+def test_H9_R1_01_dap_an_P_chu_la_chu_cung_la_DO(ven, anh):
+    mid3 = copy.deepcopy(anh[1])
+    _dong(mid3, "VD336", "202506")[0]["pm"] = "Need to manual input"            # ⛔ đo được ⇒ ĐỎ
+    tq = _chay(ven, anh[0], mid3)
+    assert not tq.phan_xu.dat and tq.hd2_cong["o_khong_so_khac_0"] == 1
+
+
+def test_H9_R1_02_ks_al_vm_lay_tu_engine_va_co_mong(ven, anh, monkeypatch):
+    from fls.bao_cao import phan_bo as pb
+    assert _chay(ven, *anh).hd2_cong["mong"]["ks_al_vm"] == 44
+    monkeypatch.setattr(pb, "ks_al", lambda *a, **k: 43)          # đột biến M: ⛔ gọi/hằng 44 ⇒ ĐỎ
+    tq = _chay(ven, *anh)
+    assert not tq.phan_xu.dat and "ks_al_vm: đo 43 ≠ mong 44" in tq.phan_xu.mot_dong

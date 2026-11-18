@@ -1064,6 +1064,8 @@ class MongC4a:
     o_so: int = 420                # ô so = 44 × 14 − ô PM ⛔ so được
     o_khong_so: int = 196          # 28 Vendor-tháng P = chữ × (P + 6 PM_cdt)
     o_khac_0: int = 0              # ⭐ tập toàn 0 — ⛔ chứng minh RATE
+    o_khong_so_khac_0: int = 0     # H9-R1-01: PHÍA ĐÁP ÁN của 196 ô ⛔ so được — đo 0/196 (R1, 18/11)
+    ks_al_vm: int = 44             # H9-R1-02: KS.AL đo = số Vendor-tháng thường (⛔ hằng ghim trong bài)
     lech: int = 0
     bo_qua: tuple = (("Max", 132), ("VD341", 11), ("VD428", 11), ("VD444", 11), ("VD62", 11))
     vendor_bo_qua: int = 15
@@ -1105,7 +1107,7 @@ def so_sanh_c4a(cfa1: dict, mid3: dict, ven, mong: MongC4a) -> ThanhQuaC4a:
             if k in dap:
                 ly.append(f"MID3 trùng khoá {k}")
             dap[k] = r
-    o_so = o_khong = o_khac0 = 0
+    o_so = o_khong = o_khac0 = o_khong_khac0 = 0
     lech: list = []
     for k, d in sorted(kq.chia.items()):
         r = dap.get(k)
@@ -1118,6 +1120,10 @@ def so_sanh_c4a(cfa1: dict, mid3: dict, ven, mong: MongC4a) -> ThanhQuaC4a:
         for cot, got in cap:
             if cot.endswith("pm") and k in p_chu:
                 o_khong += 1
+                try:                       # H9-R1-01: ô ⛔ so được vẫn có `mong` cho PHÍA ĐÁP ÁN (Đ5)
+                    o_khong_khac0 += Decimal(r[cot]) != 0
+                except (ArithmeticError, TypeError, ValueError):
+                    o_khong_khac0 += 1     # ⛔ đo được ⇒ ĐỎ, ⛔ coi là 0
                 continue
             exp = Decimal(r[cot])
             o_so += 1
@@ -1133,7 +1139,8 @@ def so_sanh_c4a(cfa1: dict, mid3: dict, ven, mong: MongC4a) -> ThanhQuaC4a:
     thuong = tuple(sorted({k[0] for k in kq.chia}))
     do = {"vm_thuong": (len(kq.chia), mong.vm_thuong), "vendor_thuong": (thuong, mong.vendor_thuong),
           "o_so": (o_so, mong.o_so), "o_khong_so": (o_khong, mong.o_khong_so),
-          "o_khac_0": (o_khac0, mong.o_khac_0), "lech": (len(lech), mong.lech),
+          "o_khac_0": (o_khac0, mong.o_khac_0), "o_khong_so_khac_0": (o_khong_khac0, mong.o_khong_so_khac_0),
+          "ks_al_vm": (ks, mong.ks_al_vm), "lech": (len(lech), mong.lech),
           "bo_qua": (bo, mong.bo_qua), "vendor_bo_qua": (vbo, mong.vendor_bo_qua)}
     for ten, (thuc, m) in do.items():
         if thuc != m:
@@ -1149,6 +1156,7 @@ def so_sanh_c4a(cfa1: dict, mid3: dict, ven, mong: MongC4a) -> ThanhQuaC4a:
            "vm_thuong": len(kq.chia), "vendor_thuong": list(thuong), "o_so": o_so,
            "o_khong_so": o_khong, "o_khong_so_ly_do": "P = chữ 'Need to manual input' (⛔ hoá 0)",
            "vm_p_chu": len(p_chu & set(kq.chia)), "o_khac_0": o_khac0,
+           "o_khong_so_khac_0": o_khong_khac0,
            "o_khac_0_nhan": "tập toàn 0 — đo được nhưng ⛔ chứng minh RATE (phép so ô ≠ 0 ⇒ H10)",
            "lech": len(lech), "ks_al_vm": ks,
            "bo_qua": dict(bo), "vendor_bo_qua": vbo,
@@ -1177,6 +1185,7 @@ def _in_bao_c4a(tq: ThanhQuaC4a) -> None:
         print(f"  Vendor-tháng thường : {h['vm_thuong']} ({len(h['vendor_thuong'])} vendor {h['vendor_thuong']})")
         print(f"  ô so / ô ⛔ so được  : {h['o_so']} / {h['o_khong_so']} ({h['o_khong_so_ly_do']}; {h['vm_p_chu']} Vendor-tháng)")
         print(f"  ô ≠ 0               : {h['o_khac_0']} — {h['o_khac_0_nhan']}")
+        print(f"  đáp án ≠ 0 ở ô ⛔ so : {h['o_khong_so_khac_0']}/{h['o_khong_so']} (mong 0)")
         print(f"  lệch                : {h['lech']} · KS.AL đo {h['ks_al_vm']} Vendor-tháng")
         print(f"  bỏ qua (5 nhãn)     : {h['bo_qua']} · {h['vendor_bo_qua']} vendor")
     for x in tq.lech[:10]:

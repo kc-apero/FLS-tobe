@@ -207,3 +207,14 @@ def test_AC4_cfa1_PHA_cot_la_trong_luoi_bi_tu_choi(tmp_path):
                     values=_luoi_cfa1(anh))
     kq = _chay("gi_cfa1", str(bt), "--mong", "408", "--ra", str(tmp_path / "ra.json"))
     assert kq.returncode == 2, (kq.stdout[-300:], kq.stderr[-300:])
+
+
+def test_DT8B_R1_01_cfa1_PHA_pe_mang_chu_thi_DO_co_ten_khong_TypeError(tmp_path):
+    """Cột số `pe` mang chữ ⇒ nhãn `pe_la@<dòng>` — ⛔ `TypeError`, ⛔ lộ giá trị."""
+    anh = _cfa1()
+    luoi = _luoi_cfa1(anh)
+    luoi[5][3] = "Trần Thị Bí Mật"
+    bt = _viet_luoi(tmp_path / "tho.json", anh, cot=COT_CFA1_THO, dong_dau=10, values=luoi)
+    kq = _chay("gi_cfa1", str(bt), "--mong", "408", "--ra", str(tmp_path / "ra.json"))
+    assert kq.returncode == 1 and "pe_la@" in kq.stdout, (kq.stdout[-500:], kq.stderr[-300:])
+    assert "TypeError" not in kq.stdout + kq.stderr and "Bí Mật" not in kq.stdout + kq.stderr

@@ -114,7 +114,12 @@ def thieu_lac(dong: list[dict[str, Any]]) -> dict[str, Any]:
             lech.append(f"itl_la@{ds}")
         pm_chu += ghi is not None
         pm_khac0 += pm is not None and float(pm) != 0
-        pe_khac0 += float(d["pe"]) != 0
+        try:                                       # DT8B-R1-01: chữ ở cột số ⇒ nhãn CÓ TÊN, ⛔ TypeError, ⛔ lộ giá trị
+            if isinstance(d["pe"], (dict, bool)):
+                raise ValueError
+            pe_khac0 += float(d["pe"]) != 0
+        except (ValueError, TypeError):
+            lech.append(f"pe_la@{ds}")
     for t in sorted(set(dem) | set(MONG_THANG)):
         if dem.get(t, 0) != MONG_THANG.get(t, 0):
             lech.append(f"thang_lech@{t}:{dem.get(t, 0)}≠{MONG_THANG.get(t, 0)}")
