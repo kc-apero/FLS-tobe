@@ -46,3 +46,19 @@
 | `BT24` | `=BT23+BR24-BS24+2.267718` | tồn mUSD **cộng hằng** |
 
 ⇒ Đây là **số dư đầu kỳ AS-IS nhập tay**; mọi cột lũy kế (AZ · BC · BI · BM · BN · BQ · BT) từ hàng 24 trở đi mang nó. FLS (H1) ⛔ có khái niệm số dư đầu kỳ ⇒ H4 gieo 5 hằng này tường minh khi so (`WO-132`); **nguồn chính thức của số dư đầu kỳ trong FLS là câu hỏi cho BA/owner** (errata ⑳). Công cụ đo: `isp-3.1/chuyen_giao/cong_cu/sa_quet_cong_thuc.py`.
+
+## Nguồn của 5 số dư đầu kỳ hàng 24 — đo 18/11 *(orchestrator, khoá SA chỉ-đọc; trả lời errata ⑳)*
+
+Người dùng 18/11 chỉ nguồn: bảng tính `1ycMOKKZg5rraLAYW-HuZDp9k3RPzr0H-iyPs_0IKL5Q`, tab **`2. CCR Cash`** *(232 × 719)*. Đo thêm tab cạnh nó **`2. CCR`** *(239 × 741)* — hai tab cùng khuôn: hàng 5/22 = ngày (serial), cột `K` = **45657 = 31/12/2024**; hàng 10–14 *"Original Currency"* USD·SGD·COP·HKD·VND; hàng 15–19 *"TOTAL"* quy đổi.
+
+| Ô 406 hàng 24 | Hằng gõ tay | Đo ở nguồn, cột `K` (31/12/2024) | Khớp |
+|---|---|---|---|
+| `AX24` USD | `1235500 + 7189` | `2. CCR`!K10 = **1.235.500,01** + `2. CCR Cash`!K10 = **7.188,78** | ✅ (làm tròn đơn vị) |
+| `BA24` SGD | `985537` | `2. CCR`!K11 = **985.537,37** | ✅ (làm tròn) |
+| `BG24` VND | `+6653796781` | `2. CCR`!K14 = **6.837.981.082** · `2. CCR Cash`!K14 = 0 | ⚠ lệch **184.184.301** — xấp xỉ một dòng VND của pháp nhân `VVOO (VGO2)` ở `2. CCR` hàng 40 *(184.184.303; còn 2 đơn vị)* ⇒ nhiều khả năng hằng = tổng trừ pháp nhân ngoài phạm vi ITL — **chưa chứng minh** |
+| `BQ24` bVND tồn | `+56842628558/10^9` | `2. CCR`!K19 TOTAL VND = 56.846.965.721,77 | ⚠ lệch 4.337.164 VND |
+| `BT24` mUSD tồn | `+2.267718` | `2. CCR`!K15 TOTAL USD = 2.267.891,40 | ⚠ lệch 173,4 USD |
+
+- ⚠ Hàng 24 của 406 thuộc kỳ **2024-10** *(`gl_406.json` `ky = 202410`)* nhưng số dư nguồn là ngày **31/12/2024** — cột đầu của cả hai tab; hai tab ⛔ có cột trước 31/12/2024.
+- ⛔ đọc cột `D:J` của hai tab: có cột `Link` · `ID` · `Pass` *(thông tin đăng nhập ngân hàng)* và số tài khoản; một nhãn ngân hàng ở `2. CCR Cash` mang tên người ⇒ ⛔ chép vào repo. Bản thô đã xoá khỏi scratchpad.
+- ⇒ **Kết luận cho H4:** giữ 5 hằng như sheet 406 gõ (parity với AS-IS); nguồn chính thức cho TO-BE = `2. CCR` + `2. CCR Cash` ngày 31/12/2024 — câu hỏi còn mở cho BA/owner: (1) VND loại pháp nhân nào; (2) số dư 31/12/2024 vì sao đặt ở hàng kỳ 2024-10.
