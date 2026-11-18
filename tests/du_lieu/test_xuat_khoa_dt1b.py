@@ -117,13 +117,17 @@ def _ws_xml(grid: dict[tuple[int, int], object], shared: dict[str, int]) -> str:
 
 
 def _lam_xlsx(path: Path, grid_ledge: dict, grid_bia: dict | None = None,
-              ten_sheet: str = "ITL Ledge", rels_ledge_tuyet_doi: bool = False) -> Path:
+              ten_sheet: str = "ITL Ledge", rels_ledge_tuyet_doi: bool = False,
+              rels_ledge_tgt: str | None = None) -> Path:
     """Dựng .xlsx TỐI THIỂU HỢP LỆ: sheet decoy `Bìa` (ĐỨNG TRƯỚC) + sheet `ten_sheet` mang `grid_ledge`.
     ⇒ công cụ phải TÌM SHEET THEO TÊN, ⛔ lấy sheet đầu.
 
     `rels_ledge_tuyet_doi=True`: đích rels của sheet `ten_sheet` viết TUYỆT ĐỐI `"/xl/worksheets/sheet2.xml"`
     (dạng openpyxl & vài thư viện/dịch vụ sinh) thay vì tương đối `"worksheets/sheet2.xml"` (dạng Excel) —
-    `DT1BT-R1-01`: công cụ phải đọc được CẢ HAI dạng."""
+    `DT1BT-R1-01`: công cụ phải đọc được CẢ HAI dạng.
+
+    `rels_ledge_tgt=<chuỗi>`: GHI ĐÈ nguyên văn đích rels của sheet `ten_sheet` (để thử các dạng NGOÀI
+    hai loại trên — `DT1BT-R2-02`: `xl/…` đã có tiền tố · `./…` · `../xl/…`). Ưu tiên hơn `rels_ledge_tuyet_doi`."""
     shared: dict[str, int] = {}
     ws_bia = _ws_xml(grid_bia or {}, shared)
     ws_ledge = _ws_xml(grid_ledge, shared)
@@ -135,7 +139,10 @@ def _lam_xlsx(path: Path, grid_ledge: dict, grid_bia: dict | None = None,
                 f'<sheet name="Bìa" sheetId="1" r:id="rId1"/>'
                 f'<sheet name="{_esc(ten_sheet)}" sheetId="2" r:id="rId2"/>'
                 f'</sheets></workbook>')
-    tgt_ledge = "/xl/worksheets/sheet2.xml" if rels_ledge_tuyet_doi else "worksheets/sheet2.xml"
+    if rels_ledge_tgt is not None:
+        tgt_ledge = rels_ledge_tgt
+    else:
+        tgt_ledge = "/xl/worksheets/sheet2.xml" if rels_ledge_tuyet_doi else "worksheets/sheet2.xml"
     rels = (f'<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
             f'<Relationships xmlns="{NS_PKG}">'
             f'<Relationship Id="rId1" Type="{NS_WS}" Target="worksheets/sheet1.xml"/>'
@@ -454,6 +461,37 @@ def _ca_zip_hong(tmp_path):
     return p, _l1_ok(tmp_path)
 
 
+def _xlsx_lat_byte_nen(src: Path, path: Path, ten_phan: str, so_byte: int = 8) -> Path:
+    """Chép `src` → `path` rồi LẬT `so_byte` byte ở GIỮA luồng NÉN của phần `ten_phan` (⛔ chạm cấu trúc
+    zip: local header, central dir còn nguyên) ⇒ `z.read(ten_phan)` ném `zlib.error` (hoặc `BadZipFile`
+    'Bad CRC-32') — chỉ phát ở lúc ĐỌC, ⛔ lúc MỞ zip. Dựng ca `DT1BT-R2-03`.
+
+    Đọc local file header (30 byte cố định + n byte tên + m byte extra) để tìm đầu vùng dữ liệu nén."""
+    raw = bytearray(src.read_bytes())
+    with zipfile.ZipFile(src) as z:
+        zi = z.getinfo(ten_phan)
+    assert zi.compress_type == zipfile.ZIP_DEFLATED, ten_phan     # phải NÉN mới có luồng để lật
+    off = zi.header_offset
+    n = int.from_bytes(raw[off + 26:off + 28], "little")
+    m = int.from_bytes(raw[off + 28:off + 30], "little")
+    data_bd = off + 30 + n + m
+    data_kt = data_bd + zi.compress_size
+    giua = data_bd + max(0, zi.compress_size // 2 - so_byte // 2)
+    for i in range(giua, min(giua + so_byte, data_kt)):
+        raw[i] ^= 0xFF                                            # lật mọi bit của byte
+    path.write_bytes(bytes(raw))
+    return path
+
+
+def _ca_zlib_hong(tmp_path):
+    """xlsx HỢP LỆ mở được, nhưng luồng nén của `xl/worksheets/sheet2.xml` bị lật byte ⇒ `zlib.error`
+    khi đọc worksheet. SENTINEL sống trong `sharedStrings.xml` (đọc TRƯỚC, nguyên) ⇒ ca này còn chứng
+    minh: shared strings đã nạp vào bộ nhớ ⛔ lộ khi một phần SAU hỏng."""
+    ok = _xlsx_co_sentinel(tmp_path)
+    xlsx = _xlsx_lat_byte_nen(ok, tmp_path / "zlib_hong.xlsx", "xl/worksheets/sheet2.xml")
+    return xlsx, _l1_ok(tmp_path)
+
+
 def _ca_thieu_sheet(tmp_path):
     return _xlsx_co_sentinel(tmp_path, ten_sheet="Sheet La"), _l1_ok(tmp_path)
 
@@ -491,6 +529,7 @@ _CA_RORI = {
     "xml_workbook_hong": _ca_workbook_xml_hong,
     "xml_worksheet_hong": _ca_worksheet_xml_hong,
     "zip_hong": _ca_zip_hong,
+    "zlib_hong": _ca_zlib_hong,
     "thieu_sheet": _ca_thieu_sheet,
     "thieu_cot": _ca_thieu_cot,
     "csv_khong_utf8": _ca_l1_khong_utf8,
@@ -517,6 +556,7 @@ _CA_HONG = {
     "xml_sharedstrings_hong": _ca_sharedstrings_hong,
     "rels_thieu": _ca_rels_thieu,
     "zip_hong": _ca_zip_hong,
+    "zlib_hong": _ca_zlib_hong,
     "csv_khong_utf8": _ca_l1_khong_utf8,
     "csv_co_nul": _ca_l1_co_nul,
     "csv_truong_qua_dai": _ca_l1_truong_qua_dai,
@@ -627,3 +667,57 @@ def test_DT1BT_R1_09_input_raw_bi_gitignore():
     assert mod_ignore(GOC / "Input_Raw" / "[Master] ITL_Ledge_raw.xlsx"), "Input_Raw/xlsx ⛔ bị gitignore"
     assert mod_ignore(GOC / "Input_Raw" / "bat_ky.csv"), "Input_Raw/*.csv ⛔ bị gitignore"
     assert mod_ignore(GOC / "hien_vat" / "khoa_dt1b.csv"), "hien_vat/ ⛔ còn bị gitignore"
+
+
+# ╔═══════════════════════════════════════════════════════════════════════════════════════════════╗
+# ║  VÒNG SỬA SAU R2 (KQ-130) — DT1BT-R2-02 (rels dạng ngoài) · R2-03 (zlib luồng nén)              ║
+# ╚═══════════════════════════════════════════════════════════════════════════════════════════════╝
+
+# DT1BT-R2-02: `_chuan_dich_rels` phải chịu được các dạng NGOÀI "tuyệt đối" / "tương đối":
+#   · `xl/worksheets/…` đã mang tiền tố gốc-zip ⇒ ⛔ nối thành `xl/xl/…` (bản cũ đọc được ⇒ hồi quy);
+#   · `./` · `../xl/` ⇒ chuẩn hoá bằng posixpath.normpath (giữ trong gốc zip);
+#   · `%20` trong tên ⇒ urllib.parse.unquote.
+def test_DT1BT_R2_02_chuan_dich_rels_dang_ngoai():
+    mod = _tool()
+    # đã có tiền tố xl/ (vài bộ sinh) ⇒ ⛔ nối thành xl/xl/
+    assert mod._chuan_dich_rels("xl/worksheets/sheet1.xml") == "xl/worksheets/sheet1.xml"
+    assert mod._chuan_dich_rels("xl/sharedStrings.xml") == "xl/sharedStrings.xml"
+    # ./ và ../ ⇒ normpath gộp, kết quả vẫn trong gốc zip
+    assert mod._chuan_dich_rels("./worksheets/sheet1.xml") == "xl/worksheets/sheet1.xml"
+    assert mod._chuan_dich_rels("../xl/worksheets/sheet1.xml") == "xl/worksheets/sheet1.xml"
+    # %20 ⇒ unquote (tên tệp worksheet có khoảng trắng)
+    assert mod._chuan_dich_rels("worksheets/sheet%201.xml") == "xl/worksheets/sheet 1.xml"
+    assert mod._chuan_dich_rels("/xl/worksheets/sheet%201.xml") == "xl/worksheets/sheet 1.xml"
+    # hai dạng cũ VẪN đúng (hồi quy ngược)
+    assert mod._chuan_dich_rels("worksheets/sheet1.xml") == "xl/worksheets/sheet1.xml"
+    assert mod._chuan_dich_rels("/xl/worksheets/sheet1.xml") == "xl/worksheets/sheet1.xml"
+
+
+@pytest.mark.parametrize("tgt", [
+    "xl/worksheets/sheet2.xml",       # đã có tiền tố xl/ ⇒ ⛔ nối thành xl/xl/ (bản cũ đọc được)
+    "./worksheets/sheet2.xml",        # ./ ⇒ normpath
+    "../xl/worksheets/sheet2.xml",    # ../ ⇒ normpath
+], ids=["xl_tien_to", "cham", "cham_cham"])
+def test_DT1BT_R2_02_rels_dang_ngoai_doc_duoc(tmp_path, tgt):
+    """Đích rels của sheet `ITL Ledge` viết ở dạng NGOÀI hai loại cũ ⇒ công cụ vẫn đọc đúng (exit 0, 3 hàng
+    SO 10·11·12). ĐỎ-trước: bản cũ nối `xl/` cứng ⇒ `xl/xl/…`/`xl/./…`/`xl/../…` ⇒ KeyError ⇒ exit 1."""
+    xlsx = _lam_xlsx(tmp_path / "ledge.xlsx", _ledge_ba_dong(), rels_ledge_tgt=tgt)
+    l1 = _lam_l1(tmp_path / "l1.csv", [list(TIEU_DE.values())])
+    ra = tmp_path / "khoa.csv"
+    kq = _chay("--xlsx", str(xlsx), "--l1", str(l1), "--ra", str(ra))
+    assert kq.returncode == 0, (tgt, kq.returncode, kq.stdout, kq.stderr)
+    so = [r for r in _doc_csv(ra) if r[0] == "SO"]
+    assert [r[1] for r in so] == ["10", "11", "12"], so
+
+
+# DT1BT-R2-03: lật byte luồng NÉN của worksheet ⇒ `zlib.error`/CRC hỏng lúc ĐỌC ⇒ MỘT dòng LOI, exit 1,
+# ⛔ Traceback, ⛔ giá trị ô. (Lớp lỗi lặp của R1-04 — `BadZipFile` chỉ bắt lúc MỞ, ⛔ lúc đọc.)
+def test_DT1BT_R2_03_zlib_luong_nen_mot_dong(tmp_path):
+    xlsx, l1 = _ca_zlib_hong(tmp_path)
+    kq = _chay("--xlsx", str(xlsx), "--l1", str(l1), "--ra", str(tmp_path / "k.csv"))
+    assert kq.returncode == 1, (kq.returncode, kq.stdout, kq.stderr)
+    assert "Traceback" not in kq.stderr, kq.stderr
+    assert kq.stderr.startswith("LOI"), kq.stderr
+    assert kq.stderr.strip().count("\n") == 0, f"lỗi NHIỀU dòng:\n{kq.stderr}"
+    assert SENTINEL not in (kq.stdout + kq.stderr), "giá trị ô LỌT ra màn"
+    assert not (tmp_path / "k.csv").exists()

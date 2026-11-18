@@ -49,10 +49,13 @@ from __future__ import annotations
 
 import argparse
 import csv
+import posixpath
 import subprocess
 import sys
 import zipfile
+import zlib
 from pathlib import Path
+from urllib.parse import unquote
 from xml.etree import ElementTree as ET
 
 GOC = Path(__file__).resolve().parents[1]
@@ -111,6 +114,18 @@ def _parse_xml(data: bytes, mo_ta: str) -> ET.Element:
         raise LoiDoc(f"{mo_ta}: XML hỏng — ⛔ phải tệp .xlsx hợp lệ") from None
 
 
+def _doc_phan_zip(z: zipfile.ZipFile, ten: str) -> bytes:
+    """`z.read(ten)` CÓ BỌC luồng giải nén. `DT1BT-R2-03` (lớp lỗi lặp của `R1-04`): `zipfile.BadZipFile`
+    chỉ bị bắt lúc MỞ archive, ⛔ lúc ĐỌC từng phần — một phần có local header đúng nhưng luồng nén / CRC
+    hỏng ⇒ `zlib.error` (luồng deflate hỏng) · `BadZipFile` ('Bad CRC-32') · `EOFError` (cụt) ⇒ nếu để
+    tràn ra thì owner (⛔ lập trình viên) thấy Traceback. ⇒ gói CẢ cây lỗi giải nén thành `LoiDoc` MỘT
+    DÒNG (⛔ byte, ⛔ giá trị ô). `KeyError` (⛔ có phần ấy) để nơi gọi tự xử — mỗi phần một câu lỗi riêng."""
+    try:
+        return z.read(ten)
+    except (zipfile.BadZipFile, zlib.error, EOFError):
+        raise LoiDoc(f"{ten}: luồng nén hỏng — ⛔ phải tệp .xlsx hợp lệ (tải/chép lại tệp)") from None
+
+
 def _chuan_dich_rels(tgt: str) -> str:
     """Chuẩn hoá đích `Target` của rels về đường trong zip (gốc = thư mục chứa archive).
     · TUYỆT ĐỐI `"/xl/worksheets/sheet1.xml"` (openpyxl & một số thư viện/dịch vụ sinh) ⇒ đã là đường
@@ -118,17 +133,30 @@ def _chuan_dich_rels(tgt: str) -> str:
     · TƯƠNG ĐỐI `"worksheets/sheet1.xml"` (dạng Excel) ⇒ tương đối với thư mục `xl/` của `workbook.xml`
       ⇒ nối `xl/`.
     `DT1BT-R1-01`: bản cũ nối `xl/` cho CẢ hai dạng ⇒ tuyệt đối thành `xl/xl/worksheets/sheet1.xml`
-    ⇒ `exit 1` trên tệp do openpyxl sinh (bước (c) của owner chết ngay nếu `[Master] …xlsx` ⛔ do Excel ghi)."""
-    tgt = tgt.strip()
+    ⇒ `exit 1` trên tệp do openpyxl sinh (bước (c) của owner chết ngay nếu `[Master] …xlsx` ⛔ do Excel ghi).
+
+    `DT1BT-R2-02`: chịu được các dạng NGOÀI hai loại trên (vài bộ sinh ⛔ theo OPC chuẩn):
+    · `%20`/`%xx` trong tên tệp ⇒ `unquote` (tên zip là chuỗi nguyên văn, ⛔ phần trăm-mã).
+    · đã mang tiền tố `xl/` ⇒ ⛔ nối lần nữa thành `xl/xl/…` (bản cũ đọc được ⇒ hồi quy).
+    · `./` · `../xl/…` ⇒ `posixpath.normpath` gộp; kết quả PHẢI còn trong gốc zip (⛔ thoát bằng `..`),
+      ⛔ thì `LoiDoc` (một dòng, ⛔ lộ giá trị). Chuẩn hoá áp cho CẢ dạng tuyệt đối (gộp `//`, `.`)."""
+    tgt = unquote(tgt.strip())
     if tgt.startswith("/"):
-        return tgt.lstrip("/")
-    return "xl/" + tgt
+        duong = tgt.lstrip("/")                      # tuyệt đối ⇒ đã gốc zip
+    elif tgt == "xl" or tgt.startswith("xl/"):
+        duong = tgt                                  # đã mang tiền tố gốc-zip ⇒ ⛔ nối lần nữa
+    else:
+        duong = "xl/" + tgt                          # tương đối thư mục workbook.xml ⇒ nối xl/
+    duong = posixpath.normpath(duong)                # gộp ./ ../ //
+    if duong == ".." or duong.startswith("../") or duong.startswith("/"):
+        raise LoiDoc(f"rels: đích {tgt!r} thoát khỏi gốc gói — ⛔ phải tệp .xlsx hợp lệ")
+    return duong
 
 
 def _tim_duong_sheet(z: zipfile.ZipFile, ten_sheet: str) -> str:
     """Tìm đường tệp worksheet của sheet TÊN `ten_sheet`, qua `workbook.xml` + rels. ⛔ "sheet đầu"."""
     try:
-        raw_wb = z.read("xl/workbook.xml")
+        raw_wb = _doc_phan_zip(z, "xl/workbook.xml")
     except KeyError:
         raise LoiDoc("xlsx ⛔ có xl/workbook.xml — ⛔ phải tệp .xlsx hợp lệ") from None
     wb = _parse_xml(raw_wb, "xl/workbook.xml")
@@ -141,7 +169,7 @@ def _tim_duong_sheet(z: zipfile.ZipFile, ten_sheet: str) -> str:
         ten_co = [(s.get("name") or "").strip() for s in wb.iter(_q("sheet"))]
         raise LoiDoc(f"⛔ thấy sheet tên {ten_sheet!r}; sheet có: {ten_co}")
     try:
-        raw_rels = z.read("xl/_rels/workbook.xml.rels")
+        raw_rels = _doc_phan_zip(z, "xl/_rels/workbook.xml.rels")
     except KeyError:
         raise LoiDoc("xlsx ⛔ có xl/_rels/workbook.xml.rels — ⛔ phải tệp .xlsx hợp lệ") from None
     rels = _parse_xml(raw_rels, "xl/_rels/workbook.xml.rels")
@@ -153,7 +181,7 @@ def _tim_duong_sheet(z: zipfile.ZipFile, ten_sheet: str) -> str:
 
 def _shared_strings(z: zipfile.ZipFile) -> list[str]:
     try:
-        raw = z.read("xl/sharedStrings.xml")
+        raw = _doc_phan_zip(z, "xl/sharedStrings.xml")
     except KeyError:
         return []
     sst = _parse_xml(raw, "xl/sharedStrings.xml")
@@ -189,7 +217,7 @@ def doc_xlsx_ledge(duong: Path, ten_sheet: str = "ITL Ledge") -> list[dict]:
         duong_sheet = _tim_duong_sheet(z, ten_sheet)
         shared = _shared_strings(z)
         try:
-            raw_ws = z.read(duong_sheet)
+            raw_ws = _doc_phan_zip(z, duong_sheet)
         except KeyError:
             raise LoiDoc(f"xlsx ⛔ có tệp worksheet {duong_sheet!r}") from None
         ws = _parse_xml(raw_ws, "worksheet")
