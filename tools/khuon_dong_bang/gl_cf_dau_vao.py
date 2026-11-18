@@ -37,6 +37,8 @@ from __future__ import annotations
 import datetime
 from typing import Any
 
+from fls.canon.o_loi import la_o_loi      # ô lỗi = tập ĐÓNG, 1 bản khai *(⛔ so bằng tiền tố '#')*
+
 BANG = "CF.GL.DauVao"
 KHOA = "dong_sheet"
 KIEU_KHOA = "dong_sheet"
@@ -49,7 +51,7 @@ DONG_DAU_SHEET = 10
 TIEN_TE = ("USD", "SGD", "COP", "VND", "HKD")
 #: ③ 4 khối LE của CFA1 *(khối thứ 5 `GROUP` = Σ mọi dòng, ⛔ là mã cột P)*.
 LE_CFA1 = ("SGO2", "SGO1", "HGO6", "BGO2")
-#: Lớp đếm của cột P: 4 mã LE · `loi_sheets` *(chuỗi `#…`)* · `khac` *(mã/tên khác — ⛔ in)*.
+#: Lớp đếm của cột P: 4 mã LE · `loi_sheets` *(mã lỗi Sheets — `fls.canon.o_loi`)* · `khac` *(mã/tên khác — ⛔ in)*.
 LOP = (*LE_CFA1, "loi_sheets", "khac")
 #: Đ5 — số dòng mỗi lớp *(đo 18/11)*. Khác ⇒ bài ghim ĐỎ *(⛔ cổng công cụ: bảng phụ chỉ đếm hàng)*.
 MONG_LE_LOP = {"SGO2": 3871, "SGO1": 715, "HGO6": 94, "BGO2": 118, "loi_sheets": 109, "khac": 7478}
@@ -64,7 +66,7 @@ def _rong(v: Any) -> bool:
 def _lop(p: Any) -> str:
     if isinstance(p, str) and p in LE_CFA1:
         return p
-    if isinstance(p, str) and p.startswith("#"):
+    if la_o_loi(p):
         return "loi_sheets"
     return "khac"
 
