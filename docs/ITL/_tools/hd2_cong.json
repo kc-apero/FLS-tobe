@@ -192,5 +192,125 @@
   "so_du_dau": "KHÔNG dùng — CFA1 Daily là phát sinh theo ngày (BR/BS từng dòng), ⛔ tồn luỹ kế",
   "dat": true,
   "ly_do": []
+ },
+ "WP-C3b": {
+  "bang": "HD2.WP-C3b",
+  "goi": "WP-C3b",
+  "mo_ta": "SO.CFA1 Y/H/Q/M: tinh_gl → cfa1_daily (trục truc_ngay(IX.PER kho, ngày đọc)) → cuon_ky (Σ Daily theo ky_cua: năm của CHÍNH ngày) ↔ đáp án 410 từng ô",
+  "nguon_dau_vao": "tests/fixture/dap_an/gl_cf_dau_vao.json (cùng feed WP-C3a)",
+  "dap_an": "tests/fixture/dap_an/cfa1_yhqm.json (PD 410, 370 hàng × 57 kỳ)",
+  "loai_tru": "411 (CFA3 Daily) — DT5 loại khỏi đóng băng (ISP Step 15) ⇒ ⛔ đáp án để so",
+  "khoa": "khoi(5) + ma_hd(cây ATL 74) + ky(57: năm×19 Y/H/Q/M)",
+  "khoi": [
+   "GROUP",
+   "SGO2",
+   "SGO1",
+   "HGO6",
+   "BGO2"
+  ],
+  "dung_sai_theo_khoi": {
+   "la": {
+    "atol": "2E-13",
+    "rtol": "0",
+    "max_lech_do": "1.10E-14"
+   },
+   "cha": {
+    "atol": "2E-13",
+    "rtol": "0",
+    "max_lech_do": "1.17E-14"
+   }
+  },
+  "dung_sai_ghi_chu": "atol 2e-13 = ≥17× max|lệch| đo 18/11 trên 11.585 ô (lá 1,10e-14 · cha 1,17e-14 — Σ ≤ 366 ô Daily); rtol 0. Chứng ĐỎ: +1 VND một dòng ⇒ lá + mọi cha × 4 kỳ ĐỎ; +1e-12 một ô đáp án ⇒ đúng ô ấy ĐỎ.",
+  "dong_so": 12373,
+  "tong_o": 11585,
+  "mong_tong_o": 11585,
+  "khop": 11585,
+  "o_so_khac_0": 2636,
+  "mong_o_so_khac_0": 2636,
+  "lech_ngoai_ten": 0,
+  "o_kpi_loai": 5700,
+  "ma_kpi": [
+   "EBITDA",
+   "EBIT",
+   "EBT",
+   "NP",
+   "NPC",
+   "NCF",
+   "NCFO",
+   "CRO",
+   "COO",
+   "NCFI",
+   "COI",
+   "NCFF",
+   "CRF",
+   "COF",
+   "PL2",
+   "PL3",
+   "PL4",
+   "PL6",
+   "PL7",
+   "PL8"
+  ],
+  "o_loi_dap_an_loai": 25,
+  "o_ky_khong_ngay_loai": 3780,
+  "so_dong_dap_an": 5655,
+  "truc": {
+   "ngay_dau": "2024-10-21",
+   "nguon_ngay_dau": "ISP-3.1.2 Step17 C6 · IX.PER kho = 21/10 (WO-188) — cụm cô lập 5435",
+   "den": "2026-11-18",
+   "so_ngay": 759,
+   "nam": [
+    2024,
+    2025,
+    2026
+   ],
+   "so_ky": 57,
+   "ky_khong_ngay": [
+    "2024H1",
+    "2024Q1",
+    "2024Q2",
+    "2024Q3",
+    "2024M01",
+    "2024M02",
+    "2024M03",
+    "2024M04",
+    "2024M05",
+    "2024M06",
+    "2024M07",
+    "2024M08",
+    "2024M09",
+    "2026M12"
+   ],
+   "ghi_chu": "ngày đầu = IX.PER KHO (C6, 21/10); trục 409/410 từ 20/10 (errata ㉑) — đo 18/11: 0 dòng sổ ngày 20/10, 5 ô ≠ 0 cột 20/10 của 409 đều NPC (KPI). Kỳ 0 ngày trên trục ⛔ so (⛔ '0 đã chốt'), đáp án ≠ 0 ở đó ⇒ ĐỎ"
+  },
+  "lech_co_ten": {
+   "thieu_tien_te_D": [
+    4957,
+    4958,
+    6068,
+    6502,
+    6944,
+    7626,
+    8026,
+    8593,
+    8649,
+    8999,
+    9071,
+    9380
+   ],
+   "hd_ngoai_cay": {
+    "ITE | ITE Interest ": 1,
+    "ITE | ITE Interest": 152,
+    "<rỗng>": 1,
+    "GAC - Other": 1,
+    "Server Cost": 7
+   },
+   "hd_khac_hoa_thuong": 5,
+   "dong_nhan_cha": 0,
+   "dong_ngoai_truc": 0,
+   "o_khac_0_ky_khong_ngay": 0
+  },
+  "dat": true,
+  "ly_do": []
  }
 }
