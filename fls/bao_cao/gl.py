@@ -173,6 +173,11 @@ class ThieuTyGia(LookupError):
         self.thang = thang
         self.tien_te = tien_te
         self.vi_tri = vi_tri
+        # ⭐ `H1-R3-01` (`KQ-074`): GIỮ `ly_do` làm trường ⇒ `__reduce__` dựng lại được
+        # qua pickle/copy mà ⛔ mất tên lỗi. Bản cũ ⛔ giữ ⇒ `BaseException.__reduce__`
+        # gọi `__init__(message,)` ⇒ `TypeError` ở ranh giới tiến trình (D1 đòi tên lỗi
+        # đi được xa — một lỗi có tên biến thành `TypeError` là mất đúng thứ cần giữ).
+        self.ly_do = ly_do
         # MỘT dòng, đọc được ngay (luật phòng tái phạm `S0-R1-04`). Câu AS-IS theo CÔNG THỨC Ô
         # (`CALC_ZONE_406.md`, `H1-R1-04`) — bản trước ghi "lỗi SUMIFS = 0" cho mọi cột, sai
         # với BO/BP (INDEX/MATCH) và với BR/BS (iferror ⇒ ô rỗng).
@@ -181,6 +186,13 @@ class ThieuTyGia(LookupError):
             f"⛔ quy đổi ra 0 hay ô rỗng (AS-IS: BO·BP·BR·BS rỗng do iferror, BM mất số do "
             f"SUMIFS = 0, BN #DIV/0! — CALC_ZONE_406)"
         )
+
+    def __reduce__(self) -> tuple:
+        # ⭐ `H1-R3-01`: dựng lại bằng CHÍNH các trường, ⛔ bằng `args` (chuỗi thông điệp).
+        # Giữ nguyên `thang · tien_te · vi_tri · ly_do` ⇒ `vars()` và `str()` y hệt sau
+        # khi qua pickle/copy. (BaseException mặc định trả `(cls, self.args)` ⇒ gọi lại
+        # `__init__` thiếu tham số.)
+        return (self.__class__, (self.thang, self.tien_te, self.vi_tri, self.ly_do))
 
 
 class TienTeNgoaiGL(ValueError):
@@ -197,11 +209,20 @@ class TienKhongHuuHan(ValueError):
     def __init__(self, nhan: str, vi_tri: int, gia_tri: Decimal) -> None:
         self.nhan = nhan
         self.vi_tri = vi_tri
+        # ⭐ `H1-R3-01` (`KQ-074`): GIỮ `gia_tri` ⇒ `__reduce__` dựng lại được qua
+        # pickle/copy (xem `ThieuTyGia.__reduce__`). Bản cũ ⛔ giữ ⇒ `TypeError` ở ranh
+        # giới tiến trình.
+        self.gia_tri = gia_tri
         # In `gia_tri` được: nó chỉ có thể là NaN/sNaN/±Infinity — ⛔ bao giờ là một số tiền.
         super().__init__(
             f"⛔ {nhan} ở dòng thứ {vi_tri} là {gia_tri} — ⛔ hữu hạn, ⛔ phải số tiền "
             f"(lọt vào tồn LUỸ KẾ là đầu độc mọi dòng sau)"
         )
+
+    def __reduce__(self) -> tuple:
+        # ⭐ `H1-R3-01`: dựng lại bằng CHÍNH các trường (`nhan · vi_tri · gia_tri`), ⛔
+        # bằng `args`. `gia_tri` là NaN/±Infinity ⇒ so qua `repr` (NaN ≠ NaN).
+        return (self.__class__, (self.nhan, self.vi_tri, self.gia_tri))
 
 
 @dataclass(frozen=True)
