@@ -43,6 +43,12 @@ BA_ERD_DOC = (pathlib.Path(__file__).resolve().parents[2]
 ERD_ISLANDS: frozenset[str] = frozenset({
     "fls_mapping_master",   # tra theo gia tri hd; hd co the UNMAPPED nen khong FK duoc
     "fls_migration",        # so ghi di tru — ha tang, khong gan dong so nao (GAP-DB-P0-02)
+    # ⭐ `C5` (`WO-142`): kho config chi-THEM. Config (IX.FX/IX.HD/…) ⛔ gan dong
+    #    so nao — no la thu dong so DOC, ⛔ phai thu tro TOI dong so. Ca cum
+    #    `fls_cau_hinh_ban` ← `fls_cau_hinh_dong` tach khoi fls_itl, cung ho
+    #    `fls_migration` (ha tang theo phien ban).
+    "fls_cau_hinh_ban",
+    "fls_cau_hinh_dong",
 })
 
 

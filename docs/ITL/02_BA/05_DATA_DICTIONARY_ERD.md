@@ -1053,12 +1053,15 @@ flowchart TB
   end
   subgraph 7_ha_tang["⑦ HẠ TẦNG — sổ di trú"]
     direction LR
+    fls_cau_hinh_ban["fls_cau_hinh_ban"]
+    fls_cau_hinh_dong["fls_cau_hinh_dong"]
     fls_migration["fls_migration"]
   end
 
   fls_adjustment -->|itl_id| fls_itl
   fls_adjustment -->|reversal_of| fls_adjustment
   fls_adjustment -->|evt_id| fls_queue_event
+  fls_cau_hinh_dong -->|ban_id| fls_cau_hinh_ban
   fls_chup_dong -->|chup_id| fls_chup
   fls_chup_dong -->|source_id| fls_source
   fls_chup_nguon -->|chup_id| fls_chup
@@ -1149,6 +1152,8 @@ flowchart LR
   end
   subgraph H_ha_tang["HẠ TẦNG — sổ di trú"]
     direction TB
+    fls_cau_hinh_ban["fls_cau_hinh_ban"]
+    fls_cau_hinh_dong["fls_cau_hinh_dong"]
     fls_migration["fls_migration"]
   end
 
@@ -1209,6 +1214,8 @@ flowchart LR
 | `fls_le` | pháp nhân | `Transaction Mapping L1` cột `P` | ⚠ danh mục **SUY từ giá trị** — AS-IS ⛔ không có tab danh mục riêng; `GAP-LE-01`: thiếu tên cho `24/29` mã |
 | `fls_mapping_master` | danh mục quyết định phân bổ | tab `Mapping Master` *(file RAW)* | `73` mã — `QĐ-ITL-70` |
 | `fls_migration` | sổ di trú | ⛔ FLS dựng mới | hạ tầng |
+| `fls_cau_hinh_ban` | một lần nạp config | ⛔ FLS dựng mới | ⭐ `C5` *(`WO-142`)* — kho config CHỈ-THÊM có phiên bản *(`IX.FX`/`IX.HD`/`IX.HD · IX.ORG`)*; chép khuôn `fls_khai_cot` |
+| `fls_cau_hinh_dong` | một dòng config | ⛔ FLS dựng mới | ⭐ `C5` — `khoa` *(yyyymm / mã HD)* + `gia_tri jsonb`; MM chỉ lưu `hd_code` *(⛔ bảng phụ `tho`)* |
 | `fls_moi_noi` | mối nối đang hiệu lực | ⛔ FLS dựng mới | khung xem — `fls_pm_link` **trừ** `fls_pm_unlink` |
 | `fls_nguon_dai` | dải nhãn thô ↔ danh mục | `Range_Condition`/`Debit`/`Credit` ở danh mục | ⚠ bản khai **THỨ HAI** — script `Run` của trang tính đọc nó, FLS thì đọc dòng 1 *(`GAP-KHAI-01`)* |
 | `fls_pm_line` | dòng lệnh chi *(PM)* | `PM_Unpivot` | ẢNH CHỤP một lần nạp — `run_id` nằm **trong** khoá chính |
@@ -1254,7 +1261,9 @@ flowchart LR
 |  | `fls_queue_event` | bảng | ⑤ VIỆC CỦA NGƯỜI | 7 | `evt_id` |
 |  | `fls_queue_reason_weekly` | khung xem | ⑤ VIỆC CỦA NGƯỜI | 2 | — |
 |  | `fls_queue_state` | khung xem | ⑤ VIỆC CỦA NGƯỜI | 4 | — |
-| **HẠ TẦNG** | `fls_migration` | bảng | ⑦ HẠ TẦNG | 4 | `version` |
+| **HẠ TẦNG** | `fls_cau_hinh_ban` | bảng | ⑦ HẠ TẦNG | 7 | `ban_id` |
+|  | `fls_cau_hinh_dong` | bảng | ⑦ HẠ TẦNG | 4 | `dong_id` |
+|  | `fls_migration` | bảng | ⑦ HẠ TẦNG | 4 | `version` |
 
 ### Ma trận `tầng × khâu` — chỗ HAI TRỤC LỆCH nhau
 
@@ -1266,8 +1275,8 @@ flowchart LR
 | **④ GHÉP LỆNH CHI** | · | 4 | · | · | · | · | **4** |
 | **⑤ VIỆC CỦA NGƯỜI** | · | · | · | · | 4 | · | **4** |
 | **⑥ SỬA & VẾT** | · | · | 4 | · | · | · | **4** |
-| **⑦ HẠ TẦNG** | · | · | · | · | · | 1 | **1** |
-| **Σ** | **9** | **4** | **4** | **3** | **4** | **1** | **25** |
+| **⑦ HẠ TẦNG** | · | · | · | · | · | 3 | **3** |
+| **Σ** | **9** | **4** | **4** | **3** | **4** | **3** | **27** |
 
 ⭐⭐ **Ba ô đáng nhìn nhất, và cả ba là chỗ hai trục ⛔ không trùng:**
 
@@ -1296,6 +1305,21 @@ erDiagram
         timestamptz at
         bigint evt_id FK
         text nguon
+    }
+    fls_cau_hinh_ban {
+        bigint ban_id PK
+        text bang
+        int phien_ban
+        text nguon
+        text checksum
+        text actor
+        timestamptz luc
+    }
+    fls_cau_hinh_dong {
+        bigint dong_id PK
+        bigint ban_id FK
+        text khoa
+        jsonb gia_tri
     }
     fls_chup {
         bigint chup_id PK
@@ -1535,6 +1559,7 @@ erDiagram
     fls_itl ||--o{ fls_adjustment : "itl_id"
     fls_adjustment ||--o{ fls_adjustment : "reversal_of"
     fls_queue_event ||--o{ fls_adjustment : "evt_id"
+    fls_cau_hinh_ban ||--o{ fls_cau_hinh_dong : "ban_id"
     fls_chup ||--o{ fls_chup_dong : "chup_id"
     fls_source ||--o{ fls_chup_dong : "source_id"
     fls_chup ||--o{ fls_chup_nguon : "chup_id"

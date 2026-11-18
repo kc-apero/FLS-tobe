@@ -67,6 +67,18 @@ const FLS = (function () {
       lam_gi: 'Khai cột một lần cho nguồn này, rồi nạp lại. Máy ⛔ không đoán '
         + 'vị trí cột — đoán sai một cột là sai tiền.'
     },
+    // ── ⭐⭐ Nhóm KHO CONFIG (`C5` · `WO-142`). HAI câu, ⛔ KHÔNG một — cùng lý
+    //    do `FLS-NGUON-LA`/`FLS-KHAI-KHONG-CO`: *"⛔ có bảng config ấy"* ≠ *"có
+    //    bảng, chưa ai nạp"* dẫn đi HAI đường sửa khác nhau.
+    'FLS-CAUHINH-BANG-LA': {
+      cau: 'Không có bảng cấu hình nào mang tên đó.',
+      lam_gi: 'Chọn lại bảng cấu hình trong danh sách — ⛔ đừng gõ tay tên bảng.'
+    },
+    'FLS-CAUHINH-CHUA-KHAI': {
+      cau: 'Bảng cấu hình này có, nhưng chưa ai nạp số cho nó.',
+      lam_gi: 'Nạp ảnh cấu hình một lần, rồi mở lại. Máy ⛔ rơi về số cũ đi '
+        + 'cùng gói — một mặc định im lặng là chỗ đẻ ra lỗi ⛔ ai thấy.'
+    },
     'FLS-KHAI-THIEU': {
       cau: 'Bản khai còn thiếu trường — máy ⛔ không nạp một phần.',
       lam_gi: 'Chỉ đủ cả 6 trường mới đi tiếp được. Thiếu một cột mà vẫn nạp '

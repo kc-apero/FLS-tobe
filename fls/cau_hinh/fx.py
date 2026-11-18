@@ -78,8 +78,6 @@ from dataclasses import dataclass
 from decimal import Decimal, InvalidOperation
 from typing import Any, Iterable, Mapping
 
-from fls.cau_hinh import nguon_tinh
-
 BANG = "IX.FX"
 # AP §3.2.1 — khoá · cột của `IX.FX`. Thứ tự = thứ tự cột của `9.2.Exchange Rate`.
 TIEN_TE: tuple[str, ...] = ("USD", "SGD", "COP", "VND", "HKD")
@@ -90,14 +88,9 @@ TIEN_TE_GOC = "VND"
 # là **giả chữ ký** ⇒ cột `trang_thai` trong nguồn là cột LẠ, bị từ chối.
 CHUA_KY = "chua_ky"
 
-# ⭐ Đường nguồn tĩnh — khai **MỘT chỗ, ở đây** *(tương đối gốc repo, dạng POSIX)*.
-#   `fls/api/bang_tuyen.py` khai `nguon_tinh` bằng CHÍNH hằng này, và hàm xử lý
-#   gọi `doc_tep()` với mặc định là nó ⇒ ⛔ chuỗi đường nào gõ lại ở chỗ thứ hai.
-#   ⚠ Phải nằm NGAY dưới `nguon_tinh.THU_MUC` *(luật đường — `C1-R1-02`)*.
-#   ⚠ `tools/soi_bang_tuyen.py` đòi chuỗi này hiện NGUYÊN VĂN trong một hàm của
-#   đường gọi `ty_gia` *(tham số mặc định của `doc_tep` — giữ nó là hằng chuỗi trơn,
-#   ⛔ ghép bằng f-string)*.
-NGUON_TINH = "fls/cau_hinh/tinh/ix_fx_mau.json"
+# ⭐⭐ `C5` (`WO-142`): GỠ nguồn TĨNH `ix_fx_mau.json` + `doc_tep()`. Tuyến
+#   `GET /config/fx` nay đọc **KHO** config chỉ-thêm qua `fls.repo.cau_hinh_repo`
+#   *(nạp ảnh DT2 → `fx.kiem` → kho)*; `kiem`/`doc_van_ban` giữ nguyên.
 
 # ⭐ `C1-R1-06` ⓒ: năm **2000…2099**, tháng `01…12`, chữ số **ASCII** *(khuôn cũ
 #   `^(\d{4})…$` — `\d` của `re` trên `str` nhận MỌI chữ số Unicode, nên
@@ -308,18 +301,3 @@ def doc_van_ban(van_ban: str, *, nguon: str) -> BangFX:
             or not isinstance(tho.get("dong"), list):
         raise LoiFX([f"{nguon}: ⛔ phải {{bang: '{BANG}', thang_dau, dong: [...]}}"])
     return kiem(tho["dong"], thang_dau=tho.get("thang_dau"), nguon=nguon)
-
-
-def doc_tep(duong: str = NGUON_TINH) -> BangFX:
-    """Nạp nguồn tĩnh *(tương đối gốc repo)* rồi `kiem`. `nguon` = chính `duong`.
-
-    ⛔ `C1-R1-02`: CHỈ đọc tệp NGAY dưới `nguon_tinh.THU_MUC` *(luật đường một chỗ —
-      ⛔ tuyệt đối, ⛔ `..`, ⛔ liên kết mềm ra ngoài)*. Bản cũ đọc `_GOC_REPO / duong`,
-      và `Path / '/etc/hostname'` **là** `/etc/hostname`. Đường hỏng ⇒ `LoiFX` một
-      dòng, ⛔ đọc gì.
-    """
-    try:
-        p = nguon_tinh.giai(duong)
-    except nguon_tinh.LoiNguonTinh as e:
-        raise LoiFX([str(e)]) from None
-    return doc_van_ban(p.read_text(encoding="utf-8"), nguon=duong)

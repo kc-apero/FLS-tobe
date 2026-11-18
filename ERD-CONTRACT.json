@@ -93,6 +93,124 @@
       "unique_keys": []
     },
     {
+      "table": "fls_cau_hinh_ban",
+      "kind": "table",
+      "erd_entity": "CAU_HINH_BAN",
+      "island_reason": "kho config chi-THEM — ⛔ gan dong so nao; cung ho `fls_migration`",
+      "columns": [
+        {
+          "name": "ban_id",
+          "type": "bigint",
+          "null": false,
+          "pk": true,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "bang",
+          "type": "text",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "phien_ban",
+          "type": "int",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "nguon",
+          "type": "text",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "checksum",
+          "type": "text",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "actor",
+          "type": "text",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "luc",
+          "type": "timestamptz",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        }
+      ],
+      "pk_cols": [],
+      "unique_keys": [
+        [
+          "bang",
+          "phien_ban"
+        ]
+      ]
+    },
+    {
+      "table": "fls_cau_hinh_dong",
+      "kind": "table",
+      "erd_entity": "CAU_HINH_DONG",
+      "island_reason": "dong cua kho config chi-THEM — noi FK ve `fls_cau_hinh_ban`, ca cum ⛔ gan dong so nao",
+      "columns": [
+        {
+          "name": "dong_id",
+          "type": "bigint",
+          "null": false,
+          "pk": true,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "ban_id",
+          "type": "bigint",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": "fls_cau_hinh_ban.ban_id"
+        },
+        {
+          "name": "khoa",
+          "type": "text",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "gia_tri",
+          "type": "jsonb",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        }
+      ],
+      "pk_cols": [],
+      "unique_keys": [
+        [
+          "ban_id",
+          "khoa"
+        ]
+      ]
+    },
+    {
       "table": "fls_chup",
       "kind": "table",
       "erd_entity": "CHUP",
@@ -1879,6 +1997,11 @@
       "from": "fls_adjustment",
       "to": "fls_queue_event",
       "via": "evt_id"
+    },
+    {
+      "from": "fls_cau_hinh_dong",
+      "to": "fls_cau_hinh_ban",
+      "via": "ban_id"
     },
     {
       "from": "fls_chup_dong",

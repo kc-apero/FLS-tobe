@@ -123,7 +123,9 @@ def test_MOI_khoa_ngoai_khai_deu_len_ban_do__KHONG_cai_nao_bi_loc():
     #   la cho de tuyen bo *"toi biet minh vua them mot khoa"*.
     #   23 -> 24 ngay 2026-09-18 (migration `0024`, `CR#12`):
     #   `fls_pm_link.run_pm -> fls_run.run_id`.
-    assert len(B.canh(bang)) == len(khai) == 24, \
+    #   24 -> 25 ngay 2026-11-18 (`C5`, `WO-142`, migration `0027`):
+    #   `fls_cau_hinh_dong.ban_id -> fls_cau_hinh_ban.ban_id`.
+    assert len(B.canh(bang)) == len(khai) == 25, \
         f"⛔ {len(khai)} khoá khai mà chỉ vẽ {len(B.canh(bang))}"
 
 
@@ -134,8 +136,9 @@ def test_SVG_hop_le_va_moi_FK_co_MOT_mui_ten():
     ve = B.sinh_svg(B.doc_bang())
     ET.fromstring(ve)                      # NO neu SVG ⛔ khong hop le
     # ⚠ Ghim co y — xem chu thich o `test_MOI_khoa_ngoai...`. 23 -> 24 ngay
-    #   2026-09-18 (migration `0024`): `fls_pm_link.run_pm`.
-    assert ve.count("marker-end") == len(B.canh(B.doc_bang())) == 24
+    #   2026-09-18 (migration `0024`): `fls_pm_link.run_pm`. 24 -> 25 ngay
+    #   2026-11-18 (`C5`, `0027`): `fls_cau_hinh_dong.ban_id`.
+    assert ve.count("marker-end") == len(B.canh(B.doc_bang())) == 25
 
 
 def test_HINH_HOC_khong_TRAN_khung_va_khong_CHONG_nhau():
@@ -219,14 +222,16 @@ def test_DONG_DAU_schema_py_noi_dung_so_bang_no_dang_khai():
         f"⛔ dong dau noi khac so view THAT ({n_view}): {dong_dau!r}"
 
 
-def test_schema_van_khai_du_25_bang():
+def test_schema_van_khai_du_27_bang():
     """⛔ Chot con so de mot lan xoa nham bang lo ra ngay."""
     bang = B.doc_bang()
     # ⭐ `23` → `24`: them khung xem `fls_may_goi_y` (migration `0025`,
     #   `QĐ-ITL-143`) — **toi biet minh vua them mot thuc the**
     # ⭐ `24` → `25`: them khung xem `fls_dien_giai` (migration `0026`,
     #   `QĐ-ITL-145`) — **toi biet minh vua them mot thuc the**
-    assert len(bang) == 25
+    # ⭐ `25` → `27`: them `fls_cau_hinh_ban` + `fls_cau_hinh_dong` (kho config
+    #   chi-them, `C5`, `WO-142`, migration `0027`) — HAI bang, ⛔ view
+    assert len(bang) == 27
     assert sum(1 for b in bang if getattr(b, "kind", "table") == "view") == 7
     assert schema.SEQUENCES  # bo khai van song
 

@@ -47,7 +47,8 @@ def test_KHAU_khep_ve_tong_so_bang():
     #   `QĐ-ITL-143`) — **toi biet minh vua them mot thuc the**
     # ⭐ `24` → `25`: them khung xem `fls_dien_giai` (migration `0026`,
     #   `QĐ-ITL-145`) — **toi biet minh vua them mot thuc the**
-    assert tong == len(bang) == 25, f"⛔ {tong} ≠ {len(bang)}"
+    # ⭐ `25` → `27`: them `fls_cau_hinh_ban` + `fls_cau_hinh_dong` (`C5`, `0027`)
+    assert tong == len(bang) == 27, f"⛔ {tong} ≠ {len(bang)}"
 
 
 def test_NO_khi_mot_bang_MOI_chua_khai_khau(monkeypatch):
@@ -214,21 +215,16 @@ def test_khoi_TANG_phai_dung_TRUOC_vung_KHAU():
     assert B.KHOI.search(txt).start() < txt.index(B.MOC_DAU)
 
 
-def test_MA_TRAN_tang_x_khau_cong_ve_dung_25():
+def test_MA_TRAN_tang_x_khau_cong_ve_dung_27():
     md = B.ma_tran_md(B.doc_bang())
     tong = re.findall(r"\*\*(\d+)\*\*", md.splitlines()[-1])
-    assert tong[-1] == "25", f"⛔ ma tran ⛔ khong khep ve 25: {tong}"
-    # ⭐ `23` → `24`: them khung xem `fls_may_goi_y` (migration `0025`,
-    #   `QĐ-ITL-143`) — **toi biet minh vua them mot thuc the**
-    # ⭐ `24` → `25`: them khung xem `fls_dien_giai` (migration `0026`,
-    #   `QĐ-ITL-145`) — **toi biet minh vua them mot thuc the**
-    assert sum(int(x) for x in tong[:-1]) == 25
+    assert tong[-1] == "27", f"⛔ ma tran ⛔ khong khep ve 27: {tong}"
+    # ⭐ `23` → `24` → `25` (`0025`/`0026`); `25` → `27`: `fls_cau_hinh_ban` +
+    #   `fls_cau_hinh_dong` (`C5`, `WO-142`, migration `0027`)
+    assert sum(int(x) for x in tong[:-1]) == 27
 
 
-def test_BANG_khau_liet_ke_DU_25_thuc_the():
+def test_BANG_khau_liet_ke_DU_27_thuc_the():
     md = B.bang_khau_md(B.doc_bang())
-    # ⭐ `23` → `24`: them khung xem `fls_may_goi_y` (migration `0025`,
-    #   `QĐ-ITL-143`) — **toi biet minh vua them mot thuc the**
-    # ⭐ `24` → `25`: them khung xem `fls_dien_giai` (migration `0026`,
-    #   `QĐ-ITL-145`) — **toi biet minh vua them mot thuc the**
-    assert md.count("| `fls_") == 25, "⛔ bang thieu thuc the"
+    # ⭐ `23` → `24` → `25` (`0025`/`0026`); `25` → `27`: kho config `C5` (`0027`)
+    assert md.count("| `fls_") == 27, "⛔ bang thieu thuc the"

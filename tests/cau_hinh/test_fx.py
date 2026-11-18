@@ -72,14 +72,18 @@ def _bon() -> list[dict]:
 
 
 # ── C1-B1 ─────────────────────────────────────────────────────────────────
-def test_C1_B1_nap_BON_thang_hop_le_tu_nguon_tinh():
-    """Nạp **nguồn tĩnh thật của bước** (`fls/cau_hinh/tinh/ix_fx_mau.json`).
+def test_C1_B1_nap_BON_thang_hop_le():
+    """Kiểm một bảng **4 tháng LIỀN hợp lệ**.
+
+    ⭐⭐ `C5` (`WO-142`): nguồn TĨNH `ix_fx_mau.json` + `doc_tep()` đã GỠ *(tuyến
+       đọc KHO — `tests/cau_hinh/test_kho_cau_hinh_pg.py`)*. Lõi `kiem` giữ nguyên,
+       nên bài này **giữ nguyên lo** — chỉ đổi nguồn vào thành `_bon()` *(⛔ tệp)*.
 
     ⚠ `Đ3`: *"`thieu = trung = lac = []`"* chỉ có nghĩa khi phép kiểm đã chạy trên
       một tập KHÁC RỖNG ⇒ đếm mẫu số trước: **4** dòng · **4** tháng khác nhau.
     """
     fx = _fx()
-    b = fx.doc_tep()
+    b = fx.kiem(_bon(), thang_dau=BON_THANG[0], nguon="bai-thu")
 
     assert len(b.ky) == 4, f"⛔ mong 4 dòng, đo {len(b.ky)}"
     thang = [d.yyyymm for d in b.ky]
@@ -97,18 +101,7 @@ def test_C1_B1_nap_BON_thang_hop_le_tu_nguon_tinh():
         assert d.trang_thai == "chua_ky", (d.yyyymm, d.trang_thai)
 
     assert (b.thieu, b.trung, b.lac) == ((), (), ())
-    assert b.nguon == fx.NGUON_TINH == "fls/cau_hinh/tinh/ix_fx_mau.json"
-
-
-def test_C1_B1_nguon_tinh_TU_KHAI_la_so_TONG_HOP():
-    """⛔ Nguồn tĩnh của C1 là **số bịa có chủ đích** — tệp phải TỰ NÓI điều ấy.
-
-    Một tệp tỷ giá ⛔ ghi gì về gốc của nó thì người sau sẽ tưởng đó là số thật.
-    """
-    fx = _fx()
-    tho = json.loads((GOC / fx.NGUON_TINH).read_text(encoding="utf-8"))
-    assert tho.get("tong_hop") is True, sorted(tho)
-    assert "TỔNG HỢP" in tho.get("ghi_chu", ""), tho.get("ghi_chu")
+    assert b.nguon == "bai-thu"
 
 
 # ── C1-B2 ─────────────────────────────────────────────────────────────────
@@ -428,24 +421,11 @@ def test_R1_06_yyyymm_NGOAI_dai_nam_hay_chu_so_ngoai_ASCII_thi_NO(sai):
     assert repr(sai) in str(e.value), str(e.value)
 
 
-# ── C1-R1-02 · `doc_tep` ⛔ đọc ngoài thư mục tĩnh *(NÊN SỬA)* ─────────────────
-@pytest.mark.parametrize("duong", [
-    "pyproject.toml",
-    "CLAUDE.md",
-    "../../../../../../../../etc/hostname",
-    "/etc/hostname",
-    "fls/cau_hinh/tinh/../../../CLAUDE.md",
-    str(GOC / "fls/cau_hinh/tinh/ix_fx_mau.json"),     # tuyệt đối — dù đúng tệp
-])
-def test_R1_02_doc_tep_CHI_doc_duoi_thu_muc_tinh(duong):
-    """Bản cũ đọc `_GOC_REPO / duong` — `Path / '/etc/hostname'` là `/etc/hostname`
-    *(đường tuyệt đối THẮNG gốc)*, và `..` đi ra ngoài repo. ⇒ `LoiFX` một dòng,
-    nói ra đường, ⛔ đọc gì."""
-    fx = _fx()
-    with pytest.raises(fx.LoiFX) as e:
-        fx.doc_tep(duong)
-    cau = str(e.value)
-    assert duong in cau and "\n" not in cau, cau
+# ── C1-R1-02 · luật ĐƯỜNG nguồn tĩnh ──────────────────────────────────────────
+#   ⭐⭐ `C5` (`WO-142`): `doc_tep` đã GỠ. Luật đường *(⛔ `..`, ⛔ tuyệt đối, ⛔
+#   ngoài `tinh/`)* vẫn sống ở `fls/cau_hinh/nguon_tinh.giai` và được canh ở
+#   `tests/cau_hinh/test_nguon_tinh.py::test_duong_SAI_thi_co_ly_do_MOT_dong` —
+#   ⛔ bản chép ở đây.
 
 
 # ══ Vòng sửa sau R2 (`KQ-078`) ══════════════════════════════════════════════

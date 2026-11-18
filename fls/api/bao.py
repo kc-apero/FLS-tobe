@@ -53,6 +53,14 @@ MA_LOI: dict[str, tuple[int, str]] = {
     "FLS-KHAI-THIEU": (422, "ban khai thieu truong trong 6 — ⛔ khong nap mot phan"),
     "FLS-SOAT-CHAN": (422, "co luat hang CHAN do ⇒ ⛔ khong ghi dong nao"),
     "FLS-NGUON-LA": (404, "source_id ⛔ khong co trong fls_source"),
+    # ⭐⭐ `C5` (`WO-142`) — KHO CONFIG. HAI ma, ⛔ mot — cung ly do tach
+    #    `FLS-NGUON-LA`/`FLS-KHAI-KHONG-CO`:
+    #      · `bang` config ⛔ co trong danh muc  → **404**, sua `bang`;
+    #      · `bang` CO nhung ⛔ ai nap           → **409**, di NAP.
+    #    Gop lai thi nguoi dung doc "khong tim thay" roi hoi lai dung `bang` ay.
+    "FLS-CAUHINH-BANG-LA": (404, "bang config ⛔ co trong danh muc (nguon la)"),
+    "FLS-CAUHINH-CHUA-KHAI": (
+        409, "bang config CO nhung ⛔ chua ai nap no — ⛔ roi ve anh tinh"),
     # ⭐⭐ `QĐ-ITL-110` — lan ANH CHUP. HAI ma, ⛔ KHONG mot, va cung ly do da
     #    tach `FLS-NGUON-LA` (404) khoi `FLS-KHAI-KHONG-CO` (409):
     #      · ⛔ khong co anh chup ay          → **404**, di sua `chup_id`;

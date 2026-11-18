@@ -30,7 +30,11 @@ import pytest
 GOC = Path(__file__).resolve().parents[2]
 # Chép NGUYÊN VĂN — ⛔ đọc lại từ hằng: bài canh chính hằng ấy.
 THU_MUC = "fls/cau_hinh/tinh"
-NGUON_C1 = "fls/cau_hinh/tinh/ix_fx_mau.json"
+# ⭐⭐ `C5` (`WO-142`): ẢNH TĨNH *(`mau.json` …)* đã GỠ — luật ĐƯỜNG `nguon_tinh`
+#   vẫn là hợp đồng của `Tuyen` *(phòng thủ cho tuyến tĩnh tương lai)*. Bài canh HÌNH
+#   đường ⇒ mẫu chỉ cần ĐÚNG KHUÔN, ⛔ cần tệp có thật; phép `giai` *(đòi tệp)* dựng
+#   tệp tạm qua `goc=tmp_path`.
+MAU = "fls/cau_hinh/tinh/mau.json"
 
 
 def _nt():
@@ -39,15 +43,19 @@ def _nt():
     return importlib.import_module("fls.cau_hinh.nguon_tinh")
 
 
-def test_thu_muc_khai_MOT_cho_va_nguon_THAT_cua_C1_hop_le():
+def test_thu_muc_khai_MOT_cho_va_duong_dung_khuon_hop_le(tmp_path):
     nt = _nt()
     assert nt.THU_MUC == THU_MUC
     # ⛔ `Đ3`: luật đường nào cũng "xanh" nếu ⛔ có đường hợp lệ nào đi qua nó.
-    assert nt.kiem_duong(NGUON_C1) == []
-    p = nt.giai(NGUON_C1)
-    assert p.is_file() and p == (GOC / NGUON_C1).resolve(), p
-    assert nt.kiem_khai((NGUON_C1,)) == []
+    assert nt.kiem_duong(MAU) == []
+    assert nt.kiem_khai((MAU,)) == []
     assert nt.kiem_khai(()) == [], "() = tuyến ⛔ có nguồn tĩnh — hợp lệ"
+    # `giai` đòi tệp CÓ THẬT — dựng repo giả ở `tmp_path` *(ảnh tĩnh đã GỠ ở `C5`)*.
+    tinh = tmp_path / THU_MUC
+    tinh.mkdir(parents=True)
+    (tinh / "mau.json").write_text("{}", encoding="utf-8")
+    p = nt.giai(MAU, goc=tmp_path)
+    assert p.is_file() and p == (tmp_path / MAU).resolve(), p
 
 
 @pytest.mark.parametrize("duong,phai_noi", [
@@ -57,16 +65,16 @@ def test_thu_muc_khai_MOT_cho_va_nguon_THAT_cua_C1_hop_le():
     ("fls/cau_hinh/tinh", "tên tệp"),                           # R1 · E — thư mục
     ("fls/cau_hinh/tinh/", "khúc rỗng"),
     ("/etc/hostname", "TUYỆT ĐỐI"),
-    (str(GOC / NGUON_C1), "TUYỆT ĐỐI"),                         # dù đúng tệp
+    (str(GOC / MAU), "TUYỆT ĐỐI"),                         # dù đúng tệp
     ("fls/cau_hinh/tinh/../../../CLAUDE.md", "khúc rỗng"),      # `..` giữa đường
-    ("fls/cau_hinh/tinh/./ix_fx_mau.json", "khúc rỗng"),        # `.`
-    ("fls//cau_hinh/tinh/ix_fx_mau.json", "khúc rỗng"),
-    ("fls/cau_hinh/tinh/con/ix_fx_mau.json", "NGAY dưới"),      # thư mục con
-    ("fls\\cau_hinh\\tinh\\ix_fx_mau.json", "POSIX"),
-    ("C:/fls/cau_hinh/tinh/ix_fx_mau.json", "TUYỆT ĐỐI"),       # ổ đĩa Windows
-    ("fls/cau_hinh/tinh/ix_fx_mau.txt", "tên tệp"),             # ⛔ `.json`
+    ("fls/cau_hinh/tinh/./mau.json", "khúc rỗng"),        # `.`
+    ("fls//cau_hinh/tinh/mau.json", "khúc rỗng"),
+    ("fls/cau_hinh/tinh/con/mau.json", "NGAY dưới"),      # thư mục con
+    ("fls\\cau_hinh\\tinh\\mau.json", "POSIX"),
+    ("C:/fls/cau_hinh/tinh/mau.json", "TUYỆT ĐỐI"),       # ổ đĩa Windows
+    ("fls/cau_hinh/tinh/mau.txt", "tên tệp"),             # ⛔ `.json`
     ("fls/cau_hinh/tinh/IX FX.json", "tên tệp"),                # ngoài `[a-z0-9_]`
-    (" fls/cau_hinh/tinh/ix_fx_mau.json", "khoảng trắng"),
+    (" fls/cau_hinh/tinh/mau.json", "khoảng trắng"),
     ("", "rỗng"),
 ])
 def test_duong_SAI_thi_co_ly_do_MOT_dong(duong, phai_noi):
@@ -82,7 +90,7 @@ def test_duong_SAI_thi_co_ly_do_MOT_dong(duong, phai_noi):
     assert "\n" not in str(e.value), str(e.value)
 
 
-@pytest.mark.parametrize("sai", [Path(NGUON_C1), None, NGUON_C1.encode(), 1])
+@pytest.mark.parametrize("sai", [Path(MAU), None, MAU.encode(), 1])
 def test_duong_SAI_KIEU_thi_mot_ly_do_noi_kieu(sai):
     nt = _nt()
     ly_do = nt.kiem_duong(sai)
@@ -90,10 +98,10 @@ def test_duong_SAI_KIEU_thi_mot_ly_do_noi_kieu(sai):
 
 
 @pytest.mark.parametrize("khai,phai_noi", [
-    (NGUON_C1, "str"),                  # R1 · C — quên dấu phẩy tuple
-    ([NGUON_C1], "list"),
-    ((Path(NGUON_C1),), "PosixPath" if os.name != "nt" else "WindowsPath"),
-    ((NGUON_C1, NGUON_C1), "trùng"),
+    (MAU, "str"),                  # R1 · C — quên dấu phẩy tuple
+    ([MAU], "list"),
+    ((Path(MAU),), "PosixPath" if os.name != "nt" else "WindowsPath"),
+    ((MAU, MAU), "trùng"),
 ])
 def test_khai_SAI_KIEU_thi_MOT_dong_KHONG_mot_cau_moi_ky_tu(khai, phai_noi):
     """R1 · C: `soi` cũ lặp trên CHUỖI ⇒ **32** câu rác. Luật mới: sai kiểu ⇒ **một**

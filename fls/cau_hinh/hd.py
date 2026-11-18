@@ -51,20 +51,15 @@ from collections import Counter
 from dataclasses import dataclass
 from typing import Any, Iterable, Mapping
 
-from fls.cau_hinh import nguon_tinh
-
 BANG = "IX.HD"
 # Nhóm Mapping Master mang thêm `IX.ORG` ở cùng tệp ⇒ vỏ ảnh ghi `IX.HD · IX.ORG`.
 BANG_MM = "IX.HD · IX.ORG"
 
-# ⭐ Đường ẢNH TĨNH — khai **MỘT chỗ, ở đây** *(tương đối gốc repo, POSIX)*. Phải nằm
-#   NGAY dưới `nguon_tinh.THU_MUC` *(luật đường — `C1-R1-02`)*. `fls/api/bang_tuyen.py`
-#   khai `nguon_tinh=(hd.NGUON_TINH, hd.NGUON_MM)` bằng CHÍNH hai hằng này, và hàm xử
-#   lý gọi `doc_tep()`/`doc_mm()` với mặc định là chúng ⇒ ⛔ chuỗi đường nào gõ lại ở
-#   chỗ thứ hai *(cổng `soi_bang_tuyen` ⓔ2 đòi đường khai hiện NGUYÊN VĂN trong đồ thị
-#   gọi của hàm; giữ hằng chuỗi trơn, ⛔ ghép f-string)*.
-NGUON_TINH = "fls/cau_hinh/tinh/ix_hd_cay.json"
-NGUON_MM = "fls/cau_hinh/tinh/ix_mapping_master.json"
+# ⭐⭐ `C5` (`WO-142`): GỠ hai ẢNH TĨNH `ix_hd_cay.json` · `ix_mapping_master.json`
+#   + `doc_tep()`/`doc_mm()`. Tuyến `GET /config/hd` nay đọc **KHO** config
+#   chỉ-thêm qua `fls.repo.cau_hinh_repo` *(nạp ảnh DT3 → `hd.kiem`/`doc_mm_van_ban`
+#   → kho; MM chỉ lưu `hd_code`, ⛔ bảng phụ `tho`)*; `kiem`/`doc_van_ban`/
+#   `doc_mm_van_ban` giữ nguyên.
 
 # ── Tên lỗi cây *(hằng chuỗi — ⛔ `ValueError` trơn)* ───────────────────────────
 HD_CHU_TRINH = "HD_CHU_TRINH"      # A→B→A
@@ -136,9 +131,21 @@ class CayHD:
         return tuple(ra)
 
 
+# ⭐⭐ `C4-R2-01` *(AC-8, orchestrator 18/11)*: `int('9'*5000)` NÉM `ValueError`
+#   *(giới hạn `sys.get_int_max_str_digits()` = 4300 của Python 3.11+)* ⇒ một ô
+#   `cap`/`thu_tu` chuỗi dài cho ra `ValueError` trơn trước khi kịp thành `HD_HONG`.
+#   Giới hạn độ dài TRƯỚC `int()`: config ⛔ bao giờ có cột số dài quá `18` chữ số
+#   *(cấp 1…n · thứ tự dòng — xa dưới `4300`, xa trên mọi giá trị thật)*.
+_SO_TOI_DA_CHU_SO = 18
+# `C4-R2-02`: câu lỗi cắt ô dài *(⛔ nhắc nguyên ô 5.000 ký tự)*.
+_O_TOI_DA = 40
+
+
 def _mot_dong(s: Any) -> str:
-    """Giá trị lạ đưa vào câu lỗi — ⛔ để nó phá luật *"một dòng"*."""
-    return " ".join(repr(s).split())
+    """Giá trị lạ đưa vào câu lỗi — ⛔ để nó phá luật *"một dòng"*; và CẮT ô dài
+    *(`C4-R2-02`: một câu lỗi 5.000 ký tự là một câu ⛔ ai đọc)*."""
+    r = " ".join(repr(s).split())
+    return r if len(r) <= _O_TOI_DA else r[:_O_TOI_DA] + "…"
 
 
 def _chu(o: Any) -> tuple[str | None, str]:
@@ -171,6 +178,12 @@ def _so(v: Any) -> tuple[int | None, str]:
     if isinstance(v, int):
         return v, ""
     if isinstance(v, str) and (s := v.strip()).isascii() and s.isdigit():
+        # ⛔⛔ `C4-R2-01`: chặn độ dài TRƯỚC `int()` — `int('9'*5000)` NÉM
+        #    `ValueError` *(giới hạn 4300 chữ số)*, một lối exception TRƠN ra
+        #    ngoài `kiem`. Config ⛔ có cột số dài thế này.
+        if len(s) > _SO_TOI_DA_CHU_SO:
+            return None, (f"{_mot_dong(v)} ⛔ phải số nguyên "
+                          f"(quá {_SO_TOI_DA_CHU_SO} chữ số)")
         return int(s), ""
     return None, f"{_mot_dong(v)} ⛔ phải số nguyên"
 
@@ -301,29 +314,20 @@ def doc_van_ban(van_ban: str, *, nguon: str) -> CayHD:
     """Lõi đọc ẢNH ATL: VĂN BẢN JSON `{bang:'IX.HD', …, dong:[...]}` ⇒ `kiem`.
 
     JSON hỏng ⇒ `LoiHD(HD_HONG)` *(⛔ `JSONDecodeError` trơn — `C4-R1-01`)*.
+
+    ⭐⭐ `C4-R2-01` *(AC-8)*: bắt CẢ `ValueError` *(số JSON 5.000 chữ số ⇒ `json.loads`
+      NÉM `ValueError`, ⛔ `JSONDecodeError`)* lẫn `RecursionError` *(`'['*100000` ⇒
+      lồng sâu)* — hai lối exception TRƠN. `JSONDecodeError` là con của `ValueError`.
     """
     try:
         tho = json.loads(van_ban)
-    except json.JSONDecodeError as e:
+    except (ValueError, RecursionError) as e:
         raise LoiHD([(HD_HONG, f"{nguon}: JSON hỏng — {_mot_dong(str(e))}")]) from None
     if not isinstance(tho, dict) or tho.get("bang") != BANG \
             or not isinstance(tho.get("dong"), list):
         raise LoiHD([(HD_HONG,
                       f"{nguon}: ⛔ phải {{bang: '{BANG}', dong: [...]}}")])
     return kiem(tho["dong"], nguon=nguon)
-
-
-def doc_tep(duong: str = NGUON_TINH) -> CayHD:
-    """Nạp ẢNH ATL *(tương đối gốc repo)* rồi `kiem`. `nguon` = chính `duong`.
-
-    ⛔ `C1-R1-02`: CHỈ đọc tệp NGAY dưới `nguon_tinh.THU_MUC` *(luật đường một chỗ —
-      ⛔ tuyệt đối, ⛔ `..`, ⛔ liên kết mềm ra ngoài)*. Đường hỏng ⇒ `LoiHD` một dòng.
-    """
-    try:
-        p = nguon_tinh.giai(duong)
-    except nguon_tinh.LoiNguonTinh as e:
-        raise LoiHD([(HD_HONG, str(e))]) from None
-    return doc_van_ban(p.read_text(encoding="utf-8"), nguon=duong)
 
 
 def _ma_mm(hd_code: str) -> str:
@@ -345,7 +349,7 @@ def doc_mm_van_ban(van_ban: str, *, nguon: str) -> tuple[str, ...]:
     """
     try:
         tho = json.loads(van_ban)
-    except json.JSONDecodeError as e:
+    except (ValueError, RecursionError) as e:    # `C4-R2-01`: + số dài · lồng sâu
         raise LoiHD([(HD_HONG, f"{nguon}: JSON hỏng — {_mot_dong(str(e))}")]) from None
     if not isinstance(tho, dict) or tho.get("bang") != BANG_MM \
             or not isinstance(tho.get("dong"), list):
@@ -370,16 +374,3 @@ def doc_mm_van_ban(van_ban: str, *, nguon: str) -> tuple[str, ...]:
     if loi:
         raise LoiHD(loi)
     return tuple(ma)
-
-
-def doc_mm(duong: str = NGUON_MM) -> tuple[str, ...]:
-    """Nạp ảnh Mapping Master *(tương đối gốc repo)*, trả **mã HD** *(⛔ COA/HR)*.
-
-    ⭐ **Chỉ các mã, theo thứ tự ảnh** — `C4` DÙNG để LIỆT KÊ chênh với ATL, ⛔ hoà
-      giải *(`74 ↔ 73`, `ATL − MM = {NCF}` — `BG-107`)*. Lõi: `doc_mm_van_ban`.
-    """
-    try:
-        p = nguon_tinh.giai(duong)
-    except nguon_tinh.LoiNguonTinh as e:
-        raise LoiHD([(HD_HONG, str(e))]) from None
-    return doc_mm_van_ban(p.read_text(encoding="utf-8"), nguon=duong)

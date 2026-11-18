@@ -22,6 +22,7 @@ from typing import Any, Callable
 
 from fls.adapters.pm_join import canon_ref
 from fls.cau_hinh import fx, hd
+from fls.repo import cau_hinh_repo as chc
 from fls.repo import do_mau_so as dms
 from fls.repo import doc_bao_cao as bc
 from fls.repo import lenh_cho as lc
@@ -1031,12 +1032,23 @@ HAM.update({"lenh_cho": lenh_cho, "lenh_cho_tom": lenh_cho_tom,
 def ty_gia(yc: YeuCau):
     """`GET /config/fx` — hợp đồng ISP 3.1.2 Step 2 mục 2, **nguyên văn**:
     `{bang, nguon, ky:[{yyyymm, USD, SGD, COP, VND, HKD, trang_thai}], thieu,
-    trung, lac}`."""
+    trung, lac}`.
+
+    ⭐⭐ `C5` (`WO-142`): đọc từ **KHO** `fls_cau_hinh_*` *(⛔ còn ảnh tĩnh)* qua
+       `cau_hinh_repo.doc_fx(yc.conn)`. Hợp đồng ra ⛔ đổi — chỉ đổi NGUỒN.
+    ⛔ Kho RỖNG *(chưa nạp)* ⇒ `409 FLS-CAUHINH-CHUA-KHAI` *(có TÊN)*, ⛔ rơi về
+       ảnh tĩnh, ⛔ trả bản mặc định *(AC-5)*.
+    """
     if yc.pv.kieu != "nap_that":
         raise LoiCua("FLS-BAD-REQUEST",
                      f"bang ty gia ⛔ theo lan nap — bo `run_id` "
                      f"({yc.pv.mo_ta()}): `meta` ⛔ duoc khai mot pham vi ⛔ ap")
-    b = fx.doc_tep()
+    try:
+        b = chc.doc_fx(yc.conn)
+    except chc.ChuaKhai as e:
+        raise LoiCua("FLS-CAUHINH-CHUA-KHAI", str(e)) from e
+    except chc.BangLa as e:      # ⛔ xảy ra (`bang` cố định) — ⛔ nuốt lỗi
+        raise LoiCua("FLS-CAUHINH-BANG-LA", str(e)) from e
     return {"bang": fx.BANG, "nguon": b.nguon,
             "ky": [{"yyyymm": d.yyyymm,
                     **{te: d.ty_gia[te] for te in fx.TIEN_TE},
@@ -1056,29 +1068,36 @@ HAM.update({"ty_gia": ty_gia})
 #   trình · cấp ⛔ nhảy)* nằm ở `fls/cau_hinh/hd.py` — đúng luật *"router mỏng, ⛔
 #   chứa luật"*. ⛔⛔ `cha = Σ con` là việc engine **H5**; ⛔ hoà giải `74 ↔ 73` —
 #   chỉ **liệt kê** `chenh_mapping_master` *(ràng buộc WO-122; `BG-107`: `{NCF}`)*.
-# ⚠ `yc.conn` ⛔ dùng *(y `ty_gia`)*: ảnh đến từ nguồn TĨNH cho tới `C5`. Cửa vẫn mở
-#   kết nối CHỈ ĐỌC cho mọi tuyến — vô hại.
-# ⭐ `data_status = flash`: ảnh ⛔ được khoác `reconciled`/`signed` *(`INV-I14`)*.
-# ⛔ Vòng `?run_id=` ⇒ `400` — CÙNG lý do `C1-R1-07` *(`ty_gia` trên)*: ảnh TĨNH ⛔
-#   theo lần nạp, nên `meta` nói một phạm vi ⛔ được áp. Từ chối, ⛔ trả cây trơn+200.
+# ⭐⭐ `C5` (`WO-142`): đọc từ **KHO** qua `cau_hinh_repo.doc_hd`/`doc_mm` *(⛔ còn
+#   ảnh tĩnh)*. `yc.conn` nay CÓ dùng — cửa mở kết nối CHỈ ĐỌC cho mọi tuyến.
+# ⭐ `data_status = flash`: config ⛔ được khoác `reconciled`/`signed` *(`INV-I14`)*.
+# ⛔ Vòng `?run_id=` ⇒ `400` — CÙNG lý do `C1-R1-07` *(`ty_gia` trên)*: kho config
+#   chỉ-thêm cũng ⛔ theo lần nạp, nên `meta` nói một phạm vi ⛔ được áp. Từ chối.
 def cay_hd(yc: YeuCau):
-    """`GET /config/hd` — cây IX.HD từ ảnh ATL + đối chiếu Mapping Master.
+    """`GET /config/hd` — cây IX.HD từ kho + đối chiếu Mapping Master.
 
     Trả `{bang:'IX.HD', nguon, nguon_mm, so_atl (74), so_mapping_master (73),
     chenh_mapping_master:[mã ATL ⛔ có ở MM], goc:[mã gốc], nhom:[6 nhóm],
     nut:[{ma, ten, cha, cap, nhom, dong_sheet, con_cua:[mã con], la}]}`.
+
+    ⛔ Kho RỖNG ⇒ `409 FLS-CAUHINH-CHUA-KHAI` *(có TÊN)*, ⛔ rơi về ảnh tĩnh *(AC-5)*.
     """
     if yc.pv.kieu != "nap_that":
         raise LoiCua("FLS-BAD-REQUEST",
                      f"cay IX.HD ⛔ theo lan nap — bo `run_id` "
                      f"({yc.pv.mo_ta()}): `meta` ⛔ duoc khai mot pham vi ⛔ ap")
-    cay = hd.doc_tep()
-    mm = hd.doc_mm()
+    try:
+        cay = chc.doc_hd(yc.conn)
+        mm = chc.doc_mm(yc.conn)
+    except chc.ChuaKhai as e:
+        raise LoiCua("FLS-CAUHINH-CHUA-KHAI", str(e)) from e
+    except chc.BangLa as e:      # ⛔ xảy ra (`bang` cố định) — ⛔ nuốt lỗi
+        raise LoiCua("FLS-CAUHINH-BANG-LA", str(e)) from e
     atl_ma = {n.ma for n in cay.nut}
-    return {"bang": hd.BANG, "nguon": cay.nguon, "nguon_mm": hd.NGUON_MM,
-            "so_atl": len(cay.nut), "so_mapping_master": len(mm),
+    return {"bang": hd.BANG, "nguon": cay.nguon, "nguon_mm": mm.nguon,
+            "so_atl": len(cay.nut), "so_mapping_master": len(mm.ma),
             # ⛔ CHỈ liệt kê — ⛔ hoà giải. `sorted` cho tất định.
-            "chenh_mapping_master": sorted(atl_ma - set(mm)),
+            "chenh_mapping_master": sorted(atl_ma - set(mm.ma)),
             "goc": list(cay.goc), "nhom": list(cay.nhom),
             "nut": [{"ma": n.ma, "ten": n.ten, "cha": n.cha, "cap": n.cap,
                      "nhom": n.nhom, "dong_sheet": n.dong_sheet,

@@ -43,12 +43,15 @@ flowchart TB
   end
   subgraph 7_ha_tang["⑦ HẠ TẦNG — sổ di trú"]
     direction LR
+    fls_cau_hinh_ban["fls_cau_hinh_ban"]
+    fls_cau_hinh_dong["fls_cau_hinh_dong"]
     fls_migration["fls_migration"]
   end
 
   fls_adjustment -->|itl_id| fls_itl
   fls_adjustment -->|reversal_of| fls_adjustment
   fls_adjustment -->|evt_id| fls_queue_event
+  fls_cau_hinh_dong -->|ban_id| fls_cau_hinh_ban
   fls_chup_dong -->|chup_id| fls_chup
   fls_chup_dong -->|source_id| fls_source
   fls_chup_nguon -->|chup_id| fls_chup

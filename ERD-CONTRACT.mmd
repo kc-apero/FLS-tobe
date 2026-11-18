@@ -11,6 +11,21 @@ erDiagram
         bigint evt_id FK
         text nguon
     }
+    fls_cau_hinh_ban {
+        bigint ban_id PK
+        text bang
+        int phien_ban
+        text nguon
+        text checksum
+        text actor
+        timestamptz luc
+    }
+    fls_cau_hinh_dong {
+        bigint dong_id PK
+        bigint ban_id FK
+        text khoa
+        jsonb gia_tri
+    }
     fls_chup {
         bigint chup_id PK
         timestamptz doc_luc
@@ -249,6 +264,7 @@ erDiagram
     fls_itl ||--o{ fls_adjustment : "itl_id"
     fls_adjustment ||--o{ fls_adjustment : "reversal_of"
     fls_queue_event ||--o{ fls_adjustment : "evt_id"
+    fls_cau_hinh_ban ||--o{ fls_cau_hinh_dong : "ban_id"
     fls_chup ||--o{ fls_chup_dong : "chup_id"
     fls_source ||--o{ fls_chup_dong : "source_id"
     fls_chup ||--o{ fls_chup_nguon : "chup_id"
