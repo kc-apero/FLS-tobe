@@ -125,6 +125,8 @@ Thay dung sai `atol 1e-6` chung bằng **dung sai THEO CỘT có căn cứ đo**
 ### Nguồn gốc `phu.so_du_dau` *(chốt orchestrator — trả lời Q1 của BG gốc; ⛔ đổi mã/hằng)*
 5 hằng số dư đầu kỳ *(hàng 24 = ngày **2024-12-31**)* = số dư 31/12/2024 của tab `2. CCR` + `2. CCR Cash`, **LOẠI pháp nhân VVOO** *(số dư VVOO = lũy kế dòng sổ hàng 10…24 = 184.184.303)*; 3 hằng bVND/mUSD = 3 hằng tiền tệ × tỷ giá 2024-12 *(khớp từng đồng; lệch chỉ do làm tròn + VND gõ thừa 2)*. Chi tiết soát: `CALC_ZONE_406.md` mục *"Đính chính + soát logic từng ô hàng 24"* *(nhánh làm việc — chờ gộp cùng H4, như `H4-R1-05`)*. **GIỮ 5 hằng y sheet 406** *(parity AS-IS)*; H4 ⛔ đổi mã/hằng ở vòng sửa này.
 
+> **Đính chính R2** *(`H4-R2-04` · Đ4 — NHÃN; chỉ THÊM, ⛔ xoá câu cũ)*: câu *"3 hằng bVND/mUSD"* ở trên SAI nhãn. Đo lại *(KQ-135 thử phá #6)*: 5 ô hàng 24 = **3** hằng tiền tệ `ton` *(`AX24` USD · `BA24` SGD · `BG24` VND)* + **2** hằng bVND/mUSD *(`BQ24` bvnd_ton · `BT24` musd_ton)*. Tức *"3 hằng bVND/mUSD"* phải đọc là **2** *(bVND/mUSD)* **+ 3** *(tiền tệ)*. ⛔ đổi hằng — chỉ sửa nhãn.
+
 ### H4-R1-03 — ô bỏ + no-op thành phép ĐO
 `ô đáp án bỏ = 36` *(6 hàng thiếu D, mỗi hàng 6 ô khác rỗng `BM·BN·BQ·BR·BS·BT`; tổng ô đáp án khác rỗng `63052` − so `63016` = `36`)* in ở `_in_bao` + `hd2_cong.json`. No-op đo: `BM·BQ·BT[ds] == [ds−1]` ở **6/6** hàng *(BR=0)* ⇒ `no_op_lech=[]`; lệch ⇒ ĐỎ.
 
@@ -144,3 +146,57 @@ Thay dung sai `atol 1e-6` chung bằng **dung sai THEO CỘT có căn cứ đo**
 1. **BQ/BT cộng dồn**: độ nhạy bị `rtol` giới hạn ở đuôi *(lệch dưới ~1.000 VND không cắn — như R1 đã khai)*; đã nới `atol BQ` lên `1e-11` vì noise cộng dồn sát `1e-12`. Nếu ảnh đáp án tái sinh *(checksum đổi)*, cần đo lại biên.
 2. **`hd2_cong.json` đổi cấu trúc** `dung_sai` → `dung_sai_theo_cot` *(⛔ "chỉ THÊM")* — làm TRƯỚC khi `CG2` *(Step 30)* ghim hợp đồng, đúng khuyến nghị A của `KQ-134 Q1`.
 3. **`H4-R1-04`** chỉ ghim tập đóng ở **khuôn** *(bảo vệ lần đóng băng sau)* + `test_DV_B4` *(bảo vệ ảnh đã commit)*; ảnh hiện `9339488011a9358e` ⛔ đổi *(4 giá trị vẫn `#N/A ()`)*.
+
+## Vòng sửa sau R2 (KQ-135)
+
+| | |
+|---|---|
+| **Phiên** | `fls-dev` cloud con *(Opus 4.8 · làn BE-HC)* · 2026-11-18 · cụm PG **5435** · nhánh `isp/H4` |
+| **Nền vòng sửa** | `9d45847` *(KQ-135 · R2 kiểm)* |
+| **R2 `KQ-135`** | ĐẠT · 0 CHẶN · **1 NÊN SỬA** `H4-R2-01` · **3 GHI NHẬN** `-02/-03/-04` *(orchestrator chốt Q1=A · Q2=A)* |
+| **Làm** | sửa `-01` *(NÊN SỬA)* + `-02`·`-03`·`-04` *(GHI NHẬN)*; `H4-R1-05`/`H4-R2` mục số dư `CALC_ZONE_406.md` ⛔ chạm *(orchestrator gộp)* |
+| **Commit** | ⑤ mã + bài + `hd2_cong.json` `d83ec5b` · ⑥ BG này — sha ở TIN NHẮN CUỐI |
+
+### Tóm tắt một dòng
+Hạ `rtol` CŨ chung `1e-9` *(rộng ≥ 10⁴× noise đo)* xuống **THEO CỘT** = ~10–40× max rel đo *(BM·BN `2e-12` · BO·BP·BR·BS `1e-14` · BQ·BT `4e-11`)*, **khoá `ô đáp án bỏ`** bằng `MONG_O_DAP_AN_BO = 36`, đổi `ITL_LOI_RE` *(lớp ký tự)* thành **TẬP ĐÓNG liệt kê** lỗi Sheets; parity thật vẫn `63016/63016` ĐẠT, 3 đột biến từng XANH nay ĐỎ, đính chính 1 nhãn BG.
+
+### Phát hiện đã sửa
+| Phát hiện | Mức | ĐÃ SỬA *(tệp)* | Bằng chứng mới | Đỏ-trước *(mã cũ `9d45847`)* |
+|---|---|---|---|---|
+| `H4-R2-01` rtol rộng | NÊN SỬA | `do_hd2.py` `DUNG_SAI_COT` *(rtol theo cột)* · `hd2_cong.json` `dung_sai_theo_cot` | `BM +1 VND` ở hàng \|BM\| lớn nhất *(ds1960)* ⇒ **ĐỎ** *(tol đuôi ~0,6 VND)* · `BQ +1e-9` ở hàng \|BQ\| nhỏ ⇒ **ĐỎ** | `rtol 1e-9` cũ ⇒ cả hai **XANH** *(bài `_mong_rtol_cu` chứng trong chính test)* |
+| `H4-R2-02` ô bỏ chưa khoá | GHI NHẬN | `do_hd2.py` `MONG_O_DAP_AN_BO=36` + khoá ở `_phan_xu` *(+ in `mong` + `hd2_cong.json`)* | xoá `BN[4962]` ⇒ `o_dap_an_bo 35` **ĐỎ** *(parity `tong_o` ⛔ đổi — hàng thiếu D bỏ khỏi so)* | ⛔ khoá ⇒ `dat=True` **ĐẠT** |
+| `H4-R2-03` cột R regex | GHI NHẬN | `gl_406_dau_vao.py` `ITL_LOI_RE` → `ITL_LOI_HOP_LE` *(frozenset)* · `test_DV_B4` ghim | `#NGUYENVANA0912345678` *(chữ HOA + số)* ⇒ **TỪ CHỐI** · `#N/A ()` ⇒ OK | regex lớp ký tự `#[A-Z/0-9!?]+` **nhận** chuỗi ấy *(PII)* ⇒ **ĐẠT** |
+| `H4-R2-04` nhãn BG | GHI NHẬN | BG *(mục "Nguồn gốc `phu.so_du_dau`")* — thêm đính chính | *"3 hằng bVND/mUSD"* ⇒ **2** bVND/mUSD + **3** tiền tệ | — *(chỉ nhãn; ⛔ đổi hằng)* |
+
+### `rtol` THEO CỘT — căn cứ ĐO *(18/11, 7.877 dòng; engine ↔ đáp án, KHÔNG áp dung sai)*
+| cột | max rel đo | rtol cũ | rtol MỚI | biên rtol/rel | knob CẮN |
+|---|---|---|---|---|---|
+| **BM** | 1,60e-13 | 1e-9 | **2e-12** | ×12,5 | rtol *(\|exp\|~1e11 ⇒ `BM +1 VND` cắn ở đuôi)* |
+| BN | 1,60e-13 | 1e-9 | **2e-12** | ×12,5 | rtol |
+| BO | 3,03e-16 | 1e-9 | **1e-14** | ×33 | rtol *(≥\|exp\|~100)* |
+| BP | 2,38e-16 | 1e-9 | **1e-14** | ×42 | rtol |
+| **BQ** | 3,19e-12 | 1e-9 | **4e-11** | ×12,5 | atol+rtol *(cộng dồn — `BQ +1e-9` cắn ở hàng \|BQ\| nhỏ)* |
+| BR | 3,38e-16 | 1e-9 | **1e-14** | ×29,6 | atol *(\|exp\|≤4,5 ⇒ `rtol·\|exp\|<atol`)* |
+| BS | 3,72e-16 | 1e-9 | **1e-14** | ×26,9 | atol *(\|exp\|≤5,1)* |
+| BT | 2,04e-12 | 1e-9 | **4e-11** | ×19,6 | atol+rtol *(cộng dồn)* |
+
+- **Sàn cũ → mới:** `rtol 1e-9` CHUNG *(rộng ≥ 10⁴× noise ⇒ BM lọt `+50 VND`, đuôi BO lỏng `1,16e-7`, `atol` BQ/BT là **mã chết** vì `rtol·\|exp\| ≫ atol`)* → `rtol` **THEO CỘT** `2e-12`·`1e-14`·`4e-11`. `atol` giữ nguyên *(sàn tuyệt đối — ôm max\|lệch\| cộng dồn)*.
+- **Lệch là CỐ ĐỊNH** *(chạy 2 lần cùng kết — khác-triển-khai Excel↔Python, ⛔ noise ngẫu nhiên BLAS)* ⇒ biên ~10–40× đủ an toàn. Gate thật vẫn `63016/63016` *(mọi noise tuyệt đối < atol)*.
+- **Sửa câu SAI** *(Đ4)*: `dung_sai_ghi_chu` cũ ghi *"atol THEO CỘT = ~10× noise"* — nay nêu rõ **hai knob** *(atol sàn tuyệt đối · rtol ~10–40× max rel)* và knob CẮN từng cột.
+
+### Giới hạn còn lại *(Dev tự thấy)*
+1. **`BM +1 VND` cắn ở hàng \|BM\| LỚN** *(tol đuôi ~0,6 VND)*; hàng \|BM\| nhỏ hơn thì ngưỡng `rtol·\|exp\|` nhỏ hơn nên cũng cắn. **`BQ +1e-9`** chỉ cắn ở hàng \|BQ\| ≲ 24 *(lỗi tuyệt đối 1e-9 ẩn trong ngưỡng tương đối ở hàng lớn)* — đúng bản chất: lỗi tuyệt đối nhỏ chỉ đo được nơi giá trị nhỏ. Lỗi **lặp nhiều dòng** vẫn bị cắn qua lũy kế BM.
+2. **Nếu ảnh đáp án tái sinh** *(checksum đổi)*: đo lại max rel từng cột, chọn lại `rtol` = ~10–40× *(kịch bản đo ở scratchpad phiên này — ⛔ commit)*.
+
+### Cổng R2 (kết quả nguyên văn — cụm 5435, container Linux)
+| Lệnh | Kết quả |
+|---|---|
+| `tools/do_hd2.py --goi WP-C2` | `63016/63016` · hàng đáp án `7883` · ô đáp án bỏ `36 (mong 36)` · no-op `[]` · 0 lệch ngoài tên · **KẾT: DAT** · exit 0 |
+| `pytest tests/oracle/test_do_hd2_ca.py tests/du_lieu/test_dap_an_406_dau_vao.py` | `31 passed` *(+4: 19 + 12)* |
+| `pytest tests/oracle` | `177 passed` |
+| `dung_moi_truong_isp.sh --duong-nen --cong 5435` *(chạy MỘT MÌNH)* | **KẾT: ĐẠT** — `12 failed, 3115 passed, 2 xfailed, 14 errors`; đỏ+XFAIL = nền `28 = 28` *(+0 −0)* · chạy `3143 (mong ≥ 3143)` · skipped 0 · web `3 = 3` |
+| `.venv/bin/lint-imports` | `Contracts: 11 kept, 0 broken.` |
+| `docs/ITL/_tools/kiem_tai_lieu.py` | `✅ cong tai lieu DAT` *(252 file · 2332 bảng)* |
+
+### Q8 — sàn pytest
+`MONG_PYTEST_TOAN_BO` **3139 → 3143** *(+4 = 3 `test_do_hd2_ca` `H4-R2-01/02` + 1 `test_dap_an_406_dau_vao` `H4-R2-03`)*; bài ghim `tests/test_dung_moi_truong_isp.py` *(`== "3143"`)* nâng cùng commit ⑤ *(= số `pytest --collect-only` = 3143)*.
