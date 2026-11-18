@@ -1,0 +1,35 @@
+{
+ "_vi_sao": "Sinh bởi `python tools/phan_loai_ly_do.py --khoa <bản đọc> --ghi` (ISP 3.1.2 Step 5 · DT1b · BG-096) từ khoá đọc ở nguồn trên máy owner (O10). ⛔ sửa tay — `python tools/phan_loai_ly_do.py` kiểm lại tệp này. Mỗi dòng sổ thiếu của DT1a mang ĐÚNG một nhãn trong bảng đóng.",
+ "khong_mang_PII": "Mỗi dòng đúng 6 khoá (dong_sheet · ky · nhan · khoa_bam · lech · ghi_chu); khoá ghép chỉ ở dạng sha256 16 ký tự hex của bộ 5 trường ĐÃ chuẩn hoá. Máy chặn trước khi ghi và khi kiểm tệp: khoá ngoài lược đồ · tên khoá ở mọi tầng chứa Diễn giải / Số chứng từ / Số CT / email (bỏ dấu) · khoa_bam ⛔ phải 16 hex · email trong mọi chuỗi · ô `#N/A` dạng dài của VLOOKUP (nhúng mã giao dịch); riêng lúc đo: mọi token trùng Số chứng từ ≥ 6 ký tự (thô hoặc đã chuẩn hoá) hay số tiền ≥ 6 chữ số của đầu vào.",
+ "nguon": {
+  "tep_dt1a": null,
+  "anh_so": "tests/fixture/dt1b_moc_20261118.json",
+  "ban_doc_sha256_16": "a413c8347bdf52b3"
+ },
+ "mau_so": {
+  "thieu": 0,
+  "so_dong_so": 12590,
+  "so_dong_l1": 12590,
+  "so_dong_ghep_dt1a": 12590,
+  "tai_lap": 12590,
+  "khoa_hong": {
+   "SO": 0,
+   "L1": 0
+  },
+  "dang_khoa_hoc": {
+   "SO": 43,
+   "L1": 43
+  }
+ },
+ "dem_nhan": {
+  "KHONG_CO_SAO_KE": 0,
+  "KHOA_LECH": 0,
+  "TRUNG_SEQ": 0,
+  "KHAC": 0
+ },
+ "nhan_theo_ky": {},
+ "van_tay": {
+  "thieu": "4f53cda18c2baa0c"
+ },
+ "dong_thieu": []
+}

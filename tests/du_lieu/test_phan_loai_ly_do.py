@@ -57,7 +57,7 @@ GOC = Path(__file__).resolve().parents[2]
 TOOL = GOC / "tools" / "phan_loai_ly_do.py"
 DT1A = GOC / "docs" / "ITL" / "_tools" / "phan_loai_dong_thieu.json"
 ANH_SO = GOC / "tests" / "fixture" / "itl_ledge_adjustment.json"
-RA_THAT = GOC / "docs" / "ITL" / "_tools" / "phan_loai_ly_do.json"
+RA_THAT = GOC / "docs" / "ITL" / "_tools" / "phan_loai_ly_do_moc_20261118.json"   # WO-156
 
 # ── MONG ĐỘC LẬP — mỗi số trỏ NƠI GHI (luật `DT1a-R1-05`), ⛔ chép từ công cụ ──────────────────────
 THIEU = 122                # BG-081 `:49` · R1 KQ-082 đo độc lập `:41` (122 dòng sổ ⛔ ghép)
@@ -617,7 +617,10 @@ def test_DT1b_B4_tep_nhan_THAT_cua_repo_vang_la_3_co_thi_khong_DO():
     r = _chay()
     if RA_THAT.exists():
         tool = _tool()
-        if tool.MONG["phan_bo_nhan"] is not None and tool.MONG["van_tay_nhan"] is not None:
+        # WO-156: tệp nhãn THẬT khai MỐC MỚI 18/11 ⇒ phải ghim `MONG_MOC` (MONG 26/08 vẫn chưa ghim ở nhánh ấy)
+        moi = json.loads(RA_THAT.read_text(encoding="utf-8")).get("nguon", {}).get("anh_so") == tool.NGUON_ANH_MOC
+        mong = tool.MONG_MOC if moi else tool.MONG
+        if mong["phan_bo_nhan"] is not None and mong["van_tay_nhan"] is not None:
             assert r.returncode == 0, r.stderr
         else:
             pytest.fail("tệp nhãn thật ĐÃ có mà MONG[phan_bo_nhan]/[van_tay_nhan] chưa ghim — mở WO ghim "

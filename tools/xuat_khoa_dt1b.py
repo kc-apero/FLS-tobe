@@ -267,10 +267,12 @@ def doc_xlsx_ledge(duong: Path, ten_sheet: str = "ITL Ledge") -> list[dict]:
 
 
 # ═════════════════════════════════════════════════════════════════════════ đọc .csv `Transaction Mapping L1`
-def doc_l1_csv(duong: Path) -> list[dict]:
+def doc_l1_csv(duong: Path, ten_bang: str = "L1 CSV", tu_hang: int = 0) -> list[dict]:
     """Đọc CSV tab `Transaction Mapping L1` (Google Sheets tải về) → `{"dong": <số hàng sheet>, 5 cột}`.
 
     Cột theo TÊN TIÊU ĐỀ (12 hàng đầu); `dong` = số hàng CSV = số hàng sheet (CHỈ để định danh trong tệp).
+    `tu_hang` (WO-156) — hàng dữ liệu ĐẦU (1-based; 0 ⇒ ngay sau hàng tiêu đề): sổ `ITL Ledge` có hàng 8 là
+    tiêu đề con (`Formual`/`Classifying`…) và hàng 9 trống/tổng — dữ liệu từ hàng 10.
     """
     # Ký tự NUL ⇒ TỪ CHỐI MINH BẠCH: `csv.reader` (Python 3.13) NUỐT NUL vào trong trường thay vì báo lỗi
     # ⇒ một tệp hỏng lọt qua im lặng (Đ5 — phép ⛔ chứng minh sạch là ĐỎ). `DT1BT-R1-03`/`-04`: một dòng, ⛔ byte.
@@ -296,23 +298,35 @@ def doc_l1_csv(duong: Path) -> list[dict]:
         for i, h in enumerate(hang[:HANG_TIM_TIEU_DE]):
             vi = [j for j, v in enumerate(h) if (v or "").strip() == ten]
             if len(vi) > 1:
-                raise LoiDoc(f"L1 CSV: tiêu đề {ten!r} xuất hiện {len(vi)} lần ở hàng {i + 1} — ⛔ phân định được")
+                raise LoiDoc(f"{ten_bang}: tiêu đề {ten!r} xuất hiện {len(vi)} lần ở hàng {i + 1} — ⛔ phân định được")
             if vi:
                 thay = (i, vi[0])
                 break
         if thay is None:
-            raise LoiDoc(f"L1 CSV: ⛔ thấy tiêu đề cột {ten!r} trong {HANG_TIM_TIEU_DE} hàng đầu")
+            raise LoiDoc(f"{ten_bang}: ⛔ thấy tiêu đề cột {ten!r} trong {HANG_TIM_TIEU_DE} hàng đầu")
         cot[khoa] = thay[1]
         hang_tieu_de = max(hang_tieu_de, thay[0])
 
     ra: list[dict] = []
     for i, h in enumerate(hang):
-        if i <= hang_tieu_de:
+        if i <= hang_tieu_de or i + 1 < tu_hang:
             continue
         if not any((v or "").strip() for v in h):
             continue
         ra.append({"dong": i + 1, **{k: (h[cot[k]] if cot[k] < len(h) else "") for k in COT_KHOA}})
     return ra
+
+
+HANG_DAU_SO_CSV = 10            # WO-156: CSV `ITL Ledge` — tiêu đề hàng 7, dữ liệu từ hàng 10 (đo 18/11)
+
+
+def doc_so_csv(duong: Path) -> list[dict]:
+    """Đọc CSV sổ `ITL Ledge` (Drive/Sheets xuất) → `{"dong": <số bản ghi CSV = hàng sheet>, 5 cột khoá}`, từ hàng 10.
+    ⛔ cột `Diễn giải` — chỉ 5 tên tiêu đề khoá được tìm."""
+    hang = doc_l1_csv(duong, "SO CSV", HANG_DAU_SO_CSV)
+    # Hàng chỉ có cột CÔNG THỨC phụ (đo 18/11: 22 hàng cuối, dòng 12600–12621, 0 ô khoá) ⛔ là giao dịch sổ:
+    # giữ lại thì thành 22 dòng "thiếu" giả. Số loại KHAI ở BG (SO 12.612 → 12.590 = số hàng L1, hai nguồn).
+    return [r for r in hang if any((r[k] or "").strip() for k in COT_KHOA)]
 
 
 # ═════════════════════════════════════════════════════════════════════════ ghi + từ chối đường nguy
@@ -358,13 +372,15 @@ def _dem_khoa(hang: list[dict]) -> tuple[int, int]:
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(
         description="XUẤT bản đọc khoá cho DT1b (ITL Ledge .xlsx + Transaction Mapping L1 .csv) → CSV 7 cột.")
-    ap.add_argument("--xlsx", type=Path, required=True, help="đường tới [Master] ITL_Ledge_raw.xlsx")
+    g = ap.add_mutually_exclusive_group(required=True)
+    g.add_argument("--xlsx", type=Path, default=None, help="đường tới [Master] ITL_Ledge_raw.xlsx")
+    g.add_argument("--so-csv", type=Path, default=None, help="(WO-156) CSV sổ ITL Ledge — mốc 18/11, dữ liệu từ hàng 10")
     ap.add_argument("--l1", type=Path, required=True, help="đường tới CSV tab Transaction Mapping L1 (tải từ Sheets)")
     ap.add_argument("--ra", type=Path, default=RA_MAC_DINH, help="đường ra (mặc định hien_vat/khoa_dt1b.csv)")
     ap.add_argument("--sheet", default="ITL Ledge", help="tên sheet sổ (mặc định 'ITL Ledge')")
     a = ap.parse_args(argv)
 
-    for nhan, p in (("--xlsx", a.xlsx), ("--l1", a.l1)):
+    for nhan, p in (("--xlsx" if a.xlsx else "--so-csv", a.xlsx or a.so_csv), ("--l1", a.l1)):
         if not p.is_file():
             print(f"⛔ TỪ CHỐI: ⛔ thấy tệp {nhan} tại {p.resolve()}", file=sys.stderr)
             return 2
@@ -377,7 +393,7 @@ def main(argv: list[str] | None = None) -> int:
         return 2
 
     try:
-        so = doc_xlsx_ledge(a.xlsx, a.sheet)
+        so = doc_xlsx_ledge(a.xlsx, a.sheet) if a.xlsx else doc_so_csv(a.so_csv)
         l1 = doc_l1_csv(a.l1)
     except LoiDoc as e:
         print(f"LOI đọc: {' '.join(str(e).split())}", file=sys.stderr)   # ⛔ traceback — một dòng, ⛔ giá trị ô
