@@ -68,3 +68,47 @@
 
 ## Câu hỏi
 - Không có câu CHẶN. *(Khuyến nghị cho mục "Dev tự thấy còn yếu #2": GỘP — một bất biến "cấp = độ sâu" — trừ khi owner cần phân biệt.)*
+
+---
+
+## Vòng sửa sau R1 (`KQ-124`)
+
+| | |
+|---|---|
+| **Vào** | `KQ-124` ĐẠT · 0 CHẶN · **2 NÊN SỬA** *(`C4-R1-01` · `C4-R1-02`)* · 3 GHI NHẬN *(`C4-R1-03…05`)*. Owner duyệt vòng sửa R1→R2 *(Q-C4-1 khuyến nghị A)*. |
+| **Phạm vi** | **chỉ** `fls/cau_hinh/hd.py` + `tests/cau_hinh/test_hd.py` *(+ Q8: `tools/dung_moi_truong_isp.sh` · `tests/test_dung_moi_truong_isp.py`)*. ⛔ chạm ảnh DT3, ⛔ kho, ⛔ `07_API_CONTRACT.md`, ⛔ `TIEN_DO`/dashboard/changelog chung. |
+| **Nền** | nhánh cục bộ `isp/C4` @ `533504e` *(ngọn `KQ-124`)* ⇒ commit mã+bài, rồi commit BG này. Cụm PG riêng cổng **5434**. |
+| **Đã sửa** | `C4-R1-01` ✅ · `C4-R1-02` ✅ · `C4-R1-03` ✅ *(rẻ)* · `C4-R1-04` ✅ *(rẻ — lưới phụ)* · `C4-R1-05` ⛔ *(ngoài phạm vi C4 — để orchestrator, xem dưới)*. |
+
+### Đã làm — mỗi lối một bài, CHỨNG MINH ĐỎ trước *(`Đ5`)*
+| Phát hiện | Sửa trong `hd.py` | Bài mới `test_hd.py` | ĐỎ-trước *(phá nguồn → bài cắn)* |
+|---|---|---|---|
+| **`C4-R1-01`** *(NÊN SỬA)* — 4 lối `ValueError`/`TypeError`/`JSONDecodeError` trơn | tách `_so` *(nhận `int`/chuỗi chữ số **ASCII**; `isascii()` kèm `isdigit()` vì `int('²')` NÉM và `int('١')`=1 lặng lẽ)* ⇒ `_cap` dùng lại · `thu_tu` TÙY CHỌN đi qua `_so` *(hỏng ⇒ `HD_HONG`, ⛔ `int(...)` trơn)* · bọc `json.loads` ở `doc_van_ban` **và** `doc_mm_van_ban` ⇒ `LoiHD(HD_HONG)` | `…cap_isdigit_ngoai_ASCII…['²','١']` · `…thu_tu_hong…['abc',None]` · `…thu_tu_tot_duoc_dung_lam_khoa_sap` *(Đ5 kia)* · `…doc_van_ban_JSON_hong…` · `…doc_mm_van_ban_JSON_hong…` **(7 bài)** | bỏ `isascii` ⇒ `'²'` NÉM / `'١'` nhận oan ⇒ ĐỎ · `thu_tu=int(...)` trơn ⇒ ĐỎ · gỡ `try` ở cả hai lõi ⇒ `JSONDecodeError`/ĐỎ |
+| **`C4-R1-02`** *(NÊN SỬA)* — 3 nhánh `raise` của `doc_mm` ⛔ có bài | tách lõi **`doc_mm_van_ban(van_ban, *, nguon)`** *(song song `doc_van_ban`)* — `doc_mm(duong)` đọc tệp rồi gọi lõi; bài nạp ảnh MM TỔNG HỢP, ⛔ chạm hệ tệp | `…doc_mm_ma_trung…` · `…doc_mm_0_ma…` · `…doc_mm_hd_code_rong…` · `…doc_mm_van_ban_hop_le…` *(Đ5 kia)* **(4 bài)** | M27 `n>=99` *(⛔ bắt trùng)* ⇒ ĐỎ · M28 `if False` *(⛔ bắt 0 mã)* ⇒ ĐỎ · nhận `hd_code` rỗng ⇒ ĐỎ |
+| **`C4-R1-03`** *(GHI NHẬN, rẻ)* — M22/M23/M26 SỐNG ở nhánh `HD_HONG` của `kiem` | *(⛔ đổi mã — `_so` đã khoá `cap=True`/`0`/âm; cột lạ đã khoá)* | `…cap_sai_la_HD_HONG[0,True,-1]` · `…cot_la_la_HD_HONG` **(4 bài)** | M22 `n<0` *(cap=0 nhận ⇒ đổi tên sang `HD_CAP_NHAY`)* ⇒ ĐỎ · M23 bỏ nhánh `bool` ⇒ ĐỎ · M26 `if False` cột lạ ⇒ ĐỎ |
+| **`C4-R1-04`** *(GHI NHẬN, rẻ)* — M1 vòng chu trình OOM `kill -9` | thêm **lưới phụ** `len(tham) <= len(theo_ma)` ở điều kiện `while` *(cây đúng ⛔ bao giờ chạm — gặp lại trước)* | *(phủ bởi `test_C4_B2` sẵn có)* | M1 *(bỏ `if cur in tham`)*: **trước** `kill -9` *(rc −9/OOM)*; **sau** bài ĐỎ SẠCH *(rc 1)* — lưới phụ giữ vòng DỪNG |
+
+### ⛔ Chưa làm — `C4-R1-05` *(GHI NHẬN, gửi orchestrator)*
+- **(a)** ảnh gói MM mang bảng phụ `tho` *(84 hàng)* mà `C4` chỉ đọc `hd_code`: `KQ-124` đã gửi **orchestrator** *(dự kiến gỡ ở `C5`)* — ⛔ việc của vòng sửa R1 *(sửa ảnh = chạm DT3, ngoài ràng buộc WO-122)*.
+- **(b)** `tools/kiem_so_song.py:406` gõ đường Windows `.venv/Scripts/lint-imports.exe`: `KQ-124` khuyến nghị **phiếu riêng** *(Q-C4-2 khuyến nghị A)* — ⛔ phạm vi WO-122. `lint-imports` vẫn chạy riêng *(11 kept)*.
+
+### Cổng *(vòng sửa R1 · cụm 5434 · `PG_DSN=…5434` `PYTHONUTF8=1`)*
+| Lệnh | Kết quả |
+|---|---|
+| `pytest tests/cau_hinh/test_hd.py tests/api/test_isp_config_hd.py` | **41 passed** *(26 → 41, +15 bài mới)* |
+| `pytest tests/test_dung_moi_truong_isp.py` *(Q8 pin)* | **60 passed** *(pin `MONG_PYTEST_TOAN_BO=3108`)* |
+| `tools/dung_moi_truong_isp.sh --duong-nen --cong 5434` *(một mình)* | **KẾT: ĐẠT** · toàn bộ `12 failed, 3080 passed, 2 xfailed, 14 errors` ⇒ tập đỏ **28 = 28** *(thêm 0 · bớt 0)* · **chạy 3108** *(mong ≥ 3108)* · skipped 0 · deselected 0; web `3 = 3` · chạy 667 |
+| `.venv/bin/lint-imports` | **Contracts: 11 kept, 0 broken.** |
+| `tools/soi_bang_tuyen.py` | **✅ KHOP SQL that o ca 42 tuyen** *(tuyến `config/hd`: `vet 11 → 13 ham` — thêm `_so` + `doc_mm_van_ban`; SQL vẫn 0 bảng)* |
+| `docs/ITL/_tools/kiem_tai_lieu.py` | **✅ cong tai lieu DAT** |
+
+### Q8 — nâng sàn CÙNG commit
+- `MONG_PYTEST_TOAN_BO` **3093 → 3108** *(`tools/dung_moi_truong_isp.sh`)* = **+15** bài *(đo `pytest --collect-only`: 3108 · web giữ 667 — bài mới đều ở `tests/cau_hinh/test_hd.py`)*; pin `tests/test_dung_moi_truong_isp.py` cập nhật + bổ sung dòng sổ. Mã + bài + sàn **một commit**; BG commit kế *(chỉ giấy)*.
+
+### Dev tự thấy *(vòng R1)*
+1. **`doc_mm_van_ban` là API mới** *(public)* — song song `doc_van_ban`, cần cho Đ5 của nhánh MM; `doc_mm` giữ chữ ký cũ *(bài sẵn `test_doc_mm_73_ma…` ⛔ đổi)*. `vet` tăng 11→13 nhưng `soi` KHOP, SQL 0 bảng.
+2. **`_so` siết hơn `_cap` cũ**: `cap='١'` *(chữ số Ả Rập)* trước nhận =1, nay `HD_HONG`. Ảnh DT3 chỉ dùng `'1'…'4'` ASCII ⇒ 74 nút giữ nguyên *(`--duong-nen` xác nhận)*. Nếu owner cần nhận chữ số Unicode ⇒ một quyết định riêng *(⛔ nghĩ là đúng cho khoá cây)*.
+3. **Lưới phụ `C4-R1-04`** chỉ là belt — ⛔ đổi hành vi cây hợp lệ/hỏng-hữu-hạn; chỉ biến một hồi quy mất `if cur in tham` từ OOM thành ĐỎ sạch.
+
+### Câu hỏi vòng R1
+- Không có câu CHẶN. *(Để orchestrator quyết: `C4-R1-05(a)(b)` — xem khuyến nghị A/B ở `KQ-124`.)*
