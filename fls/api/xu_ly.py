@@ -21,7 +21,7 @@ from decimal import Decimal, InvalidOperation
 from typing import Any, Callable
 
 from fls.adapters.pm_join import canon_ref
-from fls.cau_hinh import fx
+from fls.cau_hinh import fx, hd
 from fls.repo import do_mau_so as dms
 from fls.repo import doc_bao_cao as bc
 from fls.repo import lenh_cho as lc
@@ -1048,3 +1048,42 @@ def ty_gia(yc: YeuCau):
 # ⛔ Quên dòng dưới là một đường **404 im lặng** — lỗi `soi_bang_tuyen` đã bắt
 #   ba lần ở tệp này *(xem trên)*.
 HAM.update({"ty_gia": ty_gia})
+
+
+# ══ ⭐⭐ ISP 3.1.2 · `C4` (`WO-122`) — LÕI CONFIG: cây `IX.HD` (hợp đồng) ══
+#
+# ⛔ Hàm này chỉ ĐỌC + DỌN HÌNH: nạp ảnh ATL + kiểm cha–con *(cha có thật · ⛔ chu
+#   trình · cấp ⛔ nhảy)* nằm ở `fls/cau_hinh/hd.py` — đúng luật *"router mỏng, ⛔
+#   chứa luật"*. ⛔⛔ `cha = Σ con` là việc engine **H5**; ⛔ hoà giải `74 ↔ 73` —
+#   chỉ **liệt kê** `chenh_mapping_master` *(ràng buộc WO-122; `BG-107`: `{NCF}`)*.
+# ⚠ `yc.conn` ⛔ dùng *(y `ty_gia`)*: ảnh đến từ nguồn TĨNH cho tới `C5`. Cửa vẫn mở
+#   kết nối CHỈ ĐỌC cho mọi tuyến — vô hại.
+# ⭐ `data_status = flash`: ảnh ⛔ được khoác `reconciled`/`signed` *(`INV-I14`)*.
+# ⛔ Vòng `?run_id=` ⇒ `400` — CÙNG lý do `C1-R1-07` *(`ty_gia` trên)*: ảnh TĨNH ⛔
+#   theo lần nạp, nên `meta` nói một phạm vi ⛔ được áp. Từ chối, ⛔ trả cây trơn+200.
+def cay_hd(yc: YeuCau):
+    """`GET /config/hd` — cây IX.HD từ ảnh ATL + đối chiếu Mapping Master.
+
+    Trả `{bang:'IX.HD', nguon, nguon_mm, so_atl (74), so_mapping_master (73),
+    chenh_mapping_master:[mã ATL ⛔ có ở MM], goc:[mã gốc], nhom:[6 nhóm],
+    nut:[{ma, ten, cha, cap, nhom, dong_sheet, con_cua:[mã con], la}]}`.
+    """
+    if yc.pv.kieu != "nap_that":
+        raise LoiCua("FLS-BAD-REQUEST",
+                     f"cay IX.HD ⛔ theo lan nap — bo `run_id` "
+                     f"({yc.pv.mo_ta()}): `meta` ⛔ duoc khai mot pham vi ⛔ ap")
+    cay = hd.doc_tep()
+    mm = hd.doc_mm()
+    atl_ma = {n.ma for n in cay.nut}
+    return {"bang": hd.BANG, "nguon": cay.nguon, "nguon_mm": hd.NGUON_MM,
+            "so_atl": len(cay.nut), "so_mapping_master": len(mm),
+            # ⛔ CHỈ liệt kê — ⛔ hoà giải. `sorted` cho tất định.
+            "chenh_mapping_master": sorted(atl_ma - set(mm)),
+            "goc": list(cay.goc), "nhom": list(cay.nhom),
+            "nut": [{"ma": n.ma, "ten": n.ten, "cha": n.cha, "cap": n.cap,
+                     "nhom": n.nhom, "dong_sheet": n.dong_sheet,
+                     "con_cua": list(cay.con_cua(n.ma)), "la": cay.la(n.ma)}
+                    for n in cay.nut]}, "flash"
+
+
+HAM.update({"cay_hd": cay_hd})
