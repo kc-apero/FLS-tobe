@@ -47,11 +47,32 @@ def test_GLCF_B1_12385_dong_lien_tuc_checksum(anh):
     assert anh["checksum_noi_dung"] == _checksum_lai(anh)
 
 
+KHOA_CAM = {"Số chứng từ", "Diễn giải", "Email Address", "Tài khoản", "B", "C", "G"}
+
+
+def _khoa_cam(a: dict) -> set[str]:
+    """Khoá cấm ở cột khai · khoá bảng phụ · khoá TỪNG DÒNG chính *(H5-R1-01: ⛔ chỉ `cot`)*."""
+    moi_khoa = (set(a["cot"]) | {a["khoa"]}
+                | {k for b in a.get("phu", {}).values() for r in b["dong"] for k in r}
+                | {k for r in a["dong"] for k in r})
+    return KHOA_CAM & moi_khoa
+
+
 def test_GLCF_B2_cot_dung_khong_PII(anh):
     assert anh["cot"] == ["ngay", "itl_id", "le", "hd_final", "D", "E", "F"]
-    moi_khoa = (set(anh["cot"]) | {anh["khoa"]}
-                | {k for b in anh.get("phu", {}).values() for r in b["dong"] for k in r})
-    assert not ({"Số chứng từ", "Diễn giải", "Email Address", "Tài khoản", "B", "C", "G"} & moi_khoa)
+    assert not _khoa_cam(anh)
+    # mỗi dòng ĐÚNG khoá khai *(⛔ khoá lạ nào lọt — thừa cũng ĐỎ)*
+    mong = {"thu_tu", anh["khoa"], *anh["cot"]}
+    assert all(set(r) == mong for r in anh["dong"])
+
+
+@pytest.mark.parametrize("cot", ["C", "G"])
+def test_GLCF_B2_quet_khoa_TUNG_DONG_bat_dot_bien_M12(anh, cot):
+    """Đột biến M12/M16 của R1: thêm cột C/G vào MỘT dòng ảnh ⇒ phép quét phải bắt."""
+    import copy
+    a = copy.deepcopy(anh)
+    a["dong"][100][cot] = {"chu": "x"}
+    assert _khoa_cam(a) == {cot}
 
 
 def test_GLCF_B2_le_chi_4_ma_CFA1__lop_dem_du(anh):

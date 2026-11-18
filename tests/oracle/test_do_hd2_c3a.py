@@ -166,3 +166,12 @@ def test_H5_AC4_doi_ty_gia_thi_luoi_doi(nguon, tq_that):
     fx2[t0]["USD"] = fx2[t0]["USD"] * 2
     tq = do_hd2.so_sanh_c3a(vao, da, fx2, cay, do_hd2.mong_c3a_mac_dinh())
     assert tq.luoi != tq_that.luoi
+
+
+#: H5-R1-03 — ghim 20 mã KPI *(đọc FORMULA `F53:H93` 18/11)*: thêm/bớt mã ⇒ mẫu số đổi im lặng ⇒ ĐỎ.
+MA_KPI_GHIM = ("EBITDA", "EBIT", "EBT", "NP", "NPC", "NCF", "NCFO", "CRO", "COO", "NCFI", "COI",
+               "NCFF", "CRF", "COF", "PL2", "PL3", "PL4", "PL6", "PL7", "PL8")
+
+
+def test_H5_R1_03_MA_KPI_ghim_20_ma():
+    assert do_hd2.MA_KPI == MA_KPI_GHIM and len(set(MA_KPI_GHIM)) == 20
