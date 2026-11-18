@@ -72,3 +72,16 @@ Chặn ① ② gỡ: MID3 có khoá `(vendor, thang)` *(209 hàng)*, ảnh `test
 **Chuyển H10** *(câu cho WO H10)*: phép so ô ≠ 0 của RATE *(MID3 ô ≠ 0 đều ở vendor đặc biệt — PE ≠ 0 165/165, BG-205)* + đầu vào **PE theo CDT1** *(Source Looker PD 502, hoặc chốt dùng MID1 cột T làm đầu vào)* — ⛔ có ảnh thì RATE ⛔ đo được ở bất kỳ vendor nào.
 
 Bài ghim cũ `test_H9_B3_CHAN_MID3_khong_mang_khoa_vendor_thang` ĐỎ sau gộp *(Đ5 cắn đúng)* ⇒ khai lại thành `…_sau_DT8b_MID3_CO_khoa_vendor_thang_209_hang`. Q8: sàn 3602 *(DT8b)* + 15 *(H9 ①)* = 3617 ở commit gộp → **3629** *(+12 bài C4a)*.
+
+## Vòng sửa sau R1 (KQ-202)
+
+R1 `KQ-202`: 0 CHẶN · 1 NÊN SỬA · 5 GHI NHẬN — người dùng duyệt sửa `H9-R1-01` + hai mục rẻ; `-03…-05` ⇒ backlog H10.
+
+| Mục | Sửa | Đỏ-trước |
+|---|---|---|
+| `H9-R1-01` | `MongC4a.o_khong_so_khac_0 = 0`: đếm **đáp án ≠ 0** trong 196 ô ⛔ so được *(đo 0/196; ô đáp án là chữ/rỗng ⇒ tính ≠ 0, ⛔ coi 0)*; in ở `_in_bao_c4a` + `hd2_cong` | đột biến R1 `cvl_pm` VD336·202506 = 1 từng **XANH** ⇒ nay ĐỎ `o_khong_so_khac_0: đo 1 ≠ mong 0`; `mong = 1` ⇒ ĐỎ *(chiều ngược)* |
+| `H9-R1-02` | `ks_al_vm` lấy từ `ks_al` + `MongC4a.ks_al_vm = 44` khai trước, vào bảng `do` | `ks_al` giả trả 43 ⇒ ĐỎ `ks_al_vm: đo 43 ≠ mong 44` |
+| `DT8B-R1-01` | `gi_cfa1.thieu_lac`: `pe` chữ/dict/bool ⇒ nhãn `pe_la@<dòng>` | trước: `TypeError`; nay exit 1, ⛔ `TypeError`, ⛔ lộ giá trị |
+
+Bài mới: **5** *(4 ở `test_do_hd2_c4a.py`, 1 ở `test_dau_vao_gi.py`)* ⇒ Q8 sàn `MONG_PYTEST_TOAN_BO` **3629 → 3634** cùng commit. Ảnh `tests/fixture/**.json` ⛔ đổi byte.
+Backlog H10: `H9-R1-03` *(nguồn PE theo CDT1)* · `-04` *(BA chốt ⓐⓑ)* · `-05` *(so giá trị vendor đặc biệt)*.
