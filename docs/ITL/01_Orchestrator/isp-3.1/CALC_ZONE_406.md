@@ -33,3 +33,16 @@
 ## Ghi chú cho từng bước
 - **H1** (`BG-071` L2): cách đọc "tồn theo từng tiền tệ, nguyên tệ, lũy kế theo thứ tự dòng" — **ĐÚNG** với `AZ · BC · BF · BI · BL`. BM/BN (tồn ALL đánh giá lại theo tỷ giá tháng của dòng) chưa nằm trong phạm vi H1 nếu H1 chưa dựng — H4 sẽ lộ ra khi so BM–BN.
 - **H4**: so `BM … BT` (8 cột) theo dòng × kỳ; dung sai số thực nhị phân của Sheets ↔ `Decimal` phải khai trong `mong`.
+
+## Số dư đầu kỳ GÕ TAY ở hàng 24 (orchestrator đo 2026-11-18 — chỉ THÊM)
+Đọc CÔNG THỨC (`valueRenderOption=FORMULA`, khoá SA) `'Report I General Ledger'!AX10:BT7892`, so từng ô với khuôn hàng 11 (thay số hàng): **181.263 ô so · 5 ô lệch khuôn · cả 5 ở hàng 24** (dòng sổ ds24, kỳ 2024-12):
+
+| Ô | Công thức thật | Nghĩa |
+|---|---|---|
+| `AX24` | `=+1235500+7189` | PS Nợ USD **gõ cứng** (thay công thức dòng) |
+| `BA24` | `=985537` | PS Nợ SGD **gõ cứng** |
+| `BG24` | `=if($D24=BG$9,$E24,"")+6653796781` | PS Nợ VND của dòng **cộng thêm hằng** |
+| `BQ24` | `=BQ23+BO24-BP24+56842628558/10^9` | tồn bVND **cộng hằng** |
+| `BT24` | `=BT23+BR24-BS24+2.267718` | tồn mUSD **cộng hằng** |
+
+⇒ Đây là **số dư đầu kỳ AS-IS nhập tay**; mọi cột lũy kế (AZ · BC · BI · BM · BN · BQ · BT) từ hàng 24 trở đi mang nó. FLS (H1) ⛔ có khái niệm số dư đầu kỳ ⇒ H4 gieo 5 hằng này tường minh khi so (`WO-132`); **nguồn chính thức của số dư đầu kỳ trong FLS là câu hỏi cho BA/owner** (errata ⑳). Công cụ đo: `isp-3.1/chuyen_giao/cong_cu/sa_quet_cong_thuc.py`.
