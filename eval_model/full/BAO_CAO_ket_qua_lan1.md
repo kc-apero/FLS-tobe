@@ -7,15 +7,15 @@
 
 | Mã bản | Tệp kết quả | Model |
 |---|---|---|
-| **A** | `ket_qua_tho/FLS_ketqua_20261001_20261007.md` | *chưa ghi tên model* |
-| **B** | `ket_qua_tho/FLS_ket_qua.md` | *chưa ghi tên model* |
+| **A** | `ket_qua_tho/FLS_ketqua_20261001_20261007.md` | **Claude Opus 5.5** |
+| **B** | `ket_qua_tho/FLS_ket_qua.md` | **Claude Opus 5** |
 | **G** | `ket_qua_tho/gemini_hydrogen.md` | Gemini (tên tệp ghi "hydrogen"; chưa xác nhận phiên bản) |
 
 ---
 
 ## 1. Kết luận
 
-1. **Bản A và bản B đạt 100%: 0 ô lệch trên 4.938 ô và mục đã chấm, ở cả 9 khối.** Đây là điều kiện HD1/AC10 trong AP: mapping 100% giống đáp án, đủ 7 khối, đủ báo cáo.
+1. **Opus 5.5 (A) và Opus 5 (B) đạt 100%: 0 ô lệch trên 4.938 ô và mục đã chấm, ở cả 9 khối.** Đây là điều kiện HD1/AC10 trong AP: mapping 100% giống đáp án, đủ 7 khối, đủ báo cáo.
 2. **Bản G đạt 96,5% điểm có trọng số nhưng có 108 ô lệch, và có một lỗi loại nghiêm trọng nhất với kế toán.** Ở R1, G **sửa số phát sinh để số dư khớp với CCR gõ nhầm**, nên DIF 100.000 VND biến mất. Sau đó Auditor kết luận "Không có lỗi DIF". Một Auditor che lệch thì không dùng được làm cổng.
 3. Phần **phân loại và ghép** của G gần như hoàn hảo (A1, A2, ghép, hàng chờ, Final 6/7 khối, ALLOCATE). Phần **cộng số** thì hỏng (R1, R2, R3). Kết quả này củng cố thiết kế trong AP: Calculate → Report phải là **mã tất định**, không để model tự cộng (F0b).
 
@@ -23,7 +23,7 @@
 
 Mỗi ô ghi: % điểm · [số ô hoặc mục lệch tuyệt đối]. **Chỉ 0 lệch mới tính là đạt.**
 
-| Khối | Trọng số | A | B | G |
+| Khối | Trọng số | A · Opus 5.5 | B · Opus 5 | G · Gemini |
 |---|---|---|---|---|
 | A1 · Kiểm nguồn | 0,05 | 100% [0] | 100% [0] | 100% [0] |
 | A2 · Ledger | 0,10 | 100% [0] | 100% [0] | 100% [0] |
@@ -39,14 +39,14 @@ Mỗi ô ghi: % điểm · [số ô hoặc mục lệch tuyệt đối]. **Chỉ
 
 **ITL Final theo khối** (cột V, là số đi vào báo cáo):
 
-| Khối | A | B | G |
+| Khối | A · Opus 5.5 | B · Opus 5 | G · Gemini |
 |---|---|---|---|
 | hd · pay_type · cdt1 · svc_start · svc_end · invoice | 129/129 | 129/129 | 129/129 |
 | id_payee | 129/129 | 129/129 | **125/129** |
 
 ## 3. Tất cả các bẫy trong dữ liệu
 
-| Bẫy | A | B | G |
+| Bẫy | A · Opus 5.5 | B · Opus 5 | G · Gemini |
 |---|---|---|---|
 | S2 đảo vị trí cột, S3 thêm cột | ✅ | ✅ | ✅ |
 | Bỏ dòng số tiền 0, bỏ dòng trùng `S1-26` | ✅ | ✅ | ✅ |
@@ -87,7 +87,8 @@ Mỗi ô ghi: % điểm · [số ô hoặc mục lệch tuyệt đối]. **Chỉ
 
 ## 5. Độ tin cậy của kết quả và các giới hạn
 
-- **Chưa biết model của A và B.** 9 khối của A và B giống nhau từng ký tự; chỉ khác phần ghi chú cuối, và B không có ghi chú. Có thể là cùng một model chạy hai lần, hoặc cả hai cùng dùng công cụ chạy code nên ra kết quả tất định. Cần xác nhận model và việc có bật chạy code hay không.
+- **Opus 5.5 và Opus 5 ra kết quả giống nhau từng ký tự ở cả 9 khối**; chỉ khác phần ghi chú cuối (Opus 5 không có ghi chú). Điều này hợp lý nếu cả hai cùng hiểu đúng toàn bộ luật và cùng tính chính xác, ví dụ cùng dùng công cụ chạy code. Tuy vậy vẫn cần xác nhận lần chạy có bật chạy code hay không, vì chế độ này quyết định nhiều nhất tới khối R1–R3.
+- Với 1 lần chạy, **bộ dữ liệu này chưa phân biệt được Opus 5.5 và Opus 5 về độ chính xác**. Để chọn giữa hai model, cần một bộ khó hơn (khối lượng thật khoảng 35 dòng/ngày, nhiều ngày hơn, nhiều bẫy hơn) và tiêu chí chi phí: theo bảng ước tính, Opus 5.5 rẻ hơn khoảng 28% (2,18 so với 3,02 USD/ngày ở mức 35 dòng/ngày).
 - **Không thấy dấu hiệu chép đáp án.** A, B và G đều viết số theo định dạng khác tệp đáp án (`0.00` so với `0` ở ledger, ITL và R1), tức là tự tính.
   Tuy vậy, **đáp án đang nằm cùng nhánh git** với prompt. Nếu các lần chạy có quyền đọc repo thì không loại trừ hoàn toàn được việc đọc đáp án. Nên chạy lại bằng **seed mới**, trong workspace không có `dap_an/`.
 - **Mỗi bản chỉ có 1 lần chạy**, nên chưa đo được độ dao động. Kế hoạch là 3 lần cho mỗi model.
@@ -96,10 +97,11 @@ Mỗi ô ghi: % điểm · [số ô hoặc mục lệch tuyệt đối]. **Chỉ
 
 ## 6. Đề xuất
 
-1. **Xác nhận tên model và cấu hình của A, B, G**: effort/thinking, có bật chạy code hay không, số token, thời gian. Sau đó chạy đủ 4 model (Opus 5.5, Opus 5, Gemini 3.8 Flash, Gemini 3.1 Pro), mỗi model **3 lần**, với **seed mới**, không cho truy cập `dap_an/`.
-2. **Tách hai chế độ khi so sánh**: có chạy code và không chạy code. Kết quả của G cho thấy tự cộng hàng trăm số là điểm yếu. Nếu agent thật được dùng công cụ, phải test đúng chế độ đó.
-3. **Thiết kế TO-BE:**
+1. **Xác nhận cấu hình từng lần chạy**: effort/thinking, có bật chạy code hay không, số token, thời gian; và **phiên bản Gemini** của tệp "hydrogen". Sau đó chạy đủ 4 model (Opus 5.5, Opus 5, Gemini 3.8 Flash, Gemini 3.1 Pro), mỗi model **3 lần**, với **seed mới**, không cho truy cập `dap_an/`.
+2. **Khi độ chính xác ngang nhau, chọn theo chi phí**: Opus 5.5 đạt kết quả như Opus 5 với giá ước tính thấp hơn khoảng 28%, nên đang là lựa chọn mặc định cho Agent 1–3, chờ xác nhận qua 3 lần chạy với seed mới.
+3. **Tách hai chế độ khi so sánh**: có chạy code và không chạy code. Kết quả của G cho thấy tự cộng hàng trăm số là điểm yếu. Nếu agent thật được dùng công cụ, phải test đúng chế độ đó.
+4. **Thiết kế TO-BE:**
    - R1, R2, R3 do **mã tất định** sinh ra, giữ đúng F0b trong AP;
    - Agent 4 phải **tự tính lại từ ledger** chứ không đọc lại số R1, và không bao giờ được sửa số để DIF = 0;
    - thêm vào bộ chấm một luật đỏ riêng: *"R1 không khớp ledger của chính bản trả lời"* — đây là dấu hiệu che lệch, cần đánh dấu riêng chứ không chỉ trừ điểm.
-4. AP yêu cầu Agent 4 dùng **model khác họ** với Agent 1–3. Nếu chọn Gemini cho Agent 4, phải cho Agent 4 công cụ tính toán; không để nó tự cộng.
+5. AP yêu cầu Agent 4 dùng **model khác họ** với Agent 1–3. Nếu chọn Gemini cho Agent 4, phải cho Agent 4 công cụ tính toán; không để nó tự cộng.
