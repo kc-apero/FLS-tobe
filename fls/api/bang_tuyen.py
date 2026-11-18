@@ -708,6 +708,12 @@ BANG_TUYEN: tuple[Tuyen, ...] = (
           mo_ta="IX.VEN vendor · network · tai khoan (Block 1) + cot cach_tinh (5 ma "
                 "rieng VD341·VD444·VD428·Max·VD62 chi la NHAN, phep tinh o H10) + 7 CDT1; "
                 "doc tu KHO config chi-them (C9)"),
+    # ⭐⭐ `C11` (`WO-180`): `IX.ALR` luat phan bo hieu luc theo ky + co `bat` (D2: luon false)
+    #    doc tu KHO config chi-them. `GET`, ⛔ ghi; ⛔ tuyen bat co (owner ky — ngoai ISP).
+    Tuyen("GET", f"{TIEN_TO}/config/alr", "cau_hinh_alr",
+          ("fls_cau_hinh_ban", "fls_cau_hinh_dong"),
+          mo_ta="IX.ALR luat phan bo (By GI·By NOEM·H1000 Ledger) hieu luc tu ky + co bat "
+                "mac dinh TAT (D2); doc tu KHO config chi-them (C11); ⛔ tuyen bat co"),
 )
 
 
