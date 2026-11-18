@@ -417,10 +417,10 @@ def test_S0_R2_03_hang_mau_so_khai_MOT_cho():
     (`pytest --collect-only`: 2.481 của R3 + 9 bài mới · 211 tệp) — số 2460 là của vòng R1 bị để
     lại ở R2 (+21 bài) ⇒ khoảng dư 21 mà R3 lách bằng 20 bài bỏ im lặng. Bài ghim GIỮ việc gốc:
     hằng khai MỘT chỗ, đúng giá trị, hai dòng gọi dùng hằng; `test_S0_R3_02_…` đòi hằng = thu thập.
-    Gộp (orchestrator, luật 17/11: sàn = số thu thập CÂY GỘP, ⛔ cộng tay): + `isp/DT1A` ⇒ **2530** · + `isp/H1` ⇒ **2579** · + `isp/C1` ⇒ **2704** · + `isp/DT2` ⇒ **2792** · + `isp/H2` ⇒ **2857** · + `isp/CG1` ⇒ **2890** (xung đột script + bài ghim ⇒ giữ bản nhánh làm việc — `CG1-R2-01`) · + `isp/DT1B` ⇒ **2980** · + `isp/DT3` ⇒ **3064** · + `isp/FG` ⇒ **3067** (web 664 ⇒ **667**: FG thêm bài `tests/web`) · + `isp/DT4` ⇒ **3100**.
+    Gộp (orchestrator, luật 17/11: sàn = số thu thập CÂY GỘP, ⛔ cộng tay): + `isp/DT1A` ⇒ **2530** · + `isp/H1` ⇒ **2579** · + `isp/C1` ⇒ **2704** · + `isp/DT2` ⇒ **2792** · + `isp/H2` ⇒ **2857** · + `isp/CG1` ⇒ **2890** (xung đột script + bài ghim ⇒ giữ bản nhánh làm việc — `CG1-R2-01`) · + `isp/DT1B` ⇒ **2980** · + `isp/DT3` ⇒ **3064** · + `isp/FG` ⇒ **3067** (web 664 ⇒ **667**: FG thêm bài `tests/web`) · + `isp/DT4` ⇒ **3100** · + `isp/DT5` ⇒ **3123** (web 667 ⇒ **667**: DT5 ⛔ thêm `tests/web`; +21 bài `tests/du_lieu/test_dap_an_cfa1.py` + 2 bài khuôn-tham-số nhận 2 khuôn CFA1 mới).
     """
     van = SCRIPT.read_text(encoding="utf-8")
-    assert re.findall(r"^MONG_PYTEST_TOAN_BO=(\d+)$", van, re.M) == ["3100"]
+    assert re.findall(r"^MONG_PYTEST_TOAN_BO=(\d+)$", van, re.M) == ["3123"]
     assert re.findall(r"^MONG_PYTEST_WEB=(\d+)$", van, re.M) == ["667"]
     goi = [d.strip() for d in van.splitlines() if d.strip().startswith("chay_pytest ")]
     assert len(goi) == 2 and '"$MONG_PYTEST_TOAN_BO"' in goi[0] and '"$MONG_PYTEST_WEB"' in goi[1], goi
