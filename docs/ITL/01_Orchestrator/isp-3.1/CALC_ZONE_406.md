@@ -62,3 +62,22 @@ Người dùng 18/11 chỉ nguồn: bảng tính `1ycMOKKZg5rraLAYW-HuZDp9k3RPzr
 - ⚠ Hàng 24 của 406 thuộc kỳ **2024-10** *(`gl_406.json` `ky = 202410`)* nhưng số dư nguồn là ngày **31/12/2024** — cột đầu của cả hai tab; hai tab ⛔ có cột trước 31/12/2024.
 - ⛔ đọc cột `D:J` của hai tab: có cột `Link` · `ID` · `Pass` *(thông tin đăng nhập ngân hàng)* và số tài khoản; một nhãn ngân hàng ở `2. CCR Cash` mang tên người ⇒ ⛔ chép vào repo. Bản thô đã xoá khỏi scratchpad.
 - ⇒ **Kết luận cho H4:** giữ 5 hằng như sheet 406 gõ (parity với AS-IS); nguồn chính thức cho TO-BE = `2. CCR` + `2. CCR Cash` ngày 31/12/2024 — câu hỏi còn mở cho BA/owner: (1) VND loại pháp nhân nào; (2) số dư 31/12/2024 vì sao đặt ở hàng kỳ 2024-10.
+
+### Đính chính + soát logic từng ô hàng 24 — 18/11 *(orchestrator, khoá SA; chỉ THÊM — câu trên GIỮ làm biên bản)*
+
+**Người dùng 18/11:** (1) số dư VND **CÓ loại** pháp nhân `VVOO (VGO2)`; (2) "có thể nhầm — soát công thức từng ô, có thể trùng số hoặc đặt nhầm".
+
+- ⛔ **Lỗi của orchestrator ở mục trên:** câu *"Hàng 24 thuộc kỳ 2024-10"* SAI — tôi đọc `ky` của 3 dòng ĐẦU ảnh (`thu_tu` 1…3) rồi gán cho hàng 24. Đo lại cột `A`: **hàng 24 = 2024-12-31** *(D = VND)*; hàng 22–23 = 2024-12-29 (USD); hàng 25 = 2025-01-02. ⇒ số dư 31/12/2024 đặt ĐÚNG ngày, ⛔ đặt nhầm.
+- **Soát công thức `AX24:BT24`** (đọc `FORMULA` + `UNFORMATTED_VALUE` hàng 10…26; tỷ giá `9.2.Exchange Rate` kỳ 202410…202412 = USD 25.066 · SGD 19.319):
+
+| Ô | Công thức | Đo | Kết luận |
+|---|---|---|---|
+| `AX24` USD | `=+1235500+7189` — THAY HẲN `if($D24=AX$9,$E24,"")` | `D24 = VND` ⇒ công thức gốc ra `""` ⇒ ⛔ mất phát sinh | = `2. CCR` 1.235.500,01 + `2. CCR Cash` 7.188,78 = 1.242.688,79 làm tròn **+0,21 USD**; `AZ23 = 0` ⇒ ⛔ trùng |
+| `BA24` SGD | `=985537` — thay hẳn `if` | như trên, ⛔ mất phát sinh | = 985.537,37 làm tròn **−0,37 SGD**; `BC23 = 0` ⇒ ⛔ trùng |
+| `BG24` VND | `=if(…,$E24,"")+6653796781` | `E24` = 21.345 vẫn được cộng | Lũy kế VND hàng 10…23 `BI23` = **184.162.958**; + `E24` 21.345 = **184.184.303** = ĐÚNG số dư dòng `VVOO (VGO2)` TCB ở `2. CCR`. Hằng = 6.837.981.082 (tổng `2. CCR`) − 184.184.303 (VVOO) = 6.653.796.779 ⇒ gõ **6.653.796.781: thừa 2 VND**. `BI24` = 6.837.981.084 = tổng CCR + 2 ⇒ **⛔ trùng**: phần VVOO do chính các dòng sổ hàng 10…24 dựng, phần còn lại do hằng |
+| `BQ24` bVND tồn | `=BQ23+BO24-BP24+56842628558/10^9` | `1.242.689×25.066 + 985.537×19.319 + 6.653.796.781 = 56.842.628.558` **khớp ĐÚNG từng đồng** | hằng = 3 hằng trên quy đổi ở tỷ giá kỳ 2024-12 (⛔ dùng TOTAL của CCR — CCR dùng SGD 19.319,35 và ⛔ gồm 7.188,78 USD tiền mặt); `BQ23` = 0,184163 (VVOO) ⇒ ⛔ trùng |
+| `BT24` mUSD tồn | `=BT23+BR24-BS24+2.267718` | 56.842.628.558 / 25.066 / 10⁶ = 2,26771837 | = `BQ` hằng ÷ USD 2024-12, làm tròn 6 số lẻ (**−0,37 USD**) |
+| `BD24` · `BJ24` (COP · HKD) | khuôn chuẩn | CCR 31/12 COP = HKD = 0 | đúng |
+
+- **Kết luận:** ⛔ có trùng số, ⛔ đặt nhầm ngày. Lệch thật chỉ là **làm tròn + 2 VND gõ thừa**: USD +0,21 · SGD −0,37 · VND **+2** · bVND (kéo theo) · mUSD −0,37 USD. Cách ghép: số dư VVOO = lũy kế dòng sổ (sổ ITL có giao dịch VVOO từ 21/10/2024); số dư các pháp nhân khác = hằng ngày 31/12/2024 lấy từ `2. CCR` + `2. CCR Cash`.
+- **Cho TO-BE (C-lane / H4):** số dư đầu kỳ = bản khai có chủ (owner ký), mốc **31/12/2024**, theo tiền tệ nguyên tệ (USD · SGD · VND; COP · HKD = 0), **loại VVOO** (người dùng chốt); `bVND`/`mUSD` tồn là SUY RA từ bản khai × tỷ giá kỳ 2024-12 — ⛔ khai riêng. H4 vẫn gieo đúng 5 hằng gõ tay để parity AS-IS (gồm cả 2 VND thừa).
