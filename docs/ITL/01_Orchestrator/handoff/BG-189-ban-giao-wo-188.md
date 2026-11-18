@@ -61,3 +61,20 @@
 
 ## Kho thật
 `KHONG_CHAM`. ⛔ Drive. SA chỉ đọc công thức `Report I CFA1 Y H Q M` + `Report I CFA1 Daily` *(vài hàng đầu)*.
+
+## Vòng sửa sau R1 (KQ-190)
+*(2026-11-18 · chỉ THÊM · nền `isp/H6` @ `70ee086` · cụm `5435`)* — R1: 0 CHẶN · 2 NÊN SỬA · 3 GHI NHẬN.
+
+| Mục | Đỏ TRƯỚC | Sửa | Xanh SAU |
+|---|---|---|---|
+| `H6-R1-01` | Bài `test_H6_R1_01_chay_wp_c3b_doc_ngay_dau_TU_KHO_…` *(nạp IX.PER 25/10 vào `fls_test` → `chay_wp_c3b(dsn_test())` ⇒ `truc.ngay_dau` = 2024-10-25; trả lại 21/10)*. Đột biến M9 *(`_lich_tu_kho` ghi đè `ngay_dau` = 2024-10-20, chạy trên bản sao `git archive`)* ⇒ bài ĐỎ `1 failed` *(R1: 22/22 xanh)* | thêm bài *(mã không đổi)* | trên mã thật `16 passed` *(c3b)* |
+| `H6-R1-02` | trên bản sao, trục WP-C3a trả về từ `phu.ngay_truc` của đáp án ⇒ **3/17 bài ĐỎ** *(`…khong_doc_dap_an_409` · `…IX_PER_doi_ngay_dau…` · `…kho_doi_IX_PER_thi_truc_doi`)* | `so_sanh_c3a(…, lich, mong)`: trục = `truc_ngay(IX.PER.ngay_dau − 1 ngày errata ㉑ → ngày đọc ảnh đầu vào)`; `chay_wp_c3a(dsn)` đọc IX.PER từ kho, chưa khai ⇒ ĐỎ *(⛔ ngày tạm)*; 2 chú thích "tạm tới H6" sửa đúng; hằng `C3A_NGAY_TRUOC_PER = 1` khai như MONG | xem số dưới |
+
+**Số *(Đ4 — mỗi số một nhãn)*** — chạy lại cụm `5435`, IX.PER nạp `21/10` *(phiên bản 1, như R1)*:
+- WP-C3a: **ô khớp / ô so = 205.175 / 205.175** *(= 5 × 54 mã × 760 cột − 25 ô `-`; trục 20/10 → 18/11/2026, 760 cột)* · `KẾT: DAT`.
+- WP-C3b: **11.585 / 11.585** *(ô so; `0↔0` 8.949)* · `KẾT: DAT`.
+- Trục C3a: cột đầu = ngày đầu IX.PER − 1 ⇒ IX.PER 25/10 ⇒ cột đầu 24/10 ≠ MONG 20/10 ⇒ ĐỎ *(bài ghim)*.
+- `-03·-04·-05` GHI NHẬN ⇒ backlog, ⛔ làm *(⛔ sửa `dung_moi_truong_isp.sh` ngoài dòng sàn)*.
+
+**Q8:** `MONG_PYTEST_TOAN_BO` `3515 → 3521` *(+1 bài c3b +5 bài c3a; thu thập 3.521)* cùng commit với bài; bài ghim `test_dung_moi_truong_isp.py` nâng theo.
+`--duong-nen --cong 5435` *(một mình, một lần)*: toàn bộ `12 failed, 3493 passed, 2 xfailed, 14 errors` = **28 = 28** node id *(thêm 0 · bớt 0)* · chạy 3521 · web `3 failed, 672 passed` = 3 = 3, chạy 675 · `KẾT: ĐẠT`. `lint-imports`: `11 kept, 0 broken`.
