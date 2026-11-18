@@ -1,0 +1,209 @@
+{
+ "_vi_sao": "Sinh bởi `python tools/phan_loai_ly_do.py --khoa <bản đọc> --ghi` (ISP 3.1.2 Step 5 · DT1b · BG-096) từ khoá đọc ở nguồn trên máy owner (O10). ⛔ sửa tay — `python tools/phan_loai_ly_do.py` kiểm lại tệp này. Mỗi dòng sổ thiếu của DT1a mang ĐÚNG một nhãn trong bảng đóng.",
+ "khong_mang_PII": "Mỗi dòng đúng 6 khoá (dong_sheet · ky · nhan · khoa_bam · lech · ghi_chu); khoá ghép chỉ ở dạng sha256 16 ký tự hex của bộ 5 trường ĐÃ chuẩn hoá. Máy chặn trước khi ghi và khi kiểm tệp: khoá ngoài lược đồ · tên khoá ở mọi tầng chứa Diễn giải / Số chứng từ / Số CT / email (bỏ dấu) · khoa_bam ⛔ phải 16 hex · email trong mọi chuỗi · ô `#N/A` dạng dài của VLOOKUP (nhúng mã giao dịch); riêng lúc đo: mọi token trùng Số chứng từ ≥ 6 ký tự (thô hoặc đã chuẩn hoá) hay số tiền ≥ 6 chữ số của đầu vào.",
+ "nguon": {
+  "tep_dt1a": null,
+  "anh_so": "tests/fixture/dt1b_moc_20261118.json",
+  "ban_doc_sha256_16": "a413c8347bdf52b3"
+ },
+ "mau_so": {
+  "thieu": 19,
+  "so_dong_so": 12590,
+  "so_dong_l1": 12590,
+  "so_dong_ghep_dt1a": 12571,
+  "tai_lap": 12571,
+  "khoa_hong": {
+   "SO": 0,
+   "L1": 0
+  },
+  "dang_khoa_hoc": {
+   "SO": 43,
+   "L1": 43
+  }
+ },
+ "dem_nhan": {
+  "KHONG_CO_SAO_KE": 12,
+  "KHOA_LECH": 7,
+  "TRUNG_SEQ": 0,
+  "KHAC": 0
+ },
+ "nhan_theo_ky": {
+  "-": {
+   "KHONG_CO_SAO_KE": 12,
+   "KHOA_LECH": 7,
+   "TRUNG_SEQ": 0,
+   "KHAC": 0
+  }
+ },
+ "van_tay": {
+  "thieu": "0e1536c74728ee44"
+ },
+ "dong_thieu": [
+  {
+   "dong_sheet": 704,
+   "ky": "-",
+   "nhan": "KHONG_CO_SAO_KE",
+   "khoa_bam": "57ec59a09d2d7b7f",
+   "lech": [],
+   "ghi_chu": null
+  },
+  {
+   "dong_sheet": 771,
+   "ky": "-",
+   "nhan": "KHONG_CO_SAO_KE",
+   "khoa_bam": "f14b0f8de5e521d4",
+   "lech": [],
+   "ghi_chu": null
+  },
+  {
+   "dong_sheet": 1024,
+   "ky": "-",
+   "nhan": "KHONG_CO_SAO_KE",
+   "khoa_bam": "4ca4519ca173f136",
+   "lech": [],
+   "ghi_chu": null
+  },
+  {
+   "dong_sheet": 1054,
+   "ky": "-",
+   "nhan": "KHONG_CO_SAO_KE",
+   "khoa_bam": "2fac9eb117d9962c",
+   "lech": [],
+   "ghi_chu": null
+  },
+  {
+   "dong_sheet": 1055,
+   "ky": "-",
+   "nhan": "KHONG_CO_SAO_KE",
+   "khoa_bam": "9eb3a9af1a88ff90",
+   "lech": [],
+   "ghi_chu": null
+  },
+  {
+   "dong_sheet": 1352,
+   "ky": "-",
+   "nhan": "KHONG_CO_SAO_KE",
+   "khoa_bam": "aa27088f7ff215fb",
+   "lech": [],
+   "ghi_chu": null
+  },
+  {
+   "dong_sheet": 1602,
+   "ky": "-",
+   "nhan": "KHONG_CO_SAO_KE",
+   "khoa_bam": "99ab828a8df19355",
+   "lech": [],
+   "ghi_chu": null
+  },
+  {
+   "dong_sheet": 1684,
+   "ky": "-",
+   "nhan": "KHONG_CO_SAO_KE",
+   "khoa_bam": "fa145b53e169a50c",
+   "lech": [],
+   "ghi_chu": null
+  },
+  {
+   "dong_sheet": 1863,
+   "ky": "-",
+   "nhan": "KHONG_CO_SAO_KE",
+   "khoa_bam": "7c2c0321bd9327f1",
+   "lech": [],
+   "ghi_chu": null
+  },
+  {
+   "dong_sheet": 2022,
+   "ky": "-",
+   "nhan": "KHONG_CO_SAO_KE",
+   "khoa_bam": "95ec87c240463399",
+   "lech": [],
+   "ghi_chu": null
+  },
+  {
+   "dong_sheet": 2371,
+   "ky": "-",
+   "nhan": "KHONG_CO_SAO_KE",
+   "khoa_bam": "f14614f9eaee7fae",
+   "lech": [],
+   "ghi_chu": null
+  },
+  {
+   "dong_sheet": 2439,
+   "ky": "-",
+   "nhan": "KHONG_CO_SAO_KE",
+   "khoa_bam": "90efd3bdee98f019",
+   "lech": [],
+   "ghi_chu": null
+  },
+  {
+   "dong_sheet": 2566,
+   "ky": "-",
+   "nhan": "KHOA_LECH",
+   "khoa_bam": "59ab3e8845229de3",
+   "lech": [
+    "ps_co"
+   ],
+   "ghi_chu": null
+  },
+  {
+   "dong_sheet": 4735,
+   "ky": "-",
+   "nhan": "KHOA_LECH",
+   "khoa_bam": "95e2fc5473f5a0cd",
+   "lech": [
+    "ps_co"
+   ],
+   "ghi_chu": null
+  },
+  {
+   "dong_sheet": 4736,
+   "ky": "-",
+   "nhan": "KHOA_LECH",
+   "khoa_bam": "95e2fc5473f5a0cd",
+   "lech": [
+    "ps_co"
+   ],
+   "ghi_chu": null
+  },
+  {
+   "dong_sheet": 4737,
+   "ky": "-",
+   "nhan": "KHOA_LECH",
+   "khoa_bam": "95e2fc5473f5a0cd",
+   "lech": [
+    "ps_co"
+   ],
+   "ghi_chu": null
+  },
+  {
+   "dong_sheet": 6248,
+   "ky": "-",
+   "nhan": "KHOA_LECH",
+   "khoa_bam": "ef931d9fc95f801e",
+   "lech": [
+    "ps_co"
+   ],
+   "ghi_chu": null
+  },
+  {
+   "dong_sheet": 6249,
+   "ky": "-",
+   "nhan": "KHOA_LECH",
+   "khoa_bam": "ef931d9fc95f801e",
+   "lech": [
+    "ps_co"
+   ],
+   "ghi_chu": null
+  },
+  {
+   "dong_sheet": 6250,
+   "ky": "-",
+   "nhan": "KHOA_LECH",
+   "khoa_bam": "ef931d9fc95f801e",
+   "lech": [
+    "ps_co"
+   ],
+   "ghi_chu": null
+  }
+ ]
+}

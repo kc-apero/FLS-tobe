@@ -137,10 +137,24 @@ from fls.canon.validate import parse_so  # noqa: E402
 
 DT1A = GOC / "docs" / "ITL" / "_tools" / "phan_loai_dong_thieu.json"
 ANH_SO = GOC / "tests" / "fixture" / "itl_ledge_adjustment.json"
-RA = GOC / "docs" / "ITL" / "_tools" / "phan_loai_ly_do.json"
+# ⚠ WO-156: tệp nhãn của MỐC MỚI 18/11 ở TÊN RIÊNG. `tools/do_voi_so_luong.py` (H2) đọc `phan_loai_ly_do.json` và đòi
+#   tập dòng = 122 dòng thiếu mốc 26/08 (`do_voi_so_luong.py:113`) — ghi nhãn mốc mới (đánh số 12.590 dòng) vào đó làm
+#   ĐỎ H2 (đo 18/11: ≥4 bài `test_do_voi_hd1`). Gộp/đổi tên = quyết định của orchestrator (phương án B).
+RA = GOC / "docs" / "ITL" / "_tools" / "phan_loai_ly_do_moc_20261118.json"
 # Hằng đường dẫn khai trong `nguon` của tệp ra — R7 (DT1b-R1-04) đóng GIÁ TRỊ hai lá này bằng chính chúng.
 NGUON_TEP_DT1A = "docs/ITL/_tools/phan_loai_dong_thieu.json"
 NGUON_ANH_SO = "tests/fixture/itl_ledge_adjustment.json"
+
+# ── MỐC MỚI 18/11 (WO-156 · phương án A) — CHỈ cho lượt nhãn DT1b; ảnh 26/08 vẫn là mốc MẶC ĐỊNH ──────
+ANH_MOC = GOC / "tests" / "fixture" / "dt1b_moc_20261118.json"
+NGUON_ANH_MOC = "tests/fixture/dt1b_moc_20261118.json"
+NGUON_SO_ID = "1U-IQVOXBbGE6X6n0i0mi3IG9VWc9J_Ap"
+NGUON_SO_TEN = "ITL I Input Transaction Ledger File 2_2 (ADJUSTED) - ITL Ledge.csv"
+KY_MOC_MOI = "-"           # mốc mới ⛔ xuất cột Ngày chứng từ (ngày hỏng ở xlsx, ⛔ cần cho nhãn) ⇒ MỘT kỳ giả "-"
+KHOA_ANH = ("nguon", "so_dong", "so_khop", "so_thieu", "dong")
+KHOA_ANH_NGUON = ("id", "ten_tep", "doc_luc")
+KHOA_ANH_DONG = ("dong_sheet", "khoa_bam", "khop")
+MAU_THOI_DIEM = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\+00:00|Z)$")
 
 DAT, DO, SAI_GOI, CHUA_DO_DUOC, CHUA_GHIM = 0, 1, 2, 3, 4
 
@@ -165,6 +179,15 @@ MONG = {
     #   cùng kỳ giữ nguyên số đếm) — vân tay danh tính mới cắn.
     "van_tay_nhan": None,
 }
+
+# ── MONG của MỐC MỚI (Đ5 — khai TRƯỚC, khác ⇒ ĐỎ; `None` ⇒ mã 4). Ghim CÙNG lượt thật 18/11, nguồn WO-156 ──
+#   `so_dong` · `so_khop` · `so_thieu` đếm DÒNG của SO (Đ4: so_dong = so_khop + so_thieu); `van_tay_anh` =
+#   sha256-16 của ảnh mốc (mỗi dòng [dong_sheet, khoa_bam, khop]); hai khoá cuối như MONG ở trên.
+#   ĐÃ GHIM 18/11 (WO-156 · BG-157) từ lượt thật: SO = CSV Drive `1U-IQVO…` (12.590 dòng có ≥1 ô khoá; 22 hàng
+#   cuối chỉ có cột công thức đã loại) ↔ L1 sổ RAW `1xaD1R…` (12.590 dòng). 12.571 khớp 1-1 · 19 thiếu.
+MONG_MOC = {"so_dong": 12590, "so_khop": 12571, "so_thieu": 19, "van_tay_anh": "39620e6d87dcd75a",
+            "phan_bo_nhan": {"KHONG_CO_SAO_KE": 12, "KHOA_LECH": 7, "TRUNG_SEQ": 0, "KHAC": 0},
+            "van_tay_nhan": "566b677f3b1ad2d4"}
 
 KHOA_TRAN = ("_vi_sao", "khong_mang_PII", "nguon", "mau_so", "dem_nhan", "nhan_theo_ky", "van_tay", "dong_thieu")
 KHOA_NGUON = ("tep_dt1a", "anh_so", "ban_doc_sha256_16")
@@ -302,6 +325,64 @@ def doc_khoa(duong: Path) -> dict:
     return {"so": so, "l1": l1, "cam_ct": cam_ct, "cam_tien": cam_tien, "dang_khoa_hoc": khoa_hoc, "sha": sha}
 
 
+# ═════════════════════════════════════════════════════════════════════════ mốc (mặc định 26/08 · mới 18/11)
+def _van_tay_anh(anh: dict) -> str:
+    bo = sorted([r.get("dong_sheet"), r.get("khoa_bam"), r.get("khop")] for r in anh["dong"])
+    return hashlib.sha256(json.dumps(bo, separators=(",", ":")).encode("utf-8")).hexdigest()[:16]
+
+
+def kiem_anh_moc(anh) -> list[str]:
+    """Lược đồ ĐÓNG + nhất quán nội bộ của ảnh mốc mới. Câu lỗi nêu TÊN trường, ⛔ giá trị."""
+    if not isinstance(anh, dict):
+        return ["ảnh mốc ⛔ phải một đối tượng JSON"]
+    loi: list[str] = []
+    if set(anh) != set(KHOA_ANH):
+        return [f"ảnh mốc: khoá ngoài lược đồ: thừa {sorted(set(anh) - set(KHOA_ANH))} · thiếu {sorted(set(KHOA_ANH) - set(anh))}"]
+    ng = anh["nguon"]
+    if not (isinstance(ng, dict) and set(ng) == set(KHOA_ANH_NGUON)):
+        loi.append("ảnh mốc: nguon ⛔ đúng {id, ten_tep, doc_luc}")
+    else:
+        if ng["id"] != NGUON_SO_ID or ng["ten_tep"] != NGUON_SO_TEN:
+            loi.append("ảnh mốc: nguon.id / nguon.ten_tep ⛔ đúng hằng khai")
+        if not (isinstance(ng["doc_luc"], str) and MAU_THOI_DIEM.match(ng["doc_luc"])):
+            loi.append("ảnh mốc: nguon.doc_luc ⛔ đúng dạng thời điểm ISO UTC")
+    dong = anh["dong"]
+    if not (isinstance(dong, list) and all(isinstance(r, dict) and set(r) == set(KHOA_ANH_DONG) for r in dong)):
+        return loi + ["ảnh mốc: dong ⛔ danh sách đối tượng đúng {dong_sheet, khoa_bam, khop}"]
+    for r in dong:
+        if type(r["dong_sheet"]) is not int or type(r["khop"]) is not bool:
+            loi.append("ảnh mốc: dong_sheet ⛔ số nguyên / khop ⛔ bool")
+            break
+    for r in dong:
+        kb = r["khoa_bam"]
+        if not (isinstance(kb, str) and MAU_HEX16.match(kb)):
+            loi.append("ảnh mốc: khoa_bam ⛔ 16 ký tự hex")
+            break
+    if len({r["dong_sheet"] for r in dong if type(r["dong_sheet"]) is int}) != len(dong):
+        loi.append("ảnh mốc: dong_sheet trùng")
+    n_khop = sum(1 for r in dong if r["khop"] is True)
+    for ten, co, mong in (("so_dong", anh["so_dong"], len(dong)), ("so_khop", anh["so_khop"], n_khop),
+                          ("so_thieu", anh["so_thieu"], len(dong) - n_khop)):
+        if type(co) is not int or co != mong:
+            loi.append(f"ảnh mốc: {ten} khai ≠ đếm lại từ dong")
+    return loi
+
+
+def moc_tu_anh(anh: dict) -> dict:
+    """Mốc mới dựng TỪ ảnh mốc: tập thiếu = dòng `khop` sai. Mọi số (K9 · K10 · K11) so với số ảnh KHAI."""
+    thieu = sorted(r["dong_sheet"] for r in anh["dong"] if not r["khop"])
+    return {"moi": True, "thieu": thieu, "ky": {d: KY_MOC_MOI for d in thieu},
+            "van_tay": {"thieu": _van_tay(thieu)}, "so_dong": anh["so_dong"], "so_ghep": anh["so_khop"],
+            "tep_dt1a": None, "anh_so": NGUON_ANH_MOC, "anh": anh}
+
+
+def _moc_mac_dinh(dt1a: dict) -> dict:
+    return {"moi": False, "thieu": sorted(x["dong_sheet"] for x in dt1a["dong_thieu"]),
+            "ky": {x["dong_sheet"]: x["ky"] for x in dt1a["dong_thieu"]},
+            "van_tay": MONG["van_tay"], "so_dong": MONG["so_dong_so"], "so_ghep": MONG["so_dong_ghep"],
+            "tep_dt1a": NGUON_TEP_DT1A, "anh_so": NGUON_ANH_SO, "anh": None}
+
+
 # ═════════════════════════════════════════════════════════════════════════ phân loại
 def phan_loai(so: dict[int, tuple], l1: dict[int, tuple], thieu: list[int]) -> tuple[dict[int, dict], int]:
     """Nhãn cho từng dòng thiếu + TÁI LẬP. Làm theo NHÓM KHOÁ — ⛔ theo vị trí hàng, ⛔ theo thứ tự tệp."""
@@ -402,6 +483,77 @@ def do(duong: Path) -> tuple[dict, list[str]]:
     return kq, loi
 
 
+def do_moc_moi(duong: Path, anh_khai: dict | None = None, doc_luc: str | None = None) -> tuple[dict, list[str], dict]:
+    """ĐO trên MỐC MỚI: tập thiếu = dòng SO ⛔ có bạn L1 theo khoá + seq (thứ tự `dong`); khớp = Σ min(n_so, n_l1).
+
+    `anh_khai` (ảnh mốc ĐÃ ghim, nếu có) ⇒ K10 (số khớp · số thiếu khai ↔ đo) · K11 (tập `dong_sheet` khai ↔ SO).
+    Trả (tệp nhãn, danh sách lệch, ảnh mốc ĐO)."""
+    import datetime as _dt
+    vao = doc_khoa(duong)
+    so, l1 = vao["so"], vao["l1"]
+    mau0 = {"so_dong_so": len(so), "so_dong_l1": len(l1)}
+    rong = {k: v for k, v in mau0.items() if not v}
+    if rong:                                     # Đ3
+        return {"mau_so": mau0}, [f"mẫu số = 0 — ⛔ đo được tỷ lệ nào (Đ3): {rong}"], {}
+    n_l1 = _dem_l1(l1)
+    seen: Counter = Counter()
+    thieu: list[int] = []
+    for d in sorted(so):
+        k = so[d]
+        if _hong(k):
+            thieu.append(d)
+            continue
+        seen[k] += 1
+        if seen[k] > n_l1.get(k, 0):               # dòng SO thứ i của khoá k ghép dòng L1 thứ i; i > n_l1 ⇒ thiếu
+            thieu.append(d)
+    set_thieu = set(thieu)
+    anh_do = {"nguon": {"id": NGUON_SO_ID, "ten_tep": NGUON_SO_TEN,
+                        "doc_luc": doc_luc or _dt.datetime.now(_dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%S+00:00")},
+              "so_dong": len(so), "so_khop": len(so) - len(thieu), "so_thieu": len(thieu),
+              "dong": [{"dong_sheet": d, "khoa_bam": bam_khoa(so[d]), "khop": d not in set_thieu} for d in sorted(so)]}
+    nhan, tai_lap = phan_loai(so, l1, thieu)     # TÁI LẬP tính LẠI bằng đường khác (Σ min theo nhóm) — Đ2 hai nguồn
+    loi: list[str] = []
+    if anh_khai is not None:
+        loi.extend(kiem_anh_moc(anh_khai))
+        if isinstance(anh_khai.get("dong"), list):
+            tap_khai = {r.get("dong_sheet") for r in anh_khai["dong"] if isinstance(r, dict)}
+            if tap_khai != set(so):
+                loi.append(f"K11 tập dong_sheet khai trong ảnh mốc ({len(tap_khai)}) ≠ tập dòng SO đo ({len(so)}): "
+                           f"thiếu {len(set(so) - tap_khai)} · thừa {len(tap_khai - set(so))}")
+            khai_thieu = {r["dong_sheet"] for r in anh_khai["dong"] if isinstance(r, dict) and r.get("khop") is False}
+            if khai_thieu != set(thieu):
+                loi.append(f"K11 tập dòng THIẾU khai ({len(khai_thieu)}) ≠ đo ({len(thieu)}): "
+                           f"khai thừa {len(khai_thieu - set(thieu))} · khai thiếu {len(set(thieu) - khai_thieu)}")
+            kb_khai = {r["dong_sheet"]: r.get("khoa_bam") for r in anh_khai["dong"] if isinstance(r, dict)}
+            lech_kb = sum(1 for d in so if d in kb_khai and kb_khai[d] != bam_khoa(so[d]))
+            if lech_kb:
+                loi.append(f"K11 {lech_kb} dòng có khoa_bam khai ≠ băm khoá đo")
+        if anh_khai.get("so_khop") != tai_lap:
+            loi.append(f"K10 số khớp 1-1 khai trong ảnh mốc {anh_khai.get('so_khop')} ≠ tái lập khoá+seq đo {tai_lap}")
+        if anh_khai.get("so_thieu") != len(thieu):
+            loi.append(f"K10 số thiếu khai {anh_khai.get('so_thieu')} ≠ đo {len(thieu)}")
+    moc = moc_tu_anh(anh_khai if (anh_khai is not None and not kiem_anh_moc(anh_khai)) else anh_do)
+    mau_so = {"thieu": len(thieu), "so_dong_so": len(so), "so_dong_l1": len(l1), "so_dong_ghep_dt1a": len(so) - len(thieu)}
+    if not thieu:
+        return {"mau_so": mau_so}, loi + ["mẫu số = 0 — tập thiếu rỗng (Đ3): ⛔ nhãn nào để đo"], anh_do
+    dong = [{"dong_sheet": d, "ky": KY_MOC_MOI, **nhan[d]} for d in thieu]
+    mau_so.update(tai_lap=tai_lap,
+                  khoa_hong={"SO": sum(1 for k in so.values() if _hong(k)), "L1": sum(1 for k in l1.values() if _hong(k))},
+                  dang_khoa_hoc=vao["dang_khoa_hoc"])
+    dem = {n: sum(1 for r in dong if r["nhan"] == n) for n in NHAN}
+    kq = {"_vi_sao": VI_SAO, "khong_mang_PII": KHONG_MANG_PII,
+          "nguon": {"tep_dt1a": None, "anh_so": NGUON_ANH_MOC, "ban_doc_sha256_16": vao["sha"]},
+          "mau_so": mau_so, "dem_nhan": dem, "nhan_theo_ky": {KY_MOC_MOI: dict(dem)},
+          "van_tay": moc["van_tay"], "dong_thieu": dong}
+    loi.extend(kiem(kq, None, moc))
+    loi.extend(quet_token(kq, vao["cam_ct"], vao["cam_tien"]))
+    return kq, loi, anh_do
+
+
+def _dem_l1(l1: dict[int, tuple]) -> Counter:
+    return Counter(k for k in l1.values() if not _hong(k))
+
+
 # ═════════════════════════════════════════════════════════════════════════ kiểm (dùng chung đo ↔ cổng)
 def _moi_chuoi(x, duong: str = ""):
     """Mọi chuỗi trong `x` — cả KHOÁ dict (khoá `nhan_theo_ky` là kỳ, đọc từ DT1a) lẫn giá trị."""
@@ -457,7 +609,7 @@ def _luoc_do(kq) -> tuple[list[str], bool]:
     return loi, True
 
 
-def kiem(kq: dict, dt1a: dict) -> list[str]:
+def kiem(kq: dict, dt1a: dict | None, moc: dict | None = None) -> list[str]:
     """K1–K10 + R1–R4 trên một tệp nhãn (vừa đo, hoặc đọc từ đĩa). Trả danh sách lệch MONG."""
     loi: list[str] = []
 
@@ -465,12 +617,15 @@ def kiem(kq: dict, dt1a: dict) -> list[str]:
         if co != mong:
             loi.append(f"{ten}: đo {co!r} · mong {mong!r}")
 
-    thieu = sorted(x["dong_sheet"] for x in dt1a["dong_thieu"])
-    nguoc = sorted(x["dong_canon"] for x in dt1a["dong_nguoc"])
-    so(f"vân tay tập thiếu của DT1a (sha256 của {len(thieu)} dong_sheet đã sắp)", _van_tay(thieu),     # K1
-       MONG["van_tay"]["thieu"])
-    so(f"vân tay tập ngược của DT1a (sha256 của {len(nguoc)} dong_canon đã sắp)", _van_tay(nguoc),     # K2
-       MONG["van_tay"]["nguoc"])
+    if moc is None:                              # mốc MẶC ĐỊNH 26/08 — ⛔ đổi hành vi của bài cũ
+        moc = _moc_mac_dinh(dt1a)
+    thieu = moc["thieu"]
+    so(f"vân tay tập thiếu của {'mốc mới' if moc['moi'] else 'DT1a'} (sha256 của {len(thieu)} dong_sheet đã sắp)",
+       _van_tay(thieu), moc["van_tay"]["thieu"])                                                         # K1
+    if not moc["moi"]:
+        nguoc = sorted(x["dong_canon"] for x in dt1a["dong_nguoc"])
+        so(f"vân tay tập ngược của DT1a (sha256 của {len(nguoc)} dong_canon đã sắp)", _van_tay(nguoc),     # K2
+           MONG["van_tay"]["nguoc"])
     lo, tiep = _luoc_do(kq)                                                                             # R1 · R2
     loi.extend(lo)
     for duong, k in _moi_khoa(kq):                                                                      # R6
@@ -495,9 +650,9 @@ def kiem(kq: dict, dt1a: dict) -> list[str]:
     if kq.get("khong_mang_PII") != KHONG_MANG_PII:
         loi.append("riêng tư: /khong_mang_PII ⛔ đúng hằng khai")
     ng = kq["nguon"]
-    if ng.get("tep_dt1a") != NGUON_TEP_DT1A:
+    if ng.get("tep_dt1a") != moc["tep_dt1a"]:
         loi.append("riêng tư: /nguon/tep_dt1a ⛔ đúng đường dẫn hằng")
-    if ng.get("anh_so") != NGUON_ANH_SO:
+    if ng.get("anh_so") != moc["anh_so"]:
         loi.append("riêng tư: /nguon/anh_so ⛔ đúng đường dẫn hằng")
     if not (isinstance(ng.get("ban_doc_sha256_16"), str) and MAU_HEX16.match(ng["ban_doc_sha256_16"])):
         loi.append("riêng tư: /nguon/ban_doc_sha256_16 ⛔ phải 16 ký tự hex (sha256)")
@@ -511,7 +666,7 @@ def kiem(kq: dict, dt1a: dict) -> list[str]:
         if ten in ms0 and not (type(ms0[ten]) is int and 0 <= ms0[ten] < TRAN_DEM):
             loi.append(f"riêng tư: /mau_so/{ten} ⛔ phải số nguyên 0 ≤ n < {TRAN_DEM}")
 
-    so("vân tay ghi trong tệp nhãn (van_tay)", kq["van_tay"], MONG["van_tay"])                       # K3
+    so("vân tay ghi trong tệp nhãn (van_tay)", kq["van_tay"], moc["van_tay"])                       # K3
 
     dong = kq["dong_thieu"]                                                                             # K4
     lap = Counter(r.get("dong_sheet") for r in dong)
@@ -535,12 +690,12 @@ def kiem(kq: dict, dt1a: dict) -> list[str]:
     for d in sorted(set(thieu) - set(lap)):
         loi.append(f"dòng {d} mang 0 nhãn (vắng trong tệp nhãn)")
     for d in sorted(set(lap) - set(thieu), key=str):
-        loi.append(f"dòng {d} ngoài tập {MONG['thieu']} dòng thiếu của DT1a")
+        loi.append(f"dòng {d} ngoài tập {len(thieu)} dòng thiếu của {'mốc mới' if moc['moi'] else 'DT1a'}")
 
     dem_lai = {n: sum(1 for r in hop_le if r["nhan"] == n) for n in NHAN}                              # K5
     so("dem_nhan ↔ đếm lại từ dòng (hai nguồn)", kq["dem_nhan"], dem_lai)
     so("Σ dem_nhan (dòng sổ thiếu có nhãn)",
-       sum(v for v in kq["dem_nhan"].values() if isinstance(v, int)), MONG["thieu"])
+       sum(v for v in kq["dem_nhan"].values() if isinstance(v, int)), len(thieu))
 
     for r in hop_le:                                                                                    # K6
         d, n, lech, gc = r["dong_sheet"], r["nhan"], r.get("lech"), r.get("ghi_chu")
@@ -558,7 +713,7 @@ def kiem(kq: dict, dt1a: dict) -> list[str]:
         elif lech != [] or gc is not None:
             loi.append(f"dòng {d}: {n} ⛔ mang lech / ghi_chu")
 
-    ky = {x["dong_sheet"]: x["ky"] for x in dt1a["dong_thieu"]}                                        # K7
+    ky = moc["ky"]                                                                                      # K7
     for r in dong:
         d = r.get("dong_sheet")
         if d in ky and r.get("ky") != ky[d]:
@@ -573,11 +728,11 @@ def kiem(kq: dict, dt1a: dict) -> list[str]:
             if not (isinstance(ms.get(k), int) and ms[k] > 0)}
     if rong:
         loi.append(f"mẫu số = 0 — ⛔ đo được tỷ lệ nào (Đ3): {rong}")
-    so("mẫu số khai: dòng sổ thiếu", ms.get("thieu"), MONG["thieu"])
-    so("mẫu số khai: dòng sổ của bản đọc", ms.get("so_dong_so"), MONG["so_dong_so"])
-    so("mẫu số khai: dòng ghép DT1a", ms.get("so_dong_ghep_dt1a"), MONG["so_dong_ghep"])
-    so(f"tái lập khoá+seq (dòng ghép DT1a tìm lại được dòng L1 cùng khoá, trên {MONG['so_dong_ghep']} dòng ghép)",
-       ms.get("tai_lap"), MONG["so_dong_ghep"])
+    so("mẫu số khai: dòng sổ thiếu", ms.get("thieu"), len(thieu))
+    so("mẫu số khai: dòng sổ của bản đọc", ms.get("so_dong_so"), moc["so_dong"])
+    so("mẫu số khai: dòng ghép" + ("" if moc["moi"] else " DT1a"), ms.get("so_dong_ghep_dt1a"), moc["so_ghep"])
+    so(f"tái lập khoá+seq (dòng ghép tìm lại được dòng L1 cùng khoá, trên {moc['so_ghep']} dòng ghép)",
+       ms.get("tai_lap"), moc["so_ghep"])
     return loi
 
 
@@ -605,16 +760,18 @@ def _ty_le(tu: int, mau: int) -> str:
 
 def in_bao_cao(kq: dict, nguon: str) -> None:
     ms = kq["mau_so"]
+    moi = isinstance(kq.get("nguon"), dict) and kq["nguon"].get("tep_dt1a") is None and "nguon" in kq
+    ten_a = "mốc mới" if moi else "DT1a"
     print(f"PHÂN LOẠI LÝ DO — HD1 · dòng sổ chưa ghép 1-1 (DT1b) · {nguon}")
     # Đ3: MẪU SỐ in TRƯỚC mọi tỷ lệ, mỗi số mang nhãn NÓ ĐẾM GÌ (Đ4)
     print(f"① MẪU SỐ: bản đọc phía SO {_so(ms.get('so_dong_so'))} dòng sổ · phía L1 {_so(ms.get('so_dong_l1'))} "
-          f"dòng L1 · tập DT1a {_so(ms.get('thieu'))} dòng sổ thiếu · {_so(ms.get('so_dong_ghep_dt1a'))} dòng ghép (DT1a)")
+          f"dòng L1 · tập {ten_a} {_so(ms.get('thieu'))} dòng sổ thiếu · {_so(ms.get('so_dong_ghep_dt1a'))} dòng ghép ({ten_a})")
     if "dong_thieu" not in kq:
         return
     mau = ms.get("so_dong_ghep_dt1a")
     ty = _ty_le(ms["tai_lap"], mau) if isinstance(mau, int) and mau > 0 and isinstance(ms.get("tai_lap"), int) else "—"
     kh, dk = ms.get("khoa_hong", {}), ms.get("dang_khoa_hoc", {})
-    print(f"② tái lập khoá+seq: {_so(ms.get('tai_lap'))} / {_so(mau)} dòng ghép DT1a = {ty} · khoá hỏng: "
+    print(f"② tái lập khoá+seq: {_so(ms.get('tai_lap'))} / {_so(mau)} dòng ghép {ten_a} = {ty} · khoá hỏng: "
           f"sổ {_so(kh.get('SO'))} · L1 {_so(kh.get('L1'))} dòng · Số CT dạng khoa học: sổ {_so(dk.get('SO'))} · "
           f"L1 {_so(dk.get('L1'))} dòng")
     dem = kq["dem_nhan"]
@@ -627,15 +784,27 @@ def in_bao_cao(kq: dict, nguon: str) -> None:
     print(f"   {'kỳ':8s} {'Σ':>4s} " + " ".join(f"{n:>16s}" for n in NHAN))
     for k, x in kq["nhan_theo_ky"].items():
         print(f"   {str(k):8s} {sum(x.values()):4d} " + " ".join(f"{x.get(n, 0):16d}" for n in NHAN))
-    print(f"   vân tay DT1a: thiếu {kq['van_tay'].get('thieu')} · ngược {kq['van_tay'].get('nguoc')}")
+    print(f"   vân tay {ten_a}: thiếu {kq['van_tay'].get('thieu')} · ngược {kq['van_tay'].get('nguoc')}")
 
 
-def phan_xu(kq: dict, loi: list[str]) -> int:
+def phan_xu(kq: dict, loi: list[str], moc: dict | None = None) -> int:
     """Phán cuối: lệch ⇒ 1 · MONG phân bố / vân tay nhãn chưa ghim ⇒ 4 · khớp ⇒ 0 (M · K13)."""
-    mong = MONG["phan_bo_nhan"]
-    mong_vt = MONG["van_tay_nhan"]
+    moi = bool(moc and moc["moi"])
+    n_thieu = len(moc["thieu"]) if moi else MONG["thieu"]
+    mong = MONG_MOC["phan_bo_nhan"] if moi else MONG["phan_bo_nhan"]
+    mong_vt = MONG_MOC["van_tay_nhan"] if moi else MONG["van_tay_nhan"]
+    chua_ghim_moc: list[str] = []
+    if moi:                                      # Đ5 — số khai của ảnh mốc so với MONG ĐÃ GHIM (khai trước, khác ⇒ ĐỎ)
+        anh = moc["anh"]
+        thuc = {"so_dong": anh["so_dong"], "so_khop": anh["so_khop"], "so_thieu": anh["so_thieu"],
+                "van_tay_anh": _van_tay_anh(anh)}
+        for ten, v in thuc.items():
+            if MONG_MOC[ten] is None:
+                chua_ghim_moc.append(f"mốc {ten}")
+            elif MONG_MOC[ten] != v:
+                loi.append(f"mốc mới {ten}: ảnh {v!r} · mong {MONG_MOC[ten]!r}")
     if mong is not None and isinstance(kq.get("dem_nhan"), dict) and kq["dem_nhan"] != mong:
-        loi.append(f"phân bố nhãn của {MONG['thieu']} dòng sổ thiếu: đo {kq['dem_nhan']} · mong {mong}")
+        loi.append(f"phân bố nhãn của {n_thieu} dòng sổ thiếu: đo {kq['dem_nhan']} · mong {mong}")
     if mong_vt is not None:                       # K13 — DANH TÍNH nhãn, ⛔ chỉ phân bố (DT1b-R1-05)
         try:
             vt = _van_tay_nhan(kq["dong_thieu"])
@@ -649,13 +818,14 @@ def phan_xu(kq: dict, loi: list[str]) -> int:
         for x in loi:
             print("  " + x, file=sys.stderr)
         return DO
-    if mong is None or mong_vt is None:
+    if mong is None or mong_vt is None or chua_ghim_moc:
         thieu_ghim = [t for t, v in (("phân bố nhãn", mong), ("vân tay danh tính nhãn", mong_vt)) if v is None]
+        thieu_ghim += chua_ghim_moc
         print(f"KẾT: ĐO ĐƯỢC — ⛔ CHƯA GHIM MONG {' · '.join(thieu_ghim)} (mã {CHUA_GHIM}, ⛔ phải ĐẠT): mọi bất "
-              f"biến cấu trúc đạt · {_so(MONG['thieu'])} dòng mỗi dòng đúng một nhãn — gửi tệp nhãn + bảng ③④ "
+              f"biến cấu trúc đạt · {_so(n_thieu)} dòng mỗi dòng đúng một nhãn — gửi tệp nhãn + bảng ③④ "
               f"về orchestrator để ghim")
         return CHUA_GHIM
-    print(f"KẾT: ĐẠT — mọi phép so khớp MONG · {_so(MONG['thieu'])} dòng sổ thiếu, mỗi dòng đúng một nhãn")
+    print(f"KẾT: ĐẠT — mọi phép so khớp MONG · {_so(n_thieu)} dòng sổ thiếu, mỗi dòng đúng một nhãn")
     return DAT
 
 
@@ -670,6 +840,12 @@ def _ghi(kq: dict) -> None:
     if json.loads(tam.read_text(encoding="utf-8")) != kq:
         raise RuntimeError(f"đọc lại {tam.name} ⛔ khớp nội dung vừa ghi")
     os.replace(tam, RA)
+
+
+def _ghi_anh(anh: dict, duong: Path) -> None:
+    tam = duong.with_name(duong.name + ".tam")
+    tam.write_text(json.dumps(anh, ensure_ascii=False, separators=(",", ":")) + "\n", encoding="utf-8")
+    os.replace(tam, duong)
 
 
 def _mot_dong(e: Exception) -> str:
@@ -693,7 +869,7 @@ def _trong_repo_khong_ignore(duong: Path) -> bool:
     return r.returncode != 0
 
 
-def _che_do_do(duong: Path, ghi: bool) -> int:
+def _che_do_do(duong: Path, ghi: bool, moc_duong: Path | None = None) -> int:
     if duong.exists() and not duong.is_file():   # DT1b-R1-11 — thư mục / ⛔ tệp thường là SAI CÁCH GỌI (2), ⛔ "chưa đo"
         print(f"⛔ TỪ CHỐI: {duong.resolve()} CÓ nhưng ⛔ phải TỆP thường (bản đọc khoá CSV)", file=sys.stderr)
         return SAI_GOI
@@ -706,20 +882,31 @@ def _che_do_do(duong: Path, ghi: bool) -> int:
               f"({duong.resolve()}) — chuyển vào hien_vat/ (một `git add -A` là Số CT + tiền thật lên lịch sử)",
               file=sys.stderr)
         return SAI_GOI
+    moc = None
+    anh_do = None
     try:
-        kq, loi = do(duong)
+        if moc_duong is None:
+            kq, loi = do(duong)
+        else:                                    # MỐC MỚI — ảnh mốc đã có ⇒ K10/K11 so với số ĐÃ KHAI
+            anh_khai = _nap(moc_duong) if moc_duong.is_file() else None
+            kq, loi, anh_do = do_moc_moi(duong, anh_khai)
+            moc = moc_tu_anh(anh_khai if anh_khai is not None and not kiem_anh_moc(anh_khai) else anh_do) if anh_do else None
     except Exception as e:                       # Đ5: ⛔ đo được / sai định dạng là ĐỎ — nguyên nhân MỘT dòng
         print(_mot_dong(e), file=sys.stderr)
         return DO
     in_bao_cao(kq, f"bản đọc khoá {duong.name}")
-    ma = phan_xu(kq, loi)
+    ma = phan_xu(kq, loi, moc)
     if ghi and ma in (DAT, CHUA_GHIM):
         _ghi(kq)
         print(f"✅ đã ghi {RA.name} (mã {ma})")
+        if anh_do is not None and moc_duong is not None:
+            if not moc_duong.is_file():          # ảnh mốc chỉ GHI LẦN ĐẦU — đã có thì nó là số KHAI, ⛔ ghi đè
+                _ghi_anh(anh_do, moc_duong)
+                print(f"✅ đã ghi ảnh mốc {moc_duong.name} ({anh_do['so_dong']} dòng)")
     return ma
 
 
-def _che_do_cong(tep: Path) -> int:
+def _che_do_cong(tep: Path, moc_duong: Path | None = None) -> int:
     if tep.exists() and not tep.is_file():       # DT1b-R1-11 — thư mục / ⛔ tệp thường là SAI CÁCH GỌI (2)
         print(f"⛔ TỪ CHỐI: {tep.resolve()} CÓ nhưng ⛔ phải TỆP thường (tệp nhãn JSON)", file=sys.stderr)
         return SAI_GOI
@@ -729,7 +916,23 @@ def _che_do_cong(tep: Path) -> int:
         return CHUA_DO_DUOC
     try:
         dt1a, kq = _nap(DT1A), _nap(tep)
-        loi = kiem(kq, dt1a)
+        moc = None
+        if isinstance(kq, dict) and isinstance(kq.get("nguon"), dict) and kq["nguon"].get("anh_so") == NGUON_ANH_MOC:
+            anh = _nap(moc_duong or ANH_MOC) if (moc_duong or ANH_MOC).is_file() else None
+            if anh is None:                      # tệp nhãn khai mốc mới mà ⛔ thấy ảnh mốc ⇒ ĐỎ, ⛔ lặng lẽ về mốc cũ
+                print(f"⛔ tệp nhãn khai mốc {NGUON_ANH_MOC} nhưng ⛔ thấy ảnh mốc", file=sys.stderr)
+                return DO
+            loi = kiem_anh_moc(anh)
+            if loi:
+                moc = None
+            else:
+                moc = moc_tu_anh(anh)
+            if moc is None:
+                print(f"⛔ PHÂN LOẠI LÝ DO ĐỎ — ảnh mốc ⛔ hợp lệ:", file=sys.stderr)
+                for x in loi:
+                    print("  " + x, file=sys.stderr)
+                return DO
+        loi = kiem(kq, dt1a, moc)
     except Exception as e:
         print(_mot_dong(e), file=sys.stderr)
         return DO
@@ -737,7 +940,7 @@ def _che_do_cong(tep: Path) -> int:
         in_bao_cao(kq, f"tệp nhãn {tep.name}")
     except Exception as e:                       # bảng chỉ là trình bày — phán quyết nằm ở `loi`
         print(f"(⛔ in được bảng: {_mot_dong(e)})")
-    return phan_xu(kq, loi)
+    return phan_xu(kq, loi, moc)
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -745,6 +948,9 @@ def main(argv: list[str] | None = None) -> int:
     g = ap.add_mutually_exclusive_group()
     g.add_argument("--khoa", type=Path, default=None, help="ĐO trên bản đọc khoá (CSV định dạng đóng — xem docstring)")
     g.add_argument("--tep", type=Path, default=None, help="CỔNG: kiểm tệp nhãn này (mặc định tệp của repo)")
+    ap.add_argument("--moc", type=Path, default=None,
+                    help="MỐC MỚI 18/11 (WO-156): đường ảnh mốc gọn. Cùng --khoa: đo trên mốc mới (ảnh có sẵn = số "
+                         "khai K10/K11; chưa có + --ghi ⇒ sinh). Cùng cổng: ảnh mốc của tệp nhãn (mặc định ảnh của repo)")
     ap.add_argument("--ghi", action="store_true", help="ghi tệp nhãn của repo — chỉ cùng --khoa, chỉ khi ⛔ ĐỎ")
     a = ap.parse_args(argv)
     if a.ghi and a.khoa is None:
@@ -752,8 +958,8 @@ def main(argv: list[str] | None = None) -> int:
               file=sys.stderr)
         return SAI_GOI
     if a.khoa is not None:
-        return _che_do_do(a.khoa, a.ghi)
-    return _che_do_cong(a.tep if a.tep is not None else RA)
+        return _che_do_do(a.khoa, a.ghi, a.moc)
+    return _che_do_cong(a.tep if a.tep is not None else RA, a.moc)
 
 
 if __name__ == "__main__":
