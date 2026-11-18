@@ -95,5 +95,102 @@
  },
  "so_du_dau": "5 ô gõ tay hàng 24 (errata ⑳: FLS chưa có khái niệm số dư đầu kỳ; nguồn chính thức = câu hỏi BA/owner) — gieo qua tinh_gl(so_du_dau=…)",
  "dat": true,
- "ly_do": []
+ "ly_do": [],
+ "WP-C3a": {
+  "bang": "HD2.WP-C3a",
+  "goi": "WP-C3a",
+  "mo_ta": "SO.CFA1 Daily: tinh_gl (BR/BS từ E/F + ix_fx) trên GL của bản sao CF report → cfa1_daily (lá = Σ BR−BS theo (khối, nhãn HD V, ngày A); khối LE lọc cột P; cha = Σ con theo cây IX.HD) ↔ đáp án 409 từng ô",
+  "nguon_dau_vao": "tests/fixture/dap_an/gl_cf_dau_vao.json (A·D·E·F·P·R·V, ⛔ B:C·G; errata ㉓)",
+  "khoa": "khoi(5) + ma_hd(cây ATL 74) + ngay(serial)",
+  "khoi": [
+   "GROUP",
+   "SGO2",
+   "SGO1",
+   "HGO6",
+   "BGO2"
+  ],
+  "dung_sai_theo_khoi": {
+   "la": {
+    "atol": "1E-14",
+    "rtol": "0",
+    "max_lech_do": "1.0E-15"
+   },
+   "cha": {
+    "atol": "1E-14",
+    "rtol": "0",
+    "max_lech_do": "7.6E-16"
+   }
+  },
+  "dung_sai_ghi_chu": "atol 1e-14 = ≥10× max|lệch| đo 18/11 (lá 1,0e-15 · cha 7,5e-16); rtol 0 (|exp| ≤ 6,1). Chứng ĐỎ: +1 VND một dòng ⇒ lá + mọi cha ĐỎ; +1e-12 một ô đáp án ⇒ đúng ô ấy ĐỎ.",
+  "dong_so": 12373,
+  "mong_dong_so": 12373,
+  "tong_o": 205175,
+  "mong_tong_o": 205175,
+  "khop": 205175,
+  "lech_ngoai_ten": 0,
+  "o_kpi_loai": 76000,
+  "mong_o_kpi": 76000,
+  "ma_kpi": [
+   "EBITDA",
+   "EBIT",
+   "EBT",
+   "NP",
+   "NPC",
+   "NCF",
+   "NCFO",
+   "CRO",
+   "COO",
+   "NCFI",
+   "COI",
+   "NCFF",
+   "CRF",
+   "COF",
+   "PL2",
+   "PL3",
+   "PL4",
+   "PL6",
+   "PL7",
+   "PL8"
+  ],
+  "o_loi_dap_an_loai": 25,
+  "mong_o_loi": 25,
+  "so_dong_dap_an": 33355,
+  "mong_so_dong_dap_an": 33355,
+  "truc_ngay": {
+   "dau": "2024-10-20",
+   "so_cot": 760,
+   "ngay_so_cuoi": "2026-11-11",
+   "cot_chua_co_so": 7,
+   "ghi_chu": "cột đầu 2024-10-20 (errata ㉑, ⛔ 21/10 của spec); trục TẠM lấy từ đáp án tới H6 đọc IX.PER (C6 lưu 21/10)"
+  },
+  "lech_co_ten": {
+   "thieu_tien_te_D": [
+    4957,
+    4958,
+    6068,
+    6502,
+    6944,
+    7626,
+    8026,
+    8593,
+    8649,
+    8999,
+    9071,
+    9380
+   ],
+   "hd_ngoai_cay": {
+    "ITE | ITE Interest ": 1,
+    "ITE | ITE Interest": 152,
+    "<rỗng>": 1,
+    "GAC - Other": 1,
+    "Server Cost": 7
+   },
+   "hd_khac_hoa_thuong": 5,
+   "dong_nhan_cha": 0,
+   "dong_ngoai_truc": 0
+  },
+  "so_du_dau": "KHÔNG dùng — CFA1 Daily là phát sinh theo ngày (BR/BS từng dòng), ⛔ tồn luỹ kế",
+  "dat": true,
+  "ly_do": []
+ }
 }
