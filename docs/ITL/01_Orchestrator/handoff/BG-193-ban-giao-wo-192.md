@@ -54,3 +54,13 @@
 
 Bài: `tests/du_lieu/test_dap_an_gl_hr_cfa3.py` (**27**: tái tạo lưới từ ảnh ⇒ đúng từng byte; ca phá cổng ĐỎ hai chiều; PII; Y2024; AC-4; 412≡406; CFA3). **Sàn pytest 3557 → 3588** (+27; nền thu thập 3.561, lệch 4 so ghim cũ — ghim lại theo số thu thập, web giữ 675) — cùng commit với bài ghim.
 Bản thô: chỉ `/tmp/dt6/` (chmod 600) — xoá sau BG, ⛔ commit.
+
+## Vòng sửa sau R1 (KQ-194)
+*(chỉ THÊM · 18/11 · 0 CHẶN · 1 NÊN SỬA · 5 GHI NHẬN)* — **ảnh `tests/fixture/dap_an/*.json` đúng từng byte** *(`git diff` ảnh = 0 tệp ⇒ `checksum_noi_dung` ghim giữ nguyên)*.
+- **`DT6-R1-01` (NÊN SỬA) — xong, đỏ-trước:** `ITL_ID_RE` siết `ITL#\d{1,6}` + bài `test_DT6_R1_01_cot_R_…` *(ca `R`=tên người · `R`=`ITL#`+12 chữ số; lời lỗi ⛔ in giá trị)*. Đột biến trên **bản sao** `/tmp`: `M14` nới `.*` ⇒ **ĐỎ** *(1 failed)* · `M14b` nới lại `ITL#\d+` ⇒ **ĐỎ** *(ca số dài)*; trả nguyên ⇒ 30/30 xanh.
+- **`-02` — xong:** bài `test_DT6_R1_02_…` gọi thẳng `thieu_lac` *(`NGU_CANH@thiếu`)* và `chuan_bi` *(lưới 0 hàng có ngày ⇒ `ValueError`)*. Đột biến `M9` ⇒ **ĐỎ** · `M10` ⇒ **ĐỎ**.
+- **`-03` — chọn XOÁ nhánh `\d{6,}` mã chết:** lý do — 9 cột chữ có tập đóng + `R` có regex *(nay chặn độ dài)* ⇒ không đường nào tới; giữ nó cần ca giả tạo. Số TK dài ở `H` vẫn ĐỎ bằng `H_la@` *(bài `so_tk_lo_H` xanh)*. Chú thích ⒝ khai rõ.
+- **`-06` — xong:** `_gl_hr.py:111` đổi thành `R | <số>_<NH>_<ĐƠN VỊ>` *(0 chữ số)*.
+- **Backlog:** `-04` *(2.302 hàng thiếu ngày ⇒ câu BA, kèm ΣF 6.763.528.503 · 0 ITL ID)* · `-05` *(kích thước ảnh, việc riêng cho mọi ảnh)*.
+- **Sàn pytest 3588 → 3591** *(+3 bài: 2 tham số + 1)*, nâng cùng commit với bài ghim *(`MONG_PYTEST_TOAN_BO` + `tests/test_dung_moi_truong_isp.py:423`)*; web giữ 675.
+- **`--duong-nen --cong 5436` MỘT lần: KẾT ĐẠT** — tập đỏ + XFAIL 28 = 28 *(thêm 0 · bớt 0)* · chạy 3591 · web 3 = 3, chạy 675. `lint-imports` 11 kept / 0 broken. *(Một lần chạy `test_dung_moi_truong_isp.py` song song với cổng nền thấy `S0_R3_02` ĐỎ do tranh kho — nhiễu tự gây, không phải lỗi; trong cổng nền đứng riêng thì tập đỏ khớp.)*
