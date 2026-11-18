@@ -46,3 +46,15 @@ Chứng minh ĐỎ: phá `CHAN`+`LAC` trong `man_f08.js` ⇒ AC1, AC2-thieu Đ�
 - Nhãn `TRÙNG` chưa có đột biến riêng (chỉ AC-2-trung đo); lỗi 409 thật chưa đo qua HTTP.
 - Sàn Q8 nền cũ đã hở 3 (3299 thu thập vs ghim 3296 trước F4) — đã nâng theo số thu thập.
 - Chưa đo pixel 390 px cho bảng 7 cột (chưa có AC).
+
+## Vòng sửa sau R1 (KQ-162)
+`KQ-162` = `ĐẠT` · 0 CHẶN · 1 NÊN SỬA *(`F4-R1-01`, tràn ngang 390 px)* · 3 GHI NHẬN *(`F4-R1-02…04` ⇒ backlog, ⛔ làm ở vòng này)*. Chỉ sửa `F4-R1-01`.
+
+| | |
+|---|---|
+| **Sửa** | `fls/web/tep/man_f08.js`: bọc `<table>` trong `div.ngang` *(`hinh.css:504` `overflow-x:auto;max-width:100%`, có sẵn — ⛔ token mới)* ⇒ bảng cuộn TRONG khung |
+| **Bài** | `tests/web/test_isp_f08_fx.py::test_F4_R1_01_bang_IXFX_khong_tran_ngang_o_390px` — Chromium thật, 390 px, bấm tab ⑥ |
+| **Đo 390 px** *(nhãn: `documentElement` · hàng `[data-thang]`)* | trước: `scrollWidth 475 > clientWidth 390` · sau: `390 = 390`; `37` hàng *(mẫu số ≠ 0)*; bảng `473,6` px > khung `388` px ⇒ khung cuộn thật, `overflow-x:auto` |
+| **ĐỎ trước** | bài chạy trên mã cũ ⇒ `1 failed` *(`sw=475`, khung `overflow-x: visible`)*; sau sửa ⇒ `5 passed` cả tệp F08 |
+| **Sàn Q8** | toàn bộ `3303 → 3304` · `tests/web` `674 → 675` *(= số THU THẬP `--collect-only`: `3304` · `675`)*; `tools/dung_moi_truong_isp.sh` + bài ghim `test_dung_moi_truong_isp.py` cùng commit |
+| **Cổng** | xem dòng cổng ở tin nhắn cuối của phiên: `--duong-nen --cong 5436` một lần · `lint-imports` |
