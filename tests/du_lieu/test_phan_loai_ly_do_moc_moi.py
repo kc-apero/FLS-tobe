@@ -94,7 +94,7 @@ def test_AC2_anh_khai_khop_thi_khong_loi(m, tmp_path):
 
 def test_AC2_anh_moc_gon_khong_PII_dung_luoc_do(m, tmp_path):
     _, _, anh = m.do_moc_moi(_csv(tmp_path / "k.csv"))
-    assert set(anh) == {"nguon", "so_dong", "so_khop", "so_thieu", "dong"}
+    assert set(anh) == {"nguon", "do_chinh_xac_tien", "so_dong", "so_khop", "so_thieu", "dong"}
     assert set(anh["dong"][0]) == {"dong_sheet", "khoa_bam", "khop"}
     txt = json.dumps(anh)
     assert "SYN" not in txt and "500" not in txt
@@ -156,15 +156,18 @@ def test_AC4_doi_1_nhan_thi_cong_DO(m, tmp_path):
     assert m.main([]) == m.DO
 
 
-def test_AC4_ghim_THAT_cong_DAT_tren_tep_repo_va_doi_1_nhan_thi_DO(tmp_path):
+def test_AC4_ghim_THAT_cong_DAT_tren_tep_repo_va_them_1_nhan_thi_DO(tmp_path):
+    """Mốc THẬT 18/11 sau vòng sửa R1 (DT1BM-R1-01): 12.590 khớp · 0 thiếu ở độ chính xác 2 số lẻ."""
     t = _tool()
     assert all(v is not None for v in t.MONG_MOC.values())                      # đã ghim, ⛔ None
     assert t.main([]) == t.DAT                                                  # tệp nhãn + ảnh mốc THẬT của repo
     kq = json.loads(t.RA.read_text("utf-8"))
-    dem = kq["dem_nhan"]
-    assert (sum(dem.values()), t.MONG_MOC["so_dong"] - t.MONG_MOC["so_khop"]) == (19, 19)
-    r0 = next(r for r in kq["dong_thieu"] if r["nhan"] == "KHONG_CO_SAO_KE")
-    r0["nhan"] = "TRUNG_SEQ"                                                    # đổi ĐÚNG 1 nhãn (giữ Σ)
+    anh = json.loads(t.ANH_MOC.read_text("utf-8"))
+    assert (anh["so_dong"], anh["so_khop"], anh["so_thieu"], anh["do_chinh_xac_tien"]) == (12590, 12590, 0, 2)
+    assert (t.MONG_MOC["so_dong"], t.MONG_MOC["so_khop"], t.MONG_MOC["so_thieu"]) == (12590, 12590, 0)
+    assert sum(kq["dem_nhan"].values()) == 0 and kq["dong_thieu"] == []
+    kq["dong_thieu"].append({"dong_sheet": anh["dong"][0]["dong_sheet"], "ky": "-", "nhan": "KHONG_CO_SAO_KE",
+                             "khoa_bam": "0" * 16, "lech": [], "ghi_chu": None})   # thêm ĐÚNG 1 nhãn ⇒ ĐỎ
     kq["dem_nhan"] = {n: sum(1 for r in kq["dong_thieu"] if r["nhan"] == n) for n in t.NHAN}
     kq["nhan_theo_ky"] = {"-": dict(kq["dem_nhan"])}
     p = tmp_path / "x.json"
@@ -200,3 +203,59 @@ def test_WO156_xuat_so_csv_doc_theo_ten_tieu_de_hang7_dong_la_ban_ghi_va_bo_Dien
     with pytest.raises(SystemExit) as e:                                                           # loại trừ lẫn nhau
         x.main(["--so-csv", str(p), "--xlsx", str(p), "--l1", str(l1), "--ra", str(out)])
     assert e.value.code == 2
+
+
+# ── WO-156 vòng sửa sau R1 (KQ-158 · DT1BM-R1-01) — so tiền ở CÙNG độ chính xác hiển thị (2 số lẻ) ─────────
+#   SO mốc mới là CSV HIỂN THỊ (làm tròn 2 số lẻ), L1 đọc UNFORMATTED_VALUE (đủ số lẻ) ⇒ `x.xx` ↔ `x.xx3` là
+#   CÙNG một số, ⛔ lệch thật. Dữ liệu 100 % tổng hợp.
+def _cap(so_no, l1_no):
+    so = [_hang("SYNQ", no=so_no)] + [_hang("SYNZ", no="7")]
+    l1 = [_hang("SYNQ", no=l1_no)] + [_hang("SYNZ", no="7")]
+    return so, l1
+
+
+@pytest.mark.parametrize("so_no,l1_no", [("1234.57", "1234.5703"), ("1234.57", "1234.5749999"), ("0.00", "0.003"),
+                                         ("1234.57", "1234.565"), ("-1.00", "-0.999999999")])
+def test_DT1BM_R1_01_lech_duoi_1_xu_la_KHOP_o_moc_moi(m, tmp_path, so_no, l1_no):
+    so, l1 = _cap(so_no, l1_no)
+    _, _, anh = m.do_moc_moi(_csv(tmp_path / "k.csv", so, l1))
+    assert (anh["so_khop"], anh["so_thieu"]) == (2, 0), (so_no, l1_no)
+
+
+@pytest.mark.parametrize("so_no,l1_no", [("1234.57", "1234.58"), ("1234.57", "1234.5649999"), ("1234.57", "1234.5649")])
+def test_DT1BM_R1_01_lech_tu_1_xu_van_la_KHOA_LECH(m, tmp_path, so_no, l1_no):
+    so, l1 = _cap(so_no, l1_no)
+    kq, _, anh = m.do_moc_moi(_csv(tmp_path / "k.csv", so, l1))
+    assert (anh["so_khop"], anh["so_thieu"]) == (1, 1), (so_no, l1_no)
+    assert kq["dem_nhan"]["KHOA_LECH"] == 1
+
+
+def test_DT1BM_R1_01_anh_moc_khai_do_chinh_xac_tien_2_va_cong_canh_no(m, tmp_path):
+    _, _, anh = m.do_moc_moi(_csv(tmp_path / "k.csv"))
+    assert anh["do_chinh_xac_tien"] == 2
+    bad = json.loads(json.dumps(anh)); bad["do_chinh_xac_tien"] = 3
+    assert any("do_chinh_xac_tien" in x for x in m.kiem_anh_moc(bad))
+    del bad["do_chinh_xac_tien"]
+    assert m.kiem_anh_moc(bad)                                                  # thiếu khoá ⇒ ĐỎ
+
+
+def test_DT1BM_R1_01_moc_26_08_KHONG_doi_hanh_vi(m):
+    """Mặc định (mốc 26/08, xlsx): KHÔNG làm tròn — `x.xx` ≠ `x.xx3` vẫn là hai khoá khác nhau."""
+    assert m.chuan_hoa_khoa("A", "1234.57", "0", "111", "VND") != m.chuan_hoa_khoa("A", "1234.5703", "0", "111", "VND")
+    assert m.chuan_hoa_khoa("A", "1234.57", "0", "111", "VND") == m.chuan_hoa_khoa("A", "1234.57", "0", "111", "VND", dp=2)
+    assert m.chuan_hoa_khoa("A", "1234.57", "0", "111", "VND", dp=2) == m.chuan_hoa_khoa("A", "1234.5703", "0", "111", "VND", dp=2)
+
+
+def test_DT1BM_R1_01_thieu_0_la_KET_QUA_hop_le_o_moc_moi_ghi_ghim_roi_cong_DAT(m, tmp_path):
+    """Sau làm tròn, SO ≡ L1 ⇒ 0 dòng thiếu. Mẫu số (SO · L1 · ghép) > 0 nên 0 là KẾT QUẢ (Đ3), ⛔ lỗi;
+    ghim ảnh mốc khai `so_thieu = 0` ⇒ cổng ĐẠT, và đổi nhãn/ảnh vẫn ĐỎ."""
+    so, l1 = _cap("1234.57", "1234.5703")
+    csvp = _csv(tmp_path / "k.csv", so, l1)
+    assert m.main(["--khoa", str(csvp), "--moc", str(m.ANH_MOC), "--ghi"]) == m.CHUA_GHIM
+    kq, anh = json.loads(m.RA.read_text("utf-8")), json.loads(m.ANH_MOC.read_text("utf-8"))
+    assert kq["dong_thieu"] == [] and anh["so_thieu"] == 0 and anh["so_khop"] == 2
+    _ghim(m, kq, anh)
+    assert m.main([]) == m.DAT
+    assert m.main(["--khoa", str(csvp), "--moc", str(m.ANH_MOC)]) == m.DAT
+    m.MONG_MOC["phan_bo_nhan"] = {**kq["dem_nhan"], "KHAC": 1}                  # mong khác ⇒ ĐỎ
+    assert m.main([]) == m.DO

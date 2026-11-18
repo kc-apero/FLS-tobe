@@ -54,6 +54,9 @@ CHUẨN HOÁ — mỗi luật MỘT bản khai, mượn đúng chỗ repo đã k
   PS Nợ / PS Có  → `fls.canon.validate.parse_so`: chuỗi có dấu phân cách `'2,730,128.00'` → `2730128`;
                    trống ≡ `0`; ô lỗi / rác ⇒ HỎNG (`None`).
   Tiền tệ        → `fls.canon.tien_te.ma_tien_te` (một tập 30 ký tự trắng, chữ hoa); ô lỗi ⇒ rỗng.
+  ⭐ MỐC 18/11 (DT1BM-R1-01): PS Nợ / PS Có làm tròn `ROUND_HALF_UP` về 2 số lẻ Ở CẢ HAI PHÍA (`do_chinh_xac_tien = 2`,
+                   khai trong ảnh mốc) — SO là CSV HIỂN THỊ, L1 đọc `UNFORMATTED_VALUE`; lệch < 1 xu là làm tròn, ⛔ lệch.
+                   Mốc 26/08 (xlsx) giữ đủ số lẻ.
   Tài khoản      → NFKC, gỡ trắng hai mép, chữ hoa; ô lỗi ⇒ rỗng.
   ⭐ Vì sao "trống ≡ 0" và "ô lỗi Số CT ⇒ rỗng" (luật NỚI): phép TÁI LẬP = Σₖ min(o(k), số dòng L1 của k),
      mà min cộng dồn ⇒ NỚI chuẩn hoá (gộp nhóm) chỉ làm tái lập TĂNG. ⇒ Chuẩn hoá quá CHẶT (đúng bẫy fixture:
@@ -123,7 +126,7 @@ import subprocess
 import sys
 import unicodedata
 from collections import Counter, defaultdict
-from decimal import Decimal
+from decimal import ROUND_HALF_UP, Decimal
 from pathlib import Path
 
 GOC = Path(__file__).resolve().parents[1]
@@ -151,7 +154,9 @@ NGUON_ANH_MOC = "tests/fixture/dt1b_moc_20261118.json"
 NGUON_SO_ID = "1U-IQVOXBbGE6X6n0i0mi3IG9VWc9J_Ap"
 NGUON_SO_TEN = "ITL I Input Transaction Ledger File 2_2 (ADJUSTED) - ITL Ledge.csv"
 KY_MOC_MOI = "-"           # mốc mới ⛔ xuất cột Ngày chứng từ (ngày hỏng ở xlsx, ⛔ cần cho nhãn) ⇒ MỘT kỳ giả "-"
-KHOA_ANH = ("nguon", "so_dong", "so_khop", "so_thieu", "dong")
+# DT1BM-R1-01: ảnh mốc KHAI độ chính xác tiền đã so (số chữ số lẻ) — mốc 18/11 so CSV hiển thị ⇒ 2.
+DO_CHINH_XAC_TIEN_MOC = 2
+KHOA_ANH = ("nguon", "do_chinh_xac_tien", "so_dong", "so_khop", "so_thieu", "dong")
 KHOA_ANH_NGUON = ("id", "ten_tep", "doc_luc")
 KHOA_ANH_DONG = ("dong_sheet", "khoa_bam", "khop")
 MAU_THOI_DIEM = re.compile(r"^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\+00:00|Z)$")
@@ -183,11 +188,13 @@ MONG = {
 # ── MONG của MỐC MỚI (Đ5 — khai TRƯỚC, khác ⇒ ĐỎ; `None` ⇒ mã 4). Ghim CÙNG lượt thật 18/11, nguồn WO-156 ──
 #   `so_dong` · `so_khop` · `so_thieu` đếm DÒNG của SO (Đ4: so_dong = so_khop + so_thieu); `van_tay_anh` =
 #   sha256-16 của ảnh mốc (mỗi dòng [dong_sheet, khoa_bam, khop]); hai khoá cuối như MONG ở trên.
-#   ĐÃ GHIM 18/11 (WO-156 · BG-157) từ lượt thật: SO = CSV Drive `1U-IQVO…` (12.590 dòng có ≥1 ô khoá; 22 hàng
-#   cuối chỉ có cột công thức đã loại) ↔ L1 sổ RAW `1xaD1R…` (12.590 dòng). 12.571 khớp 1-1 · 19 thiếu.
-MONG_MOC = {"so_dong": 12590, "so_khop": 12571, "so_thieu": 19, "van_tay_anh": "39620e6d87dcd75a",
-            "phan_bo_nhan": {"KHONG_CO_SAO_KE": 12, "KHOA_LECH": 7, "TRUNG_SEQ": 0, "KHAC": 0},
-            "van_tay_nhan": "566b677f3b1ad2d4"}
+#   ĐÃ GHIM 18/11 (WO-156 · BG-157), GHIM LẠI sau R1 (`KQ-158` · DT1BM-R1-01): SO = CSV Drive `1U-IQVO…` (12.590 dòng có
+#   ≥1 ô khoá; 22 hàng cuối chỉ có cột công thức đã loại) ↔ L1 sổ RAW `1xaD1R…` (12.590 dòng, `UNFORMATTED_VALUE`).
+#   Tiền so ở `do_chinh_xac_tien = 2` (làm tròn CẢ HAI phía). Bản ghim đầu (đủ số lẻ) = 12.571 khớp · 19 thiếu
+#   (12 KHONG_CO_SAO_KE · 7 KHOA_LECH) — cả 19 chỉ lệch < 1 xu do SO là CSV hiển thị ⇒ ảo. Nay 12.590 khớp · 0 thiếu.
+MONG_MOC = {"so_dong": 12590, "so_khop": 12590, "so_thieu": 0, "van_tay_anh": "f40b0e92d11eeff6",
+            "phan_bo_nhan": {"KHONG_CO_SAO_KE": 0, "KHOA_LECH": 0, "TRUNG_SEQ": 0, "KHAC": 0},
+            "van_tay_nhan": "4f53cda18c2baa0c"}
 
 KHOA_TRAN = ("_vi_sao", "khong_mang_PII", "nguon", "mau_so", "dem_nhan", "nhan_theo_ky", "van_tay", "dong_thieu")
 KHOA_NGUON = ("tep_dt1a", "anh_so", "ban_doc_sha256_16")
@@ -226,15 +233,25 @@ class LoiDauVao(ValueError):
 
 
 # ═════════════════════════════════════════════════════════════════════════ chuẩn hoá · băm
-def _tien(raw) -> str | None:
-    """PS Nợ / PS Có → chuỗi thập phân chuẩn (`'2,730,128.00'` → `'2730128'`); trống ≡ `'0'`; hỏng ⇒ None."""
+def _tien(raw, dp: int | None = None) -> str | None:
+    """PS Nợ / PS Có → chuỗi thập phân chuẩn (`'2,730,128.00'` → `'2730128'`); trống ≡ `'0'`; hỏng ⇒ None.
+
+    `dp` (DT1BM-R1-01 · KQ-158) — độ chính xác HIỂN THỊ: `None` = giữ đủ số lẻ (mốc 26/08, xlsx — ⛔ đổi hành vi);
+    `2` = làm tròn `ROUND_HALF_UP` trên `Decimal` về 2 số lẻ. Mốc 18/11 so CSV HIỂN THỊ (SO, đã làm tròn 2 số lẻ) với
+    `UNFORMATTED_VALUE` (L1, đủ số lẻ): `x.xx` ↔ `x.xx3` là CÙNG một số ở độ chính xác SO có — đo 18/11: 7/7 dòng
+    `KHOA_LECH` chỉ lệch < 1 xu. Làm tròn CẢ HAI phía ⇒ lệch ≥ 0,01 vẫn là hai khoá khác nhau."""
     if la_o_loi(raw):
         return None
     try:
         v = parse_so(raw)
     except ValueError:
         return None
-    return format(Decimal(str(0 if v is None else v)).normalize(), "f")
+    d = Decimal(str(0 if v is None else v))
+    if dp is not None:
+        d = d.quantize(Decimal(1).scaleb(-dp), rounding=ROUND_HALF_UP)
+        if d == 0:                                 # `-0.003` → `-0.00` → '0' (⛔ '-0' khác '0' khi băm)
+            return "0"
+    return format(d.normalize(), "f")
 
 
 def _chu(raw) -> str:
@@ -243,9 +260,9 @@ def _chu(raw) -> str:
     return unicodedata.normalize("NFKC", str(raw)).strip().upper()
 
 
-def chuan_hoa_khoa(so_ct, ps_no, ps_co, tk, tien_te) -> tuple:
+def chuan_hoa_khoa(so_ct, ps_no, ps_co, tk, tien_te, dp: int | None = None) -> tuple:
     """Bộ 5 trường khoá ĐÃ chuẩn hoá, đúng thứ tự `COT_KHOA`. Trường tiền hỏng ⇒ `None` ở vị trí ấy."""
-    return (canon_ref(so_ct) or "", _tien(ps_no), _tien(ps_co), _chu(tk),
+    return (canon_ref(so_ct) or "", _tien(ps_no, dp), _tien(ps_co, dp), _chu(tk),
             "" if la_o_loi(tien_te) else ma_tien_te(tien_te))
 
 
@@ -274,7 +291,7 @@ def _van_tay_nhan(dong: list) -> str:
 
 
 # ═════════════════════════════════════════════════════════════════════════ đọc bản đọc khoá
-def doc_khoa(duong: Path) -> dict:
+def doc_khoa(duong: Path, dp: int | None = None) -> dict:
     """CSV định dạng đóng → `{so, l1}` (`dong` → khoá đã chuẩn hoá) + tập token cấm (R5) + chẩn đoán.
 
     Giá trị THÔ chỉ sống trong hàm này và trong tập token cấm (bộ nhớ) — ⛔ ra tệp, ⛔ ra màn."""
@@ -311,7 +328,7 @@ def doc_khoa(duong: Path) -> dict:
             if dong in dich:
                 raise LoiDauVao(f"hàng CSV {so_hang}: {bang} dòng {dong} trùng — mỗi dòng một hàng")
             tho = [h[vt[c]] for c in COT_KHOA]
-            khoa = chuan_hoa_khoa(*tho)
+            khoa = chuan_hoa_khoa(*tho) if dp is None else chuan_hoa_khoa(*tho, dp=dp)   # mốc 26/08: lời gọi y cũ
             dich[dong] = khoa
             for ct in (tho[0].strip(), khoa[0]):
                 if ct and len(ct) >= DAI_TOI_THIEU:
@@ -338,6 +355,8 @@ def kiem_anh_moc(anh) -> list[str]:
     loi: list[str] = []
     if set(anh) != set(KHOA_ANH):
         return [f"ảnh mốc: khoá ngoài lược đồ: thừa {sorted(set(anh) - set(KHOA_ANH))} · thiếu {sorted(set(KHOA_ANH) - set(anh))}"]
+    if type(anh["do_chinh_xac_tien"]) is not int or anh["do_chinh_xac_tien"] != DO_CHINH_XAC_TIEN_MOC:
+        loi.append(f"ảnh mốc: do_chinh_xac_tien ⛔ đúng {DO_CHINH_XAC_TIEN_MOC} (so tiền ở độ chính xác hiển thị của SO)")
     ng = anh["nguon"]
     if not (isinstance(ng, dict) and set(ng) == set(KHOA_ANH_NGUON)):
         loi.append("ảnh mốc: nguon ⛔ đúng {id, ten_tep, doc_luc}")
@@ -489,7 +508,7 @@ def do_moc_moi(duong: Path, anh_khai: dict | None = None, doc_luc: str | None = 
     `anh_khai` (ảnh mốc ĐÃ ghim, nếu có) ⇒ K10 (số khớp · số thiếu khai ↔ đo) · K11 (tập `dong_sheet` khai ↔ SO).
     Trả (tệp nhãn, danh sách lệch, ảnh mốc ĐO)."""
     import datetime as _dt
-    vao = doc_khoa(duong)
+    vao = doc_khoa(duong, DO_CHINH_XAC_TIEN_MOC)   # DT1BM-R1-01: tiền ở 2 số lẻ, CẢ HAI phía
     so, l1 = vao["so"], vao["l1"]
     mau0 = {"so_dong_so": len(so), "so_dong_l1": len(l1)}
     rong = {k: v for k, v in mau0.items() if not v}
@@ -509,6 +528,7 @@ def do_moc_moi(duong: Path, anh_khai: dict | None = None, doc_luc: str | None = 
     set_thieu = set(thieu)
     anh_do = {"nguon": {"id": NGUON_SO_ID, "ten_tep": NGUON_SO_TEN,
                         "doc_luc": doc_luc or _dt.datetime.now(_dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%S+00:00")},
+              "do_chinh_xac_tien": DO_CHINH_XAC_TIEN_MOC,
               "so_dong": len(so), "so_khop": len(so) - len(thieu), "so_thieu": len(thieu),
               "dong": [{"dong_sheet": d, "khoa_bam": bam_khoa(so[d]), "khop": d not in set_thieu} for d in sorted(so)]}
     nhan, tai_lap = phan_loai(so, l1, thieu)     # TÁI LẬP tính LẠI bằng đường khác (Σ min theo nhóm) — Đ2 hai nguồn
@@ -534,8 +554,9 @@ def do_moc_moi(duong: Path, anh_khai: dict | None = None, doc_luc: str | None = 
             loi.append(f"K10 số thiếu khai {anh_khai.get('so_thieu')} ≠ đo {len(thieu)}")
     moc = moc_tu_anh(anh_khai if (anh_khai is not None and not kiem_anh_moc(anh_khai)) else anh_do)
     mau_so = {"thieu": len(thieu), "so_dong_so": len(so), "so_dong_l1": len(l1), "so_dong_ghep_dt1a": len(so) - len(thieu)}
-    if not thieu:
-        return {"mau_so": mau_so}, loi + ["mẫu số = 0 — tập thiếu rỗng (Đ3): ⛔ nhãn nào để đo"], anh_do
+    # DT1BM-R1-01: sau làm tròn 2 số lẻ có thể SO ≡ L1 ⇒ 0 dòng thiếu. Mẫu số của phép đo là SO · L1 · số ghép (đã
+    # kiểm > 0 ở trên và ở K8); 0 dòng thiếu là KẾT QUẢ (Đ3), ⛔ lỗi — ảnh mốc ghim `so_thieu = 0` + vân tay ảnh
+    # canh nó (một bản đọc sai mà ra 0 thiếu thì vân tay ảnh ≠ MONG ⇒ ĐỎ).
     dong = [{"dong_sheet": d, "ky": KY_MOC_MOI, **nhan[d]} for d in thieu]
     mau_so.update(tai_lap=tai_lap,
                   khoa_hong={"SO": sum(1 for k in so.values() if _hong(k)), "L1": sum(1 for k in l1.values() if _hong(k))},
@@ -543,7 +564,8 @@ def do_moc_moi(duong: Path, anh_khai: dict | None = None, doc_luc: str | None = 
     dem = {n: sum(1 for r in dong if r["nhan"] == n) for n in NHAN}
     kq = {"_vi_sao": VI_SAO, "khong_mang_PII": KHONG_MANG_PII,
           "nguon": {"tep_dt1a": None, "anh_so": NGUON_ANH_MOC, "ban_doc_sha256_16": vao["sha"]},
-          "mau_so": mau_so, "dem_nhan": dem, "nhan_theo_ky": {KY_MOC_MOI: dict(dem)},
+          "mau_so": mau_so, "dem_nhan": dem, "nhan_theo_ky": {KY_MOC_MOI: dict(dem)} if dong else {},   # kỳ chỉ có khi có dòng (K7)
+         
           "van_tay": moc["van_tay"], "dong_thieu": dong}
     loi.extend(kiem(kq, None, moc))
     loi.extend(quet_token(kq, vao["cam_ct"], vao["cam_tien"]))
@@ -725,7 +747,7 @@ def kiem(kq: dict, dt1a: dict | None, moc: dict | None = None) -> list[str]:
 
     ms = kq["mau_so"]                                                                                   # K8 · K9 · K10
     rong = {k: ms.get(k) for k in ("thieu", "so_dong_so", "so_dong_l1", "so_dong_ghep_dt1a")
-            if not (isinstance(ms.get(k), int) and ms[k] > 0)}
+            if not (isinstance(ms.get(k), int) and (ms[k] > 0 or (k == "thieu" and moc["moi"] and ms[k] == 0)))}
     if rong:
         loi.append(f"mẫu số = 0 — ⛔ đo được tỷ lệ nào (Đ3): {rong}")
     so("mẫu số khai: dòng sổ thiếu", ms.get("thieu"), len(thieu))
