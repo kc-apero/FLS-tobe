@@ -1,4 +1,4 @@
-"""Khai bao 18 bang + 7 view cua FLS. Chi khai bao, khong ham.
+"""Khai bao 20 bang + 7 view cua FLS. Chi khai bao, khong ham.
 
 ⛔⛔ Hai con so tren co CONG canh (`tests/test_ban_do_tang.py`): dong dau tep
    nay tung ghi **"10 bang + 2 view"** va no sai suot nhieu thang — mot CAU
@@ -911,6 +911,52 @@ FROM (SELECT e.itl_id, e.evt_id, e.actor, e.at, e.reason, e.evt_type,
       WHERE e.evt_type IN ('done', 'reopen')) z
 WHERE z.rn = 1 AND z.evt_type = 'done'""".strip())
 
+# ⭐⭐⭐ `C5` (ISP 3.1.2 · Step 14 · `WO-142`, di tru `0027`) — KHO CONFIG CHI-THEM.
+#
+# ⛔⛔ **Hai bang nay luu CONFIG theo PHIEN BAN, ⛔ KHONG luu so.** Chep khuon
+#    `fls_khai_cot` (di tru `0016`): mot bang MOI cho moi lan nap, ⛔ sua ban cu
+#    — de cau *"so cu doc config nao"* con cau tra loi sau khi ngan hang doi ty
+#    gia / ke toan doi cay HD. Trigger chan UPDATE/DELETE/TRUNCATE o di tru.
+#
+# ⚠ `luc` do MAY dat (`DEFAULT now()`) — y `fls_khai_cot.hieu_luc_tu`. ⛔ co
+#    `CHECK` mien gia tri `bang`: ca repo ⛔ co `CHECK` enum nao (loi van + chan
+#    o tang ghi `cau_hinh_repo.BangLa`), giu dung tien le.
+_FLS_CAU_HINH_BAN = Table(
+    name="fls_cau_hinh_ban", erd_entity="CAU_HINH_BAN", tang="7-ha-tang",
+    khau="H-ha-tang",
+    island_reason="kho config chi-THEM — ⛔ gan dong so nao; cung ho `fls_migration`",
+    columns=(
+        C("ban_id", "bigint", null=False, pk=True, default="nextval('seq_itl_id')"),
+        C("bang", "text", null=False,
+          comment="bang config nao: IX.FX | IX.HD | IX.HD · IX.ORG"),
+        C("phien_ban", "int", null=False,
+          comment="ngan hang/ke toan doi config ⇒ ban MOI, ⛔ sua ban cu"),
+        C("nguon", "text", null=False, comment="anh goc da nap (de truy nguon)"),
+        C("checksum", "text", null=False,
+          comment="sha256 noi dung chuan hoa — nap lai cung anh ⇒ khong_doi"),
+        C("actor", "text", null=False,
+          comment="nap config la HANH VI, phai co ten — cung fls_khai_cot.actor"),
+        C("luc", "timestamptz", null=False, default="now()",
+          comment="moc do MAY dat, ⛔ nguoi goi truyen vao"),
+    ),
+    unique_keys=(("bang", "phien_ban"),))
+
+_FLS_CAU_HINH_DONG = Table(
+    name="fls_cau_hinh_dong", erd_entity="CAU_HINH_DONG", tang="7-ha-tang",
+    khau="H-ha-tang",
+    island_reason="dong cua kho config chi-THEM — noi FK ve `fls_cau_hinh_ban`, "
+                  "ca cum ⛔ gan dong so nao",
+    columns=(
+        C("dong_id", "bigint", null=False, pk=True,
+          default="nextval('seq_itl_id')"),
+        C("ban_id", "bigint", null=False, fk="fls_cau_hinh_ban.ban_id",
+          comment="thuoc lan nap nao"),
+        C("khoa", "text", null=False,
+          comment="khoa tu nhien cua tuyen (yyyymm cua IX.FX, ma HD cua IX.HD)"),
+        C("gia_tri", "jsonb", null=False, comment="gia tri — giu KIEU qua jsonb"),
+    ),
+    unique_keys=(("ban_id", "khoa"),))
+
 _FLS_MIGRATION = Table(
     name="fls_migration", erd_entity="MIGRATION", tang="7-ha-tang", khau="H-ha-tang",
     island_reason="so ghi cac lan di tru — ha tang, khong gan dong so nao",
@@ -932,6 +978,7 @@ TABLES: dict[str, Table] = {t.name: t for t in (
     _V_QUEUE_STATE, _V_QUEUE_REASON_WEEKLY, _V_SUA_TAY, _V_MAY_GOI_Y, _V_DIEN_GIAI,
     _V_MOI_NOI,
     _V_DA_XONG,
+    _FLS_CAU_HINH_BAN, _FLS_CAU_HINH_DONG,
     _FLS_MIGRATION,
 )}
 
@@ -953,6 +1000,10 @@ CREATE_ORDER: tuple[str, ...] = (
     "fls_queue_event", "fls_pm_unlink",
     "fls_adjustment", "fls_journal",
     "fls_reject", "fls_mapping_master",
+    # ⭐ `C5` — kho config (BANG, ⛔ view): `fls_cau_hinh_ban` la cha FK cua
+    #    `fls_cau_hinh_dong`. Dat TRUOC moi view *(view tao SAU moi bang —
+    #    `test_view_tao_sau_moi_bang`)*.
+    "fls_cau_hinh_ban", "fls_cau_hinh_dong",
     "fls_queue_state", "fls_queue_reason_weekly", "fls_sua_tay",
     "fls_may_goi_y", "fls_dien_giai", "fls_moi_noi",
     "fls_da_xong",

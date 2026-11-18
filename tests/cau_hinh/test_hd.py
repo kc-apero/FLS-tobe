@@ -76,18 +76,11 @@ def test_C4_B1_la_doi_ma_co_that():
         _doc_atl().la("KHONG_CO_MA_NAY")
 
 
-def test_C4_B1_doc_tep_mac_dinh_doc_anh_TINH_dong_bang(tmp_path):
-    """`doc_tep()` *(mặc định)* đọc ẢNH TĨNH gói `fls/cau_hinh/tinh/` — cùng 74 nút."""
-    cay = hd.doc_tep()
-    assert cay.nguon == hd.NGUON_TINH
-    assert len(cay.nut) == MONG_NUT and len(cay.goc) == MONG_GOC
-
-
-def test_anh_tinh_goi_KHOP_anh_DT3_tung_byte():
-    """Ảnh gói là **chép** ảnh DT3 *(⛔ sửa DT3 — `WO-122` ràng buộc)*. Ghim byte ⇒
-    một lần đổi tay là ĐỎ *(⛔ để hai ảnh lặng lẽ lệch)*."""
-    assert (GOC / hd.NGUON_TINH).read_bytes() == (GOC / ANH_ATL).read_bytes()
-    assert (GOC / hd.NGUON_MM).read_bytes() == (GOC / ANH_MM).read_bytes()
+# ⭐⭐ `C5` (`WO-142`): ẢNH TĨNH `ix_hd_cay.json` · `ix_mapping_master.json` +
+#    `doc_tep()`/`doc_mm()` đã GỠ — tuyến `GET /config/hd` đọc KHO config *(nạp
+#    ảnh DT3 → `hd.kiem`/`doc_mm_van_ban` → kho; xem
+#    `tests/cau_hinh/test_kho_cau_hinh_pg.py`)*. Lõi `kiem`/`doc_van_ban`/
+#    `doc_mm_van_ban` giữ nguyên, các bài dưới đọc THẲNG ảnh DT3 qua đường TRUYỀN VÀO.
 
 
 # ── C4-B2 · chu trình ───────────────────────────────────────────────────────
@@ -195,15 +188,16 @@ def test_tap_rong_la_HD_HONG_khong_xanh_tren_tap_rong():
 
 # ── Mapping Master — đối chiếu (⛔ hoà giải) ─────────────────────────────────
 def test_doc_mm_73_ma_va_chenh_voi_ATL_la_NCF():
-    """MM `73` mã; `ATL − MM = {NCF}` *(`BG-107`)* — chỉ LIỆT KÊ, ⛔ hoà giải."""
+    """MM `73` mã; `ATL − MM = {NCF}` *(`BG-107`)* — chỉ LIỆT KÊ, ⛔ hoà giải.
+
+    ⭐⭐ `C5`: đọc THẲNG ảnh DT3 qua `doc_mm_van_ban`/`doc_van_ban` *(đường TRUYỀN
+       VÀO)* — `doc_mm()`/`doc_tep()` đã GỠ; lõi `doc_mm_van_ban` giữ nguyên."""
     van_mm = (GOC / ANH_MM).read_text(encoding="utf-8")
-    # doc_mm đọc qua đường dẫn — ở đây dùng mặc định *(ảnh gói == DT3, đã ghim)*.
-    mm = hd.doc_mm()
+    mm = hd.doc_mm_van_ban(van_mm, nguon=ANH_MM)
     assert len(mm) == MONG_MM, f"⛔ mong {MONG_MM} mã MM, đo {len(mm)}"
-    atl = {n.ma for n in hd.doc_tep().nut}
+    atl = {n.ma for n in _doc_atl().nut}
     assert sorted(atl - set(mm)) == MONG_CHENH
     assert sorted(set(mm) - atl) == []        # MM ⊆ ATL
-    assert van_mm  # ảnh đọc được
 
 
 def _doc_atl_ten() -> frozenset[str]:
@@ -273,6 +267,61 @@ def test_C4_R1_01_doc_mm_van_ban_JSON_hong_la_HD_HONG():
     with pytest.raises(hd.LoiHD) as e:
         hd.doc_mm_van_ban("{ ⛔ khong phai JSON", nguon="tong_hop")
     assert hd.HD_HONG in e.value.ten, e.value.ten
+
+
+# ── C4-R2 · AC-8 (orchestrator 18/11, `KQ-125`) — ô hỏng CÒN lối exception trơn ──
+#   ⛔⛔ `C5` cây/MM HẾT đóng băng *(đọc từ KHO)* ⇒ ảnh lạ/độc có thể tới `hd.kiem`/
+#   `doc_van_ban`/`doc_mm_van_ban`. Mọi lối ra phải là `LoiHD(HD_HONG)` có TÊN —
+#   ⛔ `ValueError`/`RecursionError` trơn *(giới hạn độ dài TRƯỚC `int()`/`json.loads`)*.
+
+@pytest.mark.parametrize("o", ["cap", "thu_tu"])
+def test_C4_R2_01_so_chuoi_QUA_DAI_la_HD_HONG_khong_ValueError(o):
+    """`int('9'*5000)` NÉM `ValueError` *(giới hạn 4300 chữ số của Python 3.11+)* ⇒
+    một ô `cap`/`thu_tu` chuỗi ≥ 4.301 chữ số *(cả hai TRẦN trong ảnh)* cho ra
+    `ValueError` trơn. Phải `HD_HONG` *(giới hạn độ dài trong `_so` TRƯỚC `int()`)*."""
+    with pytest.raises(hd.LoiHD) as e:
+        hd.kiem([_dong_tot(**{o: "9" * 5000})], nguon="tong_hop")
+    assert hd.HD_HONG in e.value.ten, e.value.ten
+
+
+def test_C4_R2_01_so_JSON_QUA_DAI_la_HD_HONG_khong_ValueError():
+    """Số JSON 5.000 chữ số ⇒ `json.loads` NÉM `ValueError` *(⛔ `JSONDecodeError` —
+    `except` cũ ⛔ bắt)*. Phải `HD_HONG`."""
+    van = ('{"bang":"IX.HD","dong":[{"ma":"A","ten":"a","cha":null,"cap":'
+           + "9" * 5000 + ',"nhom":"HDO","dong_sheet":"1"}]}')
+    with pytest.raises(hd.LoiHD) as e:
+        hd.doc_van_ban(van, nguon="tong_hop")
+    assert hd.HD_HONG in e.value.ten, e.value.ten
+
+
+@pytest.mark.parametrize("doc", ["doc_van_ban", "doc_mm_van_ban"])
+def test_C4_R2_01_JSON_long_NHAU_SAU_la_HD_HONG_khong_RecursionError(doc):
+    """`'['*100000` ⇒ `json.loads` NÉM `RecursionError` *(⛔ `JSONDecodeError`)*.
+    Phải `HD_HONG` ở CẢ hai lõi đọc."""
+    with pytest.raises(hd.LoiHD) as e:
+        getattr(hd, doc)("[" * 100000, nguon="tong_hop")
+    assert hd.HD_HONG in e.value.ten, e.value.ten
+
+
+def test_C4_R2_02_cau_HD_HONG_CAT_gia_tri_dai_khong_dan_nguyen_o():
+    """`C4-R2-02`: câu `HD_HONG` ⛔ nhắc NGUYÊN giá trị ô dài *(5.000 ký tự)* — cắt
+    *(≤ 40 ký tự + '…')*. Một câu lỗi dài 5.000 ký tự là một câu ⛔ ai đọc."""
+    xau = "Z" * 5000       # `cap` TRẦN, ⛔ chữ số ⇒ `_so` NO ⇒ câu mang `_mot_dong(cap)`
+    with pytest.raises(hd.LoiHD) as e:
+        hd.kiem([_dong_tot(cap=xau)], nguon="tong_hop")
+    cau = str(e.value)
+    assert xau not in cau, "⛔ câu lỗi mang NGUYÊN ô 5.000 ký tự"
+    assert "…" in cau, cau
+
+
+@pytest.mark.parametrize("x,mong", [("+3", None), ("3_0", None), ("", None),
+                                    ("３", None), ("7", 7)])
+def test_C4_R2_03_so_bien_dau_cong_gach_duoi_rong_unicode(x, mong):
+    """`C4-R2-03`: ghim biên `_so` — `'+3'`(dấu) · `'3_0'`(gạch dưới) · `''`(rỗng) ·
+    `'３'`(unicode) đều ⛔ phải số; `'7'` thì được. `int()` nhận `'3_0'`=30 nên phải
+    chặn bằng `isdigit()`, ⛔ bằng `int()`."""
+    n, _ = hd._so(x)
+    assert n == mong, (x, n)
 
 
 # ── C4-R1-02 · ba nhánh `raise` của `doc_mm` được CHỨNG MINH ĐỎ (Đ5) ─────────

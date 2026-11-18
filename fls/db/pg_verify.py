@@ -157,6 +157,29 @@ def _lech_mot_bang(cur, t: Table, schema: str) -> list[str]:
     return ra
 
 
+# ⭐⭐ Them 2026-11-18 (`C5-R1-06`): chu bang (⛔ superuser) chay duoc
+# `ALTER TABLE … DISABLE TRIGGER <ten>` roi UPDATE/DELETE — mot LOI VONG qua luat
+# chi-them `INV-I08`/`INV-I03` (trigger la luoi DUY NHAT chan nguoi goi thuong). Day
+# ⛔ phai loi hom nay (chi chu bang lam duoc, ⛔ chan o buoc nay — xem `SO_PHAT_HIEN
+# _ISP-3.1_C5.md#C5-R1-06`), nhung mot trigger BI TAT phai DO DUOC o cong. `pg_verify`
+# ⛔ so trigger theo TEN (chung o migrations, ⛔ `schema.py`) — chi doi mot bat bien
+# chung: **⛔ co trigger NGUOI DUNG nao dang bi tat** tren ca schema.
+_Q_TRIGGER_TAT = """
+SELECT c.relname, t.tgname
+FROM pg_trigger t
+JOIN pg_class c ON c.oid = t.tgrelid
+JOIN pg_namespace n ON n.oid = c.relnamespace
+WHERE n.nspname = %s AND NOT t.tgisinternal AND t.tgenabled = 'D'
+ORDER BY c.relname, t.tgname
+"""
+
+
+def _lech_trigger_tat(cur, schema: str) -> list[str]:
+    cur.execute(_Q_TRIGGER_TAT, (schema,))
+    return [f"{bang}: trigger {ten!r} DANG BI TAT (DISABLE TRIGGER) — loi vong "
+            f"INV-I08" for bang, ten in cur.fetchall()]
+
+
 def so_sanh_voi_db(conn, tables: dict[str, Table] | None = None,
                    schema: str = "public") -> list[str]:
     """Tra ve danh sach cho lech. Rong = khop."""
@@ -164,6 +187,10 @@ def so_sanh_voi_db(conn, tables: dict[str, Table] | None = None,
     with conn.cursor() as cur:
         for name in sorted(tables if tables is not None else TABLES):
             ra += _lech_mot_bang(cur, (tables or TABLES)[name], schema)
+        # Kiem trigger chi o lan verify DAY DU (tables=None) — khong noi vao cac
+        # phep so TAP CON (test migration/khoa chay tren schema/bang le).
+        if tables is None:
+            ra += _lech_trigger_tat(cur, schema)
     return ra
 
 

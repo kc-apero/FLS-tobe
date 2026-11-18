@@ -222,6 +222,25 @@ CREATE TABLE IF NOT EXISTS fls_mapping_master (
   coa2 text
 );
 
+CREATE TABLE IF NOT EXISTS fls_cau_hinh_ban (
+  ban_id bigint NOT NULL DEFAULT nextval('seq_itl_id') PRIMARY KEY,
+  bang text NOT NULL,
+  phien_ban int NOT NULL,
+  nguon text NOT NULL,
+  checksum text NOT NULL,
+  actor text NOT NULL,
+  luc timestamptz NOT NULL DEFAULT now(),
+  CONSTRAINT fls_cau_hinh_ban_bang_phien_ban_uq UNIQUE (bang, phien_ban)
+);
+
+CREATE TABLE IF NOT EXISTS fls_cau_hinh_dong (
+  dong_id bigint NOT NULL DEFAULT nextval('seq_itl_id') PRIMARY KEY,
+  ban_id bigint NOT NULL REFERENCES fls_cau_hinh_ban(ban_id),
+  khoa text NOT NULL,
+  gia_tri jsonb NOT NULL,
+  CONSTRAINT fls_cau_hinh_dong_ban_id_khoa_uq UNIQUE (ban_id, khoa)
+);
+
 CREATE OR REPLACE VIEW fls_queue_state AS SELECT itl_id,
        (ARRAY_AGG(reason ORDER BY at DESC)
           FILTER (WHERE evt_type = 'reason'))[1]            AS reason,

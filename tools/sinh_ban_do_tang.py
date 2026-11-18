@@ -187,6 +187,12 @@ TU_DIEN_THUC_THE: tuple[tuple[str, str, str, str], ...] = (
     ("fls_mapping_master", "danh mục quyết định phân bổ",
      "tab `Mapping Master` *(file RAW)*", "`73` mã — `QĐ-ITL-70`"),
     ("fls_migration", "sổ di trú", FLS_DUNG_MOI, "hạ tầng"),
+    ("fls_cau_hinh_ban", "một lần nạp config", FLS_DUNG_MOI,
+     "⭐ `C5` *(`WO-142`)* — kho config CHỈ-THÊM có phiên bản *(`IX.FX`/`IX.HD`/"
+     "`IX.HD · IX.ORG`)*; chép khuôn `fls_khai_cot`"),
+    ("fls_cau_hinh_dong", "một dòng config", FLS_DUNG_MOI,
+     "⭐ `C5` — `khoa` *(yyyymm / mã HD)* + `gia_tri jsonb`; MM chỉ lưu `hd_code` "
+     "*(⛔ bảng phụ `tho`)*"),
     ("fls_moi_noi", "mối nối đang hiệu lực", FLS_DUNG_MOI,
      "khung xem — `fls_pm_link` **trừ** `fls_pm_unlink`"),
     ("fls_nguon_dai", "dải nhãn thô ↔ danh mục",

@@ -4,7 +4,7 @@ R, ID, VER, NGAY, SHA = pathlib.Path(sys.argv[1]), sys.argv[2], sys.argv[3], sys
 C = R / "docs/ITL/04_Test/review/SO_PHAT_HIEN_ISP-3.1.md"
 P = R / f"docs/ITL/04_Test/review/SO_PHAT_HIEN_ISP-3.1_{ID}.md"
 _tat = P.read_text(encoding="utf-8").split("\n")
-_hd = next(l for l in _tat if l.startswith("|---"))  # dòng kẻ của bảng phát hiện ĐẦU TIÊN
+_hd = next(_tat[k+1] for k in range(len(_tat)-1) if _tat[k].startswith("| Mã") and _tat[k+1].startswith("|---"))  # dòng kẻ của bảng PHÁT HIỆN (hàng tiêu đề "| Mã") — bia: sổ C5 có bảng Version đứng trước (18/11)
 import re as _re
 _ong = lambda l: len(_re.findall(r"(?<!\\)\|", l))  # đếm "|" KHÔNG thoát — ô có `\|` (bia: gộp H4 18/11 rơi 3 hàng)
 rieng = [l for l in _tat if l.startswith(f"| `{ID}-") and _ong(l) == _ong(_hd)]

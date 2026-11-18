@@ -23,7 +23,7 @@ from dataclasses import dataclass
 #   `fls.cau_hinh.fx` — bảng này dùng CHÍNH hằng ấy *(⛔ gõ lại chuỗi đường)*.
 #   Luật ĐƯỜNG nguồn tĩnh *(vòng sửa R1 · `C1-R1-02`)* ở `fls.cau_hinh.nguon_tinh`
 #   — một chỗ, chung với `soi_bang_tuyen` và `fx.doc_tep`.
-from fls.cau_hinh import fx, hd, nguon_tinh
+from fls.cau_hinh import nguon_tinh
 
 TIEN_TO = "/api/fls/v1"
 
@@ -87,6 +87,11 @@ BANG_CHO_PHEP: frozenset[str] = frozenset({
     #    may ⇒ `match` · `match-lo` · `unmatch` doc no. Kho rieng FLS — dung
     #    tinh than `QĐ-ITL-45`, ⛔ phai mot bang ngoai.
     "fls_may_goi_y",
+    # ⭐⭐ `C5` (`WO-142`) — KHO CONFIG chi-THEM. `GET /config/fx` · `/config/hd`
+    #    doi nguon tu anh TINH sang hai bang nay (`nguon_tinh` GO). Chi-THEM, co
+    #    trigger chan UPDATE/DELETE ⇒ doc lai duoc *ai nap config nao, luc nao*.
+    "fls_cau_hinh_ban",
+    "fls_cau_hinh_dong",
 })
 
 
@@ -673,19 +678,19 @@ BANG_TUYEN: tuple[Tuyen, ...] = (
     #    báo**; tháng nhập hai dòng ⇒ **cộng đôi**. Tuyến này trả bảng tỷ giá KÈM
     #    ba danh sách `thieu` · `trung` · `lac` — chỗ lệch là **trường có tên**,
     #    ⛔ một con số `0`.
-    # ⚠ `bang=()` + `nguon_tinh`: số là **4 tháng TỔNG HỢP** từ tệp tĩnh cho tới
-    #   `C5` *(kho config chỉ-thêm)*. `GET`, ⛔ ghi — ký tháng là `C7`, tuyến KHÁC.
-    Tuyen("GET", f"{TIEN_TO}/config/fx", "ty_gia", (),
-          nguon_tinh=(fx.NGUON_TINH,),
+    # ⭐⭐ `C5` (`WO-142`): doi NGUON tu anh TINH sang KHO config chi-them
+    #    (`fls_cau_hinh_ban`/`fls_cau_hinh_dong`) ⇒ `bang=(...)`, GO `nguon_tinh`.
+    #    So THAT (anh DT2 37 dong) toi tu kho. `GET`, ⛔ ghi — ky thang la `C7`.
+    Tuyen("GET", f"{TIEN_TO}/config/fx", "ty_gia",
+          ("fls_cau_hinh_ban", "fls_cau_hinh_dong"),
           mo_ta="IX.FX ty gia thang × 5 tien te (VND = 1) + `thieu`/`trung`/"
-                "`lac` thanh TRUONG RIENG — ⛔ thanh 0, ⛔ cong doi. Nguon TINH "
-                "(so TONG HOP) toi C5"),
-    # ⭐⭐ ISP 3.1.2 · `C4` *(`WO-122`)* — tuyen TINH thu HAI: cay `IX.HD` tu ANH
-    #    DONG BANG THAT (⛔ so tong hop nhu C1). Doc HAI anh: ATL (74 nut) + Mapping
-    #    Master (73 ma) ⇒ `nguon_tinh` mang CA HAI duong. `GET`, ⛔ ghi — kho config
-    #    la C5. ⛔ hoa giai 74 ↔ 73: tuyen chi LIET KE `chenh_mapping_master`.
-    Tuyen("GET", f"{TIEN_TO}/config/hd", "cay_hd", (),
-          nguon_tinh=(hd.NGUON_TINH, hd.NGUON_MM),
+                "`lac` thanh TRUONG RIENG — ⛔ thanh 0, ⛔ cong doi. Doc tu KHO "
+                "config chi-them (C5)"),
+    # ⭐⭐ `C5` (`WO-142`): cay `IX.HD` + Mapping Master doc tu KHO (⛔ con anh tinh
+    #    nhu C4). Hai bang config (ATL `IX.HD`, MM `IX.HD · IX.ORG`) — cung hai
+    #    bang kho. `GET`, ⛔ ghi. ⛔ hoa giai 74 ↔ 73: tuyen chi LIET KE chenh.
+    Tuyen("GET", f"{TIEN_TO}/config/hd", "cay_hd",
+          ("fls_cau_hinh_ban", "fls_cau_hinh_dong"),
           mo_ta="IX.HD cay ATL 74 nut · 6 nhom (HDO·HDH·HDAP·HDT·HDC·HDCI) + "
                 "con_cua/la; cay hong ⇒ loi co TEN (HD_CHU_TRINH·HD_CHA_VANG·"
                 "HD_CAP_NHAY). Doi chieu 73 ma Mapping Master: LIET KE chenh "

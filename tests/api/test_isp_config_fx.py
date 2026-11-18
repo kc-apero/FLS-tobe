@@ -25,7 +25,6 @@
 from __future__ import annotations
 
 import contextlib
-import dataclasses
 import http.client
 import json
 import os
@@ -35,21 +34,43 @@ from pathlib import Path
 
 import pytest
 
+import psycopg
+
 from fls.api import bang_tuyen as bt
 from fls.api import cua, the
 from fls.api.xu_ly import HAM
 from fls.db.kho import dsn_test, noi_chi_doc
+from fls.repo import cau_hinh_repo as chc
 from tools import soi_bang_tuyen as sbt
 
 GOC = Path(__file__).resolve().parents[2]
 KHOA = "khoa-thu-cua-bo-test-isp-c1-dai-hon-ba-muoi-hai-ky-tu"
 V = bt.TIEN_TO
 DUONG = f"{V}/config/fx"
-# Chép NGUYÊN VĂN ISP mục 3 — ⛔ đọc lại từ `fx.NGUON_TINH`: bài này canh chính
-# hằng ấy, và một bài so hằng với chính nó thì ⛔ bao giờ đỏ.
+# ⭐⭐ `C5` (`WO-142`): tuyến đọc **KHO** config chỉ-thêm ⇒ khai hai bảng kho,
+#    ⛔ còn `nguon_tinh`. Ảnh thật DT2 nạp vào `fls_test` ở `_nap` *(đường TRUYỀN
+#    VÀO)*.
+BANG_KHO = ("fls_cau_hinh_ban", "fls_cau_hinh_dong")
+ANH_IX_FX = GOC / "tests" / "fixture" / "cau_hinh" / "ix_fx.json"
+THANG_DAU_IX_FX = 202401        # khai ở khuôn `ix_fx` *(⛔ bản chép — C5 ánh xạ)*
+# Chuỗi MẪU đúng khuôn đường nguồn tĩnh — ảnh đã GỠ; dùng cho các bài canh GATE
+# `nguon_tinh` *(phòng thủ cho tuyến tĩnh tương lai, tuyến SYNTHETIC cố ý khai sai)*.
 NGUON_TINH = "fls/cau_hinh/tinh/ix_fx_mau.json"
 KHOA_DATA = {"bang", "nguon", "ky", "thieu", "trung", "lac"}
 KHOA_KY = {"yyyymm", "USD", "SGD", "COP", "VND", "HKD", "trang_thai"}
+
+
+@pytest.fixture(scope="module", autouse=True)
+def _nap():
+    """Nạp ảnh DT2 `ix_fx.json` vào kho TEST *(đường GHI riêng)* TRƯỚC khi máy đọc.
+
+    ⛔ Kho dùng chung + chỉ-thêm ⇒ ⛔ dọn được; `doc_fx` đọc phiên bản MỚI NHẤT,
+       nên nạp ngay trước bộ bài này là đủ để `GET` thấy đúng ảnh *(37 dòng)*.
+    """
+    with psycopg.connect(dsn_test(), autocommit=True) as c:
+        chc.nap_ix_fx(c, str(ANH_IX_FX), actor="bo-test-c5-fx",
+                      thang_dau=THANG_DAU_IX_FX, nguon="tests/fixture/cau_hinh/ix_fx.json")
+    yield
 
 
 @pytest.fixture(scope="module")
@@ -111,6 +132,8 @@ def _goi(may, duong: str, *, phuong_thuc: str = "GET",
 # ── C1-B4 · qua HTTP ──────────────────────────────────────────────────────
 @pytest.mark.pg
 def test_C1_B4_GET_config_fx_200_DUNG_hop_dong(may):
+    """⭐⭐ `C5` (`WO-142`): số đọc từ **KHO** *(ảnh thật DT2, 37 dòng)* — ⛔ 4 tháng
+    tổng hợp như C1. Hợp đồng RA ⛔ đổi."""
     ma, r = _goi(may, DUONG)
     assert ma == 200, (ma, r)
     assert set(r) == {"data", "error", "meta"} and r["error"] is None, r
@@ -118,10 +141,11 @@ def test_C1_B4_GET_config_fx_200_DUNG_hop_dong(may):
     d = r["data"]
     assert set(d) == KHOA_DATA, f"⛔ lệch hợp đồng: {sorted(set(d) ^ KHOA_DATA)}"
     assert d["bang"] == "IX.FX"
-    assert d["nguon"] == NGUON_TINH
+    assert d["nguon"] == "tests/fixture/cau_hinh/ix_fx.json"
 
     ky = d["ky"]
-    assert len(ky) == 4, f"⛔ mong 4 tháng tổng hợp, đo {len(ky)}"
+    # ⭐ AC-1: ảnh DT2 thật ⇒ **37** dòng *(đo trên ảnh; ⛔ sửa cho khớp — Đ1/Đ4)*.
+    assert len(ky) == 37, f"⛔ mong 37 dòng (DT2), đo {len(ky)}"
     for k in ky:
         assert set(k) == KHOA_KY, f"⛔ lệch hợp đồng: {sorted(set(k) ^ KHOA_KY)}"
         # ⛔⛔ Tiền/tỷ giá ra JSON là CHUỖI — `fls/api/bao.py`: JSON ⛔ nói kiểu,
@@ -131,14 +155,14 @@ def test_C1_B4_GET_config_fx_200_DUNG_hop_dong(may):
         assert k["VND"] == "1", (k["yyyymm"], k["VND"])
         assert k["trang_thai"] == "chua_ky", k
     thang = [k["yyyymm"] for k in ky]
-    # ⭐ `yyyymm` là SỐ NGUYÊN JSON *(⛔ chuỗi, ⛔ `bool`)* — hợp đồng liên làn với
-    #   engine H1 `fls/bao_cao/gl.py` *(khoá tỷ giá theo `int` yyyymm — orchestrator
-    #   16/11)*. Tháng ⛔ phải tiền: `202612` nằm xa ngưỡng mất chữ số của `float64`.
+    # ⭐ `yyyymm` là SỐ NGUYÊN JSON *(⛔ chuỗi, ⛔ `bool`)* — hợp đồng liên làn với H1.
     assert all(type(m) is int for m in thang), thang
-    assert thang == [202406, 202407, 202408, 202409], thang
+    assert thang == sorted(thang), f"⛔ `ky` theo thứ tự tháng: {thang}"
 
-    assert (d["thieu"], d["trung"], d["lac"]) == ([], [], [])
-    # ⛔ số TỔNG HỢP ⛔ được khoác nhãn đã đối soát/đã ký (`INV-I14`).
+    # ⭐ AC-1: `lac = [202306]` *(dòng trước `thang_dau` 202401)* — đo trên ảnh.
+    assert d["lac"] == [202306], d["lac"]
+    assert (d["thieu"], d["trung"]) == ([], [])
+    # ⛔ số THẬT chưa ký ⛔ được khoác nhãn đã đối soát/đã ký (`INV-I14`).
     assert r["meta"]["data_status"] == "flash", r["meta"]
 
 
@@ -161,29 +185,30 @@ def _tuyen_fx() -> list[bt.Tuyen]:
     return [t for t in bt.BANG_TUYEN if t.duong == DUONG]
 
 
-def test_C1_B4_bang_tuyen_khai_DUNG_MOT_tuyen_tinh_chi_doc():
+def test_C1_B4_bang_tuyen_khai_DUNG_MOT_tuyen_KHO_chi_doc():
+    """⭐⭐ `C5`: tuyến đọc KHO ⇒ `bang=(ban, dong)`, GO `nguon_tinh`."""
     ds = _tuyen_fx()
     assert len(ds) == 1, f"⛔ mong đúng 1 tuyến {DUONG}, đo {len(ds)}"
     t = ds[0]
     assert t.phuong_thuc == "GET" and not t.ghi and t.bang_ghi == ()
-    assert t.bang == (), f"⛔ C1 ⛔ chạm kho, mà khai {t.bang}"
-    assert t.nguon_tinh == (NGUON_TINH,), t.nguon_tinh
+    assert tuple(t.bang) == BANG_KHO, f"⛔ C5 đọc kho config, mà khai {t.bang}"
+    assert t.nguon_tinh == (), f"⛔ GO `nguon_tinh` khi đổi sang kho: {t.nguon_tinh}"
     assert t.ham in HAM, f"⛔ hàm `{t.ham}` chưa ghi danh ở `HAM`"
     assert bt.kiem_bang_tuyen() == []
 
 
-def test_C1_B4_soi_bang_tuyen_XANH_va_THAT_SU_do_tuyen_moi():
+def test_C1_B4_soi_bang_tuyen_XANH_SQL_cham_DUNG_hai_bang_kho():
+    """`soi`: SQL thật của `ty_gia` chạm ĐÚNG hai bảng kho đã khai *(⛔ thiếu, ⛔
+    thừa)*, và phép đo BÁM tới `fls.repo.cau_hinh_repo` *(⛔ tập rỗng — Đ3)*."""
     loi, do = sbt.soi()
     assert loi == [], "⛔ bản khai lệch SQL:\n  - " + "\n  - ".join(loi)
     ban = [x for x in do if x["duong"] == DUONG]
     assert len(ban) == 1, f"⛔ `soi` đo {len(ban)} lần tuyến {DUONG}"
     x = ban[0]
-    assert x["khai"] == [] and x["that"] == [], x
-    # ⛔ `Đ3`: "khai 0 = SQL 0" chỉ là KẾT QUẢ khi phép đo đã bám tới hàm thật.
-    assert any(v.startswith("fls.cau_hinh.fx.") for v in x["vet"]), (
-        f"⛔ phép đo ⛔ bám tới tầng config — tập rỗng là NỀN, ⛔ kết quả: {x['vet']}")
-    assert x["nguon_tinh"] == [NGUON_TINH], x
-    assert (GOC / NGUON_TINH).is_file()
+    assert x["khai"] == sorted(BANG_KHO) and x["that"] == sorted(BANG_KHO), x
+    assert x["thieu"] == [] and x["thua"] == [], x
+    assert any(v.startswith("fls.repo.cau_hinh_repo.") for v in x["vet"]), (
+        f"⛔ phép đo ⛔ bám tới tầng kho config: {x['vet']}")
 
 
 # ── ⛔ `Đ5` — cổng mới phải được chứng minh ĐỎ ─────────────────────────────
@@ -201,8 +226,10 @@ def test_cong_kiem_bang_tuyen_DO_khi_nguon_tinh_o_tuyen_khong_phai_GET_chi_doc(
 
 
 def test_cong_soi_DO_khi_nguon_tinh_KHONG_ton_tai():
-    t = dataclasses.replace(_tuyen_fx()[0],
-                            nguon_tinh=("fls/cau_hinh/tinh/khong_co_that.json",))
+    """GATE `nguon_tinh` *(phòng thủ cho tuyến tĩnh tương lai)* — tuyến SYNTHETIC cố ý
+    khai một ảnh ⛔ có thật ⇒ `soi` bắt *(`C5` ⛔ còn tuyến tĩnh THẬT)*."""
+    t = bt.Tuyen("GET", DUONG, "ty_gia", (),
+                 nguon_tinh=("fls/cau_hinh/tinh/khong_co_that.json",))
     loi, _ = sbt.soi((t,))
     assert any("khong_co_that.json" in x for x in loi), loi
 
@@ -268,20 +295,24 @@ def test_R1_02_soi_noi_RO_tep_KHONG_co_that():
     """Như trên, cho nhánh *"tệp ⛔ có thật"* — bài cũ
     `test_cong_soi_DO_khi_nguon_tinh_KHONG_ton_tai` chỉ đòi tên tệp có mặt trong câu,
     mà nay câu ⓔ2 cũng mang tên ấy."""
-    t = dataclasses.replace(_tuyen_fx()[0],
-                            nguon_tinh=("fls/cau_hinh/tinh/khong_co_that.json",))
+    t = bt.Tuyen("GET", DUONG, "ty_gia", (),
+                 nguon_tinh=("fls/cau_hinh/tinh/khong_co_that.json",))
     loi, _ = sbt.soi((t,))
     assert any("khong_co_that.json" in x and "co that" in x for x in loi), loi
 
 
 def test_R1_02_C_nguon_tinh_la_CHUOI_thi_MOT_cau_moi_cong_KHONG_32_cau_rac():
     """R1 · C: `soi` cũ lặp trên CHUỖI ⇒ một câu MỖI KÝ TỰ *(32)*. Sai kiểu ⇒ **một**
-    câu mỗi cổng, nói kiểu đo được."""
+    câu kiểu mỗi cổng, nói kiểu đo được.
+
+    ⭐⭐ `C5`: hàm `ty_gia` nay ĐỌC KHO ⇒ ⓓ''' *(kiem)* và ⓔ3 *(soi)* THÊM một câu
+       *"hàm chạm `conn`/SQL thật"* — ĐÚNG *(tuyến tĩnh ⛔ được đọc kho)*. Bài này đo
+       đúng điều nó sinh ra để đo: câu **kiểu** phải là **MỘT** *(⛔ 32 rác)*."""
     t = _xau("C")
-    k = [x for x in bt.kiem_bang_tuyen((t,)) if "nguon_tinh" in x]
-    s = [x for x in sbt.soi((t,))[0] if "nguon_tinh" in x]
-    assert len(k) == 1 and "str" in k[0], k
-    assert len(s) == 1 and "str" in s[0], s
+    k = [x for x in bt.kiem_bang_tuyen((t,)) if "nguon_tinh" in x and "str" in x]
+    s = [x for x in sbt.soi((t,))[0] if "nguon_tinh" in x and "str" in x]
+    assert len(k) == 1, k
+    assert len(s) == 1, s
 
 
 def test_R1_02_tuyen_TINH_ma_ham_DOC_KHO_thi_HAI_cong_DO_bang_cau_RIENG():
@@ -318,22 +349,17 @@ def test_R1_02_ham_cua_tuyen_TINH_KHONG_co_trong_HAM_thi_DO__do_khong_duoc():
                for x in bt.kiem_bang_tuyen((t,))), bt.kiem_bang_tuyen((t,))
 
 
-def test_R1_02_soi_do_THAT_thay_ham_ty_gia_mang_chuoi_NGUON_TINH():
-    """`Đ3`: phép canh *"hàm có đọc tệp khai"* chỉ có nghĩa khi phép đo THẤY được
-    chuỗi ấy ở tuyến thật — ⛔ thì mọi tuyến đều đỏ, hay *(tệ hơn)* phép canh bị viết
-    lỏng cho xanh. Mẫu số: tập chuỗi của `ty_gia` phải KHÁC RỖNG và chứa đúng đường."""
-    chuoi = sbt.chuoi_cua_tuyen("ty_gia")
-    assert len(chuoi) > 0
-    assert NGUON_TINH in chuoi, sorted(c for c in chuoi if "cau_hinh" in c)
-    # Và một hàm KHÔNG đọc tệp ⇒ ⛔ mang chuỗi ấy *(phép đo ⛔ trả "mọi chuỗi")*.
-    assert NGUON_TINH not in sbt.chuoi_cua_tuyen("so")
+# ⭐⭐ `C5` (`WO-142`): bài `test_R1_02_soi_do_THAT_thay_ham_ty_gia_mang_chuoi_NGUON_TINH`
+#    đã GỠ — tiền đề *"`ty_gia` mang chuỗi `NGUON_TINH` trong đồ thị gọi"* bị bước này
+#    **lật** *(handler nay đọc KHO, ⛔ còn đọc tệp tĩnh)*. Phép canh `chuoi_cua_tuyen`
+#    vẫn được ⓔ2 dùng cho tuyến tĩnh SYNTHETIC *(bài dưới)*.
 
 
-def test_R1_02_soi_DO_khi_ham_KHONG_doc_tep_khai():
-    """Tuyến đúng khuôn, tệp có thật — nhưng phép đo ⛔ thấy hàm nào trong `vet`
-    mang đường ấy ⇒ bản đồ vẽ một nguồn hàm ⛔ đọc *(`BG-076` yếu #3)*. Bơm phép đo
-    giả *(cùng cách `test_soi_bang_tuyen.py` bơm `do_sql`)*."""
-    t = _tuyen_fx()[0]
+def test_R1_02_soi_DO_khi_ham_KHONG_mang_chuoi_khai():
+    """GATE ⓔ2 *(tuyến tĩnh SYNTHETIC)*: tuyến khai `nguon_tinh=(X,)` mà ⛔ hàm nào
+    trong `vet` mang chuỗi `X` ⇒ bản đồ vẽ một nguồn hàm ⛔ đọc *(`BG-076` yếu #3)*.
+    Bơm `do_chuoi` giả trả một đường KHÁC."""
+    t = bt.Tuyen("GET", DUONG, "ty_gia", (), nguon_tinh=(NGUON_TINH,))
     loi, _ = sbt.soi((t,), do_chuoi=lambda _ham: {"fls/cau_hinh/tinh/khac.json"})
     assert any("nguon_tinh" in x and NGUON_TINH in x for x in loi), loi
 
@@ -352,6 +378,51 @@ def test_R1_07_run_id_o_tuyen_TINH_thi_400_KHONG_tra_so_khoac_pham_vi_lan_nap(ma
     # Đ5 chiều kia: lượt trơn vẫn 200 *(⛔ chặn nhầm mọi lượt gọi)*.
     ma, r = _goi(may, DUONG)
     assert ma == 200 and r["meta"]["run_id"] is None, (ma, r["meta"])
+
+
+# ── AC-5 · kho RỖNG ⇒ handler dịch `ChuaKhai`→409, `BangLa`→404 *(có TÊN)* ─────────
+def _nem(exc):
+    def _f(_conn):
+        raise exc
+    return _f
+
+
+def test_AC5_handler_dich_ChuaKhai_409_va_BangLa_404_KHONG_roi_ve_anh_tinh(monkeypatch):
+    """AC-5: kho RỖNG *(chưa nạp)* ⇒ handler `ty_gia` NỔ lỗi **có TÊN**, ⛔ rơi về ảnh
+    tĩnh. Hai câu KHÁC nhau: `ChuaKhai`→`409 FLS-CAUHINH-CHUA-KHAI` *(có bảng, chưa
+    nạp)* ≠ `BangLa`→`404 FLS-CAUHINH-BANG-LA` *(nguồn lạ)*.
+
+    ⚠ Kho `fls_test` dùng chung đã có `IX.FX` ⇒ ⛔ dọn được để đo 409 qua máy thật;
+      đo THẲNG phép **dịch lỗi** của handler *(stub ranh giới repo, ⛔ mock kho —
+      dữ liệu không dự phần)*. Hai loại lỗi đã chứng ở kho thật tại
+      `tests/cau_hinh/test_kho_cau_hinh_pg.py`."""
+    from fls.api import bao, xu_ly
+    yc = xu_ly.YeuCau(conn=None, pv=xu_ly.pham_vi_cua_yeu_cau({}), q={}, tham={})
+
+    monkeypatch.setattr(chc, "doc_fx", _nem(chc.ChuaKhai("kho rỗng")))
+    with pytest.raises(xu_ly.LoiCua) as e:
+        xu_ly.ty_gia(yc)
+    assert e.value.ma == "FLS-CAUHINH-CHUA-KHAI" and bao.MA_LOI[e.value.ma][0] == 409
+
+    monkeypatch.setattr(chc, "doc_fx", _nem(chc.BangLa("nguồn lạ")))
+    with pytest.raises(xu_ly.LoiCua) as e2:
+        xu_ly.ty_gia(yc)
+    assert e2.value.ma == "FLS-CAUHINH-BANG-LA" and bao.MA_LOI[e2.value.ma][0] == 404
+
+
+# ══ Vòng sửa sau R1 (KQ-144) ══════════════════════════════════════════════════════
+#
+# `C5-R1-04`: một bản `IX.FX` BẨN trong kho *(ghi thẳng SQL, ⛔ qua `nap`)* ⇒ tuyến
+# ra lỗi CÓ TÊN, ⛔ `500 FLS-INTERNAL`. Sổ: SO_PHAT_HIEN_ISP-3.1_C5.md.
+def test_C5R1_04_handler_ty_gia_BAN_HONG_loi_CO_TEN_khong_500(monkeypatch):
+    """`doc_fx` ra `BanHong` ⇒ `ty_gia` dịch `LoiCua FLS-CAUHINH-BAN-HONG` *(500 có
+    TÊN)*, ⛔ lọt `except Exception` ⇒ `FLS-INTERNAL` *(R1: `LoiFX` trần ⇒ 500 câm)*."""
+    from fls.api import bao, xu_ly
+    yc = xu_ly.YeuCau(conn=None, pv=xu_ly.pham_vi_cua_yeu_cau({}), q={}, tham={})
+    monkeypatch.setattr(chc, "doc_fx", _nem(chc.BanHong("ban IX.FX hong")))
+    with pytest.raises(xu_ly.LoiCua) as e:
+        xu_ly.ty_gia(yc)
+    assert e.value.ma == "FLS-CAUHINH-BAN-HONG" and bao.MA_LOI[e.value.ma][0] == 500
 
 
 # ══ Vòng sửa sau R2 (`KQ-078`) ══════════════════════════════════════════════
@@ -437,7 +508,8 @@ def test_R2_04_soi_DO_khi_do_thi_MANG_duong_tinh_ma_tuyen_KHONG_khai(nhan):
         so = next(t for t in bt.BANG_TUYEN if t.ham == "so")
         t, bom = bt.Tuyen("GET", f"{V}/x", "so", so.bang), NGUON_TINH
     else:
-        t, bom = _tuyen_fx()[0], khac
+        # ⭐⭐ `C5`: tuyến tĩnh SYNTHETIC *(tuyến tĩnh THẬT đã GỠ)*.
+        t, bom = bt.Tuyen("GET", DUONG, "ty_gia", (), nguon_tinh=(NGUON_TINH,)), khac
     that = sbt.sql_cua_tuyen(t.ham)
     loi, _ = sbt.soi((t,), do_sql=lambda _h: that,
                      do_chuoi=lambda h: sbt.chuoi_cua_tuyen(h) | {bom})
@@ -445,23 +517,18 @@ def test_R2_04_soi_DO_khi_do_thi_MANG_duong_tinh_ma_tuyen_KHONG_khai(nhan):
     assert all("\n" not in x for x in loi), loi
 
 
-def test_R2_04_e4_KHONG_do_nham_tren_bang_THAT__mau_so_khac_rong():
-    """`Đ5` chiều kia + `Đ3`: trên bảng thật ⓔ4 ⛔ đỏ nhầm, **và** tập nó so ⛔ rỗng —
-    đo ở vòng sửa R2: **1/41** tuyến có hàm mang chuỗi dưới `fls/cau_hinh/tinh/`
-    *(`ty_gia`, đúng đường nó khai)*. Hằng `THU_MUC` *(⛔ dấu `/` cuối)* cũng nằm trong
-    đồ thị của `ty_gia` ⇒ ⓔ4 so TIỀN TỐ `THU_MUC + '/'`, ⛔ chuỗi con.
+def test_R2_04_e4_KHONG_do_nham_tren_bang_THAT():
+    """`Đ5` chiều kia: trên bảng tuyến THẬT ⓔ4 ⛔ đỏ nhầm.
 
-    ⚠ Cố ý ⛔ ghim *"đúng 1 tuyến"*: `C4` *(tĩnh từ ảnh)* sẽ thêm tuyến tĩnh thứ hai —
-      bài này chỉ đòi mẫu số ≥ 1 ở chính tuyến `C1` *(bằng chứng DƯƠNG)*; cổng thật là
-      `soi()` xanh trên MỌI tuyến.
-    """
+    ⭐⭐ `C5` (`WO-142`): sau khi GỠ hai tuyến tĩnh *(C1 · C4)*, **⛔ tuyến THẬT nào**
+       mang chuỗi dưới `fls/cau_hinh/tinh/` trong đồ thị gọi ⇒ tập ⓔ4 so là **RỖNG**
+       trên mọi tuyến *(⛔ còn ảnh tĩnh)* — và `soi()` vẫn xanh."""
     from fls.cau_hinh import nguon_tinh
     tien_to = nguon_tinh.THU_MUC + "/"
     mang = {t.duong: sorted(x for x in sbt.chuoi_cua_tuyen(t.ham)
                             if x.startswith(tien_to))
             for t in bt.BANG_TUYEN}
     mang = {k: v for k, v in mang.items() if v}
-    assert mang.get(DUONG) == [NGUON_TINH], (
-        f"⛔ mẫu số ⓔ4 ở tuyến C1 lệch — {len(mang)}/{len(bt.BANG_TUYEN)} tuyến: {mang}")
-    assert nguon_tinh.THU_MUC in sbt.chuoi_cua_tuyen("ty_gia")
+    assert mang == {}, (
+        f"⛔ `C5` GỠ mọi tuyến tĩnh — ⛔ tuyến nào mang đường dưới {tien_to}: {mang}")
     assert sbt.soi()[0] == []
