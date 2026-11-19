@@ -40,7 +40,7 @@ def ven():
         chc.nap_ix_ven(c, str(GOC / "tests/fixture/cau_hinh/ix_ven.json"),
                        duong_cdt1=str(GOC / "tests/fixture/cau_hinh/cdt_correct.json"),
                        actor="bo-test-h10-c4b")
-        return chc.doc_ven(c)
+        return chc.doc_ven(c, so="GI")
 
 
 @pytest.fixture(scope="module")
@@ -133,7 +133,8 @@ def test_D5_luat_muon_RATE_bong_co_tien_thi_DO_co_ten(ven, anh):
 def test_PHA_NGUON_bo_luat_muon_khoi_config_thi_cong_DO(ven, anh, monkeypatch):
     bang = {m: (k, None) for m, (k, _) in pb.CACH_TINH.items()}
     monkeypatch.setattr(pb, "CACH_TINH", bang)
-    monkeypatch.setattr(pb.chia_theo_cach_tinh, "__kwdefaults__", {"bang": bang})
+    monkeypatch.setattr(pb.chia_theo_cach_tinh, "__kwdefaults__",   # H11: giữ kwarg mới (pm_tong_thang_bat)
+                        {**pb.chia_theo_cach_tinh.__kwdefaults__, "bang": bang})
     tq = _chay(ven, *anh)
     assert not tq.phan_xu.dat and "muon: đo 0 ≠ mong 11" in tq.phan_xu.ly_do
 

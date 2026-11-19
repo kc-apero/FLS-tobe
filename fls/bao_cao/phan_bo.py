@@ -250,6 +250,9 @@ class KetQuaCachTinh:
     theo_tong_thang: tuple[tuple[str, str, str], ...]
     #: luôn đủ 5 khoá `NHAN_RIENG`, mỗi khoá RỖNG — H10 ⛔ bỏ qua vendor nào *(WP-C4b: bỏ qua = 0)*.
     bo_qua: dict[str, tuple[Khoa, ...]]
+    #: ⭐ H11: chia TỪNG dòng CFA1 *(thứ tự vào)* — (dòng, cdt1 → (chia_pe, chia_pm | None)). OMC · SC · PS
+    #: so MID3 theo DÒNG (vendor × tháng × No), ⛔ gộp (vendor, tháng). Cùng số với `chia` *(gộp của nó)*.
+    chia_dong: tuple[tuple[DongCFA1, dict[str, tuple[Decimal, Decimal | None]]], ...] = ()
 
 
 def _dau(ven: BangVen) -> dict[str, object]:
@@ -327,10 +330,15 @@ def pe_tu_looker(ven: BangVen, looker: Iterable[DongLooker], vendor: str, thang:
 
 def chia_theo_cach_tinh(dong: Iterable[DongCFA1], pe: Mapping[Khoa, Mapping[str, Decimal]],
                         ven: BangVen, *, cdt1: Iterable[str],
-                        bang: Mapping[str, tuple[str, str | None]] = CACH_TINH) -> KetQuaCachTinh:
+                        bang: Mapping[str, tuple[str, str | None]] = CACH_TINH,
+                        pm_tong_thang_bat: bool = True) -> KetQuaCachTinh:
     """`[Formula] MID3`: chia TỪNG dòng CFA1 xuống `cdt1` theo RATE MID2 của khoá `khoa_rate`;
     gộp theo (vendor, tháng) *(= MID3 hiển thị)*; rồi `ks_al`. `pe` = PE MID2 theo (vendor, tháng)
-    × CDT1 *(tầng gọi gộp MID1 `E` mọi No)*."""
+    × CDT1 *(tầng gọi gộp MID1 `E` mọi No)*.
+
+    ⭐ H11 — tham số THEO SỔ *(tầng gọi lấy từ `fls.cau_hinh.vendor.LUAT_SO`; ⛔ tên sổ ở đây)*: `bang` *(sổ
+    ⛔ mượn RATE ⇒ bảng ⛔ có vendor cho mượn)* · `pm_tong_thang_bat` *(sổ ⛔ có nhánh `O = 0 ∧ P > 0 ⇒
+    P×S10/O10` ⇒ `False`: PM = RATE × P như mọi dòng)*."""
     cdt = tuple(cdt1)
     ds = list(dong)
     ma = ma_cach_tinh(ven, bang)
@@ -377,7 +385,8 @@ def chia_theo_cach_tinh(dong: Iterable[DongCFA1], pe: Mapping[Khoa, Mapping[str,
     hang: list[tuple[str, Decimal, dict[str, Decimal] | None]] = []
     for r in ds:
         r_ = rate((khoa.get(id(r), r.vendor), r.thang))
-        if r_ is None and (r.o != 0 or (r.p is not None and r.p != 0 and not (r.o == 0 and r.p > 0))):
+        tt = pm_tong_thang_bat and r.o == 0 and r.p is not None and r.p > 0
+        if r_ is None and (r.o != 0 or (r.p is not None and r.p != 0 and not tt)):
             ly.append(f"{r.vendor} · {r.thang} · No {r.no}: Σ PE = 0 mà O = {r.o} · P = {r.p} "
                       f"⇒ ⛔ chia được (⛔ chia 0 im)")
             continue
@@ -392,6 +401,7 @@ def chia_theo_cach_tinh(dong: Iterable[DongCFA1], pe: Mapping[Khoa, Mapping[str,
     o: dict[Khoa, Decimal] = defaultdict(lambda: _0)
     p: dict[Khoa, Decimal | None] = {}
     ttt: list[tuple[str, str, str]] = []
+    cd: list[tuple[DongCFA1, dict[str, tuple[Decimal, Decimal | None]]]] = []
     for r, x in pe_dong:
         k = (r.vendor, r.thang)
         d = chia.setdefault(k, {c: [_0, _0] for c in cdt})
@@ -399,7 +409,7 @@ def chia_theo_cach_tinh(dong: Iterable[DongCFA1], pe: Mapping[Khoa, Mapping[str,
         p[k] = None if r.p is None or (k in p and p[k] is None) else p.get(k, _0) + r.p
         if r.p is None:
             pm = {c: None for c in cdt}
-        elif r.o == 0 and r.p > 0:
+        elif pm_tong_thang_bat and r.o == 0 and r.p > 0:
             if o_thang[r.thang] == 0:
                 ly.append(f"{r.vendor} · {r.thang} · No {r.no}: tổng tháng Σ O = 0 ⇒ ⛔ chia P")
                 continue
@@ -408,6 +418,7 @@ def chia_theo_cach_tinh(dong: Iterable[DongCFA1], pe: Mapping[Khoa, Mapping[str,
         else:
             r_ = rate((khoa.get(id(r), r.vendor), r.thang))
             pm = {c: (r_[c] * r.p if r_ else _0) for c in cdt}
+        cd.append((r, {c: (x[c], pm[c]) for c in cdt}))
         for c in cdt:
             d[c][0] += x[c]
             d[c][1] = None if pm[c] is None or d[c][1] is None else d[c][1] + pm[c]
@@ -415,6 +426,6 @@ def chia_theo_cach_tinh(dong: Iterable[DongCFA1], pe: Mapping[Khoa, Mapping[str,
         raise LoiPhanBo(ly)
     kq = KetQuaCachTinh(cdt, {k: {c: (a, b) for c, (a, b) in d.items()} for k, d in chia.items()},
                         dict(o), p, {v: m[0] for v, m in ma.items()}, tuple(muon), tuple(ttt),
-                        {n: () for n in NHAN_RIENG})
+                        {n: () for n in NHAN_RIENG}, tuple(cd))
     ks_al(kq, kq.o, kq.p)
     return kq

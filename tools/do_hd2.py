@@ -1,4 +1,4 @@
-"""`do_hd2.py --goi WP-C2 | WP-C3a | WP-C3b | WP-C4a | WP-C4b` — PARITY HD2: CA.GL ↔ 406 *(H4)* · SO.CFA1 Daily ↔ 409 *(H5)* · Y/H/Q/M ↔ 410 *(H6)*.
+"""`do_hd2.py --goi WP-C2 | WP-C3a | WP-C3b | WP-C4a | WP-C4b | WP-C4c` — PARITY HD2: CA.GL ↔ 406 *(H4)* · SO.CFA1 Daily ↔ 409 *(H5)* · Y/H/Q/M ↔ 410 *(H6)*.
 
     python tools/do_hd2.py --goi WP-C2            # chạy cổng, in báo, exit 0/1
     python tools/do_hd2.py --goi WP-C2 --ghi      # … + ghi docs/ITL/_tools/hd2_cong.json
@@ -65,7 +65,7 @@ from fls.cau_hinh.ky import LichKy  # noqa: E402
 from fls.canon.tien_te import ma_tien_te  # noqa: E402
 from fls.oracle.cong_parity import PhanXu, danh_gia  # noqa: E402
 
-GOI_BIET = ("WP-C2", "WP-C3a", "WP-C3b", "WP-C4a", "WP-C4b")
+GOI_BIET = ("WP-C2", "WP-C3a", "WP-C3b", "WP-C4a", "WP-C4b", "WP-C4c")
 COT_BMBT = ("BM", "BN", "BO", "BP", "BQ", "BR", "BS", "BT")
 #: ô kết quả → thuộc tính `KetQuaDongGL`.
 ATTR = {"BM": "vnd_ton_all", "BN": "musd_ton_all", "BO": "bvnd_no", "BP": "bvnd_co",
@@ -1278,7 +1278,7 @@ def chay_wp_c4a(dsn: str | None = None) -> ThanhQuaC4a:
         from fls.db.kho import dsn_that
         from fls.repo import cau_hinh_repo as chc
         with psycopg.connect(dsn or dsn_that()) as c:
-            ven = chc.doc_ven(c)
+            ven = chc.doc_ven(c, so="GI")
     except Exception as e:  # noqa: BLE001 — Đ5: ⛔ đo được ⇒ ĐỎ có lý do
         px = PhanXu(False, (f"IX.VEN ⛔ đọc được từ kho: {type(e).__name__}: {' '.join(str(e).split())}",))
         return ThanhQuaC4a(px, {"bang": "HD2.WP-C4a", "goi": "WP-C4a", "dat": False,
@@ -1470,7 +1470,7 @@ def chay_wp_c4b(dsn: str | None = None) -> ThanhQuaC4b:
         from fls.db.kho import dsn_that
         from fls.repo import cau_hinh_repo as chc
         with psycopg.connect(dsn or dsn_that()) as c:
-            ven = chc.doc_ven(c)
+            ven = chc.doc_ven(c, so="GI")
     except Exception as e:  # noqa: BLE001 — Đ5: ⛔ đo được ⇒ ĐỎ có lý do
         return _do_c4b(PhanXu(False, (f"IX.VEN ⛔ đọc được từ kho: {type(e).__name__}: "
                                       f"{' '.join(str(e).split())}",)))
@@ -1497,6 +1497,304 @@ def _in_bao_c4b(tq: ThanhQuaC4b) -> None:
     print(f"  KẾT: {tq.phan_xu.mot_dong}")
 
 
+# ─────────────────────────────────────────────────────────────────────────────────────────────
+# WP-C4c — AL.PLT OMC · SC · PS ↔ đáp án MID3 (PD 508–510) từng ô THEO DÒNG *(ISP 3.1.2 · Step 35 · H11 ·
+# WO-233 · sau DT9 BG-221 + DT9b BG-242)*. ⭐ CÙNG engine H10 `chia_theo_cach_tinh` — tham số THEO SỔ
+# (`fls.cau_hinh.vendor.LUAT_SO`: mượn RATE · nhánh PM tổng tháng), ⛔ chép.
+#
+# Đầu vào = MID1 *(PD 508 — THƯỢNG NGUỒN: công thức `F`/`T` chỉ đọc Source (Looker) + VNM; 0/116.423 ô công thức
+# nhắc MID2/MID3 — BG-221 §4)* + IX.VEN kho `so=<sổ>` *(DT9b)*. ⛔ MID2 · ⛔ MID3 làm đầu vào *(MID3 chỉ để SO)*:
+#   · dòng engine = nhóm MID1 (vendor, tháng, No) *(mỗi nhóm 7 CDT1)*;
+#   · O = Σ `pe` MID1 của nhóm *(orchestrator chốt 19/11: ảnh CFA1 ba sổ chưa đóng băng; BG-242 §4: khớp
+#     `CFA1!F` OMC 882/890 · SC 741/741 · PS 585/585)*;
+#   · P = giá trị `pm` SỐ chung của nhóm; cả 7 dòng là chữ `Need to manual input` ⇒ None *(⛔ hoá 0)*;
+#   · PE theo CDT1 cho RATE = Σ `pe` MID1 theo (vendor, tháng) mọi No, 6 CDT1 *(⛔ SHQ2 — như MID2 `T`)*.
+# So: hàng MID3 có khoá ↔ nhóm MID1 theo THỨ TỰ trong (vendor, tháng) *(BG-242 §4: CFA1 → MID3 theo thứ tự)*
+# × 14 cột. Ô MID3 RỖNG *(iferror "")* ⇒ 0, ĐẾM `o_trong_dap_an`. Lệch tách 3 lớp CÓ TÊN *(Đ5 hai chiều)*:
+#   · `lech_nguon`   — hàng ở `lac` *(SC: `lac` của ảnh, 72 = 69 hàng khoá + 3 hàng tổng; OMC: 8 hàng O ≠ Σ pe
+#                      — BG-242 §4, `LAC_OMC`)* — đáp án nguồn tự mâu thuẫn, ⛔ FLS sai;
+#   · `lech_nghi_loi`— sổ mang cờ `phu.nguon_nghi_loi` *(OMC — `row[45]`, cận trên mọi ô)* ngoài `lac`;
+#   · `lech_fls`     — còn lại *(mong 0)*.
+# ─────────────────────────────────────────────────────────────────────────────────────────────
+SO_C4C = ("OMC", "SC", "PS")
+#: 7 kỳ ISP *(`WO-233` "Đã đo": ⛔ sổ nào có tháng 2026 ⇒ `chua_co_dap_an` CÓ TÊN, ⛔ "đạt")*.
+KY_ISP_C4C = tuple(f"2026{m:02d}" for m in range(3, 10))
+#: OMC — 8 hàng MID3 *(`dong_sheet`)* có O = `CFA1!F` ≠ Σ `pe` MID1: 7 `VD61` + 1 `VD654` *(BG-242 §4, đo 19/11)*.
+LAC_OMC = ("14", "104", "194", "284", "374", "380", "464", "644")
+COT_C4C = ("pe", "pm") + tuple(f"{c}_{v}" for c in MID3_CDT for v in ("pe", "pm"))
+
+
+def anh_c4c(so: str) -> tuple[Path, Path]:
+    d = GOC / "tests" / "fixture" / "dap_an"
+    return d / f"{so.lower()}_mid1.json", d / f"{so.lower()}_mid3.json"
+
+
+@dataclass(frozen=True)
+class MongSoC4c:
+    """Khai TRƯỚC mỗi sổ *(Đ4 nhãn · Đ5 khác ⇒ ĐỎ cả hai chiều)* — đo 19/11 *(nguyên mẫu độc lập ở scratchpad
+    BG-235 §3 + phép đếm thẳng trên ảnh)*. Nhãn: `vm` Vendor-tháng · `dong` dòng engine = nhóm MID1 (vendor,
+    tháng, No) · `dong_so` hàng MID3 có khoá được so · `dong_ngoai_anh` nhóm ⛔ có hàng MID3 trong ảnh ·
+    `o_so` ô so *(14 cột × dong_so − ô ⛔ so được)* · `o_khong_so` ô PM của dòng P chữ."""
+    thang: tuple
+    vm: int
+    dong: int
+    dong_so: int
+    dong_ngoai_anh: int
+    o_so: int
+    o_khong_so: int
+    o_khac_0: int
+    o_trong_dap_an: int
+    lech_nguon: int
+    hang_lech_nguon: int
+    lech_nghi_loi: int = 0
+    lech_fls: int = 0
+    o_khong_so_khac_0: int = 0
+    ngoai_anh_khac_0: int = 0
+    p_chu_chi_mid1: int = 0         # nhóm MID1 cả 7 dòng P chữ mà MID3 P là số
+    p_chu_chi_mid3: int = 0
+    muon: int = 0
+    theo_tong_thang: int = 0
+    chua_co_dap_an: tuple = ()
+
+
+#: ⭐ Mẫu số khai TRƯỚC *(WO-233 AC-1)*. Đo 19/11; kiểm chéo ĐỘC LẬP *(⛔ engine)*: `o_khong_so` = 7 × hàng P chữ
+#: *(OMC 559 · SC 490 + 102 · PS 439)*; `o_so` = 14 × `dong_so` − `o_khong_so`; SC 251 ô lệch PE_cdt = nguyên mẫu
+#: scratchpad BG-235 §3; OMC 52 = 8 hàng × (O + 6 PE_cdt) − 4 ô PE_cdt khớp *(SHQ1 2 · ASA 2)*.
+#: ⚠ Đ3: PS `o_khac_0 = 0` — MID1 `pe ≠ 0` 0/8.505 ⇒ tập toàn 0 là KẾT QUẢ *(⛔ chứng minh RATE ở PS)*.
+MONG_C4C: dict[str, MongSoC4c] = {
+    "OMC": MongSoC4c(thang=tuple(f"2025{m:02d}" for m in range(3, 13)), vm=210, dong=890, dong_so=890,
+                     dong_ngoai_anh=0, o_so=8547, o_khong_so=3913, o_khac_0=363, o_trong_dap_an=1650,
+                     lech_nguon=52, hang_lech_nguon=8, chua_co_dap_an=KY_ISP_C4C),
+    "SC": MongSoC4c(thang=tuple(f"2025{m:02d}" for m in range(4, 13)), vm=87, dong=741, dong_so=741,
+                    dong_ngoai_anh=0, o_so=6230, o_khong_so=4144, o_khac_0=1216, o_trong_dap_an=2575,
+                    lech_nguon=251, hang_lech_nguon=69, p_chu_chi_mid1=102, chua_co_dap_an=("202503",) + KY_ISP_C4C),
+    "PS": MongSoC4c(thang=tuple(f"2025{m:02d}" for m in range(4, 13)), vm=477, dong=1215, dong_so=585,
+                    dong_ngoai_anh=630, o_so=5117, o_khong_so=3073, o_khac_0=0, o_trong_dap_an=4386,
+                    lech_nguon=0, hang_lech_nguon=0, chua_co_dap_an=("202503",) + KY_ISP_C4C),
+}
+
+
+@dataclass
+class ThanhQuaC4c:
+    phan_xu: PhanXu
+    hd2_cong: dict[str, Any]
+    lech: list = field(default_factory=list)
+
+
+def _so_hay_none(v: Any) -> Decimal | None:
+    if v is None:
+        return None
+    return Decimal(v)                     # ô lỗi/chữ ⇒ nổ ở tầng gọi ⇒ ly do có tên
+
+
+def so_sanh_so_c4c(so: str, mid1: dict, mid3: dict, ven, mong: MongSoC4c,
+                   ky_doi_chieu: tuple = ()) -> dict[str, Any]:
+    """Một sổ ⇒ khối kết quả *(dict)* + `ly_do`. ⛔ nổ: lỗi ⇒ `ly_do` có tên *(Đ5)*."""
+    from fls.bao_cao import phan_bo as pb
+    from fls.cau_hinh.vendor import LUAT_SO, cach_tinh_cua_so
+    ly: list[str] = []
+    cdt = tuple(c for c in ven.cdt1 if c.split(" |")[0].lower() in MID3_CDT)
+    ma = {c.split(" |")[0].lower(): c for c in cdt}
+    if len(cdt) != 6:
+        ly.append(f"CDT1 khớp 6 cột MID3: đo {len(cdt)}")
+    nhom: dict[tuple, list] = {}
+    for r in mid1["dong"]:
+        nhom.setdefault((_chu(r["vendor"]), r["thang"], r["no"]), []).append(r)
+    dong: list = []
+    pe: dict = {}
+    for (v, t, n), rs in nhom.items():
+        try:
+            o = sum((Decimal(r["pe"]) for r in rs), Decimal(0))
+            so_pm = {Decimal(r["pm"]) for r in rs if r.get("pm_ghi_chu") is None and r.get("pm") is not None}
+        except (ArithmeticError, TypeError, ValueError):
+            ly.append(f"MID1 {v} · {t} · No {n}: `pe`/`pm` ⛔ số")
+            continue
+        if len(so_pm) > 1:
+            ly.append(f"MID1 {v} · {t} · No {n}: {len(so_pm)} giá trị `pm` số khác nhau ⇒ ⛔ biết P")
+            continue
+        p = next(iter(so_pm)) if so_pm else None
+        dong.append(pb.DongCFA1(v, t, n, o, p))
+        for r in rs:
+            c = _chu(r["cdt1"])
+            if c.split(" |")[0].lower() == MID1_BO_CDT:
+                continue
+            if c not in cdt:
+                ly.append(f"MID1 CDT1 lạ {c!r} @ {r['dong_sheet']}")
+                continue
+            pe.setdefault((v, t), {}).setdefault(c, Decimal(0))
+            pe[(v, t)][c] += Decimal(r["pe"])
+    if ly:
+        return {"so": so, "dat": False, "ly_do": ly}
+    luat = LUAT_SO[so]
+    try:
+        kq = pb.chia_theo_cach_tinh(dong, pe, ven, cdt1=cdt, bang=cach_tinh_cua_so(so),
+                                    pm_tong_thang_bat=luat["pm_tong_thang"])
+        ks = pb.ks_al(kq, kq.o, kq.p)
+    except pb.LoiPhanBo as e:
+        return {"so": so, "dat": False, "ly_do": [f"engine: {e}"]}
+    # ── ghép MID3 (có khoá) ↔ dòng engine theo thứ tự trong (vendor, tháng) ──
+    theo_vm: dict = {}
+    for r, x in kq.chia_dong:
+        theo_vm.setdefault((r.vendor, r.thang), []).append((r, x))
+    hang_vm: dict = {}
+    for h in mid3["dong"]:
+        if h.get("vendor") is not None:
+            hang_vm.setdefault((_chu(h["vendor"]), h["thang"]), []).append(h)
+    lac = {x.split("@", 1)[1] for x in (mid3.get("lac") or [])} | (set(LAC_OMC) if so == "OMC" else set())
+    nghi_loi = bool(((mid3.get("phu") or {}).get("nguon_nghi_loi") or {}).get("dong"))
+    dem = dict.fromkeys(("dong_so", "dong_ngoai_anh", "o_so", "o_khong_so", "o_khac_0", "o_trong_dap_an",
+                         "lech_nguon", "lech_nghi_loi", "lech_fls", "o_khong_so_khac_0",
+                         "ngoai_anh_khac_0", "p_chu_chi_mid1", "p_chu_chi_mid3"), 0)
+    hang_nguon: set = set()
+    lech: list = []
+    for vm in sorted(set(hang_vm) - set(theo_vm)):
+        ly.append(f"MID3 có Vendor-tháng {vm} mà engine ⛔ có")
+    for vm, ds in sorted(theo_vm.items()):
+        hs = hang_vm.get(vm, [])
+        if len(hs) > len(ds):
+            ly.append(f"MID3 {vm}: {len(hs)} hàng > {len(ds)} dòng engine")
+            continue
+        for i, (r, x) in enumerate(ds):
+            if i >= len(hs):                     # nhóm ⛔ có hàng MID3 trong ảnh ⇒ ⛔ so được, ĐẾM
+                dem["dong_ngoai_anh"] += 1
+                dem["ngoai_anh_khac_0"] += sum(1 for a, b in x.values() if a != 0 or (b or 0) != 0) + (r.o != 0)
+                continue
+            h = hs[i]
+            dem["dong_so"] += 1
+            chu3 = h.get("pm_ghi_chu") is not None
+            if r.p is None and not chu3:
+                dem["p_chu_chi_mid1"] += 1
+            if r.p is not None and chu3:
+                dem["p_chu_chi_mid3"] += 1
+            cap = [("pe", r.o), ("pm", r.p)]
+            for c in MID3_CDT:
+                cap += [(f"{c}_pe", x[ma[c]][0]), (f"{c}_pm", x[ma[c]][1])]
+            for cot, got in cap:
+                if got is None or (chu3 and cot.endswith("pm")):
+                    dem["o_khong_so"] += 1
+                    try:
+                        dem["o_khong_so_khac_0"] += (h[cot] is not None and Decimal(h[cot]) != 0)
+                    except (ArithmeticError, TypeError, ValueError):
+                        dem["o_khong_so_khac_0"] += 1
+                    continue
+                try:
+                    exp = _so_hay_none(h[cot])
+                except (ArithmeticError, TypeError, ValueError):
+                    ly.append(f"MID3 {so} @ {h['dong_sheet']} · {cot}: ⛔ số")
+                    continue
+                if exp is None:
+                    dem["o_trong_dap_an"] += 1
+                    exp = Decimal(0)
+                dem["o_so"] += 1
+                dem["o_khac_0"] += (exp != 0 or got != 0)
+                if abs(exp - got) > TOL_C4A:
+                    lop = ("lech_nguon" if h["dong_sheet"] in lac
+                           else "lech_nghi_loi" if nghi_loi else "lech_fls")
+                    dem[lop] += 1
+                    if lop == "lech_nguon":
+                        hang_nguon.add(h["dong_sheet"])
+                    lech.append({"so": so, "dong_sheet": h["dong_sheet"], "vendor": vm[0], "thang": vm[1],
+                                 "no": r.no, "cot": cot, "lop": lop, "exp": str(exp), "got": str(got)})
+    thang = tuple(sorted({t for _, t in kq.chia}))
+    thang_dap_an = {t for _, t in hang_vm}
+    chua = tuple(sorted(set(ky_doi_chieu) - thang_dap_an))
+    # Đ5: hàng `lac` CÓ KHOÁ phải ĐÚNG là hàng lệch nguồn — hai chiều *(lac ⛔ lệch ⇒ ĐỎ; lệch ngoài lac ⇒ lớp khác)*
+    lac_khoa = lac & {h["dong_sheet"] for hs in hang_vm.values() for h in hs}
+    if hang_nguon != lac_khoa:
+        ly.append(f"hàng `lac` có khoá ≠ hàng lệch nguồn: lac ⛔ lệch {sorted(lac_khoa - hang_nguon)[:8]} "
+                  f"· lệch ⛔ lac {sorted(hang_nguon - lac_khoa)[:8]}")
+    do = {"thang": (thang, mong.thang), "vm": (len(kq.chia), mong.vm), "dong": (len(dong), mong.dong),
+          **{k: (dem[k], getattr(mong, k)) for k in dem},
+          "hang_lech_nguon": (len(hang_nguon), mong.hang_lech_nguon),
+          "muon": (len(kq.muon), mong.muon), "theo_tong_thang": (len(kq.theo_tong_thang), mong.theo_tong_thang),
+          "chua_co_dap_an": (chua, mong.chua_co_dap_an), "ks_al_vm": (ks, mong.vm)}
+    for ten, (thuc, m) in do.items():
+        if thuc != m:
+            ly.append(f"{so} · {ten}: đo {thuc} ≠ mong {m}")
+    if dem["o_so"] == 0:
+        ly.append(f"{so}: 0 ô so ⇒ ⛔ đo được (Đ3)")
+    lech_co_ten = dem["lech_nguon"] + dem["lech_nghi_loi"]
+    return {"so": so, **{k: v[0] for k, v in do.items()}, "khop": dem["o_so"] - len(lech),
+            "lech_co_ten": lech_co_ten, "lac_khai": len(lac), "co_nguon_nghi_loi": nghi_loi,
+            "luat_so": dict(luat), "dat": not ly, "ly_do": ly, "_lech": lech}
+
+
+def so_sanh_c4c(anh: Mapping[str, tuple[dict, dict]], ven_theo_so: Mapping[str, Any],
+                mong: Mapping[str, MongSoC4c] = MONG_C4C) -> ThanhQuaC4c:
+    """3 sổ ⇒ MỘT khối `WP-C4c`. `tong_o` = ô so *(hợp đồng ITE)*; `khop` = ô khớp THẬT *(⛔ cộng lệch)*;
+    `lech_co_chu_dich` = lệch CÓ TÊN *(nguồn · nghi lỗi — Đ5 khai `mong_lech_co_chu_dich`)* ⇒ `dat` ⇔
+    `khop + lech_co_chu_dich == tong_o` ⇔ `lech_fls = 0` ∧ mọi mong khớp. 8.611 ô đáp án rỗng đếm ở `o_trong_dap_an`."""
+    ky = set(KY_ISP_C4C)
+    for so, (m1, _) in anh.items():
+        ky |= {r["thang"] for r in m1["dong"]}
+    ky_t = tuple(sorted(ky))
+    so_kq = {so: so_sanh_so_c4c(so, *anh[so], ven_theo_so[so], mong[so], ky_t) for so in SO_C4C}
+    lech = [x for k in so_kq.values() for x in k.pop("_lech", [])]
+    ly = [x for k in so_kq.values() for x in k["ly_do"]]
+    if set(so_kq) != set(SO_C4C):
+        ly.append(f"sổ đo {sorted(so_kq)} ≠ {list(SO_C4C)}")
+    o_so = sum(k.get("o_so", 0) for k in so_kq.values())
+    khop = sum(k.get("khop", 0) for k in so_kq.values())
+    ten = sum(k.get("lech_co_ten", 0) for k in so_kq.values())
+    rong = sum(k.get("o_trong_dap_an", 0) for k in so_kq.values())
+    mong_ten = sum(m.lech_nguon + m.lech_nghi_loi for m in mong.values())     # khai TRƯỚC (Đ5), ⛔ đo
+    px = PhanXu(not ly, tuple(ly))
+    hd2 = {"bang": "HD2.WP-C4c", "goi": "WP-C4c",
+           "mo_ta": "AL.PLT OMC · SC · PS: MID1 (O = Σpe nhóm · P · PE theo CDT1) + IX.VEN kho theo sổ → "
+                    "chia_theo_cach_tinh (LUAT_SO) → KS.AL ↔ MID3 từng ô theo dòng (vendor, tháng, No)",
+           "nguon_dau_vao": "tests/fixture/dap_an/{omc,sc,ps}_mid1.json (PD 508, thượng nguồn) + IX.VEN kho so=OMC/SC/PS",
+           "dap_an": "tests/fixture/dap_an/{omc,sc,ps}_mid3.json (PD 510)",
+           "khoa": "hàng MID3 có khoá ↔ nhóm MID1 (vendor, tháng, No) theo thứ tự × 14 cột",
+           # ⭐ KQ-236 H11-R1-02 (Đ4) · hợp đồng ITE (`doc_bao_cao._goi_la`, KQ-231 ITE-R1-01): `tong_o` = ô SO
+           #   (19.894), `khop` = ô khớp đáp án THẬT (⛔ cộng lệch), 303 ô lệch nguồn CÓ TÊN ở `lech_co_chu_dich`
+           #   (+ `mong_lech_co_chu_dich` khai trước). `dat` ⇔ khop + lech_co_chu_dich = tong_o ∧ lệch = mong.
+           "tong_o": o_so, "khop": khop, "o_so": o_so, "lech_co_ten": ten,
+           "lech_co_chu_dich": ten, "mong_lech_co_chu_dich": mong_ten,
+           # Đ4: `khop` KHÔNG nói "đáp án có số": trong 19.591 có 8.611 ô đáp án RỖNG (⇒ 0) — đếm riêng ở đây.
+           "o_trong_dap_an": rong,
+           "o_trong_dap_an_nhan": "ô đáp án MID3 rỗng (iferror \"\") ⇒ so như 0 — nằm TRONG `khop`/`tong_o`; ⛔ đọc "
+                                  "`khop` là 'đáp án có số khớp' (≠ 0: xem `o_khac_0` từng sổ; PS toàn 0 = 0)",
+           "lech_co_ten_nhan": "lệch nguồn (`lac`: SC ảnh · OMC 8 hàng O ≠ Σpe) + nghi lỗi (`nguon_nghi_loi` OMC) — "
+                               "nằm TRONG `tong_o`, ⛔ cộng vào `khop`; = `lech_co_chu_dich`",
+           "ky_doi_chieu": list(ky_t), "so": so_kq,
+           "nhan_d3": "PS o_khac_0 = 0 (MID1 pe ≠ 0: 0/8.505) ⇒ tập toàn 0 — đo được nhưng ⛔ chứng minh RATE ở PS",
+           "mong": {so: dataclasses.asdict(m) for so, m in mong.items()},
+           "dat": px.dat, "ly_do": list(px.ly_do)}
+    return ThanhQuaC4c(px, hd2, lech)
+
+
+def chay_wp_c4c(dsn: str | None = None) -> ThanhQuaC4c:
+    try:
+        import psycopg
+        from fls.db.kho import dsn_that
+        from fls.repo import cau_hinh_repo as chc
+        with psycopg.connect(dsn or dsn_that()) as c:
+            ven = {so: chc.doc_ven(c, so=so) for so in SO_C4C}
+    except Exception as e:  # noqa: BLE001 — Đ5: ⛔ đo được ⇒ ĐỎ có lý do
+        px = PhanXu(False, (f"IX.VEN ⛔ đọc được từ kho: {type(e).__name__}: {' '.join(str(e).split())}",))
+        return ThanhQuaC4c(px, {"bang": "HD2.WP-C4c", "goi": "WP-C4c", "dat": False, "ly_do": list(px.ly_do)})
+    anh = {so: tuple(nap_anh(p) for p in anh_c4c(so)) for so in SO_C4C}
+    return so_sanh_c4c(anh, ven)
+
+
+def _in_bao_c4c(tq: ThanhQuaC4c) -> None:
+    h = tq.hd2_cong
+    print("══ do_hd2 · WP-C4c — AL.PLT OMC · SC · PS ↔ MID3 theo dòng (vendor, tháng, No)")
+    for so, k in (h.get("so") or {}).items():
+        if "o_so" not in k:
+            continue
+        print(f"  {so:<3}: {k['vm']} Vendor-tháng · {k['dong']} dòng ({k['dong_so']} so · {k['dong_ngoai_anh']} ngoài ảnh)"
+              f" · ô so {k['o_so']} · ⛔ so {k['o_khong_so']} · ≠0 {k['o_khac_0']} · rỗng đáp án {k['o_trong_dap_an']}")
+        print(f"       lệch FLS {k['lech_fls']} · nguồn {k['lech_nguon']} ({k['hang_lech_nguon']} hàng) · "
+              f"nghi lỗi {k['lech_nghi_loi']} · chua_co_dap_an {list(k['chua_co_dap_an'])}")
+    if "tong_o" in h:
+        print(f"  khối: khop/tong_o {h['khop']}/{h['tong_o']} · lệch có chủ đích {h['lech_co_chu_dich']} "
+              f"(mong {h['mong_lech_co_chu_dich']}) · ô đáp án RỖNG {h['o_trong_dap_an']} (⇒ 0, nằm trong khop)")
+    for x in [x for x in tq.lech if x["lop"] == "lech_fls"][:10]:
+        print(f"      [{x['so']} @ {x['dong_sheet']} · {x['cot']}] exp {x['exp']} got {x['got']}")
+    print(f"  KẾT: {tq.phan_xu.mot_dong}")
+
+
 def _ghi_cong(goi: str, hop_dong: dict[str, Any]) -> None:
     """`hd2_cong.json` CHỈ THÊM: WP-C2 giữ ở gốc *(hợp đồng H4)*; gói khác vào khoá `<goi>`."""
     cu: dict[str, Any] = {}
@@ -1517,8 +1815,14 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--goi", required=True, choices=GOI_BIET, help="gói cổng HD2")
     p.add_argument("--ghi", action="store_true", help="ghi docs/ITL/_tools/hd2_cong.json")
     p.add_argument("--dsn", default=None,
-                   help="WP-C4a/WP-C4b: kho đọc IX.VEN (mặc định PG_DSN; ISP dùng PG_DSN_TEST — ⛔ ghi kho thật)")
+                   help="WP-C4a/b/c: kho đọc IX.VEN (mặc định PG_DSN; ISP dùng PG_DSN_TEST — ⛔ ghi kho thật)")
     a = p.parse_args(argv)
+    if a.goi == "WP-C4c":
+        tq4c = chay_wp_c4c(a.dsn)
+        _in_bao_c4c(tq4c)
+        if a.ghi:
+            _ghi_cong("WP-C4c", tq4c.hd2_cong)
+        return 0 if tq4c.phan_xu.dat else 1
     if a.goi == "WP-C4b":
         tq4b = chay_wp_c4b(a.dsn)
         _in_bao_c4b(tq4b)
