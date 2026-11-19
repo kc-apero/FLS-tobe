@@ -69,9 +69,9 @@ WP-C3c **ĐẠT**: **835/888** ô khớp đáp án thật + **53** lệch có ch
 ## Cổng
 | Lệnh | Kết quả |
 |---|---|
-| `tools/dung_moi_truong_isp.sh --duong-nen --cong 5435` *(một lần, chạy một mình)* | *(xem mục cuối)* |
+| `tools/dung_moi_truong_isp.sh --duong-nen --cong 5435` *(chạy một mình trên `804aff3`)* | **`KẾT: ĐẠT`**. Toàn bộ: tập đỏ + XFAIL **28 = 28** node id *(XFAIL 2 = 2 · thêm 0 · bớt 0)* · chạy **4111** *(mong ≥ 4111)* · skipped 0 · deselected 0. `tests/web`: **3 = 3** · chạy 675. ⚠ Lần chạy đầu bị cắt ở phần `tests/web` vì giới hạn thời gian 10 phút của lệnh nền *(phần toàn bộ lúc ấy đã [ĐẠT] 28 = 28)*; chạy lại một lần, đủ cả hai phần. |
 | `lint-imports` | `Contracts: 11 kept, 0 broken.` |
-| `python docs/ITL/_tools/kiem_tai_lieu.py` | *(xem mục cuối)* |
+| `python docs/ITL/_tools/kiem_tai_lieu.py` | `✅ cong tai lieu DAT` *(381 tệp · 2724 bảng · 892 ô ngày · 104 mã QĐ)* |
 
 ## Câu hỏi cho chủ / BA
 1. **Gán kỳ cho `ky_suy`**: nguồn ghi kỳ **2025-10** cho **1.125** hàng mà DT6b đã gán theo "hàng trên" *(06/07/08)*. Có đổi quyết định gán kỳ không? *(BG-250 §2; WP-C3c hiện để các hàng này ngoài Σ.)*
