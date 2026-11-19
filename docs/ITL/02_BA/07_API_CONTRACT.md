@@ -1,6 +1,6 @@
 # 07 — API CONTRACT: FLS
 
-**Version:** v3.21 · **Ngày:** 2026-11-18 · **Chủ sở hữu:** BA/PO + Tech Lead
+**Version:** v3.22 · **Ngày:** 2026-11-19 · **Chủ sở hữu:** BA/PO + Tech Lead
 **Thay thế:** v0.1 *(bản copy chương trình, prefix `/api/voi/`)* — đã khai tử.
 
 **Căn cứ:** `04_DB_IMPLEMENTATION` v1.0 *(schema `fls_itl`)* · `QĐ-ITL-38` *(app là nơi thao tác)* · `QĐ-ITL-45` *(FLS độc lập)* · `FLS-vs-FPS` §7 *(append-only event-log)*.
@@ -847,10 +847,10 @@ LY_DO_MAC_DINH_BO_GHEP = "(may dien) bo ghep tren man - nguoi bam khong ghi ly d
 
 | Tuyến | Bước ISP | Hợp đồng | Trạng thái |
 |---|---|---|---|
-| `GET /api/fls/v1/config/fx` ⭐ cửa của `SCR-F08` *(`BA-06 §9`)* | C1 → C5 (kho) | `{bang:'IX.FX', nguon, ky:[{yyyymm (số nguyên), USD, SGD, COP, VND, HKD (chuỗi), trang_thai ∈ chua_ky/da_ky}], thieu:[yyyymm], trung:[yyyymm], lac:[yyyymm]}` — tháng thiếu/trùng/lạc ở trường riêng, ⛔ cộng đôi, ⛔ thành 0. Bảng TĨNH ⛔ theo lần nạp ⇒ `?run_id=` ⇒ `400 FLS-BAD-REQUEST` *(⛔ trả số khoác phạm vi lần nạp — `C1-R1-07`)* | ✅ *(C1 — gộp 17/11 sau R3 `KQ-079`)* |
+| `GET /api/fls/v1/config/fx` ⭐ cửa của `SCR-F08` *(`BA-06 §9`)* | C1 → C5 (kho) | `{bang:'IX.FX', nguon, ky:[{yyyymm (số nguyên), USD, SGD, COP, VND, HKD (chuỗi), trang_thai ∈ chua_ky/da_ky; dòng da_ky thêm actor · ky_luc — C7}], thieu:[yyyymm], trung:[yyyymm], lac:[yyyymm]}` — tháng thiếu/trùng/lạc ở trường riêng, ⛔ cộng đôi, ⛔ thành 0. Bảng TĨNH ⛔ theo lần nạp ⇒ `?run_id=` ⇒ `400 FLS-BAD-REQUEST` *(⛔ trả số khoác phạm vi lần nạp — `C1-R1-07`)* | ✅ *(C1 — gộp 17/11 sau R3 `KQ-079`)* |
 | `GET /api/fls/v1/config/hd` | C4 | cây IX.HD 74 nút · 6 nhóm + danh sách chênh với Mapping Master (73 mã); cây hỏng ⇒ lỗi có tên (`HD_CHU_TRINH` · `HD_CHA_VANG` · `HD_CAP_NHAY` · `HD_HONG`). Bảng TĨNH ⇒ `?run_id=` ⇒ `400 FLS-BAD-REQUEST` (khuôn C1) | ✅ *(C4 — gộp 18/11 sau R3 `KQ-126`; C5 đổi nguồn sang kho)* |
 | `GET /api/fls/v1/config/per` | C6 | ngày đầu cột (2024-10-21) · luật ghi nhận kỳ (A = dồn ngày 1 tháng PL start, D4) — đọc từ KHO (dòng config IX.PER qua `0027`); luật B ⇒ lỗi có tên `LUAT_CHUA_KY`; `?run_id=` ⇒ `400` | ✅ *(C6 — gộp 18/11 sau R2 `KQ-155`; ngày đầu 20/21 chờ H5 chốt — errata ㉑)* |
-| `POST /api/fls/v1/config/fx/{yyyymm}/sign` ⭐ nút ký của `SCR-F08` *(F5, `BA-06 §9 ⓑ`)* | C7 | niêm phong tháng; người ký = người trong THẺ; ký lại ⇒ `409`; `bang_ghi` = bảng config (⛔ `fls_itl`) | ⬜ chưa xây |
+| `POST /api/fls/v1/config/fx/{yyyymm}/sign` ⭐ nút ký của `SCR-F08` *(F5, `BA-06 §9 ⓑ`)* | C7 | niêm phong tháng; người ký = người trong THẺ *(⛔ từ thân — thân có `actor` ⇒ `400` ở cửa sẵn có)*; ký lại ⇒ `409 FLS-CAUHINH-DA-KY`; thành công `201` `{bang, yyyymm, trang_thai:'da_ky', actor, ky_luc}` *(`ky_luc` do MÁY đặt)*; `yyyymm` hỏng ⇒ `400` · tháng ⛔ có trong IX.FX ⇒ `404`; `bang_ghi` = `fls_cau_hinh_ban` · `fls_cau_hinh_dong` (⛔ `fls_itl`) | ⬜ chưa xây |
 | `GET /api/fls/v1/config/ven` | C9 | Vendor & Network Block 1 (**42** dòng — AP ghi 36, errata ㉒; 36 = số bộ vendor·network·account khác nhau) · mã 'cách tính' cho 5 vendor riêng · danh mục 7 CDT1; đọc từ KHO (`0027`); `?run_id=` ⇒ `400` | ✅ *(C9 — gộp 18/11 sau R2 `KQ-175`)* |
 | `GET /api/fls/v1/config/drv` | C10 | driver (loại, CDT1, tháng); tháng thiếu ⇒ `DRV_THIEU` | ⬜ chưa xây |
 | `GET /api/fls/v1/config/alr` | C11 | luật phân bổ theo HD + hiệu lực theo kỳ + cờ (mặc định TẮT, D2) | ✅ đã xây (C11 · 17 HD có luật = 4 H1000 + 8 By GI + 5 By NOEM; hiệu lực theo kỳ TÍCH LUỸ qua lần nạp) |
@@ -916,6 +916,7 @@ LY_DO_MAC_DINH_BO_GHEP = "(may dien) bo ghep tren man - nguoi bam khong ghi ly d
 ---
 
 ## Changelog
+- **v3.22** *(2026-11-19, `fls-dev` BE-CF — C7 · `WO-212`; KHAI tuyến, orchestrator lật ✅ khi gộp)*: `§4i` dòng `POST /config/fx/{yyyymm}/sign` ghi rõ hợp đồng `201`/`400`/`404`/`409` *(vẫn ⬜)*. ⚠ Một thay đổi CỘNG vào tuyến cũ `GET /config/fx`: dòng tháng **đã ký** mang thêm `actor` · `ky_luc` và `trang_thai = da_ky` *(dòng chưa ký giữ nguyên từng byte)*.
 - **v3.21** *(2026-11-18, orchestrator ISP 3.1 — gộp C11)*: `§4i` dòng `GET /config/alr` ⬜ → ✅ (17 HD có luật; cờ mặc định TẮT, D2).
 - **v3.20** *(2026-11-18, orchestrator ISP 3.1 — gộp C9 · C8)*: `§4i` dòng `GET /config/ven` ⬜ → ✅ (42 dòng); C8 thêm cột `cdt_la` vào `GET /queue` (hợp đồng cũ giữ, chỉ THÊM trường).
 - **v3.19** *(2026-11-18, orchestrator ISP 3.1 — gộp C6)*: `§4i` dòng `GET /config/per` ⬜ → ✅ (đọc từ kho · `LUAT_CHUA_KY` · `?run_id=` ⇒ `400`).

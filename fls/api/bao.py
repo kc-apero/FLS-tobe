@@ -68,6 +68,8 @@ MA_LOI: dict[str, tuple[int, str]] = {
     # ⭐ `C6` (`WO-152`): luat ghi nhan ky `B` (chia deu PL start→end, D4) co that nhung
     #    CHUA mo ⇒ **409 CO TEN** (⛔ lang le roi ve luat A).
     "FLS-CAUHINH-LUAT-CHUA-KY": (409, "luat ghi nhan ky chua mo (D4 B) — chi luat A chay"),
+    # ⭐ `C7` (`WO-212`): tháng IX.FX ĐÃ ký ⇒ ký lại **409 CÓ TÊN** (D1; ⛔ huỷ ký).
+    "FLS-CAUHINH-DA-KY": (409, "thang IX.FX da ky — ⛔ ky lai (⛔ huy ky: ngoai WO-212)"),
     "FLS-CAUHINH-BAN-HONG": (
         500, "ban config trong kho ⛔ doc ra duoc — co ban ghi thang ⛔ qua `nap`?"),
     # ⭐⭐ `QĐ-ITL-110` — lan ANH CHUP. HAI ma, ⛔ KHONG mot, va cung ly do da

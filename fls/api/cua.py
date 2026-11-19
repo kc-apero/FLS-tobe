@@ -323,8 +323,9 @@ class _Tay(BaseHTTPRequestHandler):
 
         m = bao.meta(pv.mo_ta(), data_status=trang_thai,
                      run_id=pv.run_id)
-        self.log_message("200 %s %s actor=%s", phuong_thuc, duong, nguoi.actor)
-        self._tra(200, bao.dong_goi(data, m))
+        self.log_message("%d %s %s actor=%s", tuyen.http_ok, phuong_thuc, duong,
+                         nguoi.actor)
+        self._tra(tuyen.http_ok, bao.dong_goi(data, m))
 
 
 def kiem_truoc_khi_mo(conn) -> None:

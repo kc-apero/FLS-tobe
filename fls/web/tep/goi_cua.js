@@ -85,6 +85,12 @@ const FLS = (function () {
       cau: 'Bản cấu hình trong kho đọc không ra — số trên màn ⛔ dùng được.',
       lam_gi: '⛔ Đừng dùng số này. Báo người dựng hệ — nạp lại một bản cấu hình đúng.'
     },
+    // ⭐ `C7` (`WO-212`): tháng tỷ giá ĐÃ ký — ký lại ⇒ 409. Chữ ký là niêm phong, ⛔ huỷ ở đây.
+    'FLS-CAUHINH-DA-KY': {
+      cau: 'Tháng tỷ giá này đã được ký rồi — ⛔ ký lại được.',
+      lam_gi: 'Không cần làm gì thêm: chữ ký cũ vẫn còn hiệu lực. Muốn đổi số thì báo '
+        + 'người dựng hệ — ⛔ có nút huỷ ký trên màn.'
+    },
     // ⭐ `C6` (`WO-152`): luật ghi nhận kỳ `B` (chia đều PL start→end, D4) chưa mở.
     'FLS-CAUHINH-LUAT-CHUA-KY': {
       cau: 'Luật ghi nhận kỳ trong cấu hình chưa được mở — hiện chỉ luật A chạy.',
