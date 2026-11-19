@@ -48,8 +48,11 @@ SO = "fls_itl"
 # luc nao, va khai TRUOC do la gi* — dung dinh nghia cua tap nay.
 # ⚠ Them vao day vi cong vua bat DUNG: `POST .../khai-cot` bi bao "ghi ma
 #   ⛔ khong de lai vet" — cong dung, **tap thi thieu mot ten**.
+# ⭐ `fls_cau_hinh_ban` (`C7`, `WO-212`) — vet THAT: `actor` NOT NULL + `luc` do MAY dat,
+#   CHI-THEM (trigger `0027`, `INV-I08`) ⇒ doc lai duoc *ai ky/nap config nao, luc nao*.
+#   Ban KY thang di qua dung bang nay. (⛔ them `fls_cau_hinh_dong`: no khong co actor.)
 BANG_CO_VET: frozenset[str] = frozenset({
-    "fls_journal", "fls_queue_event", "fls_khai_cot"})
+    "fls_journal", "fls_queue_event", "fls_khai_cot", "fls_cau_hinh_ban"})
 
 # Bang duoc phep xuat hien trong bang tuyen. ⛔ Ten la = NO, de mot duong doc
 # `fps_*` hay P100 khong the lot vao trong im lang (`QĐ-ITL-45`: FLS chi doc
@@ -147,6 +150,9 @@ class Tuyen:
     #        `fls_itl` — quet ma nguon, o `tests/api/test_them_vao_so.py`.
     them_vao_so: bool = False
     ghi: bool = False
+    # ⭐ `C7` (`WO-212`): mã HTTP khi THÀNH CÔNG. Mặc định `200` ⇒ mọi tuyến cũ ⛔ đổi;
+    #   chỉ tuyến TẠO bản ghi mới *(ký tháng)* khai `201`.
+    http_ok: int = 200
     # ⭐⭐ `CR#11` task `4` — **DOC THAN ⛔ KHONG dong nghia voi GHI**.
     #
     # ⛔⛔ Cho toi 08/09 `cua.py` viet `than = _doc_than() if tuyen.ghi else {}`
@@ -686,6 +692,15 @@ BANG_TUYEN: tuple[Tuyen, ...] = (
           mo_ta="IX.FX ty gia thang × 5 tien te (VND = 1) + `thieu`/`trung`/"
                 "`lac` thanh TRUONG RIENG — ⛔ thanh 0, ⛔ cong doi. Doc tu KHO "
                 "config chi-them (C5)"),
+    # ⭐⭐ `C7` (`WO-212`): KY THANG (D1). Ghi CHI vao kho config chi-them — ⛔ cham `fls_itl`.
+    #   `actor` TU THE (cua tu choi `actor` trong than). 201 / 400 / 404 / 409 co TEN.
+    Tuyen("POST", f"{TIEN_TO}/config/fx/{{yyyymm}}/sign", "ky_thang_fx",
+          ("fls_cau_hinh_ban", "fls_cau_hinh_dong"),
+          bang_ghi=("fls_cau_hinh_ban", "fls_cau_hinh_dong"),
+          ghi=True, http_ok=201,
+          mo_ta="ky niem phong MOT thang IX.FX (D1): nguoi ky = nguoi trong THE, "
+                "ky_luc do MAY dat; ky lai ⇒ 409 FLS-CAUHINH-DA-KY; thang ⛔ co "
+                "trong IX.FX ⇒ 404; yyyymm hong ⇒ 400"),
     # ⭐⭐ `C5` (`WO-142`): cay `IX.HD` + Mapping Master doc tu KHO (⛔ con anh tinh
     #    nhu C4). Hai bang config (ATL `IX.HD`, MM `IX.HD · IX.ORG`) — cung hai
     #    bang kho. `GET`, ⛔ ghi. ⛔ hoa giai 74 ↔ 73: tuyen chi LIET KE chenh.
