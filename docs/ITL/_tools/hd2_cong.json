@@ -95,5 +95,293 @@
  },
  "so_du_dau": "5 ô gõ tay hàng 24 (errata ⑳: FLS chưa có khái niệm số dư đầu kỳ; nguồn chính thức = câu hỏi BA/owner) — gieo qua tinh_gl(so_du_dau=…)",
  "dat": true,
- "ly_do": []
+ "ly_do": [],
+ "WP-C3a": {
+  "bang": "HD2.WP-C3a",
+  "goi": "WP-C3a",
+  "mo_ta": "SO.CFA1 Daily: tinh_gl (BR/BS từ E/F + ix_fx) trên GL của bản sao CF report → cfa1_daily (lá = Σ BR−BS theo (khối, nhãn HD V, ngày A); khối LE lọc cột P; cha = Σ con theo cây IX.HD) ↔ đáp án 409 từng ô",
+  "nguon_dau_vao": "tests/fixture/dap_an/gl_cf_dau_vao.json (A·D·E·F·P·R·V, ⛔ B:C·G; errata ㉓)",
+  "khoa": "khoi(5) + ma_hd(cây ATL 74) + ngay(serial)",
+  "khoi": [
+   "GROUP",
+   "SGO2",
+   "SGO1",
+   "HGO6",
+   "BGO2"
+  ],
+  "dung_sai_theo_khoi": {
+   "la": {
+    "atol": "1E-14",
+    "rtol": "0",
+    "max_lech_do": "1.0E-15"
+   },
+   "cha": {
+    "atol": "1E-14",
+    "rtol": "0",
+    "max_lech_do": "7.6E-16"
+   }
+  },
+  "dung_sai_ghi_chu": "atol 1e-14 = ≥10× max|lệch| đo 18/11 (lá 1,0e-15 · cha 7,5e-16); rtol 0 (|exp| ≤ 6,1). Chứng ĐỎ: +1 VND một dòng ⇒ lá + mọi cha ĐỎ; +1e-12 một ô đáp án ⇒ đúng ô ấy ĐỎ.",
+  "dong_so": 12373,
+  "mong_dong_so": 12373,
+  "tong_o": 205175,
+  "mong_tong_o": 205175,
+  "khop": 205175,
+  "lech_ngoai_ten": 0,
+  "o_kpi_loai": 76000,
+  "mong_o_kpi": 76000,
+  "ma_kpi": [
+   "EBITDA",
+   "EBIT",
+   "EBT",
+   "NP",
+   "NPC",
+   "NCF",
+   "NCFO",
+   "CRO",
+   "COO",
+   "NCFI",
+   "COI",
+   "NCFF",
+   "CRF",
+   "COF",
+   "PL2",
+   "PL3",
+   "PL4",
+   "PL6",
+   "PL7",
+   "PL8"
+  ],
+  "o_loi_dap_an_loai": 25,
+  "mong_o_loi": 25,
+  "so_dong_dap_an": 33355,
+  "mong_so_dong_dap_an": 33355,
+  "truc_ngay": {
+   "dau": "2024-10-20",
+   "so_cot": 760,
+   "ngay_so_cuoi": "2026-11-11",
+   "cot_chua_co_so": 7,
+   "ngay_dau_ix_per": "2024-10-21",
+   "nguon_ngay_dau": "bai-test-h6:ISP-3.1.2-Step20 (IX.PER kho = 21/10, C6)",
+   "ghi_chu": "trục từ IX.PER KHO (H6; C6 lưu 21/10) lùi 1 cột = 2024-10-20 (errata ㉑, ⛔ 21/10 của spec); ⛔ đọc phu.ngay_truc của đáp án 409"
+  },
+  "lech_co_ten": {
+   "thieu_tien_te_D": [
+    4957,
+    4958,
+    6068,
+    6502,
+    6944,
+    7626,
+    8026,
+    8593,
+    8649,
+    8999,
+    9071,
+    9380
+   ],
+   "hd_ngoai_cay": {
+    "ITE | ITE Interest ": 1,
+    "ITE | ITE Interest": 152,
+    "<rỗng>": 1,
+    "GAC - Other": 1,
+    "Server Cost": 7
+   },
+   "hd_khac_hoa_thuong": 5,
+   "dong_nhan_cha": 0,
+   "dong_ngoai_truc": 0
+  },
+  "so_du_dau": "KHÔNG dùng — CFA1 Daily là phát sinh theo ngày (BR/BS từng dòng), ⛔ tồn luỹ kế",
+  "dat": true,
+  "ly_do": []
+ },
+ "WP-C3b": {
+  "bang": "HD2.WP-C3b",
+  "goi": "WP-C3b",
+  "mo_ta": "SO.CFA1 Y/H/Q/M: tinh_gl → cfa1_daily (trục truc_ngay(IX.PER kho, ngày đọc)) → cuon_ky (Σ Daily theo ky_cua: năm của CHÍNH ngày) ↔ đáp án 410 từng ô",
+  "nguon_dau_vao": "tests/fixture/dap_an/gl_cf_dau_vao.json (cùng feed WP-C3a)",
+  "dap_an": "tests/fixture/dap_an/cfa1_yhqm.json (PD 410, 370 hàng × 57 kỳ)",
+  "loai_tru": "411 (CFA3 Daily) — DT5 loại khỏi đóng băng (ISP Step 15) ⇒ ⛔ đáp án để so",
+  "khoa": "khoi(5) + ma_hd(cây ATL 74) + ky(57: năm×19 Y/H/Q/M)",
+  "khoi": [
+   "GROUP",
+   "SGO2",
+   "SGO1",
+   "HGO6",
+   "BGO2"
+  ],
+  "dung_sai_theo_khoi": {
+   "la": {
+    "atol": "2E-13",
+    "rtol": "0",
+    "max_lech_do": "1.10E-14"
+   },
+   "cha": {
+    "atol": "2E-13",
+    "rtol": "0",
+    "max_lech_do": "1.17E-14"
+   }
+  },
+  "dung_sai_ghi_chu": "atol 2e-13 = ≥17× max|lệch| đo 18/11 trên 11.585 ô (lá 1,10e-14 · cha 1,17e-14 — Σ ≤ 366 ô Daily); rtol 0. Chứng ĐỎ: +1 VND một dòng ⇒ lá + mọi cha × 4 kỳ ĐỎ; +1e-12 một ô đáp án ⇒ đúng ô ấy ĐỎ.",
+  "dong_so": 12373,
+  "tong_o": 11585,
+  "mong_tong_o": 11585,
+  "khop": 11585,
+  "o_so_khac_0": 2636,
+  "mong_o_so_khac_0": 2636,
+  "lech_ngoai_ten": 0,
+  "o_kpi_loai": 5700,
+  "ma_kpi": [
+   "EBITDA",
+   "EBIT",
+   "EBT",
+   "NP",
+   "NPC",
+   "NCF",
+   "NCFO",
+   "CRO",
+   "COO",
+   "NCFI",
+   "COI",
+   "NCFF",
+   "CRF",
+   "COF",
+   "PL2",
+   "PL3",
+   "PL4",
+   "PL6",
+   "PL7",
+   "PL8"
+  ],
+  "o_loi_dap_an_loai": 25,
+  "o_ky_khong_ngay_loai": 3780,
+  "so_dong_dap_an": 5655,
+  "truc": {
+   "ngay_dau": "2024-10-21",
+   "nguon_ngay_dau": "ISP-3.1.2 Step17 C6 · IX.PER kho = 21/10 (WO-188) — cụm cô lập 5435",
+   "den": "2026-11-18",
+   "so_ngay": 759,
+   "nam": [
+    2024,
+    2025,
+    2026
+   ],
+   "so_ky": 57,
+   "ky_khong_ngay": [
+    "2024H1",
+    "2024Q1",
+    "2024Q2",
+    "2024Q3",
+    "2024M01",
+    "2024M02",
+    "2024M03",
+    "2024M04",
+    "2024M05",
+    "2024M06",
+    "2024M07",
+    "2024M08",
+    "2024M09",
+    "2026M12"
+   ],
+   "ghi_chu": "ngày đầu = IX.PER KHO (C6, 21/10); trục 409/410 từ 20/10 (errata ㉑) — đo 18/11: 0 dòng sổ ngày 20/10, 5 ô ≠ 0 cột 20/10 của 409 đều NPC (KPI). Kỳ 0 ngày trên trục ⛔ so (⛔ '0 đã chốt'), đáp án ≠ 0 ở đó ⇒ ĐỎ"
+  },
+  "lech_co_ten": {
+   "thieu_tien_te_D": [
+    4957,
+    4958,
+    6068,
+    6502,
+    6944,
+    7626,
+    8026,
+    8593,
+    8649,
+    8999,
+    9071,
+    9380
+   ],
+   "hd_ngoai_cay": {
+    "ITE | ITE Interest ": 1,
+    "ITE | ITE Interest": 152,
+    "<rỗng>": 1,
+    "GAC - Other": 1,
+    "Server Cost": 7
+   },
+   "hd_khac_hoa_thuong": 5,
+   "dong_nhan_cha": 0,
+   "dong_ngoai_truc": 0,
+   "o_khac_0_ky_khong_ngay": 0
+  },
+  "dat": true,
+  "ly_do": []
+ },
+ "WP-C4a": {
+  "bang": "HD2.WP-C4a",
+  "goi": "WP-C4a",
+  "mo_ta": "AL.PLT GI vendor thường: IX.VEN kho + CFA1 GI → chia_nen_tang → KS.AL ↔ MID3 (vendor, tháng) từng ô",
+  "nguon_dau_vao": "tests/fixture/dau_vao/gi_cfa1.json (PD 504) + IX.VEN kho",
+  "dap_an": "tests/fixture/dap_an/gi_mid3.json (PD 507, 209 hàng có khoá)",
+  "khoa": "(vendor, thang) × 14 cột (O · P · 6 CDT1 × PE/PM)",
+  "vm_thuong": 44,
+  "vendor_thuong": [
+   "VD113",
+   "VD336",
+   "VD58",
+   "VD61"
+  ],
+  "o_so": 420,
+  "o_khong_so": 196,
+  "o_khong_so_ly_do": "P = chữ 'Need to manual input' (⛔ hoá 0)",
+  "vm_p_chu": 28,
+  "o_khac_0": 0,
+  "o_khac_0_nhan": "tập toàn 0 — đo được nhưng ⛔ chứng minh RATE (phép so ô ≠ 0 ⇒ H10)",
+  "lech": 0,
+  "ks_al_vm": 44,
+  "bo_qua": {
+   "Max": 132,
+   "VD341": 11,
+   "VD428": 11,
+   "VD444": 11,
+   "VD62": 11
+  },
+  "vendor_bo_qua": 15,
+  "mong": {
+   "vm_thuong": 44,
+   "vendor_thuong": [
+    "VD113",
+    "VD336",
+    "VD58",
+    "VD61"
+   ],
+   "o_so": 420,
+   "o_khong_so": 196,
+   "o_khac_0": 0,
+   "lech": 0,
+   "bo_qua": [
+    [
+     "Max",
+     132
+    ],
+    [
+     "VD341",
+     11
+    ],
+    [
+     "VD428",
+     11
+    ],
+    [
+     "VD444",
+     11
+    ],
+    [
+     "VD62",
+     11
+    ]
+   ],
+   "vendor_bo_qua": 15
+  },
+  "dat": true,
+  "ly_do": []
+ }
 }

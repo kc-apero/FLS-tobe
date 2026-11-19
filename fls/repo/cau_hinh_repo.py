@@ -42,7 +42,7 @@ from datetime import date, datetime
 from pathlib import Path
 from typing import Any, Iterable, Mapping
 
-from fls.cau_hinh import dong_pl, fx, hd, ky, to_chuc, vendor
+from fls.cau_hinh import dong_pl, fx, hd, ky, luat_pb, to_chuc, vendor
 from fls.repo import ghi_tay
 
 BANG_FX = fx.BANG                 # "IX.FX"
@@ -52,6 +52,7 @@ BANG_PER = ky.BANG               # "IX.PER" — lịch kỳ (`C6`)
 BANG_VEN = vendor.BANG           # "IX.VEN" — vendor · network · cách tính (`C9`)
 BANG_ORG = to_chuc.BANG          # "IX.ORG" — CDT Correct + TK→LE (`C8`)
 BANG_PL = dong_pl.BANG           # "IX.PL" — dòng PL là biểu thức trên cây HD (`C12`)
+BANG_ALR = luat_pb.BANG          # "IX.ALR" — luật phân bổ hiệu lực theo kỳ + cờ (`C11`)
 
 # ⭐ Danh mục `bang` config HỢP LỆ *(AP: IX.FX · IX.HD · IX.ORG · IX.PER · IX.VEN ·
 #   IX.DRV · IX.ALR · IX.PL · IX.TMP — `.importlinter` khối `C5`)*. Một `bang` ⛔ ở
@@ -177,6 +178,13 @@ def _ven_tu_cap(cap: Iterable[tuple[str, Any]], nguon: str) -> vendor.BangVen:
     return vendor.kiem(dong, cdt1=cdt1 if isinstance(cdt1, list) else [], nguon=nguon)
 
 
+def _alr_tu_cap(cap: Iterable[tuple[str, Any]], nguon: str) -> luat_pb.BangALR:
+    dong: list[Any] = []
+    for khoa, gt in cap:
+        dong.append({"khoa": khoa, **gt} if isinstance(gt, Mapping) else gt)
+    return luat_pb.kiem(dong, nguon=nguon)       # ⛔ Mapping ⇒ kiem bắt "⛔ đối tượng"
+
+
 def _kiem_mm(cap: Iterable[tuple[str, Any]]) -> None:
     """MM ⛔ có lõi `kiem` dựng-lại riêng *(`hd.doc_mm_van_ban` ăn VĂN BẢN)* ⇒ kiểm HÌNH
     đã lưu: mỗi `gia_tri` ĐÚNG tập khoá `{hd_code, thu_tu}`, `hd_code` ⛔ rỗng, `thu_tu`
@@ -253,6 +261,8 @@ def _kiem_noi_dung(bang: str, cap: list[tuple[str, Any]]) -> None:
         _ven_tu_cap(cap, nguon="(kiem truoc khi ghi)")
     elif bang == BANG_ORG:
         _kiem_org(cap)
+    elif bang == BANG_ALR:
+        _alr_tu_cap(cap, nguon="(kiem truoc khi ghi)")    # `LoiLuatPB` CÓ TÊN, ⛔ bọc lại
     elif bang == BANG_PER:
         ky.kiem(dict(cap), nguon="(kiem truoc khi ghi)")   # `LoiKy` CÓ TÊN, ⛔ bọc lại
     elif bang == BANG_PL:
@@ -566,3 +576,46 @@ def cdt_cua_ghi(conn, itl_id: int, cdt_nguon: str, *, actor: str) -> to_chuc.Ket
         with conn.transaction():
             ghi_tay.ghi_cdt_la(conn, itl_id=itl_id, ly_do=ly_do, actor=actor)
     return r
+
+
+# ── IX.ALR — luật phân bổ hiệu lực theo kỳ + cờ TẮT (`C11` · `WO-180`) ───────────────
+def nap_ix_alr(conn, duong_mm: str, *, tu_ky: int, actor: str,
+               nguon: str | None = None) -> BanCauHinh:
+    """Nạp luật phân bổ từ ảnh Mapping Master DT3 `mapping_master_cfg.json` *(đường TRUYỀN VÀO;
+    bảng `fls_mapping_master` của cụm đo 0 dòng ⇒ ⛔ nguồn)* ⇒ phiên bản mới của `IX.ALR`.
+
+    `tu_ky` *(`yyyymm`)* là **GIÁ TRỊ CẤU HÌNH do người gọi khai** *(⛔ gõ cứng ở mã)*: luật hiệu
+    lực từ kỳ ấy; các lần nạp TÍCH LUỸ *(`C11-R1-01`: bản mới = bản trước + mốc mới)*, đọc theo kỳ
+    bằng `luat_cua`. Mọi luật `bat = false` *(D2)*. Kiểm bằng CHÍNH `luat_pb.dung_tu_mm`/`kiem`."""
+    def chu(o: Any) -> Any:
+        return o.get("chu") if isinstance(o, Mapping) else o
+    anh = json.loads(Path(duong_mm).read_text(encoding="utf-8"))
+    mm = [{"hd_code": chu(r.get("hd_code")), "need_cfa2": chu(r.get("need_cfa2")),
+           "method_cfa2": chu(r.get("method_cfa2"))} for r in anh["dong"]]
+    moi = [(luat_pb.khoa_cua(r["hd"], r["tu_ky"]), dict(r))
+           for r in luat_pb.dung_tu_mm(mm, tu_ky=tu_ky)]     # `tu_ky` hỏng ⇒ `kiem` trong `nap`
+    # ⭐ `C11-R1-01` — hiệu lực theo kỳ TÍCH LUỸ: mỗi phiên bản là bản ĐẦY ĐỦ = dòng của bản liền
+    #    trước *(giữ `hd@tu_ky` cũ, ⛔ mất mốc)* + dòng lần này *(cùng `hd@tu_ky` ⇒ bản mới thắng,
+    #    ⛔ nhân đôi)*. Kho vẫn chỉ-thêm *(⛔ sửa bản cũ)*; bản liền trước ĐỌC KHÔNG ra *(⛔ qua
+    #    `nap`)* thì ⛔ chở theo — nó vẫn nằm nguyên trong kho, bản tốt kế tiếp thắng.
+    try:
+        truoc = _doc_ban(conn, BANG_ALR)
+        _alr_tu_cap(truoc.dong, truoc.nguon)
+        cap_d = dict(truoc.dong)
+    except (ChuaKhai, luat_pb.LoiLuatPB):
+        cap_d = {}
+    cap_d.update(moi)
+    cap = list(cap_d.items())
+    return nap(conn, BANG_ALR, cap, nguon=nguon or duong_mm, actor=actor)
+
+
+def doc_alr(conn) -> luat_pb.BangALR:
+    """`IX.ALR` mới nhất, dựng lại **qua `luat_pb.kiem`**. `ChuaKhai` nếu kho chưa nạp; bản BẨN
+    ⇒ `BanHong` CÓ TÊN *(⛔ `LoiLuatPB` trần lọt tuyến thành `500 FLS-INTERNAL`)*."""
+    ban = _doc_ban(conn, BANG_ALR)
+    try:
+        return _alr_tu_cap(ban.dong, ban.nguon)
+    except luat_pb.LoiLuatPB as e:
+        raise BanHong(
+            "⛔ bản `IX.ALR` phiên bản %s trong kho ⛔ ĐỌC ra được *(⛔ qua `nap`?)*"
+            % ban.phien_ban) from e

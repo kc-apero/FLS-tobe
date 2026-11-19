@@ -1,6 +1,6 @@
 # 07 — API CONTRACT: FLS
 
-**Version:** v3.20 · **Ngày:** 2026-11-18 · **Chủ sở hữu:** BA/PO + Tech Lead
+**Version:** v3.21 · **Ngày:** 2026-11-18 · **Chủ sở hữu:** BA/PO + Tech Lead
 **Thay thế:** v0.1 *(bản copy chương trình, prefix `/api/voi/`)* — đã khai tử.
 
 **Căn cứ:** `04_DB_IMPLEMENTATION` v1.0 *(schema `fls_itl`)* · `QĐ-ITL-38` *(app là nơi thao tác)* · `QĐ-ITL-45` *(FLS độc lập)* · `FLS-vs-FPS` §7 *(append-only event-log)*.
@@ -853,7 +853,7 @@ LY_DO_MAC_DINH_BO_GHEP = "(may dien) bo ghep tren man - nguoi bam khong ghi ly d
 | `POST /api/fls/v1/config/fx/{yyyymm}/sign` ⭐ nút ký của `SCR-F08` *(F5, `BA-06 §9 ⓑ`)* | C7 | niêm phong tháng; người ký = người trong THẺ; ký lại ⇒ `409`; `bang_ghi` = bảng config (⛔ `fls_itl`) | ⬜ chưa xây |
 | `GET /api/fls/v1/config/ven` | C9 | Vendor & Network Block 1 (**42** dòng — AP ghi 36, errata ㉒; 36 = số bộ vendor·network·account khác nhau) · mã 'cách tính' cho 5 vendor riêng · danh mục 7 CDT1; đọc từ KHO (`0027`); `?run_id=` ⇒ `400` | ✅ *(C9 — gộp 18/11 sau R2 `KQ-175`)* |
 | `GET /api/fls/v1/config/drv` | C10 | driver (loại, CDT1, tháng); tháng thiếu ⇒ `DRV_THIEU` | ⬜ chưa xây |
-| `GET /api/fls/v1/config/alr` | C11 | luật phân bổ theo HD + hiệu lực theo kỳ + cờ (mặc định TẮT, D2) | ⬜ chưa xây |
+| `GET /api/fls/v1/config/alr` | C11 | luật phân bổ theo HD + hiệu lực theo kỳ + cờ (mặc định TẮT, D2) | ✅ đã xây (C11 · 17 HD có luật = 4 H1000 + 8 By GI + 5 By NOEM; hiệu lực theo kỳ TÍCH LUỸ qua lần nạp) |
 | `GET /api/fls/v1/report/snapshot/{ky}` | C13 | danh sách phiên bản bản Daily Report 3 (checksum · trạng thái · người ký) | ⬜ chưa xây |
 | `POST /api/fls/v1/report/snapshot/{ky}/sign` | C13 | ký phiên bản mới nhất; phiên bản cũ đã ký giữ nguyên | ⬜ chưa xây |
 
@@ -916,6 +916,7 @@ LY_DO_MAC_DINH_BO_GHEP = "(may dien) bo ghep tren man - nguoi bam khong ghi ly d
 ---
 
 ## Changelog
+- **v3.21** *(2026-11-18, orchestrator ISP 3.1 — gộp C11)*: `§4i` dòng `GET /config/alr` ⬜ → ✅ (17 HD có luật; cờ mặc định TẮT, D2).
 - **v3.20** *(2026-11-18, orchestrator ISP 3.1 — gộp C9 · C8)*: `§4i` dòng `GET /config/ven` ⬜ → ✅ (42 dòng); C8 thêm cột `cdt_la` vào `GET /queue` (hợp đồng cũ giữ, chỉ THÊM trường).
 - **v3.19** *(2026-11-18, orchestrator ISP 3.1 — gộp C6)*: `§4i` dòng `GET /config/per` ⬜ → ✅ (đọc từ kho · `LUAT_CHUA_KY` · `?run_id=` ⇒ `400`).
 - **v3.18** *(2026-11-18, `fls-ba`, `O9` — đăng ký `SCR-F08`; ⛔ tuyến mới, ⛔ đổi hợp đồng)*: `§4i` hai dòng `config/fx` · `config/fx/{yyyymm}/sign` ghi thêm *"cửa / nút ký của `SCR-F08`"* trỏ `BA-06 §9`.

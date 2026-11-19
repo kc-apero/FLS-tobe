@@ -288,10 +288,11 @@ def test_C5R1_05_khong_doi_so_ban_LIEN_TRUOC_khong_phai_ban_DAU(conn):
     """Giết R1-M4 *(`khong_doi` so với bản ĐẦU thay bản kề trước ⇒ SỐNG khi nạp < 3
     lần)*. Nạp A, B, A: bản thứ ba KHÁC bản kề trước *(B)* ⇒ `khong_doi=False`; chỉ so
     bản ĐẦU *(A)* mới nhầm thành True."""
-    # ⭐ C9-R1-01: bang HỢP LỆ, CHƯA có kiểm riêng (⛔ như IX.VEN) VÀ ⛔ bài nào đo là RỖNG
-    #   (IX.DRV bị `AC5`/`C5R1_03` đo rỗng, `C10` sẽ nạp). Grep `tests/`+`fls/` `IX.ALR`: chỉ
-    #   danh mục `BANG_HOP_LE` ⇒ bài này là người ghi DUY NHẤT; ⛔ ai đo `IX.ALR` rỗng.
-    bang = "IX.ALR"
+    # ⭐ C11 (WO-180): `IX.ALR` nay CÓ kiểm riêng ⇒ bản mẫu `{"v": …}` bị `LoiLuatPB` chặn TRƯỚC khi
+    #   ghi. Đổi sang `IX.TMP`: bang HỢP LỆ, CHƯA có kiểm riêng, ⛔ ai nạp / đo rỗng — grep `tests/`
+    #   + `fls/` + `tools/` `IX.TMP`: 0 dòng ngoài danh mục `BANG_HOP_LE` ⇒ bài này là người ghi
+    #   DUY NHẤT *(bước nào sau nạp `IX.TMP` thật ⇒ phải đổi bảng mẫu lần nữa — `C9-R1-01`)*.
+    bang = "IX.TMP"
     A = [("x", {"v": "1"})]
     B = [("x", {"v": "2"})]
     chr.nap(conn, bang, A, nguon="n", actor="a")

@@ -1,7 +1,9 @@
-"""`do_hd2.py --goi WP-C2` — PARITY CA.GL ↔ đáp án 406 mọi kỳ *(ISP 3.1.2 · Step 13 · H4)*.
+"""`do_hd2.py --goi WP-C2 | WP-C3a | WP-C3b | WP-C4a` — PARITY HD2: CA.GL ↔ 406 *(H4)* · SO.CFA1 Daily ↔ 409 *(H5)* · Y/H/Q/M ↔ 410 *(H6)*.
 
     python tools/do_hd2.py --goi WP-C2            # chạy cổng, in báo, exit 0/1
     python tools/do_hd2.py --goi WP-C2 --ghi      # … + ghi docs/ITL/_tools/hd2_cong.json
+    python tools/do_hd2.py --goi WP-C3a [--ghi]   # H5 · SO.CFA1 Daily ↔ 409 (khối WP-C3a — xem dưới)
+    python tools/do_hd2.py --goi WP-C3b [--ghi]   # H6 · Y/H/Q/M ↔ 410; IX.PER đọc TỪ KHO (PG_DSN)
 
 ⭐ **Vì sao có tệp này** *(AP v3.1.2 §3.5.4 WP-C2 · HD2; WO-132)*. H4 là cổng HD2 ĐẦU TIÊN: chạy
 engine `fls.bao_cao.gl.tinh_gl` *(H1)* trên **dòng sổ THẬT** *(tiền nguyên tệ `E`/`F` đọc từ sheet
@@ -41,6 +43,8 @@ MINH `tinh_gl(..., so_du_dau=…)` ⇒ cả 8 cột về 0 trong dung sai. FLS C
 from __future__ import annotations
 
 import argparse
+import dataclasses
+import datetime
 import json
 import sys
 from dataclasses import dataclass, field
@@ -52,12 +56,16 @@ GOC = Path(__file__).resolve().parents[1]
 if str(GOC) not in sys.path:
     sys.path.insert(0, str(GOC))
 
+from fls.bao_cao.cfa import KHOI_TONG, DongCFA, cfa1_daily, cuon_ky, truc_ngay  # noqa: E402
 from fls.bao_cao.gl import DongGL, SoDuDau, ThieuTyGia, TienTeNgoaiGL, tinh_gl  # noqa: E402
 from fls.cau_hinh import fx as cfx  # noqa: E402
+from fls.cau_hinh import hd as hd_cfg  # noqa: E402
+from fls.cau_hinh.hd import CayHD  # noqa: E402
+from fls.cau_hinh.ky import LichKy  # noqa: E402
 from fls.canon.tien_te import ma_tien_te  # noqa: E402
 from fls.oracle.cong_parity import PhanXu, danh_gia  # noqa: E402
 
-GOI_BIET = ("WP-C2",)
+GOI_BIET = ("WP-C2", "WP-C3a", "WP-C3b", "WP-C4a")
 COT_BMBT = ("BM", "BN", "BO", "BP", "BQ", "BR", "BS", "BT")
 #: ô kết quả → thuộc tính `KetQuaDongGL`.
 ATTR = {"BM": "vnd_ton_all", "BN": "musd_ton_all", "BO": "bvnd_no", "BP": "bvnd_co",
@@ -451,18 +459,784 @@ def _in_bao(tq: ThanhQua) -> None:
     print(f"  KẾT: {tq.phan_xu.mot_dong}")
 
 
+# ══════════════════════════════════════════════════════════════════════════════════
+# WP-C3a — SO.CFA1 Daily ↔ đáp án 409 từng ô *(ISP 3.1.2 · Step 16 · H5 · WO-164)*
+# ══════════════════════════════════════════════════════════════════════════════════
+# ⭐ Nguồn ĐẦU VÀO *(errata ㉓; orchestrator đọc công thức SA 18/11)*: SUMIFS của `Report I CFA1
+# Daily` đọc `Report I General Ledger` CỦA BẢN SAO CF report *(⛔ bản sao 406 của H4)* — ô lá GROUP
+# = Σ BR − Σ BS theo (ngày A, nhãn V); khối LE thêm `P = mã LE`; hàng cha `=sum(con)`. Ảnh đầu vào
+# `gl_cf_dau_vao.json` *(A·D·E·F·P·R·V, ⛔ B:C·G)*. BR/BS do `tinh_gl` tính lại từ E/F + `ix_fx`
+# *(⛔ đọc BR/BS của sheet — vòng tròn)*; cộng theo cây do `fls.bao_cao.cfa.cfa1_daily`. Đáp án 409
+# CHỈ cấp giá trị mong. ⭐ Trục ngày lấy từ IX.PER ĐỌC TỪ KHO *(H6 · H6-R1-02)* như WP-C3b, ⛔ từ
+# `phu.ngay_truc` của đáp án.
+# ⛔ Số dư đầu kỳ *(5 ô hàng 24 của H4)* KHÔNG dùng: CFA1 Daily là PHÁT SINH theo ngày *(BR/BS
+# từng dòng)*, ⛔ tồn luỹ kế — `tinh_gl` gọi KHÔNG `so_du_dau` ⇒ BR/BS ⛔ đổi.
+
+ANH_GL_CF = GOC / "tests" / "fixture" / "dap_an" / "gl_cf_dau_vao.json"
+ANH_CFA1 = GOC / "tests" / "fixture" / "dap_an" / "cfa1_daily.json"
+ATL_CAY = GOC / "tests" / "fixture" / "cau_hinh" / "atl_cay.json"
+
+#: 5 khối của đáp án 409, thứ tự sheet *(khối 1 = Σ mọi dòng)*.
+KHOI_CFA1 = (KHOI_TONG, "SGO2", "SGO1", "HGO6", "BGO2")
+
+#: Hàng KPI — công thức CHÉO hàng *(đọc FORMULA khối GROUP `F53:H93` 18/11)*, ⛔ "lá = SUMIFS" ⛔
+#: "cha = Σ con theo cây": `EBITDA=H8+H9+H23` · `EBIT` · `EBT` · `NP` · `NPC=sum(H67:67)` *(luỹ kế)* ·
+#: `NCF=H70+H73+H76` · `NCFO/NCFI/NCFF=sum(con)` nhưng con là KPI *(`CRO=H8` · `COO=H9+H23+…` ·
+#: `COI=H34` · `CRF=H44+H45` · `COF=H46`)* · `PL2…PL8` *(trừ PL5 — hàng TRỐNG)*. 20 mã × 5 khối × 760
+#: ngày = 76.000 ô LOẠI khỏi phép so, ĐẾM có tên *(việc của bước sau — ⛔ H5)*. Hàng TRỐNG *(AR ·
+#: CP1.1 (PL2) · CP1.2 · CP2 · CP3 · CFO · PL5)* VẪN so: engine 0 ↔ đáp án 0/vắng.
+MA_KPI = ("EBITDA", "EBIT", "EBT", "NP", "NPC", "NCF", "NCFO", "CRO", "COO", "NCFI", "COI",
+          "NCFF", "CRF", "COF", "PL2", "PL3", "PL4", "PL6", "PL7", "PL8")
+
+# ── MONG *(đo 18/11 — Đ5: khai TRƯỚC; khác ⇒ ĐỎ cả hai chiều)* ──────────────────────────
+MONG_C3A_SO_DONG_ANH = 12385          #: dòng ảnh gl_cf_dau_vao (hàng 10…12394)
+MONG_C3A_THIEU_D = (4957, 4958, 6068, 6502, 6944, 7626, 8026, 8593, 8649, 8999, 9071, 9380)
+MONG_C3A_DONG_SO = MONG_C3A_SO_DONG_ANH - len(MONG_C3A_THIEU_D)   #: 12.373 dòng vào tinh_gl
+#: nhãn V ⛔ khớp nút nào *(kể cả bỏ hoa thường)* ⇒ AS-IS SUMIFS cũng ⛔ cộng — dòng rơi, CÓ TÊN.
+MONG_C3A_HD_NGOAI_CAY = {"ITE | ITE Interest": 152, "ITE | ITE Interest ": 1, "Server Cost": 7,
+                         "GAC - Other": 1, "<rỗng>": 1}
+MONG_C3A_HD_KHAC_HOA = 5               #: 4 `oga | GAC - Other` ⇒ OGA + 1 `ofR | Office Rental Cost` ⇒ OFR (SUMIFS ⛔ phân biệt hoa thường)
+MONG_C3A_SO_NGAY = 760                 #: cột ngày ≤ ngày đọc 2026-11-18
+MONG_C3A_NGAY_DAU = 45585              #: 2024-10-20 — errata ㉑ (⛔ 21/10 của spec)
+#: errata ㉑: đáp án 409 có THÊM 1 cột TRƯỚC ngày đầu IX.PER *(C6 lưu 21/10, 409 bắt đầu 20/10)*. Khai
+#: ở đây như MONG *(⛔ đọc từ đáp án)*: cột đầu trục C3a = `IX.PER.ngay_dau` − 1; đổi IX.PER ⇒ cột đầu
+#: đổi ⇒ lệch `MONG_C3A_NGAY_DAU` ⇒ ĐỎ.
+C3A_NGAY_TRUOC_PER = 1
+MONG_C3A_NGAY_SO_CUOI = 46337          #: 2026-11-11 — dòng sổ cuối ⇒ 7 cột cuối "chưa có số"
+MONG_C3A_SO_DONG_DAP_AN = 33355        #: ô ≠ 0 của đáp án (dòng chính thưa)
+MONG_C3A_O_LOI = 25                    #: ô "-" của đáp án (phu.o_loi) — LOẠI khỏi so, đếm
+MONG_C3A_O_KPI = 5 * len(MA_KPI) * MONG_C3A_SO_NGAY                       #: 76.000
+MONG_C3A_TONG_O = 5 * (74 - len(MA_KPI)) * MONG_C3A_SO_NGAY - MONG_C3A_O_LOI   #: 205.175
+
+# ── Dung sai THEO KHỐI *(lá · cha)* — đo 18/11 trên 205.175 ô, KHÔNG áp dung sai ─────────────
+#   khối  ô       max|lệch|   max|exp|   max rel (exp≠0)   atol      biên
+#   la    178.575 1,0e-15     6,07       1,0 (exp ~1e-15)  1e-14     ×10
+#   cha    26.600 7,51e-16    3,32       7,4e-15           1e-14     ×13
+# `rtol = 0`: |exp| ≤ 6,1 ⇒ `atol` là knob duy nhất; rel max 1,0 ở ô exp ~1e-15 *(sai số cộng của
+# Sheets)* ⇒ rtol vô nghĩa. Chứng ĐỎ: +1 VND một dòng *(≈4e-11 mUSD)* ⇒ ĐỎ lá + mọi cha
+# *(bài AC-3)*; +1e-12 một ô đáp án ⇒ ĐỎ đúng ô ấy *(bài Đ5)*.
+DO_C3A_MAX_LECH = {"la": Decimal("1.0e-15"), "cha": Decimal("7.6e-16")}
+DUNG_SAI_C3A: dict[str, DungSaiCot] = {
+    "la": DungSaiCot(atol=Decimal("1e-14"), rtol=Decimal(0)),
+    "cha": DungSaiCot(atol=Decimal("1e-14"), rtol=Decimal(0)),
+}
+
+
+@dataclass(frozen=True)
+class MongC3a:
+    thieu_D: tuple[int, ...]
+    hd_ngoai_cay: Mapping[str, int]
+    hd_khac_hoa: int
+    dong_nhan_cha: int = 0
+    dong_ngoai_truc: int = 0
+    dong_so: int | None = None
+    so_dong_anh: int | None = None
+    tong_o: int | None = None
+    o_kpi: int | None = None
+    o_loi: int | None = None
+    so_dong_dap_an: int | None = None
+    so_ngay: int | None = None
+    ngay_dau: int | None = None
+    ngay_so_cuoi: int | None = None
+
+
+def mong_c3a_mac_dinh() -> MongC3a:
+    return MongC3a(thieu_D=MONG_C3A_THIEU_D, hd_ngoai_cay=dict(MONG_C3A_HD_NGOAI_CAY),
+                   hd_khac_hoa=MONG_C3A_HD_KHAC_HOA, dong_so=MONG_C3A_DONG_SO,
+                   so_dong_anh=MONG_C3A_SO_DONG_ANH, tong_o=MONG_C3A_TONG_O, o_kpi=MONG_C3A_O_KPI,
+                   o_loi=MONG_C3A_O_LOI, so_dong_dap_an=MONG_C3A_SO_DONG_DAP_AN,
+                   so_ngay=MONG_C3A_SO_NGAY, ngay_dau=MONG_C3A_NGAY_DAU,
+                   ngay_so_cuoi=MONG_C3A_NGAY_SO_CUOI)
+
+
+@dataclass
+class ThanhQuaC3a:
+    tong_o: int
+    khop: int
+    lech: list[dict[str, Any]]
+    lech_co_ten: dict[str, Any]
+    o_kpi: int
+    o_loi: int
+    phan_xu: PhanXu
+    hd2_cong: dict[str, Any]
+    luoi: dict[tuple[str, str, int], Decimal]
+
+
+def nap_cay(path: Path = ATL_CAY) -> CayHD:
+    """Cây IX.HD *(ảnh ATL của C4 — qua `fls.cau_hinh.hd.doc_van_ban`, kiểm cha–con)*."""
+    return hd_cfg.doc_van_ban(path.read_text(encoding="utf-8"), nguon=path.name)
+
+
+def _iso(serial: int) -> str:
+    return (datetime.date(1899, 12, 30) + datetime.timedelta(days=serial)).isoformat()
+
+
+def so_sanh_c3a(anh_vao: dict, anh_dap_an: dict, fx: Mapping[int, Mapping[str, Decimal]],
+                cay: CayHD, lich: LichKy, mong: MongC3a) -> ThanhQuaC3a:
+    """Dòng sổ CF → `tinh_gl` *(BR/BS)* → `cfa1_daily` *(lá + cây)* → so TỪNG Ô với đáp án 409."""
+    ly: list[str] = []
+    # ── 1 · feed tinh_gl (bỏ dòng thiếu D — lệch có tên, ⛔ quy đổi được) ──
+    thieu_D: list[int] = []
+    feed: list[DongGL] = []
+    meta: list[tuple[int, str | None, str | None]] = []
+    for r in anh_vao["dong"]:
+        ds, ngay = int(_so(r["dong_sheet"])), int(_so(r["ngay"]))
+        tt = _chu(r.get("D"))
+        if not tt:
+            thieu_D.append(ds)
+            continue
+        d = datetime.date(1899, 12, 30) + datetime.timedelta(days=ngay)
+        feed.append(DongGL(thang=d.year * 100 + d.month, tien_te=tt,
+                           no=(_so(r.get("E")) or Decimal(0)), co=(_so(r.get("F")) or Decimal(0))))
+        meta.append((ngay, _chu(r.get("le")), _chu(r.get("hd_final"))))
+    kq_gl = []
+    try:
+        kq_gl = tinh_gl(feed, fx)                          # ⛔ so_du_dau: CFA1 là phát sinh
+    except (ThieuTyGia, TienTeNgoaiGL) as e:
+        ly.append(f"tinh_gl ⛔ chạy được *(⛔ đo được ⇒ ĐỎ)*: {type(e).__name__}: "
+                  f"{' '.join(str(e).split())}")
+    dong_cfa = [DongCFA(ngay=n, le=le, hd=h, musd_no=k.musd_no, musd_co=k.musd_co)
+                for (n, le, h), k in zip(meta, kq_gl)]
+
+    # ── 2 · trục ngày: IX.PER (kho) + 1 cột errata ㉑, đến ngày đọc của ẢNH ĐẦU VÀO *(⛔ đáp án 409)* ──
+    den = datetime.date.fromisoformat(str(anh_vao["ngay_dong_bang"]))
+    dau = lich.ngay_dau - datetime.timedelta(days=C3A_NGAY_TRUOC_PER)
+    truc = truc_ngay(dataclasses.replace(lich, ngay_dau=dau), den) if den >= dau else []
+    if not truc:
+        ly.append(f"trục ngày IX.PER ⛔ rỗng: ngày đọc {den} < cột đầu {dau}")
+
+    # ── 3 · engine ──
+    kq = cfa1_daily(dong_cfa, cay, ngay=truc, khoi=KHOI_CFA1)
+    luoi = kq.o
+
+    # ── 4 · đáp án ──
+    ch = lambda v: _chu(v)  # noqa: E731
+    exp: dict[tuple[str, str, int], Decimal] = {}
+    ngoai_luoi = 0
+    for r in anh_dap_an["dong"]:
+        k = (ch(r["le"]), ch(r["ma_hd"]), int(_so(r["ngay"])))
+        if k not in luoi:
+            ngoai_luoi += 1
+            continue
+        exp[k] = _so(r["gt"])
+    o_loi_set = {(ch(r["le"]), ch(r["ma_hd"]), int(_so(r["ngay"])))
+                 for r in anh_dap_an.get("phu", {}).get("o_loi", {}).get("dong", [])}
+    if ngoai_luoi:
+        ly.append(f"{ngoai_luoi} ô đáp án ⛔ thuộc lưới engine (khối × cây × trục)")
+
+    # ── 5 · so từng ô ──
+    kpi = set(MA_KPI)
+    tong_o = khop = o_kpi = o_loi = 0
+    lech: list[dict[str, Any]] = []
+    for k in KHOI_CFA1:
+        for n in cay.nut:
+            khoi_ds = "la" if cay.la(n.ma) else "cha"
+            for t in truc:
+                key = (k, n.ma, t)
+                if n.ma in kpi:
+                    o_kpi += 1
+                    continue
+                if key in o_loi_set:
+                    o_loi += 1
+                    continue
+                tong_o += 1
+                e = exp.get(key, Decimal(0))
+                g = luoi[key]
+                if DUNG_SAI_C3A[khoi_ds].khop(g, e):
+                    khop += 1
+                else:
+                    lech.append({"le": k, "ma": n.ma, "ngay": t, "khoi": khoi_ds,
+                                 "exp": str(e), "got": str(g), "lech": str(g - e)})
+
+    # ── 6 · lệch có tên ──
+    hd_ngoai: dict[str, int] = {}
+    for i in kq.dong_ngoai_cay:
+        nh = meta[i][2] if meta[i][2] else "<rỗng>"
+        hd_ngoai[nh] = hd_ngoai.get(nh, 0) + 1
+    lech_co_ten = {"thieu_tien_te_D": sorted(thieu_D), "hd_ngoai_cay": hd_ngoai,
+                   "hd_khac_hoa_thuong": len(kq.dong_khac_hoa),
+                   "dong_nhan_cha": len(kq.dong_nhan_cha),
+                   "dong_ngoai_truc": len(kq.dong_ngoai_truc)}
+    ngay_so_cuoi = max((m[0] for m in meta), default=0)
+
+    # ── 7 · phân xử ──
+    px = danh_gia(tong_o=tong_o, khop=khop, lat_truot=0, dong_doc=len(dong_cfa),
+                  dong_mong_doi=len(dong_cfa), toi_thieu_o=1)
+    ly = list(px.ly_do) + ly
+    for ten, thuc, mg in (
+            ("dòng ảnh đầu vào", len(anh_vao["dong"]), mong.so_dong_anh),
+            ("dòng vào tinh_gl", len(feed), mong.dong_so),
+            ("mẫu số ô so", tong_o, mong.tong_o),
+            ("ô KPI loại", o_kpi, mong.o_kpi),
+            ("ô '-' đáp án loại", o_loi, mong.o_loi),
+            ("số hàng đáp án", len(anh_dap_an["dong"]), mong.so_dong_dap_an),
+            ("số cột ngày", len(truc), mong.so_ngay),
+            ("ngày đầu trục", truc[0] if truc else None, mong.ngay_dau),
+            ("ngày có số cuối", ngay_so_cuoi, mong.ngay_so_cuoi)):
+        if mg is not None and thuc != mg:
+            ly.append(f"{ten} {thuc} ≠ mong {mg}")
+    for ten, thuc, mg in (
+            ("thieu_tien_te_D", lech_co_ten["thieu_tien_te_D"], sorted(mong.thieu_D)),
+            ("hd_ngoai_cay", hd_ngoai, dict(mong.hd_ngoai_cay)),
+            ("hd_khac_hoa_thuong", lech_co_ten["hd_khac_hoa_thuong"], mong.hd_khac_hoa),
+            ("dong_nhan_cha", lech_co_ten["dong_nhan_cha"], mong.dong_nhan_cha),
+            ("dong_ngoai_truc", lech_co_ten["dong_ngoai_truc"], mong.dong_ngoai_truc)):
+        if thuc != mg:
+            ly.append(f"lệch có tên `{ten}` ≠ mong: thực {thuc} · mong {mg}")
+    px = PhanXu(not ly, tuple(ly))
+
+    hd2 = {
+        "bang": "HD2.WP-C3a", "goi": "WP-C3a",
+        "mo_ta": "SO.CFA1 Daily: tinh_gl (BR/BS từ E/F + ix_fx) trên GL của bản sao CF report → "
+                 "cfa1_daily (lá = Σ BR−BS theo (khối, nhãn HD V, ngày A); khối LE lọc cột P; "
+                 "cha = Σ con theo cây IX.HD) ↔ đáp án 409 từng ô",
+        "nguon_dau_vao": "tests/fixture/dap_an/gl_cf_dau_vao.json (A·D·E·F·P·R·V, ⛔ B:C·G; errata ㉓)",
+        "khoa": "khoi(5) + ma_hd(cây ATL 74) + ngay(serial)",
+        "khoi": list(KHOI_CFA1),
+        "dung_sai_theo_khoi": {k: {"atol": str(v.atol), "rtol": str(v.rtol),
+                                   "max_lech_do": str(DO_C3A_MAX_LECH[k])}
+                               for k, v in DUNG_SAI_C3A.items()},
+        "dung_sai_ghi_chu": "atol 1e-14 = ≥10× max|lệch| đo 18/11 (lá 1,0e-15 · cha 7,5e-16); rtol 0 "
+                            "(|exp| ≤ 6,1). Chứng ĐỎ: +1 VND một dòng ⇒ lá + mọi cha ĐỎ; +1e-12 một "
+                            "ô đáp án ⇒ đúng ô ấy ĐỎ.",
+        "dong_so": len(feed), "mong_dong_so": MONG_C3A_DONG_SO,
+        "tong_o": tong_o, "mong_tong_o": MONG_C3A_TONG_O, "khop": khop,
+        "lech_ngoai_ten": len(lech),
+        "o_kpi_loai": o_kpi, "mong_o_kpi": MONG_C3A_O_KPI, "ma_kpi": list(MA_KPI),
+        "o_loi_dap_an_loai": o_loi, "mong_o_loi": MONG_C3A_O_LOI,
+        "so_dong_dap_an": len(anh_dap_an["dong"]), "mong_so_dong_dap_an": MONG_C3A_SO_DONG_DAP_AN,
+        "truc_ngay": {"dau": _iso(truc[0]) if truc else None, "so_cot": len(truc),
+                      "ngay_so_cuoi": _iso(ngay_so_cuoi) if ngay_so_cuoi else None,
+                      "cot_chua_co_so": sum(1 for t in truc if t > ngay_so_cuoi),
+                      "ngay_dau_ix_per": lich.ngay_dau.isoformat(), "nguon_ngay_dau": lich.nguon,
+                      "ghi_chu": "trục từ IX.PER KHO (H6; C6 lưu 21/10) lùi 1 cột = 2024-10-20 "
+                                 "(errata ㉑, ⛔ 21/10 của spec); ⛔ đọc phu.ngay_truc của đáp án 409"},
+        "lech_co_ten": lech_co_ten,
+        "so_du_dau": "KHÔNG dùng — CFA1 Daily là phát sinh theo ngày (BR/BS từng dòng), ⛔ tồn luỹ kế",
+        "dat": px.dat, "ly_do": list(px.ly_do),
+    }
+    return ThanhQuaC3a(tong_o=tong_o, khop=khop, lech=lech, lech_co_ten=lech_co_ten,
+                       o_kpi=o_kpi, o_loi=o_loi, phan_xu=px, hd2_cong=hd2, luoi=luoi)
+
+
+def chay_wp_c3a(dsn: str | None = None) -> ThanhQuaC3a:
+    """IX.PER TỪ KHO *(như `chay_wp_c3b`)*; kho tắt / chưa khai ⇒ ĐỎ có lý do, ⛔ rơi về ngày tạm."""
+    lich, loi = _lich_tu_kho(dsn)
+    if lich is None:
+        px = PhanXu(False, (loi or "IX.PER rỗng",))
+        return ThanhQuaC3a(tong_o=0, khop=0, lech=[], lech_co_ten={}, o_kpi=0, o_loi=0, phan_xu=px,
+                           hd2_cong={"bang": "HD2.WP-C3a", "goi": "WP-C3a", "dat": False,
+                                     "ly_do": list(px.ly_do)}, luoi={})
+    return so_sanh_c3a(nap_anh(ANH_GL_CF), nap_anh(ANH_CFA1), nap_fx(), nap_cay(), lich,
+                       mong_c3a_mac_dinh())
+
+
+def _in_bao_c3a(tq: ThanhQuaC3a) -> None:
+    h = tq.hd2_cong
+    print("══ do_hd2 · WP-C3a — SO.CFA1 Daily ↔ đáp án 409 (5 khối × cây × ngày)")
+    print(f"  dòng sổ vào   : {h['dong_so']} (mong {MONG_C3A_DONG_SO}; bỏ "
+          f"{len(tq.lech_co_ten['thieu_tien_te_D'])} thiếu D)")
+    print(f"  ô so / khớp   : {tq.khop}/{tq.tong_o}  (mẫu số mong {MONG_C3A_TONG_O} = 5 × 54 mã × "
+          f"760 ngày − 25 ô '-')")
+    print(f"  ô KPI loại    : {tq.o_kpi} (mong {MONG_C3A_O_KPI}; {len(MA_KPI)} mã công thức chéo)")
+    print(f"  ô lệch ngoài tên: {len(tq.lech)}")
+    for x in tq.lech[:10]:
+        print(f"      [{x['le']} · {x['ma']} · {_iso(x['ngay'])}] exp {x['exp']} got {x['got']}")
+    print(f"  lệch có tên   : {tq.lech_co_ten}")
+    print(f"  trục ngày     : {h['truc_ngay']['dau']} · {h['truc_ngay']['so_cot']} cột · số cuối "
+          f"{h['truc_ngay']['ngay_so_cuoi']} ({h['truc_ngay']['cot_chua_co_so']} cột chưa có số)")
+    print(f"  KẾT: {tq.phan_xu.mot_dong}")
+
+
+# ══════════════════════════════════════════════════════════════════════════════════
+# WP-C3b — SO.CFA1 Y/H/Q/M ↔ đáp án 410 từng ô *(ISP 3.1.2 · Step 20 · H6 · WO-188)*
+# ══════════════════════════════════════════════════════════════════════════════════
+# ⭐ Công thức 410 *(SA FORMULA 18/11, `Report I CFA1 Y H Q M` hàng 6…12 · 52…60)*: lá =
+#   `SUMIFS('Report I CFA1 Daily'!hàng, Daily!$1:$1, năm[, Daily!$2|$3|$4, H|Q|M])`; tiêu đề Daily
+#   `YEAR(ngày)` · `if(tháng<7,"H1","H2")` · `if(tháng<4,"Q1",…)` · `MONTH(ngày)`; cha `=sum(con)`;
+#   AR/CP1.1/CP1.2/CP2/CP3 = "-" ⇒ `phu.o_loi` (25 ô, năm 2024).
+# Chuỗi: GL CF *(cùng feed WP-C3a)* → `tinh_gl` → `cfa1_daily` trên trục `truc_ngay(IX.PER kho, ngày
+#   đọc)` → `cuon_ky` → so TỪNG Ô. Đáp án 410 CHỈ cấp giá trị mong *(⛔ trục ngày, ⛔ đầu vào)*.
+# ⛔ 411 *(CFA3 Daily)*: DT5 LOẠI khỏi đóng băng *(ISP Step 15)* ⇒ ⛔ có đáp án để so — khai `loai_tru`.
+# ⭐ Ngày 20/10/2024 *(errata ㉑: trục 409/410 từ 20/10, IX.PER kho = 21/10)*: engine theo KHO. Đo
+#   18/11: dòng sổ ngày 20/10 = 0 *(ngày sổ nhỏ nhất 2024-10-21 = 45586)*; ô ≠ 0 cột 20/10 của 409 = 5,
+#   cả 5 là `NPC` *(KPI luỹ kế — đã loại)* ⇒ 21/10 ⛔ làm rơi số nào; `dong_ngoai_truc` MONG 0 canh.
+
+ANH_YHQM = GOC / "tests" / "fixture" / "dap_an" / "cfa1_yhqm.json"
+#: AC-3: CÙNG 20 mã KPI của H5 *(⛔ bản thứ hai)* — loại khỏi so, ĐẾM.
+MA_KPI_C3B = MA_KPI
+
+# ── MONG *(đo 18/11 — Đ5: khai TRƯỚC; khác ⇒ ĐỎ cả hai chiều)* ──────────────────────────
+MONG_C3B_NGAY_DAU = "2024-10-21"       #: IX.PER kho (C6) — ⛔ 20/10 của trục đáp án (errata ㉑)
+MONG_C3B_DEN = "2026-11-18"            #: ngày đọc ảnh gl_cf_dau_vao (`ngay_dong_bang`)
+MONG_C3B_SO_KY = 57                    #: 3 năm (2024…2026, năm của trục) × 19
+MONG_C3B_KY_KHONG_NGAY = 14            #: 2024 H1·Q1·Q2·Q3·M01…M09 (trước ngày đầu) + 2026M12 (chưa tới)
+MONG_C3B_O_KPI = 5 * len(MA_KPI) * MONG_C3B_SO_KY                                     #: 5.700
+MONG_C3B_O_LOI = 25                    #: ô "-" của 410 (phu.o_loi)
+MONG_C3B_O_KY_KHONG_NGAY = 5 * (74 - len(MA_KPI)) * MONG_C3B_KY_KHONG_NGAY             #: 3.780
+MONG_C3B_TONG_O = (5 * (74 - len(MA_KPI)) * (MONG_C3B_SO_KY - MONG_C3B_KY_KHONG_NGAY)
+                   - MONG_C3B_O_LOI)                                                    #: 11.585
+MONG_C3B_O_SO_KHAC_0 = 2636           #: ô SO được mà đáp án ≠ 0 (bằng chứng dương — Đ3/Đ4)
+MONG_C3B_SO_DONG_DAP_AN = 5655         #: ô ≠ 0 của đáp án 410 (dòng chính thưa, cả KPI)
+
+# ── Dung sai THEO KHỐI — đo 18/11 trên 11.585 ô, KHÔNG áp dung sai ───────────────────
+#   khối  max|lệch| đo   max|exp| (cả 410)   atol     biên
+#   la    1,10e-14       59,6               2e-13    ×18
+#   cha   1,17e-14                           2e-13    ×17
+# Lệch lớn hơn WP-C3a *(1e-15)* vì mỗi ô kỳ là Σ ≤ 366 ô Daily *(sai số cộng dồn của Sheets)*.
+# `rtol = 0`: atol là knob duy nhất. Chứng ĐỎ: +1 VND một dòng *(≈4e-11 mUSD)* ⇒ lá + mọi cha × 4
+# kỳ ĐỎ *(bài đột biến)*; +1e-12 một ô đáp án ⇒ ĐỎ đúng ô ấy *(bài Đ5)*.
+DO_C3B_MAX_LECH = {"la": Decimal("1.10e-14"), "cha": Decimal("1.17e-14")}
+DUNG_SAI_C3B_GHI_CHU = ("atol 2e-13 = ≥17× max|lệch| đo 18/11 trên 11.585 ô (lá 1,10e-14 · cha "
+                        "1,17e-14 — Σ ≤ 366 ô Daily); rtol 0. Chứng ĐỎ: +1 VND một dòng ⇒ lá + "
+                        "mọi cha × 4 kỳ ĐỎ; +1e-12 một ô đáp án ⇒ đúng ô ấy ĐỎ.")
+DUNG_SAI_C3B: dict[str, DungSaiCot] = {
+    "la": DungSaiCot(atol=Decimal("2e-13"), rtol=Decimal(0)),
+    "cha": DungSaiCot(atol=Decimal("2e-13"), rtol=Decimal(0)),
+}
+
+
+@dataclass(frozen=True)
+class MongC3b:
+    thieu_D: tuple[int, ...]
+    hd_ngoai_cay: Mapping[str, int]
+    hd_khac_hoa: int
+    tong_o: int
+    o_so_khac_0: int
+    dong_nhan_cha: int = 0
+    dong_ngoai_truc: int = 0
+    o_khac_0_ky_khong_ngay: int = 0
+    o_kpi: int | None = None
+    o_loi: int | None = None
+    o_ky_khong_ngay: int | None = None
+    so_dong_dap_an: int | None = None
+    so_ky: int | None = None
+    ngay_dau: str | None = None
+    den: str | None = None
+
+
+def mong_c3b_mac_dinh() -> MongC3b:
+    return MongC3b(thieu_D=MONG_C3A_THIEU_D, hd_ngoai_cay=dict(MONG_C3A_HD_NGOAI_CAY),
+                   hd_khac_hoa=MONG_C3A_HD_KHAC_HOA, tong_o=MONG_C3B_TONG_O,
+                   o_so_khac_0=MONG_C3B_O_SO_KHAC_0, o_kpi=MONG_C3B_O_KPI, o_loi=MONG_C3B_O_LOI,
+                   o_ky_khong_ngay=MONG_C3B_O_KY_KHONG_NGAY,
+                   so_dong_dap_an=MONG_C3B_SO_DONG_DAP_AN, so_ky=MONG_C3B_SO_KY,
+                   ngay_dau=MONG_C3B_NGAY_DAU, den=MONG_C3B_DEN)
+
+
+@dataclass
+class ThanhQuaC3b:
+    tong_o: int
+    khop: int
+    lech: list[dict[str, Any]]
+    lech_co_ten: dict[str, Any]
+    o_kpi: int
+    o_loi: int
+    o_ky_khong_ngay: int
+    phan_xu: PhanXu
+    hd2_cong: dict[str, Any]
+    luoi: dict[tuple[str, str, str], Decimal]
+    max_lech: dict[str, Decimal] = field(default_factory=dict)
+
+
+def _feed_cfa(anh_vao: dict, fx: Mapping[int, Mapping[str, Decimal]], ly: list[str]):
+    """Dòng sổ CF → `tinh_gl` → `DongCFA` *(cùng phép WP-C3a; bỏ dòng thiếu D — có tên)*."""
+    thieu_D: list[int] = []
+    feed: list[DongGL] = []
+    meta: list[tuple[int, str | None, str | None]] = []
+    for r in anh_vao["dong"]:
+        ds, ngay = int(_so(r["dong_sheet"])), int(_so(r["ngay"]))
+        tt = _chu(r.get("D"))
+        if not tt:
+            thieu_D.append(ds)
+            continue
+        d = datetime.date(1899, 12, 30) + datetime.timedelta(days=ngay)
+        feed.append(DongGL(thang=d.year * 100 + d.month, tien_te=tt,
+                           no=(_so(r.get("E")) or Decimal(0)), co=(_so(r.get("F")) or Decimal(0))))
+        meta.append((ngay, _chu(r.get("le")), _chu(r.get("hd_final"))))
+    kq_gl = []
+    try:
+        kq_gl = tinh_gl(feed, fx)
+    except (ThieuTyGia, TienTeNgoaiGL) as e:
+        ly.append(f"tinh_gl ⛔ chạy được *(⛔ đo được ⇒ ĐỎ)*: {type(e).__name__}: "
+                  f"{' '.join(str(e).split())}")
+    dong = [DongCFA(ngay=n, le=le, hd=h, musd_no=k.musd_no, musd_co=k.musd_co)
+            for (n, le, h), k in zip(meta, kq_gl)]
+    return dong, meta, thieu_D, len(feed)
+
+
+def so_sanh_c3b(anh_vao: dict, anh_dap_an: dict, fx: Mapping[int, Mapping[str, Decimal]],
+                cay: CayHD, lich: LichKy, mong: MongC3b) -> ThanhQuaC3b:
+    """GL CF → `tinh_gl` → `cfa1_daily` *(trục IX.PER)* → `cuon_ky` → so TỪNG Ô với 410."""
+    ly: list[str] = []
+    dong_cfa, meta, thieu_D, n_feed = _feed_cfa(anh_vao, fx, ly)
+
+    # ── trục: IX.PER (kho) → ngày đọc của ẢNH ĐẦU VÀO *(⛔ đáp án)* ──
+    den = datetime.date.fromisoformat(str(anh_vao["ngay_dong_bang"]))
+    truc = truc_ngay(lich, den)
+    kq = cfa1_daily(dong_cfa, cay, ngay=truc, khoi=KHOI_CFA1)
+    cu = cuon_ky(kq.o, cay, ngay=truc, khoi=KHOI_CFA1)
+    luoi = cu.o
+    khong_ngay = set(cu.ky_khong_ngay)
+
+    # ── đáp án ──
+    exp: dict[tuple[str, str, str], Decimal] = {}
+    ngoai_luoi = 0
+    for r in anh_dap_an["dong"]:
+        k = (_chu(r["le"]), _chu(r["ma_hd"]), _chu(r["ky"]))
+        if k not in luoi:
+            ngoai_luoi += 1
+            continue
+        exp[k] = _so(r["gt"])
+    o_loi_set = {(_chu(r["le"]), _chu(r["ma_hd"]), _chu(r["ky"]))
+                 for r in anh_dap_an.get("phu", {}).get("o_loi", {}).get("dong", [])}
+    if ngoai_luoi:
+        ly.append(f"{ngoai_luoi} ô đáp án ⛔ thuộc lưới engine (khối × cây × kỳ)")
+    ky_dap_an = [_chu(x["ky"]) for x in anh_dap_an.get("phu", {}).get("ky_truc", {}).get("dong", [])]
+    if ky_dap_an != cu.ky:
+        ly.append(f"trục kỳ engine ({len(cu.ky)}) ≠ trục kỳ đáp án ({len(ky_dap_an)})")
+
+    # ── so từng ô ──
+    kpi = set(MA_KPI_C3B)
+    tong_o = khop = o_kpi = o_loi = o_kkn = o_kkn_khac_0 = o_so_khac_0 = 0
+    lech: list[dict[str, Any]] = []
+    max_lech = {"la": Decimal(0), "cha": Decimal(0)}
+    for kh in KHOI_CFA1:
+        for n in cay.nut:
+            khoi_ds = "la" if cay.la(n.ma) else "cha"
+            for t in cu.ky:
+                key = (kh, n.ma, t)
+                if n.ma in kpi:
+                    o_kpi += 1
+                    continue
+                if key in o_loi_set:
+                    o_loi += 1
+                    continue
+                e = exp.get(key, Decimal(0))
+                if t in khong_ngay:
+                    o_kkn += 1
+                    if e != 0:
+                        o_kkn_khac_0 += 1
+                    continue
+                tong_o += 1
+                if e != 0:
+                    o_so_khac_0 += 1
+                g = luoi[key]
+                max_lech[khoi_ds] = max(max_lech[khoi_ds], abs(g - e))
+                if DUNG_SAI_C3B[khoi_ds].khop(g, e):
+                    khop += 1
+                else:
+                    lech.append({"le": kh, "ma": n.ma, "ky": t, "khoi": khoi_ds,
+                                 "exp": str(e), "got": str(g), "lech": str(g - e)})
+
+    hd_ngoai: dict[str, int] = {}
+    for i in kq.dong_ngoai_cay:
+        nh = meta[i][2] if meta[i][2] else "<rỗng>"
+        hd_ngoai[nh] = hd_ngoai.get(nh, 0) + 1
+    lech_co_ten = {"thieu_tien_te_D": sorted(thieu_D), "hd_ngoai_cay": hd_ngoai,
+                   "hd_khac_hoa_thuong": len(kq.dong_khac_hoa),
+                   "dong_nhan_cha": len(kq.dong_nhan_cha),
+                   "dong_ngoai_truc": len(kq.dong_ngoai_truc),
+                   "o_khac_0_ky_khong_ngay": o_kkn_khac_0}
+
+    px = danh_gia(tong_o=tong_o, khop=khop, lat_truot=0, dong_doc=len(dong_cfa),
+                  dong_mong_doi=len(dong_cfa), toi_thieu_o=1)
+    ly = list(px.ly_do) + ly
+    for ten, thuc, mg in (
+            ("mẫu số ô so", tong_o, mong.tong_o),
+            ("ô so ≠ 0 (đáp án)", o_so_khac_0, mong.o_so_khac_0),
+            ("ô KPI loại", o_kpi, mong.o_kpi),
+            ("ô '-' đáp án loại", o_loi, mong.o_loi),
+            ("ô kỳ không ngày", o_kkn, mong.o_ky_khong_ngay),
+            ("số hàng đáp án", len(anh_dap_an["dong"]), mong.so_dong_dap_an),
+            ("số cột kỳ", len(cu.ky), mong.so_ky),
+            ("ngày đầu trục (IX.PER)", lich.ngay_dau.isoformat(), mong.ngay_dau),
+            ("ngày cuối trục (ngày đọc)", den.isoformat(), mong.den)):
+        if mg is not None and thuc != mg:
+            ly.append(f"{ten} {thuc} ≠ mong {mg}")
+    for ten, thuc, mg in (
+            ("thieu_tien_te_D", lech_co_ten["thieu_tien_te_D"], sorted(mong.thieu_D)),
+            ("hd_ngoai_cay", hd_ngoai, dict(mong.hd_ngoai_cay)),
+            ("hd_khac_hoa_thuong", lech_co_ten["hd_khac_hoa_thuong"], mong.hd_khac_hoa),
+            ("dong_nhan_cha", lech_co_ten["dong_nhan_cha"], mong.dong_nhan_cha),
+            ("dong_ngoai_truc", lech_co_ten["dong_ngoai_truc"], mong.dong_ngoai_truc),
+            ("o_khac_0_ky_khong_ngay", o_kkn_khac_0, mong.o_khac_0_ky_khong_ngay)):
+        if thuc != mg:
+            ly.append(f"lệch có tên `{ten}` ≠ mong: thực {thuc} · mong {mg}")
+    px = PhanXu(not ly, tuple(ly))
+
+    hd2 = {
+        "bang": "HD2.WP-C3b", "goi": "WP-C3b",
+        "mo_ta": "SO.CFA1 Y/H/Q/M: tinh_gl → cfa1_daily (trục truc_ngay(IX.PER kho, ngày đọc)) → "
+                 "cuon_ky (Σ Daily theo ky_cua: năm của CHÍNH ngày) ↔ đáp án 410 từng ô",
+        "nguon_dau_vao": "tests/fixture/dap_an/gl_cf_dau_vao.json (cùng feed WP-C3a)",
+        "dap_an": "tests/fixture/dap_an/cfa1_yhqm.json (PD 410, 370 hàng × 57 kỳ)",
+        "loai_tru": "411 (CFA3 Daily) — DT5 loại khỏi đóng băng (ISP Step 15) ⇒ ⛔ đáp án để so",
+        "khoa": "khoi(5) + ma_hd(cây ATL 74) + ky(57: năm×19 Y/H/Q/M)",
+        "khoi": list(KHOI_CFA1),
+        "dung_sai_theo_khoi": {k: {"atol": str(v.atol), "rtol": str(v.rtol),
+                                   "max_lech_do": str(DO_C3B_MAX_LECH[k])}
+                               for k, v in DUNG_SAI_C3B.items()},
+        "dung_sai_ghi_chu": DUNG_SAI_C3B_GHI_CHU,
+        "dong_so": n_feed, "tong_o": tong_o, "mong_tong_o": mong.tong_o, "khop": khop,
+        "o_so_khac_0": o_so_khac_0, "mong_o_so_khac_0": mong.o_so_khac_0,
+        "lech_ngoai_ten": len(lech),
+        "o_kpi_loai": o_kpi, "ma_kpi": list(MA_KPI_C3B),
+        "o_loi_dap_an_loai": o_loi, "o_ky_khong_ngay_loai": o_kkn,
+        "so_dong_dap_an": len(anh_dap_an["dong"]),
+        "truc": {"ngay_dau": lich.ngay_dau.isoformat(), "nguon_ngay_dau": lich.nguon,
+                 "den": den.isoformat(), "so_ngay": len(truc), "nam": list(cu.nam),
+                 "so_ky": len(cu.ky), "ky_khong_ngay": list(cu.ky_khong_ngay),
+                 "ghi_chu": "ngày đầu = IX.PER KHO (C6, 21/10); trục 409/410 từ 20/10 (errata ㉑) — "
+                            "đo 18/11: 0 dòng sổ ngày 20/10, 5 ô ≠ 0 cột 20/10 của 409 đều NPC (KPI). "
+                            "Kỳ 0 ngày trên trục ⛔ so (⛔ '0 đã chốt'), đáp án ≠ 0 ở đó ⇒ ĐỎ"},
+        "lech_co_ten": lech_co_ten,
+        "dat": px.dat, "ly_do": list(px.ly_do),
+    }
+    return ThanhQuaC3b(tong_o=tong_o, khop=khop, lech=lech, lech_co_ten=lech_co_ten,
+                       o_kpi=o_kpi, o_loi=o_loi, o_ky_khong_ngay=o_kkn, phan_xu=px,
+                       hd2_cong=hd2, luoi=luoi, max_lech=max_lech)
+
+
+def _lich_tu_kho(dsn: str | None) -> tuple[LichKy | None, str | None]:
+    """IX.PER mới nhất TỪ KHO *(C6)*. Kho tắt / chưa khai / bản hỏng ⇒ (None, lý do) — ⛔ ngày tạm."""
+    try:
+        import psycopg
+        from fls.db.kho import dsn_that
+        from fls.repo import cau_hinh_repo as chc
+        with psycopg.connect(dsn or dsn_that()) as c:
+            return chc.doc_per(c), None
+    except Exception as e:  # noqa: BLE001 — Đ5: ⛔ đo được ⇒ ĐỎ có lý do, ⛔ nổ
+        return None, f"IX.PER ⛔ đọc được từ kho: {type(e).__name__}: {' '.join(str(e).split())}"
+
+
+def chay_wp_c3b(dsn: str | None = None) -> ThanhQuaC3b:
+    lich, loi = _lich_tu_kho(dsn)
+    if lich is None:
+        px = PhanXu(False, (loi or "IX.PER rỗng",))
+        return ThanhQuaC3b(tong_o=0, khop=0, lech=[], lech_co_ten={}, o_kpi=0, o_loi=0,
+                           o_ky_khong_ngay=0, phan_xu=px,
+                           hd2_cong={"bang": "HD2.WP-C3b", "goi": "WP-C3b", "dat": False,
+                                     "ly_do": list(px.ly_do)}, luoi={})
+    return so_sanh_c3b(nap_anh(ANH_GL_CF), nap_anh(ANH_YHQM), nap_fx(), nap_cay(), lich,
+                       mong_c3b_mac_dinh())
+
+
+def _in_bao_c3b(tq: ThanhQuaC3b) -> None:
+    h = tq.hd2_cong
+    print("══ do_hd2 · WP-C3b — SO.CFA1 Y/H/Q/M ↔ đáp án 410 (5 khối × cây × kỳ)")
+    if "truc" in h:
+        t = h["truc"]
+        print(f"  trục          : IX.PER {t['ngay_dau']} ({t['nguon_ngay_dau']}) → {t['den']} · "
+              f"{t['so_ngay']} ngày · năm {t['nam']} · {t['so_ky']} kỳ · {len(t['ky_khong_ngay'])} kỳ 0 ngày")
+        print(f"  ô so / khớp   : {tq.khop}/{tq.tong_o}  (mẫu số mong {h['mong_tong_o']} = 5 × 54 mã × "
+              f"43 kỳ có ngày − 25 ô '-'); ô so ≠ 0: {h['o_so_khac_0']} (mong {h['mong_o_so_khac_0']})")
+        print(f"  ô loại        : KPI {tq.o_kpi} · '-' {tq.o_loi} · kỳ 0 ngày {tq.o_ky_khong_ngay}")
+        print(f"  max|lệch|     : { {k: str(v) for k, v in tq.max_lech.items()} }")
+    print(f"  ô lệch ngoài tên: {len(tq.lech)}")
+    for x in tq.lech[:10]:
+        print(f"      [{x['le']} · {x['ma']} · {x['ky']}] exp {x['exp']} got {x['got']}")
+    print(f"  lệch có tên   : {tq.lech_co_ten}")
+    print(f"  KẾT: {tq.phan_xu.mot_dong}")
+
+
+# ─────────────────────────────────────────────────────────────────────────────────────────────
+# WP-C4a — AL.PLT GI vendor THƯỜNG ↔ đáp án MID3 (PD 507) từng ô *(ISP 3.1.2 · Step 24 · H9 ·
+# WO-200 · sau DT8b BG-205)*. Đầu vào: IX.VEN ĐỌC TỪ KHO + ảnh CFA1 GI (PD 504) — ⛔ MID3 làm
+# đầu vào. O = Σ `pe` CFA1, P = Σ `pm` số CFA1 theo (vendor, tháng). PE theo CDT1 (Looker PD 502)
+# ⛔ có ảnh ⇒ engine nhận PE rỗng: Vendor-tháng thường có tiền ≠ 0 ⇒ `LoiPhanBo` ⇒ ĐỎ — đó
+# chính là chiều thứ hai của Đ5 *(một Vendor-tháng thường bỗng ≠ 0 ⇒ ĐỎ, buộc khai lại)*.
+# ⭐ Đo 18/11 *(Đ3)*: ô ≠ 0 của vendor thường = 0 ⇒ "tập toàn 0 — đo được nhưng ⛔ chứng minh
+# RATE"; phép so ô ≠ 0 của RATE chuyển H10 *(orchestrator chốt, BG-201 "Sau DT8b")*.
+# Vế PM của Vendor-tháng có `pm_ghi_chu` *(chữ 'Need to manual input')* = ô ⛔ so được *(⛔ hoá 0)*.
+# ─────────────────────────────────────────────────────────────────────────────────────────────
+ANH_CFA1_GI = GOC / "tests" / "fixture" / "dau_vao" / "gi_cfa1.json"
+ANH_MID3 = GOC / "tests" / "fixture" / "dap_an" / "gi_mid3.json"
+MID3_CDT = ("cvl", "cor", "shq1", "csm", "cah", "asa")
+TOL_C4A = Decimal("0.000001")
+
+
+@dataclass(frozen=True)
+class MongC4a:
+    """Khai TRƯỚC *(Đ4 nhãn · Đ5 khác ⇒ ĐỎ cả hai chiều)* — đo 18/11 trên ảnh DT8b."""
+    vm_thuong: int = 44            # Vendor-tháng thường = 4 vendor × 11 tháng
+    vendor_thuong: tuple = ("VD113", "VD336", "VD58", "VD61")
+    o_so: int = 420                # ô so = 44 × 14 − ô PM ⛔ so được
+    o_khong_so: int = 196          # 28 Vendor-tháng P = chữ × (P + 6 PM_cdt)
+    o_khac_0: int = 0              # ⭐ tập toàn 0 — ⛔ chứng minh RATE
+    o_khong_so_khac_0: int = 0     # H9-R1-01: PHÍA ĐÁP ÁN của 196 ô ⛔ so được — đo 0/196 (R1, 18/11)
+    ks_al_vm: int = 44             # H9-R1-02: KS.AL đo = số Vendor-tháng thường (⛔ hằng ghim trong bài)
+    lech: int = 0
+    bo_qua: tuple = (("Max", 132), ("VD341", 11), ("VD428", 11), ("VD444", 11), ("VD62", 11))
+    vendor_bo_qua: int = 15
+
+
+@dataclass
+class ThanhQuaC4a:
+    phan_xu: PhanXu
+    hd2_cong: dict[str, Any]
+    lech: list = field(default_factory=list)
+
+
+def so_sanh_c4a(cfa1: dict, mid3: dict, ven, mong: MongC4a) -> ThanhQuaC4a:
+    from fls.bao_cao import phan_bo as pb
+    ly: list[str] = []
+    o: dict = {}
+    p: dict = {}
+    p_chu: set = set()
+    for r in cfa1["dong"]:
+        k = (_chu(r["vendor"]), r["thang"])
+        o[k] = o.get(k, Decimal(0)) + Decimal(r["pe"])
+        p[k] = p.get(k, Decimal(0)) + (Decimal(r["pm"]) if r.get("pm") is not None else 0)
+        if r.get("pm_ghi_chu") is not None:
+            p_chu.add(k)
+    cdt = tuple(c for c in ven.cdt1 if c.split(" |")[0].lower() in MID3_CDT)
+    ma = {c.split(" |")[0].lower(): c for c in cdt}
+    if len(cdt) != 6:
+        ly.append(f"CDT1 khớp 6 cột MID3: đo {len(cdt)} trên {len(ven.cdt1)} CDT1 IX.VEN")
+    try:
+        kq = pb.chia_nen_tang({k: {} for k in o}, o, p, ven, cdt1=cdt)
+    except pb.LoiPhanBo as e:
+        px = PhanXu(False, (*ly, f"engine: {e}"))
+        return ThanhQuaC4a(px, {"bang": "HD2.WP-C4a", "goi": "WP-C4a", "dat": False,
+                                "ly_do": list(px.ly_do)})
+    dap: dict = {}
+    for r in mid3["dong"]:
+        if r.get("vendor") is not None:
+            k = (_chu(r["vendor"]), r["thang"])
+            if k in dap:
+                ly.append(f"MID3 trùng khoá {k}")
+            dap[k] = r
+    o_so = o_khong = o_khac0 = o_khong_khac0 = 0
+    lech: list = []
+    for k, d in sorted(kq.chia.items()):
+        r = dap.get(k)
+        if r is None:
+            ly.append(f"MID3 thiếu Vendor-tháng {k}")
+            continue
+        cap = [("pe", o[k]), ("pm", p[k])]
+        for c in MID3_CDT:
+            cap += [(f"{c}_pe", d[ma[c]][0]), (f"{c}_pm", d[ma[c]][1])]
+        for cot, got in cap:
+            if cot.endswith("pm") and k in p_chu:
+                o_khong += 1
+                try:                       # H9-R1-01: ô ⛔ so được vẫn có `mong` cho PHÍA ĐÁP ÁN (Đ5)
+                    o_khong_khac0 += Decimal(r[cot]) != 0
+                except (ArithmeticError, TypeError, ValueError):
+                    o_khong_khac0 += 1     # ⛔ đo được ⇒ ĐỎ, ⛔ coi là 0
+                continue
+            exp = Decimal(r[cot])
+            o_so += 1
+            o_khac0 += (exp != 0 or got != 0)
+            if abs(exp - got) > TOL_C4A:
+                lech.append({"vendor": k[0], "thang": k[1], "cot": cot, "exp": str(exp), "got": str(got)})
+    try:
+        ks = pb.ks_al(kq, o, p)
+    except pb.LoiPhanBo as e:
+        ks, ly = 0, [*ly, str(e)]
+    bo = tuple((n, len(x)) for n, x in kq.bo_qua.items())
+    vbo = len({k[0] for x in kq.bo_qua.values() for k in x})
+    thuong = tuple(sorted({k[0] for k in kq.chia}))
+    do = {"vm_thuong": (len(kq.chia), mong.vm_thuong), "vendor_thuong": (thuong, mong.vendor_thuong),
+          "o_so": (o_so, mong.o_so), "o_khong_so": (o_khong, mong.o_khong_so),
+          "o_khac_0": (o_khac0, mong.o_khac_0), "o_khong_so_khac_0": (o_khong_khac0, mong.o_khong_so_khac_0),
+          "ks_al_vm": (ks, mong.ks_al_vm), "lech": (len(lech), mong.lech),
+          "bo_qua": (bo, mong.bo_qua), "vendor_bo_qua": (vbo, mong.vendor_bo_qua)}
+    for ten, (thuc, m) in do.items():
+        if thuc != m:
+            ly.append(f"{ten}: đo {thuc} ≠ mong {m}")
+    if o_so == 0:
+        ly.append("0 ô so ⇒ ⛔ đo được (Đ3)")
+    px = PhanXu(not ly, tuple(ly))
+    hd2 = {"bang": "HD2.WP-C4a", "goi": "WP-C4a",
+           "mo_ta": "AL.PLT GI vendor thường: IX.VEN kho + CFA1 GI → chia_nen_tang → KS.AL ↔ MID3 (vendor, tháng) từng ô",
+           "nguon_dau_vao": "tests/fixture/dau_vao/gi_cfa1.json (PD 504) + IX.VEN kho",
+           "dap_an": "tests/fixture/dap_an/gi_mid3.json (PD 507, 209 hàng có khoá)",
+           "khoa": "(vendor, thang) × 14 cột (O · P · 6 CDT1 × PE/PM)",
+           "vm_thuong": len(kq.chia), "vendor_thuong": list(thuong), "o_so": o_so,
+           "o_khong_so": o_khong, "o_khong_so_ly_do": "P = chữ 'Need to manual input' (⛔ hoá 0)",
+           "vm_p_chu": len(p_chu & set(kq.chia)), "o_khac_0": o_khac0,
+           "o_khong_so_khac_0": o_khong_khac0,
+           "o_khac_0_nhan": "tập toàn 0 — đo được nhưng ⛔ chứng minh RATE (phép so ô ≠ 0 ⇒ H10)",
+           "lech": len(lech), "ks_al_vm": ks,
+           "bo_qua": dict(bo), "vendor_bo_qua": vbo,
+           "mong": dataclasses.asdict(mong), "dat": px.dat, "ly_do": list(px.ly_do)}
+    return ThanhQuaC4a(px, hd2, lech)
+
+
+def chay_wp_c4a(dsn: str | None = None) -> ThanhQuaC4a:
+    try:
+        import psycopg
+        from fls.db.kho import dsn_that
+        from fls.repo import cau_hinh_repo as chc
+        with psycopg.connect(dsn or dsn_that()) as c:
+            ven = chc.doc_ven(c)
+    except Exception as e:  # noqa: BLE001 — Đ5: ⛔ đo được ⇒ ĐỎ có lý do
+        px = PhanXu(False, (f"IX.VEN ⛔ đọc được từ kho: {type(e).__name__}: {' '.join(str(e).split())}",))
+        return ThanhQuaC4a(px, {"bang": "HD2.WP-C4a", "goi": "WP-C4a", "dat": False,
+                                "ly_do": list(px.ly_do)})
+    return so_sanh_c4a(nap_anh(ANH_CFA1_GI), nap_anh(ANH_MID3), ven, MongC4a())
+
+
+def _in_bao_c4a(tq: ThanhQuaC4a) -> None:
+    h = tq.hd2_cong
+    print("══ do_hd2 · WP-C4a — AL.PLT GI vendor thường ↔ MID3 (vendor, tháng)")
+    if "o_so" in h:
+        print(f"  Vendor-tháng thường : {h['vm_thuong']} ({len(h['vendor_thuong'])} vendor {h['vendor_thuong']})")
+        print(f"  ô so / ô ⛔ so được  : {h['o_so']} / {h['o_khong_so']} ({h['o_khong_so_ly_do']}; {h['vm_p_chu']} Vendor-tháng)")
+        print(f"  ô ≠ 0               : {h['o_khac_0']} — {h['o_khac_0_nhan']}")
+        print(f"  đáp án ≠ 0 ở ô ⛔ so : {h['o_khong_so_khac_0']}/{h['o_khong_so']} (mong 0)")
+        print(f"  lệch                : {h['lech']} · KS.AL đo {h['ks_al_vm']} Vendor-tháng")
+        print(f"  bỏ qua (5 nhãn)     : {h['bo_qua']} · {h['vendor_bo_qua']} vendor")
+    for x in tq.lech[:10]:
+        print(f"      [{x['vendor']} · {x['thang']} · {x['cot']}] exp {x['exp']} got {x['got']}")
+    print(f"  KẾT: {tq.phan_xu.mot_dong}")
+
+
+def _ghi_cong(goi: str, hop_dong: dict[str, Any]) -> None:
+    """`hd2_cong.json` CHỈ THÊM: WP-C2 giữ ở gốc *(hợp đồng H4)*; gói khác vào khoá `<goi>`."""
+    cu: dict[str, Any] = {}
+    if RA_CONG.is_file():
+        cu = json.loads(RA_CONG.read_text(encoding="utf-8"))
+    if goi == "WP-C2":
+        them = {k: v for k, v in cu.items() if k in GOI_BIET and k != "WP-C2"}
+        moi = {**hop_dong, **them}
+    else:
+        moi = {**cu, goi: hop_dong}
+    RA_CONG.parent.mkdir(parents=True, exist_ok=True)
+    RA_CONG.write_text(json.dumps(moi, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+    print(f"  ghi: {RA_CONG.relative_to(GOC)} [{goi}]")
+
+
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(prog="do_hd2.py", description="Cổng parity HD2.")
     p.add_argument("--goi", required=True, choices=GOI_BIET, help="gói cổng HD2")
     p.add_argument("--ghi", action="store_true", help="ghi docs/ITL/_tools/hd2_cong.json")
+    p.add_argument("--dsn", default=None,
+                   help="WP-C4a: kho đọc IX.VEN (mặc định PG_DSN; ISP dùng PG_DSN_TEST — ⛔ ghi kho thật)")
     a = p.parse_args(argv)
+    if a.goi == "WP-C4a":
+        tq4 = chay_wp_c4a(a.dsn)
+        _in_bao_c4a(tq4)
+        if a.ghi:
+            _ghi_cong("WP-C4a", tq4.hd2_cong)
+        return 0 if tq4.phan_xu.dat else 1
+    if a.goi == "WP-C3b":
+        tq3b = chay_wp_c3b()
+        _in_bao_c3b(tq3b)
+        if a.ghi:
+            _ghi_cong("WP-C3b", tq3b.hd2_cong)
+        return 0 if tq3b.phan_xu.dat else 1
+    if a.goi == "WP-C3a":
+        tq3 = chay_wp_c3a()
+        _in_bao_c3a(tq3)
+        if a.ghi:
+            _ghi_cong("WP-C3a", tq3.hd2_cong)
+        return 0 if tq3.phan_xu.dat else 1
     tq = chay_wp_c2()
     _in_bao(tq)
     if a.ghi:
-        RA_CONG.parent.mkdir(parents=True, exist_ok=True)
-        RA_CONG.write_text(json.dumps(tq.hd2_cong, ensure_ascii=False, indent=1) + "\n",
-                           encoding="utf-8")
-        print(f"  ghi: {RA_CONG.relative_to(GOC)}")
+        _ghi_cong("WP-C2", tq.hd2_cong)
     return 0 if tq.phan_xu.dat else 1
 
 

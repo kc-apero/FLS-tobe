@@ -21,7 +21,7 @@ from decimal import Decimal, InvalidOperation
 from typing import Any, Callable
 
 from fls.adapters.pm_join import canon_ref
-from fls.cau_hinh import fx, hd, ky, vendor
+from fls.cau_hinh import fx, hd, ky, luat_pb, vendor
 from fls.repo import cau_hinh_repo as chc
 from fls.repo import do_mau_so as dms
 from fls.repo import doc_bao_cao as bc
@@ -1173,3 +1173,34 @@ def cau_hinh_ven(yc: YeuCau):
 
 
 HAM.update({"cau_hinh_ven": cau_hinh_ven})
+
+
+# ══ ⭐⭐ ISP 3.1.2 · `C11` (`WO-180`) — `IX.ALR`: luật phân bổ hiệu lực theo kỳ + cờ TẮT ══
+# Khuôn `cau_hinh_ven`: đọc KHO, `run_id` ⇒ 400, lỗi có TÊN. `GET`, ⛔ ghi — ⛔ tuyến bật cờ (D2).
+def cau_hinh_alr(yc: YeuCau):
+    """`GET /config/alr` — `{bang, nguon, so_luat, dem_phuong_phap, so_bat, luat:[…]}`."""
+    if yc.pv.kieu != "nap_that":
+        raise LoiCua("FLS-BAD-REQUEST",
+                     f"bang IX.ALR ⛔ theo lan nap — bo `run_id` "
+                     f"({yc.pv.mo_ta()}): `meta` ⛔ duoc khai mot pham vi ⛔ ap")
+    try:
+        b = chc.doc_alr(yc.conn)
+    except chc.ChuaKhai as e:
+        raise LoiCua("FLS-CAUHINH-CHUA-KHAI", str(e)) from e
+    except chc.BangLa as e:
+        raise LoiCua("FLS-CAUHINH-BANG-LA", str(e)) from e
+    except chc.BanHong as e:
+        raise LoiCua("FLS-CAUHINH-BAN-HONG",
+                     "ban cau hinh trong kho ⛔ doc ra duoc — bao nguoi dung he") from e
+    dem: dict[str, int] = {}
+    for x in b.luat:
+        dem[x.phuong_phap] = dem.get(x.phuong_phap, 0) + 1
+    return {"bang": luat_pb.BANG, "nguon": b.nguon, "so_luat": len(b.luat),
+            "dem_phuong_phap": dem, "so_bat": sum(1 for x in b.luat if x.bat),
+            "luat": [{"hd": x.hd, "tu_ky": x.tu_ky, "phuong_phap": x.phuong_phap,
+                      "nhan_mm": x.nhan_mm, "driver": x.driver, "bat": x.bat,
+                      "khong_qua_allocate": x.khong_qua_allocate,
+                      "ngoai_le": list(x.ngoai_le_cdt1)} for x in b.luat]}, "flash"
+
+
+HAM.update({"cau_hinh_alr": cau_hinh_alr})

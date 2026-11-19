@@ -61,7 +61,7 @@ CHECKSUM = {
     "ix_ven": "77f81455901c3667",
     "gi_mid1": "515868c0b100ba35",
     "gi_mid2": "eb36e99f5a9cee7d",
-    "gi_mid3": "3b93f232a0bedc0a",
+    "gi_mid3": "013de4e6e826b096",
 }
 #: ⭐ vòng sửa R1 `KQ-149`: ix_ven 36→**42** *(`DT8-R1-01`: nguồn liền tới hàng 45)* · gi_mid3 11→**253**
 #: *(`DT8-R1-03`: 253 hàng số = 11 tổng-tháng + 242 chi tiết)*. Mỗi số đếm **dòng ảnh**, ⛔ cột.
@@ -137,7 +137,7 @@ COT_THO = {
     "ix_ven": ["No", "vendor", "network", "account", "pct", "cashin_month", "cashin_day"],
     "gi_mid1": ["D", "J", "K", "Q", "M", "R", "T", "U", "V"],
     "gi_mid2": ["D", "J", "K", "M", "T", "AA", "U", "V"],
-    "gi_mid3": ["O", "P", "S", "T", "U", "V", "W", "X", "Y", "Z", "AA", "AB", "AC", "AD", "AE", "AF"],
+    "gi_mid3": ["O", "P", "S", "T", "U", "V", "W", "X", "Y", "Z", "AA", "AB", "AC", "AD", "AE", "AF", "H", "F"],
 }
 
 
@@ -166,10 +166,11 @@ def _luoi(ten: str, anh: dict) -> list[list]:
         out: list[list] = []
         for r in d:
             while len(out) + 10 < int(_chu(r["dong_sheet"])):
-                out.append([True, True, *[None] * 12, None, None])      # hàng ngăn: O ⛔ số
+                out.append([True, True, *[None] * 12, None, None, None, None])      # hàng ngăn: O ⛔ số
             ds = int(_chu(r["dong_sheet"]))
             ck = True if ds <= 20 else None
-            out.append([_chu(r["pe"]), _chu(r["pm"]), *[_chu(r[c]) for c in pe_pm], ck, ck])
+            out.append([_chu(r["pe"]), _chu(r["pm"]), *[_chu(r[c]) for c in pe_pm], ck, ck,
+                        _chu(r["vendor"]), _chu(r["thang"])])      # DT8b: khoá Vendor ID (H) · tháng (F)
         return out
     raise AssertionError(ten)
 
