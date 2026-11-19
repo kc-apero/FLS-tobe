@@ -34,6 +34,29 @@ NHAN_RIENG: tuple[str, ...] = ("Max", "VD341", "VD428", "VD444", "VD62")   # s�
 NHAN_THUONG = "thường"
 SO_CDT1 = 7                         # danh mục CDT1 *(đếm CDT1 khác nhau, ⛔ đếm dòng)*
 
+#: ⭐ `H10` *(ISP 3.1.2 · Step 28 · `WO-216`)* — mã `cach_tinh` → **(kiểu hàm PE từ Looker, vendor
+#: mượn RATE ở MID3)**. Đây là chỗ DUY NHẤT tên 5 mã gắn với phép tính; engine
+#: `fls.bao_cao.phan_bo` chỉ biết KIỂU hàm *(grep tên vendor ở `fls/bao_cao` = 0 — `H10-B2`)*.
+#: Nguồn = công thức AS-IS đọc NGUYÊN VĂN bằng `FORMULA` 19/11 *(sổ GI, chép ở `phan_bo.py` + `BG-217`)*:
+#:   · `Max`   — CFA1/MID1 `E`: `VLOOKUP(M,{N:O})="Max" ∧ Q=1 ⇒ SUMIFS(Looker K; I=network; O=tháng;
+#:              S=CDT1) × VLOOKUP(M,{N:Q})` *(% dòng đầu)*; No ≠ 1 ⇒ 0.
+#:   · `VD341` · `VD444` — `or(M="VD444",M="VD341") ⇒ SUMIFS(K; I=network dòng đầu; Q=No; O; S)`.
+#:   · `VD428` — `M="VD428" ∧ Q=1 ⇒ I="Apple_store"`, `Q=2 ⇒ I="IAP_tracking"` *(= network của
+#:              dòng IX.VEN cùng (vendor, No) — đo ảnh DT8 dòng 22 · 23)*; No khác ⇒ 0.
+#:   · `VD62`  — ⛔ nhánh PE riêng *(PE theo dòng ĐẦU: `Max`)*; ở `[Formula] MID3` cột `AU`:
+#:              `if(H<>"VD62",H,VLOOKUP(H&"-"&L, AR:AT, 3))`, `AT = if(ΣP No1 > ΣP No2,"VD341","VD62")`
+#:              ⇒ No có ΣP lớn hơn MƯỢN RATE MID2 của `VD341`.
+#:   · `thường` — nhánh cuối `…,0)` ⇒ PE = 0 *(⛔ dữ liệu: CÔNG THỨC — vì thế 44/44 Vendor-tháng
+#:              thường PE = 0, BG-205)*.
+CACH_TINH: dict[str, tuple[str, str | None]] = {
+    NHAN_THUONG: ("khong", None),
+    "Max": ("mang_ty_le_no1", None),
+    "VD341": ("mang_theo_no", None),
+    "VD428": ("mang_dong_no", None),
+    "VD444": ("mang_theo_no", None),
+    "VD62": ("khong", "VD341"),
+}
+
 _COT = ("thu_tu", "dong_sheet", "No", "vendor", "network", "account", "pct",
         "cashin_month", "cashin_day", "cach_tinh")
 _SO_NGUYEN = re.compile(r"[0-9]{1,2}", re.ASCII)
