@@ -56,6 +56,9 @@ class YeuCau:
     #   khuôn `conn`: tầng cửa ⛔ tự chọn tệp nào để đo, cũng như ⛔ tự mở được kết nối (hợp đồng
     #   tầng 7). `None` ⇒ hai cổng ấy `dat=None` *"CHƯA ĐO ĐƯỢC"* kèm lý do — ⛔ bao giờ "xanh".
     tep_do: Any = None
+    # ⭐ CG2 (`WO-208`): đường dẫn `hd2_cong.json` — TRUYỀN VÀO như `tep_do`. `None` ⇒ 4 cổng HD2
+    #   cha khai sẵn `dat=None` kèm lý do (⛔ "0 lệch").
+    tep_hd2: Any = None
 
 
 def pham_vi_cua_yeu_cau(q: dict[str, str]) -> PhamVi:
@@ -202,9 +205,10 @@ def nhat_ky(yc: YeuCau):
 
 
 def cong(yc: YeuCau):
-    c = bc.doc_cong(yc.conn, yc.pv, tep_do=yc.tep_do)
+    c = bc.doc_cong(yc.conn, yc.pv, tep_do=yc.tep_do, tep_hd2=yc.tep_hd2)
     ra = [{"ma": x.ma, "ten": x.ten, "dat": x.dat, "nhan": x.nhan,
-           "da_do": x.da_do, "ly_do": x.ly_do} for x in c]
+           "da_do": x.da_do, "ly_do": x.ly_do,
+           "lat_bo_nguon": x.lat_bo_nguon} for x in c]       # ⭐ CG2-R1-01: chỉ THÊM
     return {"cong": ra,
             "dat": sum(1 for x in c if x.dat is True),
             "khong_dat": sum(1 for x in c if x.dat is False),
@@ -1052,10 +1056,19 @@ def ty_gia(yc: YeuCau):
     except chc.BanHong as e:     # bản bẩn ⇒ lỗi CÓ TÊN, ⛔ 500 FLS-INTERNAL (C5-R1-04)
         raise LoiCua("FLS-CAUHINH-BAN-HONG",
                      "ban cau hinh trong kho ⛔ doc ra duoc — bao nguoi dung he") from e
+    # ⭐ `C7`: `da_ky` CHỈ khi chữ ký còn phủ đúng tỷ giá hiện hành; dòng đã ký mang thêm
+    #   `actor` + `ky_luc` *(dòng chưa ký ⛔ đổi một byte so với C1)*.
+    da_ky = chc.doc_ky_fx(yc.conn)
+
+    def _dong(d):
+        k = da_ky.get(d.yyyymm)
+        r = {"yyyymm": d.yyyymm, **{te: d.ty_gia[te] for te in fx.TIEN_TE},
+             "trang_thai": d.trang_thai}
+        if k is not None and k.dau_van_tay == fx.dau_van_tay(d):
+            r.update(trang_thai="da_ky", actor=k.actor, ky_luc=k.ky_luc)
+        return r
     return {"bang": fx.BANG, "nguon": b.nguon,
-            "ky": [{"yyyymm": d.yyyymm,
-                    **{te: d.ty_gia[te] for te in fx.TIEN_TE},
-                    "trang_thai": d.trang_thai} for d in b.ky],
+            "ky": [_dong(d) for d in b.ky],
             "thieu": list(b.thieu), "trung": list(b.trung),
             "lac": list(b.lac)}, "flash"
 
@@ -1063,6 +1076,35 @@ def ty_gia(yc: YeuCau):
 # ⛔ Quên dòng dưới là một đường **404 im lặng** — lỗi `soi_bang_tuyen` đã bắt
 #   ba lần ở tệp này *(xem trên)*.
 HAM.update({"ty_gia": ty_gia})
+
+
+# ⭐⭐ `C7` (`WO-212`) — `POST /config/fx/{yyyymm}/sign`: niêm phong một tháng (D1).
+# `actor` = `yc.actor` = TỪ THẺ *(`the.kiem` → `Nguoi`; cửa còn từ chối `actor` trong
+# thân)* — ⛔ đọc từ `yc.than`. Mọi thẻ hợp lệ đều ký được *(O11, `GAP-WEB-01`)*.
+def ky_thang_fx(yc: YeuCau):
+    """`POST /config/fx/{yyyymm}/sign` ⇒ 201 `{bang, yyyymm, trang_thai:'da_ky', actor,
+    ky_luc}`; `yyyymm` hỏng ⇒ 400 · tháng ⛔ có trong IX.FX ⇒ 404 · đã ký ⇒ 409."""
+    if yc.pv.kieu != "nap_that":
+        raise LoiCua("FLS-BAD-REQUEST",
+                     f"ky thang ⛔ theo lan nap — bo `run_id` ({yc.pv.mo_ta()})")
+    try:
+        k = chc.ky_fx(yc.conn, yc.tham["yyyymm"], actor=yc.actor)
+    except fx.LoiFX as e:
+        raise LoiCua("FLS-BAD-REQUEST", str(e)) from e
+    except chc.ThangKhongCo as e:
+        raise LoiCua("FLS-NOT-FOUND", str(e)) from e
+    except chc.DaKy as e:
+        raise LoiCua("FLS-CAUHINH-DA-KY", str(e)) from e
+    except chc.ChuaKhai as e:
+        raise LoiCua("FLS-CAUHINH-CHUA-KHAI", str(e)) from e
+    except chc.BanHong as e:
+        raise LoiCua("FLS-CAUHINH-BAN-HONG",
+                     "ban cau hinh trong kho ⛔ doc ra duoc — bao nguoi dung he") from e
+    return {"bang": fx.BANG, "yyyymm": k.yyyymm, "trang_thai": "da_ky",
+            "actor": k.actor, "ky_luc": k.ky_luc}, "flash"
+
+
+HAM.update({"ky_thang_fx": ky_thang_fx})
 
 
 # ══ ⭐⭐ ISP 3.1.2 · `C4` (`WO-122`) — LÕI CONFIG: cây `IX.HD` (hợp đồng) ══

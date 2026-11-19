@@ -52,6 +52,7 @@ BANG_PER = ky.BANG               # "IX.PER" — lịch kỳ (`C6`)
 BANG_VEN = vendor.BANG           # "IX.VEN" — vendor · network · cách tính (`C9`)
 BANG_ORG = to_chuc.BANG          # "IX.ORG" — CDT Correct + TK→LE (`C8`)
 BANG_ALR = luat_pb.BANG          # "IX.ALR" — luật phân bổ hiệu lực theo kỳ + cờ (`C11`)
+BANG_KY_FX = "IX.FX · KY"        # bản KÝ tháng của IX.FX (`C7`) — mỗi bản = mọi chữ ký tới lúc ấy
 
 # ⭐ Danh mục `bang` config HỢP LỆ *(AP: IX.FX · IX.HD · IX.ORG · IX.PER · IX.VEN ·
 #   IX.DRV · IX.ALR · IX.PL · IX.TMP — `.importlinter` khối `C5`)*. Một `bang` ⛔ ở
@@ -60,7 +61,7 @@ BANG_ALR = luat_pb.BANG          # "IX.ALR" — luật phân bổ hiệu lực t
 #   chưa nạp phải ra `ChuaKhai`, ⛔ `BangLa`.
 BANG_HOP_LE: frozenset[str] = frozenset({
     "IX.FX", "IX.HD", "IX.ORG", "IX.PER", "IX.VEN", "IX.DRV",
-    "IX.ALR", "IX.PL", "IX.TMP",
+    "IX.ALR", "IX.PL", "IX.TMP", BANG_KY_FX,
     BANG_MM,                     # ảnh MM mang CẢ `IX.HD` lẫn `IX.ORG`
 })
 
@@ -577,3 +578,88 @@ def doc_alr(conn) -> luat_pb.BangALR:
         raise BanHong(
             "⛔ bản `IX.ALR` phiên bản %s trong kho ⛔ ĐỌC ra được *(⛔ qua `nap`?)*"
             % ban.phien_ban) from e
+
+
+# ── IX.FX · KÝ THÁNG (`C7`, `WO-212`, D1) ─────────────────────────────────────
+class DaKy(LoiCauHinh):
+    """Tháng ĐÃ ký với đúng tỷ giá hiện hành — ký lại ⇒ **409** *(⛔ huỷ ký: ngoài WO-212)*."""
+
+    ma = "FLS-CAUHINH-DA-KY"
+
+
+class ThangKhongCo(LoiCauHinh):
+    """Tháng ⛔ có trong `IX.FX` ⇒ ⛔ có gì để niêm phong — **404**."""
+
+    ma = "FLS-NOT-FOUND"
+
+
+@dataclass(frozen=True)
+class KyFX:
+    yyyymm: int
+    actor: str
+    ky_luc: str          # ISO, do MÁY đặt (`luc` của bản ký)
+    dau_van_tay: str
+
+
+def doc_ky_fx(conn) -> dict[int, KyFX]:
+    """Chữ ký tháng của bản KÝ mới nhất. Kho ⛔ có bản ký nào ⇒ `{}` *(⛔ `ChuaKhai`: chưa
+    ai ký là trạng thái THƯỜNG, ⛔ lỗi)*."""
+    try:
+        ban = _doc_ban(conn, BANG_KY_FX)
+    except ChuaKhai:
+        return {}
+    return {int(k): KyFX(int(k), v["actor"], v["ky_luc"], v["dau_van_tay"])
+            for k, v in ban.dong}
+
+
+def ky_fx(conn, yyyymm: Any, *, actor: str) -> KyFX:
+    """Niêm phong tháng `yyyymm` của `IX.FX` hiện hành. `actor` do TẦNG CỬA lấy TỪ THẺ.
+
+    Thêm MỘT bản ký mới = mọi chữ ký cũ + chữ ký này *(kho chỉ-thêm — ⛔ sửa bản cũ)*;
+    `ky_luc` = `luc` do MÁY đặt. Cùng khoá `advisory` như `nap` ⇒ hai người ký cùng
+    tháng cùng lúc: một người 201, người kia `DaKy`.
+    """
+    if not str(actor or "").strip():
+        raise LoiCauHinh("⛔ thiếu `actor` — ký tháng là hành vi của người, phải có tên")
+    m, ly = fx._thang(yyyymm)
+    if m is None:
+        raise fx.LoiFX([f"yyyymm={yyyymm!r} {ly}"])
+    with conn.transaction():
+        with conn.cursor() as cur:
+            cur.execute("SELECT pg_advisory_xact_lock(hashtext(%s)::bigint)",
+                        (BANG_KY_FX,))
+        dong = [d for d in doc_fx(conn).ky if d.yyyymm == m]
+        if not dong:
+            raise ThangKhongCo(f"⛔ tháng {m} ⛔ có trong {BANG_FX} hiện hành — "
+                               f"⛔ có số để niêm phong")
+        dv = fx.dau_van_tay(dong[0])
+        cu = doc_ky_fx(conn)
+        if m in cu and cu[m].dau_van_tay == dv:
+            raise DaKy(f"⛔ tháng {m} ĐÃ ký bởi {cu[m].actor} lúc {cu[m].ky_luc}")
+        with conn.cursor() as cur:
+            cur.execute("SELECT coalesce(max(phien_ban), 0) FROM fls_cau_hinh_ban "
+                        "WHERE bang = %s", (BANG_KY_FX,))
+            ver = int(cur.fetchone()[0]) + 1
+            cur.execute("SELECT now()")
+            luc = cur.fetchone()[0]
+            moi = {k: {"actor": v.actor, "ky_luc": v.ky_luc,
+                       "dau_van_tay": v.dau_van_tay} for k, v in cu.items()}
+            moi[m] = {"actor": actor, "ky_luc": luc.isoformat(), "dau_van_tay": dv}
+            cap = [(str(k), v) for k, v in sorted(moi.items())]
+            cur.execute(
+                "INSERT INTO fls_cau_hinh_ban (bang, phien_ban, nguon, checksum, actor, luc) "
+                "VALUES (%s,%s,%s,%s,%s,%s) RETURNING ban_id",
+                (BANG_KY_FX, ver, fx.KY_FX, _checksum(BANG_KY_FX, cap), actor, luc))
+            ban_id = cur.fetchone()[0]
+            cur.executemany(
+                "INSERT INTO fls_cau_hinh_dong (ban_id, khoa, gia_tri) "
+                "VALUES (%s,%s,%s::jsonb)",
+                [(ban_id, k, json.dumps(v, ensure_ascii=False)) for k, v in cap])
+    return KyFX(m, actor, luc.isoformat(), dv)
+
+
+def fx_cua(conn, yyyymm: Any) -> Mapping[str, Any]:
+    """Tỷ giá tháng cho ENGINE: chỉ khi tháng đã ký, ⛔ thì `fx.FxChan` có tên tháng.
+    *(Engine H4…H9 ⛔ nối ở bước này — xem BG-213.)*"""
+    return fx.fx_cua(yyyymm, doc_fx(conn),
+                     {m: k.dau_van_tay for m, k in doc_ky_fx(conn).items()})

@@ -63,6 +63,20 @@ def test_H9_B3_WP_C4a_anh_that_DAT_mau_so_co_nhan(ven, anh):
     assert h["vendor_bo_qua"] == 15 and h["vendor_thuong"] == ["VD113", "VD336", "VD58", "VD61"]
 
 
+def test_CG2_R2_03_khoi_WP_C4a_khai_tong_o_va_khop_theo_hop_dong_H4(ven, anh):
+    """Đ4: `tong_o` = ô SO ĐƯỢC (420, ⛔ tính 196 ô P chữ) · `khop` = ô so khớp = `o_so − lech`."""
+    h = _chay(ven, *anh).hd2_cong
+    assert (h["tong_o"], h["khop"]) == (420, 420) and h["tong_o"] == h["o_so"]
+    assert type(h["tong_o"]) is int and type(h["khop"]) is int
+
+
+def test_CG2_R2_03_khop_giam_dung_so_o_lech(ven, anh):
+    mid3 = copy.deepcopy(anh[1])
+    _dong(mid3, "VD61", "202507")[0]["csm_pe"] = "1"
+    h = _chay(ven, anh[0], mid3).hd2_cong
+    assert (h["lech"], h["tong_o"], h["khop"]) == (1, 420, 419)
+
+
 def test_D5_vendor_thuong_BONG_khac_0_o_DAU_VAO_thi_DO(ven, anh):
     cfa1, mid3 = copy.deepcopy(anh[0]), anh[1]
     _dong(cfa1, "VD58", "202503")[0]["pe"] = "5"

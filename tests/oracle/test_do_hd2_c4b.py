@@ -150,3 +150,21 @@ def test_MID1_mat_dong_cua_vendor_thang_co_tien_thi_DO_co_ten(ven, anh):
     m["dong"] = [r for r in m["dong"] if not (do_hd2._chu(r["vendor"]) == v and r["thang"] == t)]
     tq = _chay(ven, cfa1, m, mid3)
     assert not tq.phan_xu.dat and "Σ PE = 0 mà O =" in tq.phan_xu.ly_do[-1]
+
+
+def test_CG2_H10_R2_01_khoi_WP_C4b_khai_tong_o_va_khop_theo_hop_dong_H4(ven, anh):
+    """Đ4: `tong_o` = ô SO ĐƯỢC (1.981, ⛔ tính 945 ô P chữ) · `khop` = ô so khớp = `o_so − lech`."""
+    h = _chay(ven, *anh).hd2_cong
+    assert (h["tong_o"], h["khop"]) == (1981, 1981) and h["tong_o"] == h["o_so"]
+    assert type(h["tong_o"]) is int and type(h["khop"]) is int
+
+
+def test_CG2_H10_R2_01_khop_giam_dung_so_o_lech(ven, anh):
+    """Đột biến MỘT ô đáp án MID3 (⛔ đầu vào: một ô CFA1 lan ra 6 ô PE) ⇒ `khop = tong_o − 1`."""
+    cfa1, mid1, mid3 = anh
+    v, t = _vm_dac_biet_co_tien(ven, cfa1)
+    m = copy.deepcopy(mid3)
+    r = next(r for r in m["dong"] if do_hd2._chu(r.get("vendor")) == v and r.get("thang") == t)
+    r["cvl_pe"] = str(Decimal(r["cvl_pe"] or 0) + 1)
+    h = _chay(ven, cfa1, mid1, m).hd2_cong
+    assert (h["lech"], h["tong_o"], h["khop"]) == (1, 1981, 1980)

@@ -301,3 +301,63 @@ def doc_van_ban(van_ban: str, *, nguon: str) -> BangFX:
             or not isinstance(tho.get("dong"), list):
         raise LoiFX([f"{nguon}: ⛔ phải {{bang: '{BANG}', thang_dau, dong: [...]}}"])
     return kiem(tho["dong"], thang_dau=tho.get("thang_dau"), nguon=nguon)
+
+
+# ══ ⭐⭐ ISP 3.1.2 · `C7` (`WO-212`) — KÝ THÁNG + `fx_cua` CHẶN *(D1)* ══
+#
+# D1 *(AP §3.5.3, DECIDED · A)*: owner ký **mỗi tháng**; tháng thiếu ⇒ CHẶN. Ký = niêm
+# phong **nội dung tháng**: bản ký mang `dau_van_tay` của 5 tỷ giá lúc ký, nên nếu
+# `IX.FX` nạp lại và số tháng ấy ĐỔI thì chữ ký cũ ⛔ còn phủ nó ⇒ `fx_cua` CHẶN *(⛔ im
+# lặng dùng số mới dưới chữ ký cũ)*. Giới hạn đã khai: ký là hành vi MỘT CHIỀU
+# *(⛔ huỷ ký — ngoài phạm vi, WO-212)*. Tháng đổi số sau ký ⇒ chữ ký cũ mất hiệu lực và
+# tháng ấy **ký lại ĐƯỢC** *(dấu vân mới ⇒ ⛔ 409; 201, đè người ký cũ ở bản ký kế —
+# `BG-213` mục 4; bản cũ vẫn còn vì kho chỉ-thêm)*. `C7-R1-05`: câu cũ ở đây *("chưa có
+# đường ký lại")* SAI so với mã.
+KY_FX = "ky_thang"      # nhãn `nguon` của một bản ký trong kho
+
+
+class FxChan(Exception):
+    """`FX_CHAN` — engine ⛔ được đọc tỷ giá tháng này. Mang tên tháng + lý do."""
+
+    ma = "FLS-FX-CHAN"      # `C7-R1-05`: mã CÓ trong `bao.MA_LOI` + câu ở `goi_cua.js`
+
+    def __init__(self, thang: int, ly_do: str) -> None:
+        self.thang = thang
+        self.ly_do = ly_do
+        super().__init__(f"FX_CHAN {thang}: {ly_do}")
+
+
+def dau_van_tay(d: DongFX) -> str:
+    """sha256 của 5 tỷ giá một tháng. **Chuẩn hoá** *(`C7-R1-03`)*: tiền tệ theo `TIEN_TE`
+    cố định; mỗi số qua `Decimal.normalize()` rồi in dạng thập phân KHÔNG số mũ
+    *(`format(…, 'f')`)* ⇒ `25000` ≡ `25000.0` ≡ `25000.00`, `0.10` ≡ `0.1` — nạp lại
+    CÙNG giá trị khác dạng chữ ⛔ làm mất chữ ký. Giá trị khác ⇒ dấu vân khác *(`100` ≠ `1`:
+    `normalize` ⛔ nuốt số 0 nguyên vì ta in `'f'`, ⛔ `str`)*."""
+    import hashlib
+    noi = json.dumps([d.yyyymm, [[t, format(d.ty_gia[t].normalize(), "f")]
+                                 for t in TIEN_TE]],
+                     separators=(",", ":"))
+    return hashlib.sha256(noi.encode("utf-8")).hexdigest()
+
+
+def fx_cua(yyyymm: Any, bang: BangFX,
+           da_ky: Mapping[int, str]) -> Mapping[str, Decimal]:
+    """**THUẦN.** Tỷ giá tháng `yyyymm` — CHỈ khi tháng ấy có trong `bang`, ⛔ trùng, và
+    đã ký với đúng dấu vân hiện hành *(`da_ky`: tháng → `dau_van_tay` lúc ký)*.
+
+    Chặn theo **tháng ĐƯỢC HỎI** *(`C1-R1-05`)*: tháng ∉ `bang.ky` ⇒ `FxChan` — ⛔ rơi về
+    tháng gần nhất, ⛔ dựa vào `bang.thieu`. `yyyymm` hỏng ⇒ `LoiFX` CÓ TÊN.
+    """
+    m, ly = _thang(yyyymm)
+    if m is None:
+        raise LoiFX([f"yyyymm={_mot_dong_mot_cau(yyyymm)} {ly}"])
+    dong = [d for d in bang.ky if d.yyyymm == m]
+    if not dong:
+        raise FxChan(m, f"tháng ⛔ có trong {BANG} (⛔ rơi về tháng gần nhất)")
+    if len(dong) > 1 or m in bang.trung:
+        raise FxChan(m, "tháng TRÙNG dòng trong IX.FX ⇒ ⛔ biết dùng dòng nào")
+    if m not in da_ky:
+        raise FxChan(m, "tháng CHƯA ký (D1: owner ký mỗi tháng)")
+    if da_ky[m] != dau_van_tay(dong[0]):
+        raise FxChan(m, "tỷ giá tháng ĐỔI sau khi ký — chữ ký cũ ⛔ phủ số mới")
+    return dict(dong[0].ty_gia)

@@ -332,8 +332,11 @@
   "o_so": 420,
   "o_khong_so": 196,
   "o_khong_so_ly_do": "P = chữ 'Need to manual input' (⛔ hoá 0)",
+  "tong_o": 420,
+  "khop": 420,
   "vm_p_chu": 28,
   "o_khac_0": 0,
+  "o_khong_so_khac_0": 0,
   "o_khac_0_nhan": "tập toàn 0 — đo được nhưng ⛔ chứng minh RATE (phép so ô ≠ 0 ⇒ H10)",
   "lech": 0,
   "ks_al_vm": 44,
@@ -356,6 +359,8 @@
    "o_so": 420,
    "o_khong_so": 196,
    "o_khac_0": 0,
+   "o_khong_so_khac_0": 0,
+   "ks_al_vm": 44,
    "lech": 0,
    "bo_qua": [
     [
@@ -409,6 +414,8 @@
   "muon": 11,
   "muon_o_khac_0": 0,
   "theo_tong_thang": 0,
+  "tong_o": 1981,
+  "khop": 1981,
   "kieu_vm": {
    "mang_theo_no": 22,
    "mang_ty_le_no1": 132,

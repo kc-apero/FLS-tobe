@@ -1155,6 +1155,9 @@ def so_sanh_c4a(cfa1: dict, mid3: dict, ven, mong: MongC4a) -> ThanhQuaC4a:
            "khoa": "(vendor, thang) × 14 cột (O · P · 6 CDT1 × PE/PM)",
            "vm_thuong": len(kq.chia), "vendor_thuong": list(thuong), "o_so": o_so,
            "o_khong_so": o_khong, "o_khong_so_ly_do": "P = chữ 'Need to manual input' (⛔ hoá 0)",
+           # CG2-R2-03 · hợp đồng khối gói H4 (`doc_bao_cao._goi_la`): `tong_o` = ô SO ĐƯỢC (= `o_so`,
+           #   ⛔ tính ô P chữ), `khop` = ô so khớp = `o_so − lech`. Khoá cũ giữ nguyên nghĩa.
+           "tong_o": o_so, "khop": o_so - len(lech),
            "vm_p_chu": len(p_chu & set(kq.chia)), "o_khac_0": o_khac0,
            "o_khong_so_khac_0": o_khong_khac0,
            "o_khac_0_nhan": "tập toàn 0 — đo được nhưng ⛔ chứng minh RATE (phép so ô ≠ 0 ⇒ H10)",
@@ -1345,6 +1348,9 @@ def so_sanh_c4b(cfa1: dict, mid1: dict, mid3: dict, ven, mong: MongC4b) -> Thanh
            "dap_an": "tests/fixture/dap_an/gi_mid3.json (PD 507, 209 hàng có khoá)",
            "khoa": "(vendor, thang) × 14 cột (O · P · 6 CDT1 × PE/PM)",
            **{k: v[0] for k, v in do.items() if k not in ("kieu_vm",)},
+           # CG2-R2-03 → H10-R2-01 · hợp đồng khối gói H4 (`doc_bao_cao._goi_la`): `tong_o` = ô SO ĐƯỢC
+           #   (= `o_so` 1.981, ⛔ tính 945 ô P chữ), `khop` = ô so khớp = `o_so − lech`. Khoá cũ giữ nghĩa.
+           "tong_o": o_so, "khop": o_so - len(lech),
            "kieu_vm": dict(kieu),
            "o_khong_so_ly_do": "Vendor-tháng có dòng P = chữ 'Need to manual input' (⛔ hoá 0)",
            "o_khac_0_nhan": "ô so mà đáp án hay engine ≠ 0 — tập KHÔNG rỗng: chứng minh RATE trên số thật",

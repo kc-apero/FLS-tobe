@@ -34,6 +34,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 from dataclasses import dataclass
 from decimal import Decimal
 from pathlib import Path
@@ -838,6 +839,10 @@ class Cong:
     dat: bool | None
     da_do: str = ""
     ly_do: str = ""
+    # ⭐ CG2-R1-01 (`KQ-210`) — chỉ cổng HD2: khoá `lat_bo` của tệp đo ở trạng thái nào?
+    #   "khai" (có, số nguyên ≥ 0) · "vang" (⛔ có khoá ⇒ coi 0) · "sai_kieu" (có nhưng hỏng ⇒ `dat=None`)
+    #   · "" (cổng ⛔ đọc khoá này: cổng khác / gói chưa đo). Trường THÊM — hợp đồng `/gates` cũ giữ.
+    lat_bo_nguon: str = ""
 
     def __post_init__(self) -> None:
         if self.dat is True and not self.da_do.strip():
@@ -1066,7 +1071,164 @@ def doc_cong_tep_do(tep_do) -> list[Cong]:
     return [_cong_final(d, ngay), _cong_hd1(d, ngay)]
 
 
-def doc_cong(conn, pv: PhamVi, tep_do: str | os.PathLike | None = None) -> list[Cong]:
+# ── cổng HD2 theo gói — ISP 3.1.2 · Step 30 · CG2 · `WO-208` ──────────────────────────────────
+#
+# ⭐ Đọc `hd2_cong.json` (ghi bởi `tools/do_hd2.py --goi … --ghi`; khuôn CG1: đường dẫn TRUYỀN VÀO
+#   `tep_hd2`, ⛔ mặc định ở `fls/`). Mỗi gói là MỘT khối: `WP-C2` nằm ở cấp CAO NHẤT của tệp
+#   (khoá `goi`), gói con (`WP-C3a` · `WP-C3b` · về sau `WP-C3c` · `WP-C4a`…) là khoá lồng tên gói.
+#
+# ⭐ Cổng = HỢP của (a) bốn gói cha KHAI SẴN `_GOI_CHA_KHAI_SAN` — luôn có mặt, chưa đo ⇒ `dat=None`
+#   — và (b) mọi gói có trong tệp khớp `WP-C<số>[chữ thường]`. Gói con mới tự hiện, ⛔ sửa mã.
+#   Cha gộp con (cộng cả khối riêng của cha nếu có — `WP-C2`): một phần `False` ⇒ `False`
+#   (⛔ bị `None` che); còn phần `None` ⇒ `None`; còn lại `True`. Không phần nào ⇒ `None`.
+#
+# ⚠ Đ4 — số đếm gì: cổng LÁ (gói đo được) đếm Ô đáp án khớp (`khop/tong_o`); cổng CHA có con đếm GÓI
+#   CON đạt (+ Σ ô của các con đã đo); số cổng của tuyến = 4 cha + số gói con có trong tệp.
+# ⛔ ⛔ tin mù (Đ3 · Đ5): `dat=true` mà thiếu `khop`/`tong_o`, `tong_o=0`, `khop≠tong_o`, `goi`≠khoá,
+#   `lat_bo` sai kiểu ⇒ `None` kèm lý do. `lat_bo > 0` (lát bị bỏ — có lỗ trong phép đo) ⇒ `False`.
+_GOI_CHA_KHAI_SAN = ("WP-C2", "WP-C3", "WP-C4", "WP-C5")
+_MAU_GOI = re.compile(r"WP-C(\d+)([a-z]*)")
+_LOI_LAT_VANG = "lat_bo vắng ⇒ coi 0 (phép đo HD2 ⛔ cắt lát)"
+
+
+def _ma_hd2(goi: str) -> str:
+    return "HD2_" + goi.upper().replace("-", "_")
+
+
+def _ten_hd2(goi: str) -> str:
+    return f"HD2 {goi}: parity ô đáp án"
+
+
+def _doc_hd2(tep_hd2) -> tuple[dict | None, str]:
+    if tep_hd2 is None:
+        return None, ("tệp cổng HD2 ⛔ được truyền vào (`dung_may(tep_hd2=…)` · "
+                      "`tools/chay_cua.py --tep-hd2`) ⇒ ⛔ đo được gì")
+    p = Path(os.fspath(tep_hd2))
+    try:
+        d = json.loads(p.read_bytes().decode("utf-8"))
+    except FileNotFoundError:
+        return None, f"tệp cổng HD2 vắng: `{p.name}` ⇒ ⛔ đo được gì"
+    except OSError as e:
+        return None, f"tệp cổng HD2 `{p.name}` ⛔ đọc được ({type(e).__name__})"
+    except (UnicodeDecodeError, json.JSONDecodeError) as e:
+        return None, f"tệp cổng HD2 `{p.name}` ⛔ phải JSON UTF-8 ({type(e).__name__})"
+    if not isinstance(d, dict):
+        return None, f"tệp cổng HD2 `{p.name}` ⛔ phải một đối tượng JSON"
+    return d, ""
+
+
+def _goi_la(goi: str, b: dict, ten: str) -> Cong:
+    """Một gói đo được ⇒ một cổng LÁ. Hỏng/mâu thuẫn ⇒ `None` có lý do, ⛔ nổ."""
+    ma, tn = _ma_hd2(goi), _ten_hd2(goi)
+
+    def chua(ly: str, nguon: str = "") -> Cong:
+        return Cong(ma=ma, ten=tn, dat=None, lat_bo_nguon=nguon,
+                    ly_do=f"tệp `{ten}` hỏng ở gói {goi}: {ly}")
+
+    if not isinstance(b, dict):                          # CG2-R1-02: khối mang KIỂU HỎNG
+        return chua(f"khối `{goi}` kiểu {type(b).__name__} ⛔ phải đối tượng JSON")
+
+    if b.get("goi") != goi:
+        return chua(f"`goi` = {b.get('goi')!r} ⛔ khớp khoá `{goi}`")
+    dat = b.get("dat")
+    if type(dat) is not bool:
+        return chua(f"`dat` = {dat!r} ⛔ phải bool (chưa có phán quyết)")
+    # ⭐ CG2-R1-01: `do_hd2.py` ⛔ cắt lát ⇒ khoá `lat_bo` VẮNG ở tệp thật (0 lần). Vắng ⇒ coi 0 NHƯNG
+    #   cổng NÓI THẲNG (`da_do` + `lat_bo_nguon="vang"`), ⛔ `true` im lặng. Có khoá mà ⛔ phải số ≥ 0 ⇒ null.
+    nguon = "khai" if "lat_bo" in b else "vang"
+    lat = b.get("lat_bo", 0)
+    if type(lat) is not int or lat < 0:
+        return chua(f"`lat_bo` = {lat!r} ⛔ phải số đếm ≥ 0", "sai_kieu")
+    o, khop = b.get("tong_o"), b.get("khop")
+    co_dem = type(o) is int and type(khop) is int
+    if co_dem and (o < 0 or khop < 0 or khop > o):
+        return chua(f"tự mâu thuẫn: khớp {khop} · ô so {o}")
+    if o == 0 and co_dem:
+        return chua("0 ô được so ⇒ ⛔ đo được gì (Đ3: 0/0 ⛔ phải 100 %)")
+    ly = [str(x) for x in (b.get("ly_do") or []) if isinstance(x, str)]
+    vang = f" · {_LOI_LAT_VANG}" if nguon == "vang" else ""
+    if lat > 0:
+        ly.insert(0, f"{lat} lát bị bỏ ⇒ có lỗ trong phép đo, ⛔ kết luận cho CẢ SỐ")
+    if lat > 0 or not dat:
+        if co_dem and khop != o:
+            ly.append(f"{o - khop}/{o} ô LỆCH")
+        return Cong(ma=ma, ten=tn, dat=False,
+                    da_do=(f"{khop}/{o} ô đáp án khớp" if co_dem else "") + vang,
+                    lat_bo_nguon=nguon,
+                    ly_do=" · ".join(ly) or f"gói {goi} `dat=false` (tệp ⛔ ghi lý do)")
+    if not co_dem:
+        return chua("`dat=true` mà ⛔ khai `khop`/`tong_o` ⇒ ⛔ biết đã đo gì")
+    if khop != o:
+        return chua(f"`dat=true` mà khớp {khop} ≠ ô so {o}")
+    return Cong(ma=ma, ten=tn, dat=True, lat_bo_nguon=nguon,
+                da_do=f"{khop}/{o} ô đáp án khớp (gói {goi}){vang}")
+
+
+def _nguon_cha(phan) -> str:
+    """Nguồn `lat_bo` của cha: có phần nào còn "vang" ⇒ "vang" (⛔ cha xanh hơn con); ⛔ thì "khai"."""
+    ng = {c.lat_bo_nguon for _, c, _ in phan}
+    return "vang" if "vang" in ng else "sai_kieu" if "sai_kieu" in ng else "khai" if "khai" in ng else ""
+
+
+def _goi_cha(goi: str, phan: list[tuple[str, Cong, dict | None]]) -> Cong:
+    """Cha gộp các phần (con và/hoặc khối riêng). `phan` = (tên gói, cổng lá, khối)."""
+    ma, tn = _ma_hd2(goi), _ten_hd2(goi)
+    if not phan:
+        return Cong(ma=ma, ten=tn, dat=None,
+                    ly_do=f"chưa đo: tệp ⛔ có gói nào của {goi} (⛔ 0 lệch)")
+    nguon = _nguon_cha(phan)
+    sai = [(g, c) for g, c, _ in phan if c.dat is False]
+    chua = [(g, c) for g, c, _ in phan if c.dat is None]
+    if sai:
+        return Cong(ma=ma, ten=tn, dat=False, lat_bo_nguon=nguon,
+                    ly_do=" | ".join(f"{g}: {c.ly_do}" for g, c in sai)
+                    + ("".join(f" | {g}: chưa đo ({c.ly_do})" for g, c in chua)))
+    if chua:
+        return Cong(ma=ma, ten=tn, dat=None, lat_bo_nguon=nguon,
+                    ly_do=" | ".join(f"{g}: {c.ly_do}" for g, c in chua))
+    tong = sum(b["tong_o"] for _, _, b in phan)
+    nguon = _nguon_cha(phan)
+    return Cong(ma=ma, ten=tn, dat=True, lat_bo_nguon=nguon,
+                da_do=f"{len(phan)}/{len(phan)} gói con đạt ({' · '.join(g for g, _, _ in phan)})"
+                      f" · Σ {tong}/{tong} ô đáp án khớp"
+                      + (f" · {_LOI_LAT_VANG}" if nguon == "vang" else ""))
+
+
+def doc_cong_hd2(tep_hd2) -> list[Cong]:
+    """Cổng HD2 theo gói từ `hd2_cong.json` *(cách gộp: xem khối chú thích phía trên)*.
+
+    Tệp vắng/hỏng ⇒ chỉ 4 cha khai sẵn, cả 4 `dat=None` kèm lý do có TÊN tệp (⛔ đường dẫn).
+    Hàm thuần — ⛔ chạm kho.
+    """
+    d, ly = _doc_hd2(tep_hd2)
+    if d is None:
+        return [Cong(ma=_ma_hd2(g), ten=_ten_hd2(g), dat=None, ly_do=ly)
+                for g in _GOI_CHA_KHAI_SAN]
+    ten = Path(os.fspath(tep_hd2)).name
+    goi_co: dict[str, dict] = {}                         # tên gói → khối
+    g0 = d.get("goi")
+    if isinstance(g0, str) and _MAU_GOI.fullmatch(g0):
+        goi_co[g0] = d                                   # khối riêng ở cấp cao nhất
+    for k, v in d.items():
+        if _MAU_GOI.fullmatch(k):                        # CG2-R1-02: ⛔ lọc theo kiểu — khối hỏng
+            goi_co[k] = v                                #   vẫn HIỆN (`_goi_la` ⇒ null + lý do)
+    la = {g: _goi_la(g, b, ten) for g, b in goi_co.items()}
+    cha_so = lambda g: int(_MAU_GOI.fullmatch(g).group(1))   # noqa: E731
+    cha = {f"WP-C{cha_so(g)}" for g in goi_co} | set(_GOI_CHA_KHAI_SAN)
+    ra: list[Cong] = []
+    for c in sorted(cha, key=cha_so):
+        con = sorted(g for g in goi_co if cha_so(g) == cha_so(c) and g != c)
+        rieng = [c] if c in goi_co else []
+        if rieng and not con:
+            ra.append(la[c])                             # cha chỉ có khối riêng = chính cổng lá
+            continue
+        ra.append(_goi_cha(c, [(g, la[g], goi_co[g]) for g in rieng + con]))
+        ra += [la[g] for g in con]
+    return ra
+
+
+def doc_cong(conn, pv: PhamVi, tep_do: str | os.PathLike | None = None,
+             tep_hd2: str | os.PathLike | None = None) -> list[Cong]:
     """Cac cong doc duoc tu kho, cong bon cong ke toan khai la **chua do duoc**.
 
     ⛔ Ham nay ⛔ khong bao gio tra danh sach toan xanh: bon cong `_CHUA_DO_DUOC`
@@ -1181,6 +1343,8 @@ def doc_cong(conn, pv: PhamVi, tep_do: str | os.PathLike | None = None) -> list[
     # ⓓ ⭐ CG1 — hai cổng HD1 đọc từ TỆP ĐO truyền vào (ngoài kho, ⛔ theo phạm vi lần nạp:
     #    số của ẢNH đóng băng, `ly_do` ghi ngày ảnh).
     ra += doc_cong_tep_do(tep_do)
+    # ⓔ ⭐ CG2 (`WO-208`) — cổng HD2 theo gói từ `hd2_cong.json` truyền vào.
+    ra += doc_cong_hd2(tep_hd2)
 
     ra += [Cong(ma=m, ten=t, dat=None, ly_do=l) for m, t, l in _CHUA_DO_DUOC]
     return ra
