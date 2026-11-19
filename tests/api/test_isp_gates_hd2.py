@@ -287,3 +287,114 @@ def test_chay_cua_MAC_DINH_tro_DUNG_tep_hd2_that():
     from tools import chay_cua
     assert TEP_HD2_THAT.is_file()
     assert Path(chay_cua.TEP_HD2_MAC_DINH).resolve() == TEP_HD2_THAT.resolve()
+
+
+# ══ CG2-R1-01 · `lat_bo` VẮNG ⇒ cổng NÓI THẲNG (⛔ `true` im lặng) · `KQ-210` ═══════════════════
+# `do_hd2.py` ⛔ cắt lát (`lat_truot=0` gõ cứng) ⇒ khoá `lat_bo` có 0 lần ở tệp thật. Vắng ⇒ coi 0
+# NHƯNG cổng khai điều đó (`da_do` + trường máy đọc `lat_bo_nguon` = "vang" | "khai" | "sai_kieu").
+_LOI_VANG = "lat_bo vắng ⇒ coi 0 (phép đo HD2 ⛔ cắt lát)"
+
+
+def _nguon(c) -> dict:
+    return {x.ma: x.lat_bo_nguon for x in c}
+
+
+def test_CG2_R1_01_tep_THAT_khong_co_khoa_lat_bo_mau_so_khong_rong():
+    """Đ3: tập ⛔ rỗng — ba gói đo, và CẢ BA vắng khoá ⇒ ca 'vắng' là ca THẬT."""
+    d = _that()
+    khoi = [d, d["WP-C3a"], d["WP-C3b"]]
+    assert len(khoi) == 3 and all("lat_bo" not in b for b in khoi)
+
+
+def test_CG2_R1_01_vang_thi_true_nhung_da_do_noi_thang_va_nguon_vang():
+    c = bc.doc_cong_hd2(TEP_HD2_THAT)
+    x = {y.ma: y for y in c}
+    assert _nguon(c) == {"HD2_WP_C2": "vang", "HD2_WP_C3": "vang", "HD2_WP_C3A": "vang",
+                         "HD2_WP_C3B": "vang", "HD2_WP_C4": "", "HD2_WP_C5": ""}
+    for m in ("HD2_WP_C2", "HD2_WP_C3A", "HD2_WP_C3B", "HD2_WP_C3"):
+        assert x[m].dat is True and _LOI_VANG in x[m].da_do, x[m]
+    assert x["HD2_WP_C2"].da_do.startswith(MONG_O_C2)          # nhãn Đ4 cũ giữ nguyên
+
+
+def test_CG2_R1_01_khai_0_thi_nguon_khai_va_khong_co_cau_vang(tmp_path):
+    c = bc.doc_cong_hd2(_tep(tmp_path, lambda d: d.__setitem__("lat_bo", 0)))
+    x = {y.ma: y for y in c}
+    assert x["HD2_WP_C2"].dat is True and x["HD2_WP_C2"].lat_bo_nguon == "khai"
+    assert _LOI_VANG not in x["HD2_WP_C2"].da_do
+    assert x["HD2_WP_C3A"].lat_bo_nguon == "vang" and x["HD2_WP_C3"].lat_bo_nguon == "vang"
+
+
+def test_CG2_R1_01_khai_2_thi_false_nguon_khai(tmp_path):
+    c = bc.doc_cong_hd2(_tep(tmp_path, lambda d: d.__setitem__("lat_bo", 2)))
+    x = {y.ma: y for y in c}
+    assert x["HD2_WP_C2"].dat is False and x["HD2_WP_C2"].lat_bo_nguon == "khai"
+
+
+@pytest.mark.parametrize("v", [None, -1, True, "0", 0.0])
+def test_CG2_R1_01_khoa_co_nhung_hong_thi_null_ly_do_co_ten_nguon_sai_kieu(tmp_path, v):
+    x = {y.ma: y for y in bc.doc_cong_hd2(_tep(tmp_path, lambda d: d.__setitem__("lat_bo", v)))}
+    c2 = x["HD2_WP_C2"]
+    assert c2.dat is None and "`lat_bo`" in c2.ly_do and c2.lat_bo_nguon == "sai_kieu", c2
+
+
+@pytest.mark.pg
+def test_CG2_R1_01_qua_tuyen_truong_lat_bo_nguon_THEM_vao_hop_dong():
+    """Hợp đồng `/gates` chỉ THÊM: mọi cổng có khoá `lat_bo_nguon`; 4 khoá cũ còn nguyên."""
+    h = _hd2(_gates(TEP_HD2_THAT))
+    assert {m: c["lat_bo_nguon"] for m, c in h.items()} == {
+        "HD2_WP_C2": "vang", "HD2_WP_C3": "vang", "HD2_WP_C3A": "vang", "HD2_WP_C3B": "vang",
+        "HD2_WP_C4": "", "HD2_WP_C5": ""}
+    assert all({"ma", "ten", "dat", "nhan", "da_do", "ly_do"} <= set(c) for c in h.values())
+    assert _LOI_VANG in h["HD2_WP_C2"]["da_do"]
+
+
+# ══ CG2-R1-02 · khối gói mang KIỂU HỎNG ⇒ cổng con HIỆN, null + lý do (⛔ biến mất im) ═══════════
+@pytest.mark.parametrize("v", [[1], None, "x", 5, True])
+def test_CG2_R1_02_khoi_goi_con_sai_kieu_hien_null_cha_null_khong_true(tmp_path, v):
+    c = {y.ma: y for y in bc.doc_cong_hd2(_tep(tmp_path, lambda d: d.__setitem__("WP-C3a", v)))}
+    assert "HD2_WP_C3A" in c, list(c)                     # ⛔ biến mất im
+    assert c["HD2_WP_C3A"].dat is None and "WP-C3a" in c["HD2_WP_C3A"].ly_do, c["HD2_WP_C3A"]
+    assert c["HD2_WP_C3"].dat is None, c["HD2_WP_C3"]       # ⛔ `true` (trước: C3 `true` nhờ mỗi C3b)
+    assert c["HD2_WP_C3B"].dat is True
+
+
+def test_CG2_R1_02_goi_con_moi_sai_kieu_cung_hien(tmp_path):
+    c = {y.ma: y for y in bc.doc_cong_hd2(_tep(tmp_path, lambda d: d.__setitem__("WP-C4a", [1])))}
+    assert c["HD2_WP_C4A"].dat is None and c["HD2_WP_C4"].dat is None
+
+
+# ══ `-04` · ghim `goi ≠ khoá` ở GÓI CON (đột biến M8 sống ở R1) ════════════════════════════════
+def test_CG2_R1_04_goi_con_ghi_goi_khac_khoa_thi_null_ly_do_noi_goi(tmp_path):
+    c = {y.ma: y for y in bc.doc_cong_hd2(
+        _tep(tmp_path, lambda d: d["WP-C3a"].__setitem__("goi", "WP-C3b")))}
+    assert c["HD2_WP_C3A"].dat is None and "`goi`" in c["HD2_WP_C3A"].ly_do, c["HD2_WP_C3A"]
+    assert c["HD2_WP_C3"].dat is None and c["HD2_WP_C3B"].dat is True
+
+
+# ══ `-05` · ghim dây `tools/chay_cua.py` → `dung_may(tep_hd2=…)` (đột biến M13 sống ở R1) ═════════
+class _Dung(Exception):
+    pass
+
+
+@pytest.mark.parametrize("argv,mong", [
+    ([], str(TEP_HD2_THAT)),
+    (["--tep-hd2", "/x/khac.json"], "/x/khac.json"),
+    (["--tep-hd2", ""], None),
+])
+def test_CG2_R1_05_chay_cua_truyen_DUNG_tep_hd2_vao_dung_may(monkeypatch, argv, mong):
+    from tools import chay_cua
+    bat = {}
+
+    def gia(*a, **k):
+        bat.update(k)
+        raise _Dung
+
+    monkeypatch.setenv("PG_DSN", "postgresql://x:y@localhost:1/z")
+    monkeypatch.setattr(chay_cua.cua, "dung_may", gia)
+    monkeypatch.setattr("sys.argv", ["chay_cua.py", *argv])
+    with pytest.raises(_Dung):
+        chay_cua.main()
+    assert "tep_hd2" in bat, bat
+    got = bat["tep_hd2"]
+    assert (None if got is None else str(Path(got).resolve() if mong == str(TEP_HD2_THAT) else got)
+            ) == (None if mong is None else str(Path(mong).resolve() if mong == str(TEP_HD2_THAT) else mong))
