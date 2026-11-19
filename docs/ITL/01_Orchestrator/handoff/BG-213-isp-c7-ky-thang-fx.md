@@ -40,3 +40,18 @@ Chạy lại được: mỗi lần nạp IX.FX với USD ngẫu nhiên ⇒ dấu
 ## Đo (cổng)
 - `tests/cau_hinh` + `tests/api` + `tests/web/test_goi_cua_phu_het_ma_loi.py`: xanh (trừ mục 5). `soi_bang_tuyen`: ✅ **46** tuyến khớp SQL thật. `lint-imports`: 11 kept · 0 broken. `kiem_tai_lieu`: ✅.
 - Đường nền `--duong-nen --cong 5434`: lần 1 ĐỎ **1** (`test_moi_ma_loi_cua_cua_deu_co_cau_tieng_viet` — thiếu câu cho mã mới ⇒ sửa ở `goi_cua.js`); lần 2 **ĐẠT**: tập đỏ + XFAIL = đường nền 28 = 28 (thêm 0 · bớt 0), chạy **3659** (mong ≥ 3659), skipped 0, deselected 0; lint-imports 11/0.
+
+## Vòng sửa sau R1 (KQ-214)
+*(fls-dev · 2026-11-19 · `isp/C7` nền `8db83b1` · 0 CHẶN · 2 NÊN SỬA · 5 GHI NHẬN · chỉ THÊM mục này)*
+
+| Mã | Làm gì | Đỏ-trước *(đột biến R1, bản sao `git archive`, tệp `test_ky_fx_pg.py` 9 → 18 bài)* |
+|---|---|---|
+| `C7-R1-01` | 4 bài pg THẬT *(USD·SGD·COP·HKD — `VND` ⛔ đổi được vì `fx.kiem` ép `=1`)*: ký → `nap_ix_fx` nạp lại đổi **một** tỷ giá → `fx_cua` `FxChan` có tên tháng + `ly_do` "ĐỔI" · `GET /config/fx` `chua_ky` ⛔ `actor` + hiện số mới · ký lại 201. ⛔ dấu vân giả | `M7` *(bỏ HKD khỏi dấu vân)* ⇒ **ĐỎ** 1/13 · `M16` *(GET bỏ so dấu vân)* ⇒ **ĐỎ** |
+| `C7-R1-02` | 2 bài: 8 luồng cùng tháng qua máy HTTP *(đúng 1×201 + 7×409, kho +1)* + cặp hai tháng song song; và 5 vòng × 8 luồng ở tầng `chc.ky_fx`, mỗi luồng một kết nối *(đúng 1 `ok` + 7 `DaKy`, 0 lỗi lạ)* | `M6` *(bỏ `pg_advisory_xact_lock` của `ky_fx`)* ⇒ cả hai bài **ĐỎ**. ⚠ Bài HTTP một mình ⛔ chắc cắn; bài tầng kho mới là chốt |
+| `C7-R1-03` | `dau_van_tay` chuẩn hoá: `Decimal.normalize()` rồi `format(…, 'f')` ⇒ `25000` ≡ `25000.0` ≡ `25000.00`, `0.10` ≡ `0.1`; `100` ≠ `1`. **Hệ quả:** chữ ký đã ký bằng dấu vân cũ *(chưa có bản nào ở kho thật: `fls_itl`/cấu hình rỗng)* mất hiệu lực — fail-closed, ký lại được | bài đỏ trước sửa: 3 dấu vân khác nhau ≠ 1 |
+| `C7-R1-05` | `FxChan.ma = "FLS-FX-CHAN"` *(khuôn `FLS-[A-Z-]+` mà `test_goi_cua_phu_het_ma_loi` đòi; cũ `FX_CHAN` ⛔ khớp)*; `bao.MA_LOI` **409** + câu tiếng Việt `goi_cua.js`; sửa chú thích `fx.py` *("chưa có đường ký lại" ⇒ ký lại ĐƯỢC)* | bài đỏ trước sửa: `'FX_CHAN' ∉ MA_LOI` |
+| `C7-R1-07` | Bài ghim **lý do**: chưa ký · ∉ IX.FX *(dù đã có chữ ký)* · đổi số · trùng *(hai dòng, và `trung` khai)* — 4 lý do khác nhau | `M2` ⇒ **ĐỎ** · `M19` ⇒ **ĐỎ** |
+
+⛔ Ngoài vòng ⇒ backlog: `-04` *(chữ AC-4 ⇒ BA)* · `-06` *(ai ký sau cùng ⇒ BA)*.
+**Q8:** `MONG_PYTEST_TOAN_BO` 3659 → **3668** *(= thu thập `pytest --collect-only`; +9 bài)* cùng commit; bài ghim `test_S0_R2_03_hang_mau_so_khai_MOT_cho` nâng theo.
+**Cổng:** `--duong-nen --cong 5434` *(một mình, 1 lần)* `ĐẠT` — tập đỏ + XFAIL **28 = 28** *(thêm 0 · bớt 0)* · chạy **3668** ≥ 3668 · skipped 0 · deselected 0 *(12 failed + 14 errors + 2 xfailed)* · `lint-imports` 11 kept/0 broken · `soi_bang_tuyen` khớp tuyến.
