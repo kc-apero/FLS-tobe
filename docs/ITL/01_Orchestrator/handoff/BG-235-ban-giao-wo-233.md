@@ -37,3 +37,29 @@ Coi vendor thiếu là `thường` *(⛔ mượn)* = **đoán** ⇒ ⛔ làm. Gr
 
 ## 5 · Việc kế
 Orchestrator/BA: phát bước DATA cho §2.1–2.2 *(+ §2.3 nếu cần)*; mở lại `WO-233` khi có ảnh. Dự kiến engine **⛔ đổi** *(OMC khớp 0 lệch không cần nhánh mới)*; tham số hoá chỉ ở tầng gọi *(nguồn PE = MID1 theo (vendor, tháng, No); IX.VEN theo sổ)*.
+
+## Sau DT9b *(chỉ THÊM; gộp `isp/DT9B` @ `0b88ca2` + ngọn `claude/bold-galileo-zukpaf` — merge, ⛔ rebase)*
+**Trạng thái mới: `CHO_KIEM`** — đầu vào đủ *(`BG-242`: IX.VEN một bảng có cột `so`, 359 dòng; FORMULA `AU`·`S:T`)*. Commit mã `b010054`.
+
+### Mã *(một nguồn sự thật — engine H10, ⛔ chép)*
+- `fls/cau_hinh/vendor.py`: `LUAT_SO` *(GI/OMC/SC/PS → `muon_rate` · `pm_tong_thang`, nguồn FORMULA `BG-242 §3`: OMC `S/T` theo `$H` ⇒ ⛔ mượn; SC/PS ⛔ nhánh `O=0∧P>0`)* + `cach_tinh_cua_so(so)`.
+- `fls/bao_cao/phan_bo.py` `chia_theo_cach_tinh`: + kw `pm_tong_thang_bat` *(mặc định `True` = H10)* + trường `chia_dong` *(chia TỪNG dòng; gộp lại = `chia` — bài ghim trên GI 408 dòng)*. Grep `VD\d+` ở `fls/bao_cao` = **0** *(AC-5)*.
+- `tools/do_hd2.py --goi WP-C4c`: đầu vào **MID1** *(O = Σ`pe` nhóm (vendor,tháng,No) — orchestrator chốt; P = `pm` số chung, cả 7 dòng chữ ⇒ None; PE theo CDT1 = Σ`pe` theo (vendor,tháng), ⛔ SHQ2)* + IX.VEN kho `so=`; so hàng MID3 có khoá ↔ nhóm theo thứ tự × 14 cột. Ô MID3 rỗng *(iferror)* ⇒ 0, ĐẾM.
+
+### WP-C4c *(mẫu số khai TRƯỚC — `MONG_C4C`, nhãn Đ4)*
+| Sổ | Vendor-tháng | dòng engine *(so · ngoài ảnh)* | ô so | ô ⛔ so *(P chữ ×7)* | ô ≠ 0 | ô rỗng đáp án | lệch FLS · nguồn *(hàng)* · nghi lỗi |
+|---|---|---|---|---|---|---|---|
+| OMC | 210 | 890 *(890 · 0)* | **8.547** | 3.913 | 363 | 1.650 | **0** · 52 *(8 = `LAC_OMC`: 7 `VD61` + 1 `VD654`)* · **0** |
+| SC | 87 | 741 *(741 · 0)* | **6.230** | 4.144 *(gồm 102 nhóm MID1 chữ ∧ MID3 số)* | 1.216 | 2.575 | **0** · 251 *(69 = mọi hàng khoá của `lac`; 3 hàng tổng ⛔ khoá)* · **0** |
+| PS | 477 | 1.215 *(585 · 630)* | **5.117** | 3.073 | **0** ⚠ | 4.386 | **0** · 0 · **0** |
+- ⚠ Đ3: PS `o_khac_0 = 0` *(MID1 `pe ≠ 0`: 0/8.505)* ⇒ tập toàn 0 là KẾT QUẢ, ⛔ chứng minh RATE ở PS. 630 nhóm ngoài ảnh: engine ra 0 ở mọi ô *(`ngoai_anh_khac_0` mong 0)*.
+- `chua_co_dap_an` *(CÓ TÊN, ⛔ "đạt")*: OMC `202603…202609` · SC/PS `202503` + `202603…202609`.
+- Kiểm chéo độc lập: SC 251 = nguyên mẫu §3; `o_so` = 14 × dong_so − 7 × hàng P chữ.
+- Khối `hd2_cong.json` `WP-C4c`: **`khop`/`tong_o` = 19.591/19.591** · `o_so` 19.894 · `lech_co_ten` 303 *(NGOÀI `tong_o`, ⛔ trong `khop`)*. ⚠ Nền này ⛔ có ITE ⇒ ⛔ dùng khoá `lech_co_chu_dich` *(hợp đồng cũ đòi `khop == tong_o`)*; khi ITE gộp: đổi sang `tong_o = o_so` + `lech_co_chu_dich = mong = 303`.
+- `/gates`: **9 cổng**, `HD2_WP_C4C` = true *("19591/19591 ô")*, `HD2_WP_C4` "3/3 gói con đạt".
+
+### Bài *(TDD — ĐỎ trước)* + cổng
+- `tests/oracle/test_do_hd2_c4c.py` **77** bài: mẫu số · Đ5 ±1 trên 10 trường × 3 sổ · 3 lớp lệch *(đổi 1 ô SC ngoài lac ⇒ FLS; OMC ⇒ nghi lỗi; mất cờ ⇒ FLS; bỏ/thêm tên lac ⇒ ĐỎ)* · AC-4 đột biến 1 ô MID1 ⇒ chỉ Vendor-tháng ấy ĐỎ; đổi O MID3 ⇒ chỉ ô O · bật mượn RATE cho OMC ⇒ ĐỎ. ĐỎ trước: 3 failed *(khối tệp chưa ghi · fixture thiếu GI · đột biến rơi vào hàng lac)* ⇒ sửa ⇒ 77 passed.
+- `test_isp_gates_hd2.py` cập nhật 8 → 9 cổng; `test_do_hd2_c4b.py` giữ kwarg mới khi monkeypatch `__kwdefaults__`.
+- Q8: `MONG_PYTEST_TOAN_BO` **4.059 → 4.136** *(+77)* cùng commit.
+- `--duong-nen --cong 5444` *(một lần, một mình)*: **KẾT ĐẠT** — `12 failed · 4108 passed · 2 xfailed · 14 errors` = tập đỏ nền 28 = 28 *(thêm 0 · bớt 0)*, chạy 4.136; web 3 = 3 *(675)*. `lint-imports` 11 kept · 0 broken.
