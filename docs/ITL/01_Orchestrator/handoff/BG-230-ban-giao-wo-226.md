@@ -31,3 +31,12 @@ Bài: `tests/oracle/test_do_hd2_ite_alias.py` (30 bài) · `test_do_hd2_c3a.py` 
 
 ## Cổng
 `--duong-nen --cong 5434`: lần 1 bị dừng ở phần web do hết hạn nền 30 phút (⛔ ĐỎ; phần toàn bộ đã ĐẠT 28 = 28), chạy lại MỘT lần ⇒ **ĐẠT**: toàn bộ 12 failed · 3866 passed · 2 xfailed · 14 errors = 28 = 28 node id (thêm 0 · bớt 0), chạy 3894; web 3 = 3, chạy 675. `lint-imports` 11 kept · 0 broken · `kiem_tai_lieu` ĐẠT · `soi_bang_tuyen` khớp 46/46.
+
+## Vòng sửa sau R1 (KQ-231)
+R1 = `KQ-231`: 0 CHẶN · 1 NÊN SỬA `ITE-R1-01` · 1 GHI NHẬN `-02` (⇒ backlog). Orchestrator chốt, **mỗi số một nghĩa** (Đ4):
+- **`khop` = ô KHỚP đáp án thật** — C3a **205.140** · C3b **11.543**; ⛔ cộng ô lệch có chủ đích. Bỏ khoá `khop_dap_an` (trùng nghĩa `khop`).
+- Khối gói THÊM `lech_co_chu_dich` (số Ô: **35** · **42**) + `mong_lech_co_chu_dich` (khai trước, từ `MONG_LECH_ITE_*`); khối chi tiết `lech_co_chu_dich_ite` / `mong_…_ite` giữ.
+- Cổng HD2 (`doc_cong_hd2`): lá `dat=true` khi `khop + lech == tong_o` **và** `lech == mong`; `Cong.lech_co_chu_dich` + `GET /gates` THÊM trường cùng tên (cha = Σ con); `da_do` = `205140/205175 ô đáp án khớp + 35 lệch có chủ đích` · cha `Σ 216683/216760 … + 77 lệch có chủ đích`. Khoá vắng ⇒ 0; khoá có mà ⛔ số nguyên ≥ 0 ⇒ `dat=null` có tên; mong ≠ thực ⇒ `false`; `khop + lech ≠ tong_o` ⇒ `null`.
+- Sinh lại `WP-C3a` · `WP-C3b` bằng `do_hd2.py --ghi` (`PG_DSN=$PG_DSN_TEST`; diff chỉ `khop` · hai khoá mới · `khop_ghi_chu` · bỏ `khop_dap_an`). `07_API_CONTRACT.md` v3.25 (dòng `/gates` + changelog).
+- Bài: `test_isp_gates_hd2.py` +20 *(tệp thật 35/42/77 · gói cũ vắng ⇒ 0 · khai đúng · khai sai ×3 ⇒ false · tổng lệch ⇒ null · hỏng 2 khoá × 6 kiểu ⇒ null · qua tuyến thật)*; bài oracle C3a/C3b/ITE đổi tử số về khớp thật. Chứng ĐỎ: bỏ chốt `lech == mong` ⇒ 6 bài ĐỎ; cha ⛔ cộng Σ ⇒ ĐỎ.
+- **Q8:** sàn `MONG_PYTEST_TOAN_BO` 3894 → **3914** (= thu thập thật, +20) cùng commit với bài ghim.
