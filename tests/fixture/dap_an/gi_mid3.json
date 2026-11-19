@@ -1,11 +1,11 @@
 {
  "bang": "PD.507",
  "khuon": "gi_mid3",
- "nguon": "'CFA2 | MID 3 | GI Platform Data Ledger'!O10:AF273 (cột KHÔNG PII)",
- "cach_doc": "Sheets API v4 values.get · UNFORMATTED_VALUE · SERIAL_NUMBER · khoá SA chỉ-đọc · cột KHÔNG PII",
+ "nguon": "'CFA2 | MID 3 | GI Platform Data Ledger'!O10:AF273 + H,F (cột KHÔNG PII)",
+ "cach_doc": "Sheets API v4 values.get · UNFORMATTED_VALUE · SERIAL_NUMBER · khoá SA chỉ-đọc",
  "ngay_dong_bang": "2026-11-18",
- "khong_mang_PII": "⛔ KHÔNG mang cột riêng tư: máy soát 15 tên cột của bản thô với PM_COT_RIENG_TU ['Email Address'] — 0 trùng (gộp khoảng trắng, ⛔ phân biệt hoa thường). Ảnh chỉ giữ khoá `dong_sheet` + 14 cột chọn; 0 cột bản thô ⛔ chọn (tên ở `cot_khong_chon`). Bản thô qua `chuan_bi` của khuôn: 15 tên cột trên là của BẢNG khuôn dựng; soát thêm 0 tên cột của 0 bảng phụ — 0 trùng. Ô bản thô mà khuôn ⛔ mang/băm: xem `ghi_chu_khuon`.",
- "ghi_chu_khuon": "253 hàng số MID3 *(chọn theo `O` là số — ⛔ theo AE/AF, ⛔ đọc cột A 'Số chứng từ'; 11/253 hàng mang CHECK ALLOCATE True = tổng-tháng, còn lại chi tiết; 11 hàng ngăn ⛔ chọn)*, khoá dong_sheet. Mỗi hàng = PE Amount (O) · PM Amount (P) · 6 cặp CDT1 PE/PM *(CVL·COR·SHQ1·CSM·CAH·ASA)*. Cổng Σ chia = O/P *(TOL 0.000001)* ở `thieu_lac`. ⛔ mang cột A:N *(Số CT · Diễn giải · Tài khoản · … PII)*.",
+ "khong_mang_PII": "⛔ KHÔNG mang cột riêng tư: máy soát 17 tên cột của bản thô với PM_COT_RIENG_TU ['Email Address'] — 0 trùng (gộp khoảng trắng, ⛔ phân biệt hoa thường). Ảnh chỉ giữ khoá `dong_sheet` + 16 cột chọn; 0 cột bản thô ⛔ chọn (tên ở `cot_khong_chon`). Bản thô qua `chuan_bi` của khuôn: 17 tên cột trên là của BẢNG khuôn dựng; soát thêm 0 tên cột của 0 bảng phụ — 0 trùng. Ô bản thô mà khuôn ⛔ mang/băm: xem `ghi_chu_khuon`.",
+ "ghi_chu_khuon": "253 hàng số MID3 *(chọn theo `O` là số — ⛔ theo AE/AF, ⛔ đọc cột A 'Số chứng từ'; 11/253 hàng mang CHECK ALLOCATE True = tổng-tháng, còn lại chi tiết; 11 hàng ngăn ⛔ chọn)*, khoá dong_sheet. Mỗi hàng = PE Amount (O) · PM Amount (P) · 6 cặp CDT1 PE/PM *(CVL·COR·SHQ1·CSM·CAH·ASA)*. Cổng Σ chia = O/P *(TOL 0.000001)* ở `thieu_lac`. DT8b: THÊM `vendor` (H) + `thang` (F, yyyymm) — khoá Vendor-tháng cho WP-C4a (209 hàng có khoá, 44 hàng tổng ⛔ khoá); ⛔ `G` (= F trên mọi hàng) · ⛔ `K L M` = LE · No · ITL ID, RỖNG cả 264 hàng ⇒ MID3 ⛔ có ITL ID. ⛔ mang cột A:N còn lại *(Số CT · Diễn giải · Tài khoản · … PII)*.",
  "khoa": "dong_sheet",
  "kieu_khoa": "dong_sheet",
  "cot": [
@@ -22,7 +22,9 @@
   "cah_pe",
   "cah_pm",
   "asa_pe",
-  "asa_pm"
+  "asa_pm",
+  "vendor",
+  "thang"
  ],
  "cot_khong_chon": [],
  "so_dong": 253,
@@ -37,7 +39,7 @@
   "dat": true,
   "ly_do": []
  },
- "checksum_noi_dung": "3b93f232a0bedc0a",
+ "checksum_noi_dung": "013de4e6e826b096",
  "dong": [
   {
    "thu_tu": 1,
@@ -55,7 +57,9 @@
    "cah_pe": "1432865.2399419998",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": null,
+   "thang": null
   },
   {
    "thu_tu": 2,
@@ -73,7 +77,9 @@
    "cah_pe": "915169.590873001",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": null,
+   "thang": null
   },
   {
    "thu_tu": 3,
@@ -91,7 +97,9 @@
    "cah_pe": "1163550.4110440013",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": null,
+   "thang": null
   },
   {
    "thu_tu": 4,
@@ -109,7 +117,9 @@
    "cah_pe": "868787.8512770003",
    "cah_pm": "0",
    "asa_pe": "93.293863",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": null,
+   "thang": null
   },
   {
    "thu_tu": 5,
@@ -127,7 +137,9 @@
    "cah_pe": "868291.4599290002",
    "cah_pm": "0",
    "asa_pe": "116.203478",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": null,
+   "thang": null
   },
   {
    "thu_tu": 6,
@@ -145,7 +157,9 @@
    "cah_pe": "888809.0101658782",
    "cah_pm": "0",
    "asa_pe": "560.0252496757145",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": null,
+   "thang": null
   },
   {
    "thu_tu": 7,
@@ -163,7 +177,9 @@
    "cah_pe": "464546.5406922111",
    "cah_pm": "0",
    "asa_pe": "538.5835234662704",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": null,
+   "thang": null
   },
   {
    "thu_tu": 8,
@@ -181,7 +197,9 @@
    "cah_pe": "92256.52730357759",
    "cah_pm": "0",
    "asa_pe": "1033.9614609710745",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": null,
+   "thang": null
   },
   {
    "thu_tu": 9,
@@ -199,7 +217,9 @@
    "cah_pe": "102453.942943403",
    "cah_pm": "0",
    "asa_pe": "680.0661742800002",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": null,
+   "thang": null
   },
   {
    "thu_tu": 10,
@@ -217,7 +237,9 @@
    "cah_pe": "163963.8056923143",
    "cah_pm": "0",
    "asa_pe": "672.6572305123287",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": null,
+   "thang": null
   },
   {
    "thu_tu": 11,
@@ -235,7 +257,9 @@
    "cah_pe": "153984.5694102231",
    "cah_pm": "0",
    "asa_pe": "1313.5617223327104",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": null,
+   "thang": null
   },
   {
    "thu_tu": 12,
@@ -253,7 +277,9 @@
    "cah_pe": "1432865.2399419998",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": null,
+   "thang": null
   },
   {
    "thu_tu": 13,
@@ -271,7 +297,9 @@
    "cah_pe": "0",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": null,
+   "thang": null
   },
   {
    "thu_tu": 14,
@@ -289,7 +317,11 @@
    "cah_pe": "0",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD57"
+   },
+   "thang": "202502"
   },
   {
    "thu_tu": 15,
@@ -307,7 +339,11 @@
    "cah_pe": "0",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD429"
+   },
+   "thang": "202502"
   },
   {
    "thu_tu": 16,
@@ -325,7 +361,11 @@
    "cah_pe": "0",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD426"
+   },
+   "thang": "202502"
   },
   {
    "thu_tu": 17,
@@ -343,7 +383,11 @@
    "cah_pe": "0",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD557"
+   },
+   "thang": "202502"
   },
   {
    "thu_tu": 18,
@@ -361,7 +405,11 @@
    "cah_pe": "0",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD111"
+   },
+   "thang": "202502"
   },
   {
    "thu_tu": 19,
@@ -379,7 +427,11 @@
    "cah_pe": "0",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD427"
+   },
+   "thang": "202502"
   },
   {
    "thu_tu": 20,
@@ -397,7 +449,11 @@
    "cah_pe": "0",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD417"
+   },
+   "thang": "202502"
   },
   {
    "thu_tu": 21,
@@ -415,7 +471,11 @@
    "cah_pe": "0",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD430"
+   },
+   "thang": "202502"
   },
   {
    "thu_tu": 22,
@@ -433,7 +493,11 @@
    "cah_pe": "0",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD63"
+   },
+   "thang": "202502"
   },
   {
    "thu_tu": 23,
@@ -451,7 +515,11 @@
    "cah_pe": "0",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD424"
+   },
+   "thang": "202502"
   },
   {
    "thu_tu": 24,
@@ -469,7 +537,11 @@
    "cah_pe": "0",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD64"
+   },
+   "thang": "202502"
   },
   {
    "thu_tu": 25,
@@ -487,7 +559,11 @@
    "cah_pe": "0",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD62"
+   },
+   "thang": "202502"
   },
   {
    "thu_tu": 26,
@@ -505,7 +581,9 @@
    "cah_pe": "1432865.2399419998",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": null,
+   "thang": null
   },
   {
    "thu_tu": 27,
@@ -523,7 +601,11 @@
    "cah_pe": "1430684.3799419997",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202502"
   },
   {
    "thu_tu": 28,
@@ -541,7 +623,11 @@
    "cah_pe": "0",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD428"
+   },
+   "thang": "202502"
   },
   {
    "thu_tu": 29,
@@ -559,7 +645,11 @@
    "cah_pe": "2180.859999999999",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202502"
   },
   {
    "thu_tu": 30,
@@ -577,7 +667,11 @@
    "cah_pe": "0",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD336"
+   },
+   "thang": "202502"
   },
   {
    "thu_tu": 31,
@@ -595,7 +689,11 @@
    "cah_pe": "0",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD113"
+   },
+   "thang": "202502"
   },
   {
    "thu_tu": 32,
@@ -613,7 +711,11 @@
    "cah_pe": "0",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD61"
+   },
+   "thang": "202502"
   },
   {
    "thu_tu": 33,
@@ -631,7 +733,11 @@
    "cah_pe": "0",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD58"
+   },
+   "thang": "202502"
   },
   {
    "thu_tu": 34,
@@ -649,7 +755,9 @@
    "cah_pe": "915169.5908730006",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": null,
+   "thang": null
   },
   {
    "thu_tu": 35,
@@ -667,7 +775,9 @@
    "cah_pe": "29.910118333333333",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": null,
+   "thang": null
   },
   {
    "thu_tu": 36,
@@ -685,7 +795,11 @@
    "cah_pe": "2.7191016666666665",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD57"
+   },
+   "thang": "202503"
   },
   {
    "thu_tu": 37,
@@ -703,7 +817,11 @@
    "cah_pe": "2.7191016666666665",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD429"
+   },
+   "thang": "202503"
   },
   {
    "thu_tu": 38,
@@ -721,7 +839,11 @@
    "cah_pe": "2.7191016666666665",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD426"
+   },
+   "thang": "202503"
   },
   {
    "thu_tu": 39,
@@ -739,7 +861,11 @@
    "cah_pe": "2.7191016666666665",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD557"
+   },
+   "thang": "202503"
   },
   {
    "thu_tu": 40,
@@ -757,7 +883,11 @@
    "cah_pe": "2.7191016666666665",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD111"
+   },
+   "thang": "202503"
   },
   {
    "thu_tu": 41,
@@ -775,7 +905,11 @@
    "cah_pe": "2.7191016666666665",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD427"
+   },
+   "thang": "202503"
   },
   {
    "thu_tu": 42,
@@ -793,7 +927,11 @@
    "cah_pe": "2.7191016666666665",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD417"
+   },
+   "thang": "202503"
   },
   {
    "thu_tu": 43,
@@ -811,7 +949,11 @@
    "cah_pe": "2.7191016666666665",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD430"
+   },
+   "thang": "202503"
   },
   {
    "thu_tu": 44,
@@ -829,7 +971,11 @@
    "cah_pe": "2.7191016666666665",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD63"
+   },
+   "thang": "202503"
   },
   {
    "thu_tu": 45,
@@ -847,7 +993,11 @@
    "cah_pe": "2.7191016666666665",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD424"
+   },
+   "thang": "202503"
   },
   {
    "thu_tu": 46,
@@ -865,7 +1015,11 @@
    "cah_pe": "2.7191016666666665",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD64"
+   },
+   "thang": "202503"
   },
   {
    "thu_tu": 47,
@@ -883,7 +1037,11 @@
    "cah_pe": "2.7191016666666665",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD62"
+   },
+   "thang": "202503"
   },
   {
    "thu_tu": 48,
@@ -901,7 +1059,9 @@
    "cah_pe": "915136.9616530006",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": null,
+   "thang": null
   },
   {
    "thu_tu": 49,
@@ -919,7 +1079,11 @@
    "cah_pe": "914126.0816530006",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202503"
   },
   {
    "thu_tu": 50,
@@ -937,7 +1101,11 @@
    "cah_pe": "0",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD428"
+   },
+   "thang": "202503"
   },
   {
    "thu_tu": 51,
@@ -955,7 +1123,11 @@
    "cah_pe": "1010.88",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202503"
   },
   {
    "thu_tu": 52,
@@ -973,7 +1145,11 @@
    "cah_pe": "0",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD336"
+   },
+   "thang": "202503"
   },
   {
    "thu_tu": 53,
@@ -991,7 +1167,11 @@
    "cah_pe": "0",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD113"
+   },
+   "thang": "202503"
   },
   {
    "thu_tu": 54,
@@ -1009,7 +1189,11 @@
    "cah_pe": "0",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD61"
+   },
+   "thang": "202503"
   },
   {
    "thu_tu": 55,
@@ -1027,7 +1211,11 @@
    "cah_pe": "0",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD58"
+   },
+   "thang": "202503"
   },
   {
    "thu_tu": 56,
@@ -1045,7 +1233,9 @@
    "cah_pe": "1163550.4110440016",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": null,
+   "thang": null
   },
   {
    "thu_tu": 57,
@@ -1063,7 +1253,9 @@
    "cah_pe": "3.020956583333331",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": null,
+   "thang": null
   },
   {
    "thu_tu": 58,
@@ -1081,7 +1273,11 @@
    "cah_pe": "0.2746324166666664",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD57"
+   },
+   "thang": "202504"
   },
   {
    "thu_tu": 59,
@@ -1099,7 +1295,11 @@
    "cah_pe": "0.2746324166666664",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD429"
+   },
+   "thang": "202504"
   },
   {
    "thu_tu": 60,
@@ -1117,7 +1317,11 @@
    "cah_pe": "0.2746324166666664",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD426"
+   },
+   "thang": "202504"
   },
   {
    "thu_tu": 61,
@@ -1135,7 +1339,11 @@
    "cah_pe": "0.2746324166666664",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD557"
+   },
+   "thang": "202504"
   },
   {
    "thu_tu": 62,
@@ -1153,7 +1361,11 @@
    "cah_pe": "0.2746324166666664",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD111"
+   },
+   "thang": "202504"
   },
   {
    "thu_tu": 63,
@@ -1171,7 +1383,11 @@
    "cah_pe": "0.2746324166666664",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD427"
+   },
+   "thang": "202504"
   },
   {
    "thu_tu": 64,
@@ -1189,7 +1405,11 @@
    "cah_pe": "0.2746324166666664",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD417"
+   },
+   "thang": "202504"
   },
   {
    "thu_tu": 65,
@@ -1207,7 +1427,11 @@
    "cah_pe": "0.2746324166666664",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD430"
+   },
+   "thang": "202504"
   },
   {
    "thu_tu": 66,
@@ -1225,7 +1449,11 @@
    "cah_pe": "0.2746324166666664",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD63"
+   },
+   "thang": "202504"
   },
   {
    "thu_tu": 67,
@@ -1243,7 +1471,11 @@
    "cah_pe": "0.2746324166666664",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD424"
+   },
+   "thang": "202504"
   },
   {
    "thu_tu": 68,
@@ -1261,7 +1493,11 @@
    "cah_pe": "0.2746324166666664",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD64"
+   },
+   "thang": "202504"
   },
   {
    "thu_tu": 69,
@@ -1279,7 +1515,11 @@
    "cah_pe": "0.2746324166666664",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD62"
+   },
+   "thang": "202504"
   },
   {
    "thu_tu": 70,
@@ -1297,7 +1537,9 @@
    "cah_pe": "1163547.1154550016",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": null,
+   "thang": null
   },
   {
    "thu_tu": 71,
@@ -1315,7 +1557,11 @@
    "cah_pe": "1162912.0154550015",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202504"
   },
   {
    "thu_tu": 72,
@@ -1333,7 +1579,11 @@
    "cah_pe": "0",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD428"
+   },
+   "thang": "202504"
   },
   {
    "thu_tu": 73,
@@ -1351,7 +1601,11 @@
    "cah_pe": "635.1000000000001",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202504"
   },
   {
    "thu_tu": 74,
@@ -1369,7 +1623,11 @@
    "cah_pe": "0",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD336"
+   },
+   "thang": "202504"
   },
   {
    "thu_tu": 75,
@@ -1387,7 +1645,11 @@
    "cah_pe": "0",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD113"
+   },
+   "thang": "202504"
   },
   {
    "thu_tu": 76,
@@ -1405,7 +1667,11 @@
    "cah_pe": "0",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD61"
+   },
+   "thang": "202504"
   },
   {
    "thu_tu": 77,
@@ -1423,7 +1689,11 @@
    "cah_pe": "0",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD58"
+   },
+   "thang": "202504"
   },
   {
    "thu_tu": 78,
@@ -1441,7 +1711,9 @@
    "cah_pe": "868787.8512769999",
    "cah_pm": "0",
    "asa_pe": "93.29386300000002",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": null,
+   "thang": null
   },
   {
    "thu_tu": 79,
@@ -1459,7 +1731,9 @@
    "cah_pe": "10.673262416666677",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": null,
+   "thang": null
   },
   {
    "thu_tu": 80,
@@ -1477,7 +1751,11 @@
    "cah_pe": "0.9702965833333342",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD57"
+   },
+   "thang": "202505"
   },
   {
    "thu_tu": 81,
@@ -1495,7 +1773,11 @@
    "cah_pe": "0.9702965833333342",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD429"
+   },
+   "thang": "202505"
   },
   {
    "thu_tu": 82,
@@ -1513,7 +1795,11 @@
    "cah_pe": "0.9702965833333342",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD426"
+   },
+   "thang": "202505"
   },
   {
    "thu_tu": 83,
@@ -1531,7 +1817,11 @@
    "cah_pe": "0.9702965833333342",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD557"
+   },
+   "thang": "202505"
   },
   {
    "thu_tu": 84,
@@ -1549,7 +1839,11 @@
    "cah_pe": "0.9702965833333342",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD111"
+   },
+   "thang": "202505"
   },
   {
    "thu_tu": 85,
@@ -1567,7 +1861,11 @@
    "cah_pe": "0.9702965833333342",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD427"
+   },
+   "thang": "202505"
   },
   {
    "thu_tu": 86,
@@ -1585,7 +1883,11 @@
    "cah_pe": "0.9702965833333342",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD417"
+   },
+   "thang": "202505"
   },
   {
    "thu_tu": 87,
@@ -1603,7 +1905,11 @@
    "cah_pe": "0.9702965833333342",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD430"
+   },
+   "thang": "202505"
   },
   {
    "thu_tu": 88,
@@ -1621,7 +1927,11 @@
    "cah_pe": "0.9702965833333342",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD63"
+   },
+   "thang": "202505"
   },
   {
    "thu_tu": 89,
@@ -1639,7 +1949,11 @@
    "cah_pe": "0.9702965833333342",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD424"
+   },
+   "thang": "202505"
   },
   {
    "thu_tu": 90,
@@ -1657,7 +1971,11 @@
    "cah_pe": "0.9702965833333342",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD64"
+   },
+   "thang": "202505"
   },
   {
    "thu_tu": 91,
@@ -1675,7 +1993,11 @@
    "cah_pe": "0.9702965833333342",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD62"
+   },
+   "thang": "202505"
   },
   {
    "thu_tu": 92,
@@ -1693,7 +2015,9 @@
    "cah_pe": "868776.2077179999",
    "cah_pm": "0",
    "asa_pe": "93.29386300000002",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": null,
+   "thang": null
   },
   {
    "thu_tu": 93,
@@ -1711,7 +2035,11 @@
    "cah_pe": "867172.8177179999",
    "cah_pm": "0",
    "asa_pe": "46.63386300000001",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202505"
   },
   {
    "thu_tu": 94,
@@ -1729,7 +2057,11 @@
    "cah_pe": "0",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD428"
+   },
+   "thang": "202505"
   },
   {
    "thu_tu": 95,
@@ -1747,7 +2079,11 @@
    "cah_pe": "1603.39",
    "cah_pm": "0",
    "asa_pe": "46.66",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202505"
   },
   {
    "thu_tu": 96,
@@ -1765,7 +2101,11 @@
    "cah_pe": "0",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD336"
+   },
+   "thang": "202505"
   },
   {
    "thu_tu": 97,
@@ -1783,7 +2123,11 @@
    "cah_pe": "0",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD113"
+   },
+   "thang": "202505"
   },
   {
    "thu_tu": 98,
@@ -1801,7 +2145,11 @@
    "cah_pe": "0",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD61"
+   },
+   "thang": "202505"
   },
   {
    "thu_tu": 99,
@@ -1819,7 +2167,11 @@
    "cah_pe": "0",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD58"
+   },
+   "thang": "202505"
   },
   {
    "thu_tu": 100,
@@ -1837,7 +2189,9 @@
    "cah_pe": "868291.4599290005",
    "cah_pm": "0",
    "asa_pe": "116.20347799999999",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": null,
+   "thang": null
   },
   {
    "thu_tu": 101,
@@ -1855,7 +2209,9 @@
    "cah_pe": "269.29649999999947",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": null,
+   "thang": null
   },
   {
    "thu_tu": 102,
@@ -1873,7 +2229,11 @@
    "cah_pe": "24.481499999999954",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD57"
+   },
+   "thang": "202506"
   },
   {
    "thu_tu": 103,
@@ -1891,7 +2251,11 @@
    "cah_pe": "24.481499999999954",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD429"
+   },
+   "thang": "202506"
   },
   {
    "thu_tu": 104,
@@ -1909,7 +2273,11 @@
    "cah_pe": "24.481499999999954",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD426"
+   },
+   "thang": "202506"
   },
   {
    "thu_tu": 105,
@@ -1927,7 +2295,11 @@
    "cah_pe": "24.481499999999954",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD557"
+   },
+   "thang": "202506"
   },
   {
    "thu_tu": 106,
@@ -1945,7 +2317,11 @@
    "cah_pe": "24.481499999999954",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD111"
+   },
+   "thang": "202506"
   },
   {
    "thu_tu": 107,
@@ -1963,7 +2339,11 @@
    "cah_pe": "24.481499999999954",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD427"
+   },
+   "thang": "202506"
   },
   {
    "thu_tu": 108,
@@ -1981,7 +2361,11 @@
    "cah_pe": "24.481499999999954",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD417"
+   },
+   "thang": "202506"
   },
   {
    "thu_tu": 109,
@@ -1999,7 +2383,11 @@
    "cah_pe": "24.481499999999954",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD430"
+   },
+   "thang": "202506"
   },
   {
    "thu_tu": 110,
@@ -2017,7 +2405,11 @@
    "cah_pe": "24.481499999999954",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD63"
+   },
+   "thang": "202506"
   },
   {
    "thu_tu": 111,
@@ -2035,7 +2427,11 @@
    "cah_pe": "24.481499999999954",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD424"
+   },
+   "thang": "202506"
   },
   {
    "thu_tu": 112,
@@ -2053,7 +2449,11 @@
    "cah_pe": "24.481499999999954",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD64"
+   },
+   "thang": "202506"
   },
   {
    "thu_tu": 113,
@@ -2071,7 +2471,11 @@
    "cah_pe": "24.481499999999954",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD62"
+   },
+   "thang": "202506"
   },
   {
    "thu_tu": 114,
@@ -2089,7 +2493,9 @@
    "cah_pe": "867997.6819290004",
    "cah_pm": "0",
    "asa_pe": "116.20347799999999",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": null,
+   "thang": null
   },
   {
    "thu_tu": 115,
@@ -2107,7 +2513,11 @@
    "cah_pe": "865968.5119290004",
    "cah_pm": "0",
    "asa_pe": "101.01347799999999",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202506"
   },
   {
    "thu_tu": 116,
@@ -2125,7 +2535,11 @@
    "cah_pe": "0",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD428"
+   },
+   "thang": "202506"
   },
   {
    "thu_tu": 117,
@@ -2143,7 +2557,11 @@
    "cah_pe": "2029.1699999999998",
    "cah_pm": "0",
    "asa_pe": "15.189999999999998",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202506"
   },
   {
    "thu_tu": 118,
@@ -2161,7 +2579,11 @@
    "cah_pe": "0",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD336"
+   },
+   "thang": "202506"
   },
   {
    "thu_tu": 119,
@@ -2179,7 +2601,11 @@
    "cah_pe": "0",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD113"
+   },
+   "thang": "202506"
   },
   {
    "thu_tu": 120,
@@ -2197,7 +2623,11 @@
    "cah_pe": "0",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD61"
+   },
+   "thang": "202506"
   },
   {
    "thu_tu": 121,
@@ -2215,7 +2645,11 @@
    "cah_pe": "0",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD58"
+   },
+   "thang": "202506"
   },
   {
    "thu_tu": 122,
@@ -2233,7 +2667,9 @@
    "cah_pe": "888809.0101658778",
    "cah_pm": "0",
    "asa_pe": "560.0252496757145",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": null,
+   "thang": null
   },
   {
    "thu_tu": 123,
@@ -2251,7 +2687,9 @@
    "cah_pe": "519.555709749999",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": null,
+   "thang": null
   },
   {
    "thu_tu": 124,
@@ -2269,7 +2707,11 @@
    "cah_pe": "47.232337249999915",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD57"
+   },
+   "thang": "202507"
   },
   {
    "thu_tu": 125,
@@ -2287,7 +2729,11 @@
    "cah_pe": "47.232337249999915",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD429"
+   },
+   "thang": "202507"
   },
   {
    "thu_tu": 126,
@@ -2305,7 +2751,11 @@
    "cah_pe": "47.232337249999915",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD426"
+   },
+   "thang": "202507"
   },
   {
    "thu_tu": 127,
@@ -2323,7 +2773,11 @@
    "cah_pe": "47.232337249999915",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD557"
+   },
+   "thang": "202507"
   },
   {
    "thu_tu": 128,
@@ -2341,7 +2795,11 @@
    "cah_pe": "47.232337249999915",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD111"
+   },
+   "thang": "202507"
   },
   {
    "thu_tu": 129,
@@ -2359,7 +2817,11 @@
    "cah_pe": "47.232337249999915",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD427"
+   },
+   "thang": "202507"
   },
   {
    "thu_tu": 130,
@@ -2377,7 +2839,11 @@
    "cah_pe": "47.232337249999915",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD417"
+   },
+   "thang": "202507"
   },
   {
    "thu_tu": 131,
@@ -2395,7 +2861,11 @@
    "cah_pe": "47.232337249999915",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD430"
+   },
+   "thang": "202507"
   },
   {
    "thu_tu": 132,
@@ -2413,7 +2883,11 @@
    "cah_pe": "47.232337249999915",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD63"
+   },
+   "thang": "202507"
   },
   {
    "thu_tu": 133,
@@ -2431,7 +2905,11 @@
    "cah_pe": "47.232337249999915",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD424"
+   },
+   "thang": "202507"
   },
   {
    "thu_tu": 134,
@@ -2449,7 +2927,11 @@
    "cah_pe": "47.232337249999915",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD64"
+   },
+   "thang": "202507"
   },
   {
    "thu_tu": 135,
@@ -2467,7 +2949,11 @@
    "cah_pe": "47.232337249999915",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD62"
+   },
+   "thang": "202507"
   },
   {
    "thu_tu": 136,
@@ -2485,7 +2971,9 @@
    "cah_pe": "888242.2221188778",
    "cah_pm": "0",
    "asa_pe": "560.0252496757145",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": null,
+   "thang": null
   },
   {
    "thu_tu": 137,
@@ -2503,7 +2991,11 @@
    "cah_pe": "885337.5236590004",
    "cah_pm": "0",
    "asa_pe": "8.045092000000004",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202507"
   },
   {
    "thu_tu": 138,
@@ -2521,7 +3013,11 @@
    "cah_pe": "475.82845987743497",
    "cah_pm": "0",
    "asa_pe": "463.91015767571446",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD428"
+   },
+   "thang": "202507"
   },
   {
    "thu_tu": 139,
@@ -2539,7 +3035,11 @@
    "cah_pe": "2428.8700000000003",
    "cah_pm": "0",
    "asa_pe": "88.07",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202507"
   },
   {
    "thu_tu": 140,
@@ -2557,7 +3057,11 @@
    "cah_pe": "0",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD336"
+   },
+   "thang": "202507"
   },
   {
    "thu_tu": 141,
@@ -2575,7 +3079,11 @@
    "cah_pe": "0",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD113"
+   },
+   "thang": "202507"
   },
   {
    "thu_tu": 142,
@@ -2593,7 +3101,11 @@
    "cah_pe": "0",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD61"
+   },
+   "thang": "202507"
   },
   {
    "thu_tu": 143,
@@ -2611,7 +3123,11 @@
    "cah_pe": "0",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD58"
+   },
+   "thang": "202507"
   },
   {
    "thu_tu": 144,
@@ -2629,7 +3145,9 @@
    "cah_pe": "464546.5406922114",
    "cah_pm": "0",
    "asa_pe": "538.5835234662704",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": null,
+   "thang": null
   },
   {
    "thu_tu": 145,
@@ -2647,7 +3165,9 @@
    "cah_pe": "286.1356584166663",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": null,
+   "thang": null
   },
   {
    "thu_tu": 146,
@@ -2665,7 +3185,11 @@
    "cah_pe": "26.012332583333293",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD57"
+   },
+   "thang": "202508"
   },
   {
    "thu_tu": 147,
@@ -2683,7 +3207,11 @@
    "cah_pe": "26.012332583333293",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD429"
+   },
+   "thang": "202508"
   },
   {
    "thu_tu": 148,
@@ -2701,7 +3229,11 @@
    "cah_pe": "26.012332583333293",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD426"
+   },
+   "thang": "202508"
   },
   {
    "thu_tu": 149,
@@ -2719,7 +3251,11 @@
    "cah_pe": "26.012332583333293",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD557"
+   },
+   "thang": "202508"
   },
   {
    "thu_tu": 150,
@@ -2737,7 +3273,11 @@
    "cah_pe": "26.012332583333293",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD111"
+   },
+   "thang": "202508"
   },
   {
    "thu_tu": 151,
@@ -2755,7 +3295,11 @@
    "cah_pe": "26.012332583333293",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD427"
+   },
+   "thang": "202508"
   },
   {
    "thu_tu": 152,
@@ -2773,7 +3317,11 @@
    "cah_pe": "26.012332583333293",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD417"
+   },
+   "thang": "202508"
   },
   {
    "thu_tu": 153,
@@ -2791,7 +3339,11 @@
    "cah_pe": "26.012332583333293",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD430"
+   },
+   "thang": "202508"
   },
   {
    "thu_tu": 154,
@@ -2809,7 +3361,11 @@
    "cah_pe": "26.012332583333293",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD63"
+   },
+   "thang": "202508"
   },
   {
    "thu_tu": 155,
@@ -2827,7 +3383,11 @@
    "cah_pe": "26.012332583333293",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD424"
+   },
+   "thang": "202508"
   },
   {
    "thu_tu": 156,
@@ -2845,7 +3405,11 @@
    "cah_pe": "26.012332583333293",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD64"
+   },
+   "thang": "202508"
   },
   {
    "thu_tu": 157,
@@ -2863,7 +3427,11 @@
    "cah_pe": "26.012332583333293",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD62"
+   },
+   "thang": "202508"
   },
   {
    "thu_tu": 158,
@@ -2881,7 +3449,9 @@
    "cah_pe": "464234.39270121144",
    "cah_pm": "0",
    "asa_pe": "538.5835234662704",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": null,
+   "thang": null
   },
   {
    "thu_tu": 159,
@@ -2899,7 +3469,11 @@
    "cah_pe": "462199.1911470001",
    "cah_pm": "0",
    "asa_pe": "0.036824999999999976",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202508"
   },
   {
    "thu_tu": 160,
@@ -2917,7 +3491,11 @@
    "cah_pe": "1071.9515542113154",
    "cah_pm": "0",
    "asa_pe": "487.19669846627045",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD428"
+   },
+   "thang": "202508"
   },
   {
    "thu_tu": 161,
@@ -2935,7 +3513,11 @@
    "cah_pe": "963.2500000000001",
    "cah_pm": "0",
    "asa_pe": "51.35000000000001",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202508"
   },
   {
    "thu_tu": 162,
@@ -2953,7 +3535,11 @@
    "cah_pe": "0",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD336"
+   },
+   "thang": "202508"
   },
   {
    "thu_tu": 163,
@@ -2971,7 +3557,11 @@
    "cah_pe": "0",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD113"
+   },
+   "thang": "202508"
   },
   {
    "thu_tu": 164,
@@ -2989,7 +3579,11 @@
    "cah_pe": "0",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD61"
+   },
+   "thang": "202508"
   },
   {
    "thu_tu": 165,
@@ -3007,7 +3601,11 @@
    "cah_pe": "0",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD58"
+   },
+   "thang": "202508"
   },
   {
    "thu_tu": 166,
@@ -3025,7 +3623,9 @@
    "cah_pe": "92256.52730357759",
    "cah_pm": "0",
    "asa_pe": "1033.9614609710745",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": null,
+   "thang": null
   },
   {
    "thu_tu": 167,
@@ -3043,7 +3643,9 @@
    "cah_pe": "62.93805374999998",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": null,
+   "thang": null
   },
   {
    "thu_tu": 168,
@@ -3061,7 +3663,11 @@
    "cah_pe": "5.7216412499999985",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD57"
+   },
+   "thang": "202509"
   },
   {
    "thu_tu": 169,
@@ -3079,7 +3685,11 @@
    "cah_pe": "5.7216412499999985",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD429"
+   },
+   "thang": "202509"
   },
   {
    "thu_tu": 170,
@@ -3097,7 +3707,11 @@
    "cah_pe": "5.7216412499999985",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD426"
+   },
+   "thang": "202509"
   },
   {
    "thu_tu": 171,
@@ -3115,7 +3729,11 @@
    "cah_pe": "5.7216412499999985",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD557"
+   },
+   "thang": "202509"
   },
   {
    "thu_tu": 172,
@@ -3133,7 +3751,11 @@
    "cah_pe": "5.7216412499999985",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD111"
+   },
+   "thang": "202509"
   },
   {
    "thu_tu": 173,
@@ -3151,7 +3773,11 @@
    "cah_pe": "5.7216412499999985",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD427"
+   },
+   "thang": "202509"
   },
   {
    "thu_tu": 174,
@@ -3169,7 +3795,11 @@
    "cah_pe": "5.7216412499999985",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD417"
+   },
+   "thang": "202509"
   },
   {
    "thu_tu": 175,
@@ -3187,7 +3817,11 @@
    "cah_pe": "5.7216412499999985",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD430"
+   },
+   "thang": "202509"
   },
   {
    "thu_tu": 176,
@@ -3205,7 +3839,11 @@
    "cah_pe": "5.7216412499999985",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD63"
+   },
+   "thang": "202509"
   },
   {
    "thu_tu": 177,
@@ -3223,7 +3861,11 @@
    "cah_pe": "5.7216412499999985",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD424"
+   },
+   "thang": "202509"
   },
   {
    "thu_tu": 178,
@@ -3241,7 +3883,11 @@
    "cah_pe": "5.7216412499999985",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD64"
+   },
+   "thang": "202509"
   },
   {
    "thu_tu": 179,
@@ -3259,7 +3905,11 @@
    "cah_pe": "5.7216412499999985",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD62"
+   },
+   "thang": "202509"
   },
   {
    "thu_tu": 180,
@@ -3277,7 +3927,9 @@
    "cah_pe": "92187.8676085776",
    "cah_pm": "0",
    "asa_pe": "1033.9614609710745",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": null,
+   "thang": null
   },
   {
    "thu_tu": 181,
@@ -3295,7 +3947,11 @@
    "cah_pe": "91478.38023400007",
    "cah_pm": "0",
    "asa_pe": "0.004757000000000001",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202509"
   },
   {
    "thu_tu": 182,
@@ -3313,7 +3969,11 @@
    "cah_pe": "580.6973745775281",
    "cah_pm": "0",
    "asa_pe": "1012.9667039710746",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD428"
+   },
+   "thang": "202509"
   },
   {
    "thu_tu": 183,
@@ -3331,7 +3991,11 @@
    "cah_pe": "128.78999999999996",
    "cah_pm": "0",
    "asa_pe": "20.990000000000002",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202509"
   },
   {
    "thu_tu": 184,
@@ -3349,7 +4013,11 @@
    "cah_pe": "0",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD336"
+   },
+   "thang": "202509"
   },
   {
    "thu_tu": 185,
@@ -3367,7 +4035,11 @@
    "cah_pe": "0",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD113"
+   },
+   "thang": "202509"
   },
   {
    "thu_tu": 186,
@@ -3385,7 +4057,11 @@
    "cah_pe": "0",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD61"
+   },
+   "thang": "202509"
   },
   {
    "thu_tu": 187,
@@ -3403,7 +4079,11 @@
    "cah_pe": "0",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD58"
+   },
+   "thang": "202509"
   },
   {
    "thu_tu": 188,
@@ -3421,7 +4101,9 @@
    "cah_pe": "102453.94294340292",
    "cah_pm": "0",
    "asa_pe": "680.0661742800002",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": null,
+   "thang": null
   },
   {
    "thu_tu": 189,
@@ -3439,7 +4121,9 @@
    "cah_pe": "51.896898166666695",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": null,
+   "thang": null
   },
   {
    "thu_tu": 190,
@@ -3457,7 +4141,11 @@
    "cah_pe": "4.717899833333337",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD57"
+   },
+   "thang": "202510"
   },
   {
    "thu_tu": 191,
@@ -3475,7 +4163,11 @@
    "cah_pe": "4.717899833333337",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD429"
+   },
+   "thang": "202510"
   },
   {
    "thu_tu": 192,
@@ -3493,7 +4185,11 @@
    "cah_pe": "4.717899833333337",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD426"
+   },
+   "thang": "202510"
   },
   {
    "thu_tu": 193,
@@ -3511,7 +4207,11 @@
    "cah_pe": "4.717899833333337",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD557"
+   },
+   "thang": "202510"
   },
   {
    "thu_tu": 194,
@@ -3529,7 +4229,11 @@
    "cah_pe": "4.717899833333337",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD111"
+   },
+   "thang": "202510"
   },
   {
    "thu_tu": 195,
@@ -3547,7 +4251,11 @@
    "cah_pe": "4.717899833333337",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD427"
+   },
+   "thang": "202510"
   },
   {
    "thu_tu": 196,
@@ -3565,7 +4273,11 @@
    "cah_pe": "4.717899833333337",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD417"
+   },
+   "thang": "202510"
   },
   {
    "thu_tu": 197,
@@ -3583,7 +4295,11 @@
    "cah_pe": "4.717899833333337",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD430"
+   },
+   "thang": "202510"
   },
   {
    "thu_tu": 198,
@@ -3601,7 +4317,11 @@
    "cah_pe": "4.717899833333337",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD63"
+   },
+   "thang": "202510"
   },
   {
    "thu_tu": 199,
@@ -3619,7 +4339,11 @@
    "cah_pe": "4.717899833333337",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD424"
+   },
+   "thang": "202510"
   },
   {
    "thu_tu": 200,
@@ -3637,7 +4361,11 @@
    "cah_pe": "4.717899833333337",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD64"
+   },
+   "thang": "202510"
   },
   {
    "thu_tu": 201,
@@ -3655,7 +4383,11 @@
    "cah_pe": "4.717899833333337",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD62"
+   },
+   "thang": "202510"
   },
   {
    "thu_tu": 202,
@@ -3673,7 +4405,9 @@
    "cah_pe": "102397.32814540292",
    "cah_pm": "0",
    "asa_pe": "680.0661742800002",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": null,
+   "thang": null
   },
   {
    "thu_tu": 203,
@@ -3691,7 +4425,11 @@
    "cah_pe": "101838.67924099992",
    "cah_pm": "0",
    "asa_pe": "0.06976399999999999",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202510"
   },
   {
    "thu_tu": 204,
@@ -3709,7 +4447,11 @@
    "cah_pe": "558.6489044030002",
    "cah_pm": "0",
    "asa_pe": "679.9964102800002",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD428"
+   },
+   "thang": "202510"
   },
   {
    "thu_tu": 205,
@@ -3727,7 +4469,11 @@
    "cah_pe": "0",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202510"
   },
   {
    "thu_tu": 206,
@@ -3745,7 +4491,11 @@
    "cah_pe": "0",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD336"
+   },
+   "thang": "202510"
   },
   {
    "thu_tu": 207,
@@ -3763,7 +4513,11 @@
    "cah_pe": "0",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD113"
+   },
+   "thang": "202510"
   },
   {
    "thu_tu": 208,
@@ -3781,7 +4535,11 @@
    "cah_pe": "0",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD61"
+   },
+   "thang": "202510"
   },
   {
    "thu_tu": 209,
@@ -3799,7 +4557,11 @@
    "cah_pe": "0",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD58"
+   },
+   "thang": "202510"
   },
   {
    "thu_tu": 210,
@@ -3817,7 +4579,9 @@
    "cah_pe": "163963.80569231414",
    "cah_pm": "0",
    "asa_pe": "672.6572305123287",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": null,
+   "thang": null
   },
   {
    "thu_tu": 211,
@@ -3835,7 +4599,9 @@
    "cah_pe": "28.171147583333315",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": null,
+   "thang": null
   },
   {
    "thu_tu": 212,
@@ -3853,7 +4619,11 @@
    "cah_pe": "2.5610134166666656",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD57"
+   },
+   "thang": "202511"
   },
   {
    "thu_tu": 213,
@@ -3871,7 +4641,11 @@
    "cah_pe": "2.5610134166666656",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD429"
+   },
+   "thang": "202511"
   },
   {
    "thu_tu": 214,
@@ -3889,7 +4663,11 @@
    "cah_pe": "2.5610134166666656",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD426"
+   },
+   "thang": "202511"
   },
   {
    "thu_tu": 215,
@@ -3907,7 +4685,11 @@
    "cah_pe": "2.5610134166666656",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD557"
+   },
+   "thang": "202511"
   },
   {
    "thu_tu": 216,
@@ -3925,7 +4707,11 @@
    "cah_pe": "2.5610134166666656",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD111"
+   },
+   "thang": "202511"
   },
   {
    "thu_tu": 217,
@@ -3943,7 +4729,11 @@
    "cah_pe": "2.5610134166666656",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD427"
+   },
+   "thang": "202511"
   },
   {
    "thu_tu": 218,
@@ -3961,7 +4751,11 @@
    "cah_pe": "2.5610134166666656",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD417"
+   },
+   "thang": "202511"
   },
   {
    "thu_tu": 219,
@@ -3979,7 +4773,11 @@
    "cah_pe": "2.5610134166666656",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD430"
+   },
+   "thang": "202511"
   },
   {
    "thu_tu": 220,
@@ -3997,7 +4795,11 @@
    "cah_pe": "2.5610134166666656",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD63"
+   },
+   "thang": "202511"
   },
   {
    "thu_tu": 221,
@@ -4015,7 +4817,11 @@
    "cah_pe": "2.5610134166666656",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD424"
+   },
+   "thang": "202511"
   },
   {
    "thu_tu": 222,
@@ -4033,7 +4839,11 @@
    "cah_pe": "2.5610134166666656",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD64"
+   },
+   "thang": "202511"
   },
   {
    "thu_tu": 223,
@@ -4051,7 +4861,11 @@
    "cah_pe": "2.5610134166666656",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD62"
+   },
+   "thang": "202511"
   },
   {
    "thu_tu": 224,
@@ -4069,7 +4883,9 @@
    "cah_pe": "163933.07353131415",
    "cah_pm": "0",
    "asa_pe": "672.6572305123287",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": null,
+   "thang": null
   },
   {
    "thu_tu": 225,
@@ -4087,7 +4903,11 @@
    "cah_pe": "161887.62578799983",
    "cah_pm": "0",
    "asa_pe": "0.031758",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202511"
   },
   {
    "thu_tu": 226,
@@ -4105,7 +4925,11 @@
    "cah_pe": "2040.3777433143052",
    "cah_pm": "0",
    "asa_pe": "672.6254725123288",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD428"
+   },
+   "thang": "202511"
   },
   {
    "thu_tu": 227,
@@ -4123,7 +4947,11 @@
    "cah_pe": "5.069999999999999",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202511"
   },
   {
    "thu_tu": 228,
@@ -4141,7 +4969,11 @@
    "cah_pe": "0",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD336"
+   },
+   "thang": "202511"
   },
   {
    "thu_tu": 229,
@@ -4159,7 +4991,11 @@
    "cah_pe": "0",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD113"
+   },
+   "thang": "202511"
   },
   {
    "thu_tu": 230,
@@ -4177,7 +5013,11 @@
    "cah_pe": "0",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD61"
+   },
+   "thang": "202511"
   },
   {
    "thu_tu": 231,
@@ -4195,7 +5035,11 @@
    "cah_pe": "0",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD58"
+   },
+   "thang": "202511"
   },
   {
    "thu_tu": 232,
@@ -4213,7 +5057,9 @@
    "cah_pe": "153984.5694102232",
    "cah_pm": "0",
    "asa_pe": "1313.5617223327104",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": null,
+   "thang": null
   },
   {
    "thu_tu": 233,
@@ -4231,7 +5077,9 @@
    "cah_pe": "26.254272000000004",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": null,
+   "thang": null
   },
   {
    "thu_tu": 234,
@@ -4249,7 +5097,11 @@
    "cah_pe": "2.386752",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD57"
+   },
+   "thang": "202512"
   },
   {
    "thu_tu": 235,
@@ -4267,7 +5119,11 @@
    "cah_pe": "2.386752",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD429"
+   },
+   "thang": "202512"
   },
   {
    "thu_tu": 236,
@@ -4285,7 +5141,11 @@
    "cah_pe": "2.386752",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD426"
+   },
+   "thang": "202512"
   },
   {
    "thu_tu": 237,
@@ -4303,7 +5163,11 @@
    "cah_pe": "2.386752",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD557"
+   },
+   "thang": "202512"
   },
   {
    "thu_tu": 238,
@@ -4321,7 +5185,11 @@
    "cah_pe": "2.386752",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD111"
+   },
+   "thang": "202512"
   },
   {
    "thu_tu": 239,
@@ -4339,7 +5207,11 @@
    "cah_pe": "2.386752",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD427"
+   },
+   "thang": "202512"
   },
   {
    "thu_tu": 240,
@@ -4357,7 +5229,11 @@
    "cah_pe": "2.386752",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD417"
+   },
+   "thang": "202512"
   },
   {
    "thu_tu": 241,
@@ -4375,7 +5251,11 @@
    "cah_pe": "2.386752",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD430"
+   },
+   "thang": "202512"
   },
   {
    "thu_tu": 242,
@@ -4393,7 +5273,11 @@
    "cah_pe": "2.386752",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD63"
+   },
+   "thang": "202512"
   },
   {
    "thu_tu": 243,
@@ -4411,7 +5295,11 @@
    "cah_pe": "2.386752",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD424"
+   },
+   "thang": "202512"
   },
   {
    "thu_tu": 244,
@@ -4429,7 +5317,11 @@
    "cah_pe": "2.386752",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD64"
+   },
+   "thang": "202512"
   },
   {
    "thu_tu": 245,
@@ -4447,7 +5339,11 @@
    "cah_pe": "2.386752",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD62"
+   },
+   "thang": "202512"
   },
   {
    "thu_tu": 246,
@@ -4465,7 +5361,9 @@
    "cah_pe": "153955.92838622318",
    "cah_pm": "0",
    "asa_pe": "1313.5617223327104",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": null,
+   "thang": null
   },
   {
    "thu_tu": 247,
@@ -4483,7 +5381,11 @@
    "cah_pe": "151610.90774899995",
    "cah_pm": "0",
    "asa_pe": "0.0024029999999999993",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202512"
   },
   {
    "thu_tu": 248,
@@ -4501,7 +5403,11 @@
    "cah_pe": "2332.7206372232545",
    "cah_pm": "0",
    "asa_pe": "1313.5593193327104",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD428"
+   },
+   "thang": "202512"
   },
   {
    "thu_tu": 249,
@@ -4519,7 +5425,11 @@
    "cah_pe": "12.3",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202512"
   },
   {
    "thu_tu": 250,
@@ -4537,7 +5447,11 @@
    "cah_pe": "0",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD336"
+   },
+   "thang": "202512"
   },
   {
    "thu_tu": 251,
@@ -4555,7 +5469,11 @@
    "cah_pe": "0",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD113"
+   },
+   "thang": "202512"
   },
   {
    "thu_tu": 252,
@@ -4573,7 +5491,11 @@
    "cah_pe": "0",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD61"
+   },
+   "thang": "202512"
   },
   {
    "thu_tu": 253,
@@ -4591,7 +5513,11 @@
    "cah_pe": "0",
    "cah_pm": "0",
    "asa_pe": "0",
-   "asa_pm": "0"
+   "asa_pm": "0",
+   "vendor": {
+    "chu": "VD58"
+   },
+   "thang": "202512"
   }
  ]
 }
