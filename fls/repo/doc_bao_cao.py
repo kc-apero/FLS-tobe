@@ -843,6 +843,9 @@ class Cong:
     #   "khai" (có, số nguyên ≥ 0) · "vang" (⛔ có khoá ⇒ coi 0) · "sai_kieu" (có nhưng hỏng ⇒ `dat=None`)
     #   · "" (cổng ⛔ đọc khoá này: cổng khác / gói chưa đo). Trường THÊM — hợp đồng `/gates` cũ giữ.
     lat_bo_nguon: str = ""
+    # ⭐ ITE-R1-01 (`KQ-231`, Đ4) — chỉ cổng HD2: số Ô lệch CÓ CHỦ ĐÍCH đã khai mong (⛔ cộng vào tử số `khop`).
+    #   Cổng lá đọc từ khối gói (`lech_co_chu_dich`, vắng ⇒ 0); cổng cha = Σ con. Trường THÊM — hợp đồng cũ giữ.
+    lech_co_chu_dich: int = 0
 
     def __post_init__(self) -> None:
         if self.dat is True and not self.da_do.strip():
@@ -1143,25 +1146,37 @@ def _goi_la(goi: str, b: dict, ten: str) -> Cong:
     co_dem = type(o) is int and type(khop) is int
     if co_dem and (o < 0 or khop < 0 or khop > o):
         return chua(f"tự mâu thuẫn: khớp {khop} · ô so {o}")
+    # ⭐ ITE-R1-01: hai khoá THÊM, vắng ⇒ 0 (gói cũ ⛔ khai lệch); có mà ⛔ số nguyên ≥ 0 ⇒ null có tên.
+    sl = {}
+    for k in ("lech_co_chu_dich", "mong_lech_co_chu_dich"):
+        sl[k] = b.get(k, 0)
+        if type(sl[k]) is not int or sl[k] < 0:
+            return chua(f"`{k}` = {sl[k]!r} ⛔ phải số đếm ô ≥ 0")
+    lech, mong_lech = sl["lech_co_chu_dich"], sl["mong_lech_co_chu_dich"]
     if o == 0 and co_dem:
         return chua("0 ô được so ⇒ ⛔ đo được gì (Đ3: 0/0 ⛔ phải 100 %)")
     ly = [str(x) for x in (b.get("ly_do") or []) if isinstance(x, str)]
+    cum_lech = f" + {lech} lệch có chủ đích" if lech else ""          # Đ4: nói thẳng ở chỗ in
     vang = f" · {_LOI_LAT_VANG}" if nguon == "vang" else ""
     if lat > 0:
         ly.insert(0, f"{lat} lát bị bỏ ⇒ có lỗ trong phép đo, ⛔ kết luận cho CẢ SỐ")
     if lat > 0 or not dat:
-        if co_dem and khop != o:
-            ly.append(f"{o - khop}/{o} ô LỆCH")
+        if co_dem and khop + lech != o:
+            ly.append(f"{o - khop - lech}/{o} ô LỆCH")
         return Cong(ma=ma, ten=tn, dat=False,
-                    da_do=(f"{khop}/{o} ô đáp án khớp" if co_dem else "") + vang,
-                    lat_bo_nguon=nguon,
+                    da_do=(f"{khop}/{o} ô đáp án khớp{cum_lech}" if co_dem else "") + vang,
+                    lat_bo_nguon=nguon, lech_co_chu_dich=lech,
                     ly_do=" · ".join(ly) or f"gói {goi} `dat=false` (tệp ⛔ ghi lý do)")
     if not co_dem:
         return chua("`dat=true` mà ⛔ khai `khop`/`tong_o` ⇒ ⛔ biết đã đo gì")
-    if khop != o:
-        return chua(f"`dat=true` mà khớp {khop} ≠ ô so {o}")
-    return Cong(ma=ma, ten=tn, dat=True, lat_bo_nguon=nguon,
-                da_do=f"{khop}/{o} ô đáp án khớp (gói {goi}){vang}")
+    if khop + lech != o:
+        return chua(f"`dat=true` mà khớp {khop} + lệch có chủ đích {lech} ≠ ô so {o}")
+    if lech != mong_lech:                          # Đ5: lệch có chủ đích phải KHỚP khai trước, hai chiều
+        return Cong(ma=ma, ten=tn, dat=False, lat_bo_nguon=nguon, lech_co_chu_dich=lech,
+                    da_do=f"{khop}/{o} ô đáp án khớp{cum_lech}{vang}",
+                    ly_do=f"lệch có chủ đích {lech} ≠ mong {mong_lech} (`mong_lech_co_chu_dich`) ⇒ ⛔ đã khai trước")
+    return Cong(ma=ma, ten=tn, dat=True, lat_bo_nguon=nguon, lech_co_chu_dich=lech,
+                da_do=f"{khop}/{o} ô đáp án khớp{cum_lech} (gói {goi}){vang}")
 
 
 def _nguon_cha(phan) -> str:
@@ -1179,18 +1194,21 @@ def _goi_cha(goi: str, phan: list[tuple[str, Cong, dict | None]]) -> Cong:
     nguon = _nguon_cha(phan)
     sai = [(g, c) for g, c, _ in phan if c.dat is False]
     chua = [(g, c) for g, c, _ in phan if c.dat is None]
+    lech_cha = sum(c.lech_co_chu_dich for _, c, _ in phan)
     if sai:
-        return Cong(ma=ma, ten=tn, dat=False, lat_bo_nguon=nguon,
+        return Cong(ma=ma, ten=tn, dat=False, lat_bo_nguon=nguon, lech_co_chu_dich=lech_cha,
                     ly_do=" | ".join(f"{g}: {c.ly_do}" for g, c in sai)
                     + ("".join(f" | {g}: chưa đo ({c.ly_do})" for g, c in chua)))
     if chua:
-        return Cong(ma=ma, ten=tn, dat=None, lat_bo_nguon=nguon,
+        return Cong(ma=ma, ten=tn, dat=None, lat_bo_nguon=nguon, lech_co_chu_dich=lech_cha,
                     ly_do=" | ".join(f"{g}: {c.ly_do}" for g, c in chua))
     tong = sum(b["tong_o"] for _, _, b in phan)
     nguon = _nguon_cha(phan)
-    return Cong(ma=ma, ten=tn, dat=True, lat_bo_nguon=nguon,
+    lech = sum(c.lech_co_chu_dich for _, c, _ in phan)
+    return Cong(ma=ma, ten=tn, dat=True, lat_bo_nguon=nguon, lech_co_chu_dich=lech,
                 da_do=f"{len(phan)}/{len(phan)} gói con đạt ({' · '.join(g for g, _, _ in phan)})"
-                      f" · Σ {tong}/{tong} ô đáp án khớp"
+                      f" · Σ {tong - lech}/{tong} ô đáp án khớp"
+                      + (f" + {lech} lệch có chủ đích" if lech else "")
                       + (f" · {_LOI_LAT_VANG}" if nguon == "vang" else ""))
 
 

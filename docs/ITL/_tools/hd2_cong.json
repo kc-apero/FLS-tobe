@@ -126,9 +126,10 @@
   "mong_dong_so": 12373,
   "tong_o": 205175,
   "mong_tong_o": 205175,
-  "khop": 205175,
-  "khop_dap_an": 205140,
-  "khop_ghi_chu": "khop = ô khớp đáp án (khop_dap_an) + ô lệch CÓ CHỦ ĐÍCH ITE đã khai mong (lech_co_chu_dich_ite.so_o) — WO-226 phương án A; ⛔ giấu: khop_dap_an + so_o = khop, lech_ngoai_ten = 0, mong khác ⇒ ĐỎ cả hai chiều",
+  "khop": 205140,
+  "lech_co_chu_dich": 35,
+  "mong_lech_co_chu_dich": 35,
+  "khop_ghi_chu": "khop = CHỈ ô khớp đáp án thật; lech_co_chu_dich = ô lệch CÓ CHỦ ĐÍCH đã khai mong (WO-226 phương án A) — dat khi khop + lech_co_chu_dich = tong_o VÀ lech_co_chu_dich = mong_lech_co_chu_dich, lech_ngoai_ten = 0 (KQ-231 ITE-R1-01)",
   "lech_co_chu_dich_ite": {
    "so_o": 35,
    "theo_khoi": {
@@ -262,9 +263,10 @@
   "dong_so": 12373,
   "tong_o": 11585,
   "mong_tong_o": 11585,
-  "khop": 11585,
-  "khop_dap_an": 11543,
-  "khop_ghi_chu": "khop = ô khớp đáp án (khop_dap_an) + ô lệch CÓ CHỦ ĐÍCH ITE đã khai mong (lech_co_chu_dich_ite.so_o) — WO-226 phương án A; ⛔ giấu: khop_dap_an + so_o = khop, lech_ngoai_ten = 0, mong khác ⇒ ĐỎ cả hai chiều",
+  "khop": 11543,
+  "lech_co_chu_dich": 42,
+  "mong_lech_co_chu_dich": 42,
+  "khop_ghi_chu": "khop = CHỈ ô khớp đáp án thật; lech_co_chu_dich = ô lệch CÓ CHỦ ĐÍCH đã khai mong (WO-226 phương án A) — dat khi khop + lech_co_chu_dich = tong_o VÀ lech_co_chu_dich = mong_lech_co_chu_dich, lech_ngoai_ten = 0 (KQ-231 ITE-R1-01)",
   "lech_co_chu_dich_ite": {
    "so_o": 42,
    "theo_khoi": {

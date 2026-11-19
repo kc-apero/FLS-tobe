@@ -581,7 +581,6 @@ class ThanhQuaC3a:
     hd2_cong: dict[str, Any]
     luoi: dict[tuple[str, str, int], Decimal]
     lech_ite: list[dict[str, Any]] = field(default_factory=list)   #: WO-226 — ô lệch CÓ CHỦ ĐÍCH
-    khop_dap_an: int = 0                                          #: ô khớp đáp án THUẦN (⛔ cộng lệch ITE)
 
 
 def nap_cay(path: Path = ATL_CAY) -> CayHD:
@@ -625,6 +624,11 @@ def _dem_alias(kq, meta) -> dict[str, int]:
     for i in kq.dong_alias:
         r[meta[i][2]] = r.get(meta[i][2], 0) + 1
     return r
+
+
+def _so_o_mong(mong: Mapping[str, Any] | None) -> int | None:
+    """Số ô lệch có chủ đích đã KHAI TRƯỚC (`mong.so_o`); ⛔ khai ⇒ `None` (cổng ⇒ `null` có tên, Đ5)."""
+    return None if mong is None else mong.get("so_o")
 
 
 def _so_mong_ite(thuc: dict[str, Any], mong: Mapping[str, Any] | None) -> list[str]:
@@ -729,9 +733,9 @@ def so_sanh_c3a(anh_vao: dict, anh_dap_an: dict, fx: Mapping[int, Mapping[str, D
     ngay_so_cuoi = max((m[0] for m in meta), default=0)
 
     # ── 7 · phân xử ──
-    khop_dap_an = khop
-    khop = khop + len(lech_ite)           # hợp đồng CG2: khớp đáp án + lệch CÓ CHỦ ĐÍCH đã khai mong
-    px = danh_gia(tong_o=tong_o, khop=khop, lat_truot=0, dong_doc=len(dong_cfa),
+    # ⭐ KQ-231 ITE-R1-01 (Đ4): `khop` = ô KHỚP đáp án THẬT (⛔ cộng ô lệch có chủ đích); số ô lệch có chủ đích
+    #   là trường riêng `lech_co_chu_dich` (+ `mong_lech_co_chu_dich` khai trước). Chỉ PHÁN QUYẾT cộng hai số.
+    px = danh_gia(tong_o=tong_o, khop=khop + len(lech_ite), lat_truot=0, dong_doc=len(dong_cfa),
                   dong_mong_doi=len(dong_cfa), toi_thieu_o=1)
     ly = list(px.ly_do) + ly
     ly += _so_mong_ite(tom_ite, mong.lech_ite)
@@ -774,10 +778,10 @@ def so_sanh_c3a(anh_vao: dict, anh_dap_an: dict, fx: Mapping[int, Mapping[str, D
                             "ô đáp án ⇒ đúng ô ấy ĐỎ.",
         "dong_so": len(feed), "mong_dong_so": MONG_C3A_DONG_SO,
         "tong_o": tong_o, "mong_tong_o": MONG_C3A_TONG_O, "khop": khop,
-        "khop_dap_an": khop_dap_an,
-        "khop_ghi_chu": "khop = ô khớp đáp án (khop_dap_an) + ô lệch CÓ CHỦ ĐÍCH ITE đã khai mong "
-                        "(lech_co_chu_dich_ite.so_o) — WO-226 phương án A; ⛔ giấu: khop_dap_an + "
-                        "so_o = khop, lech_ngoai_ten = 0, mong khác ⇒ ĐỎ cả hai chiều",
+        "lech_co_chu_dich": len(lech_ite), "mong_lech_co_chu_dich": _so_o_mong(mong.lech_ite),
+        "khop_ghi_chu": "khop = CHỈ ô khớp đáp án thật; lech_co_chu_dich = ô lệch CÓ CHỦ ĐÍCH đã khai mong "
+                        "(WO-226 phương án A) — dat khi khop + lech_co_chu_dich = tong_o VÀ "
+                        "lech_co_chu_dich = mong_lech_co_chu_dich, lech_ngoai_ten = 0 (KQ-231 ITE-R1-01)",
         "lech_co_chu_dich_ite": tom_ite,
         "mong_lech_co_chu_dich_ite": dict(mong.lech_ite or {}),
         "lech_ngoai_ten": len(lech),
@@ -796,7 +800,7 @@ def so_sanh_c3a(anh_vao: dict, anh_dap_an: dict, fx: Mapping[int, Mapping[str, D
     }
     return ThanhQuaC3a(tong_o=tong_o, khop=khop, lech=lech, lech_co_ten=lech_co_ten,
                        o_kpi=o_kpi, o_loi=o_loi, phan_xu=px, hd2_cong=hd2, luoi=luoi,
-                       lech_ite=lech_ite, khop_dap_an=khop_dap_an)
+                       lech_ite=lech_ite)
 
 
 def chay_wp_c3a(dsn: str | None = None) -> ThanhQuaC3a:
@@ -921,7 +925,6 @@ class ThanhQuaC3b:
     luoi: dict[tuple[str, str, str], Decimal]
     max_lech: dict[str, Decimal] = field(default_factory=dict)
     lech_ite: list[dict[str, Any]] = field(default_factory=list)
-    khop_dap_an: int = 0
 
 
 def _feed_cfa(anh_vao: dict, fx: Mapping[int, Mapping[str, Decimal]], ly: list[str]):
@@ -1031,9 +1034,9 @@ def so_sanh_c3b(anh_vao: dict, anh_dap_an: dict, fx: Mapping[int, Mapping[str, D
                    "o_khac_0_ky_khong_ngay": o_kkn_khac_0}
     tom_ite = _tom_tat_lech_ite(lech_ite, "ky", str)
 
-    khop_dap_an = khop
-    khop = khop + len(lech_ite)           # hợp đồng CG2: khớp đáp án + lệch CÓ CHỦ ĐÍCH đã khai mong
-    px = danh_gia(tong_o=tong_o, khop=khop, lat_truot=0, dong_doc=len(dong_cfa),
+    # ⭐ KQ-231 ITE-R1-01 (Đ4): `khop` = ô KHỚP đáp án THẬT (⛔ cộng ô lệch có chủ đích); số ô lệch có chủ đích
+    #   là trường riêng `lech_co_chu_dich` (+ `mong_lech_co_chu_dich` khai trước). Chỉ PHÁN QUYẾT cộng hai số.
+    px = danh_gia(tong_o=tong_o, khop=khop + len(lech_ite), lat_truot=0, dong_doc=len(dong_cfa),
                   dong_mong_doi=len(dong_cfa), toi_thieu_o=1)
     ly = list(px.ly_do) + ly
     ly += _so_mong_ite(tom_ite, mong.lech_ite)
@@ -1075,10 +1078,10 @@ def so_sanh_c3b(anh_vao: dict, anh_dap_an: dict, fx: Mapping[int, Mapping[str, D
                                for k, v in DUNG_SAI_C3B.items()},
         "dung_sai_ghi_chu": DUNG_SAI_C3B_GHI_CHU,
         "dong_so": n_feed, "tong_o": tong_o, "mong_tong_o": mong.tong_o, "khop": khop,
-        "khop_dap_an": khop_dap_an,
-        "khop_ghi_chu": "khop = ô khớp đáp án (khop_dap_an) + ô lệch CÓ CHỦ ĐÍCH ITE đã khai mong "
-                        "(lech_co_chu_dich_ite.so_o) — WO-226 phương án A; ⛔ giấu: khop_dap_an + "
-                        "so_o = khop, lech_ngoai_ten = 0, mong khác ⇒ ĐỎ cả hai chiều",
+        "lech_co_chu_dich": len(lech_ite), "mong_lech_co_chu_dich": _so_o_mong(mong.lech_ite),
+        "khop_ghi_chu": "khop = CHỈ ô khớp đáp án thật; lech_co_chu_dich = ô lệch CÓ CHỦ ĐÍCH đã khai mong "
+                        "(WO-226 phương án A) — dat khi khop + lech_co_chu_dich = tong_o VÀ "
+                        "lech_co_chu_dich = mong_lech_co_chu_dich, lech_ngoai_ten = 0 (KQ-231 ITE-R1-01)",
         "lech_co_chu_dich_ite": tom_ite,
         "mong_lech_co_chu_dich_ite": dict(mong.lech_ite or {}),
         "o_so_khac_0": o_so_khac_0, "mong_o_so_khac_0": mong.o_so_khac_0,
@@ -1097,8 +1100,7 @@ def so_sanh_c3b(anh_vao: dict, anh_dap_an: dict, fx: Mapping[int, Mapping[str, D
     }
     return ThanhQuaC3b(tong_o=tong_o, khop=khop, lech=lech, lech_co_ten=lech_co_ten,
                        o_kpi=o_kpi, o_loi=o_loi, o_ky_khong_ngay=o_kkn, phan_xu=px,
-                       hd2_cong=hd2, luoi=luoi, max_lech=max_lech, lech_ite=lech_ite,
-                       khop_dap_an=khop_dap_an)
+                       hd2_cong=hd2, luoi=luoi, max_lech=max_lech, lech_ite=lech_ite)
 
 
 def _lich_tu_kho(dsn: str | None) -> tuple[LichKy | None, str | None]:

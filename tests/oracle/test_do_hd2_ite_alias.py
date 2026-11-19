@@ -116,8 +116,10 @@ def test_AC3_lech_co_chu_dich_khai_ten_va_o_khac_khop_100(tq, request):
     assert li["so_o"] == len(t.lech_ite) > 0                      # Đ3: tập ⛔ rỗng
     assert li["ma"] == ["ITE"] and li["theo_khoi"]["GROUP"] > 0
     assert t.lech == [] and t.hd2_cong["lech_ngoai_ten"] == 0     # ô khác khớp 100 %
-    assert t.khop_dap_an + len(t.lech_ite) == t.khop == t.tong_o
-    assert t.hd2_cong["khop_dap_an"] == t.tong_o - li["so_o"]
+    assert t.khop + len(t.lech_ite) == t.tong_o                   # KQ-231: khop = khớp đáp án THẬT
+    h = t.hd2_cong
+    assert h["khop"] == t.tong_o - li["so_o"] and "khop_dap_an" not in h
+    assert h["lech_co_chu_dich"] == h["mong_lech_co_chu_dich"] == li["so_o"]
     # mọi ô lệch có chủ đích: lệch thật (≠ đáp án), ⛔ ô khớp bị gán nhầm
     assert all(D(x["lech"]) != 0 and x["ma"] == "ITE" for x in t.lech_ite)
 
@@ -193,8 +195,9 @@ def test_D5_mot_o_ngoai_ite_lech_thi_DO_o_lech_ngoai_ten(nguon):
 @pytest.mark.parametrize("goi,mong", [("WP-C3a", do_hd2.MONG_LECH_ITE_C3A), ("WP-C3b", do_hd2.MONG_LECH_ITE_C3B)])
 def test_tep_hd2_cong_khoi_khai_lech_ite_va_hop_dong_CG2(goi, mong):
     j = json.loads(do_hd2.RA_CONG.read_text(encoding="utf-8"))[goi]
-    assert j["dat"] is True and j["tong_o"] == j["khop"] > 0
+    assert j["dat"] is True and j["tong_o"] == j["khop"] + j["lech_co_chu_dich"] > 0
     assert j["lech_co_chu_dich_ite"] == j["mong_lech_co_chu_dich_ite"] == mong
-    assert j["khop_dap_an"] + mong["so_o"] == j["khop"] and j["lech_ngoai_ten"] == 0
+    assert j["lech_co_chu_dich"] == j["mong_lech_co_chu_dich"] == mong["so_o"] and j["lech_ngoai_ten"] == 0
+    assert "khop_dap_an" not in j
     assert sum(j["lech_co_ten"]["hd_ngoai_cay"].values()) == 9
     assert sum(j["lech_co_ten"]["hd_alias"].values()) == 153
