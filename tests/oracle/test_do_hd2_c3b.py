@@ -60,7 +60,8 @@ def test_H6_B2_anh_that_DAT_mau_so_khai_truoc(tq_that):
     assert tq_that.phan_xu.dat, tq_that.phan_xu.ly_do
     # Đ4: 370 hàng × 57 kỳ = 21.090 ô lưới = ô so + ô KPI + ô '-' + ô kỳ-không-ngày
     assert do_hd2.MONG_C3B_TONG_O == 5 * 54 * (57 - 14) - 25 == 11585
-    assert tq_that.tong_o == do_hd2.MONG_C3B_TONG_O == tq_that.khop and tq_that.lech == []
+    assert tq_that.tong_o == do_hd2.MONG_C3B_TONG_O == tq_that.khop + len(tq_that.lech_ite)
+    assert tq_that.lech == [] and (tq_that.khop, len(tq_that.lech_ite)) == (11543, 42)       # KQ-231: khop thật
     assert tq_that.o_kpi == do_hd2.MONG_C3B_O_KPI == 5 * 20 * 57
     assert tq_that.o_loi == 25
     assert tq_that.o_ky_khong_ngay == do_hd2.MONG_C3B_O_KY_KHONG_NGAY == 5 * 54 * 14
@@ -93,10 +94,11 @@ def test_H6_B2_truc_ky_nam_tu_du_lieu_va_ngay_dau_IX_PER(tq_that):
 def test_H6_B2_hd2_cong_tep_THEM_goi_C3b_giu_nguyen_C2_C3a():
     j = json.loads(do_hd2.RA_CONG.read_text(encoding="utf-8"))
     assert j["goi"] == "WP-C2" and j["tong_o"] == do_hd2.MONG_TONG_O
-    assert j["WP-C3a"]["tong_o"] == j["WP-C3a"]["khop"] == 205175
+    assert j["WP-C3a"]["tong_o"] == 205175 == j["WP-C3a"]["khop"] + j["WP-C3a"]["lech_co_chu_dich"]
     c = j["WP-C3b"]
     assert c["goi"] == "WP-C3b" and c["dat"] is True
-    assert c["tong_o"] == c["mong_tong_o"] == c["khop"] == 11585
+    assert c["tong_o"] == c["mong_tong_o"] == c["khop"] + c["lech_co_chu_dich"] == 11585
+    assert (c["khop"], c["lech_co_chu_dich"], c["mong_lech_co_chu_dich"]) == (11543, 42, 42)
     assert "411" in c["loai_tru"]
 
 

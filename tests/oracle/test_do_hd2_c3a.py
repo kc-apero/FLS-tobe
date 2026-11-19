@@ -63,7 +63,9 @@ def test_H5_B2_anh_that_DAT_mau_so_khai_truoc(tq_that):
     # Đ3/Đ4: mẫu số = 5 khối × 54 mã so được × 760 ngày − 25 ô "-" của đáp án = 205.175
     assert do_hd2.MONG_C3A_TONG_O == 5 * 54 * 760 - 25 == 205175
     assert tq_that.tong_o == do_hd2.MONG_C3A_TONG_O
-    assert tq_that.khop == tq_that.tong_o and tq_that.lech == []
+    # KQ-231: `khop` = ô khớp đáp án THẬT (205.140); 35 ô lệch có chủ đích ITE nằm ở trường riêng
+    assert tq_that.khop + len(tq_that.lech_ite) == tq_that.tong_o and tq_that.lech == []
+    assert (tq_that.khop, len(tq_that.lech_ite)) == (205140, 35)
     assert tq_that.o_kpi == do_hd2.MONG_C3A_O_KPI == 5 * 20 * 760
     assert tq_that.o_loi == 25
 
@@ -72,7 +74,7 @@ def test_H5_B2_lech_co_ten_dung_MONG(tq_that):
     ct = tq_that.lech_co_ten
     assert ct["thieu_tien_te_D"] == sorted(do_hd2.MONG_C3A_THIEU_D) and len(ct["thieu_tien_te_D"]) == 12
     assert ct["hd_ngoai_cay"] == do_hd2.MONG_C3A_HD_NGOAI_CAY
-    assert sum(ct["hd_ngoai_cay"].values()) == 162
+    assert sum(ct["hd_ngoai_cay"].values()) == 9      # WO-226: 162 → 9 (153 ITE vào nút ITE nhờ alias)
     assert ct["hd_khac_hoa_thuong"] == 5
     assert ct["dong_nhan_cha"] == 0 and ct["dong_ngoai_truc"] == 0
     assert tq_that.hd2_cong["dong_so"] == do_hd2.MONG_C3A_DONG_SO == 12385 - 12
@@ -91,7 +93,8 @@ def test_H5_B2_hd2_cong_tep_THEM_goi_C3a_giu_nguyen_C2():
     assert j["goi"] == "WP-C2" and j["tong_o"] == do_hd2.MONG_TONG_O      # WP-C2 y nguyên
     c = j["WP-C3a"]
     assert c["goi"] == "WP-C3a" and c["dat"] is True
-    assert c["tong_o"] == c["mong_tong_o"] == c["khop"] == 205175
+    assert c["tong_o"] == c["mong_tong_o"] == c["khop"] + c["lech_co_chu_dich"] == 205175
+    assert (c["khop"], c["lech_co_chu_dich"], c["mong_lech_co_chu_dich"]) == (205140, 35, 35)
     assert set(c["dung_sai_theo_khoi"]) == {"la", "cha"}
 
 
@@ -197,7 +200,7 @@ def test_H6_R1_02_truc_C3a_khong_doc_dap_an_409(nguon, tq_that):
     da2.get("phu", {}).pop("ngay_truc", None)
     tq = do_hd2.so_sanh_c3a(vao, da2, fx, cay, _lich(), do_hd2.mong_c3a_mac_dinh())
     assert tq.phan_xu.dat, tq.phan_xu.ly_do
-    assert (tq.khop, tq.tong_o) == (tq_that.khop, tq_that.tong_o) == (205175, 205175)
+    assert (tq.khop, tq.tong_o) == (tq_that.khop, tq_that.tong_o) == (205140, 205175)
 
 
 def test_H6_R1_02_IX_PER_doi_ngay_dau_thi_truc_C3a_doi_va_DO(nguon):
@@ -212,7 +215,7 @@ def test_H6_R1_02_chay_wp_c3a_doc_IX_PER_tu_kho_DAT_205175():
         chc.nap_ix_per(c, actor="bo-test-h6-r1", ngay_dau="2024-10-21", luat="A", nguon=NGUON_PER)
     tq = do_hd2.chay_wp_c3a(dsn=dsn_test())
     assert tq.phan_xu.dat, tq.phan_xu.ly_do
-    assert tq.khop == tq.tong_o == 205175
+    assert (tq.khop, tq.tong_o) == (205140, 205175)
     assert tq.hd2_cong["truc_ngay"]["so_cot"] == 760
 
 

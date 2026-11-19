@@ -24,7 +24,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from datetime import date, timedelta
 from decimal import Decimal
-from typing import Iterable, Sequence
+from typing import Iterable, Mapping, Sequence
 
 from fls.cau_hinh.hd import CayHD
 from fls.cau_hinh.ky import Ky, LichKy, ky_cua
@@ -50,6 +50,7 @@ class KetQuaCFA1:
     o: dict[tuple[str, str, int], Decimal]
     dong_ngoai_cay: list[int] = field(default_factory=list)    # chỉ số dòng vào
     dong_khac_hoa: list[int] = field(default_factory=list)     # khớp chỉ khi bỏ hoa thường
+    dong_alias: list[int] = field(default_factory=list)        # vào nút nhờ bảng alias (WO-226)
     dong_nhan_cha: list[int] = field(default_factory=list)     # nhãn là nút CÓ con ⇒ ⛔ cộng
     dong_ngoai_truc: list[int] = field(default_factory=list)
 
@@ -59,7 +60,7 @@ def _nhan(ma: str, ten: str) -> str:
 
 
 def cfa1_daily(dong: Iterable[DongCFA], cay: CayHD, ngay: Sequence[int],
-               khoi: Sequence[str]) -> KetQuaCFA1:
+               khoi: Sequence[str], alias: Mapping[str, str] | None = None) -> KetQuaCFA1:
     """Lá = Σ (musd_no − musd_co) theo (khối, nhãn HD, ngày); cha = Σ con theo `cay`.
 
     `ngay`: trục cột *(serial — H6: dựng bằng `truc_ngay(IX.PER, den)`, ⛔ ngày đầu tạm)*; `khoi`: khối tính, phải có
@@ -75,6 +76,11 @@ def cfa1_daily(dong: Iterable[DongCFA], cay: CayHD, ngay: Sequence[int],
             con[n.cha].append(n.ma)
     theo_nhan = {_nhan(n.ma, n.ten): n.ma for n in nut}
     theo_nhan_thuong = {k.casefold(): m for k, m in theo_nhan.items()}
+    theo_alias: dict[str, str] = {}
+    for k, m in (alias or {}).items():
+        if m not in con:
+            raise ValueError(f"alias {k!r} → {m!r}: mã đích ⛔ có trong cây")
+        theo_alias[k.strip()] = m
 
     la: dict[tuple[str, str, int], Decimal] = {}
     kq = KetQuaCFA1(o={})
@@ -85,6 +91,10 @@ def cfa1_daily(dong: Iterable[DongCFA], cay: CayHD, ngay: Sequence[int],
             ma = theo_nhan_thuong.get(nhan.casefold())
             if ma is not None:
                 kq.dong_khac_hoa.append(i)
+        if ma is None and nhan is not None and theo_alias:
+            ma = theo_alias.get(nhan.strip())
+            if ma is not None:
+                kq.dong_alias.append(i)
         if ma is None:
             kq.dong_ngoai_cay.append(i)
             continue

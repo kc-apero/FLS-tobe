@@ -8,7 +8,7 @@ có khoá ↔ nhóm (vendor, tháng, No) × 14 cột. ⛔ MID2/MID3 làm đầu 
   · **AC-1** mẫu số khai TRƯỚC mỗi sổ *(`MONG_C4C`, nhãn Đ4)* + Đ5 hai chiều.
   · **AC-2** lệch tách 3 lớp CÓ TÊN: `lech_fls` *(mong 0)* · `lech_nguon` *(`lac`: SC ảnh 69 hàng khoá ·
     OMC 8 hàng `LAC_OMC`)* · `lech_nghi_loi` *(cờ `nguon_nghi_loi` OMC)*.
-  · **AC-3** khối `WP-C4c` theo hợp đồng CG2: `khop` = ô khớp THẬT, lệch có tên NGOÀI `tong_o`.
+  · **AC-3** khối `WP-C4c` theo hợp đồng CG2 + ITE: `khop` = ô khớp THẬT, lệch có tên ở `lech_co_chu_dich` (`tong_o` = ô so).
   · **AC-4** ⛔ vòng tròn: đột biến 1 ô MID1 ⇒ ĐÚNG các ô MID3 của hàng ấy ĐỎ.
   · **AC-5** grep mã vendor ở `fls/bao_cao` = 0.
 """
@@ -39,7 +39,10 @@ pytestmark = pytest.mark.pg
 # ══ MONG — khai TRƯỚC (Đ5) · nhãn Đ4 ═════════════════════════════════════════════════════════════
 #   (ô so · ô ≠ 0 · lệch FLS · lệch nguồn · lệch nghi lỗi) mỗi sổ
 MONG_SO = {"OMC": (8547, 363, 0, 52, 0), "SC": (6230, 1216, 0, 251, 0), "PS": (5117, 0, 0, 0, 0)}
-MONG_KHOI = (19591, 19591, 19894, 303)        # khop · tong_o · ô so · lệch có tên (= 52 + 251)
+# khop · tong_o · ô so · lệch có tên (= 52 + 251) · ô đáp án RỖNG (⇒ 0; OMC 1.650 + SC 2.575 + PS 4.386)
+# ⭐ KQ-236 H11-R1-02 (Đ4): hợp đồng ITE — `tong_o` = ô so (19.894), `khop` = ô khớp THẬT (19.591), 303 lệch nguồn ở
+#   `lech_co_chu_dich` (+ `mong_lech_co_chu_dich` khai trước); 8.611 ô rỗng-đáp án ĐẾM RIÊNG ⇒ ⛔ nói "19591 khớp".
+MONG_KHOI = (19591, 19894, 19894, 303, 8611)
 
 
 @pytest.fixture(scope="module")
@@ -81,7 +84,8 @@ def test_H11_B1_WP_C4c_anh_that_DAT_mau_so_co_nhan(ven, anh):
     do = {so: (k["o_so"], k["o_khac_0"], k["lech_fls"], k["lech_nguon"], k["lech_nghi_loi"])
           for so, k in h["so"].items()}
     assert do == MONG_SO
-    assert (h["khop"], h["tong_o"], h["o_so"], h["lech_co_ten"]) == MONG_KHOI
+    assert (h["khop"], h["tong_o"], h["o_so"], h["lech_co_ten"], h["o_trong_dap_an"]) == MONG_KHOI
+    assert (h["lech_co_chu_dich"], h["mong_lech_co_chu_dich"]) == (303, 303)     # 52 OMC + 251 SC, khai trước
     assert {so: k["vm"] for so, k in h["so"].items()} == {"OMC": 210, "SC": 87, "PS": 477}
     assert {so: (k["dong_so"], k["dong_ngoai_anh"]) for so, k in h["so"].items()} == \
         {"OMC": (890, 0), "SC": (741, 0), "PS": (585, 630)}
@@ -118,7 +122,8 @@ def test_lop_FLS_SC_doi_mot_o_ngoai_lac_thi_DO(ven, anh):
     tq = _chay(ven, _sua(anh, "SC", 1, f))
     assert not tq.phan_xu.dat
     assert tq.hd2_cong["so"]["SC"]["lech_fls"] == 1 and "SC · lech_fls: đo 1 ≠ mong 0" in tq.phan_xu.ly_do
-    assert tq.hd2_cong["khop"] == tq.hd2_cong["tong_o"] - 1          # khop = ô khớp THẬT
+    h = tq.hd2_cong
+    assert h["khop"] == h["tong_o"] - h["lech_co_chu_dich"] - 1      # khop = ô khớp THẬT
 
 
 def test_lop_NGHI_LOI_OMC_doi_mot_o_ngoai_lac_thi_DO_ten_nghi_loi(ven, anh):
@@ -236,16 +241,37 @@ def test_engine_chia_dong_GOP_lai_dung_chia_vendor_thang(ven, anh):
 def test_khoi_WP_C4c_theo_hop_dong_CG2(ven, anh):
     h = _chay(ven, anh).hd2_cong
     assert h["goi"] == "WP-C4c" and h["dat"] is True
-    assert type(h["tong_o"]) is int and type(h["khop"]) is int and h["khop"] == h["tong_o"] > 0
-    assert h["tong_o"] == h["o_so"] - h["lech_co_ten"]                # lệch có tên NGOÀI mẫu số, ⛔ trong khop
-    assert "lech_co_chu_dich" not in h                                # nền ⛔ có ITE — xem BG-235
+    assert type(h["tong_o"]) is int and type(h["khop"]) is int and h["tong_o"] == h["o_so"] > 0
+    assert h["khop"] + h["lech_co_chu_dich"] == h["tong_o"]           # hợp đồng ITE: khớp THẬT + lệch có chủ đích
+    assert h["lech_co_chu_dich"] == h["lech_co_ten"] == h["mong_lech_co_chu_dich"] == 303
+    assert h["o_trong_dap_an"] == sum(k["o_trong_dap_an"] for k in h["so"].values()) == 8611
 
 
 def test_tep_that_khoi_WP_C4c_khop_lan_chay(ven, anh):
     d = json.loads((GOC / "docs/ITL/_tools/hd2_cong.json").read_text(encoding="utf-8"))["WP-C4c"]
     h = _chay(ven, anh).hd2_cong
-    assert (d["khop"], d["tong_o"], d["o_so"], d["lech_co_ten"], d["dat"]) == \
-        (h["khop"], h["tong_o"], h["o_so"], h["lech_co_ten"], True) == (*MONG_KHOI[:2], *MONG_KHOI[2:], True)
+    assert (d["khop"], d["tong_o"], d["o_so"], d["lech_co_ten"], d["o_trong_dap_an"], d["dat"]) == \
+        (h["khop"], h["tong_o"], h["o_so"], h["lech_co_ten"], h["o_trong_dap_an"], True) == (*MONG_KHOI, True)
+    assert (d["lech_co_chu_dich"], d["mong_lech_co_chu_dich"]) == (303, 303)
+
+
+@pytest.mark.parametrize("so,lop", [("OMC", "lech_nguon"), ("SC", "lech_nguon")])
+def test_mong_lech_co_chu_dich_doi_thi_DO_ca_hai_chieu(ven, anh, so, lop):
+    """Đ5: `mong_lech_co_chu_dich` là Σ mong lớp nguồn + nghi lỗi — đổi mong một ô ⇒ ĐỎ cả `+1` lẫn `-1`."""
+    for d in (-1, 1):
+        m = dict(do_hd2.MONG_C4C)
+        m[so] = dataclasses.replace(m[so], **{lop: getattr(m[so], lop) + d})
+        tq = _chay(ven, anh, m)
+        assert not tq.phan_xu.dat and tq.hd2_cong["mong_lech_co_chu_dich"] == 303 + d
+
+
+def test_R1_04_duong_doc_kho_cua_CLI_chay_dung_ham_chay_wp_c4c(ven):
+    """`H11-R1-04`: đường ghi `hd2_cong.json` là `chay_wp_c4c` *(CLI)* — bài chạy CHÍNH hàm ấy sau khi kho có IX.VEN
+    *(fixture `ven` đã nạp)*: `dat` + khối bằng tệp thật. Đột biến `doc_ven(so="GI")` cho cả ba sổ ⇒ 640 lỗi ⇒ ĐỎ."""
+    tq = do_hd2.chay_wp_c4c(dsn_test())
+    assert tq.phan_xu.dat, tq.phan_xu.ly_do
+    d = json.loads((GOC / "docs/ITL/_tools/hd2_cong.json").read_text(encoding="utf-8"))["WP-C4c"]
+    assert json.loads(json.dumps(tq.hd2_cong)) == d              # qua JSON: tuple ⇒ list như tệp thật
 
 
 def test_kho_CHUA_khai_IX_VEN_thi_DO_co_ten():

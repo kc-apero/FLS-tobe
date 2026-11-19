@@ -374,3 +374,14 @@ def doc_mm_van_ban(van_ban: str, *, nguon: str) -> tuple[str, ...]:
     if loi:
         raise LoiHD(loi)
     return tuple(ma)
+
+
+# ⭐⭐ WO-226 *(ISP 3.1.2 · chủ chọn phương án A, 19/11)*: BẢNG ALIAS NHÃN HD — CẤU HÌNH khai CẠNH cây
+#   IX.HD *(⛔ kho C5 — ⛔ di trú mới; ⛔ `if` theo nhãn trong engine `cfa1_daily`)*. Lý do chọn "khai
+#   trong IX.HD" thay vì kho config: alias là thuộc tính của CÂY *(nhãn nguồn → nút)*, đi cùng ảnh ATL
+#   đóng băng; kho chỉ-thêm cần di trú + quy trình ghi mà chỉ có MỘT dòng cấu hình.
+#   Đo `gl_cf_dau_vao.json` cột V: nhãn nguồn ĐỔI từ 11/2025 — `ITE | Interest` (nút cây) 134 dòng,
+#   `ITE | ITE Interest` 152 dòng + `ITE | ITE Interest ` (cách cuối) 1 dòng ⇒ CFA1 AS-IS BỎ SÓT 153 dòng.
+#   Alias ⇒ FLS CỐ Ý LỆCH AS-IS đúng ở phần lãi ITE *(có khai `mong` ở C3a/C3b)*.
+#   Khoá so khớp sau `strip()` hai đầu *(⛔ hoa/thường — đã có `dong_khac_hoa`)*.
+ALIAS_NHAN_HD: Mapping[str, str] = {"ITE | ITE Interest": "ITE"}

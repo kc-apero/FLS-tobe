@@ -126,7 +126,42 @@
   "mong_dong_so": 12373,
   "tong_o": 205175,
   "mong_tong_o": 205175,
-  "khop": 205175,
+  "khop": 205140,
+  "lech_co_chu_dich": 35,
+  "mong_lech_co_chu_dich": 35,
+  "khop_ghi_chu": "khop = CHỈ ô khớp đáp án thật; lech_co_chu_dich = ô lệch CÓ CHỦ ĐÍCH đã khai mong (WO-226 phương án A) — dat khi khop + lech_co_chu_dich = tong_o VÀ lech_co_chu_dich = mong_lech_co_chu_dich, lech_ngoai_ten = 0 (KQ-231 ITE-R1-01)",
+  "lech_co_chu_dich_ite": {
+   "so_o": 35,
+   "theo_khoi": {
+    "BGO2": 1,
+    "GROUP": 26,
+    "SGO2": 8
+   },
+   "ma": [
+    "ITE"
+   ],
+   "ngay_dau": "2025-02-24",
+   "ngay_cuoi": "2026-10-31",
+   "so_cot_ngay": 26,
+   "tong_musd_group": "0.011973111599",
+   "tong_musd_moi_khoi": "0.023567965790"
+  },
+  "mong_lech_co_chu_dich_ite": {
+   "so_o": 35,
+   "theo_khoi": {
+    "BGO2": 1,
+    "GROUP": 26,
+    "SGO2": 8
+   },
+   "ma": [
+    "ITE"
+   ],
+   "ngay_dau": "2025-02-24",
+   "ngay_cuoi": "2026-10-31",
+   "so_cot_ngay": 26,
+   "tong_musd_group": "0.011973111599",
+   "tong_musd_moi_khoi": "0.023567965790"
+  },
   "lech_ngoai_ten": 0,
   "o_kpi_loai": 76000,
   "mong_o_kpi": 76000,
@@ -181,11 +216,13 @@
     9380
    ],
    "hd_ngoai_cay": {
-    "ITE | ITE Interest ": 1,
-    "ITE | ITE Interest": 152,
     "<rỗng>": 1,
     "GAC - Other": 1,
     "Server Cost": 7
+   },
+   "hd_alias": {
+    "ITE | ITE Interest ": 1,
+    "ITE | ITE Interest": 152
    },
    "hd_khac_hoa_thuong": 5,
    "dong_nhan_cha": 0,
@@ -226,7 +263,42 @@
   "dong_so": 12373,
   "tong_o": 11585,
   "mong_tong_o": 11585,
-  "khop": 11585,
+  "khop": 11543,
+  "lech_co_chu_dich": 42,
+  "mong_lech_co_chu_dich": 42,
+  "khop_ghi_chu": "khop = CHỈ ô khớp đáp án thật; lech_co_chu_dich = ô lệch CÓ CHỦ ĐÍCH đã khai mong (WO-226 phương án A) — dat khi khop + lech_co_chu_dich = tong_o VÀ lech_co_chu_dich = mong_lech_co_chu_dich, lech_ngoai_ten = 0 (KQ-231 ITE-R1-01)",
+  "lech_co_chu_dich_ite": {
+   "so_o": 42,
+   "theo_khoi": {
+    "BGO2": 4,
+    "GROUP": 24,
+    "SGO2": 14
+   },
+   "ma": [
+    "ITE"
+   ],
+   "ky_dau": "2025",
+   "ky_cuoi": "2026Q4",
+   "so_ky": 24,
+   "tong_musd_group": "0.047892446397",
+   "tong_musd_moi_khoi": "0.094271863160"
+  },
+  "mong_lech_co_chu_dich_ite": {
+   "so_o": 42,
+   "theo_khoi": {
+    "BGO2": 4,
+    "GROUP": 24,
+    "SGO2": 14
+   },
+   "ma": [
+    "ITE"
+   ],
+   "ky_dau": "2025",
+   "ky_cuoi": "2026Q4",
+   "so_ky": 24,
+   "tong_musd_group": "0.047892446397",
+   "tong_musd_moi_khoi": "0.094271863160"
+  },
   "o_so_khac_0": 2636,
   "mong_o_so_khac_0": 2636,
   "lech_ngoai_ten": 0,
@@ -301,11 +373,13 @@
     9380
    ],
    "hd_ngoai_cay": {
-    "ITE | ITE Interest ": 1,
-    "ITE | ITE Interest": 152,
     "<rỗng>": 1,
     "GAC - Other": 1,
     "Server Cost": 7
+   },
+   "hd_alias": {
+    "ITE | ITE Interest ": 1,
+    "ITE | ITE Interest": 152
    },
    "hd_khac_hoa_thuong": 5,
    "dong_nhan_cha": 0,
@@ -473,11 +547,15 @@
   "nguon_dau_vao": "tests/fixture/dap_an/{omc,sc,ps}_mid1.json (PD 508, thượng nguồn) + IX.VEN kho so=OMC/SC/PS",
   "dap_an": "tests/fixture/dap_an/{omc,sc,ps}_mid3.json (PD 510)",
   "khoa": "hàng MID3 có khoá ↔ nhóm MID1 (vendor, tháng, No) theo thứ tự × 14 cột",
-  "tong_o": 19591,
+  "tong_o": 19894,
   "khop": 19591,
   "o_so": 19894,
   "lech_co_ten": 303,
-  "lech_co_ten_nhan": "lệch nguồn (`lac`: SC ảnh · OMC 8 hàng O ≠ Σpe) + nghi lỗi (`nguon_nghi_loi` OMC) — nằm NGOÀI `tong_o`, ⛔ cộng vào `khop`",
+  "lech_co_chu_dich": 303,
+  "mong_lech_co_chu_dich": 303,
+  "o_trong_dap_an": 8611,
+  "o_trong_dap_an_nhan": "ô đáp án MID3 rỗng (iferror \"\") ⇒ so như 0 — nằm TRONG `khop`/`tong_o`; ⛔ đọc `khop` là 'đáp án có số khớp' (≠ 0: xem `o_khac_0` từng sổ; PS toàn 0 = 0)",
+  "lech_co_ten_nhan": "lệch nguồn (`lac`: SC ảnh · OMC 8 hàng O ≠ Σpe) + nghi lỗi (`nguon_nghi_loi` OMC) — nằm TRONG `tong_o`, ⛔ cộng vào `khop`; = `lech_co_chu_dich`",
   "ky_doi_chieu": [
    "202503",
    "202504",
