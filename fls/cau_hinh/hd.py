@@ -50,6 +50,7 @@ import json
 from collections import Counter
 from dataclasses import dataclass
 from typing import Any, Iterable, Mapping
+from types import MappingProxyType
 
 BANG = "IX.HD"
 # Nhóm Mapping Master mang thêm `IX.ORG` ở cùng tệp ⇒ vỏ ảnh ghi `IX.HD · IX.ORG`.
@@ -385,3 +386,42 @@ def doc_mm_van_ban(van_ban: str, *, nguon: str) -> tuple[str, ...]:
 #   Alias ⇒ FLS CỐ Ý LỆCH AS-IS đúng ở phần lãi ITE *(có khai `mong` ở C3a/C3b)*.
 #   Khoá so khớp sau `strip()` hai đầu *(⛔ hoa/thường — đã có `dong_khac_hoa`)*.
 ALIAS_NHAN_HD: Mapping[str, str] = {"ITE | ITE Interest": "ITE"}
+
+
+# ⭐ H7 *(ISP 3.1.2 · Step 32 · WO-245)*: cột `M` Mapping Master = `Code HR Allocate` *(`adapters.mapping_master`
+#   ⇒ trường `code_hr`)*. Sheet AS-IS `Report I H1000 Ledge (HR Allocate HD) Y2025` dựng cột `V` *(HD Final)* bằng
+#   cách tra `I` *(HDCode của dòng HR)* trong cột này ⇒ `hd_code`; ⛔ thấy ⇒ mặc định khối 1 *(engine `gl.hd_final_hr`)*.
+#   Đo 19/11 trên ảnh `mapping_master_cfg.json`: **9** dòng có `code_hr` *(5 mã trần `MC·DC·GAH·CXA·CXB` + 4 nhãn đủ
+#   `NIS·INT·PIT·COM | …`)* — đối chiếu 407: 9.421/9.421 dòng `V` đúng luật này *(⛔ đọc đáp án làm đầu vào — chỉ để
+#   xác nhận luật trước khi viết)*.
+def doc_code_hr_van_ban(van_ban: str, *, nguon: str) -> Mapping[str, str]:
+    """Ảnh Mapping Master ⇒ `{code_hr: hd_code}` *(nhãn `'MÃ | Tên'` nguyên chữ)*. Code trùng / 0 dòng ⇒ `LoiHD`."""
+    try:
+        tho = json.loads(van_ban)
+    except (ValueError, RecursionError) as e:
+        raise LoiHD([(HD_HONG, f"{nguon}: JSON hỏng — {_mot_dong(str(e))}")]) from None
+    if not isinstance(tho, dict) or tho.get("bang") != BANG_MM \
+            or not isinstance(tho.get("dong"), list):
+        raise LoiHD([(HD_HONG, f"{nguon}: ⛔ phải {{bang: '{BANG_MM}', dong: [...]}}")])
+    loi: list[tuple[str, str]] = []
+    cap: list[tuple[str, str]] = []
+    for i, r in enumerate(tho["dong"], start=1):
+        if not isinstance(r, Mapping):
+            loi.append((HD_HONG, f"dòng {i}: ⛔ phải một đối tượng"))
+            continue
+        k, _ = _chu(r.get("code_hr"))
+        if not k:
+            continue
+        v, ly = _chu(r.get("hd_code"))
+        if not v:
+            loi.append((HD_HONG, f"dòng {i}: code_hr có nhưng hd_code {ly or 'rỗng'}"))
+            continue
+        cap.append((k, v))
+    if not cap:
+        loi.append((HD_HONG, f"{nguon}: 0 dòng có code_hr ⇒ ⛔ có gì để tra"))
+    for m, n in sorted(Counter(k for k, _ in cap).items()):
+        if n >= 2:
+            loi.append((HD_MA_TRUNG, f"Mapping Master: code_hr {m!r} xuất hiện {n} lần"))
+    if loi:
+        raise LoiHD(loi)
+    return MappingProxyType(dict(cap))

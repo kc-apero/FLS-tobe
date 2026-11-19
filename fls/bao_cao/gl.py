@@ -139,6 +139,8 @@ from decimal import ROUND_HALF_EVEN, Context, Decimal, localcontext
 from typing import Iterable, Mapping
 
 from fls.canon.tien_te import ma_tien_te
+from fls.cau_hinh.to_chuc import LOAI_SU_KIEN, ToChuc, cdt_cua
+from fls.ledger.final_rule import MAC_DINH_THEO_KHOI
 
 # Khuôn cột tiền tệ của GL — đúng thứ tự `IX.FX` (AP §3.2.1). ⛔ chứa tỷ giá.
 TIEN_TE_GL: tuple[str, ...] = ("USD", "SGD", "COP", "VND", "HKD")
@@ -445,3 +447,48 @@ def _tra_ty_gia(
             f"BO/BP = 0; tháng vắng ⇒ SUMIFS = 0){vi_sao}",
         )
     return gia
+
+
+# ══════════════════════════════════════════════════════════════════════════════════
+# H7 — CA.GL dòng HR *(ISP 3.1.2 · Step 32 · WO-245 · AP §3.3.1 PD 407 · 408 · 413)*
+# ══════════════════════════════════════════════════════════════════════════════════
+# ⭐ Dòng HR *(ảnh `hr_ledger_2025` — file H1000 Ledger, thượng nguồn của sheet `… (HR Allocate HD) Y2025`)*
+#   đi qua ĐÚNG `tinh_gl` như dòng GL *(BA = AX ÷ tỷ giá USD tháng × 10³ — công thức `BA10` đọc 19/11, BG-250
+#   §3 — trùng BR của 406 khi tiền tệ VND)*. Phần RIÊNG của họ HR chỉ là HAI phép tra nhãn dưới đây.
+# ⛔ HR qua ALLOCATE *(Q3)* ⛔ ở đây.
+
+#: Mặc định khối 1 *(HD)* của AS-IS — MỘT bản khai ở `final_rule` *(⛔ chép chuỗi)*.
+HD_MAC_DINH_HR: str = MAC_DINH_THEO_KHOI["hd"]
+
+
+def hd_final_hr(code_hr: Mapping[str, str], hd_nguon: object) -> tuple[str, bool]:
+    """Nhãn HD Final *(cột V)* của MỘT dòng HR: `I` khớp một `Code HR Allocate` *(IX.HD — `hd.doc_code_hr_van_ban`)*
+    ⇒ `(hd_code, False)`; ⛔ khớp *(mã trần ngoài bảng · `PI…` · rỗng)* ⇒ `(HD_MAC_DINH_HR, True)`.
+
+    ⚠ Mặc định là hành vi AS-IS *(parity — D2)*; cờ `True` buộc người gọi ĐẾM có tên *(⛔ rơi im lặng)*.
+    """
+    k = hd_nguon.strip() if isinstance(hd_nguon, str) else ""
+    v = code_hr.get(k) if k else None
+    return (v, False) if v is not None else (HD_MAC_DINH_HR, True)
+
+
+class CdtLaHR(LookupError):
+    """CDT nguồn của một dòng HR ⛔ có trong `IX.ORG` *(⛔ chuẩn hoá được)*. `ma` = `CDT_LA` *(C8)*.
+
+    ⛔⛔ KHÔNG rơi về `SHQ2 | Headquarters2` như sheet NOW *(`to_chuc` docstring — một CDT gõ sai thành CDT1 của
+    Headquarters2, im lặng)*. Lời lỗi in giá trị CDT nguồn *(mã đơn vị, ⛔ tên người)*.
+    """
+
+    ma = LOAI_SU_KIEN
+
+    def __init__(self, cdt_nguon: object, nguon_org: str) -> None:
+        self.cdt_nguon = cdt_nguon
+        super().__init__(f"⛔ {self.ma}: CDT nguồn {cdt_nguon!r} ⛔ có trong IX.ORG *({nguon_org})* — ⛔ mặc định")
+
+
+def cdt1_hr(org: ToChuc, cdt_nguon: object) -> str:
+    """CDT1 chuẩn của MỘT dòng HR qua `cdt_cua` *(C8)*; lạ ⇒ `CdtLaHR`."""
+    kq = cdt_cua(org, cdt_nguon)
+    if kq.la or kq.cdt1 is None:
+        raise CdtLaHR(cdt_nguon, org.nguon)
+    return kq.cdt1
