@@ -40,3 +40,20 @@ Q8: `MONG_PYTEST_TOAN_BO` `4034 → 4040` *(+6 bài của máy quét)* + bài gh
 4. Máy quét bắt 3 DẠNG đã thấy; dạng mới *(ví dụ số TK cá nhân trong ô tự do)* ⇒ ⛔ bắt — thêm mẫu khi gặp.
 5. Biên bản cũ ở `KQ-109` · `BG-107` còn ghi checksum cũ `a47878bf…` — đúng lịch sử *(Đ2)*, ⛔ sửa.
 6. Một lệnh dò cấu trúc của chính phiên này lỡ in **1 số TK pháp nhân** ra log phiên (không vào tệp/commit) — báo để orchestrator biết.
+
+## Vòng sửa sau R1 (KQ-239)
+⛔ Mục này KHÔNG chứa giá trị số TK — chỉ đếm · tệp · dòng. Chỉ THÊM; các mục trên giữ nguyên.
+Quyết của chủ 19/11 08:30: TK pháp nhân ⛔ che; chỉ TK cá nhân *(đã duyệt 02:30)* — che CHỈ khi CHẮC.
+
+| Mã | Kết | Đo |
+|---|---|---|
+| `PII-R1-01` CHẶN | **ĐÃ SỬA** | Che BÊN TRONG zip: 37 chỗ · 4 số · 4/7 tệp ruột; nhãn dùng lại `TK_CA_NHAN_1…4` *(học số→nhãn bằng so ruột zip với bản đã che trong cây; mâu thuẫn nhãn 0)*. Nén lại cùng cấu trúc *(tên · thứ tự · ngày · kiểu nén)*; so từng tệp: dòng đổi 3+3+1+1, số dòng bằng nhau, **0 lệch ngoài chỗ che**. Máy quét đọc ruột zip |
+| `PII-R1-04` | **ĐÃ SỬA** | `KetQua.so_doc` đếm mục ĐÃ ĐỌC: **1.049** *(1.042 tệp văn bản + 7 ruột zip)*; mong ≥ 1.000 và ≥ 95 % mục. Không đọc được: **0** *(nhị phân khai theo đuôi 0 · đuôi lạ 0)*. Nhị phân khai theo `DUOI_NHI_PHAN` ⇒ liệt kê có tên; đuôi lạ ⇒ ĐỎ. Đỏ trước: đột biến `_doc → None` (M2) ⇒ 5 bài đỏ *(trước: 0)* |
+| `PII-R1-05` | **ĐÃ SỬA** | Bài `…bien_chu_so_o_buoc_che` + ca số ⊂ chuỗi dài hơn; đột biến M9 *(bỏ biên)* ⇒ 1 bài đỏ *(trước: 0)* |
+| `PII-R1-02` | **GIỮ + ĐẾM** | 1 số vừa gắn `CN` vừa gắn `_VGO1` *(khoá pháp nhân ở dữ liệu gốc — ảnh DT3)* ⇒ ⛔ CHẮC ⇒ **GIỮ 3 chỗ / 2 tệp** *(`05_DATA_DICTIONARY_ERD.md` 1 · `FLS-Wireframe-Sau-Man.html` 2)*. Máy quét đếm `số_vừa_CN_vừa_pháp_nhân`, ⛔ che. Đã che sẵn từ vòng đầu: 1 hàng `VGO1` ở ảnh DT3 + chỗ ở diễn giải `-CK` — giữ nguyên, ⛔ gỡ che *(chủ quyết nếu muốn gỡ)* |
+| `PII-R1-03` | **GIỮ + ĐẾM** | 3 dạng chữ tự do đo ở máy mới, trên 1.049 mục *(kể cả ruột zip)*: `cho <số>-…` **46** · `<số>-Ref…-CK` **26** · `tài khoản <số>` **1**. Ngữ cảnh đi kèm: `APERO HQ…` · `CONG TY` *(pháp nhân)* hoặc không nhãn ⇒ **0 chắc cá nhân ⇒ che 0**. Máy quét thêm mẫu `so_da_biet_CN`: số ĐÃ CHẮC cá nhân *(có khoá `CN`)* lặp ở BẤT KỲ dạng nào *(kể cả ba dạng chữ)* ⇒ bắt + che; ca phá đủ ba dạng *(số giả)* |
+
+Máy quét: **trước** *(cây `isp/PII` @ `d1ce388`, máy mới)* **69 khớp / 4 tệp ruột zip** → **sau 0 / 0**; mẫu 3 = 3 *(Đ5)*; 1.043 tệp theo dõi.
+Phụ: `che_repo` xử cả tệp chỉ mang SỐ ĐÃ BIẾT *(không có mẫu)*; `so_cn` trả danh sách theo thứ tự gặp *(⛔ `set` — băm ngẫu nhiên làm nhãn lệch giữa lần chạy; lộ qua 1 bài đỏ ở đường nền lần 1, đã sửa + bài ghim)*.
+`.gitattributes` thêm `*.zip binary` — trước đó `* text eol=lf` coi zip là văn bản *(cảnh báo CRLF→LF ở `git add`)* ⇒ có thể làm hỏng zip trong kho; đã kiểm blob trong index = tệp làm việc *(`testzip` None)*.
+Q8: `MONG_PYTEST_TOAN_BO` `4040 → 4051` *(+11 bài của `test_quet_pii_repo.py`)* + bài ghim cùng commit.
