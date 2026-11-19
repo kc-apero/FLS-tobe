@@ -51,3 +51,15 @@ Orchestrator chốt **A: theo NGUỒN AS-IS**. Đo lại công thức ô bằng 
 - Bài CHECK `C12-B3` đổi sang bộ số riêng `HD_CHECK` *(CHECK ngoài phạm vi)*; CHECK `==` tuyệt đối *(`-06`)* vẫn mở.
 - `-03…-06`: GHI NHẬN ⇒ backlog, ⛔ làm.
 - Q8: `MONG_PYTEST_TOAN_BO` **3500 → 3503** *(+3 bài `test_dong_pl.py`)* + bài ghim `test_dung_moi_truong_isp.py:423`, cùng commit.
+
+## Vòng sửa sau R2 — PL5 = GAG (chủ chốt 19/11)
+*(`KQ-187` · `C12-R2-01` — **thay** hàng 84 của bảng trên và dòng "PL5 ⛔ có nguồn công thức" của R1-01: hai chỗ ấy **SAI**, giữ nguyên làm biên bản.)*
+
+- **Nguồn thật của PL5** — `FORMULA` ô `AG84:AR84` *(12 ô, 2025; `N:Y` 2024 rỗng 12/12)*: `=sumifs('[2025][RPT] NOEM PL & COM'!F$18:F$26, …!$A$18:$A$26, "GAG") / SUMIFS('9.2.Exchange Rate'!$B:$B, …!$H:$H, DATE(AG$5,AG$6,1)) / 10^6 * -1 + AG83` ⇒ **PL5 = PL4 − COM_GAG**. Chủ chốt 19/11: COM cấp nhóm hàng `GAG`, ⛔ `COM Total` dòng 51.
+- **Địa chỉ hàng GAG:** sổ ATL `19NNTbXJ…`, tab `[2025][RPT] NOEM PL & COM`, hàng **18** *(tìm theo CHỮ `GAG` ở `A18:A26`: đúng 1/9 hàng)*, cột `F:Q` = 202501…202512 *(tiêu đề hàng 2–3 = `2025` × 12, `1…12`)*; `R` *(2026-01, `#N/A`)* ⛔ mang. Số VND dương *(dấu tab = chi phí)*, 12/12 tháng ≠ 0. ⚠ Bản `[COPY]` HR cùng tên tab cho `GAG` = **0 × 12** *(ô `=sum(F19:F26)` của hàng con bị bỏ)* — ⛔ dùng làm nguồn; bài đòi 12/12 ≠ 0 *(Đ3)*.
+- **Xác minh FORMULA:** `AG84` trỏ `F$18:F$26`/`$A$18:$A$26` = `GAG`, cột `F` ↔ `AG` *(tháng 1/2025)*, `AH84` ↔ `G`; tỷ giá = cột `B` USD của `9.2.Exchange Rate` theo tháng *(= `USD` của `ix_fx.json`)*; **dấu `*-1`** ⇒ `PL4 − COM_GAG`.
+- **Mã:** `DINH_NGHIA["PL5"] = "PL4 - COM_GAG"`; `COM_GAG` ∈ `DAU_VAO_NGOAI` *(đầu vào có tên NGOÀI cây HD, ⛔ hằng gõ cứng)* = VND ÷ tỷ giá USD ÷ 10^6; thiếu ⇒ `PL_THIEU_GIA_TRI`. Bộ đọc token nhận thêm `_`.
+- **Tháng sheet rỗng `N:Y` (2024):** PL5 sheet rỗng 12/12 ⇒ ⛔ có đáp án; ⛔ lấp 0 — không đưa `COM_GAG` ⇒ `PL_THIEU_GIA_TRI` *(bài ghim)*.
+- **Ảnh:** `tests/fixture/dau_vao/noem_com_gag.json` *(12 dòng, checksum `22ec5720f8cf1360`; khuôn `tools/khuon_dong_bang/noem_com_gag.py`, `--mong 12`)*. Cổng chứng minh ĐỎ: 12 ô = 0 ⇒ ĐỎ · một ô `#N/A` ⇒ ĐỎ · tháng 12 ghi `11` ⇒ TỪ CHỐI.
+- **Đo:** PL5 lệch sheet↔máy trước **0,0593** *(`PL4 + COM₅₁`, `AN`)* ⇒ sau **6,7e-16** *(nhiễu float64 sheet; dung sai bài 1e-9)*; 7/7 PL × 12 tháng = 84 phép so, 84 khớp. Bài ghim thêm 5 *(`test_C12_R2_01_*`)*.
+- **Q8:** `MONG_PYTEST_TOAN_BO` = **3742** *(thu thập thật cây gộp: nhánh làm việc 3699 + 38 bài C12 + 5)* + bài ghim `test_dung_moi_truong_isp.py`, cùng commit; web giữ 675. Gộp nhánh làm việc: xung đột `cau_hinh_repo.py` *(giữ cả `dong_pl` + `luat_pb`)*, script, bài ghim *(lấy bản nhánh làm việc)*.
