@@ -1,6 +1,6 @@
 # SỔ PHÁT HIỆN REVIEW — ISP 3.1 · phần `DT6b` *(tệp riêng, chờ gộp vào `SO_PHAT_HIEN_ISP-3.1.md`)*
 
-**Version:** v0.1 · **Ngày:** 2026-11-19 · **Chủ sở hữu:** `fls-test` *(R1 `KQ-228`)* · **Nguồn:** `IncrementalStepPlan-FLS-Voi_v3.1.2.md` Step 23 · DT6b · `WO-225` · `BG-227` *(`isp/DT6B` @ `08d64a6`)*
+**Version:** v0.2 · **Ngày:** 2026-11-19 · **Chủ sở hữu:** `fls-test` *(R1 `KQ-228` · R2 `KQ-229`)* · **Nguồn:** `IncrementalStepPlan-FLS-Voi_v3.1.2.md` Step 23 · DT6b · `WO-225` · `BG-227` *(`isp/DT6B` @ `08d64a6`)*
 
 > Thang lớp *(A1 · A2 · B1 · B2)* và mức *(CHẶN · NÊN SỬA · GHI NHẬN)*: **y như** §1 sổ chung. Sổ **chỉ THÊM**.
 > Đo độc lập *(khoá SA chỉ-đọc; bản thô `/tmp`, ⛔ commit; ⛔ đọc cột `B·C·I·J·K·M…R`; cột `H` chỉ đo HÌNH DẠNG)*.
@@ -15,6 +15,7 @@
 | `DT6B-R1-04` | DT6b | R1 | A2 | GHI NHẬN | `BG-227 §3` *(câu treo)* | Câu treo *"2.302 hàng có nằm trong đoạn đuôi A-rỗng của 407?"* — **ĐÃ ĐO: KHÔNG**. Tab 407 *(`values:batchGet` cột `A·F·G·I·J·P` từ hàng 10)*: cả 6 cột dài đúng **9.421** ô = hàng có ngày; `A` rỗng **0**/9.421; từ hàng 9431 trở đi cả 6 cột **rỗng** *(đuôi 9.808 hàng của ảnh 407 chỉ mang ô ở cột khác)*. Đối chứng *(mẫu số > 0, Đ3)*: bộ `(F,G,I,J,P)` của 9.410 hàng có ngày 408 có mặt ở 407 **9.410/9.410**; của 2.302 hàng gán kỳ chỉ **293/2.302** *(trùng giá trị ngẫu nhiên, 1.306 bộ khác nhau)*. ⇒ 2.302 hàng **không có** ở 407 ở bất kỳ vị trí nào; 407 ⊂ 408 đúng 9.410 + 11 hàng có ngày. | BA đóng câu hỏi. | — | MỞ |
 | `DT6B-R1-05` | DT6b | R1 | B2 | GHI NHẬN | `docs/ITL/02_BA/Artifacts/{Ket-qua-US-KT-037-Ma-lenh-trong-dien-giai.md · man-gan-lenh-chi.html · man-gan-lenh-chi-v2.html}` | PII **ngoài DT6b**: dãy 9 chữ số của 6 ô `H` Y2024 *(đo lại bằng SA, ⛔ in)* xuất hiện **5** chỗ ở **3** tệp BA có sẵn ở nhánh làm việc *(⛔ do `104f332`/`08d64a6` đưa vào — `git diff 213a40a HEAD` không chạm)*. Cùng 3 tệp `KQ-195` đã báo ở DT6. Trong phần DT6b: ảnh `hr_ledger_2024` · `gl_hr_408` · `gl_hr_413` **0** lần xuất hiện dãy ấy; mã/bài/`BG-227` 0 chuỗi ≥ 9 chữ số ngoài số tổng và 2 chuỗi tổng hợp *(`123456789` · `987654321`)*. | Orchestrator xử lý 3 tệp BA *(che hoặc gỡ khỏi git)*. | — | MỞ — chuyển orchestrator |
 | `DT6B-R1-06` | DT6b | R1 | B2 | GHI NHẬN | `tests/fixture/dap_an/gl_hr_408·413.json` · `dau_vao/hr_ledger_2024.json` | Kích thước ảnh: 408 6.015.581 → **7.596.989** B *(+1.581.408)* · 413 6.887.920 → **8.497.460** B *(+1.609.540)* · mới 481.877 B ⇒ **+3,67 MB** thô trong `.git` *(chưa nén)*. | Theo dõi cùng `DT6-R2-02`. | — | MỞ |
+| `DT6B-R2-01` | DT6b | R2 | B2 | GHI NHẬN | `tests/fixture/dap_an/gl_hr_408·413.json` · `tools/khuon_dong_bang/gl_hr_4*.py` | Khác góc R1, soát cây gộp thử: ảnh `gl_hr_408/413` chỉ có **2 nơi đọc ngoài tệp khuôn** — `test_dap_an_gl_hr_cfa3.py` và `test_dap_an_hr_ledger_2024.py` *(grep `fls/` = 0 · `tools/` chỉ `khuon_dong_bang/*` · `do_hd2.py` không đọc)*; H7 chưa gộp ⇒ chưa có engine đọc; không bài nào giả định "mọi hàng có ngày" bị đỏ. Ghim `checksum` cắn: đột biến 1 byte ở 408 · 413 · `hr_ledger_2024` ⇒ ĐỎ **2 · 2 · 3** bài, trả nguyên ⇒ 49/49 xanh. Cây gộp xung đột **2** tệp *(`dung_moi_truong_isp.sh` · `test_dung_moi_truong_isp.py`)* ⇒ gộp tay, sàn **3884** = thu thập thật *(3864 + 20)*. Khi H7 vào, engine đọc 408/413 phải lọc cờ `ky_suy` *(hàng gán kỳ 2.302 không phải hàng có ngày)* — đây là việc của H7, ⛔ lỗi DT6b. | Khi gộp H7: thêm bài đòi engine tách `ky_suy` khỏi tổng kỳ chốt. | — | MỞ |
 
 ## Đo R1 *(mỗi số nói nó đếm gì)*
 - **Tái đo Y2024** *(file gốc `1YEyGxBY…`, SA chỉ-đọc, `UNFORMATTED_VALUE`)*: **1.381/1.381** hàng có ngày ở nguồn ↔ ảnh, khoá `dong_sheet` khớp **2 chiều** *(thiếu 0 · thừa 0)*; **9 trường × 1.381 = 12.429** ô so từng ô *(ngày→kỳ · `D·E·F·G·S·T·AG`)* ⇒ **0** lệch. Số hàng theo `(tab, kỳ)`: NIS 2024-11 **165** · 2024-12 **536** · 2025-01 **268** · PIT 2025-01 **200** · 2025-04 **212** *(= mong)*. Σ PS Có mỗi kỳ **286.400.000 · 5.140.567.470 · 5.543.361.433 · 551.671.054** *(= BG)*. Cột `H` *(hình dạng)*: NIS 781 `a a (a)` · 182 rỗng · **6** ô dãy chữ số; PIT 412 `a a (a)`; ảnh 1.193 `a a (a)` + 182 rỗng + **6** `R` *(= 6/6)*.
@@ -24,5 +25,11 @@
 - **Ảnh khác**: `git diff --stat 213a40a HEAD -- tests/fixture` = đúng **3** tệp *(408 · 413 · `hr_ledger_2024` mới)* ⇒ `gl_hr_407` · `cfa3` · `gl_406` · mọi ảnh DT2…DT10 · DT8b **0 byte** lệch.
 - Cổng nền: xem `KQ-228`.
 
+## Đo R2 *(cây gộp thử `thu/DT6B` = nhánh làm việc + `isp/DT6B` @ `6a7888c`; mỗi số nói nó đếm gì)*
+- **Gộp**: xung đột **2** tệp; hằng `MONG_PYTEST_TOAN_BO` **3864 → 3884** = số bài THU THẬP cây gộp *(`pytest --collect-only`: 3.884)*; web giữ **675**.
+- **Đường nền** `--duong-nen --cong 5436` **một lần**: tập đỏ + XFAIL **28 = 28** *(12 đỏ + 14 lỗi + 2 XFAIL; thêm 0 · bớt 0)*, chạy **3884** *(mong ≥ 3884)*, skipped 0 · deselected 0; web **3 = 3**, chạy 675. `lint-imports` 11 kept · 0 broken; `kiem_tai_lieu` ĐẠT; `soi_bang_tuyen` khớp **46** tuyến.
+- **PII** trên tệp mới/đổi *(14 tệp)*: 3 ảnh **0** `@`; ô toàn-chữ-số ≥ 9 là số tiền *(119 · 135 · 27 ô, độ dài 9–10)*; **0** trùng dãy 9 chữ số nào ở `docs/ITL/02_BA/Artifacts`; tệp mã/bài/BG chỉ còn chuỗi tổng + 2 chuỗi tổng hợp.
+
 ## Changelog
 - **v0.1** *(2026-11-19, `fls-test` R1 của `DT6b`, `KQ-228`)*: khởi tạo — **6** phát hiện `DT6B-R1-01…06` *(0 CHẶN · 0 NÊN SỬA · 6 GHI NHẬN)*.
+- **v0.2** *(2026-11-19, `fls-test` R2 của `DT6b`, `KQ-229`)*: THÊM `DT6B-R2-01` *(GHI NHẬN)* — R2 ĐẠT, 0 CHẶN · 0 NÊN SỬA.
