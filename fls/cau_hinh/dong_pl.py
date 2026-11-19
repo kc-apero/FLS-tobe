@@ -35,13 +35,19 @@ PL_THIEU_GIA_TRI = "PL_THIEU_GIA_TRI"     # cây có mã nhưng ⛔ có giá tr�
 #   OMC âm 27/27 cột ≠ 0)* ⇒ giá trị HD của chi phí phải mang dấu ÂM; ⛔ nhập dương thì PL sai
 #   88–107 (đo trên 46 cột). ⚠ PL6 đi qua PL4 *(⛔ qua PL5 — COM bị bỏ khỏi chuỗi, đúng ô sheet)*;
 #   PL8 cộng `TAC` *(Tax Cash, dòng 57)* ⛔ `CIT` *(dòng 58)*.
-# ⚠ PL5: sheet ⛔ CÓ công thức ô *(tháng N:Y rỗng, G84 = sumifs trên vùng rỗng)* ⇒ giữ lời mô tả
-#   dòng sheet "PL5 = PL4 − COM" dưới dấu sheet *(COM âm ⇒ `PL4 + COM`)*; ⛔ ghim như nguồn.
+# ⭐ PL5 *(vòng sửa sau R2 · `C12-R2-01` · chủ chốt 19/11)*: sheet CÓ công thức ô — 12 ô `AG84:AR84`
+#   *(2025; `N:Y` 2024 RỖNG 12/12)*: `=sumifs('[2025][RPT] NOEM PL & COM'!F$18:F$26, …, "GAG") /
+#   SUMIFS('9.2.Exchange Rate'!$B:$B, …) / 10^6 * -1 + AG83` ⇒ **PL5 = PL4 − COM_GAG** *(COM cấp nhóm
+#   hàng `GAG`, VND ÷ tỷ giá USD ÷ 10^6, dấu của tab DƯƠNG = chi phí; ⛔ `COM Total` dòng 51)*.
+#   `COM_GAG` là ĐẦU VÀO NGOÀI CÂY HD *(`DAU_VAO_NGOAI`, ảnh `noem_com_gag.json`)*, ⛔ hằng gõ cứng;
+#   thiếu ⇒ `PL_THIEU_GIA_TRI` — tháng 2024 ⛔ lấp 0 *(sheet cũng để rỗng)*. Đo: lệch PL5 sheet↔máy
+#   trước sửa 0,0593 *(`PL4 + COM₅₁`)* ⇒ sau sửa < 1e-9 *(nhiễu float sheet)*.
+DAU_VAO_NGOAI: frozenset[str] = frozenset({"COM_GAG"})
 DINH_NGHIA: dict[str, str] = {
     "PL2": "GI + OMC",
     "PL3": "PL2 + API + SC + LC",
     "PL4": "PL3 + PS",
-    "PL5": "PL4 + COM",
+    "PL5": "PL4 - COM_GAG",
     "PL6": "PL4 + MC + OTMC + DC + CSO",
     "PL7": "PL6 + GAC + CDC + ITE",
     "PL8": "PL7 + TAC",
@@ -71,7 +77,7 @@ class LoiPL(ValueError):
                          + " · ".join(f"{t}: {c}" for t, c in self.loi))
 
 
-_TOKEN = re.compile(r"\s*(?:([A-Za-z][A-Za-z0-9.]*)|([+\-−()]))")
+_TOKEN = re.compile(r"\s*(?:([A-Za-z][A-Za-z0-9._]*)|([+\-−()]))")
 
 
 def _tach(bt: Any) -> list[tuple[str, str]]:
@@ -171,7 +177,7 @@ def _tinh(n: tuple, gt: Mapping[str, Any], dn: Mapping[str, str],
 
 
 def _hop_le(cay: hd.CayHD | None) -> frozenset[str] | None:
-    return None if cay is None else frozenset(n.ma for n in cay.nut)
+    return None if cay is None else frozenset(n.ma for n in cay.nut) | DAU_VAO_NGOAI
 
 
 def tinh_bieu_thuc(bt: str, gia_tri_hd: Mapping[str, Any],
@@ -184,7 +190,7 @@ def tinh_bieu_thuc(bt: str, gia_tri_hd: Mapping[str, Any],
 def kiem_dinh_nghia(dinh_nghia: Mapping[str, str], cay: hd.CayHD | None = None) -> None:
     """Kiểm HÌNH `dinh_nghia`: cú pháp từng dòng; (có `cay`) mọi mã ∈ cây. Gom HẾT lỗi."""
     loi: list[tuple[str, str]] = []
-    theo = {n.ma for n in cay.nut} if cay is not None else None
+    theo = ({n.ma for n in cay.nut} | DAU_VAO_NGOAI) if cay is not None else None
     for pl, bt in dinh_nghia.items():
         try:
             ma = _ma_cua(phan_tich(bt))

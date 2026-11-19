@@ -23,10 +23,10 @@ CAY = hd.doc_van_ban((GOC / "tests/fixture/cau_hinh/atl_cay.json")
 
 # ⭐ QUY ƯỚC DẤU THEO NGUỒN *(C12-R1-02)*: sheet ATL lưu CHI PHÍ ÂM rồi CỘNG (`PL2 = GI + OMC`).
 # Tổng hợp, tay tính (chi phí ÂM): PL2=1000+(−100)=900 · PL3=900+(−30−20−10)=840 · PL4=840−40=800 ·
-# PL5=800−50=750 · PL6=PL4+(−10−5−15−20)=750 *(⛔ qua PL5 — đúng ô sheet)* ·
+# PL5=800−COM_GAG(50)=750 · PL6=PL4+(−10−5−15−20)=750 *(⛔ qua PL5 — đúng ô sheet)* ·
 # PL7=750+(−30−20−10)=690 · PL8=690+TAC(−40)=650.
 HD_CAN = {"GI": 1000, "OMC": -100, "API": -30, "SC": -20, "LC": -10, "PS": -40,
-          "COM": -50, "MC": -10, "OTMC": -5, "DC": -15, "CSO": -20,
+          "COM": -50, "COM_GAG": 50, "MC": -10, "OTMC": -5, "DC": -15, "CSO": -20,
           "GAC": -30, "CDC": -20, "ITE": -10, "TAC": -40, "CIT": -40,
           # CHECK: NIS+INT+PIT+COM = 40+20+15+50 = 125 = CXA+GAH+DC+MC = 60+40+15+10
           "NIS": 40, "INT": 20, "PIT": 15, "CXA": 60, "GAH": 40, "NB": 0}
@@ -37,7 +37,7 @@ MONG_PL = {"PL2": 900, "PL3": 840, "PL4": 800, "PL5": 750, "PL6": 750,
 # `Report I PLA3 Y H Q M | PM + HR | ATL`, cột G, dòng sheet 81…87, `FORMULA` *(SA chỉ-đọc, 17/11;
 # giống nhau ở 46/46 cột có công thức)*. Dịch dòng sheet → mã bằng `atl_cay.json` (`dong_sheet`).
 CONG_THUC_O_GOC = {81: "=G8+G12", 82: "=G81+G18+G19+G20", 83: "=G82+G17",
-                   84: None,      # PL5: tháng N:Y RỖNG, G84 = sumifs trên vùng rỗng ⇒ ⛔ có công thức
+                   84: None,      # PL5: G84 = sumifs trên vùng RỖNG (N:Y); công thức THẬT ở AG:AR — bài `C12_R2_01` dưới
                    85: "=G83+G13+G14+G21+G22", 86: "=G85+G23+G34+G43", 87: "=G86+G57"}
 
 
@@ -87,7 +87,7 @@ def test_C12_R1_02_dau_chi_phi_AM_cong_nhu_sheet_moi_dong_PL_chi_dung_dau_cong()
     for pl, bt in dong_pl.DINH_NGHIA.items():
         if pl != "PL5":
             assert "-" not in bt and "−" not in bt, (pl, bt)
-    am = {k: (-abs(v) if k not in ("GI", "NIS", "INT", "PIT", "CXA", "GAH", "NB") else v)
+    am = {k: (-abs(v) if k not in ("GI", "NIS", "INT", "PIT", "CXA", "GAH", "NB", "COM_GAG") else v)
           for k, v in HD_CAN.items()}
     assert dong_pl.tinh_pl(am) == MONG_PL
     # chi phí nhập DƯƠNG (dấu ngược nguồn) ⇒ PL2 > GI: bài ghim để đảo dấu bị ĐỎ
@@ -99,6 +99,7 @@ def test_C12_B1_dinh_nghia_la_MOT_nguon_va_moi_ma_co_trong_cay_ATL():
     assert tuple(dong_pl.DINH_NGHIA) == tuple(MONG_PL)
     ma = dong_pl.ma_dung(dong_pl.DINH_NGHIA)
     theo = {n.ma for n in CAY.nut}
+    ma -= dong_pl.DAU_VAO_NGOAI                    # COM_GAG: đầu vào NGOÀI cây, có tên riêng
     assert len(ma) > 0 and ma <= theo, sorted(ma - theo)
     dong_pl.kiem_dinh_nghia(dong_pl.DINH_NGHIA, CAY)          # sạch ⇒ không nổ
     assert {n.nhom for n in CAY.nut if n.ma in MONG_PL} == {"HDCI"}
@@ -191,4 +192,103 @@ def test_C12_B3_ve_phai_lech_1_bao_phep_thu_hai_va_dong_nao():
 def test_C12_B3_thieu_gia_tri_CHECK_PL_THIEU_GIA_TRI_khong_xanh_tren_rong():
     with pytest.raises(dong_pl.LoiPL) as e:
         dong_pl.check_pl({"NB": 0})
+    assert dong_pl.PL_THIEU_GIA_TRI in e.value.ten
+
+
+# ── C12-R2-01 · PL5 = PL4 − COM_GAG (chủ chốt 19/11) ─────────────────────────
+# ⭐ Ô `AG84:AR84` sheet ATL *(`FORMULA`, 19/11)*: `=sumifs('[2025][RPT] NOEM PL & COM'!F$18:F$26, …$A$18:$A$26,
+#   "GAG") / SUMIFS('9.2.Exchange Rate'!$B:$B, …$H:$H, DATE(AG$5,AG$6,1)) / 10^6 * -1 + AG83` ⇒
+#   PL5 = PL4 − COM_GAG(VND ÷ tỷ giá USD ÷ 10^6). ⛔ `COM Total` dòng 51. Số `GAG` = ĐẦU VÀO có tên.
+import json                                                         # noqa: E402
+
+ATL_ANH = json.loads((GOC / "tests/fixture/dap_an/atl.json").read_text(encoding="utf-8"))
+GAG_ANH = json.loads((GOC / "tests/fixture/dau_vao/noem_com_gag.json").read_text(encoding="utf-8"))
+FX_ANH = json.loads((GOC / "tests/fixture/cau_hinh/ix_fx.json").read_text(encoding="utf-8"))
+HANG_ATL = {int(d["dong_sheet"]): d for d in ATL_ANH["dong"]}
+_DONG_MA = {int(n.dong_sheet): n.ma for n in CAY.nut if getattr(n, "dong_sheet", None)}
+_PL_DONG = {"PL2": 81, "PL3": 82, "PL4": 83, "PL5": 84, "PL6": 85, "PL7": 86, "PL8": 87}
+THANG_2025 = [f"y2025_m{m:02d}" for m in range(1, 13)]
+DUNG_SAI = Decimal("1e-9")      # nhiễu float của chính sheet (số sheet là float64, ~1e-16)
+
+
+def _gia_tri_hd_sheet(cot: str) -> dict:
+    """Số HD của MỘT cột kỳ lấy từ hàng lá của ảnh ATL *(đúng mã mà DINH_NGHIA nhắc)*."""
+    can = dong_pl.ma_dung(dong_pl.DINH_NGHIA) - dong_pl.DAU_VAO_NGOAI
+    ra = {}
+    for dong, ma in _DONG_MA.items():
+        v = HANG_ATL[dong][cot] if dong in HANG_ATL else None
+        if ma in can:
+            assert v not in (None, ""), (ma, cot)
+            ra[ma] = Decimal(v)
+    assert set(ra) == can
+    return ra
+
+
+def _com_gag(thang: int) -> Decimal:
+    """COM_GAG = VND ÷ tỷ giá USD ÷ 10^6, đúng phép của ô sheet *(⛔ nhân −1: dấu ở DINH_NGHIA)*."""
+    vnd = Decimal(next(d["com_gag_vnd"] for d in GAG_ANH["dong"] if d["thang"] == str(202500 + thang)))
+    usd = Decimal(next(d["USD"] for d in FX_ANH["dong"] if d["Month"] == str(202500 + thang)))
+    return vnd / usd / Decimal(10) ** 6
+
+
+def test_C12_R2_01_anh_COM_GAG_12_thang_va_khoa_theo_chu_GAG_khong_theo_so_hang():
+    assert [d["thang"] for d in GAG_ANH["dong"]] == [str(202500 + m) for m in range(1, 13)]
+    assert GAG_ANH["cong"]["dat"] and GAG_ANH["cong"]["mong"] == GAG_ANH["so_dong"] == 12
+    khac0 = [d for d in GAG_ANH["dong"] if Decimal(d["com_gag_vnd"]) != 0]
+    assert len(khac0) == 12, len(khac0)                     # Đ3: mẫu số ≠ 0 — 12/12 tháng có COM_GAG
+
+
+def test_C12_R2_01_PL5_la_PL4_tru_COM_GAG_dau_vao_co_ten_khong_hang_go_cung():
+    bt = dong_pl.DINH_NGHIA["PL5"].replace(" ", "")
+    assert bt == "PL4-COM_GAG", bt
+    assert "COM_GAG" in dong_pl.DAU_VAO_NGOAI and "COM_GAG" not in {n.ma for n in CAY.nut}
+    assert not re.search(r"\d", bt.replace("PL4", ""))       # ⛔ hằng số gõ cứng trong biểu thức
+    # đầu vào thiếu ⇒ lỗi CÓ TÊN, ⛔ ngầm 0
+    v = {k: x for k, x in HD_CAN.items() if k != "COM_GAG"}
+    with pytest.raises(dong_pl.LoiPL) as e:
+        dong_pl.tinh_pl(v)
+    assert dong_pl.PL_THIEU_GIA_TRI in e.value.ten and "COM_GAG" in str(e.value)
+
+
+def test_C12_R2_01_PL5_khop_o_AG_AR_sheet_lech_max_0_va_7_PL_khop_nguon_12_thang():
+    lech_max = Decimal(0)
+    n_so = n_khop_pl5 = 0
+    for ky in THANG_2025:
+        m = int(ky[-2:])
+        gt = _gia_tri_hd_sheet(ky) | {"COM_GAG": _com_gag(m)}
+        ra = dong_pl.tinh_pl(gt)
+        for pl, dong in _PL_DONG.items():
+            sheet = Decimal(HANG_ATL[dong][ky])
+            d = abs(ra[pl] - sheet)
+            n_so += 1
+            lech_max = max(lech_max, d) if pl == "PL5" else lech_max
+            assert d < DUNG_SAI, (ky, pl, ra[pl], sheet)
+        n_khop_pl5 += abs(ra["PL5"] - Decimal(HANG_ATL[84][ky])) < DUNG_SAI
+    assert n_so == 12 * 7 and n_khop_pl5 == 12             # Đ3 · Đ4: 84 phép so, 12 ô AG:AR
+    assert lech_max < DUNG_SAI
+
+
+def test_C12_R2_01_PL5_khac_PL4_va_khac_cach_COM_Total_dong_51_dem_12_thang():
+    """Chống ghim ngược: nếu PL5 = PL4 + COM₅₁ *(bản cũ)* thì lệch ≥ 1e-3 ở ≥ 1 tháng."""
+    n_lech_cu = 0
+    for ky in THANG_2025:
+        gt = _gia_tri_hd_sheet(ky)
+        pl4 = dong_pl.tinh_pl(gt | {"COM_GAG": 0})["PL4"]
+        n_lech_cu += abs(pl4 + Decimal(HANG_ATL[51][ky]) - Decimal(HANG_ATL[84][ky])) > Decimal("1e-3")
+    assert n_lech_cu >= 1, n_lech_cu
+
+
+def test_C12_R2_01_thang_2024_N_Y_rong_khong_lap_thieu_COM_GAG_la_loi_co_ten():
+    """Sheet PL5 `N:Y` *(2024)* RỖNG 12/12 *(mẫu số 12)* ⇒ ⛔ có đáp án; ⛔ lấp bằng 0 — không đưa
+    COM_GAG ⇒ `PL_THIEU_GIA_TRI`; bài `tinh_pl` ở 2024 ⛔ im lặng ra số."""
+    rong = [k for k in (f"y2024_m{m:02d}" for m in range(1, 13)) if HANG_ATL[84][k] in (None, "")]
+    assert len(rong) == 12
+    ky = "y2024_m05"
+    gt = {}
+    for dong, ma in _DONG_MA.items():
+        v = HANG_ATL.get(dong, {}).get(ky)
+        if ma in dong_pl.ma_dung(dong_pl.DINH_NGHIA) - dong_pl.DAU_VAO_NGOAI and v not in (None, ""):
+            gt[ma] = Decimal(v)
+    with pytest.raises(dong_pl.LoiPL) as e:
+        dong_pl.tinh_pl(gt)
     assert dong_pl.PL_THIEU_GIA_TRI in e.value.ten
