@@ -30,6 +30,11 @@ TEP_DO_MAC_DINH = os.path.join(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
     "docs", "ITL", "_tools", "voi_so_luong.json")
 
+# ⭐ CG2 (`WO-208`): tệp cổng HD2 theo gói — ghi bởi `python tools/do_hd2.py --goi … --ghi`.
+TEP_HD2_MAC_DINH = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+    "docs", "ITL", "_tools", "hd2_cong.json")
+
 from fls.api import cua                                          # noqa: E402
 from fls.api.the import dong_the, khoa                           # noqa: E402
 from fls.db.kho import dsn_that, noi_chi_doc                     # noqa: E402
@@ -157,6 +162,9 @@ def main() -> int:
                     help="⭐ tệp đo của cổng HD1 (`FINAL` · `HD1_THANG` trong "
                          "/gates). Rỗng ('') ⇒ ⛔ truyền: hai cổng ấy CHƯA ĐO "
                          "ĐƯỢC. Tệp vắng ⇒ cũng CHƯA ĐO ĐƯỢC, ⛔ bao giờ xanh.")
+    ap.add_argument("--tep-hd2", default=TEP_HD2_MAC_DINH, metavar="DUONG",
+                    help="⭐ tệp cổng HD2 (`HD2_WP_*` trong /gates). Rỗng ('') ⇒ ⛔ truyền: "
+                         "các cổng ấy CHƯA ĐO ĐƯỢC. Tệp vắng ⇒ cũng CHƯA ĐO ĐƯỢC.")
     a = ap.parse_args()
 
     if a.in_bang_tuyen:
@@ -210,7 +218,8 @@ def main() -> int:
     dsn = dsn_that()
     may = cua.dung_may(_mo_ket_noi(dsn), cong=a.cong, dia_chi=a.dia_chi,
                        mo_ghi=_mo_ghi(dsn) if a.cho_ghi else None,
-                       phuc_vu_tep=phuc_vu, tep_do=a.tep_do or None)
+                       phuc_vu_tep=phuc_vu, tep_do=a.tep_do or None,
+                       tep_hd2=a.tep_hd2 or None)
     print(f"cua FLS: http://{a.dia_chi}:{a.cong}/api/fls/v1/  "
           f"({'DOC + GHI' if a.cho_ghi else 'CHI DOC'} · the bat buoc · "
           f"pham vi = lan nap that)")
@@ -219,6 +228,10 @@ def main() -> int:
           + (f"{a.tep_do}" + ("" if os.path.isfile(a.tep_do)
                                else "  ⛔ VẮNG — hai cổng CHƯA ĐO ĐƯỢC")
              if a.tep_do else "⛔ (không truyền) — hai cổng CHƯA ĐO ĐƯỢC"))
+    print("  cổng HD2 (HD2_WP_*) đọc tệp: "
+          + (f"{a.tep_hd2}" + ("" if os.path.isfile(a.tep_hd2)
+                                else "  ⛔ VẮNG — CHƯA ĐO ĐƯỢC")
+             if a.tep_hd2 else "⛔ (không truyền) — CHƯA ĐO ĐƯỢC"))
     if a.cho_web:
         print(f"⭐ man hinh: http://{a.dia_chi}:{a.cong}/   "
               f"(the cap cho `{a.actor}`, song {a.the_song // 3600} gio)")

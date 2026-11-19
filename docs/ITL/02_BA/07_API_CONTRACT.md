@@ -1,6 +1,6 @@
 # 07 — API CONTRACT: FLS
 
-**Version:** v3.21 · **Ngày:** 2026-11-18 · **Chủ sở hữu:** BA/PO + Tech Lead
+**Version:** v3.22 · **Ngày:** 2026-11-19 · **Chủ sở hữu:** BA/PO + Tech Lead
 **Thay thế:** v0.1 *(bản copy chương trình, prefix `/api/voi/`)* — đã khai tử.
 
 **Căn cứ:** `04_DB_IMPLEMENTATION` v1.0 *(schema `fls_itl`)* · `QĐ-ITL-38` *(app là nơi thao tác)* · `QĐ-ITL-45` *(FLS độc lập)* · `FLS-vs-FPS` §7 *(append-only event-log)*.
@@ -916,6 +916,7 @@ LY_DO_MAC_DINH_BO_GHEP = "(may dien) bo ghep tren man - nguoi bam khong ghi ly d
 ---
 
 ## Changelog
+- **v3.22** *(2026-11-19, orchestrator ISP 3.1 — gộp CG2)*: `GET /gates` THÊM cổng HD2 theo gói — 4 gói cha `HD2_WP_C2…C5` khai sẵn + gói con `WP-C<số><chữ>` tự hiện từ `hd2_cong.json` (cha `true` chỉ khi mọi con `true` và ≥ 1 con; một con `false` ⇒ `false`; còn con `null` ⇒ `null`); trường mới `lat_bo_nguon` (`vang` · `khai`) — khoá `lat_bo` vắng ⇒ nói thẳng "coi 0 (phép đo HD2 ⛔ cắt lát)"; khối gói hỏng kiểu hoặc thiếu `tong_o`/`khop` ⇒ `null` có tên. Hợp đồng cũ chỉ THÊM phần tử/trường. Trên tệp thật 19/11: 7 cổng (C2 · C3 · C3A · C3B · C4 · C4A `true`; C5 `null`).
 - **v3.21** *(2026-11-18, orchestrator ISP 3.1 — gộp C11)*: `§4i` dòng `GET /config/alr` ⬜ → ✅ (17 HD có luật; cờ mặc định TẮT, D2).
 - **v3.20** *(2026-11-18, orchestrator ISP 3.1 — gộp C9 · C8)*: `§4i` dòng `GET /config/ven` ⬜ → ✅ (42 dòng); C8 thêm cột `cdt_la` vào `GET /queue` (hợp đồng cũ giữ, chỉ THÊM trường).
 - **v3.19** *(2026-11-18, orchestrator ISP 3.1 — gộp C6)*: `§4i` dòng `GET /config/per` ⬜ → ✅ (đọc từ kho · `LUAT_CHUA_KY` · `?run_id=` ⇒ `400`).

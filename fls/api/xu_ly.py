@@ -56,6 +56,9 @@ class YeuCau:
     #   khuôn `conn`: tầng cửa ⛔ tự chọn tệp nào để đo, cũng như ⛔ tự mở được kết nối (hợp đồng
     #   tầng 7). `None` ⇒ hai cổng ấy `dat=None` *"CHƯA ĐO ĐƯỢC"* kèm lý do — ⛔ bao giờ "xanh".
     tep_do: Any = None
+    # ⭐ CG2 (`WO-208`): đường dẫn `hd2_cong.json` — TRUYỀN VÀO như `tep_do`. `None` ⇒ 4 cổng HD2
+    #   cha khai sẵn `dat=None` kèm lý do (⛔ "0 lệch").
+    tep_hd2: Any = None
 
 
 def pham_vi_cua_yeu_cau(q: dict[str, str]) -> PhamVi:
@@ -202,9 +205,10 @@ def nhat_ky(yc: YeuCau):
 
 
 def cong(yc: YeuCau):
-    c = bc.doc_cong(yc.conn, yc.pv, tep_do=yc.tep_do)
+    c = bc.doc_cong(yc.conn, yc.pv, tep_do=yc.tep_do, tep_hd2=yc.tep_hd2)
     ra = [{"ma": x.ma, "ten": x.ten, "dat": x.dat, "nhan": x.nhan,
-           "da_do": x.da_do, "ly_do": x.ly_do} for x in c]
+           "da_do": x.da_do, "ly_do": x.ly_do,
+           "lat_bo_nguon": x.lat_bo_nguon} for x in c]       # ⭐ CG2-R1-01: chỉ THÊM
     return {"cong": ra,
             "dat": sum(1 for x in c if x.dat is True),
             "khong_dat": sum(1 for x in c if x.dat is False),
