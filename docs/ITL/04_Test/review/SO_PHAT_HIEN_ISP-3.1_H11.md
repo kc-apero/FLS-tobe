@@ -1,6 +1,6 @@
 # SỔ PHÁT HIỆN REVIEW — ISP 3.1 · phần `H11` + `DT9b` *(tệp riêng, chờ gộp vào `SO_PHAT_HIEN_ISP-3.1.md`)*
 
-**Version:** v0.1 · **Ngày:** 2026-11-19 · **Chủ sở hữu:** `fls-test` *(R1 `KQ-236`; R2/R3 thêm dòng)* · **Nguồn:** `IncrementalStepPlan-FLS-Voi_v3.1.2.md` Step 35 · H11 · `WO-233` · `BG-235` *(mục "Sau DT9b")* · `WO-241` · `BG-242` *(`isp/H11` @ `2110f53`)*
+**Version:** v0.2 · **Ngày:** 2026-11-19 · **Chủ sở hữu:** `fls-test` *(R1 `KQ-236`; R2/R3 thêm dòng)* · **Nguồn:** `IncrementalStepPlan-FLS-Voi_v3.1.2.md` Step 35 · H11 · `WO-233` · `BG-235` *(mục "Sau DT9b")* · `WO-241` · `BG-242` *(`isp/H11` @ `2110f53`)*
 
 > Thang lớp *(A1 · A2 · B1 · B2)* và mức *(CHẶN · NÊN SỬA · GHI NHẬN)*: y như §1 của sổ chung. Sổ **chỉ THÊM**. Phát hiện của `DT9b` mang mã `DT9B-R1-…` cùng sổ này. Lúc ghi, mọi hàng đều `mở`.
 
