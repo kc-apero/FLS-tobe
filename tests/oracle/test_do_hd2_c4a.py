@@ -36,7 +36,7 @@ def ven():
         chc.nap_ix_ven(c, str(GOC / "tests/fixture/cau_hinh/ix_ven.json"),
                        duong_cdt1=str(GOC / "tests/fixture/cau_hinh/cdt_correct.json"),
                        actor="bo-test-h9-c4a")
-        return chc.doc_ven(c)
+        return chc.doc_ven(c, so="GI")
 
 
 @pytest.fixture(scope="module")

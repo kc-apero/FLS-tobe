@@ -17,6 +17,13 @@ bản config được TRUYỀN VÀO *(⛔ biết kho — `.importlinter` hợp �
    khai `mong`, NO cả hai chiều)*: thiếu một nhãn *(vendor đổi mã ⇒ lọt về `thường` im lặng)*
    hay thừa một nhãn lạ *(mã lạ hoá đặc biệt)* ⇒ `LoiVen`, ⛔ im lặng. Tập rỗng ⇒ nổ *(Đ3)*.
 
+⭐ **DT9b** *(ISP 3.1.2 · `WO-241`)* — IX.VEN là **MỘT bảng có cột `so`** ∈ `GI · OMC · SC · PS` *(sổ nguồn
+của dòng; đầu vào cho cổng `WP-C4c` của H11)*. Bản kho cũ *(DT8, chỉ GI)* ⛔ có `so` ⇒ đọc là `GI`.
+Khoá kho `dong_sheet` vẫn duy nhất TOÀN BẢNG *(GI = số hàng; sổ khác = `<SO>!<hàng>`)*; khoá NGHIỆP VỤ
+là `(so, vendor, No)` — cùng vendor/No ở HAI sổ khác nhau là hợp lệ. Engine H9/H10 chỉ biết MỘT sổ ⇒ lấy
+`BangVen.theo_so(...)` *(⛔ trộn dòng của sổ khác — `ma_cach_tinh` đọc nhãn theo vendor)*. `cashin_month`
+nhận **0…12** *(SC `VD529` cash-in cùng tháng: `0`, ngày `2` — đo 19/11)*.
+
 ⛔ **Khoá**: `dong_sheet` là khoá kho *(duy nhất theo hàng)*; khoá NGHIỆP VỤ là `(vendor, No)`
    — vendor **lặp** hợp lệ *(VD341 × 12 dòng)*, nhưng cùng `(vendor, No)` hai lần là hai câu
    trả lời cho một câu hỏi ⇒ lỗi CÓ TÊN *(C9-B2)*. Mọi lý do gói trong MỘT dòng *(`S0-R1-04`)*.
@@ -32,6 +39,7 @@ from typing import Any, Iterable, Mapping
 BANG = "IX.VEN"
 NHAN_RIENG: tuple[str, ...] = ("Max", "VD341", "VD428", "VD444", "VD62")   # sắp theo chữ
 NHAN_THUONG = "thường"
+SO_HOP_LE: tuple[str, ...] = ("GI", "OMC", "SC", "PS")   # DT9b: sổ nguồn của dòng
 SO_CDT1 = 7                         # danh mục CDT1 *(đếm CDT1 khác nhau, ⛔ đếm dòng)*
 
 #: ⭐ `H10` *(ISP 3.1.2 · Step 28 · `WO-216`)* — mã `cach_tinh` → **(kiểu hàm PE từ Looker, vendor
@@ -60,7 +68,7 @@ CACH_TINH: dict[str, tuple[str, str | None]] = {
 }
 
 _COT = ("thu_tu", "dong_sheet", "No", "vendor", "network", "account", "pct",
-        "cashin_month", "cashin_day", "cach_tinh")
+        "cashin_month", "cashin_day", "cach_tinh", "so")
 _SO_NGUYEN = re.compile(r"[0-9]{1,2}", re.ASCII)
 _THAP_PHAN = re.compile(r"[0-9]+(?:\.[0-9]+)?", re.ASCII)
 
@@ -86,6 +94,7 @@ class DongVen:
     cashin_month: int
     cashin_day: int
     cach_tinh: str
+    so: str = "GI"                  # DT9b — ⛔ khai ⇒ GI (bản kho DT8 cũ)
 
 
 @dataclass(frozen=True)
@@ -94,6 +103,15 @@ class BangVen:
     dong: tuple[DongVen, ...]
     cdt1: tuple[str, ...]
     nhan_rieng: tuple[str, ...]
+
+    def theo_so(self, so: str) -> "BangVen":
+        """Các dòng của MỘT sổ *(DT9b)*. Sổ lạ hoặc 0 dòng ⇒ `LoiVen` *(Đ3 — ⛔ trả bảng rỗng im lặng)*."""
+        if so not in SO_HOP_LE:
+            raise LoiVen([f"so={_mot(so)} ⛔ thuộc {list(SO_HOP_LE)}"])
+        dong = tuple(d for d in self.dong if d.so == so)
+        if not dong:
+            raise LoiVen([f"so={so}: 0 dòng trong IX.VEN ⇒ ⛔ có gì để lọc"])
+        return BangVen(nguon=self.nguon, dong=dong, cdt1=self.cdt1, nhan_rieng=self.nhan_rieng)
 
 
 def _mot(s: Any) -> str:
@@ -157,22 +175,25 @@ def kiem(dong: Iterable[Mapping[str, Any]], *, cdt1: Iterable[str],
                       f"(⛔ float · ⛔ số mũ)")
         else:
             pct = Decimal(str(pct_v).strip())
-        thang = _so_nguyen(r.get("cashin_month"), "cashin_month", i, 1, 12, ly)
+        so = r.get("so", "GI")
+        if not isinstance(so, str) or so not in SO_HOP_LE:
+            ly.append(f"dòng {i}: so={_mot(so)} ⛔ thuộc {list(SO_HOP_LE)}")
+        thang = _so_nguyen(r.get("cashin_month"), "cashin_month", i, 0, 12, ly)
         ngay = _so_nguyen(r.get("cashin_day"), "cashin_day", i, 1, 31, ly)
         if ct is not None and ct != NHAN_THUONG and ct not in NHAN_RIENG:
             ly.append(f"dòng {i}: cach_tinh={_mot(ct)} ⛔ thuộc {list(NHAN_RIENG)} "
                       f"hay {NHAN_THUONG!r}")
         if len(ly) == n0 and None not in (ds_, no, ven, ct, thang, ngay):
-            ds.append(DongVen(thu_tu, ds_, no, ven, net, acc, pct, thang, ngay, ct))
+            ds.append(DongVen(thu_tu, ds_, no, ven, net, acc, pct, thang, ngay, ct, so))
 
     if not ds and not ly:
         ly.append("0 dòng ⇒ ⛔ có bảng để kiểm")
     for k, n in sorted(Counter(d.dong_sheet for d in ds).items()):
         if n >= 2:
             ly.append(f"dong_sheet={k} trùng {n} dòng")
-    for (v, no), n in sorted(Counter((d.vendor, d.no) for d in ds).items()):
+    for (so_, v, no), n in sorted(Counter((d.so, d.vendor, d.no) for d in ds).items()):
         if n >= 2:
-            ly.append(f"vendor={v} No={no} trùng khoá {n} dòng")
+            ly.append(f"so={so_} vendor={v} No={no} trùng khoá {n} dòng")
     if ds and not ly:
         co = {d.cach_tinh for d in ds} - {NHAN_THUONG}
         for m in NHAN_RIENG:

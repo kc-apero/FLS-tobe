@@ -41,21 +41,29 @@ hình `{spreadsheet_id, nguon, doc_luc, cach_doc, dong_dau_sheet, cot, values}`:
 """
 from __future__ import annotations
 
+import re
 from typing import Any
 
 BANG = "IX.VEN"
 KHOA = "dong_sheet"
-KIEU_KHOA = "dong_sheet"
+KIEU_KHOA = "so_dong_sheet"      # DT9b: GI = `4`…`45` (NGUYÊN); OMC/SC/PS = `<SO>!<hàng>`
 #: Thứ tự cột ảnh = khoá `dong_sheet` + 7 cột Block 1 + `cach_tinh` *(①)*. ⛔ thêm cột.
-COT = ("No", "vendor", "network", "account", "pct", "cashin_month", "cashin_day", "cach_tinh")
+COT = ("No", "vendor", "network", "account", "pct", "cashin_month", "cashin_day", "cach_tinh", "so")
 #: `vendor` = mã CHỮ ⛔ rỗng · `network`/`account` = chữ HOẶC rỗng *(hàng 32–39 trống)* · `pct` =
 #: số HOẶC rỗng · `cach_tinh` = nhãn CHỮ ⛔ rỗng *(luôn có — 'thường' hay nhãn riêng)*. `No`/
 #: `cashin_month`/`cashin_day` ⛔ khai ⇒ `so` *(strict — đo 36/36 ô số)*.
-KIEU_COT = {"vendor": "chu", "network": "chu?", "account": "chu?", "pct": "so?", "cach_tinh": "chu"}
+KIEU_COT = {"vendor": "chu", "network": "chu?", "account": "chu?", "pct": "so?", "cach_tinh": "chu",
+            "so": "chu"}
 RA = "tests/fixture/cau_hinh/ix_ven.json"
 
 #: Cột của LƯỚI bản thô — vị trí cố định *(vùng `M:S`)*.
 COT_THO = ("No", "vendor", "network", "account", "pct", "cashin_month", "cashin_day")
+#: ⭐ DT9b: lưới nhiều sổ = 7 cột Block 1 + `so` *(GI · OMC · SC · PS)* + `hang` *(số hàng sheet ≥ 4 CỦA sổ ấy)*.
+#: Lưới 7 cột cũ *(DT8)* vẫn đọc được = sổ GI, hàng `4 + i`. ⛔ `account` của OMC/SC/PS đọc *(tên người /
+#: số TK)*; ⛔ `network` của SC/PS *(cột tên, ⛔ nhãn kênh)* — phiên DATA đưa `null`, khuôn ⛔ ép.
+COT_THO9 = (*COT_THO, "so", "hang")
+SO_HOP_LE = ("GI", "OMC", "SC", "PS")
+_MA_VENDOR = re.compile(r"VD[0-9]+", re.ASCII)
 DONG_DAU_SHEET = 4
 #: ⭐ 5 nhóm vendor tính riêng *(AP §3.2.2/§3.2.4; đo 18/11 — để bài ghim: khác tập ⇒ ĐỎ)*.
 NHOM_RIENG = ("VD341", "VD428", "VD444", "VD62")   # 4 theo Vendor ID; 'Max' theo Network
@@ -81,8 +89,10 @@ def chuan_bi(tho: dict[str, Any]) -> dict[str, Any]:
     ⛔ lời lỗi mang giá trị ô *(cột `account` là Tên tài khoản — owner GIỮ, nhưng ⛔ in ra)*;
     `ValueError` ⇒ TỪ CHỐI."""
     cot_tho = tho.get("cot")
-    if cot_tho != list(COT_THO):
-        raise ValueError(f"`cot` phải đúng {list(COT_THO)} *(vùng M:S Block 1)*")
+    nhieu_so = cot_tho == list(COT_THO9)
+    if cot_tho != list(COT_THO) and not nhieu_so:
+        raise ValueError(f"`cot` phải đúng {list(COT_THO)} *(Block 1 một sổ GI)* hoặc "
+                         f"{list(COT_THO9)} *(nhiều sổ — DT9b)*")
     dau = tho.get("dong_dau_sheet")
     if dau != DONG_DAU_SHEET:
         raise ValueError(f"`dong_dau_sheet` phải {DONG_DAU_SHEET} *(Block 1 từ hàng sheet 4)*")
@@ -90,22 +100,33 @@ def chuan_bi(tho: dict[str, Any]) -> dict[str, Any]:
     if not isinstance(values, list) or not values:
         raise ValueError("`values` phải lưới hàng Block 1 ⛔ rỗng")
 
+    rong_cot = len(COT_THO9) if nhieu_so else len(COT_THO)
     dong: list[list[Any]] = []
     for i, h in enumerate(values):
-        if not isinstance(h, list) or len(h) != len(COT_THO):
-            raise ValueError(f"hàng {i + 1} phải {len(COT_THO)} ô *(đủ M:S)*")
-        No, vendor, network, account, pct, cm, cd = h
+        if not isinstance(h, list) or len(h) != rong_cot:
+            raise ValueError(f"hàng {i + 1} phải {rong_cot} ô *(đủ {'M:S + so + hang' if nhieu_so else 'M:S'})*")
+        No, vendor, network, account, pct, cm, cd = h[:7]
+        so, hang = ("GI", DONG_DAU_SHEET + i) if not nhieu_so else (h[7], h[8])
+        if so not in SO_HOP_LE:
+            raise ValueError(f"hàng {i + 1}: `so` ⛔ thuộc {list(SO_HOP_LE)}")
+        if isinstance(hang, bool) or not isinstance(hang, int) or hang < DONG_DAU_SHEET:
+            raise ValueError(f"hàng {i + 1}: `hang` phải số nguyên ≥ {DONG_DAU_SHEET}")
         if _rong(vendor):
-            raise ValueError(f"hàng {i + 1}: cột Vendor ID *(N)* RỖNG — Block 1 mỗi hàng phải có mã")
-        ds = DONG_DAU_SHEET + i
+            raise ValueError(f"hàng {i + 1}: cột Vendor ID RỖNG — Block 1 mỗi hàng phải có mã")
+        if not isinstance(vendor, str) or not _MA_VENDOR.fullmatch(vendor.strip()):
+            raise ValueError(f"hàng {i + 1}: cột vendor ⛔ phải MÃ `VD<số>` *(⛔ tên — PII; ⛔ in giá trị ô)*")
+        if so != "GI" and not _rong(account):
+            raise ValueError(f"hàng {i + 1}: `account` ⛔ đọc ở sổ {so} *(tên người / số TK — DT9b)*")
+        if so in ("SC", "PS") and not _rong(network):
+            raise ValueError(f"hàng {i + 1}: `network` ⛔ đọc ở sổ {so} *(cột tên — DT9b)*")
         # ô rỗng ("" | null) chuẩn hoá về null *(ảnh tất định)*.
-        row = [ds, No,
-               vendor.strip() if isinstance(vendor, str) else vendor,
+        row = [hang if so == "GI" else f"{so}!{hang}", No,
+               vendor.strip(),
                None if _rong(network) else network,
                None if _rong(account) else account,
                None if _rong(pct) else pct,
                cm, cd,
-               _cach_tinh(network, vendor)]
+               _cach_tinh(network, vendor), so]
         dong.append(row)
 
     rieng = sorted({r[8] for r in dong if r[8] != "thường"})
@@ -118,7 +139,10 @@ def chuan_bi(tho: dict[str, Any]) -> dict[str, Any]:
             f"*(⛔ đọc từ sheet)*: Network 'Max' ⇒ 'Max', ngược lại Vendor ∈ {list(NHOM_RIENG)} ⇒ "
             f"chính mã, ngược lại 'thường'. {len(rieng)} nhãn riêng = {rieng} *(mong "
             f"{sorted(MONG_RIENG)}; khác ⇒ cổng ĐỎ)*. Cột `account` = Tên tài khoản *(owner GIỮ "
-            f"11/09 — chỉ 'Email Address' bị cấm)*. ⛔ mang cột ngoài M:S."),
+            f"11/09 — chỉ 'Email Address' bị cấm)*. ⛔ mang cột ngoài M:S. "
+            f"DT9b: cột `so` ∈ {list(SO_HOP_LE)} — đếm DÒNG theo sổ "
+            f"{ {x: sum(1 for r in dong if r[9] == x) for x in SO_HOP_LE} }; khoá `dong_sheet` GI = số hàng, "
+            f"sổ khác = `<SO>!<hàng>`; OMC/SC/PS ⛔ đọc `account`, SC/PS ⛔ đọc `network`."),
     }
 
 
