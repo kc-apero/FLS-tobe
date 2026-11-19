@@ -388,5 +388,82 @@
   },
   "dat": true,
   "ly_do": []
+ },
+ "WP-C4b": {
+  "bang": "HD2.WP-C4b",
+  "goi": "WP-C4b",
+  "mo_ta": "AL.PLT GI mọi vendor theo mã 'cách tính': IX.VEN kho + CFA1 (O/P từng dòng) + MID1 (PE theo CDT1) → chia_theo_cach_tinh → KS.AL ↔ MID3 (vendor, tháng) từng ô",
+  "nguon_dau_vao": "tests/fixture/dau_vao/gi_cfa1.json (PD 504) + tests/fixture/dap_an/gi_mid1.json cột T (PD 505, thượng nguồn — ⛔ tính từ MID3) + IX.VEN kho",
+  "dap_an": "tests/fixture/dap_an/gi_mid3.json (PD 507, 209 hàng có khoá)",
+  "khoa": "(vendor, thang) × 14 cột (O · P · 6 CDT1 × PE/PM)",
+  "vm": 209,
+  "vm_dac_biet": 165,
+  "vm_thuong": 44,
+  "dong_cfa1": 408,
+  "dong_mid1": 2856,
+  "mid1_pe_rong": 66,
+  "o_so": 1981,
+  "o_khong_so": 945,
+  "o_khac_0": 988,
+  "o_khac_0_dac_biet": 988,
+  "o_khong_so_khac_0": 0,
+  "lech": 0,
+  "ks_al_vm": 209,
+  "ks_al_dac_biet": 165,
+  "bo_qua": 0,
+  "muon": 11,
+  "muon_o_khac_0": 0,
+  "theo_tong_thang": 0,
+  "tong_o": 1981,
+  "khop": 1981,
+  "kieu_vm": {
+   "mang_theo_no": 22,
+   "mang_ty_le_no1": 132,
+   "mang_dong_no": 11,
+   "khong": 44
+  },
+  "o_khong_so_ly_do": "Vendor-tháng có dòng P = chữ 'Need to manual input' (⛔ hoá 0)",
+  "o_khac_0_nhan": "ô so mà đáp án hay engine ≠ 0 — tập KHÔNG rỗng: chứng minh RATE trên số thật",
+  "muon_nhan": "dòng mượn RATE có O ≠ 0 = 0 ⇒ luật mượn chỉ chứng minh ở bài tổng hợp",
+  "mong": {
+   "vm": 209,
+   "vm_dac_biet": 165,
+   "vm_thuong": 44,
+   "dong_cfa1": 408,
+   "dong_mid1": 2856,
+   "mid1_pe_rong": 66,
+   "o_so": 1981,
+   "o_khong_so": 945,
+   "o_khac_0": 988,
+   "o_khac_0_dac_biet": 988,
+   "o_khong_so_khac_0": 0,
+   "lech": 0,
+   "ks_al_vm": 209,
+   "ks_al_dac_biet": 165,
+   "bo_qua": 0,
+   "muon": 11,
+   "muon_o_khac_0": 0,
+   "theo_tong_thang": 0,
+   "kieu_vm": [
+    [
+     "khong",
+     44
+    ],
+    [
+     "mang_dong_no",
+     11
+    ],
+    [
+     "mang_theo_no",
+     22
+    ],
+    [
+     "mang_ty_le_no1",
+     132
+    ]
+   ]
+  },
+  "dat": true,
+  "ly_do": []
  }
 }
