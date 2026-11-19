@@ -91,6 +91,12 @@ const FLS = (function () {
       lam_gi: 'Không cần làm gì thêm: chữ ký cũ vẫn còn hiệu lực. Muốn đổi số thì báo '
         + 'người dựng hệ — ⛔ có nút huỷ ký trên màn.'
     },
+    // ⭐ `C7-R1-05`: engine bị chặn đọc tỷ giá một tháng (`FxChan`; tên tháng ở chi tiết).
+    'FLS-FX-CHAN': {
+      cau: 'Tháng tỷ giá này chưa dùng được — chưa ký, số đã đổi sau khi ký, hoặc thiếu/trùng.',
+      lam_gi: 'Mở màn Tỷ giá, xem tháng được nêu: chưa ký thì ký; số đổi sau ký thì ký lại '
+        + 'bằng số mới. ⛔ Đừng dùng số tháng gần nhất thay vào.'
+    },
     // ⭐ `C6` (`WO-152`): luật ghi nhận kỳ `B` (chia đều PL start→end, D4) chưa mở.
     'FLS-CAUHINH-LUAT-CHUA-KY': {
       cau: 'Luật ghi nhận kỳ trong cấu hình chưa được mở — hiện chỉ luật A chạy.',

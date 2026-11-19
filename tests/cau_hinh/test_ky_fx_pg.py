@@ -12,6 +12,7 @@ import http.client
 import json
 import os
 import threading
+from concurrent.futures import ThreadPoolExecutor
 import time
 import uuid
 from decimal import Decimal
@@ -21,6 +22,7 @@ import psycopg
 import pytest
 
 from fls.api import bang_tuyen as bt
+from fls.api import bao
 from fls.api import cua, the
 from fls.cau_hinh import fx
 from fls.db.kho import dsn_test, noi_chi_doc
@@ -153,7 +155,7 @@ def test_C7_B3_fx_cua_CHAN_chua_ky_va_THIEU_han_va_hong():
     with psycopg.connect(dsn_test(), autocommit=True) as c:
         with pytest.raises(fx.FxChan) as e:
             chc.fx_cua(c, "202511")                             # có trong IX.FX, chưa ký
-        assert e.value.ma == "FX_CHAN" and "202511" in str(e.value)
+        assert e.value.ma == "FLS-FX-CHAN" and "202511" in str(e.value)
         with pytest.raises(fx.FxChan) as e2:
             chc.fx_cua(c, "209901")                             # THIẾU hẳn — ⛔ rơi gần nhất
         assert "209901" in str(e2.value)
@@ -236,3 +238,152 @@ def test_C7_B6_kho_chi_them_trigger_0027_giu():
                     "DELETE FROM fls_cau_hinh_ban"):
             with pytest.raises(psycopg.Error, match="INV-I08"):
                 cur.execute(sql)
+
+
+# ══ VÒNG SỬA SAU R1 (`KQ-214`) ═════════════════════════════════════════════
+def _nap_doi(tmp_path, thang: int, te: str) -> Decimal:
+    """Nạp LẠI `IX.FX` qua kho THẬT: y nguyên bản hiện hành, chỉ đổi MỘT tiền tệ của MỘT
+    tháng (+1). ⛔ dấu vân giả. Trả số mới."""
+    with psycopg.connect(dsn_test(), autocommit=True) as c:
+        cu = chc.doc_fx(c)
+        dong = [{"thu_tu": i, "Month": d.yyyymm, **{t: str(d.ty_gia[t]) for t in fx.TIEN_TE}}
+                for i, d in enumerate(cu.ky, start=1)]
+        moi = next(r for r in dong if r["Month"] == thang)
+        moi[te] = str(Decimal(moi[te]) + 1)
+        p = tmp_path / f"ix_fx_doi_{thang}_{te}.json"
+        p.write_text(json.dumps({"bang": "IX.FX", "dong": dong}), encoding="utf-8")
+        chc.nap_ix_fx(c, str(p), actor="bo-test-c7", thang_dau=202401,
+                      nguon="tests/cau_hinh/test_ky_fx_pg.py#doi")
+    return Decimal(moi[te])
+
+
+# `VND` ⛔ đổi được (=1, `fx.kiem` chặn) ⇒ 4 tiền tệ còn lại, mỗi cái một tháng riêng.
+@pytest.mark.pg
+@pytest.mark.parametrize("te,thang", [("USD", 202601), ("SGD", 202602),
+                                      ("COP", 202603), ("HKD", 202604)])
+def test_C7_R1_01_ky_roi_IX_FX_nap_lai_DOI_mot_ty_gia_thi_CHAN_va_GET_thoi_da_ky(
+        may, tmp_path, te, thang):
+    """`C7-R1-01`: ca THẬT qua kho *(đột biến `M7` bỏ HKD khỏi dấu vân · `M16` GET bỏ so
+    dấu vân đều SỐNG khi bài chỉ dùng dấu vân giả)*."""
+    assert _ky(may, thang)[0] == 201
+    assert _dong(may, thang)["trang_thai"] == "da_ky"           # mẫu số: ký xong là đã ký
+    with psycopg.connect(dsn_test(), autocommit=True) as c:
+        assert chc.fx_cua(c, thang)[te]                         # ⛔ chặn nhầm khi chưa đổi
+    so_moi = _nap_doi(tmp_path, thang, te)
+    with psycopg.connect(dsn_test(), autocommit=True) as c:
+        with pytest.raises(fx.FxChan) as e:
+            chc.fx_cua(c, thang)
+        assert e.value.thang == thang and str(thang) in str(e.value)
+        assert "ĐỔI" in e.value.ly_do                           # lý do = đổi số sau ký
+    d = _dong(may, thang)
+    assert d["trang_thai"] == "chua_ky" and "actor" not in d    # GET thôi báo da_ky
+    assert Decimal(str(d[te])) == so_moi                   # …và hiện số MỚI
+    assert _ky(may, thang)[0] == 201                            # ký lại số mới được
+    assert _dong(may, thang)["trang_thai"] == "da_ky"
+    with psycopg.connect(dsn_test(), autocommit=True) as c:
+        assert chc.fx_cua(c, thang)[te] == so_moi
+
+
+# ── C7-R1-02 ───────────────────────────────────────────────────────────────
+@pytest.mark.pg
+def test_C7_R1_02_ky_SONG_SONG_cung_thang_dung_1_201_con_lai_409_kho_them_dung_1(may):
+    """`C7-R1-02`: 8 luồng, cùng tháng. Bỏ `pg_advisory_xact_lock` ⇒ ĐỎ *(`M6`)*."""
+    thang, n = 202605, 8
+    truoc = _so_ban_ky()
+    bar = threading.Barrier(n)
+
+    def ky(i):
+        bar.wait(timeout=10)
+        return _ky(may, thang, tok=_the(f"song.song.{i}@vi-du.invalid"))
+    with ThreadPoolExecutor(max_workers=n) as ex:
+        kq = list(ex.map(ky, range(n)))
+    ma = sorted(st for st, _ in kq)
+    assert ma == [201] + [409] * (n - 1), kq                    # 0 lỗi lạ
+    assert all(r["error"]["code"] == "FLS-CAUHINH-DA-KY" for st, r in kq if st == 409)
+    assert _so_ban_ky() == truoc + 1                            # đúng 1 bản thêm
+    # hai THÁNG khác nhau song song ⇒ cả hai chữ ký còn *(⛔ mất cập nhật)*
+    bar2 = threading.Barrier(2)
+
+    def ky2(t):
+        bar2.wait(timeout=10)
+        return _ky(may, t)[0]
+    with ThreadPoolExecutor(max_workers=2) as ex:
+        assert list(ex.map(ky2, (202606, 202607))) == [201, 201]
+    assert _dong(may, 202606)["trang_thai"] == _dong(may, 202607)["trang_thai"] == "da_ky"
+    assert _dong(may, thang)["trang_thai"] == "da_ky"
+
+
+@pytest.mark.pg
+def test_C7_R1_02_ky_SONG_SONG_o_tang_kho_8_luong_moi_luong_ket_noi_RIENG():
+    """Máy HTTP thử có thể xếp hàng các yêu cầu ⇒ bài trên có thể xanh KHÔNG cần khoá.
+    Bài này đi thẳng `chc.ky_fx`, mỗi luồng một kết nối ⇒ **chỉ khoá advisory** cứu *(`M6`)*."""
+    n, thangs = 8, (202608, 202609, 202610, 202611, 202612)    # 5 vòng: một vòng có thể may
+    truoc = _so_ban_ky()
+
+    def vong(thang):
+        bar = threading.Barrier(n)
+
+        def ky(i):
+            with psycopg.connect(dsn_test(), autocommit=True) as c:
+                bar.wait(timeout=10)
+                try:
+                    chc.ky_fx(c, thang, actor=f"luong.{i}@vi-du.invalid")
+                    return "ok"
+                except chc.DaKy:
+                    return "da_ky"
+                except Exception as e:                          # lỗi lạ (vd UNIQUE) = ĐỎ
+                    return f"LA:{type(e).__name__}"
+        with ThreadPoolExecutor(max_workers=n) as ex:
+            return sorted(ex.map(ky, range(n)))
+    for t in thangs:
+        kq = vong(t)
+        assert kq == ["da_ky"] * (n - 1) + ["ok"], (t, kq)
+    assert _so_ban_ky() == truoc + len(thangs)
+
+
+# ── C7-R1-03 ───────────────────────────────────────────────────────────────
+def test_C7_R1_03_dau_van_tay_CHUAN_HOA_so_cung_gia_tri_cung_dau_van():
+    """Chuẩn hoá = `Decimal.normalize()` rồi in dạng KHÔNG số mũ: `25000` ≡ `25000.0` ≡
+    `25000.00`; `0.10` ≡ `0.1`. Giá trị KHÁC ⇒ dấu vân khác."""
+    def dv(usd, **kw):
+        return fx.dau_van_tay(fx.DongFX(
+            202412, {**{t: Decimal(1) for t in fx.TIEN_TE}, "USD": Decimal(usd), **kw}))
+    assert len({dv("25000"), dv("25000.0"), dv("25000.00")}) == 1
+    assert dv("0.10") == dv("0.1")
+    assert dv("25000") != dv("25001") and dv("25000") != dv("2500")
+    assert dv("100") != dv("1")                                 # normalize ⛔ nuốt số 0 nguyên
+    assert dv("1", SGD=Decimal("2")) != dv("1", SGD=Decimal("3"))
+
+
+# ── C7-R1-05 ───────────────────────────────────────────────────────────────
+def test_C7_R1_05_FX_CHAN_co_ma_trong_bao_MA_LOI_va_cau_tieng_Viet():
+    assert fx.FxChan.ma in bao.MA_LOI and bao.MA_LOI[fx.FxChan.ma][0] == 409
+    js = (GOC / "fls" / "web" / "tep" / "goi_cua.js").read_text(encoding="utf-8")
+    assert f"'{fx.FxChan.ma}'" in js
+
+
+# ── C7-R1-07 ───────────────────────────────────────────────────────────────
+def _bang(*dong, trung=()):
+    return fx.BangFX(nguon="t", ky=tuple(dong), thieu=(), trung=tuple(trung), lac=())
+
+
+def _d(m, usd=25000):
+    return fx.DongFX(m, {**{t: Decimal(1) for t in fx.TIEN_TE}, "USD": Decimal(usd)})
+
+
+def test_C7_R1_07_ly_do_chan_nao_ra_ly_do_do_chua_ky_vs_thieu_vs_doi_vs_trung():
+    """Mỗi lối chặn một LÝ DO riêng *(giết `M2` · `M19`)*."""
+    a = _d(202510)
+
+    def ly(bang, da_ky, thang=202510):
+        with pytest.raises(fx.FxChan) as e:
+            fx.fx_cua(thang, bang, da_ky)
+        return e.value.ly_do
+    chua = ly(_bang(a), {})
+    thieu = ly(_bang(a), {202510: fx.dau_van_tay(a)}, thang=202511)   # ∉ IX.FX, dù ĐÃ có chữ ký
+    doi = ly(_bang(a), {202510: "dau-cu"})
+    trung = ly(_bang(a, _d(202510, 26000)), {202510: fx.dau_van_tay(a)})
+    trung2 = ly(_bang(a, trung=(202510,)), {202510: fx.dau_van_tay(a)})
+    assert "CHƯA" in chua and "ĐỔI" in doi and "TRÙNG" in trung and "TRÙNG" in trung2
+    assert "⛔ có trong" in thieu and "CHƯA" not in thieu       # ⛔ rơi về lý do "chưa ký"
+    assert len({chua, thieu, doi, trung}) == 4

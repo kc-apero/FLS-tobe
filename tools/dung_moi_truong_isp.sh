@@ -417,7 +417,8 @@ MONG_HD1_CHAY=9845
 #    --collect-only` — đường nền: 0 skipped · 0 deselected ⇒ thu thập = chạy), nâng TRONG CÙNG commit
 #    thêm bài; bài `tests/test_dung_moi_truong_isp.py::test_S0_R3_02_…` đòi hằng = thu thập ⇒ quên
 #    nâng là ĐỎ. Sau vòng sửa R3: 2.481 + 9 bài mới = 2.490 bài ở 211 tệp · `tests/web` 664 ở 56 tệp.
-MONG_PYTEST_TOAN_BO=3659
+# C7 vòng sửa sau R1 (KQ-214): +9 bài (3659 → 3668).
+MONG_PYTEST_TOAN_BO=3668
 MONG_PYTEST_WEB=675
 
 echo

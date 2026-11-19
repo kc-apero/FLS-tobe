@@ -70,6 +70,9 @@ MA_LOI: dict[str, tuple[int, str]] = {
     "FLS-CAUHINH-LUAT-CHUA-KY": (409, "luat ghi nhan ky chua mo (D4 B) — chi luat A chay"),
     # ⭐ `C7` (`WO-212`): tháng IX.FX ĐÃ ký ⇒ ký lại **409 CÓ TÊN** (D1; ⛔ huỷ ký).
     "FLS-CAUHINH-DA-KY": (409, "thang IX.FX da ky — ⛔ ky lai (⛔ huy ky: ngoai WO-212)"),
+    # ⭐ `C7-R1-05`: `fx.FxChan` — engine ⛔ được đọc tỷ giá tháng (chưa ký · đổi số sau
+    #    ký · ∉ IX.FX · trùng). **409**: sửa bằng việc KÝ/nạp, ⛔ sửa tham số.
+    "FLS-FX-CHAN": (409, "thang IX.FX ⛔ duoc dung (chua ky · doi so sau ky · thieu · trung)"),
     "FLS-CAUHINH-BAN-HONG": (
         500, "ban config trong kho ⛔ doc ra duoc — co ban ghi thang ⛔ qua `nap`?"),
     # ⭐⭐ `QĐ-ITL-110` — lan ANH CHUP. HAI ma, ⛔ KHONG mot, va cung ly do da
