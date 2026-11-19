@@ -112,3 +112,58 @@ def test_C9_pct_null_hop_le_nhung_0_la_DO():
     d = _hop_le()
     d[0]["pct"] = None
     assert _kiem(d).dong[0].pct is None
+
+
+# ══ DT9b (`WO-241`) — cột `so`: GI · OMC · SC · PS trong MỘT bảng ═════════════════════════════
+def _them_so(d, so, tien_to=True):
+    out = copy.deepcopy(d)
+    for r in out:
+        r["so"] = so
+        if tien_to:
+            r["dong_sheet"] = f"{so}!{r['dong_sheet']}"
+    return out
+
+
+def test_DT9b_so_mac_dinh_GI_va_BangVen_theo_so():
+    b = _kiem(_hop_le())
+    assert {d.so for d in b.dong} == {"GI"}                      # không khai ⇒ GI (bản kho DT8 cũ)
+    b2 = _kiem(_hop_le() + _them_so([_dong(1, 4, "VD0", 1, "thường")], "OMC"))
+    assert [d.so for d in b2.dong].count("OMC") == 1 and len(b2.dong) == 7
+    assert len(b2.theo_so("GI").dong) == 6 and len(b2.theo_so("OMC").dong) == 1
+    assert b2.theo_so("GI").nhan_rieng == b2.nhan_rieng and b2.theo_so("GI").cdt1 == b2.cdt1
+
+
+def test_DT9b_theo_so_tap_rong_hay_so_la_NO():                    # Đ3
+    b = _kiem(_hop_le())
+    with pytest.raises(vendor.LoiVen) as e:
+        b.theo_so("OMC")
+    assert any("OMC" in x and "0 dòng" in x for x in e.value.ly_do), e.value.ly_do
+    with pytest.raises(vendor.LoiVen):
+        b.theo_so("XYZ")
+
+
+def test_DT9b_cung_vendor_No_o_hai_so_khac_nhau_HOP_LE_cung_so_la_trung():
+    ok = _hop_le() + _them_so([_dong(1, 4, "VD336", 1, "thường")], "SC")
+    assert len(_kiem(ok).dong) == 7                                # (VD336, No 1) ở GI **và** SC
+    xau = ok + _them_so([_dong(2, 5, "VD336", 1, "thường")], "SC")
+    with pytest.raises(vendor.LoiVen) as e:
+        _kiem(xau)
+    assert any("so=SC" in x and "VD336" in x and "trùng" in x for x in e.value.ly_do), e.value.ly_do
+
+
+@pytest.mark.parametrize("so", ["XYZ", "gi", "", None, 1])
+def test_DT9b_so_la_NO_co_ten(so):
+    d = copy.deepcopy(_hop_le())
+    d[0]["so"] = so
+    with pytest.raises(vendor.LoiVen) as e:
+        _kiem(d)
+    assert any("so=" in x and "GI" in x for x in e.value.ly_do), e.value.ly_do
+
+
+def test_DT9b_cashin_month_0_hop_le_vi_SC_VD529_cung_thang():
+    d = copy.deepcopy(_hop_le())
+    d[0]["cashin_month"] = "0"
+    assert _kiem(d).dong[0].cashin_month == 0
+    d[0]["cashin_month"] = "13"
+    with pytest.raises(vendor.LoiVen):
+        _kiem(d)

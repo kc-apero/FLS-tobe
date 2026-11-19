@@ -43,7 +43,7 @@ def test_C9_B1_nap_42_dong_5_ma_dac_biet_7_cdt1(conn):
     v0 = _max(conn)
     ban = _nap(conn)
     assert ban.phien_ban == v0 + 1 and ban.bang == "IX.VEN"
-    b = chc.doc_ven(conn)
+    b = chc.doc_ven(conn, so="GI")                                # DT9b: ảnh nay có 4 sổ — GI = 42
     assert len(b.dong) == 42, len(b.dong)                         # đếm DÒNG sheet 4…45
     assert len({(d.vendor, d.network, d.account) for d in b.dong}) == 36   # đếm BỘ khác nhau
     assert b.nhan_rieng == NHAN
@@ -92,4 +92,40 @@ def test_C9_ban_ghi_thang_SQL_hong_doc_ra_BanHong(conn):
     with pytest.raises(chc.BanHong):
         chc.doc_ven(conn)
     _nap(conn)                       # phục hồi: bản TỐT kế tiếp thắng (kho chỉ-thêm)
-    assert len(chc.doc_ven(conn).dong) == 42
+    assert len(chc.doc_ven(conn, so="GI").dong) == 42
+
+
+def test_DT9b_nap_359_dong_4_so_phu_vendor_MID3(conn):
+    """`WO-241`: ảnh nạp ĐỦ **359** dòng *(GI 42 · OMC 89 · SC 93 · PS 135)*; `doc_ven(so=…)` lọc đúng sổ;
+    vendor khác nhau OMC 21 · SC 10 · PS 53; chỉ-THÊM *(phiên bản mới, ⛔ đè bản cũ)*."""
+    v0 = _max(conn)
+    ban = _nap(conn)
+    assert ban.phien_ban == v0 + 1
+    b = chc.doc_ven(conn)
+    assert len(b.dong) == 359 and {d.so for d in b.dong} == {"GI", "OMC", "SC", "PS"}
+    dem = {so: len(chc.doc_ven(conn, so=so).dong) for so in ("GI", "OMC", "SC", "PS")}
+    assert dem == {"GI": 42, "OMC": 89, "SC": 93, "PS": 135}, dem
+    ven = {so: len({d.vendor for d in b.dong if d.so == so}) for so in ("OMC", "SC", "PS")}
+    assert ven == {"OMC": 21, "SC": 10, "PS": 53}, ven
+    assert len({d.dong_sheet for d in b.dong}) == 359                          # khoá kho duy nhất
+    assert {d.cach_tinh for d in chc.doc_ven(conn, so="OMC").dong} == {"thường", "VD341", "VD62", "VD428"}
+    assert min(d.cashin_month for d in chc.doc_ven(conn, so="SC").dong) == 0   # SC VD529: cùng tháng
+    assert [d.vendor for d in chc.doc_ven(conn, so="GI").dong][:2] == ["VD341", "VD341"]
+    with pytest.raises(vendor.LoiVen):
+        chc.doc_ven(conn, so="XYZ")
+
+
+def test_DT9b_ban_DT8_cu_khong_co_so_van_doc_la_GI(conn):
+    """Bản kho DT8 *(42 dòng, ⛔ `so`)* ⛔ vỡ: đọc ra `so = GI`."""
+    cap = [(chc._CDT1, [f"C{i} | Cdt{i}" for i in range(7)])]
+    for i, (v, ct) in enumerate([("VD341", "VD341"), ("VD444", "VD444"), ("VD428", "VD428"),
+                                 ("VD62", "VD62"), ("VD111", "Max"), ("VD336", "thường")]):
+        cap.append((str(4 + i), {"thu_tu": i + 1, "No": "1", "vendor": v, "network": "Max" if ct == "Max" else None,
+                                 "account": None, "pct": "1", "cashin_month": "1", "cashin_day": "23",
+                                 "cach_tinh": ct}))
+    chc.nap(conn, vendor.BANG, cap, nguon="ban-DT8-cu", actor="bo-test-c9")
+    try:
+        b = chc.doc_ven(conn)
+        assert {d.so for d in b.dong} == {"GI"} and len(b.dong) == 6
+    finally:
+        _nap(conn)

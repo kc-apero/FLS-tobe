@@ -104,7 +104,10 @@ def test_AC5_cong_cu_chung_dong_bang_sheet_khong_doi():
     """`DT10` ⛔ sửa công cụ chung *(bài ⛔ đòi — `so!` + `phu` + `LOI_MONG` đã đủ)*: sha256[:16]
     của `tools/dong_bang_sheet.py` ở nền `fba4849`. Mọi ảnh cũ ⇒ đúng từng byte."""
     sha = hashlib.sha256(TOOL.read_bytes()).hexdigest()[:16]
-    assert sha == "ae917adbf80b1c14", f"công cụ chung bị sửa: {sha}"
+    # ⭐ `DT9b` *(`WO-241`)* — ĐỔI CÓ CHỦ ĐÍCH `ae917adbf80b1c14` → `2d8c1724f8403608`: thêm kiểu khoá `so_dong_sheet`
+    #   *(`_khoa_hop_le` · `_gia_tri_khoa` · `KIEU_KHOA_BIET` — khoá `<SO>!<hàng>` của IX.VEN nhiều sổ)*; mọi
+    #   kiểu khoá cũ ⛔ đổi nhánh ⇒ ảnh cũ đúng từng byte *(`SHA_CU` + `CHECKSUM` ở `test_dap_an_*`)*.
+    assert sha == "2d8c1724f8403608", f"công cụ chung bị sửa: {sha}"
 
 
 # ══ ảnh: cổng ĐẠT + checksum ═════════════════════════════════════════════════

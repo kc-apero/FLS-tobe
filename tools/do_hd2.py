@@ -1173,7 +1173,7 @@ def chay_wp_c4a(dsn: str | None = None) -> ThanhQuaC4a:
         from fls.db.kho import dsn_that
         from fls.repo import cau_hinh_repo as chc
         with psycopg.connect(dsn or dsn_that()) as c:
-            ven = chc.doc_ven(c)
+            ven = chc.doc_ven(c, so="GI")
     except Exception as e:  # noqa: BLE001 — Đ5: ⛔ đo được ⇒ ĐỎ có lý do
         px = PhanXu(False, (f"IX.VEN ⛔ đọc được từ kho: {type(e).__name__}: {' '.join(str(e).split())}",))
         return ThanhQuaC4a(px, {"bang": "HD2.WP-C4a", "goi": "WP-C4a", "dat": False,
@@ -1365,7 +1365,7 @@ def chay_wp_c4b(dsn: str | None = None) -> ThanhQuaC4b:
         from fls.db.kho import dsn_that
         from fls.repo import cau_hinh_repo as chc
         with psycopg.connect(dsn or dsn_that()) as c:
-            ven = chc.doc_ven(c)
+            ven = chc.doc_ven(c, so="GI")
     except Exception as e:  # noqa: BLE001 — Đ5: ⛔ đo được ⇒ ĐỎ có lý do
         return _do_c4b(PhanXu(False, (f"IX.VEN ⛔ đọc được từ kho: {type(e).__name__}: "
                                       f"{' '.join(str(e).split())}",)))

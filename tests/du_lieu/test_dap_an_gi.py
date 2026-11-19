@@ -58,14 +58,15 @@ ANH = {
 }
 #: checksum_noi_dung ghim *(đổi ⇒ phải có lượt đóng băng mới + lý do)*.
 CHECKSUM = {
-    "ix_ven": "77f81455901c3667",
+    "ix_ven": "0f2d9287d332d698",       # ⭐ DT9b `WO-241`: ĐỔI CÓ CHỦ ĐÍCH — thêm cột `so` + 317 dòng OMC·SC·PS (cũ 77f81455901c3667)
     "gi_mid1": "515868c0b100ba35",
     "gi_mid2": "eb36e99f5a9cee7d",
     "gi_mid3": "013de4e6e826b096",
 }
 #: ⭐ vòng sửa R1 `KQ-149`: ix_ven 36→**42** *(`DT8-R1-01`: nguồn liền tới hàng 45)* · gi_mid3 11→**253**
 #: *(`DT8-R1-03`: 253 hàng số = 11 tổng-tháng + 242 chi tiết)*. Mỗi số đếm **dòng ảnh**, ⛔ cột.
-MONG = {"ix_ven": 42, "gi_mid1": 2856, "gi_mid2": 1463, "gi_mid3": 253}
+#: ⭐ DT9b: ix_ven 42→**359** DÒNG = GI 42 + OMC 89 + SC 93 + PS 135 *(bài DT9b: `test_ix_ven_da_so.py`)*.
+MONG = {"ix_ven": 359, "gi_mid1": 2856, "gi_mid2": 1463, "gi_mid3": 253}
 
 #: 5 nhãn `cach_tinh` ≠ 'thường' *(AP §3.2.2/§3.2.4)*.
 NHOM_RIENG = {"Max", "VD341", "VD428", "VD444", "VD62"}
@@ -134,7 +135,7 @@ def _viet_luoi(p: pathlib.Path, anh: dict, *, cot: list[str], dong_dau: int,
 # ── tái tạo lưới thô TỪ ảnh *(mỗi khuôn một hình)* ──────────────────────────────
 
 COT_THO = {
-    "ix_ven": ["No", "vendor", "network", "account", "pct", "cashin_month", "cashin_day"],
+    "ix_ven": ["No", "vendor", "network", "account", "pct", "cashin_month", "cashin_day", "so", "hang"],
     "gi_mid1": ["D", "J", "K", "Q", "M", "R", "T", "U", "V"],
     "gi_mid2": ["D", "J", "K", "M", "T", "AA", "U", "V"],
     "gi_mid3": ["O", "P", "S", "T", "U", "V", "W", "X", "Y", "Z", "AA", "AB", "AC", "AD", "AE", "AF", "H", "F"],
@@ -146,7 +147,8 @@ def _luoi(ten: str, anh: dict) -> list[list]:
     d = anh["dong"]
     if ten == "ix_ven":
         return [[_chu(r["No"]), _chu(r["vendor"]), _chu(r["network"]), _chu(r["account"]),
-                 _chu(r["pct"]), _chu(r["cashin_month"]), _chu(r["cashin_day"])] for r in d]
+                 _chu(r["pct"]), _chu(r["cashin_month"]), _chu(r["cashin_day"]), _chu(r["so"]),
+                 int(_chu(r["dong_sheet"]).rsplit("!", 1)[-1])] for r in d]
     if ten == "gi_mid1":
         # hàng phân bổ thật rồi 4.494 hàng đệm (D='USD' do công thức, 5 cột phân bổ rỗng).
         real = [[_chu(r["currency"]), _chu(r["cdt1"]), _chu(r["thang"]), _chu(r["no"]),
@@ -218,9 +220,19 @@ def test_anh_TAI_TAO_dung_tung_byte(ten, tmp_path):
 
 # ══ DT8-B1 · ix_ven: 36 dòng Block 1 + 5 nhãn cach_tinh ════════════════════════
 
+def _gi(anh: dict) -> dict:
+    """DT9b: ảnh `ix_ven` nay có 4 sổ ⇒ các bài DT8 *(Block 1 của GI)* đo trên 42 dòng `so = GI`."""
+    return {**anh, "dong": [r for r in anh["dong"] if _chu(r["so"]) == "GI"]}
+
+
+def _luoi_gi(anh: dict) -> list[list]:
+    """Lưới 7 cột *(hình DT8 — khuôn đọc là sổ GI)* của 42 dòng GI."""
+    return [h[:7] for h in _luoi("ix_ven", anh) if h[7] == "GI"]
+
+
 def test_DT8_B1_ix_ven_42_dong_5_nhom_rieng():
-    anh = _doc(ANH["ix_ven"])
-    assert anh["bang"] == "IX.VEN" and anh["so_dong"] == 42
+    anh = _gi(_doc(ANH["ix_ven"]))
+    assert _doc(ANH["ix_ven"])["bang"] == "IX.VEN" and len(anh["dong"]) == 42
     rieng = {r["cach_tinh"]["chu"] for r in anh["dong"] if r["cach_tinh"]["chu"] != "thường"}
     assert rieng == NHOM_RIENG, f"5 nhãn riêng; đo {sorted(rieng)}"
     # Đ4 — mỗi nhãn đếm số DÒNG: Max 12 · VD341 **12** · VD444 8 · VD428 3 · VD62 1 · thường 6 = 42.
@@ -232,7 +244,7 @@ def test_DT8_B1_ix_ven_42_dong_5_nhom_rieng():
 def test_DT8_R1_01_ix_ven_dai_lien_hang_4_den_45_VD341_No_toi_12():
     """`DT8-R1-01`: Block 1 = ĐỦ dải liền hàng sheet 4…45 *(42 dòng — ⛔ cắt ở 36 theo số AP)*;
     `VD341` mang `No` 1…12 *(MID1 dùng tới `No` 12)*; ảnh khai 'AP ghi 36 ⇒ errata'."""
-    anh = _doc(ANH["ix_ven"])
+    anh = _gi(_doc(ANH["ix_ven"]))
     ds = [int(_chu(r["dong_sheet"])) for r in anh["dong"]]
     assert ds == list(range(4, 46)), "liền tay hàng 4…45, ⛔ hàng trống ngăn"
     no341 = sorted(int(_chu(r["No"])) for r in anh["dong"] if _chu(r["vendor"]) == "VD341")
@@ -243,8 +255,8 @@ def test_DT8_R1_01_ix_ven_dai_lien_hang_4_den_45_VD341_No_toi_12():
 def test_DT8_R1_01_PHA_cat_o_36_hang_thi_DO(tmp_path):
     """Phá: lưới chỉ 36 hàng *(cắt theo số AP)* mà `--mong 42` ⇒ ĐỎ *(cổng canh SỐ DÒNG)*."""
     anh = _doc(ANH["ix_ven"])
-    bt = _viet_luoi(tmp_path / "tho.json", anh, cot=COT_THO["ix_ven"], dong_dau=4,
-                    values=_luoi("ix_ven", anh)[:36])
+    bt = _viet_luoi(tmp_path / "tho.json", anh, cot=COT_THO["ix_ven"][:7], dong_dau=4,
+                    values=_luoi_gi(anh)[:36])
     kq = _chay("ix_ven", str(bt), "--mong", "42", "--ra", str(tmp_path / "ra.json"))
     assert kq.returncode == 1 and "36 dòng ≠ mong 42" in kq.stdout, (kq.stdout[-500:],)
 
@@ -252,11 +264,11 @@ def test_DT8_R1_01_PHA_cat_o_36_hang_thi_DO(tmp_path):
 def test_DT8_B1_PHA_mot_nhom_rieng_thi_DO(tmp_path):
     """Phá: đổi mọi VD341 → VD999 *(mất nhãn VD341)* ⇒ 4 nhãn ≠ 5 ⇒ cổng ĐỎ *(Đ5 hai chiều)*."""
     anh = _doc(ANH["ix_ven"])
-    luoi = _luoi("ix_ven", anh)
+    luoi = _luoi_gi(anh)
     for h in luoi:
         if h[1] == "VD341":
             h[1] = "VD999"
-    bt = _viet_luoi(tmp_path / "tho.json", anh, cot=COT_THO["ix_ven"], dong_dau=4, values=luoi)
+    bt = _viet_luoi(tmp_path / "tho.json", anh, cot=COT_THO["ix_ven"][:7], dong_dau=4, values=luoi)
     kq = _chay("ix_ven", str(bt), "--mong", "42", "--ra", str(tmp_path / "ra.json"))
     assert kq.returncode == 1, (kq.stdout[-600:], kq.stderr[-300:])
     assert "thiếu" in kq.stdout and "VD341" in kq.stdout
