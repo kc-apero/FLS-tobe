@@ -11,7 +11,9 @@ MID3 *(Σ chia = O/P, khoá `vendor` + `thang`)*.
   · hàng ảnh MID1 = OMC **6.230** · SC **5.187** *(+574 hàng đệm)* · PS **8.505**;
     MID2 = **1.470** · **581** · **3.339**; MID3 *(hàng `O` là số)* = **900** · **750** *(+10 ngoài)* ·
     **594** *(+1.476 ngoài)*.
-  · ⛔ **"PS thiếu 7 tháng 03–09/2026" của AP KHÔNG tái lập được như đã viết**: ba sổ nguồn
+  · ⛔ **"PS thiếu 7 tháng 03–09/2026" của AP KHÔNG tái lập được như đã viết** *(errata `DT9-R1-01`,
+    `BG-221` — AP §3.4.1 + ISP Step 34 `DT9-B1` ⇒ SỬA: ba sổ chỉ có 2025; PS ⛔ thiếu riêng; cổng khai
+    `mong` theo DỮ LIỆU: `TAP_THANG_SO`)*: ba sổ nguồn
     `H2.2025` chỉ có tháng `202503/04…202512` *(OMC 10 · SC 9 · PS 9)*, ⛔ có tháng 2026 nào. Cổng
     đếm đúng điều đo được: 7/7 tháng `202603…202609` có **0** dòng ở CẢ BA sổ; PS thiếu `202503`
     so với kỳ đối chiếu OMC *(1 tháng)*.
@@ -56,6 +58,21 @@ THANG_MONG = {
     "ps_mid1": {t: 945 for t in _T9}, "ps_mid2": {t: 371 for t in _T9},
     "ps_mid3": {t: 65 for t in _T9},
 }
+#: ⭐ `DT9-R1-01` — tập tháng MONG theo DỮ LIỆU đo 19/11, MỖI SỔ *(hợp ba ảnh MID1/2/3)*: ba sổ chỉ có 2025.
+TAP_THANG_SO = {"omc": tuple(_T10), "sc": tuple(_T9), "ps": tuple(_T9)}
+THANG_2026_7 = tuple(f"2026{m:02d}" for m in range(3, 10))            # 7 tháng AP/ISP nêu — 0 dòng ở CẢ BA
+#: ⭐ `DT9-R1-02` — 72 hàng SC Σ 6 PE_cdt ≠ O, ghim theo TÊN `dong_sheet` *(⛔ chỉ đếm)*.
+#: 70 = CHƯA CHIA *(Σ = 0 ∧ O ≠ 0)* · 2 = CHIA LỆCH THẬT *(Σ ≠ 0)*; `478` là hàng tổng-tháng ⛔ khoá.
+LAC_SC_CHUA_CHIA = (
+"572", "584", "585", "586", "587", "588", "589", "590", "591", "592", "593", "594", "597",
+    "598", "599", "601", "602", "605", "606", "607", "608", "609", "610", "611", "612", "613",
+    "614", "615", "616", "617", "618", "619", "620", "645", "646", "666", "678", "679", "680",
+    "681", "682", "683", "684", "685", "686", "687", "688", "691", "692", "693", "695", "696",
+    "699", "700", "701", "702", "703", "704", "705", "706", "707", "708", "709", "710", "711",
+    "712", "713", "714", "739", "741"
+)
+LAC_SC_CHIA_LECH = ("478", "505")
+
 #: Đ5 — phân bố ô lỗi `so!` *(loại lỗi → số ô)*, đo 19/11 trên hàng ảnh.
 LOI = {
     "omc_mid1": {"u": {"#VALUE!": 84, "#DIV/0!": 4836}, "v": {"#VALUE!": 84, "#DIV/0!": 4836}},
@@ -159,17 +176,37 @@ def test_AC1_so_dong_theo_thang_khai_MONG(ten):
     assert sum(THANG_MONG[ten].values()) > 0                          # Đ3: mẫu số ≠ 0
 
 
-def test_AC1_PS_thang_2026_khong_co_dong_nao_bay_thang_03_den_09():
-    """AP: *"PS thiếu 03–09/2026"* ⇒ đo: 7/7 tháng `202603…202609` có 0 dòng ở MỌI ảnh PS
-    *(và ở OMC · SC — AP ⛔ phân biệt PS)*; PS thiếu `202503` so với kỳ OMC."""
-    thang_thieu = [f"2026{m:02d}" for m in range(3, 10)]
-    assert len(thang_thieu) == 7
+def test_AC1_tap_thang_moi_so_khai_mong_theo_du_lieu():
+    """`DT9-R1-01`: tập tháng MỖI SỔ = đúng điều đo được *(OMC 202503…202512 · SC · PS 202504…202512)*,
+    hợp ba ảnh MID1/2/3; ⛔ tháng 2026 nào. Mẫu số ≠ 0 *(Đ3)*."""
+    for so in SO:
+        co = set()
+        for m in (1, 2, 3):
+            co |= {d["thang"] for d in _anh(f"{so}_mid{m}")["dong"] if d.get("thang")}
+        assert tuple(sorted(co)) == TAP_THANG_SO[so], (so, sorted(co))
+        assert len(co) > 0
+
+
+def test_AC1_bay_thang_202603_202609_co_0_dong_o_ca_ba_so():
+    """AP/ISP `DT9-B1` *("PS thiếu 7 tháng 03–09/2026")* ⇒ errata: ba sổ chỉ có 2025; PS ⛔ thiếu riêng.
+    7/7 tháng 0 dòng ở MỌI ảnh; PS thiếu `202503` so với kỳ OMC *(1 tháng)*."""
+    assert len(THANG_2026_7) == 7
     for ten in TEN:
         co = {d["thang"] for d in _anh(ten)["dong"] if d.get("thang")}
-        assert not (co & set(thang_thieu)), ten
+        assert not (co & set(THANG_2026_7)), ten
         assert not any(t.startswith("2026") for t in co), ten
     ps = {d["thang"] for d in _anh("ps_mid1")["dong"]}
     assert sorted(set(_T10) - ps) == ["202503"]
+
+
+@pytest.mark.parametrize("ten", TEN)
+def test_PHA_them_mot_dong_2026_vao_anh_thi_DO(ten):
+    """Đ5 hai chiều: THÊM (⛔ thay) một dòng tháng 2026 vào ảnh ⇒ ĐỎ."""
+    dong = [dict(d) for d in _anh(ten)["dong"]]
+    moi = dict(next(d for d in dong if _chu(d.get("vendor")) is not None))
+    moi["thang"] = "202603"
+    ket = _khuon(ten).thieu_lac(dong + [moi])
+    assert any(x.startswith("thang_2026@") for x in ket["thieu"]), ket["thieu"]
 
 
 @pytest.mark.parametrize("ten", TEN)
@@ -254,6 +291,37 @@ def test_AC4_mid3_sigma_chia_lech_ghi_nhan_dung_so_va_mau_so_ve(ten):
     assert f"PE: {MID3_PE_KHAC0[ten]}/" in ket["dai"] and "PM: 0/" in ket["dai"]
     assert "vế này chưa đo được" in ket["dai"]                        # vế PM 0 ô ≠ 0 — Đ3
     assert anh["phu"]["ngoai_anh"]["dong"][0]["so_dong"] == str(MID3_NGOAI[ten])
+
+
+def test_AC4_lac_sc_72_hang_ghim_theo_TEN_va_phan_loai_70_chua_chia_2_chia_lech():
+    """`DT9-R1-02`: 72 hàng SC lệch Σ ghim theo `dong_sheet` từng hàng *(đếm 72 là chưa đủ — đổi tên
+    một hàng vẫn 72)*. 70 *chưa chia* *(Σ = 0, O ≠ 0)* · 2 *chia lệch thật* *(Σ ≠ 0)*."""
+    from decimal import Decimal
+    anh = _anh("sc_mid3")
+    ten = [x.split("@")[1] for x in anh["lac"]]
+    assert sorted(ten) == sorted(LAC_SC_CHUA_CHIA + LAC_SC_CHIA_LECH) and len(ten) == 72
+    assert len(set(ten)) == 72
+    assert sorted(_khuon("sc_mid3").thieu_lac(anh["dong"])["lac"]) == sorted(f"dong_sheet@{t}" for t in ten)
+    cot_pe = ("cvl_pe", "cor_pe", "shq1_pe", "csm_pe", "cah_pe", "asa_pe")
+    theo = {d["dong_sheet"]: d for d in anh["dong"]}
+    chua, lech = [], []
+    for t in ten:
+        d = theo[t]
+        tong = sum((Decimal(d[c]) for c in cot_pe if d[c] is not None), Decimal(0))
+        (chua if tong == 0 and Decimal(d["pe"]) != 0 else lech).append(t)
+    assert sorted(chua) == sorted(LAC_SC_CHUA_CHIA) and len(chua) == 70
+    assert sorted(lech) == sorted(LAC_SC_CHIA_LECH) and len(lech) == 2
+
+
+def test_PHA_doi_ten_mot_hang_lac_sc_thi_DO():
+    """Đột biến `DT9-R1-02`: đổi `dong_sheet` một hàng lệch ⇒ đếm vẫn 72 nhưng bài ghim ĐỎ."""
+    anh = _anh("sc_mid3")
+    dong = [dict(d) for d in anh["dong"]]
+    i = next(i for i, d in enumerate(dong) if d["dong_sheet"] == LAC_SC_CHUA_CHIA[0])
+    dong[i]["dong_sheet"] = "99999"
+    lac = _khuon("sc_mid3").thieu_lac(dong)["lac"]
+    assert len(lac) == 72
+    assert sorted(lac) != sorted(f"dong_sheet@{t}" for t in LAC_SC_CHUA_CHIA + LAC_SC_CHIA_LECH)
 
 
 # ── Đ5 hai chiều · ca PHÁ ──────────────────────────────────────────────────────
