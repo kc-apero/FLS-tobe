@@ -27,3 +27,10 @@ Trước mã: 30/31 bài hỏng (chưa có `doc_cong_hd2` · `tep_hd2`). Chiều
 
 ## Cổng đã chạy
 `--duong-nen --cong 5446` (một lần): **ĐẠT** — toàn bộ `12 failed · 3619 passed · 2 xfailed · 14 errors` = tập đỏ 28 = 28 node id đường nền (thêm 0 · bớt 0), chạy 3647 (≥ 3647) · web `3 failed · 672 passed`, 3 = 3 node id, chạy 675 (≥ 675). `lint-imports` 11 kept · 0 broken · `soi_bang_tuyen` 45/45.
+
+## Vòng sửa sau R1 (`KQ-210`) — orchestrator chốt · 2026-11-19
+R1: 0 CHẶN · 2 NÊN SỬA · 3 GHI NHẬN. Hợp đồng `GET /gates` chỉ THÊM 1 trường (`lat_bo_nguon`); `do_hd2.py` ⛔ sửa.
+- **`CG2-R1-01`** *(`lat_bo` vắng)*: `do_hd2.py` ⛔ cắt lát ⇒ khoá có **0** lần ở tệp thật (3/3 khối đo đều vắng — mẫu số ⛔ rỗng, Đ3). ⛔ đổi cổng sang `null`. Cổng NÓI THẲNG: `da_do` kèm `lat_bo vắng ⇒ coi 0 (phép đo HD2 ⛔ cắt lát)` + `Cong.lat_bo_nguon` ∈ `"vang"` · `"khai"` · `"sai_kieu"` · `""` *(cổng ⛔ đọc khoá: gói chưa đo)*; ra ở `/gates` cạnh `ly_do`. Cha: có phần `vang` ⇒ `vang`. Khoá có mà ⛔ phải số nguyên ≥ 0 *(`None` · `-1` · `True` · `"0"` · `0.0`)* ⇒ `dat=null` + `` `lat_bo` `` trong `ly_do` + `sai_kieu`. Ba ca vắng · 0 · 2 + ca hỏng có bài. *(Xuất `lat_bo` thật từ `do_hd2.py` = WO riêng — orchestrator.)*
+- **`CG2-R1-02`** *(khối gói hỏng kiểu)*: `WP-C3a: [1]` trước bị bỏ im ⇒ `C3` `true` nhờ mỗi `C3b`. Nay khối kiểu ⛔ dict ⇒ cổng con ĐÓ hiện `dat=null` + `khối WP-C3a kiểu list ⛔ phải đối tượng JSON`, cha `null`. Chứng ĐỎ-trước: bài mới (5 kiểu + gói con mới `WP-C4a`) ĐỎ trên mã cũ (`KeyError: HD2_WP_C3A`), XANH sau.
+- **`-04`** *(M8 `goi ≠ khoá` sống)*: bài ghim ở GÓI CON; chứng cắn: đổi `if b.get("goi") != goi:` → `if False:` ⇒ ĐỎ, trả nguyên ⇒ XANH. **`-05`** *(M13 dây `chay_cua`)*: bài ghim `main()` truyền `tep_hd2` đúng cho `dung_may` *(mặc định · `--tep-hd2 X` · `''`⇒`None`)*; chứng cắn: `tep_hd2=None` cứng ⇒ ĐỎ 2 ca. **`-03`** ⇒ backlog.
+- **Q8**: `MONG_PYTEST_TOAN_BO` 3647 → **3667** (= thu thập cây này `--collect-only` ⇒ +20: R1-01 ×10 · R1-02 ×6 · `-04` ×1 · `-05` ×3) cùng commit bài ghim `test_S0_R3_02_…`.
