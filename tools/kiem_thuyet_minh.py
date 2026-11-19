@@ -88,6 +88,7 @@ DONG_SINH: dict[str, str] = {
     "Bắt đầu tra": "man_f01_lenh.js::_ve_viec",
     "Hiện ĐỦ các cột của GGSheet": "man_f01_lenh.js::_nut_du_cot",
     "← Chỉ 2 cột nhận diện": "man_f01_lenh.js::_nut_du_cot",
+    "Ký tháng": "man_f08.js::_ky_o (nhãn gán bằng textContent)",
 }
 
 # Nut **ky thuat**, ⛔ khong phai thao tac nghiep vu. Chung van phai co mat

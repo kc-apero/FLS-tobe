@@ -134,7 +134,11 @@ def test_AC1_F4_F1_37_dong_va_202306_nhan_LAC():
     # số của màn = số của tuyến (⛔ hằng gõ tay): ô USD của dòng đầu
     ky0 = d["ky"][0]
     assert str(ky0["USD"]) in ve["hang"][0]["txt"].replace(".", "").replace(",", "")
-    assert ve["nut"] == 0            # ⛔ không có nút nào — Step 18 loại trừ ký
+    # Step 18 loại trừ ký (nút = 0); từ F5 (`WO-253`) mỗi dòng SẠCH chưa ký có đúng một nút
+    # `Ký tháng` — đếm theo CHÍNH `ky[]`/`lac[]` của tuyến (⛔ hằng gõ tay), mẫu ≠ rỗng (Đ3).
+    sach = [k for k in d["ky"] if k["trang_thai"] != "da_ky" and k["yyyymm"] not in d["lac"]]
+    assert len(sach) == 36, len(sach)
+    assert ve["nut"] == len(sach), (ve["nut"], len(sach))
 
 
 # ══ AC-2 · F4-F2 ════════════════════════════════════════════════════════════
