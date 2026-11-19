@@ -93,6 +93,26 @@ def nhan_vendor(ven: BangVen) -> dict[str, frozenset[str]]:
     return {v: frozenset(s) for v, s in d.items()}
 
 
+def tong_thang_as_is(hang: Iterable[tuple[str, Decimal, Mapping[str, Decimal] | None]],
+                     cdt: tuple[str, ...]) -> tuple[dict[str, dict[str, Decimal]], dict[str, Decimal]]:
+    """⭐ MỘT nguồn "tổng tháng" *(`H10-R1-01`)* — AS-IS `[Formula] MID3`: `S10_c = Σ RATE_c × O` và
+    `O10 = Σ O` của MỌI dòng trong tháng *(kể cả vendor đặc biệt)*. `hang` = (tháng, O, RATE | None).
+    Cả `chia_nen_tang` *(WP-C4a)* lẫn `chia_theo_cach_tinh` *(WP-C4b)* gọi hàm này."""
+    s: dict[str, dict[str, Decimal]] = defaultdict(lambda: {c: _0 for c in cdt})
+    o: dict[str, Decimal] = defaultdict(lambda: _0)
+    for t, ov, r in hang:
+        o[t] += ov
+        if r:
+            for c in cdt:
+                s[t][c] += r[c] * ov
+    return s, o
+
+
+def pm_tong_thang(p: Decimal, s10: Decimal, o10: Decimal) -> Decimal:
+    """AS-IS `$P×S10/O10` cho một CDT1 — hàm DUY NHẤT chia PM của dòng `O = 0 ∧ P > 0`."""
+    return p * s10 / o10
+
+
 def chia_nen_tang(pe: Mapping[Khoa, Mapping[str, Decimal]], o: Mapping[Khoa, Decimal],
                   p: Mapping[Khoa, Decimal], ven: BangVen, *,
                   cdt1: Iterable[str]) -> KetQuaPhanBo:
@@ -121,12 +141,13 @@ def chia_nen_tang(pe: Mapping[Khoa, Mapping[str, Decimal]], o: Mapping[Khoa, Dec
     def _pe(k: Khoa, c: str) -> Decimal:
         return pe[k].get(c, _0)
 
-    # Σ PE_cdt theo TỔNG THÁNG — mọi vendor trong PE của tháng ấy *(kể cả đặc biệt: tổng tháng
-    # là thuộc tính của đầu vào, ⛔ của nhóm vendor)*.
-    tong_thang: dict[str, dict[str, Decimal]] = defaultdict(lambda: {c: _0 for c in cdt})
-    for k in pe:
-        for c in cdt:
-            tong_thang[k[1]][c] += _pe(k, c)
+    # RATE từng Vendor-tháng = PE_cdt ÷ Σ PE *(None khi Σ PE = 0)*; tổng tháng theo AS-IS
+    # `S10/O10` ở `tong_thang_as_is` — mọi vendor trong tháng *(kể cả đặc biệt)*, ⛔ PE/ΣPE.
+    def _rate(k: Khoa) -> dict[str, Decimal] | None:
+        sp = sum((_pe(k, c) for c in cdt), _0)
+        return None if sp == 0 else {c: _pe(k, c) / sp for c in cdt}
+
+    s_thang, o_thang = tong_thang_as_is(((k[1], o[k], _rate(k)) for k in o), cdt)
 
     chia: dict[Khoa, dict[str, tuple[Decimal, Decimal]]] = {}
     rate: dict[Khoa, dict[str, Decimal]] = {}
@@ -144,23 +165,25 @@ def chia_nen_tang(pe: Mapping[Khoa, Mapping[str, Decimal]], o: Mapping[Khoa, Dec
             continue
         ok, pk = o[k], p[k]
         if ok == 0 and pk > 0:
-            nen, ttt_ = tong_thang[t], True
-        else:
-            nen, ttt_ = {c: _pe(k, c) for c in cdt}, False
-        s = sum(nen.values(), _0)
-        if s == 0:
+            if o_thang[t] == 0:
+                ly.append(f"{v} · {t}: tổng tháng Σ O = 0 mà P = {pk} ⇒ ⛔ chia được (⛔ chia 0 im)")
+                continue
+            r = {c: s_thang[t][c] / o_thang[t] for c in cdt}
+            rate[k] = r
+            chia[k] = {c: (_0, pm_tong_thang(pk, s_thang[t][c], o_thang[t])) for c in cdt}
+            ttt.append(k)
+            continue
+        r = _rate(k)
+        if r is None:
             if ok == 0 and pk == 0:
                 rate[k] = {}
                 chia[k] = {c: (_0, _0) for c in cdt}
                 continue
-            ly.append(f"{v} · {t}: Σ PE {'tổng tháng' if ttt_ else 'Vendor-tháng'} = 0 mà "
+            ly.append(f"{v} · {t}: Σ PE Vendor-tháng = 0 mà "
                       f"O = {ok} · P = {pk} ⇒ ⛔ chia được (⛔ chia 0 im)")
             continue
-        r = {c: nen[c] / s for c in cdt}
         rate[k] = r
         chia[k] = {c: (r[c] * ok, r[c] * pk) for c in cdt}
-        if ttt_:
-            ttt.append(k)
     if ly:
         raise LoiPhanBo(ly)
     kq = KetQuaPhanBo(cdt, chia, rate, tuple(ttt), {n: tuple(x) for n, x in bo_qua.items()})
@@ -351,8 +374,7 @@ def chia_theo_cach_tinh(dong: Iterable[DongCFA1], pe: Mapping[Khoa, Mapping[str,
         raise LoiPhanBo(ly)
 
     pe_dong: list[tuple[DongCFA1, dict[str, Decimal]]] = []
-    s_thang: dict[str, dict[str, Decimal]] = defaultdict(lambda: {c: _0 for c in cdt})
-    o_thang: dict[str, Decimal] = defaultdict(lambda: _0)
+    hang: list[tuple[str, Decimal, dict[str, Decimal] | None]] = []
     for r in ds:
         r_ = rate((khoa.get(id(r), r.vendor), r.thang))
         if r_ is None and (r.o != 0 or (r.p is not None and r.p != 0 and not (r.o == 0 and r.p > 0))):
@@ -361,11 +383,10 @@ def chia_theo_cach_tinh(dong: Iterable[DongCFA1], pe: Mapping[Khoa, Mapping[str,
             continue
         x = {c: (r_[c] * r.o if r_ else _0) for c in cdt}
         pe_dong.append((r, x))
-        o_thang[r.thang] += r.o
-        for c in cdt:
-            s_thang[r.thang][c] += x[c]
+        hang.append((r.thang, r.o, r_))
     if ly:
         raise LoiPhanBo(ly)
+    s_thang, o_thang = tong_thang_as_is(hang, cdt)             # CÙNG hàm với `chia_nen_tang`
 
     chia: dict[Khoa, dict[str, list]] = {}
     o: dict[Khoa, Decimal] = defaultdict(lambda: _0)
@@ -382,7 +403,7 @@ def chia_theo_cach_tinh(dong: Iterable[DongCFA1], pe: Mapping[Khoa, Mapping[str,
             if o_thang[r.thang] == 0:
                 ly.append(f"{r.vendor} · {r.thang} · No {r.no}: tổng tháng Σ O = 0 ⇒ ⛔ chia P")
                 continue
-            pm = {c: r.p * s_thang[r.thang][c] / o_thang[r.thang] for c in cdt}
+            pm = {c: pm_tong_thang(r.p, s_thang[r.thang][c], o_thang[r.thang]) for c in cdt}
             ttt.append((r.vendor, r.thang, r.no))
         else:
             r_ = rate((khoa.get(id(r), r.vendor), r.thang))

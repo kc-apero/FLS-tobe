@@ -43,7 +43,9 @@ SO_CDT1 = 7                         # danh mục CDT1 *(đếm CDT1 khác nhau, 
 #:   · `VD341` · `VD444` — `or(M="VD444",M="VD341") ⇒ SUMIFS(K; I=network dòng đầu; Q=No; O; S)`.
 #:   · `VD428` — `M="VD428" ∧ Q=1 ⇒ I="Apple_store"`, `Q=2 ⇒ I="IAP_tracking"` *(= network của
 #:              dòng IX.VEN cùng (vendor, No) — đo ảnh DT8 dòng 22 · 23)*; No khác ⇒ 0.
-#:   · `VD62`  — ⛔ nhánh PE riêng *(PE theo dòng ĐẦU: `Max`)*; ở `[Formula] MID3` cột `AU`:
+#:   · `VD62`  — ⛔ nhánh PE riêng *(PE theo dòng ĐẦU: `Max`)*. ⚠ Mục kiểu `"khong"` dưới đây là NHÃN KHAI:
+#:              kiểu PE thật lấy theo nhãn dòng ĐẦU của vendor *(= `Max` ⇒ `mang_ty_le_no1`)*, chỉ phần MƯỢN
+#:              RATE là riêng *(`H10-R1-03`; bài ghim nguyên văn ở `test_vendor_dac_biet.py`)*. Ở `[Formula] MID3` cột `AU`:
 #:              `if(H<>"VD62",H,VLOOKUP(H&"-"&L, AR:AT, 3))`, `AT = if(ΣP No1 > ΣP No2,"VD341","VD62")`
 #:              ⇒ No có ΣP lớn hơn MƯỢN RATE MID2 của `VD341`.
 #:   · `thường` — nhánh cuối `…,0)` ⇒ PE = 0 *(⛔ dữ liệu: CÔNG THỨC — vì thế 44/44 Vendor-tháng

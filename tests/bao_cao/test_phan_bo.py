@@ -75,8 +75,10 @@ def test_H9_B2_O_bang_0_P_duong_chia_theo_TONG_THANG():
     kq = _chia(pe, o, p)
     k = ("VA", "202502")
     assert k in kq.theo_tong_thang
-    # tổng tháng 202502 (mọi vendor, kể cả đặc biệt): CVL 11 · COR 3 · CSM 2 · CAH 2 · ASA 5 = 23
-    assert kq.rate[k]["CVL"] == D(11) / D(23) and kq.rate[k]["ASA"] == D(5) / D(23)
+    # AS-IS `P×S10/O10` *(H10-R1-01)*: S10 = Σ RATE×O mọi vendor tháng ấy — CVL 7 · CSM −4 ·
+    # CAH −4 · ASA 9 ; O10 = 0 − 8 + 7 + 9 = 8 ⇒ RATE tổng tháng = S10/O10, ⛔ PE/ΣPE.
+    assert kq.rate[k]["CVL"] == D(7) / D(8) and kq.rate[k]["ASA"] == D(9) / D(8)
+    assert kq.rate[k]["CSM"] == D(-4) / D(8)
     assert abs(sum(x[1] for x in kq.chia[k].values()) - D(20)) <= pb.TOL
     assert all(x[0] == 0 for x in kq.chia[k].values())
 
@@ -95,7 +97,7 @@ def test_AC3_sigma_PE_0_ma_tien_khac_0_LOI_CO_TEN():
         _chia(pe, o, p)
     # O = 0 ∧ P > 0 mà tổng THÁNG cũng 0
     pe, o, p = {("VC", "202503"): {}}, {("VC", "202503"): D(0)}, {("VC", "202503"): D(3)}
-    with pytest.raises(pb.LoiPhanBo, match=r"Σ PE tổng tháng = 0"):
+    with pytest.raises(pb.LoiPhanBo, match=r"tổng tháng Σ O = 0"):
         _chia(pe, o, p)
 
 
@@ -193,3 +195,20 @@ def test_H9_IX_VEN_doc_tu_KHO_phan_loai_19_vendor_4_thuong_5_nhan():
     assert {n: len(x) for n, x in kq.bo_qua.items()} == \
         {"Max": 12, "VD341": 1, "VD428": 1, "VD444": 1, "VD62": 1}    # vendor-tháng / nhãn
     assert len({k for x in kq.bo_qua.values() for k in x}) == 15       # 15 vendor (VD62 ở 2 nhãn)
+
+
+def test_H10_R1_01_MOT_nguon_tong_thang_ca_TONG_HOP_O_khac_sigma_PE():
+    """Ca R1: VC `O = 0 · P = 60`; VA `O = 100` PE `30/10`; VB `O = 20` PE `10/30`. O ≠ Σ PE ⇒ hai
+    cơ sở cũ lệch *(`PE/ΣPE` ⇒ 30/30 · `S10/O10` ⇒ 40/20)*. Hai cổng PHẢI cùng ra 40/20 *(AS-IS)*."""
+    t = "202502"
+    pe = {("VA", t): {"CVL": D(30), "COR": D(10)}, ("VB", t): {"CVL": D(10), "COR": D(30)},
+          ("VC", t): {}}
+    o = {("VA", t): D(100), ("VB", t): D(20), ("VC", t): D(0)}
+    p = {("VA", t): D(0), ("VB", t): D(0), ("VC", t): D(60)}
+    a = pb.chia_nen_tang(pe, o, p, VEN, cdt1=C6)
+    dong = [pb.DongCFA1("VA", t, "1", D(100), D(0)), pb.DongCFA1("VB", t, "1", D(20), D(0)),
+            pb.DongCFA1("VC", t, "1", D(0), D(60))]
+    b = pb.chia_theo_cach_tinh(dong, pe, VEN, cdt1=C6)
+    for kq in (a, b):
+        assert (kq.chia[("VC", t)]["CVL"][1], kq.chia[("VC", t)]["COR"][1]) == (D(40), D(20))
+    assert all(a.chia[k][c] == b.chia[k][c] for k in a.chia for c in C6)

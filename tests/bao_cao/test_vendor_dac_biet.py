@@ -180,3 +180,31 @@ def test_H10_B2_grep_ten_vendor_trong_fls_bao_cao_BANG_0_va_doi_chung_duong():
     assert _dem("fls/bao_cao") == 0
     assert _dem("fls/cau_hinh") > 0          # Đ3: phép grep ⛔ mù — tên sống ở CONFIG
     assert re.search(r"\bVD62\b", (GOC / "fls/cau_hinh/vendor.py").read_text(encoding="utf-8"))
+
+
+# ── H10-R1-02 · -03 · -05 — bài ghim giết đột biến sống M9 · M7 · M16 *(KQ-218)* ───────────────────
+def test_H10_R1_02_M9_vendor_cho_VD62_muon_RATE_ghim_nguyen_van_o_config_THAT():
+    # Dòng IX.VEN hình VD62 thật: dòng ĐẦU nhãn `Max`, dòng sau nhãn `VD62` ⇒ nguồn mượn = donor
+    # của config *(⛔ bảng tổng hợp `BANG`)*. Đổi donor `VD341` → mã khác ⇒ ĐỎ ở đây.
+    ven = _ven([("VX", "1", "Max", "0.5", "Max"), ("VX", "2", None, None, "VD62")])
+    assert pb.ma_cach_tinh(ven)["VX"] == ("mang_ty_le_no1", "VD341")
+    assert CACH_TINH["VD62"][1] == "VD341"
+
+
+def test_H10_R1_03_M7_kieu_VD62_la_NHAN_KHAI_hanh_vi_lay_theo_dong_DAU_Max():
+    # KHAI: `CACH_TINH["VD62"] = ("khong", "VD341")` *(mục kiểu ⛔ được đọc: kiểu PE của vendor
+    # lấy theo nhãn dòng ĐẦU — ở VD62 là `Max`; chỉ phần mượn RATE là riêng)*. Ghim nguyên văn để
+    # đổi kiểu `khong` ⇒ ĐỎ, buộc người sửa đọc chú thích `vendor.py` + `BG-217` (đã đính chính).
+    assert CACH_TINH["VD62"] == ("khong", "VD341")
+    ven = _ven([("VX", "1", "Max", "0.5", "Max"), ("VX", "2", None, None, "VD62")])
+    assert pb.ma_cach_tinh(ven)["VX"][0] == CACH_TINH["Max"][0] == "mang_ty_le_no1"
+
+
+def test_H10_R1_05_M16_P_AM_voi_sigma_PE_khac_0_di_nhanh_RATE_rieng_P_nhan_RATE():
+    # O = 0 ∧ P = −3, Σ PE ≠ 0 ⇒ AS-IS `and($O=0,$P>0)` sai ⇒ PM = P × RATE *(⛔ tổng tháng)*.
+    # RATE VA = ¼ · ¾ ⇒ −0,75 · −2,25. Đột biến `p > 0` → `p != 0` ⇒ vào tổng tháng ⇒ ĐỎ.
+    kq = pb.chia_theo_cach_tinh(_dong(("VA", T, "1", 0, -3)), PE, VEN,
+                                cdt1=C6, bang=BANG)
+    d = kq.chia[("VA", T)]
+    assert (d["CVL"][1], d["COR"][1]) == (D("-0.75"), D("-2.25"))
+    assert kq.theo_tong_thang == ()
