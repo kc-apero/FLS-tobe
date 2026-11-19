@@ -111,3 +111,13 @@ Chạy MỘT lần, một mình, trên cây commit ①:
 - **`H10-R1-03` — chọn SỬA LỜI, ⛔ gỡ mã:** mục `CACH_TINH["VD62"][0] = "khong"` là **nhãn khai** — kiểu PE thật của `VD62` lấy theo nhãn dòng IX.VEN **đầu** *(= `Max` ⇒ `mang_ty_le_no1`)*; chỉ phần MƯỢN RATE `VD341` là riêng. **Đính chính bảng 5 mã ở trên:** dòng `VD62` ⇒ «kiểu theo dòng đầu *(`Max`)*; mượn RATE `VD341`». Chú thích `vendor.py` đã sửa; bài `test_H10_R1_03_M7_…` ghim nguyên văn mục + hành vi.
 - **Còn lại ⇒ backlog:** `H10-R1-04` *(gói `WP-C4b-PE`)* · `-06` *(`mong` PE kiểu `khong`)* · `-07` *(3 mẫu RATE `AA`)* · `-08` *(ghim nhãn `Max` ⇔ network)*.
 - **Q8:** `MONG_PYTEST_TOAN_BO` **3742 → 3746** *(= thu thập, +4)* cùng commit ① với bài ghim.
+
+## Sửa tích hợp với CG2 (WP-C4b · H10-R2-01)
+
+*(R2 `KQ-219`: chặn tích hợp — cùng kiểu `CG2-R2-03` đã sửa cho `WP-C4a` ở `BG-209`.)*
+
+- **Lỗi:** khối `WP-C4b` trong `docs/ITL/_tools/hd2_cong.json` thiếu `tong_o`/`khop` ⇒ trên cây gộp `GET /gates` ra `HD2_WP_C4B` = null · `HD2_WP_C4` = null; 8 bài `tests/api/test_isp_gates_hd2.py` đỏ *(bài quét tệp thật báo `{'WP-C4b': ['tong_o','khop']}`)*.
+- **Sửa (TDD — 2 bài oracle đỏ `KeyError` trước):** `tools/do_hd2.py` `so_sanh_c4b` xuất thêm `tong_o` = `o_so` = **1.981** *(Đ4: ô SO ĐƯỢC, ⛔ tính 945 ô P chữ)* và `khop` = `o_so − lech` = **1.981**; mọi khoá cũ giữ nguyên nghĩa. Khối sinh lại bằng `do_hd2.py --goi WP-C4b --dsn $PG_DSN_TEST --ghi` *(⛔ sửa tay)* — diff tệp JSON = đúng 2 dòng thêm, khối khác y từng byte.
+- **Bài mới:** `test_CG2_H10_R2_01_khoi_WP_C4b_khai_tong_o_va_khop_theo_hop_dong_H4` · `test_CG2_H10_R2_01_khop_giam_dung_so_o_lech` *(đột biến 1 ô đáp án MID3 ⇒ `khop` = `tong_o − 1` = 1.980; ⛔ đột biến đầu vào CFA1 vì một ô lan ra 6 ô PE ⇒ lệch 6)*.
+- **Ghim CG2 cập nhật cùng commit:** các bài `test_isp_gates_hd2.py` ghim thế giới 7 cổng *(trước H10)*; tệp thật nay có `WP-C4b` ⇒ 8 cổng, `HD2_WP_C4` = «2/2 gói con đạt (WP-C4a · WP-C4b) · Σ 2401/2401 ô» *(= 420 + 1.981)*, `HD2_WP_C4B` true; dat − 6 → 7. Không nới điều kiện nào — chỉ thêm C4b vào mong.
+- **Q8:** `MONG_PYTEST_TOAN_BO` **3772 → 3821** = số THU THẬP thật của cây gộp *(`pytest --collect-only`; web giữ 675)*. Xung đột khi gộp: `dung_moi_truong_isp.sh` + bài ghim `test_S0_R2_03` ⇒ lấy bản nhánh làm việc rồi đặt = số thu thập.
