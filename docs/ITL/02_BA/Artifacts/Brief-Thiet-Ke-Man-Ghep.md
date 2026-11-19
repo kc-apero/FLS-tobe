@@ -184,7 +184,7 @@ Kế toán phát biểu `18/09` *(`DT-I13`)*. ⛔ **Chưa được cài**, nhưn
 Card charge (OPENAI *CHATGPT SUBSCR)
 FUNDS TRF - TT 1OR606160155C01 · SENSORTOWER, INC.
 PAYMENT/TRANSFER CSDB STRIPE PAYMENTS SIN STRIPE LKuWsFH5A
-03088010516666-123728-CK 24/7 cho 19033369015016 - Cp hc ns
+TK_CA_NHAN_1-123728-CK 24/7 cho 19033369015016 - Cp hc ns
 ```
 
 ⇒ ⛔ **Đừng cắt nó xuống một dòng mờ.** Nhưng nó dài tới **189 ký tự** ⇒ cần một phép **rút gọn có kiểm soát** ＋ cách xem đầy đủ.
