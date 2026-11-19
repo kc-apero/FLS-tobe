@@ -28,6 +28,7 @@ import re
 import pathlib
 import sys
 from collections import Counter
+from decimal import Decimal
 from typing import Any
 
 _P = pathlib.Path(__file__).resolve().parent / "_gl_hr.py"
@@ -82,18 +83,21 @@ def _rong(v: Any) -> bool:
     return v is None or (isinstance(v, str) and v == "")
 
 
-def chuan_bi(tho: dict[str, Any]) -> dict[str, Any]:
+def chuan_bi_chung(tho: dict[str, Any], *, tabs_mong: tuple[str, str], ten_tab: dict[str, str], nam: str,
+                   cho_so_le: bool = False) -> dict[str, Any]:
     """LƯỚI SA `{tabs:[{tab, dong_dau_sheet, cot_sheet, tieu_de, values}]}` → bảng + phụ `tong_ky`.
 
-    `ValueError` ⇒ TỪ CHỐI. ⛔⛔ lời lỗi KHÔNG mang giá trị ô *(chỉ vị trí/số/loại)*.
+    ⭐ Phần CHUNG của Y2024 *(`WO-225`)* và Y2025 *(`WO-249` — `hr_ledger_2025` GỌI hàm này, ⛔ chép)*.
+    `cho_so_le=True` ⇒ PS Nợ/Có được LẺ *(Y2025 đo 19/11: 9 ô F của tab NIS là phân bổ chia lẻ — `gl_hr_408`
+    cũng giữ phần lẻ)*; Σ chính xác bằng `Decimal`. `ValueError` ⇒ TỪ CHỐI. ⛔⛔ lời lỗi KHÔNG mang giá trị ô.
     """
     tabs = tho.get("tabs")
-    if not isinstance(tabs, list) or [t.get("tab") for t in tabs if isinstance(t, dict)] != list(TABS):
-        raise ValueError(f"`tabs` phải đúng 2 tab {list(TABS)} theo thứ tự")
+    if not isinstance(tabs, list) or [t.get("tab") for t in tabs if isinstance(t, dict)] != list(tabs_mong):
+        raise ValueError(f"`tabs` phải đúng 2 tab {list(tabs_mong)} theo thứ tự")
     dong: list[list[Any]] = []
-    tong: dict[tuple[str, int], list[int]] = {}
+    tong: dict[tuple[str, int], list[Any]] = {}
     for t in tabs:
-        ten = TEN_TAB[t["tab"]]
+        ten = ten_tab[t["tab"]]
         if t.get("cot_sheet") != list(COT_THO):
             raise ValueError(f"`cot_sheet` phải đúng {list(COT_THO)} *(⛔ phủ B·C·I·J·K·M…R)*")
         if t.get("dong_dau_sheet") != DONG_DAU_SHEET:
@@ -116,47 +120,55 @@ def chuan_bi(tho: dict[str, Any]) -> dict[str, Any]:
             khoa = hang + (OFFSET_PIT if ten == "PIT" else 0)
             dong.append([khoa, ten, ky, *(None if _rong(x) else x for x in (d_, e, f, g)), hh,
                          *(None if _rong(x) else x for x in (s, tt, le))])
-            tk = tong.setdefault((ten, ky), [0, 0, 0])
+            tk = tong.setdefault((ten, ky), [0, Decimal(0), Decimal(0)])
             tk[0] += 1
             for j, v in ((1, e), (2, f)):
                 if not _rong(v):
-                    if isinstance(v, bool) or not isinstance(v, (int, float)) or v != int(v):
-                        raise ValueError(f"tab {ten} hàng sheet {hang}: PS Nợ/Có phải số nguyên VND")
-                    tk[j] += int(v)
-    phu = [{"tab": k[0], "ky": k[1], "so_hang": v[0], "tong_E": v[1], "tong_F": v[2]}
+                    if isinstance(v, bool) or not isinstance(v, (int, float, Decimal)) or (
+                            not cho_so_le and v != int(v)):
+                        raise ValueError(f"tab {ten} hàng sheet {hang}: PS Nợ/Có phải số"
+                                         + ("" if cho_so_le else " nguyên VND"))
+                    tk[j] += Decimal(str(v))
+    phu = [{"tab": k[0], "ky": k[1], "so_hang": v[0], "tong_E": _gl._tong([v[1]]), "tong_F": _gl._tong([v[2]])}
            for k, v in sorted(tong.items())]
     return {"cot": [KHOA, *COT], "dong": dong, "phu": {"tong_ky": phu},
-            "ghi_chu": (f"Y2024 HR *(lưới SA, file gốc)*: {len(dong)} hàng = "
-                        + " + ".join(f"{sum(1 for r in dong if r[1] == n)} {n}" for n in TEN_TAB.values())
+            "ghi_chu": (f"Y{nam} HR *(lưới SA, file gốc)*: {len(dong)} hàng = "
+                        + " + ".join(f"{sum(1 for r in dong if r[1] == n)} {n}" for n in ten_tab.values())
                         + ", khoá dong_sheet = hàng sheet *(PIT +100000)*; `ky` suy từ cột A. ⛔⛔ BỎ cột B Số "
                         "chứng từ · C Diễn giải · I·J·K nội dung PE/PI · M…R ID Payee/PMSlip/PESlip/PELine/"
                         "PISlip/PILine · U·V·W… *(chỉ đọc 9 cột A·D·E·F·G·H·S·T·AG)*. CHE số tài khoản ngân "
                         "hàng ở H: `R | <số>_…` ⇒ `R`. Bảng phụ `tong_ky` = số hàng + Σ PS Nợ/Có theo (tab, kỳ).")}
 
 
+def chuan_bi(tho: dict[str, Any]) -> dict[str, Any]:
+    return chuan_bi_chung(tho, tabs_mong=TABS, ten_tab=TEN_TAB, nam="2024")
+
+
 def _chu(v: Any) -> str | None:
     return None if v is None else (v["chu"] if isinstance(v, dict) else str(v))
 
 
-def thieu_lac(dong: list[dict[str, Any]]) -> dict[str, Any]:
-    """Cổng Y2024 *(Đ5 — `mong` khai trước, NO cả hai chiều)*: ⒜ số hàng mỗi `(tab, kỳ)` ≠ `MONG_TAB_KY`;
-    ⒝ Σ PS Có mỗi kỳ ≠ `MONG_F_KY`; ⒞ ô chữ ngoài TẬP ĐÓNG *(PII lạc cột)*; ⒟ số ô `H` bị che ≠ `MONG_H_R`;
-    ⒠ khoá trùng/PIT lệch offset."""
+def thieu_lac_chung(dong: list[dict[str, Any]], *, mong_tab_ky: dict, mong_f_ky: dict, mong_h_r: int,
+                    tap_dong: dict, nam: str, mong_le_na: int | None = None) -> dict[str, Any]:
+    """Cổng Y2024/Y2025 *(Đ5 — `mong` khai trước, NO cả hai chiều)*: ⒜ số hàng mỗi `(tab, kỳ)` ≠ mong;
+    ⒝ Σ PS Có mỗi kỳ ≠ mong *(`Decimal`)*; ⒞ ô chữ ngoài TẬP ĐÓNG *(PII lạc cột)*; ⒟ số ô `H` bị che ≠ mong;
+    ⒠ khoá trùng/PIT lệch offset; ⒡ *(Y2025)* số ô `LE = #N/A` ≠ `mong_le_na` — tập đóng có `#N/A` nên
+    PHẢI đếm riêng *(⛔ để nó lọt như một giá trị hợp lệ)*."""
     thieu: list[str] = []
     thuc: Counter = Counter((_chu(d["tab"]), int(d["ky"])) for d in dong)
-    for k in sorted(set(thuc) | set(MONG_TAB_KY)):
-        if thuc.get(k, 0) != MONG_TAB_KY.get(k, 0):
-            thieu.append(f"tab_ky@{k[0]}:{k[1]}:{thuc.get(k, 0)}/{MONG_TAB_KY.get(k, 0)}")
-    f_ky: Counter = Counter()
+    for k in sorted(set(thuc) | set(mong_tab_ky)):
+        if thuc.get(k, 0) != mong_tab_ky.get(k, 0):
+            thieu.append(f"tab_ky@{k[0]}:{k[1]}:{thuc.get(k, 0)}/{mong_tab_ky.get(k, 0)}")
+    f_ky: dict[int, Decimal] = {}
     for d in dong:
         f = d["F"]
         f = f["chu"] if isinstance(f, dict) else f
         if f is not None:
-            f_ky[int(d["ky"])] += int(f)
-    for k in sorted(set(f_ky) | set(MONG_F_KY)):
-        if f_ky.get(k, 0) != MONG_F_KY.get(k, 0):
-            thieu.append(f"F_ky@{k}:{f_ky.get(k, 0)}/{MONG_F_KY.get(k, 0)}")
-    n_r = 0
+            f_ky[int(d["ky"])] = f_ky.get(int(d["ky"]), Decimal(0)) + Decimal(str(f))
+    for k in sorted(set(f_ky) | set(mong_f_ky)):
+        if f_ky.get(k, Decimal(0)) != Decimal(str(mong_f_ky.get(k, 0))):
+            thieu.append(f"F_ky@{k}:{_gl._tong([f_ky.get(k, 0)])}/{mong_f_ky.get(k, 0)}")
+    n_r = n_na = 0
     for d in dong:
         ds = int(d["dong_sheet"])
         if (ds >= OFFSET_PIT) != (_chu(d["tab"]) == "PIT"):
@@ -165,12 +177,21 @@ def thieu_lac(dong: list[dict[str, Any]]) -> dict[str, Any]:
             s = _chu(d[c])
             if s is None:
                 continue
-            if s not in TAP_DONG[c]:
+            if s not in tap_dong[c]:
                 thieu.append(f"{c}_la@{ds}")
         if _chu(d["H"]) == "R":
             n_r += 1
-    if n_r != MONG_H_R:
-        thieu.append(f"H_che@khác:{n_r}/{MONG_H_R}")
-    dai = (f"Y2024 HR: {len(dong)} hàng · {len(thuc)} (tab,kỳ) · kỳ {sorted({k[1] for k in thuc})} · "
-           f"Σ PS Có theo kỳ {dict(sorted(f_ky.items()))} · {n_r} ô H che")
+        if _chu(d["le"]) == "#N/A":
+            n_na += 1
+    if n_r != mong_h_r:
+        thieu.append(f"H_che@khác:{n_r}/{mong_h_r}")
+    if mong_le_na is not None and n_na != mong_le_na:
+        thieu.append(f"le_NA@khác:{n_na}/{mong_le_na}")
+    dai = (f"Y{nam} HR: {len(dong)} hàng · {len(thuc)} (tab,kỳ) · kỳ {sorted({k[1] for k in thuc})} · "
+           f"Σ PS Có theo kỳ {dict(sorted((k, _gl._tong([v])) for k, v in f_ky.items()))} · {n_r} ô H che")
     return {"thieu": thieu, "lac": [], "dai": dai}
+
+
+def thieu_lac(dong: list[dict[str, Any]]) -> dict[str, Any]:
+    return thieu_lac_chung(dong, mong_tab_ky=MONG_TAB_KY, mong_f_ky=MONG_F_KY, mong_h_r=MONG_H_R,
+                           tap_dong=TAP_DONG, nam="2024")
