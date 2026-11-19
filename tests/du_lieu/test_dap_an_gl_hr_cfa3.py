@@ -36,14 +36,20 @@ import _gl_hr as GL  # noqa: E402
 PD = {
     "407": {"ten": "gl_hr_407", "mong": 9421, "checksum": "62c6b780950f167a",
             "ngoai_2025": {202601: 269}, "n_ky": 13, "doan": 1,
-            "loi": {("P", "#N/A"): 11}},
-    "408": {"ten": "gl_hr_408", "mong": 9410, "checksum": "59e1157d077c51e8",
-            "ngoai_2025": {202601: 269}, "n_ky": 13, "doan": 7, "loi": {}},
-    "413": {"ten": "gl_hr_413", "mong": 10785, "checksum": "b3b4e8485378ff57",
-            "ngoai_2025": {202411: 165, 202412: 530, 202601: 269}, "n_ky": 15, "doan": 7,
-            "loi": {("R", "#N/A ()"): 18}},
+            "loi": {("P", "#N/A"): 11}, "suy": False},
+    "408": {"ten": "gl_hr_408", "mong": 9410 + 2302, "checksum": "c876e0fe3bffd5d7",
+            "ngoai_2025": {202601: 269}, "n_ky": 13, "doan": 1, "loi": {}, "suy": True},
+    "413": {"ten": "gl_hr_413", "mong": 10785 + 2302, "checksum": "dd8dc675e19dfce7",
+            "ngoai_2025": {202411: 165, 202412: 530, 202601: 269}, "n_ky": 15, "doan": 1,
+            "loi": {("R", "#N/A ()"): 18}, "suy": True},
 }
 CHECKSUM_GL_406 = "53a243b42101c314"
+#: DT6b (`WO-225` AC-3) — đo 19/11 *(khoá SA chỉ-đọc, ⛔ ghi)*: 6 đoạn A-rỗng GIỮA dữ liệu ở 408 · 413
+#: = 2.302 hàng thiếu ngày; gán kỳ = kỳ hàng CÓ NGÀY liền TRÊN. `(đoạn đầu ở 408, ở 413, số hàng, kỳ)`.
+SUY_DOAN = ((5221, 6596, 566, 202506), (6546, 7921, 335, 202507), (8163, 9538, 322, 202508),
+            (9023, 10398, 538, 202509), (10113, 11488, 276, 202510), (10919, 12294, 265, 202511))
+SUY_KY = {202506: 566, 202507: 335, 202508: 322, 202509: 538, 202510: 276, 202511: 265}
+SUY_TONG_F = 6763528503                      # Σ PS Có *(cột F)* của 2.302 hàng — mỗi sheet
 CFA3_CHECKSUM = "4e61473a6b526057"
 
 
@@ -105,7 +111,7 @@ def _luoi_gl(anh):
             hdr[r][ix[c]] = t
     for d in anh["dong"]:
         r = [""] * len(GL.COT_THO)
-        r[ix["A"]] = _serial(d["ky"])
+        r[ix["A"]] = "" if _chu(d.get("ky_suy")) else _serial(d["ky"])   # DT6b: hàng gán kỳ = A rỗng
         for c in GL.COT[1:]:
             if c != "ky":
                 v = _chu(d[c])
@@ -142,7 +148,8 @@ def test_DT6_B1_anh_GL_HR_so_dong_theo_ky_ky_NGOAI_2025_co_ten(k):
     m = PD[k]
     anh = _doc(DAP_AN / f"{m['ten']}.json")
     assert anh["bang"] == f"PD.{k}" and anh["khuon"] == m["ten"]
-    assert anh["khoa"] == "dong_sheet" and anh["cot"] == list(GL.COT)
+    assert anh["khoa"] == "dong_sheet"
+    assert anh["cot"] == list(GL.COT_SUY if m["suy"] else GL.COT)
     assert anh["so_dong"] == len(anh["dong"]) == m["mong"] > 0
     assert anh["cong"] == {"mong": m["mong"], "so_dong": m["mong"], "dat": True, "ly_do": []}
     assert (anh["thieu"], anh["khoa_hong"], anh["o_rong"]) == ([], [], [])
@@ -164,6 +171,8 @@ def test_DT6_B1_413_chua_408_va_them_1375_dong_nhu_da_do():
     def ky(t):
         r = {}
         for d in _doc(DAP_AN / f"gl_hr_{t}.json")["dong"]:
+            if _chu(d.get("ky_suy")) is not None:        # DT6b: ⛔ đếm hàng GÁN kỳ — chỉ hàng có ngày
+                continue
             r[int(d["ky"])] = r.get(int(d["ky"]), 0) + 1
         return r
     k407, k408, k413 = ky("407"), ky("408"), ky("413")
@@ -432,3 +441,115 @@ def test_DT6_CFA3_cong_DO_ma_la_thieu_ma_hay_doi_o_loi(pha, tmp_path):
         _da_tu_choi(kq)                                  # 73 ≠ 74 ⇒ TỪ CHỐI *(khuôn)*
     else:
         assert kq.returncode == 1, (kq.returncode, kq.stdout[-400:], kq.stderr[-300:])
+
+
+# ══ DT6b · 2.302 hàng thiếu ngày → gán kỳ theo hàng CÓ NGÀY liền trên (`WO-225` AC-3 · AC-4) ═════
+
+@pytest.mark.parametrize("k", ["408", "413"])
+def test_DT6b_AC3_2302_hang_vao_bang_chinh_ky_suy_hang_tren_dem_theo_ky_va_tong_PS_Co(k):
+    """Đếm theo kỳ · Σ PS Có khai MONG; kỳ mỗi hàng = kỳ của hàng liền trước trong thứ tự sheet
+    *(hàng liền trước = hàng có ngày HOẶC hàng gán kỳ cùng đoạn ⇒ cùng kỳ)*. Mẫu số > 0 *(Đ3)*."""
+    from decimal import Decimal
+    anh = _doc(DAP_AN / f"gl_hr_{k}.json")
+    dong = anh["dong"]
+    suy = [(i, d) for i, d in enumerate(dong) if _chu(d["ky_suy"]) is not None]
+    assert len(suy) == 2302 > 0
+    assert {_chu(d["ky_suy"]) for _, d in suy} == {"hang_tren"}
+    dem = {}
+    for _, d in suy:
+        dem[int(d["ky"])] = dem.get(int(d["ky"]), 0) + 1
+    assert dem == SUY_KY
+    assert sum(Decimal(str(d["F"])) for _, d in suy if d["F"] is not None) == SUY_TONG_F
+    for i, d in suy:
+        assert i > 0 and dong[i - 1]["ky"] == d["ky"]               # kỳ = kỳ hàng liền TRÊN
+        assert int(d["dong_sheet"]) == int(dong[i - 1]["dong_sheet"]) + 1   # liền khít, ⛔ nhảy hàng
+    ds_ky = {int(d["dong_sheet"]) for _, d in suy}
+    assert len(ds_ky) == 2302
+    cot_phu = anh["phu"]["gan_ky"]["dong"]
+    mong = [(tu[0 if k == "408" else 1], n, ky) for *tu_, n, ky in SUY_DOAN for tu in [tu_]]
+    assert [(int(r["tu"]), int(r["so_hang"]), int(r["ky"])) for r in cot_phu] == mong
+    assert sum(Decimal(str(r["tong_F"])) for r in cot_phu) == SUY_TONG_F
+    assert len(anh["phu"]["doan_trong"]["dong"]) == 1               # còn đúng ĐOẠN ĐUÔI
+    assert _chu(anh["phu"]["doan_trong"]["dong"][0]["vi_tri"]) == "duoi"
+
+
+def test_DT6b_AC4_407_khong_doi_cot_va_khuon_thay_doi_chi_o_nhanh_gan_ky():
+    """407 không có đoạn giữa ⇒ ảnh đúng từng byte như DT6: không cột `ky_suy` · checksum cũ."""
+    anh = _doc(DAP_AN / "gl_hr_407.json")
+    assert "ky_suy" not in anh["cot"] and anh["checksum_noi_dung"] == "62c6b780950f167a"
+    assert set(anh["phu"]) == {"doan_trong", "thieu_nguon"}
+
+
+def _chay_suy(k, tmp_path, sua=None, mong=None):
+    m = PD[k]
+    anh = _doc(DAP_AN / f"{m['ten']}.json")
+    v = _luoi_gl(anh)
+    if sua:
+        sua(v, anh)
+    tho = _ghi(tmp_path / "t.json", _hdr_gl(anh), v)
+    return _chay(m["ten"], tho, "--mong", mong or m["mong"], "--ra", tmp_path / "r.json")
+
+
+def _hang_suy_dau(anh):
+    return next(int(d["dong_sheet"]) for d in anh["dong"] if _chu(d["ky_suy"]))
+
+
+def test_DT6b_cong_DO_khi_doi_PS_Co_cua_hang_gan_ky(tmp_path):
+    def sua(v, anh):
+        i = 3 + _hang_suy_dau(anh) - 10
+        v[i][GL.COT_THO.index("F")] = 1_000_000_000_000
+    kq = _chay_suy("408", tmp_path, sua)
+    assert kq.returncode == 1 and "suy_F@khác" in kq.stdout, (kq.returncode, kq.stdout[-500:])
+
+
+def test_DT6b_cong_DO_khi_hang_gan_ky_lac_cot_va_loi_KHONG_in_gia_tri(tmp_path):
+    bi_mat = "Nguyen Van Thanh"
+    def sua(v, anh):
+        v[3 + _hang_suy_dau(anh) - 10][GL.COT_THO.index("J")] = bi_mat
+    kq = _chay_suy("413", tmp_path, sua)
+    assert kq.returncode == 1 and "J_la@" in kq.stdout
+    assert bi_mat not in kq.stdout + kq.stderr
+
+
+def test_DT6b_doan_giua_co_hang_rong_hoan_toan_la_TU_CHOI(tmp_path):
+    """Hàng A rỗng GIỮA dữ liệu mà ⛔ ô nào ⇒ ⛔ gán kỳ cho hàng rỗng *(Đ3)*: TỪ CHỐI, ⛔ im lặng."""
+    def sua(v, anh):
+        i = 3 + _hang_suy_dau(anh) - 10 + 1
+        v[i] = [""] * len(GL.COT_THO)
+    _da_tu_choi(_chay_suy("408", tmp_path, sua))
+
+
+def test_DT6b_cong_DO_khi_mot_hang_co_ngay_giua_doan_cat_doan_va_doi_ky_mong(tmp_path):
+    """Đặt ngày kỳ khác vào một hàng giữa đoạn ⇒ nửa đoạn sau gán theo kỳ MỚI ⇒ ĐỎ cả hai chiều."""
+    def sua(v, anh):
+        i = 3 + _hang_suy_dau(anh) - 10 + 100
+        v[i][0] = _serial(202601)
+    kq = _chay_suy("408", tmp_path, sua)
+    assert kq.returncode == 1 and ("suy_ky@" in kq.stdout or "ky@" in kq.stdout)
+
+
+def test_DT6b_thieu_lac_goi_thang_ky_suy_la_va_ky_khong_theo_hang_tren_va_doan_dau():
+    dong = [{"dong_sheet": "10", "ky": "202506", "F": None, "ky_suy": None},
+            {"dong_sheet": "11", "ky": "202507", "F": 5, "ky_suy": {"chu": "hang_tren"}},
+            {"dong_sheet": "12", "ky": "202507", "F": 5, "ky_suy": {"chu": "doan_gua"}}]
+    for r in dong:
+        r.update({c: None for c in GL.COT[1:] if c not in r})
+    GL._NGU_CANH["x"] = {"doan": []}
+    kq = GL.thieu_lac(dong, pd="x", ky_mong={}, loi_mong={}, doan_mong=[], suy_mong={202507: 2},
+                      suy_f_mong=10)
+    assert "suy_ky_lech@11" in kq["thieu"]               # kỳ ≠ kỳ hàng liền trên
+    assert "ky_suy_la@12" in kq["thieu"]                 # giá trị cờ ngoài tập đóng
+    dau = [{"dong_sheet": "10", "ky": "202506", "F": 1, "ky_suy": {"chu": "hang_tren"}}]
+    dau[0].update({c: None for c in GL.COT[1:] if c not in dau[0]})
+    kq = GL.thieu_lac(dau, pd="x", ky_mong={}, loi_mong={}, doan_mong=[], suy_mong={202506: 1},
+                      suy_f_mong=1)
+    assert "suy_dau@10" in kq["thieu"]                   # hàng gán kỳ ở ĐẦU bảng ⛔ có hàng trên
+
+
+def test_DT6b_mUSD_chi_duoc_rong_o_hang_gan_ky_hang_co_ngay_thieu_BA_la_DO():
+    """`BA`·`BB` nới `so?` vì 2.302 hàng gán kỳ không có mUSD; cổng đòi hàng CÓ NGÀY vẫn đủ."""
+    d = {"dong_sheet": "10", "ky": "202506", "F": None, "ky_suy": None, "BA": None, "BB": 1}
+    d.update({c: None for c in GL.COT[1:] if c not in d})
+    GL._NGU_CANH["x"] = {"doan": []}
+    kq = GL.thieu_lac([d], pd="x", ky_mong={}, loi_mong={}, doan_mong=[], suy_mong={}, suy_f_mong=0)
+    assert "mUSD_rong@10" in kq["thieu"]

@@ -21,6 +21,14 @@ bằng hàng tiêu đề TRƯỚC**, rồi chỉ đọc các cột ⛔ mang tên
   · MỌI cột chữ còn lại có **TẬP ĐÓNG** khai ở khuôn *(vài chục mã đo được)*: một giá trị lạ — kể cả
     một tên người rơi lạc cột — ⇒ cổng ĐỎ, ⛔ in giá trị *(chỉ `dong_sheet`, bia `DT5-R1-02`)*.
 
+⭐ **DT6b** *(ISP 3.1.2 · `WO-225` · chủ quyết 19/11 phương án 2)*: ở 408·413 có **6 đoạn A-rỗng GIỮA dữ
+liệu = 2.302 hàng** *(566 + 335 + 322 + 538 + 276 + 265; còn I/J/F/G/P — Σ PS Có 6.763.528.503)* thiếu ngày.
+Chế độ `suy=True` GÁN kỳ cho từng hàng ấy = **kỳ của hàng CÓ NGÀY liền TRÊN** *(cùng tab)* và đưa vào
+bảng chính với cột `ky_suy = "hang_tren"` *(hàng có ngày: `None`)*; bảng phụ `gan_ky` ghi từng đoạn
+`{tu, so_hang, ky, tong_F}`; `doan_trong` chỉ còn **đoạn ĐUÔI** *(⛔ gán — không có hàng trên đo được)*.
+407 *(0 đoạn giữa)* giữ chế độ cũ `suy=False` ⇒ ảnh đúng từng byte. ⛔ Hàng rỗng hoàn toàn ở đoạn GIỮA ⇒
+TỪ CHỐI *(Đ3 — ⛔ gán kỳ cho hàng không có gì)*.
+
 ⭐ **Đ5**: cổng khai `mong` TRƯỚC *(số dòng mỗi kỳ · số ô lỗi theo cột · các đoạn A-rỗng)*, ĐỎ khi
 lệch **cả hai chiều**; kỳ ngoài 2025 ⇒ `lac` *(ghi nhận CÓ TÊN, ⛔ im lặng)* và dòng `dai` IN rõ
 *"kỳ ⊂ 2025: KHÔNG"* khi đúng như vậy.
@@ -32,6 +40,7 @@ import pathlib
 import re
 import sys
 from collections import Counter
+from decimal import Decimal
 from typing import Any
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[2]))
@@ -53,6 +62,13 @@ KHOA = "dong_sheet"
 #: Cột CHỮ *(`chu?` — được rỗng)*; `E`·`F`·`AX`·`AY` = số HOẶC rỗng *(`so?`)*; còn lại số *(`so`)*.
 CHU = ("D", "G", "H", "I", "J", "P", "R", "V", "Z", "AD")
 KIEU_COT = {**{c: "chu?" for c in CHU}, **{c: "so?" for c in ("E", "F", "AX", "AY")}}
+#: DT6b: bảng chính của 408·413 thêm cột cờ `ky_suy` *(`None` = kỳ đọc từ cột A · `"hang_tren"` = gán)*.
+KY_SUY = "hang_tren"
+COT_SUY = (*COT, "ky_suy")
+#: Hàng gán kỳ KHÔNG có `BA`·`BB` *(mUSD Phát sinh Nợ/Có — đo 19/11: 2.302/2.302 rỗng; `AX`·`AY`
+#: đã là `so?`)* ⇒ hai cột nới `so?`; ⛔ mất canh hàng có ngày ⇒ cổng `thieu_lac` ⒠ đòi `BA`·`BB` ≠ rỗng ở hàng
+#: có ngày *(`mUSD_rong@ds`)*.
+KIEU_COT_SUY = {**KIEU_COT, "BA": "so?", "BB": "so?", "ky_suy": "chu?"}
 #: Cột bị BỎ khỏi ảnh nhưng có trong lưới thô *(khai ở `ghi_chu`)*.
 COT_BO = tuple(c for c in COT_THO if c not in COT and c != "A")
 
@@ -134,8 +150,15 @@ def _soat_pii_tieu_de(values: list[list]) -> None:
 _NGU_CANH: dict[str, dict[str, Any]] = {}
 
 
-def chuan_bi(tho: dict[str, Any], pd: str) -> dict[str, Any]:
-    """LƯỚI SA → bảng `{dong_sheet, ky, D…BC}` + bảng phụ `doan_trong` · `thieu_nguon`.
+def _tong(xs) -> Any:
+    """Σ chính xác *(Decimal)* → `int` khi nguyên, ⛔ float *(Đ4: Σ PS Có là số TIỀN)*."""
+    t = sum((Decimal(str(x)) for x in xs if x is not None), Decimal(0))
+    return int(t) if t == t.to_integral_value() else t
+
+
+def chuan_bi(tho: dict[str, Any], pd: str, suy: bool = False) -> dict[str, Any]:
+    """LƯỚI SA → bảng `{dong_sheet, ky, D…BC[, ky_suy]}` + bảng phụ `doan_trong` · `thieu_nguon`
+    *(+ `gan_ky` khi `suy`)*. `suy=True` ⇒ đoạn A-rỗng GIỮA gán kỳ theo hàng có ngày liền trên.
 
     `ValueError` ⇒ TỪ CHỐI. ⛔⛔ lời lỗi KHÔNG mang giá trị ô *(chỉ vị trí/số/loại)*.
     """
@@ -179,26 +202,12 @@ def chuan_bi(tho: dict[str, Any], pd: str) -> dict[str, Any]:
 
     dong: list[list[Any]] = []
     doan: list[dict[str, Any]] = []
-    cur: dict[str, Any] | None = None
-    so_che = 0
+    gan: list[dict[str, Any]] = []
+    cho: list[tuple[int, list[Any]]] = []          # đoạn A-rỗng ĐANG MỞ: (hàng sheet, hàng lưới)
+    ky_tren: int | None = None                      # kỳ của hàng CÓ NGÀY gần nhất phía trên
     dem_che: Counter = Counter()
-    data = values[3:]
-    for i, h in enumerate(data):
-        ds = DONG_DAU_DU_LIEU + i
-        a = h[ix["A"]]
-        if _rong(a):
-            if cur is None:
-                cur = {"tu": ds, "so_hang": 0, "so_hang_co_o_khac": 0, "vi_tri": "giua"}
-            cur["so_hang"] += 1
-            if any(not _rong(x) for x in h):
-                cur["so_hang_co_o_khac"] += 1
-            continue
-        if cur is not None:
-            doan.append(cur)
-            cur = None
-        if not isinstance(a, int) or isinstance(a, bool) or a < 1:
-            raise ValueError(f"hàng sheet {ds}: cột A *(ngày)* phải serial số nguyên ≥ 1")
-        d = EPOCH + datetime.timedelta(days=int(a))
+
+    def _hang(ds: int, ky: int, h: list[Any], co_suy: bool) -> list[Any]:
         o: dict[str, Any] = {}
         for c in COT[1:]:
             v = h[ix[c]]
@@ -206,34 +215,93 @@ def chuan_bi(tho: dict[str, Any], pd: str) -> dict[str, Any]:
             if c in ("H", "Z"):
                 v, che = che_tai_khoan(v)
                 if che:
-                    so_che += 1
                     dem_che[c] += 1
             o[c] = v
-        dong.append([ds, d.year * 100 + d.month, *(o[c] for c in COT[1:])])
-    if cur is not None:
-        cur["vi_tri"] = "duoi"
-        doan.append(cur)
+        r = [ds, ky, *(o[c] for c in COT[1:])]
+        return [*r, KY_SUY if co_suy else None] if suy else r
+
+    def _dong_doan(tu_ds: int, hang: list[list[Any]], vi_tri: str) -> dict[str, Any]:
+        return {"tu": tu_ds, "so_hang": len(hang),
+                "so_hang_co_o_khac": sum(1 for h in hang if any(not _rong(x) for x in h)),
+                "vi_tri": vi_tri}
+
+    def _dong_mo(den_ds: int) -> None:
+        """Có hàng CÓ NGÀY ở `den_ds` ⇒ đoạn đang mở là đoạn GIỮA."""
+        nonlocal cho
+        if not cho:
+            return
+        tu_ds = cho[0][0]
+        hang = [h for _, h in cho]
+        if not suy:
+            doan.append(_dong_doan(tu_ds, hang, "giua"))
+        else:
+            if ky_tren is None:
+                raise ValueError(f"hàng sheet {tu_ds}: đoạn A-rỗng ĐẦU bảng ⛔ có hàng có ngày "
+                                 "phía trên để gán kỳ")
+            rong_hoan_toan = [ds for ds, h in cho if all(_rong(x) for x in h)]
+            if rong_hoan_toan:
+                raise ValueError(f"hàng sheet {rong_hoan_toan[0]}: đoạn A-rỗng GIỮA dữ liệu có "
+                                 f"{len(rong_hoan_toan)} hàng rỗng hoàn toàn — ⛔ gán kỳ cho hàng "
+                                 "không có ô nào")
+            for ds, h in cho:
+                dong.append(_hang(ds, ky_tren, h, True))
+            gan.append({"tu": tu_ds, "so_hang": len(cho), "ky": ky_tren,
+                        "tong_F": _tong(None if _rong(h[ix["F"]]) else h[ix["F"]] for h in hang)})
+        cho = []
+
+    for i, h in enumerate(values[3:]):
+        ds = DONG_DAU_DU_LIEU + i
+        a = h[ix["A"]]
+        if _rong(a):
+            cho.append((ds, h))
+            continue
+        _dong_mo(ds)
+        if not isinstance(a, int) or isinstance(a, bool) or a < 1:
+            raise ValueError(f"hàng sheet {ds}: cột A *(ngày)* phải serial số nguyên ≥ 1")
+        d = EPOCH + datetime.timedelta(days=int(a))
+        ky_tren = d.year * 100 + d.month
+        dong.append(_hang(ds, ky_tren, h, False))
+    if cho:                                          # đoạn ĐUÔI — ⛔ gán *(không có hàng dưới/kỳ đo được)*
+        doan.append(_dong_doan(cho[0][0], [h for _, h in cho], "duoi"))
+    so_che = sum(dem_che.values())
     if not dong:
         raise ValueError("lưới ⛔ có hàng nào cột A có ngày — ⛔ đóng băng ảnh rỗng (Đ3)")
     _NGU_CANH[pd] = {"doan": [(x["tu"], x["so_hang"], x["so_hang_co_o_khac"], x["vi_tri"])
                               for x in doan]}
-    return {
-        "cot": [KHOA, *COT],
-        "dong": dong,
-        "phu": {"doan_trong": doan, "thieu_nguon": thieu_nguon},
-        "ghi_chu": (
-            f"{pd} *(lưới SA)*: {len(dong)} hàng cột A có ngày, khoá dong_sheet = hàng sheet; "
-            f"{len(doan)} đoạn A-RỖNG *(bảng phụ `doan_trong`: "
-            f"{sum(1 for x in doan if x['vi_tri'] == 'giua')} giữa dữ liệu · "
-            f"{sum(1 for x in doan if x['vi_tri'] == 'duoi')} đuôi)* chứa "
-            f"{sum(x['so_hang'] for x in doan)} hàng, "
-            f"{sum(x['so_hang_co_o_khac'] for x in doan)} hàng còn ô khác — ĐẾM + khai, ⛔ vào bảng "
-            f"chính. ⛔⛔ BỎ cột B Số chứng từ · C Diễn giải · M Mã đối tác · N·O file đính kèm "
+    phu = {"doan_trong": doan, "thieu_nguon": thieu_nguon}
+    if suy:
+        phu["gan_ky"] = gan
+    n_giua = sum(1 for x in doan if x["vi_tri"] == "giua")
+    ghi_chu = (
+        f"{pd} *(lưới SA)*: {sum(1 for r in dong if r[-1] is None) if suy else len(dong)} hàng cột A "
+        f"có ngày, khoá dong_sheet = hàng sheet; "
+        f"{len(doan)} đoạn A-RỖNG *(bảng phụ `doan_trong`: "
+        f"{n_giua} giữa dữ liệu · "
+        f"{sum(1 for x in doan if x['vi_tri'] == 'duoi')} đuôi)* chứa "
+        f"{sum(x['so_hang'] for x in doan)} hàng, "
+        f"{sum(x['so_hang_co_o_khac'] for x in doan)} hàng còn ô khác — ĐẾM + khai, ⛔ vào bảng "
+        f"chính. ⛔⛔ BỎ cột B Số chứng từ · C Diễn giải · M Mã đối tác · N·O file đính kèm "
+        f"(⛔ có trong lưới) và các cột {list(COT_BO)} của lưới: AP = bản Final của ID Payee "
+        f"*(mã nhân sự ⇒ BỎ, ⛔ băm)*; Q ⛔ có dữ liệu; AH·AU·AV ⛔ cần cho đáp án. CHE số tài "
+        f"khoản ngân hàng ở H·Z: `R | <số>_…` ⇒ `R` *(số ô che khai ở BG, ⛔ vào ảnh)*. ⛔ mang cột "
+        f"A — chỉ `ky`. Hai tab Y2024 đi bằng IMPORTRANGE ⇒ thiếu: bảng phụ `thieu_nguon`.")
+    if suy:
+        ghi_chu = (
+            f"{pd} *(lưới SA · DT6b)*: {len(dong)} hàng bảng chính = "
+            f"{sum(1 for r in dong if r[-1] is None)} hàng cột A có ngày + "
+            f"{sum(x['so_hang'] for x in gan)} hàng THIẾU NGÀY ở {len(gan)} đoạn GIỮA dữ liệu "
+            f"*(`ky_suy = \"hang_tren\"`: kỳ = kỳ của hàng CÓ NGÀY liền TRÊN — chủ quyết 19/11, "
+            f"phương án 2; bảng phụ `gan_ky` ghi {{tu, so_hang, ky, tong_F}}; ⛔ kỳ ĐO được từ "
+            f"ngày chứng từ)*. Khoá dong_sheet = hàng sheet. {len(doan)} đoạn A-RỖNG còn lại = "
+            f"đoạn ĐUÔI *(bảng phụ `doan_trong`, {sum(x['so_hang'] for x in doan)} hàng, "
+            f"{sum(x['so_hang_co_o_khac'] for x in doan)} hàng còn ô khác — ĐẾM, ⛔ vào bảng "
+            f"chính)*. ⛔⛔ BỎ cột B Số chứng từ · C Diễn giải · M Mã đối tác · N·O file đính kèm "
             f"(⛔ có trong lưới) và các cột {list(COT_BO)} của lưới: AP = bản Final của ID Payee "
             f"*(mã nhân sự ⇒ BỎ, ⛔ băm)*; Q ⛔ có dữ liệu; AH·AU·AV ⛔ cần cho đáp án. CHE số tài "
-            f"khoản ngân hàng ở H·Z: `R | <số>_…` ⇒ `R` *(số ô che khai ở BG, ⛔ vào ảnh)*. ⛔ mang cột "
-            f"A — chỉ `ky`. Hai tab Y2024 đi bằng IMPORTRANGE ⇒ thiếu: bảng phụ `thieu_nguon`."),
-    }
+            f"khoản ngân hàng ở H·Z: `R | <số>_…` ⇒ `R` *(số ô che khai ở BG, ⛔ vào ảnh)*. ⛔ mang "
+            f"cột A — chỉ `ky`. Hai tab Y2024 đi bằng IMPORTRANGE ⇒ thiếu: bảng phụ `thieu_nguon`.")
+    return {"cot": [KHOA, *(COT_SUY if suy else COT)], "dong": dong, "phu": phu,
+            "ghi_chu": ghi_chu}
 
 
 def _chu(v: Any) -> str | None:
@@ -242,7 +310,9 @@ def _chu(v: Any) -> str | None:
 
 def thieu_lac(dong: list[dict[str, Any]], *, pd: str, ky_mong: dict[int, int],
               loi_mong: dict[str, dict[str, int]],
-              doan_mong: list[tuple[int, int, int, str]]) -> dict[str, Any]:
+              doan_mong: list[tuple[int, int, int, str]],
+              suy_mong: dict[int, int] | None = None,
+              suy_f_mong: int | None = None) -> dict[str, Any]:
     """Cổng GL HR *(Đ5 — khai `mong`, NO cả hai chiều)*. ĐỎ *(`thieu` ⛔ rỗng)* khi:
 
       ⒜ số dòng mỗi kỳ ≠ `ky_mong` *(thừa · thiếu · kỳ lạ)*;
@@ -250,7 +320,11 @@ def thieu_lac(dong: list[dict[str, Any]], *, pd: str, ky_mong: dict[int, int],
          dài giống số tài khoản)* — `DT6-R1-03`: ⛔ còn nhánh "≥ 6 chữ số" riêng, vì 9 cột chữ có tập
          đóng + `R` có regex ⇒ không đường nào tới nó *(mã chết, đột biến `M13` sống)* — marker chỉ mang `dong_sheet` + cột;
       ⒞ phân bố ô LỖI Sheets theo cột ≠ `loi_mong` *(thêm `#REF!`/đổi tập ⇒ ĐỎ, `DT5-R1-04`)*;
-      ⒟ đoạn A-rỗng ≠ `doan_mong` *(thiếu ngữ cảnh ⇒ ĐỎ, Đ3/Đ5)*.
+      ⒟ đoạn A-rỗng ≠ `doan_mong` *(thiếu ngữ cảnh ⇒ ĐỎ, Đ3/Đ5)*;
+      ⒠ *(DT6b — chỉ khi khai `suy_mong`)* hàng `ky_suy="hang_tren"`: số hàng MỖI KỲ ≠ `suy_mong`
+         *(`suy_ky@kỳ:thực/mong`)* · Σ PS Có ≠ `suy_f_mong` *(`suy_F@khác`)* · cờ ngoài tập đóng
+         `{None, "hang_tren"}` *(`ky_suy_la@ds`)* · kỳ ≠ kỳ hàng LIỀN TRÊN trong bảng *(`suy_ky_lech@ds`)*
+         · hàng gán kỳ ở ĐẦU bảng *(`suy_dau@ds`)* · hàng CÓ NGÀY thiếu `BA`/`BB` *(`mUSD_rong@ds`)*. Khuôn ⛔ khai `suy_mong` mà dòng ⛔ có cột ⇒ ĐỎ.
 
     `lac` = kỳ NGOÀI 2025 *(ghi nhận CÓ TÊN)*. `dai` IN rõ *kỳ ⊂ 2025?* — mỗi số kèm nhãn (Đ4).
     """
@@ -279,6 +353,32 @@ def thieu_lac(dong: list[dict[str, Any]], *, pd: str, ky_mong: dict[int, int],
         tong = lambda m: sum(m.values())                                   # noqa: E731
         thieu.append(f"o_loi@khác: khai {tong(mong_loi)} ô ≠ thực {tong(loi)} ô "
                      f"({len(mong_loi)} nhóm cột×chuỗi khai ↔ {len(loi)} thực)")
+    if suy_mong is not None:
+        suy_ky: Counter = Counter()
+        suy_f: list[Any] = []
+        for i, d in enumerate(dong):
+            ds = d["dong_sheet"]
+            co = _chu(d.get("ky_suy"))
+            if co is None:
+                if d["BA"] is None or d["BB"] is None:
+                    thieu.append(f"mUSD_rong@{ds}")           # hàng CÓ NGÀY ⛔ được thiếu mUSD
+                continue
+            if co != KY_SUY:
+                thieu.append(f"ky_suy_la@{ds}")
+                continue
+            suy_ky[int(d["ky"])] += 1
+            f = d["F"]
+            suy_f.append(f["chu"] if isinstance(f, dict) else f)
+            if i == 0:
+                thieu.append(f"suy_dau@{ds}")
+            elif int(dong[i - 1]["ky"]) != int(d["ky"]):
+                thieu.append(f"suy_ky_lech@{ds}")
+        for k in sorted(set(suy_ky) | set(suy_mong)):
+            if suy_ky.get(k, 0) != suy_mong.get(k, 0):
+                thieu.append(f"suy_ky@{k}:{suy_ky.get(k, 0)}/{suy_mong.get(k, 0)}")
+        if suy_f_mong is None or _tong(suy_f) != suy_f_mong:
+            thieu.append(f"suy_F@khác: khai {suy_f_mong} ≠ thực {_tong(suy_f)} "
+                         f"({sum(suy_ky.values())} hàng gán kỳ)")
     nc = _NGU_CANH.get(pd)
     if nc is None:
         thieu.append("NGU_CANH@thiếu")                                      # Đ5: ⛔ đo được = ĐỎ
@@ -293,5 +393,8 @@ def thieu_lac(dong: list[dict[str, Any]], *, pd: str, ky_mong: dict[int, int],
            + (f" · {len(ngoai)} kỳ ngoài 2025 {sorted(ngoai)} = {sum(ngoai.values())} dòng" if ngoai
               else "")
            + f") · ô lỗi theo cột {dict(sorted((f'{c}:{s}', n) for (c, s), n in loi.items()))}"
-           f" · {0 if nc is None else len(nc['doan'])} đoạn A-rỗng")
+           f" · {0 if nc is None else len(nc['doan'])} đoạn A-rỗng"
+           + (f" · {sum(suy_ky.values())} hàng gán kỳ `hang_tren` *(thiếu ngày; Σ PS Có "
+              f"{_tong(suy_f)})* theo kỳ {dict(sorted(suy_ky.items()))}" if suy_mong is not None
+              else ""))
     return {"thieu": thieu, "lac": lac, "dai": dai}
