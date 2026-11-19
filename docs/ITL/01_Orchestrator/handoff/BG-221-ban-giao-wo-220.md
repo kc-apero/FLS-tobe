@@ -80,3 +80,9 @@
 ## 9 · Cổng cuối
 - `--duong-nen --cong 5445` (một lần, một mình): **KẾT ĐẠT** — toàn bộ `12 failed · 3864 passed · 2 xfailed · 14 errors` = tập đỏ nền 28 = 28 node id *(thêm 0 · bớt 0)*, chạy **3892** bài; `tests/web` `3 failed · 672 passed` = nền 3 = 3.
 - `lint-imports`: 11 kept · 0 broken. `kiem_tai_lieu.py`: ĐẠT. Bản thô `/tmp` đã xoá.
+
+## Vòng sửa sau R1 (KQ-222)
+*R1 = 0 CHẶN · 2 NÊN SỬA · 4 GHI NHẬN; người dùng đã duyệt vòng sửa. Chỉ THÊM mục này.*
+- **`DT9-R1-01` — errata *(⛔ sửa AP/ISP; orchestrator làm ở 3.1.3)*:** **AP §3.4.1 + ISP Step 34 `DT9-B1` ⇒ sửa: ba sổ chỉ có 2025 *(03/04…12)*; PS ⛔ thiếu riêng.** Đo lại: 0 ô `2026…` ở 9 tab MID + 4 tab thượng nguồn. Cổng khai `mong` theo DỮ LIỆU: `TAP_THANG_SO` = OMC `202503…202512` *(10 tháng)* · SC `202504…202512` *(9)* · PS `202504…202512` *(9)* — hợp ba ảnh MID1/2/3 mỗi sổ, mẫu số > 0 *(Đ3)*; "7 tháng `202603…202609` = 0 dòng ở CẢ ba sổ" *(9/9 ảnh)*. Đ5 hai chiều: **thêm** một dòng 2026 vào ảnh ⇒ ĐỎ *(`thang_2026@`, 9/9 ảnh)*; đổi `TAP_THANG_SO` OMC ⇒ ĐỎ.
+- **`DT9-R1-02`:** `lac` của 72 hàng SC lệch Σ ghim theo TÊN `dong_sheet` từng hàng *(`LAC_SC_CHUA_CHIA` 70 + `LAC_SC_CHIA_LECH` = `478`, `505`)*. Phân loại tính từ ảnh: **70 chưa chia** *(Σ 6 PE_cdt = 0 ∧ O ≠ 0)* · **2 chia lệch thật** *(Σ ≠ 0; `478` là hàng tổng-tháng ⛔ khoá)* — khớp `-03`. Đột biến đổi tên một hàng *(đếm vẫn 72)* ⇒ ĐỎ; đổi một tên trong bản ghim ⇒ ĐỎ.
+- Bài `test_dap_an_nen_tang.py`: **129 → 141**; sàn `MONG_PYTEST_TOAN_BO` **3.892 → 3.904** *(Q8, cùng commit)*. ⛔ đổi byte ảnh `tests/fixture/**`.
