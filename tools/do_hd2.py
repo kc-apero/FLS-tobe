@@ -493,9 +493,26 @@ MONG_C3A_SO_DONG_ANH = 12385          #: dòng ảnh gl_cf_dau_vao (hàng 10…1
 MONG_C3A_THIEU_D = (4957, 4958, 6068, 6502, 6944, 7626, 8026, 8593, 8649, 8999, 9071, 9380)
 MONG_C3A_DONG_SO = MONG_C3A_SO_DONG_ANH - len(MONG_C3A_THIEU_D)   #: 12.373 dòng vào tinh_gl
 #: nhãn V ⛔ khớp nút nào *(kể cả bỏ hoa thường)* ⇒ AS-IS SUMIFS cũng ⛔ cộng — dòng rơi, CÓ TÊN.
-MONG_C3A_HD_NGOAI_CAY = {"ITE | ITE Interest": 152, "ITE | ITE Interest ": 1, "Server Cost": 7,
-                         "GAC - Other": 1, "<rỗng>": 1}
+#: WO-226: 162 → **9** — 153 dòng `ITE | ITE Interest` (152) + `… ` cách cuối (1) nay vào nút `ITE` nhờ
+#: bảng alias `hd_cfg.ALIAS_NHAN_HD` (khai ở `MONG_C3A_HD_ALIAS`); 9 còn lại GIỮ NGUYÊN.
+MONG_C3A_HD_NGOAI_CAY = {"Server Cost": 7, "GAC - Other": 1, "<rỗng>": 1}
+#: dòng sổ vào nút nhờ alias *(nhãn nguồn nguyên văn → số dòng)* — 153 = 152 + 1 *(Đ4: số DÒNG, ⛔ số ô)*.
+MONG_C3A_HD_ALIAS = {"ITE | ITE Interest": 152, "ITE | ITE Interest ": 1}
 MONG_C3A_HD_KHAC_HOA = 5               #: 4 `oga | GAC - Other` ⇒ OGA + 1 `ofR | Office Rental Cost` ⇒ OFR (SUMIFS ⛔ phân biệt hoa thường)
+#: ⭐ WO-226 AC-3 · Ô LỆCH ĐÁP ÁN CÓ CHỦ ĐÍCH `lech_co_chu_dich_ite` *(Đ4: đếm Ô của lưới, ⛔ dòng sổ)*:
+#: ô khác nhau giữa lưới CÓ alias và lưới KHÔNG alias *(= ô alias chạm tới)* VÀ ≠ đáp án. AS-IS bỏ sót
+#: lãi ITE nên đáp án = 0 ở các ô này; FLS cố ý ≠. Σ mUSD = Σ (got − exp) ở khối GROUP ≈ 0,01197 *(WO-226
+#: đo 19/11: ≈ 0,01197 mUSD ròng)*; `tong_musd_moi_khoi` gồm cả khối LE.
+MONG_LECH_ITE_C3A = {
+    "so_o": 35, "theo_khoi": {"BGO2": 1, "GROUP": 26, "SGO2": 8}, "ma": ["ITE"],
+    "ngay_dau": "2025-02-24", "ngay_cuoi": "2026-10-31", "so_cot_ngay": 26,
+    "tong_musd_group": "0.011973111599", "tong_musd_moi_khoi": "0.023567965790"}
+#: C3b: 42 ô = 24 kỳ × khối. Σ mUSD GROUP 0,047892… = 4 × 0,011973 *(mỗi dòng sổ rơi vào 4 cấp kỳ chồng
+#: nhau Y · H · Q · M — Đ4: Σ ô, ⛔ số tiền ròng; số tiền ròng = `tong_musd_group` của C3a)*.
+MONG_LECH_ITE_C3B = {
+    "so_o": 42, "theo_khoi": {"BGO2": 4, "GROUP": 24, "SGO2": 14}, "ma": ["ITE"],
+    "ky_dau": "2025", "ky_cuoi": "2026Q4", "so_ky": 24,
+    "tong_musd_group": "0.047892446397", "tong_musd_moi_khoi": "0.094271863160"}
 MONG_C3A_SO_NGAY = 760                 #: cột ngày ≤ ngày đọc 2026-11-18
 MONG_C3A_NGAY_DAU = 45585              #: 2024-10-20 — errata ㉑ (⛔ 21/10 của spec)
 #: errata ㉑: đáp án 409 có THÊM 1 cột TRƯỚC ngày đầu IX.PER *(C6 lưu 21/10, 409 bắt đầu 20/10)*. Khai
@@ -538,6 +555,8 @@ class MongC3a:
     so_ngay: int | None = None
     ngay_dau: int | None = None
     ngay_so_cuoi: int | None = None
+    hd_alias: Mapping[str, int] | None = None
+    lech_ite: Mapping[str, Any] | None = None
 
 
 def mong_c3a_mac_dinh() -> MongC3a:
@@ -546,7 +565,8 @@ def mong_c3a_mac_dinh() -> MongC3a:
                    so_dong_anh=MONG_C3A_SO_DONG_ANH, tong_o=MONG_C3A_TONG_O, o_kpi=MONG_C3A_O_KPI,
                    o_loi=MONG_C3A_O_LOI, so_dong_dap_an=MONG_C3A_SO_DONG_DAP_AN,
                    so_ngay=MONG_C3A_SO_NGAY, ngay_dau=MONG_C3A_NGAY_DAU,
-                   ngay_so_cuoi=MONG_C3A_NGAY_SO_CUOI)
+                   ngay_so_cuoi=MONG_C3A_NGAY_SO_CUOI, hd_alias=dict(MONG_C3A_HD_ALIAS),
+                   lech_ite=dict(MONG_LECH_ITE_C3A))
 
 
 @dataclass
@@ -560,6 +580,8 @@ class ThanhQuaC3a:
     phan_xu: PhanXu
     hd2_cong: dict[str, Any]
     luoi: dict[tuple[str, str, int], Decimal]
+    lech_ite: list[dict[str, Any]] = field(default_factory=list)   #: WO-226 — ô lệch CÓ CHỦ ĐÍCH
+    khop_dap_an: int = 0                                          #: ô khớp đáp án THUẦN (⛔ cộng lệch ITE)
 
 
 def nap_cay(path: Path = ATL_CAY) -> CayHD:
@@ -569,6 +591,48 @@ def nap_cay(path: Path = ATL_CAY) -> CayHD:
 
 def _iso(serial: int) -> str:
     return (datetime.date(1899, 12, 30) + datetime.timedelta(days=serial)).isoformat()
+
+
+_Q12 = Decimal("1e-12")
+
+
+def _o_chiu_alias(co: Mapping[Any, Decimal], khong: Mapping[Any, Decimal]) -> set:
+    """Ô mà bảng alias làm ĐỔI giá trị *(lưới CÓ alias ≠ lưới KHÔNG alias — cùng dòng, cùng trục)*."""
+    return {k for k, v in co.items() if v != khong[k]}
+
+
+def _tom_tat_lech_ite(lech_ite: list[dict[str, Any]], tr: str, dinh_dang) -> dict[str, Any]:
+    """`lech_co_chu_dich_ite`: số ô · theo khối · mã · khoảng ngày/kỳ · Σ mUSD *(GROUP · mọi khối)*."""
+    cot = sorted({x[tr] for x in lech_ite})
+    q = lambda d: str(d.quantize(_Q12))  # noqa: E731
+    return {
+        "so_o": len(lech_ite),
+        "theo_khoi": {k: sum(1 for x in lech_ite if x["le"] == k)
+                      for k in sorted({x["le"] for x in lech_ite})},
+        "ma": sorted({x["ma"] for x in lech_ite}),
+        ("ngay_dau" if tr == "ngay" else "ky_dau"): dinh_dang(cot[0]) if cot else None,
+        ("ngay_cuoi" if tr == "ngay" else "ky_cuoi"): dinh_dang(cot[-1]) if cot else None,
+        ("so_cot_ngay" if tr == "ngay" else "so_ky"): len(cot),
+        "tong_musd_group": q(sum((Decimal(x["lech"]) for x in lech_ite if x["le"] == KHOI_TONG),
+                                 Decimal(0))),
+        "tong_musd_moi_khoi": q(sum((Decimal(x["lech"]) for x in lech_ite), Decimal(0))),
+    }
+
+
+def _dem_alias(kq, meta) -> dict[str, int]:
+    """Dòng sổ vào nút nhờ alias: nhãn nguồn NGUYÊN VĂN *(kể cả khoảng trắng cuối)* → số dòng."""
+    r: dict[str, int] = {}
+    for i in kq.dong_alias:
+        r[meta[i][2]] = r.get(meta[i][2], 0) + 1
+    return r
+
+
+def _so_mong_ite(thuc: dict[str, Any], mong: Mapping[str, Any] | None) -> list[str]:
+    """Đ5 hai chiều: `lech_co_chu_dich_ite` thực ↔ MONG *(từng khoá; mong `None` ⇒ ĐỎ, ⛔ bỏ qua)*."""
+    if mong is None:
+        return ["lech_co_chu_dich_ite ⛔ khai mong"]
+    return [f"lech_co_chu_dich_ite.{k} {thuc.get(k)!r} ≠ mong {mong.get(k)!r}"
+            for k in sorted(set(thuc) | set(mong)) if thuc.get(k) != mong.get(k)]
 
 
 def so_sanh_c3a(anh_vao: dict, anh_dap_an: dict, fx: Mapping[int, Mapping[str, Decimal]],
@@ -606,8 +670,9 @@ def so_sanh_c3a(anh_vao: dict, anh_dap_an: dict, fx: Mapping[int, Mapping[str, D
         ly.append(f"trục ngày IX.PER ⛔ rỗng: ngày đọc {den} < cột đầu {dau}")
 
     # ── 3 · engine ──
-    kq = cfa1_daily(dong_cfa, cay, ngay=truc, khoi=KHOI_CFA1)
+    kq = cfa1_daily(dong_cfa, cay, ngay=truc, khoi=KHOI_CFA1, alias=hd_cfg.ALIAS_NHAN_HD)
     luoi = kq.o
+    chiu_alias = _o_chiu_alias(luoi, cfa1_daily(dong_cfa, cay, ngay=truc, khoi=KHOI_CFA1).o)
 
     # ── 4 · đáp án ──
     ch = lambda v: _chu(v)  # noqa: E731
@@ -628,6 +693,7 @@ def so_sanh_c3a(anh_vao: dict, anh_dap_an: dict, fx: Mapping[int, Mapping[str, D
     kpi = set(MA_KPI)
     tong_o = khop = o_kpi = o_loi = 0
     lech: list[dict[str, Any]] = []
+    lech_ite: list[dict[str, Any]] = []
     for k in KHOI_CFA1:
         for n in cay.nut:
             khoi_ds = "la" if cay.la(n.ma) else "cha"
@@ -645,8 +711,9 @@ def so_sanh_c3a(anh_vao: dict, anh_dap_an: dict, fx: Mapping[int, Mapping[str, D
                 if DUNG_SAI_C3A[khoi_ds].khop(g, e):
                     khop += 1
                 else:
-                    lech.append({"le": k, "ma": n.ma, "ngay": t, "khoi": khoi_ds,
-                                 "exp": str(e), "got": str(g), "lech": str(g - e)})
+                    x = {"le": k, "ma": n.ma, "ngay": t, "khoi": khoi_ds,
+                         "exp": str(e), "got": str(g), "lech": str(g - e)}
+                    (lech_ite if key in chiu_alias else lech).append(x)
 
     # ── 6 · lệch có tên ──
     hd_ngoai: dict[str, int] = {}
@@ -654,15 +721,20 @@ def so_sanh_c3a(anh_vao: dict, anh_dap_an: dict, fx: Mapping[int, Mapping[str, D
         nh = meta[i][2] if meta[i][2] else "<rỗng>"
         hd_ngoai[nh] = hd_ngoai.get(nh, 0) + 1
     lech_co_ten = {"thieu_tien_te_D": sorted(thieu_D), "hd_ngoai_cay": hd_ngoai,
+                   "hd_alias": _dem_alias(kq, meta),
                    "hd_khac_hoa_thuong": len(kq.dong_khac_hoa),
                    "dong_nhan_cha": len(kq.dong_nhan_cha),
                    "dong_ngoai_truc": len(kq.dong_ngoai_truc)}
+    tom_ite = _tom_tat_lech_ite(lech_ite, "ngay", _iso)
     ngay_so_cuoi = max((m[0] for m in meta), default=0)
 
     # ── 7 · phân xử ──
+    khop_dap_an = khop
+    khop = khop + len(lech_ite)           # hợp đồng CG2: khớp đáp án + lệch CÓ CHỦ ĐÍCH đã khai mong
     px = danh_gia(tong_o=tong_o, khop=khop, lat_truot=0, dong_doc=len(dong_cfa),
                   dong_mong_doi=len(dong_cfa), toi_thieu_o=1)
     ly = list(px.ly_do) + ly
+    ly += _so_mong_ite(tom_ite, mong.lech_ite)
     for ten, thuc, mg in (
             ("dòng ảnh đầu vào", len(anh_vao["dong"]), mong.so_dong_anh),
             ("dòng vào tinh_gl", len(feed), mong.dong_so),
@@ -678,6 +750,7 @@ def so_sanh_c3a(anh_vao: dict, anh_dap_an: dict, fx: Mapping[int, Mapping[str, D
     for ten, thuc, mg in (
             ("thieu_tien_te_D", lech_co_ten["thieu_tien_te_D"], sorted(mong.thieu_D)),
             ("hd_ngoai_cay", hd_ngoai, dict(mong.hd_ngoai_cay)),
+            ("hd_alias", lech_co_ten["hd_alias"], dict(mong.hd_alias or {})),
             ("hd_khac_hoa_thuong", lech_co_ten["hd_khac_hoa_thuong"], mong.hd_khac_hoa),
             ("dong_nhan_cha", lech_co_ten["dong_nhan_cha"], mong.dong_nhan_cha),
             ("dong_ngoai_truc", lech_co_ten["dong_ngoai_truc"], mong.dong_ngoai_truc)):
@@ -701,6 +774,12 @@ def so_sanh_c3a(anh_vao: dict, anh_dap_an: dict, fx: Mapping[int, Mapping[str, D
                             "ô đáp án ⇒ đúng ô ấy ĐỎ.",
         "dong_so": len(feed), "mong_dong_so": MONG_C3A_DONG_SO,
         "tong_o": tong_o, "mong_tong_o": MONG_C3A_TONG_O, "khop": khop,
+        "khop_dap_an": khop_dap_an,
+        "khop_ghi_chu": "khop = ô khớp đáp án (khop_dap_an) + ô lệch CÓ CHỦ ĐÍCH ITE đã khai mong "
+                        "(lech_co_chu_dich_ite.so_o) — WO-226 phương án A; ⛔ giấu: khop_dap_an + "
+                        "so_o = khop, lech_ngoai_ten = 0, mong khác ⇒ ĐỎ cả hai chiều",
+        "lech_co_chu_dich_ite": tom_ite,
+        "mong_lech_co_chu_dich_ite": dict(mong.lech_ite or {}),
         "lech_ngoai_ten": len(lech),
         "o_kpi_loai": o_kpi, "mong_o_kpi": MONG_C3A_O_KPI, "ma_kpi": list(MA_KPI),
         "o_loi_dap_an_loai": o_loi, "mong_o_loi": MONG_C3A_O_LOI,
@@ -716,7 +795,8 @@ def so_sanh_c3a(anh_vao: dict, anh_dap_an: dict, fx: Mapping[int, Mapping[str, D
         "dat": px.dat, "ly_do": list(px.ly_do),
     }
     return ThanhQuaC3a(tong_o=tong_o, khop=khop, lech=lech, lech_co_ten=lech_co_ten,
-                       o_kpi=o_kpi, o_loi=o_loi, phan_xu=px, hd2_cong=hd2, luoi=luoi)
+                       o_kpi=o_kpi, o_loi=o_loi, phan_xu=px, hd2_cong=hd2, luoi=luoi,
+                       lech_ite=lech_ite, khop_dap_an=khop_dap_an)
 
 
 def chay_wp_c3a(dsn: str | None = None) -> ThanhQuaC3a:
@@ -813,6 +893,8 @@ class MongC3b:
     so_ky: int | None = None
     ngay_dau: str | None = None
     den: str | None = None
+    hd_alias: Mapping[str, int] | None = None
+    lech_ite: Mapping[str, Any] | None = None
 
 
 def mong_c3b_mac_dinh() -> MongC3b:
@@ -821,7 +903,8 @@ def mong_c3b_mac_dinh() -> MongC3b:
                    o_so_khac_0=MONG_C3B_O_SO_KHAC_0, o_kpi=MONG_C3B_O_KPI, o_loi=MONG_C3B_O_LOI,
                    o_ky_khong_ngay=MONG_C3B_O_KY_KHONG_NGAY,
                    so_dong_dap_an=MONG_C3B_SO_DONG_DAP_AN, so_ky=MONG_C3B_SO_KY,
-                   ngay_dau=MONG_C3B_NGAY_DAU, den=MONG_C3B_DEN)
+                   ngay_dau=MONG_C3B_NGAY_DAU, den=MONG_C3B_DEN, hd_alias=dict(MONG_C3A_HD_ALIAS),
+                   lech_ite=dict(MONG_LECH_ITE_C3B))
 
 
 @dataclass
@@ -837,6 +920,8 @@ class ThanhQuaC3b:
     hd2_cong: dict[str, Any]
     luoi: dict[tuple[str, str, str], Decimal]
     max_lech: dict[str, Decimal] = field(default_factory=dict)
+    lech_ite: list[dict[str, Any]] = field(default_factory=list)
+    khop_dap_an: int = 0
 
 
 def _feed_cfa(anh_vao: dict, fx: Mapping[int, Mapping[str, Decimal]], ly: list[str]):
@@ -874,9 +959,12 @@ def so_sanh_c3b(anh_vao: dict, anh_dap_an: dict, fx: Mapping[int, Mapping[str, D
     # ── trục: IX.PER (kho) → ngày đọc của ẢNH ĐẦU VÀO *(⛔ đáp án)* ──
     den = datetime.date.fromisoformat(str(anh_vao["ngay_dong_bang"]))
     truc = truc_ngay(lich, den)
-    kq = cfa1_daily(dong_cfa, cay, ngay=truc, khoi=KHOI_CFA1)
+    kq = cfa1_daily(dong_cfa, cay, ngay=truc, khoi=KHOI_CFA1, alias=hd_cfg.ALIAS_NHAN_HD)
     cu = cuon_ky(kq.o, cay, ngay=truc, khoi=KHOI_CFA1)
     luoi = cu.o
+    chiu_alias = _o_chiu_alias(
+        luoi, cuon_ky(cfa1_daily(dong_cfa, cay, ngay=truc, khoi=KHOI_CFA1).o, cay, ngay=truc,
+                      khoi=KHOI_CFA1).o)
     khong_ngay = set(cu.ky_khong_ngay)
 
     # ── đáp án ──
@@ -900,6 +988,7 @@ def so_sanh_c3b(anh_vao: dict, anh_dap_an: dict, fx: Mapping[int, Mapping[str, D
     kpi = set(MA_KPI_C3B)
     tong_o = khop = o_kpi = o_loi = o_kkn = o_kkn_khac_0 = o_so_khac_0 = 0
     lech: list[dict[str, Any]] = []
+    lech_ite: list[dict[str, Any]] = []
     max_lech = {"la": Decimal(0), "cha": Decimal(0)}
     for kh in KHOI_CFA1:
         for n in cay.nut:
@@ -926,22 +1015,28 @@ def so_sanh_c3b(anh_vao: dict, anh_dap_an: dict, fx: Mapping[int, Mapping[str, D
                 if DUNG_SAI_C3B[khoi_ds].khop(g, e):
                     khop += 1
                 else:
-                    lech.append({"le": kh, "ma": n.ma, "ky": t, "khoi": khoi_ds,
-                                 "exp": str(e), "got": str(g), "lech": str(g - e)})
+                    x = {"le": kh, "ma": n.ma, "ky": t, "khoi": khoi_ds,
+                         "exp": str(e), "got": str(g), "lech": str(g - e)}
+                    (lech_ite if key in chiu_alias else lech).append(x)
 
     hd_ngoai: dict[str, int] = {}
     for i in kq.dong_ngoai_cay:
         nh = meta[i][2] if meta[i][2] else "<rỗng>"
         hd_ngoai[nh] = hd_ngoai.get(nh, 0) + 1
     lech_co_ten = {"thieu_tien_te_D": sorted(thieu_D), "hd_ngoai_cay": hd_ngoai,
+                   "hd_alias": _dem_alias(kq, meta),
                    "hd_khac_hoa_thuong": len(kq.dong_khac_hoa),
                    "dong_nhan_cha": len(kq.dong_nhan_cha),
                    "dong_ngoai_truc": len(kq.dong_ngoai_truc),
                    "o_khac_0_ky_khong_ngay": o_kkn_khac_0}
+    tom_ite = _tom_tat_lech_ite(lech_ite, "ky", str)
 
+    khop_dap_an = khop
+    khop = khop + len(lech_ite)           # hợp đồng CG2: khớp đáp án + lệch CÓ CHỦ ĐÍCH đã khai mong
     px = danh_gia(tong_o=tong_o, khop=khop, lat_truot=0, dong_doc=len(dong_cfa),
                   dong_mong_doi=len(dong_cfa), toi_thieu_o=1)
     ly = list(px.ly_do) + ly
+    ly += _so_mong_ite(tom_ite, mong.lech_ite)
     for ten, thuc, mg in (
             ("mẫu số ô so", tong_o, mong.tong_o),
             ("ô so ≠ 0 (đáp án)", o_so_khac_0, mong.o_so_khac_0),
@@ -957,6 +1052,7 @@ def so_sanh_c3b(anh_vao: dict, anh_dap_an: dict, fx: Mapping[int, Mapping[str, D
     for ten, thuc, mg in (
             ("thieu_tien_te_D", lech_co_ten["thieu_tien_te_D"], sorted(mong.thieu_D)),
             ("hd_ngoai_cay", hd_ngoai, dict(mong.hd_ngoai_cay)),
+            ("hd_alias", lech_co_ten["hd_alias"], dict(mong.hd_alias or {})),
             ("hd_khac_hoa_thuong", lech_co_ten["hd_khac_hoa_thuong"], mong.hd_khac_hoa),
             ("dong_nhan_cha", lech_co_ten["dong_nhan_cha"], mong.dong_nhan_cha),
             ("dong_ngoai_truc", lech_co_ten["dong_ngoai_truc"], mong.dong_ngoai_truc),
@@ -979,6 +1075,12 @@ def so_sanh_c3b(anh_vao: dict, anh_dap_an: dict, fx: Mapping[int, Mapping[str, D
                                for k, v in DUNG_SAI_C3B.items()},
         "dung_sai_ghi_chu": DUNG_SAI_C3B_GHI_CHU,
         "dong_so": n_feed, "tong_o": tong_o, "mong_tong_o": mong.tong_o, "khop": khop,
+        "khop_dap_an": khop_dap_an,
+        "khop_ghi_chu": "khop = ô khớp đáp án (khop_dap_an) + ô lệch CÓ CHỦ ĐÍCH ITE đã khai mong "
+                        "(lech_co_chu_dich_ite.so_o) — WO-226 phương án A; ⛔ giấu: khop_dap_an + "
+                        "so_o = khop, lech_ngoai_ten = 0, mong khác ⇒ ĐỎ cả hai chiều",
+        "lech_co_chu_dich_ite": tom_ite,
+        "mong_lech_co_chu_dich_ite": dict(mong.lech_ite or {}),
         "o_so_khac_0": o_so_khac_0, "mong_o_so_khac_0": mong.o_so_khac_0,
         "lech_ngoai_ten": len(lech),
         "o_kpi_loai": o_kpi, "ma_kpi": list(MA_KPI_C3B),
@@ -995,7 +1097,8 @@ def so_sanh_c3b(anh_vao: dict, anh_dap_an: dict, fx: Mapping[int, Mapping[str, D
     }
     return ThanhQuaC3b(tong_o=tong_o, khop=khop, lech=lech, lech_co_ten=lech_co_ten,
                        o_kpi=o_kpi, o_loi=o_loi, o_ky_khong_ngay=o_kkn, phan_xu=px,
-                       hd2_cong=hd2, luoi=luoi, max_lech=max_lech)
+                       hd2_cong=hd2, luoi=luoi, max_lech=max_lech, lech_ite=lech_ite,
+                       khop_dap_an=khop_dap_an)
 
 
 def _lich_tu_kho(dsn: str | None) -> tuple[LichKy | None, str | None]:

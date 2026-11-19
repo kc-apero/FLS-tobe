@@ -72,7 +72,7 @@ def test_H5_B2_lech_co_ten_dung_MONG(tq_that):
     ct = tq_that.lech_co_ten
     assert ct["thieu_tien_te_D"] == sorted(do_hd2.MONG_C3A_THIEU_D) and len(ct["thieu_tien_te_D"]) == 12
     assert ct["hd_ngoai_cay"] == do_hd2.MONG_C3A_HD_NGOAI_CAY
-    assert sum(ct["hd_ngoai_cay"].values()) == 162
+    assert sum(ct["hd_ngoai_cay"].values()) == 9      # WO-226: 162 → 9 (153 ITE vào nút ITE nhờ alias)
     assert ct["hd_khac_hoa_thuong"] == 5
     assert ct["dong_nhan_cha"] == 0 and ct["dong_ngoai_truc"] == 0
     assert tq_that.hd2_cong["dong_so"] == do_hd2.MONG_C3A_DONG_SO == 12385 - 12
