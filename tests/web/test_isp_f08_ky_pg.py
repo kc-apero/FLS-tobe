@@ -26,6 +26,7 @@ import psycopg
 import pytest
 
 from fls.api import cua, the
+from fls.cau_hinh import fx
 from fls.db.kho import dsn_test, noi_chi_doc
 from fls.repo import cau_hinh_repo as chc
 from fls.web.phuc_vu import lam_nguoi_phuc_vu
@@ -179,8 +180,13 @@ def _chay(kb: str, cong: int, anh_dir: str = "") -> dict:
 
 
 def _da_ky() -> dict:
+    """Tháng → chữ ký ĐANG HIỆU LỰC — cùng luật cửa (`xu_ly.ty_gia`): chữ ký chỉ tính khi
+    còn phủ đúng dấu vân tỷ giá hiện hành. ⛔ đọc thô: bài C7 để lại chữ ký lệch dấu vân
+    (kho chỉ-THÊM) và nó làm tiền đề `chưa ký` sai trong bộ bài đầy đủ (đo 19/11)."""
     with noi_chi_doc(dsn_test()) as c:
-        return chc.doc_ky_fx(c)
+        ky = chc.doc_ky_fx(c)
+        return {d.yyyymm: ky[d.yyyymm] for d in chc.doc_fx(c).ky
+                if d.yyyymm in ky and ky[d.yyyymm].dau_van_tay == fx.dau_van_tay(d)}
 
 
 # ══ AC-1 · F5-F1 ════════════════════════════════════════════════════════════
