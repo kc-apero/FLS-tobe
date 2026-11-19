@@ -42,7 +42,7 @@ from datetime import date, datetime
 from pathlib import Path
 from typing import Any, Iterable, Mapping
 
-from fls.cau_hinh import fx, hd, ky, luat_pb, to_chuc, vendor
+from fls.cau_hinh import dong_pl, fx, hd, ky, luat_pb, to_chuc, vendor
 from fls.repo import ghi_tay
 
 BANG_FX = fx.BANG                 # "IX.FX"
@@ -51,6 +51,7 @@ BANG_MM = hd.BANG_MM             # "IX.HD · IX.ORG" — ảnh Mapping Master
 BANG_PER = ky.BANG               # "IX.PER" — lịch kỳ (`C6`)
 BANG_VEN = vendor.BANG           # "IX.VEN" — vendor · network · cách tính (`C9`)
 BANG_ORG = to_chuc.BANG          # "IX.ORG" — CDT Correct + TK→LE (`C8`)
+BANG_PL = dong_pl.BANG           # "IX.PL" — dòng PL là biểu thức trên cây HD (`C12`)
 BANG_ALR = luat_pb.BANG          # "IX.ALR" — luật phân bổ hiệu lực theo kỳ + cờ (`C11`)
 BANG_KY_FX = "IX.FX · KY"        # bản KÝ tháng của IX.FX (`C7`) — mỗi bản = mọi chữ ký tới lúc ấy
 
@@ -218,6 +219,22 @@ def _kiem_org(cap: Iterable[tuple[str, Any]]) -> None:
         raise LoiCauHinh("⛔ bản IX.ORG sai hình:\n  - " + "\n  - ".join(loi))
 
 
+def _pl_tu_cap(cap: Iterable[tuple[str, Any]]) -> dict[str, str]:
+    dn: dict[str, str] = {}
+    for k, v in cap:
+        bt = v.get("bieu_thuc") if isinstance(v, Mapping) else None
+        dn[k] = bt if isinstance(bt, str) else ""       # "" ⇒ `PL_CU_PHAP` (rỗng)
+    return dn
+
+
+def _kiem_pl(cap: Iterable[tuple[str, Any]], cay: hd.CayHD | None = None) -> None:
+    """`IX.PL`: kiểm bằng CHÍNH `dong_pl.kiem_dinh_nghia`; lỗi CÓ TÊN `PL_*` đi vào câu."""
+    try:
+        dong_pl.kiem_dinh_nghia(_pl_tu_cap(cap), cay)
+    except dong_pl.LoiPL as e:
+        raise LoiCauHinh("⛔ bản IX.PL sai: %s" % e) from e
+
+
 def _kiem_noi_dung(bang: str, cap: list[tuple[str, Any]]) -> None:
     """⛔ GHI một bản RỖNG/BẨN — kiểm **TRƯỚC** khi chạm kho *(khuôn ⓑ; kho chỉ-thêm
     ⛔ có đường lùi ⇒ một bản ghi sai là **vĩnh viễn** và thành bản MỚI NHẤT ⛔ xoá
@@ -249,6 +266,8 @@ def _kiem_noi_dung(bang: str, cap: list[tuple[str, Any]]) -> None:
         _alr_tu_cap(cap, nguon="(kiem truoc khi ghi)")    # `LoiLuatPB` CÓ TÊN, ⛔ bọc lại
     elif bang == BANG_PER:
         ky.kiem(dict(cap), nguon="(kiem truoc khi ghi)")   # `LoiKy` CÓ TÊN, ⛔ bọc lại
+    elif bang == BANG_PL:
+        _kiem_pl(cap)
 
 
 def nap(conn, bang: str, cap: list[tuple[str, Any]], *,
@@ -389,6 +408,29 @@ def doc_hd(conn) -> hd.CayHD:
         raise BanHong(
             "⛔ bản `IX.HD` phiên bản %s trong kho ⛔ ĐỌC ra được *(⛔ qua `nap`?)*"
             % ban.phien_ban) from e
+
+
+# ── IX.PL — dòng PL (biểu thức trên cây HD) ──────────────────────────────────
+def nap_ix_pl(conn, *, actor: str, dinh_nghia: Mapping[str, str] | None = None,
+              cay: hd.CayHD | None = None) -> BanCauHinh:
+    """Nạp định nghĩa dòng PL *(mặc định `dong_pl.DINH_NGHIA`)* ⇒ phiên bản mới `IX.PL`.
+    Kiểm cú pháp TRƯỚC khi ghi; có `cay` thì kiểm luôn mã ∈ cây HD *(`PL_MA_LA`)*."""
+    dn = dong_pl.DINH_NGHIA if dinh_nghia is None else dinh_nghia
+    cap = [(pl, {"bieu_thuc": bt}) for pl, bt in dn.items()]
+    _kiem_pl(cap, cay)
+    return nap(conn, BANG_PL, cap, nguon="fls.cau_hinh.dong_pl", actor=actor)
+
+
+def doc_pl(conn) -> dict[str, str]:
+    """`IX.PL` mới nhất ⇒ `{PLn: biểu thức}`. Bản BẨN ⇒ `BanHong` có tên."""
+    ban = _doc_ban(conn, BANG_PL)
+    dn = _pl_tu_cap(ban.dong)
+    try:
+        dong_pl.kiem_dinh_nghia(dn)
+    except dong_pl.LoiPL as e:
+        raise BanHong("⛔ bản `IX.PL` phiên bản %s ⛔ đọc được: %s"
+                      % (ban.phien_ban, e)) from e
+    return dn
 
 
 # ── IX.HD · IX.ORG — Mapping Master ───────────────────────────────────────────
