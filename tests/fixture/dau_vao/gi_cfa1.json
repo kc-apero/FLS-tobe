@@ -1,0 +1,6508 @@
+{
+ "bang": "PD.504",
+ "khuon": "gi_cfa1",
+ "nguon": "'CFA1 | GI Platform Data Ledger'!M,K,Q,T,S,R hàng 10..417 (cột KHÔNG PII)",
+ "cach_doc": "Sheets API v4 values.get · UNFORMATTED_VALUE · SERIAL_NUMBER · khoá SA chỉ-đọc",
+ "ngay_dong_bang": "2026-11-18",
+ "khong_mang_PII": "⛔ KHÔNG mang cột riêng tư: máy soát 8 tên cột của bản thô với PM_COT_RIENG_TU ['Email Address'] — 0 trùng (gộp khoảng trắng, ⛔ phân biệt hoa thường). Ảnh chỉ giữ khoá `dong_sheet` + 7 cột chọn; 0 cột bản thô ⛔ chọn (tên ở `cot_khong_chon`). Bản thô qua `chuan_bi` của khuôn: 8 tên cột trên là của BẢNG khuôn dựng; soát thêm 0 tên cột của 0 bảng phụ — 0 trùng. Ô bản thô mà khuôn ⛔ mang/băm: xem `ghi_chu_khuon`.",
+ "ghi_chu_khuon": "408 hàng giao dịch CFA1 GI *(sheet 10…417)*, khoá dong_sheet. `PM Amount` (S): số hoặc chữ `Need to manual input` — chữ tách sang `pm_ghi_chu` (176 hàng, ⛔ hoá 0). `thang` = K *(Thời điểm bắt đầu sử dụng; L = K)*, `pe` = T *(E = T = U)*. ⛔ mang cột A:C · G · H · N:O — PII/ngoài phạm vi.",
+ "khoa": "dong_sheet",
+ "kieu_khoa": "dong_sheet",
+ "cot": [
+  "vendor",
+  "thang",
+  "no",
+  "pe",
+  "pm",
+  "pm_ghi_chu",
+  "itl_id"
+ ],
+ "cot_khong_chon": [],
+ "so_dong": 408,
+ "trung": [],
+ "thieu": [],
+ "lac": [],
+ "khoa_hong": [],
+ "o_rong": [],
+ "cong": {
+  "mong": 408,
+  "so_dong": 408,
+  "dat": true,
+  "ly_do": []
+ },
+ "checksum_noi_dung": "0e39e49cd95901ed",
+ "dong": [
+  {
+   "thu_tu": 1,
+   "dong_sheet": "10",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202502",
+   "no": "1",
+   "pe": "2755605.523640997",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#1270"
+   }
+  },
+  {
+   "thu_tu": 2,
+   "dong_sheet": "11",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202502",
+   "no": "2",
+   "pe": "1724967.3516389974",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#1269"
+   }
+  },
+  {
+   "thu_tu": 3,
+   "dong_sheet": "12",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202502",
+   "no": "3",
+   "pe": "1441735.3428220002",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#1268"
+   }
+  },
+  {
+   "thu_tu": 4,
+   "dong_sheet": "13",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202502",
+   "no": "4",
+   "pe": "187217.940951",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#1267"
+   }
+  },
+  {
+   "thu_tu": 5,
+   "dong_sheet": "14",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202502",
+   "no": "5",
+   "pe": "15766.092759999998",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#1266"
+   }
+  },
+  {
+   "thu_tu": 6,
+   "dong_sheet": "15",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202502",
+   "no": "6",
+   "pe": "1068.834089",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#1265"
+   }
+  },
+  {
+   "thu_tu": 7,
+   "dong_sheet": "16",
+   "vendor": {
+    "chu": "VD57"
+   },
+   "thang": "202502",
+   "no": "1",
+   "pe": "11210.304879999992",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#1681"
+   }
+  },
+  {
+   "thu_tu": 8,
+   "dong_sheet": "17",
+   "vendor": {
+    "chu": "VD429"
+   },
+   "thang": "202502",
+   "no": "1",
+   "pe": "11210.304879999992",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#1180"
+   }
+  },
+  {
+   "thu_tu": 9,
+   "dong_sheet": "18",
+   "vendor": {
+    "chu": "VD426"
+   },
+   "thang": "202502",
+   "no": "1",
+   "pe": "11210.304879999992",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 10,
+   "dong_sheet": "19",
+   "vendor": {
+    "chu": "VD557"
+   },
+   "thang": "202502",
+   "no": "1",
+   "pe": "11210.304879999992",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 11,
+   "dong_sheet": "20",
+   "vendor": {
+    "chu": "VD111"
+   },
+   "thang": "202502",
+   "no": "1",
+   "pe": "11210.304879999992",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 12,
+   "dong_sheet": "21",
+   "vendor": {
+    "chu": "VD427"
+   },
+   "thang": "202502",
+   "no": "1",
+   "pe": "11210.304879999992",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#1680"
+   }
+  },
+  {
+   "thu_tu": 13,
+   "dong_sheet": "22",
+   "vendor": {
+    "chu": "VD417"
+   },
+   "thang": "202502",
+   "no": "1",
+   "pe": "11210.304879999992",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 14,
+   "dong_sheet": "23",
+   "vendor": {
+    "chu": "VD430"
+   },
+   "thang": "202502",
+   "no": "1",
+   "pe": "11210.304879999992",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#1703"
+   }
+  },
+  {
+   "thu_tu": 15,
+   "dong_sheet": "24",
+   "vendor": {
+    "chu": "VD63"
+   },
+   "thang": "202502",
+   "no": "1",
+   "pe": "11210.304879999992",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 16,
+   "dong_sheet": "25",
+   "vendor": {
+    "chu": "VD424"
+   },
+   "thang": "202502",
+   "no": "1",
+   "pe": "11210.304879999992",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 17,
+   "dong_sheet": "26",
+   "vendor": {
+    "chu": "VD64"
+   },
+   "thang": "202502",
+   "no": "1",
+   "pe": "11210.304879999992",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#2938"
+   }
+  },
+  {
+   "thu_tu": 18,
+   "dong_sheet": "27",
+   "vendor": {
+    "chu": "VD62"
+   },
+   "thang": "202502",
+   "no": "1",
+   "pe": "11210.304879999992",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#1272"
+   }
+  },
+  {
+   "thu_tu": 19,
+   "dong_sheet": "28",
+   "vendor": {
+    "chu": "VD428"
+   },
+   "thang": "202502",
+   "no": "1",
+   "pe": "8356.612639250345",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#1417"
+   }
+  },
+  {
+   "thu_tu": 20,
+   "dong_sheet": "29",
+   "vendor": {
+    "chu": "VD428"
+   },
+   "thang": "202502",
+   "no": "2",
+   "pe": "62866.15043039743",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#1414"
+   }
+  },
+  {
+   "thu_tu": 21,
+   "dong_sheet": "30",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202502",
+   "no": "1",
+   "pe": "2947.3499999999995",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#1221"
+   }
+  },
+  {
+   "thu_tu": 22,
+   "dong_sheet": "31",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202502",
+   "no": "2",
+   "pe": "10218.749999999996",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#1219"
+   }
+  },
+  {
+   "thu_tu": 23,
+   "dong_sheet": "32",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202502",
+   "no": "3",
+   "pe": "12213.189999999999",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#1217"
+   }
+  },
+  {
+   "thu_tu": 24,
+   "dong_sheet": "33",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202502",
+   "no": "4",
+   "pe": "2604.93",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#1215"
+   }
+  },
+  {
+   "thu_tu": 25,
+   "dong_sheet": "34",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202502",
+   "no": "5",
+   "pe": "13.74",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 26,
+   "dong_sheet": "35",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202502",
+   "no": "6",
+   "pe": "0",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 27,
+   "dong_sheet": "36",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202502",
+   "no": "7",
+   "pe": "0",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 28,
+   "dong_sheet": "37",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202502",
+   "no": "8",
+   "pe": "1682.8999999999992",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 29,
+   "dong_sheet": "38",
+   "vendor": {
+    "chu": "VD336"
+   },
+   "thang": "202502",
+   "no": "1",
+   "pe": "0",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#1179"
+   }
+  },
+  {
+   "thu_tu": 30,
+   "dong_sheet": "39",
+   "vendor": {
+    "chu": "VD113"
+   },
+   "thang": "202502",
+   "no": "1",
+   "pe": "0",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 31,
+   "dong_sheet": "40",
+   "vendor": {
+    "chu": "VD62"
+   },
+   "thang": "202502",
+   "no": "2",
+   "pe": "0",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 32,
+   "dong_sheet": "41",
+   "vendor": {
+    "chu": "VD61"
+   },
+   "thang": "202502",
+   "no": "1",
+   "pe": "0",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#1214"
+   }
+  },
+  {
+   "thu_tu": 33,
+   "dong_sheet": "42",
+   "vendor": {
+    "chu": "VD61"
+   },
+   "thang": "202502",
+   "no": "2",
+   "pe": "0",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#1213"
+   }
+  },
+  {
+   "thu_tu": 34,
+   "dong_sheet": "43",
+   "vendor": {
+    "chu": "VD428"
+   },
+   "thang": "202502",
+   "no": "3",
+   "pe": "0",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 35,
+   "dong_sheet": "44",
+   "vendor": {
+    "chu": "VD57"
+   },
+   "thang": "202502",
+   "no": "2",
+   "pe": "0",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 36,
+   "dong_sheet": "45",
+   "vendor": {
+    "chu": "VD58"
+   },
+   "thang": "202502",
+   "no": "1",
+   "pe": "0",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 37,
+   "dong_sheet": "46",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202503",
+   "no": "1",
+   "pe": "2766004.165399004",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#1577"
+   }
+  },
+  {
+   "thu_tu": 38,
+   "dong_sheet": "47",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202503",
+   "no": "2",
+   "pe": "2118509.700614",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#1576"
+   }
+  },
+  {
+   "thu_tu": 39,
+   "dong_sheet": "48",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202503",
+   "no": "3",
+   "pe": "914480.1844829996",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#1575"
+   }
+  },
+  {
+   "thu_tu": 40,
+   "dong_sheet": "49",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202503",
+   "no": "4",
+   "pe": "124178.14937900007",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#1574"
+   }
+  },
+  {
+   "thu_tu": 41,
+   "dong_sheet": "50",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202503",
+   "no": "5",
+   "pe": "28683.40747900002",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#1573"
+   }
+  },
+  {
+   "thu_tu": 42,
+   "dong_sheet": "51",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202503",
+   "no": "6",
+   "pe": "1314.9807460000004",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#1552"
+   }
+  },
+  {
+   "thu_tu": 43,
+   "dong_sheet": "52",
+   "vendor": {
+    "chu": "VD57"
+   },
+   "thang": "202503",
+   "no": "1",
+   "pe": "18201.75391666667",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#2014"
+   }
+  },
+  {
+   "thu_tu": 44,
+   "dong_sheet": "53",
+   "vendor": {
+    "chu": "VD429"
+   },
+   "thang": "202503",
+   "no": "1",
+   "pe": "18201.75391666667",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#1480"
+   }
+  },
+  {
+   "thu_tu": 45,
+   "dong_sheet": "54",
+   "vendor": {
+    "chu": "VD426"
+   },
+   "thang": "202503",
+   "no": "1",
+   "pe": "18201.75391666667",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 46,
+   "dong_sheet": "55",
+   "vendor": {
+    "chu": "VD557"
+   },
+   "thang": "202503",
+   "no": "1",
+   "pe": "18201.75391666667",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#2158"
+   }
+  },
+  {
+   "thu_tu": 47,
+   "dong_sheet": "56",
+   "vendor": {
+    "chu": "VD111"
+   },
+   "thang": "202503",
+   "no": "1",
+   "pe": "18201.75391666667",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 48,
+   "dong_sheet": "57",
+   "vendor": {
+    "chu": "VD427"
+   },
+   "thang": "202503",
+   "no": "1",
+   "pe": "18201.75391666667",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#2113"
+   }
+  },
+  {
+   "thu_tu": 49,
+   "dong_sheet": "58",
+   "vendor": {
+    "chu": "VD417"
+   },
+   "thang": "202503",
+   "no": "1",
+   "pe": "18201.75391666667",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#2199"
+   }
+  },
+  {
+   "thu_tu": 50,
+   "dong_sheet": "59",
+   "vendor": {
+    "chu": "VD430"
+   },
+   "thang": "202503",
+   "no": "1",
+   "pe": "18201.75391666667",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#2112"
+   }
+  },
+  {
+   "thu_tu": 51,
+   "dong_sheet": "60",
+   "vendor": {
+    "chu": "VD63"
+   },
+   "thang": "202503",
+   "no": "1",
+   "pe": "18201.75391666667",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 52,
+   "dong_sheet": "61",
+   "vendor": {
+    "chu": "VD424"
+   },
+   "thang": "202503",
+   "no": "1",
+   "pe": "18201.75391666667",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#1840"
+   }
+  },
+  {
+   "thu_tu": 53,
+   "dong_sheet": "62",
+   "vendor": {
+    "chu": "VD64"
+   },
+   "thang": "202503",
+   "no": "1",
+   "pe": "18201.75391666667",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#2936"
+   }
+  },
+  {
+   "thu_tu": 54,
+   "dong_sheet": "63",
+   "vendor": {
+    "chu": "VD62"
+   },
+   "thang": "202503",
+   "no": "1",
+   "pe": "18201.75391666667",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#1572"
+   }
+  },
+  {
+   "thu_tu": 55,
+   "dong_sheet": "64",
+   "vendor": {
+    "chu": "VD428"
+   },
+   "thang": "202503",
+   "no": "1",
+   "pe": "7069.509379651222",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#1679"
+   }
+  },
+  {
+   "thu_tu": 56,
+   "dong_sheet": "65",
+   "vendor": {
+    "chu": "VD428"
+   },
+   "thang": "202503",
+   "no": "2",
+   "pe": "71640.29089835106",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#1677"
+   }
+  },
+  {
+   "thu_tu": 57,
+   "dong_sheet": "66",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202503",
+   "no": "1",
+   "pe": "7936.9399999999805",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#1509"
+   }
+  },
+  {
+   "thu_tu": 58,
+   "dong_sheet": "67",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202503",
+   "no": "2",
+   "pe": "10701.910000000002",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#1507"
+   }
+  },
+  {
+   "thu_tu": 59,
+   "dong_sheet": "68",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202503",
+   "no": "3",
+   "pe": "18537.609999999997",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#1505"
+   }
+  },
+  {
+   "thu_tu": 60,
+   "dong_sheet": "69",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202503",
+   "no": "4",
+   "pe": "1438.58",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#1503"
+   }
+  },
+  {
+   "thu_tu": 61,
+   "dong_sheet": "70",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202503",
+   "no": "5",
+   "pe": "13.98",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#1490"
+   }
+  },
+  {
+   "thu_tu": 62,
+   "dong_sheet": "71",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202503",
+   "no": "6",
+   "pe": "0",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 63,
+   "dong_sheet": "72",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202503",
+   "no": "7",
+   "pe": "0",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 64,
+   "dong_sheet": "73",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202503",
+   "no": "8",
+   "pe": "2209.83",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 65,
+   "dong_sheet": "74",
+   "vendor": {
+    "chu": "VD336"
+   },
+   "thang": "202503",
+   "no": "1",
+   "pe": "0",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#1487"
+   }
+  },
+  {
+   "thu_tu": 66,
+   "dong_sheet": "75",
+   "vendor": {
+    "chu": "VD113"
+   },
+   "thang": "202503",
+   "no": "1",
+   "pe": "0",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 67,
+   "dong_sheet": "76",
+   "vendor": {
+    "chu": "VD62"
+   },
+   "thang": "202503",
+   "no": "2",
+   "pe": "0",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 68,
+   "dong_sheet": "77",
+   "vendor": {
+    "chu": "VD61"
+   },
+   "thang": "202503",
+   "no": "1",
+   "pe": "0",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#1489"
+   }
+  },
+  {
+   "thu_tu": 69,
+   "dong_sheet": "78",
+   "vendor": {
+    "chu": "VD61"
+   },
+   "thang": "202503",
+   "no": "2",
+   "pe": "0",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#1488"
+   }
+  },
+  {
+   "thu_tu": 70,
+   "dong_sheet": "79",
+   "vendor": {
+    "chu": "VD428"
+   },
+   "thang": "202503",
+   "no": "3",
+   "pe": "0",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 71,
+   "dong_sheet": "80",
+   "vendor": {
+    "chu": "VD57"
+   },
+   "thang": "202503",
+   "no": "2",
+   "pe": "0",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 72,
+   "dong_sheet": "81",
+   "vendor": {
+    "chu": "VD58"
+   },
+   "thang": "202503",
+   "no": "1",
+   "pe": "0",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 73,
+   "dong_sheet": "82",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202504",
+   "no": "1",
+   "pe": "2283023.8316669976",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#1936"
+   }
+  },
+  {
+   "thu_tu": 74,
+   "dong_sheet": "83",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202504",
+   "no": "2",
+   "pe": "3253723.9201040026",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#1935"
+   }
+  },
+  {
+   "thu_tu": 75,
+   "dong_sheet": "84",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202504",
+   "no": "3",
+   "pe": "1158851.81939",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#1934"
+   }
+  },
+  {
+   "thu_tu": 76,
+   "dong_sheet": "85",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202504",
+   "no": "4",
+   "pe": "158841.52752100004",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#1933"
+   }
+  },
+  {
+   "thu_tu": 77,
+   "dong_sheet": "86",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202504",
+   "no": "5",
+   "pe": "33814.268930999984",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#1932"
+   }
+  },
+  {
+   "thu_tu": 78,
+   "dong_sheet": "87",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202504",
+   "no": "6",
+   "pe": "26.124898000000005",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 79,
+   "dong_sheet": "88",
+   "vendor": {
+    "chu": "VD57"
+   },
+   "thang": "202504",
+   "no": "1",
+   "pe": "15433.253463416659",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 80,
+   "dong_sheet": "89",
+   "vendor": {
+    "chu": "VD429"
+   },
+   "thang": "202504",
+   "no": "1",
+   "pe": "15433.253463416659",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#1899"
+   }
+  },
+  {
+   "thu_tu": 81,
+   "dong_sheet": "90",
+   "vendor": {
+    "chu": "VD426"
+   },
+   "thang": "202504",
+   "no": "1",
+   "pe": "15433.253463416659",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 82,
+   "dong_sheet": "91",
+   "vendor": {
+    "chu": "VD557"
+   },
+   "thang": "202504",
+   "no": "1",
+   "pe": "15433.253463416659",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#2516"
+   }
+  },
+  {
+   "thu_tu": 83,
+   "dong_sheet": "92",
+   "vendor": {
+    "chu": "VD111"
+   },
+   "thang": "202504",
+   "no": "1",
+   "pe": "15433.253463416659",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 84,
+   "dong_sheet": "93",
+   "vendor": {
+    "chu": "VD427"
+   },
+   "thang": "202504",
+   "no": "1",
+   "pe": "15433.253463416659",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#2476"
+   }
+  },
+  {
+   "thu_tu": 85,
+   "dong_sheet": "94",
+   "vendor": {
+    "chu": "VD417"
+   },
+   "thang": "202504",
+   "no": "1",
+   "pe": "15433.253463416659",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#2576"
+   }
+  },
+  {
+   "thu_tu": 86,
+   "dong_sheet": "95",
+   "vendor": {
+    "chu": "VD430"
+   },
+   "thang": "202504",
+   "no": "1",
+   "pe": "15433.253463416659",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#2525"
+   }
+  },
+  {
+   "thu_tu": 87,
+   "dong_sheet": "96",
+   "vendor": {
+    "chu": "VD63"
+   },
+   "thang": "202504",
+   "no": "1",
+   "pe": "15433.253463416659",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 88,
+   "dong_sheet": "97",
+   "vendor": {
+    "chu": "VD424"
+   },
+   "thang": "202504",
+   "no": "1",
+   "pe": "15433.253463416659",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 89,
+   "dong_sheet": "98",
+   "vendor": {
+    "chu": "VD64"
+   },
+   "thang": "202504",
+   "no": "1",
+   "pe": "15433.253463416659",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#2930"
+   }
+  },
+  {
+   "thu_tu": 90,
+   "dong_sheet": "99",
+   "vendor": {
+    "chu": "VD62"
+   },
+   "thang": "202504",
+   "no": "1",
+   "pe": "15433.253463416659",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#1950"
+   }
+  },
+  {
+   "thu_tu": 91,
+   "dong_sheet": "100",
+   "vendor": {
+    "chu": "VD428"
+   },
+   "thang": "202504",
+   "no": "1",
+   "pe": "19330.297030296882",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#2161"
+   }
+  },
+  {
+   "thu_tu": 92,
+   "dong_sheet": "101",
+   "vendor": {
+    "chu": "VD428"
+   },
+   "thang": "202504",
+   "no": "2",
+   "pe": "59109.04101472546",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#2159"
+   }
+  },
+  {
+   "thu_tu": 93,
+   "dong_sheet": "102",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202504",
+   "no": "1",
+   "pe": "30976.96000000028",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#1881"
+   }
+  },
+  {
+   "thu_tu": 94,
+   "dong_sheet": "103",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202504",
+   "no": "2",
+   "pe": "9139.150000000003",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#1879"
+   }
+  },
+  {
+   "thu_tu": 95,
+   "dong_sheet": "104",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202504",
+   "no": "3",
+   "pe": "18687.93",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#1877"
+   }
+  },
+  {
+   "thu_tu": 96,
+   "dong_sheet": "105",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202504",
+   "no": "4",
+   "pe": "915.73",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#1875"
+   }
+  },
+  {
+   "thu_tu": 97,
+   "dong_sheet": "106",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202504",
+   "no": "5",
+   "pe": "102.58000000000001",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#1873"
+   }
+  },
+  {
+   "thu_tu": 98,
+   "dong_sheet": "107",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202504",
+   "no": "6",
+   "pe": "6.579999999999999",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#1871"
+   }
+  },
+  {
+   "thu_tu": 99,
+   "dong_sheet": "108",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202504",
+   "no": "7",
+   "pe": "0",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#1869"
+   }
+  },
+  {
+   "thu_tu": 100,
+   "dong_sheet": "109",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202504",
+   "no": "8",
+   "pe": "1791.5400000000016",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 101,
+   "dong_sheet": "110",
+   "vendor": {
+    "chu": "VD336"
+   },
+   "thang": "202504",
+   "no": "1",
+   "pe": "0",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#1859"
+   }
+  },
+  {
+   "thu_tu": 102,
+   "dong_sheet": "111",
+   "vendor": {
+    "chu": "VD113"
+   },
+   "thang": "202504",
+   "no": "1",
+   "pe": "0",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 103,
+   "dong_sheet": "112",
+   "vendor": {
+    "chu": "VD62"
+   },
+   "thang": "202504",
+   "no": "2",
+   "pe": "0",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 104,
+   "dong_sheet": "113",
+   "vendor": {
+    "chu": "VD61"
+   },
+   "thang": "202504",
+   "no": "1",
+   "pe": "0",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#1868"
+   }
+  },
+  {
+   "thu_tu": 105,
+   "dong_sheet": "114",
+   "vendor": {
+    "chu": "VD61"
+   },
+   "thang": "202504",
+   "no": "2",
+   "pe": "0",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#1867"
+   }
+  },
+  {
+   "thu_tu": 106,
+   "dong_sheet": "115",
+   "vendor": {
+    "chu": "VD428"
+   },
+   "thang": "202504",
+   "no": "3",
+   "pe": "0",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 107,
+   "dong_sheet": "116",
+   "vendor": {
+    "chu": "VD57"
+   },
+   "thang": "202504",
+   "no": "2",
+   "pe": "0",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 108,
+   "dong_sheet": "117",
+   "vendor": {
+    "chu": "VD58"
+   },
+   "thang": "202504",
+   "no": "1",
+   "pe": "0",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 109,
+   "dong_sheet": "118",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202505",
+   "no": "1",
+   "pe": "1849864.7243710035",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#2369"
+   }
+  },
+  {
+   "thu_tu": 110,
+   "dong_sheet": "119",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202505",
+   "no": "2",
+   "pe": "1588664.422421001",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#2368"
+   }
+  },
+  {
+   "thu_tu": 111,
+   "dong_sheet": "120",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202505",
+   "no": "3",
+   "pe": "859751.4775019995",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#2367"
+   }
+  },
+  {
+   "thu_tu": 112,
+   "dong_sheet": "121",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202505",
+   "no": "4",
+   "pe": "227114.556785",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#2366"
+   }
+  },
+  {
+   "thu_tu": 113,
+   "dong_sheet": "122",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202505",
+   "no": "5",
+   "pe": "176140.38862699986",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#2365"
+   }
+  },
+  {
+   "thu_tu": 114,
+   "dong_sheet": "123",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202505",
+   "no": "6",
+   "pe": "15.90244",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 115,
+   "dong_sheet": "124",
+   "vendor": {
+    "chu": "VD57"
+   },
+   "thang": "202505",
+   "no": "1",
+   "pe": "11240.39883916668",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 116,
+   "dong_sheet": "125",
+   "vendor": {
+    "chu": "VD429"
+   },
+   "thang": "202505",
+   "no": "1",
+   "pe": "11240.39883916668",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#3044"
+   }
+  },
+  {
+   "thu_tu": 117,
+   "dong_sheet": "126",
+   "vendor": {
+    "chu": "VD426"
+   },
+   "thang": "202505",
+   "no": "1",
+   "pe": "11240.39883916668",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 118,
+   "dong_sheet": "127",
+   "vendor": {
+    "chu": "VD557"
+   },
+   "thang": "202505",
+   "no": "1",
+   "pe": "11240.39883916668",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#3074"
+   }
+  },
+  {
+   "thu_tu": 119,
+   "dong_sheet": "128",
+   "vendor": {
+    "chu": "VD111"
+   },
+   "thang": "202505",
+   "no": "1",
+   "pe": "11240.39883916668",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 120,
+   "dong_sheet": "129",
+   "vendor": {
+    "chu": "VD427"
+   },
+   "thang": "202505",
+   "no": "1",
+   "pe": "11240.39883916668",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#4799"
+   }
+  },
+  {
+   "thu_tu": 121,
+   "dong_sheet": "130",
+   "vendor": {
+    "chu": "VD417"
+   },
+   "thang": "202505",
+   "no": "1",
+   "pe": "11240.39883916668",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 122,
+   "dong_sheet": "131",
+   "vendor": {
+    "chu": "VD430"
+   },
+   "thang": "202505",
+   "no": "1",
+   "pe": "11240.39883916668",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#3532"
+   }
+  },
+  {
+   "thu_tu": 123,
+   "dong_sheet": "132",
+   "vendor": {
+    "chu": "VD63"
+   },
+   "thang": "202505",
+   "no": "1",
+   "pe": "11240.39883916668",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 124,
+   "dong_sheet": "133",
+   "vendor": {
+    "chu": "VD424"
+   },
+   "thang": "202505",
+   "no": "1",
+   "pe": "11240.39883916668",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 125,
+   "dong_sheet": "134",
+   "vendor": {
+    "chu": "VD64"
+   },
+   "thang": "202505",
+   "no": "1",
+   "pe": "11240.39883916668",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#2937"
+   }
+  },
+  {
+   "thu_tu": 126,
+   "dong_sheet": "135",
+   "vendor": {
+    "chu": "VD62"
+   },
+   "thang": "202505",
+   "no": "1",
+   "pe": "11240.39883916668",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#2356"
+   }
+  },
+  {
+   "thu_tu": 127,
+   "dong_sheet": "136",
+   "vendor": {
+    "chu": "VD428"
+   },
+   "thang": "202505",
+   "no": "1",
+   "pe": "28045.261331876776",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#2526"
+   }
+  },
+  {
+   "thu_tu": 128,
+   "dong_sheet": "137",
+   "vendor": {
+    "chu": "VD428"
+   },
+   "thang": "202505",
+   "no": "2",
+   "pe": "42171.35549652302",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#2523"
+   }
+  },
+  {
+   "thu_tu": 129,
+   "dong_sheet": "138",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202505",
+   "no": "1",
+   "pe": "19186.379999999986",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#2283"
+   }
+  },
+  {
+   "thu_tu": 130,
+   "dong_sheet": "139",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202505",
+   "no": "2",
+   "pe": "8860.939999999999",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#2281"
+   }
+  },
+  {
+   "thu_tu": 131,
+   "dong_sheet": "140",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202505",
+   "no": "3",
+   "pe": "11830.479999999994",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#2279"
+   }
+  },
+  {
+   "thu_tu": 132,
+   "dong_sheet": "141",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202505",
+   "no": "4",
+   "pe": "1918.2400000000002",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#2277"
+   }
+  },
+  {
+   "thu_tu": 133,
+   "dong_sheet": "142",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202505",
+   "no": "5",
+   "pe": "1152.8400000000001",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#2275"
+   }
+  },
+  {
+   "thu_tu": 134,
+   "dong_sheet": "143",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202505",
+   "no": "6",
+   "pe": "788.4799999999999",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#2273"
+   }
+  },
+  {
+   "thu_tu": 135,
+   "dong_sheet": "144",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202505",
+   "no": "7",
+   "pe": "102.33",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#2271"
+   }
+  },
+  {
+   "thu_tu": 136,
+   "dong_sheet": "145",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202505",
+   "no": "8",
+   "pe": "1595.2",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#2269"
+   }
+  },
+  {
+   "thu_tu": 137,
+   "dong_sheet": "146",
+   "vendor": {
+    "chu": "VD336"
+   },
+   "thang": "202505",
+   "no": "1",
+   "pe": "0",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#3694"
+   }
+  },
+  {
+   "thu_tu": 138,
+   "dong_sheet": "147",
+   "vendor": {
+    "chu": "VD113"
+   },
+   "thang": "202505",
+   "no": "1",
+   "pe": "0",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 139,
+   "dong_sheet": "148",
+   "vendor": {
+    "chu": "VD62"
+   },
+   "thang": "202505",
+   "no": "2",
+   "pe": "0",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#2346"
+   }
+  },
+  {
+   "thu_tu": 140,
+   "dong_sheet": "149",
+   "vendor": {
+    "chu": "VD61"
+   },
+   "thang": "202505",
+   "no": "1",
+   "pe": "0",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#2268"
+   }
+  },
+  {
+   "thu_tu": 141,
+   "dong_sheet": "150",
+   "vendor": {
+    "chu": "VD61"
+   },
+   "thang": "202505",
+   "no": "2",
+   "pe": "0",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#2267"
+   }
+  },
+  {
+   "thu_tu": 142,
+   "dong_sheet": "151",
+   "vendor": {
+    "chu": "VD428"
+   },
+   "thang": "202505",
+   "no": "3",
+   "pe": "0",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 143,
+   "dong_sheet": "152",
+   "vendor": {
+    "chu": "VD57"
+   },
+   "thang": "202505",
+   "no": "2",
+   "pe": "0",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 144,
+   "dong_sheet": "153",
+   "vendor": {
+    "chu": "VD58"
+   },
+   "thang": "202505",
+   "no": "1",
+   "pe": "0",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 145,
+   "dong_sheet": "154",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202506",
+   "no": "1",
+   "pe": "1942170.4101119994",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#2844"
+   }
+  },
+  {
+   "thu_tu": 146,
+   "dong_sheet": "155",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202506",
+   "no": "2",
+   "pe": "1835053.0995160022",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#2843"
+   }
+  },
+  {
+   "thu_tu": 147,
+   "dong_sheet": "156",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202506",
+   "no": "3",
+   "pe": "859910.7168030003",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#2842"
+   }
+  },
+  {
+   "thu_tu": 148,
+   "dong_sheet": "157",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202506",
+   "no": "4",
+   "pe": "396336.2033530001",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#2841"
+   }
+  },
+  {
+   "thu_tu": 149,
+   "dong_sheet": "158",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202506",
+   "no": "5",
+   "pe": "263602.4824609998",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#2840"
+   }
+  },
+  {
+   "thu_tu": 150,
+   "dong_sheet": "159",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202506",
+   "no": "6",
+   "pe": "17.20928999999999",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 151,
+   "dong_sheet": "160",
+   "vendor": {
+    "chu": "VD57"
+   },
+   "thang": "202506",
+   "no": "1",
+   "pe": "7991.516493833316",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 152,
+   "dong_sheet": "161",
+   "vendor": {
+    "chu": "VD429"
+   },
+   "thang": "202506",
+   "no": "1",
+   "pe": "7991.516493833316",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#3043"
+   }
+  },
+  {
+   "thu_tu": 153,
+   "dong_sheet": "162",
+   "vendor": {
+    "chu": "VD426"
+   },
+   "thang": "202506",
+   "no": "1",
+   "pe": "7991.516493833316",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 154,
+   "dong_sheet": "163",
+   "vendor": {
+    "chu": "VD557"
+   },
+   "thang": "202506",
+   "no": "1",
+   "pe": "7991.516493833316",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#3579"
+   }
+  },
+  {
+   "thu_tu": 155,
+   "dong_sheet": "164",
+   "vendor": {
+    "chu": "VD111"
+   },
+   "thang": "202506",
+   "no": "1",
+   "pe": "7991.516493833316",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 156,
+   "dong_sheet": "165",
+   "vendor": {
+    "chu": "VD427"
+   },
+   "thang": "202506",
+   "no": "1",
+   "pe": "7991.516493833316",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 157,
+   "dong_sheet": "166",
+   "vendor": {
+    "chu": "VD417"
+   },
+   "thang": "202506",
+   "no": "1",
+   "pe": "7991.516493833316",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#3669"
+   }
+  },
+  {
+   "thu_tu": 158,
+   "dong_sheet": "167",
+   "vendor": {
+    "chu": "VD430"
+   },
+   "thang": "202506",
+   "no": "1",
+   "pe": "7991.516493833316",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 159,
+   "dong_sheet": "168",
+   "vendor": {
+    "chu": "VD63"
+   },
+   "thang": "202506",
+   "no": "1",
+   "pe": "7991.516493833316",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 160,
+   "dong_sheet": "169",
+   "vendor": {
+    "chu": "VD424"
+   },
+   "thang": "202506",
+   "no": "1",
+   "pe": "7991.516493833316",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 161,
+   "dong_sheet": "170",
+   "vendor": {
+    "chu": "VD64"
+   },
+   "thang": "202506",
+   "no": "1",
+   "pe": "7991.516493833316",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#2933"
+   }
+  },
+  {
+   "thu_tu": 162,
+   "dong_sheet": "171",
+   "vendor": {
+    "chu": "VD62"
+   },
+   "thang": "202506",
+   "no": "1",
+   "pe": "7991.516493833316",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#2872"
+   }
+  },
+  {
+   "thu_tu": 163,
+   "dong_sheet": "172",
+   "vendor": {
+    "chu": "VD428"
+   },
+   "thang": "202506",
+   "no": "1",
+   "pe": "60377.86160093701",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#2982"
+   }
+  },
+  {
+   "thu_tu": 164,
+   "dong_sheet": "173",
+   "vendor": {
+    "chu": "VD428"
+   },
+   "thang": "202506",
+   "no": "2",
+   "pe": "52.56420614269809",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 165,
+   "dong_sheet": "174",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202506",
+   "no": "1",
+   "pe": "15105.830000000005",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#2778"
+   }
+  },
+  {
+   "thu_tu": 166,
+   "dong_sheet": "175",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202506",
+   "no": "2",
+   "pe": "9097.310000000001",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#2776"
+   }
+  },
+  {
+   "thu_tu": 167,
+   "dong_sheet": "176",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202506",
+   "no": "3",
+   "pe": "9393.889999999998",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#2774"
+   }
+  },
+  {
+   "thu_tu": 168,
+   "dong_sheet": "177",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202506",
+   "no": "4",
+   "pe": "2425.7300000000005",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#2772"
+   }
+  },
+  {
+   "thu_tu": 169,
+   "dong_sheet": "178",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202506",
+   "no": "5",
+   "pe": "2228.4100000000003",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#2761"
+   }
+  },
+  {
+   "thu_tu": 170,
+   "dong_sheet": "179",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202506",
+   "no": "6",
+   "pe": "671.6399999999999",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#2759"
+   }
+  },
+  {
+   "thu_tu": 171,
+   "dong_sheet": "180",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202506",
+   "no": "7",
+   "pe": "102.48",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 172,
+   "dong_sheet": "181",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202506",
+   "no": "8",
+   "pe": "1641.249999999999",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 173,
+   "dong_sheet": "182",
+   "vendor": {
+    "chu": "VD336"
+   },
+   "thang": "202506",
+   "no": "1",
+   "pe": "0",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 174,
+   "dong_sheet": "183",
+   "vendor": {
+    "chu": "VD113"
+   },
+   "thang": "202506",
+   "no": "1",
+   "pe": "0",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 175,
+   "dong_sheet": "184",
+   "vendor": {
+    "chu": "VD62"
+   },
+   "thang": "202506",
+   "no": "2",
+   "pe": "0",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#2871"
+   }
+  },
+  {
+   "thu_tu": 176,
+   "dong_sheet": "185",
+   "vendor": {
+    "chu": "VD61"
+   },
+   "thang": "202506",
+   "no": "1",
+   "pe": "0",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#2771"
+   }
+  },
+  {
+   "thu_tu": 177,
+   "dong_sheet": "186",
+   "vendor": {
+    "chu": "VD61"
+   },
+   "thang": "202506",
+   "no": "2",
+   "pe": "0",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#2770"
+   }
+  },
+  {
+   "thu_tu": 178,
+   "dong_sheet": "187",
+   "vendor": {
+    "chu": "VD428"
+   },
+   "thang": "202506",
+   "no": "3",
+   "pe": "0",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 179,
+   "dong_sheet": "188",
+   "vendor": {
+    "chu": "VD57"
+   },
+   "thang": "202506",
+   "no": "2",
+   "pe": "0",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 180,
+   "dong_sheet": "189",
+   "vendor": {
+    "chu": "VD58"
+   },
+   "thang": "202506",
+   "no": "1",
+   "pe": "0",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 181,
+   "dong_sheet": "190",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202507",
+   "no": "1",
+   "pe": "2416712.9321080027",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#3406"
+   }
+  },
+  {
+   "thu_tu": 182,
+   "dong_sheet": "191",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202507",
+   "no": "2",
+   "pe": "2149282.834159998",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#3405"
+   }
+  },
+  {
+   "thu_tu": 183,
+   "dong_sheet": "192",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202507",
+   "no": "3",
+   "pe": "878377.2135589999",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#3404"
+   }
+  },
+  {
+   "thu_tu": 184,
+   "dong_sheet": "193",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202507",
+   "no": "4",
+   "pe": "516569.1125910005",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#3403"
+   }
+  },
+  {
+   "thu_tu": 185,
+   "dong_sheet": "194",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202507",
+   "no": "5",
+   "pe": "378346.44130599994",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#3402"
+   }
+  },
+  {
+   "thu_tu": 186,
+   "dong_sheet": "195",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202507",
+   "no": "6",
+   "pe": "16.143426",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 187,
+   "dong_sheet": "196",
+   "vendor": {
+    "chu": "VD57"
+   },
+   "thang": "202507",
+   "no": "1",
+   "pe": "6032.010619166649",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 188,
+   "dong_sheet": "197",
+   "vendor": {
+    "chu": "VD429"
+   },
+   "thang": "202507",
+   "no": "1",
+   "pe": "6032.010619166649",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#4020"
+   }
+  },
+  {
+   "thu_tu": 189,
+   "dong_sheet": "198",
+   "vendor": {
+    "chu": "VD426"
+   },
+   "thang": "202507",
+   "no": "1",
+   "pe": "6032.010619166649",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 190,
+   "dong_sheet": "199",
+   "vendor": {
+    "chu": "VD557"
+   },
+   "thang": "202507",
+   "no": "1",
+   "pe": "6032.010619166649",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#4072"
+   }
+  },
+  {
+   "thu_tu": 191,
+   "dong_sheet": "200",
+   "vendor": {
+    "chu": "VD111"
+   },
+   "thang": "202507",
+   "no": "1",
+   "pe": "6032.010619166649",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 192,
+   "dong_sheet": "201",
+   "vendor": {
+    "chu": "VD427"
+   },
+   "thang": "202507",
+   "no": "1",
+   "pe": "6032.010619166649",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#4030"
+   }
+  },
+  {
+   "thu_tu": 193,
+   "dong_sheet": "202",
+   "vendor": {
+    "chu": "VD417"
+   },
+   "thang": "202507",
+   "no": "1",
+   "pe": "6032.010619166649",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#3199"
+   }
+  },
+  {
+   "thu_tu": 194,
+   "dong_sheet": "203",
+   "vendor": {
+    "chu": "VD430"
+   },
+   "thang": "202507",
+   "no": "1",
+   "pe": "6032.010619166649",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 195,
+   "dong_sheet": "204",
+   "vendor": {
+    "chu": "VD63"
+   },
+   "thang": "202507",
+   "no": "1",
+   "pe": "6032.010619166649",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 196,
+   "dong_sheet": "205",
+   "vendor": {
+    "chu": "VD424"
+   },
+   "thang": "202507",
+   "no": "1",
+   "pe": "6032.010619166649",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 197,
+   "dong_sheet": "206",
+   "vendor": {
+    "chu": "VD64"
+   },
+   "thang": "202507",
+   "no": "1",
+   "pe": "6032.010619166649",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#3377"
+   }
+  },
+  {
+   "thu_tu": 198,
+   "dong_sheet": "207",
+   "vendor": {
+    "chu": "VD62"
+   },
+   "thang": "202507",
+   "no": "1",
+   "pe": "6032.010619166649",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#3424"
+   }
+  },
+  {
+   "thu_tu": 199,
+   "dong_sheet": "208",
+   "vendor": {
+    "chu": "VD428"
+   },
+   "thang": "202507",
+   "no": "1",
+   "pe": "56237.73232019921",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#3601"
+   }
+  },
+  {
+   "thu_tu": 200,
+   "dong_sheet": "209",
+   "vendor": {
+    "chu": "VD428"
+   },
+   "thang": "202507",
+   "no": "2",
+   "pe": "22.071601433932415",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#3581"
+   }
+  },
+  {
+   "thu_tu": 201,
+   "dong_sheet": "210",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202507",
+   "no": "1",
+   "pe": "14456.820000000025",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#3310"
+   }
+  },
+  {
+   "thu_tu": 202,
+   "dong_sheet": "211",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202507",
+   "no": "2",
+   "pe": "9030.169999999998",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#3308"
+   }
+  },
+  {
+   "thu_tu": 203,
+   "dong_sheet": "212",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202507",
+   "no": "3",
+   "pe": "6775.980000000001",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#3306"
+   }
+  },
+  {
+   "thu_tu": 204,
+   "dong_sheet": "213",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202507",
+   "no": "4",
+   "pe": "2604.7200000000003",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#3286"
+   }
+  },
+  {
+   "thu_tu": 205,
+   "dong_sheet": "214",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202507",
+   "no": "5",
+   "pe": "1901.7299999999993",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#3284"
+   }
+  },
+  {
+   "thu_tu": 206,
+   "dong_sheet": "215",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202507",
+   "no": "6",
+   "pe": "906.5000000000002",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#3282"
+   }
+  },
+  {
+   "thu_tu": 207,
+   "dong_sheet": "216",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202507",
+   "no": "7",
+   "pe": "199.00000000000003",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#3280"
+   }
+  },
+  {
+   "thu_tu": 208,
+   "dong_sheet": "217",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202507",
+   "no": "8",
+   "pe": "1577.1500000000003",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#3142"
+   }
+  },
+  {
+   "thu_tu": 209,
+   "dong_sheet": "218",
+   "vendor": {
+    "chu": "VD336"
+   },
+   "thang": "202507",
+   "no": "1",
+   "pe": "0",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 210,
+   "dong_sheet": "219",
+   "vendor": {
+    "chu": "VD113"
+   },
+   "thang": "202507",
+   "no": "1",
+   "pe": "0",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 211,
+   "dong_sheet": "220",
+   "vendor": {
+    "chu": "VD62"
+   },
+   "thang": "202507",
+   "no": "2",
+   "pe": "0",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#3423"
+   }
+  },
+  {
+   "thu_tu": 212,
+   "dong_sheet": "221",
+   "vendor": {
+    "chu": "VD61"
+   },
+   "thang": "202507",
+   "no": "1",
+   "pe": "0",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#3305"
+   }
+  },
+  {
+   "thu_tu": 213,
+   "dong_sheet": "222",
+   "vendor": {
+    "chu": "VD61"
+   },
+   "thang": "202507",
+   "no": "2",
+   "pe": "0",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#3304"
+   }
+  },
+  {
+   "thu_tu": 214,
+   "dong_sheet": "223",
+   "vendor": {
+    "chu": "VD428"
+   },
+   "thang": "202507",
+   "no": "3",
+   "pe": "0",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#3580"
+   }
+  },
+  {
+   "thu_tu": 215,
+   "dong_sheet": "224",
+   "vendor": {
+    "chu": "VD57"
+   },
+   "thang": "202507",
+   "no": "2",
+   "pe": "0",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 216,
+   "dong_sheet": "225",
+   "vendor": {
+    "chu": "VD58"
+   },
+   "thang": "202507",
+   "no": "1",
+   "pe": "0",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#4018"
+   }
+  },
+  {
+   "thu_tu": 217,
+   "dong_sheet": "226",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202508",
+   "no": "1",
+   "pe": "1371061.4855469994",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#3892"
+   }
+  },
+  {
+   "thu_tu": 218,
+   "dong_sheet": "227",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202508",
+   "no": "2",
+   "pe": "454548.5352949987",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#3858"
+   }
+  },
+  {
+   "thu_tu": 219,
+   "dong_sheet": "228",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202508",
+   "no": "3",
+   "pe": "459440.2702110006",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#3857"
+   }
+  },
+  {
+   "thu_tu": 220,
+   "dong_sheet": "229",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202508",
+   "no": "4",
+   "pe": "394142.6132209997",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#3856"
+   }
+  },
+  {
+   "thu_tu": 221,
+   "dong_sheet": "230",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202508",
+   "no": "5",
+   "pe": "117539.30009599993",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#3855"
+   }
+  },
+  {
+   "thu_tu": 222,
+   "dong_sheet": "231",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202508",
+   "no": "6",
+   "pe": "0",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 223,
+   "dong_sheet": "232",
+   "vendor": {
+    "chu": "VD57"
+   },
+   "thang": "202508",
+   "no": "1",
+   "pe": "4194.134763416663",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 224,
+   "dong_sheet": "233",
+   "vendor": {
+    "chu": "VD429"
+   },
+   "thang": "202508",
+   "no": "1",
+   "pe": "4194.134763416663",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 225,
+   "dong_sheet": "234",
+   "vendor": {
+    "chu": "VD426"
+   },
+   "thang": "202508",
+   "no": "1",
+   "pe": "4194.134763416663",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 226,
+   "dong_sheet": "235",
+   "vendor": {
+    "chu": "VD557"
+   },
+   "thang": "202508",
+   "no": "1",
+   "pe": "4194.134763416663",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#4559"
+   }
+  },
+  {
+   "thu_tu": 227,
+   "dong_sheet": "236",
+   "vendor": {
+    "chu": "VD111"
+   },
+   "thang": "202508",
+   "no": "1",
+   "pe": "4194.134763416663",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 228,
+   "dong_sheet": "237",
+   "vendor": {
+    "chu": "VD427"
+   },
+   "thang": "202508",
+   "no": "1",
+   "pe": "4194.134763416663",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 229,
+   "dong_sheet": "238",
+   "vendor": {
+    "chu": "VD417"
+   },
+   "thang": "202508",
+   "no": "1",
+   "pe": "4194.134763416663",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#4651"
+   }
+  },
+  {
+   "thu_tu": 230,
+   "dong_sheet": "239",
+   "vendor": {
+    "chu": "VD430"
+   },
+   "thang": "202508",
+   "no": "1",
+   "pe": "4194.134763416663",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 231,
+   "dong_sheet": "240",
+   "vendor": {
+    "chu": "VD63"
+   },
+   "thang": "202508",
+   "no": "1",
+   "pe": "4194.134763416663",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 232,
+   "dong_sheet": "241",
+   "vendor": {
+    "chu": "VD424"
+   },
+   "thang": "202508",
+   "no": "1",
+   "pe": "4194.134763416663",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 233,
+   "dong_sheet": "242",
+   "vendor": {
+    "chu": "VD64"
+   },
+   "thang": "202508",
+   "no": "1",
+   "pe": "4194.134763416663",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 234,
+   "dong_sheet": "243",
+   "vendor": {
+    "chu": "VD62"
+   },
+   "thang": "202508",
+   "no": "1",
+   "pe": "4194.134763416663",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#3852"
+   }
+  },
+  {
+   "thu_tu": 235,
+   "dong_sheet": "244",
+   "vendor": {
+    "chu": "VD428"
+   },
+   "thang": "202508",
+   "no": "1",
+   "pe": "51639.43546173242",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#4052"
+   }
+  },
+  {
+   "thu_tu": 236,
+   "dong_sheet": "245",
+   "vendor": {
+    "chu": "VD428"
+   },
+   "thang": "202508",
+   "no": "2",
+   "pe": "172.53194415942582",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#4050"
+   }
+  },
+  {
+   "thu_tu": 237,
+   "dong_sheet": "246",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202508",
+   "no": "1",
+   "pe": "5890.540000000025",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#3775"
+   }
+  },
+  {
+   "thu_tu": 238,
+   "dong_sheet": "247",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202508",
+   "no": "2",
+   "pe": "8466.15000000001",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#3773"
+   }
+  },
+  {
+   "thu_tu": 239,
+   "dong_sheet": "248",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202508",
+   "no": "3",
+   "pe": "6045.32",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#3771"
+   }
+  },
+  {
+   "thu_tu": 240,
+   "dong_sheet": "249",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202508",
+   "no": "4",
+   "pe": "689.6999999999999",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#3769"
+   }
+  },
+  {
+   "thu_tu": 241,
+   "dong_sheet": "250",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202508",
+   "no": "5",
+   "pe": "0",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#3767"
+   }
+  },
+  {
+   "thu_tu": 242,
+   "dong_sheet": "251",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202508",
+   "no": "6",
+   "pe": "600.6899999999998",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#3736"
+   }
+  },
+  {
+   "thu_tu": 243,
+   "dong_sheet": "252",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202508",
+   "no": "7",
+   "pe": "307.75",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 244,
+   "dong_sheet": "253",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202508",
+   "no": "8",
+   "pe": "619.6",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 245,
+   "dong_sheet": "254",
+   "vendor": {
+    "chu": "VD336"
+   },
+   "thang": "202508",
+   "no": "1",
+   "pe": "0",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 246,
+   "dong_sheet": "255",
+   "vendor": {
+    "chu": "VD113"
+   },
+   "thang": "202508",
+   "no": "1",
+   "pe": "0",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 247,
+   "dong_sheet": "256",
+   "vendor": {
+    "chu": "VD62"
+   },
+   "thang": "202508",
+   "no": "2",
+   "pe": "0",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#3851"
+   }
+  },
+  {
+   "thu_tu": 248,
+   "dong_sheet": "257",
+   "vendor": {
+    "chu": "VD61"
+   },
+   "thang": "202508",
+   "no": "1",
+   "pe": "0",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#3766"
+   }
+  },
+  {
+   "thu_tu": 249,
+   "dong_sheet": "258",
+   "vendor": {
+    "chu": "VD61"
+   },
+   "thang": "202508",
+   "no": "2",
+   "pe": "0",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#3765"
+   }
+  },
+  {
+   "thu_tu": 250,
+   "dong_sheet": "259",
+   "vendor": {
+    "chu": "VD428"
+   },
+   "thang": "202508",
+   "no": "3",
+   "pe": "0",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#4040"
+   }
+  },
+  {
+   "thu_tu": 251,
+   "dong_sheet": "260",
+   "vendor": {
+    "chu": "VD57"
+   },
+   "thang": "202508",
+   "no": "2",
+   "pe": "0",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 252,
+   "dong_sheet": "261",
+   "vendor": {
+    "chu": "VD58"
+   },
+   "thang": "202508",
+   "no": "1",
+   "pe": "0",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#4019"
+   }
+  },
+  {
+   "thu_tu": 253,
+   "dong_sheet": "262",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202509",
+   "no": "1",
+   "pe": "870812.882451",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#4402"
+   }
+  },
+  {
+   "thu_tu": 254,
+   "dong_sheet": "263",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202509",
+   "no": "2",
+   "pe": "835638.3911929997",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#4401"
+   }
+  },
+  {
+   "thu_tu": 255,
+   "dong_sheet": "264",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202509",
+   "no": "3",
+   "pe": "91409.99819900002",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#4400"
+   }
+  },
+  {
+   "thu_tu": 256,
+   "dong_sheet": "265",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202509",
+   "no": "4",
+   "pe": "136992.96403599982",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#4399"
+   }
+  },
+  {
+   "thu_tu": 257,
+   "dong_sheet": "266",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202509",
+   "no": "5",
+   "pe": "517641.6853860005",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#4379"
+   }
+  },
+  {
+   "thu_tu": 258,
+   "dong_sheet": "267",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202509",
+   "no": "6",
+   "pe": "0",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#4348"
+   }
+  },
+  {
+   "thu_tu": 259,
+   "dong_sheet": "268",
+   "vendor": {
+    "chu": "VD57"
+   },
+   "thang": "202509",
+   "no": "1",
+   "pe": "3231.1981010833324",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 260,
+   "dong_sheet": "269",
+   "vendor": {
+    "chu": "VD429"
+   },
+   "thang": "202509",
+   "no": "1",
+   "pe": "3231.1981010833324",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 261,
+   "dong_sheet": "270",
+   "vendor": {
+    "chu": "VD426"
+   },
+   "thang": "202509",
+   "no": "1",
+   "pe": "3231.1981010833324",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 262,
+   "dong_sheet": "271",
+   "vendor": {
+    "chu": "VD557"
+   },
+   "thang": "202509",
+   "no": "1",
+   "pe": "3231.1981010833324",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#5604"
+   }
+  },
+  {
+   "thu_tu": 263,
+   "dong_sheet": "272",
+   "vendor": {
+    "chu": "VD111"
+   },
+   "thang": "202509",
+   "no": "1",
+   "pe": "3231.1981010833324",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 264,
+   "dong_sheet": "273",
+   "vendor": {
+    "chu": "VD427"
+   },
+   "thang": "202509",
+   "no": "1",
+   "pe": "3231.1981010833324",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 265,
+   "dong_sheet": "274",
+   "vendor": {
+    "chu": "VD417"
+   },
+   "thang": "202509",
+   "no": "1",
+   "pe": "3231.1981010833324",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#5151"
+   }
+  },
+  {
+   "thu_tu": 266,
+   "dong_sheet": "275",
+   "vendor": {
+    "chu": "VD430"
+   },
+   "thang": "202509",
+   "no": "1",
+   "pe": "3231.1981010833324",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 267,
+   "dong_sheet": "276",
+   "vendor": {
+    "chu": "VD63"
+   },
+   "thang": "202509",
+   "no": "1",
+   "pe": "3231.1981010833324",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 268,
+   "dong_sheet": "277",
+   "vendor": {
+    "chu": "VD424"
+   },
+   "thang": "202509",
+   "no": "1",
+   "pe": "3231.1981010833324",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 269,
+   "dong_sheet": "278",
+   "vendor": {
+    "chu": "VD64"
+   },
+   "thang": "202509",
+   "no": "1",
+   "pe": "3231.1981010833324",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 270,
+   "dong_sheet": "279",
+   "vendor": {
+    "chu": "VD62"
+   },
+   "thang": "202509",
+   "no": "1",
+   "pe": "3231.1981010833324",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#4378"
+   }
+  },
+  {
+   "thu_tu": 271,
+   "dong_sheet": "280",
+   "vendor": {
+    "chu": "VD428"
+   },
+   "thang": "202509",
+   "no": "1",
+   "pe": "66941.32232477157",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#4482"
+   }
+  },
+  {
+   "thu_tu": 272,
+   "dong_sheet": "281",
+   "vendor": {
+    "chu": "VD428"
+   },
+   "thang": "202509",
+   "no": "2",
+   "pe": "26.773795534812038",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#4481"
+   }
+  },
+  {
+   "thu_tu": 273,
+   "dong_sheet": "282",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202509",
+   "no": "1",
+   "pe": "0",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#4290"
+   }
+  },
+  {
+   "thu_tu": 274,
+   "dong_sheet": "283",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202509",
+   "no": "2",
+   "pe": "9166.010000000002",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 275,
+   "dong_sheet": "284",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202509",
+   "no": "3",
+   "pe": "5195.63",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 276,
+   "dong_sheet": "285",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202509",
+   "no": "4",
+   "pe": "0",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 277,
+   "dong_sheet": "286",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202509",
+   "no": "5",
+   "pe": "0",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 278,
+   "dong_sheet": "287",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202509",
+   "no": "6",
+   "pe": "390.9599999999999",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 279,
+   "dong_sheet": "288",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202509",
+   "no": "7",
+   "pe": "128.78999999999996",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 280,
+   "dong_sheet": "289",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202509",
+   "no": "8",
+   "pe": "0",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 281,
+   "dong_sheet": "290",
+   "vendor": {
+    "chu": "VD336"
+   },
+   "thang": "202509",
+   "no": "1",
+   "pe": "0",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 282,
+   "dong_sheet": "291",
+   "vendor": {
+    "chu": "VD113"
+   },
+   "thang": "202509",
+   "no": "1",
+   "pe": "0",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 283,
+   "dong_sheet": "292",
+   "vendor": {
+    "chu": "VD62"
+   },
+   "thang": "202509",
+   "no": "2",
+   "pe": "0",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#4371"
+   }
+  },
+  {
+   "thu_tu": 284,
+   "dong_sheet": "293",
+   "vendor": {
+    "chu": "VD61"
+   },
+   "thang": "202509",
+   "no": "1",
+   "pe": "0",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 285,
+   "dong_sheet": "294",
+   "vendor": {
+    "chu": "VD61"
+   },
+   "thang": "202509",
+   "no": "2",
+   "pe": "0",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 286,
+   "dong_sheet": "295",
+   "vendor": {
+    "chu": "VD428"
+   },
+   "thang": "202509",
+   "no": "3",
+   "pe": "0",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#4480"
+   }
+  },
+  {
+   "thu_tu": 287,
+   "dong_sheet": "296",
+   "vendor": {
+    "chu": "VD57"
+   },
+   "thang": "202509",
+   "no": "2",
+   "pe": "0",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 288,
+   "dong_sheet": "297",
+   "vendor": {
+    "chu": "VD58"
+   },
+   "thang": "202509",
+   "no": "1",
+   "pe": "0",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#4419"
+   }
+  },
+  {
+   "thu_tu": 289,
+   "dong_sheet": "298",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202510",
+   "no": "1",
+   "pe": "852009.2737519993",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#4872"
+   }
+  },
+  {
+   "thu_tu": 290,
+   "dong_sheet": "299",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202510",
+   "no": "2",
+   "pe": "407879.2165779997",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#4871"
+   }
+  },
+  {
+   "thu_tu": 291,
+   "dong_sheet": "300",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202510",
+   "no": "3",
+   "pe": "112676.22310599996",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#4870"
+   }
+  },
+  {
+   "thu_tu": 292,
+   "dong_sheet": "301",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202510",
+   "no": "4",
+   "pe": "481869.8553510001",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#4869"
+   }
+  },
+  {
+   "thu_tu": 293,
+   "dong_sheet": "302",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202510",
+   "no": "5",
+   "pe": "301304.7606549998",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#4845"
+   }
+  },
+  {
+   "thu_tu": 294,
+   "dong_sheet": "303",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202510",
+   "no": "6",
+   "pe": "0",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#4831"
+   }
+  },
+  {
+   "thu_tu": 295,
+   "dong_sheet": "304",
+   "vendor": {
+    "chu": "VD57"
+   },
+   "thang": "202510",
+   "no": "1",
+   "pe": "2862.862891166666",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 296,
+   "dong_sheet": "305",
+   "vendor": {
+    "chu": "VD429"
+   },
+   "thang": "202510",
+   "no": "1",
+   "pe": "2862.862891166666",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 297,
+   "dong_sheet": "306",
+   "vendor": {
+    "chu": "VD426"
+   },
+   "thang": "202510",
+   "no": "1",
+   "pe": "2862.862891166666",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 298,
+   "dong_sheet": "307",
+   "vendor": {
+    "chu": "VD557"
+   },
+   "thang": "202510",
+   "no": "1",
+   "pe": "2862.862891166666",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 299,
+   "dong_sheet": "308",
+   "vendor": {
+    "chu": "VD111"
+   },
+   "thang": "202510",
+   "no": "1",
+   "pe": "2862.862891166666",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 300,
+   "dong_sheet": "309",
+   "vendor": {
+    "chu": "VD427"
+   },
+   "thang": "202510",
+   "no": "1",
+   "pe": "2862.862891166666",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#4244"
+   }
+  },
+  {
+   "thu_tu": 301,
+   "dong_sheet": "310",
+   "vendor": {
+    "chu": "VD417"
+   },
+   "thang": "202510",
+   "no": "1",
+   "pe": "2862.862891166666",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#4243"
+   }
+  },
+  {
+   "thu_tu": 302,
+   "dong_sheet": "311",
+   "vendor": {
+    "chu": "VD430"
+   },
+   "thang": "202510",
+   "no": "1",
+   "pe": "2862.862891166666",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 303,
+   "dong_sheet": "312",
+   "vendor": {
+    "chu": "VD63"
+   },
+   "thang": "202510",
+   "no": "1",
+   "pe": "2862.862891166666",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 304,
+   "dong_sheet": "313",
+   "vendor": {
+    "chu": "VD424"
+   },
+   "thang": "202510",
+   "no": "1",
+   "pe": "2862.862891166666",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 305,
+   "dong_sheet": "314",
+   "vendor": {
+    "chu": "VD64"
+   },
+   "thang": "202510",
+   "no": "1",
+   "pe": "2862.862891166666",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 306,
+   "dong_sheet": "315",
+   "vendor": {
+    "chu": "VD62"
+   },
+   "thang": "202510",
+   "no": "1",
+   "pe": "2862.862891166666",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#4862"
+   }
+  },
+  {
+   "thu_tu": 307,
+   "dong_sheet": "316",
+   "vendor": {
+    "chu": "VD428"
+   },
+   "thang": "202510",
+   "no": "1",
+   "pe": "85090.3083935941",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#5045"
+   }
+  },
+  {
+   "thu_tu": 308,
+   "dong_sheet": "317",
+   "vendor": {
+    "chu": "VD428"
+   },
+   "thang": "202510",
+   "no": "2",
+   "pe": "676.5263640480001",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#5044"
+   }
+  },
+  {
+   "thu_tu": 309,
+   "dong_sheet": "318",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202510",
+   "no": "1",
+   "pe": "0",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#4774"
+   }
+  },
+  {
+   "thu_tu": 310,
+   "dong_sheet": "319",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202510",
+   "no": "2",
+   "pe": "198.52",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#4772"
+   }
+  },
+  {
+   "thu_tu": 311,
+   "dong_sheet": "320",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202510",
+   "no": "3",
+   "pe": "171.08",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#4288"
+   }
+  },
+  {
+   "thu_tu": 312,
+   "dong_sheet": "321",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202510",
+   "no": "4",
+   "pe": "0",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 313,
+   "dong_sheet": "322",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202510",
+   "no": "5",
+   "pe": "0",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 314,
+   "dong_sheet": "323",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202510",
+   "no": "6",
+   "pe": "3.91",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 315,
+   "dong_sheet": "324",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202510",
+   "no": "7",
+   "pe": "0",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 316,
+   "dong_sheet": "325",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202510",
+   "no": "8",
+   "pe": "0",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 317,
+   "dong_sheet": "326",
+   "vendor": {
+    "chu": "VD336"
+   },
+   "thang": "202510",
+   "no": "1",
+   "pe": "0",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 318,
+   "dong_sheet": "327",
+   "vendor": {
+    "chu": "VD113"
+   },
+   "thang": "202510",
+   "no": "1",
+   "pe": "0",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 319,
+   "dong_sheet": "328",
+   "vendor": {
+    "chu": "VD62"
+   },
+   "thang": "202510",
+   "no": "2",
+   "pe": "0",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#4833"
+   }
+  },
+  {
+   "thu_tu": 320,
+   "dong_sheet": "329",
+   "vendor": {
+    "chu": "VD61"
+   },
+   "thang": "202510",
+   "no": "1",
+   "pe": "0",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#4769"
+   }
+  },
+  {
+   "thu_tu": 321,
+   "dong_sheet": "330",
+   "vendor": {
+    "chu": "VD61"
+   },
+   "thang": "202510",
+   "no": "2",
+   "pe": "0",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#4768"
+   }
+  },
+  {
+   "thu_tu": 322,
+   "dong_sheet": "331",
+   "vendor": {
+    "chu": "VD428"
+   },
+   "thang": "202510",
+   "no": "3",
+   "pe": "0",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#5043"
+   }
+  },
+  {
+   "thu_tu": 323,
+   "dong_sheet": "332",
+   "vendor": {
+    "chu": "VD57"
+   },
+   "thang": "202510",
+   "no": "2",
+   "pe": "0",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 324,
+   "dong_sheet": "333",
+   "vendor": {
+    "chu": "VD58"
+   },
+   "thang": "202510",
+   "no": "1",
+   "pe": "0",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 325,
+   "dong_sheet": "334",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202511",
+   "no": "1",
+   "pe": "1129328.1992629992",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#5482"
+   }
+  },
+  {
+   "thu_tu": 326,
+   "dong_sheet": "335",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202511",
+   "no": "2",
+   "pe": "452477.07693900005",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#5458"
+   }
+  },
+  {
+   "thu_tu": 327,
+   "dong_sheet": "336",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202511",
+   "no": "3",
+   "pe": "160574.11633799985",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#5430"
+   }
+  },
+  {
+   "thu_tu": 328,
+   "dong_sheet": "337",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202511",
+   "no": "4",
+   "pe": "525927.5835740002",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#5429"
+   }
+  },
+  {
+   "thu_tu": 329,
+   "dong_sheet": "338",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202511",
+   "no": "5",
+   "pe": "359212.9350729999",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#5428"
+   }
+  },
+  {
+   "thu_tu": 330,
+   "dong_sheet": "339",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202511",
+   "no": "6",
+   "pe": "0",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#5427"
+   }
+  },
+  {
+   "thu_tu": 331,
+   "dong_sheet": "340",
+   "vendor": {
+    "chu": "VD57"
+   },
+   "thang": "202511",
+   "no": "1",
+   "pe": "2539.8797932499992",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 332,
+   "dong_sheet": "341",
+   "vendor": {
+    "chu": "VD429"
+   },
+   "thang": "202511",
+   "no": "1",
+   "pe": "2539.8797932499992",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 333,
+   "dong_sheet": "342",
+   "vendor": {
+    "chu": "VD426"
+   },
+   "thang": "202511",
+   "no": "1",
+   "pe": "2539.8797932499992",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 334,
+   "dong_sheet": "343",
+   "vendor": {
+    "chu": "VD557"
+   },
+   "thang": "202511",
+   "no": "1",
+   "pe": "2539.8797932499992",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 335,
+   "dong_sheet": "344",
+   "vendor": {
+    "chu": "VD111"
+   },
+   "thang": "202511",
+   "no": "1",
+   "pe": "2539.8797932499992",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 336,
+   "dong_sheet": "345",
+   "vendor": {
+    "chu": "VD427"
+   },
+   "thang": "202511",
+   "no": "1",
+   "pe": "2539.8797932499992",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 337,
+   "dong_sheet": "346",
+   "vendor": {
+    "chu": "VD417"
+   },
+   "thang": "202511",
+   "no": "1",
+   "pe": "2539.8797932499992",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 338,
+   "dong_sheet": "347",
+   "vendor": {
+    "chu": "VD430"
+   },
+   "thang": "202511",
+   "no": "1",
+   "pe": "2539.8797932499992",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 339,
+   "dong_sheet": "348",
+   "vendor": {
+    "chu": "VD63"
+   },
+   "thang": "202511",
+   "no": "1",
+   "pe": "2539.8797932499992",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 340,
+   "dong_sheet": "349",
+   "vendor": {
+    "chu": "VD424"
+   },
+   "thang": "202511",
+   "no": "1",
+   "pe": "2539.8797932499992",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 341,
+   "dong_sheet": "350",
+   "vendor": {
+    "chu": "VD64"
+   },
+   "thang": "202511",
+   "no": "1",
+   "pe": "2539.8797932499992",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 342,
+   "dong_sheet": "351",
+   "vendor": {
+    "chu": "VD62"
+   },
+   "thang": "202511",
+   "no": "1",
+   "pe": "2539.8797932499992",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#5393"
+   }
+  },
+  {
+   "thu_tu": 343,
+   "dong_sheet": "352",
+   "vendor": {
+    "chu": "VD428"
+   },
+   "thang": "202511",
+   "no": "1",
+   "pe": "112013.39508876378",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 344,
+   "dong_sheet": "353",
+   "vendor": {
+    "chu": "VD428"
+   },
+   "thang": "202511",
+   "no": "2",
+   "pe": "1392.5040711617546",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 345,
+   "dong_sheet": "354",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202511",
+   "no": "1",
+   "pe": "0",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 346,
+   "dong_sheet": "355",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202511",
+   "no": "2",
+   "pe": "7633.709999999999",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 347,
+   "dong_sheet": "356",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202511",
+   "no": "3",
+   "pe": "3178.42",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 348,
+   "dong_sheet": "357",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202511",
+   "no": "4",
+   "pe": "0",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 349,
+   "dong_sheet": "358",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202511",
+   "no": "5",
+   "pe": "0",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 350,
+   "dong_sheet": "359",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202511",
+   "no": "6",
+   "pe": "243.49000000000004",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 351,
+   "dong_sheet": "360",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202511",
+   "no": "7",
+   "pe": "373.35",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 352,
+   "dong_sheet": "361",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202511",
+   "no": "8",
+   "pe": "0",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 353,
+   "dong_sheet": "362",
+   "vendor": {
+    "chu": "VD336"
+   },
+   "thang": "202511",
+   "no": "1",
+   "pe": "0",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 354,
+   "dong_sheet": "363",
+   "vendor": {
+    "chu": "VD113"
+   },
+   "thang": "202511",
+   "no": "1",
+   "pe": "0",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 355,
+   "dong_sheet": "364",
+   "vendor": {
+    "chu": "VD62"
+   },
+   "thang": "202511",
+   "no": "2",
+   "pe": "0",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#5390"
+   }
+  },
+  {
+   "thu_tu": 356,
+   "dong_sheet": "365",
+   "vendor": {
+    "chu": "VD61"
+   },
+   "thang": "202511",
+   "no": "1",
+   "pe": "0",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#5314"
+   }
+  },
+  {
+   "thu_tu": 357,
+   "dong_sheet": "366",
+   "vendor": {
+    "chu": "VD61"
+   },
+   "thang": "202511",
+   "no": "2",
+   "pe": "0",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#5313"
+   }
+  },
+  {
+   "thu_tu": 358,
+   "dong_sheet": "367",
+   "vendor": {
+    "chu": "VD428"
+   },
+   "thang": "202511",
+   "no": "3",
+   "pe": "0",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 359,
+   "dong_sheet": "368",
+   "vendor": {
+    "chu": "VD57"
+   },
+   "thang": "202511",
+   "no": "2",
+   "pe": "0",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 360,
+   "dong_sheet": "369",
+   "vendor": {
+    "chu": "VD58"
+   },
+   "thang": "202511",
+   "no": "1",
+   "pe": "0",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 361,
+   "dong_sheet": "370",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202511",
+   "no": "7",
+   "pe": "0",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#5392"
+   }
+  },
+  {
+   "thu_tu": 362,
+   "dong_sheet": "371",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202511",
+   "no": "8",
+   "pe": "0",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#5388"
+   }
+  },
+  {
+   "thu_tu": 363,
+   "dong_sheet": "372",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202511",
+   "no": "9",
+   "pe": "0",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 364,
+   "dong_sheet": "373",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202511",
+   "no": "10",
+   "pe": "0",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 365,
+   "dong_sheet": "374",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202511",
+   "no": "11",
+   "pe": "0",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 366,
+   "dong_sheet": "375",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202511",
+   "no": "12",
+   "pe": "0",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 367,
+   "dong_sheet": "376",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202512",
+   "no": "1",
+   "pe": "1486916.0653829991",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#5978"
+   }
+  },
+  {
+   "thu_tu": 368,
+   "dong_sheet": "377",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202512",
+   "no": "2",
+   "pe": "426077.10185499996",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#5914"
+   }
+  },
+  {
+   "thu_tu": 369,
+   "dong_sheet": "378",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202512",
+   "no": "3",
+   "pe": "97413.12520699999",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#5908"
+   }
+  },
+  {
+   "thu_tu": 370,
+   "dong_sheet": "379",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202512",
+   "no": "4",
+   "pe": "779177.8779210002",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#5873"
+   }
+  },
+  {
+   "thu_tu": 371,
+   "dong_sheet": "380",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202512",
+   "no": "5",
+   "pe": "868078.6070439998",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#5872"
+   }
+  },
+  {
+   "thu_tu": 372,
+   "dong_sheet": "381",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202512",
+   "no": "6",
+   "pe": "0",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#5870"
+   }
+  },
+  {
+   "thu_tu": 373,
+   "dong_sheet": "382",
+   "vendor": {
+    "chu": "VD57"
+   },
+   "thang": "202512",
+   "no": "1",
+   "pe": "2124.3076060833337",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 374,
+   "dong_sheet": "383",
+   "vendor": {
+    "chu": "VD429"
+   },
+   "thang": "202512",
+   "no": "1",
+   "pe": "2124.3076060833337",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 375,
+   "dong_sheet": "384",
+   "vendor": {
+    "chu": "VD426"
+   },
+   "thang": "202512",
+   "no": "1",
+   "pe": "2124.3076060833337",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 376,
+   "dong_sheet": "385",
+   "vendor": {
+    "chu": "VD557"
+   },
+   "thang": "202512",
+   "no": "1",
+   "pe": "2124.3076060833337",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 377,
+   "dong_sheet": "386",
+   "vendor": {
+    "chu": "VD111"
+   },
+   "thang": "202512",
+   "no": "1",
+   "pe": "2124.3076060833337",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 378,
+   "dong_sheet": "387",
+   "vendor": {
+    "chu": "VD427"
+   },
+   "thang": "202512",
+   "no": "1",
+   "pe": "2124.3076060833337",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#6063"
+   }
+  },
+  {
+   "thu_tu": 379,
+   "dong_sheet": "388",
+   "vendor": {
+    "chu": "VD417"
+   },
+   "thang": "202512",
+   "no": "1",
+   "pe": "2124.3076060833337",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 380,
+   "dong_sheet": "389",
+   "vendor": {
+    "chu": "VD430"
+   },
+   "thang": "202512",
+   "no": "1",
+   "pe": "2124.3076060833337",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#6062"
+   }
+  },
+  {
+   "thu_tu": 381,
+   "dong_sheet": "390",
+   "vendor": {
+    "chu": "VD63"
+   },
+   "thang": "202512",
+   "no": "1",
+   "pe": "2124.3076060833337",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 382,
+   "dong_sheet": "391",
+   "vendor": {
+    "chu": "VD424"
+   },
+   "thang": "202512",
+   "no": "1",
+   "pe": "2124.3076060833337",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 383,
+   "dong_sheet": "392",
+   "vendor": {
+    "chu": "VD64"
+   },
+   "thang": "202512",
+   "no": "1",
+   "pe": "2124.3076060833337",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 384,
+   "dong_sheet": "393",
+   "vendor": {
+    "chu": "VD62"
+   },
+   "thang": "202512",
+   "no": "1",
+   "pe": "2124.3076060833337",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#5898"
+   }
+  },
+  {
+   "thu_tu": 385,
+   "dong_sheet": "394",
+   "vendor": {
+    "chu": "VD428"
+   },
+   "thang": "202512",
+   "no": "1",
+   "pe": "682647.6112517716",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#5984"
+   }
+  },
+  {
+   "thu_tu": 386,
+   "dong_sheet": "395",
+   "vendor": {
+    "chu": "VD428"
+   },
+   "thang": "202512",
+   "no": "2",
+   "pe": "507.68380689755963",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#5980"
+   }
+  },
+  {
+   "thu_tu": 387,
+   "dong_sheet": "396",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202512",
+   "no": "1",
+   "pe": "0",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#5812"
+   }
+  },
+  {
+   "thu_tu": 388,
+   "dong_sheet": "397",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202512",
+   "no": "2",
+   "pe": "239.66000000000003",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#5810"
+   }
+  },
+  {
+   "thu_tu": 389,
+   "dong_sheet": "398",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202512",
+   "no": "3",
+   "pe": "60.89",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#5808"
+   }
+  },
+  {
+   "thu_tu": 390,
+   "dong_sheet": "399",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202512",
+   "no": "4",
+   "pe": "0",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#5806"
+   }
+  },
+  {
+   "thu_tu": 391,
+   "dong_sheet": "400",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202512",
+   "no": "5",
+   "pe": "0",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#5319"
+   }
+  },
+  {
+   "thu_tu": 392,
+   "dong_sheet": "401",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202512",
+   "no": "6",
+   "pe": "9.650000000000002",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#5317"
+   }
+  },
+  {
+   "thu_tu": 393,
+   "dong_sheet": "402",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202512",
+   "no": "7",
+   "pe": "12.3",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#5315"
+   }
+  },
+  {
+   "thu_tu": 394,
+   "dong_sheet": "403",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "thang": "202512",
+   "no": "8",
+   "pe": "0",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 395,
+   "dong_sheet": "404",
+   "vendor": {
+    "chu": "VD336"
+   },
+   "thang": "202512",
+   "no": "1",
+   "pe": "0",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 396,
+   "dong_sheet": "405",
+   "vendor": {
+    "chu": "VD113"
+   },
+   "thang": "202512",
+   "no": "1",
+   "pe": "0",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 397,
+   "dong_sheet": "406",
+   "vendor": {
+    "chu": "VD62"
+   },
+   "thang": "202512",
+   "no": "2",
+   "pe": "0",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#5891"
+   }
+  },
+  {
+   "thu_tu": 398,
+   "dong_sheet": "407",
+   "vendor": {
+    "chu": "VD61"
+   },
+   "thang": "202512",
+   "no": "1",
+   "pe": "0",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 399,
+   "dong_sheet": "408",
+   "vendor": {
+    "chu": "VD61"
+   },
+   "thang": "202512",
+   "no": "2",
+   "pe": "0",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 400,
+   "dong_sheet": "409",
+   "vendor": {
+    "chu": "VD428"
+   },
+   "thang": "202512",
+   "no": "3",
+   "pe": "0",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#5977"
+   }
+  },
+  {
+   "thu_tu": 401,
+   "dong_sheet": "410",
+   "vendor": {
+    "chu": "VD57"
+   },
+   "thang": "202512",
+   "no": "2",
+   "pe": "0",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 402,
+   "dong_sheet": "411",
+   "vendor": {
+    "chu": "VD58"
+   },
+   "thang": "202512",
+   "no": "1",
+   "pe": "0",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  },
+  {
+   "thu_tu": 403,
+   "dong_sheet": "412",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202512",
+   "no": "7",
+   "pe": "0",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#5849"
+   }
+  },
+  {
+   "thu_tu": 404,
+   "dong_sheet": "413",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202512",
+   "no": "8",
+   "pe": "0",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#5843"
+   }
+  },
+  {
+   "thu_tu": 405,
+   "dong_sheet": "414",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202512",
+   "no": "9",
+   "pe": "0",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#5841"
+   }
+  },
+  {
+   "thu_tu": 406,
+   "dong_sheet": "415",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202512",
+   "no": "10",
+   "pe": "0",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#5777"
+   }
+  },
+  {
+   "thu_tu": 407,
+   "dong_sheet": "416",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202512",
+   "no": "11",
+   "pe": "0",
+   "pm": "0",
+   "pm_ghi_chu": null,
+   "itl_id": {
+    "chu": "ITL#5776"
+   }
+  },
+  {
+   "thu_tu": 408,
+   "dong_sheet": "417",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "thang": "202512",
+   "no": "12",
+   "pe": "0",
+   "pm": null,
+   "pm_ghi_chu": {
+    "chu": "Need to manual input"
+   },
+   "itl_id": {
+    "chu": "Ko tìm thấy"
+   }
+  }
+ ]
+}

@@ -15,6 +15,7 @@ import contextlib
 import copy
 import http.client
 import json
+import re
 import os
 import threading
 import time
@@ -33,15 +34,17 @@ V = cua.bang_tuyen.TIEN_TO
 
 # ══ MONG — khai TRƯỚC (Đ5) ═══════════════════════════════════════════════════════════════════
 # Tệp thật (H4 · H5 · H6, đo 18/11): WP-C2 (cấp cao nhất) + WP-C3a + WP-C3b, cả ba `dat=true`.
-# 4 cha khai sẵn + 2 con có trong tệp = 6 cổng. WP-C4 · WP-C5 chưa ai đo ⇒ `null`.
+# Gộp H9 (19/11): + WP-C4a (`tong_o`/`khop` = 420/420 ô so, 196 ô ⛔ so được nằm NGOÀI mẫu số).
+# 4 cha khai sẵn + 3 con có trong tệp = 7 cổng. WP-C4 (cha, 1 con = C4a) ⇒ true; WP-C5 chưa ai đo ⇒ `null`.
 MONG_THAT = {
     "HD2_WP_C2": True, "HD2_WP_C3": True, "HD2_WP_C3A": True, "HD2_WP_C3B": True,
-    "HD2_WP_C4": None, "HD2_WP_C5": None,
+    "HD2_WP_C4": True, "HD2_WP_C4A": True, "HD2_WP_C5": None,
 }
 MONG_CHA_KHAI_SAN = ("HD2_WP_C2", "HD2_WP_C3", "HD2_WP_C4", "HD2_WP_C5")
 MONG_O_C2 = "63016/63016 ô"          # `hd2_cong.json` WP-C2 khop/tong_o (BM…BT × 7877 dòng)
 MONG_O_C3A = "205175/205175 ô"
 MONG_O_C3B = "11585/11585 ô"
+MONG_O_C4A = "420/420 ô"             # `hd2_cong.json` WP-C4a khop/tong_o (44 Vendor-tháng × 14 − 196 ô P chữ)
 
 
 # ── máy thật ─────────────────────────────────────────────────────────────────────────────────
@@ -110,13 +113,36 @@ def _dat(c) -> dict:
     return {x.ma: x.dat for x in c}
 
 
+# ══ CG2-R2-03 · HỢP ĐỒNG KHỐI GÓI (H4): MỌI khối gói của tệp THẬT khai `tong_o` + `khop` ═══════════════
+# Lỗi đã xảy ra: gộp H9 (`WP-C4a` chỉ có `o_so`/`lech`) ⇒ cổng `HD2_WP_C4A` = null (⛔ tin mù) mà không
+# bài nào quét TỆP. Quét theo khoá `WP-C\d+[a-z]*` + khối gốc; Đ3: tập ⛔ rỗng (≥ 4 khối).
+def test_CG2_R2_03_MOI_khoi_goi_cua_tep_THAT_khai_tong_o_va_khop():
+    d = _that()
+    khoi = {"WP-C2": d, **{k: v for k, v in d.items() if re.fullmatch(r"WP-C\d+[a-z]+", k)}}
+    assert set(khoi) >= {"WP-C2", "WP-C3a", "WP-C3b", "WP-C4a"}, sorted(khoi)     # Đ3: mẫu số ⛔ rỗng
+    thieu = {g: [k for k in ("tong_o", "khop") if type(b.get(k)) is not int] for g, b in khoi.items()}
+    assert {g: t for g, t in thieu.items() if t} == {}, thieu
+    assert all(b["khop"] <= b["tong_o"] and b["tong_o"] > 0 for b in khoi.values())
+
+
+@pytest.mark.pg
+def test_CG2_R2_03_cong_tuyen_THAT_moi_goi_con_trong_tep_deu_hien_va_khong_null():
+    """Tập cổng ĐỌC TỪ TỆP: 4 cha khai sẵn + mỗi gói con của tệp; chỉ cha ⛔ có con (C5) được null."""
+    d = _that()
+    con = sorted(k for k in d if re.fullmatch(r"WP-C\d+[a-z]+", k))
+    mong = {"HD2_WP_C2", "HD2_WP_C3", "HD2_WP_C4", "HD2_WP_C5", *(bc._ma_hd2(k) for k in con)}
+    h = _hd2(_gates(TEP_HD2_THAT))
+    assert set(h) == mong and len(h) == 7, sorted(h)
+    assert sorted(m for m, c in h.items() if c["dat"] is None) == ["HD2_WP_C5"]
+
+
 # ══ CG2-B1 · tệp thật ⇒ cổng theo gói; gói chưa đo ⇒ null ══════════════════════════════════════
 @pytest.mark.pg
-def test_CG2_B1_tep_that_qua_tuyen_6_cong_dung_dat_C4_C5_null():
+def test_CG2_B1_tep_that_qua_tuyen_7_cong_dung_dat_C5_null():
     h = _hd2(_gates(TEP_HD2_THAT))
     assert {m: c["dat"] for m, c in h.items()} == MONG_THAT, h
-    for m in ("HD2_WP_C4", "HD2_WP_C5"):
-        assert h[m]["nhan"] == "CHUA DO DUOC" and "WP-C" in h[m]["ly_do"], h[m]
+    assert h["HD2_WP_C5"]["nhan"] == "CHUA DO DUOC" and "WP-C" in h["HD2_WP_C5"]["ly_do"], h["HD2_WP_C5"]
+    assert MONG_O_C4A in h["HD2_WP_C4A"]["da_do"] and "1/1 gói con đạt (WP-C4a)" in h["HD2_WP_C4"]["da_do"]
     assert MONG_O_C2 in h["HD2_WP_C2"]["da_do"]
     assert MONG_O_C3A in h["HD2_WP_C3A"]["da_do"] and MONG_O_C3B in h["HD2_WP_C3B"]["da_do"]
 
@@ -125,8 +151,10 @@ def test_CG2_B1_tep_that_qua_tuyen_6_cong_dung_dat_C4_C5_null():
 def test_CG2_B1_nguon_thu_hai_dat_cua_tep_THAT_khop_mong():
     """Đ2: `MONG_THAT` ↔ chính tệp (⛔ qua mã). Mẫu số ⛔ rỗng (Đ3): 3 gói đo."""
     d = _that()
-    goi = {"WP-C2": d["dat"], "WP-C3a": d["WP-C3a"]["dat"], "WP-C3b": d["WP-C3b"]["dat"]}
-    assert goi == {"WP-C2": True, "WP-C3a": True, "WP-C3b": True}
+    goi = {"WP-C2": d["dat"], "WP-C3a": d["WP-C3a"]["dat"], "WP-C3b": d["WP-C3b"]["dat"],
+           "WP-C4a": d["WP-C4a"]["dat"]}
+    assert goi == {"WP-C2": True, "WP-C3a": True, "WP-C3b": True, "WP-C4a": True}
+    assert (d["WP-C4a"]["khop"], d["WP-C4a"]["tong_o"]) == (420, 420) == (d["WP-C4a"]["o_so"] - d["WP-C4a"]["lech"], d["WP-C4a"]["o_so"])
     assert (d["khop"], d["tong_o"]) == (63016, 63016)
     assert (d["WP-C3a"]["khop"], d["WP-C3a"]["tong_o"]) == (205175, 205175)
     assert (d["WP-C3b"]["khop"], d["WP-C3b"]["tong_o"]) == (11585, 11585)
@@ -134,7 +162,7 @@ def test_CG2_B1_nguon_thu_hai_dat_cua_tep_THAT_khop_mong():
 
 def test_CG2_B1_tep_CHI_co_C2_cac_goi_khac_null(tmp_path):
     def pha(d):
-        d.pop("WP-C3a"), d.pop("WP-C3b")
+        d.pop("WP-C3a"), d.pop("WP-C3b"), d.pop("WP-C4a")
     c = bc.doc_cong_hd2(_tep(tmp_path, pha))
     assert _dat(c) == {"HD2_WP_C2": True, "HD2_WP_C3": None, "HD2_WP_C4": None, "HD2_WP_C5": None}
     assert [x.ma for x in c] == list(MONG_CHA_KHAI_SAN)
@@ -275,12 +303,12 @@ def test_AC5_gates_cu_chi_THEM_phan_tu_va_3_con_so_tom_dem_dung():
     assert "FINAL" in cu and "KHO_SACH" in cu and "HD1_THANG" in cu
     assert [c["ma"] for c in b["cong"] if not c["ma"].startswith("HD2_")] == cu
     assert {c["ma"] for c in b["cong"]} >= set(cu) | set(MONG_THAT)
-    # `None` ⇒ 4 cổng HD2 null; tệp thật ⇒ 4 true + 2 null: chua_do_duoc GIẢM đúng 2 (6−4)... đếm lại
+    # `None` ⇒ 4 cổng HD2 null; tệp thật ⇒ 6 true + 1 null (C5): chua_do_duoc GIẢM đúng 3 (7−4 cổng null)
     for d in (a, b):
         dat = [c["dat"] for c in d["cong"]]
         assert (d["dat"], d["khong_dat"], d["chua_do_duoc"]) == (
             dat.count(True), dat.count(False), sum(1 for x in dat if x is None))
-    assert b["dat"] - a["dat"] == 4 and b["chua_do_duoc"] - a["chua_do_duoc"] == -2
+    assert b["dat"] - a["dat"] == 6 and b["chua_do_duoc"] - a["chua_do_duoc"] == -3
 
 
 def test_chay_cua_MAC_DINH_tro_DUNG_tep_hd2_that():
@@ -302,16 +330,16 @@ def _nguon(c) -> dict:
 def test_CG2_R1_01_tep_THAT_khong_co_khoa_lat_bo_mau_so_khong_rong():
     """Đ3: tập ⛔ rỗng — ba gói đo, và CẢ BA vắng khoá ⇒ ca 'vắng' là ca THẬT."""
     d = _that()
-    khoi = [d, d["WP-C3a"], d["WP-C3b"]]
-    assert len(khoi) == 3 and all("lat_bo" not in b for b in khoi)
+    khoi = [d, d["WP-C3a"], d["WP-C3b"], d["WP-C4a"]]
+    assert len(khoi) == 4 and all("lat_bo" not in b for b in khoi)
 
 
 def test_CG2_R1_01_vang_thi_true_nhung_da_do_noi_thang_va_nguon_vang():
     c = bc.doc_cong_hd2(TEP_HD2_THAT)
     x = {y.ma: y for y in c}
     assert _nguon(c) == {"HD2_WP_C2": "vang", "HD2_WP_C3": "vang", "HD2_WP_C3A": "vang",
-                         "HD2_WP_C3B": "vang", "HD2_WP_C4": "", "HD2_WP_C5": ""}
-    for m in ("HD2_WP_C2", "HD2_WP_C3A", "HD2_WP_C3B", "HD2_WP_C3"):
+                         "HD2_WP_C3B": "vang", "HD2_WP_C4": "vang", "HD2_WP_C4A": "vang", "HD2_WP_C5": ""}
+    for m in ("HD2_WP_C2", "HD2_WP_C3A", "HD2_WP_C3B", "HD2_WP_C3", "HD2_WP_C4A", "HD2_WP_C4"):
         assert x[m].dat is True and _LOI_VANG in x[m].da_do, x[m]
     assert x["HD2_WP_C2"].da_do.startswith(MONG_O_C2)          # nhãn Đ4 cũ giữ nguyên
 
@@ -343,7 +371,7 @@ def test_CG2_R1_01_qua_tuyen_truong_lat_bo_nguon_THEM_vao_hop_dong():
     h = _hd2(_gates(TEP_HD2_THAT))
     assert {m: c["lat_bo_nguon"] for m, c in h.items()} == {
         "HD2_WP_C2": "vang", "HD2_WP_C3": "vang", "HD2_WP_C3A": "vang", "HD2_WP_C3B": "vang",
-        "HD2_WP_C4": "", "HD2_WP_C5": ""}
+        "HD2_WP_C4": "vang", "HD2_WP_C4A": "vang", "HD2_WP_C5": ""}
     assert all({"ma", "ten", "dat", "nhan", "da_do", "ly_do"} <= set(c) for c in h.values())
     assert _LOI_VANG in h["HD2_WP_C2"]["da_do"]
 
