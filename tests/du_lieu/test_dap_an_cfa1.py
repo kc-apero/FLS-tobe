@@ -59,7 +59,7 @@ SHA_GIU = {
     "cau_hinh/ix_fx": "e2c9fdd028bd3286",
     "cau_hinh/atl_cay": "504fa53d27c44b83",
     "cau_hinh/cdt_correct": "8d8cfaed26b6aa5a",
-    "cau_hinh/mapping_master_cfg": "3c1f61a28fd3d8ce",
+    "cau_hinh/mapping_master_cfg": "dc926c1b35b027ef",  # WO-234 19/11: đổi CÓ CHỦ ĐÍCH — che 4 số TK CN → TK_CA_NHAN_<n>
     "dap_an/gl_406": "91987833e9bb15ec",
 }
 

@@ -53,7 +53,7 @@ Nguon: ban copy file ITL RAW `1lzwttMYMIHA…` ▸ `Transaction Mapping L1`
 | 25 | 9755 | 08/12/2026 | `FT26224090979581` | 18,800,000 VND | `PM02271-2` | VISIONLAB TT tien mua Iphone 15 pro test PM02271-2 |
 | 26 | 3746 | 09/17/2025 | `IBSML247/FT252600TV20` | 15,878,015 VND | `PM00764 *(dau phieu, 2 dong lenh)*` | Hoan ung PM00764 |
 | 27 | 3747 | 09/17/2025 | `IBSML247/FT252601XB4W` | 11,929,900 VND | `PM00765 *(dau phieu, 2 dong lenh)*` | Hoan ung PM00765 |
-| 28 | 1461 | 04/09/2025 | `2025040918027` | 10,500,000 VND | `PM00147 *(dau phieu, 1 dong lenh)*` | 03088010516666-196158-CK 24/7 cho 0081001198220- Apr pm 00147 |
+| 28 | 1461 | 04/09/2025 | `2025040918027` | 10,500,000 VND | `PM00147 *(dau phieu, 1 dong lenh)*` | TK_CA_NHAN_1-196158-CK 24/7 cho 0081001198220- Apr pm 00147 |
 | 29 | 9756 | 08/12/2026 | `FT26224392606268` | 8,380,000 VND | `PM02271-1` | ASTRONEX TT TBMM t7.26 PM02271-1 - DH118119958 - KC28C6 |
 | 30 | 4625 | 11/10/2025 | `IBSML247/FT253143TPZ2` | 7,392,788 VND | `PM01212 *(dau phieu, 1 dong lenh)*` | Hoan ung PM01212 |
 | 31 | 3422 | 08/25/2025 | `IBSML247/FT25237L5J87` | 6,604,247 VND | `PM00782 *(dau phieu, 2 dong lenh)*` | Hoan ung PM00782 |
