@@ -67,6 +67,30 @@ CACH_TINH: dict[str, tuple[str, str | None]] = {
     "VD62": ("khong", "VD341"),
 }
 
+#: ⭐ `H11` *(ISP 3.1.2 · Step 35 · `WO-233`)* — luật `[Formula] MID3` THEO SỔ. Nguồn = `FORMULA` MID3 đọc
+#: nguyên văn 19/11 *(`BG-242 §3`)*: `AU` mượn RATE y hệt GI ở cả 4 sổ, NHƯNG
+#:   · `muon_rate` — `S`/`T` của OMC tra MID2 theo **`$H`** *(vendor thật)* ⇒ luật mượn ⛔ hiệu lực dù có
+#:     hàng `VD62`; GI · SC · PS tra theo **`$AU`** ⇒ mượn có hiệu lực *(SC/PS: 0 hàng kích hoạt)*.
+#:   · `pm_tong_thang` — `T` của GI · OMC có nhánh `and($O=0,$P>0) ⇒ $P×S10/O10`; SC · PS **⛔ có**
+#:     *(`T11 = iferror(sumifs(…)*$P11)`)*.
+#: Engine `fls.bao_cao.phan_bo` nhận hai cờ này qua tham số *(⛔ biết tên sổ ở nhánh tính)*.
+LUAT_SO: dict[str, dict[str, bool]] = {
+    "GI": {"muon_rate": True, "pm_tong_thang": True},
+    "OMC": {"muon_rate": False, "pm_tong_thang": True},
+    "SC": {"muon_rate": True, "pm_tong_thang": False},
+    "PS": {"muon_rate": True, "pm_tong_thang": False},
+}
+
+
+def cach_tinh_cua_so(so: str) -> dict[str, tuple[str, str | None]]:
+    """`CACH_TINH` áp cho MỘT sổ: sổ ⛔ mượn RATE ⇒ bỏ vendor cho mượn *(kiểu PE giữ nguyên)*."""
+    if so not in LUAT_SO:
+        raise LoiVen([f"so={_mot(so)} ⛔ có luật MID3 (LUAT_SO {list(LUAT_SO)})"])
+    if LUAT_SO[so]["muon_rate"]:
+        return dict(CACH_TINH)
+    return {m: (k, None) for m, (k, _) in CACH_TINH.items()}
+
+
 _COT = ("thu_tu", "dong_sheet", "No", "vendor", "network", "account", "pct",
         "cashin_month", "cashin_day", "cach_tinh", "so")
 _SO_NGUYEN = re.compile(r"[0-9]{1,2}", re.ASCII)
