@@ -21,7 +21,7 @@ mọi câu hỏi kèm khuyến nghị. Trả lời chủ bằng tiếng Việt.
 
 ## 1. Tiến độ lúc dừng
 
-**33/48 Step ISP đã gộp** vào nhánh làm việc `claude/bold-galileo-zukpaf` (đếm chỉ Step ISP; bước bổ sung ghi riêng — bài học "34/48" đếm lẫn, đã đính chính trong `TIEN_DO`).
+**34/48 Step ISP đã gộp** (33 lúc viết + H11 gộp ở lượt cuối — xem "Trạng thái cuối") vào nhánh làm việc `claude/bold-galileo-zukpaf` (đếm chỉ Step ISP; bước bổ sung ghi riêng — bài học "34/48" đếm lẫn, đã đính chính trong `TIEN_DO`).
 
 | Nhóm | Đã gộp |
 |---|---|
@@ -37,9 +37,9 @@ mọi câu hỏi kèm khuyến nghị. Trả lời chủ bằng tiếng Việt.
 
 | Bước | Nhánh `claude/bold-galileo-zukpaf-isp/…` · ngọn | Vòng kế |
 |---|---|---|
-| H11 (+ DT9b gộp sẵn) | `H11` · `d929b0d` | R2 cuối `KQ-237` (phiên `session_01EC3zCUjEZocYt2aMG9vZbf`) — ĐẠT 0 · 0 ⇒ gộp |
-| H7 (+ DT6c gộp sẵn) | `H7` · `a6631c8` | R1 `KQ-247` (`session_01EC3zCV4UhMqYC3cx2zncm8`) ⇒ vòng sửa nếu có ⇒ R2 `KQ-248` |
-| F5 | `F5` · `2366257` | R1 `KQ-255` (`session_01EC3zCVbTmxsXzzD4f8KNg2`) ⇒ R2 `KQ-256` |
+| H11 (+ DT9b gộp sẵn) | `H11` · `b48f11b` | ✅ **ĐÃ GỘP** lượt cuối (`66f40f5`) — R2 cuối `KQ-237` ĐẠT 0 · 0 |
+| H7 (+ DT6c gộp sẵn) | `H7` · `9ca3009` | R1 `KQ-247` xong: 0 CHẶN · 2 NÊN SỬA (`session_01EC3zCV4UhMqYC3cx2zncm8`) ⇒ vòng sửa nếu có ⇒ R2 `KQ-248` |
+| F5 | `F5` · `888dc80` | R1 `KQ-255` xong: 0 CHẶN · 2 NÊN SỬA (`session_01EC3zCVbTmxsXzzD4f8KNg2`) ⇒ R2 `KQ-256` |
 
 **Còn lại (12 Step):** H8 · H12 · H13 · H14 · H15 · I1 · I2 · C13 · F7 · DT7 · DT11 · DT12 — cộng **bước KPI riêng** (chủ duyệt 19/11, chưa có WO). Đã đủ phụ thuộc ngay: **C13 · DT7 · DT11 · DT12 · KPI**; H8 chờ H7; F7 · H12 · H15 · H13 · I1 · H14 · I2 nối tiếp theo bảng phụ thuộc ISP §3.
 
@@ -47,7 +47,7 @@ mọi câu hỏi kèm khuyến nghị. Trả lời chủ bằng tiếng Việt.
 
 ## 2. Ngọn các nhánh bước lúc dừng (`claude/bold-galileo-zukpaf-isp/<ID>`)
 
-C11 `4130fed` · C12 `c9224f3` · C4 `031d048` · C5 `90829c5` · C6 `b6eab8d` · C7 `c9f6e9a` · C8 `b532430` · C9 `62f5d7e` · CG1 `df09484` · CG2 `77b2af7` · DT10 `4d03494` · DT1B `bad486c` · DT1BM `017d70f` · DT1BT `2108027` · DT2 `d9606d9` · DT3 `d5a13cc` · DT4 `edf2f29` · DT5 `79cdd7d` · DT6 `b7887da` · DT6B `059d4e7` · DT6C `2ee5ee5` · DT8 `4aae70e` · DT8B `833a273` · DT9 `a3f5153` · DT9B `0b88ca2` · DTCF `67aa88f` · F4 `a17cbb2` · F5 `2366257` · FG `55be241` · H10 `c7e43cc` · H11 `d929b0d` · H2 `6ce257d` · H4 `4f0ba26` · H5 `207d434` · H6 `a6cfda3` · H7 `a6631c8` · H9 `734eb43` · ITE `b6d9d22` · O9 `96c2c18` · PII `71e06d4`.
+H11 `b48f11b` (đã gộp) · H7 `9ca3009` · F5 `888dc80` *(ngọn mới sau lượt cuối — các mục H11/H7/F5 phía sau là ngọn LÚC VIẾT)* · C11 `4130fed` · C12 `c9224f3` · C4 `031d048` · C5 `90829c5` · C6 `b6eab8d` · C7 `c9f6e9a` · C8 `b532430` · C9 `62f5d7e` · CG1 `df09484` · CG2 `77b2af7` · DT10 `4d03494` · DT1B `bad486c` · DT1BM `017d70f` · DT1BT `2108027` · DT2 `d9606d9` · DT3 `d5a13cc` · DT4 `edf2f29` · DT5 `79cdd7d` · DT6 `b7887da` · DT6B `059d4e7` · DT6C `2ee5ee5` · DT8 `4aae70e` · DT8B `833a273` · DT9 `a3f5153` · DT9B `0b88ca2` · DTCF `67aa88f` · F4 `a17cbb2` · F5 `2366257` · FG `55be241` · H10 `c7e43cc` · H11 `d929b0d` · H2 `6ce257d` · H4 `4f0ba26` · H5 `207d434` · H6 `a6cfda3` · H7 `a6631c8` · H9 `734eb43` · ITE `b6d9d22` · O9 `96c2c18` · PII `71e06d4`.
 
 Nhánh đã gộp để nguyên làm lịch sử (⛔ xoá).
 
@@ -242,4 +242,20 @@ Nếu chủ muốn đúng 4 agent theo **làn** thay vì theo vai: `fls-dev-cf` 
 
 ## Trạng thái cuối *(lượt cuối 19/11 điền)*
 
-_(đang chờ lượt cuối)_
+Ghi 12:25 UTC 19/11. **Mọi phiên con đã DỪNG**; orchestrator không còn hẹn giờ; không phiên mới nào được giao.
+
+**Đã gộp ở lượt cuối:** **H11 (Step 35 · AL.PLT OMC · SC · PS, WP-C4c) + DT9b** — commit gộp `66f40f5`, R2 cuối `KQ-237` ĐẠT 0 · 0 (2 GHI NHẬN mới `H11-R2-01/02`). Sàn **4101 → 4219** (thu thập thật cây gộp; web 675). Sổ phát hiện chung **v0.40** (+6 hàng). `--duong-nen --cong 5433`: `KẾT: ĐẠT` — tập đỏ 28 = 28 (12 failed · 4191 passed · 2 xfailed · 14 errors, thêm 0 · bớt 0) · web 3 = 3 · chạy 4219 / 675. `lint-imports` 11 kept · `soi_bang_tuyen` 46/46 · `quet_pii_repo` 0. ⇒ **34/48 Step ISP đã gộp.**
+
+**Nhánh treo — việc kế cho tài khoản mới:**
+
+| Bước | Ngọn | R1 | Việc kế |
+|---|---|---|---|
+| H7 (+ DT6c) · Step 32 · WP-C3c | `isp/H7` @ `9ca3009` | `KQ-247`: 0 CHẶN · **2 NÊN SỬA** · 4 GHI NHẬN | phiên **sửa** (mẫu `sua.md`, Sonnet): **`H7-R1-01`** `mong` các ô lệch chỉ khai SỐ Ô, không khai độ lớn ⇒ 3/3 đột biến vào ô đã lệch vẫn ĐẠT — khai giá trị/độ lớn lệch từng ô · **`H7-R1-02`** nhãn 835/888 đếm **ô tổng** gồm 619 ô `0=0`; khớp thật 216/269 ô có số — tách nhãn (Đ4) + cân nhắc cổng mức nhóm `(kỳ,D,E,F,V)` (R1 đo 4.323 nhóm = 7.952 dòng, 0 lệch). GHI NHẬN: `H7-R1-03` (nguyên nhân 2025-04 "chia lại" sai — nguồn hơn 408 đúng 13,8% PIT) · `-04` (đột biến M8/M10 sống) · `-05` (đổi serial ngày là bản thứ 4 trong repo) · `DT6C-R1-01` (máy quét PII chưa có trên `isp/H7` ⇒ **khi gộp phải chạy `quet_pii_repo.py` trên CÂY GỘP**, đòi 0). Sau sửa ⇒ R2 cuối `KQ-248` trên cây gộp thử ⇒ gộp. Cụm H7 cũ: 5435 |
+| F5 · Step 37 · SCR-F08 nút ký | `isp/F5` @ `888dc80` | `KQ-255`: 0 CHẶN · **2 NÊN SỬA** · 5 GHI NHẬN | phiên **sửa**: **`F5-R1-01`** ký xong trang nhảy về đầu, dòng vừa ký ra khỏi khung nhìn — giữ vị trí cuộn/tiêu điểm · **`F5-R1-02`** sau 409 (người khác ký giữa chừng) màn nói sai trạng thái — tải lại dòng đó. GHI NHẬN `F5-R1-03…07` (lỗi chồng khi 401 bấm nhiều lần · tiêu điểm/phím · ảnh bằng chứng · thông báo lỗi mạng · bài thiếu ca bấm kép/401/mạng). Sau sửa ⇒ R2 cuối `KQ-256` ⇒ gộp. Cụm F5 cũ: 5446 |
+
+**Số phiếu trống kế tiếp: 257.** Bước mở được ngay: **C13 · DT7 · DT11 · DT12 · KPI** (≤ 3 phiên song song cùng lúc với 2 phiên sửa trên ⇒ nên làm 2 phiên sửa + 1 bước mới trước).
+
+**Câu hỏi còn mở cho chủ:** như §3 (DT6 `ky_suy` · 412 · C7 AC-4 · O = Σ `pe` MID1) — không chặn.
+
+**Chi phí 3 phiên lượt cuối:** R2 H11 ≈ 0,78 USD · R1 H7 ≈ 1,62 USD · R1 F5 ≈ 0,92 USD (Sonnet 5.5 medium).
+
