@@ -100,3 +100,14 @@ Chạy MỘT lần, một mình, trên cây commit ①:
 - `bash tools/dung_moi_truong_isp.sh --duong-nen --cong 5444` ⇒ **`KẾT: ĐẠT`** — toàn bộ `12 failed, 3714 passed, 2 xfailed, 14 errors`: tập đỏ + XFAIL = đường nền **28 = 28** node id *(thêm 0 · bớt 0)* · chạy **3742** bài *(mong ≥ 3742)*; `tests/web` `3 failed, 672 passed`: **3 = 3** · 675 *(mong ≥ 675)*.
 - `lint-imports` ⇒ `Contracts: 11 kept, 0 broken`.
 - `kiem_tai_lieu.py` ⇒ `cong tai lieu DAT` *(343 file, 2647 bảng, 859 ô ngày, 104 mã QĐ)*.
+
+## Vòng sửa sau R1 (KQ-218)
+
+*(Thêm 19/11 — orchestrator chốt; R1 = 0 CHẶN · 1 NÊN SỬA · 7 GHI NHẬN. Phần trên giữ nguyên.)*
+
+- **`H10-R1-01` — MỘT nguồn "tổng tháng".** `chia_nen_tang` *(WP-C4a)* từng chia tổng tháng theo `Σ PE_cdt ÷ Σ PE`, `chia_theo_cach_tinh` *(WP-C4b)* theo `S10/O10` — lệch ở ca `O ≠ Σ PE` *(R1: PM VD336 `30/30` vs `40/20`)*. Nay cả hai gọi chung `tong_thang_as_is` *(S10_c = Σ RATE×O, O10 = Σ O mọi dòng tháng)* + `pm_tong_thang` *(= AS-IS `P×S10/O10`)* ở `fls/bao_cao/phan_bo.py`. Bài ĐỎ trước *(`test_H10_R1_01_MOT_nguon_tong_thang_…`: ca tổng hợp `O=100/20/0`, PE `30/10`·`10/30`, P `60` ⇒ cả hai hàm phải ra `40/20`)*; hai bài H9 cũ *(`rate` tổng tháng; lỗi `Σ PE tổng tháng = 0`)* đổi theo cơ sở AS-IS *(`S10/O10`; lỗi nay là `tổng tháng Σ O = 0`)*.
+- **Cổng sau sửa** *(chạy lại `do_hd2.py --goi …`, ⛔ `--ghi` — số ⛔ đổi nghĩa)*: WP-C4a `420` ô so · `196` ⛔ so được · ô ≠ 0 `0` · lệch `0` · KS.AL `44` — **y hệt** khối cũ; WP-C4b `1981` ô so · `945` ⛔ so được · ô ≠ 0 `988` · lệch `0` · KS.AL `209` · tổng tháng `0` — **y hệt**. Trên ảnh thật `O = Σ PE_cdt` (209/209) nên hai cơ sở trùng — đúng như R1 đo.
+- **Đột biến sống nay chết** *(bản sao cây, phá → chạy `tests/bao_cao` + 2 bài oracle → trả)*: `M7` *(kiểu `VD62` `khong` → `mang_theo_no`)* ⇒ 1 đỏ · `M9` *(donor `VD341` → `VD444`)* ⇒ 2 đỏ · `M16` *(`p > 0` → `p != 0`)* ⇒ 1 đỏ.
+- **`H10-R1-03` — chọn SỬA LỜI, ⛔ gỡ mã:** mục `CACH_TINH["VD62"][0] = "khong"` là **nhãn khai** — kiểu PE thật của `VD62` lấy theo nhãn dòng IX.VEN **đầu** *(= `Max` ⇒ `mang_ty_le_no1`)*; chỉ phần MƯỢN RATE `VD341` là riêng. **Đính chính bảng 5 mã ở trên:** dòng `VD62` ⇒ «kiểu theo dòng đầu *(`Max`)*; mượn RATE `VD341`». Chú thích `vendor.py` đã sửa; bài `test_H10_R1_03_M7_…` ghim nguyên văn mục + hành vi.
+- **Còn lại ⇒ backlog:** `H10-R1-04` *(gói `WP-C4b-PE`)* · `-06` *(`mong` PE kiểu `khong`)* · `-07` *(3 mẫu RATE `AA`)* · `-08` *(ghim nhãn `Max` ⇔ network)*.
+- **Q8:** `MONG_PYTEST_TOAN_BO` **3742 → 3746** *(= thu thập, +4)* cùng commit ① với bài ghim.
