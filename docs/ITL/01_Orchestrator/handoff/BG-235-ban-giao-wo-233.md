@@ -63,3 +63,17 @@ Orchestrator/BA: phát bước DATA cho §2.1–2.2 *(+ §2.3 nếu cần)*; m�
 - `test_isp_gates_hd2.py` cập nhật 8 → 9 cổng; `test_do_hd2_c4b.py` giữ kwarg mới khi monkeypatch `__kwdefaults__`.
 - Q8: `MONG_PYTEST_TOAN_BO` **4.059 → 4.136** *(+77)* cùng commit.
 - `--duong-nen --cong 5444` *(một lần, một mình)*: **KẾT ĐẠT** — `12 failed · 4108 passed · 2 xfailed · 14 errors` = tập đỏ nền 28 = 28 *(thêm 0 · bớt 0)*, chạy 4.136; web 3 = 3 *(675)*. `lint-imports` 11 kept · 0 broken.
+
+## Vòng sửa sau R1 *(KQ-236 · chỉ THÊM · merge `claude/bold-galileo-zukpaf` vào `isp/H11` @ `a6e09fc`)*
+**Gộp:** xung đột `tools/dung_moi_truong_isp.sh` + `tests/test_dung_moi_truong_isp.py` ⇒ bản nhánh làm việc, sàn = thu thập thật; `hd2_cong.json` · `do_hd2.py` · `07_API_CONTRACT` tự gộp *(giữ cả hai)*. Mã `7c5c9c3`.
+
+| Mã | Đã làm | ĐỎ trước *(đột biến R1 trên bản sao, ⛔ bài dict `LUAT_SO`)* |
+|---|---|---|
+| `H11-R1-01` | `tests/bao_cao/test_luat_so_du_lieu_tong_hop.py` **13** bài, dữ liệu tổng hợp tay tính: ca `O=0∧P>0` *(PM `P×S10/O10` = 118,75 · 31,25 ở GI·OMC; `RATE×P` = 112,5 · 37,5 ở SC·PS; ca RATE rỗng: GI·OMC cho qua, SC·PS lỗi có tên)* · ca `VD62` mượn `VD341` *(PE CVL 25 / COR 5 ở GI·SC·PS; 30 / 0 ở OMC — `$H` ⛔ mượn)*. Kỳ vọng GÕ TAY, ⛔ đọc `LUAT_SO`. Mẫu số ca ≠ rỗng có bài ghim *(Đ3)*. | `SC.pm=True` · `PS.pm=True` · `SC.muon=False` · `PS.muon=False` · `OMC.pm=False` · bỏ nhánh `tt` của engine · `doc_ven(so="GI")` ở `chay_wp_c4c` ⇒ **7/7 ĐỎ** *(trước: 5 sống + 2 sống)* |
+| `H11-R1-02` | Khối `WP-C4c` theo hợp đồng ITE: `khop` **19.591** *(ô khớp THẬT)* · `tong_o` **19.894** *(= ô so)* · `lech_co_chu_dich` **303** *(52 OMC + 251 SC)* · `mong_lech_co_chu_dich` **303** *(Σ mong lớp nguồn + nghi lỗi, khai trước)* · `o_trong_dap_an` **8.611** *(OMC 1.650 · SC 2.575 · PS 4.386; nằm TRONG `khop`, ⛔ "có số khớp")*. Sinh lại `do_hd2.py --goi WP-C4c --ghi` *(⛔ sửa tay)*. Bài `±1` mong ⇒ ĐỎ hai chiều. | 7 failed trước khi sửa mã |
+| `H11-R1-04` | `test_R1_04_duong_doc_kho_cua_CLI…` chạy CHÍNH `chay_wp_c4c(dsn_test())`: `dat` + khối == tệp thật. | *(đột biến `doc_ven(so="GI")` ở trên)* |
+| `H11-R1-03` · `DT9B-R1-01/02` | ⇒ **backlog** *(không làm vòng này)*. | |
+
+**`/gates`** `HD2_WP_C4C` = `true` — *"19591/19894 ô đáp án khớp + 303 lệch có chủ đích"*; `HD2_WP_C4` cha `lech_co_chu_dich` = 303. Bài CG2 xanh *(`test_isp_gates_hd2.py` 73)*.
+**Q8:** `MONG_PYTEST_TOAN_BO` 4.084 *(nhánh làm việc)* → **4.202** = thu thập thật *(4.084 + DT9b 25 + H11 77 + 16 bài vòng sửa)*; web 675.
+**Cổng:** `--duong-nen --cong 5444` *(một lượt dừng giữa chừng vì hết giới hạn nền, ⛔ ĐỎ; chạy lại một lần)*: **ĐẠT** — `12 failed · 4174 passed · 2 xfailed · 14 errors` = nền **28 = 28** *(thêm 0 · bớt 0)*, chạy 4.202; web 3 = 3 *(675)* · `lint-imports` 11 kept · 0 broken · `soi_bang_tuyen` **46** tuyến khớp SQL · `kiem_tai_lieu` ĐẠT.

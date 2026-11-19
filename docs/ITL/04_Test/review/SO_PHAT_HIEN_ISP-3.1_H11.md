@@ -17,3 +17,4 @@
 
 ## Changelog
 - **v0.1** *(2026-11-19, `fls-test` R1 của `H11` + `DT9b`, `KQ-236`)*: khởi tạo — **6** phát hiện *(**0 CHẶN** · **2 NÊN SỬA** `H11-R1-01` · `-02` · **4 GHI NHẬN** `H11-R1-03` · `-04` · `DT9B-R1-01` · `-02`)*. DT9b: GI 42/42 từng byte · vendor mới phủ MID3 **84/84** *(21 · 10 · 53)* · 317/317 dòng khớp lại bằng khoá SA chỉ-đọc — **0** lệch.
+- **v0.2** *(2026-11-19, vòng sửa sau R1, `BG-235` mục "Vòng sửa sau R1")*: `H11-R1-01` · `-02` · `-04` ⇒ **đã sửa, chờ R2 kiểm** *(đột biến R1 nay chết 7/7; khối C4c 19591/19894 + 303 + 8611 rỗng)*; `H11-R1-03` · `DT9B-R1-01` · `-02` ⇒ backlog.
