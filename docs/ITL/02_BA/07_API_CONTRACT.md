@@ -1,6 +1,6 @@
 # 07 — API CONTRACT: FLS
 
-**Version:** v3.25 · **Ngày:** 2026-11-19 · **Chủ sở hữu:** BA/PO + Tech Lead
+**Version:** v3.26 · **Ngày:** 2026-11-20 · **Chủ sở hữu:** BA/PO + Tech Lead
 **Thay thế:** v0.1 *(bản copy chương trình, prefix `/api/voi/`)* — đã khai tử.
 
 **Căn cứ:** `04_DB_IMPLEMENTATION` v1.0 *(schema `fls_itl`)* · `QĐ-ITL-38` *(app là nơi thao tác)* · `QĐ-ITL-45` *(FLS độc lập)* · `FLS-vs-FPS` §7 *(append-only event-log)*.
@@ -854,8 +854,8 @@ LY_DO_MAC_DINH_BO_GHEP = "(may dien) bo ghep tren man - nguoi bam khong ghi ly d
 | `GET /api/fls/v1/config/ven` | C9 | Vendor & Network Block 1 (**42** dòng — AP ghi 36, errata ㉒; 36 = số bộ vendor·network·account khác nhau) · mã 'cách tính' cho 5 vendor riêng · danh mục 7 CDT1; đọc từ KHO (`0027`); `?run_id=` ⇒ `400` | ✅ *(C9 — gộp 18/11 sau R2 `KQ-175`)* |
 | `GET /api/fls/v1/config/drv` | C10 | driver (loại, CDT1, tháng); tháng thiếu ⇒ `DRV_THIEU` | ⬜ chưa xây |
 | `GET /api/fls/v1/config/alr` | C11 | luật phân bổ theo HD + hiệu lực theo kỳ + cờ (mặc định TẮT, D2) | ✅ đã xây (C11 · 17 HD có luật = 4 H1000 + 8 By GI + 5 By NOEM; hiệu lực theo kỳ TÍCH LUỸ qua lần nạp) |
-| `GET /api/fls/v1/report/snapshot/{ky}` | C13 | danh sách phiên bản bản Daily Report 3 (checksum · trạng thái · người ký) | ⬜ chưa xây |
-| `POST /api/fls/v1/report/snapshot/{ky}/sign` | C13 | ký phiên bản mới nhất; phiên bản cũ đã ký giữ nguyên | ⬜ chưa xây |
+| `GET /api/fls/v1/report/snapshot/{ky}` | C13 | danh sách phiên bản bản Daily Report 3 (checksum · trạng thái · người ký); `{ky}` = `yyyymm`, sai khuôn ⇒ `400`; kỳ chưa có bản ⇒ `200` `ban: []` | ✅ |
+| `POST /api/fls/v1/report/snapshot/{ky}/sign` | C13 | ký phiên bản mới nhất; phiên bản cũ đã ký giữ nguyên; người ký = THẺ *(thân có `actor` ⇒ `400`)*; đã ký ⇒ `409 FLS-CAUHINH-DA-KY`; kỳ chưa có bản ⇒ `404`; checksum sha256 trên JSON chuẩn hoá *(khứ hồi qua jsonb)* | ✅ |
 
 ⭐ Cổng HD1/HD2 (CG1 · CG2) **⛔ mở tuyến mới**: chúng thêm cổng vào `GET /gates` sẵn có (§2) — `FINAL` thành số đo, thêm `HD1_THANG` và `HD2_WP_C2…C5`; ba trạng thái `dat` ∈ `true` / `false` / `null` như cũ.
 
@@ -916,6 +916,7 @@ LY_DO_MAC_DINH_BO_GHEP = "(may dien) bo ghep tren man - nguoi bam khong ghi ly d
 ---
 
 ## Changelog
+- **v3.26** *(2026-11-20, orchestrator ISP 3.1 — gộp C13 · `WO-257`, R2 cuối `KQ-260` ĐẠT 0 · 0)*: `§4i` hai dòng `GET /report/snapshot/{ky}` · `POST /report/snapshot/{ky}/sign` ⬜ → ✅ (ghi hợp đồng `200`/`201`/`400`/`404`/`409` theo `BG-258`; đưa bản vào là hàm mức repo, ⛔ tuyến ghi thứ ba). Câu `message` 409 dùng chung mã với C7 còn nói "tháng IX.FX" — `C13-R1-04`, đóng ở F7.
 - **v3.25** *(2026-11-19, orchestrator ISP 3.1 — vòng sửa sau R1 alias ITE, `KQ-231` `ITE-R1-01`)*: `GET /gates` THÊM trường `lech_co_chu_dich` *(số nguyên ≥ 0, mọi cổng; chỉ cổng HD2 có thể > 0)* — số Ô lệch có chủ đích đã khai mong (`mong_lech_co_chu_dich`) trong khối gói; cổng cha = Σ con; khoá vắng ⇒ `0`; khoá có mà ⛔ số nguyên ≥ 0 ⇒ cổng `null` có tên. Cổng lá `true` khi `khop + lech_co_chu_dich = tong_o` **và** `lech_co_chu_dich = mong_lech_co_chu_dich`; `khop` ⛔ còn cộng ô lệch. Trên tệp thật: `HD2_WP_C3A` 35 · `HD2_WP_C3B` 42 · `HD2_WP_C3` 77 *(`da_do`: `205140/205175 ô đáp án khớp + 35 lệch có chủ đích`)*. Hợp đồng cũ chỉ THÊM trường.
 - **v3.24** *(2026-11-19, orchestrator ISP 3.1 — gộp C7)*: `§4i` dòng `POST /config/fx/{yyyymm}/sign` ⬜ → ✅ (`actor` CHỈ từ token; ký lại ⇒ `409`; tháng chưa ký/thiếu/dấu vân lệch ⇒ `FX_CHAN` có tên; thân có `actor` ⇒ `400` theo §1).
 - **v3.23** *(2026-11-19, `fls-dev` BE-CF — C7 · `WO-212`; KHAI tuyến, orchestrator lật ✅ khi gộp)*: `§4i` dòng `POST /config/fx/{yyyymm}/sign` ghi rõ hợp đồng `201`/`400`/`404`/`409` *(vẫn ⬜)*. ⚠ Một thay đổi CỘNG vào tuyến cũ `GET /config/fx`: dòng tháng **đã ký** mang thêm `actor` · `ky_luc` và `trang_thai = da_ky` *(dòng chưa ký giữ nguyên từng byte)*.
