@@ -37,3 +37,12 @@ Sửa bài F4 `test_isp_f08_fx.py`: `nut == 0` ⇒ `nut == số dòng sạch ch�
 3. Sau ký, **vẽ lại cả bảng** (một `GET`) — thấy chữ ký do máy xác nhận, ⛔ tự đoán.
 4. `06_SCREEN_SPEC` §9 chỉ sửa dòng *Hành động*; spec field-level ⓑ + `US` vẫn nợ `fls-ba` (⛔ tôi viết spec).
 5. Ba bài web đỏ + 12 đỏ toàn bộ là nền có sẵn (`duong_nen_bai_do.txt`), ⛔ liên quan F5.
+
+## Vòng sửa sau R1 (KQ-255)
+**F5-R1-01** *(ký xong trang nhảy về đầu)* — ĐỎ trước: `pytest tests/web/test_isp_f08_ky_pg.py -k R1` ⇒ **exit 1**, `y_truoc = 494 → y_sau = 0`, dòng `202508` `top 879 > 800` *(ngoài khung)*, tiêu điểm ngoài dòng. Sửa `man_f08.js`: `_ve_lai(o, thang)` nhớ `scrollY`, `await ve(o)`, `scrollTo(0, y)`, rồi đưa tiêu điểm về `tr[data-thang]` *(nút đã khoá ⛔ nhận tiêu điểm ⇒ lấy chính `tr`, `tabindex=-1`)*; hộp còn mở ⇒ ⛔ giật tiêu điểm. Bài `test_F5_R1_01_…`: cuộn tới dòng *(mẫu: `y_truoc > 0`, Đ3)*, ký, đòi `y_sau > 0` + dòng trong khung + tiêu điểm trong dòng + kho có chữ ký.
+**F5-R1-02** *(sau 409 màn nói sai)* — ĐỎ trước: cùng lệnh, exit 1, dòng `202511` vẫn *"…Ký tháng"* chưa khoá. Sửa: nhánh `catch` với `e.http === 409` ⇒ `ve_lai(t)` *(tải lại bảng từ cửa)*, chữ lỗi tiếng Việt trong hộp giữ nguyên. Bài `test_F5_R1_02_…`: người khác ký (201, Đ3) ⇒ màn ký ⇒ hộp *"đã được ký rồi"* **và** dòng *đã ký · người ký* + nút khoá.
+XANH sau sửa: `tests/web/test_isp_f08_ky_pg.py` **6 passed**.
+**F5-R1-05** *(ảnh không chứa điều nó chứng — cùng chỗ, rẻ)*: ảnh mới `anh_BG-254/f5_sau_ky_cuon.png` *(1100×800, scale 1, 152 KB)*: cuộn giữa bảng, dòng `202508` **nằm trong khung**, hiện *đã ký · ke.toan.f5@vi-du.invalid · 2026-11-20*, nút xám khoá.
+**GHI NHẬN ⇒ backlog (⛔ làm):** `-03` lỗi chồng trong hộp · `-04` tiêu điểm/phím `ⓐ` + spec §9 · `-06` "Failed to fetch" thô *(ngoài F5, `goi_cua.js`)* · `-07` bài ép bấm kép/401/abort/`Esc`.
+**Sàn:** `MONG_PYTEST_TOAN_BO` 4219 → **4225** · `MONG_PYTEST_WEB` 675 → **681** *(= thu thập cây gộp: F5 +4, vòng sửa +2)*; bài ghim cùng commit. Gộp nhánh làm việc: xung đột sàn ⇒ giữ bản nhánh làm việc rồi đặt = thu thập thật.
+**Cổng cuối** *(`--duong-nen --cong 5446`, MỘT lần, một mình)*: toàn bộ `12 failed · 4197 passed · 2 xfailed · 14 errors` — tập đỏ **28 = 28** *(thêm 0 · bớt 0, chạy 4225 ≥ 4225)* · `tests/web` `3 failed · 678 passed` — **3 = 3**, chạy 681 ≥ 681 · KẾT ĐẠT. `lint-imports` 11/0 · `kiem_tai_lieu` ĐẠT · `kiem_thuyet_minh` 33/33.
