@@ -49,3 +49,16 @@ sha256 hex(64) của JSON chuẩn hoá: `json.dumps(sort_keys=True, ensure_ascii
 4. Ký chỉ tác động bản **mới nhất**; bản mới nhất đã ký ⇒ `409` dù bản cũ hơn chưa ký *(không xảy ra: bản mới luôn đẩy bản cũ chưa ký xuống, ⛔ ký được nữa)*. Khuyến nghị BA: bản cũ chưa ký bị bỏ rơi là đúng ý "ký phiên bản mới nhất"?
 5. Tái dùng `FLS-CAUHINH-DA-KY` *(câu ở `bao.MA_LOI` ghi "tháng IX.FX" — chỉ là mô tả mã; câu thật ở `detail`)*; ⛔ chạm `bao.py`/`goi_cua.js` *(ngoài tệp làn CF)*. Khuyến nghị: orchestrator gọn lời mô tả mã khi gộp.
 6. Không có đồng thời nhiều luồng bài ghim riêng *(chỉ tuần tự)*: khoá advisory đã có, nhưng bài chạy đua như C7-R1-02 để R1 quyết.
+
+## Vòng sửa sau R1 (KQ-259)
+*(2026-11-20 · 0 CHẶN · 3 NÊN SỬA đã xử · 4 GHI NHẬN ⇒ backlog, ⛔ làm. Đột biến chạy trên bản sao `git archive HEAD` sau commit mã, 6 vòng/đột biến.)*
+
+| Mã | Cách sửa | Đỏ trước | Xanh sau |
+|---|---|---|---|
+| `C13-R1-01` | Chọn cách **hẹp nhất**: `ban_ky._so_khu_hoi` đưa mọi `float` hữu hạn về đúng giá trị `jsonb numeric` trả lại *(`Decimal(repr(x))` → `-0` thành `0` → `format 'f'` → `json.loads`)* **trước** băm và lưu; kiểu khác giữ nguyên; `nan/inf` vẫn `LoiBanKy`. ⚠ `1` và `1.0` vẫn là hai checksum *(kho giữ `1.0`)*. | bài `test_C13_R1_01_…` đỏ trên mã cũ: `1e22` → đọc ra `10000000000000000000000`, checksum lệch *(R1: 2/7 lệch: `1e22`, `-0.0`)* | khứ hồi **7/7** *(`1.0` · `0.1+0.2` · `1e-7` · `10**30` · `12.50` · `1e22` · `-0.0`)*: đưa → `doc_noi_dung_ban_ky` → `checksum` = checksum lưu |
+| `C13-R1-02` | Bài ký SONG SONG: 5 kỳ × 8 luồng qua HTTP thật ⇒ mỗi kỳ `[201]+[409]×7` · đúng 1 sự kiện `ky:{ky}`; thêm bài đưa-bản song song 8 luồng *(cùng nội dung ⇒ `[1]×8`; khác nội dung ⇒ phiên bản `1…8` không trùng)*. | `M7` *(bỏ khoá ở `ky_ban`)* và `M12` *(bỏ khoá ở `dua_ban_ky`)* **SỐNG 7/7** bài cũ | `M7` ĐỎ **6/6** *(bài ký song song)* · `M12` ĐỎ **6/6** *(bài đưa song song)* — tỉ lệ cắn 100% ở 6 vòng |
+| `C13-R1-03` | Bài ký v1 → đưa v2 → ký ⇒ `201` phiên bản 2 · GET `[(1,da_ky),(2,da_ky)]` + checksum đúng · ký lần 3 ⇒ `409` có "phiên bản 2" và tên người ký. | `M8` *(`cu[0]` thay `cu[-1]`)* SỐNG 7/7 | `M8` ĐỎ **6/6** |
+
+**Sàn (Q8):** `MONG_PYTEST_TOAN_BO` 4226 → **4230** *(thu thập thật cây đã gộp nhánh làm việc; +4 bài `test_ban_ky_pg.py`)* + bài ghim `test_dung_moi_truong_isp.py:423` + dòng changelog cùng commit; `tests/web` giữ 675.
+**Cổng:** `--duong-nen --cong 5434` *(một mình, 1 lần, ĐẠT lần 1)*: toàn bộ `12 failed · 4202 passed · 2 xfailed · 14 errors` ⇒ tập đỏ + XFAIL **28 = 28** *(thêm 0 · bớt 0)*, chạy **4230** ≥ 4230 · web `3 failed, 672 passed` ⇒ 3 = 3, chạy 675. `lint-imports` 11 kept/0 broken · `soi_bang_tuyen` ✅ 48 tuyến · `kiem_tai_lieu` ✅ (402 tệp · 104 mã QĐ).
+**Backlog** *(⛔ làm ở vòng này)*: `-04` mã lỗi riêng cho F7 *(`FLS-BANKY-DA-KY` + `goi_cua.js`)* · `-05` BA ghi §4i "thân JSON, có thể `{}`" · `-06` BA quyết nhãn `thay_the` cho bản chưa ký bị thay · `-07` hợp đồng đưa bản ở I2 *(ổn định kiểu số `1` vs `1.0`)*.
