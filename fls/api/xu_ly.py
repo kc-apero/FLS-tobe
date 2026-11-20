@@ -1210,7 +1210,8 @@ def cau_hinh_ven(yc: YeuCau):
             "dong": [{"thu_tu": d.thu_tu, "dong_sheet": d.dong_sheet, "No": d.no,
                       "vendor": d.vendor, "network": d.network, "account": d.account,
                       "pct": d.pct, "cashin_month": d.cashin_month,
-                      "cashin_day": d.cashin_day, "cach_tinh": d.cach_tinh}
+                      "cashin_day": d.cashin_day, "cach_tinh": d.cach_tinh,
+                      "so": d.so}                                  # DT9b: chỉ THÊM trường
                      for d in b.dong],
             "nhan_rieng": list(b.nhan_rieng), "cdt1": list(b.cdt1)}, "flash"
 

@@ -165,7 +165,8 @@ def test_H9_B3_CHAN_vendor_thuong_co_PE_0_tren_moi_o_MID2():
     ven, m2 = _anh("cau_hinh/ix_ven.json"), _anh("dap_an/gi_mid2.json")
     nhan: dict[str, set] = {}
     for r in ven["dong"]:
-        nhan.setdefault(_chu(r["vendor"]), set()).add(_chu(r["cach_tinh"]))
+        if _chu(r["so"]) == "GI":              # DT9b: ảnh nay có 4 sổ — H9 chỉ đo sổ GI
+            nhan.setdefault(_chu(r["vendor"]), set()).add(_chu(r["cach_tinh"]))
     thuong = sorted(v for v, s in nhan.items() if s == {"thường"})
     assert thuong == ["VD113", "VD336", "VD58", "VD61"], thuong
     assert len([v for v, s in nhan.items() if s - {"thường"}]) == 15
@@ -183,7 +184,7 @@ def test_H9_IX_VEN_doc_tu_KHO_phan_loai_19_vendor_4_thuong_5_nhan():
         chc.nap_ix_ven(c, str(GOC / "tests/fixture/cau_hinh/ix_ven.json"),
                        duong_cdt1=str(GOC / "tests/fixture/cau_hinh/cdt_correct.json"),
                        actor="bo-test-h9")
-        ven = chc.doc_ven(c)
+        ven = chc.doc_ven(c, so="GI")
     cdt = tuple(x for x in ven.cdt1 if not x.startswith("SHQ2"))
     assert len(ven.cdt1) == 7 and len(cdt) == 6                       # 7 CDT1 IX.VEN · 6 chia
     vs = sorted({d.vendor for d in ven.dong})
