@@ -1494,7 +1494,7 @@ và đó là **việc thật của `P6`** — ⛔ không phải thứ để dev 
 | Nguồn của ba nhãn | mảng `thieu[]` · `trung[]` · `lac[]` của cửa — màn **đọc**, ⛔ tự suy |
 | Bốn trạng thái | `đang tải` · `rỗng` · `lỗi` · `có dữ liệu` đi qua **`fls/web/tep/trang_thai.js`** — ⛔ tự vẽ khung riêng |
 | Màu | **chỉ** token `tokens.css` *(bài `test_khong_ma_mau_go_tay.py`)* — ⛔ mã hex gõ tay |
-| Hành động | ⛔ **không có nút nào** ở vùng này — `Step 18` loại trừ ký |
+| Hành động | `Step 18`: ⛔ nút. ⭐ Từ `Step 37 · F5` *(`WO-253`)*: **một** nút `Ký tháng` ở dòng sạch chưa ký *(⛔ `TRÙNG`, ⛔ `LẠC`)* — hộp xác nhận → `POST …/sign` *(thân rỗng; người ký từ thẻ)* → *"đã ký · người ký · ngày"* + nút khoá; lỗi `409` bằng chữ trong hộp. ⛔ huỷ ký · ⛔ phân quyền vai `O11` |
 
 #### ⓑ Vùng sau — ⬜ **CHƯA XÂY**, chỉ giữ chỗ
 

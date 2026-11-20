@@ -497,9 +497,13 @@ Tôi nói: *"hai cột **Nội dung ghi ở bank** và **Tên tài khoản** đi
 
 ---
 
-## §6b · `SCR-F08` Cấu hình — **⛔ CHƯA DỰNG** *(đăng ký 2026-11-18, `O9`)*
+## §6b · `SCR-F08` Cấu hình — ✅ **ĐÃ DỰNG** *(`F4` xem · `F5` ký, `WO-253`, 2026-11-19)*
 
-⛔ `man_f08.js` **chưa tồn tại** *(dựng ở ISP `Step 18 · F4`)* ⇒ tệp này **chưa có nút nào để thuyết minh** và `kiem_thuyet_minh` **⛔ đòi dòng nào** cho F08. Spec: `BA-06 §9` — vùng 1 bảng `IX.FX` **chỉ đọc**, ⛔ nút; nút **ký** *(`F5` · `F7`)* thêm vào đây **cùng lúc** nhãn nút vào `man_f08.js`.
+| Nút | Nghĩa | `US` |
+|---|---|:--:|
+| ✅ **Ký tháng** | Ở dòng tháng **sạch** *(có số, ⛔ `TRÙNG`, ⛔ `LẠC`)* chưa ký: mở **hộp xác nhận** nêu tháng + 5 tỷ giá sắp niêm phong; **xác nhận** ⇒ `POST /config/fx/{yyyymm}/sign` *(thân rỗng — người ký lấy **từ thẻ**)* ⇒ dòng hiện *"đã ký · người ký · ngày"*, nút **khoá**. **Huỷ** ở hộp ⇒ ⛔ gọi cửa. Ký lại *(người khác vừa ký)* ⇒ chữ lỗi tiếng Việt *"đã được ký rồi"* **trong hộp** | *(chưa có `US` — nợ `fls-ba`)* |
+
+⛔ Không có nút **huỷ ký** · ⛔ phân quyền theo vai *(`O11`)*. Nút ký **Daily Report 3** *(`F7`)* thêm vào đây cùng lúc nhãn vào `man_f08.js`. Spec: `BA-06 §9`.
 
 ---
 
