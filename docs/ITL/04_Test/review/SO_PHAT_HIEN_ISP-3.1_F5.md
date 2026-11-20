@@ -1,6 +1,6 @@
 # SỔ PHÁT HIỆN REVIEW — ISP 3.1 · phần `F5` *(tệp riêng, chờ gộp vào `SO_PHAT_HIEN_ISP-3.1.md`)*
 
-**Version:** v0.1 · **Ngày:** 2026-11-19 · **Chủ sở hữu:** `fls-test` *(R1 `KQ-255`)* · **Nguồn:** `IncrementalStepPlan-FLS-Voi_v3.1.2.md` Step 37 · F5 · `WO-253` · `BG-254`
+**Version:** v0.2 · **Ngày:** 2026-11-20 · **Chủ sở hữu:** `fls-test` *(R1 `KQ-255`)* · **Nguồn:** `IncrementalStepPlan-FLS-Voi_v3.1.2.md` Step 37 · F5 · `WO-253` · `BG-254`
 
 > Thang lớp *(A1 · A2 · B1 · B2)* và mức *(CHẶN · NÊN SỬA · GHI NHẬN)*: y như sổ chung. Sổ **chỉ THÊM**.
 > Mọi số R1 **tự đo** trên `isp/F5` @ `2366257`, cụm `5446`, Chromium thật *(Playwright)*, máy chủ thử + kho TEST; kịch bản ở scratchpad *(⛔ commit)*. Đột biến chạy trên **bản sao** `git archive`. Mẫu số in kèm nhãn *(Đ4)*.
@@ -16,6 +16,8 @@
 | `F5-R1-05` | F5 | R1 | B2 | GHI NHẬN | `handoff/anh_BG-254/f5_sau_ky.png` | **Ảnh bằng chứng không chứa điều nó chứng.** `BG-254` ghi ảnh *"sau"* hiện `202510` *đã ký*, nút xám. Ảnh 1100×800 chụp ở đầu trang: dòng `202510` nằm ngoài khung ⇒ **không thấy** dòng đã ký; ảnh *trước* và *sau* gần như cùng cảnh. *(Hệ quả của `F5-R1-01`.)* | Chụp phần tử dòng, hoặc cuộn dòng vào khung trước chụp. | — | MỞ |
 | `F5-R1-06` | F5 | R1 | B2 | GHI NHẬN | `goi_cua.js` *(lỗi mạng)* | Chặn mạng *(`abort`)* ⇒ hộp báo *"Không nối được tới máy chủ FLS. Kiểm tra máy chủ…"* ✔ nút mở lại ✔, nhưng kèm dòng kỹ thuật thô *"Failed to fetch"*. Ngoài `F5` *(có sẵn từ `goi_cua.js`)*. | Ẩn chi tiết thô hoặc dịch. | — | MỞ |
 | `F5-R1-07` | F5 | R1 | B1 | GHI NHẬN | `tests/web/test_isp_f08_ky_pg.py` | **Bài F5 không ép** *bấm kép*, `401`, lỗi mạng, `Esc` lúc đang ghi: `grep` `dblclick\|401\|abort\|focus` ⇒ **0** chỗ thật *(1 khớp là `thang_dau=202401`)*. Hành vi **đúng** khi tôi tự đo *(xem KQ)* nhưng ⛔ có bài ghim; tắt khoá hàng nút ở `hop_thoai.js` sẽ ⛔ bị bài F5 bắt. | Thêm bài: bấm kép xác nhận ⇒ đúng 1 POST; token hỏng ⇒ chữ + nút mở lại. | Hành động ghi phải có bài bấm-kép *(Đ5)*. | MỞ |
+| `F5-R2-01` | F5 | R2 | B2 | GHI NHẬN | `hop_thoai.js` *(cùng gốc `F5-R1-04`)* | **Sau `409`, tiêu điểm rơi về `BODY`** *(hộp còn mở, 2 nút bật)*: đo `activeElement` = `BODY` trên `isp/F5` @ `61fb607` **và** trên bản trước vòng sửa `2366257` ⇒ **có sẵn**, ⛔ do vòng sửa gây ra. Phím `Enter`/`Tab` trong hộp lúc ấy ⛔ nhận. ⛔ hại dữ liệu. | Gộp vào việc `F5-R1-04`: trả tiêu điểm vào hộp sau lỗi. | — | MỞ |
 
 ## Changelog
 - **v0.1** *(2026-11-19, `fls-test` R1 của `F5`, `KQ-255`)*: khởi tạo tệp riêng — **7** phát hiện `F5-R1-01…07` *(0 CHẶN · **2** NÊN SỬA · 5 GHI NHẬN; lớp A2 ×2 · B1 ×1 · B2 ×4)*.
+- **v0.2** *(2026-11-20, `fls-test` R2 cuối của `F5`, `KQ-256`)*: THÊM `F5-R2-01` *(GHI NHẬN, B2)*. **`F5-R1-01` · `-02` · `-05` ĐÓNG** — đo Chromium thật trên `isp/F5` @ `61fb607` *(xem `KQ-256`)*; `-03/04/06/07` vẫn MỞ ở backlog. Sổ **chỉ THÊM** — cột *Trạng thái* của hàng R1 ⛔ sửa, đóng ghi ở đây. Tổng sổ: **8** phát hiện *(0 CHẶN · 2 NÊN SỬA đã đóng · 6 GHI NHẬN mở)*.
