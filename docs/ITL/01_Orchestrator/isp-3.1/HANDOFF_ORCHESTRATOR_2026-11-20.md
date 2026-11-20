@@ -23,10 +23,10 @@ Trả lời chủ bằng tiếng Việt; mọi câu hỏi kèm khuyến nghị.
 
 | | |
 |---|---|
-| **Tiến độ** | **36/48 Step ISP đã gộp** (34 lúc nhận + **H7** · **F5** hôm nay). Chỉ đếm Step ISP |
+| **Tiến độ** | **37/48 Step ISP đã gộp** (34 lúc nhận + **H7** · **F5** · **C13** hôm nay). Chỉ đếm Step ISP |
 | **Nhánh làm việc** | `claude/bold-galileo-zukpaf` — giữ nguyên (tài khoản mới ⛔ đổi nhánh) |
-| **Sàn bài** | `MONG_PYTEST_TOAN_BO=4267` · `MONG_PYTEST_WEB=681` · tập đỏ nền **28** · web **3** |
-| **Đường nền gần nhất** | sau gộp F5: `KẾT: ĐẠT` — 28 = 28 · chạy 4267 · web 3 = 3 · 681 |
+| **Sàn bài** | `MONG_PYTEST_TOAN_BO=4278` · `MONG_PYTEST_WEB=681` · tập đỏ nền **28** · web **3** |
+| **Đường nền gần nhất** | sau gộp C13: `KẾT: ĐẠT` — 28 = 28 · chạy 4278 · web 3 = 3 · 681 |
 | **Số phiếu trống kế tiếp** | **273** |
 | **Chi phí hôm nay (phiên con, Sonnet 5.5 medium)** | sửa H7 ≈ 1,65 · sửa F5 ≈ 0,93 · dev C13 ≈ 1,11 · DT7 lần 1 ≈ 0,34 USD; các phiên sau xem `get_session(<id>).external_metadata.usage.cost_usd` |
 
@@ -119,6 +119,22 @@ Errata thêm cho v3.1.3: ㉛ Step 38 (DT12): sổ ADJUSTED có **26 kỳ** theo 
 
 ---
 
-## Trạng thái cuối *(lượt kiểm cuối điền)*
+## Trạng thái cuối *(lượt kiểm cuối 04:09–04:45 UTC 20/11)*
 
-*(chưa điền — lượt kiểm cuối hẹn 04:09 UTC)*
+**Mọi phiên con đã DỪNG** (DT7 · R2 C13 · R1 DT12 xong; ⛔ phiên nào đang chạy). Orchestrator **⛔ còn hẹn giờ** nào; ⛔ giao phiên mới.
+
+**Đã gộp ở lượt cuối:** **C13** (Step 36 · IX.TMP bản báo cáo ký có phiên bản) — commit gộp `0543792`, R2 cuối `KQ-260` ĐẠT 0 · 0 · 3 GHI NHẬN (`C13-R2-01…03`; khứ hồi checksum 17/17 mẫu; đột biến khoá `M7`/`M12` cắn 5/5, `M8` 3/3). `07_API_CONTRACT` **v3.26** — §4i 2 dòng `…/report/snapshot/{ky}` ⬜ → ✅. Sàn **4267 → 4278** (web 681). `--duong-nen --cong 5433`: `KẾT: ĐẠT` — tập đỏ 28 = 28 (12 failed · 4250 passed · 2 xfailed · 14 errors; thêm 0 · bớt 0) · chạy 4278 · web 3 = 3 · 681. `lint-imports` 11 kept · `soi_bang_tuyen` **48/48** · `quet_pii_repo` 0. ⇒ **37/48 Step ISP đã gộp.**
+
+**Nhánh treo — việc kế khi quay lại:**
+
+| Bước | Ngọn `…-isp/<ID>` | Kết cục | Việc kế |
+|---|---|---|---|
+| **DT7** · Step 31 · đáp án PLA (PD 414–419) | `DT7` @ `4aec25f` | dev XONG (`BG-262`; ≈ 3,66 USD cả phiên). **6 ảnh** (Daily + Y/H/Q/M tách, như `cfa1_daily`/`cfa1_yhqm`); tự kiểm PM+HR theo vị trí ô: Daily **4** ô lệch AS-IS (khối GROUP) · Y/H/Q/M **0** · KPI **716** ô lệch (đếm RIÊNG); tab 417 chỉ có khối GROUP ⇒ 46.398 ô `khong_so_duoc`. ⚠ **NGUỒN KHÁC PHIẾU:** 6 tab nằm ở **`[COPY] Report I General Ledger \| P&L Report`** `19NNTb…` — sổ CF (cả bản gốc `1ITAIu…` chủ vừa share, 18 tab, lẫn bản `[COPY]` `12S00T…`) có **0** tab PLA. Danh mục `pdnow_buoc.json` ghi "CF report" là **sai** (orchestrator đã chuyển lời danh mục cho chủ — chủ share sổ CF gốc là ⛔ cần) | **❓ chủ xác nhận** dùng sổ P&L `[COPY]` (khuyến nghị: ĐỒNG Ý — cùng sổ DT11 đã dùng; mỗi tab 1 ứng viên) ⇒ R1 `KQ-263` (mẫu `r1.md`) ⇒ R2 `KQ-264` ⇒ gộp ⇒ **mở H8** (Opus) |
+| **DT12** · Step 38 · ảnh Manual input ITL Ledge | `DT12` @ `5f72ce0` | R1 `KQ-267`: 0 CHẶN · **1 NÊN SỬA** · 5 GHI NHẬN. **`DT12-R1-01`**: 25/25 ảnh mới **khác hình** ảnh 2026-03 (bọc ô `{"chu": …}`, thiếu khoá `ky` · `dong_du_lieu_bat_dau`, `dong_sheet` là chuỗi) ⇒ qua `_nap` của `do_voi_so_luong.py` H15 sẽ nhận rác IM LẶNG; bài AC-5 chỉ `json.loads` nên xanh. GHI NHẬN: 26 kỳ đúng (ISP "22" lỗi thời; 3 kỳ 2024 là 15 hàng ĐẦU sổ `ITL#1…#15`, ⛔ "lạc") · sổ sống trôi sau lúc đọc (2026-11 +22 hàng) · tổng ảnh 19,9 MB (0 ảnh > 2 MB; gzip ⇒ 0,57 MB) · ảnh 2026-03 cũ lệch sổ hiện tại 6.294/16.184 ô | **phiên sửa** (mẫu `sua.md`): khuyến nghị phương án **(a)** — chuẩn hoá ảnh mới về hình 2026-03 + bài đo `_chuan`/`ky` trên ≥ 1 ảnh mới ⇒ R2 cuối `KQ-268` ⇒ gộp |
+| **DT11** · Step 41 · đáp án Daily Report 2 · 3 | `DT11` @ `6ed1a29` | dev XONG (`BG-270`), **chưa R1** (dừng theo lệnh chủ) | R1 `KQ-271` (mẫu `r1.md`) ⇒ R2 `KQ-272` |
+
+**Câu hỏi mới cho chủ:** (1) **DT7 — dùng sổ `[COPY] … P&L Report` `19NNTb…` làm nguồn 6 tab PLA?** (khuyến nghị ĐỒNG Ý). (2) Staging: chờ BÁO CÁO bước 01.
+
+**Errata v3.1.3 (sửa ㉜):** ㉜ Step 31 (DT7) + danh mục `pdnow_buoc.json` bước 414–419: 6 tab PLA ở sổ **P&L Report**, ⛔ CF report.
+
+**Số phiếu trống kế tiếp: 273.** Bước sẵn sàng sau khi gỡ nhánh treo: **F7** (C13 ✅ + F5 ✅ ⇒ **sẵn sàng ngay**) · H8 (sau DT7) · H15 (sau DT12) · KPI (cần `fls-ba` viết spec). Chi phí lượt cuối: xem `get_session(<id>).external_metadata.usage.cost_usd` của 3 phiên.
