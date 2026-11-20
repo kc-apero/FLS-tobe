@@ -106,7 +106,8 @@ def dat_san(id_: str, n: int, web: int) -> tuple[int, int]:
     b = thay_mot(b, r'(MONG_PYTEST_TOAN_BO=\(\\d\+\)\$", van, re\.M\) == \[")\d+("\])', rf"\g<1>{n}\g<2>", "ghim TOAN_BO")
     b = thay_mot(b, r'(MONG_PYTEST_WEB=\(\\d\+\)\$", van, re\.M\) == \[")\d+("\])', rf"\g<1>{web}\g<2>", "ghim WEB")
     them = f" · + `isp/{id_}` ⇒ **{n}**" + (f" (web {cu_web} ⇒ **{web}**)" if web != cu_web else "") + "."
-    b = thay_mot(b, rf"(⇒ \*\*{cu}\*\*(?: \([^)\n]*\))?)\.$", rf"\g<1>{them}", "chú thích chuỗi gộp")
+    if n != cu or web != cu_web:   # sàn không đổi ⇒ nhánh bước đã tự ghi chuỗi gộp (bia: gộp H7 20/11 ghi lặp)
+        b = thay_mot(b, rf"(⇒ \*\*{cu}\*\*(?: \([^)\n]*\))?)\.$", rf"\g<1>{them}", "chú thích chuỗi gộp")
     SCRIPT.write_text(s, encoding="utf-8")   # ghi CẢ HAI chỉ khi mọi mẫu đã khớp đúng 1 lần
     BAI_GHIM.write_text(b, encoding="utf-8")
     return cu, cu_web

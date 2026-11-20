@@ -1,9 +1,10 @@
-"""`do_hd2.py --goi WP-C2 | WP-C3a | WP-C3b | WP-C4a | WP-C4b | WP-C4c` — PARITY HD2: CA.GL ↔ 406 *(H4)* · SO.CFA1 Daily ↔ 409 *(H5)* · Y/H/Q/M ↔ 410 *(H6)*.
+"""`do_hd2.py --goi WP-C2 | WP-C3a | WP-C3b | WP-C3c | WP-C4a | WP-C4b | WP-C4c` — PARITY HD2: CA.GL ↔ 406 *(H4)* · SO.CFA1 Daily ↔ 409 *(H5)* · Y/H/Q/M ↔ 410 *(H6)*.
 
     python tools/do_hd2.py --goi WP-C2            # chạy cổng, in báo, exit 0/1
     python tools/do_hd2.py --goi WP-C2 --ghi      # … + ghi docs/ITL/_tools/hd2_cong.json
     python tools/do_hd2.py --goi WP-C3a [--ghi]   # H5 · SO.CFA1 Daily ↔ 409 (khối WP-C3a — xem dưới)
     python tools/do_hd2.py --goi WP-C3b [--ghi]   # H6 · Y/H/Q/M ↔ 410; IX.PER đọc TỪ KHO (PG_DSN)
+    python tools/do_hd2.py --goi WP-C3c [--dsn …] [--ghi]   # H7 · GL HR ↔ 408 + CFA3 (tools/do_hd2_c3c.py); IX.ORG TỪ KHO
 
 ⭐ **Vì sao có tệp này** *(AP v3.1.2 §3.5.4 WP-C2 · HD2; WO-132)*. H4 là cổng HD2 ĐẦU TIÊN: chạy
 engine `fls.bao_cao.gl.tinh_gl` *(H1)* trên **dòng sổ THẬT** *(tiền nguyên tệ `E`/`F` đọc từ sheet
@@ -65,7 +66,7 @@ from fls.cau_hinh.ky import LichKy  # noqa: E402
 from fls.canon.tien_te import ma_tien_te  # noqa: E402
 from fls.oracle.cong_parity import PhanXu, danh_gia  # noqa: E402
 
-GOI_BIET = ("WP-C2", "WP-C3a", "WP-C3b", "WP-C4a", "WP-C4b", "WP-C4c")
+GOI_BIET = ("WP-C2", "WP-C3a", "WP-C3b", "WP-C3c", "WP-C4a", "WP-C4b", "WP-C4c")
 COT_BMBT = ("BM", "BN", "BO", "BP", "BQ", "BR", "BS", "BT")
 #: ô kết quả → thuộc tính `KetQuaDongGL`.
 ATTR = {"BM": "vnd_ton_all", "BN": "musd_ton_all", "BO": "bvnd_no", "BP": "bvnd_co",
@@ -1835,6 +1836,13 @@ def main(argv: list[str] | None = None) -> int:
         if a.ghi:
             _ghi_cong("WP-C4a", tq4.hd2_cong)
         return 0 if tq4.phan_xu.dat else 1
+    if a.goi == "WP-C3c":
+        from tools import do_hd2_c3c            # H7 — tệp riêng; nhập muộn (tệp ấy nhập tệp này)
+        tq3c = do_hd2_c3c.chay_wp_c3c(a.dsn)
+        do_hd2_c3c.in_bao(tq3c)
+        if a.ghi:
+            _ghi_cong("WP-C3c", tq3c.hd2_cong)
+        return 0 if tq3c.phan_xu.dat else 1
     if a.goi == "WP-C3b":
         tq3b = chay_wp_c3b()
         _in_bao_c3b(tq3b)
