@@ -85,3 +85,24 @@ WP-C3c **ĐẠT**: **835/888** ô khớp đáp án thật + **53** lệch có ch
 - Hạt tháng của CFA3 *(ở trên)*. 20 mã KPI vẫn chưa có engine *(cùng giới hạn H5)*.
 - `MongC3c` khai số ô theo kỳ, chưa khai từng ô ⇒ nếu ô lệch **đổi chỗ trong cùng kỳ** mà số ô không đổi thì cổng vẫn xanh.
   Ô lệch và số liệu chi tiết vẫn tái tạo được bằng `in_bao`.
+
+## Vòng sửa sau R1 (KQ-247)
+*(orchestrator ISP 3.1.2 · 2026-11-20 · gộp nhánh làm việc vào `isp/H7` — xung đột `MONG_PYTEST_TOAN_BO`/`hd2_cong.json`/`do_hd2.py`/bài gates giải: sàn = thu thập thật, giữ CẢ HAI khối C3c + C4c)*
+
+**`H7-R1-01`** — `mong.o_lech` *(`tools/do_hd2_c3c_lech.py`)* khai **từng ô lệch** `phan|kỳ|ô → (engine, đáp án)`, 53 ô *(GL 20 · CFA3 33)*, dung sai `ATOL_LECH` = 1e-9 khai ở khối (`dung_sai_lech`). Ô mong lệch mà nay khớp ⇒ ĐỎ; ô lệch mà ⛔ khai ⇒ `lech_ngoai_ten`.
+Đột biến R1 trên bản sao `git archive` *(trước = `HEAD` trước sửa · sau = cây sửa)*:
+
+| Đột biến | Trước | Sau |
+|---|---|---|
+| B1 +1e9 VND dòng PIT kỳ 10 | ĐẠT | **ĐỎ** `ô lệch cfa3\|202510\|PIT` |
+| B4 đáp án PIT kỳ 04 `BA` +0,5 | ĐẠT | **ĐỎ** `ô lệch gl\|202504\|PIT…` |
+| B5 đáp án GAH kỳ 10 `BB` ×2 | ĐẠT | **ĐỎ** `ô lệch gl\|202510\|GAH…` |
+
+⇒ **3/3 nay chết** *(trước 0/3)*.
+
+**`H7-R1-02`** — nhãn Đ4 *(khối `WP-C3c` + `/gates` `da_do`)*: `tong_o` **888** = `o_co_so` **269** + `o_0_0` **619**; `khop` **835** = `khop_co_so` **216** + `o_0_0` 619 *(hợp đồng CG2: `khop + lech_co_chu_dich = tong_o`; ⛔ cộng lệch vào `khop`)*; `lech_co_chu_dich` **53**; khớp thật **216/269**. `/gates` in `835/888 ô đáp án khớp [khớp thật 216/269 ô có số · 619 ô 0 = 0] + 53 lệch có chủ đích`; nhãn thiếu/mâu thuẫn/sai kiểu ⇒ `null` có tên.
+**Cổng nhóm `(kỳ,D,E,F,V)`**: nhóm CÙNG số dòng hai bên ⇒ Σ `BA`/`BB`. `mong` hai chiều: ghép **4.323** nhóm = **7.952** dòng · lệch **0** *(max 3,79e-17, `atol` 1e-15)* · dòng vào engine ⛔ ghép **1.691** · dòng 408 ⛔ ghép **1.189** *(+ 269 dòng kỳ 2026-01 ở `chua_co_dau_vao` = 1.458 của R1)*. Đột biến một dòng *(+0,01 / −0,01 vào hai dòng 408 cùng ô, khác nhóm — Σ ô ⛔ đổi, cổng ô mù)*: trước ĐẠT · sau **ĐỎ** `nhom.lech 2 ≠ mong 0`. Khối sinh lại bằng `do_hd2.py --goi WP-C3c --ghi` *(⛔ sửa tay)*.
+
+**Ghi nhận ⇒ backlog** *(⛔ làm)*: `H7-R1-03` *(nguyên nhân kỳ 04: nguồn hơn 235.336.036 VND PIT, "chia lại" ⛔ chứng minh)* · `H7-R1-04` · `H7-R1-05` *(phép đổi ngày chép)*. **`DT6C-R1-01`**: `quet_pii_repo.py` sau gộp = **0** chỗ · 0 tệp.
+
+**Cổng**: pytest 3 tệp liên quan 102 xanh · `--duong-nen --cong 5435` ĐẠT — tập đỏ 28 = 28 *(thêm 0 · bớt 0)* · chạy **4.261** *(sàn cũ 4.219 nhánh làm việc / 4.111 H7 → mới 4.261; thu thập cây gộp 4.246 + 15 bài vòng sửa)* · web 3 = 3 *(675)* · `lint-imports` 11/0 · `soi_bang_tuyen` 46/46 · `kiem_tai_lieu` ĐẠT.
