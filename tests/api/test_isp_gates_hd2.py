@@ -40,7 +40,7 @@ V = cua.bang_tuyen.TIEN_TO
 # Gộp H11 (19/11, `WO-233`; sửa `KQ-236` H11-R1-02): + WP-C4c (`khop` 19.591 = ô khớp THẬT · `tong_o` 19.894 = ô so ·
 #   303 lệch nguồn CÓ TÊN (52 OMC + 251 SC) ở `lech_co_chu_dich` · 8.611 ô đáp án RỖNG đếm ở `o_trong_dap_an`;
 #   ô ⛔ so được P chữ ngoài mẫu số).
-# 4 cha khai sẵn + 5 con có trong tệp = 9 cổng. WP-C4 (cha, 3 con = C4a + C4b + C4c) ⇒ true; WP-C5 chưa ai đo ⇒ `null`.
+# 4 cha khai sẵn + 6 con có trong tệp = 10 cổng. WP-C4 (cha, 3 con = C4a + C4b + C4c) ⇒ true; WP-C5 chưa ai đo ⇒ `null`.
 MONG_THAT = {
     "HD2_WP_C2": True, "HD2_WP_C3": True, "HD2_WP_C3A": True, "HD2_WP_C3B": True, "HD2_WP_C3C": True,
     "HD2_WP_C4": True, "HD2_WP_C4A": True, "HD2_WP_C4B": True, "HD2_WP_C4C": True, "HD2_WP_C5": None,
@@ -142,7 +142,7 @@ def test_CG2_R2_03_cong_tuyen_THAT_moi_goi_con_trong_tep_deu_hien_va_khong_null(
     con = sorted(k for k in d if re.fullmatch(r"WP-C\d+[a-z]+", k))
     mong = {"HD2_WP_C2", "HD2_WP_C3", "HD2_WP_C4", "HD2_WP_C5", *(bc._ma_hd2(k) for k in con)}
     h = _hd2(_gates(TEP_HD2_THAT))
-    assert set(h) == mong and len(h) == 9, sorted(h)
+    assert set(h) == mong and len(h) == 10, sorted(h)      # 4 cha + 6 con (C3a·b·c · C4a·b·c)
     assert sorted(m for m, c in h.items() if c["dat"] is None) == ["HD2_WP_C5"]
 
 
@@ -321,12 +321,12 @@ def test_AC5_gates_cu_chi_THEM_phan_tu_va_3_con_so_tom_dem_dung():
     assert "FINAL" in cu and "KHO_SACH" in cu and "HD1_THANG" in cu
     assert [c["ma"] for c in b["cong"] if not c["ma"].startswith("HD2_")] == cu
     assert {c["ma"] for c in b["cong"]} >= set(cu) | set(MONG_THAT)
-    # `None` ⇒ 4 cổng HD2 null; tệp thật ⇒ 8 true + 1 null (C5): chua_do_duoc GIẢM đúng 3 (4 cha null → 1 null C5)
+    # `None` ⇒ 4 cổng HD2 null; tệp thật ⇒ 9 true + 1 null (C5): chua_do_duoc GIẢM đúng 3 (4 cha null → 1 null C5)
     for d in (a, b):
         dat = [c["dat"] for c in d["cong"]]
         assert (d["dat"], d["khong_dat"], d["chua_do_duoc"]) == (
             dat.count(True), dat.count(False), sum(1 for x in dat if x is None))
-    assert b["dat"] - a["dat"] == 8 and b["chua_do_duoc"] - a["chua_do_duoc"] == -3
+    assert b["dat"] - a["dat"] == 9 and b["chua_do_duoc"] - a["chua_do_duoc"] == -3
 
 
 def test_chay_cua_MAC_DINH_tro_DUNG_tep_hd2_that():
@@ -349,7 +349,7 @@ def test_CG2_R1_01_tep_THAT_khong_co_khoa_lat_bo_mau_so_khong_rong():
     """Đ3: tập ⛔ rỗng — ba gói đo, và CẢ BA vắng khoá ⇒ ca 'vắng' là ca THẬT."""
     d = _that()
     khoi = [d, d["WP-C3a"], d["WP-C3b"], d["WP-C3c"], d["WP-C4a"], d["WP-C4b"], d["WP-C4c"]]
-    assert len(khoi) == 6 and all("lat_bo" not in b for b in khoi)
+    assert len(khoi) == 7 and all("lat_bo" not in b for b in khoi)
 
 
 def test_CG2_R1_01_vang_thi_true_nhung_da_do_noi_thang_va_nguon_vang():
@@ -523,3 +523,30 @@ def test_ITE_R1_01_qua_tuyen_THAT_gates_co_truong_lech_co_chu_dich_THEM_vao_hop_
     assert all({"ma", "ten", "dat", "nhan", "da_do", "ly_do", "lat_bo_nguon"} <= set(c) for c in h.values())
     assert "35 lệch có chủ đích" in h["HD2_WP_C3A"]["da_do"] and "130 lệch có chủ đích" in h["HD2_WP_C3"]["da_do"]
     assert all(type(c["lech_co_chu_dich"]) is int for c in h.values())
+
+
+# ══ H7-R1-02 (`KQ-247`, Đ4) · nhãn "835/888" tách ô CÓ SỐ khỏi ô 0 = 0 ═══════════════════════════
+# Lỗi đã xảy ra: `835/888 ô khớp` đếm cả **619** ô `0 = 0` ⇒ đầu đề nghe "94 % khớp" trong khi khớp thật
+# **216/269** ô có số. Ba khoá THÊM `o_co_so`/`khop_co_so`/`o_0_0`; `khop` GIỮ nghĩa hợp đồng CG2 (`khop + lech =
+# tong_o`) = `khop_co_so + o_0_0`. Có khoá mà mâu thuẫn / thiếu / sai kiểu ⇒ `null` có tên (Đ5).
+def test_H7_R1_02_tep_THAT_C3c_tach_nhan_o_co_so_khoi_o_0_0():
+    d = _that()["WP-C3c"]
+    assert (d["tong_o"], d["o_co_so"], d["khop_co_so"], d["o_0_0"], d["lech_co_chu_dich"]) == (888, 269, 216, 619, 53)
+    assert d["khop"] == d["khop_co_so"] + d["o_0_0"] == 835 and d["o_co_so"] + d["o_0_0"] == d["tong_o"]
+    assert d["khop_co_so"] + d["lech_co_chu_dich"] == d["o_co_so"]            # 216 + 53 = 269
+    x = {c.ma: c for c in bc.doc_cong_hd2(TEP_HD2_THAT)}
+    assert "835/888 ô đáp án khớp [khớp thật 216/269 ô có số · 619 ô 0 = 0] + 53 lệch có chủ đích" in x["HD2_WP_C3C"].da_do
+    assert x["HD2_WP_C3C"].dat is True and "khớp thật" not in x["HD2_WP_C3A"].da_do      # gói cũ: câu cũ
+
+
+@pytest.mark.parametrize("pha", [
+    lambda b: b.__setitem__("o_0_0", 618),                       # 216 + 618 ≠ 835
+    lambda b: b.__setitem__("o_co_so", 270),                     # 270 + 619 ≠ 888
+    lambda b: b.pop("khop_co_so"),                               # thiếu một trong ba
+    lambda b: b.__setitem__("o_0_0", "619"),                     # sai kiểu
+    lambda b: b.__setitem__("khop_co_so", -1),
+])
+def test_H7_R1_02_nhan_mau_thuan_thieu_sai_kieu_thi_NULL_co_ten(tmp_path, pha):
+    x = _c3a(tmp_path, lambda d: pha(d["WP-C3c"]))
+    assert x["HD2_WP_C3C"].dat is None and ("nhãn ô" in x["HD2_WP_C3C"].ly_do or "o_co_so" in x["HD2_WP_C3C"].ly_do), x["HD2_WP_C3C"]
+    assert x["HD2_WP_C3"].dat is None                                            # cha: con null ⇒ null

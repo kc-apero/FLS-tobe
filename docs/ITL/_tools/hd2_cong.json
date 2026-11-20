@@ -864,5 +864,103 @@
   },
   "dat": true,
   "ly_do": []
+ },
+ "WP-C3c": {
+  "bang": "HD2.WP-C3c",
+  "goi": "WP-C3c",
+  "mo_ta": "CA.GL dòng HR (hr_ledger_2025 → hd_final_hr + cdt1_hr/cdt_cua → tinh_gl) ↔ 408 Σ BA/BB theo (kỳ, nhãn V) + SO.CFA3 (cfa1_daily, trục KỲ tháng, GROUP) ↔ cfa3 Σ ô ngày theo tháng",
+  "nguon_dau_vao": "tests/fixture/dau_vao/hr_ledger_2025.json (DT6c — file H1000 Ledger, thượng nguồn)",
+  "dap_an": {
+   "gl": "tests/fixture/dap_an/gl_hr_408.json (PD 408 — đáp án chính, ⛔ 407/413: xem docstring)",
+   "cfa3": "tests/fixture/dap_an/cfa3.json (MID I Report I CFA3 Daily — đọc sheet 407)"
+  },
+  "khoa": {
+   "gl": "ky(12) × nhan_V(10) × {BA, BB}",
+   "cfa3": "ky(12) × ma_hd(54 ⛔ KPI) — hạt THÁNG (Đ4)"
+  },
+  "dung_sai": {
+   "atol": "1E-15",
+   "rtol": "0",
+   "ghi_chu": "đo 19/11 trên ô khớp: GL 3,35e-17 · CFA3 9,34e-17 ⇒ ≥ ×10"
+  },
+  "dong_vao": 10105,
+  "dong_so": 9643,
+  "tong_o": 888,
+  "mong_tong_o": 888,
+  "o_co_so": 269,
+  "khop_co_so": 216,
+  "o_0_0": 619,
+  "khop": 835,
+  "lech_co_chu_dich": 53,
+  "mong_lech_co_chu_dich": 53,
+  "khop_ghi_chu": "tong_o = o_co_so (ô engine ≠ 0 hoặc đáp án ≠ 0) + o_0_0 (engine = 0 = đáp án); khop = khop_co_so + o_0_0 (hợp đồng CG2: khop + lech_co_chu_dich = tong_o) — khớp THẬT = khop_co_so/o_co_so; lech_co_chu_dich = ô lệch ĐÚNG khoá ô + giá trị đã khai ở mong (dung_sai_lech) — dat khi lech_co_chu_dich = mong, lech_ngoai_ten = 0, nhom.lech = 0",
+  "dung_sai_lech": {
+   "atol": "1E-9",
+   "rtol": "0",
+   "ghi_chu": "ô lệch có tên khai (engine, đáp án) từng ô ở mong.o_lech; sai > atol ⇒ ĐỎ"
+  },
+  "nhom": {
+   "khoa": "(ky, D, E, F, V) — nhóm CÙNG số dòng ở engine & 408; so Σ BA/BB",
+   "dung_sai": {
+    "atol": "1E-15",
+    "rtol": "0"
+   },
+   "ghep": 4323,
+   "dong_ghep": 7952,
+   "lech": 0,
+   "max_lech": "3.786E-17",
+   "dong_vao_khong_ghep": 1691,
+   "dong_408_khong_ghep": 1189
+  },
+  "lech_ngoai_ten": 0,
+  "gl": {
+   "o_so": 240,
+   "o_so_dap_an_khac_0": 93,
+   "lech_theo_ky": {
+    "202502": 2,
+    "202504": 2,
+    "202506": 1,
+    "202508": 1,
+    "202509": 1,
+    "202510": 7,
+    "202512": 6
+   }
+  },
+  "cfa3": {
+   "o_so": 648,
+   "o_so_dap_an_khac_0": 170,
+   "o_kpi_loai": 240,
+   "lech_theo_ky": {
+    "202502": 4,
+    "202504": 3,
+    "202510": 13,
+    "202512": 13
+   }
+  },
+  "lech_co_ten": {
+   "thieu_tien_te_D": 462,
+   "hd_mac_dinh_oga": 20,
+   "cdt_la": {
+    "COR_Terasofts": 592,
+    "(rỗng)": 59,
+    "INT | Insurance Total": 4,
+    "NIS | Net Income Staff": 3,
+    "COM | COM Total": 1
+   },
+   "ky_suy": {
+    "so_hang": 2302,
+    "tong_F": "6763528503",
+    "ba_bb_rong": 2302
+   },
+   "chua_co_dau_vao": {
+    "gl_hang": {
+     "202601": 269
+    },
+    "cfa3_o_thang_khac_0": 17,
+    "cfa3_o_loi": 5
+   }
+  },
+  "dat": true,
+  "ly_do": []
  }
 }

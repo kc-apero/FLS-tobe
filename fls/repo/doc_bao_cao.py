@@ -1155,8 +1155,19 @@ def _goi_la(goi: str, b: dict, ten: str) -> Cong:
     lech, mong_lech = sl["lech_co_chu_dich"], sl["mong_lech_co_chu_dich"]
     if o == 0 and co_dem:
         return chua("0 ô được so ⇒ ⛔ đo được gì (Đ3: 0/0 ⛔ phải 100 %)")
+    # ⭐ H7-R1-02 (KQ-247, Đ4): ba khoá THÊM tách ô CÓ SỐ khỏi ô `0 = 0` — vắng cả ba ⇒ như cũ; có thì phải
+    #   số nguyên ≥ 0 và `khop_co_so + o_0_0 = khop` · `o_co_so + o_0_0 = tong_o` ⇒ lệch ⇒ `null` có tên.
+    tach = {k: b.get(k) for k in ("o_co_so", "khop_co_so", "o_0_0") if k in b}
+    ct = ""
+    if tach:
+        if len(tach) != 3 or any(type(v) is not int or v < 0 for v in tach.values()):
+            return chua(f"`o_co_so`/`khop_co_so`/`o_0_0` phải khai CẢ BA, số đếm ô ≥ 0: {tach!r}")
+        if co_dem and (tach["khop_co_so"] + tach["o_0_0"] != khop or tach["o_co_so"] + tach["o_0_0"] != o):
+            return chua(f"nhãn ô tự mâu thuẫn: khớp có số {tach['khop_co_so']} + 0=0 {tach['o_0_0']} ≠ khớp {khop} "
+                        f"· có số {tach['o_co_so']} + 0=0 ≠ ô so {o}")
+        ct = (f" [khớp thật {tach['khop_co_so']}/{tach['o_co_so']} ô có số · {tach['o_0_0']} ô 0 = 0]")
     ly = [str(x) for x in (b.get("ly_do") or []) if isinstance(x, str)]
-    cum_lech = f" + {lech} lệch có chủ đích" if lech else ""          # Đ4: nói thẳng ở chỗ in
+    cum_lech = f"{ct} + {lech} lệch có chủ đích" if lech else ct          # Đ4: nói thẳng ở chỗ in
     vang = f" · {_LOI_LAT_VANG}" if nguon == "vang" else ""
     if lat > 0:
         ly.insert(0, f"{lat} lát bị bỏ ⇒ có lỗ trong phép đo, ⛔ kết luận cho CẢ SỐ")

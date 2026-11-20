@@ -30,6 +30,15 @@ CFA3 nào: đo 0 lệch ngoài lớp)*; 413 ⊃ 408 + 1.375 hàng 2024/2025-01·
   · `thieu_tien_te_D` *(dòng ĐẦU VÀO thiếu D ⇒ AS-IS AX rỗng ⇒ BA 0)* · `hd_mac_dinh_oga` *(I ⛔ khớp `code_hr` ⇒
     `OGA | GAC - Other`)* · `cdt_la` *(theo giá trị nguồn — `COR_Terasofts` khác hoa thường `COR_TeraSofts`)*.
 ⛔ Mọi ô lệch NGOÀI lớp trên ⇒ ĐỎ. Mẫu số 0 ⇒ ĐỎ *(Đ3)*.
+
+── VÒNG SỬA SAU R1 `KQ-247` ─────────────────────────────────────────────────────────────────────────────────────
+  · `H7-R1-01`: `mong.o_lech` khai **từng ô lệch** — khoá `phan|ky|ô` → (engine, đáp án) ⇒ đổi GIÁ TRỊ một ô đã lệch
+    ĐỎ *(`ATOL_LECH` 1e-9: engine Decimal tất định, đáp án đọc chuỗi ⇒ ⛔ nhiễu số thực; đột biến R1 B1/B4/B5 ≥ 0,5)*.
+    Ô mong lệch mà nay KHỚP cũng ĐỎ *(chiều ngược)*.
+  · `H7-R1-02` *(Đ4 — nhãn từng số)*: `tong_o` 888 = **`o_co_so` 269** *(ô mà engine ≠ 0 hoặc đáp án ≠ 0)* + **`o_0_0` 619**
+    *(engine = 0 = đáp án)*; `khop` 835 = `khop_co_so` 216 + `o_0_0` 619 *(hợp đồng CG2: `khop` + `lech_co_chu_dich` =
+    `tong_o`)*. Khớp THẬT = **216/269**. + cổng MỨC NHÓM `(kỳ, D, E, F, V)` — khối `nhom`: nhóm có CÙNG số dòng ở hai
+    bên ⇒ Σ `BA`/`BB` engine ↔ Σ 408; `mong` khai nhóm·dòng ghép **và** dòng ⛔ ghép, lệch = 0 ⇒ khác ⇒ ĐỎ cả hai chiều.
 """
 from __future__ import annotations
 
@@ -47,6 +56,7 @@ from fls.cau_hinh import to_chuc
 from fls.cau_hinh.hd import CayHD
 from fls.oracle.cong_parity import PhanXu
 from tools.do_hd2 import GOC, MA_KPI, _chu, _so, nap_anh, nap_cay, nap_fx
+from tools.do_hd2_c3c_lech import LECH_O_MONG
 
 ANH_VAO = GOC / "tests" / "fixture" / "dau_vao" / "hr_ledger_2025.json"
 ANH_GL = GOC / "tests" / "fixture" / "dap_an" / "gl_hr_408.json"
@@ -58,6 +68,10 @@ COT_GL = ("BA", "BB")
 #: Dung sai *(rtol 0)* — đo 19/11 trên ô KHỚP, ⛔ áp dung sai: GL max|lệch| 3,35e-17 · CFA3 9,34e-17 *(|exp| ≤ 0,4)*
 #: ⇒ `atol 1e-15` *(≥ ×10)*. Chứng ĐỎ: +1e-12 một ô `BA` đáp án ⇒ đúng ô ấy ĐỎ *(bài `…mot_o_dap_an…`)*.
 ATOL = Decimal("1e-15")
+#: Dung sai ô LỆCH CÓ TÊN *(H7-R1-01)* — ⛔ nới ATOL: ghim giá trị đã đo, sai ≥ 1e-9 mUSD ⇒ ĐỎ.
+ATOL_LECH = Decimal("1e-9")
+#: Dung sai Σ nhóm `(kỳ,D,E,F,V)` *(H7-R1-02)* — đo: max|Σeng − Σ408| ở nhóm ghép 3,79e-17 ⇒ atol 1e-15 ≥ ×10.
+ATOL_NHOM = Decimal("1e-15")
 _EPOCH = datetime.date(1899, 12, 30)
 
 
@@ -85,6 +99,18 @@ class MongC3c:
     gl_chua_vao: Mapping[str, int] = field(default_factory=lambda: {"202601": 269})
     cfa3_chua_vao_khac_0: int = 17      # ô THÁNG ngoài kỳ so mà Σ đáp án ≠ 0 — kể cả mã KPI (12 mã thường + 5 KPI, đều 2026-01)
     cfa3_o_loi: int = 5                 # ô '-' của đáp án (2024-10-20) — ngoài kỳ so, ĐẾM
+    # ── H7-R1-02 (Đ4): ô tổng tách ô CÓ SỐ khỏi ô 0 = 0 ──
+    o_co_so: int = 269                  # ô mà engine ≠ 0 HOẶC đáp án ≠ 0 (GL 93+5 · CFA3 170+1 …đo R1)
+    khop_co_so: int = 216               # … trong đó khớp ĐÁP ÁN THẬT (≠ 0)
+    o_0_0: int = 619                    # ô engine = 0 = đáp án (GL 142 · CFA3 477) — khớp rỗng
+    # ── H7-R1-02: cổng nhóm (kỳ, D, E, F, V) — R1 đo 19/11 bằng nguyên mẫu độc lập ──
+    nhom_ghep: int = 4323               # nhóm có CÙNG số dòng ở engine & 408
+    nhom_dong_ghep: int = 7952          # … = 7.952 dòng (mỗi bên)
+    nhom_lech: int = 0                  # … Σ BA/BB lệch quá ATOL_NHOM
+    dong_vao_khong_ghep: int = 1691     # dòng vào engine (9.643) ⛔ ghép được nhóm
+    dong_408_khong_ghep: int = 1189     # dòng 408 trong kỳ so ⛔ ghép được nhóm (+ 269 dòng kỳ 2026-01 ở `chua_co_dau_vao` = 1.458 R1)
+    # ── H7-R1-01: giá trị từng ô lệch có tên (khoá `phan|ky|ô` → (engine, đáp án)) ──
+    o_lech: Mapping[str, tuple[str, str]] = field(default_factory=lambda: dict(LECH_O_MONG))
 
 
 def mong_c3c_mac_dinh() -> MongC3c:
@@ -128,6 +154,7 @@ def so_sanh_c3c(vao: dict, gl: dict, cfa3: dict, fx: Mapping[int, Mapping[str, D
     # ── ① feed: dòng HR → nhãn V + CDT1 (`cdt_cua`) → tinh_gl ──
     feed: list[DongGL] = []
     meta: list[tuple[str, str]] = []
+    khoa_nhom: list[tuple] = []         # (kỳ, D, E, F, V) từng dòng vào engine — cổng nhóm (H7-R1-02)
     thieu_D = mac_dinh = 0
     cdt_la: Counter = Counter()
     for r in vao.get("dong", []):
@@ -144,6 +171,7 @@ def so_sanh_c3c(vao: dict, gl: dict, cfa3: dict, fx: Mapping[int, Mapping[str, D
         feed.append(DongGL(thang=int(r["ky"]), tien_te=tt, no=_so(r.get("E")) or Decimal(0),
                            co=_so(r.get("F")) or Decimal(0)))
         meta.append((str(r["ky"]), v))
+        khoa_nhom.append((str(r["ky"]), tt, _so(r.get("E")) or Decimal(0), _so(r.get("F")) or Decimal(0), v))
     kq: list = []
     try:
         kq = tinh_gl(feed, fx)
@@ -164,6 +192,7 @@ def so_sanh_c3c(vao: dict, gl: dict, cfa3: dict, fx: Mapping[int, Mapping[str, D
     suy_hang = suy_rong = 0
     suy_F = Decimal(0)
     gl_chua: Counter = Counter()
+    nhom_408: dict[tuple, list] = defaultdict(lambda: [0, Decimal(0), Decimal(0)])
     for r in gl.get("dong", []):
         if r.get("ky_suy") is not None:
             suy_hang += 1
@@ -179,24 +208,29 @@ def so_sanh_c3c(vao: dict, gl: dict, cfa3: dict, fx: Mapping[int, Mapping[str, D
             continue
         for c in COT_GL:
             dap_gl[(k, f"{v}·{c}")] += _so(r.get(c)) or Decimal(0)
+        n408 = nhom_408[(k, _chu(r.get("D")), _so(r.get("E")) or Decimal(0), _so(r.get("F")) or Decimal(0), v)]
+        n408[0] += 1
+        n408[1] += _so(r.get("BA")) or Decimal(0)
+        n408[2] += _so(r.get("BB")) or Decimal(0)
 
     lech: list[dict[str, Any]] = []
     lech_ky = {"gl": Counter(), "cfa3": Counter()}
     o_so = {"gl": 0, "cfa3": 0}
     o_khac_0 = {"gl": 0, "cfa3": 0}
-    khop = 0
+    khop = o_0_0 = 0
+    lech_o: dict[str, tuple[Decimal, Decimal]] = {}      # ô lệch THỰC (mọi lớp) — H7-R1-01
 
     def _so_o(phan: str, k: str, o: str, got: Decimal, exp: Decimal, mong_ky: Mapping[str, int]) -> None:
-        nonlocal khop
+        nonlocal khop, o_0_0
         o_so[phan] += 1
         o_khac_0[phan] += exp != 0
         luoi[(phan, k, o)] = got
         if abs(got - exp) <= ATOL:
             khop += 1
+            o_0_0 += abs(got) <= ATOL and abs(exp) <= ATOL      # Đ4: khớp RỖNG tách khỏi khớp có số
             return
         lech_ky[phan][k] += 1
-        if k not in mong_ky:
-            lech.append({"phan": phan, "ky": k, "o": o, "got": str(got), "exp": str(exp)})
+        lech_o[f"{phan}|{k}|{o}"] = (got, exp)
 
     for k in ky_so:
         for v in nhan_v:
@@ -234,10 +268,45 @@ def so_sanh_c3c(vao: dict, gl: dict, cfa3: dict, fx: Mapping[int, Mapping[str, D
                   mong.lech_cfa3)
 
     # ── phân xử *(Đ3 · Đ4 · Đ5)* ──
-    lech_cd = (sum(n for k, n in lech_ky["gl"].items() if k in mong.lech_gl)
-               + sum(n for k, n in lech_ky["cfa3"].items() if k in mong.lech_cfa3))
+    # ⭐ H7-R1-01: ô lệch CÓ TÊN = khoá ô nằm trong `mong.o_lech` VÀ giá trị (engine, đáp án) ≤ ATOL_LECH ⇒ ⛔ chỉ đếm ô.
+    lech_cd = 0
+    for kh, (got, exp) in sorted(lech_o.items()):
+        mg = mong.o_lech.get(kh)
+        phan, k, o = kh.split("|", 2)
+        if mg is None:
+            lech.append({"phan": phan, "ky": k, "o": o, "got": str(got), "exp": str(exp)})
+        elif abs(got - Decimal(mg[0])) > ATOL_LECH or abs(exp - Decimal(mg[1])) > ATOL_LECH:
+            ly.append(f"ô lệch {kh}: engine {got} · đáp án {exp} ≠ mong {mg[0]} · {mg[1]} (chênh engine "
+                      f"{got - Decimal(mg[0])} · đáp án {exp - Decimal(mg[1])}; dung sai {ATOL_LECH})")
+        else:
+            lech_cd += 1
+    for kh in sorted(set(mong.o_lech) - set(lech_o)):
+        ly.append(f"ô mong lệch {kh} nay KHỚP ⇒ ⛔ đã khai trước")
     tong_o = o_so["gl"] + o_so["cfa3"]
     mong_lech = sum(mong.lech_gl.values()) + sum(mong.lech_cfa3.values())
+    o_co_so = tong_o - o_0_0
+    khop_co_so = khop - o_0_0
+
+    # ── H7-R1-02 · cổng NHÓM (kỳ, D, E, F, V): nhóm cùng số dòng hai bên ⇒ Σ BA/BB engine ↔ Σ 408 ──
+    nhom_vao: dict[tuple, list] = defaultdict(lambda: [0, Decimal(0), Decimal(0)])
+    for kn, x in zip(khoa_nhom, kq):
+        a = nhom_vao[kn]
+        a[0] += 1
+        a[1] += x.musd_no
+        a[2] += x.musd_co
+    nhom_ghep = nhom_dong = nhom_lech = 0
+    nhom_max = Decimal(0)
+    for kn, a in nhom_vao.items():
+        b = nhom_408.get(kn)
+        if b is None or b[0] != a[0]:
+            continue
+        nhom_ghep += 1
+        nhom_dong += a[0]
+        d = max(abs(a[1] - b[1]), abs(a[2] - b[2]))
+        nhom_max = max(nhom_max, d)
+        nhom_lech += d > ATOL_NHOM
+    dong_vao_kg = len(khoa_nhom) - nhom_dong
+    dong_408_kg = sum(b[0] for b in nhom_408.values()) - nhom_dong
 
     def _so_mong(ten: str, thuc: Any, mg: Any) -> None:
         if thuc != mg:
@@ -260,6 +329,16 @@ def so_sanh_c3c(vao: dict, gl: dict, cfa3: dict, fx: Mapping[int, Mapping[str, D
     _so_mong("chua_co_dau_vao.gl_hang", dict(sorted(gl_chua.items())), dict(sorted(mong.gl_chua_vao.items())))
     _so_mong("chua_co_dau_vao.cfa3_o_thang_khac_0", cfa3_chua_khac_0, mong.cfa3_chua_vao_khac_0)
     _so_mong("cfa3.o_loi", o_loi, mong.cfa3_o_loi)
+    _so_mong("o_co_so", o_co_so, mong.o_co_so)
+    _so_mong("khop_co_so", khop_co_so, mong.khop_co_so)
+    _so_mong("o_0_0", o_0_0, mong.o_0_0)
+    _so_mong("nhom.ghep", nhom_ghep, mong.nhom_ghep)
+    _so_mong("nhom.dong_ghep", nhom_dong, mong.nhom_dong_ghep)
+    _so_mong("nhom.lech", nhom_lech, mong.nhom_lech)
+    _so_mong("nhom.dong_vao_khong_ghep", dong_vao_kg, mong.dong_vao_khong_ghep)
+    _so_mong("nhom.dong_408_khong_ghep", dong_408_kg, mong.dong_408_khong_ghep)
+    if nhom_ghep == 0:
+        ly.append("Đ3: 0 nhóm ghép ⇒ ⛔ đo được gì ở mức nhóm")
     if tong_o == 0 or o_khac_0["gl"] == 0 or o_khac_0["cfa3"] == 0:
         ly.append(f"Đ3: mẫu số rỗng — ô so {tong_o} · ô đáp án ≠ 0 GL {o_khac_0['gl']} · CFA3 {o_khac_0['cfa3']}")
     if lech:
@@ -278,10 +357,18 @@ def so_sanh_c3c(vao: dict, gl: dict, cfa3: dict, fx: Mapping[int, Mapping[str, D
                      "ghi_chu": "đo 19/11 trên ô khớp: GL 3,35e-17 · CFA3 9,34e-17 ⇒ ≥ ×10"},
         "dong_vao": len(vao.get("dong", [])), "dong_so": len(feed),
         "tong_o": tong_o, "mong_tong_o": mong.gl_o_so + mong.cfa3_o_so,
+        "o_co_so": o_co_so, "khop_co_so": khop_co_so, "o_0_0": o_0_0,
         "khop": khop, "lech_co_chu_dich": lech_cd, "mong_lech_co_chu_dich": mong_lech,
-        "khop_ghi_chu": "khop = CHỈ ô khớp đáp án thật; lech_co_chu_dich = ô lệch ở kỳ DT6c đo 'đáp án ≠ nguồn' "
-                        "(orchestrator chốt 19/11, khai mong theo kỳ) — dat khi khop + lech_co_chu_dich = tong_o, "
-                        "lech_co_chu_dich = mong, lech_ngoai_ten = 0",
+        "khop_ghi_chu": "tong_o = o_co_so (ô engine ≠ 0 hoặc đáp án ≠ 0) + o_0_0 (engine = 0 = đáp án); "
+                        "khop = khop_co_so + o_0_0 (hợp đồng CG2: khop + lech_co_chu_dich = tong_o) — khớp THẬT "
+                        "= khop_co_so/o_co_so; lech_co_chu_dich = ô lệch ĐÚNG khoá ô + giá trị đã khai ở mong "
+                        "(dung_sai_lech) — dat khi lech_co_chu_dich = mong, lech_ngoai_ten = 0, nhom.lech = 0",
+        "dung_sai_lech": {"atol": str(ATOL_LECH), "rtol": "0",
+                          "ghi_chu": "ô lệch có tên khai (engine, đáp án) từng ô ở mong.o_lech; sai > atol ⇒ ĐỎ"},
+        "nhom": {"khoa": "(ky, D, E, F, V) — nhóm CÙNG số dòng ở engine & 408; so Σ BA/BB",
+                 "dung_sai": {"atol": str(ATOL_NHOM), "rtol": "0"}, "ghep": nhom_ghep, "dong_ghep": nhom_dong,
+                 "lech": nhom_lech, "max_lech": f"{nhom_max:.3E}",
+                 "dong_vao_khong_ghep": dong_vao_kg, "dong_408_khong_ghep": dong_408_kg},
         "lech_ngoai_ten": len(lech),
         "gl": {"o_so": o_so["gl"], "o_so_dap_an_khac_0": o_khac_0["gl"],
                "lech_theo_ky": dict(sorted(lech_ky["gl"].items()))},
@@ -325,6 +412,8 @@ def in_bao(tq: ThanhQuaC3c) -> None:
     if "tong_o" in h:
         print(f"  ô so {h['tong_o']} (GL {h['gl']['o_so']} · CFA3 {h['cfa3']['o_so']}) · khớp {h['khop']} · "
               f"lệch có chủ đích {h['lech_co_chu_dich']}/{h['mong_lech_co_chu_dich']} · ngoài tên {h['lech_ngoai_ten']}")
+        print(f"  ô có số {h['o_co_so']} (khớp thật {h['khop_co_so']}) · ô 0 = 0 {h['o_0_0']} · "
+              f"nhóm (kỳ,D,E,F,V): ghép {h['nhom']['ghep']} = {h['nhom']['dong_ghep']} dòng · lệch {h['nhom']['lech']}")
         print(f"  ô ≠ 0 đáp án: GL {h['gl']['o_so_dap_an_khac_0']} · CFA3 {h['cfa3']['o_so_dap_an_khac_0']}")
         print(f"  lệch theo kỳ: GL {h['gl']['lech_theo_ky']} · CFA3 {h['cfa3']['lech_theo_ky']}")
         print(f"  lớp: {h['lech_co_ten']}")
