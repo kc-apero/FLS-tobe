@@ -152,6 +152,29 @@ KB_F2 = r"""
   await p.click('#dlg-f button.pri');
   await p.waitForFunction(() => document.querySelector('#scrim .note.crit'));
   kq.hop = await hop();
+  // F5-R1-02: màn sau lưng phải được tải lại từ cửa ⇒ dòng 'đã ký · người ký · ngày' + nút khoá
+  await p.waitForFunction(() => { const r = document.querySelector('tr[data-thang="202511"]');
+      return r && r.textContent.includes('đã ký'); }, null, { timeout: 5000 }).catch(() => {});
+  kq.hang = await hang('202511');
+"""
+
+KB_CUON = r"""
+  // F5-R1-01: cuộn tới dòng, ký, đòi dòng vừa ký VẪN trong khung nhìn + scrollY ⛔ về 0
+  await p.evaluate(() => document.querySelector('tr[data-thang="202508"]')
+      .scrollIntoView({ block: 'center' }));
+  kq.y_truoc = await p.evaluate(() => window.scrollY);
+  await nut_ky('202508').click();
+  await p.waitForSelector('#scrim.on');
+  await p.click('#dlg-f button.pri');
+  await p.waitForFunction(() => { const r = document.querySelector('tr[data-thang="202508"]');
+      return r && r.textContent.includes('đã ký'); });
+  await p.waitForTimeout(300);
+  kq.y_sau = await p.evaluate(() => window.scrollY);
+  kq.khung = await p.evaluate(() => { const r = document.querySelector('tr[data-thang="202508"]')
+      .getBoundingClientRect(); return { top: r.top, bottom: r.bottom, cao: window.innerHeight }; });
+  kq.tieu_diem = await p.evaluate(() => { const a = document.activeElement;
+      return !!(a && a.closest && a.closest('tr[data-thang="202508"]')); });
+  await chup('f5_sau_ky_cuon');
 """
 KB_F3 = r"""
   await nut_ky('202512').click();
@@ -224,6 +247,31 @@ def test_AC2_F5_F2_ky_lai_409_chu_tieng_viet_khong_ma_tho():
     assert "đã được ký rồi" in txt, txt
     assert "FLS-CAUHINH-DA-KY" not in txt and "409" not in txt.split("đã được ký")[0], txt
     assert len([p for p in kq["post"] if p["u"].endswith("/202511/sign")]) == 2  # ngoài + màn
+
+
+# ══ F5-R1-02 (KQ-255) ═══════════════════════════════════════════════════════
+@can_node
+def test_F5_R1_02_sau_409_man_ve_lai_dong_da_ky_nut_khoa_chu_loi_giu_nguyen():
+    with _may() as (m, _):
+        kq = _chay(KB_F2, m.server_address[1])
+    assert kq["ky_ngoai"] == 201, kq["ky_ngoai"]       # Đ3: lượt ký của người khác THÀNH CÔNG
+    assert kq["hop"]["mo"] and "đã được ký rồi" in kq["hop"]["txt"], kq["hop"]  # chữ lỗi giữ nguyên
+    h = kq["hang"]
+    assert "đã ký" in h["txt"] and NGUOI_KY in h["txt"], h  # người ký + ngày đúng từ cửa
+    assert h["nut"] and all(n["tat"] for n in h["nut"]), h["nut"]
+
+
+# ══ F5-R1-01 (KQ-255) ═══════════════════════════════════════════════════════
+@can_node
+def test_F5_R1_01_ky_xong_giu_vi_tri_cuon_dong_vua_ky_trong_khung_nhin():
+    with _may() as (m, _):
+        kq = _chay(KB_CUON, m.server_address[1], os.environ.get("F5_ANH_DIR", ""))
+    assert kq["y_truoc"] > 0, kq                        # Đ3: mẫu ≠ rỗng — đã thật sự cuộn
+    assert kq["y_sau"] > 0, kq                          # ⛔ trang nhảy về đầu
+    k = kq["khung"]
+    assert k["top"] >= 0 and k["bottom"] <= k["cao"], k  # dòng vừa ký còn trong khung nhìn
+    assert kq["tieu_diem"], kq                          # tiêu điểm về dòng vừa ký
+    assert 202508 in _da_ky()                           # kho thật có chữ ký
 
 
 # ══ AC-3 · F5-F3 ════════════════════════════════════════════════════════════

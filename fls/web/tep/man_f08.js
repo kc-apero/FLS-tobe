@@ -100,9 +100,12 @@ const F08 = (function () {
             await FLS.ghi('/config/fx/' + t + '/sign', {});
           } catch (e) {
             HT.loi_trong_hop(e);
+            // F5-R1-02 (`KQ-255`): `409` = NGƯỜI KHÁC đã ký giữa chừng ⇒ màn sau lưng
+            // hộp còn nói 'chưa ký'. Tải lại từ cửa (chữ lỗi trong hộp giữ nguyên).
+            if (e && e.http === 409) ve_lai(t);
             return false;
           }
-          ve_lai();
+          ve_lai(t);
           return true;
         }, { pri: true }]]);
   }
@@ -138,7 +141,7 @@ const F08 = (function () {
       if (!h.ky) nhan.push('CHAN');
       if (trung.has(h.thang)) nhan.push('TRUNG');
       if (lac.has(h.thang)) nhan.push('LAC');
-      tb.appendChild(_hang(h.thang, h.ky, nhan, () => ve(o)));
+      tb.appendChild(_hang(h.thang, h.ky, nhan, t => _ve_lai(o, t)));
     });
     b.appendChild(tb);
     // F4-R1-01 (`KQ-162`): bảng 7 cột rộng 474 px > màn 390 px ⇒ trang tràn ngang.
@@ -163,6 +166,20 @@ const F08 = (function () {
                     TP.chip_niem_tin(meta.data_status);
       o.appendChild(c);
     }
+  }
+
+  /* ⭐ F5-R1-01 (`KQ-255`): `TT.chay` xoá ô rồi vẽ khung chờ ⇒ trang co lại ⇒ cuộn về
+     đầu, dòng vừa ký ra khỏi khung nhìn (đo: `scrollY` 554 → 0). Nhớ `scrollY`, vẽ xong
+     thì trả lại; rồi đưa TIÊU ĐIỂM về dòng vừa ký (nút của nó đã khoá nên ⛔ nhận
+     tiêu điểm ⇒ lấy chính `tr`). Hộp còn mở (ca `409`) ⇒ ⛔ giật tiêu điểm khỏi hộp. */
+  async function _ve_lai(o, thang) {
+    const y = window.scrollY;
+    await ve(o);
+    window.scrollTo(0, y);
+    const s = document.getElementById('scrim');
+    if (s && s.classList.contains('on')) return;
+    const tr = o.querySelector('tr[data-thang="' + String(thang) + '"]');
+    if (tr) { tr.tabIndex = -1; tr.focus({ preventScroll: true }); }
   }
 
   function ve(o) {
