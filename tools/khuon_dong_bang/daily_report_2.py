@@ -29,6 +29,8 @@ from datetime import date, timedelta
 from decimal import Decimal
 from typing import Any
 
+from fls.canon.o_loi import la_o_loi  # noqa: E402  (DT8: ô lỗi = tập ĐÓNG, 1 bản khai)
+
 _P = pathlib.Path(__file__).resolve().parent / "_daily_report.py"
 _spec = importlib.util.spec_from_file_location("khuon_dong_bang__daily_report", _P)
 _dr = sys.modules.get(_spec.name) or importlib.util.module_from_spec(_spec)
@@ -137,7 +139,7 @@ def chuan_bi(tho: dict[str, Any]) -> dict[str, Any]:
         ds = i + 1
         a = str(h[0]).strip()
         gt = h[6:38]
-        co_chu = any(isinstance(x, str) and x.strip() and not x.startswith("#") and x.strip() != "-" for x in gt)
+        co_chu = any(isinstance(x, str) and x.strip() and not la_o_loi(x) and x.strip() != "-" for x in gt)
         co_bool = any(isinstance(x, bool) for x in gt)
         n_gt = sum(1 for x in gt if not _rong(x))
         if ds <= 10 or co_chu or co_bool or (a == "." and 0 < n_gt <= 2):

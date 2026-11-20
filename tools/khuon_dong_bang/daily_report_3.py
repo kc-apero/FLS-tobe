@@ -30,6 +30,8 @@ import sys
 from decimal import Decimal
 from typing import Any
 
+from fls.canon.o_loi import la_o_loi  # noqa: E402  (DT8: ô lỗi = tập ĐÓNG, 1 bản khai)
+
 _P = pathlib.Path(__file__).resolve().parent / "_daily_report.py"
 _spec = importlib.util.spec_from_file_location("khuon_dong_bang__daily_report", _P)
 _dr = sys.modules.get(_spec.name) or importlib.util.module_from_spec(_spec)
@@ -149,7 +151,7 @@ def chuan_bi(tho: dict[str, Any]) -> dict[str, Any]:
             elif isinstance(x, str):
                 if x.strip() == "-":
                     x = None
-                elif x.startswith("#"):
+                elif la_o_loi(x):
                     pass
                 elif _RE_CHU_SO.fullmatch(x.strip()):
                     chu_so.append({"dong_sheet": ds, "cot": c, "o": f"{_cs(j)}{ds}", "chuoi": x})
