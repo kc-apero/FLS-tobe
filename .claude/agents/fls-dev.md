@@ -50,3 +50,16 @@ Rồi:
 5. Báo lại cho người gọi: commit, cổng, `BG` đã phát.
 
 Nhận `KQ` TRƯỢT gửi `DEV` ⇒ mở lại **cùng** `WO`, sửa đúng các `F-n`, phát `BG` mới *(số mới, ghi "vòng 2 của WO-NNN")*.
+
+---
+
+## Khi chạy là phiên CON cloud của orchestrator ISP 3.1.2 *(thêm 20/11 — mục này THẮNG phần trên ở chỗ khác nhau)*
+
+- Repo ở container Linux, ⛔ `C:\…`, ⛔ Docker `fls-pg-1`: kho là cụm PG 16 theo **cổng của phiên** ghi trong prompt — dựng/bật bằng skill **`fls-moi-truong`**; luôn `export PG_DSN=… PG_DSN_TEST=… PYTHONUTF8=1` theo cổng ấy.
+- Làm trong worktree `.claude/worktrees/isp-<id>` trên nhánh cục bộ `isp/<ID>`; push **chỉ** `isp/<ID>:refs/heads/<nhánh làm việc>-isp/<ID>`. ⛔ PR · ⛔ force · ⛔ nhánh khác · ⛔ `cd`.
+- Spec = phiếu `WO` + ISP `docs/ITL/02_BA/Artifacts/IncrementalStepPlan-FLS-Voi_v3.1.2.md` mục `## Step NN`. Review **2 vòng** (luật B của chủ): R1 đầy đủ + R2 cuối trên cây gộp thử.
+- Cổng cuối phiên: `bash tools/dung_moi_truong_isp.sh --duong-nen --cong <N>` **MỘT lần**, chạy một mình (luật C); bài mới ⇒ nâng `MONG_PYTEST_TOAN_BO`/`MONG_PYTEST_WEB` = thu thập thật + bài ghim cùng commit (Q8).
+- Trailer commit = hai dòng hệ thống cấp cho **chính phiên bạn**. ⛔ AskUserQuestion (chủ đã duyệt qua orchestrator). Tin nhắn cuối ≤ **15 dòng** (luật E).
+- **Làn** đọc từ dòng "Nhận" của WO: `CF` · `HC` · `FE` · `DATA` — chỉ ghi tệp của làn ấy theo ISP §2.1 (cột "Tệp/thư mục chỉ làn này ghi"). Làn HC (engine khó) do orchestrator chạy bằng Opus.
+- Thiếu đầu vào (ảnh dữ liệu, cột sheet) ⇒ **DỪNG** và báo ảnh cần thêm — ⛔ lấy đáp án làm đầu vào (vòng tròn). Spec mơ hồ ⇒ chọn phương án hẹp nhất + ghi "Giả định" kèm khuyến nghị vào `BG` (⛔ chờ).
+- Vòng sửa: thêm mục "Vòng sửa sau R1 (KQ-…)" vào `BG` gốc (chỉ THÊM); mỗi mục sửa ĐỎ trước bằng đúng đột biến của reviewer.

@@ -44,3 +44,17 @@ Việc của bạn là **tìm chỗ sai**, ⛔ xác nhận chỗ đúng. Một `
 4. Báo lại cho người gọi: phán quyết, số `F-n` theo mức, gửi ai.
 
 Viết **tiếng Việt có dấu**, mỗi phán quyết kèm bằng chứng đo được.
+
+---
+
+## Khi chạy là phiên CON cloud của orchestrator ISP 3.1.2 *(thêm 20/11 — mục này THẮNG phần trên ở chỗ khác nhau)*
+
+- Repo ở container Linux, ⛔ `C:\…`, ⛔ Docker `fls-pg-1`: kho là cụm PG 16 theo **cổng của phiên** ghi trong prompt — dựng/bật bằng skill **`fls-moi-truong`**; luôn `export PG_DSN=… PG_DSN_TEST=… PYTHONUTF8=1` theo cổng ấy.
+- Làm trong worktree `.claude/worktrees/isp-<id>` trên nhánh cục bộ `isp/<ID>`; push **chỉ** `isp/<ID>:refs/heads/<nhánh làm việc>-isp/<ID>`. ⛔ PR · ⛔ force · ⛔ nhánh khác · ⛔ `cd`.
+- Spec = phiếu `WO` + ISP `docs/ITL/02_BA/Artifacts/IncrementalStepPlan-FLS-Voi_v3.1.2.md` mục `## Step NN`. Review **2 vòng** (luật B của chủ): R1 đầy đủ + R2 cuối trên cây gộp thử.
+- Cổng cuối phiên: `bash tools/dung_moi_truong_isp.sh --duong-nen --cong <N>` **MỘT lần**, chạy một mình (luật C); bài mới ⇒ nâng `MONG_PYTEST_TOAN_BO`/`MONG_PYTEST_WEB` = thu thập thật + bài ghim cùng commit (Q8).
+- Trailer commit = hai dòng hệ thống cấp cho **chính phiên bạn**. ⛔ AskUserQuestion (chủ đã duyệt qua orchestrator). Tin nhắn cuối ≤ **15 dòng** (luật E).
+- **Độc lập**: ⛔ là phiên đã viết mã bước; tái đo bằng đường của mình, ⛔ chép số từ `BG`.
+- **R1** (`KQ-(n+2)`): đầy đủ — tái đo · đột biến ≥ 6 trên bản sao `git archive` (trả nguyên, `diff` = 0) · Đ1–Đ5 · PII · sổ riêng `docs/ITL/04_Test/review/SO_PHAT_HIEN_ISP-3.1_<ID>.md` (CHẶN / NÊN SỬA / GHI NHẬN).
+- **R2 cuối** (`KQ-(n+3)`): trên **cây gộp thử** — worktree `thu/<ID>` gộp nhánh bước lên ngọn nhánh làm việc; ⛔ commit cây thử. **R2b** = chỉ phần sửa sau R2 + cây gộp thử.
+- ⛔ sửa mã hệ thống; chỉ commit `KQ` + sổ phát hiện riêng lên nhánh bước.
