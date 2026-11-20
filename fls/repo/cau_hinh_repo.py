@@ -522,20 +522,23 @@ def nap_ix_ven(conn, duong: str, *, duong_cdt1: str, actor: str,
             "thu_tu": r["thu_tu"], "No": chu(r["No"]), "vendor": chu(r["vendor"]),
             "network": chu(r["network"]), "account": chu(r["account"]),
             "pct": chu(r["pct"]), "cashin_month": chu(r["cashin_month"]),
-            "cashin_day": chu(r["cashin_day"]), "cach_tinh": chu(r["cach_tinh"])}))
+            "cashin_day": chu(r["cashin_day"]), "cach_tinh": chu(r["cach_tinh"]),
+            "so": chu(r.get("so", "GI"))}))      # DT9b: ảnh DT8 cũ ⛔ có `so` ⇒ GI
     return nap(conn, BANG_VEN, cap, nguon=nguon or duong, actor=actor)
 
 
-def doc_ven(conn) -> vendor.BangVen:
+def doc_ven(conn, so: str | None = None) -> vendor.BangVen:
     """`IX.VEN` mới nhất, dựng lại **qua `vendor.kiem`**. `ChuaKhai` nếu rỗng; bản BẨN ⇒
-    `BanHong` CÓ TÊN."""
+    `BanHong` CÓ TÊN. ⭐ DT9b: `so=None` ⇒ MỌI sổ *(GI · OMC · SC · PS)*; `so="GI"` ⇒ chỉ dòng sổ ấy
+    *(engine H9/H10 — `theo_so`; sổ lạ/0 dòng ⇒ `LoiVen`)*."""
     ban = _doc_ban(conn, BANG_VEN)
     try:
-        return _ven_tu_cap(ban.dong, ban.nguon)
+        b = _ven_tu_cap(ban.dong, ban.nguon)
     except vendor.LoiVen as e:
         raise BanHong(
             "⛔ bản `IX.VEN` phiên bản %s trong kho ⛔ ĐỌC ra được *(⛔ qua `nap`?)*"
             % ban.phien_ban) from e
+    return b if so is None else b.theo_so(so)
 # ── IX.ORG — CDT Correct + TK→LE (`C8` · `WO-176`) ───────────────────────────
 def nap_ix_org(conn, duong_cdt: str, duong_mm: str, *, actor: str,
                nguon: str | None = None) -> BanCauHinh:

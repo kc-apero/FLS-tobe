@@ -65,7 +65,7 @@ SHA_CAU_HINH = {
     "ix_fx": "e2c9fdd028bd3286",
     "atl_cay": "504fa53d27c44b83",
     "cdt_correct": "8d8cfaed26b6aa5a",
-    "mapping_master_cfg": "3c1f61a28fd3d8ce",
+    "mapping_master_cfg": "dc926c1b35b027ef",  # WO-234 19/11: đổi CÓ CHỦ ĐÍCH — che 4 số TK CN → TK_CA_NHAN_<n>
 }
 
 

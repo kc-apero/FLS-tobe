@@ -3,6 +3,7 @@
 *(ISP 3.1.2 · Step 21 · `WO-172`)*. 42 dòng Block 1 đọc từ KHO, ⛔ gõ cứng."""
 from __future__ import annotations
 
+from collections import Counter
 import contextlib
 import http.client
 import json
@@ -110,14 +111,16 @@ def test_C9_GET_config_ven_200_42_dong_5_nhan_7_cdt1_TU_KHO(may):
     d = r["data"]
     assert set(d) == KHOA_DATA, f"⛔ lệch hợp đồng: {sorted(set(d) ^ KHOA_DATA)}"
     assert d["bang"] == "IX.VEN" and d["nguon"] == NGUON
-    assert d["so_dong"] == len(d["dong"]) == 42
+    assert d["so_dong"] == len(d["dong"]) == 359           # DT9b: 4 sổ — GI 42 · OMC 89 · SC 93 · PS 135
+    assert Counter(x["so"] for x in d["dong"]) == {"GI": 42, "OMC": 89, "SC": 93, "PS": 135}
     assert d["nhan_rieng"] == ["Max", "VD341", "VD428", "VD444", "VD62"], d["nhan_rieng"]
     assert len(d["cdt1"]) == 7, d["cdt1"]
     assert {x["cach_tinh"] for x in d["dong"]} == set(d["nhan_rieng"]) | {"thường"}
     d0 = d["dong"][0]
     assert d0 == {"thu_tu": 1, "dong_sheet": "4", "No": "1", "vendor": "VD341",
                   "network": "Admob", "account": "Admob Trananhlinh", "pct": "1",
-                  "cashin_month": 1, "cashin_day": 23, "cach_tinh": "VD341"}, d0
+                  "cashin_month": 1, "cashin_day": 23, "cach_tinh": "VD341",
+                  "so": "GI"}, d0                                   # DT9b: CHỈ THÊM trường `so`
     assert r["meta"]["data_status"] == "flash" and r["meta"]["run_id"] is None, r["meta"]
 
 

@@ -89,7 +89,7 @@ TOM_TAT_28_08 = {"ma": 73, "can_phan_bo": 23, "co_phuong_phap": 21, "method_rong
 #: Checksum ghim sau lượt đóng băng ĐẦU *(16/11 — ⚠ ⛔ khai trước như DT2: phép so độc lập của
 #: DT3 là `CAY_AP` + `TOM_TAT_28_08`)*. Đổi ⇒ phải có lượt đóng băng mới + lý do.
 CHECKSUM_ATL = "4c95ef974a3149ba"
-CHECKSUM_MM = "a47878bf68499130"
+CHECKSUM_MM = "4f7605e5cff581ec"
 CHECKSUM_CDT = "994571a670e75cec"
 
 

@@ -143,7 +143,10 @@ _TEN_KHUON = re.compile(r"[a-z][a-z0-9_]*")
 #: `ma` thêm ở DT3 *(khoá CHỮ của cây ATL · Mapping Master · CDT Correct — xem docstring)*.
 #: `dong_sheet` thêm ở DT4 *(bài đòi — `WO-111` AC-4)*: ảnh đáp án 406 khoá theo HÀNG SHEET
 #: *(số nguyên)*, ⛔ theo `yyyymm`/mã; hợp lệ = ô SỐ chữ số nguyên ≥ 1 *(xem khuôn `gl_406`)*.
-KIEU_KHOA_BIET = ("yyyymm", "ma", "dong_sheet")
+#: `so_dong_sheet` thêm ở DT9b *(`WO-241` — IX.VEN MỘT bảng có cột `so`)*: hàng sheet CỦA MỘT SỔ ⇒ hợp lệ =
+#: ô SỐ chữ số nguyên ≥ 1 *(sổ GI — giữ NGUYÊN khoá DT8)* **hoặc** `<SO>!<số ≥ 1>` *(`OMC!4`, `SC!4`, `PS!4`:
+#: số hàng ⛔ duy nhất giữa các sổ ⇒ tiền tố sổ làm khoá kho duy nhất)*.
+KIEU_KHOA_BIET = ("yyyymm", "ma", "dong_sheet", "so_dong_sheet")
 #: Kiểu cột chọn *(DT3)*: `so` = luật DT2 *(ô SỐ, ⛔ rỗng)* · `chu` = ô CHỮ ⛔ rỗng · `chu?` = ô
 #: chữ hoặc rỗng. Cột ⛔ khai ở `KIEU_COT` của khuôn = `so` ⇒ khuôn DT2 chạy y như cũ.
 #: `so?` thêm ở DT4 *(bài đòi — `WO-111` AC-4)*: ô SỐ hoặc RỖNG — cột `BO`/`BP` của 406 là
@@ -437,11 +440,20 @@ def _khoa_hop_le(v: Any, kieu: str = "yyyymm") -> bool:
         return isinstance(v, dict) and bool(v["chu"].strip())
     if kieu == "dong_sheet":
         return isinstance(v, str) and bool(re.fullmatch(r"[0-9]+", v)) and int(v) >= 1
+    if kieu == "so_dong_sheet":
+        # DT9b: ô SỐ `[0-9]+` ≥ 1 *(GI — như `dong_sheet`)* HOẶC ô CHỮ `{"chu": "<SO>!<[0-9]+>"}`, ASCII, ≥ 1.
+        if isinstance(v, dict):
+            c = v.get("chu")
+            return isinstance(c, str) and bool(re.fullmatch(r"[A-Z]{1,8}![0-9]+", c)) \
+                and int(c.rsplit("!", 1)[-1]) >= 1
+        return isinstance(v, str) and bool(re.fullmatch(r"[0-9]+", v)) and int(v) >= 1
     return isinstance(v, str) and bool(_YYYYMM.fullmatch(v)) and 1 <= int(v[4:]) <= 12
 
 
 def _gia_tri_khoa(v: Any, kieu: str) -> str:
     """Giá trị đem ĐẾM TRÙNG: `yyyymm` ⇒ nguyên chuỗi; `ma` ⇒ chữ đã GỘP khoảng trắng."""
+    if kieu == "so_dong_sheet":
+        return v["chu"] if isinstance(v, dict) else v
     return " ".join(v["chu"].split()) if kieu == "ma" else v
 
 
