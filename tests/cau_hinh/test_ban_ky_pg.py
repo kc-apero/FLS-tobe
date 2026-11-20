@@ -262,3 +262,112 @@ def test_C13_AC6_bang_tuyen_hai_tuyen_khai_dung_bang_ghi_va_KHONG_cham_fls_itl()
     # ⛔ tuyến ghi THỨ BA: đưa bản là hàm, §4i chỉ có GET + POST sign
     assert [x.duong for x in bt.BANG_TUYEN if "/report/snapshot" in x.duong
             and x.phuong_thuc == "POST"] == [p.duong]
+
+
+# ── `C13-R1-01` · checksum == checksum của nội dung ĐỌC LẠI từ kho ────────────
+# R1 đo lệch 2/7 mẫu số: `1e22` (float → jsonb numeric → đọc ra int) và `-0.0` (→ `0.0`).
+MAU_SO_R1 = (1.0, 0.1 + 0.2, 1e-7, 10 ** 30, 12.50, 1e22, -0.0)
+
+
+@pytest.mark.pg
+def test_C13_R1_01_checksum_bang_checksum_cua_noi_dung_DOC_LAI_tren_7_mau_so_cua_R1():
+    from fls.cau_hinh import ban_ky
+    assert len(MAU_SO_R1) == 7                                   # Đ3: mẫu số của phép đo
+    khop = 0
+    with _conn() as c:
+        for x in MAU_SO_R1:
+            ky = _ky_moi()
+            b = chc.dua_ban_ky(c, ky, {"o": {"v": x}, "id": uuid.uuid4().hex}, actor="engine.h14")
+            doc = chc.doc_noi_dung_ban_ky(c, ky, 1)
+            assert ban_ky.checksum(doc) == b.checksum, (x, doc)
+            khop += 1
+    assert khop == 7
+
+
+# ── `C13-R1-02` · ký SONG SONG: mỗi kỳ đúng 1 `201`, còn lại `409` ────────────
+KY_SONG_SONG, LUONG = 5, 8
+
+
+def _chay_song_song(viec, n):
+    """`n` luồng cùng xuất phát (rào) ⇒ danh sách kết quả; luồng nổ ⇒ ghi lỗi (⛔ nuốt)."""
+    rao, kq = threading.Barrier(n), []
+
+    def chay(i):
+        rao.wait()
+        try:
+            kq.append(viec(i))
+        except Exception as e:                                   # noqa: BLE001
+            kq.append(("LOI", repr(e)))
+
+    ts = [threading.Thread(target=chay, args=(i,)) for i in range(n)]
+    for t in ts:
+        t.start()
+    for t in ts:
+        t.join()
+    return kq
+
+
+def _so_su_kien_ky(ky):
+    with _conn() as c:
+        return c.execute("SELECT count(*) FROM fls_cau_hinh_ban "
+                         "WHERE bang='IX.TMP' AND nguon=%s", (f"ky:{ky}",)).fetchone()[0]
+
+
+@pytest.mark.pg
+def test_C13_R1_02_ky_SONG_SONG_5_ky_x_8_luong_moi_ky_dung_1_201_con_lai_409_dung_1_ban_ky(may):
+    for _ in range(KY_SONG_SONG):
+        ky = _ky_moi()
+        with _conn() as c:
+            chc.dua_ban_ky(c, ky, _noi_dung(), actor="engine.h14")
+        kq = _chay_song_song(lambda i: _ky(may, ky)[0], LUONG)
+        assert len(kq) == LUONG                                  # mẫu số: đủ 8 phản hồi
+        assert sorted(kq) == [201] + [409] * (LUONG - 1), kq
+        assert _so_su_kien_ky(ky) == 1
+        ds = chc.doc_ban_ky(_conn(), ky)
+        assert [(b.phien_ban, b.trang_thai) for b in ds] == [(1, "da_ky")]
+
+
+@pytest.mark.pg
+def test_C13_R1_02_dua_ban_SONG_SONG_cung_noi_dung_dung_1_phien_ban_va_khac_noi_dung_ra_phien_ban_lien_tuc():
+    ky = _ky_moi()
+    nd = _noi_dung()
+
+    def dua(i):
+        with _conn() as c:
+            return chc.dua_ban_ky(c, ky, nd, actor="engine.h14").phien_ban
+
+    kq = _chay_song_song(dua, LUONG)
+    assert kq == [1] * LUONG, kq                                 # 1 bản · 7 lần `khong_doi`
+    ky2 = _ky_moi()
+
+    def dua_khac(i):
+        with _conn() as c:
+            return chc.dua_ban_ky(c, ky2, _noi_dung(i=i), actor="engine.h14").phien_ban
+
+    kq = _chay_song_song(dua_khac, LUONG)
+    assert sorted(kq) == list(range(1, LUONG + 1)), kq           # phiên bản KHÔNG trùng số
+    with _conn() as c:
+        assert [b.phien_ban for b in chc.doc_ban_ky(c, ky2)] == list(range(1, LUONG + 1))
+
+
+# ── `C13-R1-03` · ký phiên bản ≥ 2 ───────────────────────────────────────────
+@pytest.mark.pg
+def test_C13_R1_03_ky_v1_dua_v2_ky_ra_201_phien_ban_2_GET_hai_da_ky_ky_lan_3_409(may):
+    ky = _ky_moi()
+    with _conn() as c:
+        a = chc.dua_ban_ky(c, ky, _noi_dung(), actor="engine.h14")
+    st, r = _ky(may, ky)
+    assert st == 201 and r["data"]["phien_ban"] == 1 and r["data"]["checksum"] == a.checksum
+    with _conn() as c:
+        b = chc.dua_ban_ky(c, ky, _noi_dung(), actor="engine.h14")
+    assert b.phien_ban == 2 and b.checksum != a.checksum
+    st, r = _ky(may, ky)
+    assert st == 201, r
+    assert r["data"]["phien_ban"] == 2 and r["data"]["checksum"] == b.checksum
+    ds = _get(may, ky)[1]["data"]["ban"]
+    assert [(x["phien_ban"], x["trang_thai"]) for x in ds] == [(1, "da_ky"), (2, "da_ky")]
+    assert [x["checksum"] for x in ds] == [a.checksum, b.checksum]
+    st, r = _ky(may, ky)
+    assert st == 409 and r["error"]["code"] == "FLS-CAUHINH-DA-KY", r
+    assert "phiên bản 2" in r["error"]["detail"] and NGUOI in r["error"]["detail"]
+    assert _so_su_kien_ky(ky) == 2

@@ -15,7 +15,9 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
 import re
+from decimal import Decimal
 from typing import Any, Mapping
 
 BANG = "IX.TMP"
@@ -36,12 +38,31 @@ def kiem_ky(ky: Any) -> int:
     return int(s)
 
 
+def _so_khu_hoi(x: Any) -> Any:
+    """Đưa `float` về ĐÚNG giá trị mà `jsonb` trả lại *(`C13-R1-01`)*: kho lưu số kiểu
+    `numeric` ⇒ `1e22` đọc ra `int` `10**22` · `-0.0` đọc ra `0.0` *(numeric ⛔ có số 0 âm)*.
+    Băm bản CHƯA khứ hồi thì checksum niêm phong ≠ checksum của nội dung đọc lại.
+    Cách HẸP: chỉ đổi `float` hữu hạn *(`bool`/`int`/chuỗi/`null` giữ nguyên; `nan`/`inf` để
+    `json.dumps(allow_nan=False)` nổ như cũ)*. ⚠ `1` và `1.0` VẪN là hai checksum khác
+    nhau *(kho giữ `1.0`)* — engine H14 phải ổn định kiểu số."""
+    if isinstance(x, float) and math.isfinite(x):
+        d = Decimal(repr(x))
+        if d == 0:
+            d = abs(d)
+        return json.loads(format(d, "f"))
+    if isinstance(x, Mapping):
+        return {k: _so_khu_hoi(v) for k, v in x.items()}
+    if isinstance(x, (list, tuple)):
+        return [_so_khu_hoi(v) for v in x]
+    return x
+
+
 def chuan_hoa(noi_dung: Mapping[str, Any]) -> str:
     """Chuỗi JSON chuẩn hoá của một bản. Rỗng/không-object/không-JSON ⇒ `LoiBanKy`."""
     if not isinstance(noi_dung, Mapping) or not noi_dung:
         raise LoiBanKy("nội dung bản ⛔ phải một object JSON KHÔNG rỗng (các ô của báo cáo)")
     try:
-        return json.dumps(noi_dung, sort_keys=True, ensure_ascii=False,
+        return json.dumps(_so_khu_hoi(noi_dung), sort_keys=True, ensure_ascii=False,
                           separators=(",", ":"), allow_nan=False)
     except (TypeError, ValueError) as e:
         raise LoiBanKy(f"nội dung bản ⛔ phải JSON thuần (số · chuỗi · bool · null · "
