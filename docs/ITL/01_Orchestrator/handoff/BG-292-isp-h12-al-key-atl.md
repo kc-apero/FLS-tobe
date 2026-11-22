@@ -84,3 +84,52 @@ Quy tắc lớp *(`_lop`)*: khối ∈ CDT ∪ {SHQ2} và năm ∈ {2024, 2025};
 - Lớp quy tắc khai bằng đếm + sha *(như H8)*: ĐỎ chỉ nói "sha khác" — tái tạo chi tiết bằng `so_sanh_c5a(...).lech`.
 - `luoi_driver_tu_anh` đọc ảnh — chờ C10 thay bằng đọc kho.
 - Tên bài `test_CG2_B1_tep_that_qua_tuyen_9_cong_dung_dat_C5_null` giữ nguyên *(đổi tên = đổi node id của tập đường nền)*; nội dung nay đòi C5 `true`.
+
+## Vòng sửa sau R1 (KQ-293)
+R1 = 0 CHẶN · **1 NÊN SỬA** `H12-R1-01` · 5 GHI NHẬN; người dùng đã duyệt. **Quyết của chủ 22/11 ~10:05 UTC** *(`TIEN_DO.md`)*: ký BẬT IX.ALR 2025 giống AS-IS ⇒ cổng WP-C5a nay đo ở **cờ BẬT**; cờ TẮT còn là bài đồng nhất `H12-B1` *(50.616/50.616 ô, giữ nguyên)*. Ghi kho THẬT: `KHONG` *(kho test + kho riêng `fls_h12_cong` cho `--ghi`)*.
+
+### 1 · Cờ 2025 bật qua KHO, có ký *(⛔ hằng, ⛔ sửa bản cũ)*
+- Tệp config CÓ PHIÊN BẢN `tests/fixture/cau_hinh/ix_alr_2025_bat.json` *(`phien_ban_tep` 1)*: người ký **`KhanhCQ`** *(tên — ⛔ email; ngày 2026-11-22; căn cứ = dòng TIEN_DO)* · By GI **8** mã bật từ `202502` · By NOEM **5** mã bật từ `202501` · cả **13** tắt từ `202601` *(ATL 2026 ⛔ có công thức phân bổ)*; `mong_dem` khai trong tệp, đếm khác ⇒ lỗi. By GI ⛔ bật `202501`: D3 driver `PE`, lưới IX.DRV thiếu `GI_PE 202501` ⇒ `DRIVER_THIEU`.
+- Đường ghi: `cau_hinh_repo.ky_bat_ix_alr(conn, tệp, actor=)` ⇒ **phiên bản MỚI** của `IX.ALR` *(bản cũ nguyên — bài đếm dòng bản trước)*, `actor` PHẢI = người ký *(khác / rỗng / email ⇒ `LoiCauHinh`, kho ⛔ đổi)*, `nguon = ky:ix_alr_2025_bat.json#v1`. Lõi thuần `luat_pb.dung_tu_tep_ky` + `kiem_ky`; `kiem` nhận `bat=True` **chỉ** khi dòng mang chữ ký hợp lệ *(bài C11 D2 giữ nguyên: `bat=True` ⛔ ký ⇒ `LoiLuatPB`)*; `LuatPB.nguoi_ky`. `nap_ix_alr` ⛔ ghi đè dòng ĐÃ KÝ cùng khoá *(vd `HCC@202501`)* — nạp lại MM ⛔ lặng lẽ gỡ chữ ký.
+- Kho `fls_h12_cong` *(sinh `hd2_cong.json`)*: IX.ALR phiên bản 2, actor `KhanhCQ`, 13 luật bật.
+
+### 2 · WP-C5a ở cờ BẬT — lớp lệch gán bằng PHÉP ĐO *(⛔ quy tắc khối × năm)*
+Phản thực *(chẩn đoán, ⛔ đầu vào engine — bài `test_R1_01_phan_thuc_khong_vao_dau_ra_cong`)*: ② thay lá khối CDT 2025 của `GI · OMC · PS · SC` bằng nguồn AS-IS + dư SHQ2 = GROUP − Σ CDT *(công thức SHQ2 2025 của ATL)*; ②b như ② nhưng dư lấy GROUP của ATL; ③ thêm driver By GI = `GI khối / GI GROUP` + By GI từ 202501. Ô hồi phục ở bước nào mang nhãn bước ấy; còn lại = lệch FLS.
+
+| Lớp *(đếm ô lệch trong 11.764 ô có số)* | R1 *(cờ tắt)* | Sau *(cờ bật)* |
+|---|---|---|
+| khớp THẬT | 5.932 | **6.646** |
+| `loi_as_is` — `o_lech` từng ô *(GROUP `OMC` −0,5 tay · SGO1 NB by LE)* | 224 | **224** |
+| `loi_as_is` — `as_is_truoc_CA` *(2024 dán cũ, lan từ H8)* | 675 | **675** *(sha đổi: `NPC` hậu tố)* |
+| `loi_as_is` — `as_is_tay_lan_du` *(dư SHQ2 mang −0,5 tay)* | — | **29** |
+| `as_is_bat_phan_bo_2025` *(quy tắc — BỎ)* | 4.932 | — |
+| `chua_co_dau_vao` | — | **1.091** |
+| `lech_D3` | — | **3.099** |
+| lệch FLS *(ngoài tên, mong 0)* | 0 | **0** |
+
+Tổng lệch có chủ đích 5.831 → **5.118**; `tong_o` 45.674 · `khop` 40.556 · `o_0_0` 33.910 · `dem_phan_bo` 648 ô lá chia ở 11 mã *(CXP · CXO: GROUP 2025 = 0)* · 604 36/36. `mong` TỪNG LỚP *(đếm theo khối + sha256)* + `la_cdt_2025` theo mã ở `tools/do_hd2_c5a_mong.py`; `/gates` `HD2_WP_C5A` true *(40556/45674 ô · 5118 lệch có chủ đích)*.
+
+**Lá khối CDT 2025 theo mã** *(72 ô = 6 khối × 12 tháng)* — SA FORMULA 22/11, chỉ-đọc, bản thô ở scratchpad:
+- **`OFR` — 72/72 KHỚP.** Công thức AS-IS = `GROUP × NOEM_khối / (NOEM_GAG − NOEM_CAH)` *(chuẩn hoá trừ ngoại lệ CAH)* — nguồn FLS đã có *(IX.DRV NOEM)* ⇒ engine `phan_bo_khoa` sửa: luật có ngoại lệ CDT1 chia `d_khối / (1 − Σ d_ngoại lệ)`; driver ngoại lệ thiếu ⇒ `DRIVER_THIEU`. Trước: 72 lá lệch *(errata `-03`)*.
+- **`GI` 3 khớp · 69 `chua_co_dau_vao` · `OMC` 2 · 70 · `PS` 21 · 51 · `SC` 15 · 57.** Lá = hàng `TOTAL yyyymm` của tab `CFA2 | MID 3 | X Platform Data Ledger` cột PM theo CDT *(T · V · X · Z · AB · AD)* ÷ 10⁶ *(× −1 trừ GI)* — đo khớp GI **66/66** · OMC **60/60** · SC **54/54** · PS **51/54**; tháng ngoài MID3 *(GI M01 · OMC M01–02 · PS/SC M01–03)* = `sumifs(GROUP) × '[FS1]5. Daily Report 3'!…` *(PD 608 — đáp án bước sau, ⛔ engine)*. Đầu ra AL.PLT của FLS *(H9 · H10 · H11)* ⛔ tái tạo được hàng TOTAL: Σ PM CDT engine ↔ lá ATL khớp GI 3 · OMC 2 · SC 17 · PS 15 ô — PM CDT của engine = None ở vendor-tháng `P` chữ *"Need to manual input"* *(PM gõ tay)*; ảnh MID3 đóng băng ⛔ mang hàng TOTAL *(44 hàng ⛔ vendor/tháng, ⛔ cột A)*. ⇒ **DỪNG phần ấy** *(⛔ đoán, ⛔ đọc đáp án làm đầu vào)*.
+- **Cần ảnh** *(bước DATA, khuôn DT8/DT9)*: ① 4 tab `CFA2 | MID 3 | {GI,OMC,PS,SC} Platform Data Ledger` sổ P&L `19NNTb…` — hàng `TOTAL yyyymm` *(cột A + T:AD)*, HOẶC ô PM gõ tay của vendor-tháng `P` chữ *(thượng nguồn — tốt hơn)*; ② tháng ngoài MID3: nguồn tỉ lệ `'[FS1]5. Daily Report 3'` hàng PS/SC/GI/OMC theo CDT *(hoặc chờ H14 dựng PD 608)*.
+
+### 3 · Câu hỏi cho chủ — D3 *(⛔ tự đổi)*
+D3 *(AP §3.5.3, DECIDED)*: By GI ⇒ driver `PE`. AS-IS ATL dùng `GI khối / GI GROUP` với `GI khối` = hàng TOTAL MID3 *(trên)*. Đo: đổi sang tỉ lệ AS-IS ⇒ **3.099** ô hồi phục *(lớp `lech_D3`)*. **Hỏi:** giữ D3 *(FLS chia By GI theo PE chuẩn hoá IX.DRV — lệch AS-IS có tên vĩnh viễn)* hay đổi luật sang tỉ lệ GI MID3 như AS-IS *(cần ảnh ① ở trên; By GI bật được từ 202501)*? Khuyến nghị: **giữ D3 tới khi có ảnh ①**, rồi quyết theo số lệch đo được.
+
+### 4 · GHI NHẬN
+- **`-05` — ĐÃ SỬA.** `test_R1_05_kho_RONG_thieu_IX_ALR__DO_khong_dieu_kien`: bảng config ở SCHEMA TẠM RỖNG *(`LIKE … INCLUDING ALL`)*, giao dịch rollback ⇒ nhánh âm chạy MỌI lần *(⛔ `if co_alr == 0`)*. Bài kho khác *(`…co_tat_DO_roi_ky_bat_DAT`, PG `ky_bat`)* cũng chạy trong giao dịch rollback ⇒ ⛔ để lại bản ký cho bài C11.
+- **`-06` — ĐÃ SỬA.** `test_H12_R1_06_by_NOEM__sigma_DOC_LAP_voi_cong_thuc_du`: dư SHQ2 so với tiền × NOEM_SHQ2 *(REC)* và tiền × NOEM_SHQ2 / (1 − NOEM_CAH) *(OFR)* — đo NGOÀI công thức dư.
+- **`-02`** ⇒ §3 câu hỏi D3. **`-03`** ⇒ §2: errata v3.1.3 thêm `OMC · PS · SC` khối CDT *(hàng TOTAL MID3 / FS1 DR3)* + `OFR` *(chuẩn hoá trừ CAH — nay khớp)*.
+- **`-04` — ĐỂ SAU** *(C10 chưa gộp: `driver_cua` 0 tệp)*: lưới driver vẫn đọc ảnh `ix_drv.json`; chuyển sang `driver_cua` sau `WO-295`.
+- Phát hiện thêm khi đo *(đã sửa, bài đỏ trước)*: dư SHQ2 + cuộn Y/H/Q tính lại CẢ kỳ ⛔ chia ⇒ 6 ô `SHQ2` `BON`/`HCC` 2026 lệch 1e-29 ⇒ nay chỉ kỳ có ô chia *(bài `test_H12_R1_co_ky_2025__ky_ngoai_2025_dong_nhat_tru_NPC_hau_to`: ô 2024/2026 `==` trừ `NPC` 2024 — Σ hậu tố)*.
+
+### 5 · Bằng chứng ĐỎ trước · đột biến *(Đ5)*
+- ĐỎ trước: `test_luat_pb_ky_bat.py` 20 failed *(⛔ `dung_tu_tep_ky`)* · PG `ky_bat` 4 failed *(⛔ `ky_bat_ix_alr`)* · `phan_bo_khoa` 3 failed *(OFR chuẩn hoá · Σ độc lập · driver ngoại lệ thiếu)* + 1 *(2026 lệch 1e-29)* · cổng: `mong` cũ ⇒ `KHONG DAT` *(khop 40556 ≠ 39843 …)*.
+- Đột biến nguồn *(sửa → chạy → trả nguyên)*: **7/7** bị cắn — bỏ chuẩn hoá OFR · phản thực D3 no-op · phản thực nền tảng no-op · nạp MM ghi đè dòng ký · `kiem` nhận `bat=True` ⛔ ký · actor ≠ người ký · dư tính cả kỳ ⛔ chia. Đột biến `mong` *(bài tham số)*: sha từng lớp ×4 · đếm khối thừa/thiếu · `la_cdt_2025` ×2 · bỏ một lớp · tong_o · bỏ/thừa ô từng ô · giá trị ô ⇒ đều ĐỎ.
+
+### 6 · Sàn Q8 · cổng
+- Gộp nhánh làm việc vào `isp/H12` *(xung đột CHỈ sàn script + bài ghim ⇒ bản nhánh làm việc rồi đặt = thu thập thật cây gộp **4565**, web 690)*; vòng sửa +40 bài ⇒ **4605** *(web giữ 690)*, cùng commit.
+- `tools/dung_moi_truong_isp.sh --duong-nen --cong 5434` *(một mình, MỘT lần)*: **`KẾT: ĐẠT`** — toàn bộ: tập đỏ + XFAIL **28 = 28** node id *(XFAIL 2 = 2 · thêm 0 · bớt 0)* · chạy **4605** *(mong ≥ 4605)* · skipped 0 · deselected 0; `tests/web` **3 = 3** · chạy 690; di trú 27/27 · kho `fls` rỗng.
+- `lint-imports` 11 kept / 0 broken · `kiem_tai_lieu` ĐẠT *(451 tệp · 2.880 bảng)* · `soi_bang_tuyen` KHỚP **48** tuyến.
+- `do_hd2.py --goi WP-C5a --dsn …/fls_h12_cong --ghi`: `KẾT: DAT` ⇒ khối `WP-C5a` của `hd2_cong.json` sinh lại *(78 dòng thêm · 29 xoá)*.
