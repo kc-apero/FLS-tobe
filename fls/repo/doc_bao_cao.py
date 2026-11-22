@@ -1202,7 +1202,19 @@ def _goi_la(goi: str, b: dict, ten: str) -> Cong:
     if b.get("goi") != goi:
         return chua(f"`goi` = {b.get('goi')!r} ⛔ khớp khoá `{goi}`")
     dat = b.get("dat")
-    if type(dat) is not bool:
+    # ⭐ `H14-R1-01` (KQ-313, Đ3 · Đ5): khoá THÊM `khong_do_duoc` = danh sách CÓ TÊN các đáp án ô so = 0 *(DỪNG chưa ký)*.
+    #   `dat=null` + danh sách ⛔ rỗng ⇒ cổng `None` NÓI THẲNG từng đáp án *(⛔ "tệp hỏng")*; `dat=true` mà danh sách ⛔
+    #   rỗng ⇒ tự mâu thuẫn ⇒ `None`. Vắng ⇒ [] *(gói cũ)*. `phu_mot_phan` *(tuỳ chọn)* = câu độ phủ, chỉ IN.
+    kdd = b.get("khong_do_duoc", [])
+    phu = b.get("phu_mot_phan", [])
+    for k, v in (("khong_do_duoc", kdd), ("phu_mot_phan", phu)):
+        if not isinstance(v, list) or not all(isinstance(x, str) and x for x in v):
+            return chua(f"`{k}` = {v!r} ⛔ phải danh sách chuỗi")
+    if dat is True and kdd:
+        return chua(f"`dat=true` mà {len(kdd)} đáp án ⛔ đo được (`khong_do_duoc`) ⇒ tự mâu thuẫn")
+    if dat is None and not kdd:
+        return chua("`dat` = None ⛔ phải bool (chưa có phán quyết)")
+    if type(dat) is not bool and dat is not None:
         return chua(f"`dat` = {dat!r} ⛔ phải bool (chưa có phán quyết)")
     # ⭐ CG2-R1-01: `do_hd2.py` ⛔ cắt lát ⇒ khoá `lat_bo` VẮNG ở tệp thật (0 lần). Vắng ⇒ coi 0 NHƯNG
     #   cổng NÓI THẲNG (`da_do` + `lat_bo_nguon="vang"`), ⛔ `true` im lặng. Có khoá mà ⛔ phải số ≥ 0 ⇒ null.
@@ -1237,6 +1249,13 @@ def _goi_la(goi: str, b: dict, ten: str) -> Cong:
     ly = [str(x) for x in (b.get("ly_do") or []) if isinstance(x, str)]
     cum_lech = f"{ct} + {lech} lệch có chủ đích" if lech else ct          # Đ4: nói thẳng ở chỗ in
     vang = f" · {_LOI_LAT_VANG}" if nguon == "vang" else ""
+    if dat is None and lat == 0:                         # H14-R1-01: ⛔ đo được CÓ TÊN — ⛔ true, ⛔ "hỏng"
+        if not co_dem:
+            return chua("`dat=null` mà ⛔ khai `khop`/`tong_o`")
+        return Cong(ma=ma, ten=tn, dat=None, lat_bo_nguon=nguon, lech_co_chu_dich=lech,
+                    da_do=f"{khop}/{o} ô đáp án khớp{cum_lech} (gói {goi}){vang}",
+                    ly_do=f"{len(kdd)} đáp án ô so = 0 ⇒ ⛔ đo được: " + " · ".join(kdd)
+                          + "".join(f" · độ phủ {x}" for x in phu))
     if lat > 0:
         ly.insert(0, f"{lat} lát bị bỏ ⇒ có lỗ trong phép đo, ⛔ kết luận cho CẢ SỐ")
     if lat > 0 or not dat:
