@@ -67,7 +67,7 @@ from fls.cau_hinh.ky import LichKy  # noqa: E402
 from fls.canon.tien_te import ma_tien_te  # noqa: E402
 from fls.oracle.cong_parity import PhanXu, danh_gia  # noqa: E402
 
-GOI_BIET = ("WP-C2", "WP-C3a", "WP-C3b", "WP-C3c", "WP-C3d", "WP-C4a", "WP-C4b", "WP-C4c", "WP-C5a")
+GOI_BIET = ("WP-C2", "WP-C3a", "WP-C3b", "WP-C3c", "WP-C3d", "WP-C4a", "WP-C4b", "WP-C4c", "WP-C5a", "WP-C5b")
 COT_BMBT = ("BM", "BN", "BO", "BP", "BQ", "BR", "BS", "BT")
 #: ô kết quả → thuộc tính `KetQuaDongGL`.
 ATTR = {"BM": "vnd_ton_all", "BN": "musd_ton_all", "BO": "bvnd_no", "BP": "bvnd_co",
@@ -1844,6 +1844,13 @@ def main(argv: list[str] | None = None) -> int:
         if a.ghi:
             _ghi_cong("WP-C5a", tq5a.hd2_cong)
         return 0 if tq5a.phan_xu.dat else 1
+    if a.goi == "WP-C5b":
+        from tools import do_hd2_c5b            # H13 — tệp riêng; nhập muộn (tệp ấy nhập tệp này)
+        tq5b = do_hd2_c5b.chay_wp_c5b(a.dsn)
+        do_hd2_c5b.in_bao(tq5b)
+        if a.ghi:
+            _ghi_cong("WP-C5b", tq5b.hd2_cong)
+        return 0 if tq5b.phan_xu.dat else 1
     if a.goi == "WP-C3d":
         from tools import do_hd2_c3d            # H8 — tệp riêng; nhập muộn (tệp ấy nhập tệp này)
         tq3d = do_hd2_c3d.chay_wp_c3d(a.dsn)

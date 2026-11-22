@@ -295,3 +295,139 @@ def pla_yhqm(daily: KetQuaPLA, cay: CayHD, khoi: Sequence[str], ct: CongThuc) ->
     la = _chi_la(cu.o, loai)
     return KetQuaPLA(o=danh_gia(la, cay, cu.ky, khoi, ct), cot=list(cu.ky), khoi=tuple(khoi),
                      loai=loai, la=la, ky_khong_ngay=cu.ky_khong_ngay)
+
+
+# ══ SO.PLA3-ATL — dòng PL từ IX.PL + 2 phép CHECK trên lưới ATL *(ISP 3.1.2 · Step 44 · H13 · `WO-307`)* ══════════
+# ⭐ Lưới vào = ATL của FLS *(đầu ra AL.KEY `phan_bo_khoa` — H12)*: `{(khối, mã HD, kỳ): Decimal}`.
+# ⭐ Định nghĩa dòng PL là THAM SỐ *(IX.PL đọc từ kho ở nơi gọi — C12)*; phép tính đi qua CHÍNH
+#    `dong_pl.tinh_pl` / `dong_pl.check_pl` ⇒ ⛔ chép biểu thức, ⛔ gõ mã HD nào ở đây *(bài grep)*.
+# ⚠ Mỗi dòng tính với BAO ĐÓNG của riêng nó *(dòng + các dòng PL nó nhắc)*: `tinh_pl` tính MỌI dòng của định nghĩa
+#    đưa vào ⇒ một dòng thiếu đầu vào *(PL5 thiếu `COM_GAG` ngoài GROUP × tháng 2025)* sẽ làm hỏng cả 7 dòng.
+# ⚠ CHECK: `dong_pl.check_pl` so `==` tuyệt đối; lưới FLS là Decimal của float sheet ⇒ tầng này phân loại bằng
+#    `|chênh| ≤ atol` *(mặc định 1e-9 — cùng `atol_lech` của WP-C5a)*, ⛔ sửa engine C12.
+from fls.cau_hinh import dong_pl as _dong_pl  # noqa: E402  — nhập ở đây để khối H13 tự đứng
+
+#: trạng thái một phép CHECK của một kỳ-khối *(Đ3: "đạt" ⛔ trơn — tách có số / 0 = 0)*
+TRANG_THAI_CHECK = ("dat_co_so", "dat_0_0", "do", "khong_do_duoc")
+ATOL_CHECK = Decimal("1e-9")
+
+
+def _bao_dong(dinh_nghia: Mapping[str, str], dong: str) -> dict[str, str]:
+    """`{dòng: bt}` + mọi dòng PL mà nó nhắc *(đệ quy; chu trình để `tinh_pl` báo `PL_CHU_TRINH`)*."""
+    ra: dict[str, str] = {}
+    hang = [dong]
+    while hang:
+        d = hang.pop()
+        if d in ra or d not in dinh_nghia:
+            continue
+        ra[d] = dinh_nghia[d]
+        try:
+            hang += [m for m in _dong_pl.ma_dung({d: dinh_nghia[d]}) if m in dinh_nghia]
+        except _dong_pl.LoiPL:          # cú pháp hỏng ⇒ `tinh_pl` báo `PL_CU_PHAP` CÓ TÊN ở ô
+            pass
+    return ra
+
+
+def la_cua_dong(dinh_nghia: Mapping[str, str], dong: str) -> frozenset[str]:
+    """Mã LÁ *(mã HD + đầu vào ngoài — ⛔ dòng PL)* mà một dòng PL đi qua sau khi trải chuỗi PL."""
+    return frozenset(_dong_pl.ma_dung(_bao_dong(dinh_nghia, dong)))
+
+
+@dataclass(frozen=True)
+class KetQuaPLATL:
+    o: dict[tuple[str, str, str], Decimal]                    # (khối, dòng PL, kỳ) → giá trị
+    khong_tinh: dict[tuple[str, str, str], frozenset[str]]    # (khối, dòng PL, kỳ) → TẬP tên lỗi `PL_*`
+    chi_tiet: dict[tuple[str, str, str], str] = field(default_factory=dict)
+
+
+def dong_pl_atl(o: Mapping[tuple[str, str, str], Any], khoi: Iterable[str], ky_ds: Iterable[str],
+                dinh_nghia: Mapping[str, str],
+                dau_vao_ngoai: Mapping[tuple[str, str], Mapping[str, Any]] | None = None) -> KetQuaPLATL:
+    """Dòng PL của MỖI (khối, kỳ) từ `dinh_nghia` trên lưới `o`. `dau_vao_ngoai[(khối, kỳ)]` = giá trị ngoài cây
+    *(vd `COM_GAG`)*. Lỗi ⇒ ô vào `khong_tinh` với TẬP tên lỗi C12 *(⛔ ngầm 0, ⛔ làm hỏng dòng khác)*."""
+    ngoai = dau_vao_ngoai or {}
+    ra: dict[tuple[str, str, str], Decimal] = {}
+    loi: dict[tuple[str, str, str], frozenset[str]] = {}
+    chi: dict[tuple[str, str, str], str] = {}
+    bd: dict[str, dict[str, str]] = {}
+    la: dict[str, frozenset[str]] = {}
+    for d in dinh_nghia:
+        bd[d] = _bao_dong(dinh_nghia, d)
+        try:
+            la[d] = frozenset(_dong_pl.ma_dung(bd[d]))
+        except _dong_pl.LoiPL:
+            la[d] = frozenset()
+    ky_ds = list(ky_ds)
+    for kh in khoi:
+        for t in ky_ds:
+            ng = ngoai.get((kh, t), {})
+            for d in dinh_nghia:
+                gt = {m: o[(kh, m, t)] for m in la[d] if (kh, m, t) in o}
+                gt.update({m: v for m, v in ng.items() if m in la[d]})
+                try:
+                    ra[(kh, d, t)] = _dong_pl.tinh_pl(gt, bd[d])[d]
+                except _dong_pl.LoiPL as e:
+                    loi[(kh, d, t)] = e.ten
+                    chi[(kh, d, t)] = str(e)
+    return KetQuaPLATL(o=ra, khong_tinh=loi, chi_tiet=chi)
+
+
+@dataclass(frozen=True)
+class OCheck:
+    khoi: str
+    ky: str
+    phep: str
+    trai: Decimal | None
+    phai: Decimal | None
+    chenh: Decimal | None
+    trang_thai: str               # ∈ TRANG_THAI_CHECK
+    ly_do: str = ""
+
+
+def _o_trong(v: Any) -> bool:
+    """Ô KHÔNG mang dữ liệu: số `0` hoặc trống *(`None`/`""`)*. Chuỗi khác *(`#N/A`…)* là CÓ dữ liệu *(⛔ ngầm 0)*."""
+    if v is None or (isinstance(v, str) and not v.strip()):
+        return True
+    try:
+        return v == 0
+    except TypeError:
+        return False
+
+
+def check_atl(o: Mapping[tuple[str, str, str], Any], khoi: Iterable[str], ky_ds: Iterable[str],
+              atol: Decimal = ATOL_CHECK, ma_la: Iterable[str] | None = None) -> tuple[OCheck, ...]:
+    """Hai phép CHECK của IX.PL *(`dong_pl.CHECK` qua `check_pl`)* ở MỖI (khối, kỳ). Thiếu mã ⇒ `khong_do_duoc` CẢ
+    hai phép *(lỗi CÓ TÊN của C12)*.
+
+    ⭐ Phép cân *(`|chênh| ≤ atol`)* ⇒ `dat_0_0` khi **TẬP BẰNG CHỨNG** của phép toàn 0/trống *(`_o_trong`)*, còn lại
+       `dat_co_so`. Tập bằng chứng *(`H13-R1-01`, KQ-309)*:
+       · phép **HAI vế** *(②)* ⇒ các mã của phép — 8 mã đều 0 là 0 = 0, ⛔ chứng minh đẳng thức dù kỳ-khối có số;
+       · phép **MỘT vế** *(so với hằng 0 — ① `NB = 0`)* ⇒ mọi mã LÁ của kỳ-khối = **kỳ-khối RỖNG thật**. Trước sửa
+         dùng "mọi mã của phép = 0" ⇔ `NB = 0` ⇒ 56 kỳ-khối `GI ≠ 0` mà `NB` cân đúng 0 bị đếm 0 = 0 *(Đ3/Đ4: một
+         số đếm hai vật)*.
+    ⚠ `ma_la` = mã LÁ của cây *(`loai_ma` = `la`)*; `None` ⇒ mọi mã có trong lưới. Lưới PLA đủ phải truyền: KPI
+       cộng dồn QUA kỳ *(`NPC` = Σ hậu tố `NP`)* ≠ 0 ở kỳ ⛔ có lá nào ≠ 0 — đo 22/11: toàn lưới ⇒ rỗng 129, lá ⇒ 359."""
+    ma = sorted({m for _, t, p in _dong_pl.CHECK for m in t + p})
+    ky_ds = list(ky_ds)
+    la = None if ma_la is None else frozenset(ma_la)
+    co_du_lieu: set[tuple[str, str]] = {(kh, t) for (kh, m, t), v in o.items()
+                                        if (la is None or m in la) and not _o_trong(v)}
+    ra: list[OCheck] = []
+    for kh in khoi:
+        for t in ky_ds:
+            gt = {m: o[(kh, m, t)] for m in ma if (kh, m, t) in o}
+            try:
+                kq = _dong_pl.check_pl(gt)
+            except _dong_pl.LoiPL as e:
+                ra += [OCheck(kh, t, ten, None, None, None, "khong_do_duoc", str(e))
+                       for ten, _, _ in _dong_pl.CHECK]
+                continue
+            for (ten, tr, ph), p in zip(_dong_pl.CHECK, kq.phep):
+                if abs(p.chenh) > atol:
+                    tt = "do"
+                elif (all(_o_trong(gt[m]) for m in tr + ph) if tr and ph else (kh, t) not in co_du_lieu):
+                    tt = "dat_0_0"
+                else:
+                    tt = "dat_co_so"
+                ra.append(OCheck(kh, t, ten, p.trai, p.phai, p.chenh, tt))
+    return tuple(ra)
