@@ -57,7 +57,8 @@ MONG_FINAL_TU_SOI = "37 dòng tự soi loại"
 # `HD1_THANG` · ISP Step 7 §2 "'5/23 kỳ đạt' (KHÔNG ĐẠT)". Kỳ ĐỎ + số dòng thiếu mỗi kỳ:
 #   `MONG["phan_bo_ky_thieu"]` của DT1a (`tools/phan_loai_dong_thieu.py:128`, BG-081 §Bảng đếm) —
 #   18 kỳ, Σ 122; xếp theo thời gian. Bài `test_MONG_ky_do_TRUNG_hien_vat_DT1a` so nguồn thứ hai.
-MONG_HD1_DA_DO = "5/23 kỳ đạt"
+# ⛔ I1-R1-01: mẫu số in RÕ — 23 kỳ đo được đủ hai vế · 26 kỳ có ảnh (`tu_sinh`)
+MONG_HD1_DA_DO = "5 kỳ đạt / 23 kỳ đo được / 26 kỳ có ảnh"
 MONG_KY_DAT = ("2024-10", "2024-11", "2024-12", "2025-03", "2025-04")
 MONG_KY_DO = (
     ("2025-01", 1), ("2025-02", 2), ("2025-05", 1), ("2025-06", 3), ("2025-07", 4),
@@ -224,6 +225,10 @@ def _moi_ky_dat(d: dict) -> None:
         h["theo_ky"][k]["dat"] = True
     h["ky_dat"] = sorted(h["theo_ky"])
     h["so_ky_dat"] = len(h["ky_dat"])
+    # I1-R1-01: ảnh `tu_sinh` chỉ phủ đúng 23 kỳ của cổng ⇒ mọi kỳ ĐO ĐƯỢC (còn 26 ⇒ `dat=None`)
+    for k in ("2026-09", "2026-10", "2026-11"):
+        d["tu_sinh"]["theo_ky"].pop(k)
+    d["tu_sinh"]["so_ky_co_anh"] = len(d["tu_sinh"]["theo_ky"])
 
 
 @pytest.mark.pg
@@ -235,7 +240,7 @@ def test_CG1_B4_tep_PHA_qua_tuyen_that_HAI_CHIEU(tmp_path):
         _moi_ky_dat(d)
     c = _theo_ma(_gates(_tep_pha(tmp_path, pha)))
     assert c["FINAL"]["dat"] is False and "1/69.510 ô LỆCH" in c["FINAL"]["ly_do"], c["FINAL"]
-    assert c["HD1_THANG"]["dat"] is True and c["HD1_THANG"]["da_do"] == "23/23 kỳ đạt", c["HD1_THANG"]
+    assert c["HD1_THANG"]["dat"] is True and c["HD1_THANG"]["da_do"] == "23 kỳ đạt / 23 kỳ đo được / 23 kỳ có ảnh", c["HD1_THANG"]
 
 
 # ══ hàm thuần `doc_cong_tep_do` — ca phá tệp đo (⛔ cần kho) ════════════════════════════════════
@@ -323,7 +328,7 @@ def test_HD1_ky_do_co_0_dong_thieu_VAN_duoc_ke_ra(tmp_path):
         h["ky_dat"] = [k for k in h["ky_dat"] if k != "2024-10"]
         h["so_ky_dat"] = len(h["ky_dat"])
     c = _hai(_tep_pha(tmp_path, pha))["HD1_THANG"]
-    assert c.dat is False and c.da_do == "4/23 kỳ đạt", c
+    assert c.dat is False and c.da_do == "4 kỳ đạt / 23 kỳ đo được / 26 kỳ có ảnh", c
     cap = dict((k, int(n)) for k, n in _CAP_KY.findall(c.ly_do))
     assert cap.get("2024-10") == 0 and len(cap) == 19, c.ly_do
 

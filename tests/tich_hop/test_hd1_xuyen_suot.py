@@ -7,13 +7,10 @@ Ba tầng so cùng một thứ — *số kỳ đạt* và *danh sách kỳ đỏ
   ② tuyến    `GET /gates` qua máy chủ thử, `tep_do` = tệp tạm ở ①;
   ③ màn      F03 — node-vm (`man_f03.js` thật) VÀ Chromium headless THẬT.
 
-⛔⛔ PHÁT HIỆN I1-P1 (đo 22/11, ⛔ sửa ngầm engine H15/CG1/FG — ghi + báo):
-  `WO-303`/ISP nói "x/26"; đo thật: cổng `HD1_THANG` đọc khối `dat_hd1` ⇒ **x/23** (mẫu số = 23 kỳ của
-  ẢNH sổ 26/08, `mau_so.so_ky`), còn H15 `tu_sinh` ⇒ **26 kỳ** (manifest DT12, 25 kỳ đọc 20/11 +
-  2026-03 mốc cũ) là KHỐI KHÁC mà CG1 ⛔ đọc. Ba kỳ `2026-09 · 2026-10 · 2026-11` chỉ có ở `tu_sinh`.
-  ⇒ ba tầng ①②③ khớp nhau ở **23**; "26" dừng ở ①-`tu_sinh`. Bài ghim ĐÚNG hiện trạng đó (Đ5: một
-  ngày CG1 đọc `tu_sinh` ⇒ bài ĐỎ ⇒ người sửa khai lại `MONG_*`), ⛔ giả vờ 26 ở cổng.
-  Nhãn DT1b (tên nhãn) ⛔ đi tới `ly_do`: cổng chỉ mang *kỳ: số dòng thiếu* (I1-P2).
+⭐ `I1-R1-01/02` (vòng sửa sau `KQ-305`, orchestrator quyết): cổng `HD1_THANG` phán MỌI kỳ có ảnh
+  = **26** (`tu_sinh.so_ky_co_anh`); 23 kỳ `dat_hd1` ĐO ĐƯỢC đủ hai vế; 3 kỳ `2026-09·10·11` chỉ có ở
+  `tu_sinh` (⛔ vế dòng ghép 1-1) ⇒ `khong_do_duoc` có tên vế. `da_do` = "x kỳ đạt / y kỳ đo được /
+  26 kỳ có ảnh" ở CẢ ba tầng; `ly_do` mang TÊN nhãn DT1b (hoặc "chưa có nhãn DT1b" có tên tệp).
 """
 from __future__ import annotations
 
@@ -110,9 +107,9 @@ def _tang2(p: Path) -> tuple[dict, dict]:
 
 def _doc_cong(g: dict) -> dict:
     """Bóc `da_do` + `ly_do` của cổng ⇒ (số đạt, số kỳ, các cặp kỳ đỏ)."""
-    m = re.fullmatch(r"(\d+)/(\d+) kỳ đạt", g["da_do"])
+    m = re.fullmatch(r"(\d+) kỳ đạt / (\d+) kỳ đo được / (\d+) kỳ có ảnh", g["da_do"])
     assert m, g["da_do"]
-    return {"so_dat": int(m[1]), "so_ky": int(m[2]), "ky_do": tuple(sorted((k, int(n)) for k, n in _CAP_KY.findall(g["ly_do"])))}
+    return {"so_dat": int(m[1]), "so_ky": int(m[2]), "so_anh": int(m[3]), "ky_do": tuple(sorted((k, int(n)) for k, n in _CAP_KY.findall(g["ly_do"])))}
 
 
 @pytest.fixture(scope="module")
@@ -133,6 +130,7 @@ def test_B1_ba_tang_cung_so_ky_dat_va_danh_sach_ky_do(chuoi_that):
     c = _doc_cong(g)
     assert g["dat"] is False
     assert (c["so_dat"], c["so_ky"]) == (t1["so_dat"], t1["so_ky"]) == (5, 23)          # ① = ②
+    assert c["so_anh"] == MONG_SO_KY_TU_SINH == len(t1["d"]["tu_sinh"]["theo_ky"])      # mẫu số = 26
     assert c["ky_do"] == t1["ky_do"]
     # Đ2 — nguồn THỨ HAI: tệp ĐÃ COMMIT (ảnh tĩnh) = lần đo sống ở ①
     that = json.loads(TEP_THAT.read_text(encoding="utf-8"))["dat_hd1"]
@@ -149,23 +147,27 @@ def test_B1_nhan_ly_do_ngay_anh_va_nhan_moc_so_o_tang_cong_va_tang_tu_sinh(chuoi
     assert sum(v == NHAN_MOC_MOI for v in moc.values()) == 25
 
 
-# ═══ I1-P1 — hai khối, hai mẫu số: ghim hiện trạng ═════════════════════════════════════════════
-def test_P1_cong_doc_23_ky_cua_dat_hd1_con_tu_sinh_26_ky_chua_toi_cong(chuoi_that):
+# ═══ I1-R1-01 — cổng phán 26 kỳ có ảnh; 3 kỳ ⛔ đo được vế dòng có TÊN ═══════════════════════════
+def test_R1_01_cong_phan_26_ky_co_anh_ba_ky_moi_khong_do_duoc_ve_dong(chuoi_that):
     d, g = chuoi_that["t1"]["d"], chuoi_that["g"]
     ts = d["tu_sinh"]
     assert ts["so_ky_co_anh"] == len(ts["theo_ky"]) == MONG_SO_KY_TU_SINH and ts["chua_do"] == {}
     ky_cong, ky_ts = set(d["dat_hd1"]["theo_ky"]), set(ts["theo_ky"])
     assert len(ky_cong) == MONG_SO_KY_CONG and ky_cong < ky_ts
     assert tuple(sorted(ky_ts - ky_cong)) == MONG_KY_CHI_O_TU_SINH
-    assert _doc_cong(g)["so_ky"] == MONG_SO_KY_CONG != ts["so_ky_co_anh"]    # cổng ⛔ mang 26
-    # mọi kỳ cổng đọc KHÔNG nhắc tên kỳ chỉ-ở-tu_sinh
-    assert not any(k in g["ly_do"] for k in MONG_KY_CHI_O_TU_SINH), g["ly_do"]
+    c = _doc_cong(g)
+    assert (c["so_dat"], c["so_ky"], c["so_anh"]) == (5, MONG_SO_KY_CONG, MONG_SO_KY_TU_SINH)
+    assert g["dat"] is False
+    # ba kỳ mới được NÓI TÊN cùng vế ⛔ đo được (⛔ đạt, ⛔ bỏ im lặng)
+    assert all(k in g["ly_do"] for k in MONG_KY_CHI_O_TU_SINH), g["ly_do"]
+    assert "3/26 kỳ ⛔ đo được vế dòng ghép 1-1" in g["ly_do"], g["ly_do"]
 
 
-def test_P2_ly_do_chi_mang_ky_va_so_dong_thieu_khong_mang_TEN_nhan_DT1b(chuoi_that):
+def test_R1_02_ly_do_tep_nhan_vang_noi_chua_co_nhan_DT1b_co_ten_tep(chuoi_that):
     g = chuoi_that["g"]
     assert not re.search(r"TONG_HOP|KHONG_CO_SAO_KE|KHOA_LECH|TRUNG_SEQ|\bKHAC\b", g["ly_do"]), g["ly_do"]
     assert chuoi_that["t1"]["d"]["dat_hd1"]["tep_nhan"]["co"] is False          # DT1b chưa ghi tệp nhãn
+    assert "chưa có nhãn DT1b (tệp nhãn docs/ITL/_tools/phan_loai_ly_do.json VẮNG)" in g["ly_do"], g["ly_do"]
 
 
 def test_tu_sinh_26_ky_so_o_khop_MONG(chuoi_that):
@@ -183,7 +185,7 @@ def test_F1_vm_the_HD1_khop_cong_tung_chuoi(chuoi_that):
     ve = _ve_f03(chuoi_that["data"])
     hd1 = _the(ve, _TEN_HD1)
     assert "fail" in _lop(hd1) and "KHÔNG ĐẠT" in hd1["txt"], hd1
-    assert g["da_do"] in hd1["txt"] and "5/23" in hd1["txt"] and "/26" not in hd1["txt"], hd1["txt"][:160]
+    assert g["da_do"] in hd1["txt"] and "5 kỳ đạt / 23 kỳ đo được / 26 kỳ có ảnh" in hd1["txt"], hd1["txt"][:160]
     assert g["ly_do"] in hd1["txt"]                       # danh sách kỳ đỏ ĐẦY ĐỦ trên thẻ
     assert {k for k, _ in _CAP_KY.findall(hd1["txt"])} == {k for k, _ in MONG_KY_DO}
 
@@ -272,16 +274,23 @@ def test_AC5_chu_ky_GIA_ky_2026_07_xanh_o_ca_ba_tang_go_chu_ky_thi_do_lai(chuoi_
     assert (t1["so_dat"], t1["ky_dat"], t1["ky_do"]) == (6, ky_dat_ky, ky_do_ky)             # ①
     data, g = _tang2(p)
     c = _doc_cong(g)
-    assert (c["so_dat"], c["so_ky"], c["ky_do"]) == (6, 23, ky_do_ky) and g["dat"] is False   # ②
+    assert (c["so_dat"], c["so_ky"], c["so_anh"], c["ky_do"]) == (6, 23, 26, ky_do_ky) and g["dat"] is False  # ②
+    # I1-R1-02 (Đ3: nhãn CÓ trong đầu vào — tệp nhãn tmp): TÊN nhãn + số dòng vào `ly_do`, ở ②
+    for ten in ("TONG_HOP_A", "TONG_HOP_B", "TONG_HOP_L"):
+        assert ten in g["ly_do"], (ten, g["ly_do"])
+    assert f"TONG_HOP_A {t1['d']['dat_hd1']['theo_nhan']['TONG_HOP_A']['so_dong']} dòng (đã ký)" in g["ly_do"]
+    assert "chưa có nhãn DT1b" not in g["ly_do"]
     ve = _ve_f03(data)
     hd1 = _the(ve, _TEN_HD1)
-    assert "6/23" in hd1["txt"] and g["ly_do"] in hd1["txt"], hd1["txt"][:160]                  # ③ vm
+    assert "6 kỳ đạt / 23 kỳ đo được / 26 kỳ có ảnh" in hd1["txt"] and g["ly_do"] in hd1["txt"], hd1["txt"][:160]  # ③ vm
+    assert "TONG_HOP_A" in hd1["txt"] and "TONG_HOP_B" in hd1["txt"]
     assert KY_GIA not in {k for k, _ in _CAP_KY.findall(hd1["txt"])}
     if not can_browser.args[0]:                                                                 # ③ Chromium
         with _may(str(p)) as (m, _tok):
             res = _do_tran("http://%s:%d/" % m.server_address, 390)
         h = [x for x in res["gates"] if _TEN_HD1 in x["txt"]]
-        assert len(h) == 1 and "6/23" in h[0]["txt"] and KY_GIA not in {k for k, _ in _CAP_KY.findall(h[0]["txt"])}
+        assert len(h) == 1 and "6 kỳ đạt / 23 kỳ đo được / 26 kỳ có ảnh" in h[0]["txt"] \
+            and "TONG_HOP_B" in h[0]["txt"] and KY_GIA not in {k for k, _ in _CAP_KY.findall(h[0]["txt"])}
 
     # ── gỡ chữ ký ⇒ đỏ lại ở ba tầng (đo tay: chữ ký chỉ là tệp tạm) ──
     so.write_text(json.dumps({"chu_ky": []}), encoding="utf-8")
@@ -291,7 +300,7 @@ def test_AC5_chu_ky_GIA_ky_2026_07_xanh_o_ca_ba_tang_go_chu_ky_thi_do_lai(chuoi_
     data2, g2 = _tang2(p2)
     c2 = _doc_cong(g2)
     assert (c2["so_dat"], c2["ky_do"]) == (5, MONG_KY_DO) and (KY_GIA, 23) in c2["ky_do"]
-    assert "5/23" in _the(_ve_f03(data2), _TEN_HD1)["txt"]
+    assert "5 kỳ đạt / 23 kỳ đo được / 26 kỳ có ảnh" in _the(_ve_f03(data2), _TEN_HD1)["txt"]
     # biên: sổ lý do THẬT còn RỖNG (⛔ chữ ký thật O8 ở repo)
     assert json.loads(SO_LY_DO_THAT.read_text(encoding="utf-8")).get("chu_ky") == []
     assert os.path.exists(os.fspath(TEP_THAT))
