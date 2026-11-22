@@ -333,7 +333,10 @@ def test_AC6_anh_cu_va_cong_cu_chung_dung_tung_byte():
         assert hashlib.sha256((F / k).read_bytes()).hexdigest() == SHA_CU[k], k
     assert hashlib.sha256((GOC / "tools" / "dong_bang_sheet.py").read_bytes()).hexdigest() == SHA_CU["dong_bang_sheet.py"]
     # ảnh DT11 là tệp mới, ngoài 22 ảnh cũ
-    assert {f.name for f in F.glob("*.json")} - ten_cu == {"daily_report_2.json", "daily_report_3.json"}
+    # + 4 ảnh H14 *(`DT11-R1-02`, vòng sửa KQ-271: PD 607·608·609·615)* — tệp MỚI, ⛔ đụng 22 ảnh cũ · 2 ảnh DT11
+    assert {f.name for f in F.glob("*.json")} - ten_cu == {
+        "daily_report_2.json", "daily_report_3.json", "daily_report_3_fs2.json", "daily_report_3_fs1.json",
+        "daily_report_3_gop.json", "ccr_daily_report.json"}
 
 
 def test_AC6_hai_khuon_la_tep_rieng_khong_dung_chung_than():
