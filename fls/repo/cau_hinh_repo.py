@@ -608,9 +608,38 @@ def nap_ix_alr(conn, duong_mm: str, *, tu_ky: int, actor: str,
         cap_d = dict(truoc.dong)
     except (ChuaKhai, luat_pb.LoiLuatPB):
         cap_d = {}
-    cap_d.update(moi)
+    # ⭐ vòng sửa R1 `H12`: dòng ĐÃ KÝ *(mang `ky` — `ky_bat_ix_alr`)* ⛔ bị đường nạp ghi đè ở CÙNG khoá
+    #    *(vd `HCC@202501`)* — nạp lại Mapping Master ⛔ được lặng lẽ GỠ chữ ký; gỡ là một tệp ký mới.
+    cap_d.update((k, v) for k, v in moi
+                 if not (isinstance(cap_d.get(k), Mapping) and luat_pb.COT_KY in cap_d[k]))
     cap = list(cap_d.items())
     return nap(conn, BANG_ALR, cap, nguon=nguon or duong_mm, actor=actor)
+
+
+def ky_bat_ix_alr(conn, duong_tep: str, *, actor: str) -> BanCauHinh:
+    """**Bật/tắt cờ CÓ KÝ** *(vòng sửa R1 `H12` — `KQ-293`; quyết của chủ 22/11 ~10:05 UTC)*: tệp ký config có
+    phiên bản *(`luat_pb.dung_tu_tep_ky`)* ⇒ một phiên bản MỚI của `IX.ALR` = bản hiện hành + dòng đã ký
+    *(cùng khoá `hd@tu_ky` ⇒ dòng ký thắng — bản cũ NGUYÊN trong kho, ⛔ sửa)*.
+
+    `actor` = người ký ghi trong tệp *(⛔ người khác nạp hộ chữ ký của người khác; ⛔ email)*. Kho chưa có
+    `IX.ALR` ⇒ `ChuaKhai` *(⛔ ký trên rỗng)*; bản hiện hành BẨN ⇒ `BanHong`."""
+    tep = json.loads(Path(duong_tep).read_text(encoding="utf-8"))
+    ky_tep = tep.get("ky") if isinstance(tep, Mapping) else None
+    nguoi = ky_tep.get("nguoi_ky") if isinstance(ky_tep, Mapping) else None
+    if not str(actor or "").strip() or "@" in str(actor) or actor != nguoi:
+        raise LoiCauHinh(
+            "⛔ `actor` %r ≠ người ký %r của tệp — bật cờ là chữ ký CỦA NGƯỜI ẤY *(TÊN, ⛔ email)*"
+            % (actor, nguoi))
+    truoc = _doc_ban(conn, BANG_ALR)                     # `ChuaKhai` ⇒ ⛔ ký trên rỗng
+    try:
+        hien = _alr_tu_cap(truoc.dong, truoc.nguon)
+    except luat_pb.LoiLuatPB as e:
+        raise BanHong("⛔ bản `IX.ALR` phiên bản %s ⛔ đọc ra được ⇒ ⛔ ký lên nó" % truoc.phien_ban) from e
+    moi = luat_pb.dung_tu_tep_ky(tep, hien)              # `LoiLuatPB` CÓ TÊN
+    cap_d = dict(truoc.dong)
+    cap_d.update((luat_pb.khoa_cua(r["hd"], r["tu_ky"]), r) for r in moi)
+    return nap(conn, BANG_ALR, list(cap_d.items()),
+               nguon="ky:%s#v%s" % (Path(duong_tep).name, tep.get("phien_ban_tep")), actor=actor)
 
 
 def doc_alr(conn) -> luat_pb.BangALR:
