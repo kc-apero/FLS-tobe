@@ -162,7 +162,7 @@ def test_FG_F1_tep_do_that_FINAL_dat_HD1_khong_dat_5_tren_23():
     # ── ① vế TUYẾN đo (nền của phép so — Đ3: mẫu số ⛔ rỗng) ───────────────
     assert g["FINAL"]["dat"] is True, g["FINAL"]
     assert g["HD1_THANG"]["dat"] is False, g["HD1_THANG"]
-    assert "5/23" in g["HD1_THANG"]["da_do"], g["HD1_THANG"]["da_do"]
+    assert g["HD1_THANG"]["da_do"] == "5 kỳ đạt / 23 kỳ đo được / 26 kỳ có ảnh", g["HD1_THANG"]["da_do"]
     assert d["chua_do_duoc"] > 0, d           # tập 'chưa đo được' KHÔNG rỗng
     assert d["dat"] >= 1 and d["khong_dat"] >= 1, d
 
@@ -318,7 +318,7 @@ def test_FG_F3_ly_do_23_ky_khong_tran_ngang_o_390px():
 
     hd1 = [x for x in res["gates"] if _TEN_HD1 in x["txt"]]
     assert len(hd1) == 1, [x["txt"][:48] for x in res["gates"]]
-    assert "5/23" in hd1[0]["txt"], hd1[0]["txt"][:120]        # tập ⛔ rỗng
+    assert "5 kỳ đạt / 23 kỳ đo được / 26 kỳ có ảnh" in hd1[0]["txt"], hd1[0]["txt"][:120]        # tập ⛔ rỗng
     # ── FG-R2-01 (`KQ-119`): thẻ HD1 THẬT mang danh sách kỳ đỏ (`ly_do` ĐẦY ĐỦ)
     #    TRƯỚC khi đo tràn — ⛔ đo tràn trên một thẻ đã cụt lý do (Đ3). Bài tên
     #    "lý do 23 kỳ ⛔ tràn" phải khẳng định lý do 23 kỳ CÓ trên thẻ, so với
