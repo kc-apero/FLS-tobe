@@ -384,12 +384,34 @@ class OCheck:
     ly_do: str = ""
 
 
+def _o_trong(v: Any) -> bool:
+    """Ô KHÔNG mang dữ liệu: số `0` hoặc trống *(`None`/`""`)*. Chuỗi khác *(`#N/A`…)* là CÓ dữ liệu *(⛔ ngầm 0)*."""
+    if v is None or (isinstance(v, str) and not v.strip()):
+        return True
+    try:
+        return v == 0
+    except TypeError:
+        return False
+
+
 def check_atl(o: Mapping[tuple[str, str, str], Any], khoi: Iterable[str], ky_ds: Iterable[str],
-              atol: Decimal = ATOL_CHECK) -> tuple[OCheck, ...]:
-    """Hai phép CHECK của IX.PL *(`dong_pl.CHECK` qua `check_pl`)* ở MỖI (khối, kỳ). `dat_0_0` = mọi mã của phép
-    đúng 0 *(⛔ bằng chứng dương)*; thiếu mã ⇒ `khong_do_duoc` CẢ hai phép *(lỗi CÓ TÊN của C12)*."""
+              atol: Decimal = ATOL_CHECK, ma_la: Iterable[str] | None = None) -> tuple[OCheck, ...]:
+    """Hai phép CHECK của IX.PL *(`dong_pl.CHECK` qua `check_pl`)* ở MỖI (khối, kỳ). Thiếu mã ⇒ `khong_do_duoc` CẢ
+    hai phép *(lỗi CÓ TÊN của C12)*.
+
+    ⭐ Phép cân *(`|chênh| ≤ atol`)* ⇒ `dat_0_0` khi **TẬP BẰNG CHỨNG** của phép toàn 0/trống *(`_o_trong`)*, còn lại
+       `dat_co_so`. Tập bằng chứng *(`H13-R1-01`, KQ-309)*:
+       · phép **HAI vế** *(②)* ⇒ các mã của phép — 8 mã đều 0 là 0 = 0, ⛔ chứng minh đẳng thức dù kỳ-khối có số;
+       · phép **MỘT vế** *(so với hằng 0 — ① `NB = 0`)* ⇒ mọi mã LÁ của kỳ-khối = **kỳ-khối RỖNG thật**. Trước sửa
+         dùng "mọi mã của phép = 0" ⇔ `NB = 0` ⇒ 56 kỳ-khối `GI ≠ 0` mà `NB` cân đúng 0 bị đếm 0 = 0 *(Đ3/Đ4: một
+         số đếm hai vật)*.
+    ⚠ `ma_la` = mã LÁ của cây *(`loai_ma` = `la`)*; `None` ⇒ mọi mã có trong lưới. Lưới PLA đủ phải truyền: KPI
+       cộng dồn QUA kỳ *(`NPC` = Σ hậu tố `NP`)* ≠ 0 ở kỳ ⛔ có lá nào ≠ 0 — đo 22/11: toàn lưới ⇒ rỗng 129, lá ⇒ 359."""
     ma = sorted({m for _, t, p in _dong_pl.CHECK for m in t + p})
     ky_ds = list(ky_ds)
+    la = None if ma_la is None else frozenset(ma_la)
+    co_du_lieu: set[tuple[str, str]] = {(kh, t) for (kh, m, t), v in o.items()
+                                        if (la is None or m in la) and not _o_trong(v)}
     ra: list[OCheck] = []
     for kh in khoi:
         for t in ky_ds:
@@ -401,11 +423,11 @@ def check_atl(o: Mapping[tuple[str, str, str], Any], khoi: Iterable[str], ky_ds:
                        for ten, _, _ in _dong_pl.CHECK]
                 continue
             for (ten, tr, ph), p in zip(_dong_pl.CHECK, kq.phep):
-                if all(gt[m] == 0 for m in tr + ph):
-                    tt = "dat_0_0"
-                elif abs(p.chenh) <= atol:
-                    tt = "dat_co_so"
-                else:
+                if abs(p.chenh) > atol:
                     tt = "do"
+                elif (all(_o_trong(gt[m]) for m in tr + ph) if tr and ph else (kh, t) not in co_du_lieu):
+                    tt = "dat_0_0"
+                else:
+                    tt = "dat_co_so"
                 ra.append(OCheck(kh, t, ten, p.trai, p.phai, p.chenh, tt))
     return tuple(ra)

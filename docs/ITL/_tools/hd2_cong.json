@@ -1842,8 +1842,8 @@
   "check": {
    "fls": {
     "NB = 0": {
-     "dat_co_so": 0,
-     "dat_0_0": 537,
+     "dat_co_so": 178,
+     "dat_0_0": 359,
      "do": 147,
      "khong_do_duoc": 0
     },
@@ -1856,8 +1856,8 @@
    },
    "dap_an": {
     "NB = 0": {
-     "dat_co_so": 0,
-     "dat_0_0": 537,
+     "dat_co_so": 172,
+     "dat_0_0": 365,
      "do": 147,
      "khong_do_duoc": 0
     },
@@ -1871,10 +1871,10 @@
    "so_ky_do": 29,
    "do_sha256": "8aff172ae42ef1de08b63885b0ed4fbde04e4d9b90de1558aa9a3ff1fabfb012",
    "doi_chieu_dap_an": {
-    "khop": 1326,
+    "khop": 1320,
     "dap_an_khong_do_duoc": 0,
     "lop_thua_ke": {
-     "loi_as_is": 42
+     "loi_as_is": 48
     },
     "lech_FLS": 0
    },

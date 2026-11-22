@@ -10,8 +10,12 @@ Nhãn Đ4 *(mỗi số nói nó đếm gì)*:
   · `nhan_c5a` — lớp C5a của CHÍNH ô KPI `PL*` ∈ nhãn thừa kế: 922 trùng · 0 khác · 1 ⛔ có *(GROUP PL5 2025M02 — PL5
     là ô `trong` của `pla`, C5a ⛔ so)*.
   · `hai_dinh_nghia` — IX.PL ↔ KPI `PL*` của `pla.CONG_THUC_PM` *(H8)*: 4.104 ô = 6 dòng × 12 khối × 57 kỳ, chênh 0.
-  · `check` — kỳ-KHỐI *(684 = 12 × 57 mỗi phép)*: `dat_co_so` 0 ở CẢ HAI phép *(Đ3: mọi "đạt" là 0 = 0 — trùng DT11
-    trên Daily Report)*; 29 kỳ có ≥ 1 khối đỏ; đối chiếu CHECK của ATL: 1.326 khớp + 42 lệch thừa kế `loi_as_is`.
+  · `check` — kỳ-KHỐI *(684 = 12 × 57 mỗi phép)*. `dat_0_0` = TẬP BẰNG CHỨNG của phép toàn 0 *(`H13-R1-01`, KQ-309)*:
+    ① `NB = 0` *(MỘT vế)* ⇒ kỳ-khối có MỌI mã LÁ = 0 *(rỗng thật)* — FLS `dat_co_so` 178 · `dat_0_0` 359; ② *(HAI vế)*
+    ⇒ 8 mã của phép = 0 — `dat_co_so` 0 *(mọi "đạt" ② là 0 = 0 — trùng DT11)* · `dat_0_0` 470. Trước sửa ① ghi
+    `0 · 537` *(537 trộn 178 kỳ-khối có lá ≠ 0)*. 29 kỳ có ≥ 1 khối đỏ; đối chiếu CHECK của ATL: 1.320 khớp + 48 lệch
+    thừa kế `loi_as_is` *(+6 so bản đầu: ① FLS `dat_co_so` ↔ ATL `dat_0_0` ở ASA 2024·H2·Q4·M11·M12 + SHQ1 2024M11 —
+    lá `CXA` lệch `loi_as_is` ≠ 0 ở FLS, 0 ở ATL; phép đo hồi phục so CẢ trạng thái)*.
 """
 from typing import Any
 
@@ -26,21 +30,21 @@ MONG: dict[str, Any] = {'tong_o': 4102,
          'khong_tinh': {'PL5|PL_THIEU_GIA_TRI': 252},
          'nhan_c5a': {'trung': 922, 'khac': 0, 'khong_co': 1},
          'hai_dinh_nghia': {'o_so': 4104, 'chenh': 0},
-         'check': {'fls': {'NB = 0': {'dat_co_so': 0, 'dat_0_0': 537, 'do': 147, 'khong_do_duoc': 0},
+         'check': {'fls': {'NB = 0': {'dat_co_so': 178, 'dat_0_0': 359, 'do': 147, 'khong_do_duoc': 0},
                            'NIS+INT+PIT+COM = CXA+GAH+DC+MC': {'dat_co_so': 0,
                                                                'dat_0_0': 470,
                                                                'do': 214,
                                                                'khong_do_duoc': 0}},
-                   'dap_an': {'NB = 0': {'dat_co_so': 0, 'dat_0_0': 537, 'do': 147, 'khong_do_duoc': 0},
+                   'dap_an': {'NB = 0': {'dat_co_so': 172, 'dat_0_0': 365, 'do': 147, 'khong_do_duoc': 0},
                               'NIS+INT+PIT+COM = CXA+GAH+DC+MC': {'dat_co_so': 0,
                                                                   'dat_0_0': 473,
                                                                   'do': 211,
                                                                   'khong_do_duoc': 0}},
                    'so_ky_do': 29,
                    'do_sha256': '8aff172ae42ef1de08b63885b0ed4fbde04e4d9b90de1558aa9a3ff1fabfb012',
-                   'doi_chieu_dap_an': {'khop': 1326,
+                   'doi_chieu_dap_an': {'khop': 1320,
                                         'dap_an_khong_do_duoc': 0,
-                                        'lop_thua_ke': {'loi_as_is': 42},
+                                        'lop_thua_ke': {'loi_as_is': 48},
                                         'lech_FLS': 0}}},
  'lop_thua_ke': {'chua_co_dau_vao': {'so_o': 167,
                                      'theo_khoi': {'ASA': 27,
