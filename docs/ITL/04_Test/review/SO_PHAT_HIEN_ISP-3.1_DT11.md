@@ -1,0 +1,41 @@
+# SỔ PHÁT HIỆN REVIEW — ISP 3.1 · phần `DT11` *(tệp riêng, chờ gộp vào `SO_PHAT_HIEN_ISP-3.1.md`)*
+
+**Version:** v0.1 · **Ngày:** 2026-11-22 · **Chủ sở hữu:** `fls-test` *(R1 `KQ-271`)* · **Nguồn:** `IncrementalStepPlan-FLS-Voi_v3.1.2.md` Step 41 · DT11 · Step 46 · H14 · `WO-269` · `BG-270` · nhánh `isp/DT11` `6ed1a29`
+
+> **Luật của sổ:** sổ **chỉ THÊM**; vòng sau chỉ đổi ô `Trạng thái` + thêm hàng. R1 đầy đủ; mức **GHI NHẬN** ⇒ backlog. Lớp: **A1/A2** lỗi mã · **B1** lệch spec/thiếu bài · **B2** spec/ISP/hợp đồng sai — chuyển orchestrator. Mức: **CHẶN** · **NÊN SỬA** · **GHI NHẬN**.
+>
+> ⛔ **Riêng tư:** chỉ số đếm, số dòng sheet, tên cột — ⛔ giá trị ô. Bản đọc thô ở thư mục tạm của phiên *(chmod 600)*, ⛔ commit.
+
+## Số đo nền của R1 *(nhãn đếm gì — Đ4)*
+
+| Phép đo | Mẫu số | Kết quả |
+|---|---|---|
+| Đọc lại bằng SA chỉ-đọc, so **từng ô số** của ảnh với ô sheet cùng `(dòng_sheet, cột)` — DR3 `[MID][FS1][PLA5]…(Sign off)` `A1:GU137` *(137×203)* · DR2 `5. Daily Report 2` `A1:AR1114` *(958×38)* | DR3 **13.706** ô số *(192 cột kỳ 13.541 + `y24`·`y25` 165)* · DR2 **26.272** | lệch **0 · 0**; hình lưới khớp BG |
+| Ô số của sheet ngoài ảnh | DR3 13.899 − 13.706 = 193 *(192 tiêu đề kỳ hàng 3 + `AB4`)* · DR2 26.457 − 26.272 = 185 | đều rơi vào phụ `tieu_de`/`o_ngoai_vung`; DR2 `tieu_de` 356 ô: lệch **2** *(`Y1` · `AA1`, bool theo `TODAY()` — **trôi**, ⛔ lỗi ảnh)* |
+| Ô chữ ở cột giá trị · ô lỗi `#…` | DR3 | **2** *(`AF87` · `AF89`, đúng ghi `o_chu_so`)* · **0** lỗi; DR2 **0 · 0** |
+| Tái đóng băng từ bản đọc mới qua `dong_bang_sheet.py` *(cùng khuôn)* | DR3 · DR2 | DR3 `checksum` **`ef1744caf253f3bd` = ghim**, `dong`/`phu` bằng nhau · DR2 `dong` bằng nhau, `phu` khác 2 ô *(trôi `Y1`·`AA1`)* ⇒ checksum `4d454ebcec743efd` ≠ `01113b55ba953108` |
+| Chèn `#N/A`/`#REF!` vào bản thô rồi đóng băng *(DR3 2 ô · DR2 3 ô)* | 2 · 3 | exit **1**; ghi nguyên chuỗi, đếm theo cột *(`visionlab_202407:{#N/A:1}`…)* |
+| CHECK ② đo lại độc lập từ sheet *(chọn dòng theo mã `E`/`B:E`)* | DR3 192 kỳ-thực thể · DR2 155 ngày-khối + 160 luỹ-kế-khối | DR3 **29 · 14 · 15 · 163** · NB đo được 168, ≠0 **12** · DR2 **315 · 267 · 48 · 0** · NB ≠0 **119** — **khớp BG 100 %** |
+| Trong "đạt ②": kỳ có vế ≠ 0 mà cân | DR3 14 · DR2 267 | **0 · 0** *(cả 8 ô đều đúng 0)* — xem `DT11-R1-03` |
+| Độ nhạy dung sai | DR3 `0 / 0,5 / 1000` VND · DR2 `1e-12 … 1e-3` mUSD | **đạt không đổi** *(14 · 267)*; chênh nhỏ nhất ≠ 0 ở DR2 = 1,96e-3 mUSD ⇒ dung sai hợp lý |
+| `AH12` ATL đọc `FORMULA` | 1 ô công thức-link có hằng cuối trong tab ATL | `…!AH12-0.5` **1/1**; có tên `chinh_tay_ATL_AH12` ở phụ `o_chinh_tay` ảnh DR3; DR2 không có |
+| Ảnh cũ · công cụ chung | `git diff d9ac21f..HEAD` | chỉ **+2** tệp `dap_an` *(24 = 22 + 2)*; `dong_bang_sheet.py` **0** dòng; `quet_pii_repo` **0** |
+| Cột `AK` DR2 · cột `F` DR2 | 958 hàng | `AK` số **844** *(≠0: 241)*, tiêu đề `AK5` **rỗng**; `F` ô giá trị **0** *(chỉ 4 ô tiêu đề hàng 2–5)* |
+| Đột biến trên bản sao `git archive` | **12** | **10 cắn · 2 sống** *(`DT11-R1-01`)* |
+| `lint-imports` · `kiem_tai_lieu` | — | 11 kept 0 broken · ĐẠT |
+| `--duong-nen --cong 5446` *(một mình)* | — | KẾT **ĐẠT**: toàn bộ `12 failed · 4269 passed · 2 xfailed · 14 errors` = đường nền 28 = 28 node id *(thêm 0 · bớt 0)*, chạy **4297**; `tests/web` `3 failed · 678 passed` = nền 3, chạy 681 |
+
+## Phát hiện
+
+| Mã | Bước | Vòng | Lớp | Mức | Tệp:dòng | Mô tả | Khuyến nghị | Luật phòng tái phạm | Trạng thái |
+|---|---|---|---|---|---|---|---|---|---|
+| `DT11-R1-01` | DT11 | R1 | B1 | **CHẶN** | `tests/du_lieu/test_dap_an_report.py:68-75` *(`a["checksum_noi_dung"] == CHECKSUM[ten]`)* | Gate so `checksum_noi_dung` **đọc từ chính ảnh** với ghim, **⛔ tính lại** từ `dong`+`phu`. Đột biến đổi +1 một ô giá trị **ngoài 9 dòng CHECK** — DR3 *(`group_202405`, dòng không thuộc NB·NIS·INT·PIT·COM·CXA·GAH·DC·MC)* và DR2 *(`ngay`, cột `h`)* ⇒ **28/28 XANH** cả hai. Số ô khác rỗng *(13.541 · 26.272)* không đổi nên bài đếm cũng im. Chỉ ~9/94 dòng DR3 và 9/846 dòng DR2 được canh giá trị. Tiền lệ: `test_dap_an_atl.py:82-120` và `test_dap_an_gi.py:100` đều có `_checksum_lai` *(`stored == tính lại == ghim`)*. H14 đòi "khớp đáp án **từng ô**" ⇒ đáp án sửa im lặng được. | Thêm `_checksum_lai(anh)` như ATL/GI: `stored == tính lại == CHECKSUM[ten]`; chứng minh ĐỎ bằng đột biến 1 ô ngoài dòng CHECK. | Đ5: cổng canh nội dung phải đỏ khi đổi **bất kỳ** ô | Mở |
+| `DT11-R1-02` | DT11 | R1 | B2 | **NÊN SỬA** | `BG-270` §10 ① · ISP Step 46 §2 *("khớp đáp án 607–616 từng ô")* · `H14-B2` *(FS1/FS2/FS3)* | Giả định ① (chỉ 2 ảnh) **không đủ cho H14**. H14 cần: **607 `[FS2]` · 608 `[FS1]` · 609 `5. Daily Report 3`** — SUMIFS PLA3 Daily theo ngày `C2` From · `C3` To *(AP §3.3.2)*, lưới 1424/1092/1940×40, **bố cục khác** ảnh 605 *(Sign off: 24 kỳ tháng × 8 thực thể, dán giá trị)* ⇒ `H14-B2` *(cùng engine, FS khác)* không có đáp án nào; **615** `5. Daily Report` A-CCR *(12521×44)* — đích của "theo bản A-CCR (D5)". Đã đủ/không cần: **614** = `ix_fx.json` *(DT2; khuôn `ix_fx.py`)*; **616** PDF ⇒ H14 loại trừ. Đ1: tìm `[FS1]5. Daily`·`PD 607–609`·`PD 615–616` ở `tests/` `tools/` `fls/` = **0** tệp; ở `docs/ITL` chỉ **4** tệp *(WO-269 · BG-270 · ISP 3.1.1 · 3.1.2)*. Thêm: ảnh DR2 là bản **CF report**, đích H14 là **A-CCR** — BG đo 1.120 ô lệch/231 hàng giữa hai bản *(⛔ tôi đọc lại — chưa đo, một phần là trôi)*. | Orchestrator mở WO **DT11b** đóng băng 607 · 608 · 609 *(+ 615 nếu H14 đòi bản A-CCR từng ô)* cùng khuôn; **hoặc** sửa Step 46 thu hẹp "607–616" thành 605 + 610 + 614. ⛔ tự đóng băng ở R1. | ISP: phần phụ thuộc `Dependency` của H14 đo bằng mục cần, ⛔ bằng số PD | Mở |
+| `DT11-R1-03` | DT11 | R1 | B1 | **NÊN SỬA** | `BG-270` §4 · `test_dap_an_report.py:96-103` *(`MONG_CB`)* | Mọi kỳ **"đạt ②"** đều là **0 = 0**: DR2 **267/267**, DR3 **14/14** có cả 8 ô *(NIS·INT·PIT·COM·CXA·GAH·DC·MC)* đúng bằng 0. **0** kỳ nào có số ≠ 0 mà cân; **63/63** kỳ có số ≠ 0 *(DR3 15 · DR2 48)* ⛔ cân. "Số kỳ đạt" vì vậy ⛔ phải bằng chứng dương của IX.PL — là **tập rỗng về vật chất** *(Đ3)*; BG gọi "đạt" ⛔ nói điều đó. Mong khai 267/14 đúng số, sai nhãn. Dung sai đúng *(xem số đo nền)*. | Đổi nhãn/`MONG_CB`: tách `cb_dat_toan_0` *(267 · 14)* và `cb_dat_co_so` *(0 · 0)*, khai `mong` cả hai; ghi cho H14: đáp án này ⛔ cung cấp ca dương nào của CHECK ②. Khuyến nghị BA: xác nhận 9 dòng đúng nghĩa trước khi dựa. | Đ3: "đạt" phải kèm mẫu số **khác 0 vật chất** | Mở |
+| `DT11-R1-04` | DT11 | R1 | B1 | **NÊN SỬA** | `BG-270` §2 §3 §10 ⑤ · `daily_report_2.py:59` · `MONG_CB["daily_report_2"]` | Cột **`AK` không phải ngày**: `AK5` rỗng, hàng 6 `=text(AK5,"ddd")` ⇒ `"Sat"` *(serial 0 = Sat 30/12/1899)*, `SUMIFS` ở `AK` chạy tiêu chí rỗng ⇒ 844 ô số *(241 ≠ 0)* — **vết kéo công thức quá `To`=30/11**. BG gọi "ngày 31", "31/31 cột có dữ liệu"; **155 ngày-khối = 150 ngày thật + 5 `AK`** *(5 `AK` đều 0=0 ⇒ "đạt")*. Đo lại: đạt DR2 chỉ-ngày-thật **262/310** *(không phải 267/315)*. Nhãn `ak(khong-ngay)` ở khuôn đúng; BG và `MONG` thì ⛔. | Ghi trong BG/`MONG`: 30 ngày + 1 cột vết `AK`; tách `AK` khỏi mẫu số "ngày" *(H14 ⛔ cần tái tạo `AK`)*. | Đ4 | Mở |
+| `DT11-R1-05` | DT11 | R1 | B1 | GHI NHẬN | `BG-270` §2 *("13.541 / 18.236")* | Tử số 13.541 chỉ gồm **192 cột kỳ**; mẫu số 18.236 = 94 × **194** *(gồm `y24`·`y25`)*. Cùng phân số đếm hai vật. Đúng: riêng 192 kỳ **13.541/18.048** *(94×192)*; cả 194 cột **13.706/18.236**. | Sửa chữ ở BG. | Đ4 | Mở |
+| `DT11-R1-06` | DT11 | R1 | B1 | GHI NHẬN | `daily_report_2.json` phụ `tieu_de` `Y1`·`AA1` | Hai ô bool hàng 1 đổi theo `TODAY()` *(sheet SỐNG)*; đã vào `checksum` ⇒ tái đóng băng DR2 ra checksum khác mỗi ngày ⇒ ⛔ dùng checksum DR2 làm bằng chứng "nguồn đổi". DR3 *(dán giá trị)* tái tạo **đúng byte**. | Cân nhắc loại hàng 1 khỏi checksum DR2 hoặc ghi chú. | — | Mở |
+| `DT11-R1-07` | DT11 | R1 | B1 | GHI NHẬN | `BG-270` §5 *(AH12)* | `AH12−0.5` xác nhận ở ATL, có tên ở ảnh DR3; **chưa có** phép chứng minh −0,5 lan vào Sign off *(tab dán giá trị)*. H14 "liệt kê ô chỉnh tay" sẽ lấy từ phụ này — đủ cho nhãn, ⛔ đủ cho số lệch. | Ghi cho H14. | — | Mở |
+
+## Changelog
+- **v0.1 · 2026-11-22** — R1 `KQ-271`: 7 phát hiện *(1 CHẶN · 3 NÊN SỬA · 3 GHI NHẬN)*.
