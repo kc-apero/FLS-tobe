@@ -72,3 +72,25 @@ Bản đồ cột bằng tiêu đề trước. Chỉ đọc `A·B·C·F` + cột
 ## Câu hỏi
 1. 605: có nguồn khác thay tab `[FS1][PLA5]` đã mất không, hay chấp nhận 605 chỉ là giá trị dán?
 2. Mở vòng DATA kế cho HR Report *(610 `hr` + By NOEM)*?
+
+## Vòng sửa sau R1 (`KQ-321`) — 0 CHẶN · 2 NÊN SỬA · 5 GHI NHẬN
+*(chỉ THÊM; ⛔ đổi ảnh — chỉ thêm khai + bài. Bài: `tests/du_lieu/test_rao_dau_vao_dt13_r1.py` 16 bài; ĐỎ trước = `ImportError` module rào chưa có.)*
+
+| Mã | Sửa | Chứng minh ĐỎ *(Đ5: phá → chạy → trả nguyên)* |
+|---|---|---|
+| `DT13-R1-01` vòng tròn 605 | khuôn `sign_off_dau_vao`: `DAU_VAO_CHO = {"608"}` · `CAM_CHO = {"605"}`; `tools/khuon_dong_bang/_rao_dau_vao.py`: `kiem_dau_vao_hop_le(anh, dap_an)` ném `DauVaoSaiChoError` **có tên** *(whitelist: PD ngoài `{608}` cũng ĐỎ)* + `quet_tham_chieu` *(tệp mã nhắc ảnh mà ⛔ gọi hàm kiểm)*. Engine H14 PHẢI gọi hàm. Docstring bỏ tên bài ma `test_AC4_engine_khong_doc_dap_an` *(0 chỗ ở `tests/` `fls/`)*, viện dẫn 2 bài có thật | ① đưa `605` vào `DAU_VAO_CHO` ⇒ `test_khuon_khai_…` ĐỎ · ② cây giả có `engine_605.py` đọc ảnh mà ⛔ gọi hàm kiểm ⇒ `test_PHA_nhet_tham_chieu_…[605]` ĐỎ khi quét bắt đúng 1 tệp *(bài kiểm "bắt được")* · ③ đổi một ô ⇒ `test_PHA_dem_o_so_trung` 25.184 ≠ 25.185 |
+| `DT13-R1-02` DR2 ↔ 610 | khuôn `ccr_daily_report_2`: `DAU_VAO_CHO = {"615"}` · `CAM_CHO = {"610"}`; cùng cơ chế. `kiem_dau_vao_hop_le("ccr_daily_report_2","610")` ném lỗi | bài `test_610_doc_ccr_daily_report_2_NEM_LOI_va_615_HOP_LE` |
+
+**Nhãn số đo (Đ4 — mỗi số đếm MỘT vật):**
+| Số | Đếm gì | Nguồn |
+|---|---|---|
+| **13.541/13.541** *(KQ-321 ghi 14.036)* | ô SỐ cột số liệu `cot[7:]` của `sign_off_dau_vao` trùng đáp án 605 `daily_report_3` *(cùng `checksum_noi_dung`)* | đo lại offline ở vòng này; **14.036 ⛔ tái lập offline** — đo mọi cột ra 13.800, `cot[5:]` 13.706; ghi nhận chênh, không đổi kết luận *(trùng 100 %)* |
+| **25.185/26.272 = 95,9 %** | ô SỐ `cot[7:]` của `ccr_daily_report_2` trùng đáp án `daily_report_2` *(PD 610)* | đo lại offline — khớp KQ-321 |
+| **23.746/48.021 = 49,4 %** *(615)* | ô công thức đọc DR2 mà là THAM CHIẾU TRỰC TIẾP `='5. Daily Report 2'!…` ⇒ "khớp" ở đó là **CHÉP giá trị dán, ⛔ chứng minh tính toán** | KQ-321 *(`FORMULA` SA 22/11 — ⛔ tái lập offline vì ảnh chỉ giữ giá trị)*; khai trong khuôn `O_THAM_CHIEU_TRUC_TIEP_615` · `O_CONG_THUC_615` |
+| **24.275** *(= 48.021 − 23.746)* | ô 615 có phép tính thật *(AC-3 "khớp" chỉ có nghĩa kiểm tính toán ở đây)* | suy từ hai số trên |
+
+**Tách đếm ở AC-3 *(sửa cách đọc §3)*:** các dòng AC-3 của 615 khối mUSD · CM · person GROUP phải đọc là **{chép: 23.746 · tính: 24.275}** — ⛔ cộng chung thành "khớp".
+
+**Tập đỏ & sàn:** sàn `MONG_PYTEST_TOAN_BO` 4710 *(nhánh làm việc, H13)* → **4772** = thu thập thật cây gộp *(4756 sau merge + 16 bài mới; `tests/web` giữ 690)*; xung đột sàn/bài ghim khi merge ⇒ giữ bản nhánh làm việc rồi đặt = thu thập.
+
+**GHI NHẬN `DT13-R1-03…07` ⇒ backlog** *(không sửa ở vòng này)*: 03 khối CB 8 hàng ngoài `CB_MAP` (45·47·48 chưa dựng) · 04 `_cot_so` bỏ cột `g` *(mong 26.272, không phải 25.426)* · 05 nhãn mẫu số CM 4 LE *(6.178 tham chiếu vs 2.526 không)* · 06 ATL mẫu số 228 + 6 ô không công thức · 07 nhãn tổ chức tay + nối `DT11-R2-02`.
