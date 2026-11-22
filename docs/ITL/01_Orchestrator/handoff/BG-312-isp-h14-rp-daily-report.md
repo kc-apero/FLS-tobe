@@ -92,3 +92,51 @@ Lưới = đầu ra engine: `so_sanh_c3a(...).luoi` *(CFA1 Daily)* · `so_sanh_c
 ## Câu hỏi cho orchestrator / chủ sổ
 1. **CHECK đỏ** *(607 230 · 609 231 · 610 198)* có chặn đóng sổ không — vẫn đang chờ *(kế thừa câu H13)*.
 2. Mở bước DATA đóng băng nguồn **FS1** *(cho 608 luỹ kế + 605)* hay để ngoài phạm vi?
+
+---
+
+## Vòng sửa sau R1 *(`KQ-313` — TRƯỢT 1 CHẶN · 4 NÊN SỬA · 6 GHI NHẬN)* · 2026-11-22
+
+| | |
+|---|---|
+| **Phát bởi** | `fls-dev` làn BE-HC · phiên cloud · cụm PG **5434** |
+| **Nền** | `isp/H14` `d07f8c3` + gộp ngọn nhánh làm việc *(có I1 · C13b · `WO-315` · `WO-319`)*; xung đột sàn script + bài ghim ⇒ bản nhánh làm việc rồi đặt = thu thập thật. ⛔ gộp DT13 *(R1 DT13 đang chạy)* |
+| **Commit** | gộp + ① mã · bài · `hd2_cong.json` · `mong` sinh lại + ② mục này *(chỉ THÊM)* |
+| **Kho thật** | `KHONG_CHAM`. `--ghi` khối `WP-C5c`: kho `fls_test`, schema tạm `h14_ghi` *(`nap_nen_kho` rồi ROLLBACK)* |
+
+### Kết luận một dòng
+**`HD2_WP_C5C` = `None` CÓ TÊN** *(⛔ `true`)*: **605** ô so **0/13.706** ô số, chưa chữ ký chủ "DỪNG có tên"; cha `HD2_WP_C5` = `None`. **615** hết DỪNG: khuôn CF ⇒ ô so **12.380** · khớp **11.674** *(thật **2.023/2.729** ô có số · 9.651 ô `0 = 0`)* · lệch **706** = `lech_ban_ccr_vs_cf` **671** + `ite_alias` **35** · lệch FLS **0**. Σ 5 đáp án: ô so **84.770** · khớp **76.292** *(thật 13.563/22.041)* · lệch có chủ đích **8.478**.
+
+### Từng phát hiện *(ĐỎ trước — mã cũ `HEAD` + bài mới: **21** failed / 51 ở `tests/oracle/test_do_hd2_c5c.py` + `tests/bao_cao/test_bao_cao_daily_report.py`; **5** failed / 8 bài `/gates` chọn lọc trên `doc_bao_cao.py` cũ)*
+
+| Mã | Sửa | Bằng chứng ĐỎ → xanh |
+|---|---|---|
+| **`H14-R1-01`** CHẶN | `tools/do_hd2_c5c.py`: `do_phu` *(ô so / ô SỐ của ảnh, từng đáp án)* · `khong_do_duoc` *(đáp án ô so = 0 ⛔ có trong `DUNG_KY`)* · `dat` cổng = `None` khi danh sách ⛔ rỗng *(`dat_mong` giữ phép so `mong`)* · `phu_mot_phan` *(615)*. `DUNG_KY = {}` — chữ ký chủ là ngoại lệ DUY NHẤT. `fls/repo/doc_bao_cao.py` `_goi_la`: `dat=null` + `khong_do_duoc` ⛔ rỗng ⇒ cổng `None` nói tên; `dat=true` mà danh sách ⛔ rỗng ⇒ `None` "tự mâu thuẫn"; sai kiểu ⇒ `None` "hỏng". `do_hd2.py --goi WP-C5c` ⇒ mã thoát 1 khi `None` | Bài mới `test_R1_01_*` ×4 + `test_H14_R1_01_*` ×6 *(gates)*; **đột biến** `dat_cong = px.dat` *(bỏ nhánh `khong_do_duoc`)* ⇒ **3 failed** *(`test_R1_01_cong_null…` · `test_AC5_kho_rong…` · `test_AC5_hd2_cong_json…`)*, trả nguyên `cmp` rỗng. **Xoá khuôn 615** *(`phan_khuon`)* ⇒ 615 ô so 0 ⇒ cổng **ĐỎ** `615: 0 ô được so` *(bài `test_R1_01_bo_khuon_615_thi_DO`)*. `/gates` thật: `HD2_WP_C5C` `None` — `da_do` "76292/84770 ô đáp án khớp [khớp thật 13563/22041 ô có số · 62729 ô 0 = 0] + 8478 lệch có chủ đích"; `ly_do` "1 đáp án ô so = 0 ⇒ ⛔ đo được: 605: ô so 0/13706 ô số — DỪNG `chua_co_dau_vao` CHƯA có chữ ký chủ … · độ phủ 615: ô so 12380/48021 ô số · 35641 ô số chưa so (…)" |
+| **`H14-R1-02`** | `DAP_AN["615"]` = khuôn CF *(nhãn đoạn `Unit: mUSD` ↔ `ngay` · `CM Cumulative` ↔ `luy_ke`, kỳ 11/2026)*; đoạn khác ⇒ `NGOAI_KHUON_615` CÓ TÊN; `doi_chieu` = đáp án 610 ⇒ lớp **`lech_ban_ccr_vs_cf`** *(ô lệch mà engine = 610 ⇒ bản chính thức A-CCR ≠ bản CF report — DT13 `BG-320` §1: 615 `Unit: mUSD`/`CM` = `='5. Daily Report 2'!…` của A-CCR, tab ấy DÁN GIÁ TRỊ)* | `test_R1_02_*` ×2: lớp **671 + 35**; mỗi ô `lech_ban_ccr_vs_cf` đo lại từ HAI ảnh *(engine = 610 ≤ 1e-12 < \|615 − 610\|)*; bỏ đối chiếu ⇒ 671 rơi về `lech_dap_an_nguon` |
+| **`-02`** · kế toán ô số 615 | mọi ô SỐ ở ĐÚNG MỘT rổ có tên, Σ = **48.021** | ô so **12.380** + `engine_vang` **10.040** *(KPI CFA1 6.200 · ngày sau 18/11 3.240 · mã ngoài IX.HD 600)* + ngoài trục **800** *(`AK` 390 · hàng ⛔ nhãn 410)* + `chua_co_dau_vao` **6.753** *(`cash_balance_by_le` **1.495** chờ ảnh DT13 · `hr` 3.147 · `raw_data_management` 1.040 · `tien_dau_bao_cao` 1.071)* + `ngoai_khuon` **18.048** *(`ban_sao_DR3_A_CCR` 18.046 — đã so ở 609 · hàng ⛔ khối 2)* — bài `test_R1_02_615_khuon_CF_ke_toan_du_48021_o_so` |
+| **`H14-R1-03`** | `test_AC4_engine_khong_doc_dap_an` viết lại: ĐẦU ĐỘC *(mọi ô số ⛔ khoá ⇒ "7")* mọi ảnh `tests/fixture/dap_an/*` ⛔ tên `dau_vao` mà `nguon_engine` nạp *(qua `nap_anh` của `do_hd2` · `do_hd2_c3d` · `do_hd2_c5c`)*, dựng lại ⇒ lưới + báo cáo y nguyên. Đ3: bài khẳng định đầu độc CÓ TÁC DỤNG *(ảnh `cfa1_daily` · `cfa1_yhqm` · `pla3_pm_hr_daily` · `atl` bị nạp-độc; `dap_an` thượng nguồn đổi; cổng thượng nguồn đỏ)* | **Đột biến** engine đọc 1 ô đáp án ATL *(`luoi_atl[k] = gia_tri_atl(atl)[k]`)* ⇒ bài **ĐỎ** *(`ne0.luoi ≠ ne.luoi`)*; trả nguyên `cmp` rỗng |
+| **`H14-R1-04`** | chỉnh tay = **chuỗi lan** từ gốc `GOC_CHINH_TAY = (GROUP, OMC, 2025M02)`: mã khối GROUP mang `±0,5` ở M02 **VÀ** Q1 · H1 · Y. Ô `loi_as_is` \|e − a\| = 0,5 NGOÀI chuỗi ⇒ `chinh_tay_trung_0_5` *(⛔ gọi chỉnh tay)* | **68** *(17 mã × 4 kỳ)* + **3** trùng *(`GROUP·NPC·2025M01` · `GROUP·NPC·2025M02` · `GROUP·PL5·2025M02`)* ở 607 và 609; `SHQ` trong chuỗi **0**. Gốc đối chiếu HAI nguồn: ảnh 605 `phu.o_chinh_tay` *(hàng ATL 12 · `y2025_m02` · trừ 0.5)* ↔ ảnh ATL hàng 12 = `OMC` *(bài `test_R1_04_goc…`)*; bài đơn vị `chuoi_chinh_tay` *(thiếu một kỳ ⇒ trùng; ⛔ ô gốc ⇒ chuỗi rỗng)*. **Sửa số §4**: "71 + 71" ⇒ **68 + 68** chỉnh tay + **3 + 3** trùng; giả định 3 *("1 ô M01 lọt")* ⇒ thật **3** ô |
+| **`H14-R1-08`** | `KHUON_FS`: `FS1_FS2_gop` = *(luỹ kế FS1, luỹ kế FS2)* — tên đúng nghĩa hiện dựng *(609)*; `FS3` = phần `luy_ke:FS3` nguồn `fs3_tin_cay` ⛔ tồn tại ⇒ luôn DỪNG `chua_co_dau_vao` có câu "cần gì" *(⛔ nhãn FS3 trên dữ liệu FS1/FS2)*. `DAP_AN["609"].fs` = `FS1_FS2_gop` | `test_R1_08_FS3_la_cap_tin_cay…` *(đủ nguồn FS1 + FS2 mà FS3 vẫn DỪNG, 0 ô luỹ kế)* · `test_R1_08_anh_609_615…` *(câu "FS3 là mức độ tin cậy giao dịch đủ" có ở ĐÚNG 1 chỗ mỗi ảnh 609 · 615)*. **Sửa Giả định 1**: *"sổ ⛔ ghi nhãn FS3"* **SAI** — ảnh 609 + 615 định nghĩa FS3 = cấp tin cậy cao nhất |
+| `H14-R1-09` *(GHI NHẬN, làm kèm)* | bài M10: đáp án DỪNG rỗng ⇒ ĐỎ | `test_R1_09_dap_an_DUNG_rong_DO` |
+
+### ⛔ VÒNG TRÒN — ảnh DT13 `sign_off_dau_vao`
+DT13 (`BG-320` §2) đóng băng `sign_off_dau_vao` với **nội dung Y HỆT đáp án 605** *(`BG-320` §2: "= ảnh đáp án 605, cùng nội dung")*. **⛔ được dùng nó để dựng 605**: đổi tên đáp án thành "đầu vào" rồi so lại với chính nó = phép so xanh trên chính mình *(Đ3)*. **Được dùng cho 608** *(luỹ kế FS1: AS-IS 608 đọc tab Sign off thật — `='[MID]…(Sign off)'!W5/…`, DT13 đo 1.363/1.363)* — khi orchestrator nhắn gộp DT13. Ghi ở chú thích `DUNG` + câu "cần" của 605 trong mã.
+
+### Còn lại *(có tên)*
+- **605**: `None` tới khi chủ ký "DỪNG có tên" *(điền `DUNG_KY["605"]` = văn bản + ngày + người ký ⇒ cổng `true`; bài `test_R1_01_chu_ky…`)*. DT13: tab gốc `[FS1][PLA5]` ⛔ còn trong sổ — 0 ứng viên.
+- **615 `Cash Balance by LE` 1.495 ô**: `chua_co_dau_vao` tới khi gộp DT13 *(`ccr_so_du_ccr` · `ccr_so_du_cash`)*.
+- Backlog GHI NHẬN: `-05` *(`chua_co_dau_vao` hai nghĩa — 615 nay tách thêm `ngoai_khuon`, chưa đổi tên nghĩa (a))* · `-06` *(biên độ lệch)* · `-07` *(`NPC` 3 khối × 7 kỳ)* · `-10` *(`dua_ban_ky` khoá theo kỳ — I2)* · `-11` *(WO-319 nay CÓ trên nhánh sau gộp)*.
+
+### Câu hỏi
+1. **Chủ**: ký *"605 DỪNG có tên"* không? *(chưa ký ⇒ `HD2_WP_C5C` + cha `HD2_WP_C5` = `None`)*.
+2. **BA** *(`H14-R1-08`)*: định nghĩa FS3 *("data đủ PI&PM VÀ consistent với Non-Finance")* — đầu vào nào, mốc nào; ghi `QĐ`. Tới khi có: `FS3` DỪNG, bản 609 mang tên `FS1_FS2_gop`.
+
+### Cổng
+| Lệnh | Kết quả |
+|---|---|
+| `pytest tests/oracle/test_do_hd2_c5c.py tests/bao_cao/test_bao_cao_daily_report.py tests/api/test_isp_gates_hd2.py tests/test_dung_moi_truong_isp.py` | 51 + 85 + 60 passed |
+| `pytest --collect-only` | **4.764** *(= 4.678 nhánh làm việc + H13 29 + H14 40 + vòng sửa 17)*; `tests/web` 690 ⇒ `MONG_PYTEST_TOAN_BO` **4.764**, cùng commit |
+| `--duong-nen --cong 5434` *(một mình)* | **`KẾT: ĐẠT`** — toàn bộ `12 failed · 4736 passed · 2 xfailed · 14 errors` *(16:13)*: tập đỏ + XFAIL **28 = 28** node id *(thêm 0 · bớt 0)* · chạy **4.764** *(mong ≥ 4.764)* · skipped 0 · deselected 0; `tests/web` `3 failed · 687 passed` = **3 = 3** · chạy 690 |
+| `lint-imports` | `Contracts: 11 kept, 0 broken.` |
+| `kiem_tai_lieu.py` | `✅ cong tai lieu DAT … (479 file, 2938 bang, 966 o ngay, 104 ma QD)` |
+| `soi_bang_tuyen.py` | `✅ ban khai KHOP SQL that o ca 49 tuyen` |
