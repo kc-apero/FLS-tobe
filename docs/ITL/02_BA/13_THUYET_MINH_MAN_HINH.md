@@ -502,8 +502,9 @@ Tôi nói: *"hai cột **Nội dung ghi ở bank** và **Tên tài khoản** đi
 | Nút | Nghĩa | `US` |
 |---|---|:--:|
 | ✅ **Ký tháng** | Ở dòng tháng **sạch** *(có số, ⛔ `TRÙNG`, ⛔ `LẠC`)* chưa ký: mở **hộp xác nhận** nêu tháng + 5 tỷ giá sắp niêm phong; **xác nhận** ⇒ `POST /config/fx/{yyyymm}/sign` *(thân rỗng — người ký lấy **từ thẻ**)* ⇒ dòng hiện *"đã ký · người ký · ngày"*, nút **khoá**. **Huỷ** ở hộp ⇒ ⛔ gọi cửa. Ký lại *(người khác vừa ký)* ⇒ chữ lỗi tiếng Việt *"đã được ký rồi"* **trong hộp** | *(chưa có `US` — nợ `fls-ba`)* |
+| ✅ **Ký bản** *(`F7`, `WO-273`)* | Vùng **Bản Daily Report 3 · IX.TMP**: gõ kỳ `yyyymm` → **Xem bản** ⇒ `GET /report/snapshot/{ky}`: danh sách phiên bản *(bản · checksum 12 ký tự đầu, đủ 64 ở `title` · đã/chưa ký · người ký · ngày)*. **Ký bản** ký phiên bản **mới nhất**: hộp xác nhận nêu kỳ + phiên bản + checksum ⇒ `POST /report/snapshot/{ky}/sign` *(thân rỗng — người ký **từ thẻ**)* ⇒ bản hiện *"đã ký"*, nút **khoá**; phiên bản cũ đã ký **giữ nguyên** người ký/ngày. Kỳ chưa có bản ⇒ chữ *"chưa có bản báo cáo nào"*, ⛔ nút ký. **Huỷ**/`Esc` ⇒ ⛔ gọi cửa, tiêu điểm về nút. Người khác vừa ký ⇒ `409` chữ *"Bản báo cáo mới nhất của kỳ này đã được ký rồi"* **trong hộp** *(chữ theo ngữ cảnh bản báo cáo — `C13-R1-04`, ⛔ câu tỷ giá)* | *(chưa có `US` — nợ `fls-ba`)* |
 
-⛔ Không có nút **huỷ ký** · ⛔ phân quyền theo vai *(`O11`)*. Nút ký **Daily Report 3** *(`F7`)* thêm vào đây cùng lúc nhãn vào `man_f08.js`. Spec: `BA-06 §9`.
+⛔ Không có nút **huỷ ký** · ⛔ xem nội dung báo cáo từng ô · ⛔ PDF · ⛔ phân quyền theo vai *(`O11`)*. Spec: `BA-06 §9`.
 
 ---
 
