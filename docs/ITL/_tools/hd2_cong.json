@@ -2353,12 +2353,13 @@
  "WP-C5c": {
   "bang": "HD2.WP-C5c",
   "goi": "WP-C5c",
-  "mo_ta": "RP.PL · RP.CF: Daily Report 2 · 3 dựng theo khuôn (fls.bao_cao.bao_cao.daily_report, FS tham số) từ lưới engine (CFA1 H5/H6 · PLA3 PM+HR H8 · ATL H12+H13) ↔ đáp án 607 · 608 · 609 · 610 · 615 (A-CCR, khuôn CF: Unit: mUSD ↔ ngay · CM Cumulative ↔ luy_ke) từng ô; 605 DỪNG (chua_co_dau_vao, chưa ký ⇒ cổng null); lệch THỪA KẾ lớp bằng truy ngược ô nguồn",
+  "mo_ta": "RP.PL · RP.CF: Daily Report 2 · 3 dựng theo khuôn (fls.bao_cao.bao_cao.daily_report, FS tham số) từ lưới engine (CFA1 H5/H6 · PLA3 PM+HR H8 · ATL H12+H13) ↔ đáp án 607 · 608 · 609 · 610 · 615 (A-CCR, khuôn CF: Unit: mUSD ↔ ngay · CM Cumulative ↔ luy_ke · CB Cash Balance by LE ↔ cb: số dư fls.bao_cao.so_du_le từ ảnh DT13 ccr_so_du_ccr · ccr_so_du_cash) từng ô; 605 DỪNG (chua_co_dau_vao, chưa ký ⇒ cổng null); lệch THỪA KẾ lớp bằng truy ngược ô nguồn",
   "nguon_dau_vao": [
    "WP-C3a lưới cfa1_daily (tests/fixture/dap_an/gl_cf_dau_vao.json)",
    "WP-C3b lưới cfa1_yhqm",
    "WP-C3d lưới pla3_pm_hr_daily (gl_pl_dau_vao.json + hr_pl_dau_vao.json)",
-   "WP-C5a + WP-C5b lưới ATL của FLS (IX.ALR kho cờ 2025 BẬT ký · IX.PL kho)"
+   "WP-C5a + WP-C5b lưới ATL của FLS (IX.ALR kho cờ 2025 BẬT ký · IX.PL kho)",
+   "DT13 ảnh đầu vào số dư 615: tests/fixture/dau_vao/ccr_so_du_ccr.json + ccr_so_du_cash.json (qua rào kiem_dau_vao_hop_le)"
   ],
   "dap_an": [
    "tests/fixture/dap_an/daily_report_3_fs2.json",
@@ -2380,16 +2381,18 @@
    "rtol": "0",
    "chinh_tay": "|e−a| = 0.5 ± 1E-9"
   },
-  "tong_o": 84770,
-  "mong_tong_o": 84770,
-  "o_co_so": 22041,
-  "khop_co_so": 13563,
-  "o_0_0": 62729,
-  "khop": 76292,
+  "tong_o": 86150,
+  "mong_tong_o": 86150,
+  "o_co_so": 22893,
+  "khop_co_so": 14415,
+  "o_0_0": 63257,
+  "khop": 77672,
+  "khop_tinh": 14415,
+  "khop_chep": 0,
   "lech_co_chu_dich": 8478,
   "mong_lech_co_chu_dich": 8478,
   "lech_ngoai_ten": 0,
-  "khop_ghi_chu": "tong_o = Σ 5 đáp án ô so = o_co_so + o_0_0; khop = ô khớp THẬT (khop_co_so) + o_0_0; khop + lech_co_chu_dich = tong_o; ô chua_co_dau_vao / engine_vang / ngoai_truc NGOÀI mẫu số",
+  "khop_ghi_chu": "tong_o = Σ 5 đáp án ô so = o_co_so + o_0_0; khop = ô khớp THẬT (khop_co_so) + o_0_0; khop + lech_co_chu_dich = tong_o; khop_co_so = khop_tinh (engine TÍNH từ đầu vào) + khop_chep (engine CHÉP ô ảnh đầu vào mang giá trị dán của chính sổ báo cáo — vd DR2 A-CCR; đếm RIÊNG, ⛔ gộp); ô chua_co_dau_vao / engine_vang / ngoai_truc / ngoai_khuon NGOÀI mẫu số",
   "lech_co_ten": {
    "lop_thua_ke": {
     "chua_co_dau_vao": 1724,
@@ -2597,7 +2600,8 @@
     "phan": [
      "ngay",
      "luy_ke",
-     "hr"
+     "hr",
+     "cb"
     ]
    }
   },
@@ -2606,8 +2610,8 @@
     "theo_phan": {
      "ngay": {
       "NB = 0": {
-       "dat_co_so": 0,
-       "dat_0_0": 147,
+       "dat_co_so": 147,
+       "dat_0_0": 0,
        "do": 3,
        "khong_do_duoc": 0
       },
@@ -2620,8 +2624,8 @@
      },
      "luy_ke:FS2": {
       "NB = 0": {
-       "dat_co_so": 0,
-       "dat_0_0": 116,
+       "dat_co_so": 116,
+       "dat_0_0": 0,
        "do": 93,
        "khong_do_duoc": 0
       },
@@ -2640,8 +2644,8 @@
     "theo_phan": {
      "ngay": {
       "NB = 0": {
-       "dat_co_so": 0,
-       "dat_0_0": 147,
+       "dat_co_so": 147,
+       "dat_0_0": 0,
        "do": 3,
        "khong_do_duoc": 0
       },
@@ -2660,8 +2664,8 @@
     "theo_phan": {
      "ngay": {
       "NB = 0": {
-       "dat_co_so": 0,
-       "dat_0_0": 151,
+       "dat_co_so": 151,
+       "dat_0_0": 0,
        "do": 4,
        "khong_do_duoc": 0
       },
@@ -2674,8 +2678,8 @@
      },
      "luy_ke:FS2": {
       "NB = 0": {
-       "dat_co_so": 0,
-       "dat_0_0": 116,
+       "dat_co_so": 116,
+       "dat_0_0": 0,
        "do": 93,
        "khong_do_duoc": 0
       },
@@ -2694,8 +2698,8 @@
     "theo_phan": {
      "ngay": {
       "NB = 0": {
-       "dat_co_so": 0,
-       "dat_0_0": 82,
+       "dat_co_so": 26,
+       "dat_0_0": 56,
        "do": 8,
        "khong_do_duoc": 60
       },
@@ -2708,8 +2712,8 @@
      },
      "luy_ke": {
       "NB = 0": {
-       "dat_co_so": 0,
-       "dat_0_0": 59,
+       "dat_co_so": 35,
+       "dat_0_0": 24,
        "do": 131,
        "khong_do_duoc": 0
       },
@@ -2728,8 +2732,8 @@
     "theo_phan": {
      "ngay": {
       "NB = 0": {
-       "dat_co_so": 0,
-       "dat_0_0": 82,
+       "dat_co_so": 26,
+       "dat_0_0": 56,
        "do": 8,
        "khong_do_duoc": 60
       },
@@ -2742,8 +2746,8 @@
      },
      "luy_ke": {
       "NB = 0": {
-       "dat_co_so": 0,
-       "dat_0_0": 59,
+       "dat_co_so": 35,
+       "dat_0_0": 24,
        "do": 131,
        "khong_do_duoc": 0
       },
@@ -2762,11 +2766,29 @@
   "theo_dap_an": {
    "607": {
     "dem": {
+     "khop_tinh": 4365,
+     "khop_chep": 0,
      "tong_o": 25649,
      "o_0_0": 17405,
      "khop_co_so": 4365,
      "khop": 21770,
      "o_co_so": 8244
+    },
+    "theo_phan": {
+     "luy_ke:FS2": {
+      "tong_o": 14549,
+      "o_0_0": 6610,
+      "khop_co_so": 4060,
+      "lech": 3879,
+      "khop": 10670
+     },
+     "ngay": {
+      "tong_o": 11100,
+      "o_0_0": 10795,
+      "khop_co_so": 305,
+      "lech": 0,
+      "khop": 11100
+     }
     },
     "lop": {
      "chua_co_dau_vao": {
@@ -2905,11 +2927,22 @@
    },
    "608": {
     "dem": {
+     "khop_tinh": 270,
+     "khop_chep": 0,
      "tong_o": 8510,
      "o_0_0": 8240,
      "khop_co_so": 270,
      "khop": 8510,
      "o_co_so": 270
+    },
+    "theo_phan": {
+     "ngay": {
+      "tong_o": 8510,
+      "o_0_0": 8240,
+      "khop_co_so": 270,
+      "lech": 0,
+      "khop": 8510
+     }
     },
     "lop": {},
     "chua_co_dau_vao": {
@@ -2935,11 +2968,29 @@
    },
    "609": {
     "dem": {
+     "khop_tinh": 4387,
+     "khop_chep": 0,
      "tong_o": 25851,
      "o_0_0": 17606,
      "khop_co_so": 4387,
      "khop": 21993,
      "o_co_so": 8245
+    },
+    "theo_phan": {
+     "luy_ke:FS2": {
+      "tong_o": 14381,
+      "o_0_0": 6442,
+      "khop_co_so": 4081,
+      "lech": 3858,
+      "khop": 10523
+     },
+     "ngay": {
+      "tong_o": 11470,
+      "o_0_0": 11164,
+      "khop_co_so": 306,
+      "lech": 0,
+      "khop": 11470
+     }
     },
     "lop": {
      "chua_co_dau_vao": {
@@ -3075,11 +3126,29 @@
    },
    "610": {
     "dem": {
+     "khop_tinh": 2518,
+     "khop_chep": 0,
      "tong_o": 12380,
      "o_0_0": 9827,
      "khop_co_so": 2518,
      "khop": 12345,
      "o_co_so": 2553
+    },
+    "theo_phan": {
+     "luy_ke": {
+      "tong_o": 7520,
+      "o_0_0": 5249,
+      "khop_co_so": 2236,
+      "lech": 35,
+      "khop": 7485
+     },
+     "ngay": {
+      "tong_o": 4860,
+      "o_0_0": 4578,
+      "khop_co_so": 282,
+      "lech": 0,
+      "khop": 4860
+     }
     },
     "lop": {
      "ite_alias": {
@@ -3112,11 +3181,36 @@
    },
    "615": {
     "dem": {
-     "tong_o": 12380,
-     "o_0_0": 9651,
-     "khop_co_so": 2023,
-     "khop": 11674,
-     "o_co_so": 2729
+     "khop_tinh": 2875,
+     "khop_chep": 0,
+     "tong_o": 13760,
+     "khop_co_so": 2875,
+     "o_0_0": 10179,
+     "khop": 13054,
+     "o_co_so": 3581
+    },
+    "theo_phan": {
+     "cb": {
+      "tong_o": 1380,
+      "o_0_0": 528,
+      "khop_co_so": 852,
+      "lech": 0,
+      "khop": 1380
+     },
+     "luy_ke": {
+      "tong_o": 7520,
+      "o_0_0": 5248,
+      "khop_co_so": 1793,
+      "lech": 479,
+      "khop": 7041
+     },
+     "ngay": {
+      "tong_o": 4860,
+      "o_0_0": 4403,
+      "khop_co_so": 230,
+      "lech": 227,
+      "khop": 4633
+     }
     },
     "lop": {
      "ite_alias": {
@@ -3129,7 +3223,6 @@
      }
     },
     "chua_co_dau_vao": {
-     "cash_balance_by_le": 1495,
      "hr": 3147,
      "raw_data_management": 1040,
      "tien_dau_bao_cao": 1071
@@ -3144,6 +3237,8 @@
      "ngay_sau_ngay_doc_dau_vao": 3240
     },
     "ngoai_truc": {
+     "cb:ak": 46,
+     "cb:f": 37,
      "hang_khong_nhan": 14,
      "ngay:ak": 390,
      "o_hang_khong_nhan": 410
@@ -3152,6 +3247,7 @@
     "chinh_tay_trung_0_5": [],
     "ngoai_khuon": {
      "ban_sao_DR3_A_CCR": 18046,
+     "cb_cong_thuc_doi_theo_cot": 32,
      "daily_transactions": 0,
      "person_hang_khong_khoi": 2
     },
@@ -3197,14 +3293,14 @@
    },
    "615": {
     "o_dap_an_so": 48021,
-    "o_so": 12380,
-    "o_so_chua_so": 35641,
+    "o_so": 13760,
+    "o_so_chua_so": 34261,
     "ngoai_mau_so_co_ten": {
-     "chua_co_dau_vao:cash_balance_by_le": 1495,
      "chua_co_dau_vao:hr": 3147,
      "chua_co_dau_vao:raw_data_management": 1040,
      "chua_co_dau_vao:tien_dau_bao_cao": 1071,
      "ngoai_khuon:ban_sao_DR3_A_CCR": 18046,
+     "ngoai_khuon:cb_cong_thuc_doi_theo_cot": 32,
      "ngoai_khuon:daily_transactions": 0,
      "ngoai_khuon:person_hang_khong_khoi": 2
     },
@@ -3222,7 +3318,7 @@
    "605: ô so 0/13706 ô số — DỪNG `chua_co_dau_vao` CHƯA có chữ ký chủ 'DỪNG có tên' (cần: nguồn `[MID][FS1][PLA5]` (P&L VND theo 8 thực thể × 24 tháng 2024–2025, bản dán giá trị Sign off): ảnh `[FS1][PLA3]`/`[PLA5]` Y/H/Q/M trước khi dán + đường VND)"
   ],
   "phu_mot_phan": [
-   "615: ô so 12380/48021 ô số · 35641 ô số chưa so (chua_co_dau_vao:cash_balance_by_le 1495 · chua_co_dau_vao:hr 3147 · chua_co_dau_vao:raw_data_management 1040 · chua_co_dau_vao:tien_dau_bao_cao 1071 · ngoai_khuon:ban_sao_DR3_A_CCR 18046 · ngoai_khuon:daily_transactions 0 · ngoai_khuon:person_hang_khong_khoi 2)"
+   "615: ô so 13760/48021 ô số · 34261 ô số chưa so (chua_co_dau_vao:hr 3147 · chua_co_dau_vao:raw_data_management 1040 · chua_co_dau_vao:tien_dau_bao_cao 1071 · ngoai_khuon:ban_sao_DR3_A_CCR 18046 · ngoai_khuon:cb_cong_thuc_doi_theo_cot 32 · ngoai_khuon:daily_transactions 0 · ngoai_khuon:person_hang_khong_khoi 2)"
   ],
   "dat_mong": true,
   "dat": null,

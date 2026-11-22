@@ -41,12 +41,15 @@ LICH = LichKy(nguon="bai-h14", ngay_dau=datetime.date(2024, 10, 21), luat="A")
 #: trục × phần có đầu vào × engine có ô. 608: luỹ kế FS1 DỪNG ⇒ chỉ phần ngày *(270 ô có số, khớp 270)*.
 MONG_O = {"607": (25649, 21770, 4365, 17405, 3879), "608": (8510, 8510, 270, 8240, 0),
           "609": (25851, 21993, 4387, 17606, 3858), "610": (12380, 12345, 2518, 9827, 35),
-          "615": (12380, 11674, 2023, 9651, 706)}          # H14-R1-02: khuôn CF trên bản CHÍNH THỨC A-CCR (D5)
+          "615": (13760, 13054, 2875, 10179, 706)}          # H14-R1-02: khuôn CF trên bản CHÍNH THỨC A-CCR (D5)
+#: ⭐ vòng sửa tích hợp sau R2 (`KQ-314`): 615 + khối `CB` 1.380 ô *(46 cặp (LE, đơn vị) × 30 ngày; ảnh DT13 số dư)* —
+#: trước: (12380, 11674, 2023, 9651, 706).
 #: ô đáp án NGOÀI mẫu số vì phần ⛔ có đầu vào *(có tên)*
 MONG_CHUA = {"607": {}, "608": {"luy_ke:FS1": 8421}, "609": {"luy_ke:FS1": 8402}, "610": {"hr": 1537},
-             "615": {"cash_balance_by_le": 1495, "hr": 3147, "raw_data_management": 1040, "tien_dau_bao_cao": 1071}}
+             "615": {"hr": 3147, "raw_data_management": 1040, "tien_dau_bao_cao": 1071}}   # CB 1.495 hết `chua_co_dau_vao`
 #: 615 — đoạn ⛔ khuôn CF *(bản sao DR3 của A-CCR đã so ở 609 · hàng ⛔ khối · giao dịch ngày 0 ô số)*
-MONG_NGOAI_KHUON_615 = {"ban_sao_DR3_A_CCR": 18046, "daily_transactions": 0, "person_hang_khong_khoi": 2}
+MONG_NGOAI_KHUON_615 = {"ban_sao_DR3_A_CCR": 18046, "cb_cong_thuc_doi_theo_cot": 32, "daily_transactions": 0,
+                        "person_hang_khong_khoi": 2}
 #: 615 — lớp lệch: 671 ô engine = đáp án 610 mà bản A-CCR khác *(bản chính thức ≠ CF report)* + 35 `ite_alias` như 610
 MONG_LOP_615 = {"ite_alias": 35, "lech_ban_ccr_vs_cf": 671}
 #: đáp án DỪNG cả bản — số ô SỐ ⛔ so *(Đ3: > 0)*. 615 hết DỪNG *(H14-R1-02)*.
@@ -114,7 +117,7 @@ def test_R1_01_cong_null_co_ten_khi_605_o_so_0_chua_ky(tq):
     (k,) = tq.hd2_cong["khong_do_duoc"]
     assert k.startswith("605: ô so 0/13706 ô số") and "chữ ký" in k
     (p,) = tq.hd2_cong["phu_mot_phan"]
-    assert p.startswith("615: ô so 12380/48021 ô số · 35641 ô số chưa so") and "cash_balance_by_le 1495" in p
+    assert p.startswith("615: ô so 13760/48021 ô số · 34261 ô số chưa so") and "cash_balance_by_le" not in p
 
 
 def test_R1_01_o_so_lon_hon_0_TUNG_dap_an_va_do_phu_khai(tq):
@@ -123,7 +126,7 @@ def test_R1_01_o_so_lon_hon_0_TUNG_dap_an_va_do_phu_khai(tq):
     assert set(dp) == set(c5c.DAP_AN) | set(c5c.DUNG) == {"605", "607", "608", "609", "610", "615"}
     assert {m: (v["o_so"], v["o_dap_an_so"]) for m, v in dp.items()} == {
         "607": (25649, 27290), "608": (8510, 17962), "609": (25851, 35542), "610": (12380, 26272),
-        "615": (12380, 48021), "605": (0, 13706)}
+        "615": (13760, 48021), "605": (0, 13706)}
     assert [m for m, v in dp.items() if v["o_so"] == 0] == ["605"]
 
 
@@ -154,8 +157,9 @@ def test_R1_02_615_khuon_CF_ke_toan_du_48021_o_so(tq):
     assert {k: v["so_o"] for k, v in d["lop"].items()} == MONG_LOP_615
     assert d["ngoai_khuon"] == MONG_NGOAI_KHUON_615
     # Đ4: mọi ô SỐ của ảnh 615 nằm ĐÚNG MỘT rổ có tên — tổng = 48.021 *(⛔ rổ "khác")*
-    ro = (d["dem"]["tong_o"] + sum(d["engine_vang"].values()) + d["ngoai_truc"]["ngay:ak"]
-          + d["ngoai_truc"]["o_hang_khong_nhan"] + sum(d["chua_co_dau_vao"].values()) + sum(d["ngoai_khuon"].values()))
+    ro = (d["dem"]["tong_o"] + sum(d["engine_vang"].values())
+          + sum(v for k, v in d["ngoai_truc"].items() if k != "hang_khong_nhan")      # `hang_khong_nhan` đếm HÀNG, ⛔ ô
+          + sum(d["chua_co_dau_vao"].values()) + sum(d["ngoai_khuon"].values()))
     assert ro == 48021 == tq.hd2_cong["do_phu"]["615"]["o_dap_an_so"]
 
 
@@ -382,7 +386,7 @@ def test_AC5_kho_rong_DO_roi_nap_nen_DAT():
     assert not t0.phan_xu.dat and any("IX.PER" in x for x in t0.phan_xu.ly_do), t0.phan_xu.ly_do
     assert t1.phan_xu.dat, t1.phan_xu.ly_do[:3]
     assert t1.dat is None                                                 # 605 DỪNG chưa ký (H14-R1-01)
-    assert (t1.hd2_cong["tong_o"], t1.hd2_cong["khop"]) == (84770, 76292)
+    assert (t1.hd2_cong["tong_o"], t1.hd2_cong["khop"]) == (86150, 77672)
 
 
 def test_AC5_hd2_cong_json_khoi_WP_C5c_khop_lan_do(tq):
@@ -391,5 +395,82 @@ def test_AC5_hd2_cong_json_khoi_WP_C5c_khop_lan_do(tq):
               "mong_lech_co_chu_dich", "lech_ngoai_ten", "dat", "dat_mong", "dap_an_dung", "check", "fs_tham_so",
               "do_phu", "khong_do_duoc", "phu_mot_phan"):
         assert d[k] == json.loads(json.dumps(tq.hd2_cong[k], ensure_ascii=False)), k
-    assert (d["tong_o"], d["khop"], d["lech_co_chu_dich"], d["dat"], d["dat_mong"]) == (84770, 76292, 8478, None, True)
+    assert (d["tong_o"], d["khop"], d["lech_co_chu_dich"], d["dat"], d["dat_mong"]) == (86150, 77672, 8478, None, True)
     assert sum(o for o, *_ in MONG_O.values()) == d["tong_o"]
+
+
+# ── Vòng sửa TÍCH HỢP sau R2 (`KQ-314`) ──────────────────────────────────────────────────────────────────────────────
+
+def test_R2_01_check_NB_0_theo_phan_loai_CHECK_cua_H13(tq):
+    """`H14-R2-01`: sau gộp H13-R1 `31a6bb3` *(`pla.check_atl`: `dat_0_0` CHỈ khi kỳ-khối rỗng thật)* — `NB = 0` ở 607 phần
+    ngày là 147 `dat_co_so` *(⛔ 147 `dat_0_0` như trước gộp)*. `mong` sinh lại bằng lần đo, ⛔ sửa tay."""
+    c = tq.hd2_cong["check"]
+    assert c["607"]["theo_phan"]["ngay"]["NB = 0"] == {"dat_co_so": 147, "dat_0_0": 0, "do": 3, "khong_do_duoc": 0}
+    assert c["610"]["theo_phan"]["ngay"]["NB = 0"] == {"dat_co_so": 26, "dat_0_0": 56, "do": 8, "khong_do_duoc": 60}
+    assert {m: x["so_do"] for m, x in c.items()} == {"607": 230, "608": 4, "609": 231, "610": 198, "615": 198}
+
+
+#: 615 khối CB *(Đ4 — đếm Ô của khối CB theo rổ)*: 1.495 ô số = 1.380 ô so + 32 hàng 71 ngoài khuôn + 37 cột `F`
+#: *(31/10, ngoài trục tháng 11)* + 46 cột `AK` *(⛔ ngày)*.
+MONG_CB_615 = {"tong_o": 1380, "o_0_0": 528, "khop_co_so": 852, "khop": 1380, "lech": 0}
+
+
+def test_R2i_615_khoi_CB_dung_tu_anh_so_du_DT13_khop_tung_o(tq):
+    d = tq.theo_dap_an["615"]
+    assert d["theo_phan"]["cb"] == MONG_CB_615
+    assert MONG_CB_615["tong_o"] > 0 and MONG_CB_615["khop_co_so"] > 0              # Đ3: bằng chứng DƯƠNG
+    assert (d["ngoai_truc"]["cb:f"], d["ngoai_truc"]["cb:ak"]) == (37, 46)
+    assert (MONG_CB_615["tong_o"] + d["ngoai_khuon"]["cb_cong_thuc_doi_theo_cot"] + d["ngoai_truc"]["cb:f"]
+            + d["ngoai_truc"]["cb:ak"]) == 1495                                       # rổ CB cũ = đúng 1.495
+    assert "cash_balance_by_le" not in d["chua_co_dau_vao"]
+    assert not [x for x in tq.bao["615"]["phan"] if x["id"] == "cb" and x.get("dung")]
+
+
+def test_R2i_khop_tach_TINH_va_CHEP_khong_gop(tq):
+    """Rào DT13: `ccr_daily_report_2` *(DR2 dán giá trị)* CHỈ là đầu vào của 615 — ô 615 "khớp" vì CHÉP ô ảnh ấy ⛔ chứng minh
+    tính toán ⇒ đếm `khop_chep` RIÊNG. Engine 615 ⛔ đọc DR2 *(mọi phần `chep = False`)* ⇒ `khop_chep = 0` là KẾT QUẢ
+    *(Đ3: mẫu số = ô của phần chép = 0)*; `khop_tinh` = mọi ô khớp có số."""
+    for ma, d in tq.theo_dap_an.items():
+        assert d["dem"]["khop_tinh"] + d["dem"]["khop_chep"] == d["dem"]["khop_co_so"], ma
+    d = tq.theo_dap_an["615"]["dem"]
+    assert (d["khop_tinh"], d["khop_chep"]) == (2875, 0)
+    assert [p["id"] for p in tq.bao["615"]["phan"] if p.get("chep")] == []
+    assert (tq.hd2_cong["khop_tinh"], tq.hd2_cong["khop_chep"]) == (sum(x[2] for x in MONG_O.values()), 0)
+
+
+def test_R2i_PHA_chep_dem_rieng_khi_phan_danh_dau_chep(ne, da, bao):
+    """Chứng minh nhánh `khop_chep` SỐNG: đánh dấu phần CB là chép ⇒ 852 ô khớp có số chuyển sang `khop_chep`."""
+    b = copy.deepcopy(dict(bao["615"]))
+    for p in b["phan"]:
+        if p["id"] == "cb":
+            p["chep"] = True
+    a610, _ = c5c.o_dap_an("610", da["610"])
+    r = c5c.so_mot("615", da["615"], b, ne, doi_chieu=a610)
+    assert (r["dem"]["khop_chep"], r["dem"]["khop_tinh"]) == (852, 2875 - 852)
+
+
+def test_R2i_PHA_doi_mot_o_so_du_thi_DUNG_o_CB_lech_va_cong_DO(ne, da):
+    n2 = dataclasses.replace(ne, so_du=copy.deepcopy(ne.so_du))
+    n2.so_du["2. CCR"][40]["2026-11-15"] += Decimal(1000)                         # ⇒ LE09 bVND ngày 15
+    t = c5c.so_sanh_c5c(n2, da, c5c.mong_c5c_mac_dinh())
+    d = t.theo_dap_an["615"]
+    assert d["theo_phan"]["cb"]["lech"] == 1 and d["lech_FLS"] == ["cb|LE09|bVND|2026-11-15"]
+    assert t.dat is False and not t.phan_xu.dat
+
+
+def test_R2i_anh_so_du_vang_thi_CB_DUNG_co_ten_va_cong_DO(ne, da):
+    t = c5c.so_sanh_c5c(dataclasses.replace(ne, so_du=None), da, c5c.mong_c5c_mac_dinh())
+    assert t.theo_dap_an["615"]["chua_co_dau_vao"].get("cb") == 1380 and t.dat is False
+
+
+def test_R2i_rao_DT13_engine_goi_kiem_va_ket_qua_vao_ly_do(ne, da, bao, monkeypatch):
+    """Engine H14 GỌI `kiem_dau_vao_hop_le` *(DT13-R1-01/02)*: nạp ảnh số dư cho 615 qua rào; tự kiểm rào còn chặn
+    `sign_off_dau_vao` → 605 và `ccr_daily_report_2` → 610. Mở rào ⇒ cổng ĐỎ có tên."""
+    assert c5c.rao.quet_tham_chieu(GOC, "sign_off_dau_vao") == []
+    assert c5c.rao.quet_tham_chieu(GOC, "ccr_daily_report_2") == []
+    with pytest.raises(c5c.rao.DauVaoSaiChoError):
+        c5c.rao.kiem_dau_vao_hop_le("sign_off_dau_vao", "605")
+    c5c.rao.kiem_dau_vao_hop_le("ccr_so_du_ccr", "615")                       # ảnh số dư ⛔ khai rào ⇒ qua
+    monkeypatch.setitem(c5c.rao.RAO, "sign_off_dau_vao", (frozenset({"608", "605"}), frozenset()))
+    t = c5c.so_sanh_c5c(ne, da, c5c.mong_c5c_mac_dinh(), bao=bao)
+    assert t.dat is False and any("rào DT13" in x and "605" in x for x in t.phan_xu.ly_do), t.phan_xu.ly_do[:3]

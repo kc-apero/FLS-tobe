@@ -140,3 +140,36 @@ DT13 (`BG-320` §2) đóng băng `sign_off_dau_vao` với **nội dung Y HỆT �
 | `lint-imports` | `Contracts: 11 kept, 0 broken.` |
 | `kiem_tai_lieu.py` | `✅ cong tai lieu DAT … (479 file, 2938 bang, 966 o ngay, 104 ma QD)` |
 | `soi_bang_tuyen.py` | `✅ ban khai KHOP SQL that o ca 49 tuyen` |
+
+## Vòng sửa tích hợp sau R2 (KQ-314)
+*(chỉ THÊM · `isp/H14` gộp nhánh làm việc `3ea8052` + `isp/DT13` `ab831d7`; xung đột sàn script + bài ghim ×2 ⇒ bản `isp/H14` rồi đặt = thu thập thật · cụm 5434 · `KHONG_CHAM` kho thật)*
+
+| Mã | Sửa | ĐỎ trước *(Đ5)* |
+|---|---|---|
+| **`H14-R2-01`** CHẶN | khối `check` của `tools/do_hd2_c5c_mong.py` **sinh lại bằng lần đo** *(cùng đường fixture bài; định dạng `pprint` tái lập từng byte — ⛔ sửa tay)* + `hd2_cong.json` `WP-C5c` bằng `do_hd2.py --goi WP-C5c --dsn <kho test, schema tạm h14_ghi nạp nen_kho> --ghi`. Chỉ `check` đổi *(dap_an · dung giữ)*: `NB = 0` 607/608/609 `dat_0_0` → `dat_co_so` *(147 · 116 · 151)*, 610/615 tách 26/56 · 35/24 — đúng phân loại H13-R1. Bài ghim `test_R2_01_check_NB_0_theo_phan_loai_CHECK_cua_H13` | trên cây gộp: **5 bài đỏ** đúng danh sách KQ-314 ⇒ xanh |
+| *(tích hợp, phát hiện thêm)* rào DT13 | `tests/du_lieu/test_rao_dau_vao_dt13_r1.py::test_quet_ma_thuc_…` ĐỎ trên cây gộp: `tools/do_hd2_c5c.py` nhắc `sign_off_dau_vao` mà ⛔ gọi `kiem_dau_vao_hop_le`. Sửa: engine GỌI rào khi nạp ảnh số dư (`nap_so_du`) + `so_sanh_c5c` tự kiểm rào còn chặn `sign_off_dau_vao`→605 và `ccr_daily_report_2`→610 *(mở rào ⇒ ĐỎ có tên)* | 1 bài đỏ ⇒ xanh; bài `test_R2i_rao_DT13_…` *(monkeypatch mở rào ⇒ `dat = False`)* |
+| **615 `Cash Balance`** | `fls/bao_cao/so_du_le.py` *(mới, thuần)*: khuôn tường minh 46 cặp (LE × đơn vị) → hàng `2. CCR`/`2. CCR Cash` *(công thức AS-IS DT13; ⛔ suy được bằng nhãn — VVON↔VOON · VVOL↔VOOL · VVOT↔VVOO · UGO2 gồm `Non USD` · 7 LE cá nhân theo thứ tự, khoá `LE<nn>` ⛔ mang tên)*. `do_hd2_c5c`: phần `cb` của báo cáo 615 *(`chep = False`)*; hàng 71 *(công thức đổi theo cột)* = `ngoai_khuon:cb_cong_thuc_doi_theo_cot` | 15 bài đỏ *(mong mới khai trước)* ⇒ xanh; đột biến khuôn hàng 100 ⇒ **7 bài đỏ**, trả nguyên xanh *(đột biến hàng 101 — toàn 0 — chỉ bài hai nguồn cắn: Đ3)* |
+| `khop_tinh` / `khop_chep` *(Đ4)* | `dem` mọi đáp án + tổng `hd2_cong`: `khop_co_so = khop_tinh + khop_chep`; phần đánh dấu `chep` ⇒ đếm riêng | PHA đánh dấu `cb` chép ⇒ 852 chuyển sang `khop_chep` |
+
+**Số đo *(Đ4)*:**
+| Số | Đếm gì |
+|---|---|
+| **12.380 → 13.760** / 48.021 | ô so 615 / ô SỐ ảnh 615; chưa so 35.641 → **34.261** |
+| **1.380 = 852 + 528**, lệch **0** | ô so khối CB = khớp có số + 0=0 *(46 cặp × 30 ngày 01–30/11)*; ≤ 1e-12, max 1,01e-15 |
+| 1.495 = 1.380 + 32 + 37 + 46 | rổ CB cũ = ô so + hàng 71 `ngoai_khuon` + cột `F` 31/10 `cb:f` + cột `AK` `cb:ak` *(ngoài trục)* |
+| `khop_tinh` 615 **2.875** · `khop_chep` **0** | ô khớp có số engine TÍNH · ô khớp do CHÉP ảnh dán *(engine 615 ⛔ đọc DR2 ⇒ 0 là KẾT QUẢ, mẫu số phần chép = 0)*; 23.746 ô AS-IS tham chiếu DR2 *(KQ-321)* ⛔ tách từng ô offline |
+| Σ ô so **86.150** · khớp **77.672** | WP-C5c 5 đáp án *(trước 84.770 · 76.292)*; lệch có chủ đích 8.478 giữ, lệch FLS 0 |
+
+**⚠ GHI NHẬN mới** — bài hai nguồn *(khuôn engine ⇔ `CB_MAP` DT13)* bắt: công thức AS-IS `LE17 mUSD` *(hàng 132)* và `LE19 mUSD` *(hàng 138)* chia **10^9** dù nhãn `mUSD`. Khuôn GIỮ công thức AS-IS *(`MU_LECH_DON_VI`)*; hàng nguồn 79 · 82 = 0 cả 31 ngày ⇒ phép so ⛔ phân biệt hai mũ *(Đ3)* — câu "AS-IS sai mũ?" chờ chủ/BA.
+
+**Cổng `HD2_WP_C5C`**: vẫn `None` có tên *(605 ô so 0/13.706 chưa chữ ký; `DUNG_KY = {}` — ⛔ tự thêm)*; chuỗi `/gates` nay *"615: ô so 13760/48021 ô số · 34261 ô số chưa so"*, `da_do` *"77672/86150 ô"*.
+
+**GHI NHẬN ⇒ backlog** *(⛔ sửa vòng này)*: `H14-R2-02` *(`DUNG_KY` nhận mọi chuỗi — cần `{nguoi, ngay, qd}`)* · `H14-R2-03` *(câu "35.542" ở chú thích `ban_sao_DR3_A_CCR` — đo ở repo được 18.046/18.046)*.
+
+| Lệnh | Kết quả |
+|---|---|
+| `pytest --collect-only` | **4.843** = 4.829 cây gộp *(4.767 + DT13 62)* + 14 bài mới *(`test_so_du_le.py` 7 · `test_do_hd2_c5c.py` 7)*; `MONG_PYTEST_TOAN_BO` 4.764 → **4.843** cùng commit; web 690 |
+| `--duong-nen --cong 5434` *(một mình, MỘT lần)* | **KẾT: ĐẠT** — `12 failed · 4815 passed · 2 xfailed · 14 errors`: tập đỏ + XFAIL **28 = 28** *(thêm 0 · bớt 0)* · chạy 4.843; web 3 = 3 · 690 |
+| `lint-imports` | 11 kept, 0 broken |
+| `kiem_tai_lieu.py` | ĐẠT *(484 file · 2.954 bảng)* |
+| `soi_bang_tuyen.py` · `kiem_thuyet_minh.py` · `sinh_ban_do_tang.py --kiem` | KHỚP 49 tuyến · 35/35 nút · bản đồ khớp |

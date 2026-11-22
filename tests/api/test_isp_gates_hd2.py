@@ -72,7 +72,7 @@ MONG_O_C4B = "1981/1981 ô"           # `hd2_cong.json` WP-C4b khop/tong_o (209 
 MONG_O_C4C = "19591/19894 ô đáp án khớp + 303 lệch có chủ đích"
 MONG_O_C5A = "40556/45674 ô"         # WP-C5a khop/tong_o — cờ BẬT ký 2025 (vòng sửa R1 KQ-293); + 5118 lệch có chủ đích (lớp đo)
 MONG_O_C5B = "3179/4102 ô"          # WP-C5b khop/tong_o — dòng PL IX.PL trên ATL của FLS; + 923 lệch thừa kế lớp từ lá
-MONG_O_C5C = "76292/84770 ô"        # WP-C5c khop/tong_o — Daily Report 2 · 3 (607–610 · 615) từng ô; + 8478 lệch thừa kế (truy ngược)
+MONG_O_C5C = "77672/86150 ô"        # WP-C5c khop/tong_o — Daily Report 2 · 3 (607–610 · 615) từng ô; + 8478 lệch thừa kế (truy ngược)
 MONG_O_C4A = "420/420 ô"             # `hd2_cong.json` WP-C4a khop/tong_o (44 Vendor-tháng × 14 − 196 ô P chữ)
 
 
@@ -175,7 +175,7 @@ def test_CG2_B1_tep_that_qua_tuyen_9_cong_dung_dat_C5_null():
     assert MONG_O_C5C in h["HD2_WP_C5C"]["da_do"] and "8478 lệch có chủ đích" in h["HD2_WP_C5C"]["da_do"]
     # H14-R1-01: chuỗi /gates NÓI 605 (ô so 0) + 615 (độ phủ) — ⛔ chỉ "khớp/ô so"
     ly = h["HD2_WP_C5C"]["ly_do"]
-    assert "605: ô so 0/13706 ô số" in ly and "615: ô so 12380/48021 ô số · 35641 ô số chưa so" in ly, ly
+    assert "605: ô so 0/13706 ô số" in ly and "615: ô so 13760/48021 ô số · 34261 ô số chưa so" in ly, ly
     assert h["HD2_WP_C5"]["ly_do"].startswith("WP-C5c: 1 đáp án ô so = 0"), h["HD2_WP_C5"]
     assert MONG_O_C4A in h["HD2_WP_C4A"]["da_do"] and "3/3 gói con đạt (WP-C4a · WP-C4b · WP-C4c)" in h["HD2_WP_C4"]["da_do"]
     assert MONG_O_C4B in h["HD2_WP_C4B"]["da_do"] and MONG_O_C4C in h["HD2_WP_C4C"]["da_do"]
@@ -203,7 +203,7 @@ def test_CG2_B1_nguon_thu_hai_dat_cua_tep_THAT_khop_mong():
     assert (d["WP-C3d"]["khop"], d["WP-C3d"]["lech_co_chu_dich"], d["WP-C3d"]["tong_o"], d["WP-C3d"]["dat"]) == (1287624, 1791, 1289415, True)
     assert (d["WP-C5a"]["khop"], d["WP-C5a"]["lech_co_chu_dich"], d["WP-C5a"]["tong_o"], d["WP-C5a"]["dat"]) == (40556, 5118, 45674, True)
     assert (d["WP-C5b"]["khop"], d["WP-C5b"]["lech_co_chu_dich"], d["WP-C5b"]["tong_o"], d["WP-C5b"]["dat"]) == (3179, 923, 4102, True)
-    assert (d["WP-C5c"]["khop"], d["WP-C5c"]["lech_co_chu_dich"], d["WP-C5c"]["tong_o"], d["WP-C5c"]["dat"]) == (76292, 8478, 84770, None)
+    assert (d["WP-C5c"]["khop"], d["WP-C5c"]["lech_co_chu_dich"], d["WP-C5c"]["tong_o"], d["WP-C5c"]["dat"]) == (77672, 8478, 86150, None)
     assert d["WP-C5c"]["dat_mong"] is True and [x[:4] for x in d["WP-C5c"]["khong_do_duoc"]] == ["605:"]
 
 
