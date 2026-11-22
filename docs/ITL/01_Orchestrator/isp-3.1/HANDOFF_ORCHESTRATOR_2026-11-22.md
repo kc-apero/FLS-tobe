@@ -81,4 +81,14 @@ $env:PYTHONUTF8='1'
 ---
 
 ## Trạng thái cuối
-*(điền ở lượt kiểm cuối của ngày — xem hàng `TIEN_DO` mới nhất)*
+*(lượt kiểm cuối 23:05 UTC 22/11)* — **mọi phiên con đã DỪNG**; orchestrator **⛔ còn hẹn giờ** (chờ chủ).
+
+**I2 — R2 cuối ĐẠT** (`KQ-318` @ `b978030`; 0 CHẶN · 0 NÊN SỬA · 4 GHI NHẬN): D1 bỏ ký 202510 ⇒ **0/11** gói ra số, 11/11 `FX_CHAN 202510`; bỏ ký 202503 ⇒ 0/11; 15 cổng liên quan `dat = false` có chữ; ký lại ⇒ 11 gói khớp `hd2_cong.json`, 0 lệch. `fls/` 0 tệp đổi (chặn tỷ giá ở `tools/do_hd2.py`: `FxKho` · `ty_gia_kho` · `kiem_fx_thang` · `chay_goi`); đủ ký ⇒ `--goi WP-C4a/b/c --ghi` 0 byte đổi; `fx_cua` ở mã sản phẩm. Lệnh máy chủ bản cloud tương đương **28 passed**. F03 Chromium thật: đủ ký C2/C3/C4 có số, C5 "KHÔNG ĐO ĐƯỢC" (605); bỏ ký ⇒ 4 thẻ đỏ có `FX_CHAN`. Cây gộp thử (nhánh làm việc + H14 + I2) sạch, 4.871 bài, `--duong-nen` 28 = 28 · web 3 = 3. GHI NHẬN: `--ghi` ghi đè khối ĐỎ · D1 chỉ chặn tháng gói đọc (bỏ ký 202607 ⇒ 3/11) · C4 ⛔ nhạy giá trị tỷ giá · lời BG về `FLS_*`.
+
+**Nhánh chờ gộp (cả hai XONG kỹ thuật):**
+| Bước | Ngọn | Điều kiện còn lại (CHỦ) |
+|---|---|---|
+| **H14** · Step 46 | `…-isp/H14` @ `854550b` (R2b `KQ-323` ĐẠT 0 · 0) | chủ **ký "605 DỪNG có tên"** ⇒ phiên sửa nhỏ thêm `DUNG_KY["605"]` (tên người ký + ngày) ⇒ R2b nhẹ ⇒ gộp ⇒ **47/48** |
+| **I2** · Step 47 | `…-isp/I2` @ `b978030` (R2 `KQ-318` ĐẠT 0 · 0) | H14 gộp trước · **chủ chạy lại trên `fls-pg-1`** (§6, mong `28 passed` / `27 passed, 1 skipped`) · **ThuongCT ký** (O6) ⇒ gộp (gộp lại nhánh làm việc + `--duong-nen`) ⇒ **48/48** |
+
+**Số phiếu trống kế tiếp: 324.** Câu hỏi chủ: §5 (câu 1 chặn).
