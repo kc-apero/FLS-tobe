@@ -82,3 +82,49 @@ DR2 *(28.697 ô công thức ở `A1:AL958`; 0 `ArrayFormula`)*: `G13` *(GI, ng�
 ④ **2 ô chữ-số** `AF87` `AF89` ⛔ ép số *(dấu chấm nghìn kiểu VN, ⛔ chắc là VND nguyên hay nghìn)* ⇒ kỳ `Group@202510` **⛔ đo được ②**. *Khuyến nghị:* chủ xác nhận/định dạng lại hai ô trước khi H14 đòi kỳ này.
 ⑤ **Hình ảnh DR2 gộp 3 chế độ** *(`ngay` · `luy_ke` · `hr`)* trong MỘT ảnh, khoá hàng sheet + cột `che_do·khoi` — bám "theo (dòng PL, ngày/kỳ)" bằng bảng `tieu_de`; cột `AK` *(ngày 31, ⛔ nhãn ngày)* giữ nguyên tên `ak`.
 ⑥ `AH12` đặt ở ảnh **DR3** *(P&L)* dù ô nằm ở tab ATL; ⛔ thêm vào DR2.
+
+
+## Vòng sửa sau R1 (KQ-271) — 22/11 · nhánh `isp/DT11` *(nền `19ecfd7`, gộp nhánh làm việc; chỉ THÊM, ⛔ sửa phần trên)*
+Phiên cloud con của orchestrator ISP 3.1.2. KQ-271 = **TRƯỢT 1 CHẶN · 3 NÊN SỬA · 3 GHI NHẬN**. Ghi kho thật: `KHONG` *(cụm PG `5437` chỉ chạy đường nền)*. Đột biến chạy trên **bản sao** `/tmp` *(⛔ cây thật)*.
+
+### Bảng kết quả *(mỗi mục ĐỎ trước bằng đúng đột biến R1 → XANH sau)*
+| Mã | Việc | ĐỎ trước | Sau |
+|---|---|---|---|
+| `DT11-R1-01` CHẶN | `test_dap_an_report.py` nay **tính lại** `_checksum_lai` *(AnhChup trên `dong`+`phu`, như `atl`/`gi`)* thay vì so chữ ghi sẵn | 2 đột biến R1 *(+1 ô `group_202405` ở DR3 · +1 ô `h` ngày ở DR2, cả hai NGOÀI 9 dòng CHECK)* ⇒ **28 passed** *(2/2 SỐNG)* | **2 failed · 26 passed** — **2/2 CHẾT** *(`test_AC1_anh_dong_cot_o_khac_0_va_cong_dat[daily_report_2]` · `[…_3]`)*; ảnh gốc: `34 passed` |
+| `DT11-R1-02` NÊN SỬA | orchestrator quyết **đóng băng THÊM** — 4 ảnh *(bảng dưới)* | `pytest …_h14.py` ⇒ ⛔ có ảnh | `57 passed` |
+| `DT11-R1-03` NÊN SỬA | "đạt ②" tách `cb_dat_co_so` *(≥ 1 vế ≠ 0 mà vẫn cân)* / `cb_dat_0_0` *(cả 8 vế đúng 0)*; `MONG_CHECK` khai cả hai; dải in ra ⛔ còn "đạt ②" trơn | `KeyError cb_dat_co_so` *(bài mới ĐỎ vì thiếu ngăn)* | xanh; PHA *(đổi một kỳ 0=0 thành có-số: `NIS+=7`, `CXA+=7`)* ⇒ `cb_dat_co_so` 0→1 ⇒ cổng ĐỎ ở cả 2 ảnh |
+| `DT11-R1-04` NÊN SỬA | `AK` tách khỏi trục ngày: `KY_NGAY` **30** ngày thật + `COT_KHONG_NGAY=("ak",)` + nhãn `khong_ngay` + `MONG_AK` riêng; CHECK ② tính lại trên ngày thật | bài mới đòi `len(KY_NGAY)==30` ⇒ ĐỎ trên khuôn cũ *(31)* | xanh; PHA đổi `AK` của `NB` HGO2 (0→1) ⇒ ĐỎ **chỉ** ở `@ak`, `MONG_CHECK` ngày thật vẫn xanh |
+
+### `DT11-R1-03` · `-04` — số đo mới *(Đ4: mỗi số đếm MỘT vật)*
+| | kỳ ② đo được | **đạt ② có số** *(bằng chứng dương)* | đạt ② **0 = 0** | ⛔ đạt ② | ⛔ đo được ② |
+|---|---|---|---|---|---|
+| **DR3** *(kỳ-thực thể, 192)* | 29 | **0** | 14 | 15 | 163 |
+| **DR2** *(150 ngày-khối + 160 luỹ kế = **310**)* | 310 | **0** | 262 | 48 | 0 |
+- ⭐ **Bằng chứng dương của IX.PL ở cả hai ảnh = 0 kỳ**: "đạt" cũ *(267/267 · 14/14)* là tập 0 = 0 *(Đ3)*. Nay khai `cb_dat_co_so = 0` RÕ RÀNG; ngày nào đó có kỳ cân với số ≠ 0 ⇒ cổng ĐỎ buộc ghi lại bản khai.
+- DR2 trục ngày: **150** = 5 khối × 30 ngày *(⛔ 155 = 150 + 5 `AK`)*; đạt chỉ-ngày-thật **262/310** *(R1 đo 262/310 ✔)*. `AK` ở chế độ `ngay` = **395** ô *(838 ở cả 3 chế độ: ngay 395 · luy_ke 340 · hr 103)*; CHECK ② ở `AK` = 5 kỳ-khối *(RIÊNG, `MONG_AK`, 0 = 0)*. **Ảnh DR2/DR3 không đổi byte** *(sha ghim ở `test_dap_an_report_h14.py`)*.
+
+### `DT11-R1-02` — 4 ảnh mới *(đo tên tab bằng SA: mỗi tên đúng **1** ứng viên; WO/BG khớp)*
+| Ảnh · PD | Sổ · tab · lưới | **Dòng** ảnh | **Cột** ảnh | **Ô số ≠ 0** *(⛔ ô lỗi)* | Ô lỗi | MB | `checksum_noi_dung` |
+|---|---|---|---|---|---|---|---|
+| `daily_report_3_fs2` · **607** | P&L Report `19NNTb…` · `[FS2]5. Daily Report 3` · 1424×40 | 1.236 | 41 | **27.290** | 0 | 1,31 | `a1c97597ece5ff24` |
+| `daily_report_3_fs1` · **608** | P&L Report · `[FS1]5. Daily Report 3` · 1092×40 | 921 | 41 | **17.962** | 0 | 1,05 | `8c7617a6e2a55f0f` |
+| `daily_report_3_gop` · **609** | P&L Report · `5. Daily Report 3` · 1940×40 | 1.742 | 41 | **35.542** | 0 | 1,63 | `7a76faa90919bf03` |
+| `ccr_daily_report` · **615** | A-CCR `1ycMOK…` · `5. Daily Report` · 12521×44 *(API trả 2.502 hàng)* | 2.057 | 41 | **48.021** | **127** | **2,14** ⚠ | `2fd16287aa3648e0` |
+- **Nhãn từng số (Đ4)**: dòng = `dong_sheet`; cột `f…al` = chữ cột Sheets `F…AL`; nghĩa cột = phụ `tieu_de` *(bài đòi: mọi cột có số đều có tiêu đề ở hàng ≥ 5)*; `ma` = mã trước `|` ở nhãn; hàng ⛔ có mã *(chỉ số)* khai **17 · 12 · 37 · 38**. `phan`/`khoi` = **vết** đoạn/khối *(vd `CM Cumulative` · `CHECK ZONE` · `GROUP` · `CVL`)*, ⛔ nghĩa kế toán.
+- **Dải ngày**: 607 · 608 = `From`/`To` 45962→45991 *(01→30/11/2025, 30 ngày, cột `G…AJ`)*; **609** = 45992→46022 *(01→31/12/2025, **31** ngày, `G…AK` — ở tab này `AK` LÀ ngày thật)*; **615** = 46327→46356 *(01→30/11/2026, 30 ngày)*. `AK` **⛔ ngày** ở 607 · 608 · 615 *(395 · 395 · 922 ô — vết kéo công thức, nhãn `khong_ngay`, cùng bài học `-04`)*; ở 609 `AK` = ngày 31 *(395 ô)*. Bài canh: `((h,"AK") ∈ tieu_de) ⇔ AK là ngày`.
+- `chua_co_du_lieu` *(cột `f…al` 0 ô số, có tên, Đ5)*: **`F` · `AL`** ở 607 · 608 · 609; **không** ở 615.
+- **Ô lỗi** *(`#REF!`/`#N/A` GIỮ NGUYÊN, đếm theo cột; ghim phân bố `loi_theo_cot`)*: 607 · 608 · 609 = **0** *(khai `0` RÕ RÀNG 33 cột)*; **615 = 127**: `#DIV/0!` 84 · `#REF!` 18 · `#N/A` 16 · `#VALUE!` 9, rải **13 cột** `f·h·i·j·m·n·o·q·r·s·t·w·z`; chuỗi nguyên văn còn phần ngoặc *(vd `#REF! (Cannot find range or sheet for imported range.)`)*. Chèn `#N/A` vào bản thô 607 ⇒ công cụ **exit 1** *(`ô lỗi ≠ mong: g 1≠0`; `--ra` tạm ⇒ ⛔ đè ảnh)*.
+- **Ô chữ/bool** ở cột `F`: phụ `o_khong_so` *(102 · 240 · 0 · 56, nguyên văn, ⛔ ép số)*; hàng có chữ/bool ở `G…AL` = hàng tiêu đề *(phụ `tieu_de` 1.998 · 1.930 · 594 · 1.792 ô; trong đó vùng `CHECK ZONE` bool của sổ)*. **Bảo toàn**: ô số/lỗi `F…AL` của bản thô *(27.605 · 18.199 · 35.860 · 48.758)* = bảng chính + `tieu_de` — bài `test_bao_toan_…`.
+- **Checksum TÍNH LẠI** ở cả 4 *(`_checksum_lai`)* + PHA +1 ô ⇒ ĐỎ. **Ảnh > 2 MB (`DT4-R1-07`)**: `ccr_daily_report` **2.242.934 B** ⇒ KHAI ở `ANH_LON` *(khai thừa/thiếu đều ĐỎ)*; 3 ảnh còn lại < 2 MB; trần cứng 3 MB.
+- **615 không đóng băng hết 12.521 hàng**: API trả **2.502** hàng *(còn lại rỗng — API cắt)*; 615 là sổ A-CCR *(tab "Cash Balance by LE", bố cục KHÁC DR2/DR3 — cùng khung `A…AL` nên dùng chung `_dr_luoi.py`)*. 616 `6. CCR I DEL I W I Pdf` = **PDF ⇒ LOẠI TRỪ** *(⛔ đóng băng, có tên)*; 614 `9.2.Exchange Rate` đã có ở `ix_fx`.
+- Việc đã làm: `tools/khuon_dong_bang/_dr_luoi.py` *(thân chung, mới)* + 4 khuôn riêng `daily_report_3_fs2|fs1|gop` · `ccr_daily_report` *(mới; ⛔ sửa `daily_report_2/3` · `_daily_report` ngoài `-03`/`-04`; `dong_bang_sheet.py` sha ghim)*; `tests/fixture/dap_an/` +4 ảnh; `tests/du_lieu/test_dap_an_report_h14.py` **57** bài; `test_AC6_anh_cu…` ở `test_dap_an_report.py` nới tập tên ảnh mới *(22 ảnh cũ + 2 DT11 đúng từng byte)*.
+
+### Đột biến sau sửa *(bản sao; chạy `test_dap_an_report.py` + `…_h14.py`)* — **11/11 CHẾT**
+`dr3 +1 ô` 2 failed · `dr2 +1 ô` 2 failed · `fs2 +1 ô` 2 · `fs1 +1 ô` 2 · `gop +1 ô` 2 · `ccr +1 ô` 3 · `fs2 sửa tiêu đề` 2 · `ccr sửa tiêu đề` 3 · `fs1 sửa ô chữ` 2 · `gop xoá 1 hàng` 6 · `fs2 chèn #N/A` 5.
+
+### GHI NHẬN `-05 · -06 · -07` ⇒ backlog *(⛔ làm)*
+`-05` nhãn 13.541/18.236 *(sửa chữ BG)* · `-06` checksum DR2 trôi theo `TODAY()` *(`Y1`·`AA1`; 4 ảnh mới có bool hàng 1 — cùng loại)* · `-07` −0,5 của `AH12` lan vào Sign off chưa chứng minh. Trạng thái ở sổ: `Backlog`.
+
+### Q8 · sàn · cổng
+- `MONG_PYTEST_TOAN_BO` **4278 → 4375** *(= `pytest --collect-only` thật: 4 375 · web 681 giữ)* + bài ghim `test_S0_R2_03_…` cùng commit. Xung đột khi gộp nhánh làm việc *(`tools/dung_moi_truong_isp.sh` · `tests/test_dung_moi_truong_isp.py`)*: giữ bản nhánh làm việc rồi đặt = thu thập.
+- ⛔⛔ **Riêng tư (cổng bắt được, sửa trong vòng này)**: lần đường nền đầu **ĐỎ** *(`tests/kiem/test_quet_pii_repo.py::test_quet_repo_mau_so_khong_rong_va_dat_0` — THÊM 1 ngoài tập đỏ nền)*: ảnh A-CCR `5. Daily Report` mang **4 số TK cá nhân** *(nhãn `R | <số>_<NH> <TT>_CN`, cột `nhan_c`; 8 chỗ khớp)*. Sửa NGAY ở khuôn *(`_dr_luoi.che_pii` dùng `quet_pii_repo.che_van_ban` — một bản khai mẫu)*: `TK_CA_NHAN_1…4`, ảnh ghi lại *(checksum `ef405b5eb2f631bb` → `2fd16287aa3648e0`)*; bản chứa số thật **chưa từng push** *(commit viết lại cục bộ)*. Bài mới `test_PII_…` *(0 số thật · che đúng 4 mã · `Decimal` giữ nguyên · cùng số ⇒ cùng mã)*. `quet_pii_repo` **0 chỗ · 0 tệp**. Bản thô `/tmp/dt11b` chmod 600, **xoá sau**, ⛔ commit.
