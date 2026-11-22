@@ -254,3 +254,27 @@ def dung_tu_anh(anh: Mapping[str, Any]) -> list[tuple[str, dict[str, Any]]]:
 def driver_cua(bang: BangDRV, loai: str, cdt1: str, thang: Any) -> float:
     """Hàm tự do — `bang` TRUYỀN VÀO. Đọc từ KHO: `cau_hinh_repo.driver_cua(conn, …)`."""
     return bang.driver_cua(loai, cdt1, thang)
+
+
+# ══ `C10-R1-01` (`KQ-297`) — bảng nối TÊN driver của ENGINE ↔ KHOÁ kho ══════════════════════════
+# Một vật, hai nhãn (Đ4): luật `IX.ALR` (C11 `luat_pb.DRIVER`, H12) gọi driver là `PE` · `PM` ·
+# `NOEM`; kho C10 khoá là `GI_PE` · `GI_PM` · `NOEM`. Đo trước khi nối: `driver_cua("PE", …)` ⇒
+# `DRV_LA`. Bảng khai Ở ĐÂY *(phía config)*, ⛔ sửa engine. Tên lạ ⇒ `LoiDRV(DRV_LA)` CÓ TÊN, ⛔ đoán.
+NOI_TEN_ENGINE: dict[str, str] = {"PE": "GI_PE", "PM": "GI_PM", "NOEM": "NOEM"}
+MONG_NOI = 3             # số tên engine nối được (đếm TÊN ENGINE, ⛔ ô)
+
+
+def khoa_kho_cua(ten_engine: Any) -> str:
+    """Tên driver ENGINE ⇒ khoá kho. Lạ *(gồm `None` = luật H1000 ⛔ qua driver, và chính khoá kho)*
+    ⇒ `LoiDRV(DRV_LA)`."""
+    if isinstance(ten_engine, str) and ten_engine in NOI_TEN_ENGINE:
+        return NOI_TEN_ENGINE[ten_engine]
+    raise LoiDRV(f"tên driver của engine {ten_engine!r} ⛔ thuộc {sorted(NOI_TEN_ENGINE)} "
+                 f"(None = luật ⛔ qua driver)", DRV_LA)
+
+
+def driver_cua_theo_luat(bang: BangDRV, luat: Any, cdt1: str, thang: Any) -> float:
+    """Driver của `luat` *(đối tượng có `.driver`, vd `LuatPB`, HOẶC chính tên engine `PE`·`PM`·`NOEM`)*
+    ở `(cdt1, thang)` — nối tên rồi `BangDRV.driver_cua`. Ô thiếu ⇒ `DrvThieu` có tên như cũ."""
+    ten = luat.driver if hasattr(luat, "driver") else luat
+    return bang.driver_cua(khoa_kho_cua(ten), cdt1, thang)

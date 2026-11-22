@@ -1320,16 +1320,21 @@ def cau_hinh_drv(yc: YeuCau):
         raise LoiCua("FLS-CAUHINH-BAN-HONG",
                      "ban cau hinh trong kho ⛔ doc ra duoc — bao nguoi dung he") from e
     ok = lambda l, t: (loai is None or l == loai) and (ky is None or int(ky) == t)   # noqa: E731
-    luoi = []
+    luoi, thieu_ngoai = [], []
     for (l, c), r in sorted(b.luoi.items()):
         if loai is not None and l != loai:
             continue
         th = {int(r["nam"]) * 100 + i: r[drv_mod.THANG[i - 1]] for i in range(1, 13)}
         if ky is not None:
             th = {t: v for t, v in th.items() if t == int(ky)}
+            if not th:      # `C10-R1-02`: kỳ ⛔ có trong lưới ⇒ null (thiếu) + dòng `o_thieu` CÓ TÊN, ⛔ rỗng
+                th = {int(ky): None}
+                thieu_ngoai.append({"loai": l, "cdt1": c, "thang": int(ky),
+                                    "ly_do": f"nguồn ⛔ có driver năm {int(ky) // 100} "
+                                             f"(ảnh DT10 chỉ có {r['nam']})"})
         luoi.append({"loai": l, "cdt1": c, "nam": r["nam"], "thang": {str(t): v for t, v in th.items()}})
     thieu = [{"loai": l, "cdt1": c, "thang": t, "ly_do": ly}
-             for (l, c, t), ly in sorted(b.thieu.items()) if ok(l, t)]
+             for (l, c, t), ly in sorted(b.thieu.items()) if ok(l, t)] + thieu_ngoai
     dem: dict[str, int] = {}
     for x in thieu:
         dem[x["ly_do"]] = dem.get(x["ly_do"], 0) + 1

@@ -180,3 +180,24 @@ def test_C10_handler_cau_hinh_drv_dich_loi_CO_TEN(monkeypatch, exc, ma, http_):
     with pytest.raises(xu_ly.LoiCua) as e:
         xu_ly.cau_hinh_drv(_yc())
     assert e.value.ma == ma and bao.MA_LOI[ma][0] == http_
+
+
+@pytest.mark.pg
+def test_C10R1_02_ky_ngoai_nam_luoi_NEU_TEN_thieu_khong_im_lang(may):
+    # mẫu số trước (Đ3): lưới có 21 hàng; ?ky=202603 ⛔ được trả rỗng im lặng
+    ma, r = _goi(may, f"{DUONG}?ky=202603")
+    d = r["data"]
+    assert ma == 200 and len(d["luoi"]) == 21
+    assert d["so_o_so"] == 0 and d["so_o_thieu"] == 21 == len(d["o_thieu"]), d["so_o_thieu"]
+    assert {(x["loai"], x["cdt1"]) for x in d["o_thieu"]} == {
+        (x["loai"], x["cdt1"]) for x in d["luoi"]}
+    assert all(x["thang"] == 202603 and "2026" in x["ly_do"] for x in d["o_thieu"])
+    assert d["o_thieu_theo_ly_do"] == {d["o_thieu"][0]["ly_do"]: 21}
+    assert all(x["thang"] == {"202603": None} for x in d["luoi"])      # null = thiếu CÓ TÊN
+    ma, r = _goi(may, f"{DUONG}?loai=NOEM&ky=202603")
+    assert ma == 200 and r["data"]["so_o_thieu"] == 7
+    ma, r = _goi(may, f"{DUONG}?ky=202503")                              # kỳ CÓ trong lưới: ⛔ thêm dòng giả
+    d = r["data"]
+    assert d["so_o_so"] + d["so_o_thieu"] > 0 and d["so_o_so"] == sum(
+        1 for x in d["luoi"] if x["thang"]["202503"] is not None)
+    assert all("ảnh DT10 chỉ có" not in x["ly_do"] for x in d["o_thieu"]), d["o_thieu"][:1]

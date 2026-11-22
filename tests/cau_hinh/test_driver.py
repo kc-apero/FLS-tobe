@@ -146,3 +146,32 @@ def test_C10_tong_34_Sigma_7_CDT1_bang_1_tren_anh():
                 assert abs(sum(v) - 1) <= 1e-9
                 n += 1
     assert n == dv.MONG_TONG == 34
+
+
+# ══ `C10-R1-01` (KQ-297): bảng nối tên driver của ENGINE ↔ khoá kho ══════════════════════════
+def test_C10R1_01_moi_driver_cua_luat_IX_ALR_noi_duoc_ve_khoa_kho():
+    # mẫu số trước (Đ3): C11 khai ≥ 2 driver ≠ None ⇒ phép so ⛔ chạy trên tập rỗng
+    from fls.cau_hinh import luat_pb
+    ten = {v for v in luat_pb.DRIVER.values() if v is not None}
+    assert ten == {"PE", "NOEM"}
+    b = _bang()
+    for t in sorted(ten):
+        assert dv.khoa_kho_cua(t) in dv.LOAI_SO
+        assert dv.driver_cua_theo_luat(b, t, "CVL", 202503) == b.driver_cua(dv.khoa_kho_cua(t),
+                                                                           "CVL", 202503)
+    assert dv.khoa_kho_cua("PE") == "GI_PE" and dv.khoa_kho_cua("PM") == "GI_PM"
+    assert dv.khoa_kho_cua("NOEM") == "NOEM"
+    assert dv.MONG_NOI == 3 == len(dv.NOI_TEN_ENGINE)
+    assert set(dv.NOI_TEN_ENGINE.values()) <= set(dv.LOAI_SO)
+
+
+def test_C10R1_01_theo_dung_doi_tuong_luat_va_ten_la_thi_loi_co_ten():
+    from fls.cau_hinh.luat_pb import LuatPB
+    b = _bang()
+    lu = LuatPB(hd="X", tu_ky=202501, phuong_phap="BY_GI", nhan_mm="By GI", driver="PE",
+                bat=False, khong_qua_allocate=False)
+    assert dv.driver_cua_theo_luat(b, lu, "CVL", 202503) == b.driver_cua("GI_PE", "CVL", 202503)
+    for la in ("GI_PE", "pe", "XX", None, ""):       # khoá kho ⛔ phải tên engine; H1000 (None) ⛔ qua driver
+        with pytest.raises(dv.LoiDRV) as e:
+            dv.driver_cua_theo_luat(b, la, "CVL", 202503)
+        assert e.value.ma == dv.DRV_LA and repr(la) in str(e.value), la
