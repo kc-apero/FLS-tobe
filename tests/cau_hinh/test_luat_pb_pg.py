@@ -132,3 +132,49 @@ def test_C11_R1_01_hieu_luc_TICH_LUY_qua_hai_lan_nap_202501_roi_202507(conn):
     assert b.luat_cua("OFR", 202503, cdt1="CAH").tu_ky == 202501
     _nap(conn, tu_ky=202507)                                 # nạp lại mốc cũ ⇒ ⛔ nhân đôi
     assert len(chc.doc_alr(conn).luat) == 34
+
+
+# ── Vòng sửa R1 `H12` *(`KQ-293`)* — bật cờ 2025 CÓ KÝ qua KHO *(phiên bản MỚI, ⛔ sửa bản cũ)* ──────────
+#   ⚠ Kho config TÍCH LUỸ *(`C11-R1-01`)* ⇒ một bản bật cờ đã COMMIT sẽ làm mọi bài C11 chạy sau thấy `bat=True`
+#   *(bài `…_100pct_bat_false`)*. Bài ở đây chạy trong MỘT giao dịch rồi ROLLBACK *(`nap` lồng ⇒ savepoint)*.
+TEP_KY = GOC / "tests" / "fixture" / "cau_hinh" / "ix_alr_2025_bat.json"
+
+
+@pytest.fixture()
+def conn_lui():
+    with psycopg.connect(dsn_test()) as c:          # ⛔ autocommit ⇒ cuối bài rollback
+        yield c
+        c.rollback()
+
+
+def test_H12_R1_ky_bat_2025__phien_ban_MOI_actor_nguoi_ky_ban_cu_nguyen(conn_lui):
+    c = conn_lui
+    _nap(c, tu_ky=202501)
+    truoc = chc._doc_ban(c, lp.BANG)
+    ban = chc.ky_bat_ix_alr(c, str(TEP_KY), actor="KhanhCQ")
+    assert ban.phien_ban == truoc.phien_ban + 1 and ban.actor == "KhanhCQ" and ban.nguon.startswith("ky:")
+    with c.cursor() as cur:                                      # bản cũ NGUYÊN *(chỉ-thêm)*
+        cur.execute("SELECT count(*) FROM fls_cau_hinh_dong d JOIN fls_cau_hinh_ban b USING (ban_id) "
+                    "WHERE b.bang = %s AND b.phien_ban = %s", (lp.BANG, truoc.phien_ban))
+        assert cur.fetchone()[0] == len(truoc.dong) >= 17          # kho tích luỹ: ≥ 17 (mốc khác của bài C11)
+    b = chc.doc_alr(c)
+    assert sum(1 for x in b.luat if x.bat) == 13 and {x.nguoi_ky for x in b.luat if x.bat} == {"KhanhCQ"}
+    assert b.luat_cua("LC", 202501).bat is False and b.luat_cua("LC", 202502).bat is True
+    assert b.luat_cua("OFR", 202503, cdt1="CAH").phuong_phap is None
+    assert b.luat_cua("REC", 202601).bat is False
+    assert not any(x.bat for x in b.luat if x.phuong_phap == lp.H1000)
+    _nap(c, tu_ky=202501)                     # nạp lại MM sau ký ⇒ chữ ký ⛔ mất — kể cả dòng CÙNG khoá `HCC@202501`
+    b2 = chc.doc_alr(c)
+    assert b2.luat_cua("LC", 202502).bat is True and b2.luat_cua("HCC", 202501).bat is True
+    assert b2.luat_cua("HCC", 202501).nguoi_ky == "KhanhCQ" and sum(1 for x in b2.luat if x.bat) == 13
+
+
+@pytest.mark.parametrize("actor", ["", "nguoi-khac", "KhanhCQ@x.vn"])
+def test_H12_R1_ky_bat__actor_phai_DUNG_nguoi_ky(conn_lui, actor):
+    c = conn_lui
+    _nap(c, tu_ky=202501)
+    v0 = _max(c)
+    with pytest.raises(chc.LoiCauHinh):
+        chc.ky_bat_ix_alr(c, str(TEP_KY), actor=actor)
+    assert _max(c) == v0
+
