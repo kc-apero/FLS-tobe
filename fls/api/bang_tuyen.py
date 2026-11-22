@@ -701,6 +701,19 @@ BANG_TUYEN: tuple[Tuyen, ...] = (
           mo_ta="ky niem phong MOT thang IX.FX (D1): nguoi ky = nguoi trong THE, "
                 "ky_luc do MAY dat; ky lai ⇒ 409 FLS-CAUHINH-DA-KY; thang ⛔ co "
                 "trong IX.FX ⇒ 404; yyyymm hong ⇒ 400"),
+    # ⭐⭐ `C13` (`WO-257`): BAN BAO CAO KY CO PHIEN BAN (IX.TMP). Dung lai kho config chi-them
+    #   `0027` (⛔ di tru moi). Chi HAI tuyen (§4i): GET + POST sign — ⛔ tuyen "dua ban" (ham
+    #   `chc.dua_ban_ky`, engine noi o I2). `actor` TU THE; ky lai ⇒ 409; ky chua co ban ⇒ 404.
+    Tuyen("GET", f"{TIEN_TO}/report/snapshot/{{ky}}", "ban_ky_ds",
+          ("fls_cau_hinh_ban", "fls_cau_hinh_dong"),
+          mo_ta="danh sach phien ban ban Daily Report 3 cua ky yyyymm: checksum · trang "
+                "thai · nguoi ky; ky chua co ban ⇒ ban=[]; ky hong ⇒ 400"),
+    Tuyen("POST", f"{TIEN_TO}/report/snapshot/{{ky}}/sign", "ban_ky_ky",
+          ("fls_cau_hinh_ban", "fls_cau_hinh_dong"),
+          bang_ghi=("fls_cau_hinh_ban", "fls_cau_hinh_dong"),
+          ghi=True, http_ok=201,
+          mo_ta="ky phien ban MOI NHAT cua ky: nguoi ky = nguoi trong THE; da ky ⇒ 409 "
+                "FLS-CAUHINH-DA-KY; ky chua co ban ⇒ 404; ky hong ⇒ 400"),
     # ⭐⭐ `C5` (`WO-142`): cay `IX.HD` + Mapping Master doc tu KHO (⛔ con anh tinh
     #    nhu C4). Hai bang config (ATL `IX.HD`, MM `IX.HD · IX.ORG`) — cung hai
     #    bang kho. `GET`, ⛔ ghi. ⛔ hoa giai 74 ↔ 73: tuyen chi LIET KE chenh.
