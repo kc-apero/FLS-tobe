@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import datetime
 import pathlib
+import re
 import sys
 from decimal import Decimal
 from typing import Any
@@ -157,3 +158,91 @@ def tho_mau() -> dict[str, Any]:
     return {"nguon": "mau-gia", "doc_luc": "2026-11-20", "cach_doc": "mẫu giả", "ky": "2026-04",
             "tieu_de": list(TIEU_DE),
             "hang": [[10 + i, serial + i, f"ITL#{i}", *c28] for i in range(2)]}
+
+
+# ══════════════════════════════════════════════════════════════════════════════════════════════
+# ⭐ CHUẨN HOÁ ẢNH về ĐÚNG HÌNH ảnh 2026-03 *(`KQ-267` · `DT12-R1-01` · orchestrator quyết phương án (a))*
+# Lý do: ảnh `dong_bang_sheet` mang `{bang, khuon, cot, cong, checksum…, dong:[{thu_tu, dong_sheet:"7049", ô:{"chu": …}}]}`;
+# bước đọc H15 *(`do_voi_so_luong._nap` + `_chuan`)* viết cho ảnh 2026-03 `{nguon, ky, dong_du_lieu_bat_dau, so_dong, ghi_chu,
+# dong:[{dong_sheet:int, ô phẳng}]}` ⇒ trên ảnh `{"chu"}` thì `d["ky"]` KeyError và `_chuan({"chu": …})` ra CHUỖI DICT
+# `"{'chu': …}"` — hai lỗi mà AC-5 cũ *(chỉ `json.loads`)* KHÔNG thấy. Ảnh ghi ra = hình 2026-03; cổng · checksum · cột
+# sống ở `itl_ledge_cac_ky.json` *(manifest)*; `ve_dang_cong` là phép NGƯỢC để tính lại checksum *(khứ hồi)*.
+KHOA_ANH = ("nguon", "ky", "dong_du_lieu_bat_dau", "so_dong", "ghi_chu", "dong")      # thứ tự khoá cấp trên của ảnh 2026-03
+#: Hàng dữ liệu đầu của SỔ *(ảnh 2026-03: `10` — hàng 7·8 tiêu đề, 9 trống)*, ⛔ hàng đầu của kỳ.
+HANG_DAU_SO = 10
+#: Cột mà nguồn LẪN số lẫn chữ *(`svc_*`)* — chỉ ở đây ô chữ-số **trả lại SỐ** *(ảnh 2026-03: `svc_start_manual` 149 số + 435 chữ)*.
+#: ⛔ cột khác: `id_payee_*` có vài ô toàn chữ số mà là MÃ *(chữ)*.
+COT_SO = tuple(c for c in COT if c.startswith(("svc_start_", "svc_end_")))
+_RE_SO = re.compile(r"^-?\d+(\.\d+)?$", re.ASCII)
+
+
+def _tra_so(v: str) -> int | float:
+    return int(v) if "." not in v else float(v)
+
+
+def chuan_hoa_anh(cong: dict[str, Any], hang_dau_so: int = HANG_DAU_SO) -> dict[str, Any]:
+    """Ảnh của `dong_bang_sheet` *(`{"chu"}`, `thu_tu`)* → ảnh HÌNH 2026-03. Chỉ ĐỔI HÌNH: ô chữ gỡ `{"chu"}`; ô chữ-số của
+    `COT_SO` trả lại số; `dong_sheet` → số nguyên; ô rỗng giữ `None`. ⛔ bỏ/thêm dòng·ô *(`ValueError` nếu ảnh vào hỏng hình)*."""
+    dong = cong.get("dong")
+    if not dong or cong.get("so_dong") != len(dong):
+        raise ValueError("ảnh cổng rỗng hoặc `so_dong` ≠ số dòng — ⛔ chuẩn hoá (Đ3)")
+    ra = []
+    for r in dong:
+        o: dict[str, Any] = {"dong_sheet": int(_u(r["dong_sheet"]))}
+        for c in COT:
+            v = _u(r[c])
+            if v is not None and not isinstance(v, str):
+                raise ValueError(f"cột `{c}`: ô kiểu {type(v).__name__} — ảnh cổng chỉ có chữ/rỗng")
+            o[c] = _tra_so(v) if (c in COT_SO and v is not None and _RE_SO.match(v)) else v
+        ra.append(o)
+    ky = str(ra[0]["ngay"])[:7]
+    return {"nguon": cong["nguon"], "ky": ky, "dong_du_lieu_bat_dau": hang_dau_so, "so_dong": len(ra),
+            "ghi_chu": cong.get("ghi_chu_khuon", ""), "dong": ra}
+
+
+def ve_dang_cong(anh: dict[str, Any]) -> list[dict[str, Any]]:
+    """Phép NGƯỢC của `chuan_hoa_anh`: ảnh hình 2026-03 → dòng dạng cổng *(`thu_tu` · `dong_sheet` chữ · ô `{"chu"}`)* để
+    `AnhChup.checksum()` tính lại ⇒ so với checksum ghim = bằng chứng khứ hồi 100 % ô."""
+    ra = []
+    for i, r in enumerate(anh["dong"], 1):
+        o: dict[str, Any] = {"thu_tu": i, "dong_sheet": str(r["dong_sheet"])}
+        for c in COT:
+            v = r[c]
+            o[c] = None if v is None else {"chu": _chu_so(v) if isinstance(v, (int, float)) else v}
+        ra.append(o)
+    return ra
+
+
+def _kieu(v: Any) -> str:
+    return "rỗng" if v is None else "số" if isinstance(v, (int, float)) and not isinstance(v, bool) else type(v).__name__
+
+
+def loi_hinh(anh: dict[str, Any], mau: dict[str, Any]) -> list[str]:
+    """So HÌNH `anh` với `mau` *(ảnh 2026-03)*: khoá cấp trên *(tập + thứ tự)* · khoá dòng · KIỂU ô từng cột ⊆ kiểu của mẫu *(chữ/số; rỗng ở đâu cũng được)* ·
+    `dong_sheet` số · ⛔ ô `dict` ở đâu cả. `[]` = đúng hình; mỗi lỗi một câu, ⛔ mang giá trị ô."""
+    loi = []
+    if list(anh) != list(mau):
+        loi.append(f"khoá cấp trên {list(anh)} ≠ {list(mau)}")
+    if not isinstance(anh.get("dong"), list) or not anh.get("dong"):
+        return [*loi, "`dong` rỗng/không phải danh sách — ⛔ đo được (Đ3)"]
+    khoa_dong = list(mau["dong"][0])
+    kieu_mau: dict[str, set[str]] = {c: set() for c in khoa_dong}
+    for r in mau["dong"]:
+        for c in khoa_dong:
+            kieu_mau[c].add(_kieu(r[c]))
+    sai_khoa = sai_kieu = 0
+    ghi: dict[str, set[str]] = {}
+    for r in anh["dong"]:
+        if list(r) != khoa_dong:
+            sai_khoa += 1
+            continue
+        for c in khoa_dong:
+            k = _kieu(r[c])
+            if k != "rỗng" and k not in kieu_mau[c]:       # ô RỖNG hợp lệ ở mọi cột *(khuôn `chu?` — sổ thật có ô trống ở cột mà 2026-03 đầy)*
+                sai_kieu += 1
+                ghi.setdefault(c, set()).add(k)
+    if sai_khoa:
+        loi.append(f"{sai_khoa} dòng có khoá ≠ ảnh 2026-03")
+    if sai_kieu:
+        loi.append(f"{sai_kieu} ô sai KIỂU so với ảnh 2026-03 ở cột {sorted(ghi)} (kiểu lạ: {sorted(set().union(*ghi.values()))})")
+    return loi

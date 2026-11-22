@@ -73,11 +73,6 @@ def _nap_khuon():
     return m
 
 
-def _checksum_lai(anh: dict) -> str:
-    return AnhChup(run_id="kiem", ngay=datetime.date.fromisoformat(anh["ngay_dong_bang"]), nguon=anh["nguon"],
-                   dong=tuple(anh["dong"])).checksum()[:16]
-
-
 # ── AC-1 ────────────────────────────────────────────────────────────────────────
 def test_mong_la_phep_do_doc_lap_khong_rong():
     """Đ3: mẫu số của mọi phép so dưới đây KHÔNG rỗng — 25 kỳ · 12.049 dòng, ⛔ 0."""
@@ -88,9 +83,11 @@ def test_AC1_moi_ky_ngoai_2026_03_co_anh_dung_so_dong():
     thieu = [k for k in MONG if not _anh(k).is_file()]
     assert not thieu, f"{len(thieu)}/25 kỳ chưa có ảnh: {thieu}"
     sai = {}
+    m = _doc(MANIFEST)
     for k, n in MONG.items():
         a = _doc(_anh(k))
-        if not (a["so_dong"] == len(a["dong"]) == n and a["cong"]["dat"] and a["cong"]["mong"] == n):
+        cong = m["anh"][k]["cong"]          # cổng `--mong` của lượt đóng băng — ở manifest *(ảnh = hình 2026-03, ⛔ mang cổng)*
+        if not (a["so_dong"] == len(a["dong"]) == n and cong["dat"] and cong["mong"] == cong["so_dong"] == n):
             sai[k] = (a["so_dong"], len(a["dong"]), n)
     assert not sai, sai
     assert sum(_doc(_anh(k))["so_dong"] for k in MONG) == MONG_TONG_DONG
@@ -99,7 +96,7 @@ def test_AC1_moi_ky_ngoai_2026_03_co_anh_dung_so_dong():
 def test_AC1_moi_dong_co_ngay_dung_ky_va_khoa_dong_sheet_khong_trung():
     for k in MONG:
         a = _doc(_anh(k))
-        ngay = {(r["ngay"]["chu"] if isinstance(r["ngay"], dict) else r["ngay"])[:7] for r in a["dong"]}
+        ngay = {r["ngay"][:7] for r in a["dong"]}
         assert ngay == {k}, (k, ngay)
         ds = [r["dong_sheet"] for r in a["dong"]]
         assert len(set(ds)) == len(ds)
@@ -147,7 +144,8 @@ def test_AC3_khuon_cot_bang_anh_2026_03():
     cot = _cot_khuon()
     assert len(cot) == 30 and cot[:2] == ["itl_id_sheet", "ngay"]            # 28 + ngày + itl_id
     for ky in MONG:
-        assert _doc(_anh(ky))["cot"] == cot, ky
+        assert [c for c in _doc(_anh(ky))["dong"][0] if c != "dong_sheet"] == cot, ky      # khoá dòng = ảnh 2026-03
+        assert _doc(MANIFEST)["anh"][ky]["cot"] == cot, ky
     assert list(_nap_khuon().COT) == cot
 
 
@@ -166,7 +164,7 @@ def test_AC3_doi_ten_mot_cot_khuon_la_do(tmp_path):
 def test_AC4_anh_khong_mang_cot_cam():
     for ky in MONG:
         a = _doc(_anh(ky))
-        ten = [a["khoa"], *a["cot"], *a.get("cot_khong_chon", [])]
+        ten = [*a, *a["dong"][0]]          # khoá cấp trên + khoá dòng
         bad = [c for c in ten if any(x in c.casefold() for x in CAM)]
         assert not bad, (ky, bad)
 
@@ -184,22 +182,109 @@ def test_AC4_cay_mot_cot_cam_la_do(tmp_path):
 
 
 # ── AC-5 ────────────────────────────────────────────────────────────────────────
-def test_AC5_do_voi_so_luong_nap_duoc_anh_moi():
+def _h15():
+    """Module `tools/do_voi_so_luong.py` — ĐÚNG đường đọc mà H15 *(Step 43)* sẽ dùng: `_nap` rồi `_chuan` từng ô."""
     spec = importlib.util.spec_from_file_location("_do_voi_so_luong_dt12", GOC / "tools" / "do_voi_so_luong.py")
     m = importlib.util.module_from_spec(spec)
     sys.modules[spec.name] = m
     spec.loader.exec_module(m)
-    a = m._nap("dap_an/itl_ledge_2026-04.json")
-    assert a["so_dong"] == len(a["dong"]) == MONG["2026-04"]
+    return m
+
+
+def _loi_gia_tri_h15(m, d: dict, ky: str) -> list[str]:
+    """Đo GIÁ TRỊ qua đường đọc H15 *(⛔ chỉ `json.loads` — AC-5 cũ xanh trên ảnh mà `d["ky"]` KeyError)*."""
+    loi = []
+    if "ky" not in d or d["ky"] != ky:
+        loi.append("khoá cấp trên `ky` thiếu/sai")
+    if not isinstance(d.get("dong_du_lieu_bat_dau"), int):
+        loi.append("`dong_du_lieu_bat_dau` thiếu/không phải số")
+    n = len(d.get("dong", []))
+    if not n or d.get("so_dong") != n:
+        loi.append(f"`so_dong` {d.get('so_dong')} ≠ {n} dòng *(hoặc rỗng — Đ3)*")
+    sai_chuoi = sai_kieu = 0
+    for r in d.get("dong", []):
+        if m._chuan(r["hd_manual"]).startswith("{"):          # `_chuan` của dict = "{'chu': …}" — chuỗi dict, ⛔ giá trị
+            sai_chuoi += 1
+        if not isinstance(r["dong_sheet"], int) or isinstance(r["dong_sheet"], bool):
+            sai_kieu += 1
+    if sai_chuoi:
+        loi.append(f"{sai_chuoi} ô `hd_manual` qua `_chuan` ra chuỗi dict")
+    if sai_kieu:
+        loi.append(f"{sai_kieu} `dong_sheet` ⛔ phải số")
+    return loi
+
+
+KY_H15 = ("2024-10", "2025-06", "2026-04", "2026-11")
+
+
+def test_AC5_do_gia_tri_qua_duong_doc_H15():
+    """AC-5 *(sửa theo `KQ-267` `DT12-R1-01`)*: ≥ 3 ảnh mới — gồm `2024-10` · `2026-11` — đọc bằng `_nap` + `_chuan` ra GIÁ TRỊ."""
+    m = _h15()
+    ref03 = m._nap("itl_ledge_2026_03.json")
+    for ky in KY_H15:
+        d = m._nap(f"dap_an/itl_ledge_{ky}.json")
+        assert not _loi_gia_tri_h15(m, d, ky), (ky, _loi_gia_tri_h15(m, d, ky))
+        assert type(d["dong"][0]["dong_sheet"]) is type(ref03["dong"][0]["dong_sheet"]) is int, ky
+        assert d["so_dong"] == len(d["dong"]) == MONG[ky]
+        # ô chữ → chuỗi thật, ô trống → ""; ô SỐ giữ số rồi `_chuan` → chuỗi thập phân
+        r = d["dong"][0]
+        assert m._chuan(r["hd_manual"]) and not m._chuan(r["hd_manual"]).startswith("{"), ky
+        assert isinstance(r["hd_manual"], str) and isinstance(r["itl_id_sheet"], str), ky
+
+
+def test_AC5_do_hinh_moi_anh_bang_anh_2026_03():
+    """Tập khoá cấp trên + khoá dòng + KIỂU ô của MỌI ảnh mới ⊆ ảnh 2026-03 *(25/25; mẫu số = 25 kỳ, Đ3)*."""
+    k = _nap_khuon()
+    mau = _doc(ANH_03)
+    assert len(MONG) == 25
+    sai = {ky: k.loi_hinh(_doc(_anh(ky)), mau) for ky in MONG}
+    sai = {ky: v for ky, v in sai.items() if v}
+    assert not sai, sai
+    assert list(_doc(_anh("2026-04"))) == list(mau)                  # đúng THỨ TỰ khoá cấp trên
+
+
+def _anh_mau_tu_tho(tmp_path) -> dict:
+    """Dựng một ảnh nhỏ qua đường THẬT: bản thô mẫu → cổng `dong_bang_sheet` → `chuan_hoa_anh`."""
+    ra = tmp_path / "cong.json"
+    r = subprocess.run([sys.executable, str(TOOL), "itl_ledge_ky", str(_tho_mau(tmp_path)), "--mong", "2", "--ra", str(ra)],
+                       capture_output=True, text=True, cwd=GOC)
+    assert r.returncode == 0, r.stdout[-300:]
+    return _nap_khuon().chuan_hoa_anh(_doc(ra))
+
+
+def test_AC5_chuan_hoa_ra_dung_hinh_va_giu_so(tmp_path):
+    a = _anh_mau_tu_tho(tmp_path)
+    mau = _doc(ANH_03)
+    assert _nap_khuon().loi_hinh(a, mau) == [] and list(a) == list(mau)
+    r = a["dong"][0]
+    assert r["dong_sheet"] == 10 and r["svc_start_manual"] == 202604 and type(r["svc_start_manual"]) is int
+    assert r["hd_manual"] == "Need to manual input" or isinstance(r["hd_manual"], str)
+
+
+def test_AC5_dot_bien_hinh_va_gia_tri_deu_do(tmp_path):
+    """Đột biến *(bản sao trong bộ nhớ)*: bọc lại 1 ô `{"chu"}` · xoá khoá `ky` · `dong_sheet` thành chuỗi ⇒ MỖI cái ĐỎ ở
+    cả hai bài đo *(hình + giá trị qua H15)*; ảnh nguyên ⇒ xanh *(chiều dương — bằng chứng ⛔ bị biên bản làm nhiễu)*."""
+    k, m, mau = _nap_khuon(), _h15(), _doc(ANH_03)
+    goc = _doc(_anh("2024-10"))
+    assert k.loi_hinh(goc, mau) == [] and _loi_gia_tri_h15(m, goc, "2024-10") == []
+
+    boc = copy.deepcopy(goc); boc["dong"][0]["hd_manual"] = {"chu": boc["dong"][0]["hd_manual"]}
+    bo_ky = copy.deepcopy(goc); del bo_ky["ky"]
+    ds_chu = copy.deepcopy(goc); ds_chu["dong"][0]["dong_sheet"] = str(ds_chu["dong"][0]["dong_sheet"])
+    so_boc = copy.deepcopy(goc); so_boc["dong"][0]["svc_start_manual"] = {"chu": "202410"}
+    for ten, d in (("bọc {chu}", boc), ("xoá ky", bo_ky), ("dong_sheet chuỗi", ds_chu), ("ô số bọc {chu}", so_boc)):
+        assert k.loi_hinh(d, mau), f"hình: {ten} ⛔ bị bắt"
+    for ten, d in (("bọc {chu}", boc), ("xoá ky", bo_ky), ("dong_sheet chuỗi", ds_chu)):
+        assert _loi_gia_tri_h15(m, d, "2024-10"), f"giá trị H15: {ten} ⛔ bị bắt"
 
 
 def test_checksum_ghim_va_itl_id_loi_va_kich_thuoc():
     for k in MONG:
         a = _doc(_anh(k))
-        assert a["checksum_noi_dung"] == CHECKSUM[k], k
-        n = sum(1 for r in a["dong"] if r["itl_id_sheet"]["chu"] == "#N/A ()")
+        assert _doc(MANIFEST)["anh"][k]["checksum_noi_dung"] == CHECKSUM[k], k      # checksum sống ở manifest *(ảnh = hình 2026-03)*
+        n = sum(1 for r in a["dong"] if r["itl_id_sheet"] == "#N/A ()")
         assert n == ITL_ID_LOI.get(k, 0), (k, n)
-        assert all(r["itl_id_sheet"]["chu"] in ("#N/A ()",) or r["itl_id_sheet"]["chu"].startswith("ITL#")
+        assert all(r["itl_id_sheet"] in ("#N/A ()",) or r["itl_id_sheet"].startswith("ITL#")
                    for r in a["dong"]), k
         assert _anh(k).stat().st_size <= TRAN_BYTE, k
     m = _doc(MANIFEST)
@@ -225,8 +310,15 @@ def test_o_loi_khac_n_a_o_bat_ky_cot_la_tu_choi(tmp_path):
 
 # ── checksum ───────────────────────────────────────────────────────────────────
 def test_checksum_noi_dung_tinh_lai_khop_anh():
-    sai = [k for k in MONG if _doc(_anh(k))["checksum_noi_dung"] != _checksum_lai(_doc(_anh(k)))]
-    assert not sai, sai
+    """⭐ KHỨ HỒI *(`DT12-R1-01`)*: ảnh ĐÃ chuẩn hoá về hình 2026-03 → `ve_dang_cong` (ô → `{"chu"}` · `thu_tu`) → checksum của
+    `AnhChup` = checksum ghim của lượt đóng băng gốc ⇒ chuẩn hoá ⛔ mất/đổi một ô nào *(100 % — 25/25 kỳ, mẫu số ở `MONG`)*."""
+    k = _nap_khuon()
+    ngay = _doc(MANIFEST)["doc_luc"]
+    sai = [ky for ky in MONG
+           if CHECKSUM[ky] != AnhChup(run_id="kiem", ngay=datetime.date.fromisoformat(ngay), nguon=_doc(_anh(ky))["nguon"],
+                                      dong=tuple(k.ve_dang_cong(_doc(_anh(ky))))).checksum()[:16]]
+    assert len(MONG) == 25 and not sai, sai
+    assert {ky: x["checksum_noi_dung"] for ky, x in _doc(MANIFEST)["anh"].items()} == CHECKSUM
 
 
 # ── bản thô mẫu cho bài chiều ĐỎ ───────────────────────────────────────────────────

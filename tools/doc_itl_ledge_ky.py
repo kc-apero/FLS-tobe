@@ -84,11 +84,68 @@ def _ky(serial) -> str:
     return f"{d.year}-{d.month:02d}"
 
 
+def ghi_anh_chuan(cong: dict, ra: Path) -> dict:
+    """Ảnh của cổng `dong_bang_sheet` → ghi ảnh HÌNH 2026-03 ở `ra` *(`K.chuan_hoa_anh`)* + mục manifest *(cổng · cột · checksum
+    của lượt đóng băng, byte/sha256 của ảnh GHI RA)*. `DT12-R1-01`: ⛔ sửa tay JSON — mọi ảnh đi qua đây."""
+    anh = K.chuan_hoa_anh(cong)
+    ra.write_text(json.dumps(anh, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+    hang = [r["dong_sheet"] for r in anh["dong"]]
+    return {"so_dong": anh["so_dong"], "hang_sheet": [min(hang), max(hang)],
+            "itl_id_loi": sum(1 for r in anh["dong"] if la_o_loi(r["itl_id_sheet"])),
+            "checksum_noi_dung": cong["checksum_noi_dung"], "cong": cong["cong"], "cot": cong["cot"],
+            "bytes": ra.stat().st_size, "sha256": hashlib.sha256(ra.read_bytes()).hexdigest()}
+
+
+def chuan_hoa_anh_cu() -> int:
+    """MỘT LẦN: ảnh đã đóng băng ở hình `{"chu"}` *(lượt `BG-266`)* → hình 2026-03, ⛔ đọc lại sổ. Khứ hồi: mỗi ô `_chuan` TRƯỚC =
+    SAU và checksum tính lại từ ảnh mới = checksum cũ, nếu không ⇒ exit 1 *(⛔ ghi)*. Ảnh đã đúng hình ⇒ bỏ qua *(idempotent)*."""
+    mp = RA_DIR / "itl_ledge_cac_ky.json"
+    m = json.loads(mp.read_text(encoding="utf-8"))
+    mau = json.loads((GOC / "tests" / "fixture" / "itl_ledge_2026_03.json").read_text(encoding="utf-8"))
+    o_truoc = o_sau = n_ky = 0
+    chuan_o = lambda v: "" if v is None else (str(int(v)) if isinstance(v, float) and v.is_integer() else str(v).strip())  # noqa: E731
+    moi: dict[str, dict] = {}
+    for ky in sorted(m["anh"]):
+        p = RA_DIR / f"itl_ledge_{ky}.json"
+        cong = json.loads(p.read_text(encoding="utf-8"))
+        if "thu_tu" not in cong["dong"][0]:
+            print(f"[{ky}] đã đúng hình — bỏ qua"); continue
+        anh = K.chuan_hoa_anh(cong)
+        if K.loi_hinh(anh, mau):
+            print(f"[ĐỎ] {ky}: sau chuẩn hoá vẫn sai hình {K.loi_hinh(anh, mau)}"); return 1
+        for rc, ra_ in zip(cong["dong"], anh["dong"]):
+            for c in K.COT:
+                o_truoc += 1
+                u = rc[c]["chu"] if isinstance(rc[c], dict) else rc[c]
+                o_sau += 1
+                if chuan_o(u) != chuan_o(ra_[c]):
+                    print(f"[ĐỎ] {ky}: ô `{c}` đổi giá trị qua chuẩn hoá"); return 1
+        if len(cong["dong"]) != len(anh["dong"]):
+            print(f"[ĐỎ] {ky}: số dòng đổi"); return 1
+        moi[ky] = cong
+        n_ky += 1
+    for ky, cong in moi.items():
+        m["anh"][ky] = ghi_anh_chuan(cong, RA_DIR / f"itl_ledge_{ky}.json")
+        if m["anh"][ky]["checksum_noi_dung"] != cong["checksum_noi_dung"]:
+            print(f"[ĐỎ] {ky}: checksum đổi"); return 1
+    m["tong_bytes"] = sum(x["bytes"] for x in m["anh"].values())
+    m["anh_lon_hon_2MB"] = [k for k, x in m["anh"].items() if x["bytes"] > 2 * 1024 * 1024]
+    m["hinh_anh"] = "= ảnh 2026-03 {nguon, ky, dong_du_lieu_bat_dau, so_dong, ghi_chu, dong} · DT12-R1-01"
+    mp.write_text(json.dumps(m, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+    print(f"[khứ hồi] {n_ky} kỳ · {o_truoc} ô trước = {o_sau} ô sau · mọi `_chuan` khớp · {m['tong_bytes']:,} byte")
+    return 0 if n_ky else 1
+
+
 def main() -> int:
     ap = argparse.ArgumentParser()
-    ap.add_argument("--mong-ky", type=int, required=True, help="Đ5: số kỳ của sổ (gồm 2026-03)")
+    ap.add_argument("--chuan-hoa-anh-cu", action="store_true", help="đổi ảnh `{\"chu\"}` đã có sang hình 2026-03 (⛔ đọc sổ)")
     ap.add_argument("--giu-tho", action="store_true", help="⛔ xoá bản thô cuối lượt — cờ này chỉ để gỡ lỗi")
+    ap.add_argument("--mong-ky", type=int, required=False, help="Đ5: số kỳ của sổ (gồm 2026-03)")
     a = ap.parse_args()
+    if a.chuan_hoa_anh_cu:
+        return chuan_hoa_anh_cu()
+    if a.mong_ky is None:
+        ap.error("--mong-ky bắt buộc (trừ --chuan-hoa-anh-cu)")
     s = _phien()
     v = lay(s, f"'{TAB}'!A1:AT8")
     if isinstance(v, str):
@@ -148,8 +205,9 @@ def main() -> int:
                                  "ky": ky, "tieu_de": td, "hang": hang}, ensure_ascii=False), encoding="utf-8")
         os.chmod(p, 0o600)
         ra = RA_DIR / f"itl_ledge_{ky}.json"
+        cong_p = TMP / f"cong_{ky}.json"          # ảnh của cổng *(checksum · cổng)* — trung gian, xoá cùng `TMP`
         r = subprocess.run([sys.executable, str(GOC / "tools" / "dong_bang_sheet.py"), "itl_ledge_ky", str(p),
-                            "--mong", str(mong[ky]), "--ra", str(ra)], capture_output=True, text=True, cwd=GOC)
+                            "--mong", str(mong[ky]), "--ra", str(cong_p)], capture_output=True, text=True, cwd=GOC)
         dat = r.returncode == 0
         print(f"[{ky}] cổng exit {r.returncode} · {len(hang)} hàng đọc · mong {mong[ky]}"
               + ("" if dat else " — " + (r.stdout.strip().splitlines() or [r.stderr.strip()[:200]])[-1][:200]))
@@ -157,11 +215,9 @@ def main() -> int:
             doc[ky] = None
             ly_do[ky] = f"cổng exit {r.returncode}"
             continue
-        j = json.loads(ra.read_text(encoding="utf-8"))
+        j = json.loads(cong_p.read_text(encoding="utf-8"))
         doc[ky] = j["so_dong"]
-        loi_id = sum(1 for h in hang if la_o_loi(h[2]))
-        anh[ky] = {"so_dong": j["so_dong"], "hang_sheet": [lo, hi], "itl_id_loi": loi_id, "checksum_noi_dung": j["checksum_noi_dung"],
-                   "bytes": ra.stat().st_size, "sha256": hashlib.sha256(ra.read_bytes()).hexdigest()}
+        anh[ky] = ghi_anh_chuan(j, ra)             # hình 2026-03; cổng/checksum ⇒ manifest
     if not a.giu_tho:
         shutil.rmtree(TMP, ignore_errors=True)
     kq = K.phan_loai_ky(doc, mong=a.mong_ky - len(BO_QUA))
