@@ -100,3 +100,13 @@ python -m pytest tests/tich_hop/test_hd2_xuyen_suot.py -p no:cacheprovider
 - **Mong:** `25 passed` *(~1 phút; Chromium thiếu ⇒ 1 skipped `test_F1_F2_chromium_that`, còn 24 passed)*. ⚠ conftest phiên DROP/CREATE `fls_test` *(như mọi lượt pytest — ⛔ chạm `fls`)*.
 - **Đọc kết quả:** `test_B1_goi_…[WP-Cx]` đỏ ⇒ gói x ra số khác khối `hd2_cong.json` commit *(lệch giữa tầng — dán diff)*; `test_B2_*` đỏ ⇒ chữ ký tháng ⛔ chặn; `test_C5c_H14_R2_01_*` đỏ sau khi gộp H14 đã sửa = **mong đợi** ⇒ khai lại `MONG_H14_R2_01_CHUA_SUA = False`.
 - Dọn tuỳ chọn: `psql … -c 'DROP DATABASE fls_test_i2'` *(bài tự dựng lại lần sau)*.
+
+---
+
+## Vòng gộp lại H14 sau `KQ-314` (orchestrator nhắn 22/11 19:31)
+Gộp `origin/…-isp/H14` **`4b49d00`** (`H14-R2-01` đã sửa: `mong` CHECK `NB = 0` của WP-C5c sinh lại; 615 ô so 12.380 → 13.760) + ngọn nhánh làm việc **`31ae77a`**. Xung đột chỉ ở sàn script + bài ghim ⇒ bản `isp/I2` rồi đặt = thu thập thật; `hd2_cong.json`/`do_hd2*.py` tự gộp *(mong C5c = bản H14 mới)*.
+- **Bài ghim cắn đúng:** với `MONG_H14_R2_01_CHUA_SUA = True` ⇒ **5 bài ĐỎ** (B1[WP-C5c] · F1 cổng · `test_C5c_H14_R2_01_…` · F1 vm · Chromium) — C5 giờ `None`. Khai lại `= False` ⇒ **25/25** xanh.
+- **Số đổi (chỉ WP-C5c):** ô so **84.770 → 86.150** *(+1.380 = 615: 12.380 → 13.760)* · khớp **76.292 → 77.672** · ô có số 22.041 → **22.893** · khớp có số 13.563 → **14.415** · lệch có chủ đích **8.478** (giữ) · lệch FLS **0** · `dat` **null** = khối commit H14 *(605 DỪNG 0/13.706 chờ chủ ký "DỪNG có tên")*. 10 gói khác **⛔ đổi số**.
+- **I2-F1 nay đúng trạng thái:** thẻ C2/C3/C4 ✓ ĐẠT có số · thẻ **C5 "⛔ KHÔNG ĐO ĐƯỢC" có lý do 605** *(lệch có tên so với chữ ISP — ⛔ ép xanh)*. `I2-P3` **đóng**.
+- **Sàn:** `MONG_PYTEST_TOAN_BO` **4854 → 4868** = thu thập thật cây gộp; web giữ **690**.
+<!-- KQ_CONG_2 -->
