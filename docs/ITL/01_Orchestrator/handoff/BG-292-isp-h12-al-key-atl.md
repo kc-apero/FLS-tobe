@@ -69,7 +69,7 @@ Quy tắc lớp *(`_lop`)*: khối ∈ CDT ∪ {SHQ2} và năm ∈ {2024, 2025};
 | `tools/dung_moi_truong_isp.sh --duong-nen --cong 5434` *(một mình)* | **`KẾT: ĐẠT`** *(trên `4f076c9`)* — toàn bộ: tập đỏ + XFAIL **28 = 28** node id *(XFAIL 2 = 2 · thêm 0 · bớt 0)* · chạy **4556** *(mong ≥ 4556)* · skipped 0 · deselected 0; `tests/web` **3 = 3** · chạy 681; di trú 27/27 · `pg_verify` 0 lệch · kho `fls` rỗng |
 | `pytest tests/oracle tests/bao_cao tests/api/test_isp_gates_hd2.py tests/du_lieu/test_dap_an_atl.py tests/cau_hinh` | lần đầu **2 failed** / 1046 passed: `test_luat_pb_pg.py::test_C11_B1…` + `::test_C11_B2_B3…` — Ô NHIỄM THỨ TỰ do bài cổng nạp IX.ALR `tu_ky 202410` *(kho config tích luỹ ⇒ C11 thấy 34 luật)* ⇒ đổi `TU_KY_ALR` = **202501** *(cùng khoá bài C11, ghi lý do ở mã)*; chạy lại `test_do_hd2_c5a.py` TRƯỚC `test_luat_pb_pg.py`: **24 passed**; `hd2_cong.json` sinh lại **y nguyên** byte |
 | `lint-imports` | `Contracts: 11 kept, 0 broken.` |
-| `python docs/ITL/_tools/kiem_tai_lieu.py` | lần đầu ĐỎ K3 *(dấu `|` trần trong ô bảng BG này — thoát)*; sau: `✅ cong tai lieu DAT — va no da do duoc that (441 file, 2864 bang, 934 o ngay, 104 ma QD)` |
+| `python docs/ITL/_tools/kiem_tai_lieu.py` | lần đầu ĐỎ K3 *(dấu ống trần trong ô bảng BG này — thoát)*; sau: `✅ cong tai lieu DAT — va no da do duoc that (441 file, 2864 bang, 934 o ngay, 104 ma QD)` |
 | `python tools/soi_bang_tuyen.py` | `✅ ban khai KHOP SQL that o ca 48 tuyen` |
 
 ## Câu hỏi cho orchestrator / chủ sổ
