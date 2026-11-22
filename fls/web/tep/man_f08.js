@@ -220,7 +220,7 @@ const F08 = (function () {
   }
 
   function _ve_ban_lai(ky) {
-    const o = document.getElementById('ban-ds');
+    const o = _ds;
     if (!o) return null;
     const y = window.scrollY;
     const xong = _tai_ban(o, ky);
@@ -254,28 +254,52 @@ const F08 = (function () {
       });
   }
 
-  /* Dựng vùng MỘT lần (⛔ vẽ lại theo bảng tỷ giá): thẻ riêng ngay sau thẻ `IX.FX`. */
+  /* Dựng vùng MỘT lần (⛔ vẽ lại theo bảng tỷ giá): thẻ riêng ngay sau thẻ `IX.FX`.
+     Dựng bằng `createElement` + GIỮ THAM CHIẾU (⛔ `getElementById` sau `innerHTML`): vỏ DOM
+     giả của bài F4 ⛔ dựng cây từ chuỗi HTML. Không có chỗ gắn (⛔ cha) ⇒ ⛔ dựng. */
+  let _vung = null, _ds = null;
+
   function _dung_vung_ban(o) {
-    if (document.getElementById('ban-f08')) return;
-    const the_ = TP.el('div', 'card');
-    the_.id = 'ban-f08';
-    the_.innerHTML = '<header><h3>Bản Daily Report 3 · IX.TMP</h3></header>'
-      + '<div class="body"><div class="note"><label for="ban-ky">Kỳ (yyyymm) </label>'
-      + '<input id="ban-ky" class="mono" inputmode="numeric" maxlength="12" size="9" '
-      + 'placeholder="202601"> <button class="b" id="ban-xem" type="button">Xem bản</button></div>'
-      + '<div id="ban-ds"><div class="muted">Nhập kỳ rồi bấm Xem bản để thấy các phiên bản '
-      + 'của bản báo cáo.</div></div></div>';
+    if (_vung && _vung.parentNode) return;
     const card = o.closest ? o.closest('.card') : null;
-    (card && card.parentNode ? card.parentNode : o.parentNode)
-      .insertBefore(the_, card ? card.nextSibling : null);
+    const cha = card && card.parentNode ? card.parentNode : o.parentNode;
+    if (!cha) return;
+    const v = TP.el('div', 'card');
+    v.id = 'ban-f08';
+    const h = TP.el('header');
+    h.appendChild(TP.el('h3', '', 'Bản Daily Report 3 · IX.TMP'));
+    v.appendChild(h);
+    const body = TP.el('div', 'body');
+    const hang = TP.el('div', 'note');
+    const nhan = TP.el('label', '', 'Kỳ (yyyymm) ');
+    nhan.setAttribute('for', 'ban-ky');
+    const inp = document.createElement('input');
+    inp.id = 'ban-ky';
+    inp.className = 'mono';
+    inp.setAttribute('inputmode', 'numeric');
+    inp.setAttribute('maxlength', '12');
+    inp.setAttribute('placeholder', '202601');
+    const nut = TP.el('button', 'b', 'Xem bản');
+    nut.id = 'ban-xem';
+    nut.type = 'button';
+    hang.appendChild(nhan);
+    hang.appendChild(inp);
+    hang.appendChild(nut);
+    _ds = TP.el('div');
+    _ds.id = 'ban-ds';
+    _ds.appendChild(TP.el('div', 'muted', 'Nhập kỳ rồi bấm Xem bản để thấy các phiên bản '
+      + 'của bản báo cáo.'));
+    body.appendChild(hang);
+    body.appendChild(_ds);
+    v.appendChild(body);
+    cha.insertBefore(v, card ? card.nextSibling : null);
+    _vung = v;
     const xem = () => {
-      _ky_ban = document.getElementById('ban-ky').value.trim();
-      _tai_ban(document.getElementById('ban-ds'), _ky_ban);
+      _ky_ban = String(inp.value || '').trim();
+      _tai_ban(_ds, _ky_ban);
     };
-    document.getElementById('ban-xem').onclick = xem;
-    document.getElementById('ban-ky').onkeydown = e => {
-      if (e.key === 'Enter' && !HT.nuot_phim(e)) xem();
-    };
+    nut.onclick = xem;
+    inp.onkeydown = e => { if (e.key === 'Enter' && !HT.nuot_phim(e)) xem(); };
   }
 
   function _hang(thang, ky, nhan, ve_lai) {
