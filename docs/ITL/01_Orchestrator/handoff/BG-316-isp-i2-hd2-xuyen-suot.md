@@ -109,4 +109,5 @@ Gộp `origin/…-isp/H14` **`4b49d00`** (`H14-R2-01` đã sửa: `mong` CHECK `
 - **Số đổi (chỉ WP-C5c):** ô so **84.770 → 86.150** *(+1.380 = 615: 12.380 → 13.760)* · khớp **76.292 → 77.672** · ô có số 22.041 → **22.893** · khớp có số 13.563 → **14.415** · lệch có chủ đích **8.478** (giữ) · lệch FLS **0** · `dat` **null** = khối commit H14 *(605 DỪNG 0/13.706 chờ chủ ký "DỪNG có tên")*. 10 gói khác **⛔ đổi số**.
 - **I2-F1 nay đúng trạng thái:** thẻ C2/C3/C4 ✓ ĐẠT có số · thẻ **C5 "⛔ KHÔNG ĐO ĐƯỢC" có lý do 605** *(lệch có tên so với chữ ISP — ⛔ ép xanh)*. `I2-P3` **đóng**.
 - **Sàn:** `MONG_PYTEST_TOAN_BO` **4854 → 4868** = thu thập thật cây gộp; web giữ **690**.
-<!-- KQ_CONG_2 -->
+- **Cổng (cây gộp `387ab0c`, cụm 5435):** `--duong-nen` MỘT lần, một mình ⇒ **KẾT: ĐẠT** — toàn bộ 12 failed · 4.840 passed · 2 xfailed · 14 errors = tập đỏ **28 = 28** *(thêm 0 · bớt 0)*, chạy **4.868** = mong · skipped 0; web **3 = 3**, chạy 690. 6 bài đỏ thêm của lượt đầu *(5 `H14-R2-01` + 1 rào DT13 × H14 — `I2-P4`)* **hết** sau gộp ngọn H14 ⇒ `I2-P4` **đóng**. `lint-imports` 11 kept · 0 broken · `soi_bang_tuyen` 49/49 · `kiem_thuyet_minh` 35/35 · `kiem_tai_lieu` ĐẠT. `khop_owner --kiem` · `kiem_so_song` như trên *(có sẵn, `I1-P3`)*.
+- **Phát hiện còn mở:** `I2-P1` (C4 ⛔ đọc tỷ giá) · `I2-P2` (`do_hd2` ⛔ nối `fx_cua`/⛔ bắt `FxChan`).
