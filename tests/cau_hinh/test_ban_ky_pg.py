@@ -350,6 +350,66 @@ def test_C13_R1_02_dua_ban_SONG_SONG_cung_noi_dung_dung_1_phien_ban_va_khac_noi_
         assert [b.phien_ban for b in chc.doc_ban_ky(c, ky2)] == list(range(1, LUONG + 1))
 
 
+# ── `C13-R1-02` bổ sung (`WO-299`, C13b) · giá trị TRẢ VỀ đúng bản vừa chèn/ký ──
+def _chen_xen_sau_khoi_giao_dich(monkeypatch, ky):
+    """Ép đua TẤT ĐỊNH: ngay lúc `dua_ban_ky`/`ky_ban` đọc `_sk_ban_ky` mà kết nối của nó
+    KHÔNG còn trong giao dịch *(= SAU khối giữ khoá advisory)*, một kết nối KHÁC chèn bản
+    `n+1`. Mã đọc-trong-khoá ⇒ ⛔ có điểm ấy ⇒ không bị chèn. Trả `da_chen` *(mẫu số: đếm lần chèn)*."""
+    goc = chc._sk_ban_ky
+    da_chen: list[int] = []
+
+    def moc(conn, k):
+        if (k == ky and not da_chen
+                and conn.info.transaction_status == psycopg.pq.TransactionStatus.IDLE):
+            da_chen.append(1)
+            with _conn() as c2:
+                chc.dua_ban_ky(c2, ky, _noi_dung(luong_khac=1), actor="engine.luong.khac")
+        return goc(conn, k)
+
+    monkeypatch.setattr(chc, "_sk_ban_ky", moc)
+    return da_chen
+
+
+@pytest.mark.pg
+def test_C13B_AC2_dua_ban_ky_tra_DUNG_ban_vua_chen_du_luong_khac_chen_n_cong_1_ngay_sau_khoi_giao_dich(monkeypatch):
+    ky = _ky_moi()
+    with _conn() as c:
+        a = chc.dua_ban_ky(c, ky, _noi_dung(), actor="engine.h14")      # v1
+    nd2 = _noi_dung()
+    da_chen = _chen_xen_sau_khoi_giao_dich(monkeypatch, ky)
+    with _conn() as c:
+        b = chc.dua_ban_ky(c, ky, nd2, actor="engine.h14")
+    monkeypatch.undo()
+    assert a.phien_ban == 1
+    assert (b.phien_ban, b.checksum) == (2, chc.ban_ky.checksum(nd2)), b   # ⛔ bản 3 của luồng khác
+    if da_chen:                          # mã cũ có điểm giữa ⇒ luồng khác chèn ⇒ kho có 3 bản
+        assert len(chc.doc_ban_ky(_conn(), ky)) == 3
+    else:                                # mã mới đọc trong khoá ⇒ ⛔ có điểm giữa: kho 2 bản
+        assert len(chc.doc_ban_ky(_conn(), ky)) == 2
+
+
+@pytest.mark.pg
+def test_C13B_AC1_ky_ban_tra_DUNG_ban_vua_ky_du_luong_khac_chen_n_cong_1_ngay_sau_khoi_giao_dich(monkeypatch):
+    ky = _ky_moi()
+    with _conn() as c:
+        a = chc.dua_ban_ky(c, ky, _noi_dung(), actor="engine.h14")
+    _chen_xen_sau_khoi_giao_dich(monkeypatch, ky)
+    with _conn() as c:
+        d = chc.ky_ban(c, ky, actor=NGUOI)
+    monkeypatch.undo()
+    assert (d.phien_ban, d.checksum, d.trang_thai) == (1, a.checksum, "da_ky"), d
+
+
+@pytest.mark.pg
+def test_C13B_AC1_dua_ban_ky_trung_checksum_van_tra_khong_doi_dung_ban():
+    ky = _ky_moi()
+    nd = _noi_dung()
+    with _conn() as c:
+        a = chc.dua_ban_ky(c, ky, nd, actor="engine.h14")
+        b = chc.dua_ban_ky(c, ky, nd, actor="engine.h14")
+    assert (b.phien_ban, b.checksum, b.khong_doi) == (1, a.checksum, True)
+
+
 # ── `C13-R1-03` · ký phiên bản ≥ 2 ───────────────────────────────────────────
 @pytest.mark.pg
 def test_C13_R1_03_ky_v1_dua_v2_ky_ra_201_phien_ban_2_GET_hai_da_ky_ky_lan_3_409(may):

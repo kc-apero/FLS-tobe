@@ -808,7 +808,10 @@ def dua_ban_ky(conn, ky: Any, noi_dung: Mapping[str, Any], *, actor: str) -> Ban
         with conn.cursor() as cur:
             _them_su_kien(cur, f"ban:{k}", ck, actor, n,
                           [("noi_dung", json.loads(ban_ky.chuan_hoa(noi_dung)))])
-    return _sk_ban_ky(conn, k)[-1]
+        # ⭐ `C13b` (WO-299): đọc bản vừa chèn TRONG khối còn giữ khoá advisory — đọc SAU khối
+        # (khoá đã nhả) thì luồng khác chèn `n+1` kịp ⇒ trả nhầm phiên bản của luồng khác.
+        moi = _sk_ban_ky(conn, k)[-1]
+    return moi
 
 
 def ky_ban(conn, ky: Any, *, actor: str) -> BanKy:
@@ -829,4 +832,6 @@ def ky_ban(conn, ky: Any, *, actor: str) -> BanKy:
                        f"lúc {m.ky_luc}")
         with conn.cursor() as cur:
             _them_su_kien(cur, f"ky:{k}", m.checksum, actor, m.phien_ban)
-    return _sk_ban_ky(conn, k)[-1]
+        # ⭐ `C13b`: cùng mẫu — đọc bản vừa ký TRONG khoá, ⛔ sau khi nhả.
+        da_ky = _sk_ban_ky(conn, k)[-1]
+    return da_ky
