@@ -20,7 +20,7 @@
 | AC | Mong *(đo được)* | Cách đo |
 |---|---|---|
 | AC-1 (H12-B1) | mọi cờ IX.ALR TẮT (mặc định C11) ⇒ `phan_bo_khoa()` trả **đúng** PLA3 PM+HR từng ô (đồng nhất) — so 100 % ô, mẫu số khai trước (Đ3) | đơn vị |
-| AC-2 (H12-B2) | bật cờ "by NOEM" trên **dữ liệu TỔNG HỢP** (⛔ dữ liệu thật — D2, owner ký): Σ chia = tiền (|Δ| ≤ dung sai khai), chia đúng tỉ lệ driver; driver thiếu ô có tên (146) ⇒ lỗi/lệch có tên, ⛔ hoá 0 | đơn vị |
+| AC-2 (H12-B2) | bật cờ "by NOEM" trên **dữ liệu TỔNG HỢP** (⛔ dữ liệu thật — D2, owner ký): Σ chia = tiền (trị tuyệt đối Δ ≤ dung sai khai), chia đúng tỉ lệ driver; driver thiếu ô có tên (146) ⇒ lỗi/lệch có tên, ⛔ hoá 0 | đơn vị |
 | AC-3 (H12-B3 · WP-C5a) | cổng `WP-C5a` khớp ATL 606 (và tham chiếu 604) theo ô; mẫu số khai TRƯỚC kèm nhãn Đ4 (ô so · khớp · lệch FLS · lệch AS-IS · `khong_so_duoc`); lệch `mong` hai chiều (Đ5); khối `hd2_cong.json` theo hợp đồng CG2 (`khop` = ô khớp THẬT, `lech_co_chu_dich`), sinh bằng `do_hd2.py --ghi`; `/gates` `HD2_WP_C5A` đúng; bài CG2 + `tests/api/test_isp_gates_hd2.py` xanh | `do_hd2.py --goi WP-C5a` + pytest |
 | AC-4 | ⛔ vòng tròn: đột biến 1 ô đầu vào PLA3 ⇒ đúng ô ATL tương ứng ĐỎ; đột biến 1 ô driver (khi bật cờ tổng hợp) ⇒ phân bổ đổi đúng chỗ | pytest |
 | AC-5 | cờ đọc từ IX.ALR (C11, có hiệu lực theo kỳ) qua repo/kho config — ⛔ hằng trong mã; thiếu luật ⇒ lỗi có tên | pytest |
