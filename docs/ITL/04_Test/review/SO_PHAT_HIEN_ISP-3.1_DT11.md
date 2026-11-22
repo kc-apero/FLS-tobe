@@ -1,6 +1,6 @@
 # SỔ PHÁT HIỆN REVIEW — ISP 3.1 · phần `DT11` *(tệp riêng, chờ gộp vào `SO_PHAT_HIEN_ISP-3.1.md`)*
 
-**Version:** v0.3 · **Ngày:** 2026-11-22 · **Chủ sở hữu:** `fls-test` *(R1 `KQ-271`)* · **Nguồn:** `IncrementalStepPlan-FLS-Voi_v3.1.2.md` Step 41 · DT11 · Step 46 · H14 · `WO-269` · `BG-270` · nhánh `isp/DT11` `6ed1a29`
+**Version:** v0.4 · **Ngày:** 2026-11-22 · **Chủ sở hữu:** `fls-test` *(R1 `KQ-271`)* · **Nguồn:** `IncrementalStepPlan-FLS-Voi_v3.1.2.md` Step 41 · DT11 · Step 46 · H14 · `WO-269` · `BG-270` · nhánh `isp/DT11` `6ed1a29`
 
 > **Luật của sổ:** sổ **chỉ THÊM**; vòng sau chỉ đổi ô `Trạng thái` + thêm hàng. R1 đầy đủ; mức **GHI NHẬN** ⇒ backlog. Lớp: **A1/A2** lỗi mã · **B1** lệch spec/thiếu bài · **B2** spec/ISP/hợp đồng sai — chuyển orchestrator. Mức: **CHẶN** · **NÊN SỬA** · **GHI NHẬN**.
 >
@@ -36,8 +36,8 @@
 | `DT11-R1-05` | DT11 | R1 | B1 | GHI NHẬN | `BG-270` §2 *("13.541 / 18.236")* | Tử số 13.541 chỉ gồm **192 cột kỳ**; mẫu số 18.236 = 94 × **194** *(gồm `y24`·`y25`)*. Cùng phân số đếm hai vật. Đúng: riêng 192 kỳ **13.541/18.048** *(94×192)*; cả 194 cột **13.706/18.236**. | Sửa chữ ở BG. | Đ4 | Backlog — GHI NHẬN, ⛔ làm ở vòng sửa |
 | `DT11-R1-06` | DT11 | R1 | B1 | GHI NHẬN | `daily_report_2.json` phụ `tieu_de` `Y1`·`AA1` | Hai ô bool hàng 1 đổi theo `TODAY()` *(sheet SỐNG)*; đã vào `checksum` ⇒ tái đóng băng DR2 ra checksum khác mỗi ngày ⇒ ⛔ dùng checksum DR2 làm bằng chứng "nguồn đổi". DR3 *(dán giá trị)* tái tạo **đúng byte**. | Cân nhắc loại hàng 1 khỏi checksum DR2 hoặc ghi chú. | — | Backlog — GHI NHẬN, ⛔ làm ở vòng sửa |
 | `DT11-R1-07` | DT11 | R1 | B1 | GHI NHẬN | `BG-270` §5 *(AH12)* | `AH12−0.5` xác nhận ở ATL, có tên ở ảnh DR3; **chưa có** phép chứng minh −0,5 lan vào Sign off *(tab dán giá trị)*. H14 "liệt kê ô chỉnh tay" sẽ lấy từ phụ này — đủ cho nhãn, ⛔ đủ cho số lệch. | Ghi cho H14. | — | Backlog — GHI NHẬN, ⛔ làm ở vòng sửa |
-| `DT11-R2-01` | DT11 | R2 | B1 | **NÊN SỬA** | `tests/du_lieu/test_dap_an_report.py:337` *(`test_AC6_anh_cu_va_cong_cu_chung_dung_tung_byte`)* | Bài đòi tập tên `*.json` ở `tests/fixture/dap_an/` **trừ 22 ảnh cũ = đúng 6 ảnh DT11**. Ở **cây gộp thử** *(+ DT7 6 ảnh PLA · + DT12 25 ảnh `itl_ledge_*` · 60 tệp)* tập thừa 31 tên ⇒ ĐỎ. `--duong-nen`: tập đỏ 28 + **THÊM 1** *(chính bài này)* · bớt 0 · chạy 4448. Cổng xanh ở nhánh `isp/DT11` vì nhánh chưa có ảnh DT7·DT12 — cùng kiểu lỗi tích hợp "khai tập đóng ở một nhánh". | Đổi vế phải thành `⊇` 6 tên DT11 *(22 ảnh cũ + `dong_bang_sheet.py` vẫn đòi nguyên byte)*; hoặc gộp tay lúc gộp. Chạy lại `--duong-nen` ở cây gộp. | Đ5 — canh "tập khác" bằng `⊇`, ⛔ `==` trên thư mục chung | Mở |
-| `DT11-R2-02` | DT11 | R2 | B2 | **NÊN SỬA** | `tests/fixture/dap_an/ccr_daily_report.json` *(`dong[].nhan_c` 29 · phụ `tieu_de` 7)* · `tools/quet_pii_repo.py` *(mẫu `khoa_R_CN`)* | Ảnh 615 giữ **36 chuỗi ≥ 8 chữ số** ở nhãn dạng `R \| <số>_<NH> <TT>_<hậu tố>`; **7** hậu tố là **tên-viết-tắt người** *(7 loại: `HOATT` `SONNH` `HIEPNV` `LUANDQ` `QUYDX` `TRUNGNT` `LOCNX` — mỗi loại 1 chỗ)* chứ ⛔ `_CN`; 4 chỗ `_CN` đã che đúng *(`TK_CA_NHAN_1…4`)*; còn lại là tổ chức *(`OCBC` 5 · `ASTRONEX` 3 · `TPCI` 2 · `VOOA` 2 · `VOOL` 2 · `MSB` · `TCB` · `SUPERMINDS` · 5 không hậu tố)*. Máy quét **0** *(luật chỉ bắt `CN`)* ⇒ ⛔ CHẶN theo luật máy; nhưng nếu 7 số là TK người thì lọt. Tiền lệ: 3 trong 7 hậu tố *(`HOATT` `SONNH` `HIEPNV`)* đã nằm ở `docs/ITL/02_BA/Artifacts/Ket-qua-Phan-loai-4-loai-o.md`. Số đo: ⛔ in số. | **Chủ quyết** *(B2)*: 7 số có là TK cá nhân không. Có ⇒ mở rộng mẫu quét + che ảnh 615 + tài liệu trên. Không ⇒ ghi quyết định vào sổ `QĐ` để máy quét có lý do giữ. | Đ1 — phủ định "0 số cá nhân" chỉ đúng cho dạng máy biết | Mở — chờ chủ |
+| `DT11-R2-01` | DT11 | R2 | B1 | **NÊN SỬA** | `tests/du_lieu/test_dap_an_report.py:337` *(`test_AC6_anh_cu_va_cong_cu_chung_dung_tung_byte`)* | Bài đòi tập tên `*.json` ở `tests/fixture/dap_an/` **trừ 22 ảnh cũ = đúng 6 ảnh DT11**. Ở **cây gộp thử** *(+ DT7 6 ảnh PLA · + DT12 25 ảnh `itl_ledge_*` · 60 tệp)* tập thừa 31 tên ⇒ ĐỎ. `--duong-nen`: tập đỏ 28 + **THÊM 1** *(chính bài này)* · bớt 0 · chạy 4448. Cổng xanh ở nhánh `isp/DT11` vì nhánh chưa có ảnh DT7·DT12 — cùng kiểu lỗi tích hợp "khai tập đóng ở một nhánh". | Đổi vế phải thành `⊇` 6 tên DT11 *(22 ảnh cũ + `dong_bang_sheet.py` vẫn đòi nguyên byte)*; hoặc gộp tay lúc gộp. Chạy lại `--duong-nen` ở cây gộp. | Đ5 — canh "tập khác" bằng `⊇`, ⛔ `==` trên thư mục chung | **Đóng R2b** *(KQ-286: bài ⊇ xanh; 2 đột biến ĐỎ)* |
+| `DT11-R2-02` | DT11 | R2 | B2 | **NÊN SỬA** | `tests/fixture/dap_an/ccr_daily_report.json` *(`dong[].nhan_c` 29 · phụ `tieu_de` 7)* · `tools/quet_pii_repo.py` *(mẫu `khoa_R_CN`)* | Ảnh 615 giữ **36 chuỗi ≥ 8 chữ số** ở nhãn dạng `R \| <số>_<NH> <TT>_<hậu tố>`; **7** hậu tố là **tên-viết-tắt người** *(7 loại: `HOATT` `SONNH` `HIEPNV` `LUANDQ` `QUYDX` `TRUNGNT` `LOCNX` — mỗi loại 1 chỗ)* chứ ⛔ `_CN`; 4 chỗ `_CN` đã che đúng *(`TK_CA_NHAN_1…4`)*; còn lại là tổ chức *(`OCBC` 5 · `ASTRONEX` 3 · `TPCI` 2 · `VOOA` 2 · `VOOL` 2 · `MSB` · `TCB` · `SUPERMINDS` · 5 không hậu tố)*. Máy quét **0** *(luật chỉ bắt `CN`)* ⇒ ⛔ CHẶN theo luật máy; nhưng nếu 7 số là TK người thì lọt. Tiền lệ: 3 trong 7 hậu tố *(`HOATT` `SONNH` `HIEPNV`)* đã nằm ở `docs/ITL/02_BA/Artifacts/Ket-qua-Phan-loai-4-loai-o.md`. Số đo: ⛔ in số. | **Chủ quyết** *(B2)*: 7 số có là TK cá nhân không. Có ⇒ mở rộng mẫu quét + che ảnh 615 + tài liệu trên. Không ⇒ ghi quyết định vào sổ `QĐ` để máy quét có lý do giữ. | Đ1 — phủ định "0 số cá nhân" chỉ đúng cho dạng máy biết | **Đóng R2b** *(KQ-286: che 7 nhãn; 7 tên đứng riêng GIỮ theo quyết chủ 11/09)* |
 | `DT11-R2-03` | DT11 | R2 | B1 | GHI NHẬN | `BG-270` §4 *(phần gốc, dòng `đạt ②`)* | Phần gốc BG còn nhãn "đạt ②" trơn *(267/14)*; mục "Vòng sửa" đính chính **đúng** *(0 có số · 262/14 0=0)*. Sổ chỉ-thêm nên giữ biên bản; chỉ nhắc để H14 đọc mục sửa. | Không sửa. | — | Backlog — GHI NHẬN |
 
 ## Số đo R2 *(vòng sửa `KQ-271` → `KQ-272`; nhãn đếm gì — Đ4)*
@@ -56,7 +56,24 @@
 | `--duong-nen --cong 5446` *(một mình)* | cây gộp thử | **ĐỎ**: `13 failed · 4419 passed · 2 xfailed · 14 errors`; tập đỏ **29** = 28 nền + **THÊM 1** `DT11-R2-01`; chạy **4448** *(mong ≥ 4448)*; web **3 = 3**, chạy 681 |
 | `lint-imports` · `kiem_tai_lieu` | — | 11 kept 0 broken · ĐẠT |
 
+## Số đo R2b *(vòng sửa `KQ-272` → `KQ-286`; nhãn đếm gì — Đ4)*
+
+| Phép đo | Mẫu số | Kết quả |
+|---|---|---|
+| `-01` bài AC6 ⊇ trên cây gộp thử *(+ 2 đột biến trả nguyên)* | 1 bài · 22 ảnh cũ ghim · 6 ảnh DT11 | xanh; xoá `atl.json` ⇒ **ĐỎ**; thêm 1 byte `atl.json` ⇒ **ĐỎ**; trả nguyên ⇒ xanh; `git status` sạch |
+| `-02` đếm ĐỘC LẬP *(script riêng, ⛔ hàm khuôn)* nhãn hàng ảnh 615 | 66.504 chuỗi ảnh · 6.427 chuỗi nhãn hàng *(`ma`·`nhan_a/b/c`·`dong_chi_nhan`)* | nhãn `≥ 8` chữ số gắn `_PO USD_<tên>` **0** *(ảnh cũ BG: 7)*; còn **23** nhãn `≥ 8` chữ số = **22** nhãn tổ chức + **1** số thực `46086.…` *(⛔ nhãn, ⛔ TK)* |
+| `-02` mã `TK_CA_NHAN_n` | 615 mới | đủ **11** mã `1…11`, mỗi mã **1** lần; 4 `_CN` *(1…4)* + 7 `_PO USD` *(5…11)*; 0 hậu tố tên người |
+| `-02` cùng số ⇒ cùng mã | 7 cặp *(ảnh cũ ↔ mới, theo vị trí chuỗi)* | 7 số → 7 mã, **1–1** hai chiều; đúng **9** chuỗi đổi = 7 nhãn + `ghi_chu_khuon` + `checksum_noi_dung` |
+| Checksum 615 *(tính lại bằng sha256 riêng, đúng phép `AnhChup`)* | 2.057 hàng chính + phụ | **`14f965a9b8f7a4e8`** = khai = ghim; ảnh cũ `2fd16287aa3648e0` |
+| Byte ảnh | 54 ảnh có ở nhánh làm việc · 5 ảnh DT11 khác | **54/54** y nguyên · **5/5** y nguyên so `34a119c`; chỉ 615 đổi |
+| `quet_pii_repo` | cây gộp thử | **0 chỗ · 0 tệp** |
+| `--duong-nen --cong 5446` *(một mình)* | cây gộp thử | **ĐẠT**: tập đỏ **28 = 28** *(thêm 0 · bớt 0; XFAIL 2)*, chạy **4450** *(mong ≥ 4450)*; `12 failed · 4422 passed · 2 xfailed · 14 errors`; web **3 = 3**, chạy 681 |
+| `lint-imports` · `kiem_tai_lieu` | — | 11 kept 0 broken · ĐẠT |
+
+⭐ Gộp thử `isp/DT11` `d4850ad` vào nhánh làm việc: **0 xung đột**. GHI NHẬN (backlog, ⛔ chặn): `-03` giữ nguyên *(mở rộng máy quét `khoa_R_CN` + tài liệu BA cũ `Ket-qua-Phan-loai-4-loai-o.md`)*; 7 tên viết tắt đứng riêng *(⛔ kèm số TK)* **giữ** theo quyết chủ 11/09.
+
 ## Changelog
 - **v0.1 · 2026-11-22** — R1 `KQ-271`: 7 phát hiện *(1 CHẶN · 3 NÊN SỬA · 3 GHI NHẬN)*.
 - **v0.2 · 2026-11-22** — vòng sửa sau R1 `KQ-271`: chỉ đổi cột `Trạng thái` *(-01 · -02 · -03 · -04 đã sửa · -05 · -06 · -07 backlog)*; chi tiết ở `BG-270` §"Vòng sửa sau R1 (KQ-271)".
 - **v0.3 · 2026-11-22** — R2 cuối `KQ-272`: `-01…-04` đóng; thêm `R2-01` *(NÊN SỬA, tích hợp bài AC6)* · `R2-02` *(NÊN SỬA, chủ quyết 7 số)* · `R2-03` *(GHI NHẬN)*.
+- **v0.4 · 2026-11-22** — R2b nhẹ `KQ-286`: `R2-01` · `R2-02` đóng; thêm mục "Số đo R2b"; 0 CHẶN · 0 NÊN SỬA mới; `R2-03` giữ GHI NHẬN.
