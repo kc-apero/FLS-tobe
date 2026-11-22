@@ -1713,5 +1713,641 @@
   },
   "dat": true,
   "ly_do": []
+ },
+ "WP-C5b": {
+  "bang": "HD2.WP-C5b",
+  "goi": "WP-C5b",
+  "mo_ta": "SO.PLA3-ATL: dòng PL2…PL8 từ IX.PL (kho, C12) trên ATL của FLS (đầu ra AL.KEY H12, cờ IX.ALR 2025 BẬT ký) ↔ dòng PL của ATL 606; lệch THỪA KẾ lớp từ ô lá (phép đo hồi phục); 2 phép CHECK mỗi kỳ-khối",
+  "nguon_dau_vao": [
+   "WP-C5a (ATL của FLS — tests/fixture/dau_vao/gl_pl_dau_vao.json + hr_pl_dau_vao.json + tests/fixture/cau_hinh/ix_drv.json + IX.ALR kho)",
+   "IX.PL (kho) ← fls/cau_hinh/dong_pl.py",
+   "tests/fixture/dau_vao/noem_com_gag.json + tests/fixture/cau_hinh/ix_fx.json (COM_GAG)"
+  ],
+  "dap_an": [
+   "tests/fixture/dap_an/atl.json"
+  ],
+  "khoa": "khối (12) × dòng PL (7) × kỳ (57) của hàng ATL có nhãn PL*; ô là số và IX.PL tính được",
+  "dung_sai": {
+   "atol": "1E-12",
+   "rtol": "0",
+   "atol_hoi_phuc": "1E-9",
+   "atol_check": "1E-9",
+   "max_lech_khop": "5.539399087281E-15"
+  },
+  "tong_o": 4102,
+  "mong_tong_o": 4102,
+  "o_co_so": 1807,
+  "khop_co_so": 884,
+  "o_0_0": 2295,
+  "khop": 3179,
+  "lech_co_chu_dich": 923,
+  "mong_lech_co_chu_dich": 923,
+  "lech_ngoai_ten": 0,
+  "khop_ghi_chu": "tong_o = ô so (hàng PL* có nhãn của ATL, ô là số, IX.PL tính được) = o_co_so + o_0_0; khop = ô khớp THẬT (khop_co_so) + o_0_0; khop + lech_co_chu_dich = tong_o",
+  "lech_co_ten": {
+   "lop_thua_ke": {
+    "chua_co_dau_vao": {
+     "so_o": 167,
+     "theo_khoi": {
+      "ASA": 27,
+      "CAH": 19,
+      "COR": 19,
+      "CSM": 19,
+      "CVL": 19,
+      "SHQ1": 19,
+      "SHQ2": 45
+     },
+     "sha256": "2b6dcc764d7709db35077144d8ccb90537eb8caa0398948ba51d5ff59c41e533"
+    },
+    "chua_co_dau_vao+lech_D3": {
+     "so_o": 600,
+     "theo_khoi": {
+      "ASA": 80,
+      "CAH": 95,
+      "COR": 95,
+      "CSM": 95,
+      "CVL": 95,
+      "SHQ1": 95,
+      "SHQ2": 45
+     },
+     "sha256": "1bbae5017cd456d49773fe8352b2767e50175ae394d26ecf2fb66b4e0d0605cf"
+    },
+    "chua_co_dau_vao+lech_D3+loi_as_is": {
+     "so_o": 15,
+     "theo_khoi": {
+      "SHQ2": 15
+     },
+     "sha256": "d3e8287678fbc512bb288661782d619c4425b30ebe58af040af936ad365f0212"
+    },
+    "chua_co_dau_vao+loi_as_is": {
+     "so_o": 9,
+     "theo_khoi": {
+      "SHQ2": 9
+     },
+     "sha256": "8231cf8c6ad5e4123fca86ded2194549b2fe3179e75384495975304635acc2a3"
+    },
+    "loi_as_is": {
+     "so_o": 132,
+     "theo_khoi": {
+      "ASA": 8,
+      "CAH": 13,
+      "COR": 13,
+      "CSM": 13,
+      "CVL": 13,
+      "GROUP": 25,
+      "SGO1": 21,
+      "SHQ1": 13,
+      "SHQ2": 13
+     },
+     "sha256": "34bcbc74738002476ad4995799154c789af0b1dc26aba1392769a5ff5eeb80a2"
+    }
+   },
+   "pl5_khong_tinh_duoc": {
+    "so_o": 252,
+    "theo_khoi": {
+     "ASA": 33,
+     "CAH": 33,
+     "COR": 33,
+     "CSM": 33,
+     "CVL": 33,
+     "GROUP": 21,
+     "SHQ1": 33,
+     "SHQ2": 33
+    },
+    "sha256": "d0a8df6727818d394ac95a4a165bf4d62dfc2d7f5b4251e0a3e6c705c740b2a1",
+    "ly_do": "IX.PL PL5 = PL4 − COM_GAG; ảnh COM_GAG chỉ có GROUP × 12 tháng 2025 ⇒ ô khác ⛔ có đầu vào (⛔ ngầm 0)",
+    "theo_loi": {
+     "PL5|PL_THIEU_GIA_TRI": 252
+    }
+   },
+   "o_trong_dap_an": 192,
+   "khong_so_duoc": 14
+  },
+  "nhan_c5a": {
+   "trung": 922,
+   "khac": 0,
+   "khong_co": 1
+  },
+  "hai_dinh_nghia": {
+   "o_so": 4104,
+   "chenh": 0
+  },
+  "chenh_dinh_nghia_mm": [
+   {
+    "dong": "PL3",
+    "ma": "LC",
+    "ly_do": "ATL trừ `LC` (License Cost) ở PL3; MM mô tả PL3 = PL2 − Tech Service Cost (none HR: server, API.. + Tools) — ⛔ nêu License"
+   }
+  ],
+  "check": {
+   "fls": {
+    "NB = 0": {
+     "dat_co_so": 178,
+     "dat_0_0": 359,
+     "do": 147,
+     "khong_do_duoc": 0
+    },
+    "NIS+INT+PIT+COM = CXA+GAH+DC+MC": {
+     "dat_co_so": 0,
+     "dat_0_0": 470,
+     "do": 214,
+     "khong_do_duoc": 0
+    }
+   },
+   "dap_an": {
+    "NB = 0": {
+     "dat_co_so": 172,
+     "dat_0_0": 365,
+     "do": 147,
+     "khong_do_duoc": 0
+    },
+    "NIS+INT+PIT+COM = CXA+GAH+DC+MC": {
+     "dat_co_so": 0,
+     "dat_0_0": 473,
+     "do": 211,
+     "khong_do_duoc": 0
+    }
+   },
+   "so_ky_do": 29,
+   "do_sha256": "8aff172ae42ef1de08b63885b0ed4fbde04e4d9b90de1558aa9a3ff1fabfb012",
+   "doi_chieu_dap_an": {
+    "khop": 1320,
+    "dap_an_khong_do_duoc": 0,
+    "lop_thua_ke": {
+     "loi_as_is": 48
+    },
+    "lech_FLS": 0
+   },
+   "do_theo_ky": {
+    "2024": [
+     "NB = 0 @GROUP: 1.075312408",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @GROUP: 0.602588864",
+     "NB = 0 @CVL: 0.064889170",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @CVL: 0.005738443",
+     "NB = 0 @COR: 0.557646230",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @COR: 0.005380104",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @SHQ1: 0.230819591",
+     "NB = 0 @CSM: 0.072849740",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @CSM: 0.022309873",
+     "NB = 0 @CAH: 0.087840370",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @CAH: 0.020771324",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @ASA: 0.005105916",
+     "NB = 0 @SHQ2: 0.292086898",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @SHQ2: 0.312463614"
+    ],
+    "2024H2": [
+     "NB = 0 @GROUP: 1.075312408",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @GROUP: 0.602588864",
+     "NB = 0 @CVL: 0.064889170",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @CVL: 0.005738443",
+     "NB = 0 @COR: 0.557646230",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @COR: 0.005380104",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @SHQ1: 0.230819591",
+     "NB = 0 @CSM: 0.072849740",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @CSM: 0.022309873",
+     "NB = 0 @CAH: 0.087840370",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @CAH: 0.020771324",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @ASA: 0.005105916",
+     "NB = 0 @SHQ2: 0.292086898",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @SHQ2: 0.312463614"
+    ],
+    "2024Q4": [
+     "NB = 0 @GROUP: 1.075312408",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @GROUP: 0.602588864",
+     "NB = 0 @CVL: 0.064889170",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @CVL: 0.005738443",
+     "NB = 0 @COR: 0.557646230",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @COR: 0.005380104",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @SHQ1: 0.230819591",
+     "NB = 0 @CSM: 0.072849740",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @CSM: 0.022309873",
+     "NB = 0 @CAH: 0.087840370",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @CAH: 0.020771324",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @ASA: 0.005105916",
+     "NB = 0 @SHQ2: 0.292086898",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @SHQ2: 0.312463614"
+    ],
+    "2024M11": [
+     "NB = 0 @GROUP: 0.004606104",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @GROUP: 0.314398297",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @CVL: 0.003014467",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @COR: 0.002102727",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @SHQ1: 0.115036173",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @CSM: 0.021518393",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @CAH: -0.000026257",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @ASA: 0.002615759",
+     "NB = 0 @SHQ2: 0.004606104",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @SHQ2: 0.170137036"
+    ],
+    "2024M12": [
+     "NB = 0 @GROUP: 1.070706304",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @GROUP: 0.288190567",
+     "NB = 0 @CVL: 0.064889170",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @CVL: 0.002723976",
+     "NB = 0 @COR: 0.557646230",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @COR: 0.003277377",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @SHQ1: 0.115783419",
+     "NB = 0 @CSM: 0.072849740",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @CSM: 0.000791480",
+     "NB = 0 @CAH: 0.087840370",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @CAH: 0.020797581",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @ASA: 0.002490157",
+     "NB = 0 @SHQ2: 0.287480794",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @SHQ2: 0.142326578"
+    ],
+    "2025": [
+     "NB = 0 @GROUP: -2.206531772",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @GROUP: 2.827443147",
+     "NB = 0 @SGO2: -0.183078942",
+     "NB = 0 @SGO1: -6.082913410",
+     "NB = 0 @HGO6: 1.200000000",
+     "NB = 0 @BGO2: -0.250335970",
+     "NB = 0 @CVL: 0.024949400",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @CVL: 0.423668214",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @COR: 0.422089783",
+     "NB = 0 @SHQ1: -0.564282216",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @SHQ1: 1.416135664",
+     "NB = 0 @CSM: -0.009800000",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @CSM: 0.382165944",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @CAH: 0.294973001",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @ASA: 0.212360646",
+     "NB = 0 @SHQ2: -1.657398956",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @SHQ2: -0.323950106"
+    ],
+    "2025H1": [
+     "NB = 0 @GROUP: -1.013684723",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @GROUP: 1.277509325",
+     "NB = 0 @SGO2: -0.716631830",
+     "NB = 0 @SGO1: -2.676317770",
+     "NB = 0 @CVL: 0.024949400",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @CVL: 0.162670043",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @COR: 0.123286088",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @SHQ1: 0.901892231",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @CSM: 0.104972898",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @CAH: 0.128877683",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @ASA: 0.033700075",
+     "NB = 0 @SHQ2: -1.038634123",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @SHQ2: -0.177889692"
+    ],
+    "2025H2": [
+     "NB = 0 @GROUP: -1.192847049",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @GROUP: 1.549933822",
+     "NB = 0 @SGO2: 0.533552888",
+     "NB = 0 @SGO1: -3.406595640",
+     "NB = 0 @HGO6: 1.200000000",
+     "NB = 0 @BGO2: -0.250335970",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @CVL: 0.260998171",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @COR: 0.298803696",
+     "NB = 0 @SHQ1: -0.564282216",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @SHQ1: 0.514243434",
+     "NB = 0 @CSM: -0.009800000",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @CSM: 0.277193046",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @CAH: 0.166095318",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @ASA: 0.178660572",
+     "NB = 0 @SHQ2: -0.618764834",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @SHQ2: -0.146060414"
+    ],
+    "2025Q1": [
+     "NB = 0 @GROUP: -0.618314116",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @GROUP: 0.534877049",
+     "NB = 0 @SGO2: -0.016631830",
+     "NB = 0 @SGO1: -1.199113600",
+     "NB = 0 @CVL: 0.024949400",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @CVL: 0.070811198",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @COR: 0.050927219",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @SHQ1: 0.400669136",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @CSM: 0.047370057",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @CAH: 0.047920184",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @ASA: 0.010384601",
+     "NB = 0 @SHQ2: -0.643263516",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @SHQ2: -0.093205347"
+    ],
+    "2025Q2": [
+     "NB = 0 @GROUP: -0.395370607",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @GROUP: 0.742632276",
+     "NB = 0 @SGO2: -0.700000000",
+     "NB = 0 @SGO1: -1.477204170",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @CVL: 0.091858845",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @COR: 0.072358869",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @SHQ1: 0.501223095",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @CSM: 0.057602841",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @CAH: 0.080957499",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @ASA: 0.023315474",
+     "NB = 0 @SHQ2: -0.395370607",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @SHQ2: -0.084684345"
+    ],
+    "2025Q3": [
+     "NB = 0 @GROUP: 0.611281590",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @GROUP: 0.702400946",
+     "NB = 0 @SGO2: 0.933767028",
+     "NB = 0 @SGO1: -1.596679410",
+     "NB = 0 @HGO6: 1.200000000",
+     "NB = 0 @BGO2: -0.250000000",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @CVL: 0.140036807",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @COR: 0.155151764",
+     "NB = 0 @SHQ1: 0.700000000",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @SHQ1: 0.280768256",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @CSM: 0.134434879",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @CAH: 0.081643970",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @ASA: 0.069485964",
+     "NB = 0 @SHQ2: -0.088718410",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @SHQ2: -0.159120694"
+    ],
+    "2025Q4": [
+     "NB = 0 @GROUP: -1.804128640",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @GROUP: 0.847532876",
+     "NB = 0 @SGO2: -0.400214140",
+     "NB = 0 @SGO1: -1.809916230",
+     "NB = 0 @BGO2: -0.000335970",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @CVL: 0.120961364",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @COR: 0.143651932",
+     "NB = 0 @SHQ1: -1.264282216",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @SHQ1: 0.233475177",
+     "NB = 0 @CSM: -0.009800000",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @CSM: 0.142758167",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @CAH: 0.084451347",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @ASA: 0.109174608",
+     "NB = 0 @SHQ2: -0.530046424",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @SHQ2: 0.013060280"
+    ],
+    "2025M01": [
+     "NB = 0 @GROUP: -3.221976665",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @GROUP: 0.217065211",
+     "NB = 0 @SGO2: -2.481881196",
+     "NB = 0 @SGO1: -0.757113600",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @CVL: 0.022338794",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @COR: 0.024092212",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @SHQ1: 0.122861950",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @CSM: 0.020865442",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @CAH: 0.020219230",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @ASA: 0.003385040",
+     "NB = 0 @SHQ2: -3.221976665",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @SHQ2: 0.003302543"
+    ],
+    "2025M02": [
+     "NB = 0 @GROUP: 2.764135236",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @GROUP: 0.258012094",
+     "NB = 0 @SGO2: 2.465249365",
+     "NB = 0 @SGO1: -0.170000000",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @CVL: 0.023734000",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @COR: 0.022795388",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @SHQ1: 0.125542704",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @CSM: 0.021641848",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @CAH: 0.025008700",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @ASA: 0.004712215",
+     "NB = 0 @SHQ2: 2.764135236",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @SHQ2: 0.034577238"
+    ],
+    "2025M03": [
+     "NB = 0 @GROUP: -0.160472687",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @GROUP: 0.059799744",
+     "NB = 0 @SGO1: -0.272000000",
+     "NB = 0 @CVL: 0.024949400",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @CVL: 0.024738404",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @COR: 0.004039619",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @SHQ1: 0.152264483",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @CSM: 0.004862767",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @CAH: 0.002692254",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @ASA: 0.002287345",
+     "NB = 0 @SHQ2: -0.185422087",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @SHQ2: -0.131085128"
+    ],
+    "2025M04": [
+     "NB = 0 @GROUP: -0.698288793",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @GROUP: 0.263407535",
+     "NB = 0 @SGO2: -0.700000000",
+     "NB = 0 @SGO1: -0.800100000",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @CVL: 0.031831226",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @COR: 0.025599355",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @SHQ1: 0.167026626",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @CSM: 0.019138930",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @CAH: 0.027144157",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @ASA: 0.007634203",
+     "NB = 0 @SHQ2: -0.698288793",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @SHQ2: -0.014966963"
+    ],
+    "2025M05": [
+     "NB = 0 @GROUP: 0.160985209",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @GROUP: 0.328694823",
+     "NB = 0 @SGO1: -0.131561640",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @CVL: 0.031764168",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @COR: 0.023965931",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @SHQ1: 0.173644160",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @CSM: 0.020013615",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @CAH: 0.026922391",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @ASA: 0.007868246",
+     "NB = 0 @SHQ2: 0.160985209",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @SHQ2: 0.044516311"
+    ],
+    "2025M06": [
+     "NB = 0 @GROUP: 0.141932977",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @GROUP: 0.150529918",
+     "NB = 0 @SGO1: -0.545542530",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @CVL: 0.028263451",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @COR: 0.022793582",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @SHQ1: 0.160552308",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @CSM: 0.018450295",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @CAH: 0.026890951",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @ASA: 0.007813025",
+     "NB = 0 @SHQ2: 0.141932977",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @SHQ2: -0.114233694"
+    ],
+    "2025M07": [
+     "NB = 0 @GROUP: -0.097088172",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @GROUP: 0.290261753",
+     "NB = 0 @SGO1: -0.574272200",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @CVL: 0.049143309",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @COR: 0.046136140",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @SHQ1: 0.096212698",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @CSM: 0.044279725",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @CAH: 0.027617789",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @ASA: 0.017866882",
+     "NB = 0 @SHQ2: -0.097088172",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @SHQ2: 0.009005211"
+    ],
+    "2025M08": [
+     "NB = 0 @GROUP: 0.020824776",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @GROUP: 0.242374061",
+     "NB = 0 @SGO2: 0.000905728",
+     "NB = 0 @SGO1: -0.696000000",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @CVL: 0.049650577",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @COR: 0.057999516",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @SHQ1: 0.109397128",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @CSM: 0.046061787",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @CAH: 0.028017000",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @ASA: 0.018448291",
+     "NB = 0 @SHQ2: 0.020824776",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @SHQ2: -0.067200238"
+    ],
+    "2025M09": [
+     "NB = 0 @GROUP: 0.687544986",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @GROUP: 0.169765132",
+     "NB = 0 @SGO2: 0.932861300",
+     "NB = 0 @SGO1: -0.326407210",
+     "NB = 0 @HGO6: 1.200000000",
+     "NB = 0 @BGO2: -0.250000000",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @CVL: 0.041242922",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @COR: 0.051016108",
+     "NB = 0 @SHQ1: 0.700000000",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @SHQ1: 0.075158431",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @CSM: 0.044093368",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @CAH: 0.026009181",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @ASA: 0.033170790",
+     "NB = 0 @SHQ2: -0.012455014",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @SHQ2: -0.100925667"
+    ],
+    "2025M10": [
+     "NB = 0 @GROUP: -0.834087982",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @GROUP: 0.278931070",
+     "NB = 0 @SGO2: 1.000000000",
+     "NB = 0 @SGO1: -2.181916230",
+     "NB = 0 @BGO2: -0.083000000",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @CVL: 0.039397861",
+     "NB = 0 @COR: -0.001960784",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @COR: 0.048478134",
+     "NB = 0 @SHQ1: -0.998823529",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @SHQ1: 0.077547589",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @CSM: 0.042827825",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @CAH: 0.027609155",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @ASA: 0.038243170",
+     "NB = 0 @SHQ2: 0.166696332",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @SHQ2: 0.004827336"
+    ],
+    "2025M11": [
+     "NB = 0 @GROUP: -0.389556421",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @GROUP: 0.568571541",
+     "NB = 0 @SGO2: -0.000214140",
+     "NB = 0 @SGO1: -0.676000000",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @CVL: 0.039881771",
+     "NB = 0 @COR: 0.001960784",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @COR: 0.046433743",
+     "NB = 0 @SHQ1: 0.024541314",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @SHQ1: 0.079319816",
+     "NB = 0 @CSM: -0.009800000",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @CSM: 0.051478524",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @CAH: 0.028300015",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @ASA: 0.036377121",
+     "NB = 0 @SHQ2: -0.406258519",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @SHQ2: 0.286780551"
+    ],
+    "2025M12": [
+     "NB = 0 @GROUP: -0.580484237",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @GROUP: 0.000030264",
+     "NB = 0 @SGO2: -1.400000000",
+     "NB = 0 @SGO1: 1.048000000",
+     "NB = 0 @BGO2: 0.082664030",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @CVL: 0.041681732",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @COR: 0.048740055",
+     "NB = 0 @SHQ1: -0.290000000",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @SHQ1: 0.076607772",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @CSM: 0.048451818",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @CAH: 0.028542178",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @ASA: 0.034554316",
+     "NB = 0 @SHQ2: -0.290484237",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @SHQ2: -0.278547607"
+    ],
+    "2026": [
+     "NB = 0 @GROUP: 0.329545937",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @GROUP: -0.748631754",
+     "NB = 0 @SGO2: -0.200000000",
+     "NB = 0 @SGO1: -0.252000000",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @CVL: -0.014961697",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @COR: -0.012662028",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @CAH: -0.008733440",
+     "NB = 0 @SHQ2: 0.329545937",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @SHQ2: -0.712274589"
+    ],
+    "2026H1": [
+     "NB = 0 @GROUP: 0.329545937",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @GROUP: -0.748631754",
+     "NB = 0 @SGO2: -0.200000000",
+     "NB = 0 @SGO1: -0.252000000",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @CVL: -0.014961697",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @COR: -0.012662028",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @CAH: -0.008733440",
+     "NB = 0 @SHQ2: 0.329545937",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @SHQ2: -0.712274589"
+    ],
+    "2026Q1": [
+     "NB = 0 @GROUP: 0.329545937",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @GROUP: -0.748631754",
+     "NB = 0 @SGO2: -0.200000000",
+     "NB = 0 @SGO1: -0.252000000",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @CVL: -0.014961697",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @COR: -0.012662028",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @CAH: -0.008733440",
+     "NB = 0 @SHQ2: 0.329545937",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @SHQ2: -0.712274589"
+    ],
+    "2026M01": [
+     "NB = 0 @GROUP: 0.044872437",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @GROUP: -0.435859738",
+     "NB = 0 @SGO2: 0.300000000",
+     "NB = 0 @SGO1: -0.035000000",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @CVL: -0.014961697",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @COR: -0.012662028",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @CAH: -0.008733440",
+     "NB = 0 @SHQ2: 0.044872437",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @SHQ2: -0.399502573"
+    ],
+    "2026M02": [
+     "NB = 0 @GROUP: 0.284673500",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @GROUP: -0.312772017",
+     "NB = 0 @SGO2: -0.500000000",
+     "NB = 0 @SGO1: -0.217000000",
+     "NB = 0 @SHQ2: 0.284673500",
+     "NIS+INT+PIT+COM = CXA+GAH+DC+MC @SHQ2: -0.312772017"
+    ]
+   }
+  },
+  "theo_khoi": {
+   "GROUP": {
+    "o_so": 354,
+    "lech": 25
+   },
+   "SGO2": {
+    "o_so": 342
+   },
+   "SGO1": {
+    "o_so": 342,
+    "lech": 21
+   },
+   "HGO6": {
+    "o_so": 342
+   },
+   "BGO2": {
+    "o_so": 342
+   },
+   "CVL": {
+    "o_so": 340,
+    "lech": 127
+   },
+   "COR": {
+    "o_so": 340,
+    "lech": 127
+   },
+   "SHQ1": {
+    "o_so": 340,
+    "lech": 127
+   },
+   "CSM": {
+    "o_so": 340,
+    "lech": 127
+   },
+   "CAH": {
+    "o_so": 340,
+    "lech": 127
+   },
+   "ASA": {
+    "o_so": 340,
+    "lech": 115
+   },
+   "SHQ2": {
+    "o_so": 340,
+    "lech": 127
+   }
+  },
+  "dat": true,
+  "ly_do": []
  }
 }
