@@ -26,7 +26,7 @@ WP-C3d **ĐẠT** trên **6 tab × 12 khối** *(417: chỉ GROUP)*: **1.287.624
 | Tệp | Vì sao |
 |---|---|
 | `fls/bao_cao/pla.py` *(mới)* | `ngay_pl` *(chỉ qua C6)* · `ngay_pl_tu_yyyymm` *(`AH` rỗng ⇒ `AH_RONG`, lạ ⇒ `AH_LA`)* · `ngay_pl_hr` · `CONG_THUC_PM`/`CONG_THUC_HR` *(17 KPI; HR chỉ áp khối GROUP — `chi_khoi`/`khoi_khac`)* · `pla_daily(…, cdt=)` = `cfa1_daily` H5 ×2 *(khoá LE · khoá CDT)* + khối dư + `danh_gia` · `cong_theo_khoa` · `pla_pm_hr_daily` · `pla_yhqm` = `cuon_ky` H6 + `danh_gia` |
-| `tools/do_hd2_c3d.py` · `tools/do_hd2_c3d_mong.py` *(mới)* · `tools/do_hd2.py` | `--goi WP-C3d [--dsn]`; `MONG` khai TRƯỚC *(lớp đếm + 8 ô lệch theo giá trị + lớp `as_is_truoc_CA` theo `tab|khối` + sha256)* |
+| `tools/do_hd2_c3d.py` · `tools/do_hd2_c3d_mong.py` *(mới)* · `tools/do_hd2.py` | `--goi WP-C3d [--dsn]`; `MONG` khai TRƯỚC *(lớp đếm + 8 ô lệch theo giá trị + lớp `as_is_truoc_CA` theo `tab\|khối` + sha256)* |
 | `docs/ITL/_tools/hd2_cong.json` | khối `WP-C3d`, sinh bằng `do_hd2.py --goi WP-C3d --dsn $PG_DSN_TEST --ghi` *(khối cũ giữ nguyên)* |
 | `tests/bao_cao/test_pla.py` *(21)* · `tests/oracle/test_do_hd2_c3d.py` *(23)* | AC-1…AC-5 |
 | `tests/api/test_isp_gates_hd2.py` | 10 → **11** cổng; C3 `4/4 gói con` · `1505142/1507063 ô` · **1.921** lệch có chủ đích |
@@ -82,7 +82,7 @@ Trục Daily = IX.PER kho `2024-10-21 … 2026-02-27` = **495** ngày *(`den` = 
 | `tools/dung_moi_truong_isp.sh --duong-nen --cong 5435` *(một mình, trên `34b6663`)* | **`KẾT: ĐẠT`** — toàn bộ: tập đỏ + XFAIL **28 = 28** node id *(XFAIL 2 = 2 · thêm 0 · bớt 0)* · chạy **4426** *(mong ≥ 4426)* · skipped 0 · deselected 0; `tests/web` **3 = 3** · chạy 681. *(Lần chạy trước trên `2ce7de4` — 5 khối — cũng ĐẠT 4415; chạy lại MỘT lần vì phạm vi đổi theo chốt 06:57.)* |
 | `pytest tests/oracle tests/bao_cao tests/api/test_isp_gates_hd2.py tests/du_lieu/test_dap_an_pla.py tests/du_lieu/test_dap_an_pl_dau_vao.py tests/test_dung_moi_truong_isp.py` | **770 passed** + 1 đỏ sàn *(trước khi nâng sàn 4426 — nay xanh)* |
 | `lint-imports` | `Contracts: 11 kept, 0 broken.` |
-| `python docs/ITL/_tools/kiem_tai_lieu.py` | `⛔ CONG TAI LIEU KHONG DAT — 1 loi` |
+| `python docs/ITL/_tools/kiem_tai_lieu.py` | `✅ cong tai lieu DAT — va no da do duoc that (430 file, 2835 bang, 924 o ngay, 104 ma QD), khong chi 'khong thay loi'` *(đo SAU khi thêm BG này)* |
 | `python tools/soi_bang_tuyen.py` | `✅ ban khai KHOP SQL that o ca 48 tuyen` |
 
 ## Errata AP/ISP v3.1.3 *(đo, ⛔ sửa ở bước này)*
