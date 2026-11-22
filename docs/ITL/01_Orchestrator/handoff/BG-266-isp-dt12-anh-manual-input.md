@@ -79,3 +79,24 @@ Một lỗi đã cắn trong lượt: `test_CHI_MOT_BAN_KHAI_trong_ca_he` đỏ 
 4. **Ảnh 2026-03 LỆCH sổ hiện tại**: sổ đã bị sửa sau khi đóng băng — kỳ 2026-03 nay ở hàng `6465…7048` *(ảnh cũ `6470…7053`: dịch 5 hàng)*, cùng 584 dòng, nhưng **7.430/16.352 ô** của 28 cột khác ảnh *(vd dòng đầu: `hd_manual` ảnh = `SC | Server Cost`, sổ nay = `OMC | Online Marketing Cost`)*. ⛔ đụng *(WO)*; ảnh các kỳ khác phản ánh sổ **ngày 20/11**. **Khuyến nghị:** orchestrator hỏi chủ — đóng băng lại 2026-03 từ sổ hiện tại, hay giữ.
 5. **Nguồn sống**: sổ ADJUSTED còn đang sửa; mốc đọc `ngay_dong_bang = 2026-11-20` ghi trong từng ảnh. Kỳ `2026-10`/`2026-11` có nhiều `#N/A ()` nhất *(47 · 27)* — kỳ gần nhất, chưa đóng sổ.
 6. Sổ **chưa có** `Manual input` thật ở mọi dòng: cột `*_manual` rỗng nhiều *(vd `hd_manual` rỗng 832/12.633 hàng của 26 kỳ)* — H15 lọc theo kỳ/khối, ⛔ việc của bước này.
+
+## Vòng sửa sau R1 (KQ-267) — `DT12-R1-01` · phương án (a) *(orchestrator quyết)* · 22/11
+Nền: `isp/DT12` @ `5f72ce0` + gộp nhánh làm việc *(xung đột sàn ⇒ bản nhánh làm việc, đặt = thu thập thật)*. Ghi kho THẬT: `KHONG`; ⛔ đọc lại sổ *(khứ hồi từ chính ảnh `{"chu"}`)*.
+
+**Sửa.** Khuôn `tools/khuon_dong_bang/itl_ledge_ky.py` thêm `chuan_hoa_anh` *(gỡ `{"chu"}` · `dong_sheet` số · ô chữ-số của `svc_*` trả lại SỐ · rỗng giữ `None`)*, `ve_dang_cong` *(phép ngược)*, `loi_hinh` *(so hình với ảnh 2026-03)*. `tools/doc_itl_ledge_ky.py`: mọi ảnh đi qua `ghi_anh_chuan` *(⛔ sửa tay JSON)*; cổng · cột · checksum chuyển sang manifest `itl_ledge_cac_ky.json`; cờ `--chuan-hoa-anh-cu` đổi 25 ảnh đã có, **idempotent**.
+
+**Hình ảnh mới = 2026-03: 25/25** *(khoá cấp trên `nguon·ky·dong_du_lieu_bat_dau·so_dong·ghi_chu·dong` đúng thứ tự; `dong_sheet` int; 0 ô `dict`; kiểu ô ⊆ kiểu ảnh 2026-03, ô rỗng hợp lệ ở mọi cột)*. `dong_du_lieu_bat_dau = 10` *(hàng dữ liệu đầu của sổ — đúng nghĩa ở ảnh 2026-03, ⛔ hàng đầu của kỳ)*.
+
+**Khứ hồi** *(Đ3: mẫu số 361.470 = 12.049 dòng × 30 cột, ≠ 0)*: số dòng trước = sau *(12.049)*; số ô **361.470 = 361.470**; `_chuan(ô trước) = _chuan(ô sau)` **lệch 0** *(so ĐỘC LẬP với mã sinh, trên bản sao ảnh cũ)*; checksum tính lại qua `ve_dang_cong` + `AnhChup` = checksum ghim **25/25**. **74.419 ô** `svc_*` chữ-số trả lại số. Giới hạn nói thẳng: ảnh cũ ⛔ phân biệt `202603` số với chữ `"202603"` ⇒ coi mọi ô chữ-số của `svc_*` là số *(`id_payee_*` có 8 ô toàn chữ số — là MÃ, giữ chữ)*; `_chuan` hai bên bằng nhau nên H15 không thấy khác.
+
+**Đo giá trị qua đường đọc H15** *(`_nap` + `_chuan`)* — `test_AC5_do_gia_tri_qua_duong_doc_H15` trên **4** ảnh `2024-10 · 2025-06 · 2026-04 · 2026-11`: `"ky" in d` · `_chuan(hd_manual)` ⛔ chuỗi dict · kiểu `dong_sheet` = int = ảnh 2026-03. `test_AC5_do_hinh_…` so tập khoá + kiểu ô của 25/25 ảnh với ảnh 2026-03. AC-5 cũ *(chỉ `json.loads`)* **thay** bằng bài đo giá trị.
+
+**ĐỎ trước** *(TDD, bài thật trên ảnh `{"chu"}`)*: `pytest tests/du_lieu/test_anh_manual_input.py` ⇒ **9 failed · 9 passed**; sau: **18 passed**. **Đột biến — 7/7 ĐỎ**: *(trong bộ nhớ, 4)* bọc lại 1 ô `{"chu"}` · xoá `ky` · `dong_sheet` thành chuỗi · bọc 1 ô số ⇒ `loi_hinh` ≠ rỗng *(và đo giá trị H15 ≠ rỗng với 3 cái đầu)*; *(trên ảnh thật `2026-11`, bản sao, trả nguyên: `sha256` trước = sau)* bọc ô ⇒ 4 bài đỏ · xoá `ky` ⇒ 3 · `dong_sheet` chuỗi ⇒ 3. Chiều dương: ảnh nguyên ⇒ xanh.
+
+**Kích thước:** tổng 25 ảnh **14.223.510 B** *(trước 20.881.876 B; −31,9 %)* · 0 ảnh > 2 MB. **Ảnh 2026-03: sha256 `fa9e4ca3…` = ghim, 0 byte đổi.** `quet_pii_repo` = 0.
+
+**Sàn Q8:** `MONG_PYTEST_TOAN_BO` = **4297** *(thu thập thật cây gộp; +18 bài DT12 ở cây này, vòng sửa +3)* · web **681** giữ; bài ghim `test_dung_moi_truong_isp.py` cùng commit.
+
+**Cổng cuối:** `--duong-nen --cong 5437` *(một mình, 1 lần)*: tập đỏ **28 = 28** *(thêm 0 · bớt 0 · XFAIL 2 = 2)*, chạy **4297 ≥ 4297**; `tests/web` **3 = 3**, chạy 681 ≥ 681 ⇒ ĐẠT. `lint-imports` 11 kept · 0 broken · `kiem_tai_lieu` ĐẠT.
+
+**GHI NHẬN, ⛔ làm** *(backlog)*: `DT12-R1-02` *(ISP "22" ⇒ 25 kỳ)* · `-03` · `-04` *(đề xuất tách ảnh — nay 14,2 MB, 0 > 2 MB)* · `-06`. **`-05`** *(đóng băng lại 2026-03 từ sổ hiện tại)* là quyết của chủ — ⛔ làm; ảnh 2026-03 vẫn lệch sổ nay.
