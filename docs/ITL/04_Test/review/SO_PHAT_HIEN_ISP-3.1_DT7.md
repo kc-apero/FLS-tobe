@@ -1,6 +1,6 @@
 # SỔ PHÁT HIỆN REVIEW — ISP 3.1 · phần `DT7` *(tệp riêng, chờ gộp vào `SO_PHAT_HIEN_ISP-3.1.md`)*
 
-**Version:** v0.1 · **Ngày:** 2026-11-22 · **Chủ sở hữu:** `fls-test` *(R1 `KQ-263`)* · **Nguồn:** `IncrementalStepPlan-FLS-Voi_v3.1.2.md` Step 31 · DT7 · `WO-261` · `BG-262` · nhánh `isp/DT7` @ `4aec25f`
+**Version:** v0.2 · **Ngày:** 2026-11-22 · **Chủ sở hữu:** `fls-test` *(R1 `KQ-263`)* · **Nguồn:** `IncrementalStepPlan-FLS-Voi_v3.1.2.md` Step 31 · DT7 · `WO-261` · `BG-262` · nhánh `isp/DT7` @ `4aec25f`
 
 > **Luật của sổ:** sổ **chỉ THÊM**; vòng sau chỉ đổi ô `Trạng thái` của hàng đã có và thêm hàng mới.
 > Lớp: **A1** lỗi mã · **B1** lệch spec / thiếu bài · **B2** spec/ISP/hợp đồng sai — chuyển orchestrator. Mức: **CHẶN** · **NÊN SỬA** · **GHI NHẬN**.
@@ -47,6 +47,7 @@
 | `DT7-R1-07` | DT7 | R1 | B2 | GHI NHẬN | AP `…ISP-Correction_2026-11-16.html` §3.3.1 *(dòng 939 · 867 · 891 — **4** chỗ ghi `21/10/2024`)* | AP: Daily "cột từ 21/10/2024"; sheet thật bắt đầu **2024-10-20 (CN)** và cột đó mang **12** *(`414`)* · **7** *(`416`)* · **12** *(`418`)* ô ≠ 0. BG giữ mốc thật *(đúng)*. H8 làm theo chữ AP ⇒ đáp án thiếu **31** ô ≠ 0. | Errata AP v3.1.3: mốc = 20/10/2024 *(hoặc quyết bỏ cột ấy)*; ghi vào WO của H8. | — | Mở |
 | `DT7-R1-08` | DT7 | R1 | B2 | GHI NHẬN | `BG-262` §9.5 | Xác nhận: `417` thật sự chỉ có khối `GROUP` *(74 hàng HD)* ⇒ Y/H/Q/M của HR vắng ở **11 khối** *(46.398 ô không so được)*. `419` có đủ 12 khối vì là Σ-kỳ của `418`. ❓ BA: H8 có cần HR Y/H/Q/M 11 khối kia *(suy từ `416` Daily)* không? | Quyết ở WO của H8. | — | Mở |
 | `DT7-R1-09` | DT7 | R1 | B1 | GHI NHẬN | `tools/dong_bang_sheet.py` `--mong` · `test_dap_an_pla.py:CHECKSUM` | Cổng khuôn đo **ĐẾM** dòng, ⛔ giá trị: đột biến **F2** *(đổi giá trị 1 ô thô đã ≠ 0, đếm giữ nguyên)* ⇒ `--mong` **ĐẠT, exit 0**; chỉ `checksum_noi_dung` khác. Giá trị đã ghim ở **ảnh** *(đột biến M1: đổi 1 ô ảnh ⇒ 3 bài đỏ)*, nên an toàn khi dùng; nhưng ai SINH LẠI ảnh từ nguồn trôi vẫn xanh nếu số ô không đổi. | Khi sinh lại: so `checksum_noi_dung` với `CHECKSUM` ghim — đã có bài. ⛔ cần sửa mã. | — | Mở |
+| `DT7-R2-01` | DT7 | R2 | B1 | GHI NHẬN | `tools/khuon_dong_bang/_pla.py:57` `SERIAL_MOC` | Đột biến **N5** *(đổi `SERIAL_MOC` 45585→45586 trên bản sao `git archive` cây gộp thử)* ⇒ `178 passed` *(`test_dap_an_pla.py` + `test_dong_bang_sheet.py`)*, **xanh**: hằng mốc ngày chỉ cắn khi khuôn chạy trên nguồn sống *(`raise ValueError` ở dòng 163-164)*, ⛔ ở CI. Cùng họ `-02`·`-03` *(hằng ở khuôn không bài ghim)*. Đã xét lại `-02`·`-03`·`-09`: **0** chỗ trong `fls/` + `tools/` ngoài khuôn dùng `LOAI_MA`/ảnh PLA *(đo `grep`, Đ1)* ⇒ H8 chưa tiêu thụ; ảnh ghim `loai` + `checksum` ⇒ ⛔ nâng NÊN SỬA *(chưa đo được hại cho H8 — Step 39)*. | Gộp một bài ghim hằng khuôn (`LOAI_MA` Counter 40/10/17/7 · `SERIAL_MOC == 45585`) vào backlog cùng `-02`·`-03`. | Đột biến N5 / M9 ⇒ ĐỎ | Mở |
 
 ## Ghi chú kiểm *(⛔ phát hiện)*
 - **Đột biến 16 · 13 cắn · 3 sống.** *Ảnh* — M1 đổi 1 ô PLA1 Daily ⇒ 3 đỏ · M2 xoá khối `SHQ2` khỏi ảnh `419` ⇒ 6 · M3 đổi nhãn `GI→ZZ` ⇒ 4 · M4 `EBITDA` vào `la` ở ảnh `418` ⇒ 5 · M5 `MONG_TU_KIEM` lech 4→3 ⇒ 1 · M6 nới dung sai `1e-1` ⇒ 5 · M7 xoá 1 ô số ảnh `418` ⇒ 3 · M8 thêm ô số ngày tương lai ⇒ 1 · **M9 `LOAI_MA` ở `_pla.py` ⇒ xanh *(sống, `-03`)***. *Bản thô qua khuôn* — A số vào cột kỳ tương lai có tiêu đề ⇒ **TỪ CHỐI exit 2** · C `#REF!` vào hàng HD ⇒ ĐỎ `o_loi 61 ≠ 60` · D đổi nhãn mã ⇒ ĐỎ `thiếu 4` · E `#N/A` vào cột tương lai `419` ⇒ ĐỎ `tuong_lai_chu 2 dòng ≠ 1` · F ô 0 → số ⇒ ĐỎ `9695 ≠ 9694` · **B số ở cột không tiêu đề ⇒ ĐẠT *(sống, `-02`)*** · **F2 đổi giá trị ô đã ≠ 0 ⇒ ĐẠT *(sống, `-09`)***. Nền M0 = `48 passed`.
@@ -55,5 +56,12 @@
 - Mốc `21/10` đếm bằng `grep -c "21/10/2024"` trên AP = **4** *(Đ1: đếm cả hai nơi; ở `fls/`·`tools/` mốc là `SERIAL_MOC = 45585` = 20/10)*.
 - Bản thô `/tmp/dt7r1` xoá sau đo; ⛔ commit.
 
+## Ghi chú R2 *(`KQ-264`, cây gộp thử `thu/DT7` = nhánh làm việc @ `96d6ebf` + `isp/DT7` @ `5d6881f`)*
+- **Xung đột 2 tệp:** `tools/dung_moi_truong_isp.sh` + `tests/test_dung_moi_truong_isp.py` *(sàn 4278 ↔ 4321)* ⇒ gộp tay, sàn = thu thập thật cây gộp = **4.332** *(= 4.278 + 54: 48 bài `test_dap_an_pla.py` + 6 tham số hoá)*; `tests/web` 681 giữ. 17 tệp còn lại gộp sạch; ảnh/khuôn cũ đổi byte **0 / 22** ảnh; 6 ảnh PLA + `_pla.py` + khuôn: C13/H7/F5 chạm **0**.
+- `test_dap_an_pla.py` **48 passed**; `tu_kiem`: Daily lệch **4** · KPI **510**; YHQM lệch **0** · KPI **206**; `khong_so_duoc` YHQM **46.398** *(đúng mong)*.
+- Đột biến mới trên `git archive`: **8**, **7 cắn · 1 sống (`-R2-01`)**: N1 đổi dấu HR trong `tu_kiem` ⇒ 1 đỏ · N2 +1 một ô ảnh `415` ⇒ 1 · N3 xoá 1 dòng ảnh `417`-YHQM ⇒ 1 · N4 dời ngày 1 ô ⇒ 1 · N7 xoá phần tử `o_loi` ⇒ 1 · N8 bỏ nhánh khối HR vắng ⇒ 1 · N9 `kpi→la` ở `_pla.py` ⇒ 1 · **N5 sống**.
+- `--duong-nen --cong 5447` *(một lần, một mình)*: toàn bộ `12 failed · 4304 passed · 2 xfailed · 14 errors` ⇒ tập đỏ **28 = 28** *(thêm 0 · bớt 0 · chạy 4332 ≥ 4332 · skipped 0)*; `tests/web` đỏ **3 = 3** *(chạy 681 ≥ 681)*. `lint-imports` 11/0 · `kiem_tai_lieu` ĐẠT *(418 file · 2.809 bảng · 916 ô ngày · 104 mã)* · `soi_bang_tuyen` 48 tuyến khớp · `quet_pii_repo` 0 chỗ · 0 tệp.
+
 ## Changelog
 - **v0.1** *(2026-11-22, `fls-test` R1 của `DT7`, `KQ-263`)*: khởi tạo — **9** phát hiện `DT7-R1-01…09` *(**0 CHẶN** · **0 NÊN SỬA** · 9 GHI NHẬN: B2 ×3 · B1 ×5 · A1 ×1)*. Nguồn khớp **100 %** *(43.811 ô số + 4.514 hàng HD; ảnh thiếu 0)*; tái chạy khuôn **giống từng byte 6/6**; đột biến **13/16 cắn** *(6/6 mục phiếu)*.
+- **v0.2** *(2026-11-22, `fls-test` R2 cuối của `DT7`, `KQ-264`)*: THÊM `DT7-R2-01` *(GHI NHẬN, B1)* — **0 CHẶN · 0 NÊN SỬA**; `-02·03·09` giữ GHI NHẬN; cây gộp thử sàn **4.332**.
