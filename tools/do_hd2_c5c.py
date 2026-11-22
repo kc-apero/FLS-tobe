@@ -23,6 +23,19 @@
    nào" *(tiền lệ DT7b)*, NGOÀI mẫu số. CHECK của báo cáo: chỉ ĐẾM + LIỆT KÊ *(câu chặn đóng sổ chờ chủ)*.
 ⭐ Vòng sửa R1 `KQ-313`: 615 so bằng khuôn CF *(`-02`)* · đáp án ô so = 0 chưa ký ⇒ cổng `null` *(`-01`)* · chỉnh tay
    theo chuỗi lan `AH12` *(`-04`)* · 609 = `FS1_FS2_gop`, ⛔ FS3 *(`-08`)*.
+⭐ Vòng sửa TÍCH HỢP sau R2 `KQ-314` *(gộp nhánh làm việc + DT13)*:
+   · `H14-R2-01`: `mong` khối `check` sinh lại bằng lần đo theo phân loại CHECK của H13-R1 *(`dat_0_0` CHỈ khi kỳ-khối rỗng
+     thật)* — `do_hd2.py --goi WP-C5c --ghi` + sinh lại `do_hd2_c5c_mong.py` từ cùng lần đo *(⛔ sửa tay)*.
+   · 615 khối `CB I Cash Balance by LE` *(1.495 ô số)* DỰNG bằng `fls.bao_cao.so_du_le` từ ảnh ĐẦU VÀO DT13
+     `ccr_so_du_ccr` · `ccr_so_du_cash` *(⛔ đáp án)* ⇒ phần `cb` của báo cáo 615; hàng 71 *(công thức đổi theo cột)* NGOÀI
+     khuôn CÓ TÊN.
+   · ⛔⛔ **Rào DT13** *(`tools/khuon_dong_bang/_rao_dau_vao.py`)*: mọi ảnh `dau_vao` nạp ở đây đi qua
+     `kiem_dau_vao_hop_le(ảnh, PD)`; ảnh `ccr_daily_report_2` *(DR2 A-CCR dán giá trị)* CHỈ là đầu vào của 615 và engine
+     615 hiện ⛔ đọc nó; ảnh `sign_off_dau_vao` *(= nội dung đáp án 605)* ⛔ dựng 605. `so_sanh_c5c` tự kiểm rào còn chặn
+     hai đường ấy — rào mở ⇒ ĐỎ có tên.
+   · **`khop_tinh` ≠ `khop_chep`** *(Đ4)*: ô khớp có số đếm TÁCH theo phần báo cáo — phần đánh dấu `chep` *(giá trị engine
+     = CHÉP một ô ảnh đầu vào mang giá trị dán của chính sổ báo cáo)* ⇒ `khop_chep`, ⛔ cộng chung "khớp". Hiện mọi phần
+     `chep = False` ⇒ `khop_chep = 0` là KẾT QUẢ *(Đ3)*, ⛔ nền.
 """
 from __future__ import annotations
 
@@ -35,6 +48,7 @@ from decimal import Decimal, InvalidOperation
 from typing import Any, Mapping
 
 from fls.bao_cao import bao_cao as bc
+from fls.bao_cao import so_du_le as sd
 from fls.cau_hinh import dong_pl
 from fls.oracle.cong_parity import PhanXu
 from tools import do_hd2 as h
@@ -42,6 +56,7 @@ from tools import do_hd2_c3d as c3d
 from tools import do_hd2_c5a as c5a
 from tools import do_hd2_c5b as c5b
 from tools.do_hd2 import GOC, nap_anh
+from tools.khuon_dong_bang import _rao_dau_vao as rao
 
 DA = GOC / "tests" / "fixture" / "dap_an"
 ATOL = Decimal("1e-12")            # rtol 0 — ô báo cáo là CHÍNH ô nguồn (≤ 2 hạng tử) ⇒ cùng ngưỡng C5a/C5b
@@ -52,6 +67,12 @@ LECH_NGUON = "lech_dap_an_nguon"
 #: ⭐ `H14-R1-02`: ô 615 *(A-CCR `5. Daily Report 2`, DÁN GIÁ TRỊ — DT13 `BG-320` §1)* lệch mà engine = đáp án CF report
 #: 610 cùng khoá ⇒ **bản chính thức ≠ bản CF report** *(đo 22/11: 671/706 ô lệch của 615; 35 còn lại `ite_alias` như 610)*
 LECH_CCR_CF = "lech_ban_ccr_vs_cf"
+
+#: nhãn đoạn khối số dư của 615 ⇒ phần `cb` *(vòng sửa tích hợp sau R2: dựng từ ảnh DT13, `fls.bao_cao.so_du_le`)*
+NHAN_CB = "CB I Cash Balance by LE I Legal Entity by Currency"
+#: ảnh ĐẦU VÀO của phần `cb` *(DT13 `BG-320` §2)* — tên khuôn ↔ tab A-CCR
+ANH_SO_DU = {"ccr_so_du_ccr": "2. CCR", "ccr_so_du_cash": "2. CCR Cash"}
+DV = GOC / "tests" / "fixture" / "dau_vao"
 
 #: đáp án → (tệp, loại, FS, kỳ) *(kỳ = tháng của trục ngày `From`/`To` — đo ở `BG-270`)*
 DAP_AN: dict[str, dict[str, Any]] = {
@@ -64,16 +85,12 @@ DAP_AN: dict[str, dict[str, Any]] = {
     #   nhãn đoạn `Unit: mUSD` ↔ `ngay`, `CM Cumulative` ↔ `luy_ke` của CÙNG báo cáo CF engine. Đoạn khác ⇒ NGOÀI mẫu số
     #   CÓ TÊN (`ngoai_khuon_615`). `doi_chieu` = đáp án 610 — chỉ để gán lớp `lech_ban_ccr_vs_cf` ở bước SO.
     "615": {"anh": "ccr_daily_report", "loai": "CF", "fs": "-", "ky": 202611, "doi_chieu": "610",
-            "phan_khuon": {"Unit: mUSD": "ngay", "CM Cumulative": "luy_ke"}},
+            "phan_khuon": {"Unit: mUSD": "ngay", "CM Cumulative": "luy_ke", NHAN_CB: "cb"}},
 }
 #: 615 — đoạn sổ ⛔ thuộc khuôn CF engine ⇒ (loại, tên, cần gì). Loại `chua_co_dau_vao` = cần ảnh ĐẦU VÀO; `ngoai_khuon` =
 #: ô ⛔ phải của báo cáo CF *(đã so ở đáp án khác)*. Khoá = (nhãn đoạn, nhóm khối) — nhóm khối: `GROUP` · `FS` *(khối
 #: `[FSx][PLA3] …`)* · `*`.
 NGOAI_KHUON_615: dict[tuple[str | None, str], tuple[str, str, str]] = {
-    ("CB I Cash Balance by LE I Legal Entity by Currency", "*"): (
-        "chua_co_dau_vao", "cash_balance_by_le",
-        "ảnh số dư A-CCR `2. CCR` + `2. CCR Cash` theo LE × ngày — DT13 đã đóng băng (`ccr_so_du_ccr` · `ccr_so_du_cash`, "
-        "`BG-320`) nhưng CHƯA gộp vào nhánh này ⇒ chờ orchestrator nhắn gộp DT13"),
     (None, "*"): (
         "chua_co_dau_vao", "tien_dau_bao_cao",
         "khối đầu báo cáo `Cash on way` · `Bank` theo LE (hàng 11–55) — chưa đo nguồn (ứng viên: ảnh số dư DT13)"),
@@ -152,6 +169,28 @@ def _cot_ky(hd: Mapping[str, Any]) -> dict[str, str]:
     return ra
 
 
+def nhan_cb_615(anh: Mapping[str, Any]) -> dict[int, tuple[str, str]]:
+    """Khối CB của ảnh 615 ⇒ {hàng sheet → (LE, đơn vị)}. LE = `LE<nn>` theo số thứ tự nhãn `"<nn> > <tên>"` của hàng chỉ
+    nhãn đứng TRƯỚC *(⛔ mang tên — 7 nhãn là tên người)*; đơn vị = nhãn `ma` *(`mUSD` · `mSGD` · `mHKD` · `bVND`)*."""
+    hang: list[tuple[int, str, Any]] = []
+    for x in anh["phu"]["dong_chi_nhan"]["dong"]:
+        if _chu(x.get("phan")) == NHAN_CB:
+            m = re.match(r"^(\d+) > ", _chu(x.get("nhan")) or "")
+            if m:
+                hang.append((int(x["dong_sheet"]), "le", f"LE{int(m.group(1)):02d}"))
+    for r in anh["dong"]:
+        if _chu(r.get("phan")) == NHAN_CB:
+            hang.append((int(r["dong_sheet"]), "o", _chu(r.get("ma"))))
+    ra: dict[int, tuple[str, str]] = {}
+    le = None
+    for ds, loai, v in sorted(hang):
+        if loai == "le":
+            le = v
+        elif le is not None and v:
+            ra[ds] = (le, v)
+    return ra
+
+
 def o_dap_an(ma_da: str, anh: Mapping[str, Any]) -> tuple[dict[str, Decimal], Counter]:
     """Đáp án ⇒ {khoá ô báo cáo → số}; cột ⛔ thuộc trục *(`F` ngày trước · `AK` ⛔ ngày)* đếm riêng có tên."""
     cfg = DAP_AN[ma_da]
@@ -169,6 +208,7 @@ def o_dap_an(ma_da: str, anh: Mapping[str, Any]) -> tuple[dict[str, Decimal], Co
     ra: dict[str, Decimal] = {}
     ngoai = Counter()
     pk = cfg.get("phan_khuon")
+    cb = nhan_cb_615(anh) if pk and "cb" in pk.values() else {}
     for r in anh["dong"]:
         ds = int(r["dong_sheet"])
         ph = _chu(r.get("phan")) or _chu(r.get("che_do"))
@@ -182,12 +222,20 @@ def o_dap_an(ma_da: str, anh: Mapping[str, Any]) -> tuple[dict[str, Decimal], Co
                                               and _so(v) is not None)
                 continue
             ph = pk[nhan]
+            if ph == "cb":                                   # khối số dư: khoá (LE, đơn vị) — hàng ngoài khuôn CÓ TÊN
+                kh, ma = cb.get(ds, (None, None))
+                if (kh, ma) in sd.NGOAI_KHUON_CB:
+                    ngoai[f"ngoai_khuon:{sd.NGOAI_KHUON_CB[(kh, ma)][0]}"] += sum(
+                        1 for c, v in r.items() if len(c) <= 2 and c.isalpha() and _so(v) is not None)
+                    continue
         if kh is None or ma is None:
             ngoai["hang_khong_nhan"] += 1
             ngoai["o_hang_khong_nhan"] += sum(1 for c, v in r.items() if len(c) <= 2 and c.isalpha()
                                               and _so(v) is not None)
             continue
-        if ph in (None, "ngay"):
+        if ph == "cb":
+            phan, cot = "cb", cot_ngay
+        elif ph in (None, "ngay"):
             phan, cot = "ngay", cot_ngay
         else:
             m = _TIEN_TO.match(kh)
@@ -220,6 +268,7 @@ class NguonEngine:
     dap_an: dict[str, dict[tuple, Decimal]]              # nguồn → giá trị đáp án THƯỢNG NGUỒN *(chỉ bước so)*
     cong: dict[str, bool]                                # cổng thượng nguồn ĐẠT?
     pl5_bo: int = 0
+    so_du: dict[str, dict[int, dict[str, Decimal | None]]] | None = None   # phần `cb` của 615 *(ảnh DT13)*
     tom: dict[str, tuple[set[str], int]] = field(default_factory=dict)   # bộ nhớ đệm (mã có · cột ngày lớn nhất)
 
 
@@ -232,6 +281,19 @@ def _dap_an_thua(anh: Mapping[str, Any], cot: str) -> dict[tuple, Decimal]:
         s = _so(r["gt"])
         if s is not None:
             ra[(_chu(r["le"]), _chu(r["ma_hd"]), k)] = s
+    return ra
+
+
+def nap_so_du(pd: str = "615") -> dict[str, dict[int, dict[str, Decimal | None]]]:
+    """Ảnh ĐẦU VÀO DT13 `ccr_so_du_ccr` · `ccr_so_du_cash` ⇒ `{tab: {hàng sheet: {ngày ISO: số|None}}}` cho `so_du_le`.
+    ⭐ Qua rào DT13 TRƯỚC khi đọc *(`kiem_dau_vao_hop_le(ảnh, PD)` — ảnh dùng sai PD ⇒ `DauVaoSaiChoError` có tên)*."""
+    ra: dict[str, dict[int, dict[str, Decimal | None]]] = {}
+    for ten, tab in ANH_SO_DU.items():
+        rao.kiem_dau_vao_hop_le(ten, pd)
+        anh = nap_anh(DV / f"{ten}.json")
+        cot = {c: datetime.date(int(c[1:5]), int(c[5:7]), int(c[7:9])).isoformat()
+               for c in anh["cot"] if re.fullmatch(r"d\d{8}", c)}
+        ra[tab] = {int(r["dong_sheet"]): {iso: _so(r.get(c)) for c, iso in cot.items()} for r in anh["dong"]}
     return ra
 
 
@@ -278,7 +340,7 @@ def nguon_engine(lich, alr, dinh_nghia: Mapping[str, str]) -> NguonEngine:
                 "atl": c5a.gia_tri_atl(atl)},
         cong={"WP-C3a": a.phan_xu.dat, "WP-C3b": b.phan_xu.dat, "WP-C3d": d.phan_xu.dat,
               "WP-C5a": t5a.phan_xu.dat, "WP-C5b": t5b.phan_xu.dat},
-        pl5_bo=len(bo))
+        pl5_bo=len(bo), so_du=nap_so_du("615"))
 
 
 # ── so ─────────────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -332,6 +394,8 @@ def _lop_lech(ne: NguonEngine, nguon: str, truc: str, khoi: str, ma: str, c: str
 
 def ly_do_vang(ne: NguonEngine, p: Mapping[str, Any], ma: str, c: str) -> str:
     """Ô đáp án mà báo cáo engine ⛔ có ⇒ lý do CÓ TÊN *(⛔ một rổ "vắng")*."""
+    if p["nguon"] not in ne.luoi:
+        return f"ngoai_luoi:{p['nguon']}"                 # phần ⛔ lấy từ lưới engine thượng nguồn (vd `cb`)
     luoi = ne.luoi[p["nguon"]]
     if p["nguon"] not in ne.tom:
         ne.tom[p["nguon"]] = ({k[1] for k in luoi}, max((k[2] for k in luoi if isinstance(k[2], int)), default=0))
@@ -376,7 +440,8 @@ def so_mot(ma_da: str, anh: Mapping[str, Any], bao: Mapping[str, Any], ne: Nguon
     `doi_chieu` *(chỉ 615)* = ô đáp án 610 cùng khoá: ô lệch mà engine = 610 ⇒ lớp `lech_ban_ccr_vs_cf`."""
     da, ngoai = o_dap_an(ma_da, anh)
     phan = _nguon_cua(bao)
-    dem = Counter()
+    dem = Counter({"khop_tinh": 0, "khop_chep": 0})
+    theo_phan: dict[str, Counter] = {}
     chua = Counter()
     nk = Counter()
     for k in [k for k in ngoai if k.startswith(("chua_co_dau_vao:", "ngoai_khuon:"))]:
@@ -396,13 +461,21 @@ def so_mot(ma_da: str, anh: Mapping[str, Any], bao: Mapping[str, Any], ne: Nguon
             continue
         e = Decimal(e)
         dem["tong_o"] += 1
+        tp = theo_phan.setdefault(ph, Counter({"tong_o": 0, "o_0_0": 0, "khop_co_so": 0, "lech": 0}))
+        tp["tong_o"] += 1
         if e == 0 and a == 0:
             dem["o_0_0"] += 1
+            tp["o_0_0"] += 1
         elif abs(e - a) <= ATOL:
             dem["khop_co_so"] += 1
+            tp["khop_co_so"] += 1
+            dem["khop_chep" if p.get("chep") else "khop_tinh"] += 1
             mx = max(mx, abs(e - a))
         else:
-            lop = _lop_lech(ne, p["nguon"], p["truc"], kh, ma, c, e, a)
+            tp["lech"] += 1
+            # phần `cb` ⛔ có cổng thượng nguồn để truy *(đầu vào = ảnh số dư)* ⇒ lệch = `lech_FLS` *(mong 0)*
+            lop = (LECH_FLS if p["nguon"] not in ne.dap_an
+                   else _lop_lech(ne, p["nguon"], p["truc"], kh, ma, c, e, a))
             b = doi_chieu.get(k) if doi_chieu is not None else None
             if b is not None and abs(a - b) > ATOL:          # bản chính thức (615) ≠ bản CF report (610) ở ô này
                 lop = LECH_CCR_CF if abs(e - b) <= ATOL else "+".join(sorted(set(lop.split("+")) | {LECH_CCR_CF}))
@@ -422,7 +495,8 @@ def so_mot(ma_da: str, anh: Mapping[str, Any], bao: Mapping[str, Any], ne: Nguon
     vang_ma = Counter()
     for k, n in vang.items():
         vang_ma[k] += n
-    return {"dem": dict(dem), "lop": lop, "chua_co_dau_vao": dict(sorted(chua.items())),
+    tp_ra = {ph: {**dict(v), "khop": v["khop_co_so"] + v["o_0_0"]} for ph, v in sorted(theo_phan.items())}
+    return {"dem": dict(dem), "theo_phan": tp_ra, "lop": lop, "chua_co_dau_vao": dict(sorted(chua.items())),
             "engine_vang": dict(sorted(vang_ma.items())), "ngoai_truc": dict(sorted(ngoai.items())),
             "chinh_tay": chinh_tay, "chinh_tay_trung_0_5": trung, "ngoai_khuon": dict(sorted(nk.items())),
             "max_lech_khop": str(mx),
@@ -465,9 +539,34 @@ def _khac(thuc: Any, mong: Any, duong: str, ly: list[str]) -> None:
     c3d._khac(thuc, mong, duong, ly)
 
 
+def them_phan_cb(b: dict[str, Any], so_du: Mapping[str, Any] | None) -> dict[str, Any]:
+    """Báo cáo CF + phần `cb` *(khối số dư theo LE — `fls.bao_cao.so_du_le`)*. CHECK IX.PL ⛔ áp cho `cb` *(tính TRƯỚC)*.
+    Ảnh số dư vắng ⇒ phần DỪNG `chua_co_dau_vao` có tên *(⛔ ngầm 0)*. `chep = False`: engine TÍNH từ số dư."""
+    nam, thang = divmod(int(b["ky"]), 100)
+    mo_ta: dict[str, Any] = {"id": "cb", "nguon": "ccr_so_du", "truc": "ngay", "chep": False,
+                             "khoi": sorted({le for le, _dv in sd.KHUON_CB_615}),
+                             "cot": [d.isoformat() for d in sd.ngay_cua_thang(nam, thang)]}
+    try:
+        o = sd.bang_so_du_le(nam, thang, so_du)
+    except sd.LoiSoDu as l:
+        mo_ta["dung"] = "chua_co_dau_vao"
+        b["chua_co_dau_vao"].append({"phan": "cb", "nguon": "ccr_so_du", "khoi": mo_ta["khoi"], "can": str(l)})
+        b["phan"].append(mo_ta)
+        return b
+    for (le, dv, c), v in o.items():
+        b["o"][bc.khoa_o("cb", le, dv, c)] = str(v)
+    mo_ta["so_o"] = len(o)
+    b["phan"].append(mo_ta)
+    return b
+
+
 def dung_bao(ne: NguonEngine) -> dict[str, dict[str, Any]]:
-    """Dựng 4 báo cáo bằng CÙNG engine *(FS là tham số)* — đầu vào = lưới engine."""
-    return {m: bc.daily_report(cfg["ky"], cfg["fs"], ne.luoi, loai=cfg["loai"]) for m, cfg in DAP_AN.items()}
+    """Dựng 5 báo cáo bằng CÙNG engine *(FS là tham số)* — đầu vào = lưới engine; 615 + phần `cb` từ ảnh số dư."""
+    ra = {m: bc.daily_report(cfg["ky"], cfg["fs"], ne.luoi, loai=cfg["loai"]) for m, cfg in DAP_AN.items()}
+    for m, cfg in DAP_AN.items():
+        if "cb" in (cfg.get("phan_khuon") or {}).values():
+            them_phan_cb(ra[m], ne.so_du)
+    return ra
 
 
 def so_sanh_c5c(ne: NguonEngine, dap_an: Mapping[str, Mapping[str, Any]], mong: MongC5c,
@@ -476,6 +575,12 @@ def so_sanh_c5c(ne: NguonEngine, dap_an: Mapping[str, Mapping[str, Any]], mong: 
     for g, ok in ne.cong.items():
         if not ok:
             ly.append(f"nền {g} ĐỎ ⇒ lưới engine ⛔ tin được")
+    for anh, pd in (("sign_off_dau_vao", "605"), ("ccr_daily_report_2", "610")):
+        try:
+            rao.kiem_dau_vao_hop_le(anh, pd)
+            ly.append(f"rào DT13 ⛔ chặn `{anh}` → PD {pd} ⇒ vòng tròn đáp án mở (DT13-R1-01/02)")
+        except rao.DauVaoSaiChoError:
+            pass
     bao = dict(bao) if bao is not None else dung_bao(ne)
     m = mong.so
     if m is None:
@@ -489,7 +594,7 @@ def so_sanh_c5c(ne: NguonEngine, dap_an: Mapping[str, Mapping[str, Any]], mong: 
         r = so_mot(ma_da, dap_an[ma_da], bao[ma_da], ne, doi_chieu=dc)
         lech = r.pop("_lech")
         theo[ma_da] = r
-        for k in ("tong_o", "khop", "khop_co_so", "o_0_0", "o_co_so"):
+        for k in ("tong_o", "khop", "khop_co_so", "o_0_0", "o_co_so", "khop_tinh", "khop_chep"):
             tong[k] += r["dem"].get(k, 0)
         for l, v in r["lop"].items():
             lop_tong[l] += v["so_o"]
@@ -543,11 +648,14 @@ def so_sanh_c5c(ne: NguonEngine, dap_an: Mapping[str, Mapping[str, Any]], mong: 
         "bang": "HD2.WP-C5c", "goi": "WP-C5c",
         "mo_ta": "RP.PL · RP.CF: Daily Report 2 · 3 dựng theo khuôn (fls.bao_cao.bao_cao.daily_report, FS tham số) từ "
                  "lưới engine (CFA1 H5/H6 · PLA3 PM+HR H8 · ATL H12+H13) ↔ đáp án 607 · 608 · 609 · 610 · 615 (A-CCR, khuôn "
-                 "CF: Unit: mUSD ↔ ngay · CM Cumulative ↔ luy_ke) từng ô; 605 DỪNG (chua_co_dau_vao, chưa ký ⇒ cổng "
+                 "CF: Unit: mUSD ↔ ngay · CM Cumulative ↔ luy_ke · CB Cash Balance by LE ↔ cb: số dư fls.bao_cao.so_du_le "
+                 "từ ảnh DT13 ccr_so_du_ccr · ccr_so_du_cash) từng ô; 605 DỪNG (chua_co_dau_vao, chưa ký ⇒ cổng "
                  "null); lệch THỪA KẾ lớp bằng truy ngược ô nguồn",
         "nguon_dau_vao": ["WP-C3a lưới cfa1_daily (tests/fixture/dap_an/gl_cf_dau_vao.json)", "WP-C3b lưới cfa1_yhqm",
                           "WP-C3d lưới pla3_pm_hr_daily (gl_pl_dau_vao.json + hr_pl_dau_vao.json)",
-                          "WP-C5a + WP-C5b lưới ATL của FLS (IX.ALR kho cờ 2025 BẬT ký · IX.PL kho)"],
+                          "WP-C5a + WP-C5b lưới ATL của FLS (IX.ALR kho cờ 2025 BẬT ký · IX.PL kho)",
+                          "DT13 ảnh đầu vào số dư 615: tests/fixture/dau_vao/ccr_so_du_ccr.json + ccr_so_du_cash.json "
+                          "(qua rào kiem_dau_vao_hop_le)"],
         "dap_an": [f"tests/fixture/dap_an/{c['anh']}.json" for c in DAP_AN.values()],
         "dap_an_dung": dung,
         "khoa": "đáp án × phần (ngay · luy_ke[:FS]) × khối × mã × cột (ngày ISO | kỳ); ô đáp án là số, cột thuộc trục, "
@@ -556,13 +664,16 @@ def so_sanh_c5c(ne: NguonEngine, dap_an: Mapping[str, Mapping[str, Any]], mong: 
         "tong_o": tong["tong_o"], "mong_tong_o": sum(((m.get("dap_an") or {}).get(x) or {}).get("dem", {})
                                                      .get("tong_o", 0) for x in DAP_AN) or None,
         "o_co_so": tong["o_co_so"], "khop_co_so": tong["khop_co_so"], "o_0_0": tong["o_0_0"],
-        "khop": tong["khop"], "lech_co_chu_dich": lech_co_chu_dich,
+        "khop": tong["khop"], "khop_tinh": tong["khop_tinh"], "khop_chep": tong["khop_chep"],
+        "lech_co_chu_dich": lech_co_chu_dich,
         "mong_lech_co_chu_dich": sum(v.get("so_o", 0) for x in DAP_AN
                                      for l, v in (((m.get("dap_an") or {}).get(x) or {}).get("lop") or {}).items()
                                      if l != LECH_FLS),
         "lech_ngoai_ten": lop_tong.get(LECH_FLS, 0),
         "khop_ghi_chu": "tong_o = Σ 5 đáp án ô so = o_co_so + o_0_0; khop = ô khớp THẬT (khop_co_so) + o_0_0; "
-                        "khop + lech_co_chu_dich = tong_o; ô chua_co_dau_vao / engine_vang / ngoai_truc NGOÀI mẫu số",
+                        "khop + lech_co_chu_dich = tong_o; khop_co_so = khop_tinh (engine TÍNH từ đầu vào) + khop_chep "
+                        "(engine CHÉP ô ảnh đầu vào mang giá trị dán của chính sổ báo cáo — vd DR2 A-CCR; đếm RIÊNG, ⛔ "
+                        "gộp); ô chua_co_dau_vao / engine_vang / ngoai_truc / ngoai_khuon NGOÀI mẫu số",
         "lech_co_ten": {"lop_thua_ke": dict(sorted(lop_tong.items())),
                         "chinh_tay_actor": {x: theo[x]["chinh_tay"] for x in DAP_AN if theo[x]["chinh_tay"]},
                         "chinh_tay_trung_0_5": {x: theo[x]["chinh_tay_trung_0_5"] for x in DAP_AN
