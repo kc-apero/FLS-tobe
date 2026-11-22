@@ -43,3 +43,14 @@ Chọn **chữ phía màn theo ngữ cảnh tuyến** *(`CAU_BAN` trong `man_f08
 2. `C13-R1-06`: bản cũ chưa ký bị bản mới đẩy xuống — màn hiện `chưa ký` mãi, ⛔ nhãn `thay_the` *(chờ BA)*.
 3. `C13-R1-05`: màn gửi `{}` *(cửa đòi thân JSON)* — đã đúng; §4i chưa ghi.
 4. Thẻ `IX.FX` ở kho test rỗng ⇒ ảnh có khung đỏ `409` phía trên *(ngoài phạm vi)*.
+
+## Vòng sửa sau R2 (`KQ-276`) — `F7-R2-01`
+- **Lỗi (R2 đo):** mở hộp "Ký phiên bản 2", engine chèn bản 3, xác nhận ⇒ POST `{}` `201` ký **bản 3**, bản 2 `chua_ky`, ⛔ cảnh báo.
+- **Sửa (chỉ FE `man_f08.js`; ⛔ đổi tuyến · ⛔ thêm trường thân POST):** xác nhận ⇒ `GET …/snapshot/{ky}` ngay trước POST; bản mới nhất ≠ (phiên bản · checksum) của hộp ⇒ ⛔ POST, vẽ lại danh sách + hộp nêu bản MỚI kèm *"Đã có phiên bản mới hơn — kiểm lại trước khi ký"*, đòi xác nhận lại; bản mới nhất đã `da_ky` ⇒ chỉ chữ cảnh báo trong hộp; lỗi khi tải lại ⇒ chữ lỗi, ⛔ POST.
+- **Đo:** `test_F7_R2_01_ban3_chen_…` ĐỎ trước (POST ngay lần 1) → sau sửa: lần 1 **0 POST**, hộp nêu bản 3 + checksum rút gọn, lần 2 **đúng 1 POST** `{}`, kho `[da_ky, chua_ky, da_ky]` (bản 3 do thẻ ký). `test_F7_R2_01_loi_mang_…`: **0 POST** + chữ Việt. Ca thường (`AC1`: bản 2 không đổi) vẫn **1 POST**; Huỷ/Esc/Enter/bấm kép/409/404/400/500 xanh (20/20 trên `ky_ban`+`ky`+`fx`). **Đột biến** bỏ so sánh bản (`if (false)`) ⇒ bài bản-3 ĐỎ; trả nguyên ⇒ xanh.
+- **Sàn (Q8, cùng commit):** thu thập thật toàn bộ **4360** (4351 + 7 F7 + 2) · web **690**; bài ghim + changelog nâng cùng commit. `--duong-nen --cong 5436` (một mình, một lần): **ĐẠT** — toàn bộ 28 = 28 (thêm 0 · bớt 0), chạy 4360; web 3 = 3, chạy 690. `lint-imports` 11/0 · `kiem_tai_lieu` ĐẠT · `kiem_thuyet_minh` 35/35.
+- **GHI NHẬN `F7-R1-01/03/04`** ⇒ backlog (⛔ làm ở vòng này).
+
+### Câu hỏi cho BA
+1. **Khe đua còn lại:** giữa lúc tải lại và POST (cỡ ms) engine vẫn có thể chèn bản mới ⇒ vẫn ký bản mới. Màn ⛔ chặn được hết.
+2. **Phương án ràng ở tuyến:** `POST …/sign` nhận (qua query `?checksum=` hoặc thân) checksum bản người dùng đã thấy; ≠ bản mới nhất ⇒ `409` mã riêng. BA chốt §4i có đổi hợp đồng (hiện thân `{}`, cửa `400` nếu có `actor`) hay chấp nhận khe ms. ⛔ làm ở vòng này.
