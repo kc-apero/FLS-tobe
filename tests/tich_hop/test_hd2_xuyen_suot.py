@@ -7,9 +7,11 @@ báo cáo → ký bản. Mỗi tầng là CHÍNH mã thật, ⛔ tầng nào t�
             ⛔ dùng chung)*. Nạp: IX.FX (`ix_fx.json`) · IX.PER (21/10, luật A) · IX.ALR (17 luật MM rồi KÝ BẬT 2025 —
             `ix_alr_2025_bat.json`, quyết chủ 22/11) · IX.PL · IX.ORG · IX.VEN.
   ① ký      `POST /config/fx/{yyyymm}/sign` qua máy chủ thử THẬT, `actor` = thẻ test *(C7 — ⛔ gọi hàm repo thẳng)*.
-  ② chuỗi   11 gói `WP-C2 … WP-C5c` *(CA → SO → AL → RP)* chạy bằng CHÍNH `tools/do_hd2*.py`; tỷ giá của MỌI gói đến
-            từ `fls.repo.cau_hinh_repo.fx_cua(conn, tháng)` THẬT *(tháng chưa ký ⇒ `FxChan`)* — `nap_fx` (ảnh tệp) bị thay
-            ở đúng 4 chỗ gọi tên ấy; bài canh tệp ảnh ⛔ được đọc lần nào.
+  ② chuỗi   11 gói `WP-C2 … WP-C5c` *(CA → SO → AL → RP)* chạy bằng CHÍNH đường sản phẩm `tools/do_hd2.chay_goi(gói,
+            dsn, fx="kho")` *(vòng sửa R1 `I2-R1-02` — ⛔ còn mock `nap_fx` trong bài)*: tỷ giá của MỌI gói đến từ
+            `fls.repo.cau_hinh_repo.fx_cua(conn, tháng)` THẬT; tháng chưa ký ⇒ `FxChan` ⇒ khối ĐỎ do MÃ ghép. C4a/b/c
+            *(đầu vào đã quy đổi)* hỏi `fx_cua` mọi tháng đầu vào *(`kiem_fx_thang` — `I2-R1-01`)*. Ảnh `ix_fx.json` bị
+            trỏ vào tệp vắng suốt chuỗi ⇒ gói nào lén đọc ảnh là NỔ.
   ③ cổng    `GET /gates` *(máy chủ thử, `tep_hd2` = tệp tạm ghi theo hợp đồng `_ghi_cong`)*.
   ④ màn     F03 — node-vm (`man_f03.js` thật) VÀ Chromium headless THẬT, 390 px.
   ⑤ ký bản  báo cáo kỳ 2025-12 *(đầu ra H14 `bao["609"]`)* → `dua_ban_ky` → `ky_ban` ⇒ checksum = checksum JSON ô.
@@ -26,6 +28,7 @@ import os
 import threading
 import time
 from collections.abc import Mapping
+from decimal import Decimal
 from pathlib import Path
 from unittest import mock
 
@@ -59,10 +62,19 @@ KY_BAN = 202512                              # kỳ ký bản (AC-3) — đầu 
 MA_BAN = "609"
 MONG_SO_THANG_FX = 37                        # tháng của IX.FX (`ix_fx.json`: 202306 + 202401…202612) — mọi tháng đều ký
 GOI = ("WP-C2", "WP-C3a", "WP-C3b", "WP-C3c", "WP-C3d", "WP-C4a", "WP-C4b", "WP-C4c", "WP-C5a", "WP-C5b", "WP-C5c")
-#: gói đọc tỷ giá *(qua `nap_fx`)* ⇒ bỏ ký 202510 phải CHẶN cả gói. C4a/b/c ⛔ đọc tỷ giá — đầu vào là ẢNH CFA1/MID
-#: *(số AS-IS đã nhân tỷ giá sẵn)* ⇒ phát hiện `I2-P1` (lệch giữa tầng, ⛔ sửa engine).
-MONG_GOI_CHAN = ("WP-C2", "WP-C3a", "WP-C3b", "WP-C3c", "WP-C3d", "WP-C5a", "WP-C5b", "WP-C5c")
-MONG_GOI_KHONG_DOC_FX = ("WP-C4a", "WP-C4b", "WP-C4c")
+#: ⭐ `I2-R1-01` (KQ-317 CHẶN) — D1 DECIDED: bỏ ký 202510 ⇒ CẢ 11/11 gói CHẶN, **0 ô số** ở mọi gói *(trước vòng sửa
+#: C4a/b/c còn ra 35 + 175 + 2.303 = 2.513 ô — bài cũ ghim vi phạm làm `mong`)*.
+MONG_GOI_CHAN = GOI
+#: Giới hạn CÓ TÊN (`I2-R1-03`): đầu vào C4a/b/c *(CFA1 GI · MID1 — PD 504/MID1)* mang **mUSD đã quy đổi ở AS-IS** ⇒
+#: GIÁ TRỊ tỷ giá ⛔ vào phép tính; gói chỉ hỏi CHỮ KÝ tháng *(D1 vẫn CHẶN — xem trên)*.
+MONG_GOI_DA_QUY_DOI = ("WP-C4a", "WP-C4b", "WP-C4c")
+#: Đột biến tỷ giá *(`I2-R1-03`, đo 22/11)* — mong gói ĐỔI số theo hai kiểu phá:
+#:  · CHỈ USD ×1,01 *(VND = 1 giữ)* ⇒ mọi gói đọc GIÁ TRỊ tỷ giá đổi = 8/11; C4a/b/c giữ *(đầu vào đã quy đổi)*.
+#:  · MỌI tiền tệ ×1,01 *(kể cả VND)* ⇒ chỉ C2 · C5b · C5c đổi: mUSD = tỷ giá(tt) ÷ tỷ giá(USD) × số *(`gl.py` BR/BS)*
+#:    ⇒ nhân ĐỀU triệt tiêu — C3a…d · C5a ⛔ bỏ qua tỷ giá, chỉ là đột biến đồng dạng ⛔ có răng với chúng. C2 đổi
+#:    vì bVND *(BO/BP/BQ)* + tồn VND; C5b vì COM_GAG VND ÷ USD; C5c vì đọc lại C5b.
+MONG_DOI_USD = tuple(g for g in GOI if g not in MONG_GOI_DA_QUY_DOI)
+MONG_DOI_DEU = ("WP-C2", "WP-C5b", "WP-C5c")
 #: khoá số so với khối đã commit — mọi khoá CÓ trong khối commit đều phải bằng (⛔ chọn lọc)
 KHOA_SO = ("tong_o", "khop", "khop_co_so", "o_co_so", "o_0_0", "so_o_dap_an_so_duoc", "lech_co_chu_dich",
            "lech_ngoai_ten", "o_so", "o_khong_so", "o_khac_0", "dong_so", "mau_so_thang", "dat")
@@ -77,78 +89,25 @@ MONG_C5C_SO_LY_DO_NB0 = 18 if MONG_H14_R2_01_CHUA_SUA else 0
 MONG_CHA = {"WP-C2": True, "WP-C3": True, "WP-C4": True, "WP-C5": MONG_C5C_DAT}
 
 
-# ══ ② tỷ giá TỪ KHO ════════════════════════════════════════════════════════════════════════════════════════════
-class FxKho(Mapping):
-    """`{tháng: {tiền tệ: Decimal}}` mà MỖI lần đọc một tháng đi qua `chc.fx_cua(conn, tháng)` THẬT *(nhớ theo
-    tháng)*. Tháng chưa ký ⇒ `cfx.FxChan` NỔ ra khỏi engine *(⛔ `KeyError` — ⛔ bị hiểu là "thiếu tỷ giá")*.
-    `in` = tháng có trong IX.FX *(như dict ảnh cũ)*; số đọc ra = quyền của `fx_cua`."""
-
-    def __init__(self, conn) -> None:
-        self._c = conn
-        self._thang = tuple(sorted(d.yyyymm for d in chc.doc_fx(conn).ky))
-        self._nho: dict[int, Mapping] = {}
-        self.da_doc: set[int] = set()
-
-    def __getitem__(self, m):
-        m = int(m)
-        if m not in self._nho:
-            self._nho[m] = chc.fx_cua(self._c, m)
-            self.da_doc.add(m)
-        return self._nho[m]
-
-    def __contains__(self, m) -> bool:
-        return isinstance(m, int) and m in self._thang
-
-    def __iter__(self):
-        return iter(self._thang)
-
-    def __len__(self) -> int:
-        return len(self._thang)
-
-
-_CHAY = {
-    "WP-C2": lambda d: h.chay_wp_c2(),
-    "WP-C3a": h.chay_wp_c3a, "WP-C3b": h.chay_wp_c3b,
-    "WP-C3c": do_hd2_c3c.chay_wp_c3c, "WP-C3d": do_hd2_c3d.chay_wp_c3d,
-    "WP-C4a": h.chay_wp_c4a, "WP-C4b": h.chay_wp_c4b, "WP-C4c": h.chay_wp_c4c,
-    "WP-C5a": do_hd2_c5a.chay_wp_c5a, "WP-C5b": do_hd2_c5b.chay_wp_c5b, "WP-C5c": do_hd2_c5c.chay_wp_c5c,
-}
-
-
+# ══ ② chuỗi = ĐƯỜNG SẢN PHẨM `h.chay_goi` ═════════════════════════════════════════════════════════════════════════
 def chay_chuoi(dsn: str) -> dict:
-    """11 gói, tỷ giá TỪ KHO. Gói nổ `FxChan` ⇒ khối ĐỎ có lý do *(ghép ở đây: `do_hd2` ⛔ bắt `FxChan` —
-    phát hiện `I2-P2`)*. Trả `{khoi, tq, fx_chan, fx_doc, anh_fx_doc}`."""
-    with noi_chi_doc(dsn) as c:
-        fxk = FxKho(c)
-        anh_doc: list[str] = []
-
-        def thay_nap_fx(*a, **k):
-            anh_doc.append("goi nap_fx")                 # ⛔ chạm tệp ảnh — trả tỷ giá kho
-            return fxk
-
-        def cam_anh(*a, **k):                            # canh: ảnh `ix_fx.json` ⛔ được mở
-            anh_doc.append("mo ix_fx.json")
-            raise AssertionError("⛔ I2: tỷ giá phải TỪ KHO, ⛔ ảnh ix_fx.json")
-
-        khoi: dict[str, dict] = {}
-        tq: dict = {}
-        chan: dict[str, str] = {}
-        with mock.patch.object(h, "nap_fx", thay_nap_fx), \
-                mock.patch.object(do_hd2_c3c, "nap_fx", thay_nap_fx), \
-                mock.patch.object(do_hd2_c3d, "nap_fx", thay_nap_fx), \
-                mock.patch.object(do_hd2_c5b, "nap_fx", thay_nap_fx), \
-                mock.patch.object(h, "IX_FX", Path("/khong-co/ix_fx.json")):
-            for g in GOI:
-                try:
-                    t = _CHAY[g](dsn)
-                except cfx.FxChan as e:
-                    chan[g] = str(e)
-                    khoi[g] = {"bang": f"HD2.{g}", "goi": g, "dat": False, "ly_do": [str(e)]}
-                    continue
+    """11 gói qua `h.chay_goi(g, dsn, fx="kho")` — MÃ ghép khối ĐỎ khi `FxChan` *(⛔ bài ghép)*. Ảnh `ix_fx.json` trỏ
+    vào tệp vắng ⇒ gói nào đọc ảnh là NỔ `FileNotFoundError` *(canh có răng — `I2-R1-04`; `nap_fx` đọc `IX_FX` lúc
+    GỌI)*. Trả `{khoi, tq, fx_chan, fx_doc, fx_doc_goi}`."""
+    khoi: dict[str, dict] = {}
+    tq: dict = {}
+    chan: dict[str, str] = {}
+    doc_goi: dict[str, list[int]] = {}
+    with mock.patch.object(h, "IX_FX", Path("/khong-co/ix_fx.json")):
+        for g in GOI:
+            k, _dat, t, doc = h.chay_goi(g, dsn, fx="kho")
+            khoi[g], doc_goi[g] = k, doc
+            if t is None:
+                chan[g] = k["ly_do"][0]
+            else:
                 tq[g] = t
-                khoi[g] = t.hd2_cong
-        return {"khoi": khoi, "tq": tq, "fx_chan": chan, "fx_doc": sorted(fxk.da_doc),
-                "goi_nap_fx": anh_doc.count("goi nap_fx"), "mo_anh": anh_doc.count("mo ix_fx.json")}
+    return {"khoi": khoi, "tq": tq, "fx_chan": chan, "fx_doc_goi": doc_goi,
+            "fx_doc": sorted({m for d in doc_goi.values() for m in d})}
 
 
 def ghi_cong(khoi: Mapping[str, dict], p: Path) -> Path:
@@ -238,13 +197,19 @@ def chuoi(tmp_path_factory):
         st_bo, _ = _goi(m, f"{V}/config/fx/{THANG_BO_KY}/sign", "POST")
         b = chay_chuoi(dsn)                               # đủ 36 tháng đã ký
         ky[THANG_BO_KY] = st_bo
+        that = chc.fx_cua
+        dot = {}
+        for ten, cot in (("usd", ("USD",)), ("deu", tuple(cfx.TIEN_TE))):     # `I2-R1-03` — đột biến tỷ giá kho
+            with mock.patch.object(chc, "fx_cua", lambda c, m, cot=cot: {
+                    t: (v * Decimal("1.01") if t in cot else v) for t, v in that(c, m).items()}):
+                dot[ten] = chay_chuoi(dsn)["khoi"]
     with psycopg.connect(dsn, autocommit=True) as c:
         nguoi_ky = {k: v.actor for k, v in chc.doc_ky_fx(c).items()}
         noi_dung = b["tq"]["WP-C5c"].bao[MA_BAN]
         v_dua = chc.dua_ban_ky(c, KY_BAN, noi_dung, actor="engine-h14-i2")
         v_ky = chc.ky_ban(c, KY_BAN, actor=ACTOR)
         nd_kho = chc.doc_noi_dung_ban_ky(c, KY_BAN, v_ky.phien_ban)
-    return {"dsn": dsn, "thang": thang, "ky": ky, "nguoi_ky": nguoi_ky, "alr": alr_ky, "a": a, "b": b,
+    return {"dsn": dsn, "thang": thang, "ky": ky, "nguoi_ky": nguoi_ky, "alr": alr_ky, "a": a, "b": b, "dot": dot,
             "p_a": ghi_cong(a["khoi"], tmp / "hd2_cong_bo_ky.json"), "p_b": ghi_cong(b["khoi"], tmp / "hd2_cong.json"),
             "noi_dung": noi_dung, "v_dua": v_dua, "v_ky": v_ky, "nd_kho": nd_kho}
 
@@ -284,11 +249,41 @@ def test_config_ALR_2025_bat_da_ky_trong_kho(chuoi):
 
 
 # ══ AC-1 · I2-B1 ═══════════════════════════════════════════════════════════════════════════════════════════════
-def test_B1_ty_gia_moi_goi_TU_KHO_anh_khong_mo(chuoi):
+def test_B1_ty_gia_moi_goi_TU_KHO_qua_duong_san_pham(chuoi):
+    """`I2-R1-02`: MỖI gói *(11/11)* hỏi `fx_cua` ≥ 1 tháng qua `h.chay_goi` — bằng chứng DƯƠNG, ⛔ đếm 0 lần mở ảnh."""
     b = chuoi["b"]
-    assert b["mo_anh"] == 0 and b["goi_nap_fx"] > 0
     assert b["fx_chan"] == {}
+    assert {g: bool(d) for g, d in b["fx_doc_goi"].items()} == {g: True for g in GOI}, b["fx_doc_goi"]
     assert THANG_BO_KY in b["fx_doc"] and len(b["fx_doc"]) >= 20, b["fx_doc"]    # mẫu số tháng đọc qua fx_cua
+    for g in MONG_GOI_DA_QUY_DOI:                                                 # C4: đủ mọi tháng đầu vào
+        assert THANG_BO_KY in b["fx_doc_goi"][g], (g, b["fx_doc_goi"][g])
+
+
+def test_B1_anh_ix_fx_canh_co_rang():
+    """Canh của `chay_chuoi` có RĂNG (`I2-R1-04`): ngoài `ty_gia_kho`, `nap_fx()` với `IX_FX` vắng ⇒ NỔ."""
+    with mock.patch.object(h, "IX_FX", Path("/khong-co/ix_fx.json")), pytest.raises(FileNotFoundError):
+        h.nap_fx()
+
+
+def test_chay_goi_kho_khong_doc_duoc_la_khoi_DO_co_ly_do():
+    """Đ5: kho tắt / IX.FX chưa nạp ⇒ `chay_goi` trả khối ĐỎ có chữ `IX.FX ⛔ đọc được` — ⛔ nổ, ⛔ rơi về ảnh."""
+    k, dat, tq, doc = h.chay_goi("WP-C2", "postgresql://fls:fls@127.0.0.1:1/khong_co", fx="kho")
+    assert (dat, tq, doc, k["dat"]) == (False, None, [], False), k
+    assert k["ly_do"][0].startswith("IX.FX ⛔ đọc được từ kho:"), k["ly_do"]
+
+
+def _so(k: dict) -> dict:
+    return {x: k[x] for x in KHOA_SO if x != "dat" and isinstance(k.get(x), int | float)}
+
+
+def test_B1_dot_bien_ty_gia_goi_doi_so_dung_mong(chuoi):
+    """`I2-R1-03`: đột biến USD ×1,01 ⇒ 8/11 gói đọc GIÁ TRỊ tỷ giá đổi số; nhân ĐỀU ⇒ chỉ 3/11 *(triệt tiêu ở mUSD)*.
+    C4a/b/c giữ ở cả hai *(đầu vào đã quy đổi — giới hạn có tên)*."""
+    goc = {g: _so(chuoi["b"]["khoi"][g]) for g in GOI}
+    assert all(goc[g] for g in GOI), goc                                         # Đ3: mỗi gói có số để so
+    for ten, mong in (("usd", MONG_DOI_USD), ("deu", MONG_DOI_DEU)):
+        doi = tuple(g for g in GOI if _so(chuoi["dot"][ten][g]) != goc[g])
+        assert doi == mong, (ten, doi)
 
 
 @pytest.mark.parametrize("g", GOI)
@@ -325,12 +320,18 @@ def test_B1_C3d_lech_FLS_0(chuoi):
 
 # ══ AC-2 · I2-B2 ═══════════════════════════════════════════════════════════════════════════════════════════════
 def test_B2_bo_ky_202510_FX_CHAN_xuyen_chuoi(chuoi):
+    """`I2-R1-01`: D1 xuyên MỌI tầng — 11/11 gói CHẶN, đếm ô số TỪNG gói = 0 *(⛔ chỉ đếm gói nổ)*."""
     a = chuoi["a"]
     assert sorted(a["fx_chan"]) == sorted(MONG_GOI_CHAN), sorted(a["fx_chan"])
     for g, ly in a["fx_chan"].items():
         assert ly.startswith(f"FX_CHAN {THANG_BO_KY}:") and "CHƯA ký" in ly, (g, ly)
     assert THANG_BO_KY not in a["fx_doc"]                 # ⛔ số tỷ giá nào ra cho tháng ấy
-    assert sorted(a["tq"]) == sorted(MONG_GOI_KHONG_DOC_FX)   # I2-P1: gói ⛔ đọc tỷ giá vẫn chạy
+    assert a["tq"] == {}                                  # ⛔ gói nào chạy ra kết quả
+    o_so = {g: sum(_so(a["khoi"][g]).values()) for g in GOI}
+    assert len(o_so) == 11 and o_so == {g: 0 for g in GOI}, o_so
+    for g in GOI:
+        k = a["khoi"][g]
+        assert (k["dat"], k["fx_chan"], k["nguon_ty_gia"]) == (False, THANG_BO_KY, "kho"), (g, k)
 
 
 def test_B2_cong_HD2_WP_C2_dat_false_co_chu(chuoi):
@@ -338,8 +339,10 @@ def test_B2_cong_HD2_WP_C2_dat_false_co_chu(chuoi):
     g = {x["ma"]: x for x in d["cong"]}
     c2 = g["HD2_WP_C2"]
     assert c2["dat"] is False and f"FX_CHAN {THANG_BO_KY}" in (c2.get("ly_do") or ""), c2
-    for cha in ("HD2_WP_C3", "HD2_WP_C5"):
+    for cha in ("HD2_WP_C3", "HD2_WP_C4", "HD2_WP_C5"):
         assert g[cha]["dat"] is False, g[cha]
+    c4 = json.dumps(g["HD2_WP_C4"], ensure_ascii=False)                          # `I2-R1-01`: C4 ĐỎ có chữ
+    assert f"FX_CHAN {THANG_BO_KY}" in c4, c4
 
 
 # ══ AC-3 · I2-B3 ═══════════════════════════════════════════════════════════════════════════════════════════════
