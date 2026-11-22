@@ -164,15 +164,44 @@ const F08 = (function () {
     ob.observe(s, { attributes: true, attributeFilter: ['class'] });
   }
 
-  function _hoi_ky_ban(ky, m, ve_lai) {
+  /* ⭐ `F7-R2-01` (`KQ-276`): hộp nêu bản `m` lúc MỞ; engine có thể chèn bản mới giữa lúc mở
+     và lúc xác nhận ⇒ POST `{}` ký bản MỚI NHẤT mà người dùng ⛔ thấy (R2 đo: hộp nói "bản 2",
+     kho ký bản 3, bản 2 `chua_ky`, ⛔ cảnh báo). Sửa ở màn (⛔ đổi hợp đồng tuyến · ⛔ thêm trường
+     vào thân): xác nhận ⇒ TẢI LẠI `GET …/snapshot/{ky}` ngay trước POST; bản mới nhất ≠
+     (phiên bản · checksum) đang hiện ⇒ ⛔ POST, vẽ lại hộp nêu bản MỚI + câu cảnh báo, đòi xác
+     nhận lại. Lỗi khi tải lại ⇒ chữ lỗi trong hộp, ⛔ POST. Khe đua ms còn lại giữa tải lại và
+     POST: ghi `BG-274` §Câu hỏi cho BA (ràng checksum ở tuyến). */
+  const CAU_BAN_MOI = 'Đã có phiên bản mới hơn — kiểm lại trước khi ký';
+
+  function _hoi_ky_ban(ky, m, ve_lai, canh_bao) {
     HT.mo('Ký bản báo cáo kỳ ' + ky,
-      '<p>Ký <b>phiên bản ' + TP.chu(String(m.phien_ban)) + '</b> (checksum <span class="mono">'
+      (canh_bao ? '<div class="note crit"><b>' + TP.chu(canh_bao) + '</b></div>' : '')
+      + '<p>Ký <b>phiên bản ' + TP.chu(String(m.phien_ban)) + '</b> (checksum <span class="mono">'
       + TP.chu(String(m.checksum).slice(0, 12)) + '</span>) của kỳ <b>' + TP.chu(ky)
       + '</b> là niêm phong bản Daily Report 3 này. Các phiên bản cũ đã ký giữ nguyên.</p>'
       + '<p>Số đổi sau khi ký thì phải có phiên bản mới rồi ký lại; màn ⛔ có nút huỷ ký. '
       + 'Người ký lấy từ thẻ đăng nhập của anh/chị.</p>',
       [['Huỷ', null],
        ['Ký bản kỳ ' + ky, async function () {
+          // ① tải lại NGAY trước POST — bản mới nhất còn là bản hộp đang nêu?
+          let d;
+          try {
+            d = (await FLS.doc('/report/snapshot/' + encodeURIComponent(ky))).data;
+          } catch (e) {
+            HT.loi_trong_hop(_loi_ban(e));       // ⛔ POST khi chưa biết bản nào là mới nhất
+            return false;
+          }
+          const ds = (d && d.ban) || [];
+          const moi = ds[ds.length - 1];
+          if (!moi || moi.phien_ban !== m.phien_ban || moi.checksum !== m.checksum) {
+            ve_lai(ky);                          // danh sách sau lưng hộp cũng nói bản mới
+            if (moi && moi.trang_thai !== 'da_ky') {
+              _hoi_ky_ban(ky, moi, ve_lai, CAU_BAN_MOI);   // hộp MỚI nêu bản mới, đòi xác nhận lại
+            } else {
+              HT.loi_trong_hop({ cau: CAU_BAN_MOI + (moi ? ' (bản mới nhất đã được ký rồi).' : '.') });
+            }
+            return false;
+          }
           try {
             // ⛔ `actor` trong thân: người ký do cửa lấy TỪ THẺ (C13).
             await FLS.ghi('/report/snapshot/' + ky + '/sign', {});

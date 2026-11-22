@@ -162,6 +162,40 @@ KB_F1 = r"""
   kq.hop_sau = await hop();
   await chup('f7_sau_ky');
 """
+# ⭐ `F7-R2-01` (`KQ-276`): đúng kịch bản R2 — mở hộp "Ký phiên bản 2", RỒI engine chèn bản 3 vào kho
+# (python chèn ở dòng `CHEN`), RỒI người dùng xác nhận. Trước sửa: 1 POST ký bản 3 mà bản 2 `chua_ky`.
+KB_BAN3 = r"""
+  await xem(KY);
+  await p.waitForSelector('tr[data-ban="2"]');
+  await nut_ky().click();
+  await p.waitForSelector('#scrim.on');
+  kq.hop_truoc = await hop();
+  console.log('CHEN');
+  await new Promise(r => process.stdin.once('data', r));      // python chèn bản 3 rồi gõ xuống dòng
+  await p.click('#dlg-f button.pri');                          // xác nhận LẦN ĐẦU
+  await p.waitForTimeout(1500);
+  kq.post_lan1 = post.length;
+  kq.hop_lan1 = await hop();
+  await p.waitForSelector('tr[data-ban="3"]', { timeout: 5000 }).catch(() => {});
+  kq.ds_lan1 = await ds();
+  if (kq.hop_lan1.mo) {
+    await p.click('#dlg-f button.pri');                        // xác nhận LẦN HAI (hộp nêu bản 3)
+    await p.waitForTimeout(1500);
+  }
+  kq.hop_sau = await hop();
+  kq.ds_sau = await ds();
+"""
+# Lỗi mạng khi TẢI LẠI trước ký ⇒ chữ lỗi, ⛔ POST.
+KB_TAI_LOI = r"""
+  await xem(KY);
+  await p.waitForSelector('tr[data-ban="2"]');
+  await nut_ky().click();
+  await p.waitForSelector('#scrim.on');
+  await p.route('**/report/snapshot/*', r => r.abort());       // chỉ GET danh sách (…/sign ⛔ khớp `*`)
+  await p.click('#dlg-f button.pri');
+  await p.waitForSelector('#scrim .note.crit');
+  kq.hop = await hop();
+"""
 KB_RONG = r"""
   await xem(KY);
   await p.waitForFunction(() => document.querySelector('#ban-ds .ban-rong'));
@@ -242,12 +276,25 @@ KB_AC5 = r"""
 """
 
 
-def _chay(kb: str, cong: int, ky: int | str = 0, anh_dir: str = "") -> dict:
+def _chay(kb: str, cong: int, ky: int | str = 0, anh_dir: str = "", chen=None) -> dict:
     npm = subprocess.run(["npm", "root", "-g"], capture_output=True, text=True).stdout.strip()
     env = dict(os.environ, NODE_PATH=npm, GOC=f"http://127.0.0.1:{cong}", ANH_DIR=anh_dir,
                KY=str(ky))
-    r = subprocess.run([NODE, "-e", _DAU + kb + _CUOI], capture_output=True, text=True,
-                       encoding="utf-8", env=env, timeout=120)
+    if chen is None:
+        r = subprocess.run([NODE, "-e", _DAU + kb + _CUOI], capture_output=True, text=True,
+                           encoding="utf-8", env=env, timeout=120)
+    else:
+        # bắt tay qua stdin/stdout: kịch bản in `CHEN` ⇒ python chèn vào kho ⇒ gõ xuống dòng.
+        pr = subprocess.Popen([NODE, "-e", _DAU + kb + _CUOI], stdin=subprocess.PIPE,
+                              stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True,
+                              encoding="utf-8", env=env)
+        dong = pr.stdout.readline()
+        assert dong.strip() == "CHEN", f"⛔ kịch bản ⛔ tới điểm chèn: {dong!r} {pr.stderr.read()}"
+        chen()
+        pr.stdin.write("\n")
+        pr.stdin.flush()
+        out, err = pr.communicate(timeout=120)
+        r = subprocess.CompletedProcess(pr.args, pr.returncode, dong + out, err)
     assert r.returncode == 0, f"⛔ playwright NỔ:\n{r.stdout}\n{r.stderr}"
     return json.loads(r.stdout.strip().splitlines()[-1])
 
@@ -370,3 +417,38 @@ def test_AC5_cua_tra_400_khi_than_co_actor_va_man_khong_gui_actor():
     ma = (GOC / "fls" / "web" / "tep" / "man_f08.js").read_text(encoding="utf-8")
     assert not re.search(r"\bactor\s*:", ma), "⛔ man_f08.js gửi `actor` trong thân"
     assert ban_ky.BANG == "IX.TMP"
+
+
+# ══ F7-R2-01 · `KQ-276`: engine chèn bản 3 SAU KHI hộp nêu bản 2 ═══════════════════════
+@can_node
+def test_F7_R2_01_ban3_chen_sau_khi_mo_hop_xac_nhan_lan1_0_POST_hop_nem_ban3_lan2_ky_ban3():
+    ky = _hai_ban()
+    with _may() as (m, _):
+        kq = _chay(KB_BAN3, m.server_address[1], ky, chen=lambda: _dua(ky, o=uuid.uuid4().hex))
+    sau = _ban(ky)
+    assert [b.phien_ban for b in sau] == [1, 2, 3]                  # Đ3: bản 3 CÓ trong kho
+    assert "phiên bản 2" in kq["hop_truoc"]["txt"]                  # hộp mở trên bản 2
+    # lần 1: ⛔ POST; hộp VẼ LẠI nêu bản 3 + checksum rút gọn + câu cảnh báo tiếng Việt
+    assert kq["post_lan1"] == 0, kq["post_lan1"]
+    h = kq["hop_lan1"]
+    assert h["mo"] and "phiên bản 3" in h["txt"] and sau[2].checksum[:12] in h["txt"], h
+    assert "Đã có phiên bản mới hơn — kiểm lại trước khi ký" in h["txt"], h
+    assert "phiên bản 2" not in h["txt"] and sau[1].checksum[:12] not in h["txt"], h
+    # danh sách sau lưng hộp đã vẽ lại 3 hàng
+    assert [r["pb"] for r in kq["ds_lan1"]["hang"]] == ["1", "2", "3"], kq["ds_lan1"]
+    # lần 2: ĐÚNG 1 POST thân `{}`, bản 3 `da_ky` bởi thẻ, bản 2 vẫn `chua_ky` (và người dùng đã BIẾT)
+    assert len(kq["post"]) == 1 and json.loads(kq["post"][0]["than"]) == {}, kq["post"]
+    assert not kq["hop_sau"]["mo"]
+    assert [b.trang_thai for b in sau] == ["da_ky", "chua_ky", "da_ky"], sau
+    assert sau[2].actor == NGUOI_KY and sau[0].actor == NGUOI_CU
+
+
+@can_node
+def test_F7_R2_01_loi_mang_khi_tai_lai_truoc_ky_chu_loi_0_POST():
+    ky = _hai_ban()
+    with _may() as (m, _):
+        kq = _chay(KB_TAI_LOI, m.server_address[1], ky)
+    assert kq["hop"]["mo"] and re.search(r"[ăâđêôơưáàảãạ]", kq["hop"]["txt"]), kq["hop"]
+    assert not re.search(r"FLS-[A-Z-]+", kq["hop"]["txt"]), kq["hop"]["txt"]
+    assert kq["post"] == [], kq["post"]
+    assert [b.trang_thai for b in _ban(ky)] == ["da_ky", "chua_ky"]
