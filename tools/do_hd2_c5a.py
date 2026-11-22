@@ -177,6 +177,8 @@ class ThanhQuaC5a:
     #: H13 *(WP-C5b)*: lưới ATL của FLS *(đầu ra AL.KEY)* + lớp của TỪNG ô lệch — để dòng PL THỪA KẾ nhãn từ lá
     o: Mapping[tuple[str, str, str], Decimal] = field(default_factory=dict)
     lop_o: dict[str, str] = field(default_factory=dict)
+    #: H13 vòng sửa R1 *(`H13-R1-01`)*: mã LÁ của cây *(`loai_ma` = `la`)* — CHECK ① đo "kỳ-khối rỗng" trên lá
+    ma_la: frozenset[str] | None = None
 
 
 def _lop_2024(x: Mapping[str, str]) -> str | None:
@@ -439,7 +441,8 @@ def so_sanh_c5a(pla3: pla.KetQuaPLA, atl: Mapping[str, Any], drv: Mapping[str, A
     for k, v in theo_lop.items():
         lop_o.update({x["o"]: ("loi_as_is" if k in ("as_is_truoc_CA", "as_is_tay_lan_du") else k) for x in v})
     lop_o.update({x["o"]: "lech_FLS" for x in ngoai_ten})
-    return ThanhQuaC5a(so=so, phan_xu=px, hd2_cong=hd2, lech=lech, o=kq.o, lop_o=lop_o)
+    return ThanhQuaC5a(so=so, phan_xu=px, hd2_cong=hd2, lech=lech, o=kq.o, lop_o=lop_o,
+                       ma_la=frozenset(m for m, lo in pla3.loai.items() if lo == "la"))
 
 
 def nap_nguon() -> tuple:

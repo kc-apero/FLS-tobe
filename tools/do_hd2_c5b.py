@@ -108,6 +108,20 @@ def _thua_ke(kh: str, t: str, la: frozenset[str], lop_o: Mapping[str, str], o: M
     return LECH_FLS, [f"{m}:{l}" for m, l in lech_la.items()]
 
 
+#: trạng thái CHECK → bậc cách nhau xa hơn mọi chênh *(phép đo hồi phục so được cả trạng thái — `H13-R1-01`)*
+MA_HOA_TT = {tt: Decimal(10) ** 9 * i for i, tt in enumerate(pla.TRANG_THAI_CHECK)}
+
+
+def _ma_hoa(x: pla.OCheck) -> Decimal:
+    return MA_HOA_TT[x.trang_thai] + (x.chenh if x.chenh is not None else 0)
+
+
+def _ma_hoa_check(gt: Mapping[str, Any], kh: str, t: str, phep: str, ma_la: frozenset[str] | None) -> Decimal:
+    (x,) = [c for c in pla.check_atl({(kh, m, t): v for m, v in gt.items()}, (kh,), (t,), ma_la=ma_la)
+            if c.phep == phep]
+    return _ma_hoa(x)
+
+
 def _co_chu_dich(nhan: str) -> bool:
     return nhan != LECH_FLS and set(nhan.split("+")) <= set(LOP_GOC)
 
@@ -192,8 +206,9 @@ def so_sanh_c5b(tq5a: c5a.ThanhQuaC5a, atl: Mapping[str, Any], dinh_nghia: Mappi
         hai["o_so"] += 1
         hai["chenh"] += abs(v - tq5a.o[(kh, d, t)]) > ATOL
     # ── CHECK mỗi kỳ-khối ──
-    chk_f = pla.check_atl(tq5a.o, khoi, ky_ds)
-    chk_d = {(x.khoi, x.ky, x.phep): x for x in pla.check_atl(atl_o, khoi, ky_ds)}
+    # `H13-R1-01`: "kỳ-khối rỗng" của phép ① đo trên mã LÁ *(cùng tập cho FLS và ATL — ⛔ KPI cộng dồn `NPC`)*
+    chk_f = pla.check_atl(tq5a.o, khoi, ky_ds, ma_la=tq5a.ma_la)
+    chk_d = {(x.khoi, x.ky, x.phep): x for x in pla.check_atl(atl_o, khoi, ky_ds, ma_la=tq5a.ma_la)}
     phep_ds = [t for t, _, _ in dong_pl.CHECK]
     dem_f = {p: {tt: 0 for tt in pla.TRANG_THAI_CHECK} for p in phep_ds}
     dem_d = {p: {tt: 0 for tt in pla.TRANG_THAI_CHECK} for p in phep_ds}
@@ -214,10 +229,12 @@ def so_sanh_c5b(tq5a: c5a.ThanhQuaC5a, atl: Mapping[str, Any], dinh_nghia: Mappi
         if x.trang_thai == y.trang_thai and x.chenh is not None and abs(x.chenh - y.chenh) <= ATOL_HOI:
             dc["khop"] += 1
             continue
-        i = phep_ds.index(x.phep)
-        tat_ca = frozenset(m for s in ma_chk.values() for m in s)
+        # `H13-R1-01`: phép đo hồi phục so CẢ chênh LẪN trạng thái *(⛔ chỉ chênh: ① khác `dat_co_so` ↔ `dat_0_0`
+        # khi chênh đã bằng nhau ⇒ phép đo xanh trên tập rỗng — Đ3)*: lá = mã CHECK ∪ mã LÁ *(rỗng của ①)*,
+        # `f` = CHÍNH `pla.check_atl` trên lưới một kỳ-khối, mã hoá `chênh + MA_HOA_TT[trạng thái]`.
+        tat_ca = frozenset(m for s in ma_chk.values() for m in s) | (tq5a.ma_la or frozenset())
         nhan, _ = _thua_ke(x.khoi, x.ky, tat_ca, tq5a.lop_o, tq5a.o, atl_o, {},
-                           lambda gt, i=i: dong_pl.check_pl(gt).phep[i].chenh, y.chenh)
+                           lambda gt, x=x: _ma_hoa_check(gt, x.khoi, x.ky, x.phep, tq5a.ma_la), _ma_hoa(y))
         if _co_chu_dich(nhan):
             dc_lop[nhan] += 1
         else:

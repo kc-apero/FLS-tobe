@@ -3,7 +3,8 @@
 
 ⭐ Engine `pla.dong_pl_atl` / `pla.check_atl` ⛔ chép biểu thức: định nghĩa là THAM SỐ *(IX.PL đọc từ kho ở cổng)*;
    phép tính đi qua CHÍNH `dong_pl.tinh_pl` / `dong_pl.check_pl`.
-⭐ CHECK tách `dat_co_so` *(≥ 1 vế ≠ 0 mà cân)* / `dat_0_0` *(mọi mã của phép = 0 — Đ3: ⛔ "đạt" trơn)* / `do` /
+⭐ CHECK tách `dat_co_so` / `dat_0_0` theo TẬP BẰNG CHỨNG của phép *(`H13-R1-01`; Đ3: ⛔ "đạt" trơn)*: phép HAI vế ⇒
+   các mã của phép; phép MỘT vế *(so với 0 — ①)* ⇒ mọi mã LÁ của kỳ-khối *(rỗng thật)*. Tập ấy toàn 0 ⇒ `dat_0_0` / `do` /
    `khong_do_duoc` *(thiếu giá trị ⇒ lỗi CÓ TÊN của C12, ⛔ ngầm 0)*.
 """
 from __future__ import annotations
@@ -95,14 +96,62 @@ def test_check_atl_bon_trang_thai():
     kq = {(x.khoi, x.ky, x.phep): x for x in pla.check_atl(o, KHOI, KY)}
     p1, p2 = (t for t, _, _ in dong_pl.CHECK)
     assert len(kq) == len(KHOI) * len(KY) * 2
-    assert kq[("GROUP", "2025M01", p1)].trang_thai == "dat_0_0"
+    # `H13-R1-01`: kỳ-khối CÓ dữ liệu *(NIS = CXA = 5)* mà `NB` cân đúng 0 ⇒ ① `dat_co_so` *(⛔ 0 = 0)*
+    assert kq[("GROUP", "2025M01", p1)].trang_thai == "dat_co_so"
     assert kq[("GROUP", "2025M01", p2)].trang_thai == "dat_co_so"
     assert kq[("GROUP", "2025M02", p1)].trang_thai == "do" and kq[("GROUP", "2025M02", p1)].chenh == 7
+    # ② HAI vế: 8 mã của phép đúng 0 ⇒ tập bằng chứng rỗng ⇒ `dat_0_0` dù kỳ-khối có dữ liệu *(NB = 7 …)*
     assert kq[("GROUP", "2025M02", p2)].trang_thai == "dat_0_0"
+    # `dat_0_0` CHỈ khi kỳ-khối RỖNG thật *(mọi ô của khối-kỳ trong lưới = 0)*
+    for m in {mm for (kh, mm, t) in o if kh == "SGO1" and t == "2025M01"}:
+        o[("SGO1", m, "2025M01")] = D(0)
+    kq = {(x.khoi, x.ky, x.phep): x for x in pla.check_atl(o, KHOI, KY)}
+    assert kq[("SGO1", "2025M01", p1)].trang_thai == kq[("SGO1", "2025M01", p2)].trang_thai == "dat_0_0"
     assert kq[("SGO1", "2025M02", p1)].trang_thai == kq[("SGO1", "2025M02", p2)].trang_thai == "khong_do_duoc"
     assert dong_pl.PL_THIEU_GIA_TRI in kq[("SGO1", "2025M02", p2)].ly_do
-    assert kq[("SGO1", "2025M01", p2)].trang_thai == "do"          # số tổng hợp ⛔ cân
     assert set(x.trang_thai for x in kq.values()) == set(pla.TRANG_THAI_CHECK)
+
+
+def test_H13_R1_01_ky_tong_hop_can_co_so_ca_hai_phep_dat_co_so():
+    """`H13-R1-01` *(KQ-309)*: kỳ `NIS 3 INT 2 PIT 1 COM 1 = CXA 4 GAH 2 DC 1 MC 0`, `NB 0` ⇒ CẢ HAI phép `dat_co_so`.
+    Trước sửa: ① ra `dat_0_0` vì phép ① chỉ có MỘT mã ⇒ "mọi mã của phép = 0" ⇔ `NB = 0` — trộn rỗng với cân."""
+    o = _luoi()
+    for m, v in {"NIS": 3, "INT": 2, "PIT": 1, "COM": 1, "CXA": 4, "GAH": 2, "DC": 1, "MC": 0, "NB": 0}.items():
+        o[("GROUP", m, "2025M01")] = D(v)
+    kq = {(x.khoi, x.ky, x.phep): x for x in pla.check_atl(o, KHOI, KY)}
+    p1, p2 = (t for t, _, _ in dong_pl.CHECK)
+    assert kq[("GROUP", "2025M01", p1)].trang_thai == "dat_co_so"
+    assert kq[("GROUP", "2025M01", p2)].trang_thai == "dat_co_so"
+    # 9 mã CHECK = 0, mã lá khác ≠ 0: ① *(MỘT vế, so với 0)* — kỳ-khối có số mà `NB` = 0 ⇒ `dat_co_so`;
+    # ② *(HAI vế)* — 8 mã của phép đều 0 ⇒ 0 = 0, ⛔ bằng chứng dương ⇒ `dat_0_0`
+    for m in MA_CHECK:
+        o[("GROUP", m, "2025M01")] = D(0)
+    kq = {(x.khoi, x.ky, x.phep): x for x in pla.check_atl(o, KHOI, KY)}
+    assert kq[("GROUP", "2025M01", p1)].trang_thai == "dat_co_so"
+    assert kq[("GROUP", "2025M01", p2)].trang_thai == "dat_0_0"
+    # rỗng thật *(mọi ô của khối-kỳ = 0 hoặc trống)* ⇒ `dat_0_0`; ô trống `None` ⛔ là dữ liệu
+    for (kh, m, t) in list(o):
+        if kh == "GROUP" and t == "2025M01":
+            o[(kh, m, t)] = D(0)
+    o[("GROUP", "GI", "2025M01")] = None
+    kq = {(x.khoi, x.ky, x.phep): x for x in pla.check_atl(o, KHOI, KY)}
+    assert kq[("GROUP", "2025M01", p1)].trang_thai == kq[("GROUP", "2025M01", p2)].trang_thai == "dat_0_0"
+
+
+def test_H13_R1_01_ky_khoi_rong_chi_dem_ma_LA():
+    """`ma_la`: rỗng đo trên mã LÁ — KPI cộng dồn qua kỳ *(`NPC` = Σ hậu tố của `NP`)* ⛔ làm kỳ-khối "có số".
+    Đo 22/11 trên lưới FLS: toàn lưới ⇒ rỗng 129 vì `NPC` ≠ 0 ở 256 kỳ-khối ⛔ có lá nào ≠ 0."""
+    o = _luoi()
+    for (kh, m, t) in list(o):
+        if kh == "GROUP" and t == "2025M01":
+            o[(kh, m, t)] = D(0)
+    o[("GROUP", "NPC", "2025M01")] = D("-1.19")
+    p1 = dong_pl.CHECK[0][0]
+    la = frozenset(set(MA_PL) | set(MA_CHECK))
+    kq = {(x.khoi, x.ky, x.phep): x for x in pla.check_atl(o, KHOI, KY, ma_la=la)}
+    assert kq[("GROUP", "2025M01", p1)].trang_thai == "dat_0_0"
+    kq = {(x.khoi, x.ky, x.phep): x for x in pla.check_atl(o, KHOI, KY)}           # mặc định: mọi mã của lưới
+    assert kq[("GROUP", "2025M01", p1)].trang_thai == "dat_co_so"
 
 
 def test_check_atl_dung_sai_float_chi_trong_nguong():

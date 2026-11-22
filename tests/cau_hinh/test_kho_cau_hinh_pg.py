@@ -100,8 +100,11 @@ def test_C5_doc_luon_tra_phien_ban_MOI_NHAT(conn):
     assert ban.phien_ban == b2.phien_ban and ban.actor == "b"
 
 
+BANG_MAU_CHUA_NAP = "IX.MAU_CHUA_NAP"   # `bang` GIẢ — ⛔ bước nào nạp (C10 đã dùng hết 11 tên thật)
+
+
 # ── AC-5 · kho RỖNG (chưa nạp) ⇒ `ChuaKhai` có TÊN, ≠ `BangLa` ───────────────────────
-def test_AC5_chua_nap_thi_ChuaKhai_co_ten_KHONG_la_BangLa(conn):
+def test_AC5_chua_nap_thi_ChuaKhai_co_ten_KHONG_la_BangLa(conn, monkeypatch):
     """Một `bang` HỢP LỆ mà ⛔ ai nạp ⇒ `ChuaKhai` *(409)*. ⛔ rơi về ảnh tĩnh,
     ⛔ trả bản mặc định *(khuôn `khai_cot` ⓓ)*.
 
@@ -112,10 +115,14 @@ def test_AC5_chua_nap_thi_ChuaKhai_co_ten_KHONG_la_BangLa(conn):
        từng là mẫu này — `C6` *(WO-152)* nạp nó nên đổi sang `IX.DRV`. Mẫu số `Đ3`:
        khẳng định nó RỖNG trước khi kết luận.
     """
-    assert "IX.DRV" in chr.BANG_HOP_LE
-    assert _max_phien(conn, "IX.DRV") == 0, "⛔ tiền đề: IX.DRV chưa ai nạp"
+    # ⭐ `C10` (`WO-295`) nạp `IX.DRV` ⇒ CẢ 11 `bang` hợp lệ đều đã có người nạp *(`IX.TMP`: C13)*.
+    #   ⇒ mẫu là một `bang` GIẢ thêm vào danh mục bằng `monkeypatch` — ⛔ tên thật nào cũng sẽ có
+    #   bản; kho ⛔ có `CHECK` miền `bang` (di trú 0027) nên hỏi nó trả 0 dòng thật.
+    monkeypatch.setattr(chr, "BANG_HOP_LE", chr.BANG_HOP_LE | {BANG_MAU_CHUA_NAP})
+    assert BANG_MAU_CHUA_NAP in chr.BANG_HOP_LE
+    assert _max_phien(conn, BANG_MAU_CHUA_NAP) == 0, "⛔ tiền đề: bảng mẫu chưa ai nạp"
     with pytest.raises(chr.ChuaKhai) as e:
-        chr._doc_ban(conn, "IX.DRV")
+        chr._doc_ban(conn, BANG_MAU_CHUA_NAP)
     assert e.value.ma == "FLS-CAUHINH-CHUA-KHAI"
     assert not isinstance(e.value, chr.BangLa)
 
@@ -223,13 +230,15 @@ def test_C5R1_02_MM_gia_tri_DUNG_tap_khoa_hd_code_thu_tu_KHONG_bang_phu_tho(conn
 
 
 # ── C5-R1-03 · "đủ-hoặc-không" ĐẾM hai bảng trước/sau nạp HỎNG giữa chừng ──────────
-def test_C5R1_03_du_hoac_khong_DEM_hai_bang_quanh_nap_hong_giua_chung(conn):
+def test_C5R1_03_du_hoac_khong_DEM_hai_bang_quanh_nap_hong_giua_chung(conn, monkeypatch):
     """Giết R1-M7 *(`with conn.transaction()` → `if True:` trên kết nối autocommit ⇒
     bản DỞ — một `fls_cau_hinh_ban`, 0 `_dong` — thành bản MỚI NHẤT)*. Nạp một `cap`
     QUA được phép kiểm nội dung nhưng NỔ khi ghi dòng *(`gia_tri` chứa `set` ⛔
     serialize ⇒ `json.dumps` NÉM `TypeError` SAU khi `ban` đã INSERT)* ⇒ `(ban, dong)`
     trước = sau. `Đ5`: ⛔ chỉ `raises`, mà ĐẾM hai bảng."""
-    bang = "IX.DRV"       # bang HỢP LỆ ⛔ bước nào dùng — nạp luôn HỎNG ⇒ giữ rỗng (⛔ bài nào GHI thật vào đây)
+    # ⭐ `C10`: `IX.DRV` nay có bản thật ⇒ đếm trên `bang` mẫu GIẢ *(nạp HỎNG ⇒ giữ rỗng)*.
+    bang = BANG_MAU_CHUA_NAP
+    monkeypatch.setattr(chr, "BANG_HOP_LE", chr.BANG_HOP_LE | {bang})
     truoc = _dem(conn, bang)
     with pytest.raises(TypeError):
         chr.nap(conn, bang, [("A", {"ok": 1}), ("B", {"xau": {1, 2}})],

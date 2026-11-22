@@ -41,7 +41,9 @@ MONG_TONG_O, MONG_KHOP, MONG_KHOP_THAT, MONG_O_0_0, MONG_LECH = 4102, 3179, 884,
 MONG_PL5_KHONG_DO = 252
 #: CHECK trên ATL của FLS *(684 kỳ-khối = 12 khối × 57 kỳ mỗi phép)*
 P1, P2 = (t for t, _, _ in dong_pl.CHECK)
-MONG_CHECK_FLS = {P1: {"dat_co_so": 0, "dat_0_0": 537, "do": 147, "khong_do_duoc": 0},
+#: `H13-R1-01` *(KQ-309)*: `dat_0_0` = TẬP BẰNG CHỨNG của phép rỗng — ① *(một vế)* = kỳ-khối có MỌI mã LÁ = 0 *(359)*;
+#: ② *(hai vế)* = 8 mã của phép = 0 *(470)*. Trước sửa ① `dat_0_0` 537 trộn 178 kỳ-khối CÓ lá ≠ 0 mà `NB` cân đúng 0.
+MONG_CHECK_FLS = {P1: {"dat_co_so": 178, "dat_0_0": 359, "do": 147, "khong_do_duoc": 0},
                   P2: {"dat_co_so": 0, "dat_0_0": 470, "do": 214, "khong_do_duoc": 0}}
 
 
@@ -164,8 +166,10 @@ def test_AC2_CHECK_moi_ky_khoi_bon_trang_thai(tq):
     assert c["fls"] == MONG_CHECK_FLS
     for p in (P1, P2):
         assert sum(c["fls"][p].values()) == 12 * 57                        # Đ4: kỳ-khối
-    # Đ3: "đạt" ⛔ trơn — 0 kỳ-khối cân CÓ SỐ *(trùng DT11 trên Daily Report: mọi "đạt" là 0 = 0)*
-    assert all(c["fls"][p]["dat_co_so"] == 0 for p in (P1, P2))
+    # Đ3: "đạt" ⛔ trơn — ② 0 kỳ-khối cân CÓ SỐ *(mọi "đạt" ② là 0 = 0 — trùng DT11)*; ① 178 kỳ-khối có lá ≠ 0 mà
+    # `NB` cân *(`H13-R1-01`: ⛔ gọi là 0 = 0)*; ① `dat_0_0` ⊆ ② `dat_0_0` *(kỳ-khối rỗng ⇒ 8 mã của ② cũng 0)*
+    assert c["fls"][P2]["dat_co_so"] == 0 and c["fls"][P1]["dat_co_so"] > 0
+    assert c["fls"][P1]["dat_0_0"] <= c["fls"][P2]["dat_0_0"]
 
 
 def test_AC2_ky_do_CO_TEN_ky_phep_chenh(tq):
@@ -276,3 +280,16 @@ def test_kho_IX_PL_doi_bieu_thuc_DO():
 def test_kho_hong_DO():
     t = c5b.chay_wp_c5b(dsn="postgresql://fls:fls@localhost:1/khong_co")
     assert not t.phan_xu.dat and t.hd2_cong["dat"] is False and len(t.phan_xu.ly_do) == 3
+
+
+def test_H13_R1_03_thua_ke_lay_tap_lop_NHO_NHAT_khong_lay_hop():
+    """`H13-R1-03` *(KQ-309, GHI NHẬN — rẻ nên làm)*: dữ liệu thật ⛔ có ca nhãn ⊊ hợp *(923/923 nhãn = hợp)* ⇒ nhánh
+    "tập NHỎ NHẤT" chưa từng cắn. Ca tổng hợp: 2 lá lệch thuộc 2 lớp, dòng chỉ phụ thuộc lá thứ nhất *(sai số lá thứ
+    hai ⛔ vào dòng)* ⇒ nhãn = MỘT lớp, ⛔ `lech_D3+loi_as_is`."""
+    lop_o = {"X#A#2025M01": "loi_as_is", "X#B#2025M01": "lech_D3"}
+    o = {("X", "A", "2025M01"): Decimal(1), ("X", "B", "2025M01"): Decimal(5)}
+    atl = {("X", "A", "2025M01"): Decimal(2), ("X", "B", "2025M01"): Decimal(9)}
+    nhan, la_lech = c5b._thua_ke("X", "2025M01", frozenset({"A", "B"}), lop_o, o, atl, {},
+                                 lambda gt: gt["A"], Decimal(2))
+    assert sorted(la_lech) == ["A:loi_as_is", "B:lech_D3"]                 # Đ3: CẢ hai lá đều lệch *(tập ⛔ rỗng)*
+    assert nhan == "loi_as_is"
