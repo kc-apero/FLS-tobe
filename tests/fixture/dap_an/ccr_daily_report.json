@@ -5,7 +5,7 @@
  "cach_doc": "Sheets API v4 values.get · UNFORMATTED_VALUE · SERIAL_NUMBER · khoá SA chỉ-đọc",
  "ngay_dong_bang": "2026-11-22",
  "khong_mang_PII": "⛔ KHÔNG mang cột riêng tư: máy soát 42 tên cột của bản thô với PM_COT_RIENG_TU ['Email Address'] — 0 trùng (gộp khoảng trắng, ⛔ phân biệt hoa thường). Ảnh chỉ giữ khoá `dong_sheet` + 41 cột chọn; 0 cột bản thô ⛔ chọn (tên ở `cot_khong_chon`). Bản thô qua `chuan_bi` của khuôn: 42 tên cột trên là của BẢNG khuôn dựng; soát thêm 10 tên cột của 3 bảng phụ — 0 trùng. Ô bản thô mà khuôn ⛔ mang/băm: xem `ghi_chu_khuon`.",
- "ghi_chu_khuon": "5. Daily Report (PD 615): vùng A1:AR12521 · 2057 hàng sheet có ô số/lỗi × 33 cột F…AL; `phan`/`khoi` = vết đoạn/khối; tiêu đề nguyên văn ở `tieu_de` (1792 ô); ô chữ/bool ở `o_khong_so` (56 ô, ⛔ ép số); 230 hàng chỉ nhãn ở `dong_chi_nhan`; 131 hàng rỗng hẳn ⛔ mang. ⭐ Che 4 số TK cá nhân → `TK_CA_NHAN_<n>` ngay ở khuôn (⛔ ảnh mang số thật).",
+ "ghi_chu_khuon": "5. Daily Report (PD 615): vùng A1:AR12521 · 2057 hàng sheet có ô số/lỗi × 33 cột F…AL; `phan`/`khoi` = vết đoạn/khối; tiêu đề nguyên văn ở `tieu_de` (1792 ô); ô chữ/bool ở `o_khong_so` (56 ô, ⛔ ép số); 230 hàng chỉ nhãn ở `dong_chi_nhan`; 131 hàng rỗng hẳn ⛔ mang. ⭐ Che 11 số TK cá nhân → `TK_CA_NHAN_<n>` ngay ở khuôn (⛔ ảnh mang số thật).",
  "khoa": "dong_sheet",
  "kieu_khoa": "dong_sheet",
  "cot": [
@@ -859,7 +859,7 @@
   "dat": true,
   "ly_do": []
  },
- "checksum_noi_dung": "2fd16287aa3648e0",
+ "checksum_noi_dung": "14f965a9b8f7a4e8",
  "dong": [
   {
    "thu_tu": 1,
@@ -7664,7 +7664,7 @@
     "chu": "P100 | Bank Transactions"
    },
    "nhan_c": {
-    "chu": "R | 70589520002340804_PO USD_HOATT"
+    "chu": "R | TK_CA_NHAN_5_PO USD"
    },
    "nhan_d": null,
    "nhan_e": null,
@@ -7719,7 +7719,7 @@
     "chu": "P100 | Bank Transactions"
    },
    "nhan_c": {
-    "chu": "R | 70583520002340803_PO USD_SONNH"
+    "chu": "R | TK_CA_NHAN_6_PO USD"
    },
    "nhan_d": null,
    "nhan_e": null,
@@ -7774,7 +7774,7 @@
     "chu": "P100 | Bank Transactions"
    },
    "nhan_c": {
-    "chu": "R | 70582700002400469_PO USD_HIEPNV"
+    "chu": "R | TK_CA_NHAN_7_PO USD"
    },
    "nhan_d": null,
    "nhan_e": null,
@@ -7841,7 +7841,7 @@
     "chu": "P100 | Bank Transactions"
    },
    "nhan_c": {
-    "chu": "R | 70580780002400444_PO USD_LUANDQ"
+    "chu": "R | TK_CA_NHAN_8_PO USD"
    },
    "nhan_d": null,
    "nhan_e": null,
@@ -7908,7 +7908,7 @@
     "chu": "P100 | Bank Transactions"
    },
    "nhan_c": {
-    "chu": "R | 70581100002380253_PO USD_QUYDX"
+    "chu": "R | TK_CA_NHAN_9_PO USD"
    },
    "nhan_d": null,
    "nhan_e": null,
@@ -7975,7 +7975,7 @@
     "chu": "P100 | Bank Transactions"
    },
    "nhan_c": {
-    "chu": "R | 70580550002400835_PO USD_TRUNGNT"
+    "chu": "R | TK_CA_NHAN_10_PO USD"
    },
    "nhan_d": null,
    "nhan_e": null,
@@ -8042,7 +8042,7 @@
     "chu": "P100 | Bank Transactions"
    },
    "nhan_c": {
-    "chu": "R | 70589910002408311_PO USD_LOCNX"
+    "chu": "R | TK_CA_NHAN_11_PO USD"
    },
    "nhan_d": null,
    "nhan_e": null,

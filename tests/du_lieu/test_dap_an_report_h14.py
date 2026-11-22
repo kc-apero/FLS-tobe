@@ -32,7 +32,7 @@ TEN = ("daily_report_3_fs2", "daily_report_3_fs1", "daily_report_3_gop", "ccr_da
 MONG = {"daily_report_3_fs2": (1236, 41, 27290), "daily_report_3_fs1": (921, 41, 17962),
         "daily_report_3_gop": (1742, 41, 35542), "ccr_daily_report": (2057, 41, 48021)}
 CHECKSUM = {"daily_report_3_fs2": "a1c97597ece5ff24", "daily_report_3_fs1": "8c7617a6e2a55f0f",
-            "daily_report_3_gop": "7a76faa90919bf03", "ccr_daily_report": "2fd16287aa3648e0"}
+            "daily_report_3_gop": "7a76faa90919bf03", "ccr_daily_report": "14f965a9b8f7a4e8"}
 #: ô số-hoặc-lỗi ở `F…AL` của BẢN ĐỌC THÔ *(Đ4: ⛔ cột nhãn `A…E`)* — bảo toàn: chính + `tieu_de` = số này.
 SO_THO_F_AL = {"daily_report_3_fs2": 27605, "daily_report_3_fs1": 18199, "daily_report_3_gop": 35860, "ccr_daily_report": 48758}
 #: sha256 ghim *(⛔ đổi byte nào — ảnh DT11 đã R1 ĐẠT đọc-lại-bằng-SA)*.
@@ -50,7 +50,7 @@ KHONG_MA = {"daily_report_3_fs2": 17, "daily_report_3_fs1": 12, "daily_report_3_
 LOAI_LOI = {"daily_report_3_fs2": {}, "daily_report_3_fs1": {}, "daily_report_3_gop": {},
             "ccr_daily_report": {"#DIV/0!": 84, "#N/A": 16, "#REF!": 18, "#VALUE!": 9}}
 #: ảnh > 2 MB *(luật `DT4-R1-07`: ảnh lớn ⇒ KHAI)*: tên → byte *(đo 22/11)*. Khác ⇒ ĐỎ cả hai chiều.
-ANH_LON = {"ccr_daily_report": 2242934}
+ANH_LON = {"ccr_daily_report": 2242856}
 
 
 def _doc(ten: str) -> dict:
@@ -292,8 +292,8 @@ def test_kich_thuoc_anh_lon_hon_2MB_phai_khai_luat_DT4_R1_07(bo):
 
 # ── Riêng tư · số TK cá nhân che NGAY ở khuôn ───────────────────────────────
 
-#: số TK cá nhân đã che ở ảnh *(`R | <số>_<NH> <TT>_CN` → `TK_CA_NHAN_<n>`; Đ4: SỐ KHÁC NHAU, ⛔ số chỗ)* — A-CCR có 4; P&L Report 0.
-SO_TK_CHE = {"daily_report_3_fs2": 0, "daily_report_3_fs1": 0, "daily_report_3_gop": 0, "ccr_daily_report": 4}
+#: số TK cá nhân đã che ở ảnh *(`R | <số>_<NH> <TT>_CN` → `TK_CA_NHAN_<n>`; Đ4: SỐ KHÁC NHAU, ⛔ số chỗ)* — A-CCR có **11** *(4 nhãn `_CN` + 7 nhãn `PO USD` có hậu tố tên người — `DT11-R2-02`, KQ-272)*; P&L Report 0.
+SO_TK_CHE = {"daily_report_3_fs2": 0, "daily_report_3_fs1": 0, "daily_report_3_gop": 0, "ccr_daily_report": 11}
 
 
 def test_PII_anh_khong_mang_so_tk_ca_nhan_va_che_dung_so_khai(bo):
@@ -322,3 +322,57 @@ def test_PII_che_pii_doi_so_that_thanh_ma_giu_nguyen_Decimal_va_dem_so_khac_nhau
     assert n == 2 and so1 not in s and so2 not in s
     assert ra["dong"][0][1] == Decimal("1.50") and ra["dong"][1][0] == "x TK_CA_NHAN_1 y"      # cùng số ⇒ cùng mã
     assert G.che_pii({"a": ["sạch"]}) == 0                                # ⛔ che khi không có
+
+
+# ── `DT11-R2-02` (KQ-272, orchestrator quyết CHE) · 7 nhãn `PO USD` mang số TK + tên viết tắt người ───────────
+
+#: 7 hậu tố tên-viết-tắt người ở nhãn `R | <số>_PO USD_<TÊN>` của A-CCR `5. Daily Report` — ⛔ còn ở ảnh.
+HAU_TO_TEN = ("HOATT", "SONNH", "HIEPNV", "LUANDQ", "QUYDX", "TRUNGNT", "LOCNX")
+
+
+def _chuoi_nhan(a: dict):
+    """Mọi chuỗi CHỮ ở cột nhãn `nhan_*` của bảng chính + hàng chỉ-nhãn + tiêu đề phụ *(⛔ ô số dạng chuỗi)*."""
+    for d in a["dong"]:
+        for c in ("nhan_a", "nhan_b", "nhan_c", "nhan_d", "nhan_e"):
+            v = d.get(c) if isinstance(d, dict) else None
+            if isinstance(v, dict) and isinstance(v.get("chu"), str):
+                yield v["chu"]
+    for r in a["phu"]["dong_chi_nhan"]["dong"]:
+        if isinstance(r.get("nhan"), dict):
+            yield r["nhan"]["chu"]
+
+
+def test_R2_02_nhan_hang_anh_615_khong_con_chuoi_8_chu_so_va_7_hau_to_ten():
+    import re
+    a = _doc("ccr_daily_report")
+    nhan = list(_chuoi_nhan(a))
+    assert len(nhan) > 200                                                # Đ3: mẫu số ≠ 0 *(nhãn đã quét)*
+    dai = [s for s in nhan if re.search(r"\d{8,}", s)]
+    assert sum(1 for s in dai if "_PO USD" in s) == 0                     # đếm = 0: ⛔ còn số TK ở nhãn `PO USD` (mẫu số: 7 nhãn che ở dưới)
+    # nhãn còn lại mang số ≥ 8 chữ số là nhãn TỔ CHỨC `R | <số>_<NH> <TT>_<pháp nhân>` — KQ-272 xếp "tổ chức", GIỮ; ghim đúng
+    # SỐ ĐẾM *(Đ4: nhãn hàng, ⛔ số TK khác nhau)* ⇒ che nhầm thêm / sót đều ĐỎ (Đ5 hai chiều). Mở rộng che ⇒ chủ quyết riêng.
+    assert len(dai) == 22 and all(s.startswith("R | ") for s in dai), len(dai)
+    van = (F / "ccr_daily_report.json").read_text(encoding="utf-8")
+    # HẬU TỐ `_<TÊN>` (cả tệp) = 0. ⚠ 7 tên ĐỨNG RIÊNG ở cột `ma`/`nhan_c` + `phu.dong_chi_nhan` ("20 > …") — hàng danh sách PO,
+    # ⛔ kèm số TK, ⛔ phải hậu tố — NGOÀI phạm vi lệnh che *(ghi nhận ở BG-270 §R2, chờ chủ)*; ⛔ ghim là 0 ở đây.
+    assert [h for h in HAU_TO_TEN if f"_{h}" in van] == []                # ⛔ còn hậu tố tên người
+    che = sorted(int(m) for s in nhan for m in re.findall(r"^R \| TK_CA_NHAN_(\d+)_PO USD$", s))
+    assert che == list(range(5, 12))                                      # DƯƠNG: 7 nhãn che, nối tiếp 5…11, giữ loại `PO USD`
+    assert sum(1 for s in nhan if s.endswith("_CN")) == 4                 # 4 nhãn `_CN` cũ giữ nguyên (`TK_CA_NHAN_1…4`)
+    for g in ("MSB", "OCBC", "TPCI", "ASTRONEX"):                         # nhãn TỔ CHỨC ⛔ bị che nhầm
+        assert any(g in s for s in nhan), g
+
+
+def test_R2_02_che_pii_nhan_PO_doi_ca_so_lan_ten_giu_loai_va_nhan_to_chuc():
+    spec = importlib.util.spec_from_file_location("kh_dr_luoi_pii2", KH / "_dr_luoi.py")
+    G = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = G
+    spec.loader.exec_module(G)
+    so1, so2, so3 = "5" * 16, "6" * 16, "9" * 12                           # dựng lúc chạy (⛔ số/mẫu nằm trong NGUỒN)
+    ra = {"dong": [[f"R | {so1}_PO USD_ABCXY", f"R | {so2}_PO USD_QWERT", f"R | {so3}_OCBC SGD_SGO2"]],
+          "phu": {"a": [f"R | {so1}_PO USD_ABCXY"]}}
+    n = G.che_pii(ra)
+    assert ra["dong"][0] == ["R | TK_CA_NHAN_1_PO USD", "R | TK_CA_NHAN_2_PO USD", f"R | {so3}_OCBC SGD_SGO2"]
+    assert ra["phu"]["a"] == ["R | TK_CA_NHAN_1_PO USD"] and n == 2         # cùng số ⇒ cùng mã; tổ chức GIỮ
+    s = repr(ra)
+    assert "ABCXY" not in s and "QWERT" not in s and so1 not in s

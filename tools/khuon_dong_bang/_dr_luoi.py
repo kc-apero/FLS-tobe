@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import importlib.util
 import pathlib
+import re
 import sys
 from dataclasses import dataclass
 from typing import Any
@@ -43,6 +44,18 @@ def _quet():
     return m
 
 
+#: ⭐ `DT11-R2-02` (`KQ-272`, orchestrator quyết CHE 22/11): nhãn `R | <số>_PO USD_<TÊN>` — số TK + hậu tố là TÊN VIẾT TẮT NGƯỜI
+#: *(7 nhãn ở A-CCR `5. Daily Report`; ⛔ `_CN`, nên máy quét `quet_pii_repo.py` KHÔNG bắt — ⛔ sửa máy quét ở đây, việc riêng)*.
+#: Che CẢ số lẫn tên → `TK_CA_NHAN_<n>_PO USD` *(chỉ giữ loại)*; cùng cơ chế + cùng bộ đếm với 4 nhãn `_CN`
+#: *(nên nối tiếp số)*. Nhãn tổ chức `…_OCBC SGD_SGO2` · `…_TCB VND_VOOA` … ⛔ đụng *(loại ≠ `PO USD`)*.
+_NHAN_PO = re.compile(r"(?<!\d)(\d{8,})(?=_PO USD_[A-Za-z0-9]+)")
+_HAU_TO_TEN = re.compile(r"(TK_CA_NHAN_\d+_PO USD)_[A-Za-z0-9]+")
+
+
+def _bo_hau_to_ten(s: str) -> str:
+    return _HAU_TO_TEN.sub(r"\1", s)
+
+
 def che_pii(ra: dict[str, Any]) -> int:
     """⭐ Che số TK CÁ NHÂN *(nhãn `R | <số>_<NH> <TT>_CN` — gặp ở sổ A-CCR, tab `5. Daily Report`)* → `TK_CA_NHAN_<n>`
     NGAY ở khuôn, TRƯỚC khi ghi ảnh: ảnh commit ⛔ mang số thật *(`CLAUDE.md` · "Riêng tư & tiền thật"; bài
@@ -62,7 +75,7 @@ def che_pii(ra: dict[str, Any]) -> int:
             yield o
 
     for s in duyet(ra):                                      # lượt 1: gom SỐ theo thứ tự gặp đầu tiên
-        for so in q.so_cn(s):
+        for so in [*q.so_cn(s), *_NHAN_PO.findall(s)]:       # `_CN` (máy quét) + nhãn `PO USD` (DT11-R2-02)
             ma.setdefault(so, len(ma) + 1)
     if not ma:
         return 0
@@ -72,7 +85,7 @@ def che_pii(ra: dict[str, Any]) -> int:
             return {k: thay(v) for k, v in o.items()}
         if isinstance(o, list):
             return [thay(v) for v in o]
-        return q.che_van_ban(o, ma) if isinstance(o, str) else o
+        return _bo_hau_to_ten(q.che_van_ban(o, ma)) if isinstance(o, str) else o
 
     moi = thay(ra)
     ra.clear()
