@@ -73,7 +73,14 @@ Lưới = đầu ra engine: `so_sanh_c3a(...).luoi` *(CFA1 Daily)* · `so_sanh_c
 | AC-6 *(Q8)* | sàn 4.682 ≠ thu thập 4.722 | `MONG_PYTEST_TOAN_BO` = **4.722** |
 
 ## 7 · Cổng
-*(điền ở §8 sau khi chạy)*
+| Lệnh | Kết quả |
+|---|---|
+| `tools/dung_moi_truong_isp.sh --duong-nen --cong 5434` *(một mình, MỘT lần, trên `5c17f13`)* | **`KẾT: ĐẠT`** — toàn bộ `12 failed · 4694 passed · 2 xfailed · 14 errors`: tập đỏ + XFAIL **28 = 28** node id *(XFAIL 2 = 2 · thêm 0 · bớt 0)* · chạy **4722** *(mong ≥ 4722)* · skipped 0 · deselected 0; `tests/web` **3 = 3** · chạy 690; di trú 27/27 · `pg_verify` 0 lệch · kho `fls` rỗng |
+| `pytest tests/oracle tests/bao_cao tests/api tests/cau_hinh tests/du_lieu tests/canon tests/test_dung_moi_truong_isp.py` | 2.712 passed · 3 failed + 11 errors = tập đỏ sẵn *(`*_SO_THAT_*` ×3 · `test_mui_thu_luoi.py` ×11)* |
+| Đột biến NGUỒN `bao_cao.py` *(sửa → chạy → trả nguyên, `git diff` rỗng)* | **3/3** bị cắn: `SHQ` chỉ `SHQ1` ⇒ 4 failed · `HGO2` ⛔ ánh xạ `HGO6` ⇒ 5 · trục ngày cứng 30 ngày ⇒ 3 |
+| `lint-imports` | `Contracts: 11 kept, 0 broken.` |
+| `python docs/ITL/_tools/kiem_tai_lieu.py` | `✅ cong tai lieu DAT — va no da do duoc that (467 file, 2912 bang, 956 o ngay, 104 ma QD)` |
+| `python tools/soi_bang_tuyen.py` | `✅ ban khai KHOP SQL that o ca 49 tuyen` |
 
 ## Giả định *(chọn phương án hẹp nhất — R1 soát)*
 1. **"FS3" = bản `5. Daily Report 3` (609)** — sổ ⛔ ghi nhãn "FS3"; đo: 609 = hợp nửa `[FS1][PLA3]` + `[FS2][PLA3]`. Chủ xác nhận nếu FS3 nghĩa khác.
