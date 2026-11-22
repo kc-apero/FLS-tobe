@@ -84,3 +84,59 @@ Lệch Final ở 8 kỳ, Σ **92** ô = 88.431 − 88.339 (khớp WO).
 
 ## Sàn (Q8)
 `MONG_PYTEST_TOAN_BO` **4550 → 4561** (= 11 bài thu thập thật) cùng bài ghim, cùng commit `313bcec`. `MONG_PYTEST_WEB` **giữ 690** (bài mới ở `tests/tich_hop`, ⛔ `tests/web`).
+
+---
+
+## Vòng sửa sau R1 (KQ-305)
+R1 = 0 CHẶN · 3 NÊN SỬA (`I1-R1-01/02/03`) · người dùng đã duyệt. Nhánh làm việc đã gộp vào `isp/I1` (xung đột `tools/dung_moi_truong_isp.sh` + `tests/test_dung_moi_truong_isp.py` ⇒ bản nhánh làm việc rồi đặt sàn = thu thập thật).
+
+### Việc 1 · `I1-R1-01` — cổng `HD1_THANG` phán MỌI kỳ có ảnh (26)
+- **ĐỎ trước:** `tests/api/test_isp_gates_hd1_i1r1.py` (11 bài; trên mã cũ **9 ĐỎ**, 2 xanh có chủ ý: tập `26 − 23 = 3` kỳ không rỗng · khoá CG1 "tệp không có `tu_sinh` ⇒ mẫu số cũ"). Phá chiều ngược: tệp mà `tu_sinh` chỉ phủ đúng 23 kỳ + mọi kỳ đạt ⇒ `dat=True`.
+- **Sửa** `fls/repo/doc_bao_cao.py` `_cong_hd1` (+`_ky_tu_sinh`, `_cap_o`): đọc `tu_sinh.theo_ky` (26 kỳ). Kỳ của `dat_hd1` ⇒ phán như cũ (**đo được**, 23 kỳ). Kỳ chỉ có ở `tu_sinh` (`2026-09·10·11`) ⇒ **`khong_do_duoc` có tên vế "dòng ghép 1-1"** (`tu_sinh` chỉ có `o·hd·mid·lech_*`), ⛔ tính đạt, ⛔ bỏ khỏi mẫu số. Ô lệch ở kỳ ấy ⇒ ĐỎ nói tên. `dat` = `False` nếu có kỳ đỏ · `None` nếu không đỏ mà còn kỳ ⛔ đo được · `True` chỉ khi mọi kỳ có ảnh đo được và đạt. `tu_sinh` có mà hỏng / tự mâu thuẫn ⇒ `dat=None` kèm lý do (Đ5). Tệp ⛔ có `tu_sinh` ⇒ giữ nguyên hành vi cũ (khoá CG1).
+- **Mẫu số in rõ (Đ4):** `da_do` = `5 kỳ đạt / 23 kỳ đo được / 26 kỳ có ảnh`. Ba tầng cùng chuỗi (ghim bởi `test_B1_…` ①②, `test_F1_vm_…` + `test_F1_chromium_…` ③ — node-vm và Chromium 390 px; `test_FG_F1`/`FG_F3` ở `tests/web`).
+- **Hợp đồng `/gates`:** ⛔ thêm/đổi khoá (chỉ đổi chuỗi `da_do`/`ly_do`); `07_API_CONTRACT` dòng 860 thêm một câu (⬜ ⛔ đổi tuyến). Bài CG1 (`test_isp_gates_hd1.py`) xanh sau khi khai lại ghim mẫu số `MONG_HD1_DA_DO` và ca chiều ngược `B4` (khai `tu_sinh` chỉ 23 kỳ).
+
+### Việc 2 · `I1-R1-02` — `ly_do` mang TÊN nhãn DT1b
+- **ĐỎ trước** (cùng tệp bài): `test_I1_R1_02_ly_do_mang_TEN_nhan_va_so_dong_khi_co_nhan` dựng `dat_hd1.theo_nhan` có nhãn thật trong đầu vào (Đ3) · `…thieu_tep_nhan_ghi_chua_co_nhan_co_ten`.
+- **Sửa** `_nhan_dt1b`: có nhãn ⇒ `nhãn DT1b: TONG_HOP_A 23 dòng (đã ký) · KHOA_LECH_B 99 dòng (chưa ký)`; mỗi kỳ đỏ kèm `(N có nhãn)` khi `co_nhan>0`. ⛔ nhãn ⇒ `chưa có nhãn DT1b (tệp nhãn docs/ITL/_tools/phan_loai_ly_do.json VẮNG)` — có tên tệp. Mẫu `kỳ: số` vẫn bóc đúng 18 kỳ đỏ (bài kiểm).
+- Bài tích hợp `test_AC5_…` dùng tệp nhãn tmp (3 nhãn `TONG_HOP_A/B/L`, chữ ký GIẢ) ⇒ tên nhãn có ở ② và ③ (vm + Chromium).
+
+### Việc 3 · `I1-R1-03` — bảng AC10/AC11 theo AP §5.3.2
+**AC10** = *dòng ghép 1-1* **và** *ô mapping Final 7 khối*, đạt khi **CẢ HAI 100 %** (cả chế độ tự sinh) · **AC11** = riêng *ô khối HD* (đọc MID sổ 9.930/9.930 · tự sinh). Mốc sổ ghi từng hàng (`tu_sinh.moc_so`). Ô Final/HD ở bảng = `tu_sinh` (chế độ **tự sinh**, ⛔ cùng mẫu số với `dat_hd1.o_100` của sổ ⇒ `2025-03` ô tự sinh `2077/2079` ⇒ AC10 ĐỎ dù cổng kỳ ĐẠT — hai mốc/chế độ, Đ4). Dòng 1-1 chỉ đo được ở 23 kỳ `dat_hd1` (ảnh sổ 26/08); 3 kỳ mới ghi "⛔ đo được vế dòng". Mốc cột dòng: ảnh **26/08**; mốc cột ô/HD: cột "mốc sổ".
+
+| kỳ | mốc sổ | AC10a · dòng ghép 1-1 (`dat_hd1`, dòng thiếu) | AC10b · ô mapping Final 7 khối khớp/tổng | AC10 (cả hai 100 %) | AC11 · ô khối HD khớp/tổng |
+|---|---|---|---|---|---|
+| 2024-10 | 20/11 | 100 % (0 thiếu) | 42/42 | ĐẠT | 6/6 |
+| 2024-11 | 20/11 | 100 % (0 thiếu) | 21/21 | ĐẠT | 3/3 |
+| 2024-12 | 20/11 | 100 % (0 thiếu) | 42/42 | ĐẠT | 6/6 |
+| 2025-01 | 20/11 | ĐỎ (1 thiếu) | 5236/5236 | ĐỎ | 748/748 |
+| 2025-02 | 20/11 | ĐỎ (2 thiếu) | 1979/1981 | ĐỎ | 283/283 |
+| 2025-03 | 20/11 | 100 % (0 thiếu) | 2077/2079 | ĐỎ | 297/297 |
+| 2025-04 | 20/11 | 100 % (0 thiếu) | 2324/2324 | ĐẠT | 332/332 |
+| 2025-05 | 20/11 | ĐỎ (1 thiếu) | 2852/2856 | ĐỎ | 408/408 |
+| 2025-06 | 20/11 | ĐỎ (3 thiếu) | 2436/2436 | ĐỎ | 348/348 |
+| 2025-07 | 20/11 | ĐỎ (4 thiếu) | 3822/3822 | ĐỎ | 546/546 |
+| 2025-08 | 20/11 | ĐỎ (4 thiếu) | 3759/3759 | ĐỎ | 537/537 |
+| 2025-09 | 20/11 | ĐỎ (4 thiếu) | 3507/3507 | ĐỎ | 501/501 |
+| 2025-10 | 20/11 | ĐỎ (9 thiếu) | 3401/3409 | ĐỎ | 487/487 |
+| 2025-11 | 20/11 | ĐỎ (14 thiếu) | 3321/3339 | ĐỎ | 477/477 |
+| 2025-12 | 20/11 | ĐỎ (5 thiếu) | 3943/3962 | ĐỎ | 566/566 |
+| 2026-01 | 20/11 | ĐỎ (4 thiếu) | 3290/3297 | ĐỎ | 471/471 |
+| 2026-02 | 20/11 | ĐỎ (5 thiếu) | 3073/3073 | ĐỎ | 439/439 |
+| 2026-03 | mốc CŨ | ĐỎ (5 thiếu) | 4088/4088 | ĐỎ | 584/584 |
+| 2026-04 | 20/11 | ĐỎ (8 thiếu) | 4200/4200 | ĐỎ | 600/600 |
+| 2026-05 | 20/11 | ĐỎ (5 thiếu) | 3759/3759 | ĐỎ | 537/537 |
+| 2026-06 | 20/11 | ĐỎ (12 thiếu) | 4291/4291 | ĐỎ | 613/613 |
+| 2026-07 | 20/11 | ĐỎ (23 thiếu) | 4770/4802 | ĐỎ | 686/686 |
+| 2026-08 | 20/11 | ĐỎ (13 thiếu) | 5068/5068 | ĐỎ | 724/724 |
+| 2026-09 | 20/11 | ⛔ đo được vế dòng (`tu_sinh` ⛔ có dòng ghép 1-1) | 5159/5159 | ⛔ đo được (ô 100 %) | 737/737 |
+| 2026-10 | 20/11 | ⛔ đo được vế dòng (`tu_sinh` ⛔ có dòng ghép 1-1) | 7266/7266 | ⛔ đo được (ô 100 %) | 1038/1038 |
+| 2026-11 | 20/11 | ⛔ đo được vế dòng (`tu_sinh` ⛔ có dòng ghép 1-1) | 4613/4613 | ⛔ đo được (ô 100 %) | 659/659 |
+| **Σ 26** | | dòng 100 %: **5/23** kỳ đo được | 88339/88431 | **4/23** kỳ đo được · 3 ⛔ đo được vế dòng | 12633/12633 · **26/26** kỳ |
+
+### Cổng sau vòng sửa
+| Cổng | Kết quả |
+|---|---|
+| `--duong-nen --cong 5437` (một mình, chạy 1 lần) | **ĐẠT**: toàn bộ 12 failed · 4.615 passed · 2 xfailed · 14 errors = tập đỏ 28 = 28 (thêm 0 · bớt 0), chạy **4.643** ≥ mong 4.643 · `tests/web` 3 failed · 687 passed = 3 = 3, chạy 690 ≥ 690 |
+| bài mới `test_isp_gates_hd1_i1r1.py` | 11/11 xanh (9 ĐỎ trên mã cũ) |
+| GHI NHẬN (backlog) | `I1-R1-04..07` giữ nguyên sổ; ⛔ phát hiện mới |
