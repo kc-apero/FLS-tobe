@@ -742,6 +742,12 @@ BANG_TUYEN: tuple[Tuyen, ...] = (
           ("fls_cau_hinh_ban", "fls_cau_hinh_dong"),
           mo_ta="IX.ALR luat phan bo (By GI·By NOEM·H1000 Ledger) hieu luc tu ky + co bat "
                 "mac dinh TAT (D2); doc tu KHO config chi-them (C11); ⛔ tuyen bat co"),
+    # ⭐⭐ `C10` (`WO-295`): `IX.DRV` driver theo (loai, CDT1, thang) doc tu KHO config chi-them;
+    #    o thieu ⇒ liet ke CO TEN (⛔ 0). `GET`, ⛔ ghi. Loc `?loai=` `?ky=`.
+    Tuyen("GET", f"{TIEN_TO}/config/drv", "cau_hinh_drv",
+          ("fls_cau_hinh_ban", "fls_cau_hinh_dong"),
+          mo_ta="IX.DRV driver theo (loai GI_PE·GI_PM·NOEM, CDT1, thang) 238 o so + 146 o thieu "
+                "CO TEN (⛔ 0, ⛔ o cung H1000); doc tu KHO config chi-them (C10)"),
 )
 
 

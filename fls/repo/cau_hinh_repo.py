@@ -42,7 +42,7 @@ from datetime import date, datetime
 from pathlib import Path
 from typing import Any, Iterable, Mapping
 
-from fls.cau_hinh import ban_ky, dong_pl, fx, hd, ky, luat_pb, to_chuc, vendor
+from fls.cau_hinh import ban_ky, dong_pl, driver, fx, hd, ky, luat_pb, to_chuc, vendor
 from fls.repo import ghi_tay
 
 BANG_FX = fx.BANG                 # "IX.FX"
@@ -53,6 +53,7 @@ BANG_VEN = vendor.BANG           # "IX.VEN" — vendor · network · cách tính
 BANG_ORG = to_chuc.BANG          # "IX.ORG" — CDT Correct + TK→LE (`C8`)
 BANG_PL = dong_pl.BANG           # "IX.PL" — dòng PL là biểu thức trên cây HD (`C12`)
 BANG_ALR = luat_pb.BANG          # "IX.ALR" — luật phân bổ hiệu lực theo kỳ + cờ (`C11`)
+BANG_DRV = driver.BANG           # "IX.DRV" — driver theo (loại, CDT1, tháng) (`C10`)
 BANG_KY_FX = "IX.FX · KY"        # bản KÝ tháng của IX.FX (`C7`) — mỗi bản = mọi chữ ký tới lúc ấy
 
 # ⭐ Danh mục `bang` config HỢP LỆ *(AP: IX.FX · IX.HD · IX.ORG · IX.PER · IX.VEN ·
@@ -186,6 +187,13 @@ def _alr_tu_cap(cap: Iterable[tuple[str, Any]], nguon: str) -> luat_pb.BangALR:
     return luat_pb.kiem(dong, nguon=nguon)       # ⛔ Mapping ⇒ kiem bắt "⛔ đối tượng"
 
 
+def _drv_tu_cap(cap: Iterable[tuple[str, Any]], nguon: str) -> driver.BangDRV:
+    dong: list[Any] = []
+    for khoa, gt in cap:
+        dong.append({"khoa": khoa, **gt} if isinstance(gt, Mapping) else gt)
+    return driver.kiem(dong, nguon=nguon)        # ⛔ Mapping ⇒ kiem bắt "⛔ đối tượng"
+
+
 def _kiem_mm(cap: Iterable[tuple[str, Any]]) -> None:
     """MM ⛔ có lõi `kiem` dựng-lại riêng *(`hd.doc_mm_van_ban` ăn VĂN BẢN)* ⇒ kiểm HÌNH
     đã lưu: mỗi `gia_tri` ĐÚNG tập khoá `{hd_code, thu_tu}`, `hd_code` ⛔ rỗng, `thu_tu`
@@ -264,6 +272,8 @@ def _kiem_noi_dung(bang: str, cap: list[tuple[str, Any]]) -> None:
         _kiem_org(cap)
     elif bang == BANG_ALR:
         _alr_tu_cap(cap, nguon="(kiem truoc khi ghi)")    # `LoiLuatPB` CÓ TÊN, ⛔ bọc lại
+    elif bang == BANG_DRV:
+        _drv_tu_cap(cap, nguon="(kiem truoc khi ghi)")   # `LoiDRV` CÓ TÊN, ⛔ bọc lại
     elif bang == BANG_PER:
         ky.kiem(dict(cap), nguon="(kiem truoc khi ghi)")   # `LoiKy` CÓ TÊN, ⛔ bọc lại
     elif bang == BANG_PL:
@@ -623,6 +633,30 @@ def doc_alr(conn) -> luat_pb.BangALR:
         raise BanHong(
             "⛔ bản `IX.ALR` phiên bản %s trong kho ⛔ ĐỌC ra được *(⛔ qua `nap`?)*"
             % ban.phien_ban) from e
+
+
+# ── IX.DRV — driver theo (loại, CDT1, tháng) (`C10` · `WO-295`) ───────────────────────
+def nap_ix_drv(conn, duong: str, *, actor: str, nguon: str | None = None) -> BanCauHinh:
+    """Nạp ảnh DT10 `ix_drv.json` *(đường TRUYỀN VÀO)* ⇒ phiên bản mới của `IX.DRV`: 21 dòng số +
+    146 dòng `@thieu:` + 304 dòng `@nb_le:`. Dùng lại `nap` *(⛔ chép khuôn kho)*; số ô ≠ 238/146 ⇒
+    `LoiDRV` ⛔ ghi."""
+    anh = json.loads(Path(duong).read_text(encoding="utf-8"))
+    return nap(conn, BANG_DRV, driver.dung_tu_anh(anh), nguon=nguon or duong, actor=actor)
+
+
+def doc_drv(conn) -> driver.BangDRV:
+    """`IX.DRV` mới nhất, dựng lại qua `driver.kiem`. `ChuaKhai` nếu chưa nạp; bản BẨN ⇒ `BanHong`."""
+    ban = _doc_ban(conn, BANG_DRV)
+    try:
+        return _drv_tu_cap(ban.dong, ban.nguon)
+    except driver.LoiDRV as e:
+        raise BanHong("⛔ bản `IX.DRV` phiên bản %s trong kho ⛔ ĐỌC ra được *(⛔ qua `nap`?)*"
+                      % ban.phien_ban) from e
+
+
+def driver_cua(conn, loai: str, cdt1: str, thang: Any) -> float:
+    """Driver `(loai, cdt1, thang)` từ KHO. Ô thiếu ⇒ `driver.DrvThieu` CÓ TÊN."""
+    return doc_drv(conn).driver_cua(loai, cdt1, thang)
 
 
 # ── IX.FX · KÝ THÁNG (`C7`, `WO-212`, D1) ─────────────────────────────────────

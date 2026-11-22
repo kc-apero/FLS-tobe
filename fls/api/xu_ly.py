@@ -22,6 +22,7 @@ from typing import Any, Callable
 
 from fls.adapters.pm_join import canon_ref
 from fls.cau_hinh import ban_ky, fx, hd, ky, luat_pb, vendor
+from fls.cau_hinh import driver as drv_mod
 from fls.repo import cau_hinh_repo as chc
 from fls.repo import do_mau_so as dms
 from fls.repo import doc_bao_cao as bc
@@ -1291,3 +1292,53 @@ def cau_hinh_alr(yc: YeuCau):
 
 
 HAM.update({"cau_hinh_alr": cau_hinh_alr})
+
+
+# ══ ⭐⭐ ISP 3.1.2 · `C10` (`WO-295`) — `IX.DRV`: driver theo (loại, CDT1, tháng) ══
+# Khuôn `cau_hinh_alr`: đọc KHO, `run_id` ⇒ 400, lỗi có TÊN. `GET`, ⛔ ghi. Lọc `?loai=` · `?ky=`.
+def cau_hinh_drv(yc: YeuCau):
+    """`GET /config/drv` — `{bang, nguon, so_o_so, so_o_thieu, loai, cdt1, o_thieu_theo_ly_do,
+    luoi:[{loai, cdt1, nam, thang:{yyyymm: số|null}}], o_thieu:[…], nb_le_so_dong}`."""
+    if yc.pv.kieu != "nap_that":
+        raise LoiCua("FLS-BAD-REQUEST",
+                     f"bang IX.DRV ⛔ theo lan nap — bo `run_id` "
+                     f"({yc.pv.mo_ta()}): `meta` ⛔ duoc khai mot pham vi ⛔ ap")
+    loai = yc.q.get("loai")
+    if loai is not None and loai not in drv_mod.LOAI:
+        raise LoiCua("FLS-BAD-REQUEST", f"loai={loai!r} ⛔ thuoc {list(drv_mod.LOAI)}")
+    ky = yc.q.get("ky")
+    if ky is not None and (not ky.isdigit() or not 1 <= int(ky) % 100 <= 12
+                           or not 190001 <= int(ky) <= 299912):
+        raise LoiCua("FLS-BAD-REQUEST", f"ky={ky!r} ⛔ yyyymm")
+    try:
+        b = chc.doc_drv(yc.conn)
+    except chc.ChuaKhai as e:
+        raise LoiCua("FLS-CAUHINH-CHUA-KHAI", str(e)) from e
+    except chc.BangLa as e:
+        raise LoiCua("FLS-CAUHINH-BANG-LA", str(e)) from e
+    except chc.BanHong as e:
+        raise LoiCua("FLS-CAUHINH-BAN-HONG",
+                     "ban cau hinh trong kho ⛔ doc ra duoc — bao nguoi dung he") from e
+    ok = lambda l, t: (loai is None or l == loai) and (ky is None or int(ky) == t)   # noqa: E731
+    luoi = []
+    for (l, c), r in sorted(b.luoi.items()):
+        if loai is not None and l != loai:
+            continue
+        th = {int(r["nam"]) * 100 + i: r[drv_mod.THANG[i - 1]] for i in range(1, 13)}
+        if ky is not None:
+            th = {t: v for t, v in th.items() if t == int(ky)}
+        luoi.append({"loai": l, "cdt1": c, "nam": r["nam"], "thang": {str(t): v for t, v in th.items()}})
+    thieu = [{"loai": l, "cdt1": c, "thang": t, "ly_do": ly}
+             for (l, c, t), ly in sorted(b.thieu.items()) if ok(l, t)]
+    dem: dict[str, int] = {}
+    for x in thieu:
+        dem[x["ly_do"]] = dem.get(x["ly_do"], 0) + 1
+    return {"bang": drv_mod.BANG, "nguon": b.nguon,
+            "so_o_so": sum(1 for x in luoi for v in x["thang"].values() if v is not None),
+            "so_o_thieu": len(thieu), "loai": list(drv_mod.LOAI),
+            "cdt1": list(drv_mod.CDT1_LUOI), "luoi": luoi, "o_thieu": thieu,
+            "o_thieu_theo_ly_do": dem,
+            "nb_le_so_dong": len(b.nb_le)}, "flash"      # NB theo LE: ⛔ trong lưới CDT1 (AC-4)
+
+
+HAM.update({"cau_hinh_drv": cau_hinh_drv})
