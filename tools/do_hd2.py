@@ -1858,7 +1858,7 @@ def main(argv: list[str] | None = None) -> int:
         do_hd2_c5c.in_bao(tq5c)
         if a.ghi:
             _ghi_cong("WP-C5c", tq5c.hd2_cong)
-        return 0 if tq5c.phan_xu.dat else 1
+        return 0 if tq5c.dat is True else 1          # H14-R1-01: `None` (⛔ đo được) ⛔ phải thành công
     if a.goi == "WP-C3d":
         from tools import do_hd2_c3d            # H8 — tệp riêng; nhập muộn (tệp ấy nhập tệp này)
         tq3d = do_hd2_c3d.chay_wp_c3d(a.dsn)

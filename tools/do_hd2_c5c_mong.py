@@ -3,13 +3,17 @@
 Nhãn Đ4 *(mỗi số nói nó đếm gì)* — theo TỪNG đáp án:
   · `dem.tong_o` = ô đáp án SO được: ô là số · cột thuộc trục *(ngày của tháng `ky` | kỳ luỹ kế)* · phần có đầu vào ·
     báo cáo engine có ô. = `o_0_0` *(engine 0 VÀ đáp án 0 — ⛔ bằng chứng dương)* + `o_co_so`. `khop` = `khop_co_so`
-    *(khớp THẬT ≤ 1e-12)* + `o_0_0`. 607 25.649 · 608 8.510 · 609 25.851 · 610 12.380.
+    *(khớp THẬT ≤ 1e-12)* + `o_0_0`. 607 25.649 · 608 8.510 · 609 25.851 · 610 12.380 · 615 12.380 *(vòng sửa R1
+    `KQ-313` `-02`: khuôn CF `Unit: mUSD` ↔ `ngay` · `CM Cumulative` ↔ `luy_ke`; lớp `lech_ban_ccr_vs_cf` 671 + `ite_alias`
+    35)*.
   · `lop` — ô lệch theo lớp THỪA KẾ bằng truy ngược ô nguồn *(số ô + sha256 của (ô, engine, đáp án))*; `lech_FLS` = [].
   · NGOÀI mẫu số, có tên: `chua_co_dau_vao` *(phần ⛔ engine: `luy_ke:FS1` · `hr`)* · `engine_vang` *(lý do: KPI CFA1
     engine ⛔ tính · `PL5` IX.PL ⛔ tính được · mã sổ ngoài cây IX.HD `HDAP·HDC·HDCI·HDH·HDT` · ngày sau ngày đọc đầu
     vào 2026-11-18)* · `ngoai_truc` *(cột `AK` ⛔ ngày · hàng ⛔ nhãn khối/mã)*.
-  · `chinh_tay` — ô lệch `loi_as_is` với |e − a| = 0,5: chỉnh tay ⛔ actor *(gốc ATL `AH12` −0,5)*.
-  · `dung` — đáp án DỪNG cả bản *(605 · 615)*: số ô SỐ ⛔ so *(Đ3: > 0)*.
+  · `chinh_tay` — chuỗi lan từ gốc ATL `AH12` *(`GROUP·OMC·2025M02` −0,5)*: mã khối GROUP mang 0,5 ở M02 VÀ Q1 · H1 · Y
+    = **68** *(17 mã × 4 kỳ)*; `chinh_tay_trung_0_5` = ô `loi_as_is` |e − a| = 0,5 NGOÀI chuỗi = **3** *(`NPC` M01 · M02 ·
+    `PL5` M02 — `H14-R1-04`)*. `ngoai_khuon` *(615)* = đoạn sổ ⛔ khuôn CF *(bản sao DR3 · hàng ⛔ khối)*.
+  · `dung` — đáp án DỪNG cả bản *(605 — 615 hết DỪNG ở vòng sửa R1)*: số ô SỐ ⛔ so *(Đ3: > 0)*.
   · `check` — CHECK IX.PL của BÁO CÁO engine theo (phần, khối, cột): chỉ ĐẾM + băm danh sách đỏ *(⛔ phán)*.
 """
 from typing import Any
@@ -42,7 +46,7 @@ MONG: dict[str, Any] = {'dap_an': {'607': {'dem': {'tong_o': 25649, 'o_0_0': 174
                                     'ma_ngoai_luoi:HDCI': 209,
                                     'ma_ngoai_luoi:HDH': 132,
                                     'ma_ngoai_luoi:HDT': 132},
-                    'ngoai_truc': {'hang_khong_nhan': 17, 'ngay:ak': 390},
+                    'ngoai_truc': {'hang_khong_nhan': 17, 'ngay:ak': 390, 'o_hang_khong_nhan': 365},
                     'chinh_tay': ['luy_ke:FS2|GROUP|CAC|2025',
                                   'luy_ke:FS2|GROUP|CAC|2025H1',
                                   'luy_ke:FS2|GROUP|CAC|2025M02',
@@ -75,8 +79,6 @@ MONG: dict[str, Any] = {'dap_an': {'607': {'dem': {'tong_o': 25649, 'o_0_0': 174
                                   'luy_ke:FS2|GROUP|NCF|2025H1',
                                   'luy_ke:FS2|GROUP|NCF|2025M02',
                                   'luy_ke:FS2|GROUP|NCF|2025Q1',
-                                  'luy_ke:FS2|GROUP|NPC|2025M01',
-                                  'luy_ke:FS2|GROUP|NPC|2025M02',
                                   'luy_ke:FS2|GROUP|NP|2025',
                                   'luy_ke:FS2|GROUP|NP|2025H1',
                                   'luy_ke:FS2|GROUP|NP|2025M02',
@@ -101,7 +103,6 @@ MONG: dict[str, Any] = {'dap_an': {'607': {'dem': {'tong_o': 25649, 'o_0_0': 174
                                   'luy_ke:FS2|GROUP|PL4|2025H1',
                                   'luy_ke:FS2|GROUP|PL4|2025M02',
                                   'luy_ke:FS2|GROUP|PL4|2025Q1',
-                                  'luy_ke:FS2|GROUP|PL5|2025M02',
                                   'luy_ke:FS2|GROUP|PL6|2025',
                                   'luy_ke:FS2|GROUP|PL6|2025H1',
                                   'luy_ke:FS2|GROUP|PL6|2025M02',
@@ -114,6 +115,10 @@ MONG: dict[str, Any] = {'dap_an': {'607': {'dem': {'tong_o': 25649, 'o_0_0': 174
                                   'luy_ke:FS2|GROUP|PL8|2025H1',
                                   'luy_ke:FS2|GROUP|PL8|2025M02',
                                   'luy_ke:FS2|GROUP|PL8|2025Q1'],
+                    'chinh_tay_trung_0_5': ['luy_ke:FS2|GROUP|NPC|2025M01',
+                                            'luy_ke:FS2|GROUP|NPC|2025M02',
+                                            'luy_ke:FS2|GROUP|PL5|2025M02'],
+                    'ngoai_khuon': {},
                     'lech_FLS': []},
             '608': {'dem': {'tong_o': 8510, 'o_0_0': 8240, 'khop_co_so': 270, 'khop': 8510, 'o_co_so': 270},
                     'lop': {},
@@ -123,8 +128,10 @@ MONG: dict[str, Any] = {'dap_an': {'607': {'dem': {'tong_o': 25649, 'o_0_0': 174
                                     'ma_ngoai_luoi:HDCI': 92,
                                     'ma_ngoai_luoi:HDH': 92,
                                     'ma_ngoai_luoi:HDT': 92},
-                    'ngoai_truc': {'hang_khong_nhan': 12, 'ngay:ak': 390},
+                    'ngoai_truc': {'hang_khong_nhan': 12, 'ngay:ak': 390, 'o_hang_khong_nhan': 181},
                     'chinh_tay': [],
+                    'chinh_tay_trung_0_5': [],
+                    'ngoai_khuon': {},
                     'lech_FLS': []},
             '609': {'dem': {'tong_o': 25851, 'o_0_0': 17606, 'khop_co_so': 4387, 'khop': 21993, 'o_co_so': 8245},
                     'lop': {'chua_co_dau_vao': {'so_o': 862,
@@ -152,7 +159,7 @@ MONG: dict[str, Any] = {'dap_an': {'607': {'dem': {'tong_o': 25649, 'o_0_0': 174
                                     'ma_ngoai_luoi:HDCI': 185,
                                     'ma_ngoai_luoi:HDH': 136,
                                     'ma_ngoai_luoi:HDT': 136},
-                    'ngoai_truc': {'hang_khong_nhan': 37},
+                    'ngoai_truc': {'hang_khong_nhan': 37, 'o_hang_khong_nhan': 439},
                     'chinh_tay': ['luy_ke:FS2|GROUP|CAC|2025',
                                   'luy_ke:FS2|GROUP|CAC|2025H1',
                                   'luy_ke:FS2|GROUP|CAC|2025M02',
@@ -185,8 +192,6 @@ MONG: dict[str, Any] = {'dap_an': {'607': {'dem': {'tong_o': 25649, 'o_0_0': 174
                                   'luy_ke:FS2|GROUP|NCF|2025H1',
                                   'luy_ke:FS2|GROUP|NCF|2025M02',
                                   'luy_ke:FS2|GROUP|NCF|2025Q1',
-                                  'luy_ke:FS2|GROUP|NPC|2025M01',
-                                  'luy_ke:FS2|GROUP|NPC|2025M02',
                                   'luy_ke:FS2|GROUP|NP|2025',
                                   'luy_ke:FS2|GROUP|NP|2025H1',
                                   'luy_ke:FS2|GROUP|NP|2025M02',
@@ -211,7 +216,6 @@ MONG: dict[str, Any] = {'dap_an': {'607': {'dem': {'tong_o': 25649, 'o_0_0': 174
                                   'luy_ke:FS2|GROUP|PL4|2025H1',
                                   'luy_ke:FS2|GROUP|PL4|2025M02',
                                   'luy_ke:FS2|GROUP|PL4|2025Q1',
-                                  'luy_ke:FS2|GROUP|PL5|2025M02',
                                   'luy_ke:FS2|GROUP|PL6|2025',
                                   'luy_ke:FS2|GROUP|PL6|2025H1',
                                   'luy_ke:FS2|GROUP|PL6|2025M02',
@@ -224,6 +228,10 @@ MONG: dict[str, Any] = {'dap_an': {'607': {'dem': {'tong_o': 25649, 'o_0_0': 174
                                   'luy_ke:FS2|GROUP|PL8|2025H1',
                                   'luy_ke:FS2|GROUP|PL8|2025M02',
                                   'luy_ke:FS2|GROUP|PL8|2025Q1'],
+                    'chinh_tay_trung_0_5': ['luy_ke:FS2|GROUP|NPC|2025M01',
+                                            'luy_ke:FS2|GROUP|NPC|2025M02',
+                                            'luy_ke:FS2|GROUP|PL5|2025M02'],
+                    'ngoai_khuon': {},
                     'lech_FLS': []},
             '610': {'dem': {'tong_o': 12380, 'o_0_0': 9827, 'khop_co_so': 2518, 'khop': 12345, 'o_co_so': 2553},
                     'lop': {'ite_alias': {'so_o': 35,
@@ -236,10 +244,33 @@ MONG: dict[str, Any] = {'dap_an': {'607': {'dem': {'tong_o': 25649, 'o_0_0': 174
                                     'ma_ngoai_luoi:HDH': 120,
                                     'ma_ngoai_luoi:HDT': 120,
                                     'ngay_sau_ngay_doc_dau_vao': 3240},
-                    'ngoai_truc': {'hang_khong_nhan': 10, 'ngay:ak': 390},
+                    'ngoai_truc': {'hang_khong_nhan': 10, 'ngay:ak': 390, 'o_hang_khong_nhan': 315},
                     'chinh_tay': [],
+                    'chinh_tay_trung_0_5': [],
+                    'ngoai_khuon': {},
+                    'lech_FLS': []},
+            '615': {'dem': {'tong_o': 12380, 'o_0_0': 9651, 'khop_co_so': 2023, 'khop': 11674, 'o_co_so': 2729},
+                    'lop': {'ite_alias': {'so_o': 35,
+                                          'sha256': '28da7f334f886ef4f4c3b22d00478e34256dd069484d2f3d9b9a38930e753f1d'},
+                            'lech_ban_ccr_vs_cf': {'so_o': 671,
+                                                   'sha256': 'b98af46f7addc2519b3767215b86b6bb3657c2eae2187d3581532f33e849d738'}},
+                    'chua_co_dau_vao': {'cash_balance_by_le': 1495,
+                                        'hr': 3147,
+                                        'raw_data_management': 1040,
+                                        'tien_dau_bao_cao': 1071},
+                    'engine_vang': {'kpi_cfa1_engine_chua_tinh': 6200,
+                                    'ma_ngoai_luoi:HDAP': 120,
+                                    'ma_ngoai_luoi:HDC': 120,
+                                    'ma_ngoai_luoi:HDCI': 120,
+                                    'ma_ngoai_luoi:HDH': 120,
+                                    'ma_ngoai_luoi:HDT': 120,
+                                    'ngay_sau_ngay_doc_dau_vao': 3240},
+                    'ngoai_truc': {'hang_khong_nhan': 14, 'ngay:ak': 390, 'o_hang_khong_nhan': 410},
+                    'chinh_tay': [],
+                    'chinh_tay_trung_0_5': [],
+                    'ngoai_khuon': {'ban_sao_DR3_A_CCR': 18046, 'daily_transactions': 0, 'person_hang_khong_khoi': 2},
                     'lech_FLS': []}},
- 'dung': {'605': 13706, '615': 48021},
+ 'dung': {'605': 13706},
  'check': {'607': {'theo_phan': {'ngay': {'NB = 0': {'dat_co_so': 0, 'dat_0_0': 147, 'do': 3, 'khong_do_duoc': 0},
                                           'NIS+INT+PIT+COM = CXA+GAH+DC+MC': {'dat_co_so': 0,
                                                                               'dat_0_0': 149,
@@ -278,6 +309,18 @@ MONG: dict[str, Any] = {'dap_an': {'607': {'dem': {'tong_o': 25649, 'o_0_0': 174
                    'so_do': 231,
                    'do_sha256': '8371998326b5071ae802e4dc5ca6202934566aad2bfdbe5c244c25a78ea171ef'},
            '610': {'theo_phan': {'ngay': {'NB = 0': {'dat_co_so': 0, 'dat_0_0': 82, 'do': 8, 'khong_do_duoc': 60},
+                                          'NIS+INT+PIT+COM = CXA+GAH+DC+MC': {'dat_co_so': 0,
+                                                                              'dat_0_0': 82,
+                                                                              'do': 8,
+                                                                              'khong_do_duoc': 60}},
+                                 'luy_ke': {'NB = 0': {'dat_co_so': 0, 'dat_0_0': 59, 'do': 131, 'khong_do_duoc': 0},
+                                            'NIS+INT+PIT+COM = CXA+GAH+DC+MC': {'dat_co_so': 0,
+                                                                                'dat_0_0': 139,
+                                                                                'do': 51,
+                                                                                'khong_do_duoc': 0}}},
+                   'so_do': 198,
+                   'do_sha256': '70b40b011750da1487e02afb5804fe958752d2c6eb73a40174852a771c8c8790'},
+           '615': {'theo_phan': {'ngay': {'NB = 0': {'dat_co_so': 0, 'dat_0_0': 82, 'do': 8, 'khong_do_duoc': 60},
                                           'NIS+INT+PIT+COM = CXA+GAH+DC+MC': {'dat_co_so': 0,
                                                                               'dat_0_0': 82,
                                                                               'do': 8,

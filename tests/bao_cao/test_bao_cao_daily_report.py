@@ -1,7 +1,8 @@
 """`fls.bao_cao.bao_cao` — RP.PL · RP.CF dựng theo khuôn *(ISP 3.1.2 · Step 46 · H14 · `WO-311`)*: bài ĐƠN VỊ trên lưới
 tổng hợp *(⛔ kho, ⛔ tệp)*.
 
-AC-2 `H14-B2`: FS1 · FS2 · FS3 = CÙNG engine khác tham số — đổi FS ⇒ ĐÚNG phần luỹ kế đổi, phần ngày giữ từng byte.
+AC-2 `H14-B2`: FS1 · FS2 · FS1_FS2_gop · FS3 = CÙNG engine khác tham số — đổi FS ⇒ ĐÚNG phần luỹ kế đổi, phần ngày giữ
+      từng byte. ⭐ `H14-R1-08` (KQ-313): bản 609 = `FS1_FS2_gop` *(hợp hai khối)*; FS3 = cấp tin cậy CAO NHẤT ⇒ luỹ kế DỪNG.
 AC-3: đầu ra là JSON THUẦN theo hợp đồng C13 *(`ban_ky.checksum` nhận; cùng đầu vào ⇒ cùng checksum)*.
 AC-4: đầu vào = lưới engine — đột biến 1 ô đầu vào ⇒ ĐÚNG ô báo cáo chiếu từ nó đổi, ⛔ ô nào khác.
 """
@@ -65,7 +66,7 @@ def test_ky_hai_khuon_cung_nghia():
 # ── AC-2 · FS là THAM SỐ ──────────────────────────────────────────────────────────────────────────────────────────────
 
 def test_AC2_FS_cung_engine_khac_tham_so():
-    b1, b2, b3 = (bc.rp_pl(KY, fs, _nguon()) for fs in ("FS1", "FS2", "FS3"))
+    b1, b2, b3 = (bc.rp_pl(KY, fs, _nguon()) for fs in ("FS1", "FS2", "FS1_FS2_gop"))
     ngay = _phan(b2, "ngay")
     assert len(ngay) == 5 * len(MA) * 30                              # Đ3: phần chung ⛔ rỗng (5 khối LE × 3 mã × 30 ngày)
     assert _phan(b1, "ngay") == ngay == _phan(b3, "ngay")              # phần CHUNG giữ từng ô
@@ -74,7 +75,22 @@ def test_AC2_FS_cung_engine_khac_tham_so():
     assert [p["id"] for p in b3["phan"]] == ["ngay", "luy_ke:FS1", "luy_ke:FS2"]
     assert len(_phan(b2, "luy_ke:FS2")) == 11 * len(MA) * 19          # 11 nhãn khối (SHQ gộp) × 3 mã × 19 kỳ
     assert _phan(b3, "luy_ke:FS2") == _phan(b2, "luy_ke:FS2")
-    assert b3["o"] == {**b1["o"], **b2["o"]}                            # FS3 = HỢP hai bản, ⛔ ô lạ
+    assert b3["o"] == {**b1["o"], **b2["o"]}                            # FS1_FS2_gop = HỢP hai bản, ⛔ ô lạ
+
+
+def test_R1_08_FS3_la_cap_tin_cay_cao_nhat_DUNG_co_ten_khong_phai_hop_FS1_FS2():
+    """Ảnh 609 + 615 ghi FS3 = "mức độ tin cậy giao dịch đủ (PI&PM; Finance&Non-Finance) … Audits/Due Diligence" — cấp
+    CAO NHẤT, ⛔ hợp FS1 ∪ FS2. ⛔ nguồn ⇒ luỹ kế DỪNG `chua_co_dau_vao` *(⛔ trả nhãn FS3 cho dữ liệu FS1/FS2)*."""
+    n = _nguon(atl_fs1=_luoi_ky())                                    # có ĐỦ nguồn FS1 + FS2 ⇒ FS3 vẫn DỪNG
+    b3 = bc.rp_pl(KY, "FS3", n)
+    gop = bc.rp_pl(KY, "FS1_FS2_gop", n)
+    assert [p["id"] for p in b3["phan"]] == ["ngay", "luy_ke:FS3"]
+    assert [p.get("dung") for p in b3["phan"]] == [None, "chua_co_dau_vao"]
+    (c,) = b3["chua_co_dau_vao"]
+    assert (c["phan"], c["nguon"]) == ("luy_ke:FS3", "fs3_tin_cay") and "Non-Finance" in c["can"] and "BA" in c["can"]
+    assert not [k for k in b3["o"] if k.startswith("luy_ke")]           # ⛔ ô luỹ kế nào mang nhãn FS3
+    assert len(_phan(gop, "luy_ke:FS2")) > 0 and b3["o"] != gop["o"]   # Đ3: bản gộp có ô — FS3 ⛔ là nó
+    assert _phan(b3, "ngay") == _phan(gop, "ngay")                      # phần ngày chung (D5 A)
 
 
 def test_AC2_FS1_thieu_nguon_DUNG_co_ten_khong_ngam_0():
@@ -123,10 +139,10 @@ def test_CF_hai_nam_luy_ke_va_hr_dung():
 # ── AC-3 · JSON THUẦN theo hợp đồng C13 ───────────────────────────────────────────────────────────────────────────────
 
 def test_AC3_json_thuan_checksum_on_dinh():
-    b = bc.rp_pl(KY, "FS3", _nguon())
+    b = bc.rp_pl(KY, "FS1_FS2_gop", _nguon())
     s = json.dumps(b, sort_keys=True, ensure_ascii=False, allow_nan=False)  # ⛔ Decimal/date lọt
     assert json.loads(s) == b
-    assert ban_ky.checksum(b) == ban_ky.checksum(bc.rp_pl(KY, "FS3", _nguon()))
+    assert ban_ky.checksum(b) == ban_ky.checksum(bc.rp_pl(KY, "FS1_FS2_gop", _nguon()))
     assert ban_ky.checksum(b) != ban_ky.checksum(bc.rp_pl(KY, "FS2", _nguon()))
 
 
@@ -140,13 +156,13 @@ def test_AC4_dot_bien_mot_o_ngay_dung_mot_o_bao_cao():
     n = _nguon()
     d = _luoi_ngay()
     d[("HGO6", "OMC", SER[4])] += Decimal("0.001")
-    assert _khac(bc.rp_pl(KY, "FS3", n), bc.rp_pl(KY, "FS3", _nguon(pla3_daily=d))) == {"ngay|HGO2|OMC|2025-11-05"}
+    assert _khac(bc.rp_pl(KY, "FS1_FS2_gop", n), bc.rp_pl(KY, "FS1_FS2_gop", _nguon(pla3_daily=d))) == {"ngay|HGO2|OMC|2025-11-05"}
 
 
 def test_AC4_dot_bien_SHQ1_dung_o_SHQ_moi_ban_FS():
     a = _luoi_ky()
     a[("SHQ1", "NB", "2025Q2")] += Decimal(1)
-    kq = _khac(bc.rp_pl(KY, "FS3", _nguon(atl_fs1=_luoi_ky())), bc.rp_pl(KY, "FS3", _nguon(atl=a, atl_fs1=_luoi_ky())))
+    kq = _khac(bc.rp_pl(KY, "FS1_FS2_gop", _nguon(atl_fs1=_luoi_ky())), bc.rp_pl(KY, "FS1_FS2_gop", _nguon(atl=a, atl_fs1=_luoi_ky())))
     assert kq == {"luy_ke:FS2|SHQ|NB|2025Q2"}                           # FS1 có nguồn RIÊNG ⇒ ⛔ đổi
 
 

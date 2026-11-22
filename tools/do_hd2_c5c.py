@@ -19,8 +19,10 @@
      Ô nguồn lệch mà cổng thượng nguồn ⛔ gán lớp ⇒ `lech_FLS` *(mong 0)*.
 ⭐ **Ô chỉnh tay** *(ISP mục 3)*: ô lệch có lớp chứa `loi_as_is` và `|e − a| = 0,5` *(±1e-9)* ⇒ liệt kê tên
    "chỉnh tay ⛔ actor" *(gốc: ATL `AH12` `='…'!AH12-0.5` — `phu.o_chinh_tay` của ảnh 605)*; ⛔ chép vào config.
-⭐ Phần ⛔ có đầu vào *(FS1 luỹ kế · `hr` · cả 605 · 615)* ⇒ DỪNG, đếm ô đáp án bỏ + câu "cần ảnh nào" *(tiền lệ
-   DT7b)*, NGOÀI mẫu số. CHECK của báo cáo: chỉ ĐẾM + LIỆT KÊ *(câu chặn đóng sổ chờ chủ)*.
+⭐ Phần ⛔ có đầu vào *(FS1 luỹ kế · `hr` · cả 605 · đoạn 615 ngoài khuôn CF)* ⇒ DỪNG, đếm ô đáp án bỏ + câu "cần ảnh
+   nào" *(tiền lệ DT7b)*, NGOÀI mẫu số. CHECK của báo cáo: chỉ ĐẾM + LIỆT KÊ *(câu chặn đóng sổ chờ chủ)*.
+⭐ Vòng sửa R1 `KQ-313`: 615 so bằng khuôn CF *(`-02`)* · đáp án ô so = 0 chưa ký ⇒ cổng `null` *(`-01`)* · chỉnh tay
+   theo chuỗi lan `AH12` *(`-04`)* · 609 = `FS1_FS2_gop`, ⛔ FS3 *(`-08`)*.
 """
 from __future__ import annotations
 
@@ -47,24 +49,65 @@ ATOL_CHINH_TAY = Decimal("1e-9")
 CHINH_TAY = Decimal("0.5")
 LECH_FLS = "lech_FLS"
 LECH_NGUON = "lech_dap_an_nguon"
+#: ⭐ `H14-R1-02`: ô 615 *(A-CCR `5. Daily Report 2`, DÁN GIÁ TRỊ — DT13 `BG-320` §1)* lệch mà engine = đáp án CF report
+#: 610 cùng khoá ⇒ **bản chính thức ≠ bản CF report** *(đo 22/11: 671/706 ô lệch của 615; 35 còn lại `ite_alias` như 610)*
+LECH_CCR_CF = "lech_ban_ccr_vs_cf"
 
 #: đáp án → (tệp, loại, FS, kỳ) *(kỳ = tháng của trục ngày `From`/`To` — đo ở `BG-270`)*
 DAP_AN: dict[str, dict[str, Any]] = {
     "607": {"anh": "daily_report_3_fs2", "loai": "PL", "fs": "FS2", "ky": 202511},
     "608": {"anh": "daily_report_3_fs1", "loai": "PL", "fs": "FS1", "ky": 202511},
-    "609": {"anh": "daily_report_3_gop", "loai": "PL", "fs": "FS3", "ky": 202512},
+    "609": {"anh": "daily_report_3_gop", "loai": "PL", "fs": "FS1_FS2_gop", "ky": 202512},
     "610": {"anh": "daily_report_2", "loai": "CF", "fs": "-", "ky": 202611},
+    # ⭐ `H14-R1-02` (KQ-313): 615 = A-CCR `5. Daily Report` = bản CHÍNH THỨC (AP §3.5.3 D5). Đo R1: 22.420/48.021 ô số
+    #   (46,7 %) nằm trên ĐÚNG bộ khoá engine sinh cho 610 *(cùng kỳ 11/2026)* ⇒ thiếu KHUÔN, ⛔ thiếu đầu vào. Khuôn =
+    #   nhãn đoạn `Unit: mUSD` ↔ `ngay`, `CM Cumulative` ↔ `luy_ke` của CÙNG báo cáo CF engine. Đoạn khác ⇒ NGOÀI mẫu số
+    #   CÓ TÊN (`ngoai_khuon_615`). `doi_chieu` = đáp án 610 — chỉ để gán lớp `lech_ban_ccr_vs_cf` ở bước SO.
+    "615": {"anh": "ccr_daily_report", "loai": "CF", "fs": "-", "ky": 202611, "doi_chieu": "610",
+            "phan_khuon": {"Unit: mUSD": "ngay", "CM Cumulative": "luy_ke"}},
 }
-#: đáp án DỪNG cả bản *(⛔ engine FLS nào sinh được nguồn)* — câu "cần ảnh nào"
+#: 615 — đoạn sổ ⛔ thuộc khuôn CF engine ⇒ (loại, tên, cần gì). Loại `chua_co_dau_vao` = cần ảnh ĐẦU VÀO; `ngoai_khuon` =
+#: ô ⛔ phải của báo cáo CF *(đã so ở đáp án khác)*. Khoá = (nhãn đoạn, nhóm khối) — nhóm khối: `GROUP` · `FS` *(khối
+#: `[FSx][PLA3] …`)* · `*`.
+NGOAI_KHUON_615: dict[tuple[str | None, str], tuple[str, str, str]] = {
+    ("CB I Cash Balance by LE I Legal Entity by Currency", "*"): (
+        "chua_co_dau_vao", "cash_balance_by_le",
+        "ảnh số dư A-CCR `2. CCR` + `2. CCR Cash` theo LE × ngày — DT13 đã đóng băng (`ccr_so_du_ccr` · `ccr_so_du_cash`, "
+        "`BG-320`) nhưng CHƯA gộp vào nhánh này ⇒ chờ orchestrator nhắn gộp DT13"),
+    (None, "*"): (
+        "chua_co_dau_vao", "tien_dau_bao_cao",
+        "khối đầu báo cáo `Cash on way` · `Bank` theo LE (hàng 11–55) — chưa đo nguồn (ứng viên: ảnh số dư DT13)"),
+    ("Raw Data Management", "*"): (
+        "chua_co_dau_vao", "raw_data_management",
+        "`Raw Data Management` — 220 công thức nội bộ A-CCR chưa đo (`BG-320` §4)"),
+    ("Unit: person", "GROUP"): (
+        "chua_co_dau_vao", "hr", "ảnh `Report HR` (số người theo Grade) — FLS ⛔ có engine số người (như 610 `hr`)"),
+    ("Unit: person", "FS"): (
+        "ngoai_khuon", "ban_sao_DR3_A_CCR",
+        "bản sao `5. Daily Report 3` của A-CCR (DT13 đo 35.542/35.542 ô số trùng ảnh 609) — đã so ở 609, ⛔ khuôn CF"),
+    ("Unit: person", "*"): ("ngoai_khuon", "person_hang_khong_khoi", "hàng đoạn `Unit: person` ⛔ nhãn khối"),
+    ("Daily Transactions", "*"): ("ngoai_khuon", "daily_transactions", "giao dịch ngày (PII) — ⛔ báo cáo"),
+}
+#: đáp án DỪNG cả bản *(⛔ engine FLS nào sinh được nguồn)* — câu "cần ảnh nào". ⭐ `H14-R1-01`: DỪNG ⇒ ô so = 0 ⇒ cổng
+#: ⛔ đo được ⇒ `dat = null` *(⛔ `true`)* trừ khi chủ ký "DỪNG có tên" ở `DUNG_KY`. ⛔ VÒNG TRÒN: ảnh DT13
+#: `sign_off_dau_vao` NỘI DUNG Y HỆT đáp án 605 *(`BG-320` §2)* ⇒ ⛔ được dùng để dựng 605 *(đổi tên đáp án thành đầu
+#: vào = so đáp án với chính nó)*; được dùng cho 608 *(AS-IS 608 đọc tab Sign off thật)*.
 DUNG: dict[str, dict[str, str]] = {
     "605": {"anh": "daily_report_3",
             "can": "nguồn `[MID][FS1][PLA5]` (P&L VND theo 8 thực thể × 24 tháng 2024–2025, bản dán giá trị Sign off): "
                    "ảnh `[FS1][PLA3]`/`[PLA5]` Y/H/Q/M trước khi dán + đường VND; FLS ⛔ có engine FS1, và 2024 "
-                   "(trước ITL 10/2024) ⛔ có sổ nguồn"},
-    "615": {"anh": "ccr_daily_report",
-            "can": "nguồn `Cash Balance by LE` (số dư tiền mặt/ngân hàng theo LE × ngày, sổ A-CCR): ảnh số dư quỹ + "
-                   "ngân hàng theo ngày; FLS ⛔ có engine số dư (HD4 · CCR ngoài ISP)"},
+                   "(trước ITL 10/2024) ⛔ có sổ nguồn; DT13 (`BG-320`): tab gốc `[FS1][PLA5]` ⛔ còn trong sổ — 0 ứng "
+                   "viên; ⛔ dùng `sign_off_dau_vao` (= chính đáp án 605 ⇒ vòng tròn)"},
 }
+#: ⭐ chữ ký chủ "DỪNG có tên" *(mã đáp án → văn bản + ngày + người ký)*. RỖNG tới khi chủ ký ⇒ 605 giữ cổng `null`.
+#: ⛔ tự điền: orchestrator hỏi chủ *(KQ-313 · câu 1)*.
+DUNG_KY: dict[str, str] = {}
+
+#: ⭐ `H14-R1-04` — gốc ô chỉnh tay ⛔ actor: ATL `AH12` = `GROUP·OMC·2025M02` `='…'!AH12-0.5` *(ghi ở ảnh 605
+#: `phu.o_chinh_tay`: `dong_sheet_atl` 12 · `cot_anh_atl` `y2025_m02` — bài đối chiếu hai nguồn)*. Chuỗi lan = mọi mã của
+#: khối gốc mang ĐỦ `±0,5` ở kỳ gốc VÀ MỌI kỳ cộng dồn chứa nó *(M02 ⇒ Q1 ⇒ H1 ⇒ Y)*: hàng nhận `OMC` qua công thức lan
+#: đủ 4 kỳ; ô `±0,5` ở mã ⛔ lan đủ *(đo: `NPC` M01 · M02, `PL5` M02)* = TRÙNG ngẫu nhiên, liệt kê riêng, ⛔ gọi chỉnh tay.
+GOC_CHINH_TAY = ("GROUP", "OMC", "2025M02")
 
 
 def _so(v: Any) -> Decimal | None:
@@ -125,12 +168,24 @@ def o_dap_an(ma_da: str, anh: Mapping[str, Any]) -> tuple[dict[str, Decimal], Co
     hd_ky = sorted((r, _cot_ky(m)) for r, m in td.items() if str(m.get("g")) in ("2024", "2025", "2026"))
     ra: dict[str, Decimal] = {}
     ngoai = Counter()
+    pk = cfg.get("phan_khuon")
     for r in anh["dong"]:
         ds = int(r["dong_sheet"])
         ph = _chu(r.get("phan")) or _chu(r.get("che_do"))
         kh, ma = _chu(r.get("khoi")), _chu(r.get("ma"))
+        if pk is not None:                                   # 615: nhãn đoạn sổ ⇒ phần của khuôn CF; đoạn khác ⇒ có tên
+            nhan = _chu(r.get("phan"))
+            if nhan not in pk:
+                nhom = "GROUP" if kh == "GROUP" else "FS" if kh and kh.startswith("[FS") else "*"
+                loai, ten, _can = NGOAI_KHUON_615.get((nhan, nhom)) or NGOAI_KHUON_615[(nhan, "*")]
+                ngoai[f"{loai}:{ten}"] += sum(1 for c, v in r.items() if len(c) <= 2 and c.isalpha()
+                                              and _so(v) is not None)
+                continue
+            ph = pk[nhan]
         if kh is None or ma is None:
             ngoai["hang_khong_nhan"] += 1
+            ngoai["o_hang_khong_nhan"] += sum(1 for c, v in r.items() if len(c) <= 2 and c.isalpha()
+                                              and _so(v) is not None)
             continue
         if ph in (None, "ngay"):
             phan, cot = "ngay", cot_ngay
@@ -298,12 +353,34 @@ def _sha(ds: list[str]) -> str:
     return hashlib.sha256("\n".join(sorted(ds)).encode("utf-8")).hexdigest()
 
 
-def so_mot(ma_da: str, anh: Mapping[str, Any], bao: Mapping[str, Any], ne: NguonEngine) -> dict[str, Any]:
-    """So TỪNG Ô một đáp án với báo cáo engine. Trả số đếm *(Đ4 — mỗi khoá nói nó đếm gì)*."""
+def chuoi_chinh_tay(ung_vien: list[str], goc: tuple[str, str, str] = GOC_CHINH_TAY) -> tuple[list[str], list[str]]:
+    """`H14-R1-04`: ô `loi_as_is` có |e − a| = 0,5 ⇒ (chuỗi lan từ gốc `AH12`, trùng ngẫu nhiên). Chuỗi = mã của khối gốc
+    mang 0,5 ở kỳ gốc VÀ mọi kỳ cộng dồn chứa nó *(M ⇒ Q ⇒ H ⇒ Y)*; ⛔ có ô gốc ⇒ chuỗi rỗng *(⛔ đoán)*."""
+    kh0, ma0, ky0 = goc
+    nam, th = int(ky0[:4]), int(ky0[5:])
+    ky_chuoi = {ky0, f"{nam}Q{(th - 1) // 3 + 1}", f"{nam}H{1 if th <= 6 else 2}", f"{nam}"}
+    co: dict[tuple[str, str, str], set[str]] = {}
+    for k in ung_vien:
+        ph, kh, ma, c = k.split("|")
+        co.setdefault((ph, kh, ma), set()).add(c)
+    goc_co = any(kh == kh0 and ma == ma0 and ky_chuoi <= cs for (ph, kh, ma), cs in co.items())
+    chuoi = sorted(k for k in ung_vien if goc_co and k.split("|")[1] == kh0 and k.split("|")[3] in ky_chuoi
+                   and ky_chuoi <= co[tuple(k.split("|")[:3])])
+    return chuoi, sorted(set(ung_vien) - set(chuoi))
+
+
+def so_mot(ma_da: str, anh: Mapping[str, Any], bao: Mapping[str, Any], ne: NguonEngine,
+           doi_chieu: Mapping[str, Decimal] | None = None) -> dict[str, Any]:
+    """So TỪNG Ô một đáp án với báo cáo engine. Trả số đếm *(Đ4 — mỗi khoá nói nó đếm gì)*.
+
+    `doi_chieu` *(chỉ 615)* = ô đáp án 610 cùng khoá: ô lệch mà engine = 610 ⇒ lớp `lech_ban_ccr_vs_cf`."""
     da, ngoai = o_dap_an(ma_da, anh)
     phan = _nguon_cua(bao)
     dem = Counter()
     chua = Counter()
+    nk = Counter()
+    for k in [k for k in ngoai if k.startswith(("chua_co_dau_vao:", "ngoai_khuon:"))]:
+        (chua if k.startswith("chua") else nk)[k.split(":", 1)[1]] += ngoai.pop(k)
     vang = Counter()
     lech: list[dict[str, str]] = []
     mx = Decimal(0)
@@ -325,8 +402,11 @@ def so_mot(ma_da: str, anh: Mapping[str, Any], bao: Mapping[str, Any], ne: Nguon
             dem["khop_co_so"] += 1
             mx = max(mx, abs(e - a))
         else:
-            lech.append({"o": k, "engine": str(e), "dap_an": str(a),
-                         "lop": _lop_lech(ne, p["nguon"], p["truc"], kh, ma, c, e, a)})
+            lop = _lop_lech(ne, p["nguon"], p["truc"], kh, ma, c, e, a)
+            b = doi_chieu.get(k) if doi_chieu is not None else None
+            if b is not None and abs(a - b) > ATOL:          # bản chính thức (615) ≠ bản CF report (610) ở ô này
+                lop = LECH_CCR_CF if abs(e - b) <= ATOL else "+".join(sorted(set(lop.split("+")) | {LECH_CCR_CF}))
+            lech.append({"o": k, "engine": str(e), "dap_an": str(a), "lop": lop})
     dem["khop"] = dem["khop_co_so"] + dem["o_0_0"]
     dem["o_co_so"] = dem["tong_o"] - dem["o_0_0"]
     q = Decimal("1e-12")
@@ -336,14 +416,16 @@ def so_mot(ma_da: str, anh: Mapping[str, Any], bao: Mapping[str, Any], ne: Nguon
     lop = {l: {"so_o": len(v), "sha256": _sha([f"{x['o']}={Decimal(x['engine']).quantize(q)}|"
                                                 f"{Decimal(x['dap_an']).quantize(q)}" for x in v])}
            for l, v in sorted(theo_lop.items())}
-    chinh_tay = sorted(x["o"] for x in lech if "loi_as_is" in x["lop"].split("+")
-                       and abs(abs(Decimal(x["engine"]) - Decimal(x["dap_an"])) - CHINH_TAY) <= ATOL_CHINH_TAY)
+    ung_vien = [x["o"] for x in lech if "loi_as_is" in x["lop"].split("+")
+                and abs(abs(Decimal(x["engine"]) - Decimal(x["dap_an"])) - CHINH_TAY) <= ATOL_CHINH_TAY]
+    chinh_tay, trung = chuoi_chinh_tay(ung_vien)
     vang_ma = Counter()
     for k, n in vang.items():
         vang_ma[k] += n
     return {"dem": dict(dem), "lop": lop, "chua_co_dau_vao": dict(sorted(chua.items())),
             "engine_vang": dict(sorted(vang_ma.items())), "ngoai_truc": dict(sorted(ngoai.items())),
-            "chinh_tay": chinh_tay, "max_lech_khop": str(mx),
+            "chinh_tay": chinh_tay, "chinh_tay_trung_0_5": trung, "ngoai_khuon": dict(sorted(nk.items())),
+            "max_lech_khop": str(mx),
             "lech_FLS": sorted(x["o"] for x in lech if x["lop"] == LECH_FLS),
             "_lech": lech}
 
@@ -370,8 +452,11 @@ def mong_c5c_mac_dinh() -> MongC5c:
 
 @dataclass
 class ThanhQuaC5c:
+    """`phan_xu` = phép so khớp `mong` hai chiều; `dat` = phán CỔNG *(`H14-R1-01`: `None` khi còn đáp án ô so = 0 chưa
+    có chữ ký chủ "DỪNG có tên" — ⛔ đo được ⛔ phải đạt)*."""
     phan_xu: PhanXu
     hd2_cong: dict[str, Any]
+    dat: bool | None = None
     theo_dap_an: dict[str, Any] = field(default_factory=dict)
     bao: dict[str, dict[str, Any]] = field(default_factory=dict)
 
@@ -399,8 +484,9 @@ def so_sanh_c5c(ne: NguonEngine, dap_an: Mapping[str, Mapping[str, Any]], mong: 
     theo: dict[str, Any] = {}
     tong = Counter()
     lop_tong = Counter()
-    for ma_da in DAP_AN:
-        r = so_mot(ma_da, dap_an[ma_da], bao[ma_da], ne)
+    for ma_da, cfg in DAP_AN.items():
+        dc = o_dap_an(cfg["doi_chieu"], dap_an[cfg["doi_chieu"]])[0] if cfg.get("doi_chieu") else None
+        r = so_mot(ma_da, dap_an[ma_da], bao[ma_da], ne, doi_chieu=dc)
         lech = r.pop("_lech")
         theo[ma_da] = r
         for k in ("tong_o", "khop", "khop_co_so", "o_0_0", "o_co_so"):
@@ -427,11 +513,38 @@ def so_sanh_c5c(ne: NguonEngine, dap_an: Mapping[str, Mapping[str, Any]], mong: 
     fs = {ma_da: {"fs": b["fs"], "phan": [p["id"] for p in b["phan"]]} for ma_da, b in bao.items()}
     lech_co_chu_dich = sum(v for l, v in lop_tong.items() if l != LECH_FLS)
     px = PhanXu(not ly, tuple(ly))
+    # ── ⭐ `H14-R1-01` (Đ3 · Đ5): ô so > 0 cho TỪNG đáp án. Đáp án ô so = 0 ⇒ ⛔ đo được ⇒ cổng `null` CÓ TÊN *(⛔ `true`)*,
+    #    trừ khi chủ ký "DỪNG có tên" (`DUNG_KY`). Độ phủ mỗi đáp án = ô so / ô SỐ của ảnh — in cạnh nhau *(Đ4)*. ──
+    do_phu: dict[str, dict[str, Any]] = {}
+    for ma_da in list(DAP_AN) + list(DUNG):
+        n = dem_dap_an_dung(dap_an[ma_da])
+        o = theo[ma_da]["dem"].get("tong_o", 0) if ma_da in theo else 0
+        ngoai: dict[str, int] = {}
+        if ma_da in theo:
+            ngoai = {**{f"chua_co_dau_vao:{k}": v for k, v in theo[ma_da]["chua_co_dau_vao"].items()},
+                     **{f"ngoai_khuon:{k}": v for k, v in theo[ma_da].get("ngoai_khuon", {}).items()}}
+        do_phu[ma_da] = {"o_dap_an_so": n, "o_so": o, "o_so_chua_so": n - o, "ngoai_mau_so_co_ten": ngoai,
+                         "dung_ky": DUNG_KY.get(ma_da)}
+    khong_do: list[str] = []
+    for ma_da, v in do_phu.items():
+        if v["o_so"] > 0:
+            continue
+        if v["dung_ky"]:
+            continue                                         # chủ đã ký DỪNG có tên ⇒ ngoại lệ DUY NHẤT
+        can = DUNG[ma_da]["can"].split(";")[0] if ma_da in DUNG else "đáp án so được mà 0 ô so"
+        khong_do.append(f"{ma_da}: ô so 0/{v['o_dap_an_so']} ô số — DỪNG `chua_co_dau_vao` CHƯA có chữ ký chủ "
+                        f"'DỪNG có tên' (cần: {can})")
+    phu_mot_phan = [f"{m}: ô so {v['o_so']}/{v['o_dap_an_so']} ô số · {v['o_so_chua_so']} ô số chưa so"
+                    + (" (" + " · ".join(f"{k} {n}" for k, n in v["ngoai_mau_so_co_ten"].items()) + ")"
+                       if v["ngoai_mau_so_co_ten"] else "")
+                    for m, v in do_phu.items() if m == "615"]
+    dat_cong: bool | None = (None if khong_do else True) if px.dat else False
     hd2 = {
         "bang": "HD2.WP-C5c", "goi": "WP-C5c",
         "mo_ta": "RP.PL · RP.CF: Daily Report 2 · 3 dựng theo khuôn (fls.bao_cao.bao_cao.daily_report, FS tham số) từ "
-                 "lưới engine (CFA1 H5/H6 · PLA3 PM+HR H8 · ATL H12+H13) ↔ đáp án 607 · 608 · 609 · 610 từng ô; "
-                 "605 · 615 DỪNG (chua_co_dau_vao); lệch THỪA KẾ lớp bằng truy ngược ô nguồn",
+                 "lưới engine (CFA1 H5/H6 · PLA3 PM+HR H8 · ATL H12+H13) ↔ đáp án 607 · 608 · 609 · 610 · 615 (A-CCR, khuôn "
+                 "CF: Unit: mUSD ↔ ngay · CM Cumulative ↔ luy_ke) từng ô; 605 DỪNG (chua_co_dau_vao, chưa ký ⇒ cổng "
+                 "null); lệch THỪA KẾ lớp bằng truy ngược ô nguồn",
         "nguon_dau_vao": ["WP-C3a lưới cfa1_daily (tests/fixture/dap_an/gl_cf_dau_vao.json)", "WP-C3b lưới cfa1_yhqm",
                           "WP-C3d lưới pla3_pm_hr_daily (gl_pl_dau_vao.json + hr_pl_dau_vao.json)",
                           "WP-C5a + WP-C5b lưới ATL của FLS (IX.ALR kho cờ 2025 BẬT ký · IX.PL kho)"],
@@ -448,19 +561,25 @@ def so_sanh_c5c(ne: NguonEngine, dap_an: Mapping[str, Mapping[str, Any]], mong: 
                                      for l, v in (((m.get("dap_an") or {}).get(x) or {}).get("lop") or {}).items()
                                      if l != LECH_FLS),
         "lech_ngoai_ten": lop_tong.get(LECH_FLS, 0),
-        "khop_ghi_chu": "tong_o = Σ 4 đáp án ô so = o_co_so + o_0_0; khop = ô khớp THẬT (khop_co_so) + o_0_0; "
+        "khop_ghi_chu": "tong_o = Σ 5 đáp án ô so = o_co_so + o_0_0; khop = ô khớp THẬT (khop_co_so) + o_0_0; "
                         "khop + lech_co_chu_dich = tong_o; ô chua_co_dau_vao / engine_vang / ngoai_truc NGOÀI mẫu số",
         "lech_co_ten": {"lop_thua_ke": dict(sorted(lop_tong.items())),
                         "chinh_tay_actor": {x: theo[x]["chinh_tay"] for x in DAP_AN if theo[x]["chinh_tay"]},
-                        "chinh_tay_goc": "ATL AH12 `='Report I PLA3 Y H Q M | PM + HR'!AH12-0.5` (GROUP·OMC·2025M02, "
-                                         "lan SHQ2 dư) — chỉnh tay ⛔ actor; ⛔ chép vào config"},
+                        "chinh_tay_trung_0_5": {x: theo[x]["chinh_tay_trung_0_5"] for x in DAP_AN
+                                                if theo[x]["chinh_tay_trung_0_5"]},
+                        "chinh_tay_goc": "ATL AH12 `='Report I PLA3 Y H Q M | PM + HR'!AH12-0.5` (GROUP·OMC·2025M02) — "
+                                         "chuỗi lan = mã khối GROUP mang 0,5 ở M02 VÀ Q1 · H1 · Y; ô 0,5 ngoài chuỗi = "
+                                         "trùng ngẫu nhiên (chinh_tay_trung_0_5) — chỉnh tay ⛔ actor; ⛔ chép vào config"},
         "fs_tham_so": fs,
         "check": check,
         "theo_dap_an": theo,
         "pl5_bo_khoi_luoi": ne.pl5_bo,
-        "dat": px.dat, "ly_do": list(px.ly_do),
+        "do_phu": do_phu,
+        "khong_do_duoc": khong_do, "phu_mot_phan": phu_mot_phan,
+        "dat_mong": px.dat,
+        "dat": dat_cong, "ly_do": list(px.ly_do),
     }
-    return ThanhQuaC5c(phan_xu=px, hd2_cong=hd2, theo_dap_an=theo, bao=bao)
+    return ThanhQuaC5c(phan_xu=px, hd2_cong=hd2, theo_dap_an=theo, bao=bao, dat=dat_cong)
 
 
 def nap_nen_kho(conn, *, actor: str = "bai-h14") -> None:
@@ -490,7 +609,7 @@ def nap_dap_an() -> dict[str, dict[str, Any]]:
 
 def _do(ly: tuple[str, ...]) -> ThanhQuaC5c:
     return ThanhQuaC5c(phan_xu=PhanXu(False, ly), hd2_cong={"bang": "HD2.WP-C5c", "goi": "WP-C5c", "dat": False,
-                                                             "ly_do": list(ly)})
+                                                             "ly_do": list(ly)}, dat=False)
 
 
 def chay_wp_c5c(dsn: str | None = None, conn=None) -> ThanhQuaC5c:
@@ -511,9 +630,10 @@ def in_bao(tq: ThanhQuaC5c) -> None:
         print(f"  {ma_da} ({DAP_AN[ma_da]['fs']}): ô so {d.get('tong_o', 0)} = có số {d.get('o_co_so', 0)} + 0=0 "
               f"{d.get('o_0_0', 0)} · khớp {d.get('khop', 0)} (thật {d.get('khop_co_so', 0)}) · lệch theo lớp "
               + (" · ".join(f"{k} {v['so_o']}" for k, v in r["lop"].items()) or "0")
-              + f" · chua_co_dau_vao {sum(r['chua_co_dau_vao'].values())} · engine vắng "
+              + f" · chua_co_dau_vao {sum(r['chua_co_dau_vao'].values())} · ngoài khuôn "
+              f"{sum(r.get('ngoai_khuon', {}).values())} · engine vắng "
               f"{sum(r['engine_vang'].values())} · ngoài trục {sum(r['ngoai_truc'].values())} · chỉnh tay "
-              f"{len(r['chinh_tay'])}")
+              f"{len(r['chinh_tay'])} (+ {len(r.get('chinh_tay_trung_0_5', []))} trùng 0,5 ngoài chuỗi)")
     for ma_da, v in hh.get("dap_an_dung", {}).items():
         print(f"  {ma_da}: DỪNG — {v['o_dap_an_so']} ô số ⛔ so · cần: {v['can']}")
     if "tong_o" in hh:
@@ -523,6 +643,11 @@ def in_bao(tq: ThanhQuaC5c) -> None:
             print(f"  CHECK {ma_da}: đỏ {c['so_do']} · " + " · ".join(
                 f"{p}: " + ", ".join(f"{ph} {dict((k, v) for k, v in d.items() if v)}" for ph, d in x.items())
                 for p, x in c["theo_phan"].items()))
+    for x in hh.get("phu_mot_phan", []):
+        print(f"  độ phủ {x}")
     for x in hh.get("ly_do", []):
         print(f"  ⛔ {x}")
-    print(f"  KẾT: {tq.phan_xu.mot_dong}")
+    for x in hh.get("khong_do_duoc", []):
+        print(f"  ⛔ đo được: {x}")
+    kq = {True: "ĐẠT", False: "ĐỎ", None: "⛔ ĐO ĐƯỢC (cổng null)"}[tq.dat]
+    print(f"  KẾT: {kq} · so mong: {tq.phan_xu.mot_dong}")

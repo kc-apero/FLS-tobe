@@ -1014,6 +1014,56 @@ def _cong_final(d: dict, ngay: str) -> Cong:
         ly_do=ly_do)
 
 
+def _cap_o(v, ten: str) -> tuple[int, int]:
+    """`[khớp, tổng]` ô của MỘT kỳ ở `tu_sinh.theo_ky[k].{ten}` — hai số đếm, khớp ≤ tổng."""
+    if (not isinstance(v, list) or len(v) != 2
+            or not all(type(x) is int and x >= 0 for x in v) or v[0] > v[1]):
+        raise _TepDoHong(f"`tu_sinh.theo_ky[..].{ten}` = {v!r} ⛔ phải `[khớp, tổng]` số đếm")
+    return v[0], v[1]
+
+
+def _ky_tu_sinh(d: dict, ky_cong: set[str]) -> dict[str, bool] | None:
+    """`I1-R1-01` — kỳ CÓ ẢNH của `tu_sinh` *(H15, 26 kỳ)* ⇒ `{kỳ: ô+HD khớp 100 %}`; `None` ⇒ tệp
+    ⛔ có khối `tu_sinh` *(khoá CG1: tệp chỉ có `dat_hd1` ⇒ mẫu số cũ)*. Khối CÓ mà hỏng / tự mâu
+    thuẫn ⇒ `_TepDoHong` (Đ5: ⛔ lặng lẽ rơi về 23)."""
+    t = d.get("tu_sinh")
+    if t is None:
+        return None
+    if not isinstance(t, dict) or not isinstance(t.get("theo_ky"), dict):
+        raise _TepDoHong("`tu_sinh.theo_ky` ⛔ phải bảng theo kỳ")
+    n = _dem(t, "so_ky_co_anh")
+    if n != len(t["theo_ky"]):
+        raise _TepDoHong(f"tự mâu thuẫn: `tu_sinh.so_ky_co_anh` {n} ≠ {len(t['theo_ky'])} kỳ"
+                         f" trong `tu_sinh.theo_ky`")
+    if not ky_cong <= set(t["theo_ky"]):
+        raise _TepDoHong("tự mâu thuẫn: kỳ của `dat_hd1` ⛔ có ảnh ở `tu_sinh`: "
+                         + ", ".join(sorted(ky_cong - set(t["theo_ky"]))))
+    ra = {}
+    for k, v in t["theo_ky"].items():
+        if not isinstance(v, dict):
+            raise _TepDoHong(f"`tu_sinh.theo_ky[{k}]` ⛔ phải bảng")
+        o, hd = _cap_o(v.get("o"), "o"), _cap_o(v.get("hd"), "hd")
+        ra[k] = o[0] == o[1] and hd[0] == hd[1]
+    return ra
+
+
+def _nhan_dt1b(h: dict) -> str:
+    """`I1-R1-02` — TÊN nhãn DT1b + số dòng *(`dat_hd1.theo_nhan`)*; ⛔ có nhãn ⇒ NÓI "chưa có
+    nhãn DT1b" kèm tên tệp nhãn *(Đ3: ⛔ im như thể không có gì để nói)*."""
+    nhan = h.get("theo_nhan")
+    if isinstance(nhan, dict) and nhan:
+        ds = []
+        for ten, v in sorted(nhan.items()):
+            if not isinstance(v, dict) or type(v.get("so_dong")) is not int:
+                raise _TepDoHong(f"`theo_nhan[{ten}].so_dong` ⛔ phải một số đếm")
+            ds.append(f"{ten} {_vn(v['so_dong'])} dòng ({'đã ký' if v.get('da_ky') else 'chưa ký'})")
+        return "nhãn DT1b: " + " · ".join(ds)
+    tn = h.get("tep_nhan")
+    ten = tn.get("duong") if isinstance(tn, dict) else None
+    return (f"chưa có nhãn DT1b (tệp nhãn {ten if isinstance(ten, str) else '⛔ khai'}"
+            f" {'có nhưng 0 nhãn' if isinstance(tn, dict) and tn.get('co') else 'VẮNG'})")
+
+
 def _cong_hd1(d: dict, ngay: str) -> Cong:
     h = d.get("dat_hd1")
     try:
@@ -1029,13 +1079,13 @@ def _cong_hd1(d: dict, ngay: str) -> Cong:
             raise _TepDoHong("`ky_dat` ⛔ phải danh sách kỳ")
         if not isinstance(theo_ky, dict):
             raise _TepDoHong("`theo_ky` ⛔ phải bảng theo kỳ")
-        ky: dict[str, tuple[bool, int]] = {}
+        ky: dict[str, tuple[bool, int, int]] = {}
         for x, v in theo_ky.items():
             if not isinstance(v, dict) or type(v.get("dat")) is not bool:
                 raise _TepDoHong(f"`theo_ky[{x}].dat` ⛔ phải true/false")
-            ky[x] = (v["dat"], _dem(v, "thieu"))
+            ky[x] = (v["dat"], _dem(v, "thieu"), _dem(v, "co_nhan") if "co_nhan" in v else 0)
         # ⛔ tính lại luật kỳ — chỉ đòi các phần ĐẾM của khối nói cùng một chuyện
-        dat_ky = {x for x, (dat, _n) in ky.items() if dat}
+        dat_ky = {x for x, (dat, _n, _c) in ky.items() if dat}
         if len(ky) != so_ky:
             raise _TepDoHong(f"tự mâu thuẫn: `mau_so.so_ky` {so_ky} ≠ {len(ky)} kỳ"
                              f" trong `theo_ky`")
@@ -1043,24 +1093,42 @@ def _cong_hd1(d: dict, ngay: str) -> Cong:
                 or set(ky_dat) != dat_ky):
             raise _TepDoHong(f"tự mâu thuẫn: `so_ky_dat` {so_dat} · `ky_dat`"
                              f" {len(ky_dat)} kỳ · `theo_ky` {len(dat_ky)} kỳ đạt")
+        anh = _ky_tu_sinh(d, set(ky))
+        nhan_ly_do = _nhan_dt1b(h)
     except _TepDoHong as e:
         return Cong(ma="HD1_THANG", ten=_TEN_HD1, dat=None,
-                    ly_do=f"tệp đo hỏng ở khối `dat_hd1`: {e} · {ngay}")
+                    ly_do=f"tệp đo hỏng ở khối `dat_hd1`/`tu_sinh`: {e} · {ngay}")
     if so_ky == 0:
         return Cong(ma="HD1_THANG", ten=_TEN_HD1, dat=None,
                     ly_do=f"0 kỳ trong mẫu số ⇒ ⛔ đo được gì (Đ3) · {ngay}")
-    # Kỳ đỏ theo thời gian, mỗi kỳ kèm SỐ DÒNG THIẾU *(dòng sổ ⛔ ghép 1-1)*. Một kỳ đỏ với 0
-    # dòng thiếu *(đỏ ở vế ô — sau `H2-R1-01` là có thể)* VẪN được kể tên: ⛔ lọc theo `thieu`.
-    do_ = sorted((x, n) for x, (dat, n) in ky.items() if not dat)
+    # Kỳ đỏ theo thời gian, mỗi kỳ kèm SỐ DÒNG THIẾU *(dòng sổ ⛔ ghép 1-1)* và, nếu có, số dòng
+    # mang nhãn DT1b. Một kỳ đỏ với 0 dòng thiếu *(đỏ ở vế ô — sau `H2-R1-01` là có thể)* VẪN
+    # được kể tên: ⛔ lọc theo `thieu`.
+    do_ = sorted((x, n, c) for x, (dat, n, c) in ky.items() if not dat)
     phan = []
     if do_:
         phan.append(f"kỳ đỏ {len(do_)}/{so_ky} — kỳ: số dòng thiếu (sổ ⛔ ghép 1-1) — "
-                    + " · ".join(f"{x}: {n}" for x, n in do_)
-                    + f" (Σ {_vn(sum(n for _x, n in do_))} dòng)")
+                    + " · ".join(f"{x}: {n}" + (f" ({c} có nhãn)" if c else "") for x, n, c in do_)
+                    + f" (Σ {_vn(sum(n for _x, n, _c in do_))} dòng)")
+        phan.append(nhan_ly_do)
+    so_anh, da_do = so_ky, f"{so_dat}/{so_ky} kỳ đạt"
+    dat = so_dat == so_ky
+    if anh is not None:
+        # ⭐ `I1-R1-01` (orchestrator): cổng phán MỌI kỳ có ảnh. Kỳ chỉ-ở-`tu_sinh` ⛔ có vế dòng
+        # ghép 1-1 ⇒ `khong_do_duoc` CÓ TÊN vế ấy: ⛔ tính đạt, ⛔ bỏ khỏi mẫu số im lặng.
+        so_anh = len(anh)
+        khong = sorted(set(anh) - set(ky))
+        o_lech = [k for k in khong if not anh[k]]
+        da_do = f"{so_dat} kỳ đạt / {so_ky} kỳ đo được / {so_anh} kỳ có ảnh"
+        if khong:
+            phan.append(f"{len(khong)}/{so_anh} kỳ ⛔ đo được vế dòng ghép 1-1 (`tu_sinh` chỉ có ô·HD·MID):"
+                        f" {' · '.join(khong)}")
+        if o_lech:
+            phan.append(f"{len(o_lech)} kỳ trong đó ô lệch: {' · '.join(o_lech)}")
+        dat = False if (so_dat < so_ky or o_lech) else (None if khong else True)
     phan += [ngay, "⛔ gồm chế độ tự sinh (H15) — luật kỳ do H2 phán, cổng này chỉ"
-                   " đọc `dat_hd1`"]
-    return Cong(ma="HD1_THANG", ten=_TEN_HD1, dat=so_dat == so_ky,
-                da_do=f"{so_dat}/{so_ky} kỳ đạt", ly_do=" · ".join(phan))
+                   " đọc `dat_hd1` + `tu_sinh`"]
+    return Cong(ma="HD1_THANG", ten=_TEN_HD1, dat=dat, da_do=da_do, ly_do=" · ".join(phan))
 
 
 def doc_cong_tep_do(tep_do) -> list[Cong]:
@@ -1134,7 +1202,19 @@ def _goi_la(goi: str, b: dict, ten: str) -> Cong:
     if b.get("goi") != goi:
         return chua(f"`goi` = {b.get('goi')!r} ⛔ khớp khoá `{goi}`")
     dat = b.get("dat")
-    if type(dat) is not bool:
+    # ⭐ `H14-R1-01` (KQ-313, Đ3 · Đ5): khoá THÊM `khong_do_duoc` = danh sách CÓ TÊN các đáp án ô so = 0 *(DỪNG chưa ký)*.
+    #   `dat=null` + danh sách ⛔ rỗng ⇒ cổng `None` NÓI THẲNG từng đáp án *(⛔ "tệp hỏng")*; `dat=true` mà danh sách ⛔
+    #   rỗng ⇒ tự mâu thuẫn ⇒ `None`. Vắng ⇒ [] *(gói cũ)*. `phu_mot_phan` *(tuỳ chọn)* = câu độ phủ, chỉ IN.
+    kdd = b.get("khong_do_duoc", [])
+    phu = b.get("phu_mot_phan", [])
+    for k, v in (("khong_do_duoc", kdd), ("phu_mot_phan", phu)):
+        if not isinstance(v, list) or not all(isinstance(x, str) and x for x in v):
+            return chua(f"`{k}` = {v!r} ⛔ phải danh sách chuỗi")
+    if dat is True and kdd:
+        return chua(f"`dat=true` mà {len(kdd)} đáp án ⛔ đo được (`khong_do_duoc`) ⇒ tự mâu thuẫn")
+    if dat is None and not kdd:
+        return chua("`dat` = None ⛔ phải bool (chưa có phán quyết)")
+    if type(dat) is not bool and dat is not None:
         return chua(f"`dat` = {dat!r} ⛔ phải bool (chưa có phán quyết)")
     # ⭐ CG2-R1-01: `do_hd2.py` ⛔ cắt lát ⇒ khoá `lat_bo` VẮNG ở tệp thật (0 lần). Vắng ⇒ coi 0 NHƯNG
     #   cổng NÓI THẲNG (`da_do` + `lat_bo_nguon="vang"`), ⛔ `true` im lặng. Có khoá mà ⛔ phải số ≥ 0 ⇒ null.
@@ -1169,6 +1249,13 @@ def _goi_la(goi: str, b: dict, ten: str) -> Cong:
     ly = [str(x) for x in (b.get("ly_do") or []) if isinstance(x, str)]
     cum_lech = f"{ct} + {lech} lệch có chủ đích" if lech else ct          # Đ4: nói thẳng ở chỗ in
     vang = f" · {_LOI_LAT_VANG}" if nguon == "vang" else ""
+    if dat is None and lat == 0:                         # H14-R1-01: ⛔ đo được CÓ TÊN — ⛔ true, ⛔ "hỏng"
+        if not co_dem:
+            return chua("`dat=null` mà ⛔ khai `khop`/`tong_o`")
+        return Cong(ma=ma, ten=tn, dat=None, lat_bo_nguon=nguon, lech_co_chu_dich=lech,
+                    da_do=f"{khop}/{o} ô đáp án khớp{cum_lech} (gói {goi}){vang}",
+                    ly_do=f"{len(kdd)} đáp án ô so = 0 ⇒ ⛔ đo được: " + " · ".join(kdd)
+                          + "".join(f" · độ phủ {x}" for x in phu))
     if lat > 0:
         ly.insert(0, f"{lat} lát bị bỏ ⇒ có lỗ trong phép đo, ⛔ kết luận cho CẢ SỐ")
     if lat > 0 or not dat:

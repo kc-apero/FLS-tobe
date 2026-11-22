@@ -13,9 +13,14 @@ các ảnh đáp án *(chỉ để HIỂU khuôn — ⛔ đầu vào; `BG-312` �
   · DR2 *(RP.CF — 610)* phần **ngày** = `CFA1 Daily` *(H5)*; **luỹ kế** = `CFA1 Y/H/Q/M` *(H6)* — 100 % ô ≠ 0
     *(788 · 4.687)*; phần **`hr`** *(`Report HR`, số người)* ⛔ có engine ⇒ `chua_co_dau_vao`.
 
-⭐ **FS là THAM SỐ** *(D5 A — "cùng engine, khác tham số")*: `FS1` · `FS2` · `FS3` chỉ đổi **tập phần luỹ kế** của
-khuôn *(`KHUON_FS`)*; phần ngày + phép chiếu + JSON ra **dùng chung**. `FS3` = bản `5. Daily Report 3` *(609)* mang
-CẢ nửa `[FS1][PLA3]` lẫn `[FS2][PLA3]` — Giả định ① của `BG-312` *(sổ ⛔ ghi nhãn "FS3"; đo: 609 = hợp hai bộ khối)*.
+⭐ **FS là THAM SỐ** *(D5 A — "cùng engine, khác tham số")*: `FS1` · `FS2` · `FS1_FS2_gop` · `FS3` chỉ đổi **tập phần
+luỹ kế** của khuôn *(`KHUON_FS`)*; phần ngày + phép chiếu + JSON ra **dùng chung**.
+⛔ **FS3 ⛔ phải hợp FS1 ∪ FS2** *(`H14-R1-08`, KQ-313)*: ảnh 609 VÀ 615 ghi nguyên văn *"Level báo cáo: FS1 -> FS3 trong
+đó FS3 là mức độ tin cậy giao dịch đủ (PI&PM; Finance&Non-Finance) để phục vụ Audits/Due Diligence"* — FS = **cấp tin
+cậy dữ liệu**, FS3 là cấp CAO NHẤT *(data đủ VÀ consistent với Non-Finance)*. Bản `5. Daily Report 3` *(609)* chỉ mang
+hai khối `[FS1][PLA3]` + `[FS2][PLA3]` ⇒ tên đúng nghĩa hiện dựng là **`FS1_FS2_gop`**. `FS3` thật ⛔ dựng: phần luỹ kế
+của nó DỪNG `chua_co_dau_vao` *(nguồn `fs3_tin_cay` ⛔ tồn tại — câu hỏi BA: định nghĩa FS3 + đầu vào Non-Finance)*;
+⛔ trả nhãn FS3 cho dữ liệu FS1/FS2 *(chủ gọi FS3 để nộp Audit sẽ nhận nhầm)*.
 
 ⭐ **Đầu ra = JSON ô theo hợp đồng C13** *(`ban_ky.checksum`: object JSON THUẦN — ⛔ `Decimal`)* ⇒ giá trị là CHUỖI
 `str(Decimal)`; khoá ô `"<phần>|<khối>|<mã>|<cột>"` *(cột = ngày ISO hoặc kỳ `2025` · `2025H1` · `2025Q1` · `2025M01`)*.
@@ -52,6 +57,9 @@ CAN_ANH = {
     "cfa1_daily": "lưới SO.CFA1 Daily của engine H5 (`cfa.cfa1_daily`)",
     "cfa1_yhqm": "lưới SO.CFA1 Y/H/Q/M của engine H6 (`cfa.cuon_ky`)",
     "hr_report": "ảnh `Report HR` (số người theo Grade, sổ CF report hàng 843+) — FLS ⛔ có engine số người",
+    "fs3_tin_cay": "cấp FS3 = data đủ (PI&PM) VÀ consistent với data Non-Finance (ảnh 609/615: 'mức độ tin cậy giao "
+                   "dịch đủ (PI&PM; Finance&Non-Finance) để phục vụ Audits/Due Diligence') — FLS ⛔ có nguồn/engine; "
+                   "định nghĩa FS3 chờ BA (H14-R1-08) ⇒ ⛔ dựng",
 }
 
 
@@ -68,7 +76,9 @@ class Phan:
 #: luỹ kế P&L theo FS — chỗ DUY NHẤT FS làm khác *(D5 A)*
 _LK_FS2 = Phan("luy_ke:FS2", "ky", "atl", KHOI_LE + KHOI_CDT)
 _LK_FS1 = Phan("luy_ke:FS1", "ky", "atl_fs1", (KHOI_LE[0],) + KHOI_CDT)
-KHUON_FS: dict[str, tuple[Phan, ...]] = {"FS1": (_LK_FS1,), "FS2": (_LK_FS2,), "FS3": (_LK_FS1, _LK_FS2)}
+_LK_FS3 = Phan("luy_ke:FS3", "ky", "fs3_tin_cay", KHOI_LE + KHOI_CDT)     # ⛔ nguồn nào sinh ⇒ luôn DỪNG có tên
+KHUON_FS: dict[str, tuple[Phan, ...]] = {"FS1": (_LK_FS1,), "FS2": (_LK_FS2,), "FS1_FS2_gop": (_LK_FS1, _LK_FS2),
+                                         "FS3": (_LK_FS3,)}
 
 KHUON: dict[str, dict[str, Any]] = {
     "PL": {"ten": "RP.PL · Daily Report 3", "don_vi": "mUSD",
@@ -179,7 +189,7 @@ def daily_report(ky: Any, fs: str, nguon: Mapping[str, Mapping[tuple, Any] | Non
 
 
 def rp_pl(ky: Any, fs: str, nguon: Mapping[str, Any]) -> dict[str, Any]:
-    """RP.PL = Daily Report 3 *(P&L)*; FS ∈ FS1 · FS2 · FS3."""
+    """RP.PL = Daily Report 3 *(P&L)*; FS ∈ FS1 · FS2 · FS1_FS2_gop *(609)* · FS3 *(luỹ kế DỪNG — `H14-R1-08`)*."""
     return daily_report(ky, fs, nguon, loai="PL")
 
 

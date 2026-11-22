@@ -857,7 +857,7 @@ LY_DO_MAC_DINH_BO_GHEP = "(may dien) bo ghep tren man - nguoi bam khong ghi ly d
 | `GET /api/fls/v1/report/snapshot/{ky}` | C13 | danh sách phiên bản bản Daily Report 3 (checksum · trạng thái · người ký); `{ky}` = `yyyymm`, sai khuôn ⇒ `400`; kỳ chưa có bản ⇒ `200` `ban: []` | ✅ |
 | `POST /api/fls/v1/report/snapshot/{ky}/sign` | C13 | ký phiên bản mới nhất; phiên bản cũ đã ký giữ nguyên; người ký = THẺ *(thân có `actor` ⇒ `400`)*; đã ký ⇒ `409 FLS-CAUHINH-DA-KY`; kỳ chưa có bản ⇒ `404`; checksum sha256 trên JSON chuẩn hoá *(khứ hồi qua jsonb)* | ✅ |
 
-⭐ Cổng HD1/HD2 (CG1 · CG2) **⛔ mở tuyến mới**: chúng thêm cổng vào `GET /gates` sẵn có (§2) — `FINAL` thành số đo, thêm `HD1_THANG` và `HD2_WP_C2…C5`; ba trạng thái `dat` ∈ `true` / `false` / `null` như cũ.
+⭐ Cổng HD1/HD2 (CG1 · CG2) **⛔ mở tuyến mới**: chúng thêm cổng vào `GET /gates` sẵn có (§2) — `FINAL` thành số đo, thêm `HD1_THANG` và `HD2_WP_C2…C5`; ba trạng thái `dat` ∈ `true` / `false` / `null` như cũ. ⭐ I1-R1-01: `HD1_THANG` phán MỌI kỳ có ảnh — `da_do` = `x kỳ đạt / y kỳ đo được / N kỳ có ảnh` (N = `tu_sinh.so_ky_co_anh`); kỳ ⛔ đo được vế *dòng ghép 1-1* ⇒ nêu tên trong `ly_do`, ⛔ tính đạt (`dat=null` nếu không kỳ nào đỏ). ⛔ thêm/đổi khoá của `GET /gates`: chỉ đổi chuỗi `da_do`/`ly_do`.
 
 ---
 
