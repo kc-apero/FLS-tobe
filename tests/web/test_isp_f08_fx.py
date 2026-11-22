@@ -100,7 +100,9 @@ def _config_fx() -> dict:
 
 
 def _ve(data: dict) -> dict:
-    """Render `man_f08.js` với `data` làm thân `GET /config/fx`; trả các hàng."""
+    """⭐ F7 (`WO-273`): `nut` đếm `button.nut-ky` (nút `Ký tháng`) — màn có thêm vùng ký bản
+    với nút `Xem bản`/`Ký bản` ⇒ đếm MỌI `button` là đếm sai vật.
+    Render `man_f08.js` với `data` làm thân `GET /config/fx`; trả các hàng."""
     kb = (
         "_TRA['/config/fx'] = {data: %s};"
         "const o = document.createElement('div'); o.id = 'than-f08';"
@@ -109,7 +111,7 @@ def _ve(data: dict) -> dict:
         "return {hang: [...document.querySelectorAll('[data-thang]')].map("
         "  r => ({thang: r.dataset.thang, txt: r.textContent,"
         "         nhan: [...r.querySelectorAll('.nhan-fx')].map(x => x.textContent)})),"
-        " nut: document.querySelectorAll('button').length};"
+        " nut: document.querySelectorAll('button.nut-ky').length};"
         % json.dumps(data, ensure_ascii=False))
     return kn._chay(kb, tep=TEP_F08, vo="")
 

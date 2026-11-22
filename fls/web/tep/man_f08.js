@@ -6,7 +6,12 @@
    mới) nêu tháng + số sắp niêm phong ⇒ xác nhận ⇒ `POST /config/fx/{yyyymm}/sign`
    ⇒ vẽ lại: dòng hiện 'đã ký · người ký · ngày', nút khoá. ⛔ Thân POST RỖNG: người
    ký lấy TỪ THẺ ở cửa (`C7` — gửi `actor` là 400). ⛔ Huỷ ký, ⛔ phân quyền theo vai
-   (`O11`). Ký Daily Report 3 (`F7`) vẫn là việc của bước sau.
+   (`O11`).
+   ⭐ **F7** (ISP 3.1.2 Step 40, `WO-273`): vùng thứ hai `#ban-f08` — danh sách phiên bản
+   bản Daily Report 3 (`IX.TMP`, C13) của MỘT kỳ + nút `Ký bản` (cùng hộp `HT`, ⛔ hộp mới).
+   Đọc `GET /report/snapshot/{ky}`; ký `POST …/{ky}/sign` thân RỖNG (người ký = THẺ). Vùng
+   này ⛔ phụ thuộc bảng tỷ giá (kho thiếu `IX.FX` ⇒ `409` ở bảng, vùng ký bản vẫn sống).
+   ⛔ xem nội dung báo cáo · ⛔ PDF · ⛔ huỷ ký.
    ⛔ Nút chỉ ở dòng SẠCH (có số, ⛔ TRÙNG, ⛔ LẠC): ký một tháng trùng/lạc là niêm
    phong một số mà màn chính nó đang gắn cờ.
 
@@ -110,6 +115,222 @@ const F08 = (function () {
         }, { pri: true }]]);
   }
 
+  /* ═══ F7 · ký bản Daily Report 3 (`IX.TMP`) ═══════════════════════════════════════ */
+
+  /* ⭐ `C13-R1-04` (sổ `SO_PHAT_HIEN_ISP-3.1_C13.md`): `FLS-CAUHINH-DA-KY` dùng chung cho C7
+     (tỷ giá) và C13 (bản báo cáo) mà `goi_cua.js` chỉ có MỘT câu — câu "tháng tỷ giá".
+     Lựa chọn: sửa ở CHỮ phía màn theo ngữ cảnh tuyến (⛔ đổi mã lỗi, ⛔ chạm `bao.py`). Chỉ
+     ghi đè `cau`/`lam_gi`; `chi_tiet` (câu của cửa: 'phiên bản N của kỳ K ĐÃ ký bởi X') giữ. */
+  const CAU_BAN = {
+    'FLS-CAUHINH-DA-KY': {
+      cau: 'Bản báo cáo mới nhất của kỳ này đã được ký rồi — ⛔ ký lại được.',
+      lam_gi: 'Không cần làm gì thêm: chữ ký cũ vẫn còn hiệu lực. Bản mới chỉ có khi hệ '
+        + 'đưa vào một nội dung khác — ⛔ có nút huỷ ký trên màn.'
+    }
+  };
+
+  function _loi_ban(e) {
+    const c = e && CAU_BAN[e.ma];
+    return c ? { cau: c.cau, lam_gi: c.lam_gi, chi_tiet: e.chi_tiet } : e;
+  }
+
+  let _ky_ban = '';      // kỳ đang xem — còn nguyên khi bảng tỷ giá vẽ lại
+
+  function _dong_ban(b) {
+    const tr = document.createElement('tr');
+    tr.dataset.ban = String(b.phien_ban);
+    tr.appendChild(_o('bản ' + b.phien_ban, 'mono'));
+    const ck = _o(String(b.checksum || '').slice(0, 12), 'mono ck');
+    ck.title = b.checksum || '';          // đủ 64 ký tự ở title
+    tr.appendChild(ck);
+    const da = b.trang_thai === 'da_ky';
+    tr.appendChild(_o(da ? 'đã ký' : 'chưa ký', da ? 'da-ky' : ''));
+    tr.appendChild(_o(da ? (b.actor || '?') : '—'));
+    tr.appendChild(_o(da ? _ngay(b.ky_luc) : '—', 'mono'));
+    return tr;
+  }
+
+  /* ⭐ AC-6: đóng hộp mà ⛔ ký (Huỷ · Esc · bấm nền) ⇒ tiêu điểm TRẢ VỀ nút `Ký bản` (hộp
+     ⛔ tự trả). Một lần: theo dõi lớp `on` của `#scrim` rồi gỡ. Ký xong ⇒ `_ve_ban_lai` lo. */
+  function _tra_tieu_diem() {
+    const s = document.getElementById('scrim');
+    if (!s || typeof MutationObserver === 'undefined') return;
+    const ob = new MutationObserver(() => {
+      if (s.classList.contains('on')) return;
+      ob.disconnect();
+      const n = document.querySelector('#ban-ds button.nut-ky-ban');
+      if (n) n.focus({ preventScroll: true });
+    });
+    ob.observe(s, { attributes: true, attributeFilter: ['class'] });
+  }
+
+  /* ⭐ `F7-R2-01` (`KQ-276`): hộp nêu bản `m` lúc MỞ; engine có thể chèn bản mới giữa lúc mở
+     và lúc xác nhận ⇒ POST `{}` ký bản MỚI NHẤT mà người dùng ⛔ thấy (R2 đo: hộp nói "bản 2",
+     kho ký bản 3, bản 2 `chua_ky`, ⛔ cảnh báo). Sửa ở màn (⛔ đổi hợp đồng tuyến · ⛔ thêm trường
+     vào thân): xác nhận ⇒ TẢI LẠI `GET …/snapshot/{ky}` ngay trước POST; bản mới nhất ≠
+     (phiên bản · checksum) đang hiện ⇒ ⛔ POST, vẽ lại hộp nêu bản MỚI + câu cảnh báo, đòi xác
+     nhận lại. Lỗi khi tải lại ⇒ chữ lỗi trong hộp, ⛔ POST. Khe đua ms còn lại giữa tải lại và
+     POST: ghi `BG-274` §Câu hỏi cho BA (ràng checksum ở tuyến). */
+  const CAU_BAN_MOI = 'Đã có phiên bản mới hơn — kiểm lại trước khi ký';
+
+  function _hoi_ky_ban(ky, m, ve_lai, canh_bao) {
+    HT.mo('Ký bản báo cáo kỳ ' + ky,
+      (canh_bao ? '<div class="note crit"><b>' + TP.chu(canh_bao) + '</b></div>' : '')
+      + '<p>Ký <b>phiên bản ' + TP.chu(String(m.phien_ban)) + '</b> (checksum <span class="mono">'
+      + TP.chu(String(m.checksum).slice(0, 12)) + '</span>) của kỳ <b>' + TP.chu(ky)
+      + '</b> là niêm phong bản Daily Report 3 này. Các phiên bản cũ đã ký giữ nguyên.</p>'
+      + '<p>Số đổi sau khi ký thì phải có phiên bản mới rồi ký lại; màn ⛔ có nút huỷ ký. '
+      + 'Người ký lấy từ thẻ đăng nhập của anh/chị.</p>',
+      [['Huỷ', null],
+       ['Ký bản kỳ ' + ky, async function () {
+          // ① tải lại NGAY trước POST — bản mới nhất còn là bản hộp đang nêu?
+          let d;
+          try {
+            d = (await FLS.doc('/report/snapshot/' + encodeURIComponent(ky))).data;
+          } catch (e) {
+            HT.loi_trong_hop(_loi_ban(e));       // ⛔ POST khi chưa biết bản nào là mới nhất
+            return false;
+          }
+          const ds = (d && d.ban) || [];
+          const moi = ds[ds.length - 1];
+          if (!moi || moi.phien_ban !== m.phien_ban || moi.checksum !== m.checksum) {
+            ve_lai(ky);                          // danh sách sau lưng hộp cũng nói bản mới
+            if (moi && moi.trang_thai !== 'da_ky') {
+              _hoi_ky_ban(ky, moi, ve_lai, CAU_BAN_MOI);   // hộp MỚI nêu bản mới, đòi xác nhận lại
+            } else {
+              HT.loi_trong_hop({ cau: CAU_BAN_MOI + (moi ? ' (bản mới nhất đã được ký rồi).' : '.') });
+            }
+            return false;
+          }
+          try {
+            // ⛔ `actor` trong thân: người ký do cửa lấy TỪ THẺ (C13).
+            await FLS.ghi('/report/snapshot/' + ky + '/sign', {});
+          } catch (e) {
+            HT.loi_trong_hop(_loi_ban(e));
+            // `409` = NGƯỜI KHÁC đã ký giữa chừng ⇒ danh sách sau lưng hộp còn nói 'chưa ký'.
+            if (e && e.http === 409) ve_lai(ky);
+            return false;
+          }
+          ve_lai(ky);
+          return true;
+        }, { pri: true }]]);
+    _tra_tieu_diem();
+  }
+
+  function _ve_ban_ds(d, meta, o, ve_lai) {
+    const ky = String(d.ky);
+    const ban = d.ban || [];
+    const b = TP.el('table');
+    b.innerHTML = '<thead><tr><th>Phiên bản</th><th>Checksum</th><th>Trạng thái</th>'
+      + '<th>Người ký</th><th>Ngày</th></tr></thead>';
+    const tb = document.createElement('tbody');
+    ban.forEach(x => tb.appendChild(_dong_ban(x)));
+    b.appendChild(tb);
+    const kn = TP.el('div', 'ngang');
+    kn.appendChild(b);
+    o.appendChild(kn);
+    // Ký = bản MỚI NHẤT (cuối mảng, cũ → mới). Đã ký ⇒ nút KHOÁ.
+    const m = ban[ban.length - 1];
+    const da = m.trang_thai === 'da_ky';
+    const nut = TP.el('button', 'b nut-ky-ban', 'Ký bản');
+    nut.type = 'button';
+    nut.dataset.ky = ky;
+    nut.disabled = da;
+    if (!da) nut.onclick = () => _hoi_ky_ban(ky, m, ve_lai);
+    const ghi = TP.el('div', 'note');
+    ghi.appendChild(nut);
+    const c = document.createElement('span');
+    c.className = 'muted';
+    c.style.marginLeft = '8px';
+    c.textContent = da ? 'Phiên bản ' + m.phien_ban + ' (mới nhất) đã ký — ⛔ ký lại.'
+                       : 'Ký phiên bản ' + m.phien_ban + ' (mới nhất); bản cũ đã ký giữ nguyên.';
+    ghi.appendChild(c);
+    o.appendChild(ghi);
+  }
+
+  function _ve_ban_lai(ky) {
+    const o = _ds;
+    if (!o) return null;
+    const y = window.scrollY;
+    const xong = _tai_ban(o, ky);
+    return xong.then(() => {
+      window.scrollTo(0, y);
+      const s = document.getElementById('scrim');
+      if (s && s.classList.contains('on')) return;     // hộp còn mở (ca 409) ⛔ giật tiêu điểm
+      const n = o.querySelector('button.nut-ky-ban');
+      if (n) n.focus({ preventScroll: true });
+    });
+  }
+
+  let _lan_ban = 0;
+  function _tai_ban(o, ky) {
+    const lan = ++_lan_ban;            // lượt MỚI NHẤT thắng (đổi kỳ giữa chừng)
+    return TT.chay(o, () => FLS.doc('/report/snapshot/' + encodeURIComponent(ky)),
+      (d, meta, oo) => _ve_ban_ds(d, meta, oo, _ve_ban_lai), {
+        so_dong: 2,
+        con_hieu_luc: () => lan === _lan_ban,
+        la_rong: d => !d || !d.ban || d.ban.length === 0,
+        rong: {
+          icon: '⛔',
+          tieu_de: 'Kỳ ' + ky + ' chưa có bản báo cáo nào',
+          cau: 'Chưa có bản báo cáo kỳ ' + ky + ' ⇒ chưa có gì để ký. Bản do hệ đưa vào; màn ⛔ tự tạo.'
+        }
+      }).then(kq => {
+        // chữ rỗng có TÊN (lớp `ban-rong`) + nút ký ⛔ có ở trạng thái rỗng (⇒ khoá/ẩn)
+        const r = o.firstElementChild;
+        if (kq && r && !o.querySelector('table')) r.classList.add('ban-rong');
+        return kq;
+      });
+  }
+
+  /* Dựng vùng MỘT lần (⛔ vẽ lại theo bảng tỷ giá): thẻ riêng ngay sau thẻ `IX.FX`.
+     Dựng bằng `createElement` + GIỮ THAM CHIẾU (⛔ `getElementById` sau `innerHTML`): vỏ DOM
+     giả của bài F4 ⛔ dựng cây từ chuỗi HTML. Không có chỗ gắn (⛔ cha) ⇒ ⛔ dựng. */
+  let _vung = null, _ds = null;
+
+  function _dung_vung_ban(o) {
+    if (_vung && _vung.parentNode) return;
+    const card = o.closest ? o.closest('.card') : null;
+    const cha = card && card.parentNode ? card.parentNode : o.parentNode;
+    if (!cha) return;
+    const v = TP.el('div', 'card');
+    v.id = 'ban-f08';
+    const h = TP.el('header');
+    h.appendChild(TP.el('h3', '', 'Bản Daily Report 3 · IX.TMP'));
+    v.appendChild(h);
+    const body = TP.el('div', 'body');
+    const hang = TP.el('div', 'note');
+    const nhan = TP.el('label', '', 'Kỳ (yyyymm) ');
+    nhan.setAttribute('for', 'ban-ky');
+    const inp = document.createElement('input');
+    inp.id = 'ban-ky';
+    inp.className = 'mono';
+    inp.setAttribute('inputmode', 'numeric');
+    inp.setAttribute('maxlength', '12');
+    inp.setAttribute('placeholder', '202601');
+    const nut = TP.el('button', 'b', 'Xem bản');
+    nut.id = 'ban-xem';
+    nut.type = 'button';
+    hang.appendChild(nhan);
+    hang.appendChild(inp);
+    hang.appendChild(nut);
+    _ds = TP.el('div');
+    _ds.id = 'ban-ds';
+    _ds.appendChild(TP.el('div', 'muted', 'Nhập kỳ rồi bấm Xem bản để thấy các phiên bản '
+      + 'của bản báo cáo.'));
+    body.appendChild(hang);
+    body.appendChild(_ds);
+    v.appendChild(body);
+    cha.insertBefore(v, card ? card.nextSibling : null);
+    _vung = v;
+    const xem = () => {
+      _ky_ban = String(inp.value || '').trim();
+      _tai_ban(_ds, _ky_ban);
+    };
+    nut.onclick = xem;
+    inp.onkeydown = e => { if (e.key === 'Enter' && !HT.nuot_phim(e)) xem(); };
+  }
+
   function _hang(thang, ky, nhan, ve_lai) {
     const tr = document.createElement('tr');
     tr.dataset.thang = String(thang);
@@ -183,6 +404,7 @@ const F08 = (function () {
   }
 
   function ve(o) {
+    _dung_vung_ban(o);
     return TT.chay(o, () => FLS.doc('/config/fx'), _ve, {
       so_dong: 6,
       la_rong: d => !d || !d.ky || (d.ky.length === 0
