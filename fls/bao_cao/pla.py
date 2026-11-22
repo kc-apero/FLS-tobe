@@ -137,6 +137,12 @@ class CongThuc:
     chi_cot_dau: frozenset[str] = frozenset()
     trong: frozenset[str] = TRONG
     khong_cong_thuc: Mapping[str, frozenset[str]] = field(default_factory=dict)
+    #: bộ này CHỈ áp cho các khối ấy; khối khác dùng `khoi_khac` *(416: chỉ GROUP dấu HR · khối LE/CDT/dư dấu PM)*
+    chi_khoi: frozenset[str] | None = None
+    khoi_khac: "CongThuc | None" = None
+
+    def cua_khoi(self, kh: str) -> "CongThuc":
+        return self if self.chi_khoi is None or kh in self.chi_khoi or self.khoi_khac is None else self.khoi_khac
 
     @property
     def ma_kpi(self) -> frozenset[str]:
@@ -144,8 +150,11 @@ class CongThuc:
 
 
 CONG_THUC_PM = CongThuc("PM", _kpi(1))
+#: 416/417: dấu HR NGƯỢC + 11 KPI chỉ cột đầu + TAC/CIT ⛔ công thức — CHỈ khối GROUP *(đo FORMULA 22/11: khối LE ·
+#: CDT · dư của 416 dùng đúng khuôn KPI của 414, mọi cột)*.
 CONG_THUC_HR = CongThuc("HR", _kpi(-1), chi_cot_dau=frozenset(_KPI_LOI_NHUAN),
-                        khong_cong_thuc={KHOI_TONG: frozenset({"TAC", "CIT"})})
+                        khong_cong_thuc={KHOI_TONG: frozenset({"TAC", "CIT"})},
+                        chi_khoi=frozenset({KHOI_TONG}), khoi_khac=CONG_THUC_PM)
 
 
 def loai_ma(cay: CayHD, ct: CongThuc) -> dict[str, str]:
@@ -185,7 +194,9 @@ def danh_gia(la: Mapping[tuple[str, str, Any], Decimal], cay: CayHD, cot: Sequen
         raise KeyError(f"công thức {ct.ten} nhắc mã ⛔ có trong cây: {sorted(set(thieu))}")
     dau = cot[0] if cot else None
     o: dict[tuple[str, str, Any], Decimal] = {}
+    ct0 = ct
     for kh in khoi:
+        ct = ct0.cua_khoi(kh)
         kcc = ct.khong_cong_thuc.get(kh, frozenset())
         for t in cot:
             nho: dict[str, Decimal] = {}
@@ -229,15 +240,32 @@ def _chi_la(o: Mapping[tuple[str, str, Any], Decimal], loai: Mapping[str, str]
 
 
 def pla_daily(dong: Iterable[DongCFA], cay: CayHD, ngay: Sequence[int], khoi: Sequence[str],
-              ct: CongThuc, alias: Mapping[str, str] | None = None) -> KetQuaPLA:
+              ct: CongThuc, alias: Mapping[str, str] | None = None,
+              cdt: tuple[Iterable[DongCFA], Sequence[str], str] | None = None) -> KetQuaPLA:
     """Daily: lá = `cfa1_daily` *(H5 — Σ BR−BS theo (khối, nhãn V, ngày GHI NHẬN))*; tong/kpi theo `ct`.
 
-    `dong[i].ngay` = serial ngày ghi nhận *(`ngay_pl_tu_yyyymm` / `ngay_pl_hr`)*, ⛔ ngày chứng từ.
+    `dong[i].ngay` = serial ngày ghi nhận *(`ngay_pl_tu_yyyymm` / `ngay_pl_hr`)*, ⛔ ngày chứng từ; `dong[i].le` =
+    khoá khối LE *(GL/HR cột `P`)*. `cdt` = (cùng các dòng nhưng `le` = mã khối CDT *(GL `AD` · HR `BP`, nơi gọi
+    tra nhãn)*, các khối CDT, khối dư) ⇒ khối dư = GROUP − Σ khối CDT *(công thức `SHQ2`)*.
     """
     kq = cfa1_daily(dong, cay, ngay, khoi, alias)
     loai = loai_ma(cay, ct)
     la = _chi_la(kq.o, loai)
-    return KetQuaPLA(o=danh_gia(la, cay, list(ngay), khoi, ct), cot=list(ngay), khoi=tuple(khoi),
+    tat = tuple(khoi)
+    if cdt is not None:
+        dong_cdt, khoi_cdt, khoi_du = cdt
+        kq2 = cfa1_daily(dong_cdt, cay, ngay, (KHOI_TONG,) + tuple(khoi_cdt), alias)
+        la2 = _chi_la(kq2.o, loai)
+        for k, v in la2.items():
+            if k[0] != KHOI_TONG:
+                la[k] = v
+        # khối DƯ *(SHQ2)*: `=G{GROUP} − SUMIFS(G{khối CDT}…)` — Σ lá GROUP trừ Σ lá 6 khối CDT
+        for n in cay.nut:
+            for t in ngay:
+                la[(khoi_du, n.ma, t)] = la[(KHOI_TONG, n.ma, t)] - sum(
+                    (la[(k, n.ma, t)] for k in khoi_cdt), _KHONG)
+        tat = tat + tuple(khoi_cdt) + (khoi_du,)
+    return KetQuaPLA(o=danh_gia(la, cay, list(ngay), tat, ct), cot=list(ngay), khoi=tat,
                      loai=loai, la=la, dong=kq)
 
 

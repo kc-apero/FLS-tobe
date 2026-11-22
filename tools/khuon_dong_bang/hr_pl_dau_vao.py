@@ -16,11 +16,20 @@ từ cột `A` của file GỐC HR, ⛔ có `BM` của tab `For PL Report` ở s
 năm 2024; MỌI trường hợp khác ⇒ năm **2025** *(⛔ theo `BL`)*. ⛔ `BM` ⛔ phải ngày của cột `A`: `A` còn
 `2.571` hàng RỖNG mà `BM` vẫn có ngày; ở `7.578/10.785` hàng có `A`, tháng `A` ≠ tháng `BM`. Cổng tái dựng `BM` từ `BK`·`BL` cho **mọi** hàng.
 
+⭐ **KHOÁ KHỐI CDT** *(`DT7B-R1-02`, đọc 22/11 bằng FORMULA chỉ-đọc — 416 = `[MID] Report I PLA3 Daily | HR Only`)*:
+  · 6 khối CDT `CVL COR SHQ1 CSM CAH ASA` ở cột `CA…SH` *(2025-01+)*: `SUMIFS(BA, BM=ngày, V=nhãn, BP=A{mở khối}) − SUMIFS(BB, …)`;
+    khối `SHQ2` = `GROUP − Σ 6 khối CDT` *(dư)*. ⛔ khoá `J` — khoá là **`BP`** *("CDT Correct")*.
+  · `BP10` = `=ArrayFormula(iferror(VLOOKUP(J10:J,$BR$11:$BS$28,2,FALSE),"SHQ2 | Headquarters2"))` ⇒ nguồn `J` *(hằng dán, 114 rỗng)*
+    + bảng ánh xạ `BR11:BS28` *(CÙNG tab, 13 hàng chữ — hằng `BP_ANH_XA`; `BR:BS` toàn CHỮ — 14 ô `BR` gồm tiêu đề · 13 ô `BS` · 0 số)*.
+  · ⚠ Ô `G…BX` *(72 cột đầu, 2024-10-20…2024-12-30)* của 416 còn là bản dán CŨ `SUMIFS(BR…) − SUMIFS(BS…)` ở tab HR — `BR:BS`
+    là bảng chữ ⇒ `0`; vì vậy `SGO2/SGO1/6 CDT` = 0 ở kỳ 2411·2412 và `SHQ2 = GROUP`; `BGO2` = ΣBA *(`BS` chữ)*.
+
 ⭐ **Hợp đồng bản thô** — LƯỚI `{spreadsheet_id, nguon, doc_luc, cach_doc, dong_dau_sheet, cot, values}`:
-  · `cot` = `("dong_sheet","A","P","V","BK","BL","BM","BA","BB")` *(SA, ánh xạ cột bằng hàng tiêu đề 7–8 TRƯỚC:
-    `P`=LE · `V`=Budget Code Final · `BK`/`BL`/`BM`=thời điểm bắt đầu/năm/ngày PL · `BA`/`BB`=PS Nợ/Có mUSD)*.
+  · `cot` = `("dong_sheet","A","P","V","BK","BL","BM","BA","BB","J","BP")` *(SA, ánh xạ cột bằng hàng tiêu đề 7–8 TRƯỚC:
+    `P`=LE · `V`=Budget Code Final · `BK`/`BL`/`BM`=thời điểm bắt đầu/năm/ngày PL · `BA`/`BB`=PS Nợ/Có mUSD ·
+    `J`=Chủ dự toán (CDT1) · `BP`=CDT Correct)*.
     ⛔⛔ `B` Số chứng từ · `C` Diễn giải · `G`…`O` · `H` Payment Type *(số TK)* — vùng đọc ⛔ phủ.
-  · `values` = mọi hàng có `V` *(13.356, `dong_sheet` 10…13365 liên tục)*; `A`/`BA`/`BB` RỖNG đồng thời ở **2.571** hàng.
+  · `values` = mọi hàng có `V` *(13.356, `dong_sheet` 10…13365 liên tục)*; `J` rỗng ở 114 hàng; `A`/`BA`/`BB` RỖNG đồng thời ở **2.571** hàng.
 """
 from __future__ import annotations
 
@@ -50,12 +59,13 @@ _k406 = _pl._k406
 BANG = "PD.PL.HR.DauVao"
 KHOA = "dong_sheet"
 KIEU_KHOA = "dong_sheet"
-COT = ("A", "P", "V", "BK", "BL", "BM", "BA", "BB")
-KIEU_COT = {"A": "so?", "P": "chu", "V": "chu", "BK": "so", "BL": "so", "BM": "so", "BA": "so?", "BB": "so?"}
+COT = ("A", "P", "V", "BK", "BL", "BM", "BA", "BB", "J", "BP")
+KIEU_COT = {"A": "so?", "P": "chu", "V": "chu", "BK": "so", "BL": "so", "BM": "so", "BA": "so?", "BB": "so?",
+            "J": "chu?", "BP": "chu"}
 RA = "tests/fixture/dau_vao/hr_pl_dau_vao.json"
 PHU_MONG = {"tong_ky": 14}
 
-COT_THO = ("dong_sheet", "A", "P", "V", "BK", "BL", "BM", "BA", "BB")
+COT_THO = ("dong_sheet", "A", "P", "V", "BK", "BL", "BM", "BA", "BB", "J", "BP")
 DONG_DAU_SHEET = 10
 
 #: Đ5 — đo 22/11 *(mỗi số đếm MỘT vật)*.
@@ -66,6 +76,33 @@ MONG_BL = {2024: 1375, 2025: 11981}
 MONG_KY_BM_THAT: dict[int, int] = {
     202411: 726, 202412: 649, 202501: 879, 202502: 902, 202503: 792, 202504: 919, 202505: 921,
     202506: 1364, 202507: 1094, 202508: 1604, 202509: 1076, 202510: 828, 202511: 795, 202512: 807}
+
+
+#: ⭐ `BR11:BS28` của tab HR *(13 hàng có chữ, đọc 22/11 — mã nhóm CDT, ⛔ tên người/TK)*: khoá `J` *(so không phân biệt hoa-thường
+#: như `VLOOKUP`)* → `BP`; ⛔ có trong bảng ⇒ `SHQ2 | Headquarters2`.
+BP_ANH_XA: tuple[tuple[str, str], ...] = (
+    ("SHQ2 | Headquarters2", "SHQ2 | Headquarters2"), ("SHQ2_Headquarters2", "SHQ2 | Headquarters2"),
+    ("SHQ1_Headquarters1", "SHQ1 | Headquarters1"), ("CMN_Management", "SHQ1 | Headquarters1"),
+    ("CSM_SuperMinds", "CSM | SuperMinds"), ("ASA_Super App (IOs)", "ASA | Super App"),
+    ("CVL_VisionLab", "CVL | VisionLab"), ("COR_TeraSofts", "COR | TeraSofts"),
+    ("CAH_Astronex", "CAH | Astronex"), ("CSM | SuperMinds", "CSM | SuperMinds"),
+    ("CVL | VisionLab", "CVL | VisionLab"), ("COR | TeraSofts", "COR | TeraSofts"),
+    ("CAH | Astronex", "CAH | Astronex"))
+BP_MAC_DINH = "SHQ2 | Headquarters2"
+#: `J` — tập đóng 14 giá trị + rỗng *(đo 22/11, 13.356 hàng)*; `BP` — 7 giá trị. Mong phân bố `BP` *(Đ5)*.
+MONG_J_RONG = 114
+TAP_J = frozenset({"SHQ1_Headquarters1", "CVL_VisionLab", "SHQ2_Headquarters2", "CSM_SuperMinds", "CAH_Astronex",
+                   "COR_TeraSofts", "COR_Terasofts", "ASA_Super App (IOs)", "CMN_Management", "SHQ2 | Headquarters2",
+                   "COR | TeraSofts", "CSM | SuperMinds", "CVL | VisionLab", "CAH | Astronex"})
+MONG_BP: dict[str, int] = {
+    "SHQ1 | Headquarters1": 4689, "SHQ2 | Headquarters2": 1982, "CVL | VisionLab": 1767, "COR | TeraSofts": 1664,
+    "CSM | SuperMinds": 1395, "CAH | Astronex": 1209, "ASA | Super App": 650}
+
+
+def tra_bp(j: Any) -> str:
+    """`BP = iferror(VLOOKUP(J, BR11:BS28, 2, FALSE), "SHQ2 | Headquarters2")` — `VLOOKUP` ⛔ phân biệt hoa-thường."""
+    k = "" if j is None else str(j).casefold()
+    return next((v for a, v in BP_ANH_XA if a.casefold() == k), BP_MAC_DINH)
 
 
 def _ky_bm(bm: int) -> int:
@@ -104,7 +141,7 @@ def chuan_bi(tho: dict[str, Any]) -> dict[str, Any]:
         "cot": [KHOA, *COT], "dong": dong, "phu": {"tong_ky": phu},
         "ghi_chu": (
             f"ĐẦU VÀO PLA3-HR = {len(dong)} hàng tab `…Y2025 | For PL Report` sổ P&L, khoá dong_sheet "
-            f"{DONG_DAU_SHEET}…{DONG_DAU_SHEET + len(dong) - 1} liên tục; 8 cột A·P·V·BK·BL·BM·BA·BB "
+            f"{DONG_DAU_SHEET}…{DONG_DAU_SHEET + len(dong) - 1} liên tục; 10 cột A·P·V·BK·BL·BM·BA·BB·J·BP "
             f"*(⛔ B Số chứng từ · C Diễn giải · H Payment Type · G…O)*. `BM` = "
             f"`=if(BK=\"\",\"\",if(and(BL=2024,BK=11),DATE(BL,BK,1),if(and(BL=2024,BK=12),DATE(BL,BK,1),DATE(2025,BK,1))))` "
             f"⇒ cột NGUỒN `BK` *(= ArrayFormula(AH10:AH), tháng)* + `BL` *(hằng năm)*; cổng tái dựng BM ở `thieu_lac`. "
@@ -123,9 +160,11 @@ def _i(v: Any) -> int:
 
 def thieu_lac(dong: list[dict[str, Any]]) -> dict[str, Any]:
     """Cổng *(Đ5; ⛔ in giá trị ô)*: ⒜ `P`/`V` ngoài tập đóng; ⒝ **`BM` ≠ f(`BK`,`BL`)** ở hàng nào / số khớp ≠ 13.356;
-    ⒞ `A`·`BA`·`BB` ⛔ rỗng-cùng-lúc, số hàng rỗng ≠ 2.571; ⒟ phân bố `BL` ≠ mong; ⒠ số hàng mỗi kỳ BM ≠ mong."""
+    ⒞ `A`·`BA`·`BB` ⛔ rỗng-cùng-lúc, số hàng rỗng ≠ 2.571; ⒟ phân bố `BL` ≠ mong; ⒠ số hàng mỗi kỳ BM ≠ mong; ⒡ **`J` ngoài tập đóng · `BP` ≠ `tra(J)` · phân bố `BP` ≠ mong**."""
     thieu: list[str] = []
-    n_khop = n_rong = 0
+    n_khop = n_rong = n_bp = 0
+    j_rong = 0
+    bp_dem: Counter = Counter()
     bl: Counter = Counter()
     ky: Counter = Counter()
     for d in dong:
@@ -134,6 +173,17 @@ def thieu_lac(dong: list[dict[str, Any]]) -> dict[str, Any]:
             thieu.append(f"P_la@{ds}")
         if _chu(d["V"]) not in _gl.HD_FINAL:
             thieu.append(f"V_la@{ds}")
+        j, bp = _chu(d["J"]), _chu(d["BP"])
+        j_rong += j is None
+        if j is not None and j not in TAP_J:
+            thieu.append(f"J_la@{ds}")
+        if bp not in MONG_BP:
+            thieu.append(f"BP_la@{ds}")
+        if bp == tra_bp(j):
+            n_bp += 1
+        else:
+            thieu.append(f"BP_khac_tra_J@{ds}")
+        bp_dem[bp] += 1
         bk, b_l, bm = _i(d["BK"]), _i(d["BL"]), _i(d["BM"])
         bl[b_l] += 1
         nam = b_l if (b_l == 2024 and bk in (11, 12)) else 2025
@@ -151,11 +201,17 @@ def thieu_lac(dong: list[dict[str, Any]]) -> dict[str, Any]:
         thieu.append(f"BM_khop@khác:{n_khop}/{MONG_BM_KHOP}")
     if n_rong != MONG_A_RONG:
         thieu.append(f"A_rong@khác:{n_rong}/{MONG_A_RONG}")
+    if n_bp != MONG_BM_KHOP:
+        thieu.append(f"BP_khop@khác:{n_bp}/{MONG_BM_KHOP}")
+    if j_rong != MONG_J_RONG:
+        thieu.append(f"J_rong@khác:{j_rong}/{MONG_J_RONG}")
+    if dict(bp_dem) != MONG_BP:
+        thieu.append("BP@phân_bố_khác")
     if dict(bl) != MONG_BL:
         thieu.append("BL@phân_bố_khác")
     if dict(ky) != MONG_KY_BM_THAT:
         thieu.append("ky_BM@phân_bố_khác")
     dai = (f"{len(dong)} hàng · BM=f(BK,BL) khớp {n_khop} · A/BA/BB rỗng {n_rong} · BL {dict(sorted(bl.items()))} · "
-           f"{len(ky)} kỳ BM")
+           f"{len(ky)} kỳ BM · BP=tra(J) khớp {n_bp} · J rỗng {j_rong}")
     return {"thieu": thieu, "lac": [], "dai": dai}
 

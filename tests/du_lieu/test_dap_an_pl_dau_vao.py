@@ -39,8 +39,8 @@ import hr_pl_dau_vao as H  # noqa: E402
 
 MONG_GL = 7883
 MONG_HR = 13356
-CHECKSUM_GL = "725fab7b8140c6af"
-CHECKSUM_HR = "71b0434574bba96f"
+CHECKSUM_GL = "94f794fdbb2c10ee"
+CHECKSUM_HR = "d6085f433469b7cc"
 #: AC-4 — đo 22/11, ghim *(Đ5)*.
 MONG_AC4 = {
     "gl": {"mau_so_o_dap_an": 371, "mau_so_o_input": 446, "o_so": 372, "o_khong_zero": 371, "khop": 371,
@@ -150,9 +150,12 @@ def test_B1_gl_DE_tai_dung_tu_AH(gl):
         khop += (de == str(G.de_tu_ah(Decimal(ah)))) if not isinstance(de, dict) else 0
         lech += isinstance(de, dict) or de != str(G.de_tu_ah(Decimal(ah)))
     assert (khop, loi, lech, ah_rong) == (7574, 309, 0, 309)
-    assert G.MONG_AH_LA == (5487, 5556, 5557, 5634, 5712, 7098)
+    # DT7B-R1-01: `AH` lạ = **8** hàng *(6 serial/yymmdd + 2 tháng ∉ 1…12: 669 tháng 27 · 6230 tháng 14)*
+    assert G.MONG_AH_LA == (669, 5487, 5556, 5557, 5634, 5712, 6230, 7098)
     assert [d["dong_sheet"] for d in gl["dong"] if d["AH"] is not None
-            and not 202000 < int(d["AH"]) < 203000] == [str(x) for x in G.MONG_AH_LA]
+            and G.ah_la(int(d["AH"]))] == [str(x) for x in G.MONG_AH_LA]
+    assert [d["dong_sheet"] for d in gl["dong"] if d["AH"] is not None
+            and not 202000 < int(d["AH"]) < 203000] == [str(x) for x in G.MONG_AH_LA if x not in (669, 6230)]
 
 
 def test_B1_gl_DE_phan_bo(gl):
@@ -360,3 +363,154 @@ def test_AC4_hr_vs_416(hr):
     kq = doi_chieu(hr, "BM", "BA", "BB", "pla3_hr_daily")
     assert kq["o_khong_zero"] > 0
     assert kq == MONG_AC4["hr"], kq
+
+
+# ═══ VÒNG SỬA SAU R1 `KQ-283` *(DT7B-R1-01 · DT7B-R1-02)* ═════════════════════════════════════════════════
+# ⭐ CÔNG THỨC khối ở 414/416 *(đọc 22/11 bằng FORMULA, chỉ-đọc — `BG-282` §«Vòng sửa sau R1»)*:
+#   414 *(GL, mọi 496 cột)*: `SUMIFS(BR, DE=ngày, V=nhãn, <khoá khối>) − SUMIFS(BS, …)`; khoá khối = `P`=mã LE
+#   cho `SGO2 SGO1 HGO6 BGO2` · **`AD`** = nhãn CDT cho `CVL COR SHQ1 CSM CAH ASA` · `SHQ2` = GROUP − Σ 6 khối CDT.
+#   416 *(HR)*: `BA − BB` theo `BM`·`V`·khoá khối; khoá CDT = **`BP`** *("CDT Correct" = VLOOKUP(J, BR11:BS28, 2, FALSE)
+#   mặc định `SHQ2 | Headquarters2`)*. ⚠ 72 cột đầu `G…BX` *(= 2024-10-20…2024-12-30, BM kỳ 2411·2412)* còn là bản dán
+#   CŨ: `SGO2/SGO1/CDT` cộng `BR−BS` của tab HR — mà `BR:BS` ở HR là BẢNG ÁNH XẠ CHỮ ⇒ `0`; `BGO2` = `BA − BS` ⇒ chỉ
+#   ΣBA. Từ cột `CA` *(serial ≥ 45657)* mọi khối `BA − BB`.
+NGAY_CA = 45657
+KHOI_CDT = ("CVL", "COR", "SHQ1", "CSM", "CAH", "ASA")
+KHOI_LE = ("SGO2", "SGO1", "HGO6", "BGO2")
+KHOI_12 = ("GROUP", *KHOI_LE, *KHOI_CDT, "SHQ2")
+#: ô so *(ô la ≠ 0 ở ít nhất MỘT bên)* · khớp, theo khối — đo 22/11, ghim *(Đ5; `0` ở khối LE của HR là KẾT QUẢ: mẫu số = 0)*.
+MONG_KHOI_GL = {"GROUP": 371, "SGO2": 108, "SGO1": 89, "HGO6": 11, "BGO2": 35, "CVL": 45, "COR": 77, "SHQ1": 154,
+                "CSM": 38, "CAH": 49, "ASA": 5, "SHQ2": 316}
+MONG_KHOI_HR = {"GROUP": 119, "SGO2": 0, "SGO1": 0, "HGO6": 0, "BGO2": 0, "CVL": 42, "COR": 43, "SHQ1": 29,
+                "CSM": 42, "CAH": 48, "ASA": 30, "SHQ2": 117}
+
+
+def _khoi_so(ten_pd, anh, cot_ngay, cot_no, cot_co, cot_cdt, la_cdt_tu_ngay):
+    """Tái dựng ô `la` MỌI khối 12 khối từ ảnh đầu vào ↔ đáp án ⇒ `{khối: (mẫu số đáp án ≠ 0, ô so, khớp)}` + lệch."""
+    a = _doc(FX / "dap_an" / f"{ten_pd}.json")
+    hd = [(_chu(r["le"]), _chu(r["ma"]), _chu(r["ten"])) for r in a["phu"]["hd"]["dong"] if _chu(r["loai"]) == "la"]
+    ten_le = {_chu(r["le"]): _chu(r["ten_le"]) for r in a["phu"]["le"]["dong"]}
+    ngay = sorted({int(_chu(r["ngay"])) for r in a["phu"]["ngay_truc"]["dong"]})
+    cell = {(_chu(d["le"]), _chu(d["ma_hd"]), int(d["ngay"])): Decimal(d["gt"]) for d in a["dong"]}
+    S: dict = {}
+    for d in anh["dong"]:
+        v, n = _chu(d["V"]), d[cot_ngay]
+        if v is None or isinstance(n, dict):
+            continue
+        no, co = Decimal(d[cot_no] or 0), Decimal(d[cot_co] or 0)
+        for k, x in ((("P", (_chu(d["P"]) or "").casefold(), v.casefold(), int(n)), no - co),
+                     (("A", (_chu(d["P"]) or "").casefold(), v.casefold(), int(n)), no),
+                     (("G", "", v.casefold(), int(n)), no - co),
+                     (("C", (_chu(d[cot_cdt]) or "").casefold(), v.casefold(), int(n)), no - co)):
+            S[k] = S.get(k, Decimal(0)) + x
+    g = lambda *k: S.get(k, Decimal(0))     # noqa: E731
+
+    def gt(le, nh, n):
+        if le == "GROUP":
+            return g("G", "", nh, n)
+        if le == "SHQ2":
+            return g("G", "", nh, n) - sum((gt(c, nh, n) for c in KHOI_CDT), Decimal(0))
+        cu = n < NGAY_CA and la_cdt_tu_ngay           # 416: bản dán cũ ở 2024 *(BR/BS chữ)*
+        if le in KHOI_CDT:
+            return Decimal(0) if cu else g("C", f"{le} | {ten_le[le]}".casefold(), nh, n)
+        if le == "BGO2" and cu:
+            return g("A", le.casefold(), nh, n)       # BA − BS(chữ) = ΣBA
+        if cu and le in ("SGO2", "SGO1"):
+            return Decimal(0)
+        return g("P", le.casefold(), nh, n)
+
+    kq = {le: [0, 0, 0] for le in KHOI_12}
+    lech: list = []
+    bi_bo_2024 = 0
+    for le, m, t in hd:
+        nh = f"{m} | {t}".casefold()
+        for n in ngay:
+            e, o = gt(le, nh, n), cell.get((le, m, n), Decimal(0))
+            if o != 0:
+                kq[le][0] += 1
+            if e == 0 and o == 0:
+                continue
+            kq[le][1] += 1
+            if abs(e - o) <= DUNG_SAI:
+                kq[le][2] += 1
+            else:
+                lech.append(f"{le}/{m}#{n}")
+    if la_cdt_tu_ngay:
+        for le in KHOI_CDT:                           # Σ theo BP ≠ 0 ở 2024 mà ô ĐÁP ÁN = 0 *(bản dán cũ bỏ)*
+            for _, m, t in (x for x in hd if x[0] == le):
+                nh = f"{m} | {t}".casefold()
+                for n in ngay:
+                    if n < NGAY_CA and g("C", f"{le} | {ten_le[le]}".casefold(), nh, n) != 0:
+                        bi_bo_2024 += 1
+    return {k: tuple(v) for k, v in kq.items()}, lech, bi_bo_2024
+
+
+def test_R101_AH_la_bat_thang_la():
+    """DT7B-R1-01: nhận dạng "lạ" gồm tháng ∉ 1…12 *(`202000<AH<203000` cũ SÓT 669·6230)*."""
+    assert G.ah_la(202527) and G.ah_la(202514) and G.ah_la(202500)       # tháng 27 · 14 · 0
+    assert G.ah_la(45962) and G.ah_la(260603) and G.ah_la(1)             # serial · yymmdd
+    assert not G.ah_la(202410) and not G.ah_la(202612) and not G.ah_la(202601)
+
+
+def test_R101_cong_AH_la_do_khi_them_hang_la(tho_gl):
+    """Đột biến: một `AH` hợp lệ thành `202513` *(DE giữ khớp = DATE ⇒ chỉ cổng "lạ" bắt)* ⇒ ĐỎ *(mong đúng 8)*."""
+    def sua(t):
+        i = next(i for i, r in enumerate(t["values"]) if r[_i(t, "AH")] == 202506)
+        t["values"][i][_i(t, "AH")] = 202513
+        t["values"][i][_i(t, "DE")] = G.de_tu_ah(Decimal(202513))
+    assert _ca_pha(tho_gl, MONG_GL, "gl_pl_dau_vao", sua) != 0
+
+
+def test_R102_hr_co_J_BP(hr):
+    """DT7B-R1-02: ảnh HR có `J` *(CDT1 hằng dán)* + `BP` *(= VLOOKUP(J))* ⇒ `BP = tra(J)` ở 13.356/13.356."""
+    assert hr["cot"] == list(H.COT) and {"J", "BP"} <= set(H.COT)
+    tra = {k.casefold(): v for k, v in H.BP_ANH_XA}
+    khop = sum(1 for d in hr["dong"] if tra.get((_chu(d["J"]) or "").casefold(), "SHQ2 | Headquarters2") == _chu(d["BP"]))
+    assert (khop, len(hr["dong"])) == (MONG_HR, MONG_HR)                 # mẫu số > 0
+    assert Counter(_chu(d["BP"]) for d in hr["dong"]) == H.MONG_BP
+    assert sum(1 for d in hr["dong"] if d["J"] is None) == H.MONG_J_RONG == 114
+
+
+def test_R102_gl_co_AD(gl):
+    assert gl["cot"] == list(G.COT) and "AD" in G.COT
+    assert Counter(_chu(d["AD"]) for d in gl["dong"]) == G.MONG_AD and sum(G.MONG_AD.values()) == MONG_GL
+
+
+def test_R102_hr_vs_416_moi_khoi(hr):
+    """⭐ H8: 416 mọi khối *(ô `la`)* tái dựng từ ảnh HR — khoá CDT = `BP`; 72 cột 2024 = bản dán cũ."""
+    kq, lech, bi_bo = _khoi_so("pla3_hr_daily", hr, "BM", "BA", "BB", "BP", True)
+    assert lech == [], lech[:5]
+    assert {k: v[1] for k, v in kq.items()} == MONG_KHOI_HR              # ô so mỗi khối
+    assert all(v[1] == v[2] for v in kq.values())                        # khớp = ô so
+    assert {k: v[0] for k, v in kq.items()} == {k: v[1] for k, v in kq.items()}   # đáp án ≠ 0 ⇒ ảnh tạo ra
+    assert sum(v[1] for v in kq.values()) == 470 and sum(MONG_KHOI_HR[k] for k in KHOI_CDT + ("SHQ2",)) == 351
+    assert bi_bo == MONG_BI_BO_2024 > 0                                  # Σ(BP) ≠ 0 ở 2024 mà ô đáp án = 0
+
+
+def test_R102_gl_vs_414_moi_khoi(gl):
+    kq, lech, _ = _khoi_so("pla1_daily", gl, "DE", "BR", "BS", "AD", False)
+    assert lech == [], lech[:5]
+    assert {k: v[1] for k, v in kq.items()} == MONG_KHOI_GL
+    assert all(v[1] == v[2] for v in kq.values())
+    assert {k: v[0] for k, v in kq.items()} == MONG_KHOI_GL
+    assert sum(v[1] for v in kq.values()) == 1298
+
+
+#: ô (khối CDT × mã `la` × kỳ 2411·2412) mà Σ(BA−BB) theo `BP` ≠ 0 nhưng ô đáp án 416 = 0 *(bản dán cũ `BR/BS` chữ)* — đo 22/11.
+MONG_BI_BO_2024 = 38
+
+
+def test_R102_ca_pha_BP_J_AD_do(tho_hr, tho_gl):
+    def BP(t):
+        t["values"][0][_i(t, "BP")] = "CVL | VisionLab" if t["values"][0][_i(t, "BP")] != "CVL | VisionLab" else "COR | TeraSofts"
+    def J_la(t):
+        t["values"][2][_i(t, "J")] = "NGUYEN VAN A"
+    def cot_cam(t):
+        t["cot"][_i(t, "J")] = "Email Address"
+    for f in (BP, J_la, cot_cam):
+        assert _ca_pha(tho_hr, MONG_HR, "hr_pl_dau_vao", f) != 0, f.__name__
+    def AD_la(t):
+        t["values"][4][_i(t, "AD")] = "0912345678"
+    def AD_doi(t):                                       # đổi AD sang mã HỢP LỆ khác ⇒ phân bố khác mong
+        t["values"][4][_i(t, "AD")] = "ASA | Super App" if t["values"][4][_i(t, "AD")] != "ASA | Super App" else "CVL | VisionLab"
+    for f in (AD_la, AD_doi):
+        assert _ca_pha(tho_gl, MONG_GL, "gl_pl_dau_vao", f) != 0, f.__name__

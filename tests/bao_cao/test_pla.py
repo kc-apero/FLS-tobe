@@ -9,6 +9,7 @@
 """
 from __future__ import annotations
 
+import dataclasses
 from datetime import date
 from decimal import Decimal as D
 
@@ -143,3 +144,21 @@ def test_YHQM_cuon_la_roi_tinh_lai_KPI_NPC_hau_to_tren_ky():
     assert (g("GI", "2025"), g("GI", "2025Q1"), g("GI", "2025Q2"), g("GI", "2025M04")) == (10, 4, 6, 6)
     assert g("EBITDA", "2025") == 10
     assert g("NPC", "2025M12") == 0 and g("NPC", "2025M04") == 6 and g("NPC", "2025") == 10 + 10 + 4 + 6 + 4 + 6     # Y + H1 + Q1 + Q2 + M03 + M04
+
+
+def test_khoi_CDT_va_khoi_DU_SHQ2_bang_GROUP_tru_tong_CDT():
+    """`cdt`: dòng mang mã khối CDT ở `le` *(GL `AD` · HR `BP`)*; khối dư = GROUP − Σ khối CDT *(công thức SHQ2)*."""
+    dong = [_d(1, "GI", 10), _d(1, "GI", 4), _d(1, "GI", 1)]
+    cdt = [dataclasses.replace(dong[0], le="CVL"), dataclasses.replace(dong[1], le="COR"),
+           dataclasses.replace(dong[2], le=None)]                                   # nhãn CDT lạ ⇒ chỉ GROUP
+    kq = pla.pla_daily(dong, CAY, [1], ("GROUP",), pla.CONG_THUC_PM, cdt=(cdt, ("CVL", "COR"), "SHQ2"))
+    g = lambda k: kq.o[(k, "GI", 1)]  # noqa: E731
+    assert (g("GROUP"), g("CVL"), g("COR"), g("SHQ2")) == (15, 10, 4, 1)
+    assert kq.o[("SHQ2", "EBITDA", 1)] == 1 and kq.khoi == ("GROUP", "CVL", "COR", "SHQ2")
+
+
+def test_HR_chi_khoi_GROUP_dau_nguoc_khoi_khac_dau_PM_moi_cot():
+    dong = [_d(1, "GI", 10, le="SGO2"), _d(1, "OMC", -3, le="SGO2"), _d(2, "GI", 2, le="SGO2")]
+    kq = pla.pla_daily(dong, CAY, [1, 2], ("GROUP", "SGO2"), pla.CONG_THUC_HR)
+    assert kq.o[("GROUP", "EBITDA", 1)] == 13 and kq.o[("SGO2", "EBITDA", 1)] == 7     # GROUP − · SGO2 +
+    assert kq.o[("GROUP", "EBITDA", 2)] == 0 and kq.o[("SGO2", "EBITDA", 2)] == 2      # chỉ cột đầu chỉ GROUP

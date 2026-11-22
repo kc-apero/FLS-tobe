@@ -14,10 +14,9 @@ Chuỗi *(dùng lại — ⛔ chép)*: `tinh_gl` *(H4)* → `pla.pla_daily` *(= 
 `pla.pla_pm_hr_daily` *(cộng THEO KHOÁ)* → `pla.pla_yhqm` *(= `cuon_ky` H6 + công thức tab)*.
 
 ── PHẠM VI KHỐI *(Đ4 — đếm cái gì)* ──────────────────────────────────────────────────────────────────────────────
-  · ĐO ĐƯỢC: PLA1 `GROUP` + 4 khối LE *(`SGO2 SGO1 HGO6 BGO2` — khoá `GL!P`)*; HR `GROUP`; PM+HR `GROUP`.
-  · `chua_co_dau_vao` *(CÓ TÊN, ⛔ coi là khớp, ⛔ đoán khoá — orchestrator chốt 22/11)*: PLA1 7 khối CDT
-    *(`CVL…ASA` khoá `GL!AD` ⛔ có trong ảnh · `SHQ2` = dư của GROUP − 6 khối ấy)*; HR 4 khối LE *(cộng `HR!BR/BS`
-    — ⛔ có trong ảnh)* + 7 khối CDT *(khoá `HR!J` — `DT7B-R1-02`)*; PM+HR 11 khối *(phần HR thiếu)*.
+  · ĐO ĐƯỢC cả **12 khối** ở 5 tab: `GROUP` · 4 khối LE *(khoá `GL!P` / `HR!P`)* · 6 khối CDT *(khoá `GL!AD` /
+    `HR!BP` "CDT Correct" — DT7b vòng sửa)* · `SHQ2` = GROUP − Σ 6 khối CDT *(dư)*. 417 chỉ có `GROUP`.
+  · `chua_co_dau_vao` *(ô đáp án ≠ 0 ở khối ⛔ đo — giữ bộ đếm, mong 0)*.
   · `khong_so_duoc`: 417 chỉ có khối `GROUP` ⇒ 11 khối × 74 mã × 57 kỳ = 46.398 ô.
   · `cot_ngoai_truc`: cột đáp án ⛔ nằm trên trục IX.PER *(2024-10-20 — IX.PER kho = 21/10, errata ㉑ ·
     `DT7-R1-07`)*.
@@ -25,6 +24,7 @@ Chuỗi *(dùng lại — ⛔ chép)*: `tinh_gl` *(H4)* → `pla.pla_daily` *(= 
 """
 from __future__ import annotations
 
+import dataclasses
 import datetime
 from collections import Counter
 from dataclasses import dataclass, field
@@ -46,7 +46,18 @@ _DA = GOC / "tests" / "fixture" / "dap_an"
 TAB = {"pla1_daily": "PM", "pla3_hr_daily": "HR", "pla3_pm_hr_daily": "PMHR",
        "pla1_yhqm": "PM", "pla3_hr_yhqm": "HR", "pla3_pm_hr_yhqm": "PMHR"}
 KHOI_LE = ("SGO2", "SGO1", "HGO6", "BGO2")
-KHOI_DO = {"PM": (KHOI_TONG,) + KHOI_LE, "HR": (KHOI_TONG,), "PMHR": (KHOI_TONG,)}
+#: Khối CDT — mã → nhãn khối *(ô `A{mở khối}` của 414/416, đo 22/11; SUMIFS so NGUYÊN nhãn, ⛔ hoa thường)*.
+KHOI_CDT = {"CVL": "CVL | VisionLab", "COR": "COR | TeraSofts", "SHQ1": "SHQ1 | Headquarters1",
+            "CSM": "CSM | SuperMinds", "CAH": "CAH | Astronex", "ASA": "ASA | Super App"}
+KHOI_DU = "SHQ2"                       # = GROUP − Σ 6 khối CDT *(công thức dư `=G8-SUMIFS(G$448:G$945…)`)*
+KHOI_12 = (KHOI_TONG,) + KHOI_LE + tuple(KHOI_CDT) + (KHOI_DU,)
+KHOI_DO = {"PM": KHOI_12, "HR": KHOI_12, "PMHR": KHOI_12}
+_THEO_NHAN_CDT = {v.casefold(): k for k, v in KHOI_CDT.items()}
+
+
+def ma_cdt(nhan: Any) -> str | None:
+    """Nhãn khối CDT *(GL `AD` · HR `BP`)* → mã khối; ⛔ khớp ⇒ None *(dòng chỉ vào GROUP ⇒ rơi vào khối dư)*."""
+    return _THEO_NHAN_CDT.get(nhan.casefold()) if isinstance(nhan, str) else None
 #: Dung sai ô *(rtol 0)* — đo 22/11 trên ô khớp: xem `MONG` `max_lech` *(⇒ atol ≥ ×10)*.
 ATOL = Decimal("1e-12")
 #: Dung sai đối chiếu BR/BS `tinh_gl` ↔ cột BR/BS của ảnh *(chỉ để kiểm feed — ⛔ đầu vào)*.
@@ -88,7 +99,7 @@ def feed_gl(anh: dict, fx, luat: str, ly: list[str]) -> tuple[list[DongCFA], dic
     """GL sổ P&L → `tinh_gl` *(BR/BS)* + ngày ghi nhận D4 *(AH)* → `DongCFA`. Lớp bỏ CÓ TÊN, đếm."""
     dem: dict[str, Any] = {"vao": 0, "thieu_D": [], "AH_RONG": [], "AH_LA": [], "de_lech": [], "br_lech": 0}
     feed: list[DongGL] = []
-    meta: list[tuple[int, str | None, str | None, Decimal | None, Decimal | None]] = []
+    meta: list[tuple[int, str | None, str | None, Decimal | None, Decimal | None, str | None]] = []
     for r in anh["dong"]:
         dem["vao"] += 1
         ds = int(_so(r["dong_sheet"]))
@@ -107,25 +118,28 @@ def feed_gl(anh: dict, fx, luat: str, ly: list[str]) -> tuple[list[DongCFA], dic
         a = _ngay(int(_so(r["A"])))
         feed.append(DongGL(thang=a.year * 100 + a.month, tien_te=tt,
                            no=_so(r.get("E")) or Decimal(0), co=_so(r.get("F")) or Decimal(0)))
-        meta.append((t, _chu(r.get("P")), _chu(r.get("V")), _so(r.get("BR")), _so(r.get("BS"))))
+        meta.append((t, _chu(r.get("P")), _chu(r.get("V")), _so(r.get("BR")), _so(r.get("BS")),
+                     ma_cdt(_chu(r.get("AD")))))
     try:
         kq = tinh_gl(feed, fx)
     except (ThieuTyGia, TienTeNgoaiGL) as e:
         ly.append(f"tinh_gl ⛔ chạy được *(⛔ đo được ⇒ ĐỎ)*: {type(e).__name__}: {' '.join(str(e).split())}")
         kq = []
-    dong = []
-    for (t, le, v, br, bs), k in zip(meta, kq):
+    dong, dong_cdt = [], []
+    for (t, le, v, br, bs, cdt), k in zip(meta, kq):
         if br is None or bs is None or abs(k.musd_no - br) > ATOL_BR or abs(k.musd_co - bs) > ATOL_BR:
             dem["br_lech"] += 1
         dong.append(DongCFA(ngay=t, le=le, hd=v, musd_no=k.musd_no, musd_co=k.musd_co))
+        dong_cdt.append(DongCFA(ngay=t, le=cdt, hd=v, musd_no=k.musd_no, musd_co=k.musd_co))
     dem["vao_engine"] = len(dong)
-    return dong, dem
+    dem["cdt_khong_khop"] = sum(1 for d in dong_cdt if d.le is None)
+    return dong, dong_cdt, dem
 
 
 def feed_hr(anh: dict, luat: str) -> tuple[list[DongCFA], dict[str, Any]]:
     """HR For PL Report → ngày ghi nhận *(BK/BL, luật năm AS-IS của BM + C6)* → `DongCFA` *(BA/BB)*."""
     dem: dict[str, Any] = {"vao": 0, "BK_RONG": [], "AH_LA": [], "bm_lech": [], "ba_bb_rong": 0}
-    dong = []
+    dong, dong_cdt = [], []
     for r in anh["dong"]:
         dem["vao"] += 1
         ds = int(_so(r["dong_sheet"]))
@@ -145,8 +159,10 @@ def feed_hr(anh: dict, luat: str) -> tuple[list[DongCFA], dict[str, Any]]:
             dem["ba_bb_rong"] += 1
         dong.append(DongCFA(ngay=t, le=_chu(r.get("P")), hd=_chu(r.get("V")),
                             musd_no=ba or Decimal(0), musd_co=bb or Decimal(0)))
+        dong_cdt.append(dataclasses.replace(dong[-1], le=ma_cdt(_chu(r.get("BP")))))
     dem["vao_engine"] = len(dong)
-    return dong, dem
+    dem["cdt_khong_khop"] = sum(1 for d in dong_cdt if d.le is None)
+    return dong, dong_cdt, dem
 
 
 # ── đáp án ───────────────────────────────────────────────────────────────────────────────────────
@@ -168,11 +184,12 @@ def _dap_an(anh: dict) -> tuple[dict[tuple[str, str, Any], Decimal], list, dict[
 # ── so ───────────────────────────────────────────────────────────────────────────────────────────
 
 def tinh_luoi(gl: dict, hr: dict, fx, cay: CayHD, lich: LichKy, den: datetime.date, ly: list[str]):
-    dong_gl, dem_gl = feed_gl(gl, fx, lich.luat, ly)
-    dong_hr, dem_hr = feed_hr(hr, lich.luat)
+    dong_gl, cdt_gl, dem_gl = feed_gl(gl, fx, lich.luat, ly)
+    dong_hr, cdt_hr, dem_hr = feed_hr(hr, lich.luat)
     truc = truc_ngay(lich, den)
-    pm = pla.pla_daily(dong_gl, cay, truc, KHOI_DO["PM"], pla.CONG_THUC_PM)
-    hrd = pla.pla_daily(dong_hr, cay, truc, KHOI_DO["HR"], pla.CONG_THUC_HR)
+    khoi_le = (KHOI_TONG,) + KHOI_LE
+    pm = pla.pla_daily(dong_gl, cay, truc, khoi_le, pla.CONG_THUC_PM, cdt=(cdt_gl, tuple(KHOI_CDT), KHOI_DU))
+    hrd = pla.pla_daily(dong_hr, cay, truc, khoi_le, pla.CONG_THUC_HR, cdt=(cdt_hr, tuple(KHOI_CDT), KHOI_DU))
     ph = pla.pla_pm_hr_daily(pm, hrd, cay, KHOI_DO["PMHR"])
     luoi = {"pla1_daily": pm, "pla3_hr_daily": hrd, "pla3_pm_hr_daily": ph,
             "pla1_yhqm": pla.pla_yhqm(pm, cay, KHOI_DO["PM"], pla.CONG_THUC_PM),
@@ -253,9 +270,11 @@ def _so_lop(so: Mapping[str, Any]) -> dict[str, Any]:
     return {
         "gl": {"vao": dg["vao"], "thieu_D": len(dg["thieu_D"]), "AH_RONG": len(dg["AH_RONG"]),
                "AH_LA": sorted(dg["AH_LA"]), "de_lech": len(dg["de_lech"]), "br_lech": dg["br_lech"],
-               "vao_engine": dg["vao_engine"], **{f"dong_{k}": v for k, v in dd["gl"].items()}},
+               "vao_engine": dg["vao_engine"], "cdt_khong_khop": dg["cdt_khong_khop"],
+               **{f"dong_{k}": v for k, v in dd["gl"].items()}},
         "hr": {"vao": dh["vao"], "BK_RONG": len(dh["BK_RONG"]), "AH_LA": len(dh["AH_LA"]),
                "bm_lech": len(dh["bm_lech"]), "ba_bb_rong": dh["ba_bb_rong"], "vao_engine": dh["vao_engine"],
+               "cdt_khong_khop": dh["cdt_khong_khop"],
                **{f"dong_{k}": v for k, v in dd["hr"].items()}},
         "truc": [_ngay(so["dem"]["truc"][0]).isoformat(), _ngay(so["dem"]["truc"][1]).isoformat(),
                  so["dem"]["truc"][2]],
@@ -264,6 +283,7 @@ def _so_lop(so: Mapping[str, Any]) -> dict[str, Any]:
                     "chua_co_dau_vao": s["chua_co_dau_vao"], "cot_ngoai_truc": s["cot_ngoai_truc"]["o_khac_0"],
                     "trong_khac_0": s["trong_khac_0"]} for t, s in so["tab"].items()},
         "khong_so_duoc": so["khong_so_duoc"],
+        "la_cdt_truoc_CA_khac_0": so["la_cdt_truoc_CA_khac_0"],
         "tu_kiem_dap_an": so["tu_kiem_dap_an"], "tu_kiem_engine": so["tu_kiem_engine"],
     }
 
@@ -292,6 +312,13 @@ def so_sanh_c3d(gl: dict, hr: dict, dap_an: Mapping[str, dict], fx, cay: CayHD, 
         so["tab"][ten] = s
         lech += lc
     so["khong_so_duoc"] = _khong_so_duoc(dap_an)
+    # bằng chứng DƯƠNG của lớp `as_is_truoc_CA` *(Đ3)*: ô LÁ khối CDT 416 trước cột CA ≠ 0 — đáp án vs engine
+    o416, _, l416, _ = _dap_an(dap_an["pla3_hr_daily"])
+    so["la_cdt_truoc_CA_khac_0"] = {
+        "dap_an": sum(1 for (kh, mm, t), v in o416.items() if kh in KHOI_CDT and t < SERIAL_CA and v
+                      and l416.get(mm) == "la"),
+        "engine": sum(1 for (kh, mm, t), v in luoi["pla3_hr_daily"].la.items() if kh in KHOI_CDT
+                      and t < SERIAL_CA and v)}
     so["tu_kiem_engine"], so["tu_kiem_dap_an"] = {}, {}
     for (a, b, c), hat in zip(_CAP, ("daily", "yhqm")):
         so["tu_kiem_engine"][hat] = _tu_kiem(luoi[a].o, luoi[b].o, luoi[c].o, luoi[c].loai, luoi[c].cot)
@@ -312,14 +339,20 @@ def so_sanh_c3d(gl: dict, hr: dict, dap_an: Mapping[str, dict], fx, cay: CayHD, 
     atol_lech = Decimal(str(m.get("atol_lech", "1e-9")))
     co_chu_dich: list[dict[str, Any]] = []
     ngoai_ten: list[dict[str, Any]] = []
+    truoc_ca: list[dict[str, Any]] = []
     for x in lech:
         k = f"{x['tab']}|{x['o']}"
         mg = mong_o.get(k)
         if mg is not None and abs(Decimal(x["engine"]) - Decimal(mg[0])) <= atol_lech \
                 and abs(Decimal(x["dap_an"]) - Decimal(mg[1])) <= atol_lech:
             co_chu_dich.append(x)
+        elif la_truoc_ca(x):
+            truoc_ca.append(x)
         else:
             ngoai_ten.append(x)
+    so["as_is_truoc_CA"] = tom_truoc_ca(truoc_ca)
+    _khac(so["as_is_truoc_CA"], m.get("as_is_truoc_CA"), "as_is_truoc_CA", ly)
+    co_chu_dich += truoc_ca
     thay = {f"{x['tab']}|{x['o']}" for x in lech}
     for k in sorted(set(mong_o) - thay):
         ly.append(f"ô mong lệch `{k}` nay KHỚP ⇒ sửa bản khai (Đ5 chiều ngược)")
@@ -347,13 +380,15 @@ def so_sanh_c3d(gl: dict, hr: dict, dap_an: Mapping[str, dict], fx, cay: CayHD, 
         "tong_o": tong["o_so"], "mong_tong_o": m.get("tong_o"),
         "o_co_so": o_co_so, "khop_co_so": khop_co_so, "o_0_0": tong["o_0_0"],
         "khop": tong["khop"],
-        "lech_co_chu_dich": len(co_chu_dich), "mong_lech_co_chu_dich": len(mong_o),
+        "lech_co_chu_dich": len(co_chu_dich),
+        "mong_lech_co_chu_dich": len(mong_o) + sum((m.get("as_is_truoc_CA") or {}).get("theo_tab_khoi", {}).values()),
         "lech_ngoai_ten": len(ngoai_ten),
         "khop_ghi_chu": "tong_o = Σ ô so 6 tab (la+tong và kpi, khối đo được, cột trên trục) = o_co_so + o_0_0; "
                         "khop = ô khớp THẬT (khop_co_so + o_0_0); khop + lech_co_chu_dich = tong_o",
         "theo_tab": {t: {"thuong": s["thuong"], "kpi": s["kpi"]} for t, s in so["tab"].items()},
         "lech_co_ten": {
-            "as_is_416_GAC_thieu_CXA": [f"{x['tab']}|{x['o']}" for x in co_chu_dich],
+            "as_is_416_GAC_thieu_CXA": [f"{x['tab']}|{x['o']}" for x in co_chu_dich if x not in truoc_ca],
+            "as_is_truoc_CA": so["as_is_truoc_CA"],
             "chua_co_dau_vao": {t: s["chua_co_dau_vao"] for t, s in so["tab"].items()},
             "khong_so_duoc": so["khong_so_duoc"],
             "cot_ngoai_truc": {t: s["cot_ngoai_truc"] for t, s in so["tab"].items()},
@@ -367,6 +402,31 @@ def so_sanh_c3d(gl: dict, hr: dict, dap_an: Mapping[str, dict], fx, cay: CayHD, 
         px = PhanXu(False, tuple(ly))
         hd2["dat"], hd2["ly_do"] = False, list(ly)
     return ThanhQuaC3d(so=so, phan_xu=px, hd2_cong=hd2, luoi=luoi, lech=lech)
+
+
+#: Cột `CA` của 416 = 2025-01-01 *(serial 45658)*: 72 cột trước nó *(`G…BX`, 2024-10-20…2024-12-30)* là bản dán CŨ
+#: cộng `HR!BR/BS` *(bảng ánh xạ CHỮ ⇒ 0)* ở khối CDT; khối dư `SHQ2` ⇒ = GROUP. Engine tính luật ĐÚNG mọi cột
+#: *(orchestrator chốt 22/11)* ⇒ ô lệch ở vùng ấy là **lệch của AS-IS**, có tên. Lan sang 418 *(= 414 + 416 từng ô)*
+#: và các kỳ 2024 của 419 *(Σ-kỳ của 418)*.
+SERIAL_CA = 45658
+_TAB_TRUOC_CA = ("pla3_hr_daily", "pla3_pm_hr_daily", "pla3_pm_hr_yhqm")
+
+
+def la_truoc_ca(x: Mapping[str, str]) -> bool:
+    kh, _, t = x["o"].split("#")
+    if x["tab"] not in _TAB_TRUOC_CA or (kh not in KHOI_CDT and kh != KHOI_DU):
+        return False
+    return t.startswith("2024") if x["tab"].endswith("yhqm") else int(t) < SERIAL_CA
+
+
+def tom_truoc_ca(ds: list[Mapping[str, str]]) -> dict[str, Any]:
+    """Đếm theo `tab|khối` + băm sha256 của (ô, engine, đáp án) làm tròn 1e-12 ⇒ đổi GIÁ TRỊ một ô cũng ĐỎ."""
+    import hashlib
+    q = Decimal("1e-12")
+    dem = Counter(f"{x['tab']}|{x['o'].split('#')[0]}" for x in ds)
+    chuoi = "\n".join(sorted(f"{x['tab']}|{x['o']}={Decimal(x['engine']).quantize(q)}|{Decimal(x['dap_an']).quantize(q)}"
+                              for x in ds))
+    return {"theo_tab_khoi": dict(sorted(dem.items())), "sha256": hashlib.sha256(chuoi.encode()).hexdigest()}
 
 
 def _lich_tu_kho(dsn: str | None):

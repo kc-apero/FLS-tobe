@@ -62,3 +62,49 @@ Bản đồ cột bằng hàng tiêu đề 7–8 TRƯỚC; chỉ đọc cột kh
 1. `DE` ở hàng `AH` lỗi/lạ giữ NGUYÊN *(chuỗi `#NUM!` · số vô lý)* — engine H8 phải bỏ như `SUMIFS` bỏ ô không bằng ngày cột trục; ❓ BA: 6 hàng `AH` serial là lỗi nhập liệu nguồn cần sửa ở sổ?
 2. HR ảnh lấy **13.356** hàng *(mọi hàng có `V`)*, ⛔ chỉ 10.785 hàng có `A`: để H8 thấy cả 2.571 hàng `A` rỗng *(đóng góp 0)*.
 3. Errata AP/phiếu: phiếu viết "2 ô `DE` ngày ≠ 1" — không có; ghi v3.1.3.
+
+## 8. Vòng sửa sau R1 *(`KQ-283` — 0 CHẶN · 2 NÊN SỬA · 2 GHI NHẬN; người dùng đã duyệt)* — 22/11, `fls-dev #DATA`, cụm 5437
+> Phần này **chỉ THÊM**. Nhánh `isp/DT7B` @ `d2afe2a` + gộp nhánh làm việc *(chỉ `TIEN_DO.md`, 0 xung đột)*. Ảnh cũ *(mọi ảnh ngoài 2 ảnh DT7b)* **đúng từng byte** *(6 sha ghim, bài `test_OLD_*`)*.
+
+### 8.1 `DT7B-R1-02` — khoá khối CDT *(đọc FORMULA bằng SA chỉ-đọc, ⛔ tin mù tin nhắn bổ sung)*
+**Bản đồ cột bằng tiêu đề TRƯỚC:** GL `AD` = hàng 7 `AA`=`=J7` *("Chủ dự toán (CDT1)")* · hàng 8 `Final`; HR `J` = "Chủ dự toán (CDT1)", `BP` = "CDT Correct", `BR:BS` ở HR = **bảng ánh xạ CHỮ** `BR11:BS28` *(14 ô `BR` gồm tiêu đề · 13 ô `BS` · **0 số**; đọc `BR1:BS13500`)*.
+**Công thức nguyên văn** *(rút gọn tên tab HR = `H!`; mỗi nhóm đếm bằng chuẩn hoá chỉ số hàng/cột trên 12 khối × 2 hàng `la` × 496 cột)*:
+```
+416 GROUP   G8 (496/496 cột):  =SUMIFS(H!$BA:$BA,H!$BM:$BM,G$5,H!$V:$V,$F8)-SUMIFS(H!$BB:$BB,H!$BM:$BM,G$5,H!$V:$V,$F8)
+416 HGO6    G282 (496/496):    …BA/BB…,H!$V:$V,$F282,H!$P:$P,$A$281)  ← khoá P = mã LE
+416 SGO2    CA116 (424 cột CA…SH): BA−BB … H!$P:$P,$A$115      ·  G116 (72 cột G…BX): BR−BS … H!$P:$P,$A$115   ⇒ 0 (BR/BS chữ)
+416 SGO1    như SGO2 (CA199 / G199, $A$198)
+416 BGO2    CA366 (424): BA−BB … P=$A$365   ·  G366 (72): =SUMIFS(H!$BA…)-SUMIFS(H!$BS…)  ⇒ chỉ ΣBA
+416 CDT ×6  CB454 (424): =SUMIFS(H!$BA:$BA,H!$BM:$BM,CB$5,H!$V:$V,$F454,H!$BP:$BP,A448)-SUMIFS(H!$BB:$BB,… ,H!$BP:$BP,A448)
+            G449 (72): =SUMIFS(H!$BR:$BR,…,$F449,H!$J:$J,A448)-SUMIFS(H!$BS:$BS,…)  ⇒ 0
+416 SHQ2     G947 / CB952 (496): =G8-SUMIFS(G$448:G$945,$F$448:$F$945,$F947)   ⇒ GROUP − Σ 6 khối CDT
+HR  BP10:   =ArrayFormula(iferror(VLOOKUP(J10:J,$BR$11:$BS$28,2,FALSE),"SHQ2 | Headquarters2"))
+414 CDT G449 (496/496): =SUMIFS(GL!$BR:$BR,GL!$DE:$DE,G$5,GL!$V:$V,$F449,GL!$AD:$AD,A448)-SUMIFS(GL!$BS:$BS,…)   ·  LE: GL!$P:$P,$A$115…  ·  SHQ2 = G8−SUMIFS(G448:G945…)
+```
+**Kết luận:** (1) **cột khối CDT HR = `BP`** *(nguồn `J` + bảng ánh xạ `BR11:BS28` cùng tab, ⛔ PII; mã nhóm)*; GL = **`AD`**; ⛔ `BR`/`BS` của HR *(tin nhắn bổ sung ghi `J`+`BR`+`BS` — SAI cho HR: `BR:BS` là chữ, SUMIFS = 0)*. (2) **72 cột đầu của 416 `G…BX` = 2024-10-20…2024-12-30 (kỳ `BM` 2411·2412)** còn là bản dán cũ `BR−BS` ⇒ `SGO2/SGO1/6 CDT` = 0, `SHQ2 = GROUP`, `BGO2` = ΣBA; từ `CA` (serial ≥ 45657) mọi khối `BA−BB`. Đo: **38** ô (6 khối CDT × mã `la` × kỳ 2411·2412) có Σ(BA−BB) theo `BP` ≠ 0 mà ô đáp án = 0 — engine H8 phải **tái hiện** quy tắc cột, ⛔ "sửa".
+Ảnh mới *(khuôn, ⛔ sửa tay JSON)*: HR **13.356** hàng × **10** cột `A·P·V·BK·BL·BM·BA·BB·J·BP` *(4,56 MB; checksum `d6085f433469b7cc`; cũ 3,30 MB)* · GL **7.883** × **12** cột thêm `AD` *(3,15 MB; `94f794fdbb2c10ee`; cũ 2,75 MB)* — > 2 MB ⇒ khai *(`DT4-R1-07`, orchestrator đã chấp nhận)*. Cổng mới ở khuôn: `J` ∈ tập đóng 14 + rỗng · `BP` ∈ 7 · **`BP = tra(J)` 13.356/13.356** · `J` rỗng **114** · phân bố `BP` *(7 giá trị ghim)* · `AD` tập đóng **14 giá trị** *(gồm biến thể lệch dấu cách ×5, `SUMIFS` khớp chuỗi ⇒ rơi vào `SHQ2`)* + phân bố ghim. PII: `J`/`AD`/`BP` là mã nhóm/dự án *(0 tên người · 0 TK · 0 `@`)*; `quet_pii_repo` = 0.
+
+**Đối chiếu đo (⛔ đầu vào; bài `test_R102_*`)** — Σ(BA−BB) theo `(khối, mã HD ở V, ngày BM)` ↔ ô `la` *(40 mã)*; mẫu số đáp án trước *(Đ3)*; dung sai 1e-6 mUSD:
+| Khối | HR↔416: đáp án `la` ≠ 0 · ô so · khớp | GL↔414: đáp án `la` ≠ 0 · ô so · khớp |
+|---|---|---|
+| GROUP | 119 · 119 · 119 | 371 · 371 · 371 |
+| SGO2 · SGO1 · HGO6 · BGO2 | **0 · 0 · 0** *(mẫu số = 0 là KẾT QUẢ: HR không có `P` = 4 mã ấy)* | 108·108 · 89·89 · 11·11 · 35·35 |
+| CVL · COR · SHQ1 · CSM · CAH · ASA | 42 · 43 · 29 · 42 · 48 · 30 *(khớp hết)* | 45 · 77 · 154 · 38 · 49 · 5 *(khớp hết)* |
+| SHQ2 *(dư)* | 117 · 117 · 117 | 316 · 316 · 316 |
+| **Tổng** | **470 / 470**, lệch **0** *(trong đó 7 khối CDT = 351)* | **1.298 / 1.298**, lệch **0** |
+⇒ "4.381 ô ≠ 0 ở 7 khối CDT" của R1 được **giải thích**: đo lại trên đáp án 416 = **4.457** ô ≠ 0 ở 7 khối *(= 351 `la` + 467 `tong` + 3.639 KPI; R1 ghi 4.381, chênh 76 không tái hiện được — không ảnh hưởng)*; **`la` 351 khớp 351/351** từ ảnh vào, còn `tong`/KPI là công thức cộng/chéo hàng trên `la` *(H8 tự cộng, ⛔ cần ảnh riêng)*. GL: 7 khối nhãn *(6 CDT + SHQ2)* = 684 ô `la` khớp 684/684 + 4 khối LE 243/243 *(`-03` đã đo ở R1)*.
+
+### 8.2 `DT7B-R1-01` — `AH` bất thường = 8
+Phép nhận dạng cũ `202000<AH<203000` sót hàng có THÁNG ∉ 1…12 nằm trong dải. Mới: `ah_la(AH) = ⛔(202000 < AH < 203000 ∧ 1 ≤ AH%100 ≤ 12)` *(hàm ở khuôn, bài gọi chung)*. Khai CÓ TÊN `MONG_AH_LA` = **8** hàng sheet: **669** *(tháng 27 ⇒ `DE` 2027-03-01)* · 5487 · 5556 · 5557 · 5634 · 5712 · **6230** *(tháng 14 ⇒ `DE` 2027-02-01)* · 7098; `DE` vẫn ĐÚNG công thức *(DATE tràn tháng)*, ⛔ sửa dữ liệu. `MONG_DE_KHOP` 7.574 giữ *(gồm 8 hàng)*. **Chữa Đ1:** câu "`AH` lạ **6**" ở §2 *(dòng 37)* là SAI — đúng là 8. Grep `docs/`+`tools/`+`tests/`+`fls/` *(22/11)*: còn **3** chỗ ghi "6" ở docs *(BG-282 §2 dòng 37 · sổ R1 `DT7B` ×2 — là BIÊN BẢN, giữ nguyên, Đ2)*; mã + bài đã đổi 6→8 *(`MONG_AH_LA`, `test_B1_gl_DE_tai_dung_tu_AH`)*.
+
+### 8.3 Đỏ trước · đột biến · sàn
+- **ĐỎ trước** *(chạy bài mới trên mã/ảnh cũ)*: **8 bài đỏ** — `test_B1_gl_DE_tai_dung_tu_AH` *(mong 8)* · `test_R101_AH_la_bat_thang_la` *(`G.ah_la` chưa có)* · `test_R101_cong_AH_la_do_khi_them_hang_la` · `test_R102_hr_co_J_BP` · `test_R102_gl_co_AD` · `test_R102_hr_vs_416_moi_khoi` · `test_R102_gl_vs_414_moi_khoi` · `test_R102_ca_pha_BP_J_AD_do`. Sau sửa **xanh** *(29/29 ở tệp bài)*.
+- **Cổng mới chứng minh ĐỎ** *(Đ5, `test_R102_ca_pha_*` + `test_R101_cong_*`)*: HR đổi `BP` 1 ô · `J` thành chuỗi lạ · tên cột `J`→`Email Address`; GL `AD` chuỗi lạ · `AD` sang mã HỢP LỆ khác *(phân bố lệch)* · `AH` hợp lệ→`202513` *(`DE` giữ khớp ⇒ chỉ cổng "lạ" bắt)* ⇒ exit ≠ 0 cả 6; trả nguyên ⇒ xanh *(bài tái tạo từng byte `test_AC2_*`)*.
+- **Sàn Q8:** `MONG_PYTEST_TOAN_BO` **4375 → 4382** *(= `pytest --collect-only` toàn bộ; +7 bài)* ở `tools/dung_moi_truong_isp.sh` + bài ghim `tests/test_dung_moi_truong_isp.py:423` cùng commit; web giữ 681.
+- Bản thô `/tmp/dt7b2` *(chmod 600)* đọc bằng SA chỉ-đọc; chiếu về 9/12 cột cũ rồi chạy khuôn CŨ ⇒ **đúng từng byte** hai ảnh cũ *(GL `725fab7b8140c6af`, HR `71b0434574bba96f`)* — chứng minh lần đọc lại KHÔNG trôi. Đã xoá sau BG; ⛔ commit.
+
+### 8.4 Ghi nhận · việc còn lại
+`DT7B-R1-03` *(AC-4 thêm 4 khối LE)* · `DT7B-R1-04` *(khoá `V` = chuỗi đầy đủ, ⛔ mã `ITE`)* ⇒ **backlog** *(AC-4 mới ở §8.1 đã đo cả 12 khối; chuyển WO H8 ghi khoá `V` đầy đủ)*. ❓ BA/orchestrator: 72 cột 2024 của 416 là bản dán cũ *(lỗi nguồn P&L)* — H8 tái hiện hay đòi sửa sổ? Số trống kế tiếp: **285**.
+
+### 8.5 Cổng *(sau vòng sửa)*
+`--duong-nen --cong 5437` MỘT lần, một mình: **KẾT ĐẠT** — toàn bộ `12 failed · 4354 passed · 2 xfailed · 14 errors` ⇒ tập đỏ + XFAIL **28 = 28** *(thêm 0 · bớt 0)*, chạy **4382** (mong ≥ 4382), skipped 0, deselected 0; `tests/web` **3 = 3**, chạy 681. `lint-imports` **11 kept / 0 broken**. `quet_pii_repo` = `0 chỗ · 0 tệp`. Ghi kho THẬT: `KHONG`.

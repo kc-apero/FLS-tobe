@@ -14,12 +14,13 @@
 ⇒ `DE` = ngày MÙNG 1 của tháng `yyyymm` ghi ở cột **`AH`** *(= "Thời điểm bắt đầu sử dụng dịch vụ" · nhóm `Final`,
 **HẰNG DÁN** `yyyymm`, ⛔ công thức — đọc FORMULA `AH10/11/3000/5487/7000` đều là hằng)*. Cột NGUỒN = `AH`, cùng tab,
 cùng sổ, ⛔ PII ⇒ đóng băng CẢ `AH` *(`WO-281` AC-1)*. ⭐ Cổng tái dựng `DE = DATE(AH//100, AH%100, 1)` cho **mọi** hàng:
-`AH` rỗng ⇒ `DE = #NUM!` *(`DATE(-29…)`)*; `AH` ⛔ phải `yyyymm` *(6 hàng sheet 5487·5556·5557·5634·5712·7098 mang
-serial/`yymmdd` lạ ⇒ `DE` ra ngày vô lý)* ⇒ khai CÓ TÊN, ⛔ sửa.
+`AH` rỗng ⇒ `DE = #NUM!` *(`DATE(-29…)`)*; `AH` ⛔ phải `yyyymm` hợp lệ *(**8** hàng sheet 5487·5556·5557·5634·5712·7098 mang
+serial/`yymmdd` lạ ⇒ `DE` ra ngày vô lý, + 669·6230 mang tháng 27·14 ⇒ `DE` ngoài lưới; `DT7B-R1-01`)* ⇒ khai CÓ TÊN, ⛔ sửa.
 
 ⭐ **Hợp đồng bản thô** — LƯỚI `{spreadsheet_id, nguon, doc_luc, cach_doc, dong_dau_sheet, cot, values}`:
-  · `cot` = `("dong_sheet","A","D","E","F","P","R","V","AH","BR","BS","DE")` *(SA, ánh xạ cột bằng hàng tiêu đề 7–8
-    TRƯỚC: `P`=LE · `R`=ITL ID · `V`=Budget Code Final · `AH`=Thời điểm bắt đầu Final · `BR`/`BS`=PS Nợ/Có mUSD)*.
+  · `cot` = `("dong_sheet","A","D","E","F","P","R","V","AH","BR","BS","DE","AD")` *(SA, ánh xạ cột bằng hàng tiêu đề 7–8
+    TRƯỚC: `P`=LE · `R`=ITL ID · `V`=Budget Code Final · `AH`=Thời điểm bắt đầu Final · `BR`/`BS`=PS Nợ/Có mUSD ·
+    `AD`=Chủ dự toán CDT1 Final — khoá 6 khối CDT của 414, `DT7B-R1-02`)*.
     ⛔⛔ `B` Số chứng từ · `C` Diễn giải · `G`…`O` *(PII)* — vùng đọc ⛔ phủ.
   · `values` = hàng dữ liệu *(cột `A` có ngày)* theo thứ tự sheet; `dong_sheet` liên tục `10…7892`.
 
@@ -53,26 +54,45 @@ _gl = _nap("_gl_hr")
 BANG = "PD.PL.GL.DauVao"
 KHOA = "dong_sheet"
 KIEU_KHOA = "dong_sheet"
-COT = ("A", "D", "E", "F", "P", "R", "V", "AH", "BR", "BS", "DE")
+COT = ("A", "D", "E", "F", "P", "R", "V", "AH", "BR", "BS", "DE", "AD")
 #: `A` *(ngày chứng từ, serial)* · `D` tiền tệ *(6 hàng rỗng)* · `E`/`F` nguyên tệ · `P` LE · `R` ITL ID ·
 #: `V` mã HD *(3 rỗng)* · `AH` yyyymm *(309 rỗng)* · `BR`/`BS` mUSD · `DE` số HOẶC `#NUM!` *(309)*.
 KIEU_COT = {"A": "so", "D": "chu?", "E": "so?", "F": "so?", "P": "chu", "R": "chu", "V": "chu?",
-            "AH": "so?", "BR": "so", "BS": "so", "DE": "so!"}
+            "AH": "so?", "BR": "so", "BS": "so", "DE": "so!", "AD": "chu"}
 RA = "tests/fixture/dau_vao/gl_pl_dau_vao.json"
 #: Đ5 — số ô lỗi `DE` *(phân bố theo loại)*: 309 `#NUM!` = đúng 309 hàng `AH` rỗng.
 LOI_MONG = {"DE": {"#NUM!": 309}}
 #: Bảng phụ: `tong_ky` *(mỗi kỳ của cột A)* · `tong_de` *(mỗi giá trị `DE` + 1 nhóm lỗi)*.
 PHU_MONG = {"tong_ky": 20, "tong_de": 34}
 
-COT_THO = ("dong_sheet", "A", "D", "E", "F", "P", "R", "V", "AH", "BR", "BS", "DE")
+COT_THO = ("dong_sheet", "A", "D", "E", "F", "P", "R", "V", "AH", "BR", "BS", "DE", "AD")
 DONG_DAU_SHEET = 10
 EPOCH = datetime.date(1899, 12, 30)
 TIEN_TE = _k406.TIEN_TE
 
 #: Đ5 — đo 22/11 *(⛔ chép từ 406: số liệu của CHÍNH tab này)*.
 MONG_AH_RONG = 309
-MONG_DE_KHOP = 7574          # DE = DATE(AH//100, AH%100, 1) khớp — gồm 6 hàng AH lạ
-MONG_AH_LA = (5487, 5556, 5557, 5634, 5712, 7098)
+MONG_DE_KHOP = 7574          # DE = DATE(AH//100, AH%100, 1) khớp — gồm 8 hàng AH lạ
+#: ⭐ `AH` lạ = **8** hàng *(`DT7B-R1-01`; bản đầu khai 6 vì cổng chỉ nhìn dải `202000…203000` — Đ1 phủ định thiếu)*:
+#: 6 hàng serial/`yymmdd` *(5487·5556·5557·5634·5712·7098 — `DE` ra ngày vô lý)* + 2 hàng `yyyymm` có THÁNG ∉ 1…12
+#: *(669: tháng 27 ⇒ `DE` 2027-03-01 · 6230: tháng 14 ⇒ `DE` 2027-02-01; `DATE` tràn tháng nên `DE` ĐÚNG công thức nhưng
+#: ngoài lưới 2024-10-20…2026-02-27 ⇒ `SUMIFS` bỏ)*. ⛔ sửa dữ liệu — khai CÓ TÊN.
+MONG_AH_LA = (669, 5487, 5556, 5557, 5634, 5712, 6230, 7098)
+#: ⭐ `AD` = "Chủ dự toán (CDT1)" nhóm `Final` *(hàng 7 `AA`=`=J7` · hàng 8 `Final`; HẰNG dán, 0 công thức — đọc FORMULA
+#: `AD10:AD8100`)*: khoá khối CDT của 414 *(`SUMIFS(BR, DE, V, AD = A{mở khối})` ở 6 khối `CVL COR SHQ1 CSM CAH ASA`; `SHQ2` = dư)*.
+#: **Tập đóng 14 giá trị** *(đo 22/11 trên 7.883 hàng, ⛔ rỗng)* — kể cả biến thể lệch dấu cách / hoa-thường *(`SHQ1| Headquarters1`
+#: ×92 · `SHQ2| Headquarters2` ×28 · `COR | Terasofts` ×16 · `SHQ2 | Headquarters1` ×31 · `SHQ1 | Headquarters2` ×2)*: `SUMIFS` khớp
+#: chuỗi nên biến thể ⛔ vào khối CDT nào ⇒ rơi vào `SHQ2` *(dư)*. Mã nhóm, ⛔ tên người/TK.
+MONG_AD: dict[str, int] = {
+    "SHQ2 | Headquarters2": 4769, "SHQ1 | Headquarters1": 2091, "COR | TeraSofts": 525, "CVL | VisionLab": 121,
+    "CAH | Astronex": 97, "CSM | SuperMinds": 92, "SHQ1| Headquarters1": 92, "SHQ2 | Headquarters1": 31,
+    "SHQ2| Headquarters2": 28, "COR | Terasofts": 16, "TOR | Project A": 12, "ASA | Super App": 5,
+    "SHQ1 | Headquarters2": 2, "TOL | Project L": 2}
+
+
+def ah_la(ah: int) -> bool:
+    """`AH` ⛔ `yyyymm` hợp lệ *(năm 2020…2029, THÁNG 1…12)* ⇒ lạ. ⭐ Tháng ∉ 1…12 cũng là lạ *(`DT7B-R1-01`)*."""
+    return not (202000 < ah < 203000 and 1 <= ah % 100 <= 12)
 MONG_R_LOI = 4
 TAP_P = frozenset({"VGOH", "VVOH", "VVOS", "VVOT", "VVOV", "SGO1", "SGO2", "BGO1", "BGO2", "VGO1", "HGO6",
                    "UGO2", "MGO1", "VOOA", "CN", "Cash Treasury", "Cash Treasury ", "#N/A ()"})
@@ -156,10 +176,10 @@ def chuan_bi(tho: dict[str, Any]) -> dict[str, Any]:
         "phu": {"tong_ky": tong_ky, "tong_de": tong_de},
         "ghi_chu": (
             f"ĐẦU VÀO PLA = {len(dong)} hàng dữ liệu *(cột A có ngày)* tab `Report I General Ledger` sổ P&L, khoá "
-            f"dong_sheet {DONG_DAU_SHEET}…{DONG_DAU_SHEET + len(dong) - 1} liên tục; 11 cột A·D·E·F·P·R·V·AH·BR·BS·DE "
+            f"dong_sheet {DONG_DAU_SHEET}…{DONG_DAU_SHEET + len(dong) - 1} liên tục; 12 cột A·D·E·F·P·R·V·AH·BR·BS·DE·AD "
             f"*(⛔ B Số chứng từ · C Diễn giải · G…O)*. `DE` = `=ArrayFormula(DATE(left(AH10:AH,4),RIGHT(AH10:AH,2),1))` "
             f"⇒ cột NGUỒN `AH` *(hằng dán yyyymm)*; cổng tái dựng DE từ AH ở `thieu_lac`. `P` LE · `V` mã HD "
-            f"giữ NGUYÊN chuỗi *(tập đóng — kể cả biến thể dấu cách đuôi)*. Bảng phụ `tong_ky` = số hàng + ΣBR/ΣBS "
+            f"giữ NGUYÊN chuỗi *(tập đóng — kể cả biến thể dấu cách đuôi)*; `AD` tập đóng 14 giá trị. Bảng phụ `tong_ky` = số hàng + ΣBR/ΣBS "
             f"theo kỳ cột A; `tong_de` = số hàng + Σ(BR−BS) theo giá trị DE."),
     }
 
@@ -175,7 +195,8 @@ def _n(v: Any) -> Any:
 def thieu_lac(dong: list[dict[str, Any]]) -> dict[str, Any]:
     """Cổng *(Đ5 — mong khai trước, NO cả hai chiều; ⛔ in giá trị ô)*: ⒜ số hàng mỗi kỳ cột A ↔ `phan_bo_ky`
     *(GỌI `gl_406_dau_vao`; 4 kỳ lệch có tên)*; ⒝ `D`/`P`/`V` ngoài tập đóng; ⒞ `R` ngoài `ITL#n` ∪ lỗi hợp lệ, số
-    lỗi ≠ 4; ⒟ **`DE` ≠ `DATE(AH)`** ở hàng nào; số `AH` rỗng ≠ 309; số `DE` khớp ≠ 7574; `AH` lạ ≠ 6 hàng cố định."""
+    lỗi ≠ 4; ⒟ **`DE` ≠ `DATE(AH)`** ở hàng nào; số `AH` rỗng ≠ 309; số `DE` khớp ≠ 7574; `AH` lạ ≠ 8 hàng cố định *(⒠ tháng ∉ 1…12 cũng lạ)*;
+    ⒡ **`AD` ngoài tập đóng 14 giá trị / phân bố ≠ mong**."""
     ledger = _k406._phan_bo_ledger()
     mong = {k: _k406.LECH_CO_TEN.get(k, v) for k, v in ledger.items()}
     thuc: dict[int, int] = {}
@@ -188,13 +209,17 @@ def thieu_lac(dong: list[dict[str, Any]]) -> dict[str, Any]:
     thieu += [f"ky_lech@{k}:{thuc.get(k, 0)}/{v}" for k, v in sorted(_k406.LECH_CO_TEN.items())
               if thuc.get(k, 0) != v]
     n_ah_rong = n_khop = n_loi_r = 0
-    ah_la: list[int] = []
+    ah_la_ds: list[int] = []
+    ad_dem: dict[str, int] = {}
     for d in dong:
         ds = int(_chu(d["dong_sheet"]))
-        for c, tap in (("D", set(TIEN_TE)), ("P", TAP_P), ("V", TAP_V)):
+        for c, tap in (("D", set(TIEN_TE)), ("P", TAP_P), ("V", TAP_V), ("AD", set(MONG_AD))):
             s = _chu(d[c])
             if s is not None and s not in tap:
                 thieu.append(f"{c}_la@{ds}")
+        ad = _chu(d["AD"])
+        if ad is not None:
+            ad_dem[ad] = ad_dem.get(ad, 0) + 1
         r = _chu(d["R"])
         if not _k406.ITL_ID_RE.fullmatch(r):
             n_loi_r += 1
@@ -211,18 +236,20 @@ def thieu_lac(dong: list[dict[str, Any]]) -> dict[str, Any]:
             thieu.append(f"DE_khac_AH@{ds}")
         else:
             n_khop += 1
-        if not 202000 < ah < 203000:
-            ah_la.append(ds)
+        if ah_la(int(ah)):
+            ah_la_ds.append(ds)
     if n_ah_rong != MONG_AH_RONG:
         thieu.append(f"AH_rong@khác:{n_ah_rong}/{MONG_AH_RONG}")
     if n_khop != MONG_DE_KHOP:
         thieu.append(f"DE_khop@khác:{n_khop}/{MONG_DE_KHOP}")
-    if tuple(ah_la) != MONG_AH_LA:
-        thieu.append(f"AH_la@khác:{len(ah_la)}/{len(MONG_AH_LA)}")
+    if tuple(ah_la_ds) != MONG_AH_LA:
+        thieu.append(f"AH_la@khác:{len(ah_la_ds)}/{len(MONG_AH_LA)}")
+    if ad_dem != MONG_AD:
+        thieu.append("AD@phân_bố_khác")
     if n_loi_r != MONG_R_LOI:
         thieu.append(f"R_loi@khác:{n_loi_r}/{MONG_R_LOI}")
     lac = [str(k) for k in sorted(_k406.LECH_CO_TEN)]
     dai = (f"{len(dong)} hàng · {sum(1 for k in mong if thuc.get(k) == mong[k] and k not in _k406.LECH_CO_TEN)} kỳ "
            f"khớp phan_bo_ky · {len(lac)} kỳ lệch có tên · DE=DATE(AH) khớp {n_khop} + {n_ah_rong} `#NUM!` "
-           f"(AH rỗng) · AH lạ {len(ah_la)} · R lỗi {n_loi_r}")
+           f"(AH rỗng) · AH lạ {len(ah_la_ds)} · R lỗi {n_loi_r}")
     return {"thieu": thieu, "lac": lac, "dai": dai}

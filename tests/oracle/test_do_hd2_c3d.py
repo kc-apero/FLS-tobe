@@ -64,16 +64,17 @@ def _sua_mong(**sua) -> c3d.MongC3d:
 def test_H8_AC3_anh_that_DAT_mau_so_khai_truoc(tq_that):
     assert tq_that.phan_xu.dat, tq_that.phan_xu.ly_do
     h = tq_that.hd2_cong
-    assert (h["tong_o"], h["khop"], h["lech_co_chu_dich"], h["lech_ngoai_ten"]) == (258888, 258880, 8, 0)
-    assert (h["o_co_so"], h["khop_co_so"], h["o_0_0"]) == (11889, 11881, 246999)
+    assert (h["tong_o"], h["khop"], h["lech_co_chu_dich"], h["lech_ngoai_ten"]) == (1289415, 1287624, 1791, 0)
+    assert (h["o_co_so"], h["khop_co_so"], h["o_0_0"]) == (44501, 42710, 1244914)
     assert h["khop"] + h["lech_co_chu_dich"] == h["tong_o"] == h["mong_tong_o"]
 
 
 def test_H8_AC3_khoi_va_KPI_tach_theo_tab(tq_that):
     t = tq_that.hd2_cong["theo_tab"]
-    assert t["pla1_daily"]["thuong"]["o_so"] == 5 * 50 * 495 and t["pla1_daily"]["kpi"]["o_so"] == 5 * 17 * 495
+    assert t["pla1_daily"]["thuong"]["o_so"] == 12 * 50 * 495 and t["pla1_daily"]["kpi"]["o_so"] == 12 * 17 * 495
     assert t["pla3_hr_yhqm"]["thuong"]["o_so"] == 1 * 50 * 57
-    assert [t[x]["kpi"]["lech"] for x in t] == [0, 4, 0, 0, 0, 0]          # KPI theo công thức TỪNG tab
+    assert [t[x]["kpi"]["lech"] for x in t] == [0, 418, 414, 0, 0, 439]    # chỉ lệch AS-IS (8 GAC + trước CA)
+    assert [t[x]["thuong"]["lech"] for x in t] == [0, 116, 112, 0, 0, 292]
     assert tq_that.hd2_cong["lech_co_ten"]["khong_so_duoc"] == 46398       # 11 × 74 × 57 (417 chỉ GROUP)
 
 
@@ -87,9 +88,9 @@ def test_H8_D3_dap_an_rong_thi_DO(nguon):
 
 
 @pytest.mark.parametrize("duong, v", [(("lop", "gl", "AH_RONG"), 308), (("lop", "gl", "AH_RONG"), 310),
-                                      (("lop", "tab", "pla1_daily", "chua_co_dau_vao"), 5418),
+                                      (("lop", "tab", "pla1_daily", "chua_co_dau_vao"), 1),
                                       (("lop", "tu_kiem_dap_an", "daily", "thuong"), 3),
-                                      (("lop", "khong_so_duoc"), 0), (("tong_o",), 258887)])
+                                      (("lop", "khong_so_duoc"), 0), (("tong_o",), 1289414), (("lop", "la_cdt_truoc_CA_khac_0", "engine"), 37)])
 def test_H8_D5_mong_lop_khac_thi_DO_ca_hai_chieu(nguon, duong, v):
     m = copy.deepcopy(dict(c3d.mong_c3d_mac_dinh().so))
     o = m
@@ -121,6 +122,27 @@ def test_H8_chung_DO_dung_sai_mot_o_dap_an_1e_11(nguon):
     x["gt"] = str(D(x["gt"]) + D("1e-11"))
     tq = _chay(nguon, da=da1)
     assert not tq.phan_xu.dat and any("pla1_yhqm|SGO1#GI#" in s for s in tq.phan_xu.ly_do)
+
+
+def test_H8_as_is_truoc_CA_doi_gia_tri_mot_o_thi_DO_va_ngoai_vung_thi_ngoai_ten(nguon, tq_that):
+    """Lớp `as_is_truoc_CA` *(72 cột 2024 của 416, bản dán cũ)*: băm GIÁ TRỊ ⇒ đổi một ô đáp án trong vùng ⇒ ĐỎ;
+    ô lệch NGOÀI vùng *(cột ≥ CA)* ⛔ được lớp nuốt."""
+    gl, hr, da, fx, cay = nguon
+    assert tq_that.so["la_cdt_truoc_CA_khac_0"] == {"dap_an": 0, "engine": 38}     # Đ3: tập ⛔ rỗng
+    x = next(x for x in tq_that.lech if c3d.la_truoc_ca(x) and x["tab"] == "pla3_pm_hr_daily")
+    kh, ma, t = x["o"].split("#")
+    da1 = copy.deepcopy(da)
+    r = next((r for r in da1["pla3_pm_hr_daily"]["dong"] if r["o_id"]["chu"] == x["o"]), None)
+    if r is None:
+        da1["pla3_pm_hr_daily"]["dong"].append({"o_id": {"chu": x["o"]}, "le": {"chu": kh}, "ma_hd": {"chu": ma},
+                                                "ngay": t, "gt": "0.5"})
+    else:
+        r["gt"] = str(D(r["gt"]) + D("0.5"))
+    tq = _chay(nguon, da=da1)
+    assert not tq.phan_xu.dat and any(s.startswith("as_is_truoc_CA.sha256") for s in tq.phan_xu.ly_do)
+    assert not c3d.la_truoc_ca({"tab": "pla3_hr_daily", "o": "CVL#GI#45658"})          # cột CA ⛔ thuộc lớp
+    assert not c3d.la_truoc_ca({"tab": "pla3_hr_daily", "o": "GROUP#GI#45600"})        # GROUP ⛔ thuộc lớp
+    assert not c3d.la_truoc_ca({"tab": "pla1_daily", "o": "CVL#GI#45600"})             # PLA1 ⛔ thuộc lớp
 
 
 # ── AC-2 · đầu vào thượng nguồn — ⛔ vòng tròn ──────────────────────────────────
@@ -155,7 +177,7 @@ def _o_do(tq) -> set[str]:
     """Mọi ô lệch NGOÀI bản khai *(⛔ đọc `ly_do` — nó cắt ở 20 dòng)*; kèm cổng ĐỎ."""
     assert not tq.phan_xu.dat
     khai = set(c3d.mong_c3d_mac_dinh().so["o_lech"])
-    return {f"{x['tab']}|{x['o']}" for x in tq.lech} - khai
+    return {f"{x['tab']}|{x['o']}" for x in tq.lech if not c3d.la_truoc_ca(x)} - khai
 
 
 def test_H8_AC5_dot_bien_mot_dong_GL_do_dung_o_PLA1_va_PM_HR(nguon):
@@ -228,6 +250,6 @@ def test_H8_IX_PER_ngay_dau_khac_thi_truc_doi_va_DO():
 def test_H8_AC4_khoi_hd2_cong_tep_that_theo_hop_dong_CG2(tq_that):
     b = json.loads((GOC / "docs" / "ITL" / "_tools" / "hd2_cong.json").read_text(encoding="utf-8"))["WP-C3d"]
     assert (b["goi"], b["dat"], b["tong_o"], b["khop"], b["lech_co_chu_dich"], b["mong_lech_co_chu_dich"]) == \
-        ("WP-C3d", True, 258888, 258880, 8, 8)
+        ("WP-C3d", True, 1289415, 1287624, 1791, 1791)
     assert b["khop_co_so"] + b["o_0_0"] == b["khop"] and b["o_co_so"] + b["o_0_0"] == b["tong_o"]
     assert b["theo_tab"] == json.loads(json.dumps(tq_that.hd2_cong["theo_tab"]))   # sinh bằng --ghi, ⛔ sửa tay
