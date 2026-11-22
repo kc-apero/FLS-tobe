@@ -1,0 +1,270 @@
+{
+ "bang": "NOEM.COM.CDT",
+ "khuon": "noem_com_cdt",
+ "nguon": "'[2025][RPT] NOEM PL & COM'!A18:B26 + F2:Q3 + F18:Q26 (sổ 19NNTbXJ6SmwA8AFnaUQlc0-WKjM_YPAkUaa2-shEU2g)",
+ "cach_doc": "Sheets API v4 values.get · UNFORMATTED_VALUE · SERIAL_NUMBER · khoá SA chỉ-đọc",
+ "ngay_dong_bang": "2026-11-22",
+ "khong_mang_PII": "⛔ KHÔNG mang cột riêng tư: máy soát 15 tên cột của bản thô với PM_COT_RIENG_TU ['Email Address'] — 0 trùng (gộp khoảng trắng, ⛔ phân biệt hoa thường). Ảnh chỉ giữ khoá `dong_sheet` + 14 cột chọn; 0 cột bản thô ⛔ chọn (tên ở `cot_khong_chon`). Bản thô qua `chuan_bi` của khuôn: 15 tên cột trên là của BẢNG khuôn dựng; soát thêm 0 tên cột của 0 bảng phụ — 0 trùng. Ô bản thô mà khuôn ⛔ mang/băm: xem `ghi_chu_khuon`.",
+ "ghi_chu_khuon": "COM theo nhóm NOEM (VND, dấu của tab: dương = chi phí) — 9 hàng 18…26 × 12 tháng 2025 (F:Q) của `[2025][RPT] NOEM PL & COM` sổ ATL; ô PL5 khối CDT: PL5 = PL4 − COM(left(nhãn khối,3)) / USD / 10^6. `SHQ` ở HAI hàng (SHQ1, SHQ2) — SUMIFS cộng cả hai. ⛔ cột R (2026-01) · ⛔ hàng khác.",
+ "khoa": "dong_sheet",
+ "kieu_khoa": "dong_sheet",
+ "cot": [
+  "ma",
+  "nhan",
+  "m01",
+  "m02",
+  "m03",
+  "m04",
+  "m05",
+  "m06",
+  "m07",
+  "m08",
+  "m09",
+  "m10",
+  "m11",
+  "m12"
+ ],
+ "cot_khong_chon": [],
+ "so_dong": 9,
+ "trung": [],
+ "thieu": [],
+ "lac": [],
+ "khoa_hong": [],
+ "o_rong": [],
+ "o_loi": [],
+ "loi_theo_cot": {
+  "m01": {},
+  "m02": {},
+  "m03": {},
+  "m04": {},
+  "m05": {},
+  "m06": {},
+  "m07": {},
+  "m08": {},
+  "m09": {},
+  "m10": {},
+  "m11": {},
+  "m12": {}
+ },
+ "loi_mong": {
+  "m01": 0,
+  "m02": 0,
+  "m03": 0,
+  "m04": 0,
+  "m05": 0,
+  "m06": 0,
+  "m07": 0,
+  "m08": 0,
+  "m09": 0,
+  "m10": 0,
+  "m11": 0,
+  "m12": 0
+ },
+ "cong": {
+  "mong": 9,
+  "so_dong": 9,
+  "dat": true,
+  "ly_do": []
+ },
+ "checksum_noi_dung": "eaa7fd6008a66569",
+ "dong": [
+  {
+   "thu_tu": 1,
+   "dong_sheet": "18",
+   "ma": {
+    "chu": "GAG"
+   },
+   "nhan": {
+    "chu": "GAG I Apero Group"
+   },
+   "m01": "156623874",
+   "m02": "178783890",
+   "m03": "96735894",
+   "m04": "80500000",
+   "m05": "57000000",
+   "m06": "90500000",
+   "m07": "86500000",
+   "m08": "456658374",
+   "m09": "187068379",
+   "m10": "232113717",
+   "m11": "189109597",
+   "m12": "206520084"
+  },
+  {
+   "thu_tu": 2,
+   "dong_sheet": "19",
+   "ma": {
+    "chu": "SHQ"
+   },
+   "nhan": {
+    "chu": "SHQ1_Headquarters1"
+   },
+   "m01": "0",
+   "m02": "0",
+   "m03": "0",
+   "m04": "0",
+   "m05": "0",
+   "m06": "0",
+   "m07": "0",
+   "m08": "0",
+   "m09": "0",
+   "m10": "0",
+   "m11": "0",
+   "m12": "0"
+  },
+  {
+   "thu_tu": 3,
+   "dong_sheet": "20",
+   "ma": {
+    "chu": "SHQ"
+   },
+   "nhan": {
+    "chu": "SHQ2_Headquarters2"
+   },
+   "m01": "35000000",
+   "m02": "9500000",
+   "m03": "0",
+   "m04": "0",
+   "m05": "0",
+   "m06": "26000000",
+   "m07": "0",
+   "m08": "0",
+   "m09": "0",
+   "m10": "0",
+   "m11": "0",
+   "m12": "0"
+  },
+  {
+   "thu_tu": 4,
+   "dong_sheet": "21",
+   "ma": {
+    "chu": "COR"
+   },
+   "nhan": {
+    "chu": "COR_Terasofts"
+   },
+   "m01": "17700000",
+   "m02": "12500000",
+   "m03": "42321608",
+   "m04": "25500000",
+   "m05": "21000000",
+   "m06": "31500000",
+   "m07": "39000000",
+   "m08": "421750404",
+   "m09": "180568379",
+   "m10": "172441737",
+   "m11": "163350054",
+   "m12": "170107127"
+  },
+  {
+   "thu_tu": 5,
+   "dong_sheet": "22",
+   "ma": {
+    "chu": "CVL"
+   },
+   "nhan": {
+    "chu": "CVL_VisionLab"
+   },
+   "m01": "91923874",
+   "m02": "156783890",
+   "m03": "54414286",
+   "m04": "40000000",
+   "m05": "36000000",
+   "m06": "33000000",
+   "m07": "46000000",
+   "m08": "34907970",
+   "m09": "6500000",
+   "m10": "59671980",
+   "m11": "25759543",
+   "m12": "36412957"
+  },
+  {
+   "thu_tu": 6,
+   "dong_sheet": "23",
+   "ma": {
+    "chu": "CSM"
+   },
+   "nhan": {
+    "chu": "CSM_SuperMinds"
+   },
+   "m01": "0",
+   "m02": "0",
+   "m03": "0",
+   "m04": "0",
+   "m05": "0",
+   "m06": "0",
+   "m07": "0",
+   "m08": "0",
+   "m09": "0",
+   "m10": "0",
+   "m11": "0",
+   "m12": "0"
+  },
+  {
+   "thu_tu": 7,
+   "dong_sheet": "24",
+   "ma": {
+    "chu": "CAH"
+   },
+   "nhan": {
+    "chu": "CAH_Astronex"
+   },
+   "m01": "12000000",
+   "m02": "0",
+   "m03": "0",
+   "m04": "15000000",
+   "m05": "0",
+   "m06": "0",
+   "m07": "1500000",
+   "m08": "0",
+   "m09": "0",
+   "m10": "0",
+   "m11": "0",
+   "m12": "0"
+  },
+  {
+   "thu_tu": 8,
+   "dong_sheet": "25",
+   "ma": {
+    "chu": "ASA"
+   },
+   "nhan": {
+    "chu": "ASA_Super App (IOs)"
+   },
+   "m01": "0",
+   "m02": "0",
+   "m03": "0",
+   "m04": "0",
+   "m05": "0",
+   "m06": "0",
+   "m07": "0",
+   "m08": "0",
+   "m09": "0",
+   "m10": "0",
+   "m11": "0",
+   "m12": "0"
+  },
+  {
+   "thu_tu": 9,
+   "dong_sheet": "26",
+   "ma": {
+    "chu": "CMN"
+   },
+   "nhan": {
+    "chu": "CMN_Management"
+   },
+   "m01": "0",
+   "m02": "0",
+   "m03": "0",
+   "m04": "0",
+   "m05": "0",
+   "m06": "0",
+   "m07": "0",
+   "m08": "0",
+   "m09": "0",
+   "m10": "0",
+   "m11": "0",
+   "m12": "0"
+  }
+ ]
+}
