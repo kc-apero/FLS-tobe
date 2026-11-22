@@ -136,6 +136,65 @@ MONG = {
     "tu_sinh_o": (4088, 4088),       # chế độ TỰ SINH 2026-03: FLS tự tính MID từ Manual input (tinh_mid) → Final
     "tu_sinh_hd": (584, 584),
     "tu_sinh_mid": (4020, 4088),     # MID tự tính = MID của sổ ở 4.020 ô (Final vẫn khớp đủ vì Classifying có trả lời)
+    # ⭐ H15 (ISP 3.1.2 · Step 43 · WO-287) — HD1 TỰ SINH theo kỳ, khai SAU lần đo đầu (22/11, 26 kỳ có ảnh DT12). Mỗi kỳ:
+    #    ô Final (khớp, tổng ô 7 khối) · khối HD · MID tự tính = MID sổ · lệch Final / lệch MID THEO KHỐI · ô bỏ vì mã lỗi.
+    #    ⛔ sửa lệch MID (ISP loại trừ). Sửa được 1 kỳ ⇒ ĐỎ ⇒ khai lại ở đây (Đ5). 2026-03 = ảnh sổ CŨ; 25 kỳ còn lại = mốc 20/11.
+    "tu_sinh_so_ky": 26,
+    "tu_sinh_chua_do": (),
+    "tu_sinh_theo_ky": {
+        "2024-10": {"o": (42, 42), "hd": (6, 6), "mid": (42, 42),
+                    "lech_final": {}, "lech_mid": {}, "o_loi": 0},
+        "2024-11": {"o": (21, 21), "hd": (3, 3), "mid": (21, 21),
+                    "lech_final": {}, "lech_mid": {}, "o_loi": 0},
+        "2024-12": {"o": (42, 42), "hd": (6, 6), "mid": (42, 42),
+                    "lech_final": {}, "lech_mid": {}, "o_loi": 0},
+        "2025-01": {"o": (5236, 5236), "hd": (748, 748), "mid": (4758, 5236),
+                    "lech_final": {}, "lech_mid": {'cdt1': 144, 'hd': 128, 'id_payee': 15, 'invoice': 18, 'pay_type': 145, 'svc_end': 13, 'svc_start': 15}, "o_loi": 0},
+        "2025-02": {"o": (1979, 1981), "hd": (283, 283), "mid": (1464, 1981),
+                    "lech_final": {'svc_end': 1, 'svc_start': 1}, "lech_mid": {'cdt1': 104, 'hd': 94, 'id_payee': 14, 'invoice': 63, 'pay_type': 90, 'svc_end': 76, 'svc_start': 76}, "o_loi": 0},
+        "2025-03": {"o": (2077, 2079), "hd": (297, 297), "mid": (1274, 2079),
+                    "lech_final": {'svc_end': 1, 'svc_start': 1}, "lech_mid": {'cdt1': 154, 'hd': 156, 'id_payee': 8, 'invoice': 84, 'pay_type': 139, 'svc_end': 132, 'svc_start': 132}, "o_loi": 0},
+        "2025-04": {"o": (2324, 2324), "hd": (332, 332), "mid": (1507, 2324),
+                    "lech_final": {}, "lech_mid": {'cdt1': 140, 'hd': 152, 'id_payee': 5, 'invoice': 109, 'pay_type': 142, 'svc_end': 134, 'svc_start': 135}, "o_loi": 0},
+        "2025-05": {"o": (2852, 2856), "hd": (408, 408), "mid": (1611, 2856),
+                    "lech_final": {'svc_end': 2, 'svc_start': 2}, "lech_mid": {'cdt1': 225, 'hd': 236, 'id_payee': 9, 'invoice': 135, 'pay_type': 221, 'svc_end': 210, 'svc_start': 209}, "o_loi": 0},
+        "2025-06": {"o": (2436, 2436), "hd": (348, 348), "mid": (1956, 2436),
+                    "lech_final": {}, "lech_mid": {'cdt1': 62, 'hd': 65, 'id_payee': 18, 'invoice': 83, 'pay_type': 132, 'svc_end': 60, 'svc_start': 60}, "o_loi": 0},
+        "2025-07": {"o": (3822, 3822), "hd": (546, 546), "mid": (3541, 3822),
+                    "lech_final": {}, "lech_mid": {'id_payee': 9, 'invoice': 98, 'pay_type': 174}, "o_loi": 0},
+        "2025-08": {"o": (3759, 3759), "hd": (537, 537), "mid": (3488, 3759),
+                    "lech_final": {}, "lech_mid": {'id_payee': 12, 'invoice': 104, 'pay_type': 155}, "o_loi": 0},
+        "2025-09": {"o": (3507, 3507), "hd": (501, 501), "mid": (3356, 3507),
+                    "lech_final": {}, "lech_mid": {'id_payee': 8, 'invoice': 74, 'pay_type': 69}, "o_loi": 0},
+        "2025-10": {"o": (3401, 3409), "hd": (487, 487), "mid": (3264, 3409),
+                    "lech_final": {'svc_end': 8}, "lech_mid": {'id_payee': 12, 'invoice': 81, 'pay_type': 31, 'svc_end': 21}, "o_loi": 0},
+        "2025-11": {"o": (3321, 3339), "hd": (477, 477), "mid": (3208, 3339),
+                    "lech_final": {'svc_end': 18}, "lech_mid": {'id_payee': 5, 'invoice': 61, 'pay_type': 31, 'svc_end': 34}, "o_loi": 0},
+        "2025-12": {"o": (3943, 3962), "hd": (566, 566), "mid": (3764, 3962),
+                    "lech_final": {'svc_end': 19}, "lech_mid": {'id_payee': 18, 'invoice': 59, 'pay_type': 78, 'svc_end': 43}, "o_loi": 0},
+        "2026-01": {"o": (3290, 3297), "hd": (471, 471), "mid": (3184, 3297),
+                    "lech_final": {'svc_end': 7}, "lech_mid": {'id_payee': 4, 'invoice': 62, 'pay_type': 26, 'svc_end': 21}, "o_loi": 0},
+        "2026-02": {"o": (3073, 3073), "hd": (439, 439), "mid": (3020, 3073),
+                    "lech_final": {}, "lech_mid": {'invoice': 53}, "o_loi": 0},
+        "2026-03": {"o": (4088, 4088), "hd": (584, 584), "mid": (4020, 4088),
+                    "lech_final": {}, "lech_mid": {'cdt1': 2, 'id_payee': 2, 'invoice': 62, 'pay_type': 2}, "o_loi": 0},
+        "2026-04": {"o": (4200, 4200), "hd": (600, 600), "mid": (4126, 4200),
+                    "lech_final": {}, "lech_mid": {'invoice': 66, 'pay_type': 8}, "o_loi": 0},
+        "2026-05": {"o": (3759, 3759), "hd": (537, 537), "mid": (3682, 3759),
+                    "lech_final": {}, "lech_mid": {'id_payee': 4, 'invoice': 72, 'svc_end': 1}, "o_loi": 0},
+        "2026-06": {"o": (4291, 4291), "hd": (613, 613), "mid": (4251, 4291),
+                    "lech_final": {}, "lech_mid": {'invoice': 40}, "o_loi": 0},
+        "2026-07": {"o": (4770, 4802), "hd": (686, 686), "mid": (4762, 4802),
+                    "lech_final": {'cdt1': 7, 'id_payee': 6, 'invoice': 9, 'svc_end': 5, 'svc_start': 5}, "lech_mid": {'invoice': 40}, "o_loi": 0},
+        "2026-08": {"o": (5068, 5068), "hd": (724, 724), "mid": (5043, 5068),
+                    "lech_final": {}, "lech_mid": {'invoice': 25}, "o_loi": 0},
+        "2026-09": {"o": (5159, 5159), "hd": (737, 737), "mid": (5119, 5159),
+                    "lech_final": {}, "lech_mid": {'invoice': 40}, "o_loi": 0},
+        "2026-10": {"o": (7266, 7266), "hd": (1038, 1038), "mid": (7249, 7266),
+                    "lech_final": {}, "lech_mid": {'invoice': 17}, "o_loi": 0},
+        "2026-11": {"o": (4613, 4613), "hd": (659, 659), "mid": (4610, 4613),
+                    "lech_final": {}, "lech_mid": {'invoice': 3}, "o_loi": 0},
+    },
     "checksum": {"itl_ledge_adjustment.json": "575c53379074c759",
                  "classifying_vs_canon.json": "7226ef112dbd00f7",
                  "pm_join.json": "6ec10945e6c1636a"},
@@ -527,10 +586,26 @@ def do(nhan: Path = NHAN, so_ly_do: Path = SO_LY_DO, hom_nay: date | None = None
                                                  sum(o_moi[k]["o_moi_dong"] for k in cac_ky)),
          tuple(MONG.get("o_moi_dong") or ()))
     kiem("parity khối HD", (sum(o[k]["hd_parity_khop"] for k in cac_ky), sum(o[k]["hd_parity"] for k in cac_ky)), MONG["hd_parity"])
-    tu_sinh = do_tu_sinh()
+    tsk = do_tu_sinh_theo_ky()
+    loi.extend(tsk["loi"])
+    tu_sinh = dict(tsk["theo_ky"].get("2026-03") or {"ky": "2026-03", "o": (0, 0), "hd": (0, 0), "mid": (0, 0)})
     kiem("tự sinh ô Final 2026-03", tu_sinh["o"], MONG["tu_sinh_o"])
     kiem("tự sinh khối HD 2026-03", tu_sinh["hd"], MONG["tu_sinh_hd"])
     kiem("tự sinh MID 2026-03", tu_sinh["mid"], MONG["tu_sinh_mid"])
+    # H15 — MONG theo kỳ (Đ5 hai chiều): so TỪNG kỳ với bản khai; kỳ ⛔ đo được ⇒ ĐỎ có tên (⛔ "không thấy lệch")
+    kiem("số kỳ tự sinh có ảnh", tsk["so_ky_co_anh"], MONG.get("tu_sinh_so_ky"))
+    kiem("kỳ chua_do", tuple(sorted(tsk["chua_do"])), tuple(MONG.get("tu_sinh_chua_do") or ()))
+    for ky, mo in (MONG.get("tu_sinh_theo_ky") or {}).items():
+        x = tsk["theo_ky"].get(ky)
+        if x is not None:
+            kiem(f"tự sinh {ky} (ô Final · HD · MID · lệch Final theo khối · lệch MID theo khối · ô lỗi)",
+                 (tuple(x["o"]), tuple(x["hd"]), tuple(x["mid"]), x["lech_final"], x["lech_mid"], x["o_loi"]),
+                 (tuple(mo["o"]), tuple(mo["hd"]), tuple(mo["mid"]), mo["lech_final"], mo["lech_mid"], mo["o_loi"]))
+    for ky in sorted(set(tsk["theo_ky"]) - set(MONG.get("tu_sinh_theo_ky") or {})):
+        loi.append(f"tự sinh {ky}: đo được nhưng MONG ⛔ khai kỳ này (Đ5)")
+    tu_sinh["theo_ky"] = tsk["theo_ky"]
+    tu_sinh.update({"so_ky_co_anh": tsk["so_ky_co_anh"], "chua_do": tsk["chua_do"], "tong": tsk["tong"],
+                    "moc_so": tsk["moc_so"]})
 
     # mapping FLS + PM line theo kỳ (bank → dòng canon → dòng sổ → kỳ)
     bank_khong_ky = 0
@@ -592,29 +667,84 @@ def do(nhan: Path = NHAN, so_ly_do: Path = SO_LY_DO, hom_nay: date | None = None
     }
 
 
-def do_tu_sinh() -> dict:
-    """Chế độ TỰ SINH trên tháng duy nhất có cột Manual input (itl_ledge_2026_03.json, 584 dòng):
-    MID_fls = tinh_mid(Classifying, Manual, mặc định khối) → Final_fls = tinh_final(Classifying, MID_fls), so Final sổ.
-    ⛔ đọc MID của sổ — đây mới là phép đo "FLS tự mapping ra đúng quá khứ"."""
+ANH_DAP_AN = FX / "dap_an"
+MANIFEST_KY = ANH_DAP_AN / "itl_ledge_cac_ky.json"   # DT12: `dong_theo_ky_o_cot_A` = 26 kỳ của sổ (đo 20/11)
+
+
+def _duong_anh_ky(ky: str) -> Path:
+    """Ảnh của kỳ: 2026-03 là ảnh CŨ ở `tests/fixture/` (chụp sổ cũ — `DT12-R1-05`); 25 kỳ còn lại ở `dap_an/`."""
+    return FX / "itl_ledge_2026_03.json" if ky == "2026-03" else ANH_DAP_AN / f"itl_ledge_{ky}.json"
+
+
+def do_tu_sinh_ky(d: dict, ky: str) -> dict:
+    """Đo chế độ TỰ SINH trên MỘT ảnh kỳ (`d` đã nạp). Mọi phép so ô qua `_chuan` (⛔ so KIỂU — `DT12-R2-02`).
+    Ra: `o` · `hd` · `mid` = (khớp, tổng) — tổng đếm Ô (⛔ dòng) 7 khối ⛔ có mã lỗi Sheets ở Cls/MID/Final;
+    `lech_final` · `lech_mid` = lệch theo KHỐI (lớp có tên); `o_loi` = ô bỏ vì mã lỗi (`#N/A ()`… giữ nguyên chuỗi)."""
     from fls.ledger.final_rule import tinh_mid
-    d = _nap("itl_ledge_2026_03.json")
-    if len(d["dong"]) != d["so_dong"] or d["ky"] != "2026-03":
-        raise SystemExit("⛔ ảnh 2026-03 khác khai")
-    tong = khop = hd_t = hd_k = mid_k = 0
+    if d.get("ky") != ky or len(d["dong"]) != d["so_dong"]:
+        raise ValueError(f"ảnh khai ky={d.get('ky')} so_dong={d.get('so_dong')} ≠ {ky}/{len(d['dong'])} dòng thật")
+    tong = khop = hd_t = hd_k = mid_k = o_loi = 0
+    lech_final: Counter = Counter()
+    lech_mid: Counter = Counter()
     for r in d["dong"]:
         for k in KHOI:
             cls, man, mid, fin = (r[f"{k}_{c}"] for c in ("classifying", "manual", "mid", "final"))
             if any(la_o_loi(_chuan(v)) for v in (cls, mid, fin) if v is not None):
+                o_loi += 1
                 continue
             m2 = tinh_mid(_chuan(cls) or None, _chuan(man) or None, MAC_DINH_THEO_KHOI[k])
             f2 = tinh_final(_chuan(cls) or None, m2)
             tong += 1
             ok = _chuan(f2) == _chuan(fin)
             khop += ok
-            mid_k += _chuan(m2) == _chuan(mid)
+            if not ok:
+                lech_final[k] += 1
+            if _chuan(m2) == _chuan(mid):
+                mid_k += 1
+            else:
+                lech_mid[k] += 1
             if k == "hd":
                 hd_t, hd_k = hd_t + 1, hd_k + ok
-    return {"ky": "2026-03", "o": (khop, tong), "hd": (hd_k, hd_t), "mid": (mid_k, tong)}
+    return {"ky": ky, "so_dong": len(d["dong"]), "o": (khop, tong), "hd": (hd_k, hd_t), "mid": (mid_k, tong),
+            "lech_final": dict(lech_final), "lech_mid": dict(lech_mid), "o_loi": o_loi}
+
+
+def do_tu_sinh_theo_ky(manifest: Path | None = None, duong_anh=None) -> dict:
+    """H15 · Step 43: lặp chế độ TỰ SINH theo MỌI kỳ có ảnh (26). Kỳ ⛔ có ảnh / ảnh hỏng ⇒ `chua_do` CÓ TÊN
+    (⛔ "đạt"). `ky_kham` rỗng (manifest hỏng/0 kỳ) ⇒ `loi` — Đ3, ⛔ xanh trên tập rỗng."""
+    manifest = manifest or MANIFEST_KY
+    duong_anh = duong_anh or _duong_anh_ky
+    loi: list[str] = []
+    try:
+        cac_ky = sorted(json.loads(manifest.read_text(encoding="utf-8"))["dong_theo_ky_o_cot_A"])
+    except (OSError, ValueError, KeyError) as e:
+        cac_ky = []
+        loi.append(f"manifest DT12 {_duong(manifest)}: ⛔ đọc được — {type(e).__name__}")
+    theo_ky: dict = {}
+    chua_do: dict = {}
+    for ky in cac_ky:
+        p = duong_anh(ky)
+        try:
+            theo_ky[ky] = do_tu_sinh_ky(json.loads(p.read_text(encoding="utf-8")), ky)
+        except FileNotFoundError:
+            chua_do[ky] = f"⛔ có ảnh {_duong(p)}"
+        except (OSError, ValueError, KeyError, TypeError) as e:
+            chua_do[ky] = f"ảnh hỏng {_duong(p)}: {type(e).__name__}: " + " ".join(str(e).split())[:120]
+    if not cac_ky:
+        loi.append("DT12 cho 0 kỳ (⛔ đo trên tập rỗng)")
+    tong = {c: [sum(x[c][i] for x in theo_ky.values()) for i in (0, 1)] for c in ("o", "hd", "mid")}
+    return {"so_ky_co_anh": len(cac_ky), "theo_ky": theo_ky, "chua_do": chua_do, "tong": tong,
+            "loi": loi,
+            "moc_so": {k: ("20/11 (sổ hiện tại)" if k != "2026-03" else "mốc CŨ (ảnh chụp sổ cũ — chủ chưa quyết đóng băng lại)")
+                       for k in theo_ky}}
+
+
+def do_tu_sinh() -> dict:
+    """Tương thích ngược (2026-03 — HD 584/584): lát cắt kỳ 2026-03 của `do_tu_sinh_theo_ky`.
+    MID_fls = tinh_mid(Classifying, Manual, mặc định khối) → Final_fls = tinh_final(Classifying, MID_fls), so Final sổ.
+    ⛔ đọc MID của sổ — đây mới là phép đo "FLS tự mapping ra đúng quá khứ"."""
+    x = do_tu_sinh_ky(json.loads(_duong_anh_ky("2026-03").read_text(encoding="utf-8")), "2026-03")
+    return {k: x[k] for k in ("ky", "o", "hd", "mid")}
 
 
 def main() -> None:

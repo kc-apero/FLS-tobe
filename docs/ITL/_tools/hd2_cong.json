@@ -962,5 +962,364 @@
   },
   "dat": true,
   "ly_do": []
+ },
+ "WP-C3d": {
+  "bang": "HD2.WP-C3d",
+  "goi": "WP-C3d",
+  "mo_ta": "SO.PLA1 · PLA3 HR · PLA3 PM+HR (gl_pl_dau_vao → tinh_gl + C6 D4 A từ AH; hr_pl_dau_vao BA/BB + BK/BL) → pla_daily (cfa1_daily H5 + công thức tab) · cộng THEO KHOÁ · pla_yhqm (cuon_ky H6) ↔ 414–419",
+  "nguon_dau_vao": [
+   "tests/fixture/dau_vao/gl_pl_dau_vao.json",
+   "tests/fixture/dau_vao/hr_pl_dau_vao.json"
+  ],
+  "dap_an": [
+   "tests/fixture/dap_an/pla1_daily.json",
+   "tests/fixture/dap_an/pla3_hr_daily.json",
+   "tests/fixture/dap_an/pla3_pm_hr_daily.json",
+   "tests/fixture/dap_an/pla1_yhqm.json",
+   "tests/fixture/dap_an/pla3_hr_yhqm.json",
+   "tests/fixture/dap_an/pla3_pm_hr_yhqm.json"
+  ],
+  "khoa": "tab × khối đo được × mã (la+tong | kpi — ⛔ trong) × cột trục (ngày | kỳ)",
+  "khoi_do": {
+   "pla1_daily": [
+    "GROUP",
+    "SGO2",
+    "SGO1",
+    "HGO6",
+    "BGO2",
+    "CVL",
+    "COR",
+    "SHQ1",
+    "CSM",
+    "CAH",
+    "ASA",
+    "SHQ2"
+   ],
+   "pla3_hr_daily": [
+    "GROUP",
+    "SGO2",
+    "SGO1",
+    "HGO6",
+    "BGO2",
+    "CVL",
+    "COR",
+    "SHQ1",
+    "CSM",
+    "CAH",
+    "ASA",
+    "SHQ2"
+   ],
+   "pla3_pm_hr_daily": [
+    "GROUP",
+    "SGO2",
+    "SGO1",
+    "HGO6",
+    "BGO2",
+    "CVL",
+    "COR",
+    "SHQ1",
+    "CSM",
+    "CAH",
+    "ASA",
+    "SHQ2"
+   ],
+   "pla1_yhqm": [
+    "GROUP",
+    "SGO2",
+    "SGO1",
+    "HGO6",
+    "BGO2",
+    "CVL",
+    "COR",
+    "SHQ1",
+    "CSM",
+    "CAH",
+    "ASA",
+    "SHQ2"
+   ],
+   "pla3_hr_yhqm": [
+    "GROUP",
+    "SGO2",
+    "SGO1",
+    "HGO6",
+    "BGO2",
+    "CVL",
+    "COR",
+    "SHQ1",
+    "CSM",
+    "CAH",
+    "ASA",
+    "SHQ2"
+   ],
+   "pla3_pm_hr_yhqm": [
+    "GROUP",
+    "SGO2",
+    "SGO1",
+    "HGO6",
+    "BGO2",
+    "CVL",
+    "COR",
+    "SHQ1",
+    "CSM",
+    "CAH",
+    "ASA",
+    "SHQ2"
+   ]
+  },
+  "dung_sai": {
+   "atol": "1E-12",
+   "rtol": "0",
+   "ghi_chu": "đo 22/11: max|lệch| ô khớp pla1_daily 8.9E-15 · pla3_hr_daily 2.9E-15 · pla3_pm_hr_daily 6.7E-15 · pla1_yhqm 5.0E-14 · pla3_hr_yhqm 3.5E-15 · pla3_pm_hr_yhqm 5.3E-14 ⇒ atol ≥ ×30"
+  },
+  "truc": [
+   "2024-10-21",
+   "2026-02-27",
+   495
+  ],
+  "tong_o": 1289415,
+  "mong_tong_o": 1289415,
+  "o_co_so": 44501,
+  "khop_co_so": 42710,
+  "o_0_0": 1244914,
+  "khop": 1287624,
+  "lech_co_chu_dich": 1791,
+  "mong_lech_co_chu_dich": 1791,
+  "lech_ngoai_ten": 0,
+  "khop_ghi_chu": "tong_o = Σ ô so 6 tab (la+tong và kpi, khối đo được, cột trên trục) = o_co_so + o_0_0; khop = ô khớp THẬT (khop_co_so + o_0_0); khop + lech_co_chu_dich = tong_o",
+  "theo_tab": {
+   "pla1_daily": {
+    "thuong": {
+     "o_so": 297000,
+     "khop": 297000,
+     "o_0_0": 294795,
+     "lech": 0,
+     "max_lech_khop": "2.921833630661E-15"
+    },
+    "kpi": {
+     "o_so": 100980,
+     "khop": 100980,
+     "o_0_0": 93499,
+     "lech": 0,
+     "max_lech_khop": "8.86230893734E-15"
+    }
+   },
+   "pla3_hr_daily": {
+    "thuong": {
+     "o_so": 297000,
+     "khop": 296884,
+     "o_0_0": 295859,
+     "lech": 116,
+     "max_lech_khop": "8.017465E-16"
+    },
+    "kpi": {
+     "o_so": 100980,
+     "khop": 100562,
+     "o_0_0": 97200,
+     "lech": 418,
+     "max_lech_khop": "2.87558695E-15"
+    }
+   },
+   "pla3_pm_hr_daily": {
+    "thuong": {
+     "o_so": 297000,
+     "khop": 296888,
+     "o_0_0": 294219,
+     "lech": 112,
+     "max_lech_khop": "3.272607370954E-15"
+    },
+    "kpi": {
+     "o_so": 100980,
+     "khop": 100566,
+     "o_0_0": 93263,
+     "lech": 414,
+     "max_lech_khop": "6.73327592148E-15"
+    }
+   },
+   "pla1_yhqm": {
+    "thuong": {
+     "o_so": 34200,
+     "khop": 34200,
+     "o_0_0": 29664,
+     "lech": 0,
+     "max_lech_khop": "1.600001493214E-14"
+    },
+    "kpi": {
+     "o_so": 11628,
+     "khop": 11628,
+     "o_0_0": 7311,
+     "lech": 0,
+     "max_lech_khop": "5.01441494469E-14"
+    }
+   },
+   "pla3_hr_yhqm": {
+    "thuong": {
+     "o_so": 2850,
+     "khop": 2850,
+     "o_0_0": 2444,
+     "lech": 0,
+     "max_lech_khop": "3.54145147E-15"
+    },
+    "kpi": {
+     "o_so": 969,
+     "khop": 969,
+     "o_0_0": 889,
+     "lech": 0,
+     "max_lech_khop": "3.54145147E-15"
+    }
+   },
+   "pla3_pm_hr_yhqm": {
+    "thuong": {
+     "o_so": 34200,
+     "khop": 33908,
+     "o_0_0": 28721,
+     "lech": 292,
+     "max_lech_khop": "1.378742817152E-14"
+    },
+    "kpi": {
+     "o_so": 11628,
+     "khop": 11189,
+     "o_0_0": 7050,
+     "lech": 439,
+     "max_lech_khop": "5.30425974995E-14"
+    }
+   }
+  },
+  "lech_co_ten": {
+   "as_is_416_GAC_thieu_CXA": [
+    "pla3_hr_daily|GROUP#GAC#45597",
+    "pla3_hr_daily|GROUP#GAC#45627",
+    "pla3_hr_daily|GROUP#NCFO#45597",
+    "pla3_hr_daily|GROUP#NCFO#45627",
+    "pla3_hr_daily|GROUP#NCF#45597",
+    "pla3_hr_daily|GROUP#NCF#45627",
+    "pla3_hr_daily|GROUP#COO#45597",
+    "pla3_hr_daily|GROUP#COO#45627"
+   ],
+   "as_is_truoc_CA": {
+    "theo_tab_khoi": {
+     "pla3_hr_daily|ASA": 64,
+     "pla3_hr_daily|CAH": 81,
+     "pla3_hr_daily|COR": 74,
+     "pla3_hr_daily|CSM": 77,
+     "pla3_hr_daily|CVL": 74,
+     "pla3_hr_daily|SHQ1": 74,
+     "pla3_hr_daily|SHQ2": 82,
+     "pla3_pm_hr_daily|ASA": 64,
+     "pla3_pm_hr_daily|CAH": 81,
+     "pla3_pm_hr_daily|COR": 74,
+     "pla3_pm_hr_daily|CSM": 77,
+     "pla3_pm_hr_daily|CVL": 74,
+     "pla3_pm_hr_daily|SHQ1": 74,
+     "pla3_pm_hr_daily|SHQ2": 82,
+     "pla3_pm_hr_yhqm|ASA": 74,
+     "pla3_pm_hr_yhqm|CAH": 118,
+     "pla3_pm_hr_yhqm|COR": 105,
+     "pla3_pm_hr_yhqm|CSM": 108,
+     "pla3_pm_hr_yhqm|CVL": 105,
+     "pla3_pm_hr_yhqm|SHQ1": 99,
+     "pla3_pm_hr_yhqm|SHQ2": 122
+    },
+    "sha256": "f984dc06ac3a11b77c37b8215dcbcfa723f8e74e761032db25ff41093cc14ab4"
+   },
+   "chua_co_dau_vao": {
+    "pla1_daily": 0,
+    "pla3_hr_daily": 0,
+    "pla3_pm_hr_daily": 0,
+    "pla1_yhqm": 0,
+    "pla3_hr_yhqm": 0,
+    "pla3_pm_hr_yhqm": 0
+   },
+   "khong_so_duoc": 46398,
+   "cot_ngoai_truc": {
+    "pla1_daily": {
+     "cot": [
+      "45585"
+     ],
+     "o_khac_0": 12
+    },
+    "pla3_hr_daily": {
+     "cot": [
+      "45585"
+     ],
+     "o_khac_0": 7
+    },
+    "pla3_pm_hr_daily": {
+     "cot": [
+      "45585"
+     ],
+     "o_khac_0": 12
+    },
+    "pla1_yhqm": {
+     "cot": [],
+     "o_khac_0": 0
+    },
+    "pla3_hr_yhqm": {
+     "cot": [],
+     "o_khac_0": 0
+    },
+    "pla3_pm_hr_yhqm": {
+     "cot": [],
+     "o_khac_0": 0
+    }
+   },
+   "gl": {
+    "vao": 7883,
+    "thieu_D": 6,
+    "AH_RONG": 309,
+    "AH_LA": [
+     669,
+     5487,
+     5556,
+     5557,
+     5634,
+     5712,
+     6230,
+     7098
+    ],
+    "de_lech": 0,
+    "br_lech": 0,
+    "vao_engine": 7560,
+    "cdt_khong_khop": 4798,
+    "dong_ngoai_cay": 51,
+    "dong_nhan_cha": 0,
+    "dong_ngoai_truc": 922,
+    "dong_khac_hoa": 0
+   },
+   "hr": {
+    "vao": 13356,
+    "BK_RONG": 0,
+    "AH_LA": 0,
+    "bm_lech": 0,
+    "ba_bb_rong": 2571,
+    "vao_engine": 13356,
+    "cdt_khong_khop": 1982,
+    "dong_ngoai_cay": 0,
+    "dong_nhan_cha": 0,
+    "dong_ngoai_truc": 0,
+    "dong_khac_hoa": 0
+   },
+   "tu_kiem_dap_an": {
+    "daily": {
+     "thuong": 4,
+     "kpi": 510
+    },
+    "yhqm": {
+     "thuong": 0,
+     "kpi": 206
+    }
+   },
+   "tu_kiem_engine": {
+    "daily": {
+     "thuong": 0,
+     "kpi": 505
+    },
+    "yhqm": {
+     "thuong": 0,
+     "kpi": 206
+    }
+   }
+  },
+  "dat": true,
+  "ly_do": []
  }
 }
