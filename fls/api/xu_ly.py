@@ -21,7 +21,7 @@ from decimal import Decimal, InvalidOperation
 from typing import Any, Callable
 
 from fls.adapters.pm_join import canon_ref
-from fls.cau_hinh import fx, hd, ky, luat_pb, vendor
+from fls.cau_hinh import ban_ky, fx, hd, ky, luat_pb, vendor
 from fls.repo import cau_hinh_repo as chc
 from fls.repo import do_mau_so as dms
 from fls.repo import doc_bao_cao as bc
@@ -1106,6 +1106,49 @@ def ky_thang_fx(yc: YeuCau):
 
 
 HAM.update({"ky_thang_fx": ky_thang_fx})
+
+
+# ⭐⭐ `C13` (`WO-257`) — bản báo cáo KÝ có phiên bản. `actor` = `yc.actor` TỪ THẺ.
+def _dong_ban_ky(b: "chc.BanKy") -> dict:
+    r = {"phien_ban": b.phien_ban, "checksum": b.checksum, "trang_thai": b.trang_thai,
+         "nguoi_dua": b.nguoi_dua, "dua_luc": b.dua_luc}
+    if b.trang_thai == "da_ky":
+        r.update(actor=b.actor, ky_luc=b.ky_luc)
+    return r
+
+
+def ban_ky_ds(yc: YeuCau):
+    """`GET /report/snapshot/{ky}` ⇒ `{ky, ban:[{phien_ban, checksum, trang_thai, nguoi_dua,
+    dua_luc; da_ky thêm actor · ky_luc}]}` cũ → mới. Kỳ chưa có bản ⇒ `ban: []`."""
+    if yc.pv.kieu != "nap_that":
+        raise LoiCua("FLS-BAD-REQUEST",
+                     f"ban bao cao ky ⛔ theo lan nap — bo `run_id` ({yc.pv.mo_ta()})")
+    try:
+        ds = chc.doc_ban_ky(yc.conn, yc.tham["ky"])
+    except ban_ky.LoiBanKy as e:
+        raise LoiCua("FLS-BAD-REQUEST", str(e)) from e
+    return {"ky": ban_ky.kiem_ky(yc.tham["ky"]), "ban": [_dong_ban_ky(b) for b in ds]}, "flash"
+
+
+def ban_ky_ky(yc: YeuCau):
+    """`POST /report/snapshot/{ky}/sign` ⇒ 201 `{ky, phien_ban, checksum, trang_thai:'da_ky',
+    actor, ky_luc}`; `ky` hỏng ⇒ 400 · chưa có bản ⇒ 404 · bản mới nhất đã ký ⇒ 409."""
+    if yc.pv.kieu != "nap_that":
+        raise LoiCua("FLS-BAD-REQUEST",
+                     f"ban bao cao ky ⛔ theo lan nap — bo `run_id` ({yc.pv.mo_ta()})")
+    try:
+        b = chc.ky_ban(yc.conn, yc.tham["ky"], actor=yc.actor)
+    except ban_ky.LoiBanKy as e:
+        raise LoiCua("FLS-BAD-REQUEST", str(e)) from e
+    except chc.ThangKhongCo as e:
+        raise LoiCua("FLS-NOT-FOUND", str(e)) from e
+    except chc.DaKy as e:
+        raise LoiCua("FLS-CAUHINH-DA-KY", str(e)) from e
+    return {"ky": b.ky, "phien_ban": b.phien_ban, "checksum": b.checksum,
+            "trang_thai": "da_ky", "actor": b.actor, "ky_luc": b.ky_luc}, "flash"
+
+
+HAM.update({"ban_ky_ds": ban_ky_ds, "ban_ky_ky": ban_ky_ky})
 
 
 # ══ ⭐⭐ ISP 3.1.2 · `C4` (`WO-122`) — LÕI CONFIG: cây `IX.HD` (hợp đồng) ══

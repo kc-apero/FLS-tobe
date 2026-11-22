@@ -37,12 +37,12 @@ from __future__ import annotations
 
 import hashlib
 import json
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from datetime import date, datetime
 from pathlib import Path
 from typing import Any, Iterable, Mapping
 
-from fls.cau_hinh import dong_pl, fx, hd, ky, luat_pb, to_chuc, vendor
+from fls.cau_hinh import ban_ky, dong_pl, fx, hd, ky, luat_pb, to_chuc, vendor
 from fls.repo import ghi_tay
 
 BANG_FX = fx.BANG                 # "IX.FX"
@@ -708,3 +708,125 @@ def fx_cua(conn, yyyymm: Any) -> Mapping[str, Any]:
     *(Engine H4…H9 ⛔ nối ở bước này — xem BG-213.)*"""
     return fx.fx_cua(yyyymm, doc_fx(conn),
                      {m: k.dau_van_tay for m, k in doc_ky_fx(conn).items()})
+
+
+# ── IX.TMP · BẢN BÁO CÁO KÝ CÓ PHIÊN BẢN (`C13`, `WO-257`) ────────────────────
+# Dùng LẠI bảng `0027` *(⛔ di trú mới)*. Kho chỉ-thêm ⇒ MỖI SỰ KIỆN là một bản config
+# `bang='IX.TMP'` — ⛔ sửa dòng nào:
+#   · đưa bản : `nguon='ban:{ky}'` · `checksum` = checksum nội dung · `actor` = người/engine đưa
+#               · dòng `so_ban` (phiên bản 1,2,… TRONG kỳ) + `noi_dung` (JSON ô)
+#   · ký      : `nguon='ky:{ky}'`  · `checksum` = của bản được ký · `actor` = người ký (TỪ THẺ)
+#               · `luc` do MÁY · dòng `so_ban`
+# Phiên bản `n` là `da_ky` ⇔ có sự kiện ký mang `so_ban = n`.
+@dataclass(frozen=True)
+class BanKy:
+    ky: int
+    phien_ban: int
+    checksum: str
+    trang_thai: str            # 'chua_ky' | 'da_ky'
+    nguoi_dua: str
+    dua_luc: str
+    actor: str | None = None   # người ký (chỉ khi da_ky)
+    ky_luc: str | None = None
+    khong_doi: bool = False    # True ⇒ lần `dua_ban_ky` này TRÙNG bản mới nhất (⛔ sinh bản)
+
+
+def _sk_ban_ky(conn, ky: int) -> list[BanKy]:
+    with conn.cursor() as cur:
+        cur.execute(
+            "SELECT b.nguon, b.checksum, b.actor, b.luc, "
+            "(SELECT d.gia_tri FROM fls_cau_hinh_dong d "
+            "  WHERE d.ban_id = b.ban_id AND d.khoa = 'so_ban') "
+            "FROM fls_cau_hinh_ban b WHERE b.bang = %s AND b.nguon IN (%s, %s) "
+            "ORDER BY b.phien_ban", (ban_ky.BANG, f"ban:{ky}", f"ky:{ky}"))
+        rows = cur.fetchall()
+    ban: dict[int, BanKy] = {}
+    for nguon, ck, actor, luc, so in rows:
+        n = int(so)
+        if nguon.startswith("ban:"):
+            ban[n] = BanKy(ky, n, ck, "chua_ky", actor, luc.isoformat())
+        elif n in ban and ban[n].trang_thai == "chua_ky":
+            ban[n] = replace(ban[n], trang_thai="da_ky", actor=actor,
+                             ky_luc=luc.isoformat())
+    return [ban[n] for n in sorted(ban)]
+
+
+def doc_ban_ky(conn, ky: Any) -> list[BanKy]:
+    """Mọi phiên bản của kỳ, cũ → mới. Kỳ chưa có bản ⇒ `[]` *(trạng thái THƯỜNG)*;
+    `ky` hỏng ⇒ `ban_ky.LoiBanKy`."""
+    return _sk_ban_ky(conn, ban_ky.kiem_ky(ky))
+
+
+def doc_noi_dung_ban_ky(conn, ky: Any, phien_ban: int) -> dict:
+    """Nội dung JSON ô của một phiên bản *(⛔ có tuyến trả — chỉ bài/engine đọc)*."""
+    k = ban_ky.kiem_ky(ky)
+    with conn.cursor() as cur:
+        cur.execute(
+            "SELECT d.gia_tri FROM fls_cau_hinh_ban b "
+            "JOIN fls_cau_hinh_dong d ON d.ban_id = b.ban_id AND d.khoa = 'noi_dung' "
+            "JOIN fls_cau_hinh_dong s ON s.ban_id = b.ban_id AND s.khoa = 'so_ban' "
+            "WHERE b.bang = %s AND b.nguon = %s AND s.gia_tri = %s::jsonb",
+            (ban_ky.BANG, f"ban:{k}", json.dumps(int(phien_ban))))
+        r = cur.fetchone()
+    if r is None:
+        raise ThangKhongCo(f"⛔ kỳ {k} chưa có phiên bản {phien_ban}")
+    return r[0]
+
+
+def _them_su_kien(cur, nguon: str, ck: str, actor: str, so: int, them=()) -> None:
+    cur.execute("SELECT coalesce(max(phien_ban), 0) FROM fls_cau_hinh_ban WHERE bang = %s",
+                (ban_ky.BANG,))
+    ver = int(cur.fetchone()[0]) + 1
+    cur.execute(
+        "INSERT INTO fls_cau_hinh_ban (bang, phien_ban, nguon, checksum, actor) "
+        "VALUES (%s,%s,%s,%s,%s) RETURNING ban_id", (ban_ky.BANG, ver, nguon, ck, actor))
+    ban_id = cur.fetchone()[0]
+    cap = [("so_ban", so), *them]
+    cur.executemany(
+        "INSERT INTO fls_cau_hinh_dong (ban_id, khoa, gia_tri) VALUES (%s,%s,%s::jsonb)",
+        [(ban_id, k, json.dumps(v, ensure_ascii=False)) for k, v in cap])
+
+
+def dua_ban_ky(conn, ky: Any, noi_dung: Mapping[str, Any], *, actor: str) -> BanKy:
+    """Đưa MỘT bản báo cáo vào kỳ `ky` *(engine H14 gọi sau này; ⛔ tuyến)*.
+
+    Checksum khác bản MỚI NHẤT ⇒ phiên bản mới `chua_ky`. TRÙNG checksum bản mới nhất ⇒
+    ⛔ phiên bản mới, trả bản ấy với `khong_doi=True` *(đã ký thì vẫn `da_ky`)*.
+    ⚠ So với bản MỚI NHẤT, ⛔ với mọi bản: đổi rồi quay lại số cũ là phiên bản mới.
+    """
+    k = ban_ky.kiem_ky(ky)
+    ck = ban_ky.checksum(noi_dung)
+    if not str(actor or "").strip():
+        raise LoiCauHinh("⛔ thiếu `actor` — đưa bản vào kỳ là hành vi có người/engine đứng tên")
+    with conn.transaction():
+        with conn.cursor() as cur:
+            cur.execute("SELECT pg_advisory_xact_lock(hashtext(%s)::bigint)", (ban_ky.BANG,))
+        cu = _sk_ban_ky(conn, k)
+        if cu and cu[-1].checksum == ck:
+            return replace(cu[-1], khong_doi=True)
+        n = len(cu) + 1
+        with conn.cursor() as cur:
+            _them_su_kien(cur, f"ban:{k}", ck, actor, n,
+                          [("noi_dung", json.loads(ban_ky.chuan_hoa(noi_dung)))])
+    return _sk_ban_ky(conn, k)[-1]
+
+
+def ky_ban(conn, ky: Any, *, actor: str) -> BanKy:
+    """Ký phiên bản MỚI NHẤT của kỳ. `actor` do TẦNG CỬA lấy TỪ THẺ. Kỳ chưa có bản ⇒
+    `ThangKhongCo` · bản mới nhất đã ký ⇒ `DaKy` · bản cũ đã ký ⛔ đụng."""
+    k = ban_ky.kiem_ky(ky)
+    if not str(actor or "").strip():
+        raise LoiCauHinh("⛔ thiếu `actor` — ký bản là hành vi của người, phải có tên")
+    with conn.transaction():
+        with conn.cursor() as cur:
+            cur.execute("SELECT pg_advisory_xact_lock(hashtext(%s)::bigint)", (ban_ky.BANG,))
+        cu = _sk_ban_ky(conn, k)
+        if not cu:
+            raise ThangKhongCo(f"⛔ kỳ {k} chưa có bản báo cáo nào để ký")
+        m = cu[-1]
+        if m.trang_thai == "da_ky":
+            raise DaKy(f"⛔ phiên bản {m.phien_ban} của kỳ {k} ĐÃ ký bởi {m.actor} "
+                       f"lúc {m.ky_luc}")
+        with conn.cursor() as cur:
+            _them_su_kien(cur, f"ky:{k}", m.checksum, actor, m.phien_ban)
+    return _sk_ban_ky(conn, k)[-1]
