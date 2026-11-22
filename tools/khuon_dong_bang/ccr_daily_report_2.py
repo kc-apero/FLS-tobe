@@ -26,6 +26,13 @@ if _spec.name not in sys.modules:
     sys.modules[_spec.name] = _d2
     _spec.loader.exec_module(_d2)
 
+#: ⭐ RÀO *(`DT13-R1-02`)* — đầu vào CHỈ cho PD 615; CẤM cho 610 *(25.185/26.272 = 95,9 % ô SỐ trùng đáp án `daily_report_2` ⇒ engine 610 nạp nhầm xanh ~96 %)*.
+DAU_VAO_CHO = frozenset({"615"})
+CAM_CHO = frozenset({"610"})
+#: ⭐ Đ4 — với 615, ô công thức của các khối đọc ảnh này *(KQ-321, `FORMULA` SA 22/11)*: **23.746/48.021 = 49,4 %** là THAM CHIẾU TRỰC TIẾP
+#: `='5. Daily Report 2'!…` ⇒ "khớp" ở đó là engine CHÉP giá trị dán, ⛔ chứng minh tính toán; 24.275 ô còn lại mới có phép tính.
+O_THAM_CHIEU_TRUC_TIEP_615 = 23746
+O_CONG_THUC_615 = 48021
 BANG = "DAU_VAO.CCR_DAILY_REPORT_2"
 KHOA = "dong_sheet"
 KIEU_KHOA = "dong_sheet"
