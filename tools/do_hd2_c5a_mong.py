@@ -1,6 +1,13 @@
-"""`MONG` của WP-C5a — khai TRƯỚC *(Đ4 nhãn · Đ5 hai chiều; đo 22/11 trên nền b9d3e46 + H8 518ea28)*.
+"""`MONG` của WP-C5a — khai TRƯỚC *(Đ4 nhãn · Đ5 hai chiều)*. Đo lần đầu 22/11 *(cờ TẮT, nền b9d3e46 + H8 518ea28)*;
+**vòng sửa R1 `KQ-293` 22/11: cổng đo ở CỜ BẬT 2025** *(phiên bản ký `tests/fixture/cau_hinh/ix_alr_2025_bat.json`)*,
+lớp lệch gán bằng PHÉP ĐO phản thực *(`do_hd2_c5a.py` đầu tệp)*.
 
-⚠ Sửa engine/ảnh mà số đổi ⇒ cổng ĐỎ ⇒ đo lại, ghi lý do vào BG, rồi mới sửa tệp này *(⛔ chép số cho xanh)*.
+Trước → sau *(đếm ô lệch trong 11.764 ô có số)*: R1 `as_is_bat_phan_bo_2025` **4.932** *(quy tắc khối × năm)* ⇒
+`chua_co_dau_vao` **1.091** + `lech_D3` **3.099** + `as_is_tay_lan_du` **29** + nay KHỚP **713** *(By NOEM 4 mã + OFR
+chuẩn hoá trừ CAH)*; `o_lech` 224 + `as_is_truoc_CA` 675 giữ ⇒ lệch có chủ đích 5.831 → **5.118**. Khớp THẬT 5.932 →
+**6.646** *(+714 = 713 + 1 ô `0 = 0` ở cờ tắt nay engine ≠ 0 mà vẫn trong dung sai)*.
+
+⚠ Sửa engine/ảnh/tệp ký mà số đổi ⇒ cổng ĐỎ ⇒ đo lại, ghi lý do vào BG, rồi mới sửa tệp này *(⛔ chép số cho xanh)*.
 """
 
 MONG = {
@@ -8,25 +15,35 @@ MONG = {
     #: ô so = hàng ATL có nhãn (817 = 829 − 12 hàng ⛔ nhãn) × 57 kỳ, bỏ mã `trong` (741 ô) và ô ⛔ là số (154)
     "tong_o": 45674,
     "lop": {
-        "dem": {"o_so": 45674, "khop": 39843, "o_0_0": 33911, "o_trong": 741, "khong_so_duoc": 154,
+        #: khop 40.556 = khớp THẬT 6.646 + `0 = 0` 33.910 *(cờ BẬT: 1 ô 0=0 của cờ tắt nay ≠ 0 ở engine)*
+        "dem": {"o_so": 45674, "khop": 40556, "o_0_0": 33910, "o_trong": 741, "khong_so_duoc": 154,
                 "hang_so": 817, "hang_khong_nhan": 12, "hang_khong_nhan_khac_0": 7},
-        #: lưới ra = 12 khối × 74 mã × 57 kỳ; cờ TẮT ⇒ 0 ô chia (D2)
-        "dem_phan_bo": {"o": 50616, "o_chia": 0, "luat_bat": 0},
+        #: lưới ra = 12 khối × 74 mã × 57 kỳ; cờ BẬT ký: 648 ô LÁ tháng chia *(khối CDT)* ở 11 mã *(13 mã ký − CXP,
+        #: CXO: GROUP 2025 = 0 ⇒ ⛔ ô chia)*
+        "dem_phan_bo": {"o": 50616, "o_chia": 648, "luat_bat": 11},
         #: PD 604: 3 driver × 12 tháng số CDT1 có số (ATL pd604_ky) ↔ lưới IX.DRV; 238 ô số + 146 ô thiếu có tên; 34 tổng Σ7 = 1
         "tham_chieu_604": {"o_so": 36, "khop": 36, "o_drv": 238, "o_thieu": 146, "sigma_7": 34},
     },
-    # ── lớp theo QUY TẮC: khối CDT ∪ {SHQ2} × năm của kỳ — đếm theo khối + sha256 (ô, engine, đáp án) ──
-    "lop_quy_tac": {
-        #: AS-IS BẬT phân bổ 2025 (By GI 576 · By NOEM 348 · GI từ MID3 66 ô tháng — FORMULA 22/11) + lan Y/H/Q · cây · KPI · dư SHQ2
-        "as_is_bat_phan_bo_2025": {"theo_khoi": {"ASA": 642, "CAH": 700, "COR": 722, "CSM": 716, "CVL": 720, "SHQ1": 722,
-                                                 "SHQ2": 710}, "so_o": 4932,
-                                   "sha256": "c57b14fd34770e24f8084a6c8cadb22b3eb5816f57e67b4a3783891dd81e8f0a"},
-        #: lệch AS-IS 416 (72 cột 2024 dán cũ) lan từ H8 — đúng 675 ô mà đáp án 419 cũng ≠ engine (BG-278 lớp as_is_truoc_CA)
+    # ── lớp gán bằng PHÉP ĐO — đếm theo khối + sha256 (ô, engine, đáp án) ──
+    "lop_do": {
+        #: ① lệch AS-IS 416 (72 cột 2024 dán cũ) lan từ H8 — khối CDT ∪ SHQ2 × 2024 (BG-278); đếm = R1, sha đổi vì NPC hậu tố
         "as_is_truoc_CA": {"theo_khoi": {"ASA": 66, "CAH": 110, "COR": 97, "CSM": 100, "CVL": 97, "SHQ1": 91, "SHQ2": 114},
-                           "so_o": 675, "sha256": "7a6d908dbd93f4c3639b4e5633ccb5225595487d125649ecc93b28cd437b1493"},
+                           "so_o": 675, "sha256": "d07216e21f8258ac4c55ed1144265cc0f26dd7a5a719f044148327e47b25fa37"},
+        #: ① dư SHQ2 sổ nền tảng mang GROUP `OMC` 2025-02 −0,5 gõ tay (chỉ hồi phục ở phản thực ②b) + lan cây/KPI/NPC
+        "as_is_tay_lan_du": {"theo_khoi": {"SHQ2": 29}, "so_o": 29,
+                             "sha256": "ecd5f988ef10bcf7772e6f8e3743e89189e775bc80f3332fed99c091534be23f"},
+        #: ② lá khối CDT 2025 GI · OMC · PS · SC = hàng TOTAL MID3 (PM CDT gõ tay) / FS1 Daily Report 3 — ⛔ có ảnh
+        "chua_co_dau_vao": {"theo_khoi": {"ASA": 134, "CAH": 148, "COR": 151, "CSM": 145, "CVL": 149, "SHQ1": 151,
+                                          "SHQ2": 213}, "so_o": 1091,
+                            "sha256": "6b007db20e2cf0d544c54be8f52303ecf7026a0d7bdeafafa5dc88a9fb00d853"},
+        #: ③ By GI: D3 driver PE ≠ AS-IS `GI khối / GI GROUP` (+ AS-IS bật By GI từ 202501) — giữ D3, hỏi chủ
+        "lech_D3": {"theo_khoi": {"ASA": 403, "CAH": 478, "COR": 478, "CSM": 478, "CVL": 478, "SHQ1": 478, "SHQ2": 306},
+                    "so_o": 3099, "sha256": "743ebe670451eaaff37d8ddb2383a7dd8994df270c173f3fa00333895e5b198d"},
     },
-    # ── TỪNG Ô theo giá trị [engine, ATL] (atol_lech) — 224 ô: GROUP 96 (`OMC` 2025-02 = PLA3 − 0,5 gõ tay + lan cây · KPI ·
-    #    NPC hậu tố) · SGO1 128 (hàng `DC` + `'Allocation Table | NB | By LE'` × −1, 12 tháng 2025 + lan) ──
+    # ── lá khối CDT 2025 (6 khối × 12 tháng = 72 ô/mã) THEO MÃ: ô có số ATL · khớp · chua_co_dau_vao ──
+    "la_cdt_2025": {"GI": {"o": 72, "khop": 3, "chua_co_dau_vao": 69}, "OMC": {"o": 72, "khop": 2, "chua_co_dau_vao": 70},
+                    "PS": {"o": 72, "khop": 21, "chua_co_dau_vao": 51}, "SC": {"o": 72, "khop": 15, "chua_co_dau_vao": 57},
+                    "OFR": {"o": 72, "khop": 72, "chua_co_dau_vao": 0}},
     "atol_lech": "1e-9",
     "o_lech": {
         "GROUP#CAC#2025": ["-44.07512285017739876707234474", "-44.57512285017739"],

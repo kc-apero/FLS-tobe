@@ -13,17 +13,32 @@ Report'…)`)* · **66** ô `GI` khối CDT lấy `CFA2 | MID 3 | GI Platform Da
 `PLA3 − 0,5` *(gõ tay)*; SGO1 một hàng `+ 'Allocation Table | NB | By LE'×−1` *(12 ô 2025)*. ⇒ AS-IS ĐÃ BẬT phân bổ;
 FLS giữ cờ TẮT *(D2)* ⇒ các ô ấy là **lệch AS-IS có tên** *(⛔ chép vào engine)*.
 
+⭐ **VÒNG SỬA R1 *(`KQ-293` · `H12-R1-01`)* — cổng đo ở CỜ BẬT 2025** *(quyết của chủ 22/11 ~10:05 UTC: ký bật
+IX.ALR 2025 giống AS-IS)*: cờ đọc từ KHO = phiên bản ký `tests/fixture/cau_hinh/ix_alr_2025_bat.json`
+*(`cau_hinh_repo.ky_bat_ix_alr`, actor = người ký)*. Cờ TẮT còn là bài đồng nhất `H12-B1` *(⛔ cổng)*.
+
 ── LỚP LỆCH *(Đ5 — `mong` khai TRƯỚC ở `do_hd2_c5a_mong.py`, khác ⇒ ĐỎ CẢ HAI CHIỀU)* ────────────────────────
-  · `o_lech` — khai TỪNG Ô theo giá trị *(GROUP: −0,5 tay + lan cây/KPI/NPC · SGO1: NB by LE + lan)*.
-  · `as_is_bat_phan_bo_2025` — khối CDT ∪ {SHQ2} × kỳ 2025: đếm theo khối + sha256 *(ô, engine, đáp án)*.
-  · `as_is_truoc_CA` — khối CDT ∪ {SHQ2} × kỳ 2024: lệch AS-IS 416 lan từ H8 *(`BG-278` — 72 cột 2024)*; như trên.
-  Ô lệch ngoài ba lớp ⇒ `lech_ngoai_ten` ⇒ ĐỎ.
+⭐ Nhãn do **PHÉP ĐO** gán *(luật phòng tái phạm `H12-R1-01`: ⛔ quy tắc khối × năm cho 2025)*:
+  ① `loi_as_is` — lỗi AS-IS thật: `o_lech` TỪNG Ô theo giá trị *(224: GROUP `OMC` −0,5 gõ tay + lan · SGO1 NB by
+     LE + lan)* + `as_is_truoc_CA` *(675: lệch 416 dán cũ 2024 lan từ H8 — `BG-278`; cờ 2025 ⛔ đổi đếm)* +
+     `as_is_tay_lan_du` *(ô chỉ hồi phục ở phản thực ②b — dư SHQ2 lấy GROUP của ATL mang −0,5 gõ tay)*.
+  ② `chua_co_dau_vao` — ô HỒI PHỤC khi thay lá khối CDT 2025 của 4 sổ nền tảng `GI · OMC · PS · SC` bằng giá trị
+     nguồn AS-IS *(phản thực — CHẨN ĐOÁN, ⛔ đầu vào engine)*. SA FORMULA 22/11: lá ấy = hàng `TOTAL yyyymm` của tab
+     `CFA2 | MID 3 | X Platform Data Ledger` cột PM theo CDT *(T·V·X·Z·AB·AD)* ÷ 10⁶ *(× −1 trừ GI)* — đo khớp
+     GI 66/66 · OMC 60/60 · SC 54/54 · PS 51/54 ô; tháng ngoài MID3 *(GI M01 · OMC M01–02 · PS/SC M01–03)* =
+     `sumifs(GROUP) × '[FS1]5. Daily Report 3'` *(PD 608 — đáp án bước sau)*. Hàng `TOTAL` ⛔ có trong ảnh MID3
+     đóng băng *(44 hàng ⛔ vendor/tháng — ⛔ cột A)* và Σ PM CDT của engine AL.PLT ≠ `TOTAL` *(PM CDT = None ở
+     vendor-tháng `P` chữ "Need to manual input")* ⇒ **cần ảnh**, ⛔ đoán.
+  ③ `lech_D3` — ô hồi phục THÊM khi đổi driver By GI từ `PE` *(D3, AP DECIDED)* sang tỉ lệ AS-IS `GI khối / GI
+     GROUP` *(và bật By GI từ 202501)* — phản thực; giữ D3, câu hỏi chủ ở BG.
+  ④ còn lại = `lech_ngoai_ten` *(lệch FLS — mong 0)* ⇒ ĐỎ.
 """
 from __future__ import annotations
 
 import datetime
 import hashlib
 from collections import Counter
+import dataclasses
 from dataclasses import dataclass, field
 from decimal import Decimal, InvalidOperation
 from typing import Any, Mapping
@@ -40,6 +55,11 @@ from tools.do_hd2 import GOC, _chu, _so, nap_anh
 ANH_ATL = GOC / "tests" / "fixture" / "dap_an" / "atl.json"
 ANH_DRV = GOC / "tests" / "fixture" / "cau_hinh" / "ix_drv.json"
 ANH_MM = GOC / "tests" / "fixture" / "cau_hinh" / "mapping_master_cfg.json"
+#: tệp KÝ bật cờ 2025 *(config có phiên bản — vòng sửa R1)*
+TEP_KY = GOC / "tests" / "fixture" / "cau_hinh" / "ix_alr_2025_bat.json"
+#: 4 sổ nền tảng *(MID3)* — mã = chữ đầu nhãn `luat_pb.NHAN_NEN_TANG` *(⛔ gõ lại)*
+MA_NEN_TANG = tuple(n.split()[0] for n in luat_pb.NHAN_NEN_TANG)
+THANG_2025 = tuple(f"2025M{m:02d}" for m in range(1, 13))
 KHOI_CDT6 = tuple(c3d.KHOI_CDT)
 KHOI_PB = frozenset(KHOI_CDT6) | {c3d.KHOI_DU}
 ATOL = c3d.ATOL                                  # 1e-12, rtol 0 *(cùng WP-C3d — lưới vào là của H8)*
@@ -61,6 +81,18 @@ def alr_tu_anh_mm(tu_ky: int = TU_KY_ALR) -> luat_pb.BangALR:
     mm = [{"hd_code": _chu(r.get("hd_code")), "need_cfa2": _chu(r.get("need_cfa2")),
            "method_cfa2": _chu(r.get("method_cfa2"))} for r in anh["dong"]]
     return luat_pb.kiem(luat_pb.dung_tu_mm(mm, tu_ky=tu_ky), nguon=ANH_MM.name)
+
+
+def alr_ky_tu_anh(tu_ky: int = TU_KY_ALR) -> luat_pb.BangALR:
+    """`BangALR` cờ BẬT = ảnh MM *(`alr_tu_anh_mm`)* + tệp ký qua CHÍNH `luat_pb.dung_tu_tep_ky` + `kiem` — cùng
+    phép gộp của `cau_hinh_repo.ky_bat_ix_alr` *(dòng ký thắng cùng khoá)*; cho bài ⛔ kho."""
+    hien = alr_tu_anh_mm(tu_ky)
+    d = {luat_pb.khoa_cua(x.hd, x.tu_ky): {"hd": x.hd, "tu_ky": x.tu_ky, "nhan_mm": x.nhan_mm, "bat": x.bat,
+                                           "ngoai_le": list(x.ngoai_le_cdt1)} for x in hien.luat}
+    import json
+    d.update((luat_pb.khoa_cua(r["hd"], r["tu_ky"]), r)
+             for r in luat_pb.dung_tu_tep_ky(json.loads(TEP_KY.read_text(encoding="utf-8")), hien))
+    return luat_pb.kiem(list(d.values()), nguon=f"{ANH_MM.name} + {TEP_KY.name}")
 
 
 def luoi_driver_tu_anh(anh: Mapping[str, Any] | None = None) -> pbk.LuoiDriver:
@@ -144,11 +176,69 @@ class ThanhQuaC5a:
     lech: list[dict[str, Any]] = field(default_factory=list)
 
 
-def _lop(x: Mapping[str, str]) -> str | None:
+def _lop_2024(x: Mapping[str, str]) -> str | None:
+    """Lớp H8 *(`BG-278`)*: lệch 416 dán cũ 2024 lan sang khối CDT ∪ {SHQ2}. Cờ ký chỉ hiệu lực 2025 ⇒ ô 2024 GIỮ
+    NGUYÊN giữa cờ tắt/bật trừ `NPC` *(Σ hậu tố — bài `test_H12_R1_co_ky_2025__ky_ngoai_2025_dong_nhat…`)*: đếm 675
+    y nguyên, sha đổi vì giá trị engine `NPC`."""
     kh, _, t = x["o"].split("#")
-    if kh not in KHOI_PB:
-        return None
-    return {"2025": "as_is_bat_phan_bo_2025", "2024": "as_is_truoc_CA"}.get(t[:4])
+    return "as_is_truoc_CA" if kh in KHOI_PB and t[:4] == "2024" else None
+
+
+def gia_tri_atl(atl: Mapping[str, Any]) -> dict[tuple[str, str, str], Decimal]:
+    """Ô SỐ của ATL theo `(khối, mã, kỳ)` — chỉ cho bước SO và phép đo PHẢN THỰC *(⛔ đầu vào engine)*."""
+    ra: dict[tuple[str, str, str], Decimal] = {}
+    for kh, ma, r in hang_atl(atl)[0]:
+        for c in atl["cot"]:
+            if c[:1] == "y" and r.get(c) is not None:
+                try:
+                    ra[(kh, ma, _ky(c))] = Decimal(str(r[c]))
+                except InvalidOperation:
+                    pass
+    return ra
+
+
+def pla3_thay_la_nen_tang(pla3: pla.KetQuaPLA, atl_o: Mapping, cay: CayHD, *,
+                          group_atl: bool = False) -> pla.KetQuaPLA:
+    """PHẢN THỰC ② *(chẩn đoán — ⛔ đầu vào engine)*: lá tháng 2025 của `MA_NEN_TANG` ở 6 khối CDT := giá trị nguồn
+    AS-IS *(đọc từ ATL — chính là ô cần đo)*, dư SHQ2 = GROUP − Σ CDT *(công thức ATL)*, cuộn lại Y/H/Q, tính lại
+    cây/KPI. `group_atl` *(bước ②b)*: dư lấy GROUP của ATL *(mang lỗi gõ tay `o_lech` của GROUP — vd `OMC`
+    2025-02 −0,5)* ⇒ ô chỉ hồi phục ở ②b là lỗi AS-IS LAN qua dư SHQ2, ⛔ thiếu đầu vào."""
+    la = dict(pla3.la)
+    co = set(pla3.cot)
+    gop = {g for t in THANG_2025 for g in pbk.ky_gop(t)} & co
+    for ma in MA_NEN_TANG:
+        if pla3.loai.get(ma) != "la":
+            continue
+        for kh in KHOI_CDT6:
+            for t in THANG_2025:
+                if (kh, ma, t) in atl_o:
+                    la[(kh, ma, t)] = atl_o[(kh, ma, t)]
+        for t in THANG_2025:            # dư SHQ2 = GROUP − Σ CDT *(công thức SHQ2 2025 của ATL: `=R-SUMIFS(…)`)*
+            g = atl_o.get((KHOI_TONG, ma, t), la[(KHOI_TONG, ma, t)]) if group_atl else la[(KHOI_TONG, ma, t)]
+            la[(c3d.KHOI_DU, ma, t)] = g - sum((la[(k, ma, t)] for k in KHOI_CDT6), Decimal(0))
+        for kh in (*KHOI_CDT6, c3d.KHOI_DU):
+            for g in gop:
+                la[(kh, ma, g)] = sum((la[(kh, ma, t)] for t in THANG_2025 if g in pbk.ky_gop(t)), Decimal(0))
+    return dataclasses.replace(pla3, la=la, o=pla.danh_gia(la, cay, list(pla3.cot), tuple(pla3.khoi),
+                                                           pla.CONG_THUC_PM))
+
+
+def phan_thuc_D3(alr: luat_pb.BangALR, drv: pbk.LuoiDriver, atl_o: Mapping) -> tuple:
+    """PHẢN THỰC ③ *(chẩn đoán)*: driver By GI := tỉ lệ AS-IS `GI khối / GI GROUP` *(công thức ATL
+    `iferror(sumifs(GROUP) × (GI khối / sumifs GI GROUP))`)* thay `GI_PE` *(D3)*; By GI bật từ 202501 như AS-IS."""
+    ten = pbk.DRIVER_LUOI[luat_pb.DRIVER_BY_GI]
+    o = dict(drv.o)
+    for t in THANG_2025:
+        g = atl_o.get((KHOI_TONG, "GI", t))
+        for kh in KHOI_CDT6:
+            if g and (kh, "GI", t) in atl_o:
+                o[(ten, kh, pbk.thang_cua(t))] = atl_o[(kh, "GI", t)] / g
+    bat_gi = {x.hd: x for x in alr.luat if x.phuong_phap == luat_pb.BY_GI and x.bat}
+    som = min(pbk.thang_cua(t) for t in THANG_2025)
+    luat = [x for x in alr.luat if not (x.hd in bat_gi and x.tu_ky <= som)]
+    luat += [dataclasses.replace(x, tu_ky=som) for x in bat_gi.values()]
+    return luat_pb.BangALR(nguon=alr.nguon + " +phản thực D3", luat=tuple(luat)), \
+        pbk.LuoiDriver(o=o, thieu=drv.thieu)
 
 
 def _tom(ds: list[Mapping[str, str]]) -> dict[str, Any]:
@@ -160,12 +250,34 @@ def _tom(ds: list[Mapping[str, str]]) -> dict[str, Any]:
             "sha256": hashlib.sha256(chuoi.encode()).hexdigest()}
 
 
+def _khop_co_so(o: Mapping, hang: list, cot: list, loai: Mapping) -> int:
+    """Ô khớp THẬT *(⛔ `0 = 0`)* của lưới `o` ↔ ATL — CÙNG định nghĩa `khop_co_so` của cổng *(để báo cờ tắt → bật)*."""
+    n = 0
+    for kh, ma, r in hang:
+        if loai.get(ma) in (None, "trong"):
+            continue
+        for c in cot:
+            v = r.get(c)
+            try:
+                a = Decimal(0) if v is None else Decimal(str(v))
+            except InvalidOperation:
+                continue
+            e = o[(kh, ma, _ky(c))]
+            n += not (e == 0 and a == 0) and abs(e - a) <= ATOL
+    return n
+
+
+def _pbk(p, alr, drv: pbk.LuoiDriver, cay: CayHD) -> pbk.KetQuaKhoa:
+    return pbk.phan_bo_khoa(p, alr, cay, pla.CONG_THUC_PM, khoi_nguon=KHOI_TONG, khoi_cdt=KHOI_CDT6,
+                            khoi_du=c3d.KHOI_DU, driver=drv)
+
+
 def so_sanh_c5a(pla3: pla.KetQuaPLA, atl: Mapping[str, Any], drv: Mapping[str, Any], alr: Any, cay: CayHD,
                 mong: MongC5a) -> ThanhQuaC5a:
     ly: list[str] = []
+    luoi = luoi_driver_tu_anh(drv)
     try:
-        kq = pbk.phan_bo_khoa(pla3, alr, cay, pla.CONG_THUC_PM, khoi_nguon=KHOI_TONG, khoi_cdt=KHOI_CDT6,
-                              khoi_du=c3d.KHOI_DU, driver=luoi_driver_tu_anh(drv))
+        kq = _pbk(pla3, alr, luoi, cay)
     except pbk.LoiPhanBoKhoa as e:
         px = PhanXu(False, (str(e),))
         return ThanhQuaC5a(so={}, phan_xu=px, hd2_cong={"bang": "HD2.WP-C5a", "goi": "WP-C5a", "dat": False,
@@ -223,22 +335,61 @@ def so_sanh_c5a(pla3: pla.KetQuaPLA, atl: Mapping[str, Any], drv: Mapping[str, A
     c3d._khac(lop_thuc, m.get("lop"), "lop", ly)
     if t604["lech"] or t604["sigma_7_lech"]:
         ly.append(f"tham chiếu 604 lệch: {t604['lech'][:5]} · Σ7≠1: {t604['sigma_7_lech'][:5]}")
+    if not any(getattr(x, "bat", False) for x in getattr(alr, "luat", ())):
+        ly.append("IX.ALR ⛔ có luật nào BẬT ⇒ ⛔ phải phiên bản KÝ 2025 (cổng đo ở cờ BẬT — vòng sửa R1)")
     mong_o = m.get("o_lech") or {}
     atol_lech = Decimal(str(m.get("atol_lech", "1e-9")))
+    # ── PHẢN THỰC *(chẩn đoán gán nhãn — ⛔ đầu ra cổng)* ──
+    atl_o = gia_tri_atl(atl)
+    try:
+        p2 = pla3_thay_la_nen_tang(pla3, atl_o, cay)
+        e2 = _pbk(p2, alr, luoi, cay).o
+        p2b = pla3_thay_la_nen_tang(pla3, atl_o, cay, group_atl=True)
+        e2b = _pbk(p2b, alr, luoi, cay).o
+        alr3, luoi3 = phan_thuc_D3(alr, luoi, atl_o)
+        e3 = _pbk(p2b, alr3, luoi3, cay).o
+    except (pbk.LoiPhanBoKhoa, luat_pb.LoiLuatPB) as e:
+        ly.append(f"phản thực ⛔ chạy được ⇒ ⛔ gán nhãn được (Đ5): {e}")
+        e2 = e2b = e3 = {}
     tung_o: list[dict[str, Any]] = []
-    theo_lop: dict[str, list[dict[str, Any]]] = {"as_is_bat_phan_bo_2025": [], "as_is_truoc_CA": []}
+    theo_lop: dict[str, list[dict[str, Any]]] = {"as_is_truoc_CA": [], "as_is_tay_lan_du": [],
+                                                 "chua_co_dau_vao": [], "lech_D3": []}
     ngoai_ten: list[dict[str, Any]] = []
+
+    def _hoi(e: Mapping, x: Mapping) -> bool:
+        kh, ma, t = x["o"].split("#")
+        v = e.get((kh, ma, t))
+        return v is not None and abs(v - Decimal(x["dap_an"])) <= ATOL
+
     for x in lech:
         mg = mong_o.get(x["o"])
         if mg is not None and abs(Decimal(x["engine"]) - Decimal(mg[0])) <= atol_lech \
                 and abs(Decimal(x["dap_an"]) - Decimal(mg[1])) <= atol_lech:
             tung_o.append(x)
-        elif _lop(x):
-            theo_lop[_lop(x)].append(x)
+        elif _lop_2024(x):
+            theo_lop["as_is_truoc_CA"].append(x)
+        elif _hoi(e2, x):
+            theo_lop["chua_co_dau_vao"].append(x)
+        elif _hoi(e2b, x):
+            theo_lop["as_is_tay_lan_du"].append(x)
+        elif _hoi(e3, x):
+            theo_lop["lech_D3"].append(x)
         else:
             ngoai_ten.append(x)
-    so["lop_quy_tac"] = {k: _tom(v) for k, v in theo_lop.items()}
-    c3d._khac(so["lop_quy_tac"], m.get("lop_quy_tac"), "lop_quy_tac", ly)
+    so["lop_do"] = {k: _tom(v) for k, v in theo_lop.items()}
+    c3d._khac(so["lop_do"], m.get("lop_do"), "lop_do", ly)
+    # lá khối CDT 2025 của 4 sổ nền tảng + mã có ngoại lệ (OFR) — khớp / chua_co_dau_vao THEO MÃ *(Đ4)*
+    cdv = {x["o"] for x in theo_lop["chua_co_dau_vao"]}
+    lech_o = {x["o"] for x in lech}
+    ma_la = (*MA_NEN_TANG, *sorted({x.hd for x in getattr(alr, "luat", ()) if x.ngoai_le_cdt1}))
+    so["la_cdt_2025"] = {ma: {"o": sum(1 for kh in KHOI_CDT6 for t in THANG_2025 if (kh, ma, t) in atl_o),
+                              "khop": sum(1 for kh in KHOI_CDT6 for t in THANG_2025
+                                          if (kh, ma, t) in atl_o and f"{kh}#{ma}#{t}" not in lech_o),
+                              "chua_co_dau_vao": sum(1 for kh in KHOI_CDT6 for t in THANG_2025
+                                                     if f"{kh}#{ma}#{t}" in cdv)} for ma in ma_la}
+    c3d._khac(so["la_cdt_2025"], m.get("la_cdt_2025"), "la_cdt_2025", ly)
+    # khớp THẬT ở cờ TẮT *(lưới vào — đồng nhất H12-B1)* để báo trước/sau
+    so["khop_co_so_co_tat"] = _khop_co_so(pla3.o, hang, cot, pla3.loai)
     thay = {x["o"] for x in lech}
     for k in sorted(set(mong_o) - thay):
         ly.append(f"ô mong lệch `{k}` nay KHỚP ⇒ sửa bản khai (Đ5 chiều ngược)")
@@ -247,16 +398,19 @@ def so_sanh_c5a(pla3: pla.KetQuaPLA, atl: Mapping[str, Any], drv: Mapping[str, A
     if len(ngoai_ten) > 20:
         ly.append(f"… +{len(ngoai_ten) - 20} ô lệch ngoài tên")
     co_chu_dich = len(tung_o) + sum(len(v) for v in theo_lop.values())
+    so["loi_as_is"] = len(tung_o) + len(theo_lop["as_is_truoc_CA"]) + len(theo_lop["as_is_tay_lan_du"])
     so["lech_co_chu_dich"], so["lech_ngoai_ten"] = co_chu_dich, len(ngoai_ten)
+    so["ngoai_ten_o"] = sorted(x["o"] for x in ngoai_ten)
     if m.get("tong_o") is not None and m["tong_o"] != dem["o_so"]:
         ly.append(f"mẫu số tong_o {dem['o_so']} ≠ mong {m['tong_o']}")
     px = PhanXu(not ly, tuple(ly))
     hd2 = {
         "bang": "HD2.WP-C5a", "goi": "WP-C5a",
-        "mo_ta": "AL.KEY cờ IX.ALR TẮT (kho, C11 — D2) trên lưới SO.PLA3 PM+HR Y/H/Q/M của H8 (đầu vào DT7b) "
-                 "↔ ATL 606 (+ tham chiếu 604: lưới IX.DRV ↔ pd604_ky)",
+        "mo_ta": "AL.KEY cờ IX.ALR BẬT 2025 (kho — phiên bản KÝ ix_alr_2025_bat.json, quyết của chủ 22/11) trên "
+                 "lưới SO.PLA3 PM+HR Y/H/Q/M của H8 (đầu vào DT7b) ↔ ATL 606 (+ tham chiếu 604: lưới IX.DRV ↔ "
+                 "pd604_ky); lớp lệch gán bằng PHÉP ĐO phản thực",
         "nguon_dau_vao": ["tests/fixture/dau_vao/gl_pl_dau_vao.json", "tests/fixture/dau_vao/hr_pl_dau_vao.json",
-                          "tests/fixture/cau_hinh/ix_drv.json", "IX.ALR (kho)"],
+                          "tests/fixture/cau_hinh/ix_drv.json", "IX.ALR (kho) ← tests/fixture/cau_hinh/ix_alr_2025_bat.json"],
         "dap_an": ["tests/fixture/dap_an/atl.json"],
         "khoa": "khối (12) × mã (la+tong+kpi — ⛔ trong) × kỳ (57) của hàng ATL có nhãn",
         "dung_sai": {"atol": str(ATOL), "rtol": "0", "max_lech_khop": str(mx)},
@@ -265,11 +419,13 @@ def so_sanh_c5a(pla3: pla.KetQuaPLA, atl: Mapping[str, Any], drv: Mapping[str, A
         "khop": dem["khop"],
         "lech_co_chu_dich": co_chu_dich,
         "mong_lech_co_chu_dich": len(mong_o) + sum((v or {}).get("so_o", 0)
-                                                   for v in (m.get("lop_quy_tac") or {}).values()),
+                                                   for v in (m.get("lop_do") or {}).values()),
+        "khop_co_so_co_tat": so["khop_co_so_co_tat"], "loi_as_is": so["loi_as_is"],
+        "la_cdt_2025": so["la_cdt_2025"],
         "lech_ngoai_ten": len(ngoai_ten),
         "khop_ghi_chu": "tong_o = ô so (hàng ATL có nhãn, mã ⛔ trong, ô là số) = o_co_so + o_0_0; khop = ô khớp "
                         "THẬT; khop + lech_co_chu_dich = tong_o",
-        "lech_co_ten": {"o_lech": sorted(x["o"] for x in tung_o), **so["lop_quy_tac"],
+        "lech_co_ten": {"o_lech": sorted(x["o"] for x in tung_o), **so["lop_do"],
                         "khong_so_duoc": dem["khong_so_duoc"], "o_trong": dem["o_trong"],
                         "hang_khong_nhan_khac_0": dem["hang_khong_nhan_khac_0"]},
         "theo_khoi": so["theo_khoi"],
@@ -288,20 +444,32 @@ def tinh_pla3(gl, hr, fx, cay, lich, den) -> pla.KetQuaPLA:
     return luoi["pla3_pm_hr_yhqm"]
 
 
-def _alr_tu_kho(dsn: str | None):
+def _alr_tu_kho(dsn: str | None, conn=None):
     try:
+        from fls.repo import cau_hinh_repo as chc
+        if conn is not None:
+            return chc.doc_alr(conn), None
         import psycopg
         from fls.db.kho import dsn_that
-        from fls.repo import cau_hinh_repo as chc
         with psycopg.connect(dsn or dsn_that()) as c:
             return chc.doc_alr(c), None
     except Exception as e:  # noqa: BLE001 — Đ5: ⛔ đo được ⇒ ĐỎ có lý do
         return None, f"IX.ALR ⛔ đọc được từ kho: {type(e).__name__}: {' '.join(str(e).split())}"
 
 
-def chay_wp_c5a(dsn: str | None = None) -> ThanhQuaC5a:
-    lich, loi = c3d._lich_tu_kho(dsn)
-    alr, loi2 = _alr_tu_kho(dsn)
+def _lich_tu_conn(conn):
+    try:
+        from fls.repo import cau_hinh_repo as chc
+        return chc.doc_per(conn), None
+    except Exception as e:  # noqa: BLE001
+        return None, f"IX.PER ⛔ đọc được từ kho: {type(e).__name__}: {' '.join(str(e).split())}"
+
+
+def chay_wp_c5a(dsn: str | None = None, conn=None) -> ThanhQuaC5a:
+    """`conn` *(tuỳ chọn)*: đọc IX.PER + IX.ALR qua kết nối người gọi *(bài chạy trong giao dịch rollback —
+    kho config TÍCH LUỸ, ⛔ để lại bản ký cho bài C11)*."""
+    lich, loi = _lich_tu_conn(conn) if conn is not None else c3d._lich_tu_kho(dsn)
+    alr, loi2 = _alr_tu_kho(dsn, conn)
     if lich is None or alr is None:
         px = PhanXu(False, tuple(x for x in (loi, loi2) if x))
         return ThanhQuaC5a(so={}, phan_xu=px, hd2_cong={"bang": "HD2.WP-C5a", "goi": "WP-C5a", "dat": False,
@@ -313,11 +481,17 @@ def chay_wp_c5a(dsn: str | None = None) -> ThanhQuaC5a:
 
 def in_bao(tq: ThanhQuaC5a) -> None:
     h = tq.hd2_cong
-    print("══ WP-C5a · AL.KEY cờ TẮT ↔ ATL 606 (+ 604)")
+    print("══ WP-C5a · AL.KEY cờ BẬT 2025 (kho, phiên bản ký) ↔ ATL 606 (+ 604)")
     if "tong_o" in h:
         print(f"  ô so {h['tong_o']} = có số {h['o_co_so']} + 0=0 {h['o_0_0']} · khớp {h['khop']} "
               f"(thật {h['khop_co_so']}/{h['o_co_so']}) · lệch có chủ đích {h['lech_co_chu_dich']} · "
               f"ngoài tên {h['lech_ngoai_ten']} · khong_so_duoc {h['lech_co_ten']['khong_so_duoc']}")
+        print(f"  khớp thật cờ TẮT {h['khop_co_so_co_tat']} → cờ BẬT {h['khop_co_so']} / {h['o_co_so']}")
+        lt = h["lech_co_ten"]
+        print(f"  lớp: loi_as_is {h['loi_as_is']} (o_lech {len(lt['o_lech'])} + as_is_truoc_CA "
+              f"{lt['as_is_truoc_CA']['so_o']} + as_is_tay_lan_du {lt['as_is_tay_lan_du']['so_o']}) · chua_co_dau_vao {lt['chua_co_dau_vao']['so_o']} · "
+              f"lech_D3 {lt['lech_D3']['so_o']} · lệch FLS {h['lech_ngoai_ten']}")
+        print(f"  lá CDT 2025: {h['la_cdt_2025']}")
         print(f"  604: {h['tham_chieu_604']}")
     for x in h.get("ly_do", []):
         print(f"  ⛔ {x}")

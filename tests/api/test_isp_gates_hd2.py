@@ -44,6 +44,7 @@ V = cua.bang_tuyen.TIEN_TO
 #   1.791 lệch có chủ đích — 8 ô 416 `GAC` thiếu `CXA` + 1.783 ô AS-IS 72 cột 2024 trước `CA` của 416).
 # H12 (22/11, WO-291): + WP-C5a (`tong_o` 45.674 = ô ATL so; `khop` 39.843 = ô khớp THẬT; 5.831 lệch có chủ đích —
 #   AS-IS BẬT phân bổ 2025 4.932 + 72 cột 2024 lan từ H8 675 + 224 ô từng ô: −0,5 tay GROUP · NB by LE SGO1).
+# ⭐ vòng sửa R1 H12 (KQ-293, 22/11): cổng đo ở cờ BẬT ký 2025 ⇒ `khop` 40.556 · 5.118 lệch có chủ đích (lớp gán bằng phép đo).
 # 4 cha khai sẵn + 8 con có trong tệp = 12 cổng. WP-C4 (cha, 3 con) ⇒ true; WP-C5 (cha, 1 con C5a) ⇒ true.
 MONG_THAT = {
     "HD2_WP_C2": True, "HD2_WP_C3": True, "HD2_WP_C3A": True, "HD2_WP_C3B": True, "HD2_WP_C3C": True, "HD2_WP_C3D": True,
@@ -59,7 +60,7 @@ MONG_O_C3D = "1287624/1289415 ô"     # WP-C3d khop/tong_o (ô khớp THẬT; + 
 MONG_O_C4B = "1981/1981 ô"           # `hd2_cong.json` WP-C4b khop/tong_o (209 Vendor-tháng × 14 − 945 ô P chữ)
 # ⭐ KQ-236 H11-R1-02: tử số = ô KHỚP THẬT; mẫu số 19.894 gồm 303 lệch nguồn CÓ TÊN (52 OMC + 251 SC) khai riêng
 MONG_O_C4C = "19591/19894 ô đáp án khớp + 303 lệch có chủ đích"
-MONG_O_C5A = "39843/45674 ô"         # WP-C5a khop/tong_o (ô khớp THẬT; + 5831 lệch có chủ đích — AS-IS bật phân bổ)
+MONG_O_C5A = "40556/45674 ô"         # WP-C5a khop/tong_o — cờ BẬT ký 2025 (vòng sửa R1 KQ-293); + 5118 lệch có chủ đích (lớp đo)
 MONG_O_C4A = "420/420 ô"             # `hd2_cong.json` WP-C4a khop/tong_o (44 Vendor-tháng × 14 − 196 ô P chữ)
 
 
@@ -157,7 +158,7 @@ def test_CG2_R2_03_cong_tuyen_THAT_moi_goi_con_trong_tep_deu_hien_va_khong_null(
 def test_CG2_B1_tep_that_qua_tuyen_9_cong_dung_dat_C5_null():
     h = _hd2(_gates(TEP_HD2_THAT))
     assert {m: c["dat"] for m, c in h.items()} == MONG_THAT, h
-    assert MONG_O_C5A in h["HD2_WP_C5A"]["da_do"] and "5831 lệch có chủ đích" in h["HD2_WP_C5A"]["da_do"]
+    assert MONG_O_C5A in h["HD2_WP_C5A"]["da_do"] and "5118 lệch có chủ đích" in h["HD2_WP_C5A"]["da_do"]
     assert h["HD2_WP_C5"]["da_do"].startswith("1/1 gói con"), h["HD2_WP_C5"]
     assert MONG_O_C4A in h["HD2_WP_C4A"]["da_do"] and "3/3 gói con đạt (WP-C4a · WP-C4b · WP-C4c)" in h["HD2_WP_C4"]["da_do"]
     assert MONG_O_C4B in h["HD2_WP_C4B"]["da_do"] and MONG_O_C4C in h["HD2_WP_C4C"]["da_do"]
@@ -183,7 +184,7 @@ def test_CG2_B1_nguon_thu_hai_dat_cua_tep_THAT_khop_mong():
     assert (d["WP-C3b"]["khop"], d["WP-C3b"]["lech_co_chu_dich"], d["WP-C3b"]["tong_o"]) == (11543, 42, 11585)
     assert (d["WP-C3c"]["khop"], d["WP-C3c"]["lech_co_chu_dich"], d["WP-C3c"]["tong_o"], d["WP-C3c"]["dat"]) == (835, 53, 888, True)
     assert (d["WP-C3d"]["khop"], d["WP-C3d"]["lech_co_chu_dich"], d["WP-C3d"]["tong_o"], d["WP-C3d"]["dat"]) == (1287624, 1791, 1289415, True)
-    assert (d["WP-C5a"]["khop"], d["WP-C5a"]["lech_co_chu_dich"], d["WP-C5a"]["tong_o"], d["WP-C5a"]["dat"]) == (39843, 5831, 45674, True)
+    assert (d["WP-C5a"]["khop"], d["WP-C5a"]["lech_co_chu_dich"], d["WP-C5a"]["tong_o"], d["WP-C5a"]["dat"]) == (40556, 5118, 45674, True)
 
 
 def test_CG2_B1_tep_CHI_co_C2_cac_goi_khac_null(tmp_path):
@@ -531,7 +532,7 @@ def test_ITE_R1_01_qua_tuyen_THAT_gates_co_truong_lech_co_chu_dich_THEM_vao_hop_
     h = _hd2(_gates(TEP_HD2_THAT))
     assert {m: c["lech_co_chu_dich"] for m, c in h.items()} == {
         "HD2_WP_C2": 0, "HD2_WP_C3": 1921, "HD2_WP_C3A": 35, "HD2_WP_C3B": 42, "HD2_WP_C3C": 53, "HD2_WP_C3D": 1791,
-        "HD2_WP_C4": 303, "HD2_WP_C4A": 0, "HD2_WP_C4B": 0, "HD2_WP_C4C": 303, "HD2_WP_C5": 5831, "HD2_WP_C5A": 5831}
+        "HD2_WP_C4": 303, "HD2_WP_C4A": 0, "HD2_WP_C4B": 0, "HD2_WP_C4C": 303, "HD2_WP_C5": 5118, "HD2_WP_C5A": 5118}
     assert all({"ma", "ten", "dat", "nhan", "da_do", "ly_do", "lat_bo_nguon"} <= set(c) for c in h.values())
     assert "35 lệch có chủ đích" in h["HD2_WP_C3A"]["da_do"] and "1921 lệch có chủ đích" in h["HD2_WP_C3"]["da_do"]
     assert all(type(c["lech_co_chu_dich"]) is int for c in h.values())

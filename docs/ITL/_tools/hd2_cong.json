@@ -1325,12 +1325,12 @@
  "WP-C5a": {
   "bang": "HD2.WP-C5a",
   "goi": "WP-C5a",
-  "mo_ta": "AL.KEY cờ IX.ALR TẮT (kho, C11 — D2) trên lưới SO.PLA3 PM+HR Y/H/Q/M của H8 (đầu vào DT7b) ↔ ATL 606 (+ tham chiếu 604: lưới IX.DRV ↔ pd604_ky)",
+  "mo_ta": "AL.KEY cờ IX.ALR BẬT 2025 (kho — phiên bản KÝ ix_alr_2025_bat.json, quyết của chủ 22/11) trên lưới SO.PLA3 PM+HR Y/H/Q/M của H8 (đầu vào DT7b) ↔ ATL 606 (+ tham chiếu 604: lưới IX.DRV ↔ pd604_ky); lớp lệch gán bằng PHÉP ĐO phản thực",
   "nguon_dau_vao": [
    "tests/fixture/dau_vao/gl_pl_dau_vao.json",
    "tests/fixture/dau_vao/hr_pl_dau_vao.json",
    "tests/fixture/cau_hinh/ix_drv.json",
-   "IX.ALR (kho)"
+   "IX.ALR (kho) ← tests/fixture/cau_hinh/ix_alr_2025_bat.json"
   ],
   "dap_an": [
    "tests/fixture/dap_an/atl.json"
@@ -1343,12 +1343,41 @@
   },
   "tong_o": 45674,
   "mong_tong_o": 45674,
-  "o_co_so": 11763,
-  "khop_co_so": 5932,
-  "o_0_0": 33911,
-  "khop": 39843,
-  "lech_co_chu_dich": 5831,
-  "mong_lech_co_chu_dich": 5831,
+  "o_co_so": 11764,
+  "khop_co_so": 6646,
+  "o_0_0": 33910,
+  "khop": 40556,
+  "lech_co_chu_dich": 5118,
+  "mong_lech_co_chu_dich": 5118,
+  "khop_co_so_co_tat": 5932,
+  "loi_as_is": 928,
+  "la_cdt_2025": {
+   "GI": {
+    "o": 72,
+    "khop": 3,
+    "chua_co_dau_vao": 69
+   },
+   "OMC": {
+    "o": 72,
+    "khop": 2,
+    "chua_co_dau_vao": 70
+   },
+   "PS": {
+    "o": 72,
+    "khop": 21,
+    "chua_co_dau_vao": 51
+   },
+   "SC": {
+    "o": 72,
+    "khop": 15,
+    "chua_co_dau_vao": 57
+   },
+   "OFR": {
+    "o": 72,
+    "khop": 72,
+    "chua_co_dau_vao": 0
+   }
+  },
   "lech_ngoai_ten": 0,
   "khop_ghi_chu": "tong_o = ô so (hàng ATL có nhãn, mã ⛔ trong, ô là số) = o_co_so + o_0_0; khop = ô khớp THẬT; khop + lech_co_chu_dich = tong_o",
   "lech_co_ten": {
@@ -1578,19 +1607,6 @@
     "SGO1#PL8#2025Q1",
     "SGO1#PL8#2025Q4"
    ],
-   "as_is_bat_phan_bo_2025": {
-    "theo_khoi": {
-     "ASA": 642,
-     "CAH": 700,
-     "COR": 722,
-     "CSM": 716,
-     "CVL": 720,
-     "SHQ1": 722,
-     "SHQ2": 710
-    },
-    "so_o": 4932,
-    "sha256": "c57b14fd34770e24f8084a6c8cadb22b3eb5816f57e67b4a3783891dd81e8f0a"
-   },
    "as_is_truoc_CA": {
     "theo_khoi": {
      "ASA": 66,
@@ -1602,7 +1618,40 @@
      "SHQ2": 114
     },
     "so_o": 675,
-    "sha256": "7a6d908dbd93f4c3639b4e5633ccb5225595487d125649ecc93b28cd437b1493"
+    "sha256": "d07216e21f8258ac4c55ed1144265cc0f26dd7a5a719f044148327e47b25fa37"
+   },
+   "as_is_tay_lan_du": {
+    "theo_khoi": {
+     "SHQ2": 29
+    },
+    "so_o": 29,
+    "sha256": "ecd5f988ef10bcf7772e6f8e3743e89189e775bc80f3332fed99c091534be23f"
+   },
+   "chua_co_dau_vao": {
+    "theo_khoi": {
+     "ASA": 134,
+     "CAH": 148,
+     "COR": 151,
+     "CSM": 145,
+     "CVL": 149,
+     "SHQ1": 151,
+     "SHQ2": 213
+    },
+    "so_o": 1091,
+    "sha256": "6b007db20e2cf0d544c54be8f52303ecf7026a0d7bdeafafa5dc88a9fb00d853"
+   },
+   "lech_D3": {
+    "theo_khoi": {
+     "ASA": 403,
+     "CAH": 478,
+     "COR": 478,
+     "CSM": 478,
+     "CVL": 478,
+     "SHQ1": 478,
+     "SHQ2": 306
+    },
+    "so_o": 3099,
+    "sha256": "743ebe670451eaaff37d8ddb2383a7dd8994df270c173f3fa00333895e5b198d"
    },
    "khong_so_duoc": 154,
    "o_trong": 741,
@@ -1628,31 +1677,31 @@
    },
    "CVL": {
     "o_so": 3797,
-    "lech": 817
+    "lech": 724
    },
    "COR": {
     "o_so": 3797,
-    "lech": 819
+    "lech": 726
    },
    "SHQ1": {
     "o_so": 3797,
-    "lech": 813
+    "lech": 720
    },
    "CSM": {
     "o_so": 3797,
-    "lech": 816
+    "lech": 723
    },
    "CAH": {
     "o_so": 3797,
-    "lech": 810
+    "lech": 736
    },
    "ASA": {
     "o_so": 3797,
-    "lech": 708
+    "lech": 603
    },
    "SHQ2": {
     "o_so": 3797,
-    "lech": 824
+    "lech": 662
    }
   },
   "tham_chieu_604": {

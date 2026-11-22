@@ -15,6 +15,8 @@ khối CDT theo tỉ lệ driver `(driver, CDT1, tháng)` *(IX.DRV — PD 604)*.
    §3.2.5 *(`luat_cua` trả `phuong_phap None`)* ⇒ giữ nguyên khối ấy.
 ⭐ **D2 — mặc định mọi cờ TẮT** ⇒ ⛔ một ô nào được chia ⇒ trả **đúng** lưới vào *(bản sao `o`, ⛔ tính lại —
    đồng nhất TỪNG Ô, ⛔ "khớp trong dung sai")*. Bật cờ chỉ trên dữ liệu TỔNG HỢP *(owner ký mới bật thật)*.
+⭐ **Ngoại lệ CDT1 *(AP §3.2.5 — `OFR` × `CAH`)***: khối ngoại lệ giữ nguyên; khối khác nhận
+   `d_khối / (1 − Σ d_ngoại lệ)` *(chuẩn hoá phần còn lại — công thức AS-IS đo SA FORMULA 22/11, vòng sửa R1)*.
 ⛔ **Driver thiếu ⇒ lỗi CÓ TÊN `DRIVER_THIEU`** kèm MỌI ô thiếu và lý do của bảng `o_thieu` *(ảnh DT10: 146 ô —
    `NB_LE` 96 · `CMN` 36 · `GI 202501` 14)* — ⛔ hoá 0. Ô có tiền nguồn = 0 ⛔ cần driver *(0 × mọi tỉ lệ = 0 —
    chính xác, ⛔ phải hoá 0)*. ⛔ bảng luật ⇒ `LUAT_THIEU`. Kỳ lạ ⇒ `KY_LA`.
@@ -117,14 +119,23 @@ def phan_bo_khoa(kq: pla.KetQuaPLA, alr: Any, cay: CayHD, ct: pla.CongThuc, *, k
                 if luat is None or not luat.bat or luat.khong_qua_allocate or luat.phuong_phap is None \
                         or luat.driver is None:
                     continue
-                k = (DRIVER_LUOI.get(luat.driver, luat.driver), kh, yyyymm)
-                ten = "|".join(map(str, k))
+                ten_drv = DRIVER_LUOI.get(luat.driver, luat.driver)
+                # ⭐ vòng sửa R1 `H12`: luật có ngoại lệ CDT1 *(AP §3.2.5 — `luat.ngoai_le_cdt1`)* chia phần CÒN
+                #    LẠI theo driver chuẩn hoá TRỪ khối ngoại lệ: `d_khối / (1 − Σ d_ngoại lệ)` *(AS-IS, SA FORMULA
+                #    ATL 22/11: `NOEM_khối / (NOEM_GAG − NOEM_CAH)`; Σ7 NOEM = 1 — tham chiếu 604)*.
+                can = [(ten_drv, kh, yyyymm)] + [(ten_drv, e, yyyymm) for e in luat.ngoai_le_cdt1]
                 if driver is None:
-                    thieu.append(f"{ten} (⛔ có lưới driver IX.DRV)")
-                elif k in driver.o:
-                    chia[(kh, n.ma, t)] = (k[0], driver.o[k])
-                else:
-                    thieu.append(f"{ten} ({driver.thieu.get(k, '⛔ có trong lưới driver — ngoài kỳ/khối có số')})")
+                    thieu.append(f"{'|'.join(map(str, can[0]))} (⛔ có lưới driver IX.DRV)")
+                    continue
+                vang = [k for k in can if k not in driver.o]
+                for k in vang:
+                    thieu.append(f"{'|'.join(map(str, k))} "
+                                 f"({driver.thieu.get(k, '⛔ có trong lưới driver — ngoài kỳ/khối có số')})")
+                if not vang:
+                    ty_le = driver.o[can[0]]
+                    if len(can) > 1:
+                        ty_le = ty_le / (1 - sum((driver.o[k] for k in can[1:]), _KHONG))
+                    chia[(kh, n.ma, t)] = (ten_drv, ty_le)
     if thieu:
         raise LoiPhanBoKhoa(DRIVER_THIEU, f"{len(thieu)} ô driver thiếu ⇒ ⛔ chia (⛔ hoá 0): "
                             + " · ".join(thieu[:12]) + (" …" if len(thieu) > 12 else ""), thieu)
@@ -134,12 +145,17 @@ def phan_bo_khoa(kq: pla.KetQuaPLA, alr: Any, cay: CayHD, ct: pla.CongThuc, *, k
     for (kh, m, t), (_, ty_le) in chia.items():
         la[(kh, m, t)] = la[(khoi_nguon, m, t)] * ty_le
     co_ky = set(kq.cot)
+    # ⭐ vòng sửa R1 `H12`: cuộn kỳ + dư CHỈ ở kỳ CÓ ô chia *(tháng chia + kỳ gộp chứa nó)* — đo trước sửa: cờ ký 2025
+    #    làm 6 ô `SHQ2` 2026 Y/H1/Q1 lệch 1e-29 vì dư tính lại CẢ kỳ ⛔ chia *(bài `…ky_ngoai_2025_dong_nhat…`)*.
+    ky_cham: dict[str, set] = {}
+    for _, m, t in chia:
+        ky_cham.setdefault(m, set()).update({t, *ky_gop(t)})
     for kh, m in {(kh, m) for kh, m, _ in chia}:     # cuộn lại Y/H/Q của mã bị chia *(ATL: Σ tháng)*
-        for g in {g for t, y in thang.items() if y is not None for g in ky_gop(t)} & co_ky:
+        for g in {g for g in ky_cham[m] if thang.get(g) is None} & co_ky:
             la[(kh, m, g)] = sum((la[(kh, m, t)] for t in kq.cot if g in ky_gop(t)), _KHONG)
     if khoi_du is not None:
-        for m in {m for _, m, _ in chia}:
-            for t in kq.cot:
+        for m, kys in ky_cham.items():
+            for t in kys & co_ky:
                 la[(khoi_du, m, t)] = la[(khoi_nguon, m, t)] - sum((la[(k, m, t)] for k in khoi_cdt), _KHONG)
     o = pla.danh_gia(la, cay, list(kq.cot), tuple(kq.khoi), ct)
     return KetQuaKhoa(o=o, la=la, cot=list(kq.cot), khoi=tuple(kq.khoi), dem=dem, chia=chia)

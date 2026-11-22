@@ -157,11 +157,35 @@ def test_H12_B2_by_GI__sigma_chia_bang_tien__dung_ti_le_driver(cay, alr_tat, dri
 def test_H12_B2_by_NOEM__ngoai_le_OFR_CAH_giu_nguyen(cay, alr_tat, driver):
     kq0 = _tong_hop(cay, {("OFR", "2025M05"): Decimal("-7.5"), ("REC", "2025M05"): Decimal("3")})
     kq = _chay(kq0, _bat(alr_tat, "OFR", "REC"), cay, driver)
+    d = {kh: driver.o[("NOEM", kh, 202505)] for kh in (*KHOI_CDT6, c3d.KHOI_DU)}
     for kh in KHOI_CDT6:
-        assert kq.o[(kh, "REC", "2025M05")] == Decimal("3") * driver.o[("NOEM", kh, 202505)]
-        mong_ofr = Decimal(0) if kh == "CAH" else Decimal("-7.5") * driver.o[("NOEM", kh, 202505)]
-        assert kq.o[(kh, "OFR", "2025M05")] == mong_ofr, kh          # AP §3.2.5: CAH ⛔ chia By NOEM
+        assert kq.o[(kh, "REC", "2025M05")] == Decimal("3") * d[kh]
+        # AP §3.2.5: CAH ⛔ chia By NOEM. ⭐ Vòng sửa R1 `H12` *(SA FORMULA ATL 22/11, ô `OFR` khối CDT 2025)*: AS-IS
+        #   chia phần CÒN LẠI theo NOEM chuẩn hoá TRỪ ngoại lệ — `NOEM_khối / (NOEM_GAG − NOEM_CAH)`.
+        mong_ofr = Decimal(0) if kh == "CAH" else Decimal("-7.5") * (d[kh] / (1 - d["CAH"]))
+        assert kq.o[(kh, "OFR", "2025M05")] == mong_ofr, kh
     assert kq.dem["o_chia"] == 11
+    assert d["CAH"] != 0, "Đ3: driver CAH = 0 ⇒ chuẩn hoá ⛔ đo được"
+
+
+def test_H12_R1_06_by_NOEM__sigma_DOC_LAP_voi_cong_thuc_du(cay, alr_tat, driver):
+    """`H12-R1-06` — Σ chia so với tiền × driver đo NGOÀI công thức dư *(dư := GROUP − Σ CDT ⇒ "Σ = tiền" luôn
+    đúng)*: dư SHQ2 phải bằng tiền × NOEM_SHQ2 *(⇔ Σ7 NOEM = 1)*; OFR: tiền × NOEM_SHQ2 / (1 − NOEM_CAH)."""
+    tien_rec, tien_ofr = Decimal("3"), Decimal("-7.5")
+    kq0 = _tong_hop(cay, {("REC", "2025M05"): tien_rec, ("OFR", "2025M05"): tien_ofr})
+    kq = _chay(kq0, _bat(alr_tat, "OFR", "REC"), cay, driver)
+    d = {kh: driver.o[("NOEM", kh, 202505)] for kh in (*KHOI_CDT6, c3d.KHOI_DU)}
+    assert abs(kq.o[(c3d.KHOI_DU, "REC", "2025M05")] - tien_rec * d[c3d.KHOI_DU]) <= DUNG_SAI
+    assert abs(kq.o[(c3d.KHOI_DU, "OFR", "2025M05")] - tien_ofr * d[c3d.KHOI_DU] / (1 - d["CAH"])) <= DUNG_SAI
+    assert d[c3d.KHOI_DU] != 0, "Đ3: driver SHQ2 = 0 ⇒ dư = 0 xanh trên tập rỗng"
+
+
+def test_H12_R1_OFR_driver_ngoai_le_thieu__loi_co_ten(cay, alr_tat, driver):
+    o2 = {k: v for k, v in driver.o.items() if k != ("NOEM", "CAH", 202505)}
+    kq0 = _tong_hop(cay, {("OFR", "2025M05"): Decimal("-7.5")})
+    with pytest.raises(pbk.LoiPhanBoKhoa) as e:
+        _chay(kq0, _bat(alr_tat, "OFR"), cay, dataclasses.replace(driver, o=o2))
+    assert e.value.ma == pbk.DRIVER_THIEU and "NOEM|CAH|202505" in str(e.value)
 
 
 @pytest.mark.parametrize("ma, thang, mau", [
@@ -240,3 +264,16 @@ def test_ky_gop_va_ky_la():
     with pytest.raises(pbk.LoiPhanBoKhoa) as e:
         pbk.ky_gop("2025X9")
     assert e.value.ma == pbk.KY_LA
+
+
+# ── Vòng sửa R1 `H12` *(`KQ-293`)* — cờ BẬT 2025 theo tệp KÝ *(quyết của chủ 22/11)* trên lưới THẬT ─────────
+
+def test_H12_R1_co_ky_2025__ky_ngoai_2025_dong_nhat_tru_NPC_hau_to(pla3, cay, driver):
+    """Luật ký chỉ hiệu lực 202501…202512 ⇒ mọi ô kỳ 2024/2026 GIỮ NGUYÊN `==` *(⛔ dung sai)*, trừ `NPC` 2024 —
+    `NPC` = Σ HẬU TỐ ⇒ kéo theo kỳ sau *(AC-4)*. Đo trước sửa: 6 ô `SHQ2` `BON`/`HCC` 2026 Y/H1/Q1 lệch 1e-29
+    *(dư SHQ2 tính lại CẢ kỳ ⛔ chia)*."""
+    kq = _chay(pla3, c5a.alr_ky_tu_anh(), cay, driver)
+    assert kq.dem["o_chia"] > 0 and kq.dem["luat_bat"] == 11, kq.dem      # 13 mã bật − CXP, CXO (GROUP 2025 = 0)
+    doi = [k for k in pla3.o if k[2][:4] != "2025" and kq.o[k] != pla3.o[k]]
+    assert {k[1] for k in doi} <= {"NPC"} and all(k[2][:4] == "2024" for k in doi), sorted(doi)[:8]
+    assert doi, "Đ3: NPC hậu tố phải đổi — ⛔ thì phép chia ⛔ chạm lưới"
