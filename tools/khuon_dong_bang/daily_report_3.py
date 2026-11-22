@@ -60,14 +60,14 @@ TOL = Decimal("0.5")                               # VND: dưới nửa đồng 
 
 #: ⭐ Đ5 — CHECK theo THỰC THỂ *(đo lần đầu 20/11, rồi khai)*. Khác ⇒ ĐỎ cả hai chiều.
 MONG_CHECK: dict[str, dict[str, Any]] = {
-    'Group': {'nb_do': 24, 'nb_trong': 0, 'nb_khac_0': ('Group@202405', 'Group@202406', 'Group@202411', 'Group@202412', 'Group@202501', 'Group@202502', 'Group@202503', 'Group@202504', 'Group@202505', 'Group@202506', 'Group@202507', 'Group@202508'), 'cb_do': 6, 'cb_dat': 0, 'cb_khong_dat': ('Group@202410', 'Group@202411', 'Group@202412', 'Group@202501', 'Group@202502', 'Group@202503'), 'cb_khong_do': 18},
-    'VisionLab': {'nb_do': 24, 'nb_trong': 0, 'nb_khac_0': (), 'cb_do': 0, 'cb_dat': 0, 'cb_khong_dat': (), 'cb_khong_do': 24},
-    'TeraSofts': {'nb_do': 24, 'nb_trong': 0, 'nb_khac_0': (), 'cb_do': 0, 'cb_dat': 0, 'cb_khong_dat': (), 'cb_khong_do': 24},
-    'SuperMinds': {'nb_do': 24, 'nb_trong': 0, 'nb_khac_0': (), 'cb_do': 0, 'cb_dat': 0, 'cb_khong_dat': (), 'cb_khong_do': 24},
-    'Astronex': {'nb_do': 24, 'nb_trong': 0, 'nb_khac_0': (), 'cb_do': 0, 'cb_dat': 0, 'cb_khong_dat': (), 'cb_khong_do': 24},
-    'IOs': {'nb_do': 24, 'nb_trong': 0, 'nb_khac_0': (), 'cb_do': 0, 'cb_dat': 0, 'cb_khong_dat': (), 'cb_khong_do': 24},
-    'Headquarters': {'nb_do': 24, 'nb_trong': 0, 'nb_khac_0': (), 'cb_do': 23, 'cb_dat': 14, 'cb_khong_dat': ('Headquarters@202411', 'Headquarters@202412', 'Headquarters@202501', 'Headquarters@202502', 'Headquarters@202503', 'Headquarters@202504', 'Headquarters@202505', 'Headquarters@202506', 'Headquarters@202507'), 'cb_khong_do': 1},
-    'CHECKING': {'nb_do': 0, 'nb_trong': 24, 'nb_khac_0': (), 'cb_do': 0, 'cb_dat': 0, 'cb_khong_dat': (), 'cb_khong_do': 24},
+    'Group': {'nb_do': 24, 'nb_trong': 0, 'nb_khac_0': ('Group@202405', 'Group@202406', 'Group@202411', 'Group@202412', 'Group@202501', 'Group@202502', 'Group@202503', 'Group@202504', 'Group@202505', 'Group@202506', 'Group@202507', 'Group@202508'), 'cb_do': 6, 'cb_dat': 0, 'cb_dat_co_so': 0, 'cb_dat_0_0': 0, 'cb_khong_dat': ('Group@202410', 'Group@202411', 'Group@202412', 'Group@202501', 'Group@202502', 'Group@202503'), 'cb_khong_do': 18},
+    'VisionLab': {'nb_do': 24, 'nb_trong': 0, 'nb_khac_0': (), 'cb_do': 0, 'cb_dat': 0, 'cb_dat_co_so': 0, 'cb_dat_0_0': 0, 'cb_khong_dat': (), 'cb_khong_do': 24},
+    'TeraSofts': {'nb_do': 24, 'nb_trong': 0, 'nb_khac_0': (), 'cb_do': 0, 'cb_dat': 0, 'cb_dat_co_so': 0, 'cb_dat_0_0': 0, 'cb_khong_dat': (), 'cb_khong_do': 24},
+    'SuperMinds': {'nb_do': 24, 'nb_trong': 0, 'nb_khac_0': (), 'cb_do': 0, 'cb_dat': 0, 'cb_dat_co_so': 0, 'cb_dat_0_0': 0, 'cb_khong_dat': (), 'cb_khong_do': 24},
+    'Astronex': {'nb_do': 24, 'nb_trong': 0, 'nb_khac_0': (), 'cb_do': 0, 'cb_dat': 0, 'cb_dat_co_so': 0, 'cb_dat_0_0': 0, 'cb_khong_dat': (), 'cb_khong_do': 24},
+    'IOs': {'nb_do': 24, 'nb_trong': 0, 'nb_khac_0': (), 'cb_do': 0, 'cb_dat': 0, 'cb_dat_co_so': 0, 'cb_dat_0_0': 0, 'cb_khong_dat': (), 'cb_khong_do': 24},
+    'Headquarters': {'nb_do': 24, 'nb_trong': 0, 'nb_khac_0': (), 'cb_do': 23, 'cb_dat': 14, 'cb_dat_co_so': 0, 'cb_dat_0_0': 14, 'cb_khong_dat': ('Headquarters@202411', 'Headquarters@202412', 'Headquarters@202501', 'Headquarters@202502', 'Headquarters@202503', 'Headquarters@202504', 'Headquarters@202505', 'Headquarters@202506', 'Headquarters@202507'), 'cb_khong_do': 1},
+    'CHECKING': {'nb_do': 0, 'nb_trong': 24, 'nb_khac_0': (), 'cb_do': 0, 'cb_dat': 0, 'cb_dat_co_so': 0, 'cb_dat_0_0': 0, 'cb_khong_dat': (), 'cb_khong_do': 24},
 }
 #: ⭐ số ô KHÁC RỖNG theo (thực thể, năm) + 2 cột năm.
 MONG_O: dict[str, int] = {
@@ -205,7 +205,8 @@ def do_check(dong: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
 
 def _tom(r: dict[str, Any]) -> dict[str, Any]:
     return {"nb_do": r["nb_do"], "nb_trong": r["nb_trong"], "nb_khac_0": tuple(r["nb_khac_0"]),
-            "cb_do": r["cb_do"], "cb_dat": r["cb_dat"], "cb_khong_dat": tuple(r["cb_khong_dat"]),
+            "cb_do": r["cb_do"], "cb_dat": r["cb_dat"], "cb_dat_co_so": r["cb_dat_co_so"],
+            "cb_dat_0_0": r["cb_dat_0_0"], "cb_khong_dat": tuple(r["cb_khong_dat"]),
             "cb_khong_do": r["cb_khong_do"]}
 
 
@@ -233,10 +234,11 @@ def thieu_lac(dong: list[dict[str, Any]]) -> dict[str, Any]:
     chua = tuple(f"{e}@{k}" for e in ENT_COT for k in KY if all(d[f"{e}_{k}"] is None for d in dong))
     if chua != CHUA_CO_DU_LIEU:
         thieu.append(f"chua_co_du_lieu {chua}≠{CHUA_CO_DU_LIEU}")
-    do_tong = sum(c["cb_do"] for c in ck.values())
-    dat_tong = sum(c["cb_dat"] for c in ck.values())
+    c_so = sum(c["cb_dat_co_so"] for c in ck.values())
+    c_00 = sum(c["cb_dat_0_0"] for c in ck.values())
     return {"thieu": thieu, "lac": [],
             "dai": (f"{len(dong)} hàng × 192 cột kỳ (8 thực thể × 202401…202512) · CHECK ② đo được "
-                    f"{do_tong} kỳ-thực thể, đạt {dat_tong} · CHECK ① NB=0 đo được "
+                    f"{sum(c['cb_do'] for c in ck.values())} kỳ-thực thể: đạt ② có số {c_so} · đạt ② 0=0 {c_00} · "
+                    f"⛔ đạt {sum(len(c['cb_khong_dat']) for c in ck.values())} · CHECK ① NB=0 đo được "
                     f"{sum(c['nb_do'] for c in ck.values())} kỳ-thực thể, ≠0 ở "
                     f"{sum(len(c['nb_khac_0']) for c in ck.values())} · kỳ 0 ô: {len(chua)}")}

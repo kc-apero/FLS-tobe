@@ -10,6 +10,7 @@
 from __future__ import annotations
 
 import copy
+import datetime
 import hashlib
 import importlib.util
 import json
@@ -18,6 +19,8 @@ import sys
 from decimal import Decimal
 
 import pytest
+
+from fls.oracle.anh_chup import AnhChup
 
 GOC = pathlib.Path(__file__).resolve().parents[2]
 F = GOC / "tests" / "fixture" / "dap_an"
@@ -29,8 +32,13 @@ MONG = {"daily_report_2": (846, 39, 26272), "daily_report_3": (94, 199, 13541)}
 CHECKSUM = {"daily_report_2": "01113b55ba953108", "daily_report_3": "ef1744caf253f3bd"}
 
 #: ⭐ AC-2 — CHECK trên chính đáp án *(đo lần đầu 20/11 rồi khai — Đ5)*.
-MONG_CB = {"daily_report_2": {"cb_do": 315, "cb_dat": 267, "cb_khong_dat": 48, "nb_do": 315, "nb_khac_0": 119, "cb_khong_do": 0},
-           "daily_report_3": {"cb_do": 29, "cb_dat": 14, "cb_khong_dat": 15, "nb_do": 168, "nb_khac_0": 12, "cb_khong_do": 163}}
+#: ⭐ `DT11-R1-03`: "đạt ②" tách làm hai ngăn — `cb_dat_co_so` *(≥ 1 trong 8 vế ≠ 0 mà vẫn cân = BẰNG CHỨNG DƯƠNG)* ·
+#: `cb_dat_0_0` *(cả 8 vế đúng 0 ⇒ 0 = 0, ⛔ chứng minh gì)*. Đo 22/11: **0** kỳ nào có số mà cân ở CẢ HAI ảnh.
+#: ⭐ `DT11-R1-04`: DR2 đếm trên NGÀY THẬT — 5 khối × 30 ngày = 150 + 160 kỳ luỹ kế = **310** kỳ-khối ② *(cột `AK` tách riêng)*.
+MONG_CB = {"daily_report_2": {"cb_do": 310, "cb_dat": 262, "cb_dat_co_so": 0, "cb_dat_0_0": 262, "cb_khong_dat": 48,
+                              "nb_do": 310, "nb_khac_0": 119, "cb_khong_do": 0},
+           "daily_report_3": {"cb_do": 29, "cb_dat": 14, "cb_dat_co_so": 0, "cb_dat_0_0": 14, "cb_khong_dat": 15,
+                              "nb_do": 168, "nb_khac_0": 12, "cb_khong_do": 163}}
 #: kỳ KHÔNG đạt CHECK ② của DR3 *(kỳ · chênh = vế trái − vế phải, VND)*.
 KHONG_DAT_DR3 = {
     "Group@202410": "145298916", "Group@202411": "775085821", "Group@202412": "-2079550",
@@ -44,6 +52,16 @@ BAM_DR2 = "d8bca5bddc797032"
 
 def _doc(ten: str) -> dict:
     return json.loads((F / f"{ten}.json").read_text(encoding="utf-8"))
+
+
+def _checksum_lai(anh: dict) -> str:
+    """⭐ `DT11-R1-01`: TÍNH LẠI checksum từ `dong` + `phu` của CHÍNH tệp ảnh *(như `test_dap_an_atl`/`_gi`)*.
+    Bản đầu chỉ so `a["checksum_noi_dung"]` *(chữ ghi sẵn trong ảnh)* với ghim ⇒ đổi +1 một ô NGOÀI 9 dòng CHECK
+    ở DR3 và DR2 vẫn 28/28 xanh. Chữ ghi sẵn ⛔ phải bằng chứng; chỉ phép băm lại nội dung mới là."""
+    phu = tuple({"phu": ten, "dong": r} for ten, b in anh.get("phu", {}).items() for r in b["dong"])
+    return AnhChup(run_id=f"dong_bang_sheet:{anh['khuon']}",
+                   ngay=datetime.date.fromisoformat(anh["ngay_dong_bang"]),
+                   nguon=anh["nguon"], dong=tuple(anh["dong"]) + phu).checksum()[:16]
 
 
 def _nap(ten: str):
@@ -71,7 +89,7 @@ def test_AC1_anh_dong_cot_o_khac_0_va_cong_dat(bo):
     assert a["so_dong"] == len(a["dong"]) == n and a["cong"]["dat"] is True and a["cong"]["mong"] == n
     assert len(a["cot"]) == c and o > 0                                       # Đ3: mẫu số ≠ 0
     assert sum(1 for d in a["dong"] for x in _cot_so(ten, K) if d[x] is not None) == o
-    assert a["checksum_noi_dung"] == CHECKSUM[ten] and a["thieu"] == [] and a["trung"] == [] and a["o_rong"] == []
+    assert a["checksum_noi_dung"] == _checksum_lai(a) == CHECKSUM[ten] and a["thieu"] == [] and a["trung"] == [] and a["o_rong"] == []
     assert a["bang"] == K.BANG
 
 
@@ -89,6 +107,7 @@ def test_AC1_gom_tren_dong_pl_va_ky_nhan_tung_so(bo):
 
 def _tong(ck):
     return {"cb_do": sum(c["cb_do"] for c in ck.values()), "cb_dat": sum(c["cb_dat"] for c in ck.values()),
+            "cb_dat_co_so": sum(c["cb_dat_co_so"] for c in ck.values()), "cb_dat_0_0": sum(c["cb_dat_0_0"] for c in ck.values()),
             "cb_khong_dat": sum(len(c["cb_khong_dat"]) for c in ck.values()), "nb_do": sum(c["nb_do"] for c in ck.values()),
             "nb_khac_0": sum(len(c["nb_khac_0"]) for c in ck.values()), "cb_khong_do": sum(c["cb_khong_do"] for c in ck.values())}
 
@@ -100,6 +119,36 @@ def test_AC2_check_so_ky_dat_khai_mong_mau_so_khac_0(bo):
     assert t == MONG_CB[ten]
     assert t["cb_do"] > 0 and t["nb_do"] > 0                                  # Đ3: tập đo được ≠ rỗng
     assert t["cb_do"] == t["cb_dat"] + t["cb_khong_dat"]                       # mỗi kỳ vào ĐÚNG một ngăn
+    assert t["cb_dat"] == t["cb_dat_co_so"] + t["cb_dat_0_0"]                  # `DT11-R1-03`: "đạt" = có số + 0=0
+    assert t["cb_dat_0_0"] > 0                                                 # Đ3: ngăn 0=0 KHÔNG rỗng ⇒ nói thẳng nó là 0=0
+    assert t["cb_dat_co_so"] == 0                                              # bằng chứng dương = 0 kỳ — khai RÕ, ⛔ để im
+
+
+def test_R1_03_dai_goi_0_0_la_0_0_khong_goi_dat_tron(bo):
+    """Nhãn ở dải in ra: ⛔ có chữ "đạt ②" trơn — luôn tách `có số` / `0=0` *(Đ3: mẫu số của bằng chứng dương)*."""
+    ten, a, K = bo
+    dai = K.thieu_lac(copy.deepcopy(a["dong"]))["dai"]
+    assert "đạt ② có số" in dai and "đạt ② 0=0" in dai, dai
+    assert "đạt ② có số 0" in dai                                                # bằng chứng dương khai 0 RÕ RÀNG
+
+
+@pytest.mark.parametrize("ten", TEN)
+def test_R1_03_PHA_ky_0_0_thanh_ky_co_so_thi_dat_co_so_tang_va_cong_DO(ten):
+    """Đ5 hai chiều: biến MỘT kỳ 0=0 thành kỳ CÓ SỐ mà vẫn cân *(NIS += x, CXA += x)* ⇒ `cb_dat_co_so` 0 → 1 ⇒ ĐỎ."""
+    a, K = _doc(ten), _nap(ten)
+    d2 = copy.deepcopy(a["dong"])
+    cot = "headquarters_202508" if ten.endswith("3") else "g"
+    pick = lambda m: next(d for d in d2 if isinstance(d["ma"], dict) and d["ma"]["chu"] == m
+                          and (ten.endswith("3") or (d["che_do"]["chu"] == "ngay" and d["khoi"]["chu"] == "HGO2")))
+    n, c = pick("NIS"), pick("CXA")
+    if ten.endswith("2"):
+        cot = "j"                                                                # HGO2 · một ngày 0=0 chắc chắn đạt
+    assert n[cot] is not None and c[cot] is not None
+    n[cot] = str(Decimal(n[cot]) + Decimal("7")); c[cot] = str(Decimal(c[cot]) + Decimal("7"))
+    ck = K.do_check(d2)
+    assert sum(x["cb_dat_co_so"] for x in ck.values()) == 1
+    r = K.thieu_lac(d2)
+    assert r["thieu"], "đổi một kỳ 0=0 thành có-số mà cổng vẫn xanh"
 
 
 def test_AC2_dr3_liet_ke_15_ky_khong_dat_ky_va_chenh():
@@ -193,13 +242,39 @@ def test_AC4_dr2_dai_ngay_01_30_11_2026_va_luy_ke_2025_den_2026_M6():
     K = _nap("daily_report_2")
     td = {(r["dong_sheet"], r["cot"]["chu"]): r["gia_tri"] for r in a["phu"]["tieu_de"]["dong"]}
     assert [td[("9", c)] for c in ("G", "AJ")] == ["46327", "46356"]        # 2026-11-01 … 2026-11-30
-    assert K.KY_NGAY[0][0] == "2026-11-01" and K.KY_NGAY[29][0] == "2026-11-30" and K.KY_NGAY[30][0] == "ak(khong-ngay)"
+    assert K.KY_NGAY[0][0] == "2026-11-01" and K.KY_NGAY[29][0] == "2026-11-30" and len(K.KY_NGAY) == 30
+    # ⭐ `DT11-R1-04`: `AK` ⛔ ngày — trục RIÊNG `khong_ngay`, ⛔ lẫn vào 30 ngày thật
+    assert K.COT_KHONG_NGAY == ("ak",) and K.NHAN_KHONG_NGAY == "khong_ngay" and "ak" not in {c for _, c in K.KY_NGAY}
+    assert ("5", "AK") not in td and ("9", "AK") not in td and td[("6", "AK")] == {"chu": "Sat"}   # AK5 rỗng · "Sat" = serial 0
     assert [td[("428", c)] for c in ("G", "Z", "AG", "AL")] == ["2025", "2026", "1", "6"]   # Y2025 · Y2026 · M1 · M6
     assert td[("428", "H")] == {"chu": "H1"}
     assert K.KY_LUY_KE[-1][0] == "2026-M06" and len(K.KY_LUY_KE) == 32      # ⛔ có 2026-M07…M12 trong bố cục
     # kỳ có CỘT mà 0 ô ⇒ chua_co_du_lieu có tên (hr: số người 2026 H2·Q3·Q4)
     assert K.CHUA_CO_DU_LIEU == ("hr@2026-H2", "hr@2026-Q3", "hr@2026-Q4")
     assert all(any(d[c] is not None for d in a["dong"] if d["che_do"]["chu"] == "ngay") for _, c in K.KY_NGAY)
+
+
+def test_R1_04_ngay_thuc_150_ngay_khoi_va_AK_dem_rieng_khong_cong_vao():
+    """Đ4: `150` = 5 khối × 30 ngày THẬT *(⛔ 155 = 150 + 5 `AK`)*; `AK` có 844 ô số nhưng là vết kéo công thức."""
+    a, K = _doc("daily_report_2"), _nap("daily_report_2")
+    ck = K.do_check(copy.deepcopy(a["dong"]))
+    assert sum(c["cb_do"] for k, c in ck.items() if k.startswith("ngay:")) == 150 == len(K.KHOI) * len(K.KY_NGAY)
+    assert sum(c["cb_do"] for k, c in ck.items() if k.startswith("luy_ke:")) == 160
+    ak = K.do_check_khong_ngay(copy.deepcopy(a["dong"]))
+    assert set(ak) == {f"ngay:{k}" for k in K.KHOI} and sum(c["cb_do"] for c in ak.values()) == 5
+    assert sum(1 for d in a["dong"] if d["che_do"]["chu"] == "ngay" and d["ak"] is not None) == 395 > 0   # Đ3: AK ở chế độ `ngay` = 395 ô (838 = cả 3 chế độ: ngay 395 · luy_ke 340 · hr 103)
+    assert set(K.MONG_AK) == set(ak)
+
+
+def test_R1_04_PHA_doi_mot_o_AK_thi_cong_DO_va_ngay_thuc_khong_doi():
+    """AK RIÊNG ⇒ đổi AK (NB 0 → 1) làm `MONG_AK` ĐỎ mà `MONG_CHECK` *(ngày thật)* xanh — hai trục độc lập."""
+    a, K = _doc("daily_report_2"), _nap("daily_report_2")
+    d2 = copy.deepcopy(a["dong"])
+    nb = next(d for d in d2 if d["che_do"]["chu"] == "ngay" and d["khoi"]["chu"] == "HGO2" and isinstance(d["ma"], dict) and d["ma"]["chu"] == "NB")
+    assert nb["ak"] is not None                                             # mẫu số phép phá ≠ 0 (Đ3)
+    nb["ak"] = "1"
+    r = K.thieu_lac(d2)
+    assert r["thieu"] and all("@ak" in x for x in r["thieu"]), r["thieu"]
 
 
 def test_AC4_PHA_xoa_ca_cot_ngay_thi_chua_co_du_lieu_doi_va_DO():

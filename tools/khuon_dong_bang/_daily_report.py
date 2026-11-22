@@ -35,6 +35,7 @@ def kiem_check(hang: Mapping[str, Mapping[str, Any]], cot_ky: Sequence[tuple[str
     if thieu:
         raise ValueError(f"khối thiếu dòng {thieu} — ⛔ đo được CHECK")
     ra: dict[str, Any] = {"nb_do": 0, "nb_trong": 0, "nb_khac_0": [], "cb_do": 0, "cb_dat": 0,
+                          "cb_dat_co_so": 0, "cb_dat_0_0": 0,
                           "cb_khong_dat": [], "cb_khong_do": 0, "chenh": {}}
     for nhan, c in cot_ky:
         nb = _so(hang["NB"][c])
@@ -55,6 +56,12 @@ def kiem_check(hang: Mapping[str, Mapping[str, Any]], cot_ky: Sequence[tuple[str
             ra["chenh"][nhan] = ch
         else:
             ra["cb_dat"] += 1
+            # ⭐ `DT11-R1-03`: "đạt" tách hai ngăn. `0 = 0` *(cả 8 vế đúng 0)* ⛔ chứng minh gì về IX.PL — đo 22/11:
+            # MỌI kỳ đạt ở DR2 *(262/262)* và DR3 *(14/14)* đều là 0 = 0. Bằng chứng DƯƠNG = `cb_dat_co_so`.
+            if all(x == 0 for x in v):
+                ra["cb_dat_0_0"] += 1
+            else:
+                ra["cb_dat_co_so"] += 1
     return ra
 
 

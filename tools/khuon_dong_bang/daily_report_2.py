@@ -55,25 +55,37 @@ TOL = Decimal("1e-9")                              # mUSD: dưới 1e-9 là nhi�
 
 #: nhãn kỳ của cột theo chế độ *(Đ4: ngày ⇒ ISO; luỹ kế ⇒ `<năm>-<Y|H1|…|M01…>`)*
 _NGAY0 = 46327
-KY_NGAY = tuple((str(date(1899, 12, 30) + timedelta(days=_NGAY0 + i)), COT_GT[i]) for i in range(30)) \
-    + (("ak(khong-ngay)", "ak"),)
+#: ⭐ `DT11-R1-04`: **30** ngày THẬT *(hàng 9: serial 46327…46356 = `From`…`To`)*. Cột `AK` ⛔ phải ngày — `AK5` rỗng, hàng 6
+#: `=text(AK5,"ddd")` ⇒ `"Sat"` *(serial 0)*, `SUMIFS` chạy tiêu chí rỗng ⇒ **vết kéo công thức** quá `To` = 30/11. Bản đầu gộp nó
+#: vào trục ngày ("31/31 cột", 155 ngày-khối = 150 + 5 `AK`) ⇒ nay tách: trục ngày 30, trục `khong_ngay` *(cột `ak`)* RIÊNG.
+KY_NGAY = tuple((str(date(1899, 12, 30) + timedelta(days=_NGAY0 + i)), COT_GT[i]) for i in range(30))
+COT_KHONG_NGAY = ("ak",)
+NHAN_KHONG_NGAY = "khong_ngay"
 _LK = [("2025", k) for k in ("Y", "H1", "H2", "Q1", "Q2", "Q3", "Q4", *[f"M{m:02d}" for m in range(1, 13)])] \
     + [("2026", k) for k in ("Y", "H1", "H2", "Q1", "Q2", "Q3", "Q4", *[f"M{m:02d}" for m in range(1, 7)])]
 KY_LUY_KE = tuple((f"{n}-{k}", COT_GT[i]) for i, (n, k) in enumerate(_LK))
-assert len(KY_NGAY) == 31 and len(KY_LUY_KE) == 32
+assert len(KY_NGAY) == 30 and len(KY_LUY_KE) == 32 and not set(COT_KHONG_NGAY) & {c for _, c in KY_NGAY}
 
 #: ⭐ Đ5 — theo khối, đo lần đầu 20/11 rồi khai. Khác ⇒ ĐỎ cả hai chiều.
 MONG_CHECK: dict[str, dict[str, Any]] = {
-    'ngay:GROUP': {'nb_do': 31, 'nb_trong': 0, 'nb_khac_0': ('ngay:GROUP@2026-11-04', 'ngay:GROUP@2026-11-05', 'ngay:GROUP@2026-11-09', 'ngay:GROUP@2026-11-10', 'ngay:GROUP@2026-11-11'), 'cb_do': 31, 'cb_dat': 25, 'cb_khong_dat': ('ngay:GROUP@2026-11-02', 'ngay:GROUP@2026-11-03', 'ngay:GROUP@2026-11-05', 'ngay:GROUP@2026-11-09', 'ngay:GROUP@2026-11-10', 'ngay:GROUP@2026-11-11'), 'cb_khong_do': 0},
-    'ngay:SGO2': {'nb_do': 31, 'nb_trong': 0, 'nb_khac_0': ('ngay:SGO2@2026-11-10',), 'cb_do': 31, 'cb_dat': 30, 'cb_khong_dat': ('ngay:SGO2@2026-11-10',), 'cb_khong_do': 0},
-    'ngay:SGO1': {'nb_do': 31, 'nb_trong': 0, 'nb_khac_0': ('ngay:SGO1@2026-11-04', 'ngay:SGO1@2026-11-10'), 'cb_do': 31, 'cb_dat': 30, 'cb_khong_dat': ('ngay:SGO1@2026-11-09',), 'cb_khong_do': 0},
-    'ngay:HGO2': {'nb_do': 31, 'nb_trong': 0, 'nb_khac_0': (), 'cb_do': 31, 'cb_dat': 31, 'cb_khong_dat': (), 'cb_khong_do': 0},
-    'ngay:BGO2': {'nb_do': 31, 'nb_trong': 0, 'nb_khac_0': (), 'cb_do': 31, 'cb_dat': 31, 'cb_khong_dat': (), 'cb_khong_do': 0},
-    'luy_ke:GROUP': {'nb_do': 32, 'nb_trong': 0, 'nb_khac_0': ('luy_ke:GROUP@2025-Y', 'luy_ke:GROUP@2025-H1', 'luy_ke:GROUP@2025-H2', 'luy_ke:GROUP@2025-Q1', 'luy_ke:GROUP@2025-Q2', 'luy_ke:GROUP@2025-Q3', 'luy_ke:GROUP@2025-Q4', 'luy_ke:GROUP@2025-M01', 'luy_ke:GROUP@2025-M02', 'luy_ke:GROUP@2025-M03', 'luy_ke:GROUP@2025-M04', 'luy_ke:GROUP@2025-M05', 'luy_ke:GROUP@2025-M06', 'luy_ke:GROUP@2025-M07', 'luy_ke:GROUP@2025-M08', 'luy_ke:GROUP@2025-M09', 'luy_ke:GROUP@2025-M10', 'luy_ke:GROUP@2025-M11', 'luy_ke:GROUP@2025-M12', 'luy_ke:GROUP@2026-Y', 'luy_ke:GROUP@2026-H1', 'luy_ke:GROUP@2026-H2', 'luy_ke:GROUP@2026-Q1', 'luy_ke:GROUP@2026-Q2', 'luy_ke:GROUP@2026-Q3', 'luy_ke:GROUP@2026-Q4', 'luy_ke:GROUP@2026-M01', 'luy_ke:GROUP@2026-M02', 'luy_ke:GROUP@2026-M03', 'luy_ke:GROUP@2026-M04', 'luy_ke:GROUP@2026-M05', 'luy_ke:GROUP@2026-M06'), 'cb_do': 32, 'cb_dat': 0, 'cb_khong_dat': ('luy_ke:GROUP@2025-Y', 'luy_ke:GROUP@2025-H1', 'luy_ke:GROUP@2025-H2', 'luy_ke:GROUP@2025-Q1', 'luy_ke:GROUP@2025-Q2', 'luy_ke:GROUP@2025-Q3', 'luy_ke:GROUP@2025-Q4', 'luy_ke:GROUP@2025-M01', 'luy_ke:GROUP@2025-M02', 'luy_ke:GROUP@2025-M03', 'luy_ke:GROUP@2025-M04', 'luy_ke:GROUP@2025-M05', 'luy_ke:GROUP@2025-M06', 'luy_ke:GROUP@2025-M07', 'luy_ke:GROUP@2025-M08', 'luy_ke:GROUP@2025-M09', 'luy_ke:GROUP@2025-M10', 'luy_ke:GROUP@2025-M11', 'luy_ke:GROUP@2025-M12', 'luy_ke:GROUP@2026-Y', 'luy_ke:GROUP@2026-H1', 'luy_ke:GROUP@2026-H2', 'luy_ke:GROUP@2026-Q1', 'luy_ke:GROUP@2026-Q2', 'luy_ke:GROUP@2026-Q3', 'luy_ke:GROUP@2026-Q4', 'luy_ke:GROUP@2026-M01', 'luy_ke:GROUP@2026-M02', 'luy_ke:GROUP@2026-M03', 'luy_ke:GROUP@2026-M04', 'luy_ke:GROUP@2026-M05', 'luy_ke:GROUP@2026-M06'), 'cb_khong_do': 0},
-    'luy_ke:SGO2': {'nb_do': 32, 'nb_trong': 0, 'nb_khac_0': ('luy_ke:SGO2@2025-Y', 'luy_ke:SGO2@2025-H1', 'luy_ke:SGO2@2025-H2', 'luy_ke:SGO2@2025-Q1', 'luy_ke:SGO2@2025-Q2', 'luy_ke:SGO2@2025-Q3', 'luy_ke:SGO2@2025-Q4', 'luy_ke:SGO2@2025-M01', 'luy_ke:SGO2@2025-M02', 'luy_ke:SGO2@2025-M04', 'luy_ke:SGO2@2025-M08', 'luy_ke:SGO2@2025-M09', 'luy_ke:SGO2@2025-M10', 'luy_ke:SGO2@2025-M11', 'luy_ke:SGO2@2025-M12', 'luy_ke:SGO2@2026-Y', 'luy_ke:SGO2@2026-H1', 'luy_ke:SGO2@2026-H2', 'luy_ke:SGO2@2026-Q1', 'luy_ke:SGO2@2026-Q2', 'luy_ke:SGO2@2026-Q3', 'luy_ke:SGO2@2026-Q4', 'luy_ke:SGO2@2026-M01', 'luy_ke:SGO2@2026-M02', 'luy_ke:SGO2@2026-M05'), 'cb_do': 32, 'cb_dat': 28, 'cb_khong_dat': ('luy_ke:SGO2@2026-Y', 'luy_ke:SGO2@2026-H2', 'luy_ke:SGO2@2026-Q3', 'luy_ke:SGO2@2026-Q4'), 'cb_khong_do': 0},
-    'luy_ke:SGO1': {'nb_do': 32, 'nb_trong': 0, 'nb_khac_0': ('luy_ke:SGO1@2025-Y', 'luy_ke:SGO1@2025-H1', 'luy_ke:SGO1@2025-H2', 'luy_ke:SGO1@2025-Q1', 'luy_ke:SGO1@2025-Q2', 'luy_ke:SGO1@2025-Q3', 'luy_ke:SGO1@2025-Q4', 'luy_ke:SGO1@2025-M01', 'luy_ke:SGO1@2025-M02', 'luy_ke:SGO1@2025-M03', 'luy_ke:SGO1@2025-M04', 'luy_ke:SGO1@2025-M05', 'luy_ke:SGO1@2025-M06', 'luy_ke:SGO1@2025-M07', 'luy_ke:SGO1@2025-M08', 'luy_ke:SGO1@2025-M09', 'luy_ke:SGO1@2025-M10', 'luy_ke:SGO1@2025-M11', 'luy_ke:SGO1@2025-M12', 'luy_ke:SGO1@2026-Y', 'luy_ke:SGO1@2026-H1', 'luy_ke:SGO1@2026-H2', 'luy_ke:SGO1@2026-Q1', 'luy_ke:SGO1@2026-Q2', 'luy_ke:SGO1@2026-Q3', 'luy_ke:SGO1@2026-Q4', 'luy_ke:SGO1@2026-M01', 'luy_ke:SGO1@2026-M02', 'luy_ke:SGO1@2026-M03', 'luy_ke:SGO1@2026-M04', 'luy_ke:SGO1@2026-M06'), 'cb_do': 32, 'cb_dat': 28, 'cb_khong_dat': ('luy_ke:SGO1@2026-Y', 'luy_ke:SGO1@2026-H2', 'luy_ke:SGO1@2026-Q3', 'luy_ke:SGO1@2026-Q4'), 'cb_khong_do': 0},
-    'luy_ke:HGO2': {'nb_do': 32, 'nb_trong': 0, 'nb_khac_0': ('luy_ke:HGO2@2025-Y', 'luy_ke:HGO2@2025-H2', 'luy_ke:HGO2@2025-Q3', 'luy_ke:HGO2@2025-M09', 'luy_ke:HGO2@2026-Y', 'luy_ke:HGO2@2026-H1', 'luy_ke:HGO2@2026-H2', 'luy_ke:HGO2@2026-Q2', 'luy_ke:HGO2@2026-Q3', 'luy_ke:HGO2@2026-Q4', 'luy_ke:HGO2@2026-M05'), 'cb_do': 32, 'cb_dat': 32, 'cb_khong_dat': (), 'cb_khong_do': 0},
-    'luy_ke:BGO2': {'nb_do': 32, 'nb_trong': 0, 'nb_khac_0': ('luy_ke:BGO2@2025-Y', 'luy_ke:BGO2@2025-H2', 'luy_ke:BGO2@2025-Q3', 'luy_ke:BGO2@2025-Q4', 'luy_ke:BGO2@2025-M09', 'luy_ke:BGO2@2025-M12', 'luy_ke:BGO2@2026-Y', 'luy_ke:BGO2@2026-H1', 'luy_ke:BGO2@2026-H2', 'luy_ke:BGO2@2026-Q2', 'luy_ke:BGO2@2026-Q3', 'luy_ke:BGO2@2026-M05'), 'cb_do': 32, 'cb_dat': 32, 'cb_khong_dat': (), 'cb_khong_do': 0},
+    'ngay:GROUP': {'nb_do': 30, 'nb_trong': 0, 'nb_khac_0': ('ngay:GROUP@2026-11-04', 'ngay:GROUP@2026-11-05', 'ngay:GROUP@2026-11-09', 'ngay:GROUP@2026-11-10', 'ngay:GROUP@2026-11-11'), 'cb_do': 30, 'cb_dat': 24, 'cb_dat_co_so': 0, 'cb_dat_0_0': 24, 'cb_khong_dat': ('ngay:GROUP@2026-11-02', 'ngay:GROUP@2026-11-03', 'ngay:GROUP@2026-11-05', 'ngay:GROUP@2026-11-09', 'ngay:GROUP@2026-11-10', 'ngay:GROUP@2026-11-11'), 'cb_khong_do': 0},
+    'ngay:SGO2': {'nb_do': 30, 'nb_trong': 0, 'nb_khac_0': ('ngay:SGO2@2026-11-10',), 'cb_do': 30, 'cb_dat': 29, 'cb_dat_co_so': 0, 'cb_dat_0_0': 29, 'cb_khong_dat': ('ngay:SGO2@2026-11-10',), 'cb_khong_do': 0},
+    'ngay:SGO1': {'nb_do': 30, 'nb_trong': 0, 'nb_khac_0': ('ngay:SGO1@2026-11-04', 'ngay:SGO1@2026-11-10'), 'cb_do': 30, 'cb_dat': 29, 'cb_dat_co_so': 0, 'cb_dat_0_0': 29, 'cb_khong_dat': ('ngay:SGO1@2026-11-09',), 'cb_khong_do': 0},
+    'ngay:HGO2': {'nb_do': 30, 'nb_trong': 0, 'nb_khac_0': (), 'cb_do': 30, 'cb_dat': 30, 'cb_dat_co_so': 0, 'cb_dat_0_0': 30, 'cb_khong_dat': (), 'cb_khong_do': 0},
+    'ngay:BGO2': {'nb_do': 30, 'nb_trong': 0, 'nb_khac_0': (), 'cb_do': 30, 'cb_dat': 30, 'cb_dat_co_so': 0, 'cb_dat_0_0': 30, 'cb_khong_dat': (), 'cb_khong_do': 0},
+    'luy_ke:GROUP': {'nb_do': 32, 'nb_trong': 0, 'nb_khac_0': ('luy_ke:GROUP@2025-Y', 'luy_ke:GROUP@2025-H1', 'luy_ke:GROUP@2025-H2', 'luy_ke:GROUP@2025-Q1', 'luy_ke:GROUP@2025-Q2', 'luy_ke:GROUP@2025-Q3', 'luy_ke:GROUP@2025-Q4', 'luy_ke:GROUP@2025-M01', 'luy_ke:GROUP@2025-M02', 'luy_ke:GROUP@2025-M03', 'luy_ke:GROUP@2025-M04', 'luy_ke:GROUP@2025-M05', 'luy_ke:GROUP@2025-M06', 'luy_ke:GROUP@2025-M07', 'luy_ke:GROUP@2025-M08', 'luy_ke:GROUP@2025-M09', 'luy_ke:GROUP@2025-M10', 'luy_ke:GROUP@2025-M11', 'luy_ke:GROUP@2025-M12', 'luy_ke:GROUP@2026-Y', 'luy_ke:GROUP@2026-H1', 'luy_ke:GROUP@2026-H2', 'luy_ke:GROUP@2026-Q1', 'luy_ke:GROUP@2026-Q2', 'luy_ke:GROUP@2026-Q3', 'luy_ke:GROUP@2026-Q4', 'luy_ke:GROUP@2026-M01', 'luy_ke:GROUP@2026-M02', 'luy_ke:GROUP@2026-M03', 'luy_ke:GROUP@2026-M04', 'luy_ke:GROUP@2026-M05', 'luy_ke:GROUP@2026-M06'), 'cb_do': 32, 'cb_dat': 0, 'cb_dat_co_so': 0, 'cb_dat_0_0': 0, 'cb_khong_dat': ('luy_ke:GROUP@2025-Y', 'luy_ke:GROUP@2025-H1', 'luy_ke:GROUP@2025-H2', 'luy_ke:GROUP@2025-Q1', 'luy_ke:GROUP@2025-Q2', 'luy_ke:GROUP@2025-Q3', 'luy_ke:GROUP@2025-Q4', 'luy_ke:GROUP@2025-M01', 'luy_ke:GROUP@2025-M02', 'luy_ke:GROUP@2025-M03', 'luy_ke:GROUP@2025-M04', 'luy_ke:GROUP@2025-M05', 'luy_ke:GROUP@2025-M06', 'luy_ke:GROUP@2025-M07', 'luy_ke:GROUP@2025-M08', 'luy_ke:GROUP@2025-M09', 'luy_ke:GROUP@2025-M10', 'luy_ke:GROUP@2025-M11', 'luy_ke:GROUP@2025-M12', 'luy_ke:GROUP@2026-Y', 'luy_ke:GROUP@2026-H1', 'luy_ke:GROUP@2026-H2', 'luy_ke:GROUP@2026-Q1', 'luy_ke:GROUP@2026-Q2', 'luy_ke:GROUP@2026-Q3', 'luy_ke:GROUP@2026-Q4', 'luy_ke:GROUP@2026-M01', 'luy_ke:GROUP@2026-M02', 'luy_ke:GROUP@2026-M03', 'luy_ke:GROUP@2026-M04', 'luy_ke:GROUP@2026-M05', 'luy_ke:GROUP@2026-M06'), 'cb_khong_do': 0},
+    'luy_ke:SGO2': {'nb_do': 32, 'nb_trong': 0, 'nb_khac_0': ('luy_ke:SGO2@2025-Y', 'luy_ke:SGO2@2025-H1', 'luy_ke:SGO2@2025-H2', 'luy_ke:SGO2@2025-Q1', 'luy_ke:SGO2@2025-Q2', 'luy_ke:SGO2@2025-Q3', 'luy_ke:SGO2@2025-Q4', 'luy_ke:SGO2@2025-M01', 'luy_ke:SGO2@2025-M02', 'luy_ke:SGO2@2025-M04', 'luy_ke:SGO2@2025-M08', 'luy_ke:SGO2@2025-M09', 'luy_ke:SGO2@2025-M10', 'luy_ke:SGO2@2025-M11', 'luy_ke:SGO2@2025-M12', 'luy_ke:SGO2@2026-Y', 'luy_ke:SGO2@2026-H1', 'luy_ke:SGO2@2026-H2', 'luy_ke:SGO2@2026-Q1', 'luy_ke:SGO2@2026-Q2', 'luy_ke:SGO2@2026-Q3', 'luy_ke:SGO2@2026-Q4', 'luy_ke:SGO2@2026-M01', 'luy_ke:SGO2@2026-M02', 'luy_ke:SGO2@2026-M05'), 'cb_do': 32, 'cb_dat': 28, 'cb_dat_co_so': 0, 'cb_dat_0_0': 28, 'cb_khong_dat': ('luy_ke:SGO2@2026-Y', 'luy_ke:SGO2@2026-H2', 'luy_ke:SGO2@2026-Q3', 'luy_ke:SGO2@2026-Q4'), 'cb_khong_do': 0},
+    'luy_ke:SGO1': {'nb_do': 32, 'nb_trong': 0, 'nb_khac_0': ('luy_ke:SGO1@2025-Y', 'luy_ke:SGO1@2025-H1', 'luy_ke:SGO1@2025-H2', 'luy_ke:SGO1@2025-Q1', 'luy_ke:SGO1@2025-Q2', 'luy_ke:SGO1@2025-Q3', 'luy_ke:SGO1@2025-Q4', 'luy_ke:SGO1@2025-M01', 'luy_ke:SGO1@2025-M02', 'luy_ke:SGO1@2025-M03', 'luy_ke:SGO1@2025-M04', 'luy_ke:SGO1@2025-M05', 'luy_ke:SGO1@2025-M06', 'luy_ke:SGO1@2025-M07', 'luy_ke:SGO1@2025-M08', 'luy_ke:SGO1@2025-M09', 'luy_ke:SGO1@2025-M10', 'luy_ke:SGO1@2025-M11', 'luy_ke:SGO1@2025-M12', 'luy_ke:SGO1@2026-Y', 'luy_ke:SGO1@2026-H1', 'luy_ke:SGO1@2026-H2', 'luy_ke:SGO1@2026-Q1', 'luy_ke:SGO1@2026-Q2', 'luy_ke:SGO1@2026-Q3', 'luy_ke:SGO1@2026-Q4', 'luy_ke:SGO1@2026-M01', 'luy_ke:SGO1@2026-M02', 'luy_ke:SGO1@2026-M03', 'luy_ke:SGO1@2026-M04', 'luy_ke:SGO1@2026-M06'), 'cb_do': 32, 'cb_dat': 28, 'cb_dat_co_so': 0, 'cb_dat_0_0': 28, 'cb_khong_dat': ('luy_ke:SGO1@2026-Y', 'luy_ke:SGO1@2026-H2', 'luy_ke:SGO1@2026-Q3', 'luy_ke:SGO1@2026-Q4'), 'cb_khong_do': 0},
+    'luy_ke:HGO2': {'nb_do': 32, 'nb_trong': 0, 'nb_khac_0': ('luy_ke:HGO2@2025-Y', 'luy_ke:HGO2@2025-H2', 'luy_ke:HGO2@2025-Q3', 'luy_ke:HGO2@2025-M09', 'luy_ke:HGO2@2026-Y', 'luy_ke:HGO2@2026-H1', 'luy_ke:HGO2@2026-H2', 'luy_ke:HGO2@2026-Q2', 'luy_ke:HGO2@2026-Q3', 'luy_ke:HGO2@2026-Q4', 'luy_ke:HGO2@2026-M05'), 'cb_do': 32, 'cb_dat': 32, 'cb_dat_co_so': 0, 'cb_dat_0_0': 32, 'cb_khong_dat': (), 'cb_khong_do': 0},
+    'luy_ke:BGO2': {'nb_do': 32, 'nb_trong': 0, 'nb_khac_0': ('luy_ke:BGO2@2025-Y', 'luy_ke:BGO2@2025-H2', 'luy_ke:BGO2@2025-Q3', 'luy_ke:BGO2@2025-Q4', 'luy_ke:BGO2@2025-M09', 'luy_ke:BGO2@2025-M12', 'luy_ke:BGO2@2026-Y', 'luy_ke:BGO2@2026-H1', 'luy_ke:BGO2@2026-H2', 'luy_ke:BGO2@2026-Q2', 'luy_ke:BGO2@2026-Q3', 'luy_ke:BGO2@2026-M05'), 'cb_do': 32, 'cb_dat': 32, 'cb_dat_co_so': 0, 'cb_dat_0_0': 32, 'cb_khong_dat': (), 'cb_khong_do': 0},
+}
+#: ⭐ `DT11-R1-04` — CHECK trên cột `AK` *(⛔ ngày; vết kéo công thức)*, khai RIÊNG khỏi `MONG_CHECK`.
+MONG_AK: dict[str, dict[str, Any]] = {
+    'ngay:GROUP': {'nb_do': 1, 'nb_trong': 0, 'nb_khac_0': (), 'cb_do': 1, 'cb_dat': 1, 'cb_dat_co_so': 0, 'cb_dat_0_0': 1, 'cb_khong_dat': (), 'cb_khong_do': 0},
+    'ngay:SGO2': {'nb_do': 1, 'nb_trong': 0, 'nb_khac_0': (), 'cb_do': 1, 'cb_dat': 1, 'cb_dat_co_so': 0, 'cb_dat_0_0': 1, 'cb_khong_dat': (), 'cb_khong_do': 0},
+    'ngay:SGO1': {'nb_do': 1, 'nb_trong': 0, 'nb_khac_0': (), 'cb_do': 1, 'cb_dat': 1, 'cb_dat_co_so': 0, 'cb_dat_0_0': 1, 'cb_khong_dat': (), 'cb_khong_do': 0},
+    'ngay:HGO2': {'nb_do': 1, 'nb_trong': 0, 'nb_khac_0': (), 'cb_do': 1, 'cb_dat': 1, 'cb_dat_co_so': 0, 'cb_dat_0_0': 1, 'cb_khong_dat': (), 'cb_khong_do': 0},
+    'ngay:BGO2': {'nb_do': 1, 'nb_trong': 0, 'nb_khac_0': (), 'cb_do': 1, 'cb_dat': 1, 'cb_dat_co_so': 0, 'cb_dat_0_0': 1, 'cb_khong_dat': (), 'cb_khong_do': 0},
 }
 #: ⭐ số hàng · số ô KHÁC RỖNG theo (chế độ, khối).
 MONG_DONG: dict[str, tuple[int, int]] = {
@@ -202,8 +214,14 @@ def _hang(dong: list[dict[str, Any]], che_do: str, khoi: str) -> dict[str, dict[
     return out
 
 
+def do_check_khong_ngay(dong: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
+    """CHECK trên cột `AK` *(⛔ ngày — vết kéo công thức)*, 5 khối `ngay`: RIÊNG, ⛔ cộng vào đếm ngày."""
+    return {f"ngay:{k}": _dr.kiem_check(_hang(dong, "ngay", k), [(f"ngay:{k}@{NHAN_KHONG_NGAY}", "ak")], TOL)
+            for k in KHOI}
+
+
 def do_check(dong: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
-    """CHECK theo (chế độ ∈ ngay·luy_ke) × khối — 10 khối."""
+    """CHECK theo (chế độ ∈ ngay·luy_ke) × khối — 10 khối. Trục `ngay` = **30 ngày thật** *(⛔ `AK`)*."""
     out = {}
     for cd, ky in (("ngay", KY_NGAY), ("luy_ke", KY_LUY_KE)):
         for k in KHOI:
@@ -213,7 +231,8 @@ def do_check(dong: list[dict[str, Any]]) -> dict[str, dict[str, Any]]:
 
 def _tom(r: dict[str, Any]) -> dict[str, Any]:
     return {"nb_do": r["nb_do"], "nb_trong": r["nb_trong"], "nb_khac_0": tuple(r["nb_khac_0"]),
-            "cb_do": r["cb_do"], "cb_dat": r["cb_dat"], "cb_khong_dat": tuple(r["cb_khong_dat"]),
+            "cb_do": r["cb_do"], "cb_dat": r["cb_dat"], "cb_dat_co_so": r["cb_dat_co_so"],
+            "cb_dat_0_0": r["cb_dat_0_0"], "cb_khong_dat": tuple(r["cb_khong_dat"]),
             "cb_khong_do": r["cb_khong_do"]}
 
 
@@ -239,12 +258,15 @@ def thieu_lac(dong: list[dict[str, Any]]) -> dict[str, Any]:
     `CHUA_CO_DU_LIEU`. Tập rỗng ⇒ `ValueError` *(Đ3)*; mong ⛔ khai ⇒ ĐỎ."""
     if not dong:
         raise ValueError("0 hàng — mẫu số 0, ⛔ nền xanh (Đ3)")
-    if len(MONG_CHECK) != 10 or not MONG_DONG:
+    if len(MONG_CHECK) != 10 or len(MONG_AK) != 5 or not MONG_DONG:
         raise ValueError("MONG_CHECK / MONG_DONG ⛔ khai — cổng ⛔ đo được")
     ck = do_check(dong)
     thieu: list[str] = []
     for k, m in MONG_CHECK.items():
         thieu += _dr.so_voi_mong(k, _tom(ck[k]), m)
+    ak = do_check_khong_ngay(dong)
+    for k, m in MONG_AK.items():
+        thieu += _dr.so_voi_mong(f"{k}@ak", _tom(ak[k]), m)
     dd = dem_dong(dong)
     if dd != MONG_DONG:
         thieu += [f"{k}: {dd.get(k)}≠{MONG_DONG.get(k)}" for k in sorted(set(dd) | set(MONG_DONG)) if dd.get(k) != MONG_DONG.get(k)]
@@ -252,8 +274,10 @@ def thieu_lac(dong: list[dict[str, Any]]) -> dict[str, Any]:
     if chua != CHUA_CO_DU_LIEU:
         thieu.append(f"chua_co_du_lieu {chua}≠{CHUA_CO_DU_LIEU}")
     return {"thieu": thieu, "lac": [],
-            "dai": (f"{len(dong)} hàng × 32 cột G…AL · ngày 2026-11-01…2026-11-30 (+AK không ngày) · luỹ kế "
-                    f"2025 Y…M12 + 2026 Y…M6 · CHECK ② đo được {sum(c['cb_do'] for c in ck.values())} kỳ-khối, đạt "
-                    f"{sum(c['cb_dat'] for c in ck.values())} · CHECK ① NB=0 đo được "
-                    f"{sum(c['nb_do'] for c in ck.values())} kỳ-khối, ≠0 ở "
-                    f"{sum(len(c['nb_khac_0']) for c in ck.values())} · kỳ 0 ô: {len(chua)}")}
+            "dai": (f"{len(dong)} hàng × 32 cột G…AL · ngày 2026-11-01…2026-11-30 (30 ngày thật; AK = khong_ngay, tách) · "
+                    f"luỹ kế 2025 Y…M12 + 2026 Y…M6 · CHECK ② đo được {sum(c['cb_do'] for c in ck.values())} kỳ-khối "
+                    f"(150 ngày-khối + 160 luỹ kế): đạt ② có số {sum(c['cb_dat_co_so'] for c in ck.values())} · "
+                    f"đạt ② 0=0 {sum(c['cb_dat_0_0'] for c in ck.values())} · ⛔ đạt {sum(len(c['cb_khong_dat']) for c in ck.values())} · "
+                    f"CHECK ① NB=0 đo được {sum(c['nb_do'] for c in ck.values())} kỳ-khối, ≠0 ở "
+                    f"{sum(len(c['nb_khac_0']) for c in ck.values())} · AK(khong_ngay) ② đo được "
+                    f"{sum(c['cb_do'] for c in ak.values())} · kỳ 0 ô: {len(chua)}")}
