@@ -111,3 +111,71 @@ Gộp `origin/…-isp/H14` **`4b49d00`** (`H14-R2-01` đã sửa: `mong` CHECK `
 - **Sàn:** `MONG_PYTEST_TOAN_BO` **4854 → 4868** = thu thập thật cây gộp; web giữ **690**.
 - **Cổng (cây gộp `387ab0c`, cụm 5435):** `--duong-nen` MỘT lần, một mình ⇒ **KẾT: ĐẠT** — toàn bộ 12 failed · 4.840 passed · 2 xfailed · 14 errors = tập đỏ **28 = 28** *(thêm 0 · bớt 0)*, chạy **4.868** = mong · skipped 0; web **3 = 3**, chạy 690. 6 bài đỏ thêm của lượt đầu *(5 `H14-R2-01` + 1 rào DT13 × H14 — `I2-P4`)* **hết** sau gộp ngọn H14 ⇒ `I2-P4` **đóng**. `lint-imports` 11 kept · 0 broken · `soi_bang_tuyen` 49/49 · `kiem_thuyet_minh` 35/35 · `kiem_tai_lieu` ĐẠT. `khop_owner --kiem` · `kiem_so_song` như trên *(có sẵn, `I1-P3`)*.
 - **Phát hiện còn mở:** `I2-P1` (C4 ⛔ đọc tỷ giá) · `I2-P2` (`do_hd2` ⛔ nối `fx_cua`/⛔ bắt `FxChan`).
+
+---
+
+## Vòng sửa sau R1 (KQ-317)
+Nền: `isp/I2` `f61df65` + gộp ngọn nhánh làm việc + gộp `isp/H14` `854550b` *(R2b ĐẠT — cả hai gộp sạch, ⛔ xung đột)*. **Ngoại lệ có giới hạn của orchestrator** cho "⛔ sửa engine" của `WO-315`: D1 DECIDED ⇒ sửa TỐI THIỂU để chặn tỷ giá — chạm **chỉ** `tools/do_hd2.py` *(đường chạy gói)*, ⛔ đổi `fls/` nào, ⛔ đổi phép tính nào: 11/11 gói ra **y hệt** khối `hd2_cong.json` commit *(B1 xanh, ⛔ sinh lại JSON)*.
+
+### Mã (`tools/do_hd2.py`)
+- **`I2-R1-02` — `fx_cua` nối ở MÃ SẢN PHẨM.** `FxKho` *(chuyển từ bài vào mã — Mapping mà MỖI tháng đọc qua `chc.fx_cua(conn, tháng)` THẬT)* + `ty_gia_kho(conn)` *(đặt nguồn tỷ giá của CẢ lượt)*: `nap_fx()` gọi trần trong khối ⇒ trả `FxKho` ⇒ cả **5** chỗ gọi *(do_hd2 · c3c · c3d · c5b · c5c qua `h.nap_fx`)* đi qua kho, ⛔ sửa chỗ gọi nào. Đường sản phẩm **`chay_goi(gói, dsn, fx="kho")`** ⇒ `(khối, dat, tq, fx_doc)`: bắt `FxChan` ⇒ khối `dat=false` · `ly_do = FX_CHAN <tháng>: …` · `fx_chan` · `nguon_ty_gia`; kho tắt / IX.FX chưa nạp ⇒ khối ĐỎ `IX.FX ⛔ đọc được từ kho: …` *(Đ5 — trước đó CLI nổ traceback, đo 22/11 trên `fls_test`)*. CLI `main` đi qua `chay_goi`; cờ mới **`--fx kho|anh`** — **mặc định `kho`** *(D1)*, `anh` = parity ảnh `ix_fx.json` *(⛔ hỏi chữ ký)*. `nap_fx(path=None)` đọc `IX_FX` lúc GỌI *(gỡ luôn bẫy ràng mặc định của `I2-R1-04`)*.
+- **`I2-R1-01` — D1 ở tầng AL.** `kiem_fx_thang(tháng)` hỏi `nap_fx()[m]` cho MỌI tháng đầu vào TRƯỚC khi tính *(nguồn kho ⇒ `fx_cua` ⇒ `FxChan` có tên; nguồn ảnh thiếu tháng ⇒ `FxChan` "⛔ có trong ảnh")*; gọi ở `chay_wp_c4a` · `chay_wp_c4b` *(tháng CFA1 GI: 202502…202512 = 11)* · `chay_wp_c4c` *(tháng MID1 của OMC · SC · PS — đầu vào engine)*.
+
+### Bài (`tests/tich_hop/test_hd2_xuyen_suot.py` — 25 → **28**)
+- Bỏ **toàn bộ** mock `nap_fx` *(4 chỗ)* + lớp `FxKho` trong bài: `chay_chuoi` gọi `h.chay_goi(g, dsn, fx="kho")`; canh ảnh = `IX_FX` → tệp vắng suốt chuỗi *(nay CÓ răng — bài mới `test_B1_anh_ix_fx_canh_co_rang`)*.
+- `test_B1_ty_gia_moi_goi_TU_KHO_qua_duong_san_pham`: **11/11** gói có `fx_doc` ≠ ∅ *(bằng chứng DƯƠNG)*; C4a/b/c hỏi cả 202510.
+- **B2 đảo** *(⛔ còn ghim vi phạm)*: `MONG_GOI_CHAN = GOI` *(11)* · `a["tq"] == {}` · **ô số đếm TỪNG gói** *(tổng khoá số của khối)* = `{11 gói: 0}` · mỗi khối `(dat, fx_chan, nguon_ty_gia) = (False, 202510, "kho")`. Cổng: `HD2_WP_C3` · **`HD2_WP_C4`** · `HD2_WP_C5` `dat=false`, `HD2_WP_C4` mang chữ `FX_CHAN 202510`.
+- `test_B1_dot_bien_ty_gia_goi_doi_so_dung_mong` *(`-03`)* · `test_chay_goi_kho_khong_doc_duoc_la_khoi_DO_co_ly_do` *(Đ5)*.
+
+### D1 sau sửa — bỏ ký 202510 *(nhãn: ô số = Σ khoá số của khối gói; gói bị chặn ⇒ ⛔ khoá số nào)*
+| Gói | C2 | C3a | C3b | C3c | C3d | **C4a** | **C4b** | **C4c** | C5a | C5b | C5c |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+| ô số 202510 *(trước)* | 0 | 0 | 0 | 0 | 0 | **35** | **175** | **2.303** | 0 | 0 | 0 |
+| ô số *(sau — mong 0)* | 0 | 0 | 0 | 0 | 0 | **0** | **0** | **0** | 0 | 0 | 0 |
+
+⇒ **0/11** gói ra số *(11/11 `FX_CHAN 202510`)*; cổng `HD2_WP_C4` **`dat=false`** + `FX_CHAN 202510` *(trước: `true`)*; thẻ F03 C4 theo cổng.
+
+### `I2-R1-03` — vì sao C3a–d · C5a ⛔ đổi khi ×1,01 / ×100 *(ĐO, ⛔ suy)*
+`fls/bao_cao/gl.py` BR/BS: **mUSD = tỷ giá(tt) × số ÷ tỷ giá(USD)** ⇒ nhân **ĐỀU** mọi tỷ giá *(kể cả VND)* triệt tiêu ở mọi ô mUSD. C3a…d · C5a so ô **mUSD** ⇒ đột biến đồng dạng **⛔ có răng** với chúng — gói **⛔ bỏ qua** tỷ giá. Đo bằng đột biến **⛔ đồng dạng** *(chỉ USD ×1,01, VND = 1 giữ)*: **8/11** gói đổi số = mọi gói đọc GIÁ TRỊ tỷ giá *(C2 · C3a · C3b · C3c · C3d · C5a · C5b · C5c)*; nhân đều ×1,01 ⇒ đúng **3/11** *(C2 — bVND BO/BP/BQ + tồn VND · C5b — COM_GAG VND ÷ USD · C5c — đọc lại C5b)* = số R1 đo. Bài ghim cả hai `mong` *(`MONG_DOI_USD` · `MONG_DOI_DEU`)*.
+**Giới hạn CÓ TÊN** *(`MONG_GOI_DA_QUY_DOI`)*: **C4a · C4b · C4c ⛔ phụ thuộc GIÁ TRỊ tỷ giá** — đầu vào CFA1 GI *(PD 504)* / MID1 mang **mUSD đã quy đổi ở AS-IS**; giữ nguyên ở cả hai đột biến *(bài ghim)*. D1 vẫn CHẶN tháng chưa ký ở các gói ấy *(mục trên)*. Nối AL đọc CFA1 do engine FLS sinh = việc sau *(backlog)*.
+
+### ĐỎ trước (Đ5)
+| Phá | Kết |
+|---|---|
+| bài mới trên `tools/do_hd2.py` CŨ *(HEAD `f61df65`)* | **1 failed + 26 errors** — ⛔ có `chay_goi`; `test_B1_anh_ix_fx_canh_co_rang` ĐỎ *(mặc định `IX_FX` ràng lúc định nghĩa ⇒ canh ⛔ răng — chính `-04`)* |
+| có `chay_goi`, bỏ 3 lời gọi `kiem_fx_thang` ở C4 | **3 failed** đúng chỗ: B1 *(C4 ⛔ hỏi `fx_cua`)* · **B2** *(C4a/b/c ra số)* · cổng *(`HD2_WP_C4` `dat=true`)* — trả nguyên ⇒ xanh |
+| CLI `--goi WP-C4a` trên kho chưa nạp IX.FX | traceback `ChuaKhai` ⇒ sửa ⇒ `CHẶN: IX.FX ⛔ đọc được …`, mã 1 |
+Xanh: bài I2 + `test_do_hd2_ca` · `c3a` · `c4a` · `c4b` · `c4c` · `test_isp_gates_hd2` = **278 passed**.
+
+### Sàn (Q8)
+`MONG_PYTEST_TOAN_BO` **4868 → 4871** = thu thập thật *(`--collect-only`, tắt `addopts`)* — **+3** bài I2; cùng bài ghim, cùng commit. Web **giữ 690** *(thu thập 690)*.
+
+### Lệnh chạy lại trên máy chủ (Windows · `.venv\Scripts` · `fls-pg-1`) — thay mục cũ
+```powershell
+docker start fls-pg-1                                    # ⛔⛔ KHÔNG `docker compose down` (volume vô danh)
+$env:PG_DSN='postgresql://fls:fls@localhost:5433/fls'
+$env:PG_DSN_TEST='postgresql://fls:fls@localhost:5433/fls_test'
+$env:PYTHONUTF8='1'
+# tuỳ chọn — phủ Chromium (⛔ đặt ⇒ bài Chromium BỎ QUA, chấp nhận được):
+#   npx playwright install chromium
+$env:FLS_PW_INDEX=(node -e "process.stdout.write(require.resolve('playwright'))")
+$env:FLS_CHROMIUM=(Get-ChildItem "$env:LOCALAPPDATA\ms-playwright\chromium-*\chrome-win*\chrome.exe" | Select-Object -Last 1).FullName
+.venv\Scripts\python.exe -m pytest tests/tich_hop/test_hd2_xuyen_suot.py -p no:cacheprovider
+```
+- **Mong:** `28 passed` *(~3 phút: 4 lượt chuỗi — đủ · bỏ ký · 2 đột biến)*. Thiếu Chromium/`FLS_*` ⇒ **`27 passed, 1 skipped`** *(`test_F1_F2_chromium_that`)* = **kết quả đúng, chấp nhận được** ở máy chủ — phần F03 vẫn đo headless bằng node-vm *(`test_F1_vm_…` · `test_F2_vm_…`)*; Chromium thật đo ở cụm cloud *(R1: 0 skipped)*.
+- **"Chỉ đọc"** đúng với DB `fls` *(⛔ ghi · ⛔ `FLS_CHO_GHI_THAT` · ⛔ đòi kho rỗng)*; máy chủ vẫn thấy **2** `DROP/CREATE DATABASE` *(`fls_test` của conftest + `fls_test_i2` của bài; role `fls` có `CREATEDB`)*.
+- ⚠ **Đổi hành vi CLI:** `python tools\do_hd2.py --goi …` nay **mặc định đọc tỷ giá KHO** `PG_DSN` *(D1)* ⇒ tháng chưa ký ⇒ mã 1 + `CHẶN: FX_CHAN <tháng>`; `--ghi` ghi khối ĐỎ ấy vào `hd2_cong.json`. Đo parity ảnh như cũ: thêm `--fx anh`.
+
+### Backlog *(GHI NHẬN — ⛔ sửa ở vòng này)*
+- **`I2-R1-04`** — phần **bộ đếm `mo_anh` rỗng** hết *(đếm bị xoá cùng mock; canh = `IX_FX` vắng + bài răng)*; phần còn lại *(⛔)* ⇒ **đóng được** khi R2 xác nhận.
+- **`I2-R1-06`** — `mong` B1 = khối commit của chính gói *(⛔ đáp án độc lập; độc lập duy nhất C2)*; thẻ C5 = KHÔNG ĐO ĐƯỢC (605) — nhãn giữ.
+- **AL đọc CFA1/MID do engine FLS sinh** *(gỡ giới hạn có tên C4 của `-03`)*.
+
+### Cổng (cụm 5435)
+| Cổng | Kết quả |
+|---|---|
+| `--duong-nen --cong 5435` *(MỘT lần, một mình)* | **KẾT: ĐẠT** — toàn bộ 12 failed · 4.843 passed · 2 xfailed · 14 errors ⇒ tập đỏ **28 = 28** *(thêm 0 · bớt 0)*, chạy **4.871** = mong · skipped 0 · deselected 0 *(18 phút 43 s)*; web 3 failed · 687 passed ⇒ **3 = 3**, chạy 690 |
+| `lint-imports` | 11 kept · 0 broken |
+| `kiem_tai_lieu.py` | ĐẠT *(sau BG này)* |
+| `soi_bang_tuyen.py` | khớp SQL ở **49/49** tuyến |
+| `kiem_thuyet_minh.py` | **35/35** nút |
