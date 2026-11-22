@@ -2349,5 +2349,711 @@
   },
   "dat": true,
   "ly_do": []
+ },
+ "WP-C5c": {
+  "bang": "HD2.WP-C5c",
+  "goi": "WP-C5c",
+  "mo_ta": "RP.PL · RP.CF: Daily Report 2 · 3 dựng theo khuôn (fls.bao_cao.bao_cao.daily_report, FS tham số) từ lưới engine (CFA1 H5/H6 · PLA3 PM+HR H8 · ATL H12+H13) ↔ đáp án 607 · 608 · 609 · 610 từng ô; 605 · 615 DỪNG (chua_co_dau_vao); lệch THỪA KẾ lớp bằng truy ngược ô nguồn",
+  "nguon_dau_vao": [
+   "WP-C3a lưới cfa1_daily (tests/fixture/dap_an/gl_cf_dau_vao.json)",
+   "WP-C3b lưới cfa1_yhqm",
+   "WP-C3d lưới pla3_pm_hr_daily (gl_pl_dau_vao.json + hr_pl_dau_vao.json)",
+   "WP-C5a + WP-C5b lưới ATL của FLS (IX.ALR kho cờ 2025 BẬT ký · IX.PL kho)"
+  ],
+  "dap_an": [
+   "tests/fixture/dap_an/daily_report_3_fs2.json",
+   "tests/fixture/dap_an/daily_report_3_fs1.json",
+   "tests/fixture/dap_an/daily_report_3_gop.json",
+   "tests/fixture/dap_an/daily_report_2.json"
+  ],
+  "dap_an_dung": {
+   "605": {
+    "o_dap_an_so": 13706,
+    "can": "nguồn `[MID][FS1][PLA5]` (P&L VND theo 8 thực thể × 24 tháng 2024–2025, bản dán giá trị Sign off): ảnh `[FS1][PLA3]`/`[PLA5]` Y/H/Q/M trước khi dán + đường VND; FLS ⛔ có engine FS1, và 2024 (trước ITL 10/2024) ⛔ có sổ nguồn",
+    "trang_thai": "chua_co_dau_vao"
+   },
+   "615": {
+    "o_dap_an_so": 48021,
+    "can": "nguồn `Cash Balance by LE` (số dư tiền mặt/ngân hàng theo LE × ngày, sổ A-CCR): ảnh số dư quỹ + ngân hàng theo ngày; FLS ⛔ có engine số dư (HD4 · CCR ngoài ISP)",
+    "trang_thai": "chua_co_dau_vao"
+   }
+  },
+  "khoa": "đáp án × phần (ngay · luy_ke[:FS]) × khối × mã × cột (ngày ISO | kỳ); ô đáp án là số, cột thuộc trục, phần có đầu vào, engine có ô",
+  "dung_sai": {
+   "atol": "1E-12",
+   "rtol": "0",
+   "chinh_tay": "|e−a| = 0.5 ± 1E-9"
+  },
+  "tong_o": 72390,
+  "mong_tong_o": 72390,
+  "o_co_so": 19312,
+  "khop_co_so": 11540,
+  "o_0_0": 53078,
+  "khop": 64618,
+  "lech_co_chu_dich": 7772,
+  "mong_lech_co_chu_dich": 7772,
+  "lech_ngoai_ten": 0,
+  "khop_ghi_chu": "tong_o = Σ 4 đáp án ô so = o_co_so + o_0_0; khop = ô khớp THẬT (khop_co_so) + o_0_0; khop + lech_co_chu_dich = tong_o; ô chua_co_dau_vao / engine_vang / ngoai_truc NGOÀI mẫu số",
+  "lech_co_ten": {
+   "lop_thua_ke": {
+    "chua_co_dau_vao": 1724,
+    "chua_co_dau_vao+lech_D3": 1180,
+    "chua_co_dau_vao+lech_D3+loi_as_is": 40,
+    "chua_co_dau_vao+loi_as_is": 32,
+    "ite_alias": 35,
+    "lech_D3": 4266,
+    "lech_D3+lech_dap_an_nguon": 84,
+    "lech_D3+loi_as_is": 16,
+    "lech_dap_an_nguon": 21,
+    "lech_dap_an_nguon+loi_as_is": 21,
+    "loi_as_is": 353
+   },
+   "chinh_tay_actor": {
+    "607": [
+     "luy_ke:FS2|GROUP|CAC|2025",
+     "luy_ke:FS2|GROUP|CAC|2025H1",
+     "luy_ke:FS2|GROUP|CAC|2025M02",
+     "luy_ke:FS2|GROUP|CAC|2025Q1",
+     "luy_ke:FS2|GROUP|COO|2025",
+     "luy_ke:FS2|GROUP|COO|2025H1",
+     "luy_ke:FS2|GROUP|COO|2025M02",
+     "luy_ke:FS2|GROUP|COO|2025Q1",
+     "luy_ke:FS2|GROUP|EBITDA|2025",
+     "luy_ke:FS2|GROUP|EBITDA|2025H1",
+     "luy_ke:FS2|GROUP|EBITDA|2025M02",
+     "luy_ke:FS2|GROUP|EBITDA|2025Q1",
+     "luy_ke:FS2|GROUP|EBIT|2025",
+     "luy_ke:FS2|GROUP|EBIT|2025H1",
+     "luy_ke:FS2|GROUP|EBIT|2025M02",
+     "luy_ke:FS2|GROUP|EBIT|2025Q1",
+     "luy_ke:FS2|GROUP|EBT|2025",
+     "luy_ke:FS2|GROUP|EBT|2025H1",
+     "luy_ke:FS2|GROUP|EBT|2025M02",
+     "luy_ke:FS2|GROUP|EBT|2025Q1",
+     "luy_ke:FS2|GROUP|MAC|2025",
+     "luy_ke:FS2|GROUP|MAC|2025H1",
+     "luy_ke:FS2|GROUP|MAC|2025M02",
+     "luy_ke:FS2|GROUP|MAC|2025Q1",
+     "luy_ke:FS2|GROUP|NCFO|2025",
+     "luy_ke:FS2|GROUP|NCFO|2025H1",
+     "luy_ke:FS2|GROUP|NCFO|2025M02",
+     "luy_ke:FS2|GROUP|NCFO|2025Q1",
+     "luy_ke:FS2|GROUP|NCF|2025",
+     "luy_ke:FS2|GROUP|NCF|2025H1",
+     "luy_ke:FS2|GROUP|NCF|2025M02",
+     "luy_ke:FS2|GROUP|NCF|2025Q1",
+     "luy_ke:FS2|GROUP|NPC|2025M01",
+     "luy_ke:FS2|GROUP|NPC|2025M02",
+     "luy_ke:FS2|GROUP|NP|2025",
+     "luy_ke:FS2|GROUP|NP|2025H1",
+     "luy_ke:FS2|GROUP|NP|2025M02",
+     "luy_ke:FS2|GROUP|NP|2025Q1",
+     "luy_ke:FS2|GROUP|OMC|2025",
+     "luy_ke:FS2|GROUP|OMC|2025H1",
+     "luy_ke:FS2|GROUP|OMC|2025M02",
+     "luy_ke:FS2|GROUP|OMC|2025Q1",
+     "luy_ke:FS2|GROUP|OPC|2025",
+     "luy_ke:FS2|GROUP|OPC|2025H1",
+     "luy_ke:FS2|GROUP|OPC|2025M02",
+     "luy_ke:FS2|GROUP|OPC|2025Q1",
+     "luy_ke:FS2|GROUP|PL2|2025",
+     "luy_ke:FS2|GROUP|PL2|2025H1",
+     "luy_ke:FS2|GROUP|PL2|2025M02",
+     "luy_ke:FS2|GROUP|PL2|2025Q1",
+     "luy_ke:FS2|GROUP|PL3|2025",
+     "luy_ke:FS2|GROUP|PL3|2025H1",
+     "luy_ke:FS2|GROUP|PL3|2025M02",
+     "luy_ke:FS2|GROUP|PL3|2025Q1",
+     "luy_ke:FS2|GROUP|PL4|2025",
+     "luy_ke:FS2|GROUP|PL4|2025H1",
+     "luy_ke:FS2|GROUP|PL4|2025M02",
+     "luy_ke:FS2|GROUP|PL4|2025Q1",
+     "luy_ke:FS2|GROUP|PL5|2025M02",
+     "luy_ke:FS2|GROUP|PL6|2025",
+     "luy_ke:FS2|GROUP|PL6|2025H1",
+     "luy_ke:FS2|GROUP|PL6|2025M02",
+     "luy_ke:FS2|GROUP|PL6|2025Q1",
+     "luy_ke:FS2|GROUP|PL7|2025",
+     "luy_ke:FS2|GROUP|PL7|2025H1",
+     "luy_ke:FS2|GROUP|PL7|2025M02",
+     "luy_ke:FS2|GROUP|PL7|2025Q1",
+     "luy_ke:FS2|GROUP|PL8|2025",
+     "luy_ke:FS2|GROUP|PL8|2025H1",
+     "luy_ke:FS2|GROUP|PL8|2025M02",
+     "luy_ke:FS2|GROUP|PL8|2025Q1"
+    ],
+    "609": [
+     "luy_ke:FS2|GROUP|CAC|2025",
+     "luy_ke:FS2|GROUP|CAC|2025H1",
+     "luy_ke:FS2|GROUP|CAC|2025M02",
+     "luy_ke:FS2|GROUP|CAC|2025Q1",
+     "luy_ke:FS2|GROUP|COO|2025",
+     "luy_ke:FS2|GROUP|COO|2025H1",
+     "luy_ke:FS2|GROUP|COO|2025M02",
+     "luy_ke:FS2|GROUP|COO|2025Q1",
+     "luy_ke:FS2|GROUP|EBITDA|2025",
+     "luy_ke:FS2|GROUP|EBITDA|2025H1",
+     "luy_ke:FS2|GROUP|EBITDA|2025M02",
+     "luy_ke:FS2|GROUP|EBITDA|2025Q1",
+     "luy_ke:FS2|GROUP|EBIT|2025",
+     "luy_ke:FS2|GROUP|EBIT|2025H1",
+     "luy_ke:FS2|GROUP|EBIT|2025M02",
+     "luy_ke:FS2|GROUP|EBIT|2025Q1",
+     "luy_ke:FS2|GROUP|EBT|2025",
+     "luy_ke:FS2|GROUP|EBT|2025H1",
+     "luy_ke:FS2|GROUP|EBT|2025M02",
+     "luy_ke:FS2|GROUP|EBT|2025Q1",
+     "luy_ke:FS2|GROUP|MAC|2025",
+     "luy_ke:FS2|GROUP|MAC|2025H1",
+     "luy_ke:FS2|GROUP|MAC|2025M02",
+     "luy_ke:FS2|GROUP|MAC|2025Q1",
+     "luy_ke:FS2|GROUP|NCFO|2025",
+     "luy_ke:FS2|GROUP|NCFO|2025H1",
+     "luy_ke:FS2|GROUP|NCFO|2025M02",
+     "luy_ke:FS2|GROUP|NCFO|2025Q1",
+     "luy_ke:FS2|GROUP|NCF|2025",
+     "luy_ke:FS2|GROUP|NCF|2025H1",
+     "luy_ke:FS2|GROUP|NCF|2025M02",
+     "luy_ke:FS2|GROUP|NCF|2025Q1",
+     "luy_ke:FS2|GROUP|NPC|2025M01",
+     "luy_ke:FS2|GROUP|NPC|2025M02",
+     "luy_ke:FS2|GROUP|NP|2025",
+     "luy_ke:FS2|GROUP|NP|2025H1",
+     "luy_ke:FS2|GROUP|NP|2025M02",
+     "luy_ke:FS2|GROUP|NP|2025Q1",
+     "luy_ke:FS2|GROUP|OMC|2025",
+     "luy_ke:FS2|GROUP|OMC|2025H1",
+     "luy_ke:FS2|GROUP|OMC|2025M02",
+     "luy_ke:FS2|GROUP|OMC|2025Q1",
+     "luy_ke:FS2|GROUP|OPC|2025",
+     "luy_ke:FS2|GROUP|OPC|2025H1",
+     "luy_ke:FS2|GROUP|OPC|2025M02",
+     "luy_ke:FS2|GROUP|OPC|2025Q1",
+     "luy_ke:FS2|GROUP|PL2|2025",
+     "luy_ke:FS2|GROUP|PL2|2025H1",
+     "luy_ke:FS2|GROUP|PL2|2025M02",
+     "luy_ke:FS2|GROUP|PL2|2025Q1",
+     "luy_ke:FS2|GROUP|PL3|2025",
+     "luy_ke:FS2|GROUP|PL3|2025H1",
+     "luy_ke:FS2|GROUP|PL3|2025M02",
+     "luy_ke:FS2|GROUP|PL3|2025Q1",
+     "luy_ke:FS2|GROUP|PL4|2025",
+     "luy_ke:FS2|GROUP|PL4|2025H1",
+     "luy_ke:FS2|GROUP|PL4|2025M02",
+     "luy_ke:FS2|GROUP|PL4|2025Q1",
+     "luy_ke:FS2|GROUP|PL5|2025M02",
+     "luy_ke:FS2|GROUP|PL6|2025",
+     "luy_ke:FS2|GROUP|PL6|2025H1",
+     "luy_ke:FS2|GROUP|PL6|2025M02",
+     "luy_ke:FS2|GROUP|PL6|2025Q1",
+     "luy_ke:FS2|GROUP|PL7|2025",
+     "luy_ke:FS2|GROUP|PL7|2025H1",
+     "luy_ke:FS2|GROUP|PL7|2025M02",
+     "luy_ke:FS2|GROUP|PL7|2025Q1",
+     "luy_ke:FS2|GROUP|PL8|2025",
+     "luy_ke:FS2|GROUP|PL8|2025H1",
+     "luy_ke:FS2|GROUP|PL8|2025M02",
+     "luy_ke:FS2|GROUP|PL8|2025Q1"
+    ]
+   },
+   "chinh_tay_goc": "ATL AH12 `='Report I PLA3 Y H Q M | PM + HR'!AH12-0.5` (GROUP·OMC·2025M02, lan SHQ2 dư) — chỉnh tay ⛔ actor; ⛔ chép vào config"
+  },
+  "fs_tham_so": {
+   "607": {
+    "fs": "FS2",
+    "phan": [
+     "ngay",
+     "luy_ke:FS2"
+    ]
+   },
+   "608": {
+    "fs": "FS1",
+    "phan": [
+     "ngay",
+     "luy_ke:FS1"
+    ]
+   },
+   "609": {
+    "fs": "FS3",
+    "phan": [
+     "ngay",
+     "luy_ke:FS1",
+     "luy_ke:FS2"
+    ]
+   },
+   "610": {
+    "fs": null,
+    "phan": [
+     "ngay",
+     "luy_ke",
+     "hr"
+    ]
+   }
+  },
+  "check": {
+   "607": {
+    "theo_phan": {
+     "ngay": {
+      "NB = 0": {
+       "dat_co_so": 0,
+       "dat_0_0": 147,
+       "do": 3,
+       "khong_do_duoc": 0
+      },
+      "NIS+INT+PIT+COM = CXA+GAH+DC+MC": {
+       "dat_co_so": 0,
+       "dat_0_0": 149,
+       "do": 1,
+       "khong_do_duoc": 0
+      }
+     },
+     "luy_ke:FS2": {
+      "NB = 0": {
+       "dat_co_so": 0,
+       "dat_0_0": 116,
+       "do": 93,
+       "khong_do_duoc": 0
+      },
+      "NIS+INT+PIT+COM = CXA+GAH+DC+MC": {
+       "dat_co_so": 0,
+       "dat_0_0": 76,
+       "do": 133,
+       "khong_do_duoc": 0
+      }
+     }
+    },
+    "so_do": 230,
+    "do_sha256": "cb3da5be1d49519ad6c1e2aeb40b188099638c52da84cf937acb2b335c98bbcc"
+   },
+   "608": {
+    "theo_phan": {
+     "ngay": {
+      "NB = 0": {
+       "dat_co_so": 0,
+       "dat_0_0": 147,
+       "do": 3,
+       "khong_do_duoc": 0
+      },
+      "NIS+INT+PIT+COM = CXA+GAH+DC+MC": {
+       "dat_co_so": 0,
+       "dat_0_0": 149,
+       "do": 1,
+       "khong_do_duoc": 0
+      }
+     }
+    },
+    "so_do": 4,
+    "do_sha256": "e5416a94d2136dfab7615049ee0da421daccccc15db401dde98355cf520903b0"
+   },
+   "609": {
+    "theo_phan": {
+     "ngay": {
+      "NB = 0": {
+       "dat_co_so": 0,
+       "dat_0_0": 151,
+       "do": 4,
+       "khong_do_duoc": 0
+      },
+      "NIS+INT+PIT+COM = CXA+GAH+DC+MC": {
+       "dat_co_so": 0,
+       "dat_0_0": 154,
+       "do": 1,
+       "khong_do_duoc": 0
+      }
+     },
+     "luy_ke:FS2": {
+      "NB = 0": {
+       "dat_co_so": 0,
+       "dat_0_0": 116,
+       "do": 93,
+       "khong_do_duoc": 0
+      },
+      "NIS+INT+PIT+COM = CXA+GAH+DC+MC": {
+       "dat_co_so": 0,
+       "dat_0_0": 76,
+       "do": 133,
+       "khong_do_duoc": 0
+      }
+     }
+    },
+    "so_do": 231,
+    "do_sha256": "8371998326b5071ae802e4dc5ca6202934566aad2bfdbe5c244c25a78ea171ef"
+   },
+   "610": {
+    "theo_phan": {
+     "ngay": {
+      "NB = 0": {
+       "dat_co_so": 0,
+       "dat_0_0": 82,
+       "do": 8,
+       "khong_do_duoc": 60
+      },
+      "NIS+INT+PIT+COM = CXA+GAH+DC+MC": {
+       "dat_co_so": 0,
+       "dat_0_0": 82,
+       "do": 8,
+       "khong_do_duoc": 60
+      }
+     },
+     "luy_ke": {
+      "NB = 0": {
+       "dat_co_so": 0,
+       "dat_0_0": 59,
+       "do": 131,
+       "khong_do_duoc": 0
+      },
+      "NIS+INT+PIT+COM = CXA+GAH+DC+MC": {
+       "dat_co_so": 0,
+       "dat_0_0": 139,
+       "do": 51,
+       "khong_do_duoc": 0
+      }
+     }
+    },
+    "so_do": 198,
+    "do_sha256": "70b40b011750da1487e02afb5804fe958752d2c6eb73a40174852a771c8c8790"
+   }
+  },
+  "theo_dap_an": {
+   "607": {
+    "dem": {
+     "tong_o": 25649,
+     "o_0_0": 17405,
+     "khop_co_so": 4365,
+     "khop": 21770,
+     "o_co_so": 8244
+    },
+    "lop": {
+     "chua_co_dau_vao": {
+      "so_o": 862,
+      "sha256": "bbea7be2830e82fe7c5b44de7cee40d3f34e86e9a8f368bc5b0c6833a32e3b71"
+     },
+     "chua_co_dau_vao+lech_D3": {
+      "so_o": 590,
+      "sha256": "e3e69b3e1705032ea7f328a7becf7db4c04dd915b858ebef98dc444833b02a69"
+     },
+     "chua_co_dau_vao+lech_D3+loi_as_is": {
+      "so_o": 20,
+      "sha256": "16c333264d0b98c17c014d03ce04c2a7a2b9edada668f315894fe1bf484bc241"
+     },
+     "chua_co_dau_vao+loi_as_is": {
+      "so_o": 16,
+      "sha256": "6695297f5406e2335850e98262950f106f3363968cf25175c51843659a71e219"
+     },
+     "lech_D3": {
+      "so_o": 2133,
+      "sha256": "7858ab9a6f501b67aa4776551223868a693590c20433ed8d9ce0c658f70ddcdb"
+     },
+     "lech_D3+lech_dap_an_nguon": {
+      "so_o": 42,
+      "sha256": "375bbac683cbf9e2ec13ef86cc0f4db037332ea0895e79ef54ddc6ee799fb325"
+     },
+     "lech_D3+loi_as_is": {
+      "so_o": 8,
+      "sha256": "91a58c5841b5c4282628215b0123e8a74744ece6ef8dde4affb0107b3b72c505"
+     },
+     "lech_dap_an_nguon": {
+      "so_o": 21,
+      "sha256": "a6e64964c0b672f07b96ef63d3afdd2f61ce51f481af3b211e8336757d92cc08"
+     },
+     "lech_dap_an_nguon+loi_as_is": {
+      "so_o": 14,
+      "sha256": "1391b3f155cb62ba11fc42d1c79e13c254ccecc790f9bbcb0646429b58601344"
+     },
+     "loi_as_is": {
+      "so_o": 173,
+      "sha256": "0e10ecd8e1d45610b05d66acac0dc81c7febc382a1c3010242e0e28ba19c1a41"
+     }
+    },
+    "chua_co_dau_vao": {},
+    "engine_vang": {
+     "PL5_ix_pl_khong_tinh_duoc": 149,
+     "ma_ngoai_luoi:HDAP": 132,
+     "ma_ngoai_luoi:HDC": 132,
+     "ma_ngoai_luoi:HDCI": 209,
+     "ma_ngoai_luoi:HDH": 132,
+     "ma_ngoai_luoi:HDT": 132
+    },
+    "ngoai_truc": {
+     "hang_khong_nhan": 17,
+     "ngay:ak": 390
+    },
+    "chinh_tay": [
+     "luy_ke:FS2|GROUP|CAC|2025",
+     "luy_ke:FS2|GROUP|CAC|2025H1",
+     "luy_ke:FS2|GROUP|CAC|2025M02",
+     "luy_ke:FS2|GROUP|CAC|2025Q1",
+     "luy_ke:FS2|GROUP|COO|2025",
+     "luy_ke:FS2|GROUP|COO|2025H1",
+     "luy_ke:FS2|GROUP|COO|2025M02",
+     "luy_ke:FS2|GROUP|COO|2025Q1",
+     "luy_ke:FS2|GROUP|EBITDA|2025",
+     "luy_ke:FS2|GROUP|EBITDA|2025H1",
+     "luy_ke:FS2|GROUP|EBITDA|2025M02",
+     "luy_ke:FS2|GROUP|EBITDA|2025Q1",
+     "luy_ke:FS2|GROUP|EBIT|2025",
+     "luy_ke:FS2|GROUP|EBIT|2025H1",
+     "luy_ke:FS2|GROUP|EBIT|2025M02",
+     "luy_ke:FS2|GROUP|EBIT|2025Q1",
+     "luy_ke:FS2|GROUP|EBT|2025",
+     "luy_ke:FS2|GROUP|EBT|2025H1",
+     "luy_ke:FS2|GROUP|EBT|2025M02",
+     "luy_ke:FS2|GROUP|EBT|2025Q1",
+     "luy_ke:FS2|GROUP|MAC|2025",
+     "luy_ke:FS2|GROUP|MAC|2025H1",
+     "luy_ke:FS2|GROUP|MAC|2025M02",
+     "luy_ke:FS2|GROUP|MAC|2025Q1",
+     "luy_ke:FS2|GROUP|NCFO|2025",
+     "luy_ke:FS2|GROUP|NCFO|2025H1",
+     "luy_ke:FS2|GROUP|NCFO|2025M02",
+     "luy_ke:FS2|GROUP|NCFO|2025Q1",
+     "luy_ke:FS2|GROUP|NCF|2025",
+     "luy_ke:FS2|GROUP|NCF|2025H1",
+     "luy_ke:FS2|GROUP|NCF|2025M02",
+     "luy_ke:FS2|GROUP|NCF|2025Q1",
+     "luy_ke:FS2|GROUP|NPC|2025M01",
+     "luy_ke:FS2|GROUP|NPC|2025M02",
+     "luy_ke:FS2|GROUP|NP|2025",
+     "luy_ke:FS2|GROUP|NP|2025H1",
+     "luy_ke:FS2|GROUP|NP|2025M02",
+     "luy_ke:FS2|GROUP|NP|2025Q1",
+     "luy_ke:FS2|GROUP|OMC|2025",
+     "luy_ke:FS2|GROUP|OMC|2025H1",
+     "luy_ke:FS2|GROUP|OMC|2025M02",
+     "luy_ke:FS2|GROUP|OMC|2025Q1",
+     "luy_ke:FS2|GROUP|OPC|2025",
+     "luy_ke:FS2|GROUP|OPC|2025H1",
+     "luy_ke:FS2|GROUP|OPC|2025M02",
+     "luy_ke:FS2|GROUP|OPC|2025Q1",
+     "luy_ke:FS2|GROUP|PL2|2025",
+     "luy_ke:FS2|GROUP|PL2|2025H1",
+     "luy_ke:FS2|GROUP|PL2|2025M02",
+     "luy_ke:FS2|GROUP|PL2|2025Q1",
+     "luy_ke:FS2|GROUP|PL3|2025",
+     "luy_ke:FS2|GROUP|PL3|2025H1",
+     "luy_ke:FS2|GROUP|PL3|2025M02",
+     "luy_ke:FS2|GROUP|PL3|2025Q1",
+     "luy_ke:FS2|GROUP|PL4|2025",
+     "luy_ke:FS2|GROUP|PL4|2025H1",
+     "luy_ke:FS2|GROUP|PL4|2025M02",
+     "luy_ke:FS2|GROUP|PL4|2025Q1",
+     "luy_ke:FS2|GROUP|PL5|2025M02",
+     "luy_ke:FS2|GROUP|PL6|2025",
+     "luy_ke:FS2|GROUP|PL6|2025H1",
+     "luy_ke:FS2|GROUP|PL6|2025M02",
+     "luy_ke:FS2|GROUP|PL6|2025Q1",
+     "luy_ke:FS2|GROUP|PL7|2025",
+     "luy_ke:FS2|GROUP|PL7|2025H1",
+     "luy_ke:FS2|GROUP|PL7|2025M02",
+     "luy_ke:FS2|GROUP|PL7|2025Q1",
+     "luy_ke:FS2|GROUP|PL8|2025",
+     "luy_ke:FS2|GROUP|PL8|2025H1",
+     "luy_ke:FS2|GROUP|PL8|2025M02",
+     "luy_ke:FS2|GROUP|PL8|2025Q1"
+    ],
+    "max_lech_khop": "1.1264888175137E-14",
+    "lech_FLS": []
+   },
+   "608": {
+    "dem": {
+     "tong_o": 8510,
+     "o_0_0": 8240,
+     "khop_co_so": 270,
+     "khop": 8510,
+     "o_co_so": 270
+    },
+    "lop": {},
+    "chua_co_dau_vao": {
+     "luy_ke:FS1": 8421
+    },
+    "engine_vang": {
+     "ma_ngoai_luoi:HDAP": 92,
+     "ma_ngoai_luoi:HDC": 92,
+     "ma_ngoai_luoi:HDCI": 92,
+     "ma_ngoai_luoi:HDH": 92,
+     "ma_ngoai_luoi:HDT": 92
+    },
+    "ngoai_truc": {
+     "hang_khong_nhan": 12,
+     "ngay:ak": 390
+    },
+    "chinh_tay": [],
+    "max_lech_khop": "2.785089305187E-15",
+    "lech_FLS": []
+   },
+   "609": {
+    "dem": {
+     "tong_o": 25851,
+     "o_0_0": 17606,
+     "khop_co_so": 4387,
+     "khop": 21993,
+     "o_co_so": 8245
+    },
+    "lop": {
+     "chua_co_dau_vao": {
+      "so_o": 862,
+      "sha256": "bbea7be2830e82fe7c5b44de7cee40d3f34e86e9a8f368bc5b0c6833a32e3b71"
+     },
+     "chua_co_dau_vao+lech_D3": {
+      "so_o": 590,
+      "sha256": "e3e69b3e1705032ea7f328a7becf7db4c04dd915b858ebef98dc444833b02a69"
+     },
+     "chua_co_dau_vao+lech_D3+loi_as_is": {
+      "so_o": 20,
+      "sha256": "16c333264d0b98c17c014d03ce04c2a7a2b9edada668f315894fe1bf484bc241"
+     },
+     "chua_co_dau_vao+loi_as_is": {
+      "so_o": 16,
+      "sha256": "6695297f5406e2335850e98262950f106f3363968cf25175c51843659a71e219"
+     },
+     "lech_D3": {
+      "so_o": 2133,
+      "sha256": "7858ab9a6f501b67aa4776551223868a693590c20433ed8d9ce0c658f70ddcdb"
+     },
+     "lech_D3+lech_dap_an_nguon": {
+      "so_o": 42,
+      "sha256": "375bbac683cbf9e2ec13ef86cc0f4db037332ea0895e79ef54ddc6ee799fb325"
+     },
+     "lech_D3+loi_as_is": {
+      "so_o": 8,
+      "sha256": "91a58c5841b5c4282628215b0123e8a74744ece6ef8dde4affb0107b3b72c505"
+     },
+     "lech_dap_an_nguon+loi_as_is": {
+      "so_o": 7,
+      "sha256": "c734ba65f90bc146783ff0e5206c8375837aa6d275f7af47529e4ae19ee7aaf7"
+     },
+     "loi_as_is": {
+      "so_o": 180,
+      "sha256": "dbec67a8edd2534a25cdc9bfad59bd3560db910dcb10747178bd0c8859ce8d64"
+     }
+    },
+    "chua_co_dau_vao": {
+     "luy_ke:FS1": 8402
+    },
+    "engine_vang": {
+     "PL5_ix_pl_khong_tinh_duoc": 121,
+     "ma_ngoai_luoi:HDAP": 136,
+     "ma_ngoai_luoi:HDC": 136,
+     "ma_ngoai_luoi:HDCI": 185,
+     "ma_ngoai_luoi:HDH": 136,
+     "ma_ngoai_luoi:HDT": 136
+    },
+    "ngoai_truc": {
+     "hang_khong_nhan": 37
+    },
+    "chinh_tay": [
+     "luy_ke:FS2|GROUP|CAC|2025",
+     "luy_ke:FS2|GROUP|CAC|2025H1",
+     "luy_ke:FS2|GROUP|CAC|2025M02",
+     "luy_ke:FS2|GROUP|CAC|2025Q1",
+     "luy_ke:FS2|GROUP|COO|2025",
+     "luy_ke:FS2|GROUP|COO|2025H1",
+     "luy_ke:FS2|GROUP|COO|2025M02",
+     "luy_ke:FS2|GROUP|COO|2025Q1",
+     "luy_ke:FS2|GROUP|EBITDA|2025",
+     "luy_ke:FS2|GROUP|EBITDA|2025H1",
+     "luy_ke:FS2|GROUP|EBITDA|2025M02",
+     "luy_ke:FS2|GROUP|EBITDA|2025Q1",
+     "luy_ke:FS2|GROUP|EBIT|2025",
+     "luy_ke:FS2|GROUP|EBIT|2025H1",
+     "luy_ke:FS2|GROUP|EBIT|2025M02",
+     "luy_ke:FS2|GROUP|EBIT|2025Q1",
+     "luy_ke:FS2|GROUP|EBT|2025",
+     "luy_ke:FS2|GROUP|EBT|2025H1",
+     "luy_ke:FS2|GROUP|EBT|2025M02",
+     "luy_ke:FS2|GROUP|EBT|2025Q1",
+     "luy_ke:FS2|GROUP|MAC|2025",
+     "luy_ke:FS2|GROUP|MAC|2025H1",
+     "luy_ke:FS2|GROUP|MAC|2025M02",
+     "luy_ke:FS2|GROUP|MAC|2025Q1",
+     "luy_ke:FS2|GROUP|NCFO|2025",
+     "luy_ke:FS2|GROUP|NCFO|2025H1",
+     "luy_ke:FS2|GROUP|NCFO|2025M02",
+     "luy_ke:FS2|GROUP|NCFO|2025Q1",
+     "luy_ke:FS2|GROUP|NCF|2025",
+     "luy_ke:FS2|GROUP|NCF|2025H1",
+     "luy_ke:FS2|GROUP|NCF|2025M02",
+     "luy_ke:FS2|GROUP|NCF|2025Q1",
+     "luy_ke:FS2|GROUP|NPC|2025M01",
+     "luy_ke:FS2|GROUP|NPC|2025M02",
+     "luy_ke:FS2|GROUP|NP|2025",
+     "luy_ke:FS2|GROUP|NP|2025H1",
+     "luy_ke:FS2|GROUP|NP|2025M02",
+     "luy_ke:FS2|GROUP|NP|2025Q1",
+     "luy_ke:FS2|GROUP|OMC|2025",
+     "luy_ke:FS2|GROUP|OMC|2025H1",
+     "luy_ke:FS2|GROUP|OMC|2025M02",
+     "luy_ke:FS2|GROUP|OMC|2025Q1",
+     "luy_ke:FS2|GROUP|OPC|2025",
+     "luy_ke:FS2|GROUP|OPC|2025H1",
+     "luy_ke:FS2|GROUP|OPC|2025M02",
+     "luy_ke:FS2|GROUP|OPC|2025Q1",
+     "luy_ke:FS2|GROUP|PL2|2025",
+     "luy_ke:FS2|GROUP|PL2|2025H1",
+     "luy_ke:FS2|GROUP|PL2|2025M02",
+     "luy_ke:FS2|GROUP|PL2|2025Q1",
+     "luy_ke:FS2|GROUP|PL3|2025",
+     "luy_ke:FS2|GROUP|PL3|2025H1",
+     "luy_ke:FS2|GROUP|PL3|2025M02",
+     "luy_ke:FS2|GROUP|PL3|2025Q1",
+     "luy_ke:FS2|GROUP|PL4|2025",
+     "luy_ke:FS2|GROUP|PL4|2025H1",
+     "luy_ke:FS2|GROUP|PL4|2025M02",
+     "luy_ke:FS2|GROUP|PL4|2025Q1",
+     "luy_ke:FS2|GROUP|PL5|2025M02",
+     "luy_ke:FS2|GROUP|PL6|2025",
+     "luy_ke:FS2|GROUP|PL6|2025H1",
+     "luy_ke:FS2|GROUP|PL6|2025M02",
+     "luy_ke:FS2|GROUP|PL6|2025Q1",
+     "luy_ke:FS2|GROUP|PL7|2025",
+     "luy_ke:FS2|GROUP|PL7|2025H1",
+     "luy_ke:FS2|GROUP|PL7|2025M02",
+     "luy_ke:FS2|GROUP|PL7|2025Q1",
+     "luy_ke:FS2|GROUP|PL8|2025",
+     "luy_ke:FS2|GROUP|PL8|2025H1",
+     "luy_ke:FS2|GROUP|PL8|2025M02",
+     "luy_ke:FS2|GROUP|PL8|2025Q1"
+    ],
+    "max_lech_khop": "1.1264888175137E-14",
+    "lech_FLS": []
+   },
+   "610": {
+    "dem": {
+     "tong_o": 12380,
+     "o_0_0": 9827,
+     "khop_co_so": 2518,
+     "khop": 12345,
+     "o_co_so": 2553
+    },
+    "lop": {
+     "ite_alias": {
+      "so_o": 35,
+      "sha256": "28da7f334f886ef4f4c3b22d00478e34256dd069484d2f3d9b9a38930e753f1d"
+     }
+    },
+    "chua_co_dau_vao": {
+     "hr": 1537
+    },
+    "engine_vang": {
+     "kpi_cfa1_engine_chua_tinh": 6200,
+     "ma_ngoai_luoi:HDAP": 120,
+     "ma_ngoai_luoi:HDC": 120,
+     "ma_ngoai_luoi:HDCI": 120,
+     "ma_ngoai_luoi:HDH": 120,
+     "ma_ngoai_luoi:HDT": 120,
+     "ngay_sau_ngay_doc_dau_vao": 3240
+    },
+    "ngoai_truc": {
+     "hang_khong_nhan": 10,
+     "ngay:ak": 390
+    },
+    "chinh_tay": [],
+    "max_lech_khop": "1.162595419847E-14",
+    "lech_FLS": []
+   }
+  },
+  "pl5_bo_khoi_luoi": 672,
+  "dat": true,
+  "ly_do": []
  }
 }
