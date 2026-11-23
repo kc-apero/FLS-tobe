@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Trạng thái** | `MO` — giao 23/11 ~08:30 UTC |
+| **Trạng thái** | `CHO_TEST` — Dev bàn giao `BG-346` 23/11 *(giao 23/11 ~08:30 UTC; AC-2/AC-4 ĐẠT một phần — ĐỎ có tên ở BG-346 §3)* |
 | **Phát bởi** | orchestrator · 2026-11-23 |
 | **Nhận** | `fls-dev` làn **DATA** — phiên cloud **Opus 5.5 · medium** · nhánh `claude/bold-galileo-zukpaf-isp/SONG` (nền = ngọn nhánh làm việc) |
 | **Dải phiếu** | `BG-346` · `KQ-347` (R1) · `KQ-348` (R2 cuối). Số trống kế tiếp sau dải: **349** |
