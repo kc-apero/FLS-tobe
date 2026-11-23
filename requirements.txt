@@ -1,3 +1,4 @@
 psycopg[binary]>=3.2.0
 pytest>=8.0.0
 import-linter>=2.0
+anthropic>=2.12  # WO-355: adapter THẬT `fls/agent/mo_hinh.py` (nhập muộn — chỉ sau khi đủ chốt)

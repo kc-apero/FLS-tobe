@@ -8,7 +8,7 @@
 | **Đầu vào** | sổ ITL đóng băng 23 kỳ + ảnh Manual input 2026-03 + kết quả 10 gói engine HD2 |
 | **Đầu ra** | ô `voi:theo_ky.*.{o_parity,hd_parity,o_go_that,o_mac_dinh}(_khop)` · `voi:khoi_theo_ky.*.*` · `voi:tu_sinh.*` · `hd2:<gói>.{khop,tong_o,lech_co_chu_dich}` |
 | **Công cụ được gọi** *(CHỈ hàm FLS có sẵn)* | `final_7_khoi` · `vung_sua` · `tu_sinh` = `do_voi_so_luong.do()` (`final_rule.tinh_final` · `tu_soi.soi_mot_dong`) · `phan_bo_bao_cao` = số gói HD2 (`hd2_cong.json`, ghi bởi `tools/do_hd2.py`) |
-| **Mô hình ghim** | `claude-opus-5-5` · họ `anthropic` · ghim — **CHƯA gọi thật** (bản phát lại do mô hình GIẢ sinh) · **phương án A — chủ chốt 23/11** |
+| **Mô hình ghim** | `claude-opus-5-5` · họ `anthropic` · ghim — **CHƯA gọi thật** (bản phát lại do mô hình GIẢ sinh) · **quyết chủ 23/11 ~12:45 (`WO-355`): MỘT nhà cung cấp Anthropic — Opus 5.5 cho agent LÀM** |
 | **Dữ liệu & lưu giữ** *(chủ 23/11)* | agent đọc TOÀN BỘ nội dung giao dịch + số TK + tên (chỉ bỏ `Email Address`) · vận hành: Messages API dưới **ZDR** (bật theo tổ chức qua Anthropic) · fleet eval: **gửi theo lô** (Batches API — Anthropic giữ 29 ngày, đổi lấy −50 % giá; chủ chấp nhận) |
 | **Phiên bản** | checksum prompt `fe71100066e826c8` + mô hình ghim + checksum tham chiếu (tệp số máy đã đo) |
 | **Bước thông minh** | Hôm nay chép số engine. Đề xuất G0 (Voi roadmap 23/11): gợi ý ô vùng sửa khối 2 Loại GD + 7 Hoá đơn (ô máy ⛔ trả lời) — CHƯA dựng; cần ảnh Manual input 22 tháng. |
@@ -16,12 +16,12 @@
 
 ## Bộ skill — chạy TUẦN TỰ (skill n+1 chỉ khi cổng skill n ĐẠT)
 
-| # | skill | loại | công cụ | cổng ra |
-|---|---|---|---|---|
-| 01 | [Ô Final 7 khối + khối HD theo kỳ (parity)](../../../fls/agent/skill/A3_SI_ITL/01_final_7_khoi.md) | lam | `final_7_khoi` | `khop_le_mau:o_parity+hd_parity` |
-| 02 | [Vùng chỉnh tay R–AT: ô người gõ · ô mặc định · theo khối](../../../fls/agent/skill/A3_SI_ITL/02_vung_sua.md) | lam | `vung_sua` | `tong_ky:o_go_that+o_mac_dinh` |
-| 03 | [Chế độ tự sinh MID (FLS tự tính từ Manual input)](../../../fls/agent/skill/A3_SI_ITL/03_tu_sinh.md) | lam | `tu_sinh` | `so_khong_am` |
-| 04 | [Calculate · Allocate · Report — parity 10 gói HD2](../../../fls/agent/skill/A3_SI_ITL/04_phan_bo_bao_cao.md) | lam | `phan_bo_bao_cao` | `hd2_dem` |
+| # | skill | loại | mô hình skill gọi | công cụ | cổng ra |
+|---|---|---|---|---|---|
+| 01 | [Ô Final 7 khối + khối HD theo kỳ (parity)](../../../fls/agent/skill/A3_SI_ITL/01_final_7_khoi.md) | lam | `claude-opus-5-5` | `final_7_khoi` | `khop_le_mau:o_parity+hd_parity` |
+| 02 | [Vùng chỉnh tay R–AT: ô người gõ · ô mặc định · theo khối](../../../fls/agent/skill/A3_SI_ITL/02_vung_sua.md) | lam | `claude-opus-5-5` | `vung_sua` | `tong_ky:o_go_that+o_mac_dinh` |
+| 03 | [Chế độ tự sinh MID (FLS tự tính từ Manual input)](../../../fls/agent/skill/A3_SI_ITL/03_tu_sinh.md) | lam | `claude-opus-5-5` | `tu_sinh` | `so_khong_am` |
+| 04 | [Calculate · Allocate · Report — parity 10 gói HD2](../../../fls/agent/skill/A3_SI_ITL/04_phan_bo_bao_cao.md) | lam | `claude-opus-5-5` | `phan_bo_bao_cao` | `hd2_dem` |
 
 Loại: `lam` = mô hình làm, A4 so 100 % với máy · `bong` = G0 bóng, so với đáp án giữ riêng, ⛔ ghi · `ma` = mã tất định, ⛔ mô hình.
 

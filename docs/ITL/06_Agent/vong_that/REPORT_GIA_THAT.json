@@ -1,0 +1,101 @@
+{
+ "be": "có (ngoài repo)",
+ "che": "mo",
+ "gia": {
+  "be": {
+   "a": {
+    "chua_chot": {
+     "agent_noi": 0,
+     "so_ca": 0
+    },
+    "diem_tb": 1.4923,
+    "l3_bi_noi": 0,
+    "mau_so_chinh": 65,
+    "noi_sai": 2,
+    "phai_nguoi_bi_noi": 2,
+    "recall_phai_noi": 0.0,
+    "so_ca": 65,
+    "so_noi": 2,
+    "so_phai_noi": 29,
+    "ti_le_noi_sai": 1.0,
+    "van_tay_be": "f38221e154537840"
+   },
+   "b": {
+    "chua_chot": {
+     "agent_noi": 0,
+     "so_ca": 5
+    },
+    "diem_tb": 1.5231,
+    "l3_bi_noi": 0,
+    "mau_so_chinh": 65,
+    "noi_sai": 1,
+    "phai_nguoi_bi_noi": 1,
+    "recall_phai_noi": 0.0333,
+    "so_ca": 65,
+    "so_noi": 2,
+    "so_phai_noi": 30,
+    "ti_le_noi_sai": 0.5,
+    "van_tay_be": "8271044d42889222"
+   }
+  },
+  "chuoi": {
+   "agent": 4,
+   "agent_dat": 4,
+   "doc_lap": {
+    "khop": 557,
+    "mau_so": 557
+   },
+   "dung_o": null,
+   "g0": {
+    "be": "tập nhỏ",
+    "diem_tb": 1.5312,
+    "noi_sai": 1,
+    "phai_nguoi_bi_noi": 1,
+    "recall_phai_noi": 0.35,
+    "so_ca": 32,
+    "so_noi": 8,
+    "ti_le_noi_sai": 0.125
+   },
+   "khong_do_duoc": 0,
+   "lech": 0,
+   "mo_hinh_that": 0,
+   "vong_tron": {
+    "khop": 74,
+    "mau_so": 74
+   }
+  }
+ },
+ "mo_hinh": {
+  "A1_RI": "claude-opus-5-5",
+  "A2_PR_MAP": "claude-opus-5-5",
+  "A3_SI_ITL": "claude-opus-5-5",
+  "A4_AUDITOR": "claude-sonnet-5-5"
+ },
+ "ngay": "2026-11-23",
+ "nhat_ky": {
+  "cache_doc": 0,
+  "cache_ghi": 0,
+  "chi_phi_usd": 0.0,
+  "giay": 0.0,
+  "ngay_tra_gia": "2026-11-23",
+  "so_goi": 0,
+  "theo_mo_hinh": {},
+  "token_ra": 0,
+  "token_vao": 0
+ },
+ "tap_nho": {
+  "be_b": "mẫu 20/70 ca bể B (hạt 355)",
+  "ca_be_b": 20,
+  "ca_dung": 12,
+  "theo_nhom": {
+   "chua_chot": 1,
+   "l3": 2,
+   "phai_nguoi": 9,
+   "phai_noi": 20
+  },
+  "van_tay_tap": "4f5a3f7b1ee013f2"
+ },
+ "that": {
+  "do": "thiếu ANTHROPIC_API_KEY · CamGoiThat: ⛔ gọi API thật: `FLS_CHO_GOI_API` ≠ 1 · khoá `ANTHROPIC_API_KEY` vắng trong biến môi trường · chế độ che `mo` gửi nguyên văn tên · số TK ⇒ đòi `FLS_ZDR_DA_BAT=1` (ZDR — quyết chủ 23/11)"
+ }
+}

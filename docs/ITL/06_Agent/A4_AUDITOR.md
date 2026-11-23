@@ -8,20 +8,20 @@
 | **Đầu vào** | đầu ra A1–A3 + số máy đã đo (`voi_so_luong.json` · `hd2_cong.json` · đếm ảnh · cổng FLS) |
 | **Đầu ra** | phán ĐẠT/TRƯỢT từng agent (MÃ) · ô `cong:HD1.*.dat` · `cong:HD2.*.dat` · `voi:dat_hd1.*` · `report.html` |
 | **Công cụ được gọi** *(CHỈ hàm FLS có sẵn)* | `doi_chieu` (mã `fls/agent/doi_chieu.py`) · `cong_hd1` = `fls.repo.doc_bao_cao.doc_cong_tep_do` · `cong_hd2` = `doc_cong_hd2` · `report` (mã `fls/agent/report.py`) |
-| **Mô hình** | **MÃ THUẦN tới G1** (quyết chủ C2) — ⛔ gọi mô hình, ⛔ dựng nhà cung cấp · dự kiến G1: `gemini-3.8-flash` họ `google` (CHƯA ghim) |
+| **Mô hình** | **MÃ THUẦN tới G1** (quyết chủ C2) — ⛔ gọi mô hình, ⛔ dựng nhà cung cấp · phán cuối = MÃ `doi_chieu` · dự kiến G1 (phần KIỂM, `WO-355`): `claude-sonnet-5-5` họ `anthropic` (ghim) |
 | **Dữ liệu & lưu giữ** *(chủ 23/11)* | agent đọc TOÀN BỘ nội dung giao dịch + số TK + tên (chỉ bỏ `Email Address`) · vận hành: Messages API dưới **ZDR** (bật theo tổ chức qua Anthropic) · fleet eval: **gửi theo lô** (Batches API — Anthropic giữ 29 ngày, đổi lấy −50 % giá; chủ chấp nhận) |
-| **Phiên bản** | checksum prompt `5bc5a8779826a613` + mô hình ghim + checksum tham chiếu (tệp số máy đã đo) |
+| **Phiên bản** | checksum prompt `0388cc6a6ab210f0` + mô hình ghim + checksum tham chiếu (tệp số máy đã đo) |
 | **Bước thông minh** | MÃ THUẦN tới G1 (quyết chủ C2): phán và đọc cổng đều là mã, ⛔ lượt API. Đề xuất G0 (Voi 23/11–11/12): CHỈ THÊM cờ giải thích lệch, ⛔ bỏ cờ v0. |
-| **Fleet eval** | `a4-soat.eval.lot-chan` (chấm bằng họ khác: Claude Opus 5.5) |
+| **Fleet eval** | `a4-soat.eval.lot-chan` (phần KIỂM dùng mô hình ở G1: `claude-sonnet-5-5` — cùng hãng, KHÁC mô hình A1–A3; WO-355) |
 
 ## Bộ skill — chạy TUẦN TỰ (skill n+1 chỉ khi cổng skill n ĐẠT)
 
-| # | skill | loại | công cụ | cổng ra |
-|---|---|---|---|---|
-| 01 | [Soát lớp: so TỪNG Ô agent ↔ máy đã đo (mã, ⛔ mô hình)](../../../fls/agent/skill/A4_AUDITOR/01_soat_lop.md) | ma | `doi_chieu` | `-` |
-| 02 | [Cổng HD1: ô Final + kỳ đạt](../../../fls/agent/skill/A4_AUDITOR/02_cong_hd1.md) | ma | `cong_hd1` | `cong_doc` |
-| 03 | [Cổng HD2: parity từng gói báo cáo · phân bổ](../../../fls/agent/skill/A4_AUDITOR/03_cong_hd2.md) | ma | `cong_hd2` | `cong_doc` |
-| 04 | [Report MỘT trang (mã)](../../../fls/agent/skill/A4_AUDITOR/04_report.md) | ma | `report` | `-` |
+| # | skill | loại | mô hình skill gọi | công cụ | cổng ra |
+|---|---|---|---|---|---|
+| 01 | [Soát lớp: so TỪNG Ô agent ↔ máy đã đo (mã, ⛔ mô hình)](../../../fls/agent/skill/A4_AUDITOR/01_soat_lop.md) | ma | MÃ — ⛔ lượt API | `doi_chieu` | `-` |
+| 02 | [Cổng HD1: ô Final + kỳ đạt](../../../fls/agent/skill/A4_AUDITOR/02_cong_hd1.md) | ma | MÃ — ⛔ lượt API | `cong_hd1` | `cong_doc` |
+| 03 | [Cổng HD2: parity từng gói báo cáo · phân bổ](../../../fls/agent/skill/A4_AUDITOR/03_cong_hd2.md) | ma | MÃ — ⛔ lượt API | `cong_hd2` | `cong_doc` |
+| 04 | [Report MỘT trang (mã)](../../../fls/agent/skill/A4_AUDITOR/04_report.md) | ma | MÃ — ⛔ lượt API | `report` | `-` |
 
 Loại: `lam` = mô hình làm, A4 so 100 % với máy · `bong` = G0 bóng, so với đáp án giữ riêng, ⛔ ghi · `ma` = mã tất định, ⛔ mô hình.
 

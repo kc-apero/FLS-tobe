@@ -20,7 +20,7 @@ from pathlib import Path
 GOC = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(GOC))
 
-from fls.agent.chuoi import AGENT, can_mo_hinh  # noqa: E402
+from fls.agent.chuoi import AGENT, can_mo_hinh, mo_hinh_skill  # noqa: E402
 from fls.agent.skill import THU_MUC, checksum_prompt, nap_bo  # noqa: E402
 
 TM = GOC / "docs" / "ITL" / "06_Agent"
@@ -63,7 +63,8 @@ VAI = {
   ra="phán ĐẠT/TRƯỢT từng agent (MÃ) · ô `cong:HD1.*.dat` · `cong:HD2.*.dat` · `voi:dat_hd1.*` · `report.html`",
   cong_cu="`doi_chieu` (mã `fls/agent/doi_chieu.py`) · `cong_hd1` = `fls.repo.doc_bao_cao.doc_cong_tep_do` · "
           "`cong_hd2` = `doc_cong_hd2` · `report` (mã `fls/agent/report.py`)",
-  eval="`a4-soat.eval.lot-chan` (chấm bằng họ khác: Claude Opus 5.5)", the_eval=("a4-soat.md",),
+  eval="`a4-soat.eval.lot-chan` (phần KIỂM dùng mô hình ở G1: `claude-sonnet-5-5` — cùng hãng, KHÁC mô hình A1–A3; WO-355)",
+  the_eval=("a4-soat.md",),
   thong_minh="MÃ THUẦN tới G1 (quyết chủ C2): phán và đọc cổng đều là mã, ⛔ lượt API. Đề xuất G0 (Voi 23/11–11/12): CHỈ THÊM cờ giải thích lệch, ⛔ bỏ cờ v0."),
 }
 
@@ -85,9 +86,10 @@ def the(ag) -> str:
             f"| **Đầu vào** | {v['vao']} |",
             f"| **Đầu ra** | {v['ra']} |",
             f"| **Công cụ được gọi** *(CHỈ hàm FLS có sẵn)* | {v['cong_cu']} |",
-            (f"| **Mô hình ghim** | `{m.ma}` · họ `{m.ho}` · {'ghim — **CHƯA gọi thật** (bản phát lại do mô hình GIẢ sinh)' if m.ghim else '**CHƯA ghim**'} · **phương án A — chủ chốt 23/11** |"
+            (f"| **Mô hình ghim** | `{m.ma}` · họ `{m.ho}` · {'ghim — **CHƯA gọi thật** (bản phát lại do mô hình GIẢ sinh)' if m.ghim else '**CHƯA ghim**'} · **quyết chủ 23/11 ~12:45 (`WO-355`): MỘT nhà cung cấp Anthropic — Opus 5.5 cho agent LÀM** |"
              if can_mo_hinh(ag.ma) else
-             f"| **Mô hình** | **MÃ THUẦN tới G1** (quyết chủ C2) — ⛔ gọi mô hình, ⛔ dựng nhà cung cấp · dự kiến G1: `{m.ma}` họ `{m.ho}` "
+             f"| **Mô hình** | **MÃ THUẦN tới G1** (quyết chủ C2) — ⛔ gọi mô hình, ⛔ dựng nhà cung cấp · phán cuối = MÃ `doi_chieu` · "
+             f"dự kiến G1 (phần KIỂM, `WO-355`): `{m.ma}` họ `{m.ho}` "
              f"({'ghim' if m.ghim else 'CHƯA ghim'}) |"),
             "| **Dữ liệu & lưu giữ** *(chủ 23/11)* | agent đọc TOÀN BỘ nội dung giao dịch + số TK + tên (chỉ bỏ `Email Address`) · "
             "vận hành: Messages API dưới **ZDR** (bật theo tổ chức qua Anthropic) · fleet eval: **gửi theo lô** (Batches API — "
@@ -96,10 +98,11 @@ def the(ag) -> str:
             f"| **Bước thông minh** | {v['thong_minh']} |",
             f"| **Fleet eval** | {v['eval']} |",
             "", "## Bộ skill — chạy TUẦN TỰ (skill n+1 chỉ khi cổng skill n ĐẠT)", "",
-            "| # | skill | loại | công cụ | cổng ra |", "|---|---|---|---|---|"]
+            "| # | skill | loại | mô hình skill gọi | công cụ | cổng ra |", "|---|---|---|---|---|---|"]
     for s in bo:
+        mhs = mo_hinh_skill(ag, s)
         dong.append(f"| {s.so:02d} | [{s.ten}](../../../fls/agent/skill/{ag.ma}/{s.ma}.md) | {s.loai} | "
-                    f"`{s.cong_cu}` | `{s.cong}` |")
+                    + (f"`{mhs.ma}`" if mhs else "MÃ — ⛔ lượt API") + f" | `{s.cong_cu}` | `{s.cong}` |")
     dong += ["", "Loại: `lam` = mô hình làm, A4 so 100 % với máy · `bong` = G0 bóng, so với đáp án giữ riêng, ⛔ ghi · "
              "`ma` = mã tất định, ⛔ mô hình.", "", "## Cổng ra của agent", "",
              "A4 (mã `fls/agent/doi_chieu.py`) so MỌI ô skill `lam` (và skill `ma` có công cụ) với số máy đã đo — mong: lệch 0 · ⛔ đo được 0 · "

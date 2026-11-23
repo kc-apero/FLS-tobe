@@ -9,4 +9,4 @@ Skill MÃ tới G1 (quyết chủ C2, 23/11): mã gọi công cụ `cong_hd1` (`
 NGUYÊN kết quả làm đầu ra; ⛔ gọi mô hình, ⛔ lượt API. Đầu ra vẫn qua cổng `cong_doc` và cửa ② (so từng ô
 với máy đã đo). `dat` = true / false / null (null = CHƯA ĐO ĐƯỢC).
 
-Từ G1 (chưa mở): mô hình họ khác A1–A3 đọc cùng kết quả và chỉ THÊM cờ giải thích — ⛔ đổi phán của mã.
+Từ G1 (chưa mở): mô hình KHÁC A1–A3 (`claude-sonnet-5-5`, WO-355 — cùng hãng Anthropic) đọc cùng kết quả và chỉ THÊM cờ giải thích — ⛔ đổi phán của mã.

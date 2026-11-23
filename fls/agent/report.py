@@ -68,7 +68,8 @@ details{margin:2px 0} summary{cursor:pointer}
 
 
 #: Nguồn trả lời ⇒ có phải lượt API THẬT không. Khác danh sách này (giả · phát lại của giả · ⛔ rõ) ⇒ ⛔ thật.
-NGUON_THAT = ("anthropic", "google")
+#: ⭐ `WO-355`: chỉ họ có adapter (`mo_hinh.HO_CO_ADAPTER`) — `google` đã bỏ (chủ 23/11: ⛔ Gemini).
+NGUON_THAT = ("anthropic",)
 
 
 def _la_that(pb: dict[str, Any] | None) -> bool:
@@ -152,7 +153,8 @@ def sinh(kc: KqChuoi, phien_ban: dict[str, Any], as_is: list[tuple[str, str, Any
       f"content='width=device-width,initial-scale=1'><title>Report 4 agent Voi</title><style>{CSS}</style></head><body>")
     w("<h1>Report 4 agent vận hành Voi — agent ↔ số máy đã đo</h1>")
     w(f"<div class='mo'>Sinh bằng <code>python tools/chay_agent_voi.py --ghi-report</code> · {html.escape(ngay)} · "
-      "chế độ PHÁT LẠI (⛔ gọi API thật) · ⛔ sửa tay.</div>")
+      + ("chế độ PHÁT LẠI/GIẢ (⛔ gọi API thật)" if so_that == 0 else f"lượt API THẬT ở {so_that} agent")
+      + " · ⛔ sửa tay.</div>")
     lop = "ok" if dat else "do"
     w(f"<div class='ket {lop}'>KẾT: {dong_ket(tom)}</div>")
     gia = so_that == 0
@@ -203,6 +205,7 @@ def sinh(kc: KqChuoi, phien_ban: dict[str, Any], as_is: list[tuple[str, str, Any
       " · ".join(f"<code>{html.escape(k)}</code> {html.escape(v)}" for k, v in nguon_may.items()) + "</div>")
 
     w("<h2>2 · Chuỗi skill tuần tự (cổng ra từng skill)</h2><table><tr><th>#</th><th>skill</th><th>loại</th>"
+      "<th>mô hình skill gọi</th>"
       "<th>cổng</th><th>kết quả cổng</th><th>lượt</th><th>ô bị che</th></tr>")
     for a in kc.agents:
         for ks in a.skills:
@@ -214,7 +217,9 @@ def sinh(kc: KqChuoi, phien_ban: dict[str, Any], as_is: list[tuple[str, str, Any
             else:
                 kqc = f"<span class={'ok' if ks.dat_cong else 'do'}>{'ĐẠT' if ks.dat_cong else 'ĐỎ'}</span> " + \
                       html.escape(ks.ly_do)
+            mhs = a.dn.mo_hinh.ma if s.loai in ("lam", "bong") else "MÃ (⛔ API)"
             w(f"<tr><td>{s.agent[:2]}.{s.so:02d}</td><td>{html.escape(s.ten)}</td><td>{s.loai}</td>"
+              f"<td><code>{html.escape(mhs)}</code></td>"
               f"<td><code>{html.escape(s.cong)}</code></td><td>{kqc}</td><td class=s>{ks.so_luot}</td>"
               f"<td class=s>{ks.so_bo_che}</td></tr>")
     w("</table>")
