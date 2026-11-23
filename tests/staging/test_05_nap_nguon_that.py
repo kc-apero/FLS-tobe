@@ -608,9 +608,9 @@ def test_dem_ly_do_loai_che_o_tho():
 
 # ═══ `NAP-R1-05` — từ chối cổng 5433 ở MỌI dạng DSN (kể cả 5 dạng từng lọt) ═══
 @pytest.mark.parametrize("dsn", [
-    "postgresql://u:p@localhost:5433/fls", "postgresql://u:p@127.0.0.1:5433/fls", "postgresql://u:p@localhost:5433/fls?sslmode=disable",
-    "postgresql://u:p@localhost:05433/fls", "postgresql://u:p@localhost/fls?port=5433", "host=localhost port=5433 dbname=fls",
-    "postgresql://u:p@localhost:5433", "postgresql://u:p@[::1]:5433/fls", "host=/var/run port=5433",
+    "postgresql://u:p@localhost:5433/kho_x", "postgresql://u:p@127.0.0.1:5433/kho_x", "postgresql://u:p@localhost:5433/kho_x?sslmode=disable",
+    "postgresql://u:p@localhost:05433/kho_x", "postgresql://u:p@localhost/kho_x?port=5433", "host=localhost port=5433 dbname=fls",
+    "postgresql://u:p@localhost:5433", "postgresql://u:p@[::1]:5433/kho_x", "host=/var/run port=5433",
 ])
 def test_kiem_dsn_chan_moi_dang_cong_5433(dsn):
     from tools.staging.nap_nguon_that import kiem_dsn
@@ -618,7 +618,7 @@ def test_kiem_dsn_chan_moi_dang_cong_5433(dsn):
         kiem_dsn(dsn)
 
 
-@pytest.mark.parametrize("dsn", ["postgresql://u:p@localhost:5436/fls", "host=localhost port=5436 dbname=fls", "postgresql://u@localhost/fls"])
+@pytest.mark.parametrize("dsn", ["postgresql://u:p@localhost:5436/kho_x", "host=localhost port=5436 dbname=fls", "postgresql://u@localhost/kho_x"])
 def test_kiem_dsn_cho_qua_cum_phien(dsn):
     from tools.staging.nap_nguon_that import kiem_dsn
     kiem_dsn(dsn)
@@ -627,7 +627,7 @@ def test_kiem_dsn_cho_qua_cum_phien(dsn):
 def test_kiem_dsn_khong_phan_tich_duoc_thi_tu_choi():
     from tools.staging.nap_nguon_that import kiem_dsn
     with pytest.raises(SystemExit, match="phân tích"):
-        kiem_dsn("postgresql://u:p@localhost:abc/fls")
+        kiem_dsn("postgresql://u:p@localhost:abc/kho_x")
 
 
 # ═══ `NAP-R1-13` — ID nguồn khai MỘT chỗ; mong theo nguồn sống ═══

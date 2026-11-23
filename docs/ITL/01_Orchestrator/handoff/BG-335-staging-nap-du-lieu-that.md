@@ -432,4 +432,15 @@ rc=1
 | `lint-imports` | **11 kept, 0 broken** |
 | `quet_pii_repo` | **`[ĐẠT] 0 chỗ số TK cá nhân · 0 tệp`** |
 | `kiem_so_song` · `dong_bo_so_song` · `khop_owner --kiem` | ⛔ **CHƯA CHẠY** — `kiem_so_song.py:406` gọi `.venv/Scripts/lint-imports.exe` *(đường Windows, `NAP-R1-11`)* |
-| `--duong-nen --cong 5436` | xem §10.1 |
+| `--duong-nen --cong 5436` | **`KẾT: ĐỎ`** — 3 THÊM, 2 của STG-R1-02, 1 lỗi tôi đã sửa — §10.1 |
+
+### 10.1 · `--duong-nen --cong 5436` *(MỘT lần, một mình, cây `b420445`)* — **`KẾT: ĐỎ`**, ⛔ ĐẠT
+Toàn bộ: `15 failed · 4.994 passed · 2 xfailed · 14 errors` trong 1.698 s = **31** node id *(XFAIL 2)* = 28 nền + **3 THÊM**, bớt **0**; chạy **5.025** *(= 15 + 4.994 + 2 + 14; ≥ sàn 5.025 ✅, skipped 0, deselected 0)*; `tests/web` **3 = 3**, chạy 690 ✅; mọi phép kiểm môi trường ĐẠT *(HD1 `chay 9845 / co 9967` · `lint-imports` 11 kept · `pg_verify` 27/27)*.
+
+3 bài THÊM:
+| Bài | Nguồn gốc | Xử lý |
+|---|---|---|
+| `tests/staging/test_04_nap_du_lieu.py::test_chuoi_sau_khi_nap_config_ra_DAT_10_goi` · `…::test_chuoi_tren_kho_TRANG_DO_nen_ten_goi_thieu_config` | `STG-R1-02` *(ghim cứng "10 gói", `GOI_BIET` có 11)* — **đã biết ở `KQ-336`, ⛔ do WO-334**; nền STG-NAP = `isp/STG` `1a94247`, **sửa đã ở `origin/…-isp/STG` `4042079`** | ⛔ **không** kéo 59 commit STG (có vòng R2 `KQ-328` chưa đóng) vào nhánh này *(ngoài phiếu)*; **tự hết khi orchestrator gộp STG** — đề nghị orchestrator chạy lại `--duong-nen` ở cây gộp |
+| `tests/db/test_khong_ai_tro_lai_kho_that.py::test_khong_file_test_nao_ghi_cung_dia_chi_kho_that` | **LỖI CỦA TÔI**: bài `test_kiem_dsn_*` mới gõ DSN kết thúc `/fls` *(cổng quét mã nguồn cấm)* | **đã sửa** *(đổi tên kho trong DSN thử sang `/kho_x`)*; chạy lại riêng: `16 passed` *(cổng này + `test_kiem_dsn_*`)*. ⛔ **chưa** chạy lại `--duong-nen` toàn bộ *(luật C: MỘT lần)* ⇒ phần này chỉ có bằng chứng cục bộ |
+
+Đúng ra kỳ vọng sau sửa + gộp STG: THÊM 0 ⇒ `ĐẠT`; **chưa được chứng minh** ở phiên này.
