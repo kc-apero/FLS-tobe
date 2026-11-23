@@ -37,3 +37,10 @@
 | `HELD-R1v2-02` | GHI NHẬN | Sàn HELD 4.967 ≠ thu thập thật cây gộp **4.997**; gộp thật xung đột đúng 2 dòng sàn ⇒ đặt = thu thập thật lúc gộp + bài ghim cùng commit | mở *(orchestrator lúc gộp)* |
 | `HELD-R1v2-03` | GHI NHẬN | `che_noi_dung` bị `CamGui` chặn A 10 · B 14 chỗ; lọt số TK 17/65 · 24/70; `mo` ≡ `che_het` với luật giả ⇒ chưa đo được lợi ích đọc nội dung/TK | mở *(quyết chủ)* |
 
+
+## R2 cuối *(`KQ-350` · `isp/HELD` `7535479` + `origin/claude/bold-galileo-zukpaf` `06db986` · cụm 5446)* — **ĐẠT 0 CHẶN · 0 NÊN SỬA**
+| Mã | Mức | Nội dung | Trạng thái |
+|---|---|---|---|
+| `HELD-R2-G1` | GHI NHẬN | AC-4 "0 lọt sau che" **không đo được**: lọt số TK 17/65 · 24/70, tên 5 · 2; `email`/`so_chung_tu` `do_duoc_theo_loai=False` ⇒ mẫu số 0 *(Đ3)*; `che_noi_dung` bị `CamGui` A 10 · B 14 chỗ; mặc định `mo` | mở *(quyết chủ — `HELD-R1v2-03`)* |
+| `HELD-R2-G2` | GHI NHẬN | Ngọn nhánh làm việc `577044e → 06db986`; gộp vẫn 2 xung đột sàn, thu thập thật 4.997 / web 690 ⇒ đặt sàn lúc gộp | mở *(orchestrator)* |
+| `HELD-R2-G3` | GHI NHẬN | `HELD-R1-08` (9 ca trùng A↔B) chưa đo lại ở R2; email nền `HELD-R1v2-01` HELD thêm 0 | mở |
