@@ -1,33 +1,33 @@
 {
  "be": "ca DỰNG trong repo (⛔ dữ liệu thật)",
- "checksum_be": "7bf678fcb945d5cc",
- "phien_ban": "v1-gia-bat-noi-dung",
+ "checksum_be": "1a792ab498f2c45f",
+ "phien_ban": "v1-gia-che-het",
  "mo_hinh": "GIẢ (luat_gia_v1) thay claude-opus-5-5",
- "checksum_prompt": "4b629ff21f901479",
- "cho_noi_dung": true,
+ "checksum_prompt": "e9d149e87fff5474",
+ "che_do": "che_het",
  "cong_skill": {
   "dat": true,
   "ly_do": "12 ca: 0 vi phạm luật cứng"
  },
- "the_noi_dung_che": 5,
+ "the_noi_dung_che": 0,
  "tong_hop": {
   "so_ca": 12,
-  "so_noi": 6,
+  "so_noi": 2,
   "noi_sai": 0,
   "ti_le_noi_sai": 0.0,
-  "recall_phai_noi": 0.8571,
+  "recall_phai_noi": 0.2857,
   "phai_nguoi_bi_noi": 0,
-  "diem_tb": 1.9167
+  "diem_tb": 1.5833
  },
  "theo_nhom": {
   "phai_noi": {
    "so_ca": 7,
-   "so_noi": 6,
+   "so_noi": 2,
    "noi_sai": 0,
    "ti_le_noi_sai": 0.0,
-   "recall_phai_noi": 0.8571,
+   "recall_phai_noi": 0.2857,
    "phai_nguoi_bi_noi": 0,
-   "diem_tb": 1.8571
+   "diem_tb": 1.2857
   },
   "phai_nguoi": {
    "so_ca": 5,
@@ -43,10 +43,10 @@
   {
    "ca": "c08",
    "nhom": "phai_noi",
-   "diem": 2,
-   "vi_sao": "đúng line, có lý do",
-   "noi": true,
-   "dung_line": true
+   "diem": 1,
+   "vi_sao": "để người — an toàn, bỏ lỡ nối",
+   "noi": false,
+   "dung_line": false
   },
   {
    "ca": "c10",
@@ -83,10 +83,10 @@
   {
    "ca": "c09",
    "nhom": "phai_noi",
-   "diem": 2,
-   "vi_sao": "đúng line, có lý do",
-   "noi": true,
-   "dung_line": true
+   "diem": 1,
+   "vi_sao": "để người — an toàn, bỏ lỡ nối",
+   "noi": false,
+   "dung_line": false
   },
   {
    "ca": "c04",
@@ -107,18 +107,18 @@
   {
    "ca": "c12",
    "nhom": "phai_noi",
-   "diem": 2,
-   "vi_sao": "đúng line, có lý do",
-   "noi": true,
-   "dung_line": true
+   "diem": 1,
+   "vi_sao": "để người — an toàn, bỏ lỡ nối",
+   "noi": false,
+   "dung_line": false
   },
   {
    "ca": "c01",
    "nhom": "phai_noi",
-   "diem": 2,
-   "vi_sao": "đúng line, có lý do",
-   "noi": true,
-   "dung_line": true
+   "diem": 1,
+   "vi_sao": "để người — an toàn, bỏ lỡ nối",
+   "noi": false,
+   "dung_line": false
   },
   {
    "ca": "c02",

@@ -97,3 +97,44 @@ bash tools/dung_moi_truong_isp.sh --duong-nen --cong 5437:
 - `tools/kiem_so_song.py` · `tools/dong_bo_so_song.py --ghi` → `FileNotFoundError: .venv/Scripts/lint-imports.exe` — đường dẫn Windows cứng, ⛔ chạy được trên Linux cloud. *(⛔ đo được ở máy này; chưa chạy ở máy chủ)*
 
 Lượt đầu của `--duong-nen` ĐỎ vì 7 bài của WO-338 bị SKIP khi vắng bể thật (cổng đòi skipped = 0) → sửa: bài chạy trên bể giả khi vắng bể + `test_DEM_BE_nhat_quan` luôn chạy; lượt hai ĐẠT.
+
+---
+
+## Vòng sửa sau R1 (KQ-340) — `fls-dev` làn DATA · 2026-11-23 *(chỉ THÊM; các mục trên giữ nguyên là biên bản R0)*
+
+⚠ Mọi con số ở mục này là của **lượt dựng lại 23/11 (lần 2)** trên bể ngoài repo; nhãn = cái nó đếm (Đ4). Agent vẫn là mô hình **GIẢ** (0 lượt API thật · 0 ghi sheet · 0 ghi kho thật). Mục "Cổng" của R0 ở trên thuộc nền `9840f27` — bản **hiện hành** ở mục §Cổng sau vòng sửa cuối trang.
+
+### Việc đã sửa *(mỗi mục sửa có bài ĐỎ đúng lý do trước)*
+| Mã | Mức | Đã làm | Bằng chứng |
+|---|---|---|---|
+| `HELD-R1-01` | CHẶN | **Gộp `origin/…/AG` (ngọn `2db1f22`, R2 cuối ĐẠT) vào HELD** (`git merge --no-ff`, 3 xung đột). `tools/fleet_eval_voi.py`: chuyển `VONG`/`chay_vong`/`chay_chuoi_be`/`chay_be` sang `che_do` *(`mo` · `che_noi_dung` · `che_het`)*, chuỗi gọi `cav.chay("gia", che_do, ncc=…)` + `cav.sinh_report(…)` của AG. Sàn: script + bài ghim = **4.967** (= `pytest --collect-only` cây gộp, ⛔ cộng tay) · web **690**. **⛔ sửa `fls/` của AG: 0 tệp** *(`git diff 2db1f22 -- fls/` rỗng)* | 28 → mục tiêu **28 = 28** (xem §Cổng) · `tests/test_dung_moi_truong_isp.py` 60 passed |
+| `HELD-R1-02` | CHẶN | Ca bể mang `tk` = cột G `Tài khoản` của `Mapping L1` *(`dung_be_giu_rieng.DongNguon.tk`, ép số nguyên khi Sheets trả float)*. **Bể dựng lại: A 65/65 · B 70/70 ca có `tk` khác rỗng.** `o_ca` của AG chạy hết, ⛔ `KeyError`. | bài `test_o_ca_doc_tk_va_moi_ca_cua_be_co_tk` — **ĐỎ** khi gỡ `"tk"` khỏi ca: `KeyError: 'tk'` ở `chay_agent_voi.py:137` *(đột biến của reviewer)* · `test_tk_doc_tu_cot_G_va_ep_so_nguyen` |
+| `HELD-R1-03` | NÊN SỬA | Bài ghim **số đã đo** cho khoảng trống bộ che: `test_che_hien_tai_so_tk_xen_cach_het_lot_ma_ten_co_dau_van_lot_DA_DO` *(sau `che_noi_dung`: số TK xen cách ⇒ 0 lọt; tên CÓ DẤU ⇒ 1 lọt)*. Hai tên bài cũ trong AC-4 *(`…che_0_lot_MONG_AC4`, `…phep_do_ro_ri_ghim_dung_so_da_do`)* **đã đổi** — tên hiện hành: `test_BE_che_ro_ri_phep_do_hop_le_va_ghim_so_da_do` + bài mới trên | grep hai tên cũ trong `tests/` = **0** |
+| `HELD-R1-04` | NÊN SỬA | `do_ro_ri_che.do` thêm `do_duoc_theo_loai` *(loại có `truoc_che = 0` ⇒ `False`)*. Trên bể thật: **`email` · `so_chung_tu` = `False`** — "0 lọt" của hai loại ấy là tập RỖNG, ⛔ số đo; `so_tk` · `ten_ung_vien` = `True`. | `test_ro_ri_hop_le_THEO_LOAI_…` · `test_DEM_BE_nhat_quan` đòi `do_duoc_theo_loai == {loại: truoc_che > 0}` |
+| `HELD-R1-05` | NÊN SỬA | Muối vân tay **dẫn xuất** `HMAC-SHA256(bí mật ngoài repo, "fls-be-giu-rieng/<a/b>")[:16]`: bí mật = `FLS_MUOI_BE` hoặc khoá SA chỉ-đọc của môi trường *(đã có ở mọi container của phiên)*; ⛔ bí mật nào ⇒ ngẫu nhiên. Dựng lại lần 2 ⇒ `test_BE_van_tay_khop_tep_dem_repo` **ĐẠT trên bể thật** *(có `FLS_HELDOUT_NOI_DUNG`)*, trước đó ĐỎ. | `test_muoi_on_dinh_theo_bi_mat_va_khac_giua_hai_be` *(ổn định · khác giữa a/b · đổi bí mật ⇒ đổi muối · không bí mật ⇒ ngẫu nhiên)* |
+| `HELD-R1-06` | NÊN SỬA | Bỏ nhánh `khong_che` (đọc thẳng `luat(o_ca)`). **Chế độ chính của chủ = `che_do="mo"` đi QUA `chay_skill`** *(cổng skill + chốt)*; bài kiểm `cong_skill.dat` ở mọi vòng. | `test_chay_be_chi_so_…` |
+| `HELD-R1-07…10` | GHI NHẬN | **Backlog, giữ nguyên, có lý do:** `-07` đáp án = cột N `Mapping L1` *(công thức)* — đổi đáp án cần chủ chốt Q3/Q4, ⛔ việc của vòng sửa · `-08` A∩B **9** ca — bể là hai mẫu từ CÙNG vũ trụ, loại trùng làm lệch `mong` từng tầng · `-09` **đã tự gỡ**: lượt dựng lần 2 đọc Ledge **hết 12.675 ô ngày · 0 lát hỏng** ⇒ đối chiếu kỳ ĐỎ cũ ⇒ **KHỚP** (xem dưới) · `-10` sàn đặt ở `-01` | — |
+
+### Đo thêm trong vòng sửa — **điều R1 chưa thấy**
+1. **Đối chiếu kỳ "đã chốt" ĐỎ vì lý do SAI** *(bản R0 cho cả kỳ ĐANG MỞ vào `ket`)*. Ledge đọc được lần này: **25/25 kỳ chốt khớp ảnh DT12 · mẫu số 12.675 ô ngày**; chỉ kỳ mở `2026-11` lệch *(ảnh 659 dòng · sống 701 — kỳ mở nhận thêm dòng sau ảnh: lớn lên là đúng)*. Sửa `doi_chieu_ky`: `ky_lech_ky_chot` (vào `ket`) tách khỏi `ky_lech_ky_mo` (chỉ in); bài `test_doi_chieu_ky_mo_lon_len_KO_do_nhung_ky_chot_lech_DO` **cả hai chiều** (Đ5). `ket` = **KHỚP**.
+2. **Bộ che `che_noi_dung` (AG, `AG-R1-03`) trên bể thật: lọt nhiều hơn bản cũ.** Nhãn: bộ dò độc lập `do_ro_ri_che`, mẫu số **65 / 70** nội dung — số TK *(dãy ≥ 8 số)* trước che **28 / 35** ⇒ sau che **17 / 24** *(R0 đo ở nền cũ: 1 / 3)*; ca bị lớp 2 `CamGui` chặn **9 / 11**. Nguyên nhân đo được: dãy số **DÍNH CHỮ** *(dạng mã `FT…` + 9–14 số)* — `MAU_CUM_SO` đòi `(?<![\w.\-])` nên ⛔ bắt dãy dính chữ, còn `\d{6,}` cũ thì bắt. Hệ quả ở vòng eval: `v1-gia-che-noi-dung` bị `CamGui` **từ chối gửi** *(10 / 14 chỗ)* — **cổng chạy đúng**, và nay được ghi là KẾT QUẢ có tên `bi_cam_gui` *(⛔ làm dừng cả vòng)*. **⛔ sửa `fls/agent/`** (che là TUỲ CHỌN theo chủ 06:00; chế độ chính `mo` ⛔ qua che) ⇒ **GHI NHẬN cho orchestrator**: nếu chủ muốn giữ `che_noi_dung`, cần WO cho AG nới `MAU_CUM_SO` bắt dãy dính chữ.
+
+### Bảng A ↔ B mới *(chỉ số; ⛔ nội dung · mẫu số chính **65** ca mỗi bể, `chua_chot` tách)*
+| | bể A · dữ liệu CŨ | bể B · dữ liệu THẬT hiện tại |
+|---|---|---|
+| ca / mong · ca có `tk` | 65 / 65 · **65** | 70 / 70 · **70** |
+| kỳ chốt · kỳ mở · đối chiếu kỳ chốt ↔ ảnh DT12 | 25 · 0 · **KHỚP** | 25 · 1 · **KHỚP** |
+| độc lập: trùng ca WO-329 · trùng prompt | 0 · 0 | 0 · 0 |
+| `v0-ma-tat-dinh` (`che_het`) nối · sai · người-bị-nối | 0 · 0 · 0 | 0 · 0 · 0 |
+| `v1-gia-mo` **(`mo` — CHÍNH)** nối · sai · recall phải-nối *(mẫu số 29 / 30)* · **ca phải-để-người bị nối** · L3 bị nối | 2 · 2 · 0,0 · **2** · 0 | 2 · 1 · 0,0333 · **1** · 0 |
+| `v1-gia-che-het` nối · sai · recall · người-bị-nối | 2 · 2 · 0,0 · 2 | 2 · 1 · 0,0333 · 1 |
+| `v1-gia-che-noi-dung` | ⛔ `CamGui` 10 chỗ | ⛔ `CamGui` 14 chỗ |
+| `chua_chot`: ca · agent nối *(⛔ recall)* — vòng `mo` | 0 · 0 | 5 · **0** |
+| điểm TB 0–2 — `mo` | 1,4923 | 1,5231 |
+| chuỗi 4 agent `mo`: ô khớp / mẫu số · lệch · ⛔ đo được | 631/631 · 0 · 0 | 631/631 · 0 · 0 |
+| chuỗi `che_het` · `che_noi_dung` ô khớp | 631/631 · 195/631 *(dừng ở A2)* | 631/631 · 195/631 |
+| G0 A2.04 chuỗi `mo`: nối · sai · recall · người-bị-nối | 2 · 2 · 0,0 · 2 | 2 · 1 · 0,0333 · 1 |
+
+Đọc bảng: bar thẻ `a3-1-ref` *(0 ca phải-để-người bị nối)* vẫn **CHẶN** ở cả hai bể ở **mọi** chế độ có chạy — luật giả `luat_gia_v1` nối 2 / 1 ca bằng "ứng viên DUY NHẤT khớp tiền+tiền tệ+ngày", ⛔ dùng nội dung ⇒ `mo` ≡ `che_het` ở mọi chỉ số; bể **chưa** đo được lợi ích của việc cho agent đọc nội dung + số TK *(cần mô hình thật — ngoài WO-338)*. `fleet_eval_voi.py --be-giu-rieng` exit **1** vì CHẶN, đúng mong.
+
+**Giả định** *(Q6 — hẹp nhất, chủ xác nhận)*: `tk` = cột `Tài khoản` của `Mapping L1` *(số TK của dòng sao kê)*; cột `Số tài khoản` của `PM_Unpivot` *(người nhận)* ⛔ đưa vào ca *(ca mang MỘT dòng bank; người nhận đã nằm ở ứng viên PM, mà ứng viên chỉ mang `pm · tiền · cur · ngày`)*. Khuyến nghị: giữ.

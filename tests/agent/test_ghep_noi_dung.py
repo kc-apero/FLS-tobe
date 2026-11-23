@@ -38,13 +38,13 @@ def test_cong_luat_ghep__chon_ngoai_ung_vien_hoac_lech_tien__DO():
 
 
 def test_fleet_eval_ba_vong__khai_mong():
-    """Mong (Đ5) trên bể DỰNG 12 ca: v0 0 nối · v1 tắt nội dung 2 nối · v1 bật nội dung 6 nối; 0 nối sai;
-    0 ca phải-để-người bị nối. Sửa luật/bể ⇒ ĐỎ ⇒ khai lại."""
+    """Mong (Đ5) trên bể DỰNG 12 ca: v0 0 nối · v1 che hết 2 · v1 che nội dung 6 · v1 MỞ (chủ 23/11) 6;
+    0 nối sai; 0 ca phải-để-người bị nối. Sửa luật/bể ⇒ ĐỎ ⇒ khai lại."""
     ca, dap, _ = fe.cav.bo_ca(cho_heldout=False)
     ds = [fe.chay_vong(m, l, c, ca, dap) for m, l, c in fe.VONG]
     assert [(v["tong_hop"]["so_noi"], v["tong_hop"]["noi_sai"], v["tong_hop"]["phai_nguoi_bi_noi"]) for v in ds] == \
-        [(0, 0, 0), (2, 0, 0), (6, 0, 0)]
-    assert [x["ket"] for x in fe.phan_xu(ds)] == ["ĐẠT bar"] * 3
+        [(0, 0, 0), (2, 0, 0), (6, 0, 0), (6, 0, 0)]
+    assert [x["ket"] for x in fe.phan_xu(ds)] == ["ĐẠT bar"] * 4
 
 
 def test_fleet_eval__luat_noi_bua_bi_CHAN():
@@ -52,6 +52,6 @@ def test_fleet_eval__luat_noi_bua_bi_CHAN():
     def bua(cells):
         return {f"noi:{c}.chon": cells[f"noi:{c}.uv.0.pm"] for c in gnd._ca(cells)}
     ca, dap, _ = fe.cav.bo_ca(cho_heldout=False)
-    v = fe.chay_vong("bua", bua, True, ca, dap)
+    v = fe.chay_vong("bua", bua, "mo", ca, dap)
     # luật cứng của skill chặn trước cả bộ chấm (ca c05/c06 lệch tiền tệ/tiền)
     assert v.get("loi") or v["cong_skill"]["dat"] is False or fe.phan_xu([v])[0]["chan"]

@@ -8,9 +8,13 @@
    Dừng ở đâu ⇒ `KqChuoi.dung_o` mang TÊN chỗ dừng (agent/skill + cổng + lý do) — ⛔ "lỗi chung".
 ⭐ Skill `bong` (G0 bóng) chịu cổng ① (luật cứng) nhưng ⛔ vào cửa ② — nó so với ĐÁP ÁN giữ riêng, ở khối riêng.
 ⭐ Skill `ma` ⛔ gọi mô hình: `01_soat_lop` = chính cửa ②; `04_report` = sinh trang (tools/chay_agent_voi.py).
+   Skill `ma` CÓ công cụ được tiêm (A4.02 `cong_hd1` · A4.03 `cong_hd2`) ⇒ MÃ chạy công cụ, đầu ra = kết quả
+   công cụ, vẫn qua cổng ① và cửa ② — ⛔ nhà cung cấp nào được dựng cho nó.
+   ⚠ Bia `AG-R1-06` (KQ-331): bản đầu để A4.02/03 `loai: lam` ⇒ gọi `gemini-3.8-flash` CHƯA ghim, ngược quyết chủ
+   C2 *"A4 MÃ THUẦN tới G1"* — và `--that` phải dựng nhà cung cấp Google ⇒ chạy thật A1–A3 cũng ⛔ được.
 
 Vòng một skill `lam`/`bong` (khuôn Messages, xem `mo_hinh.py`): user = prompt skill · mô hình gọi ĐÚNG công cụ
-của skill (tên khác ⇒ dừng) · kết quả công cụ (phía máy) đi vào `tool_result` · MỌI yêu cầu qua `che.che_yeu_cau`
+của skill (tên khác ⇒ dừng) · kết quả công cụ (phía máy) đi vào `tool_result` · MỌI yêu cầu qua `che.che_yeu_cau` (chế độ mặc định `mo` — chủ 23/11)
 TRƯỚC khi tới nhà cung cấp · mô hình trả chữ JSON `{mã ô: giá trị}`. Tối đa `SO_LUOT_TOI_DA` lượt.
 """
 from __future__ import annotations
@@ -37,6 +41,8 @@ class DinhNghiaAgent:
 
 
 #: Thứ tự chuỗi. Phương án A (Voi phase 1 §F0b — PROPOSED): A1–A3 Claude Opus 5.5 · A4 họ khác (Gemini 3.8 Flash).
+#: ⭐ Quyết chủ C2 (23/11): A4 là MÃ THUẦN tới G1 — `mo_hinh` của A4 chỉ là mô hình DỰ KIẾN cho G1 (giữ để canh
+#:    luật hai họ); hôm nay A4 ⛔ có skill `lam`/`bong` nên ⛔ được dựng nhà cung cấp (`can_mo_hinh`).
 AGENT = (
     DinhNghiaAgent("A1_RI", "A1 · Collect_raw_data (4 nguồn raw)", OPUS_5_5),
     DinhNghiaAgent("A2_PR_MAP", "A2 · Generate Group Ledger + Mapping", OPUS_5_5),
@@ -47,6 +53,14 @@ AGENT = (
 
 class LoiChuoi(RuntimeError):
     pass
+
+
+LOAI_GOI_MO_HINH = ("lam", "bong")
+
+
+def can_mo_hinh(ma_agent: str) -> bool:
+    """Agent có ít nhất một skill gọi mô hình (`lam`/`bong`)? ⛔ ⇒ ⛔ dựng nhà cung cấp cho nó (C2)."""
+    return any(s.loai in LOAI_GOI_MO_HINH for s in nap_bo(ma_agent))
 
 
 def kiem_hai_ho(agent: tuple[DinhNghiaAgent, ...] = AGENT) -> None:
@@ -96,7 +110,7 @@ def _cong_cu_def(s: Skill) -> dict:
 
 
 def chay_skill(dn: DinhNghiaAgent, he: str, s: Skill, ncc: NhaCungCap,
-               cong_cu: dict[str, Callable[[], dict]], cho_noi_dung: bool = False) -> KqSkill:
+               cong_cu: dict[str, Callable[[], dict]], che_do: str | None = None) -> KqSkill:
     kq = KqSkill(skill=s)
     if s.cong_cu not in cong_cu:
         kq.loi = f"công cụ `{s.cong_cu}` ⛔ được tiêm"
@@ -106,7 +120,7 @@ def chay_skill(dn: DinhNghiaAgent, he: str, s: Skill, ncc: NhaCungCap,
         for _ in range(SO_LUOT_TOI_DA):
             yc = {"model": dn.mo_hinh.ma, "max_tokens": MAX_TOKENS, "system": he,
                   "tools": [_cong_cu_def(s)], "messages": messages}
-            yc_che, bc = che_mod.che_yeu_cau(yc, cho_noi_dung=cho_noi_dung)
+            yc_che, bc = che_mod.che_yeu_cau(yc, che_do or che_mod.CHE_DO_MAC_DINH)
             kq.so_bo_che, kq.the_noi_dung = bc.so_bo, bc.the_noi_dung
             tl = ncc.goi(yc_che)
             kq.so_luot += 1
@@ -143,8 +157,21 @@ def chay_skill(dn: DinhNghiaAgent, he: str, s: Skill, ncc: NhaCungCap,
     return kq
 
 
+def chay_skill_ma(s: Skill, cong_cu: dict[str, Callable[[], dict]]) -> KqSkill:
+    """Skill `ma` có công cụ: MÃ gọi công cụ, đầu ra = kết quả công cụ (⛔ mô hình, ⛔ lượt API)."""
+    kq = KqSkill(skill=s)
+    try:
+        kq.may_cong_cu = cong_cu[s.cong_cu]()
+    except Exception as e:  # noqa: BLE001 — mọi lỗi công cụ ⇒ chuỗi DỪNG có tên
+        kq.loi = f"{type(e).__name__}: {e}"
+        return kq
+    kq.ra = dict(kq.may_cong_cu)
+    kq.dat_cong, kq.ly_do = chay_cong(s.cong, kq.ra, {"cong_cu": kq.may_cong_cu})
+    return kq
+
+
 def chay_chuoi(ncc_theo_agent: dict[str, NhaCungCap], cong_cu: dict[str, Callable[[], dict]],
-               may: dict[str, Any], dap_an: dict[str, Any] | None = None, cho_noi_dung: bool = False,
+               may: dict[str, Any], dap_an: dict[str, Any] | None = None, che_do: str | None = None,
                agent: tuple[DinhNghiaAgent, ...] = AGENT) -> KqChuoi:
     """Chạy chuỗi. `may` = số máy đã đo theo nguồn ô (`voi` · `hd2` · `nguon` · `cong`); `dap_an` = `{"noi": …}`."""
     kiem_hai_ho(agent)
@@ -159,20 +186,26 @@ def chay_chuoi(ncc_theo_agent: dict[str, NhaCungCap], cong_cu: dict[str, Callabl
                 ka.skills.append(KqSkill(skill=s))
                 continue
             if s.loai == "ma":
-                ka.skills.append(KqSkill(skill=s, dat_cong=True, ly_do="skill mã — chạy ở cửa ② / sinh trang"))
+                if s.cong_cu in cong_cu and s.mau_o:
+                    ks = chay_skill_ma(s, cong_cu)
+                    ka.skills.append(ks)
+                    if ks.loi or not ks.dat_cong:
+                        kc.dung_o = f"DỪNG ở {s.nhan} — " + (ks.loi or f"cổng `{s.cong}` ĐỎ: {ks.ly_do}")
+                else:
+                    ka.skills.append(KqSkill(skill=s, dat_cong=True, ly_do="skill mã — chạy ở cửa ② / sinh trang"))
                 continue
             ncc = ncc_theo_agent.get(dn.ma)
             if ncc is None:
                 ks = KqSkill(skill=s, loi=f"⛔ có nhà cung cấp cho {dn.ma}")
             else:
-                ks = chay_skill(dn, he, s, ncc, cong_cu, cho_noi_dung)
+                ks = chay_skill(dn, he, s, ncc, cong_cu, che_do)
             ka.skills.append(ks)
             if ks.loi or not ks.dat_cong:
                 kc.dung_o = f"DỪNG ở {s.nhan} — " + (ks.loi or f"cổng `{s.cong}` ĐỎ: {ks.ly_do}")
         # cửa ② — A4 (mã) soát agent này
         for ks in ka.skills:
             s = ks.skill
-            if s.loai == "lam":
+            if s.loai == "lam" or (s.loai == "ma" and s.mau_o):
                 ka.o += dc.doi_chieu_skill(s.nhan, s.mau_o, ks.ra, may)
             elif s.loai == "bong":
                 ka.o_bong += dc.doi_chieu_skill(s.nhan, s.mau_o, ks.ra, dap_an or {})

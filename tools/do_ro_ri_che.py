@@ -88,7 +88,10 @@ def do(ca: dict, meta: dict | None = None) -> dict[str, Any]:
             cam_gui += 1
     return {"mau_so_noi_dung": mau_so, "the_da_thay": the, "truoc_che": tru, "sau_che": sau,
             "tong_lot_sau_che": sum(sau.values()), "ca_bi_lop2_chan": cam_gui,
-            "hop_le": mau_so > 0 and sum(tru.values()) > 0}      # Đ3: bộ dò phải THẤY gì đó trên chữ chưa che
+            "hop_le": mau_so > 0 and sum(tru.values()) > 0,      # Đ3: bộ dò phải THẤY gì đó trên chữ chưa che (TỔNG)
+            # ⭐ `HELD-R1-04`: bản R0 chỉ kiểm TỔNG ⇒ loại có `truoc_che = 0` (đo 23/11: `email` · `so_chung_tu`) vẫn in
+            # "0 lọt sau che" như số đo — tập RỖNG. Nay từng loại khai riêng: `False` ⇒ "0 lọt" của loại ấy ⛔ có nghĩa.
+            "do_duoc_theo_loai": {k: tru[k] > 0 for k in tru}}
 
 
 def main(argv: list[str] | None = None) -> int:

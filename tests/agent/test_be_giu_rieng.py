@@ -39,7 +39,7 @@ def nguon_gia() -> dict:
     kys = sorted(CHOT_GIA) + ["2026-10"]                 # kỳ chuyển = 2026-10 ⛔ thuộc ảnh ⇒ B chốt, A ⛔ có
 
     def bank(ky, ref, nd, cur, tien, line=None, co=True):
-        r = [_serial(ky), ref, nd, cur, None if co else tien, tien if co else None, "TK"] + [None] * 6 + [line or "#N/A"]
+        r = [_serial(ky), ref, nd, cur, None if co else tien, tien if co else None, f"1903{len(l1):06d}"] + [None] * 6 + [line or "#N/A"]
         l1.append(r)
 
     def lenh(ky, ref, line, cur, tien):
@@ -262,6 +262,26 @@ def test_bo_do_so_tk_bat_day_xen_cach_ma_che_6_chu_so_lien_bo_sot():
     assert rr.dem_mot("so 12345", None)["so_tk"] == 0
 
 
+def test_che_hien_tai_so_tk_xen_cach_het_lot_ma_ten_co_dau_van_lot_DA_DO():
+    """`HELD-R1-03`: khoảng trống "che bỏ sót số TK xen cách + tên có dấu" từng chỉ nằm ở văn xuôi BG-339. Ghim SỐ ĐÃ ĐO
+    (bộ dò ĐỘC LẬP `do_ro_ri_che` chạy SAU `che.che_noi_dung`): số TK xen cách ⇒ 0 lọt; tên CÓ DẤU ⇒ 1 lọt (ứng viên).
+    Che là TUỲ CHỌN (chủ 23/11) nên ⛔ chặn; nhưng sửa che mà ⛔ khai lại số này ⇒ ĐỎ (Đ5, cả hai chiều)."""
+    from fls.agent import che
+    tk, _ = che.che_noi_dung("TK 0123 4567 89 chuyen")
+    assert rr.dem_mot("TK 0123 4567 89 chuyen", None)["so_tk"] == 1 and rr.dem_mot(tk, None)["so_tk"] == 0
+    ten, _ = che.che_noi_dung("Chuyen tien Nguyễn Văn An thanh toan")
+    assert rr.dem_mot("Chuyen tien Nguyễn Văn An thanh toan", None)["ten_ung_vien"] == 1
+    assert rr.dem_mot(ten, None)["ten_ung_vien"] == 1                                   # LỌT — số đã đo
+
+
+def test_ro_ri_hop_le_THEO_LOAI_loai_rong_ko_duoc_in_la_0_lot():
+    """`HELD-R1-04`: loại có `truoc_che = 0` ⇒ `do_duoc_theo_loai[loại] = False` (tập RỖNG, Đ3), dù TỔNG > 0."""
+    ca = {"ca": {"x": {"noi_dung": "so 0123456789 nhe"}}}
+    r = rr.do(ca, {"x": {"so_ct": None}})
+    assert r["hop_le"] and r["truoc_che"]["so_tk"] == 1                                 # tổng > 0
+    assert r["do_duoc_theo_loai"] == {"email": False, "so_tk": True, "so_chung_tu": False, "ten_ung_vien": False}
+
+
 def test_bo_do_so_chung_tu_bat_khi_con_nguyen():
     assert rr.dem_mot("FT26123ABC456", "FT26123ABC456")["so_chung_tu"] == 1
     assert rr.dem_mot("<SO>", "FT26123ABC456")["so_chung_tu"] == 0
@@ -279,23 +299,69 @@ def pool_gia(be_a, be_b, tmp_path_factory):
 def test_chay_be_chi_so_va_chua_chot_khong_vao_recall(pool_gia):
     kq = fe.chay_be(pool_gia / "b")
     n_pn = sum(1 for d in json.loads((pool_gia / "b" / "dap_an.json").read_text())["noi"].values() if d["nhom"] == "phai_noi")
-    assert "loi" not in kq and [v["phien_ban"] for v in kq["vong"]] == [m for m, _, _ in fe.VONG + fe.VONG_BE_THEM]
+    assert "loi" not in kq and [v["phien_ban"] for v in kq["vong"]] == [m for m, _, _ in fe.VONG]
     for v in kq["vong"]:
         t = v["be"]
         assert t["mau_so_chinh"] == 65 and t["chua_chot"]["so_ca"] == 5       # 70 ca − 5 chưa chốt
         assert t["so_phai_noi"] == n_pn >= 25          # A10 + B5 + C10 (+ ca chuyển hình A·B·C — nhóm theo ĐÁP ÁN)
-    v0, v2, v3, v4 = (v["be"] for v in kq["vong"])
-    assert v4["so_noi"] >= v3["so_noi"] and v4["mau_so_chinh"] == 65         # KHÔNG CHE thấy nhiều hơn bản đã che
+    v0, v1, v2, v3 = (v["be"] for v in kq["vong"])
+    assert [v["che_do"] for v in kq["vong"]][-1] == fe.CHE_CHINH == "mo"           # chủ 23/11: chế độ CHÍNH = `mo`, qua `chay_skill`
+    assert all(v["cong_skill"]["dat"] for v in kq["vong"]), "vòng phải đi qua cổng skill (HELD-R1-06)"
+    assert v3["so_noi"] >= v2["so_noi"] >= v1["so_noi"] and v3["mau_so_chinh"] == 65   # mở thấy nhiều hơn bản đã che
     assert v0["so_noi"] == 0 and v0["phai_nguoi_bi_noi"] == 0
-    assert v3["so_noi"] >= v2["so_noi"]
+
+
+def test_vong_che_bi_lop2_chan_thanh_KET_QUA_co_ten_con_mo_van_chay(be_a):
+    """Dãy số DÍNH CHỮ qua `che_noi_dung` ⇒ lớp 2 từ chối (đo 23/11 trên bể thật: 10/14 chỗ) — vòng che ghi `bi_cam_gui`
+    (có TÊN), ⛔ làm dừng cả vòng; chế độ `mo` (chính) vẫn chạy, qua `chay_skill`."""
+    import copy
+    ca = copy.deepcopy(be_a["ca"])
+    k = next(iter(ca["ca"]))
+    ca["ca"][k]["noi_dung"] = "CK FT26123456789012 tra tien"                # 14 chữ số dính chữ
+    from fls.agent import che
+    assert che.kiem_den({"messages": [{"role": "user", "content": che.che_noi_dung(ca["ca"][k]["noi_dung"])[0]}]})   # mẫu số: lớp 2 CẮN
+    luat = fe.VONG[1][1]
+    v = fe.chay_vong("t-che", luat, "che_noi_dung", ca, be_a["dap_an"])
+    assert "bi_cam_gui" in v and "loi" not in v and v["bi_cam_gui"].startswith("CamGui")
+    m = fe.chay_vong("t-mo", luat, "mo", ca, be_a["dap_an"])
+    assert "bi_cam_gui" not in m and m["tong_hop"]["so_ca"] > 0 and m["cong_skill"]["dat"]
+
+
+def test_o_ca_doc_tk_va_moi_ca_cua_be_co_tk(be_a, be_b):
+    """`HELD-R1-02`: `chay_agent_voi.o_ca` đọc `c["tk"]`; bản R0 bể 0/65 ca có `tk` ⇒ `KeyError`. Mong: 65/65 · 70/70, ⛔ rỗng."""
+    for b, n in ((be_a, 65), (be_b, 70)):
+        ca = b["ca"]["ca"]
+        assert len(ca) == n and sum(1 for c in ca.values() if c.get("tk")) == n          # mẫu số n > 0 (Đ3)
+        o = fe.cav.o_ca(b["ca"])                                                          # ⛔ KeyError
+        assert sum(1 for k in o if k.endswith(".tk") and o[k]) == n
+
+
+def test_tk_doc_tu_cot_G_va_ep_so_nguyen():
+    assert dbg._tk(1903000012.0) == "1903000012" and dbg._tk("  0123 ") == "0123" and dbg._tk(None) == "" and dbg._tk(True) == ""
+    dong, _ = dbg.doc_bank({"l1": [[_serial("2025-01"), "REF00001", "nd", "VND", 1, None, 1903000012.0] + [None] * 7]})
+    assert [d.tk for d in dong] == ["1903000012"]
+
+
+def test_muoi_on_dinh_theo_bi_mat_va_khac_giua_hai_be(monkeypatch):
+    """`HELD-R1-05`: muối dẫn xuất từ bí mật ngoài repo ⇒ dựng lại ở container khác cho CÙNG vân tay."""
+    monkeypatch.setenv(dbg.BIEN_MUOI, "ab" * 16)
+    a1, a2, b1 = dbg.muoi_be("a"), dbg.muoi_be("a"), dbg.muoi_be("b")
+    assert a1 == a2 and a1 != b1 and len(a1) == 16 and a1 != bytes.fromhex("ab" * 16)
+    monkeypatch.setenv(dbg.BIEN_MUOI, "cd" * 16)
+    assert dbg.muoi_be("a") != a1                                                      # đổi bí mật ⇒ đổi muối
+    monkeypatch.delenv(dbg.BIEN_MUOI)
+    monkeypatch.delenv("FLS_GSHEETS_SA_JSON_B64", raising=False)
+    monkeypatch.delenv("FLS_GSHEETS_SA_JSON", raising=False)
+    assert dbg.muoi_be("a") != dbg.muoi_be("a")                                        # ⛔ bí mật ⇒ ngẫu nhiên
 
 
 def test_chay_chuoi_be_dung_duong_o_ca_hai_co_noi_dung(pool_gia):
     for c in ("a", "b"):
-        for cho in (False, True):
+        for cho in fe.CHE_CHUOI:
             r = fe.chay_chuoi_be(pool_gia / c, cho)
             assert "loi" not in r, r
             assert r["mau_so"] > 0 and r["khop"] + r["lech"] <= r["mau_so"]
+            assert r["doc_lap"]["mau_so"] > 0 and r["vong_tron"]["mau_so"] > 0          # hai nhóm ô của AG, mẫu số ≠ 0
             assert r["g0"]["so_ca"] == len(json.loads((pool_gia / c / "ca.json").read_text())["ca"])
 
 
@@ -312,6 +378,18 @@ def test_doi_chieu_ky_lech_co_ten():
     song2 = song + [_serial("2025-05")]
     dc = dbg.doi_chieu_ky(song2)
     assert set(dc["ky_lech_so_dong"]) == {"2025-05"} and dc["mau_so_o_ngay_song"] == sum(dong_bang.values()) + 1
+
+
+def test_doi_chieu_ky_mo_lon_len_KO_do_nhung_ky_chot_lech_DO():
+    """Kỳ ĐANG MỞ lúc đóng băng nhận thêm dòng ⇒ lớn lên là ĐÚNG; kỳ ĐÃ CHỐT lệch mới là tín hiệu (Đ5 hai chiều)."""
+    dong_bang = json.loads(dbg.TEP_KY_DONG_BANG.read_text(encoding="utf-8"))["dong_theo_ky_o_cot_A"]
+    song = [_serial(k) for k, n in dong_bang.items() for _ in range(n)]
+    ky_mo, ky_chot = max(dong_bang), min(dong_bang)
+    assert ky_mo not in dbg.ky_chot_dong_bang() and ky_chot in dbg.ky_chot_dong_bang()
+    d1 = dbg.doi_chieu_ky(song + [_serial(ky_mo)] * 3)
+    assert d1["ky_lech_ky_chot"] == {} and set(d1["ky_lech_ky_mo"]) == {ky_mo} and d1["so_ky_chot_so_sanh"] == len(dong_bang) - 1
+    d2 = dbg.doi_chieu_ky(song + [_serial(ky_chot)])
+    assert set(d2["ky_lech_ky_chot"]) == {ky_chot} and d2["ky_lech_ky_mo"] == {}
 
 
 def test_ky_chot_dong_bang_bo_ky_moi_nhat():
@@ -336,7 +414,9 @@ def test_BE_che_ro_ri_phep_do_hop_le_va_ghim_so_da_do(c, pool_gia):
     d = _thu_muc(c, pool_gia)
     r = rr.do(json.loads((d / "ca.json").read_text(encoding="utf-8")), json.loads((d / "meta.json").read_text(encoding="utf-8")))
     assert r["hop_le"], f"bộ dò ⛔ thấy gì trên chữ chưa che (mẫu số {r['mau_so_noi_dung']}) — phép đo vô nghĩa"
-    assert r["ca_bi_lop2_chan"] == 0
+    assert 0 <= r["ca_bi_lop2_chan"] <= r["mau_so_noi_dung"]
+    if not _CO_BE:
+        assert r["ca_bi_lop2_chan"] == 0                  # bể GIẢ: số TK liền ⇒ che bắt hết; bể thật: số đo ghim ở DEM_BE
     if _CO_BE:
         assert r == json.loads(dbg.TEP_DEM.read_text(encoding="utf-8"))["be"][c]["ro_ri_che"]
 
@@ -371,6 +451,8 @@ def test_DEM_BE_nhat_quan():
         assert v["doc_lap"]["trung_ca_dung_wo329"] == 0 and v["doc_lap"]["trung_prompt_agent"] == 0
         assert v["doc_lap"]["so_tep_prompt_da_quet"] > 0                         # Đ3: tập quét ⛔ rỗng
         r = v["ro_ri_che"]
-        assert r["hop_le"] and r["mau_so_noi_dung"] == v["tong_ca"] and r["ca_bi_lop2_chan"] == 0
+        # `ca_bi_lop2_chan` ĐÃ ĐO 9/11 trên bể thật (che_noi_dung của AG ⛔ bắt dãy số DÍNH CHỮ) — che là TUỲ CHỌN ⇒ ⛔ chặn
+        assert r["hop_le"] and r["mau_so_noi_dung"] == v["tong_ca"] and 0 <= r["ca_bi_lop2_chan"] <= r["mau_so_noi_dung"]
+        assert r["do_duoc_theo_loai"] == {k: n > 0 for k, n in r["truoc_che"].items()}     # `HELD-R1-04`: khai theo LOẠI
     assert dem["be"]["a"]["mong_theo_tang"] == dbg.MONG_TANG
     assert dem["be"]["b"]["mong_theo_tang"] == dbg.MONG_TANG | {"chua_chot": dbg.MONG_CHUA_CHOT}

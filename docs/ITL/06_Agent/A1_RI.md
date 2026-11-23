@@ -8,7 +8,8 @@
 | **Đầu vào** | ảnh đóng băng 4 nguồn raw: Bank (`tests/fixture/pm_join.json` bank + `itl_ledge_adjustment.json` sổ AS-IS) · FPS (`pm_join.json` pm) · H1000 (`dau_vao/hr_ledger_2024/2025.json`) · PLT (`dau_vao/gi_cfa1.json` + `dap_an/{omc,sc,ps}_mid1.json`) |
 | **Đầu ra** | ô `nguon:<nguồn>.so_dong · dem_dong · van_tay` (+ `fps.co_ref`) — 9 ảnh |
 | **Công cụ được gọi** *(CHỈ hàm FLS có sẵn)* | `nguon_bank` · `nguon_fps` · `nguon_h1000` · `nguon_plt` = đếm dòng + đọc vân tay ảnh (`tools/chay_agent_voi.py:dem_nguon`) |
-| **Mô hình ghim** | `claude-opus-5-5` · họ `anthropic` · ghim ✅ · phương án A (PROPOSED — câu chủ C1) |
+| **Mô hình ghim** | `claude-opus-5-5` · họ `anthropic` · ghim — **CHƯA gọi thật** (bản phát lại do mô hình GIẢ sinh) · **phương án A — chủ chốt 23/11** |
+| **Dữ liệu & lưu giữ** *(chủ 23/11)* | agent đọc TOÀN BỘ nội dung giao dịch + số TK + tên (chỉ bỏ `Email Address`) · vận hành: Messages API dưới **ZDR** (bật theo tổ chức qua Anthropic) · fleet eval: **gửi theo lô** (Batches API — Anthropic giữ 29 ngày, đổi lấy −50 % giá; chủ chấp nhận) |
 | **Phiên bản** | checksum prompt `9f84a5b36e62d7b0` + mô hình ghim + checksum tham chiếu (tệp số máy đã đo) |
 | **Bước thông minh** | Hôm nay chỉ đếm + vân tay. Đề xuất G1 (Voi roadmap 01/03): đề xuất bản khai cho sheet mới · báo đổi bố cục cột. |
 | **Fleet eval** | chưa có thẻ riêng (Voi: `a1-khai-chup.eval.lech-cot-ngay` PROPOSED) |
@@ -26,11 +27,11 @@ Loại: `lam` = mô hình làm, A4 so 100 % với máy · `bong` = G0 bóng, so 
 
 ## Cổng ra của agent
 
-A4 (mã `fls/agent/doi_chieu.py`) so MỌI ô skill `lam` với số máy đã đo — mong: lệch 0 · ⛔ đo được 0 · thiếu 0 · thừa 0. Khác ⇒ agent TRƯỢT, chuỗi DỪNG, agent sau ⛔ chạy.
+A4 (mã `fls/agent/doi_chieu.py`) so MỌI ô skill `lam` (và skill `ma` có công cụ) với số máy đã đo — mong: lệch 0 · ⛔ đo được 0 · thiếu 0 · thừa 0. Khác ⇒ agent TRƯỢT, chuỗi DỪNG, agent sau ⛔ chạy.
 
 ## ⛔ Không được làm
 
 - ⛔ gọi API thật khi thiếu chốt (`--that` + `FLS_CHO_GOI_API=1` + khoá + mô hình ghim)
 - ⛔ ghi kho · ⛔ sửa ảnh · ⛔ sửa engine/tuyến — chỉ GỌI công cụ được cấp
 - ⛔ tính lại / làm tròn / thêm ô / bịa ô — A4 so từng ô với máy
-- ⛔ gửi `Diễn giải` · `Số chứng từ` · tên người · email · số TK — bộ che `NFR-I13` chạy trước mọi lời gọi
+- ⛔ gửi `Email Address` (`PM_COT_RIENG_TU`) — bộ che chạy trước mọi lời gọi; mặc định `mo` (chủ 23/11: nội dung · số TK · tên đi nguyên văn) ⇒ chạy thật đòi thêm chốt `FLS_ZDR_DA_BAT=1` (ZDR); `--che che_noi_dung`/`che_het` che lại

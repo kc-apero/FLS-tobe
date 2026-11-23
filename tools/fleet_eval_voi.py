@@ -37,9 +37,10 @@ import chay_agent_voi as cav  # noqa: E402
 TM_VONG = GOC / "docs" / "ITL" / "05_FleetEval" / "vong"
 #: (mã phiên bản, luật đứng thay mô hình, cờ gửi nội dung đã che). Thêm vòng = thêm MỘT dòng.
 VONG = (
-    ("v0-ma-tat-dinh", gnd.luat_v0, False),
-    ("v1-gia-tat-noi-dung", gnd.luat_gia_v1, False),
-    ("v1-gia-bat-noi-dung", gnd.luat_gia_v1, True),
+    ("v0-ma-tat-dinh", gnd.luat_v0, "che_het"),
+    ("v1-gia-che-het", gnd.luat_gia_v1, "che_het"),
+    ("v1-gia-che-noi-dung", gnd.luat_gia_v1, "che_noi_dung"),
+    ("v1-gia-mo", gnd.luat_gia_v1, "mo"),           # chủ 23/11: mặc định — nội dung + số TK nguyên văn
 )
 #: Bar (thẻ a3-1-ref, đề xuất): 0 ca "phải để người" bị nối · tỉ lệ nối sai ≤ v0 (v0 0/0 ⇒ bar = 0).
 BAR_PHAI_NGUOI_BI_NOI = 0
@@ -64,22 +65,23 @@ def _cham_mu(ra: dict, dap_an: dict, hat: int = 23) -> tuple[list[dict], dict]:
     return cham, gnd.tong_hop(cham)
 
 
-def chay_vong(ma: str, luat, cho_noi_dung: bool, ca: dict, dap_an: dict, hat: int = 23, khong_che: bool = False) -> dict:
-    """`khong_che=True` (chủ 23/11 ~06:00: agent được đọc TOÀN BỘ nội dung): luật đọc thẳng ô thô, ⛔ qua bộ che."""
-    dn = [a for a in ch.AGENT if a.ma == "A2_PR_MAP"][0]
-    if khong_che:
-        cham, th = _cham_mu(luat(cav.o_ca(ca)), dap_an, hat)
-        return {"phien_ban": ma, "mo_hinh": f"GIẢ ({luat.__name__}) thay {dn.mo_hinh.ma}", "cho_noi_dung": "KHÔNG CHE",
-                "tong_hop": th, "theo_nhom": {n: gnd.tong_hop([x for x in cham if x["nhom"] == n])
-                                              for n in ("phai_noi", "phai_nguoi")}, "cham": cham}
+def chay_vong(ma: str, luat, che_do: str, ca: dict, dap_an: dict, hat: int = 23) -> dict:
+    """MỘT vòng QUA `chay_skill` (cổng skill + chốt + bộ che theo `che_do`). ⭐ `HELD-R1-06`: bản R0 có nhánh
+    `khong_che` đọc thẳng `luat(cav.o_ca(ca))` ⇒ BỎ cổng skill — vòng ấy đo LUẬT, ⛔ đo đường ống. Chế độ
+    chính theo chủ 23/11 ~06:00 ("agent đọc TOÀN BỘ nội dung + số TK") nay là `che_do="mo"` — đi ĐÚNG đường ống."""
     s = [x for x in nap_bo("A2_PR_MAP") if x.loai == "bong"][0]
+    dn = [a for a in ch.AGENT if a.ma == "A2_PR_MAP"][0]
     ks = ch.chay_skill(dn, he_thong(dn.ma), s, mh.GiaLap({"ung_vien_ghep": luat}),
-                       {"ung_vien_ghep": lambda: cav.o_ca(ca)}, cho_noi_dung=cho_noi_dung)
+                       {"ung_vien_ghep": lambda: cav.o_ca(ca)}, che_do=che_do)
+    if ks.loi and ks.loi.startswith("CamGui") and che_do != CHE_CHINH:
+        # Lớp 2 của bộ che TỪ CHỐI gửi (số dài còn sót sau che) — chế độ che là TUỲ CHỌN, nên đây là KẾT QUẢ ĐO của che
+        # (đo 23/11 trên bể thật: che_noi_dung để lọt dãy số DÍNH CHỮ ⇒ bị chặn), ⛔ lỗi hạ tầng làm dừng cả vòng.
+        return {"phien_ban": ma, "che_do": che_do, "bi_cam_gui": ks.loi[:160]}
     if ks.loi or ks.ra is None:
         return {"phien_ban": ma, "loi": ks.loi or "⛔ đầu ra"}
     cham, th = _cham_mu(ks.ra, dap_an, hat)
     return {"phien_ban": ma, "mo_hinh": f"GIẢ ({luat.__name__}) thay {dn.mo_hinh.ma}",
-            "checksum_prompt": checksum_prompt("A2_PR_MAP"), "cho_noi_dung": cho_noi_dung,
+            "checksum_prompt": checksum_prompt("A2_PR_MAP"), "che_do": che_do,
             "cong_skill": {"dat": ks.dat_cong, "ly_do": ks.ly_do}, "the_noi_dung_che": ks.the_noi_dung,
             "tong_hop": th, "theo_nhom": {n: gnd.tong_hop([x for x in cham if x["nhom"] == n])
                                           for n in ("phai_noi", "phai_nguoi")},
@@ -105,7 +107,10 @@ BIEN_BE = cav.BIEN_HELDOUT
 TEP_BE_MD = TM_VONG / "BE_GIU_RIENG.md"
 TEP_BE_JSON = TM_VONG / "BE_GIU_RIENG.json"
 TEP_DEM_BE = GOC / "docs" / "ITL" / "05_FleetEval" / "be" / "DEM_BE.json"
-VONG_BE_THEM = (("v1-gia-khong-che", gnd.luat_gia_v1, "KHÔNG CHE"),)      # chủ 23/11 ~06:00: chế độ chính = KHÔNG che
+#: Chủ 23/11 ~06:00: chế độ CHÍNH = agent đọc TOÀN BỘ nội dung + số TK = `che_do="mo"` = vòng `v1-gia-mo` ở `VONG`
+#: (⛔ còn vòng riêng "KHÔNG CHE" bỏ cổng skill — `HELD-R1-06`). Che là TUỲ CHỌN: hai vòng `che_noi_dung` · `che_het`.
+CHE_CHINH = "mo"
+CHE_CHUOI = ("mo", "che_noi_dung", "che_het")        # chuỗi 4 agent: chính trước, rồi hai mức che tuỳ chọn
 NHOM_CHINH = ("phai_noi", "phai_nguoi", "l3")        # `chua_chot` ⛔ vào recall chính (WO-338 AC-7)
 
 
@@ -121,17 +126,17 @@ def tong_hop_be(cham: list[dict]) -> dict:
     return th
 
 
-def chay_chuoi_be(thu_muc: Path, cho_noi_dung: bool) -> dict:
+def chay_chuoi_be(thu_muc: Path, che_do: str) -> dict:
     """AC-6: chuỗi 4 agent ở chế độ GIẢ trên bể (⛔ API thật) ⇒ ô khớp/lệch agent ↔ máy + G0 của A2.04."""
     from fls.agent import report as rp
     cu = os.environ.get(BIEN_BE)
     os.environ[BIEN_BE] = str(thu_muc)
     try:
-        kc, may, dap_an, nhan = cav.chay("gia", cho_noi_dung)
-        _, tom = rp.sinh(kc, {}, cav.as_is_co_ten(may), cav.g0_tong_hop(kc, dap_an, nhan),
-                         {"voi_so_luong.json": "có" if may.get("voi") else "VẮNG", "hd2_cong.json": "có" if may.get("hd2") else "VẮNG"},
-                         date.today().isoformat())
+        ncc = cav.ncc_cho("gia")
+        kc, may, dap_an, nhan = cav.chay("gia", che_do, ncc=ncc)
+        _, tom = cav.sinh_report(kc, may, dap_an, nhan, ncc)
         return {"mau_so": tom["mau_so"], "khop": tom["khop"], "lech": tom["LECH"], "khong_do_duoc": tom["KHONG_DO_DUOC"],
+                "doc_lap": tom["doc_lap"], "vong_tron": tom["vong_tron"],
                 "agent_dat": f"{tom['agent_dat']}/{tom['agent']}", "dung_o": list(kc.dung_o or []),
                 "g0": cav.g0_tong_hop(kc, dap_an, nhan)}
     except Exception as e:                            # noqa: BLE001 — lỗi = ĐỎ có tên, ⛔ nuốt
@@ -147,16 +152,19 @@ def chay_be(thu_muc: Path) -> dict:
     ca = json.loads((thu_muc / "ca.json").read_text(encoding="utf-8"))
     dap_an = json.loads((thu_muc / "dap_an.json").read_text(encoding="utf-8"))
     vong = []
-    for m, luat, cho in VONG + VONG_BE_THEM:
-        # `bật nội dung` ở vòng 3 ⇒ cờ BẬT-đã-che; hai vòng đầu TẮT (mặc định WO-329 AC-3); vòng cuối KHÔNG CHE
-        v = chay_vong(m, luat, cho, ca, dap_an, khong_che=cho == "KHÔNG CHE")
+    for m, luat, che in VONG:
+        v = chay_vong(m, luat, che, ca, dap_an)
         if "loi" in v:
             return {"loi": v["loi"]}
+        if "bi_cam_gui" in v:                          # che tuỳ chọn bị lớp 2 chặn ⇒ có TÊN, ⛔ số giả
+            v["be"], v["theo_nhom_be"] = None, None
+            vong.append(v)
+            continue
         v["be"] = tong_hop_be(v["cham"])
         v["theo_nhom_be"] = {n: gnd.tong_hop([x for x in v["cham"] if x["nhom"] == n]) for n in NHOM_CHINH}
         v.pop("cham")
         vong.append(v)
-    return {"vong": vong, "chuoi": {"tat": chay_chuoi_be(thu_muc, False), "bat_da_che": chay_chuoi_be(thu_muc, True)}}
+    return {"vong": vong, "chuoi": {c: chay_chuoi_be(thu_muc, c) for c in CHE_CHUOI}}
 
 
 def _x(v) -> str:
@@ -183,8 +191,13 @@ def md_be(kq: dict, dem: dict) -> str:
         f"{d[c]['doc_lap']['trung_ca_dung_wo329']} · {d[c]['doc_lap']['trung_prompt_agent']}"))
     L += ["", "## Vòng GIẢ trên bể (recall CHÍNH = nhóm `phai_noi`; `chua_chot` ⛔ vào)", "",
           "| phiên bản (nội dung) | chỉ số | bể A | bể B |", "|---|---|---|---|"]
-    for i, (m, _, cho) in enumerate(VONG + VONG_BE_THEM):
-        nhan = f"`{m}` ({cho if isinstance(cho, str) else ('BẬT-đã-che' if cho else 'TẮT')})"
+    for i, (m, _, cho) in enumerate(VONG):
+        nhan = f"`{m}` (`{cho}`{' · CHÍNH' if cho == CHE_CHINH else ''})"
+        if any(kq[c]["vong"][i].get("be") is None for c in cot):
+            L.append(f"| {nhan} | **bị lớp 2 chặn (`CamGui`)** — ⛔ có số | " + " | ".join(
+                ("⛔ " + kq[c]["vong"][i]["bi_cam_gui"].split("—")[-1].strip()[:70]) if kq[c]["vong"][i].get("be") is None
+                else "đã chạy" for c in cot) + " |")
+            continue
         for ten, k in (("mẫu số chính (ca)", "mau_so_chinh"), ("nối", "so_noi"), ("nối sai", "noi_sai"), ("tỉ lệ nối sai", "ti_le_noi_sai"),
                        ("recall phải-nối", "recall_phai_noi"), ("ca phải-để-người bị nối", "phai_nguoi_bi_noi"),
                        ("L3 bị nối", "l3_bi_noi"), ("điểm TB (0–2)", "diem_tb")):
@@ -193,8 +206,8 @@ def md_be(kq: dict, dem: dict) -> str:
         L.append("| | `chua_chot`: ca · agent nối *(⛔ recall)* | " + " | ".join(
             f"{kq[c]['vong'][i]['be']['chua_chot']['so_ca']} · {kq[c]['vong'][i]['be']['chua_chot']['agent_noi']}" for c in cot) + " |")
     L += ["", "## Chuỗi 4 agent (GIẢ) — ô khớp ↔ máy *(mẫu số cổ định: các ô máy không phụ thuộc bể; phần phụ thuộc bể = G0 A2.04)*", "",
-          "| cờ nội dung | chỉ số | bể A | bể B |", "|---|---|---|---|"]
-    for k, nh in (("tat", "TẮT"), ("bat_da_che", "BẬT-đã-che")):
+          "| chế độ che | chỉ số | bể A | bể B |", "|---|---|---|---|"]
+    for k, nh in ((c, f"`{c}`{' · CHÍNH' if c == CHE_CHINH else ''}") for c in CHE_CHUOI):
         L.append(f"| {nh} | khớp / mẫu số · lệch · ⛔ đo được | " + " | ".join(
             (f"{kq[c]['chuoi'][k]['khop']}/{kq[c]['chuoi'][k]['mau_so']} · {kq[c]['chuoi'][k]['lech']} · {kq[c]['chuoi'][k]['khong_do_duoc']}"
              if "loi" not in kq[c]["chuoi"][k] else "⛔ " + kq[c]["chuoi"][k]["loi"]) for c in cot) + " |")
@@ -215,8 +228,10 @@ def md_be(kq: dict, dem: dict) -> str:
         L.append(f"- phép THAY THẾ *(khác vật đo)*: dòng bank sống ở `Mapping L1` ↔ dòng Ledge đóng băng, trên {tt.get('mau_so_ky')} kỳ — "
                  f"lệch **{len(kl)}** kỳ: " + ", ".join(f"`{k}` bank {v['bank_song']} · Ledge {v['ledge_dong_bang']}" for k, v in kl.items()))
     else:
-        L.append(f"- Ledge Final đọc hôm nay ↔ ảnh đóng băng DT12 — kỳ lệch số dòng: **{len(lg['ky_lech_so_dong'])}** {sorted(lg['ky_lech_so_dong'])} "
-                 f"*(mẫu số: {lg['mau_so_o_ngay_song']} ô ngày)*")
+        L.append(f"- Ledge Final đọc hôm nay ↔ ảnh đóng băng DT12 — kỳ ĐÃ CHỐT lệch số dòng: **{len(lg['ky_lech_ky_chot'])}**/"
+                 f"{lg['so_ky_chot_so_sanh']} {sorted(lg['ky_lech_ky_chot'])} *(mẫu số: {lg['mau_so_o_ngay_song']} ô ngày)*; "
+                 f"kỳ ĐANG MỞ (nhận thêm dòng sau ảnh — lớn lên là đúng): {len(lg['ky_lech_ky_mo'])} "
+                 + ", ".join(f"`{k}` ảnh {v['dong_bang']} · sống {v['song']}" for k, v in sorted(lg['ky_lech_ky_mo'].items())))
     return "\n".join(L) + "\n"
 
 
@@ -236,10 +251,13 @@ def main_be(ghi: bool) -> int:
     chan = False
     for c in ("a", "b"):
         print(f"── bể {c.upper()} · {dem['be'][c]['tong_ca']}/{dem['be'][c]['mong_tong']} ca ──")
-        for (m, _, cho), v in zip(VONG + VONG_BE_THEM, kq[c]["vong"]):
+        for (m, _, cho), v in zip(VONG, kq[c]["vong"]):
             t = v["be"]
+            if t is None:
+                print(f"  {m:24s} {cho:12s} ⛔ bị lớp 2 chặn: {v['bi_cam_gui'][:110]}")
+                continue
             chan |= t["phai_nguoi_bi_noi"] > BAR_PHAI_NGUOI_BI_NOI
-            print(f"  {m:24s} {cho if isinstance(cho, str) else ('BẬT' if cho else 'TẮT')}  nối {t['so_noi']:3d} sai {t['noi_sai']:3d} recall {_x(t['recall_phai_noi']):>6s} "
+            print(f"  {m:24s} {cho:12s} nối {t['so_noi']:3d} sai {t['noi_sai']:3d} recall {_x(t['recall_phai_noi']):>6s} "
                   f"người-bị-nối {t['phai_nguoi_bi_noi']} L3-bị-nối {t['l3_bi_noi']} chưa-chốt-nối {t['chua_chot']['agent_noi']}/{t['chua_chot']['so_ca']}")
     print("đối chiếu kỳ A↔B:", dem["doi_chieu_A_B"]["ket"])
     if ghi:

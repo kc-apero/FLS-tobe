@@ -20,7 +20,7 @@ from pathlib import Path
 GOC = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(GOC))
 
-from fls.agent.chuoi import AGENT  # noqa: E402
+from fls.agent.chuoi import AGENT, can_mo_hinh  # noqa: E402
 from fls.agent.skill import THU_MUC, checksum_prompt, nap_bo  # noqa: E402
 
 TM = GOC / "docs" / "ITL" / "06_Agent"
@@ -64,13 +64,14 @@ VAI = {
   cong_cu="`doi_chieu` (mã `fls/agent/doi_chieu.py`) · `cong_hd1` = `fls.repo.doc_bao_cao.doc_cong_tep_do` · "
           "`cong_hd2` = `doc_cong_hd2` · `report` (mã `fls/agent/report.py`)",
   eval="`a4-soat.eval.lot-chan` (chấm bằng họ khác: Claude Opus 5.5)", the_eval=("a4-soat.md",),
-  thong_minh="Phán là MÃ; mô hình chỉ chép cổng. Đề xuất G0 (Voi 23/11–11/12): CHỈ THÊM cờ giải thích lệch, ⛔ bỏ cờ v0."),
+  thong_minh="MÃ THUẦN tới G1 (quyết chủ C2): phán và đọc cổng đều là mã, ⛔ lượt API. Đề xuất G0 (Voi 23/11–11/12): CHỈ THÊM cờ giải thích lệch, ⛔ bỏ cờ v0."),
 }
 
 CAM_CHUNG = ("⛔ gọi API thật khi thiếu chốt (`--that` + `FLS_CHO_GOI_API=1` + khoá + mô hình ghim)",
              "⛔ ghi kho · ⛔ sửa ảnh · ⛔ sửa engine/tuyến — chỉ GỌI công cụ được cấp",
              "⛔ tính lại / làm tròn / thêm ô / bịa ô — A4 so từng ô với máy",
-             "⛔ gửi `Diễn giải` · `Số chứng từ` · tên người · email · số TK — bộ che `NFR-I13` chạy trước mọi lời gọi")
+             "⛔ gửi `Email Address` (`PM_COT_RIENG_TU`) — bộ che chạy trước mọi lời gọi; mặc định `mo` (chủ 23/11: nội dung · "
+             "số TK · tên đi nguyên văn) ⇒ chạy thật đòi thêm chốt `FLS_ZDR_DA_BAT=1` (ZDR); `--che che_noi_dung`/`che_het` che lại")
 
 
 def the(ag) -> str:
@@ -84,7 +85,13 @@ def the(ag) -> str:
             f"| **Đầu vào** | {v['vao']} |",
             f"| **Đầu ra** | {v['ra']} |",
             f"| **Công cụ được gọi** *(CHỈ hàm FLS có sẵn)* | {v['cong_cu']} |",
-            f"| **Mô hình ghim** | `{m.ma}` · họ `{m.ho}` · {'ghim ✅' if m.ghim else '**CHƯA ghim** (tên tạm — câu chủ C2)'} · phương án A (PROPOSED — câu chủ C1) |",
+            (f"| **Mô hình ghim** | `{m.ma}` · họ `{m.ho}` · {'ghim — **CHƯA gọi thật** (bản phát lại do mô hình GIẢ sinh)' if m.ghim else '**CHƯA ghim**'} · **phương án A — chủ chốt 23/11** |"
+             if can_mo_hinh(ag.ma) else
+             f"| **Mô hình** | **MÃ THUẦN tới G1** (quyết chủ C2) — ⛔ gọi mô hình, ⛔ dựng nhà cung cấp · dự kiến G1: `{m.ma}` họ `{m.ho}` "
+             f"({'ghim' if m.ghim else 'CHƯA ghim'}) |"),
+            "| **Dữ liệu & lưu giữ** *(chủ 23/11)* | agent đọc TOÀN BỘ nội dung giao dịch + số TK + tên (chỉ bỏ `Email Address`) · "
+            "vận hành: Messages API dưới **ZDR** (bật theo tổ chức qua Anthropic) · fleet eval: **gửi theo lô** (Batches API — "
+            "Anthropic giữ 29 ngày, đổi lấy −50 % giá; chủ chấp nhận) |",
             f"| **Phiên bản** | checksum prompt `{checksum_prompt(ag.ma)}` + mô hình ghim + checksum tham chiếu (tệp số máy đã đo) |",
             f"| **Bước thông minh** | {v['thong_minh']} |",
             f"| **Fleet eval** | {v['eval']} |",
@@ -95,7 +102,7 @@ def the(ag) -> str:
                     f"`{s.cong_cu}` | `{s.cong}` |")
     dong += ["", "Loại: `lam` = mô hình làm, A4 so 100 % với máy · `bong` = G0 bóng, so với đáp án giữ riêng, ⛔ ghi · "
              "`ma` = mã tất định, ⛔ mô hình.", "", "## Cổng ra của agent", "",
-             "A4 (mã `fls/agent/doi_chieu.py`) so MỌI ô skill `lam` với số máy đã đo — mong: lệch 0 · ⛔ đo được 0 · "
+             "A4 (mã `fls/agent/doi_chieu.py`) so MỌI ô skill `lam` (và skill `ma` có công cụ) với số máy đã đo — mong: lệch 0 · ⛔ đo được 0 · "
              "thiếu 0 · thừa 0. Khác ⇒ agent TRƯỢT, chuỗi DỪNG, agent sau ⛔ chạy.", "", "## ⛔ Không được làm", ""]
     dong += [f"- {x}" for x in CAM_CHUNG]
     return "\n".join(dong) + "\n"

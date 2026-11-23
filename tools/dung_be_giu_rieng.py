@@ -63,7 +63,7 @@ SID_ADJ = "1r4WemIbazqYQLtin6FbUn3VghIi3WiskjhAtMGk1yXA"        # ITL … 2/2 (A
 TAB_L1, TAB_PM, TAB_LEDGE = "Transaction Mapping L1", "[Importrange]PM_Unpivot", "ITL Ledge"
 L1_DONG1, PM_DONG1, LEDGE_DONG1, LEDGE_CUOI = 4, 3, 10, 12684
 #: Cột `Mapping L1` dùng: ngày · số chứng từ · diễn giải · tiền tệ · Nợ · Có · … · ID PMLine (cột N, vị trí 13).
-L1_COT = {"ngay": 0, "so_ct": 1, "dien_giai": 2, "cur": 3, "no": 4, "co": 5, "id_pmline": 13}
+L1_COT = {"ngay": 0, "so_ct": 1, "dien_giai": 2, "cur": 3, "no": 4, "co": 5, "tk": 6, "id_pmline": 13}
 L1_TIEU_DE_MONG_DOI = {0: "Ngày chứng từ", 1: "Số chứng từ", 2: "Diễn giải", 3: "Đơn vị tiền tệ", 4: "PS Nợ", 5: "PS Có",
                        13: "ID PMLine"}
 EPOCH = dt.date(1899, 12, 30)
@@ -157,6 +157,7 @@ class DongNguon:
     cur: str
     tien: Decimal
     id_l1: str | None            # `ID PMLine` ở Mapping L1 (None = ô lỗi/rỗng)
+    tk: str = ""                 # cột G `Tài khoản` của `Mapping L1` — ⭐ HELD-R1-02: chủ 23/11 ~06:00 "agent đọc TOÀN BỘ nội dung + số TK"
 
 
 def kiem_tieu_de(nguon: dict) -> list[str]:
@@ -173,6 +174,15 @@ def kiem_tieu_de(nguon: dict) -> list[str]:
     return loi
 
 
+def _tk(v: Any) -> str:
+    """Số TK dạng chữ: Sheets UNFORMATTED trả SỐ cho ô toàn chữ số (`1.2345E+10` ⛔ — ép nguyên khi là số nguyên)."""
+    if v is None or isinstance(v, bool):
+        return ""
+    if isinstance(v, float) and v == int(v):
+        return str(int(v))
+    return str(v).strip()
+
+
 def doc_bank(nguon: dict) -> tuple[list[DongNguon], dict[str, int]]:
     ra, bo = [], Counter()
     for i, r in enumerate(nguon["l1"]):
@@ -187,7 +197,7 @@ def doc_bank(nguon: dict) -> tuple[list[DongNguon], dict[str, int]]:
             continue
         id_l1 = None if (r[13] in (None, "") or la_o_loi(r[13])) else str(r[13]).strip()
         ra.append(DongNguon(L1_DONG1 + i, ng, canon_ref(r[1]), str(r[2] or ""), cur, (no or Decimal(0)) + (co or Decimal(0)),
-                            id_l1))
+                            id_l1, _tk(r[L1_COT["tk"]])))
     return ra, dict(bo)
 
 
@@ -317,6 +327,20 @@ def chon_ca(ung: list[Ung], ky_cho_phep: set[str], ky_mo: set[str], ky_chuyen: s
     return ra, thieu
 
 
+BIEN_MUOI = "FLS_MUOI_BE"
+
+
+def muoi_be(ten: str) -> bytes:
+    """Muối vân tay 128 bit của bể `ten`. ⭐ `HELD-R1-05`: bản R0 `secrets.token_bytes` mỗi lần dựng ⇒ dựng lại ĐÚNG
+    (mọi đếm khớp) vẫn ĐỎ `test_BE_van_tay_khop_tep_dem_repo`. Nay DẪN XUẤT từ một bí mật ngoài repo, bền qua container:
+    `FLS_MUOI_BE` (hex) nếu có, ngược lại khoá SA chỉ-đọc (secret của môi trường) ⇒ `HMAC-SHA256(bí mật, "be/<ten>")[:16]`.
+    ⛔ không bí mật nào ⇒ ngẫu nhiên (bể GIẢ của bài thử; vân tay lúc ấy ⛔ so với tệp đếm của repo)."""
+    bi_mat = os.environ.get(BIEN_MUOI) or os.environ.get("FLS_GSHEETS_SA_JSON_B64") or os.environ.get("FLS_GSHEETS_SA_JSON")
+    if not bi_mat:
+        return secrets.token_bytes(16)
+    return hmac.new(bi_mat.encode(), f"fls-be-giu-rieng/{ten}".encode(), hashlib.sha256).digest()[:16]
+
+
 def dung_be(nguon: dict, *, ten: str, ky_chot_dong_bang: set[str], ky_mo_ngay_chay: set[str], hat: int = HAT) -> dict[str, Any]:
     """Dựng MỘT bể (`ten` = `a` | `b`). Trả `{ca, dap_an, meta, muoi, dem, do}` — chưa ghi đĩa."""
     la_b = ten == "b"
@@ -333,15 +357,15 @@ def dung_be(nguon: dict, *, ten: str, ky_chot_dong_bang: set[str], ky_mo_ngay_ch
         ky_mo = set()
     ky_chuyen = max(ky_chot) if ky_chot else None
     rng = random.Random(hat + (1 if la_b else 0))
-    muoi = secrets.token_bytes(16)
+    muoi = muoi_be(ten)
     chon, thieu = chon_ca(ung, ky_cho_phep, ky_mo, ky_chuyen, rng, la_b)
     thu_tu = [(t, u) for t, us in chon.items() for u in us]
     rng.shuffle(thu_tu)                                          # id ca ⛔ lộ tầng
     ca, dap, meta = {}, {}, {}
     for i, (t, u) in enumerate(thu_tu, 1):
         c = f"c{i:03d}"
-        ca[c] = {"tien": _so(u.dong.tien), "cur": u.dong.cur, "ngay": u.dong.ngay.isoformat(), "noi_dung": u.dong.nd,
-                 "ung_vien": _ung_vien(u, pm, ngay_pm_, muoi, rng)}
+        ca[c] = {"tien": _so(u.dong.tien), "cur": u.dong.cur, "ngay": u.dong.ngay.isoformat(), "tk": u.dong.tk,
+                 "noi_dung": u.dong.nd, "ung_vien": _ung_vien(u, pm, ngay_pm_, muoi, rng)}
         if t == "chua_chot" or u.ky in ky_mo:
             nhom = "chua_chot"
             chon_pm = alias_pm(muoi, u.pm_dung[0].line) if u.hinh in ("A", "B", "C") else DE_NGUOI
@@ -451,9 +475,14 @@ def doi_chieu_ky(ledge_ngay: list, tep: Path = TEP_KY_DONG_BANG) -> dict[str, An
         sống[ky_cua(d)] += 1
     lech = {k: {"dong_bang": dong_bang.get(k), "song": sống.get(k, 0)}
             for k in sorted(set(dong_bang) | set(sống)) if dong_bang.get(k) != sống.get(k, 0)}
+    # ⭐ Phép đo mang nhãn "kỳ ĐÃ CHỐT": kỳ ĐANG MỞ lúc đóng băng (20/11) còn nhận dòng mới ⇒ LỚN LÊN là đúng (đo 23/11 lần
+    #   Ledge đọc được: 25 kỳ chốt khớp, chỉ kỳ mở lệch). Bản R0 cho cả kỳ mở vào `ket` ⇒ ĐỎ vì lý do SAI.
+    chot = ky_chot_dong_bang(tep)
+    lech_chot = {k: v for k, v in lech.items() if k in chot}
     return {"so_ky_dong_bang": len(dong_bang), "so_ky_song": len(sống), "ky_song_khong_co_o_dong_bang":
             sorted(set(sống) - set(dong_bang)), "ky_dong_bang_vang_o_song": sorted(set(dong_bang) - set(sống)),
-            "ky_lech_so_dong": lech, "o_ngay_khong_giai_ma": khong_giai, "mau_so_o_ngay_song": sum(sống.values())}
+            "ky_lech_so_dong": lech, "ky_lech_ky_chot": lech_chot, "ky_lech_ky_mo": {k: v for k, v in lech.items() if k not in chot},
+            "so_ky_chot_so_sanh": len(chot), "o_ngay_khong_giai_ma": khong_giai, "mau_so_o_ngay_song": sum(sống.values())}
 
 
 def ky_chot_dong_bang(tep: Path = TEP_KY_DONG_BANG) -> set[str]:
@@ -513,7 +542,7 @@ def main(argv: list[str] | None = None) -> int:
         "mau_so_ky": len(dbang), "ky_lech": {k: {"bank_song": bk.get(k, 0), "ledge_dong_bang": dbang.get(k)}
                                              for k in sorted(set(dbang) | set(bk)) if bk.get(k, 0) != dbang.get(k)}}
     do_duoc = not dc["lat_ledge_hong"] and dc["mau_so_o_ngay_song"] > 0              # Đ3/Đ5: ⛔ đo được ⇒ ĐỎ
-    ket_ky = be_a["ky_chot"] == be_b["ky_chot"] and not dc["ky_lech_so_dong"] and do_duoc
+    ket_ky = be_a["ky_chot"] == be_b["ky_chot"] and not dc["ky_lech_ky_chot"] and do_duoc
     sys.path.insert(0, str(GOC / "tools"))
     import do_ro_ri_che as rr            # cùng thư mục tools/ — phép đo của TUỲ CHỌN che (chủ 23/11 ~06:00: ⛔ điều kiện chặn)
     out = {"ngay_doc": nguon["ngay_doc"], "ky_mo_ngay_chay": sorted(ky_mo),

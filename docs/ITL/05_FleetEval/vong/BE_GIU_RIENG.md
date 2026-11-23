@@ -23,7 +23,7 @@
 
 | phiên bản (nội dung) | chỉ số | bể A | bể B |
 |---|---|---|---|
-| `v0-ma-tat-dinh` (TẮT) | mẫu số chính (ca) | 65 | 65 |
+| `v0-ma-tat-dinh` (`che_het`) | mẫu số chính (ca) | 65 | 65 |
 |  | nối | 0 | 0 |
 |  | nối sai | 0 | 0 |
 |  | tỉ lệ nối sai | — | — |
@@ -32,7 +32,7 @@
 |  | L3 bị nối | 0 | 0 |
 |  | điểm TB (0–2) | 1.5538 | 1.5385 |
 | | `chua_chot`: ca · agent nối *(⛔ recall)* | 0 · 0 | 5 · 0 |
-| `v1-gia-tat-noi-dung` (TẮT) | mẫu số chính (ca) | 65 | 65 |
+| `v1-gia-che-het` (`che_het`) | mẫu số chính (ca) | 65 | 65 |
 |  | nối | 2 | 2 |
 |  | nối sai | 2 | 1 |
 |  | tỉ lệ nối sai | 1.0 | 0.5 |
@@ -41,16 +41,8 @@
 |  | L3 bị nối | 0 | 0 |
 |  | điểm TB (0–2) | 1.4923 | 1.5231 |
 | | `chua_chot`: ca · agent nối *(⛔ recall)* | 0 · 0 | 5 · 0 |
-| `v1-gia-bat-noi-dung` (BẬT-đã-che) | mẫu số chính (ca) | 65 | 65 |
-|  | nối | 2 | 2 |
-|  | nối sai | 2 | 1 |
-|  | tỉ lệ nối sai | 1.0 | 0.5 |
-|  | recall phải-nối | 0.0 | 0.0333 |
-|  | ca phải-để-người bị nối | 2 | 1 |
-|  | L3 bị nối | 0 | 0 |
-|  | điểm TB (0–2) | 1.4923 | 1.5231 |
-| | `chua_chot`: ca · agent nối *(⛔ recall)* | 0 · 0 | 5 · 0 |
-| `v1-gia-khong-che` (KHÔNG CHE) | mẫu số chính (ca) | 65 | 65 |
+| `v1-gia-che-noi-dung` (`che_noi_dung`) | **bị lớp 2 chặn (`CamGui`)** — ⛔ có số | ⛔ từ chối gửi: dãy ≥ 9 chữ số trong chuỗi (số TK?): 10 chỗ | ⛔ từ chối gửi: dãy ≥ 9 chữ số trong chuỗi (số TK?): 14 chỗ |
+| `v1-gia-mo` (`mo` · CHÍNH) | mẫu số chính (ca) | 65 | 65 |
 |  | nối | 2 | 2 |
 |  | nối sai | 2 | 1 |
 |  | tỉ lệ nối sai | 1.0 | 0.5 |
@@ -62,16 +54,17 @@
 
 ## Chuỗi 4 agent (GIẢ) — ô khớp ↔ máy *(mẫu số cổ định: các ô máy không phụ thuộc bể; phần phụ thuộc bể = G0 A2.04)*
 
-| cờ nội dung | chỉ số | bể A | bể B |
+| chế độ che | chỉ số | bể A | bể B |
 |---|---|---|---|
-| TẮT | khớp / mẫu số · lệch · ⛔ đo được | 627/627 · 0 · 0 | 627/627 · 0 · 0 |
-| TẮT | G0 A2.04: nối · sai · recall · người-bị-nối | 2 · 2 · 0.0 · 2 | 2 · 1 · 0.0333 · 1 |
-| BẬT-đã-che | khớp / mẫu số · lệch · ⛔ đo được | 627/627 · 0 · 0 | 627/627 · 0 · 0 |
-| BẬT-đã-che | G0 A2.04: nối · sai · recall · người-bị-nối | 2 · 2 · 0.0 · 2 | 2 · 1 · 0.0333 · 1 |
+| `mo` · CHÍNH | khớp / mẫu số · lệch · ⛔ đo được | 631/631 · 0 · 0 | 631/631 · 0 · 0 |
+| `mo` · CHÍNH | G0 A2.04: nối · sai · recall · người-bị-nối | 2 · 2 · 0.0 · 2 | 2 · 1 · 0.0333 · 1 |
+| `che_noi_dung` | khớp / mẫu số · lệch · ⛔ đo được | 195/631 · 0 · 0 | 195/631 · 0 · 0 |
+| `che_noi_dung` | G0 A2.04: nối · sai · recall · người-bị-nối | None · None · None · None | None · None · None · None |
+| `che_het` | khớp / mẫu số · lệch · ⛔ đo được | 631/631 · 0 · 0 | 631/631 · 0 · 0 |
+| `che_het` | G0 A2.04: nối · sai · recall · người-bị-nối | 2 · 2 · 0.0 · 2 | 2 · 1 · 0.0333 · 1 |
 
 ## Đối chiếu kỳ ĐÃ CHỐT A ↔ B
 
-- kết: **ĐỎ — ⛔ đo được: Ledge sống ⛔ đọc hết giờ (ô ngày giải mã 0, lát hỏng 0)**
+- kết: **KHỚP**
 - tập kỳ chốt A = B: **True** *(A 25 kỳ · B 25 kỳ)*
-- Ledge Final đọc hôm nay ↔ ảnh đóng băng DT12: **⛔ đo được** (mẫu số 0 ô ngày giải mã; lát hỏng 0 — đọc Ledge hết giờ liên tục) ⇒ ĐỎ, ⛔ coi là KHỚP
-- phép THAY THẾ *(khác vật đo)*: dòng bank sống ở `Mapping L1` ↔ dòng Ledge đóng băng, trên 26 kỳ — lệch **8** kỳ: `2025-11` bank 475 · Ledge 477, `2026-02` bank 438 · Ledge 439, `2026-03` bank 582 · Ledge 584, `2026-04` bank 599 · Ledge 600, `2026-05` bank 536 · Ledge 537, `2026-06` bank 611 · Ledge 613, `2026-07` bank 683 · Ledge 686, `2026-11` bank 748 · Ledge 659
+- Ledge Final đọc hôm nay ↔ ảnh đóng băng DT12 — kỳ ĐÃ CHỐT lệch số dòng: **0**/25 [] *(mẫu số: 12675 ô ngày)*; kỳ ĐANG MỞ (nhận thêm dòng sau ảnh — lớn lên là đúng): 1 `2026-11` ảnh 659 · sống 701

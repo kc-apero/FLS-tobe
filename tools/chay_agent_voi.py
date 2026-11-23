@@ -4,7 +4,7 @@
     python tools/chay_agent_voi.py                     # phát lại · in KẾT · exit 0 khi ĐẠT
     python tools/chay_agent_voi.py --ghi-report        # + ghi docs/ITL/06_Agent/report.html
     python tools/chay_agent_voi.py --gia --ghi-phat-lai  # mô hình GIẢ tất định ⇒ ghi lại bản phát lại
-    python tools/chay_agent_voi.py --cho-noi-dung      # bật gửi nội dung giao dịch ĐÃ CHE (câu chủ C4)
+    python tools/chay_agent_voi.py --che che_het       # che lại (mặc định `mo` — chủ 23/11: agent đọc toàn bộ)
     python tools/chay_agent_voi.py --that              # ⛔ WO-329. Chỉ chạy khi thêm FLS_CHO_GOI_API=1 + khoá
 
 ⭐ Công cụ agent gọi = CHỈ hàm FLS có sẵn, tiêm vào chuỗi từ đây (gói `fls.agent` ⛔ biết kho/tuyến):
@@ -133,7 +133,7 @@ def bo_ca(cho_heldout: bool = True) -> tuple[dict, dict, str]:
 def o_ca(ca: dict) -> dict[str, Any]:
     ra: dict[str, Any] = {}
     for k, c in ca["ca"].items():
-        for f in ("tien", "cur", "ngay", "noi_dung"):
+        for f in ("tien", "cur", "ngay", "tk", "noi_dung"):
             ra[f"noi:{k}.{f}"] = c[f]
         for i, u in enumerate(c["ung_vien"]):
             for f in ("pm", "tien", "cur", "ngay"):
@@ -206,11 +206,17 @@ def as_is_co_ten(may: dict) -> list[tuple[str, str, Any]]:
     return ra
 
 
-def ncc_cho(che_do: str, co_that: bool = False, luat: dict | None = None) -> dict[str, Any]:
+def ncc_cho(che_do: str, co_that: bool = False, luat: dict | None = None, che: str | None = None) -> dict[str, Any]:
+    """Nhà cung cấp theo agent — CHỈ cho agent có skill gọi mô hình (`ch.can_mo_hinh`).
+
+    ⚠ Bia `AG-R1-06`: bản đầu dựng cho cả 4 agent ⇒ `--that` dựng Google cho A4 ⇒ `GoogleChuaDung` chặn luôn A1–A3.
+    """
     ra: dict[str, Any] = {}
     for dn in ch.AGENT:
+        if not ch.can_mo_hinh(dn.ma):
+            continue
         if che_do == "that":
-            ra[dn.ma] = mh.tao_that(dn.mo_hinh, co_that)
+            ra[dn.ma] = mh.tao_that(dn.mo_hinh, co_that, che or ch.che_mod.CHE_DO_MAC_DINH)
         elif che_do == "gia":
             ra[dn.ma] = mh.GiaLap(luat if luat is not None else {"ung_vien_ghep": gnd.luat_gia_v1})
         else:
@@ -222,6 +228,8 @@ def ghi_phat_lai(ncc: dict[str, mh.GhiLai]) -> None:
     from fls.agent.skill import checksum_prompt
     TM_PHAT_LAI.mkdir(parents=True, exist_ok=True)
     for dn in ch.AGENT:
+        if dn.ma not in ncc:
+            continue
         g = ncc[dn.ma]
         d = {"_vi_sao": "Bản ghi PHÁT LẠI — sinh bằng mô hình GIẢ tất định (`--gia --ghi-phat-lai`), ⛔ lượt API thật. "
                         "Tra theo vân tay yêu cầu ĐÃ CHE; prompt/dữ liệu đổi ⇒ ⛔ có lượt ⇒ ĐỎ.",
@@ -242,14 +250,38 @@ def g0_tong_hop(kc: ch.KqChuoi, dap_an: dict, nhan_be: str) -> dict[str, Any] | 
     return {"be": nhan_be, **gnd.tong_hop(gnd.cham(ks[0].ra, phang))}
 
 
-def chay(che_do: str = "phat_lai", cho_noi_dung: bool = False, co_that: bool = False,
+def phien_ban_cua(ncc: dict[str, Any]) -> dict[str, dict[str, Any]]:
+    """Nguồn trả lời THẬT SỰ của từng agent — đọc từ nhà cung cấp, ⛔ từ mã mô hình (bia `AG-R1-01`).
+
+    Phát lại ⇒ trường `nguon_tra_loi` ghi trong tệp phát lại (hôm nay `gia-lap`); bọc ghi ⇒ nhà cung cấp gốc.
+    """
+    ra: dict[str, dict[str, Any]] = {}
+    for ma, n in ncc.items():
+        if isinstance(n, mh.PhatLai):
+            ra[ma] = {"nguon_tra_loi": str(n.dau.get("nguon_tra_loi", "⛔ rõ")), "che_do": "phat-lai"}
+        elif isinstance(n, mh.GhiLai):
+            ra[ma] = {"nguon_tra_loi": n.goc.ten, "che_do": "ghi"}
+        else:
+            ra[ma] = {"nguon_tra_loi": getattr(n, "ten", "⛔ rõ"), "che_do": "truc-tiep"}
+    return ra
+
+
+def sinh_report(kc: ch.KqChuoi, may: dict, dap_an: dict, nhan_be: str, ncc: dict[str, Any],
+                ngay: str | None = None) -> tuple[str, dict[str, Any]]:
+    return rp.sinh(kc, phien_ban_cua(ncc), as_is_co_ten(may), g0_tong_hop(kc, dap_an, nhan_be),
+                   {"voi_so_luong.json": (may.get("voi") or {}).get("nguon", {}).get("so_dong_bang", "VẮNG")
+                    if may.get("voi") else "VẮNG", "hd2_cong.json": "có" if may.get("hd2") else "VẮNG"},
+                   ngay or date.today().isoformat(), may=may)
+
+
+def chay(che_do: str = "phat_lai", che: str | None = None, co_that: bool = False,
          tep_voi: Path = TEP_VOI, tep_hd2: Path = TEP_HD2, fx: Path = FX, ncc: dict | None = None,
          cho_heldout: bool = True) -> tuple[ch.KqChuoi, dict, dict, str]:
     ca, dap_an, nhan_be = bo_ca(cho_heldout)
     cc = dung_cong_cu(tep_voi, tep_hd2, fx, ca)
     may = dung_may(tep_voi, tep_hd2, fx)
     ncc = ncc if ncc is not None else ncc_cho(che_do, co_that)
-    kc = ch.chay_chuoi(ncc, cc, may, dap_an=dap_an, cho_noi_dung=cho_noi_dung)
+    kc = ch.chay_chuoi(ncc, cc, may, dap_an=dap_an, che_do=che)
     return kc, may, dap_an, nhan_be
 
 
@@ -259,11 +291,12 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--that", action="store_true", help="gọi API THẬT — ⛔ trong WO-329; cần FLS_CHO_GOI_API=1 + khoá")
     p.add_argument("--ghi-phat-lai", action="store_true", help="(với --gia) ghi docs/ITL/06_Agent/phat_lai/*.json")
     p.add_argument("--ghi-report", action="store_true", help="ghi docs/ITL/06_Agent/report.html")
-    p.add_argument("--cho-noi-dung", action="store_true", help="gửi nội dung giao dịch ĐÃ CHE (câu chủ C4)")
+    p.add_argument("--che", choices=("mo", "che_noi_dung", "che_het"), default=None,
+                   help="chế độ che (mặc định `mo` — chủ 23/11: agent đọc toàn bộ nội dung + số TK)")
     a = p.parse_args(argv)
     che_do = "that" if a.that else ("gia" if a.gia else "phat_lai")
     try:
-        ncc = ncc_cho(che_do, a.that)
+        ncc = ncc_cho(che_do, a.that, che=a.che)
     except (mh.CamGoiThat, mh.ChuaDung, mh.KhongCoBanGhi) as e:
         print(f"⛔ {type(e).__name__}: {e}")
         return 2
@@ -272,14 +305,9 @@ def main(argv: list[str] | None = None) -> int:
             print("⛔ --ghi-phat-lai chỉ đi với --gia")
             return 2
         ncc = {k: mh.GhiLai(v) for k, v in ncc.items()}
-    kc, may, dap_an, nhan_be = chay(che_do, a.cho_noi_dung, a.that, ncc=ncc)
-    html_, tom = rp.sinh(kc, {}, as_is_co_ten(may), g0_tong_hop(kc, dap_an, nhan_be),
-                         {"voi_so_luong.json": (may.get("voi") or {}).get("nguon", {}).get("so_dong_bang", "VẮNG")
-                          if may.get("voi") else "VẮNG", "hd2_cong.json": "có" if may.get("hd2") else "VẮNG"},
-                         date.today().isoformat())
-    print(f"KẾT: {'ĐẠT' if tom['dat'] else 'ĐỎ'} — {tom['khop']}/{tom['mau_so']} ô khớp · lệch {tom['LECH']} · "
-          f"⛔ đo được {tom['KHONG_DO_DUOC']} · thiếu {tom['AGENT_THIEU']} · thừa {tom['AGENT_THUA']} · "
-          f"chưa chạy {tom['CHUA_CHAY']} · A4 ĐẠT {tom['agent_dat']}/{tom['agent']}")
+    kc, may, dap_an, nhan_be = chay(che_do, a.che, a.that, ncc=ncc)
+    html_, tom = sinh_report(kc, may, dap_an, nhan_be, ncc)
+    print("KẾT: " + rp.dong_ket(tom))
     if kc.dung_o:
         print("  ⛔", kc.dung_o)
     for ag in kc.agents:

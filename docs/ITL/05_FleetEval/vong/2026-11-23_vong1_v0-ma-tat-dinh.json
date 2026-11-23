@@ -1,10 +1,10 @@
 {
  "be": "ca DỰNG trong repo (⛔ dữ liệu thật)",
- "checksum_be": "7bf678fcb945d5cc",
+ "checksum_be": "1a792ab498f2c45f",
  "phien_ban": "v0-ma-tat-dinh",
  "mo_hinh": "GIẢ (luat_v0) thay claude-opus-5-5",
- "checksum_prompt": "4b629ff21f901479",
- "cho_noi_dung": false,
+ "checksum_prompt": "e9d149e87fff5474",
+ "che_do": "che_het",
  "cong_skill": {
   "dat": true,
   "ly_do": "12 ca: 0 vi phạm luật cứng"
