@@ -87,6 +87,13 @@ Bước **02 · 03 · 04** + `Dockerfile` + kịch bản UAT + README trình t�
 | 6 | **Công cụ nạp nguồn lấy token Sheets bằng SA cục bộ gắn cứng** (`tools/nap_that.py` · `nap_mapping_master.py`: `gcloud auth print-access-token --account claude-code-access@…`) | đọc mã | ⛔ chạy ở Cloud Shell nếu ⛔ khoá SA ⇒ `04 --nguon-that` luôn từ chối + nói lý do; chờ C3 |
 | 7 | **`kiem_so_song.py`/`dong_bo_so_song.py` gọi `.venv/Scripts/lint-imports.exe`** *(đường Windows)* ⇒ `FileNotFoundError` trên Linux; và cả hai đòi **kho có sổ thật** | `tools/kiem_so_song.py:406`; sau khi đặt liên kết `.venv/Scripts/lint-imports.exe → ../bin/lint-imports`: "⛔ không đo được: kho ⛔ không có dấu thời điểm của lần nạp / ảnh chụp" | đỏ-có-sẵn của container (kho rỗng) — ⛔ do WO này |
 
+## 5b · Lần chạy THẬT bước 01 — 23/11 *(chủ, Cloud Shell, `fp-a-project`; do orchestrator báo)*
+- Lần 1: ①–⑤ xong; **⑥ HỎNG** — `iam service-accounts create` xong rồi `projects add-iam-policy-binding` báo `INVALID_ARGUMENT: Service account … does not exist` (IAM lan truyền trễ) ⇒ `set -e` dừng, ⛔ in BÁO CÁO. Lần 2: **12/12 ĐẠT** (instance `fls-staging` RUNNABLE · kho `fls` · 4 tài khoản · 5 bí mật · SA `fls-staging-app@fp-a-project…` có `cloudsql.client` + `secretAccessor`).
+- **Vá (đúng một chỗ, ⛔ đổi hành vi khác):** bước ⑥ thử lại CÓ HẠN (≤ 12 lần × 5 s; `FLS_STG_THU_LAI`/`FLS_STG_CHO_GIAY`); hết hạn ⇒ lỗi CÓ TÊN `IAM_KHONG_LAN_TRUYEN` và **vẫn in BÁO CÁO** (mục "SA có cloudsql.client" ĐỎ). Bài `tests/staging/test_01_iam_lan_truyen.py` (3 bài, gcloud GIẢ): hỏng 2 lần rồi được ⇒ đúng 3 lần gọi + ĐẠT · hỏng mãi ⇒ đúng 5 lần + lỗi có tên + BÁO CÁO + ĐỎ · được ngay ⇒ 1 lần. Sàn pytest 4865 → **4868**.
+- ⚠ Mục BÁO CÁO chỉ đo `cloudsql.client`; `secretAccessor` hỏng ⇒ lỗi có tên ở stderr, ⛔ có mục ĐỎ riêng (giữ nguyên báo cáo 12 mục theo yêu cầu).
+- Số thật dùng cho 02/03/04: `fp-a-project` · `asia-southeast1` · `fls-staging` · `fp-a-project:asia-southeast1:fls-staging`. Chủ có `roles/owner` + `run.admin` + `artifactregistry.admin` + `storage.admin` ⇒ **Cloud Run + Artifact Registry dùng được** (⇒ B khả thi về quyền; vẫn vướng luật loopback của cửa, §3).
+- Cloud Shell chỉ upload từng tệp, ⛔ có repo clone ⇒ README có mục "Đưa mã lên Cloud Shell" (clone nhánh STG, hoặc `git archive` + upload); 03 đòi `git archive` nên cần git repo (snapshot `git init` cũng được).
+
 ## 6 · Kho thật
 - `KHONG_CHAM`. Cụm PG phiên `localhost:5437`; bài thử tạo kho scratch `fls_stg_<pid>` + vai `fls_admin` `fls_ghi` `fls_doc` `stg_qt_<pid>` (+ `cloudsqlsuperuser` nếu cụm chưa có) và **dọn khi xong**. Đường lùi: `DROP DATABASE … WITH (FORCE)` + `DROP ROLE` đã nằm trong fixture.
 

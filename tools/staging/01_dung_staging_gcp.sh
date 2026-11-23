@@ -131,13 +131,30 @@ if [ "$KIEM" -eq 0 ]; then
   else
     "${G[@]}" iam service-accounts create "$SA_NAME" --display-name="FLS staging — máy chạy cửa API"
   fi
-  "${G[@]}" projects add-iam-policy-binding "$PROJECT" \
-      --member="serviceAccount:$SA_EMAIL" --role=roles/cloudsql.client --condition=None >/dev/null
+  # ⭐ Lần chạy THẬT 23/11: `iam service-accounts create` xong ngay, nhưng `add-iam-policy-binding` ngay sau đó báo
+  #   `INVALID_ARGUMENT: Service account … does not exist` (IAM lan truyền trễ) ⇒ `set -e` chết im, ⛔ in BÁO CÁO.
+  #   ⇒ thử lại CÓ HẠN (≤ 12 lần × 5 giây, chỉnh bằng FLS_STG_THU_LAI / FLS_STG_CHO_GIAY); hết hạn ⇒ lỗi CÓ TÊN, ⛔ dừng:
+  #   vẫn đi tiếp tới BÁO CÁO để phép ⛔ đo được hiện ĐỎ (Đ5).
+  THU_LAI="${FLS_STG_THU_LAI:-12}"; CHO_GIAY="${FLS_STG_CHO_GIAY:-5}"
+  thu_lai() {   # chạy "$@" tới khi được hoặc hết lượt; ⛔ in lỗi của gcloud giữa chừng
+    local i
+    for i in $(seq 1 "$THU_LAI"); do
+      if "$@" >/dev/null 2>&1; then return 0; fi
+      [ "$i" -lt "$THU_LAI" ] && { echo "   (lần $i/$THU_LAI chưa được — chờ ${CHO_GIAY}s cho IAM lan truyền)"; sleep "$CHO_GIAY"; }
+    done
+    return 1
+  }
+  IAM_LOI=0
+  thu_lai "${G[@]}" projects add-iam-policy-binding "$PROJECT" \
+      --member="serviceAccount:$SA_EMAIL" --role=roles/cloudsql.client --condition=None \
+    || { echo "⛔ IAM_KHONG_LAN_TRUYEN: không gán được roles/cloudsql.client cho $SA_EMAIL sau $THU_LAI lần" >&2; IAM_LOI=1; }
   for s in "${SECRETS[@]}"; do
-    "${G[@]}" secrets add-iam-policy-binding "$s" \
-        --member="serviceAccount:$SA_EMAIL" --role=roles/secretmanager.secretAccessor >/dev/null
+    thu_lai "${G[@]}" secrets add-iam-policy-binding "$s" \
+        --member="serviceAccount:$SA_EMAIL" --role=roles/secretmanager.secretAccessor \
+      || { echo "⛔ IAM_KHONG_LAN_TRUYEN: không gán được secretAccessor trên $s sau $THU_LAI lần" >&2; IAM_LOI=1; }
   done
-  echo "   cloudsql.client + secretAccessor trên ${#SECRETS[@]} bí mật"
+  [ "$IAM_LOI" -eq 0 ] && echo "   cloudsql.client + secretAccessor trên ${#SECRETS[@]} bí mật" \
+    || echo "   ⛔ gán vai chưa đủ — sang BÁO CÁO (mục \"SA có cloudsql.client\" sẽ ĐỎ); chạy lại script khi IAM ổn"
 fi
 
 # ══════════════════════════════ BÁO CÁO — gửi lại phần này ══════════════════════════════

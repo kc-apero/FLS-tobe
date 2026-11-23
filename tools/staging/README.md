@@ -4,7 +4,12 @@
 > ⛔ **Chưa script nào chạy thật trên GCP** (đo 23/11). Mỗi script đã được thử với `gcloud` GIẢ + `cloud-sql-proxy` GIẢ + **`psql` · `pg_migrate` · quyền PostgreSQL THẬT** trên kho cục bộ (`tests/staging/`, 130 bài) — nên cú pháp, thứ tự, quyền và BÁO CÁO đã được chứng minh ĐỎ-khi-hỏng; còn những giả định về **chính GCP** ở §"Giả định chưa kiểm" bên dưới sẽ lộ ra ở BÁO CÁO thật.
 > Nội dung gửi lại ⛔ chứa mật khẩu/khoá: BÁO CÁO chỉ có tên, cấu hình, số đếm (bài thử quét rò rỉ: 0 chỗ).
 
-Chuẩn bị một lần: trong Cloud Shell `git clone` repo, `cd` vào, chọn project: `gcloud config set project <PROJECT_ID>`. Dưới đây viết `P` = `<PROJECT_ID>`.
+Chuẩn bị một lần. Dưới đây viết `P` = `<PROJECT_ID>` (staging thật: `fp-a-project`, instance `fls-staging`, `asia-southeast1`; bước 01 đã ĐẠT 12/12 ngày 23/11).
+
+**Đưa mã lên Cloud Shell** — 02/03/04 cần cây mã (`fls/`, `tools/`, `tools/staging/sql/`, `requirements.txt`, `Dockerfile`, `tests/fixture/cau_hinh/`, và với 03 cả git để `git archive`), ⛔ chỉ mỗi một tệp `.sh`. Cách ngắn nhất, chọn một:
+1. `git clone` repo vào `~/fls` rồi `git checkout claude/bold-galileo-zukpaf-isp/STG` (cần quyền đọc repo từ Cloud Shell) — **bắt buộc cho 03** (script đòi `git archive HEAD`).
+2. Không có quyền clone: trên máy bạn `git archive --format=tar.gz -o fls.tar.gz HEAD`, **Upload** `fls.tar.gz` lên Cloud Shell, `mkdir ~/fls && tar -xzf fls.tar.gz -C ~/fls && cd ~/fls && git init -q && git add -A && git -c user.email=x -c user.name=x commit -qm snap` (đủ cho 02/04 và cho `git archive` của 03; ⛔ có `sao_luu/` `hien_vat/` vì `git archive` chỉ lấy tệp đã commit).
+Script 01 chỉ cần chính nó (đã chạy xong). Script 02/04 tự tạo venv + `pip install psycopg` (cần mạng ra PyPI — Cloud Shell có).
 
 | Bước | Lệnh (Cloud Shell) | Mất bao lâu *(ước — ⛔ đo được ở GCP)* | Gửi lại |
 |---|---|---|---|
