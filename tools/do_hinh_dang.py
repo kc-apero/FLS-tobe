@@ -33,7 +33,11 @@ import urllib.parse
 import urllib.request
 
 SA = "claude-code-access@fpa-t-494007.iam.gserviceaccount.com"
-API = "https://sheets.googleapis.com/v4/spreadsheets/"
+try:                      # ⭐ WO-334: gốc API + token qua MỘT chỗ (`tools/staging/cred_sheets.py`) — tương thích khi ⛔ khai gì
+    from tools.staging.cred_sheets import api_goc as _api_goc, lay_token as _lay_token
+except ImportError:       # chạy tệp trực tiếp, `tools` ⛔ trên đường dẫn
+    _api_goc = _lay_token = None
+API = _api_goc() if _api_goc else "https://sheets.googleapis.com/v4/spreadsheets/"
 
 # ── Nguon trong pham vi `Đ2` (owner chot 2026-09-07: 6 sheet + archetype `R |`)
 NGUON = {
@@ -51,6 +55,8 @@ NGUON = {
 
 
 def token() -> str:
+    if _lay_token is not None:
+        return _lay_token()
     r = subprocess.run(
         ["gcloud", "auth", "print-access-token", "--account", SA, "--scopes",
          "https://www.googleapis.com/auth/spreadsheets.readonly"],
