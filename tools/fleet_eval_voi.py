@@ -205,8 +205,18 @@ def md_be(kq: dict, dem: dict) -> str:
     L += ["", "## Đối chiếu kỳ ĐÃ CHỐT A ↔ B", "",
           f"- kết: **{dc['ket']}**",
           f"- tập kỳ chốt A = B: **{dc['ky_chot_A'] == dc['ky_chot_B']}** *(A {len(dc['ky_chot_A'])} kỳ · B {len(dc['ky_chot_B'])} kỳ)*",
-          f"- Ledge Final đọc hôm nay ↔ ảnh đóng băng DT12 — kỳ lệch số dòng: **{len(dc['ledge_song_vs_dong_bang']['ky_lech_so_dong'])}** "
-          f"{sorted(dc['ledge_song_vs_dong_bang']['ky_lech_so_dong']) or ''} *(mẫu số: {dc['ledge_song_vs_dong_bang']['mau_so_o_ngay_song']} ô ngày giải mã được)*"]
+          ]
+    lg = dc["ledge_song_vs_dong_bang"]
+    if lg["mau_so_o_ngay_song"] == 0:                  # Đ3: mẫu số 0 ⇒ phép đo ⛔ có nghĩa, ⛔ in "lệch 26 kỳ"
+        L.append(f"- Ledge Final đọc hôm nay ↔ ảnh đóng băng DT12: **⛔ đo được** (mẫu số 0 ô ngày giải mã; lát hỏng "
+                 f"{len(lg.get('lat_ledge_hong', []))} — đọc Ledge hết giờ liên tục) ⇒ ĐỎ, ⛔ coi là KHỚP")
+        tt = lg.get("thay_the_bank_song_vs_ledge_dong_bang") or {}
+        kl = tt.get("ky_lech", {})
+        L.append(f"- phép THAY THẾ *(khác vật đo)*: dòng bank sống ở `Mapping L1` ↔ dòng Ledge đóng băng, trên {tt.get('mau_so_ky')} kỳ — "
+                 f"lệch **{len(kl)}** kỳ: " + ", ".join(f"`{k}` bank {v['bank_song']} · Ledge {v['ledge_dong_bang']}" for k, v in kl.items()))
+    else:
+        L.append(f"- Ledge Final đọc hôm nay ↔ ảnh đóng băng DT12 — kỳ lệch số dòng: **{len(lg['ky_lech_so_dong'])}** {sorted(lg['ky_lech_so_dong'])} "
+                 f"*(mẫu số: {lg['mau_so_o_ngay_song']} ô ngày)*")
     return "\n".join(L) + "\n"
 
 

@@ -506,6 +506,12 @@ def main(argv: list[str] | None = None) -> int:
     da = ghi_be(ra, be_a), ghi_be(ra, be_b)
     dc = doi_chieu_ky(nguon["ledge_ngay"])
     dc["lat_ledge_hong"] = nguon.get("ledge_loi", [])
+    # Phép THAY THẾ (khác vật đo — Đ4): dòng bank sống ở `Mapping L1` theo kỳ ↔ dòng Ledge ĐÓNG BĂNG DT12 theo kỳ.
+    dbang = json.loads(TEP_KY_DONG_BANG.read_text(encoding="utf-8"))["dong_theo_ky_o_cot_A"]
+    bk = be_a["vu_tru"]["bank_theo_ky"]
+    dc["thay_the_bank_song_vs_ledge_dong_bang"] = {
+        "mau_so_ky": len(dbang), "ky_lech": {k: {"bank_song": bk.get(k, 0), "ledge_dong_bang": dbang.get(k)}
+                                             for k in sorted(set(dbang) | set(bk)) if bk.get(k, 0) != dbang.get(k)}}
     do_duoc = not dc["lat_ledge_hong"] and dc["mau_so_o_ngay_song"] > 0              # Đ3/Đ5: ⛔ đo được ⇒ ĐỎ
     ket_ky = be_a["ky_chot"] == be_b["ky_chot"] and not dc["ky_lech_so_dong"] and do_duoc
     sys.path.insert(0, str(GOC / "tools"))
@@ -514,7 +520,7 @@ def main(argv: list[str] | None = None) -> int:
            "be": {"a": dem_cua(be_a, da[0], {"ro_ri_che": rr.do(be_a["ca"], be_a["meta"])}),
                   "b": dem_cua(be_b, da[1], {"ro_ri_che": rr.do(be_b["ca"], be_b["meta"])})},
            "doi_chieu_A_B": {"ledge_song_vs_dong_bang": dc, "ky_chot_A": be_a["ky_chot"], "ky_chot_B": be_b["ky_chot"],
-                             "ket": "KHỚP" if ket_ky else ("ĐỎ — ⛔ đo được: lát Ledge hỏng " + str(dc["lat_ledge_hong"]) if not do_duoc
+                             "ket": "KHỚP" if ket_ky else (f"ĐỎ — ⛔ đo được: Ledge sống ⛔ đọc hết giờ (ô ngày giải mã {dc['mau_so_o_ngay_song']}, lát hỏng {len(dc['lat_ledge_hong'])})" if not do_duoc
                                                 else "ĐỎ — kỳ đã chốt lệch (nguồn đã sửa sau chốt?)")}}
     TEP_DEM.parent.mkdir(parents=True, exist_ok=True)
     TEP_DEM.write_text(json.dumps(out, ensure_ascii=False, indent=1, sort_keys=True) + "\n", encoding="utf-8")

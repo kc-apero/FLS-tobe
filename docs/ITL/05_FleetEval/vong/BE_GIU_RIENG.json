@@ -1,0 +1,758 @@
+{
+ "ngay": "2026-11-23",
+ "doi_chieu_A_B": "ĐỎ — ⛔ đo được: Ledge sống ⛔ đọc hết giờ (ô ngày giải mã 0, lát hỏng 0)",
+ "kq": {
+  "a": {
+   "vong": [
+    {
+     "phien_ban": "v0-ma-tat-dinh",
+     "mo_hinh": "GIẢ (luat_v0) thay claude-opus-5-5",
+     "checksum_prompt": "4b629ff21f901479",
+     "cho_noi_dung": false,
+     "cong_skill": {
+      "dat": true,
+      "ly_do": "65 ca: 0 vi phạm luật cứng"
+     },
+     "the_noi_dung_che": 0,
+     "tong_hop": {
+      "so_ca": 65,
+      "so_noi": 0,
+      "noi_sai": 0,
+      "ti_le_noi_sai": null,
+      "recall_phai_noi": 0.0,
+      "phai_nguoi_bi_noi": 0,
+      "diem_tb": 1.5538
+     },
+     "theo_nhom": {
+      "phai_noi": {
+       "so_ca": 29,
+       "so_noi": 0,
+       "noi_sai": 0,
+       "ti_le_noi_sai": null,
+       "recall_phai_noi": 0.0,
+       "phai_nguoi_bi_noi": 0,
+       "diem_tb": 1.0
+      },
+      "phai_nguoi": {
+       "so_ca": 25,
+       "so_noi": 0,
+       "noi_sai": 0,
+       "ti_le_noi_sai": null,
+       "recall_phai_noi": null,
+       "phai_nguoi_bi_noi": 0,
+       "diem_tb": 2.0
+      }
+     },
+     "be": {
+      "so_ca": 65,
+      "so_noi": 0,
+      "noi_sai": 0,
+      "ti_le_noi_sai": null,
+      "recall_phai_noi": 0.0,
+      "phai_nguoi_bi_noi": 0,
+      "diem_tb": 1.5538,
+      "l3_bi_noi": 0,
+      "mau_so_chinh": 65,
+      "so_phai_noi": 29,
+      "chua_chot": {
+       "so_ca": 0,
+       "agent_noi": 0
+      }
+     },
+     "theo_nhom_be": {
+      "phai_noi": {
+       "so_ca": 29,
+       "so_noi": 0,
+       "noi_sai": 0,
+       "ti_le_noi_sai": null,
+       "recall_phai_noi": 0.0,
+       "phai_nguoi_bi_noi": 0,
+       "diem_tb": 1.0
+      },
+      "phai_nguoi": {
+       "so_ca": 25,
+       "so_noi": 0,
+       "noi_sai": 0,
+       "ti_le_noi_sai": null,
+       "recall_phai_noi": null,
+       "phai_nguoi_bi_noi": 0,
+       "diem_tb": 2.0
+      },
+      "l3": {
+       "so_ca": 11,
+       "so_noi": 0,
+       "noi_sai": 0,
+       "ti_le_noi_sai": null,
+       "recall_phai_noi": null,
+       "phai_nguoi_bi_noi": 0,
+       "diem_tb": 2.0
+      }
+     }
+    },
+    {
+     "phien_ban": "v1-gia-tat-noi-dung",
+     "mo_hinh": "GIẢ (luat_gia_v1) thay claude-opus-5-5",
+     "checksum_prompt": "4b629ff21f901479",
+     "cho_noi_dung": false,
+     "cong_skill": {
+      "dat": true,
+      "ly_do": "65 ca: 0 vi phạm luật cứng"
+     },
+     "the_noi_dung_che": 0,
+     "tong_hop": {
+      "so_ca": 65,
+      "so_noi": 2,
+      "noi_sai": 2,
+      "ti_le_noi_sai": 1.0,
+      "recall_phai_noi": 0.0,
+      "phai_nguoi_bi_noi": 2,
+      "diem_tb": 1.4923
+     },
+     "theo_nhom": {
+      "phai_noi": {
+       "so_ca": 29,
+       "so_noi": 0,
+       "noi_sai": 0,
+       "ti_le_noi_sai": null,
+       "recall_phai_noi": 0.0,
+       "phai_nguoi_bi_noi": 0,
+       "diem_tb": 1.0
+      },
+      "phai_nguoi": {
+       "so_ca": 25,
+       "so_noi": 2,
+       "noi_sai": 2,
+       "ti_le_noi_sai": 1.0,
+       "recall_phai_noi": null,
+       "phai_nguoi_bi_noi": 2,
+       "diem_tb": 1.84
+      }
+     },
+     "be": {
+      "so_ca": 65,
+      "so_noi": 2,
+      "noi_sai": 2,
+      "ti_le_noi_sai": 1.0,
+      "recall_phai_noi": 0.0,
+      "phai_nguoi_bi_noi": 2,
+      "diem_tb": 1.4923,
+      "l3_bi_noi": 0,
+      "mau_so_chinh": 65,
+      "so_phai_noi": 29,
+      "chua_chot": {
+       "so_ca": 0,
+       "agent_noi": 0
+      }
+     },
+     "theo_nhom_be": {
+      "phai_noi": {
+       "so_ca": 29,
+       "so_noi": 0,
+       "noi_sai": 0,
+       "ti_le_noi_sai": null,
+       "recall_phai_noi": 0.0,
+       "phai_nguoi_bi_noi": 0,
+       "diem_tb": 1.0
+      },
+      "phai_nguoi": {
+       "so_ca": 25,
+       "so_noi": 2,
+       "noi_sai": 2,
+       "ti_le_noi_sai": 1.0,
+       "recall_phai_noi": null,
+       "phai_nguoi_bi_noi": 2,
+       "diem_tb": 1.84
+      },
+      "l3": {
+       "so_ca": 11,
+       "so_noi": 0,
+       "noi_sai": 0,
+       "ti_le_noi_sai": null,
+       "recall_phai_noi": null,
+       "phai_nguoi_bi_noi": 0,
+       "diem_tb": 2.0
+      }
+     }
+    },
+    {
+     "phien_ban": "v1-gia-bat-noi-dung",
+     "mo_hinh": "GIẢ (luat_gia_v1) thay claude-opus-5-5",
+     "checksum_prompt": "4b629ff21f901479",
+     "cho_noi_dung": true,
+     "cong_skill": {
+      "dat": true,
+      "ly_do": "65 ca: 0 vi phạm luật cứng"
+     },
+     "the_noi_dung_che": 32,
+     "tong_hop": {
+      "so_ca": 65,
+      "so_noi": 2,
+      "noi_sai": 2,
+      "ti_le_noi_sai": 1.0,
+      "recall_phai_noi": 0.0,
+      "phai_nguoi_bi_noi": 2,
+      "diem_tb": 1.4923
+     },
+     "theo_nhom": {
+      "phai_noi": {
+       "so_ca": 29,
+       "so_noi": 0,
+       "noi_sai": 0,
+       "ti_le_noi_sai": null,
+       "recall_phai_noi": 0.0,
+       "phai_nguoi_bi_noi": 0,
+       "diem_tb": 1.0
+      },
+      "phai_nguoi": {
+       "so_ca": 25,
+       "so_noi": 2,
+       "noi_sai": 2,
+       "ti_le_noi_sai": 1.0,
+       "recall_phai_noi": null,
+       "phai_nguoi_bi_noi": 2,
+       "diem_tb": 1.84
+      }
+     },
+     "be": {
+      "so_ca": 65,
+      "so_noi": 2,
+      "noi_sai": 2,
+      "ti_le_noi_sai": 1.0,
+      "recall_phai_noi": 0.0,
+      "phai_nguoi_bi_noi": 2,
+      "diem_tb": 1.4923,
+      "l3_bi_noi": 0,
+      "mau_so_chinh": 65,
+      "so_phai_noi": 29,
+      "chua_chot": {
+       "so_ca": 0,
+       "agent_noi": 0
+      }
+     },
+     "theo_nhom_be": {
+      "phai_noi": {
+       "so_ca": 29,
+       "so_noi": 0,
+       "noi_sai": 0,
+       "ti_le_noi_sai": null,
+       "recall_phai_noi": 0.0,
+       "phai_nguoi_bi_noi": 0,
+       "diem_tb": 1.0
+      },
+      "phai_nguoi": {
+       "so_ca": 25,
+       "so_noi": 2,
+       "noi_sai": 2,
+       "ti_le_noi_sai": 1.0,
+       "recall_phai_noi": null,
+       "phai_nguoi_bi_noi": 2,
+       "diem_tb": 1.84
+      },
+      "l3": {
+       "so_ca": 11,
+       "so_noi": 0,
+       "noi_sai": 0,
+       "ti_le_noi_sai": null,
+       "recall_phai_noi": null,
+       "phai_nguoi_bi_noi": 0,
+       "diem_tb": 2.0
+      }
+     }
+    },
+    {
+     "phien_ban": "v1-gia-khong-che",
+     "mo_hinh": "GIẢ (luat_gia_v1) thay claude-opus-5-5",
+     "cho_noi_dung": "KHÔNG CHE",
+     "tong_hop": {
+      "so_ca": 65,
+      "so_noi": 2,
+      "noi_sai": 2,
+      "ti_le_noi_sai": 1.0,
+      "recall_phai_noi": 0.0,
+      "phai_nguoi_bi_noi": 2,
+      "diem_tb": 1.4923
+     },
+     "theo_nhom": {
+      "phai_noi": {
+       "so_ca": 29,
+       "so_noi": 0,
+       "noi_sai": 0,
+       "ti_le_noi_sai": null,
+       "recall_phai_noi": 0.0,
+       "phai_nguoi_bi_noi": 0,
+       "diem_tb": 1.0
+      },
+      "phai_nguoi": {
+       "so_ca": 25,
+       "so_noi": 2,
+       "noi_sai": 2,
+       "ti_le_noi_sai": 1.0,
+       "recall_phai_noi": null,
+       "phai_nguoi_bi_noi": 2,
+       "diem_tb": 1.84
+      }
+     },
+     "be": {
+      "so_ca": 65,
+      "so_noi": 2,
+      "noi_sai": 2,
+      "ti_le_noi_sai": 1.0,
+      "recall_phai_noi": 0.0,
+      "phai_nguoi_bi_noi": 2,
+      "diem_tb": 1.4923,
+      "l3_bi_noi": 0,
+      "mau_so_chinh": 65,
+      "so_phai_noi": 29,
+      "chua_chot": {
+       "so_ca": 0,
+       "agent_noi": 0
+      }
+     },
+     "theo_nhom_be": {
+      "phai_noi": {
+       "so_ca": 29,
+       "so_noi": 0,
+       "noi_sai": 0,
+       "ti_le_noi_sai": null,
+       "recall_phai_noi": 0.0,
+       "phai_nguoi_bi_noi": 0,
+       "diem_tb": 1.0
+      },
+      "phai_nguoi": {
+       "so_ca": 25,
+       "so_noi": 2,
+       "noi_sai": 2,
+       "ti_le_noi_sai": 1.0,
+       "recall_phai_noi": null,
+       "phai_nguoi_bi_noi": 2,
+       "diem_tb": 1.84
+      },
+      "l3": {
+       "so_ca": 11,
+       "so_noi": 0,
+       "noi_sai": 0,
+       "ti_le_noi_sai": null,
+       "recall_phai_noi": null,
+       "phai_nguoi_bi_noi": 0,
+       "diem_tb": 2.0
+      }
+     }
+    }
+   ],
+   "chuoi": {
+    "tat": {
+     "mau_so": 627,
+     "khop": 627,
+     "lech": 0,
+     "khong_do_duoc": 0,
+     "agent_dat": "4/4",
+     "dung_o": [],
+     "g0": {
+      "be": "giữ riêng (ngoài repo)",
+      "so_ca": 65,
+      "so_noi": 2,
+      "noi_sai": 2,
+      "ti_le_noi_sai": 1.0,
+      "recall_phai_noi": 0.0,
+      "phai_nguoi_bi_noi": 2,
+      "diem_tb": 1.4923
+     }
+    },
+    "bat_da_che": {
+     "mau_so": 627,
+     "khop": 627,
+     "lech": 0,
+     "khong_do_duoc": 0,
+     "agent_dat": "4/4",
+     "dung_o": [],
+     "g0": {
+      "be": "giữ riêng (ngoài repo)",
+      "so_ca": 65,
+      "so_noi": 2,
+      "noi_sai": 2,
+      "ti_le_noi_sai": 1.0,
+      "recall_phai_noi": 0.0,
+      "phai_nguoi_bi_noi": 2,
+      "diem_tb": 1.4923
+     }
+    }
+   }
+  },
+  "b": {
+   "vong": [
+    {
+     "phien_ban": "v0-ma-tat-dinh",
+     "mo_hinh": "GIẢ (luat_v0) thay claude-opus-5-5",
+     "checksum_prompt": "4b629ff21f901479",
+     "cho_noi_dung": false,
+     "cong_skill": {
+      "dat": true,
+      "ly_do": "70 ca: 0 vi phạm luật cứng"
+     },
+     "the_noi_dung_che": 0,
+     "tong_hop": {
+      "so_ca": 70,
+      "so_noi": 0,
+      "noi_sai": 0,
+      "ti_le_noi_sai": null,
+      "recall_phai_noi": 0.0,
+      "phai_nguoi_bi_noi": 0,
+      "diem_tb": 1.5714
+     },
+     "theo_nhom": {
+      "phai_noi": {
+       "so_ca": 30,
+       "so_noi": 0,
+       "noi_sai": 0,
+       "ti_le_noi_sai": null,
+       "recall_phai_noi": 0.0,
+       "phai_nguoi_bi_noi": 0,
+       "diem_tb": 1.0
+      },
+      "phai_nguoi": {
+       "so_ca": 25,
+       "so_noi": 0,
+       "noi_sai": 0,
+       "ti_le_noi_sai": null,
+       "recall_phai_noi": null,
+       "phai_nguoi_bi_noi": 0,
+       "diem_tb": 2.0
+      }
+     },
+     "be": {
+      "so_ca": 65,
+      "so_noi": 0,
+      "noi_sai": 0,
+      "ti_le_noi_sai": null,
+      "recall_phai_noi": 0.0,
+      "phai_nguoi_bi_noi": 0,
+      "diem_tb": 1.5385,
+      "l3_bi_noi": 0,
+      "mau_so_chinh": 65,
+      "so_phai_noi": 30,
+      "chua_chot": {
+       "so_ca": 5,
+       "agent_noi": 0
+      }
+     },
+     "theo_nhom_be": {
+      "phai_noi": {
+       "so_ca": 30,
+       "so_noi": 0,
+       "noi_sai": 0,
+       "ti_le_noi_sai": null,
+       "recall_phai_noi": 0.0,
+       "phai_nguoi_bi_noi": 0,
+       "diem_tb": 1.0
+      },
+      "phai_nguoi": {
+       "so_ca": 25,
+       "so_noi": 0,
+       "noi_sai": 0,
+       "ti_le_noi_sai": null,
+       "recall_phai_noi": null,
+       "phai_nguoi_bi_noi": 0,
+       "diem_tb": 2.0
+      },
+      "l3": {
+       "so_ca": 10,
+       "so_noi": 0,
+       "noi_sai": 0,
+       "ti_le_noi_sai": null,
+       "recall_phai_noi": null,
+       "phai_nguoi_bi_noi": 0,
+       "diem_tb": 2.0
+      }
+     }
+    },
+    {
+     "phien_ban": "v1-gia-tat-noi-dung",
+     "mo_hinh": "GIẢ (luat_gia_v1) thay claude-opus-5-5",
+     "checksum_prompt": "4b629ff21f901479",
+     "cho_noi_dung": false,
+     "cong_skill": {
+      "dat": true,
+      "ly_do": "70 ca: 0 vi phạm luật cứng"
+     },
+     "the_noi_dung_che": 0,
+     "tong_hop": {
+      "so_ca": 70,
+      "so_noi": 2,
+      "noi_sai": 1,
+      "ti_le_noi_sai": 0.5,
+      "recall_phai_noi": 0.0333,
+      "phai_nguoi_bi_noi": 1,
+      "diem_tb": 1.5571
+     },
+     "theo_nhom": {
+      "phai_noi": {
+       "so_ca": 30,
+       "so_noi": 1,
+       "noi_sai": 0,
+       "ti_le_noi_sai": 0.0,
+       "recall_phai_noi": 0.0333,
+       "phai_nguoi_bi_noi": 0,
+       "diem_tb": 1.0333
+      },
+      "phai_nguoi": {
+       "so_ca": 25,
+       "so_noi": 1,
+       "noi_sai": 1,
+       "ti_le_noi_sai": 1.0,
+       "recall_phai_noi": null,
+       "phai_nguoi_bi_noi": 1,
+       "diem_tb": 1.92
+      }
+     },
+     "be": {
+      "so_ca": 65,
+      "so_noi": 2,
+      "noi_sai": 1,
+      "ti_le_noi_sai": 0.5,
+      "recall_phai_noi": 0.0333,
+      "phai_nguoi_bi_noi": 1,
+      "diem_tb": 1.5231,
+      "l3_bi_noi": 0,
+      "mau_so_chinh": 65,
+      "so_phai_noi": 30,
+      "chua_chot": {
+       "so_ca": 5,
+       "agent_noi": 0
+      }
+     },
+     "theo_nhom_be": {
+      "phai_noi": {
+       "so_ca": 30,
+       "so_noi": 1,
+       "noi_sai": 0,
+       "ti_le_noi_sai": 0.0,
+       "recall_phai_noi": 0.0333,
+       "phai_nguoi_bi_noi": 0,
+       "diem_tb": 1.0333
+      },
+      "phai_nguoi": {
+       "so_ca": 25,
+       "so_noi": 1,
+       "noi_sai": 1,
+       "ti_le_noi_sai": 1.0,
+       "recall_phai_noi": null,
+       "phai_nguoi_bi_noi": 1,
+       "diem_tb": 1.92
+      },
+      "l3": {
+       "so_ca": 10,
+       "so_noi": 0,
+       "noi_sai": 0,
+       "ti_le_noi_sai": null,
+       "recall_phai_noi": null,
+       "phai_nguoi_bi_noi": 0,
+       "diem_tb": 2.0
+      }
+     }
+    },
+    {
+     "phien_ban": "v1-gia-bat-noi-dung",
+     "mo_hinh": "GIẢ (luat_gia_v1) thay claude-opus-5-5",
+     "checksum_prompt": "4b629ff21f901479",
+     "cho_noi_dung": true,
+     "cong_skill": {
+      "dat": true,
+      "ly_do": "70 ca: 0 vi phạm luật cứng"
+     },
+     "the_noi_dung_che": 43,
+     "tong_hop": {
+      "so_ca": 70,
+      "so_noi": 2,
+      "noi_sai": 1,
+      "ti_le_noi_sai": 0.5,
+      "recall_phai_noi": 0.0333,
+      "phai_nguoi_bi_noi": 1,
+      "diem_tb": 1.5571
+     },
+     "theo_nhom": {
+      "phai_noi": {
+       "so_ca": 30,
+       "so_noi": 1,
+       "noi_sai": 0,
+       "ti_le_noi_sai": 0.0,
+       "recall_phai_noi": 0.0333,
+       "phai_nguoi_bi_noi": 0,
+       "diem_tb": 1.0333
+      },
+      "phai_nguoi": {
+       "so_ca": 25,
+       "so_noi": 1,
+       "noi_sai": 1,
+       "ti_le_noi_sai": 1.0,
+       "recall_phai_noi": null,
+       "phai_nguoi_bi_noi": 1,
+       "diem_tb": 1.92
+      }
+     },
+     "be": {
+      "so_ca": 65,
+      "so_noi": 2,
+      "noi_sai": 1,
+      "ti_le_noi_sai": 0.5,
+      "recall_phai_noi": 0.0333,
+      "phai_nguoi_bi_noi": 1,
+      "diem_tb": 1.5231,
+      "l3_bi_noi": 0,
+      "mau_so_chinh": 65,
+      "so_phai_noi": 30,
+      "chua_chot": {
+       "so_ca": 5,
+       "agent_noi": 0
+      }
+     },
+     "theo_nhom_be": {
+      "phai_noi": {
+       "so_ca": 30,
+       "so_noi": 1,
+       "noi_sai": 0,
+       "ti_le_noi_sai": 0.0,
+       "recall_phai_noi": 0.0333,
+       "phai_nguoi_bi_noi": 0,
+       "diem_tb": 1.0333
+      },
+      "phai_nguoi": {
+       "so_ca": 25,
+       "so_noi": 1,
+       "noi_sai": 1,
+       "ti_le_noi_sai": 1.0,
+       "recall_phai_noi": null,
+       "phai_nguoi_bi_noi": 1,
+       "diem_tb": 1.92
+      },
+      "l3": {
+       "so_ca": 10,
+       "so_noi": 0,
+       "noi_sai": 0,
+       "ti_le_noi_sai": null,
+       "recall_phai_noi": null,
+       "phai_nguoi_bi_noi": 0,
+       "diem_tb": 2.0
+      }
+     }
+    },
+    {
+     "phien_ban": "v1-gia-khong-che",
+     "mo_hinh": "GIẢ (luat_gia_v1) thay claude-opus-5-5",
+     "cho_noi_dung": "KHÔNG CHE",
+     "tong_hop": {
+      "so_ca": 70,
+      "so_noi": 2,
+      "noi_sai": 1,
+      "ti_le_noi_sai": 0.5,
+      "recall_phai_noi": 0.0333,
+      "phai_nguoi_bi_noi": 1,
+      "diem_tb": 1.5571
+     },
+     "theo_nhom": {
+      "phai_noi": {
+       "so_ca": 30,
+       "so_noi": 1,
+       "noi_sai": 0,
+       "ti_le_noi_sai": 0.0,
+       "recall_phai_noi": 0.0333,
+       "phai_nguoi_bi_noi": 0,
+       "diem_tb": 1.0333
+      },
+      "phai_nguoi": {
+       "so_ca": 25,
+       "so_noi": 1,
+       "noi_sai": 1,
+       "ti_le_noi_sai": 1.0,
+       "recall_phai_noi": null,
+       "phai_nguoi_bi_noi": 1,
+       "diem_tb": 1.92
+      }
+     },
+     "be": {
+      "so_ca": 65,
+      "so_noi": 2,
+      "noi_sai": 1,
+      "ti_le_noi_sai": 0.5,
+      "recall_phai_noi": 0.0333,
+      "phai_nguoi_bi_noi": 1,
+      "diem_tb": 1.5231,
+      "l3_bi_noi": 0,
+      "mau_so_chinh": 65,
+      "so_phai_noi": 30,
+      "chua_chot": {
+       "so_ca": 5,
+       "agent_noi": 0
+      }
+     },
+     "theo_nhom_be": {
+      "phai_noi": {
+       "so_ca": 30,
+       "so_noi": 1,
+       "noi_sai": 0,
+       "ti_le_noi_sai": 0.0,
+       "recall_phai_noi": 0.0333,
+       "phai_nguoi_bi_noi": 0,
+       "diem_tb": 1.0333
+      },
+      "phai_nguoi": {
+       "so_ca": 25,
+       "so_noi": 1,
+       "noi_sai": 1,
+       "ti_le_noi_sai": 1.0,
+       "recall_phai_noi": null,
+       "phai_nguoi_bi_noi": 1,
+       "diem_tb": 1.92
+      },
+      "l3": {
+       "so_ca": 10,
+       "so_noi": 0,
+       "noi_sai": 0,
+       "ti_le_noi_sai": null,
+       "recall_phai_noi": null,
+       "phai_nguoi_bi_noi": 0,
+       "diem_tb": 2.0
+      }
+     }
+    }
+   ],
+   "chuoi": {
+    "tat": {
+     "mau_so": 627,
+     "khop": 627,
+     "lech": 0,
+     "khong_do_duoc": 0,
+     "agent_dat": "4/4",
+     "dung_o": [],
+     "g0": {
+      "be": "giữ riêng (ngoài repo)",
+      "so_ca": 70,
+      "so_noi": 2,
+      "noi_sai": 1,
+      "ti_le_noi_sai": 0.5,
+      "recall_phai_noi": 0.0333,
+      "phai_nguoi_bi_noi": 1,
+      "diem_tb": 1.5571
+     }
+    },
+    "bat_da_che": {
+     "mau_so": 627,
+     "khop": 627,
+     "lech": 0,
+     "khong_do_duoc": 0,
+     "agent_dat": "4/4",
+     "dung_o": [],
+     "g0": {
+      "be": "giữ riêng (ngoài repo)",
+      "so_ca": 70,
+      "so_noi": 2,
+      "noi_sai": 1,
+      "ti_le_noi_sai": 0.5,
+      "recall_phai_noi": 0.0333,
+      "phai_nguoi_bi_noi": 1,
+      "diem_tb": 1.5571
+     }
+    }
+   }
+  }
+ }
+}
