@@ -28,6 +28,8 @@
 #   ② kho ảnh Artifact Registry `fls` + SA `fls-staging-app` được ĐỌC (`artifactregistry.reader`)
 #   ③ dựng ảnh bằng Cloud Build. ⛔⛔ Ngữ cảnh build = `git archive HEAD -- <danh sách cho phép>` ⇒ chỉ tệp ĐÃ COMMIT:
 #      `sao_luu/` · `hien_vat/` · `Input_Raw/` · `.env*` (đều gitignore) ⛔ thể nào lên Cloud Build
+#      (`ngu_canh_build.sh`; ⛔ `.gcloudignore` — `STG-R2b-01`). Bộ build = `--tag` (CŨ, ⛔ BuildKit — `STG-R2b-05`);
+#      BÁO CÁO đếm tệp ngữ cảnh = tệp gcloud tải lên. Thử trước ở máy có dockerd: `bash tools/staging/thu_dung_anh.sh`.
 #   ④ firewall: CHẶN mọi vào VM (tag `fls-stg-app`, ưu tiên 900) + CHO riêng dải IAP vào cổng 22 (ưu tiên 800)
 #   ⑤ VM Debian 12 gắn SA `fls-staging-app` (đọc bí mật + nối Cloud SQL) — `startup-script` = `vm_khoi_dong.sh`:
 #      cài docker → kéo ảnh → `docker run --network host` (vao.sh: bí mật từ Secret Manager → Auth Proxy → cửa)
@@ -110,12 +112,21 @@ if [ "$KIEM" -eq 0 ]; then
   echo "   $SA_EMAIL: artifactregistry.reader"
 
   buoc "③ dựng ảnh $IMAGE (ngữ cảnh = git archive HEAD — ⛔ dữ liệu gitignore)"
-  CTX="$(mktemp -d)"
-  trap 'rm -rf "$CTX"' EXIT
-  git -C "$GOC" archive --format=tar HEAD -- Dockerfile .dockerignore .gcloudignore requirements.txt \
-      fls tools docs/ITL/_tools tests/fixture | tar -x -C "$CTX"
-  echo "   ngữ cảnh: $(find "$CTX" -type f | wc -l | tr -d ' ') tệp, commit $(git -C "$GOC" rev-parse --short HEAD)"
-  "${G[@]}" builds submit "$CTX" --tag "$IMAGE" --timeout=1200
+  CTX="$(mktemp -d)" ; BLOG="$(mktemp)"
+  trap 'rm -rf "$CTX" "$BLOG"' EXIT
+  # ⭐ `STG-R2b-01`: ⛔ `.gcloudignore` trong ngữ cảnh (gcloud lọc thêm ⇒ thiếu Dockerfile) — xem `ngu_canh_build.sh`.
+  bash "$GOC/tools/staging/ngu_canh_build.sh" "$GOC" "$CTX"
+  R_CTX_N="$(find "$CTX" -type f | wc -l | tr -d ' ')"
+  # ⭐ `STG-R2b-05`: `--tag` = bộ build CŨ (⛔ BuildKit) — Dockerfile ⛔ dùng cú pháp đòi BuildKit (`thu_dung_anh.sh`).
+  # Giữ lời gcloud (dòng `Creating temporary archive of N file(s)` ⇒ mục BÁO CÁO "tệp tải lên = tệp ngữ cảnh");
+  # build đỏ ⇒ ⛔ chết im: bỏ ④–⑥ (⛔ dựng VM cho ảnh ⛔ có) rồi sang BÁO CÁO để mục ĐỎ hiện tên (Đ5).
+  R_BUILD_RC=0
+  "${G[@]}" builds submit "$CTX" --tag "$IMAGE" --timeout=1200 2>&1 | tee "$BLOG" || R_BUILD_RC=$?
+  R_TAI_N="$(sed -n 's/.*Creating temporary \(tarball \)\{0,1\}archive of \([0-9][0-9]*\) file(s).*/\2/p' "$BLOG" | tail -1)"
+  [ "$R_BUILD_RC" -eq 0 ] || echo "⛔ BUILD_LOI: gcloud builds submit exit $R_BUILD_RC — bỏ ④–⑥, sang BÁO CÁO" >&2
+fi
+
+if [ "$KIEM" -eq 0 ] && [ "${R_BUILD_RC:-0}" -eq 0 ]; then
 
   buoc "④ firewall: chặn mọi vào VM · chỉ IAP vào cổng 22"
   if co compute firewall-rules describe "$FW_DENY"; then echo "   $FW_DENY: có rồi"
@@ -161,6 +172,7 @@ fi
 # ══════════════════════════════ BÁO CÁO — gửi lại phần này ══════════════════════════════
 buoc "BÁO CÁO (KHÔNG chứa mật khẩu/khoá) — chép từ dòng này tới hết, gửi lại"
 export PROJECT REGION ZONE VM IMAGE TAG SA_EMAIL NET_TAG FW_DENY FW_IAP PRI_DENY DAI_IAP CHE_DO KIEM AR_REPO AR_ANH NGUOI_KY
+export R_CTX_N="${R_CTX_N:-}" R_TAI_N="${R_TAI_N:-}" R_BUILD_RC="${R_BUILD_RC:-}"
 export R_APIS="$("${G[@]}" services list --enabled --format='value(config.name)' 2>/dev/null | tr '\n' ' ' || true)"
 export R_REPO="$("${G[@]}" artifacts repositories describe "$AR_REPO" --location="$REGION" --format='value(name)' 2>/dev/null || true)"
 export R_ANH="$("${G[@]}" artifacts docker images list "${REGION}-docker.pkg.dev/${PROJECT}/${AR_REPO}/${AR_ANH}" --include-tags --format='value(tags)' 2>/dev/null | tr '\n' ' ' || true)"
@@ -233,6 +245,19 @@ hang = [
   ("TRONG VM · gọi API không thẻ ⇒ HTTP",  trong.get("http_khong_the"),               "401"),
   ("TRONG VM · màn hình / ⇒ HTTP",         trong.get("http_man_hinh"),                "200"),
 ]
+if e["KIEM"] != "1":
+    # ⭐ `STG-R2b-01`: ngữ cảnh 398 tệp mà gcloud tải 292 ⇒ thiếu Dockerfile — mục này bắt ĐÚNG lỗi ấy, cả khi Cloud Build
+    #   tình cờ vẫn qua. Mong khai trước: tải lên = ngữ cảnh (⛔ lọc gì). ⛔ đọc được dòng gcloud ⇒ None ⇒ ĐỎ (Đ5).
+    def _so(v):
+        try: return int(v)
+        except (TypeError, ValueError): return None
+    ctx_n, tai_n = _so(e["R_CTX_N"]), _so(e["R_TAI_N"])
+    hang[2:2] = [
+      ("ngữ cảnh build · tệp ngữ cảnh / tệp gcloud tải lên (đếm)", f"{ctx_n} / {tai_n}", None),
+      ("ngữ cảnh build · tệp tải lên = tệp ngữ cảnh (≠ 0)",
+       None if ctx_n is None or tai_n is None else (tai_n == ctx_n and ctx_n > 0), True),
+      ("dựng ảnh · gcloud builds submit (exit)", _so(e["R_BUILD_RC"]), 0),
+    ]
 do = 0
 for ten, gt, mong in hang:
     if mong is None:

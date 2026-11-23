@@ -55,6 +55,43 @@ def chay_quan_tri(sql: str, kho: str = "postgres") -> str:
     return r.stdout.strip()
 
 
+def dung_vai_cloud_sql(qt: str, kieu: str):
+    """Dựng vai theo hình Cloud SQL PG16 — `STG-R2b-02` (lỗi THẬT GCP bước 02, 23/11). Trả hàm dọn.
+
+    Sự thật ĐÃ ĐO ở GCP (BÁO CÁO bước 02 của chủ, ngọn `c4a0f39`): `postgres` ⛔ siêu người dùng; `GRANT fls_admin
+    TO CURRENT_USER` ĐẠT · `ALTER ROLE fls_doc SET …` ĐẠT (PG16 đòi ADMIN OPTION cho cả hai) · `ALTER ROLE fls_ghi
+    NOSUPERUSER NOCREATEROLE NOCREATEDB NOREPLICATION NOBYPASSRLS` BỊ TỪ CHỐI ⇒ 2 vai còn CREATEROLE/CREATEDB.
+
+      `H-B` — vai quản trị CÓ ADMIN OPTION (thừa kế qua `cloudsqlsuperuser`) trên CẢ BA vai gcloud tạo; ALTER cũ bị
+              từ chối vì mệnh đề `NOSUPERUSER` (đo trên PG 16 cục bộ). ⭐ Khớp MỌI sự thật đã đo.
+      `H-A` — giả thuyết của phiếu giao việc: vai quản trị ⛔ ADMIN OPTION trên `fls_ghi`/`fls_doc` (vẫn có trên
+              `fls_admin`, để `02a` đổi chủ kho được như GCP). Mâu thuẫn với `ALTER ROLE fls_doc SET` ĐẠT — giữ để
+              chứng minh đường chuyển vẫn ĐÚNG nếu GCP thật là thế (`DROP ROLE` SQL ⛔ được ⇒ `gcloud sql users delete`).
+    `fls_ghi`/`fls_doc` = CREATEROLE + CREATEDB (như gcloud tạo). Vai quản trị: LOGIN CREATEROLE CREATEDB, ⛔ SUPERUSER."""
+    assert kieu in ("H-B", "H-A"), kieu
+    tao_csu = chay_quan_tri("SELECT count(*) = 0 FROM pg_roles WHERE rolname = 'cloudsqlsuperuser'") == "t"
+    if tao_csu:
+        chay_quan_tri("CREATE ROLE cloudsqlsuperuser NOLOGIN CREATEROLE CREATEDB")
+    for v in ("fls_admin", "fls_ghi", "fls_doc", qt):
+        chay_quan_tri(f"DROP ROLE IF EXISTS {v}")
+    chay_quan_tri(f"CREATE ROLE {qt} LOGIN NOSUPERUSER CREATEROLE CREATEDB PASSWORD '{MK['fls-staging-pg-postgres']}'")
+    chay_quan_tri(f"GRANT cloudsqlsuperuser TO {qt} WITH ADMIN OPTION")
+    for v in ("fls_admin", "fls_ghi", "fls_doc"):
+        chay_quan_tri(f"CREATE ROLE {v} LOGIN PASSWORD '{MK['fls-staging-pg-' + v]}' CREATEROLE CREATEDB")
+    co_admin = ("fls_admin", "fls_ghi", "fls_doc") if kieu == "H-B" else ("fls_admin",)
+    for v in co_admin:
+        # `INHERIT FALSE, SET FALSE`: CHỈ quyền quản trị vai — ⛔ để `cloudsqlsuperuser` (và mọi thành viên của nó)
+        #   thừa kế quyền CHỦ BẢNG của `fls_admin` (hiện vật của mô phỏng: `fls_doc` vào nhóm ⇒ "có quyền GHI" giả).
+        chay_quan_tri(f"GRANT {v} TO cloudsqlsuperuser WITH ADMIN OPTION, INHERIT FALSE, SET FALSE")
+
+    def don():
+        for v in ("fls_admin", "fls_ghi", "fls_doc", qt):
+            chay_quan_tri(f"DROP ROLE IF EXISTS {v}")
+        if tao_csu:
+            chay_quan_tri("DROP ROLE IF EXISTS cloudsqlsuperuser")
+    return don
+
+
 def _viet_chay_duoc(p: Path, noi_dung: str) -> Path:
     p.write_text(noi_dung, encoding="utf-8")
     p.chmod(p.stat().st_mode | stat.S_IXUSR)
@@ -79,6 +116,13 @@ case "$args" in
       ten="${{args##*--secret=}}"; ten="${{ten%% *}}"
       f="{thu_muc}/secret_$ten"; [ -f "$f" ] && cat "$f" || {{ echo "NOT_FOUND $ten" >&2; exit 1; }} ;;
   *"sql instances describe"*"connectionName"*) echo "du-an-gia:asia-southeast1:fls-staging" ;;
+  *"sql users delete "*)
+      # Cloud SQL Admin API xoá vai bằng `cloudsqladmin` (siêu người dùng) — ở đây: peer `postgres` của cụm cục bộ.
+      # Như GCP: vai còn được cấp quyền ⇒ `DROP ROLE` đỏ ⇒ gcloud đỏ (bài canh đường chuyển phải THU quyền trước).
+      vai="${{args##*sql users delete }}"; vai="${{vai%% *}}"
+      [ -f "{thu_muc}/xoa_vai_hong" ] && {{ echo "ERROR: (gcloud.sql.users.delete) giả hỏng" >&2; exit 1; }}
+      runuser -u postgres -- psql -p {cong_pg()} -d postgres -X -q -v ON_ERROR_STOP=1 -c "DROP ROLE $vai" >&2 \
+        || {{ echo "ERROR: (gcloud.sql.users.delete) role $vai cannot be dropped" >&2; exit 1; }} ;;
   *) echo "gcloud GIẢ: lệnh lạ hoặc lệnh GHI: $args" >&2; exit 99 ;;
 esac
 """)

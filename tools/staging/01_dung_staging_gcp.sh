@@ -20,11 +20,15 @@
 #      (`deletion-protection`) · cờ `cloudsql.iam_authentication=on` để phase SSO sau gắn
 #      người dùng IAM vào kho mà ⛔ cần mật khẩu.
 #   ③ kho `fls`
-#   ④ 3 tài khoản kho (mật khẩu ngẫu nhiên 43 ký tự, cất ở Secret Manager, ⛔ in):
-#        `fls_admin` — chủ sở hữu kho, chạy di trú (`python -m fls.db.pg_migrate`)
+#   ④ 3 mật khẩu kho (ngẫu nhiên 43 ký tự, cất ở Secret Manager, ⛔ in) — nhưng CHỈ `fls_admin` là
+#      tài khoản tạo bằng gcloud:
+#        `fls_admin` — chủ sở hữu kho, chạy di trú (`python -m fls.db.pg_migrate`) — `gcloud sql users create`
 #        `fls_ghi`   — đường GHI của ứng dụng (`mo_ghi`; công cụ ghi sổ còn đòi `FLS_CHO_GHI_THAT=1`)
 #        `fls_doc`   — đường ĐỌC của cửa API: `tools/chay_cua.py` TỪ CHỐI chạy nếu kết nối còn ghi
 #                      được ⇒ bước 02 đặt `default_transaction_read_only = on` cho vai này
+#        ⭐ `fls_ghi`/`fls_doc` ⛔ tạo ở đây (`STG-R2b-02`, lỗi THẬT GCP 23/11): `gcloud sql users create` gắn
+#           CREATEROLE + CREATEDB mà `postgres` ⛔ hạ được ⇒ bước 02 tạo chúng bằng SQL (`CREATE ROLE … LOGIN
+#           NOCREATEDB NOCREATEROLE`, mật khẩu từ CHÍNH bí mật bước này sinh). Bước 01 chỉ sinh bí mật của chúng.
 #      + mật khẩu `postgres` (quản trị Cloud SQL) cũng ngẫu nhiên, cất Secret Manager.
 #   ⑤ bí mật `fls-staging-jwt-secret` (cửa API tự từ chối nếu thiếu `FLS_JWT_SECRET`)
 #   ⑥ service account `fls-staging-app` — vai `roles/cloudsql.client` + `secretAccessor` trên ĐÚNG 3 bí mật
@@ -60,7 +64,8 @@ command -v gcloud >/dev/null || { echo "⛔ không có gcloud — chạy trong C
 command -v python3 >/dev/null || { echo "⛔ không có python3" >&2; exit 2; }
 
 DB="fls"
-USERS=(fls_admin fls_ghi fls_doc)
+USERS=(fls_admin)                 # tài khoản kho tạo bằng gcloud (⛔ vai ứng dụng — `STG-R2b-02`)
+VAI_APP=(fls_ghi fls_doc)          # bước 01 chỉ sinh BÍ MẬT; bước 02 tạo vai bằng SQL
 SA_NAME="fls-staging-app"
 SA_EMAIL="${SA_NAME}@${PROJECT}.iam.gserviceaccount.com"
 # ⭐ `STG-R1-01`: tách hai nhóm. `BI_MAT_APP` = ĐÚNG những gì app đọc (đo bằng grep chỗ dùng: `vao.sh` đọc
@@ -136,6 +141,10 @@ if [ "$KIEM" -eq 0 ]; then
       "${G[@]}" sql users create "$u" --instance="$INSTANCE" --password="$PW" >/dev/null
       echo "   $u: tạo"
     fi
+  done
+  for u in "${VAI_APP[@]}"; do
+    bi_mat "fls-staging-pg-$u" >/dev/null
+    echo "   $u: bí mật sẵn — vai tạo ở BƯỚC 02 bằng SQL (⛔ gcloud sql users create: gắn CREATEROLE/CREATEDB)"
   done
   unset PW
 
@@ -241,7 +250,8 @@ hang = [
   ("kho",                 ",".join(dbs),                          None),
   ("có kho fls",          "fls" in dbs,                           True),
   ("tài khoản kho",       ",".join(users),                        None),
-  ("đủ 4 tài khoản",      all(u in users for u in mong_users),   True),
+  # ⭐ `STG-R2b-02`: chỉ ĐÒI hai tài khoản gcloud; `fls_ghi`/`fls_doc` do bước 02 tạo bằng SQL (có/không tuỳ đã chạy 02).
+  ("đủ tài khoản gcloud (postgres · fls_admin)", all(u in users for u in mong_users), True),
   ("bí mật (số bản bật)", " ".join(f"{k}:{v}" for k, v in sec.items()), None),
   ("đủ 5 bí mật ≥ 1 bản", len(sec) == 5 and all(int(v) >= 1 for v in sec.values()), True),
   ("service account",     e["SA_CO"] or "—",                      None),

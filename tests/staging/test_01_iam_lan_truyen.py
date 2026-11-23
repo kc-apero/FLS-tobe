@@ -154,3 +154,17 @@ def test_secretAccessor_PERMISSION_DENIED_ra_ĐỎ_va_hien_chu_that(tmp_path):
     assert re.search(r"\[ĐỎ\] SA đọc đúng bí mật app .*'0/3'", r.stdout)
     assert r.returncode == 1 and "KẾT: ĐỎ" in r.stdout
     assert "sẽ ĐỎ" not in r.stdout or "gán/gỡ vai đủ" in r.stdout        # câu in ra phải đúng với báo cáo bên dưới
+
+
+# ══ `STG-R2b-02` — bước 01 ⛔ còn tạo vai ứng dụng bằng gcloud (gcloud gắn CREATEROLE/CREATEDB mà `postgres` ⛔ hạ được) ══
+
+def test_buoc01_KHONG_tao_hay_dat_mat_khau_vai_app_bang_gcloud_nhung_van_sinh_bi_mat(tmp_path):
+    r, _ = _chay(tmp_path, 0)
+    nk = _log(tmp_path)
+    users = [d for d in nk if re.search(r"\bsql users (create|set-password)\b", d)]
+    assert [d for d in users if re.search(r"\bfls_(ghi|doc)\b", d)] == [], users
+    assert [re.search(r"sql users create (\S+)", d).group(1) for d in users if "users create" in d] == ["fls_admin"], users
+    tao_bm = sorted(re.search(r"secrets create (\S+)", d).group(1) for d in nk if "secrets create" in d)
+    assert tao_bm == sorted(APP + QUAN_TRI), tao_bm          # bí mật vai app VẪN sinh ở bước 01 (bước 02 đọc nó)
+    assert "vai tạo ở BƯỚC 02 bằng SQL" in r.stdout
+    assert "đủ tài khoản gcloud (postgres · fls_admin)" in r.stdout
