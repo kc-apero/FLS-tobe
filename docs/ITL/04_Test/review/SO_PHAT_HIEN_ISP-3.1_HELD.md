@@ -29,3 +29,11 @@
 | `HELD-R1-08` | GHI NHẬN | Bể A và B ⛔ độc lập nhau: **9** ca trùng *(D 5 — "toàn bộ D" — · B 1 · C 1 · E 1 · chuyển 1)*; hai cột A↔B không phải hai mẫu rời | mở |
 | `HELD-R1-09` | GHI NHẬN | Ledge sống ĐỎ đúng *(mẫu số 0 ⇒ ĐỎ, ⛔ coi KHỚP; phép thay thế ghi nhãn "khác vật đo")*. Tái lập: lát **800** hàng đọc **15/16** lát *(11.875 ô ngày, 25 kỳ; lát `A810:A1609` hỏng)* ⇒ đọc được nếu lát nhỏ + thử lại; ĐỎ gỡ được. `DEM_BE.json` `ky_lech_so_dong` liệt 26 kỳ "lệch" với `song = 0` — nhiễu của mẫu số 0 | mở |
 | `HELD-R1-10` | GHI NHẬN | Sàn gộp: 3 giá trị khác nhau ở 3 nhánh *(4887 · 4928 · 4854)* ⇒ đặt = thu thập thật cây gộp **4.990** + bài ghim cùng commit | mở |
+
+## R1 vòng 2 *(`KQ-349` · `isp/HELD` `f015cbf` · cụm 5446)* — `HELD-R1-01…06` **đã sửa, đo lại độc lập ĐẠT**
+| Mã | Mức | Nội dung | Trạng thái |
+|---|---|---|---|
+| `HELD-R1v2-01` | GHI NHẬN | Email thật của chủ ở `tests/oracle/test_do_hd2_c5c.py` + sổ H14 *(commit `a59f4b9`, đã ở nhánh làm việc; `H14-R2b2-01`)* vào qua gộp nền, HELD ⛔ thêm; `quet_pii_repo` ⛔ quét email | mở *(chủ H14)* |
+| `HELD-R1v2-02` | GHI NHẬN | Sàn HELD 4.967 ≠ thu thập thật cây gộp **4.997**; gộp thật xung đột đúng 2 dòng sàn ⇒ đặt = thu thập thật lúc gộp + bài ghim cùng commit | mở *(orchestrator lúc gộp)* |
+| `HELD-R1v2-03` | GHI NHẬN | `che_noi_dung` bị `CamGui` chặn A 10 · B 14 chỗ; lọt số TK 17/65 · 24/70; `mo` ≡ `che_het` với luật giả ⇒ chưa đo được lợi ích đọc nội dung/TK | mở *(quyết chủ)* |
+
