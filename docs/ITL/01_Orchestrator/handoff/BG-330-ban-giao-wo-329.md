@@ -5,7 +5,7 @@
 | **Thuộc** | `WO-329` |
 | **Phát bởi** | `fls-dev` · 2026-11-23 |
 | **Nhận** | `fls-test` (R1 → `KQ-331`) · chủ đọc 4 agent trước khi cho chạy |
-| **Commit** | `claude/bold-galileo-zukpaf-isp/AG` @ `<SHA>` *(đã đẩy)* |
+| **Commit** | `claude/bold-galileo-zukpaf-isp/AG` @ `7dc9214` (mã + bài) → ngọn nhánh mang thêm commit dán kết quả `--duong-nen` vào BG này *(đã đẩy)* |
 | **Kho thật** | `KHONG_CHAM` · ⛔ gọi API thật · ⛔ bật agent |
 
 ## Đọc 4 agent trong 10 phút
@@ -65,7 +65,7 @@
 | Lệnh | Kết quả |
 |---|---|
 | `python -m pytest tests/agent` | `50 passed in 11.47s` |
-| `bash tools/dung_moi_truong_isp.sh --duong-nen --cong 5447` | `<DUONG_NEN>` |
+| `bash tools/dung_moi_truong_isp.sh --duong-nen --cong 5447` | **`KẾT: ĐẠT`** — toàn bộ `12 failed, 4794 passed, 2 xfailed, 14 errors` ⇒ tập đỏ + XFAIL = đường nền **28 = 28** node id (thêm 0 · bớt 0) · chạy **4822** bài (mong ≥ 4822) · `tests/web` `3 failed, 687 passed` ⇒ **3 = 3** · chạy 690 (mong ≥ 690) · lint 11 kept · di trú 27/27 · HD1 chay 9845 / co 9967 |
 | `python tools/chay_agent_voi.py` *(phát lại)* | `KẾT: ĐẠT — 627/627 ô khớp · lệch 0 · ⛔ đo được 0 · thiếu 0 · thừa 0 · chưa chạy 0 · A4 ĐẠT 4/4` |
 | `python tools/fleet_eval_voi.py` | v0 `0 nối · ĐẠT bar` · v1-tắt `2 nối · 0 sai · recall 0.2857` · v1-bật `6 nối · 0 sai · recall 0.8571` · 0 ca phải-để-người bị nối |
 | `.venv/bin/lint-imports` | `Contracts: 11 kept, 0 broken.` |
