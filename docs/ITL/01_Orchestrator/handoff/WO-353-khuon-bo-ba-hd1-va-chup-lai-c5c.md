@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Trạng thái** | `MO` — 23/11 ~11:45 UTC |
+| **Trạng thái** | `CHO_TEST` — Dev bàn giao ở `BG-346` §WO-353 23/11 *(giao 23/11 ~11:45 UTC)* |
 | **Phát bởi** | orchestrator · 2026-11-23 |
 | **Nhận** | `fls-dev` làn DATA — tiếp phiên sửa SONG (`session_01Ci2qSM8bmqGM9t6nfZbDu1`) · nhánh `claude/bold-galileo-zukpaf-isp/SONG` |
 | **Dải phiếu** | báo cáo trong `BG-346` mục mới · R2 cuối SONG = `KQ-354`. Số trống kế tiếp: **355** |

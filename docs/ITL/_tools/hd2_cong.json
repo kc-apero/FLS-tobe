@@ -2359,14 +2359,14 @@
    "WP-C3b lưới cfa1_yhqm",
    "WP-C3d lưới pla3_pm_hr_daily (gl_pl_dau_vao.json + hr_pl_dau_vao.json)",
    "WP-C5a + WP-C5b lưới ATL của FLS (IX.ALR kho cờ 2025 BẬT ký · IX.PL kho)",
-   "DT13 ảnh đầu vào số dư 615: tests/fixture/dau_vao/ccr_so_du_ccr.json + ccr_so_du_cash.json (qua rào kiem_dau_vao_hop_le)"
+   "DT13 ảnh đầu vào số dư 615: tests/fixture/dau_vao/ccr_so_du_ccr_20261123.json + ccr_so_du_cash_20261123.json — CÙNG lượt với đáp án 615 (WO-353) (qua rào kiem_dau_vao_hop_le)"
   ],
   "dap_an": [
    "tests/fixture/dap_an/daily_report_3_fs2.json",
    "tests/fixture/dap_an/daily_report_3_fs1.json",
    "tests/fixture/dap_an/daily_report_3_gop.json",
    "tests/fixture/dap_an/daily_report_2.json",
-   "tests/fixture/dap_an/ccr_daily_report.json"
+   "tests/fixture/dap_an/ccr_daily_report_20261123.json"
   ],
   "dap_an_dung": {
    "605": {
@@ -2384,13 +2384,13 @@
   "tong_o": 86150,
   "mong_tong_o": 86150,
   "o_co_so": 22893,
-  "khop_co_so": 14415,
+  "khop_co_so": 14406,
   "o_0_0": 63257,
-  "khop": 77672,
-  "khop_tinh": 14415,
+  "khop": 77663,
+  "khop_tinh": 14406,
   "khop_chep": 0,
-  "lech_co_chu_dich": 8478,
-  "mong_lech_co_chu_dich": 8478,
+  "lech_co_chu_dich": 8487,
+  "mong_lech_co_chu_dich": 8487,
   "lech_ngoai_ten": 0,
   "khop_ghi_chu": "tong_o = Σ 5 đáp án ô so = o_co_so + o_0_0; khop = ô khớp THẬT (khop_co_so) + o_0_0; khop + lech_co_chu_dich = tong_o; khop_co_so = khop_tinh (engine TÍNH từ đầu vào) + khop_chep (engine CHÉP ô ảnh đầu vào mang giá trị dán của chính sổ báo cáo — vd DR2 A-CCR; đếm RIÊNG, ⛔ gộp); ô chua_co_dau_vao / engine_vang / ngoai_truc / ngoai_khuon NGOÀI mẫu số",
   "lech_co_ten": {
@@ -2403,7 +2403,7 @@
     "lech_D3": 4266,
     "lech_D3+lech_dap_an_nguon": 84,
     "lech_D3+loi_as_is": 16,
-    "lech_ban_ccr_vs_cf": 671,
+    "lech_ban_ccr_vs_cf": 680,
     "lech_dap_an_nguon": 21,
     "lech_dap_an_nguon+loi_as_is": 21,
     "loi_as_is": 353
@@ -3181,12 +3181,12 @@
    },
    "615": {
     "dem": {
-     "khop_tinh": 2875,
+     "khop_tinh": 2866,
      "khop_chep": 0,
      "tong_o": 13760,
-     "khop_co_so": 2875,
+     "khop_co_so": 2866,
      "o_0_0": 10179,
-     "khop": 13054,
+     "khop": 13045,
      "o_co_so": 3581
     },
     "theo_phan": {
@@ -3200,9 +3200,9 @@
      "luy_ke": {
       "tong_o": 7520,
       "o_0_0": 5248,
-      "khop_co_so": 1793,
-      "lech": 479,
-      "khop": 7041
+      "khop_co_so": 1784,
+      "lech": 488,
+      "khop": 7032
      },
      "ngay": {
       "tong_o": 4860,
@@ -3218,8 +3218,8 @@
       "sha256": "28da7f334f886ef4f4c3b22d00478e34256dd069484d2f3d9b9a38930e753f1d"
      },
      "lech_ban_ccr_vs_cf": {
-      "so_o": 671,
-      "sha256": "b98af46f7addc2519b3767215b86b6bb3657c2eae2187d3581532f33e849d738"
+      "so_o": 680,
+      "sha256": "37cb305b8a297ce6364ebbda3171dff2f430621c5a879d5a2d30e54dea0f3ca3"
      }
     },
     "chua_co_dau_vao": {
@@ -3248,7 +3248,6 @@
     "ngoai_khuon": {
      "ban_sao_DR3_A_CCR": 18046,
      "cb_cong_thuc_doi_theo_cot": 32,
-     "daily_transactions": 0,
      "person_hang_khong_khoi": 2
     },
     "max_lech_khop": "1.025490196079E-14",
@@ -3301,7 +3300,6 @@
      "chua_co_dau_vao:tien_dau_bao_cao": 1071,
      "ngoai_khuon:ban_sao_DR3_A_CCR": 18046,
      "ngoai_khuon:cb_cong_thuc_doi_theo_cot": 32,
-     "ngoai_khuon:daily_transactions": 0,
      "ngoai_khuon:person_hang_khong_khoi": 2
     },
     "dung_ky": null
@@ -3321,7 +3319,7 @@
   },
   "khong_do_duoc": [],
   "phu_mot_phan": [
-   "615: ô so 13760/48021 ô số · 34261 ô số chưa so (chua_co_dau_vao:hr 3147 · chua_co_dau_vao:raw_data_management 1040 · chua_co_dau_vao:tien_dau_bao_cao 1071 · ngoai_khuon:ban_sao_DR3_A_CCR 18046 · ngoai_khuon:cb_cong_thuc_doi_theo_cot 32 · ngoai_khuon:daily_transactions 0 · ngoai_khuon:person_hang_khong_khoi 2)"
+   "615: ô so 13760/48021 ô số · 34261 ô số chưa so (chua_co_dau_vao:hr 3147 · chua_co_dau_vao:raw_data_management 1040 · chua_co_dau_vao:tien_dau_bao_cao 1071 · ngoai_khuon:ban_sao_DR3_A_CCR 18046 · ngoai_khuon:cb_cong_thuc_doi_theo_cot 32 · ngoai_khuon:person_hang_khong_khoi 2)"
   ],
   "dung_co_ky": [
    "605: DỪNG có chữ ký KhanhCQ 2026-11-23"

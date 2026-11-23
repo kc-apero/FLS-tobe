@@ -15,6 +15,11 @@ Nhãn Đ4 *(mỗi số nói nó đếm gì)* — theo TỪNG đáp án:
     `PL5` M02 — `H14-R1-04`)*. `ngoai_khuon` *(615)* = đoạn sổ ⛔ khuôn CF *(bản sao DR3 · hàng ⛔ khối)*.
   · `dung` — đáp án DỪNG cả bản *(605 — 615 hết DỪNG ở vòng sửa R1)*: số ô SỐ ⛔ so *(Đ3: > 0)*.
   · `check` — CHECK IX.PL của BÁO CÁO engine theo (phần, khối, cột): chỉ ĐẾM + băm danh sách đỏ *(⛔ phán)*.
+⭐ `WO-353` C3 = ⓐ *(chủ 23/11)* — 615 + số dư chụp CÙNG lượt *(A-CCR 2026-11-23 12:11:45–50Z)*; khối `615` SINH LẠI từ MỘT lần đo
+  *(`chay_wp_c5c` trên kho TEST, ⛔ sửa tay; 4 đáp án kia ⛔ đổi — máy so bằng)*. Số CŨ *(615 chụp 22/11)*: `dem.khop` 13.054 ·
+  `khop_co_so`/`khop_tinh` 2.875 · `luy_ke` khớp 7.041 · `khop_co_so` 1.793 · lệch 479 · lớp `lech_ban_ccr_vs_cf` 671 ô
+  *(sha256 `b98af46f…`)* · `ngoai_khuon.daily_transactions` 0 *(23/11: hàng `Daily Transactions` mang chữ ⇒ tiêu đề — ⛔ còn đoạn)*.
+  `cb` 1.380/1.380 — ⛔ đổi; `lech_FLS` [] — ⛔ đổi.
 """
 from typing import Any
 
@@ -300,19 +305,19 @@ MONG: dict[str, Any] = {'dap_an': {'607': {'dem': {'khop_tinh': 4365,
                     'chinh_tay_trung_0_5': [],
                     'ngoai_khuon': {},
                     'lech_FLS': []},
-            '615': {'dem': {'khop_tinh': 2875,
+            '615': {'dem': {'khop_tinh': 2866,
                             'khop_chep': 0,
                             'tong_o': 13760,
-                            'khop_co_so': 2875,
+                            'khop_co_so': 2866,
                             'o_0_0': 10179,
-                            'khop': 13054,
+                            'khop': 13045,
                             'o_co_so': 3581},
                     'theo_phan': {'cb': {'tong_o': 1380, 'o_0_0': 528, 'khop_co_so': 852, 'lech': 0, 'khop': 1380},
                                   'luy_ke': {'tong_o': 7520,
                                              'o_0_0': 5248,
-                                             'khop_co_so': 1793,
-                                             'lech': 479,
-                                             'khop': 7041},
+                                             'khop_co_so': 1784,
+                                             'lech': 488,
+                                             'khop': 7032},
                                   'ngay': {'tong_o': 4860,
                                            'o_0_0': 4403,
                                            'khop_co_so': 230,
@@ -320,8 +325,8 @@ MONG: dict[str, Any] = {'dap_an': {'607': {'dem': {'khop_tinh': 4365,
                                            'khop': 4633}},
                     'lop': {'ite_alias': {'so_o': 35,
                                           'sha256': '28da7f334f886ef4f4c3b22d00478e34256dd069484d2f3d9b9a38930e753f1d'},
-                            'lech_ban_ccr_vs_cf': {'so_o': 671,
-                                                   'sha256': 'b98af46f7addc2519b3767215b86b6bb3657c2eae2187d3581532f33e849d738'}},
+                            'lech_ban_ccr_vs_cf': {'so_o': 680,
+                                                   'sha256': '37cb305b8a297ce6364ebbda3171dff2f430621c5a879d5a2d30e54dea0f3ca3'}},
                     'chua_co_dau_vao': {'hr': 3147, 'raw_data_management': 1040, 'tien_dau_bao_cao': 1071},
                     'engine_vang': {'kpi_cfa1_engine_chua_tinh': 6200,
                                     'ma_ngoai_luoi:HDAP': 120,
@@ -339,7 +344,6 @@ MONG: dict[str, Any] = {'dap_an': {'607': {'dem': {'khop_tinh': 4365,
                     'chinh_tay_trung_0_5': [],
                     'ngoai_khuon': {'ban_sao_DR3_A_CCR': 18046,
                                     'cb_cong_thuc_doi_theo_cot': 32,
-                                    'daily_transactions': 0,
                                     'person_hang_khong_khoi': 2},
                     'lech_FLS': []}},
  'dung': {'605': 13706},

@@ -1,0 +1,2170 @@
+{
+ "_vi_sao": "Sinh bởi tools/do_voi_so_luong.py — chạy mã FLS lên ảnh đóng băng tests/fixture/. ⛔ sửa tay.",
+ "nguon": {
+  "so": "'ITL Ledge'!A10:B12731 · D10:G12731 · R10:AT12731 (⛔ C)",
+  "so_dong_bang": "2026-11-23",
+  "canon": "'Transaction Mapping L1'!A5:AL14269",
+  "pm": "'[Importrange]PM_Unpivot'!A3:AC3911 (chiếu 14 cột)",
+  "checksum": {
+   "itl_ledge_adjustment_song_20261123.json": "469daa90d9255072",
+   "l1_canon_song_20261123.json": "bb2386bf3696b0ac",
+   "pm_join_song_20261123.json": "51c6454d3d6e0d82"
+  },
+  "anh": {
+   "so": "itl_ledge_adjustment_song_20261123.json",
+   "canon": "l1_canon_song_20261123.json",
+   "pm": "pm_join_song_20261123.json"
+  },
+  "ngoai_mau_so": {
+   "_vi_sao": "dòng sổ SỐNG của kỳ ngoài 23 kỳ đã ký (KY_HD1) — ⛔ vào phán HD1 (C1 = ⓐ giữ mẫu số)",
+   "dong_so": {
+    "2026-09": 737,
+    "2026-10": 1038,
+    "2026-11": 748
+   },
+   "dong_ghep": {
+    "2026-09": 702,
+    "2026-10": 991,
+    "2026-11": 721
+   }
+  }
+ },
+ "bo_ba": "song",
+ "ky": [
+  "2024-10",
+  "2024-11",
+  "2024-12",
+  "2025-01",
+  "2025-02",
+  "2025-03",
+  "2025-04",
+  "2025-05",
+  "2025-06",
+  "2025-07",
+  "2025-08",
+  "2025-09",
+  "2025-10",
+  "2025-11",
+  "2025-12",
+  "2026-01",
+  "2026-02",
+  "2026-03",
+  "2026-04",
+  "2026-05",
+  "2026-06",
+  "2026-07",
+  "2026-08"
+ ],
+ "theo_ky": {
+  "2024-10": {
+   "co": 6,
+   "chay": 6,
+   "o_go_that": 29,
+   "o_mac_dinh": 13,
+   "o_parity": 42,
+   "o_parity_khop": 42,
+   "hd_parity": 6,
+   "hd_parity_khop": 6,
+   "pm_noi": 0
+  },
+  "2024-11": {
+   "co": 3,
+   "chay": 3,
+   "o_go_that": 14,
+   "o_mac_dinh": 7,
+   "o_parity": 21,
+   "o_parity_khop": 21,
+   "hd_parity": 3,
+   "hd_parity_khop": 3,
+   "pm_noi": 0
+  },
+  "2024-12": {
+   "co": 6,
+   "chay": 6,
+   "o_go_that": 30,
+   "o_mac_dinh": 12,
+   "o_parity": 42,
+   "o_parity_khop": 42,
+   "hd_parity": 6,
+   "hd_parity_khop": 6,
+   "pm_noi": 0
+  },
+  "2025-01": {
+   "co": 748,
+   "chay": 748,
+   "o_go_that": 2397,
+   "o_mac_dinh": 2317,
+   "o_parity": 5236,
+   "o_parity_khop": 5236,
+   "hd_parity": 748,
+   "hd_parity_khop": 748,
+   "map_now": 148,
+   "map_fls": 131,
+   "day_nguoi": 31,
+   "pm_noi": 127
+  },
+  "2025-02": {
+   "co": 283,
+   "chay": 283,
+   "o_go_that": 814,
+   "o_mac_dinh": 609,
+   "o_parity": 1981,
+   "o_parity_khop": 1981,
+   "hd_parity": 283,
+   "hd_parity_khop": 283,
+   "map_now": 110,
+   "map_fls": 88,
+   "day_nguoi": 23,
+   "pm_noi": 84
+  },
+  "2025-03": {
+   "co": 297,
+   "chay": 297,
+   "o_go_that": 660,
+   "o_mac_dinh": 581,
+   "o_parity": 2079,
+   "o_parity_khop": 2079,
+   "hd_parity": 297,
+   "hd_parity_khop": 297,
+   "map_now": 161,
+   "map_fls": 122,
+   "day_nguoi": 44,
+   "pm_noi": 120
+  },
+  "2025-04": {
+   "co": 332,
+   "chay": 332,
+   "o_go_that": 745,
+   "o_mac_dinh": 736,
+   "o_parity": 2324,
+   "o_parity_khop": 2324,
+   "hd_parity": 332,
+   "hd_parity_khop": 332,
+   "map_now": 157,
+   "map_fls": 151,
+   "day_nguoi": 15,
+   "pm_noi": 146
+  },
+  "2025-05": {
+   "co": 408,
+   "chay": 408,
+   "o_mac_dinh": 735,
+   "o_go_that": 838,
+   "o_parity": 2856,
+   "o_parity_khop": 2856,
+   "hd_parity": 408,
+   "hd_parity_khop": 408,
+   "map_now": 242,
+   "o_trong": 1,
+   "map_fls": 159,
+   "day_nguoi": 92,
+   "pm_noi": 152
+  },
+  "2025-06": {
+   "co": 348,
+   "chay": 348,
+   "o_mac_dinh": 748,
+   "o_go_that": 819,
+   "o_parity": 2436,
+   "o_parity_khop": 2436,
+   "hd_parity": 348,
+   "hd_parity_khop": 348,
+   "map_now": 173,
+   "day_nguoi": 45,
+   "map_fls": 134,
+   "pm_noi": 135
+  },
+  "2025-07": {
+   "co": 546,
+   "chay": 546,
+   "map_now": 250,
+   "o_mac_dinh": 1118,
+   "o_parity": 3822,
+   "o_parity_khop": 3822,
+   "hd_parity": 546,
+   "hd_parity_khop": 546,
+   "o_go_that": 1393,
+   "o_trong": 1,
+   "map_fls": 205,
+   "day_nguoi": 55,
+   "pm_noi": 175
+  },
+  "2025-08": {
+   "co": 537,
+   "chay": 537,
+   "o_go_that": 1406,
+   "o_mac_dinh": 1122,
+   "o_parity": 3759,
+   "o_parity_khop": 3759,
+   "hd_parity": 537,
+   "hd_parity_khop": 537,
+   "map_now": 229,
+   "map_fls": 190,
+   "day_nguoi": 57,
+   "pm_noi": 167
+  },
+  "2025-09": {
+   "co": 501,
+   "chay": 501,
+   "o_go_that": 1511,
+   "o_mac_dinh": 1057,
+   "o_parity": 3507,
+   "o_parity_khop": 3507,
+   "hd_parity": 501,
+   "hd_parity_khop": 501,
+   "map_now": 180,
+   "map_fls": 150,
+   "day_nguoi": 37,
+   "pm_noi": 128
+  },
+  "2025-10": {
+   "co": 487,
+   "chay": 487,
+   "o_go_that": 1505,
+   "o_mac_dinh": 1051,
+   "o_parity": 3409,
+   "o_parity_khop": 3409,
+   "hd_parity": 487,
+   "hd_parity_khop": 487,
+   "map_now": 166,
+   "o_trong": 3,
+   "map_fls": 137,
+   "day_nguoi": 35,
+   "pm_noi": 131
+  },
+  "2025-11": {
+   "co": 477,
+   "chay": 475,
+   "o_mac_dinh": 1053,
+   "o_go_that": 1596,
+   "o_parity": 3339,
+   "o_parity_khop": 3339,
+   "hd_parity": 477,
+   "hd_parity_khop": 477,
+   "map_now": 128,
+   "map_fls": 117,
+   "day_nguoi": 22,
+   "pm_noi": 110
+  },
+  "2025-12": {
+   "co": 566,
+   "chay": 566,
+   "o_go_that": 1437,
+   "o_mac_dinh": 1509,
+   "o_parity": 3962,
+   "o_parity_khop": 3962,
+   "hd_parity": 566,
+   "hd_parity_khop": 566,
+   "map_now": 188,
+   "o_trong": 2,
+   "map_fls": 187,
+   "day_nguoi": 26,
+   "pm_noi": 136
+  },
+  "2026-01": {
+   "co": 471,
+   "chay": 471,
+   "o_go_that": 1577,
+   "o_mac_dinh": 1063,
+   "o_parity": 3297,
+   "o_parity_khop": 3297,
+   "hd_parity": 471,
+   "hd_parity_khop": 471,
+   "map_now": 132,
+   "map_fls": 116,
+   "day_nguoi": 17,
+   "pm_noi": 113
+  },
+  "2026-02": {
+   "co": 439,
+   "chay": 438,
+   "o_go_that": 1592,
+   "o_mac_dinh": 948,
+   "o_parity": 3073,
+   "o_parity_khop": 3073,
+   "hd_parity": 439,
+   "hd_parity_khop": 439,
+   "map_now": 107,
+   "map_fls": 87,
+   "day_nguoi": 22,
+   "pm_noi": 85
+  },
+  "2026-03": {
+   "co": 584,
+   "chay": 582,
+   "o_go_that": 2278,
+   "o_mac_dinh": 1196,
+   "o_parity": 4088,
+   "o_parity_khop": 4088,
+   "hd_parity": 584,
+   "hd_parity_khop": 584,
+   "map_now": 123,
+   "map_fls": 113,
+   "day_nguoi": 11,
+   "pm_noi": 113
+  },
+  "2026-04": {
+   "co": 600,
+   "chay": 599,
+   "o_go_that": 2168,
+   "o_mac_dinh": 1338,
+   "o_parity": 4200,
+   "o_parity_khop": 4200,
+   "hd_parity": 600,
+   "hd_parity_khop": 600,
+   "map_now": 150,
+   "o_trong": 15,
+   "day_nguoi": 20,
+   "map_fls": 131,
+   "pm_noi": 92
+  },
+  "2026-05": {
+   "co": 537,
+   "chay": 536,
+   "o_go_that": 1829,
+   "o_mac_dinh": 1122,
+   "o_parity": 3759,
+   "o_parity_khop": 3759,
+   "hd_parity": 537,
+   "hd_parity_khop": 537,
+   "map_now": 176,
+   "o_trong": 18,
+   "map_fls": 147,
+   "day_nguoi": 29,
+   "pm_noi": 107
+  },
+  "2026-06": {
+   "co": 613,
+   "chay": 611,
+   "o_mac_dinh": 1434,
+   "o_go_that": 2075,
+   "o_parity": 4291,
+   "o_parity_khop": 4291,
+   "hd_parity": 613,
+   "hd_parity_khop": 613,
+   "map_now": 180,
+   "map_fls": 154,
+   "day_nguoi": 28,
+   "pm_noi": 126
+  },
+  "2026-07": {
+   "co": 686,
+   "chay": 683,
+   "o_go_that": 2433,
+   "o_mac_dinh": 1570,
+   "o_parity": 4711,
+   "o_parity_khop": 4711,
+   "hd_parity": 673,
+   "hd_parity_khop": 673,
+   "map_now": 159,
+   "o_trong": 34,
+   "loai_tu_soi": 13,
+   "map_fls": 133,
+   "day_nguoi": 29,
+   "pm_noi": 134
+  },
+  "2026-08": {
+   "co": 724,
+   "chay": 724,
+   "o_go_that": 2703,
+   "o_mac_dinh": 1732,
+   "o_parity": 5068,
+   "o_parity_khop": 5068,
+   "hd_parity": 724,
+   "hd_parity_khop": 724,
+   "map_now": 142,
+   "map_fls": 125,
+   "day_nguoi": 21,
+   "pm_noi": 122
+  }
+ },
+ "khoi_theo_ky": {
+  "2024-10": {
+   "hd": [
+    6,
+    0
+   ],
+   "pay_type": [
+    5,
+    1
+   ],
+   "cdt1": [
+    0,
+    6
+   ],
+   "svc_start": [
+    6,
+    0
+   ],
+   "svc_end": [
+    6,
+    0
+   ],
+   "id_payee": [
+    0,
+    6
+   ],
+   "invoice": [
+    6,
+    0
+   ]
+  },
+  "2024-11": {
+   "hd": [
+    3,
+    0
+   ],
+   "pay_type": [
+    2,
+    1
+   ],
+   "cdt1": [
+    0,
+    3
+   ],
+   "svc_start": [
+    3,
+    0
+   ],
+   "svc_end": [
+    3,
+    0
+   ],
+   "id_payee": [
+    0,
+    3
+   ],
+   "invoice": [
+    3,
+    0
+   ]
+  },
+  "2024-12": {
+   "hd": [
+    6,
+    0
+   ],
+   "pay_type": [
+    4,
+    2
+   ],
+   "cdt1": [
+    1,
+    5
+   ],
+   "svc_start": [
+    6,
+    0
+   ],
+   "svc_end": [
+    6,
+    0
+   ],
+   "id_payee": [
+    1,
+    5
+   ],
+   "invoice": [
+    6,
+    0
+   ]
+  },
+  "2025-01": {
+   "hd": [
+    206,
+    394
+   ],
+   "pay_type": [
+    77,
+    513
+   ],
+   "cdt1": [
+    48,
+    555
+   ],
+   "svc_start": [
+    733,
+    0
+   ],
+   "svc_end": [
+    733,
+    0
+   ],
+   "id_payee": [
+    69,
+    656
+   ],
+   "invoice": [
+    531,
+    199
+   ]
+  },
+  "2025-02": {
+   "hd": [
+    148,
+    25
+   ],
+   "pay_type": [
+    57,
+    115
+   ],
+   "cdt1": [
+    34,
+    143
+   ],
+   "svc_start": [
+    206,
+    0
+   ],
+   "svc_end": [
+    206,
+    0
+   ],
+   "id_payee": [
+    90,
+    179
+   ],
+   "invoice": [
+    73,
+    147
+   ]
+  },
+  "2025-03": {
+   "hd": [
+    106,
+    30
+   ],
+   "pay_type": [
+    54,
+    80
+   ],
+   "cdt1": [
+    13,
+    128
+   ],
+   "svc_start": [
+    165,
+    0
+   ],
+   "svc_end": [
+    164,
+    0
+   ],
+   "id_payee": [
+    89,
+    200
+   ],
+   "invoice": [
+    69,
+    143
+   ]
+  },
+  "2025-04": {
+   "hd": [
+    119,
+    56
+   ],
+   "pay_type": [
+    56,
+    113
+   ],
+   "cdt1": [
+    17,
+    175
+   ],
+   "svc_start": [
+    197,
+    0
+   ],
+   "svc_end": [
+    198,
+    0
+   ],
+   "id_payee": [
+    65,
+    262
+   ],
+   "invoice": [
+    93,
+    130
+   ]
+  },
+  "2025-05": {
+   "hd": [
+    125,
+    41
+   ],
+   "pay_type": [
+    56,
+    101
+   ],
+   "cdt1": [
+    12,
+    170
+   ],
+   "svc_start": [
+    198,
+    0
+   ],
+   "svc_end": [
+    198,
+    0
+   ],
+   "id_payee": [
+    119,
+    280
+   ],
+   "invoice": [
+    130,
+    143
+   ]
+  },
+  "2025-06": {
+   "hd": [
+    140,
+    35
+   ],
+   "pay_type": [
+    57,
+    113
+   ],
+   "cdt1": [
+    37,
+    172
+   ],
+   "svc_start": [
+    215,
+    0
+   ],
+   "svc_end": [
+    215,
+    0
+   ],
+   "id_payee": [
+    85,
+    242
+   ],
+   "invoice": [
+    70,
+    186
+   ]
+  },
+  "2025-07": {
+   "hd": [
+    250,
+    46
+   ],
+   "pay_type": [
+    96,
+    190
+   ],
+   "cdt1": [
+    131,
+    194
+   ],
+   "svc_start": [
+    328,
+    0
+   ],
+   "svc_end": [
+    329,
+    0
+   ],
+   "id_payee": [
+    183,
+    330
+   ],
+   "invoice": [
+    76,
+    358
+   ]
+  },
+  "2025-08": {
+   "hd": [
+    257,
+    51
+   ],
+   "pay_type": [
+    65,
+    225
+   ],
+   "cdt1": [
+    156,
+    195
+   ],
+   "svc_start": [
+    322,
+    0
+   ],
+   "svc_end": [
+    323,
+    0
+   ],
+   "id_payee": [
+    217,
+    294
+   ],
+   "invoice": [
+    66,
+    357
+   ]
+  },
+  "2025-09": {
+   "hd": [
+    271,
+    50
+   ],
+   "pay_type": [
+    70,
+    244
+   ],
+   "cdt1": [
+    169,
+    172
+   ],
+   "svc_start": [
+    350,
+    0
+   ],
+   "svc_end": [
+    348,
+    0
+   ],
+   "id_payee": [
+    256,
+    224
+   ],
+   "invoice": [
+    47,
+    367
+   ]
+  },
+  "2025-10": {
+   "hd": [
+    266,
+    55
+   ],
+   "pay_type": [
+    74,
+    241
+   ],
+   "cdt1": [
+    181,
+    156
+   ],
+   "svc_start": [
+    364,
+    0
+   ],
+   "svc_end": [
+    364,
+    0
+   ],
+   "id_payee": [
+    222,
+    230
+   ],
+   "invoice": [
+    34,
+    369
+   ]
+  },
+  "2025-11": {
+   "hd": [
+    307,
+    42
+   ],
+   "pay_type": [
+    72,
+    266
+   ],
+   "cdt1": [
+    193,
+    172
+   ],
+   "svc_start": [
+    359,
+    0
+   ],
+   "svc_end": [
+    360,
+    0
+   ],
+   "id_payee": [
+    300,
+    163
+   ],
+   "invoice": [
+    5,
+    410
+   ]
+  },
+  "2025-12": {
+   "hd": [
+    327,
+    51
+   ],
+   "pay_type": [
+    71,
+    280
+   ],
+   "cdt1": [
+    79,
+    309
+   ],
+   "svc_start": [
+    390,
+    0
+   ],
+   "svc_end": [
+    390,
+    0
+   ],
+   "id_payee": [
+    179,
+    363
+   ],
+   "invoice": [
+    1,
+    506
+   ]
+  },
+  "2026-01": {
+   "hd": [
+    305,
+    34
+   ],
+   "pay_type": [
+    86,
+    252
+   ],
+   "cdt1": [
+    131,
+    222
+   ],
+   "svc_start": [
+    373,
+    0
+   ],
+   "svc_end": [
+    374,
+    0
+   ],
+   "id_payee": [
+    308,
+    146
+   ],
+   "invoice": [
+    0,
+    409
+   ]
+  },
+  "2026-02": {
+   "hd": [
+    286,
+    46
+   ],
+   "pay_type": [
+    80,
+    250
+   ],
+   "cdt1": [
+    159,
+    188
+   ],
+   "svc_start": [
+    358,
+    0
+   ],
+   "svc_end": [
+    358,
+    0
+   ],
+   "id_payee": [
+    351,
+    78
+   ],
+   "invoice": [
+    0,
+    386
+   ]
+  },
+  "2026-03": {
+   "hd": [
+    406,
+    55
+   ],
+   "pay_type": [
+    89,
+    371
+   ],
+   "cdt1": [
+    328,
+    168
+   ],
+   "svc_start": [
+    487,
+    0
+   ],
+   "svc_end": [
+    487,
+    0
+   ],
+   "id_payee": [
+    481,
+    80
+   ],
+   "invoice": [
+    0,
+    522
+   ]
+  },
+  "2026-04": {
+   "hd": [
+    385,
+    64
+   ],
+   "pay_type": [
+    84,
+    365
+   ],
+   "cdt1": [
+    258,
+    232
+   ],
+   "svc_start": [
+    515,
+    0
+   ],
+   "svc_end": [
+    515,
+    0
+   ],
+   "id_payee": [
+    411,
+    157
+   ],
+   "invoice": [
+    0,
+    520
+   ]
+  },
+  "2026-05": {
+   "hd": [
+    299,
+    62
+   ],
+   "pay_type": [
+    79,
+    282
+   ],
+   "cdt1": [
+    260,
+    117
+   ],
+   "svc_start": [
+    458,
+    0
+   ],
+   "svc_end": [
+    458,
+    0
+   ],
+   "id_payee": [
+    275,
+    211
+   ],
+   "invoice": [
+    0,
+    450
+   ]
+  },
+  "2026-06": {
+   "hd": [
+    363,
+    70
+   ],
+   "pay_type": [
+    112,
+    319
+   ],
+   "cdt1": [
+    303,
+    135
+   ],
+   "svc_start": [
+    524,
+    0
+   ],
+   "svc_end": [
+    530,
+    0
+   ],
+   "id_payee": [
+    243,
+    337
+   ],
+   "invoice": [
+    0,
+    573
+   ]
+  },
+  "2026-07": {
+   "hd": [
+    446,
+    81
+   ],
+   "pay_type": [
+    169,
+    353
+   ],
+   "cdt1": [
+    341,
+    187
+   ],
+   "svc_start": [
+    567,
+    0
+   ],
+   "svc_end": [
+    564,
+    0
+   ],
+   "id_payee": [
+    346,
+    314
+   ],
+   "invoice": [
+    0,
+    635
+   ]
+  },
+  "2026-08": {
+   "hd": [
+    483,
+    99
+   ],
+   "pay_type": [
+    116,
+    462
+   ],
+   "cdt1": [
+    452,
+    142
+   ],
+   "svc_start": [
+    642,
+    0
+   ],
+   "svc_end": [
+    643,
+    0
+   ],
+   "id_payee": [
+    367,
+    330
+   ],
+   "invoice": [
+    0,
+    699
+   ]
+  }
+ },
+ "tong": {
+  "co": 10199,
+  "chay": 10187,
+  "o_go_that": 31849,
+  "o_mac_dinh": 23071,
+  "o_parity": 71302,
+  "o_parity_khop": 71302,
+  "hd_parity": 10186,
+  "hd_parity_khop": 10186,
+  "pm_noi": 2503,
+  "map_now": 3301,
+  "map_fls": 2777,
+  "day_nguoi": 659,
+  "o_trong": 74,
+  "loai_tu_soi": 13,
+  "o_de": 0
+ },
+ "pm_tong": {
+  "so_dong_pm": 3909,
+  "pm_noi_tong": 2501,
+  "pm_co_ref": 3369
+ },
+ "tu_sinh": {
+  "ky": "2026-03",
+  "so_dong": 584,
+  "o": [
+   4088,
+   4088
+  ],
+  "hd": [
+   584,
+   584
+  ],
+  "mid": [
+   4022,
+   4088
+  ],
+  "lech_final": {},
+  "lech_mid": {
+   "invoice": 62,
+   "cdt1": 2,
+   "pay_type": 2
+  },
+  "o_loi": 0,
+  "theo_ky": {
+   "2024-10": {
+    "ky": "2024-10",
+    "so_dong": 6,
+    "o": [
+     42,
+     42
+    ],
+    "hd": [
+     6,
+     6
+    ],
+    "mid": [
+     42,
+     42
+    ],
+    "lech_final": {},
+    "lech_mid": {},
+    "o_loi": 0
+   },
+   "2024-11": {
+    "ky": "2024-11",
+    "so_dong": 3,
+    "o": [
+     21,
+     21
+    ],
+    "hd": [
+     3,
+     3
+    ],
+    "mid": [
+     21,
+     21
+    ],
+    "lech_final": {},
+    "lech_mid": {},
+    "o_loi": 0
+   },
+   "2024-12": {
+    "ky": "2024-12",
+    "so_dong": 6,
+    "o": [
+     42,
+     42
+    ],
+    "hd": [
+     6,
+     6
+    ],
+    "mid": [
+     42,
+     42
+    ],
+    "lech_final": {},
+    "lech_mid": {},
+    "o_loi": 0
+   },
+   "2025-01": {
+    "ky": "2025-01",
+    "so_dong": 748,
+    "o": [
+     5236,
+     5236
+    ],
+    "hd": [
+     748,
+     748
+    ],
+    "mid": [
+     4758,
+     5236
+    ],
+    "lech_final": {},
+    "lech_mid": {
+     "pay_type": 145,
+     "cdt1": 144,
+     "id_payee": 15,
+     "hd": 128,
+     "invoice": 18,
+     "svc_start": 15,
+     "svc_end": 13
+    },
+    "o_loi": 0
+   },
+   "2025-02": {
+    "ky": "2025-02",
+    "so_dong": 283,
+    "o": [
+     1979,
+     1981
+    ],
+    "hd": [
+     283,
+     283
+    ],
+    "mid": [
+     1464,
+     1981
+    ],
+    "lech_final": {
+     "svc_start": 1,
+     "svc_end": 1
+    },
+    "lech_mid": {
+     "hd": 94,
+     "pay_type": 90,
+     "cdt1": 104,
+     "svc_start": 76,
+     "svc_end": 76,
+     "invoice": 63,
+     "id_payee": 14
+    },
+    "o_loi": 0
+   },
+   "2025-03": {
+    "ky": "2025-03",
+    "so_dong": 297,
+    "o": [
+     2077,
+     2079
+    ],
+    "hd": [
+     297,
+     297
+    ],
+    "mid": [
+     1274,
+     2079
+    ],
+    "lech_final": {
+     "svc_start": 1,
+     "svc_end": 1
+    },
+    "lech_mid": {
+     "hd": 156,
+     "pay_type": 139,
+     "cdt1": 154,
+     "invoice": 84,
+     "svc_start": 132,
+     "svc_end": 132,
+     "id_payee": 8
+    },
+    "o_loi": 0
+   },
+   "2025-04": {
+    "ky": "2025-04",
+    "so_dong": 332,
+    "o": [
+     2324,
+     2324
+    ],
+    "hd": [
+     332,
+     332
+    ],
+    "mid": [
+     1507,
+     2324
+    ],
+    "lech_final": {},
+    "lech_mid": {
+     "hd": 152,
+     "pay_type": 142,
+     "cdt1": 140,
+     "svc_start": 135,
+     "svc_end": 134,
+     "invoice": 109,
+     "id_payee": 5
+    },
+    "o_loi": 0
+   },
+   "2025-05": {
+    "ky": "2025-05",
+    "so_dong": 408,
+    "o": [
+     2852,
+     2856
+    ],
+    "hd": [
+     408,
+     408
+    ],
+    "mid": [
+     1611,
+     2856
+    ],
+    "lech_final": {
+     "svc_start": 2,
+     "svc_end": 2
+    },
+    "lech_mid": {
+     "hd": 236,
+     "cdt1": 225,
+     "svc_start": 209,
+     "svc_end": 210,
+     "invoice": 135,
+     "pay_type": 221,
+     "id_payee": 9
+    },
+    "o_loi": 0
+   },
+   "2025-06": {
+    "ky": "2025-06",
+    "so_dong": 348,
+    "o": [
+     2436,
+     2436
+    ],
+    "hd": [
+     348,
+     348
+    ],
+    "mid": [
+     1956,
+     2436
+    ],
+    "lech_final": {},
+    "lech_mid": {
+     "hd": 65,
+     "cdt1": 62,
+     "svc_start": 60,
+     "svc_end": 60,
+     "pay_type": 132,
+     "invoice": 83,
+     "id_payee": 18
+    },
+    "o_loi": 0
+   },
+   "2025-07": {
+    "ky": "2025-07",
+    "so_dong": 546,
+    "o": [
+     3822,
+     3822
+    ],
+    "hd": [
+     546,
+     546
+    ],
+    "mid": [
+     3541,
+     3822
+    ],
+    "lech_final": {},
+    "lech_mid": {
+     "invoice": 98,
+     "pay_type": 174,
+     "id_payee": 9
+    },
+    "o_loi": 0
+   },
+   "2025-08": {
+    "ky": "2025-08",
+    "so_dong": 537,
+    "o": [
+     3759,
+     3759
+    ],
+    "hd": [
+     537,
+     537
+    ],
+    "mid": [
+     3488,
+     3759
+    ],
+    "lech_final": {},
+    "lech_mid": {
+     "pay_type": 155,
+     "invoice": 104,
+     "id_payee": 12
+    },
+    "o_loi": 0
+   },
+   "2025-09": {
+    "ky": "2025-09",
+    "so_dong": 501,
+    "o": [
+     3507,
+     3507
+    ],
+    "hd": [
+     501,
+     501
+    ],
+    "mid": [
+     3356,
+     3507
+    ],
+    "lech_final": {},
+    "lech_mid": {
+     "invoice": 74,
+     "pay_type": 69,
+     "id_payee": 8
+    },
+    "o_loi": 0
+   },
+   "2025-10": {
+    "ky": "2025-10",
+    "so_dong": 487,
+    "o": [
+     3401,
+     3409
+    ],
+    "hd": [
+     487,
+     487
+    ],
+    "mid": [
+     3264,
+     3409
+    ],
+    "lech_final": {
+     "svc_end": 8
+    },
+    "lech_mid": {
+     "pay_type": 31,
+     "id_payee": 12,
+     "invoice": 81,
+     "svc_end": 21
+    },
+    "o_loi": 0
+   },
+   "2025-11": {
+    "ky": "2025-11",
+    "so_dong": 477,
+    "o": [
+     3321,
+     3339
+    ],
+    "hd": [
+     477,
+     477
+    ],
+    "mid": [
+     3208,
+     3339
+    ],
+    "lech_final": {
+     "svc_end": 18
+    },
+    "lech_mid": {
+     "invoice": 61,
+     "pay_type": 31,
+     "svc_end": 34,
+     "id_payee": 5
+    },
+    "o_loi": 0
+   },
+   "2025-12": {
+    "ky": "2025-12",
+    "so_dong": 566,
+    "o": [
+     3943,
+     3962
+    ],
+    "hd": [
+     566,
+     566
+    ],
+    "mid": [
+     3764,
+     3962
+    ],
+    "lech_final": {
+     "svc_end": 19
+    },
+    "lech_mid": {
+     "invoice": 59,
+     "pay_type": 78,
+     "id_payee": 18,
+     "svc_end": 43
+    },
+    "o_loi": 0
+   },
+   "2026-01": {
+    "ky": "2026-01",
+    "so_dong": 471,
+    "o": [
+     3290,
+     3297
+    ],
+    "hd": [
+     471,
+     471
+    ],
+    "mid": [
+     3184,
+     3297
+    ],
+    "lech_final": {
+     "svc_end": 7
+    },
+    "lech_mid": {
+     "pay_type": 26,
+     "invoice": 62,
+     "svc_end": 21,
+     "id_payee": 4
+    },
+    "o_loi": 0
+   },
+   "2026-02": {
+    "ky": "2026-02",
+    "so_dong": 439,
+    "o": [
+     3073,
+     3073
+    ],
+    "hd": [
+     439,
+     439
+    ],
+    "mid": [
+     3020,
+     3073
+    ],
+    "lech_final": {},
+    "lech_mid": {
+     "invoice": 53
+    },
+    "o_loi": 0
+   },
+   "2026-03": {
+    "ky": "2026-03",
+    "so_dong": 584,
+    "o": [
+     4088,
+     4088
+    ],
+    "hd": [
+     584,
+     584
+    ],
+    "mid": [
+     4022,
+     4088
+    ],
+    "lech_final": {},
+    "lech_mid": {
+     "invoice": 62,
+     "cdt1": 2,
+     "pay_type": 2
+    },
+    "o_loi": 0
+   },
+   "2026-04": {
+    "ky": "2026-04",
+    "so_dong": 600,
+    "o": [
+     4200,
+     4200
+    ],
+    "hd": [
+     600,
+     600
+    ],
+    "mid": [
+     4126,
+     4200
+    ],
+    "lech_final": {},
+    "lech_mid": {
+     "invoice": 66,
+     "pay_type": 8
+    },
+    "o_loi": 0
+   },
+   "2026-05": {
+    "ky": "2026-05",
+    "so_dong": 537,
+    "o": [
+     3759,
+     3759
+    ],
+    "hd": [
+     537,
+     537
+    ],
+    "mid": [
+     3682,
+     3759
+    ],
+    "lech_final": {},
+    "lech_mid": {
+     "invoice": 72,
+     "svc_end": 1,
+     "id_payee": 4
+    },
+    "o_loi": 0
+   },
+   "2026-06": {
+    "ky": "2026-06",
+    "so_dong": 613,
+    "o": [
+     4291,
+     4291
+    ],
+    "hd": [
+     613,
+     613
+    ],
+    "mid": [
+     4251,
+     4291
+    ],
+    "lech_final": {},
+    "lech_mid": {
+     "invoice": 40
+    },
+    "o_loi": 0
+   },
+   "2026-07": {
+    "ky": "2026-07",
+    "so_dong": 686,
+    "o": [
+     4770,
+     4802
+    ],
+    "hd": [
+     686,
+     686
+    ],
+    "mid": [
+     4762,
+     4802
+    ],
+    "lech_final": {
+     "cdt1": 7,
+     "svc_start": 5,
+     "svc_end": 5,
+     "id_payee": 6,
+     "invoice": 9
+    },
+    "lech_mid": {
+     "invoice": 40
+    },
+    "o_loi": 0
+   },
+   "2026-08": {
+    "ky": "2026-08",
+    "so_dong": 724,
+    "o": [
+     5068,
+     5068
+    ],
+    "hd": [
+     724,
+     724
+    ],
+    "mid": [
+     5043,
+     5068
+    ],
+    "lech_final": {},
+    "lech_mid": {
+     "invoice": 25
+    },
+    "o_loi": 0
+   },
+   "2026-09": {
+    "ky": "2026-09",
+    "so_dong": 737,
+    "o": [
+     5159,
+     5159
+    ],
+    "hd": [
+     737,
+     737
+    ],
+    "mid": [
+     5119,
+     5159
+    ],
+    "lech_final": {},
+    "lech_mid": {
+     "invoice": 40
+    },
+    "o_loi": 0
+   },
+   "2026-10": {
+    "ky": "2026-10",
+    "so_dong": 1038,
+    "o": [
+     7266,
+     7266
+    ],
+    "hd": [
+     1038,
+     1038
+    ],
+    "mid": [
+     7249,
+     7266
+    ],
+    "lech_final": {},
+    "lech_mid": {
+     "invoice": 17
+    },
+    "o_loi": 0
+   },
+   "2026-11": {
+    "ky": "2026-11",
+    "so_dong": 748,
+    "o": [
+     5236,
+     5236
+    ],
+    "hd": [
+     748,
+     748
+    ],
+    "mid": [
+     5233,
+     5236
+    ],
+    "lech_final": {},
+    "lech_mid": {
+     "invoice": 3
+    },
+    "o_loi": 0
+   }
+  },
+  "so_ky_co_anh": 26,
+  "chua_do": {},
+  "tong": {
+   "o": [
+    88962,
+    89054
+   ],
+   "hd": [
+    12722,
+    12722
+   ],
+   "mid": [
+    82987,
+    89054
+   ]
+  },
+  "moc_so": {
+   "2024-10": "23/11 ≡ 20/11 (đóng băng lại ra checksum BẰNG ảnh 20/11 — đọc ảnh 20/11)",
+   "2024-11": "23/11 ≡ 20/11 (đóng băng lại ra checksum BẰNG ảnh 20/11 — đọc ảnh 20/11)",
+   "2024-12": "23/11 ≡ 20/11 (đóng băng lại ra checksum BẰNG ảnh 20/11 — đọc ảnh 20/11)",
+   "2025-01": "23/11 ≡ 20/11 (đóng băng lại ra checksum BẰNG ảnh 20/11 — đọc ảnh 20/11)",
+   "2025-02": "23/11 ≡ 20/11 (đóng băng lại ra checksum BẰNG ảnh 20/11 — đọc ảnh 20/11)",
+   "2025-03": "23/11 ≡ 20/11 (đóng băng lại ra checksum BẰNG ảnh 20/11 — đọc ảnh 20/11)",
+   "2025-04": "23/11 ≡ 20/11 (đóng băng lại ra checksum BẰNG ảnh 20/11 — đọc ảnh 20/11)",
+   "2025-05": "23/11 ≡ 20/11 (đóng băng lại ra checksum BẰNG ảnh 20/11 — đọc ảnh 20/11)",
+   "2025-06": "23/11 ≡ 20/11 (đóng băng lại ra checksum BẰNG ảnh 20/11 — đọc ảnh 20/11)",
+   "2025-07": "23/11 ≡ 20/11 (đóng băng lại ra checksum BẰNG ảnh 20/11 — đọc ảnh 20/11)",
+   "2025-08": "23/11 ≡ 20/11 (đóng băng lại ra checksum BẰNG ảnh 20/11 — đọc ảnh 20/11)",
+   "2025-09": "23/11 ≡ 20/11 (đóng băng lại ra checksum BẰNG ảnh 20/11 — đọc ảnh 20/11)",
+   "2025-10": "23/11 (nguồn sống — ảnh _20261123; chủ quyết nguồn sống là chuẩn)",
+   "2025-11": "23/11 ≡ 20/11 (đóng băng lại ra checksum BẰNG ảnh 20/11 — đọc ảnh 20/11)",
+   "2025-12": "23/11 ≡ 20/11 (đóng băng lại ra checksum BẰNG ảnh 20/11 — đọc ảnh 20/11)",
+   "2026-01": "23/11 ≡ 20/11 (đóng băng lại ra checksum BẰNG ảnh 20/11 — đọc ảnh 20/11)",
+   "2026-02": "23/11 ≡ 20/11 (đóng băng lại ra checksum BẰNG ảnh 20/11 — đọc ảnh 20/11)",
+   "2026-03": "23/11 (nguồn sống — ảnh _20261123; chủ quyết nguồn sống là chuẩn)",
+   "2026-04": "23/11 ≡ 20/11 (đóng băng lại ra checksum BẰNG ảnh 20/11 — đọc ảnh 20/11)",
+   "2026-05": "23/11 ≡ 20/11 (đóng băng lại ra checksum BẰNG ảnh 20/11 — đọc ảnh 20/11)",
+   "2026-06": "23/11 ≡ 20/11 (đóng băng lại ra checksum BẰNG ảnh 20/11 — đọc ảnh 20/11)",
+   "2026-07": "23/11 ≡ 20/11 (đóng băng lại ra checksum BẰNG ảnh 20/11 — đọc ảnh 20/11)",
+   "2026-08": "23/11 ≡ 20/11 (đóng băng lại ra checksum BẰNG ảnh 20/11 — đọc ảnh 20/11)",
+   "2026-09": "23/11 ≡ 20/11 (đóng băng lại ra checksum BẰNG ảnh 20/11 — đọc ảnh 20/11)",
+   "2026-10": "23/11 ≡ 20/11 (đóng băng lại ra checksum BẰNG ảnh 20/11 — đọc ảnh 20/11)",
+   "2026-11": "23/11 (nguồn sống — ảnh _20261123; chủ quyết nguồn sống là chuẩn)"
+  }
+ },
+ "bank_tong": {
+  "dong_bank": 12601,
+  "khong_co_ma": 100,
+  "khong_thay_ma_PM": 8963,
+  "dong_theo_hinh": {
+   "A": 2438,
+   "F": 438,
+   "E": 201,
+   "B": 30,
+   "C": 404,
+   "D": 27
+  },
+  "bank_khong_ky": 2414
+ },
+ "dat_hd1": {
+  "_luat": "kỳ ĐẠT HD1 ⇔ [dòng] (dòng 1-1 100 % hoặc mọi dòng thiếu của kỳ có nhãn ĐÃ KÝ trong sổ lý do) ∧ [ô] (mẫu số ô trên MỌI dòng sổ của kỳ > 0 ∧ (ô Final = f(Classifying, MID) khớp trên MỌI dòng — gồm dòng tự-soi loại, ⛔ chỉ dòng đã ghép — hoặc mọi dòng tự-soi loại của kỳ có nhãn ĐÃ KÝ và ô của các dòng còn lại khớp hết)). `o_100` = vế [ô] ấy (H2-R1-01 ⓐ, errata ⑩). Nhãn: tệp DT1b, tập hợp lệ = dòng thiếu ∪ dòng tự-soi loại; dòng VẮNG trong tệp nhãn = chưa có nhãn (đỏ, ⛔ lỗi). Chữ ký: so_dong + van_tay_dong phải bằng TẬP dòng mang nhãn lúc đo (chép từ theo_nhan — errata ⑬); ⛔ ký KHAC; ngày ≤ hôm nay. ⛔ xét: chế độ tự sinh (H15); chiều ngược — dòng FLS ⛔ có dòng sổ (số ở ngoai_phan; ảnh pm_join ⛔ có ngày ⇒ ⛔ gán được kỳ; BA chốt khi DT2). AP v3.1.2 §5.3.1 HD1.",
+  "mau_so": {
+   "so_ky": 23,
+   "dong_so": 10199,
+   "dong_thieu": 12,
+   "dong_tu_soi_loai": 13,
+   "o_moi_dong": 71393
+  },
+  "tep_nhan": {
+   "duong": "docs/ITL/_tools/phan_loai_ly_do.json",
+   "co": false
+  },
+  "so_ly_do": "docs/ITL/_tools/so_ly_do_hd1.json",
+  "so_chu_ky": 0,
+  "van_tay": {
+   "thieu": "40fa4bfe4e2ec48c",
+   "nguoc": "4f53cda18c2baa0c"
+  },
+  "dem": {
+   "thieu": 12,
+   "co_nhan": 0,
+   "da_ky": 0,
+   "loai_tu_soi": 13,
+   "loai_co_nhan": 0,
+   "loai_da_ky": 0
+  },
+  "so_ky_dat": 16,
+  "ky_dat": [
+   "2024-10",
+   "2024-11",
+   "2024-12",
+   "2025-01",
+   "2025-02",
+   "2025-03",
+   "2025-04",
+   "2025-05",
+   "2025-06",
+   "2025-07",
+   "2025-08",
+   "2025-09",
+   "2025-10",
+   "2025-12",
+   "2026-01",
+   "2026-08"
+  ],
+  "theo_ky": {
+   "2024-10": {
+    "dat": true,
+    "thieu": 0,
+    "co_nhan": 0,
+    "da_ky": 0,
+    "dong_100": true,
+    "o_100": true,
+    "loai_tu_soi": 0,
+    "loai_co_nhan": 0,
+    "loai_da_ky": 0,
+    "o_moi_dong": 42,
+    "o_moi_dong_khop": 42
+   },
+   "2024-11": {
+    "dat": true,
+    "thieu": 0,
+    "co_nhan": 0,
+    "da_ky": 0,
+    "dong_100": true,
+    "o_100": true,
+    "loai_tu_soi": 0,
+    "loai_co_nhan": 0,
+    "loai_da_ky": 0,
+    "o_moi_dong": 21,
+    "o_moi_dong_khop": 21
+   },
+   "2024-12": {
+    "dat": true,
+    "thieu": 0,
+    "co_nhan": 0,
+    "da_ky": 0,
+    "dong_100": true,
+    "o_100": true,
+    "loai_tu_soi": 0,
+    "loai_co_nhan": 0,
+    "loai_da_ky": 0,
+    "o_moi_dong": 42,
+    "o_moi_dong_khop": 42
+   },
+   "2025-01": {
+    "dat": true,
+    "thieu": 0,
+    "co_nhan": 0,
+    "da_ky": 0,
+    "dong_100": true,
+    "o_100": true,
+    "loai_tu_soi": 0,
+    "loai_co_nhan": 0,
+    "loai_da_ky": 0,
+    "o_moi_dong": 5236,
+    "o_moi_dong_khop": 5236
+   },
+   "2025-02": {
+    "dat": true,
+    "thieu": 0,
+    "co_nhan": 0,
+    "da_ky": 0,
+    "dong_100": true,
+    "o_100": true,
+    "loai_tu_soi": 0,
+    "loai_co_nhan": 0,
+    "loai_da_ky": 0,
+    "o_moi_dong": 1981,
+    "o_moi_dong_khop": 1981
+   },
+   "2025-03": {
+    "dat": true,
+    "thieu": 0,
+    "co_nhan": 0,
+    "da_ky": 0,
+    "dong_100": true,
+    "o_100": true,
+    "loai_tu_soi": 0,
+    "loai_co_nhan": 0,
+    "loai_da_ky": 0,
+    "o_moi_dong": 2079,
+    "o_moi_dong_khop": 2079
+   },
+   "2025-04": {
+    "dat": true,
+    "thieu": 0,
+    "co_nhan": 0,
+    "da_ky": 0,
+    "dong_100": true,
+    "o_100": true,
+    "loai_tu_soi": 0,
+    "loai_co_nhan": 0,
+    "loai_da_ky": 0,
+    "o_moi_dong": 2324,
+    "o_moi_dong_khop": 2324
+   },
+   "2025-05": {
+    "dat": true,
+    "thieu": 0,
+    "co_nhan": 0,
+    "da_ky": 0,
+    "dong_100": true,
+    "o_100": true,
+    "loai_tu_soi": 0,
+    "loai_co_nhan": 0,
+    "loai_da_ky": 0,
+    "o_moi_dong": 2856,
+    "o_moi_dong_khop": 2856
+   },
+   "2025-06": {
+    "dat": true,
+    "thieu": 0,
+    "co_nhan": 0,
+    "da_ky": 0,
+    "dong_100": true,
+    "o_100": true,
+    "loai_tu_soi": 0,
+    "loai_co_nhan": 0,
+    "loai_da_ky": 0,
+    "o_moi_dong": 2436,
+    "o_moi_dong_khop": 2436
+   },
+   "2025-07": {
+    "dat": true,
+    "thieu": 0,
+    "co_nhan": 0,
+    "da_ky": 0,
+    "dong_100": true,
+    "o_100": true,
+    "loai_tu_soi": 0,
+    "loai_co_nhan": 0,
+    "loai_da_ky": 0,
+    "o_moi_dong": 3822,
+    "o_moi_dong_khop": 3822
+   },
+   "2025-08": {
+    "dat": true,
+    "thieu": 0,
+    "co_nhan": 0,
+    "da_ky": 0,
+    "dong_100": true,
+    "o_100": true,
+    "loai_tu_soi": 0,
+    "loai_co_nhan": 0,
+    "loai_da_ky": 0,
+    "o_moi_dong": 3759,
+    "o_moi_dong_khop": 3759
+   },
+   "2025-09": {
+    "dat": true,
+    "thieu": 0,
+    "co_nhan": 0,
+    "da_ky": 0,
+    "dong_100": true,
+    "o_100": true,
+    "loai_tu_soi": 0,
+    "loai_co_nhan": 0,
+    "loai_da_ky": 0,
+    "o_moi_dong": 3507,
+    "o_moi_dong_khop": 3507
+   },
+   "2025-10": {
+    "dat": true,
+    "thieu": 0,
+    "co_nhan": 0,
+    "da_ky": 0,
+    "dong_100": true,
+    "o_100": true,
+    "loai_tu_soi": 0,
+    "loai_co_nhan": 0,
+    "loai_da_ky": 0,
+    "o_moi_dong": 3409,
+    "o_moi_dong_khop": 3409
+   },
+   "2025-11": {
+    "dat": false,
+    "thieu": 2,
+    "co_nhan": 0,
+    "da_ky": 0,
+    "dong_100": false,
+    "o_100": true,
+    "loai_tu_soi": 0,
+    "loai_co_nhan": 0,
+    "loai_da_ky": 0,
+    "o_moi_dong": 3339,
+    "o_moi_dong_khop": 3339
+   },
+   "2025-12": {
+    "dat": true,
+    "thieu": 0,
+    "co_nhan": 0,
+    "da_ky": 0,
+    "dong_100": true,
+    "o_100": true,
+    "loai_tu_soi": 0,
+    "loai_co_nhan": 0,
+    "loai_da_ky": 0,
+    "o_moi_dong": 3962,
+    "o_moi_dong_khop": 3962
+   },
+   "2026-01": {
+    "dat": true,
+    "thieu": 0,
+    "co_nhan": 0,
+    "da_ky": 0,
+    "dong_100": true,
+    "o_100": true,
+    "loai_tu_soi": 0,
+    "loai_co_nhan": 0,
+    "loai_da_ky": 0,
+    "o_moi_dong": 3297,
+    "o_moi_dong_khop": 3297
+   },
+   "2026-02": {
+    "dat": false,
+    "thieu": 1,
+    "co_nhan": 0,
+    "da_ky": 0,
+    "dong_100": false,
+    "o_100": true,
+    "loai_tu_soi": 0,
+    "loai_co_nhan": 0,
+    "loai_da_ky": 0,
+    "o_moi_dong": 3073,
+    "o_moi_dong_khop": 3073
+   },
+   "2026-03": {
+    "dat": false,
+    "thieu": 2,
+    "co_nhan": 0,
+    "da_ky": 0,
+    "dong_100": false,
+    "o_100": true,
+    "loai_tu_soi": 0,
+    "loai_co_nhan": 0,
+    "loai_da_ky": 0,
+    "o_moi_dong": 4088,
+    "o_moi_dong_khop": 4088
+   },
+   "2026-04": {
+    "dat": false,
+    "thieu": 1,
+    "co_nhan": 0,
+    "da_ky": 0,
+    "dong_100": false,
+    "o_100": true,
+    "loai_tu_soi": 0,
+    "loai_co_nhan": 0,
+    "loai_da_ky": 0,
+    "o_moi_dong": 4200,
+    "o_moi_dong_khop": 4200
+   },
+   "2026-05": {
+    "dat": false,
+    "thieu": 1,
+    "co_nhan": 0,
+    "da_ky": 0,
+    "dong_100": false,
+    "o_100": true,
+    "loai_tu_soi": 0,
+    "loai_co_nhan": 0,
+    "loai_da_ky": 0,
+    "o_moi_dong": 3759,
+    "o_moi_dong_khop": 3759
+   },
+   "2026-06": {
+    "dat": false,
+    "thieu": 2,
+    "co_nhan": 0,
+    "da_ky": 0,
+    "dong_100": false,
+    "o_100": true,
+    "loai_tu_soi": 0,
+    "loai_co_nhan": 0,
+    "loai_da_ky": 0,
+    "o_moi_dong": 4291,
+    "o_moi_dong_khop": 4291
+   },
+   "2026-07": {
+    "dat": false,
+    "thieu": 3,
+    "co_nhan": 0,
+    "da_ky": 0,
+    "dong_100": false,
+    "o_100": false,
+    "loai_tu_soi": 13,
+    "loai_co_nhan": 0,
+    "loai_da_ky": 0,
+    "o_moi_dong": 4802,
+    "o_moi_dong_khop": 4770
+   },
+   "2026-08": {
+    "dat": true,
+    "thieu": 0,
+    "co_nhan": 0,
+    "da_ky": 0,
+    "dong_100": true,
+    "o_100": true,
+    "loai_tu_soi": 0,
+    "loai_co_nhan": 0,
+    "loai_da_ky": 0,
+    "o_moi_dong": 5068,
+    "o_moi_dong_khop": 5068
+   }
+  },
+  "theo_nhan": {},
+  "dong_tu_soi_loai": {
+   "2026-07": [
+    8937,
+    8938,
+    8943,
+    8944,
+    8945,
+    8946,
+    8947,
+    8948,
+    9008,
+    9009,
+    9010,
+    9037,
+    9038
+   ]
+  },
+  "ngoai_phan": {
+   "dong_fls_khong_co_dong_so": 0,
+   "_vi_sao": "dòng FLS dựng lại (bank) ⛔ có dòng sổ AS-IS — chiều ngược của HD1, = DT1a dong_nguoc. ⛔ vào phán kỳ: ảnh pm_join.json ⛔ có ngày ⇒ ⛔ gán được kỳ. BA chốt khi DT2 (Step 8) đóng băng được ngày."
+  }
+ }
+}

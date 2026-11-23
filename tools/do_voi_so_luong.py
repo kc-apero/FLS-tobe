@@ -214,6 +214,47 @@ MONG = {
     #    ⇒ 69.769 − 63 = 69.706. Khác `parity_o` (69.510 = 9.930 dòng tự nhất quán × 7) — hai phép, hai nhãn.
     "o_moi_dong": (69706, 69769),
 }
+
+# ⭐⭐ WO-353 (chủ 23/11: C1 = ⓐ) — bộ ba HD1 đóng băng LẠI từ NGUỒN SỐNG bằng 3 khuôn `tools/khuon_dong_bang/{itl_ledge_adjustment,
+#    l1_canon, pm_join}.py` *(lượt `tools/doc_bo_ba_hd1.py` 23/11 12:11:50–12:17:22Z)*. Bộ ba CŨ *(tháng 8 — `MONG` ở trên)* GIỮ làm
+#    BIÊN BẢN *(Đ2)*, đo lại được bằng `--bo-ba cu`. ĐỊNH NGHĨA kỳ đạt GIỮ NGUYÊN *(⛔ đổi — `phan_hd1` y nguyên)*; MẪU SỐ GIỮ 23 kỳ
+#    đã ký *(`KY_HD1` = `phan_bo_ky` của ảnh tháng 8, 2024-10…2026-08 — chủ chọn ⓐ, ⛔ ⓑ "23 → 26 kỳ")*: dòng sổ sống của kỳ ngoài
+#    tập ấy *(2026-09…11)* ⛔ vào phán, đếm riêng ở `ngoai_mau_so` (Đ4).
+#    ⭐ `classifying_vs_canon` ⛔ còn là ẢNH: phép ghép sổ ↔ canon CHẠY ở đây trên `khoa_ghep` *(cùng hàm `_bo_ba_hd1.khoa_ghep` ở 2
+#    khuôn)* + seq trùng theo thứ tự hàng sheet — đúng luật `ghep_bang` của ảnh tháng 8.
+ANH_SONG = {"so": "itl_ledge_adjustment_song_20261123.json", "canon": "l1_canon_song_20261123.json", "pm": "pm_join_song_20261123.json"}
+KY_HD1 = ("2024-10", "2024-11", "2024-12", "2025-01", "2025-02", "2025-03", "2025-04", "2025-05", "2025-06", "2025-07",
+          "2025-08", "2025-09", "2025-10", "2025-11", "2025-12", "2026-01", "2026-02", "2026-03", "2026-04", "2026-05",
+          "2026-06", "2026-07", "2026-08")
+#: ⭐ Đ5 — đo lượt WO-353 rồi khai *(số CŨ tháng 8 ở chú thích từng khoá; khác ⇒ ĐỎ cả hai chiều)*.
+MONG_SONG: dict = {
+    "checksum": {"itl_ledge_adjustment_song_20261123.json": "469daa90d9255072",
+                 "l1_canon_song_20261123.json": "bb2386bf3696b0ac",
+                 "pm_join_song_20261123.json": "51c6454d3d6e0d82"},
+    "so_dong_so": 10199,             # dòng sổ sống thuộc 23 kỳ KY_HD1 · CŨ 9.967 (ảnh xlsx 26/08) · Σ 26 kỳ sống 12.722
+    "so_ky": 23,                     # = CŨ (mẫu số GIỮ — C1 = ⓐ)
+    "so_dong_ghep_canon": 10187,     # dòng sổ 23 kỳ ghép 1-1 · CŨ 9.845
+    "so_dong_bank": 12601,           # dòng canon L1 sống (`bank.nap`) · CŨ 9.992
+    "so_dong_pm": 3909,              # CŨ 3.703
+    "khong_co_ma": 100,              # CŨ 105
+    "khong_thay_ma_PM": 8963,        # CŨ 6.532
+    "dong_theo_hinh": {"A": 2438, "B": 30, "C": 404, "D": 27, "E": 201, "F": 438},   # CŨ 2272·29·400·27·199·428 — = BG-346 §2 (Đ2)
+    "parity_o": (71302, 71302),      # CŨ (69510, 69510)
+    "dong_loai_tu_soi": 13,          # CŨ 37
+    "hd_parity": (10186, 10186),     # CŨ (9930, 9930)
+    "o_moi_dong": (71361, 71393),    # CŨ (69706, 69769) — 32 ô lệch (CŨ 63)
+    "dat_hd1_theo_ky": ("2024-10", "2024-11", "2024-12", "2025-01", "2025-02", "2025-03", "2025-04", "2025-05",
+                        "2025-06", "2025-07", "2025-08", "2025-09", "2025-10", "2025-12", "2026-01", "2026-08"),
+    #                                CŨ 5/23: 2024-10 · 2024-11 · 2024-12 · 2025-03 · 2025-04
+}
+#: bộ ba của cổng mặc định *(CLI · `--ghi` ⇒ `voi_so_luong.json` · bài H2/I1/CG1/F03/agent đọc tệp ấy)*.
+#: ⭐⭐ GIỮ "cu" *(WO-353, Dev — ⛔ tự chuyển)*: đo 23/11 — đặt "song" làm đỏ **81** bài ở 10 tệp *(81 failed · 237 passed)*: tập
+#:    122 dòng thiếu của DT1a/DT1b, vân tay nhãn, chữ ký O8 *(`so_ly_do_hd1.json`)*, số 69.510 · 5/23 của CG1/F03/agent đều ràng vào
+#:    bộ ba tháng 8. Chuyển cổng = đổi số ĐÃ KÝ ⇒ câu chủ *(BG-346 §WO-353)*; ⛔ tự coi đã ký. Bộ ba SỐNG đo + ghim riêng:
+#:    `--bo-ba song` *(MONG_SONG, Đ5)* · `--bo-ba song --ghi` ⇒ `voi_so_luong_song.json`.
+BO_BA_MAC_DINH = "cu"
+RA_SONG = GOC / "docs" / "ITL" / "_tools" / "voi_so_luong_song.json"
+
 _HONG = object()                     # dấu "tệp ⛔ đọc được" của _doc_json (⛔ nhầm với JSON `null`)
 
 
@@ -467,7 +508,78 @@ def phan_hd1(theo_ky: dict, thieu: list[tuple[int, str]], van_tay: dict,
     }, []
 
 
-def do(nhan: Path = NHAN, so_ly_do: Path = SO_LY_DO, hom_nay: date | None = None) -> dict:
+
+def _o_song(v):
+    """Ô ảnh `dong_bang_sheet` ⇒ giá trị phẳng *(`{"chu": s}` ⇒ `s`)*."""
+    return v.get("chu") if isinstance(v, dict) else v
+
+
+def _bo_ba_cu(kiem):
+    """Bộ ba tháng 8 *(biên bản)* — đúng phép đọc trước WO-353, ⛔ đổi một chữ."""
+    g = _nap("itl_ledge_adjustment.json")
+    kiem("checksum itl_ledge_adjustment", _sha(g["dong"], g["bang_gia_tri"]), MONG["checksum"]["itl_ledge_adjustment.json"])
+    idx = {n: i for i, n in enumerate(g["cot"])}
+    bang = g["bang_gia_tri"]
+
+    def val(h, ten):
+        i = h[idx[ten]]
+        return None if i == -1 else bang[i]
+
+    so = [(h[0], h[1], {k: (val(h, f"{k}_classifying"), None, val(h, f"{k}_mid"), val(h, f"{k}_final")) for k in KHOI})
+          for h in g["dong"]]
+    c = _nap("classifying_vs_canon.json")
+    kiem("checksum classifying_vs_canon", c["checksum_noi_dung"], MONG["checksum"]["classifying_vs_canon.json"])
+    ci = {n: i for i, n in enumerate(c["cot"])}
+    canon_ve_so = {r[ci["dong_canon"]]: r[ci["dong_so"]] for r in c["dong"]}
+    p = _nap("pm_join.json")
+    kiem("checksum pm_join", p["checksum_noi_dung"], MONG["checksum"]["pm_join.json"])
+    bank = [DongBank(x["dong"], canon_ref(x["ref_tho"]), D(x["tien"]), x["cur"]) for x in p["bank"]]
+    pm = [DongPM(x["dong"], x["slip"], x["line"], D(x["tien"]) if x["tien"] else None, x["cur"],
+                 x["status"], canon_ref(x["ref_tho"]), x["hd"] or None, x["cdt1"] or None) for x in p["pm"]]
+    return so, canon_ve_so, bank, pm, {"so": g["nguon"], "so_dong_bang": g["ngay_dong_bang"], "canon": c["nguon"],
+                                       "pm": p["nguon"], "checksum": MONG["checksum"]}
+
+
+def ghep_theo_khoa(so_khoa: list[tuple[int, str]], canon_khoa: list[tuple[int, str]]) -> dict[int, int]:
+    """Ghép 1-1 sổ ↔ canon: cùng `khoa_ghep`, cặp thứ i của khoá ↔ thứ i *(seq trùng, theo hàng sheet tăng)*. → {dòng canon: dòng sổ}."""
+    from collections import defaultdict as _dd
+    a, b = _dd(list), _dd(list)
+    for d, k in sorted(so_khoa):
+        a[k].append(d)
+    for d, k in sorted(canon_khoa):
+        b[k].append(d)
+    return {dc: ds for k, ls in a.items() for ds, dc in zip(ls, b.get(k, ()))}
+
+
+def _bo_ba_song(kiem):
+    """Bộ ba SỐNG *(WO-353)*: 3 ảnh khuôn ⇒ cùng hình dữ liệu với `_bo_ba_cu`. Sổ chỉ lấy kỳ ∈ `KY_HD1` *(mẫu số đã ký)*."""
+    ms = MONG_SONG.get("checksum") or {}
+    anh = {}
+    for vai, ten in ANH_SONG.items():
+        anh[vai] = _nap(ten)
+        kiem(f"checksum {ten}", anh[vai].get("checksum_noi_dung"), ms.get(ten))
+    g, c, p = anh["so"], anh["canon"], anh["pm"]
+    so_all = [{k: _o_song(v) for k, v in r.items()} for r in g["dong"]]
+    so = [(int(r["dong_sheet"]), r["ky"], {k: (r[f"{k}_classifying"], None, r[f"{k}_mid"], r[f"{k}_final"]) for k in KHOI})
+          for r in so_all if r["ky"] in KY_HD1]
+    cn = [{k: _o_song(v) for k, v in r.items()} for r in c["dong"]]
+    canon_ve_so = ghep_theo_khoa([(int(r["dong_sheet"]), r["khoa_ghep"]) for r in so_all],
+                                 [(int(r["dong_sheet"]), r["khoa_ghep"]) for r in cn])
+    bank = [DongBank(int(r["dong_sheet"]), canon_ref(r["ref_tho"]), D(r["tien"]), r["cur"] or "") for r in cn]
+    pm = []
+    for r in p["dong"]:
+        x = {k: _o_song(v) for k, v in r.items()}
+        pm.append(DongPM(int(x["dong_sheet"]), x["slip"] or "", x["line"] or "", D(x["tien"]) if x["tien"] else None,
+                         x["cur"] or "", x["status"] or "", canon_ref(x["ref_tho"]), x["hd"] or None, x["cdt1"] or None))
+    ngoai = Counter(r["ky"] for r in so_all if r["ky"] not in KY_HD1)
+    ghep_ngoai = Counter(r["ky"] for r in so_all if r["ky"] not in KY_HD1 and int(r["dong_sheet"]) in set(canon_ve_so.values()))
+    return so, canon_ve_so, bank, pm, {
+        "so": g["nguon"], "so_dong_bang": g["ngay_dong_bang"], "canon": c["nguon"], "pm": p["nguon"],
+        "checksum": ms, "anh": dict(ANH_SONG),
+        "ngoai_mau_so": {"_vi_sao": "dòng sổ SỐNG của kỳ ngoài 23 kỳ đã ký (KY_HD1) — ⛔ vào phán HD1 (C1 = ⓐ giữ mẫu số)",
+                         "dong_so": dict(sorted(ngoai.items())), "dong_ghep": dict(sorted(ghep_ngoai.items()))}}
+
+def do(nhan: Path = NHAN, so_ly_do: Path = SO_LY_DO, hom_nay: date | None = None, bo_ba: str = BO_BA_MAC_DINH) -> dict:
     """Đo cả bảng + khối `dat_hd1`. `hom_nay` (H2-R1-06) — ngày so với `ngay` của chữ ký; `None` ⇒ hôm nay
     của máy (CLI); bài thử truyền vào để tất định."""
     loi: list[str] = []
@@ -476,46 +588,27 @@ def do(nhan: Path = NHAN, so_ly_do: Path = SO_LY_DO, hom_nay: date | None = None
         if co != mong:
             loi.append(f"{ten}: đo {co!r} · mong {mong!r}")
 
-    # ① sổ AS-IS · ITL Ledge (Classifying / MID / Final × 7 khối, kỳ đã dựng lại)
-    g = _nap("itl_ledge_adjustment.json")
-    kiem("checksum itl_ledge_adjustment", _sha(g["dong"], g["bang_gia_tri"]),
-         MONG["checksum"]["itl_ledge_adjustment.json"])
-    idx = {n: i for i, n in enumerate(g["cot"])}
-    bang = g["bang_gia_tri"]
-
-    def val(h, ten):
-        i = h[idx[ten]]
-        return None if i == -1 else bang[i]
-
-    so = []                                   # (dong_sheet, ky, {khoi: (cls, None, mid, fin)})
-    for h in g["dong"]:
-        so.append((h[0], h[1], {k: (val(h, f"{k}_classifying"), None, val(h, f"{k}_mid"),
-                                    val(h, f"{k}_final")) for k in KHOI}))
-    kiem("số dòng sổ", len(so), MONG["so_dong_so"])
+    # ①②③ bộ ba — CŨ *(ảnh tháng 8, biên bản)* hay SỐNG *(WO-353, ảnh 23/11 của 3 khuôn)*; CÙNG mã đo phía dưới
+    if bo_ba == "cu":
+        mong = MONG
+        so, canon_ve_so, bank, pm, nguon = _bo_ba_cu(kiem)
+    elif bo_ba == "song":
+        mong = MONG_SONG
+        so, canon_ve_so, bank, pm, nguon = _bo_ba_song(kiem)
+    else:
+        raise SystemExit(f"⛔ bo_ba={bo_ba!r} — chỉ 'cu' | 'song'")
+    kiem("số dòng sổ", len(so), mong["so_dong_so"])
     ky_cua_dong = {d: k for d, k, _ in so}
     cac_ky = sorted({k for _, k, _ in so})
-    kiem("số kỳ", len(cac_ky), MONG["so_ky"])
-
-    # ② dòng FLS dựng lại ↔ dòng sổ (khoá Số CT · PS Nợ · PS Có · TK · tiền tệ)
-    c = _nap("classifying_vs_canon.json")
-    kiem("checksum classifying_vs_canon", c["checksum_noi_dung"], MONG["checksum"]["classifying_vs_canon.json"])
-    ci = {n: i for i, n in enumerate(c["cot"])}
-    canon_ve_so = {r[ci["dong_canon"]]: r[ci["dong_so"]] for r in c["dong"]}
-    so_co_canon = set(canon_ve_so.values())
-    kiem("số dòng ghép canon", len(so_co_canon), MONG["so_dong_ghep_canon"])
-
-    # ③ ghép bank ↔ PM bằng CHÍNH mã FLS
-    p = _nap("pm_join.json")
-    kiem("checksum pm_join", p["checksum_noi_dung"], MONG["checksum"]["pm_join.json"])
-    bank = [DongBank(x["dong"], canon_ref(x["ref_tho"]), D(x["tien"]), x["cur"]) for x in p["bank"]]
-    pm = [DongPM(x["dong"], x["slip"], x["line"], D(x["tien"]) if x["tien"] else None, x["cur"],
-                 x["status"], canon_ref(x["ref_tho"]), x["hd"] or None, x["cdt1"] or None) for x in p["pm"]]
+    kiem("số kỳ", len(cac_ky), mong["so_ky"])
+    so_co_canon = set(canon_ve_so.values()) & set(ky_cua_dong)   # dòng sổ TRONG mẫu số đã ghép 1-1
+    kiem("số dòng ghép canon", len(so_co_canon), mong["so_dong_ghep_canon"])
     nhom, tk = xep_ca_lat(bank, pm)
-    kiem("số dòng bank", tk.dong_bank, MONG["so_dong_bank"])
-    kiem("số dòng PM", len(pm), MONG["so_dong_pm"])
-    kiem("bank không có mã", tk.khong_co_ma, MONG["khong_co_ma"])
-    kiem("bank không thấy mã PM", tk.khong_thay_ma_PM, MONG["khong_thay_ma_PM"])
-    kiem("dòng theo hình", dict(tk.dong_theo_hinh), MONG["dong_theo_hinh"])
+    kiem("số dòng bank", tk.dong_bank, mong["so_dong_bank"])
+    kiem("số dòng PM", len(pm), mong["so_dong_pm"])
+    kiem("bank không có mã", tk.khong_co_ma, mong["khong_co_ma"])
+    kiem("bank không thấy mã PM", tk.khong_thay_ma_PM, mong["khong_thay_ma_PM"])
+    kiem("dòng theo hình", dict(tk.dong_theo_hinh), mong["dong_theo_hinh"])
     hinh_cua_bank: dict[int, str] = {}
     line_cua_bank: dict[int, set] = defaultdict(set)
     for n in nhom:
@@ -582,13 +675,13 @@ def do(nhan: Path = NHAN, so_ly_do: Path = SO_LY_DO, hom_nay: date | None = None
             if kh == "hd":
                 x["hd_parity"] += 1
                 x["hd_parity_khop"] += trung
-    kiem("parity ô", (khop_o, tong_o), MONG["parity_o"])
-    kiem("dòng tu_soi loại", loai, MONG["dong_loai_tu_soi"])
+    kiem("parity ô", (khop_o, tong_o), mong["parity_o"])
+    kiem("dòng tu_soi loại", loai, mong["dong_loai_tu_soi"])
     # MONG.get: mất khoá ⇒ ĐỎ một dòng, ⛔ KeyError (S0-R1-04)
     kiem("ô Final trên MỌI dòng (o_moi_dong)", (sum(o_moi[k]["o_moi_dong_khop"] for k in cac_ky),
                                                  sum(o_moi[k]["o_moi_dong"] for k in cac_ky)),
-         tuple(MONG.get("o_moi_dong") or ()))
-    kiem("parity khối HD", (sum(o[k]["hd_parity_khop"] for k in cac_ky), sum(o[k]["hd_parity"] for k in cac_ky)), MONG["hd_parity"])
+         tuple(mong.get("o_moi_dong") or ()))
+    kiem("parity khối HD", (sum(o[k]["hd_parity_khop"] for k in cac_ky), sum(o[k]["hd_parity"] for k in cac_ky)), mong["hd_parity"])
     tsk = do_tu_sinh_theo_ky()
     loi.extend(tsk["loi"])
     tu_sinh = dict(tsk["theo_ky"].get("2026-03") or {"ky": "2026-03", "o": (0, 0), "hd": (0, 0), "mid": (0, 0)})
@@ -635,7 +728,7 @@ def do(nhan: Path = NHAN, so_ly_do: Path = SO_LY_DO, hom_nay: date | None = None
                             loai=dong_loai, hom_nay=hom_nay)
     loi.extend(loi_hd1)
     if hd1 is not None:                        # đầu vào hỏng ⇒ loi_hd1 đã ĐỎ, ⛔ so MONG trên phán rỗng
-        kiem("kỳ đạt HD1 (dat_hd1_theo_ky)", tuple(hd1["ky_dat"]), tuple(MONG.get("dat_hd1_theo_ky") or ()))
+        kiem("kỳ đạt HD1 (dat_hd1_theo_ky)", tuple(hd1["ky_dat"]), tuple(mong.get("dat_hd1_theo_ky") or ()))
         # H2-R1-05 (Đ4) — chiều ngược KHAI bằng số, ⛔ chỉ bằng lời: tập này ⛔ vào phán kỳ nào ở bước này
         hd1["ngoai_phan"] = {
             "dong_fls_khong_co_dong_so": len(nguoc),
@@ -652,10 +745,15 @@ def do(nhan: Path = NHAN, so_ly_do: Path = SO_LY_DO, hom_nay: date | None = None
     tong = Counter()
     for k in cac_ky:
         tong.update(o[k])
+    # WO-353 — bộ ba sống ⛔ có ô ĐÈ nào ⇒ Counter ⛔ sinh khoá `o_de`; khoá `tong` GIỮ đủ bộ của bộ ba cũ *(bên đọc JSON
+    # dùng `tong[...]`)* — 0 là KẾT QUẢ đo *(Đ3: mẫu số `o_parity` > 0 đã canh ở trên)*.
+    for kk in ("chay", "co", "day_nguoi", "hd_parity", "hd_parity_khop", "loai_tu_soi", "map_fls", "map_now", "o_de",
+               "o_go_that", "o_mac_dinh", "o_parity", "o_parity_khop", "o_trong", "pm_noi"):
+        tong.setdefault(kk, 0)
     return {
         "_vi_sao": "Sinh bởi tools/do_voi_so_luong.py — chạy mã FLS lên ảnh đóng băng tests/fixture/. ⛔ sửa tay.",
-        "nguon": {"so": g["nguon"], "so_dong_bang": g["ngay_dong_bang"], "canon": c["nguon"], "pm": p["nguon"],
-                  "checksum": MONG["checksum"]},
+        "nguon": nguon,
+        **({"bo_ba": bo_ba} if bo_ba != "cu" else {}),          # bộ ba cũ: JSON giữ TỪNG KHOÁ như trước WO-353
         "ky": cac_ky,
         "theo_ky": {k: dict(o[k]) for k in cac_ky},
         "khoi_theo_ky": {k: {kh: [khoi_ky[k][f"{kh}:go"], khoi_ky[k][f"{kh}:md"]] for kh in KHOI} for k in cac_ky},
@@ -771,8 +869,15 @@ def do_tu_sinh() -> dict:
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--ghi", action="store_true")
+    ap.add_argument("--bo-ba", choices=("cu", "song"), default=BO_BA_MAC_DINH,
+                    help="bộ ba HD1: cu = ảnh tháng 8 (cổng đã ký ⇒ voi_so_luong.json) · song = ảnh WO-353 23/11 "
+                         "(⇒ voi_so_luong_song.json)")
     a = ap.parse_args()
-    kq = do()
+    kq = do(bo_ba=a.bo_ba)
+    print(f"bộ ba HD1: {a.bo_ba} · sổ {kq['nguon']['so'][:70]}")
+    if kq["nguon"].get("ngoai_mau_so"):
+        nm = kq["nguon"]["ngoai_mau_so"]
+        print(f"⛔ vào phán (ngoài 23 kỳ đã ký): dòng sổ {nm['dong_so']} · đã ghép {nm['dong_ghep']}")
     print(f"{'kỳ':8s} {'có':>6s} {'chạy':>6s} {'mapNOW':>7s} {'mapFLS':>7s} {'ô gõ':>6s} {'ô mđ':>6s} {'trống':>6s} {'đè':>4s} {'parity':>13s}")
     for k in kq["ky"]:
         x = kq["theo_ky"][k]
@@ -816,14 +921,15 @@ def main() -> None:
     if a.ghi:
         # tệp tạm + os.replace (`DT1a-R1-07`): đứt giữa chừng ⛔ để lại voi_so_luong.json cụt — và ⛔ để lại
         # rác `.tam` hiện ở `git status` (H2-R1-03: bài mô phỏng đứt giữa lúc ghi canh cả hai)
-        tam = RA.with_name(RA.name + ".tam")
+        ra = RA if a.bo_ba == BO_BA_MAC_DINH else RA_SONG
+        tam = ra.with_name(ra.name + ".tam")
         try:
             tam.write_text(json.dumps(kq, ensure_ascii=False, indent=1), encoding="utf-8")
-            os.replace(tam, RA)
+            os.replace(tam, ra)
         except BaseException:
             tam.unlink(missing_ok=True)
             raise
-        print("✅ đã ghi", _duong(RA))
+        print("✅ đã ghi", _duong(ra))
 
 
 if __name__ == "__main__":

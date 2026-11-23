@@ -34,7 +34,9 @@ def _nap(ten: str):
     return mod
 
 
-ANH_CO_RAO = ("sign_off_dau_vao", "ccr_daily_report_2")
+#: `ccr_daily_report_2_song` *(WO-353)* = khuôn chụp lại DR2 từ nguồn sống — CÙNG rào với khuôn cũ *(đọc thẳng `DAU_VAO_CHO`/`CAM_CHO`
+#: của khuôn cũ)*; ảnh của nó mang `khuon: ccr_daily_report_2_song` ⇒ phải có mục ở đây, ⛔ thì rào cho qua im lặng.
+ANH_CO_RAO = ("sign_off_dau_vao", "ccr_daily_report_2", "ccr_daily_report_2_song")
 #: {tên ảnh: (DAU_VAO_CHO, CAM_CHO)} — đọc TỪ KHUÔN *(⛔ khai hai chỗ)*.
 RAO: dict[str, tuple[frozenset, frozenset]] = {t: (_nap(t).DAU_VAO_CHO, _nap(t).CAM_CHO) for t in ANH_CO_RAO}
 
@@ -82,13 +84,18 @@ def dem_o_so_trung(a: dict, b: dict, *, cot: list[str]) -> tuple[int, int]:
 
 def quet_tham_chieu(goc: pathlib.Path, ten_anh: str) -> list[pathlib.Path]:
     """Tệp `.py` dưới `fls/` + `tools/` NHẮC `ten_anh` mà ⛔ gọi `kiem_dau_vao_hop_le` — trừ khuôn của chính ảnh và module rào này."""
-    bo_qua = {(_KH / f"{ten_anh}.py").resolve(), pathlib.Path(__file__).resolve()}
+    # khuôn của chính ảnh + khuôn ANH EM có rào *(`<ảnh>_song` — WO-353: nạp thân khuôn cũ nên nhắc tên ảnh, và chính nó
+    # khai rào ở `ANH_CO_RAO`)* — ⛔ phải "engine đọc ảnh".
+    bo_qua = {(_KH / f"{ten_anh}.py").resolve(), pathlib.Path(__file__).resolve(),
+              *((_KH / f"{t}.py").resolve() for t in ANH_CO_RAO if t.startswith(f"{ten_anh}_"))}
     bat = []
     for thu_muc in ("fls", "tools"):
         for p in sorted((goc / thu_muc).rglob("*.py")):
             if "__pycache__" in p.parts or p.resolve() in bo_qua:
                 continue
             van = p.read_text(encoding="utf-8", errors="replace")
-            if ten_anh in van and TEN_HAM not in van:
+            # theo TOKEN *(WO-353)*: `ccr_daily_report_2` là CHUỖI CON của `ccr_daily_report_20261123` *(ảnh 615)* — so chuỗi con
+            # thì tệp nhắc ảnh 615 bị gọi là "đọc DR2". Sau tên ⛔ được là chữ/số; `_`/`.`/hết dòng thì đúng là nhắc ảnh.
+            if re.search(rf"{re.escape(ten_anh)}(?![0-9A-Za-z])", van) and TEN_HAM not in van:
                 bat.append(p)
     return bat

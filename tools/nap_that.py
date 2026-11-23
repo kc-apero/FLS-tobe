@@ -152,36 +152,11 @@ def cong_doc_du(tok: str, hang: list[list]) -> None:
         raise SystemExit("⛔ cong doc-du KHONG DAT — ⛔ khong ghi mot dong nao")
 
 
-def doc_pm(tok: str) -> list[DongPM]:
-    """Doc `[Importrange]PM_Unpivot`. ⚠ Tieu de o dong 2, du lieu tu dong 3.
-
-    ⭐⭐ **SUA 2026-09-11 — owner chot "co luu dong tho".** Truoc do ham nay
-      chi dung 8 truong da phan tich va **vut 20 cot con lai ngay luc doc**,
-      nen them mot truong hien thi ve sau thi ⛔ khong bu nguoc duoc cho 3.772
-      dong dang co. Nay moi dong mang them `tho` = **ca hang**, khoa theo TEN.
-
-    ⛔ Ban den rieng tu chuyen ve `pm_join.PM_COT_RIENG_TU` — **mot cho**:
-      `Email Address` **CAM** *(viec ghep ⛔ khong dung den no mot lan nao)*;
-      `Ten tai khoan` **GIU**, vi 535 dong ⛔ khong co so chung tu **chi tra
-      duoc bang no** — owner quyet 11/09.
-    """
+def dung_pm(tieu_de: list, hang: list[list]) -> list[DongPM]:
+    """Hàng thô `[Importrange]PM_Unpivot` (từ `PM_DONG_DAU`) -> `DongPM` — HÀM THUẦN tách ra từ `doc_pm` *(`WO-353`:
+    khuôn đóng băng `pm_join` GỌI đúng hàm này, ⛔ chép luật đọc)*. `tieu_de` = hàng 2 *(cho `loc_tho`)*.
+    Hàng i mang `dong_sheet = PM_DONG_DAU + i` — `hang` phải giữ hàng rỗng giữa lưới."""
     from decimal import Decimal
-    tab = "[Importrange]PM_Unpivot"
-    hdr = _lat(tok, f"'{tab}'!A{PM_DONG_TIEU_DE}:AC{PM_DONG_TIEU_DE}",
-               cho=CHO_PM)
-    kiem_tieu_de_pm(hdr[0] if hdr else [])
-    print(f"cong hinh dang PM: XANH ({len(hdr[0])} cot)")
-
-    hang: list[list] = []
-    lo = PM_DONG_DAU
-    while True:
-        v = _lat(tok, f"'{tab}'!A{lo}:AC{lo + LO - 1}", cho=CHO_PM)
-        if not v:
-            break
-        hang.extend(v)
-        if len(v) < LO:
-            break
-        lo += LO
 
     def g(r, k):
         j = PM_COT[k]
@@ -204,7 +179,7 @@ def doc_pm(tok: str) -> list[DongPM]:
         except Exception:
             return None
 
-    ra = []
+    ra: list[DongPM] = []
     for i, r in enumerate(hang):
         ra.append(DongPM(
             dong_sheet=PM_DONG_DAU + i,
@@ -219,7 +194,7 @@ def doc_pm(tok: str) -> list[DongPM]:
             ref_tho=(lambda x: None if x in (None, "") else str(x).strip() or None)(
                 g(r, "ref")),
             # ⭐ CA HANG, khoa theo TEN COT — tru ban den rieng tu.
-            tho=loc_tho(hdr[0] if hdr else [], r),
+            tho=loc_tho(tieu_de, r),
             # ⭐⭐ Bay khoa PE/PI len KIEU (2026-09-17). `pe_loai` do MA NAY
             #   sinh, ⛔ khong doc thang: nguon de no o HAI cot rieng
             #   (`Advance` / `Urgent`) va dong nao cung chi co mot.
@@ -229,6 +204,40 @@ def doc_pm(tok: str) -> list[DongPM]:
                      else "Urgent" if _chu(g(r, "pe_urg")) else None),
             pi_slip=_chu(g(r, "pi_slip")),
             pi_line=_chu(g(r, "pi_line"))))
+    return ra
+
+
+def doc_pm(tok: str) -> list[DongPM]:
+    """Doc `[Importrange]PM_Unpivot`. ⚠ Tieu de o dong 2, du lieu tu dong 3.
+
+    ⭐⭐ **SUA 2026-09-11 — owner chot "co luu dong tho".** Truoc do ham nay
+      chi dung 8 truong da phan tich va **vut 20 cot con lai ngay luc doc**,
+      nen them mot truong hien thi ve sau thi ⛔ khong bu nguoc duoc cho 3.772
+      dong dang co. Nay moi dong mang them `tho` = **ca hang**, khoa theo TEN.
+
+    ⛔ Ban den rieng tu chuyen ve `pm_join.PM_COT_RIENG_TU` — **mot cho**:
+      `Email Address` **CAM** *(viec ghep ⛔ khong dung den no mot lan nao)*;
+      `Ten tai khoan` **GIU**, vi 535 dong ⛔ khong co so chung tu **chi tra
+      duoc bang no** — owner quyet 11/09.
+    """
+    tab = "[Importrange]PM_Unpivot"
+    hdr = _lat(tok, f"'{tab}'!A{PM_DONG_TIEU_DE}:AC{PM_DONG_TIEU_DE}",
+               cho=CHO_PM)
+    kiem_tieu_de_pm(hdr[0] if hdr else [])
+    print(f"cong hinh dang PM: XANH ({len(hdr[0])} cot)")
+
+    hang: list[list] = []
+    lo = PM_DONG_DAU
+    while True:
+        v = _lat(tok, f"'{tab}'!A{lo}:AC{lo + LO - 1}", cho=CHO_PM)
+        if not v:
+            break
+        hang.extend(v)
+        if len(v) < LO:
+            break
+        lo += LO
+
+    ra = dung_pm(hdr[0] if hdr else [], hang)
     co_tho = sum(1 for x in ra if x.tho)
     print(f"PM: {len(ra)} dong · {sum(1 for x in ra if x.ref)} dong co ma"
           f" · {co_tho} dong giu duoc hang tho")

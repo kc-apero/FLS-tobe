@@ -34,8 +34,19 @@ def test_khuon_khai_DAU_VAO_CHO_va_CAM_CHO():
 
 
 def test_bang_khai_gom_dung_hai_anh_Đ5():
-    """Mong: ĐÚNG 2 ảnh khai rào *(thêm ảnh có rào ⇒ sửa số Ở ĐÂY)*; tập rỗng ⇒ ĐỎ *(Đ3)*."""
-    assert sorted(R.RAO) == ["ccr_daily_report_2", "sign_off_dau_vao"]
+    """Mong: ĐÚNG 3 khuôn khai rào *(thêm ảnh có rào ⇒ sửa số Ở ĐÂY)*; tập rỗng ⇒ ĐỎ *(Đ3)*.
+    `WO-353`: 2 → 3 — thêm `ccr_daily_report_2_song` *(DR2 chụp lại từ nguồn sống, CÙNG rào khuôn cũ)*."""
+    assert sorted(R.RAO) == ["ccr_daily_report_2", "ccr_daily_report_2_song", "sign_off_dau_vao"]
+    assert R.RAO["ccr_daily_report_2_song"] == R.RAO["ccr_daily_report_2"] == (frozenset({"615"}), frozenset({"610"}))
+
+
+def test_WO353_anh_DR2_song_mang_ten_khuon_song_va_bi_rao_chan_o_610():
+    """Ảnh DR2 23/11 khai `khuon: ccr_daily_report_2_song` ⇒ rào tra theo TÊN ẤY: 610 ⇒ ĐỎ có tên, 615 ⇒ qua."""
+    a = json.loads((GOC / "tests" / "fixture" / "dau_vao" / "ccr_daily_report_2_20261123.json").read_text(encoding="utf-8"))
+    assert a["khuon"] == "ccr_daily_report_2_song"
+    with pytest.raises(R.DauVaoSaiChoError, match="ccr_daily_report_2_song.*610"):
+        R.kiem_dau_vao_hop_le(a, "610")
+    R.kiem_dau_vao_hop_le(a, "615")
 
 
 # ── hàm kiểm có tên ─────────────────────────────────────────────────────────────────────────────

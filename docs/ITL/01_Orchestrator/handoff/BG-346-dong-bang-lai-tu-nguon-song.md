@@ -225,3 +225,90 @@ Quyết orchestrator *(theo quyết chủ "nguồn sống là chuẩn")*: **⛔ 
 | `python tools/chay_agent_voi.py` *(phát lại)* | `KẾT: ĐẠT — ô ĐỘC LẬP … 557/557 khớp · ô VÒNG TRÒN … 74/74 khớp · lệch 0 · … A4 ĐẠT 4/4 agent` |
 
 **Dev tự thấy còn yếu *(vòng sửa)*:** `report.png` chụp bằng Playwright ở khung 1240×1000 đoán theo kích thước ảnh cũ *(⛔ có công cụ sinh trong repo)*; dòng "Tham chiếu: `voi_so_luong.json` 2026-08-26" trong report đọc trường ngày của tệp đo *(ngày ảnh sổ xlsx)* — ⛔ đổi ở vòng này; C1/C3 vẫn chờ chủ.
+
+---
+
+## WO-353 — khuôn bộ ba HD1 *(C1 = ⓐ)* · chụp lại 615 + DR2 + số dư CÙNG một lượt *(C3 = ⓐ)* *(fls-dev làn DATA · 23/11 · cụm PG 5435)*
+
+**Kết luận một dòng.** 7 khuôn ĐẠT trên MỘT lượt đọc sống bằng công cụ commit `tools/doc_bo_ba_hd1.py` *(⛔ script scratchpad — `SONG-R1-05`)*. **C1:** HD1 trên bộ ba sống, ĐỊNH NGHĨA + mẫu số 23 kỳ GIỮ NGUYÊN ⇒ **16/23 kỳ đạt** *(cũ 5/23)* · ghép 1-1 **10.187/10.199** *(cũ 9.845/9.967)* — nhưng **cổng mặc định GIỮ bộ ba CŨ** *(số đã ký; chuyển = câu chủ C6 — đo: 81 bài ràng vào bộ ba cũ)*. **C3:** WP-C5c trên 615 + số dư cùng lượt ⇒ phần `cb` **1.380/1.380 · lệch FLS 0** *(79 ô của WO-345 = lệch THỜI ĐIỂM ẢNH, đã hết)*; cổng `do_hd2.py --goi WP-C5c` **ĐẠT**, `khop` 77.672 → **77.663** *(+9 ô lớp có tên `lech_ban_ccr_vs_cf`)* ⇒ sinh lại bản ghi phát lại + report agent, **KẾT ĐẠT 557/557 · 74/74**.
+
+### Lượt đọc *(SA `fls-sheets-reader` chỉ-đọc · `UNFORMATTED_VALUE` · bản thô `/tmp/wo353` thư mục 700 / tệp 600, ĐÃ XOÁ sau dùng)*
+| Lượt | Giờ đọc *(UTC, `luot_*.json`)* | Vùng | Hàng đọc về |
+|---|---|---|---|
+| C3 · A-CCR `1ycMOK…` | **12:11:45 → 12:11:50** *(4 tab liền nhau)* | `5. Daily Report` A1:AR12521 · `5. Daily Report 2` A1:AR1114 · `2. CCR` A1:ABM240 · `2. CCR Cash` A1:ABM240 | 2.566 · 958 · 236 · 175 |
+| C1 · sổ ADJUSTED `1r4Wem…` `ITL Ledge` | 12:11:50 → 12:17:13 *(1 lát `HTTP 503` lần 1 ⇒ lần 2 ĐẠT)* | A7:AT8 tiêu đề · `A:B` · `D:G` · `R:AT` hàng 10…12.731 *(⛔ cột C Diễn giải)* | 12.722 hàng có ô A |
+| C1 · RAW `1md85t…` `Transaction Mapping L1` | → 12:17:21 | A3:AL3 + A5:AL… | 14.265 |
+| C1 · RAW `[Importrange]PM_Unpivot` | → 12:17:22 | A2:AC2 + A3:AC… — **CHIẾU 14 vị trí `PM_TIEU_DE_MONG_DOI` trước khi chạm đĩa** *(⛔ Email · tên/số TK · ghi chú)* | 3.909 |
+
+⚠ Một lượt đọc thử trước đó *(script scratchpad 12:04–12:11Z)* chỉ để dựng khuôn; MỌI ảnh commit sinh từ lượt công cụ commit ở trên. Nguồn Bank `1zJA0M…` · Quỹ GỐC `1QSYSz…` ⛔ cần cho WO này *(bộ ba đọc L1/PM ở RAW; C3 đọc A-CCR)* — ⛔ đọc.
+
+### Đã đổi *(WO-353)*
+| Tệp | Vì sao |
+|---|---|
+| `tools/khuon_dong_bang/_bo_ba_hd1.py` *(mới)* | thân chung: `khoa_ghep` = sha256[:16] của (Số CT `canon_ref` · PS Nợ · PS Có `parse_so` · TK · tiền tệ) — MỘT hàm cho sổ VÀ L1; ⛔ lưu Số CT sổ |
+| `tools/khuon_dong_bang/itl_ledge_adjustment.py` *(mới)* | khuôn SỔ: `dong_sheet · ky · khoa_ghep` + 7 khối × Cls/MID/Final *(= cột ảnh tháng 8)*; tên 30 cột R:AT so `itl_ledge_ky.TIEU_DE`; `MONG_KY` 26 kỳ Σ 12.722 |
+| `tools/khuon_dong_bang/l1_canon.py` *(mới)* | khuôn L1 qua CHÍNH `bank.nap` + `chay_nap._bank_tu_canon`; `ref_tho · cur · tien · khoa_ghep` + 7 `canon_pos_p` *(vị trí `VI_TRI_CLASSIFYING`; ảnh tháng 8 giữ 13 — 6 vị trí thừa ~5,3 MB ô `#N/A` ⛔ mang)*; `MONG_BA_DUONG` |
+| `tools/khuon_dong_bang/pm_join.py` *(mới)* | khuôn PM qua `nap_that.dung_pm`; TỪ CHỐI tên cột riêng tư / ô ngoài 14 vị trí; `MONG_DEM` |
+| `tools/nap_that.py` | tách `dung_pm(tieu_de, hang)` THUẦN ra khỏi `doc_pm` *(⛔ đổi luật đọc — `doc_pm` gọi lại nó)* |
+| `tools/khuon_dong_bang/ccr_daily_report_song.py` · `ccr_daily_report_2_song.py` *(mới)* | khuôn ANH EM *(⛔ sửa khuôn cũ — khuôn cũ là cổng của ảnh 22/11 biên bản)*: 615 `N_HANG` 2.502 → **2.566**, `LOI_MONG` 127 → 120 ô, `PHU_MONG.tieu_de` 1.792 → 2.377, bỏ `Daily Transactions:No`; DR2 CHỈ `MONG_CHECK` `nb_khac_0` thêm `2026-11-22` ở GROUP · SGO2 |
+| `tools/khuon_dong_bang/_rao_dau_vao.py` | `ANH_CO_RAO` + `ccr_daily_report_2_song` *(ảnh mang tên khuôn ấy — ⛔ thì rào cho qua IM LẶNG)*; `quet_tham_chieu` so theo TOKEN *(`ccr_daily_report_2` là chuỗi con của `ccr_daily_report_20261123` — quét chuỗi con bắt nhầm)* |
+| `tools/doc_bo_ba_hd1.py` *(mới)* | MỘT lượt đọc 7 nguồn ⇒ bản thô `/tmp` ⇒ 7 khuôn qua `dong_bang_sheet.py --mong` *(`MONG_DONG_ANH`)*; kiểm rào DR2 → 615 ĐẠT / → 610 ĐỎ ngay sau đóng băng |
+| `tests/fixture/{itl_ledge_adjustment,l1_canon,pm_join}_song_20261123.json` | ảnh bộ ba sống *(17,2 · 11,1 · 1,5 MB)*; hậu tố `_song_` để `do_tren_anh_song --hau-to _20261123` ⛔ chuyển hướng nhầm ảnh sổ cũ *(đo: lần đầu WP-C2 `KeyError: 'phan_bo_ky'`)*. Bộ ba tháng 8 GIỮ — biên bản |
+| `tests/fixture/dap_an/ccr_daily_report_20261123.json` · `dau_vao/ccr_daily_report_2_20261123.json` | 615 · DR2 cùng lượt. Số dư lượt này ra **ĐÚNG TỪNG BYTE** ảnh `ccr_so_du_{ccr,cash}_20261123.json` sáng 23/11 *(ghi đè ⇒ `git status` 0 đổi)* ⇒ G1, ⛔ tệp mới |
+| `tools/do_voi_so_luong.py` | `do(bo_ba=…)`: `cu` *(mặc định — `voi_so_luong.json` **0 byte đổi**)* · `song` *(`MONG_SONG`, ghép `ghep_theo_khoa`, mẫu số `KY_HD1` = 23 kỳ ảnh tháng 8; kỳ 2026-09…11 ⇒ `ngoai_mau_so`)*; `--bo-ba song --ghi` ⇒ `docs/ITL/_tools/voi_so_luong_song.json` |
+| `tools/do_hd2_c5c.py` · `do_hd2_c5c_mong.py` | 615 + số dư đọc bộ ảnh cùng lượt `_20261123` *(`TEP_LUOT_C5C`)*; khối `615` của `mong` SINH LẠI từ MỘT lần `chay_wp_c5c` *(`pprint width=120` — tái tạo đúng từng byte tệp cũ trước khi đổi; 4 đáp án kia máy so bằng)* |
+| `docs/ITL/_tools/hd2_cong.json` | `do_hd2.py --goi WP-C5c --dsn …/fls_wo353_mong --ghi` — CHỈ khối WP-C5c đổi *(diff dưới)* |
+| `docs/ITL/06_Agent/phat_lai/A3_SI_ITL.json` · `report.html` · `report.png` · `goi/A3_SI_ITL.zip` · `goi/A4_AUDITOR.zip` | sinh lại bằng công cụ; A1/A2 zip chỉ khác dấu giờ *(giải nén 0 tệp khác)* ⇒ giữ |
+| `tests/du_lieu/test_bo_ba_hd1_song.py` *(mới)* · bài ghim cũ *(`test_do_hd2_c5c` · `test_isp_gates_hd2` · `test_do_tren_anh_song` · `test_dau_vao_dt13` · `test_rao_dau_vao_dt13_r1`)* | mong mới = số đo mới, số cũ ở chú thích |
+
+### AC-2 · HD1 — bảng CŨ ↔ MỚI *(định nghĩa `phan_hd1` y nguyên; CŨ = bộ ba tháng 8 = cổng; MỚI = `do(bo_ba="song")`)*
+| Số *(nhãn — Đ4)* | CŨ *(xlsx 26/08 · L1 26/08 · PM 27/08)* | MỚI *(sống 23/11)* |
+|---|---|---|
+| mẫu số kỳ | 23 *(2024-10…2026-08)* | **23** *(GIỮ — `KY_HD1`)*; ngoài mẫu số: 2026-09 737 · 10 1.038 · 11 748 dòng sổ |
+| **kỳ đạt HD1** `dat_hd1` | **5/23** *(2024-10 · 11 · 12 · 2025-03 · 04)* | **16/23** *(2024-10…2025-10 · 2025-12 · 2026-01 · 2026-08)* |
+| kỳ đỏ *(dòng thiếu · [loại] · ô)* | 18 | **7**: 2025-11 2 · 2026-02 1 · 03 2 · 04 1 · 05 1 · 06 2 · 07 3 + loại 13 · ô 4.770/4.802 |
+| dòng sổ `co` · **dòng ghép 1-1** `chay` | 9.967 · 9.845 | **10.199 · 10.187** |
+| dòng thiếu *(sổ ⛔ ghép)* | 122 | **12** — cả 12 *(và 121/121 trên 26 kỳ)* = hàng L1 bị `bank.nap` LOẠI `cot goc AG ('LE') la o loi` *(khoá ghép trùng khoá hàng loại — đo trên bản thô)* |
+| chiều ngược *(dòng FLS ⛔ dòng sổ)* | 147 | **0** *(12.601/12.601 canon ghép)* |
+| **ô parity** Final 7 khối *(dòng tự nhất quán)* | 69.510/69.510 | **71.302/71.302** |
+| ô Final trên MỌI dòng `o_moi_dong` | 69.706/69.769 *(63 lệch)* | **71.361/71.393** *(32 lệch, cả 32 ở 2026-07)* |
+| dòng tự-soi loại | 37 | **13** *(2026-07)* |
+| khối HD parity | 9.930/9.930 | **10.186/10.186** |
+| Classifying sổ = `iferror(canon)` *(phép của ảnh `classifying_vs_canon`)* | 68.915/68.915 | **88.207/88.207** *(23 kỳ: 71.309/71.309)* |
+| bank · PM · có mã PM | 9.992 · 3.703 · 3.173 | **12.601 · 3.909 · 3.369** |
+| bậc thang ghép A·B·C·D·E·F | 2.272·29·400·27·199·428 | **2.438·30·404·27·201·438** *(= BG-346 §2 đo chỉ-đọc — Đ2)* |
+| bank ⛔ mã · ⛔ thấy mã PM | 105 · 6.532 | **100 · 8.963** |
+| checksum ảnh | `575c5337…` · `7226ef11…` · `6ec10945…` | `469daa90…` · `bb2386bf…` · `51c6454d…` |
+
+### AC-3 · WP-C5c — CŨ ↔ MỚI *(`do_hd2.py --goi WP-C5c` — cổng)*
+| Số | CŨ *(615 + số dư 22/11)* | WO-345 *(615 22/11 + số dư 23/11)* | **MỚI** *(615 + số dư CÙNG lượt 23/11)* |
+|---|---|---|---|
+| ô so `tong_o` | 86.150 | 86.150 | **86.150** |
+| khớp `khop` | 77.672 | 77.593 | **77.663** |
+| lệch có tên `lech_co_chu_dich` | 8.478 | 8.478 | **8.487** |
+| **lệch FLS** *(5 đáp án)* | 0 | **79** *(`cb` 19–30/11)* | **0** |
+| 615 `cb` khớp/ô | 1.380/1.380 | 1.301/1.380 | **1.380/1.380** |
+| 615 `luy_ke` khớp · lệch | 7.041 · 479 | — | **7.032 · 488** |
+| 615 lớp `lech_ban_ccr_vs_cf` *(engine = 610, A-CCR ≠ CF report)* | 671 | — | **680** *(+9 — bản A-CCR đổi từ 22/11; ⛔ engine)* |
+| 615 `ngoai_khuon.daily_transactions` | 0 | — | **⛔ còn đoạn** *(hàng mang chữ ⇒ tiêu đề; bảng chính 2.057 → 2.056)* |
+| cổng | ĐẠT | ĐỎ | **ĐẠT** · `KẾT: ĐẠT · so mong: DAT` |
+
+### Số cần chủ / ThuongCT ký lại *(cập nhật WO-353 — ⛔ tự coi đã ký)*
+| # | Số đã ký *(O6)* | Số MỚI | WO-353 |
+|---|---|---|---|
+| 1–4 | *(tự sinh — như trên)* | *(như trên)* | — |
+| 5 | HD1 **5/23** kỳ đạt · **9.845/9.967** dòng ghép · ô 69.510/69.510 | **16/23 · 10.187/10.199 · 71.302/71.302** *(bộ ba sống, đo được — `voi_so_luong_song.json`)* | ⭐ đo được; **cổng vẫn đọc bộ ba cũ** ⇒ câu C6 |
+| 6 | HD2 11 gói | 10 gói ⛔ đổi; **WP-C5c khop 77.663 · lệch có tên 8.487 · lệch FLS 0** | ⭐ cổng đổi |
+| 7 | *(WO-345)* WP-C5c × số dư mới 79 lệch FLS | **hết** — lệch thời điểm ảnh | ⭐ đóng C3 |
+| 8 | Report agent | ô `hd2:WP-C5c.*` đổi ở lượt 7 A3 *(`van_tay_yeu_cau` `ab7bc4c0…` → `74776d1c…`)*; KẾT **ĐẠT 557/557 · 74/74** | ⭐ sinh lại |
+
+### Câu chủ *(mới)*
+- **C6 — chuyển cổng HD1 sang bộ ba sống?** Đo: đặt `BO_BA_MAC_DINH = "song"` ⇒ **81 failed · 237 passed** ở 10 tệp bài HD1/CG1/F03/agent — vì tập 122 dòng thiếu của DT1a/DT1b *(nhãn lý do + vân tay)*, chữ ký O8 `so_ly_do_hd1.json`, các số 69.510 · 5/23 đều buộc vào bộ ba tháng 8.
+  - ⓐ Chuyển: WO DATA mới — sinh lại DT1a `phan_loai_dong_thieu` + DT1b `phan_loai_ly_do` trên tập 12 dòng thiếu sống *(đều cùng MỘT lý do có tên `AG (LE) ô lỗi`)* + 13 dòng loại 2026-07, ký lại O6/O8, sửa ~81 bài. Cái giá: 1 WO + R1/R2.
+  - ⓑ Giữ cổng cũ đến khi chủ ký số #5; bộ ba sống là cổng PHỤ có ghim *(hiện trạng)*.
+  - **Khuyến nghị ⓐ sau khi chủ ký #5** — nguồn sống là chuẩn, nhưng đổi số đã ký trước chữ ký là "tự coi đã ký".
+
+### Giả định *(R1 soi)*
+- **G4** mẫu số HD1 trên bộ ba sống = 23 kỳ của ảnh tháng 8 *(C1 = ⓐ "⛔ đổi mẫu số")*; dòng 2026-09…11 đo nhưng ⛔ phán.
+- **G5** ghép sổ ↔ canon = luật `ghep_bang` của ảnh tháng 8 *(5 trường + seq trùng theo hàng sheet)*, chạy lại bằng mã thay cho ảnh kết quả ⛔ có mã sinh.
+- **G6** khuôn ANH EM `_song` thay vì sửa khuôn DT13 tại chỗ — khuôn cũ còn là cổng của ảnh 22/11 biên bản.

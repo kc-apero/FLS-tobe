@@ -41,17 +41,19 @@ LICH = LichKy(nguon="bai-h14", ngay_dau=datetime.date(2024, 10, 21), luat="A")
 #: trục × phần có đầu vào × engine có ô. 608: luỹ kế FS1 DỪNG ⇒ chỉ phần ngày *(270 ô có số, khớp 270)*.
 MONG_O = {"607": (25649, 21770, 4365, 17405, 3879), "608": (8510, 8510, 270, 8240, 0),
           "609": (25851, 21993, 4387, 17606, 3858), "610": (12380, 12345, 2518, 9827, 35),
-          "615": (13760, 13054, 2875, 10179, 706)}          # H14-R1-02: khuôn CF trên bản CHÍNH THỨC A-CCR (D5)
+          "615": (13760, 13045, 2866, 10179, 715)}          # H14-R1-02: khuôn CF trên bản CHÍNH THỨC A-CCR (D5)
+#: ⭐ WO-353 (C3 = ⓐ): 615 + số dư chụp CÙNG lượt 23/11 — 615 CŨ (22/11): (13760, 13054, 2875, 10179, 706); +9 ô lớp
+#: `lech_ban_ccr_vs_cf` *(luỹ kế — bản A-CCR đổi từ 22/11)*; `cb` ⛔ đổi; `lech_FLS` 0.
 #: ⭐ vòng sửa tích hợp sau R2 (`KQ-314`): 615 + khối `CB` 1.380 ô *(46 cặp (LE, đơn vị) × 30 ngày; ảnh DT13 số dư)* —
 #: trước: (12380, 11674, 2023, 9651, 706).
 #: ô đáp án NGOÀI mẫu số vì phần ⛔ có đầu vào *(có tên)*
 MONG_CHUA = {"607": {}, "608": {"luy_ke:FS1": 8421}, "609": {"luy_ke:FS1": 8402}, "610": {"hr": 1537},
              "615": {"hr": 3147, "raw_data_management": 1040, "tien_dau_bao_cao": 1071}}   # CB 1.495 hết `chua_co_dau_vao`
 #: 615 — đoạn ⛔ khuôn CF *(bản sao DR3 của A-CCR đã so ở 609 · hàng ⛔ khối · giao dịch ngày 0 ô số)*
-MONG_NGOAI_KHUON_615 = {"ban_sao_DR3_A_CCR": 18046, "cb_cong_thuc_doi_theo_cot": 32, "daily_transactions": 0,
-                        "person_hang_khong_khoi": 2}
+#: WO-353: `daily_transactions` *(22/11: 0)* ⛔ còn — hàng `Daily Transactions` ảnh 23/11 mang chữ ⇒ tiêu đề, ⛔ đoạn dữ liệu.
+MONG_NGOAI_KHUON_615 = {"ban_sao_DR3_A_CCR": 18046, "cb_cong_thuc_doi_theo_cot": 32, "person_hang_khong_khoi": 2}
 #: 615 — lớp lệch: 671 ô engine = đáp án 610 mà bản A-CCR khác *(bản chính thức ≠ CF report)* + 35 `ite_alias` như 610
-MONG_LOP_615 = {"ite_alias": 35, "lech_ban_ccr_vs_cf": 671}
+MONG_LOP_615 = {"ite_alias": 35, "lech_ban_ccr_vs_cf": 680}         # WO-353 — 22/11: 671
 #: đáp án DỪNG cả bản — số ô SỐ ⛔ so *(Đ3: > 0)*. 615 hết DỪNG *(H14-R1-02)*.
 MONG_DUNG = {"605": 13706}
 #: H14-R1-04: chuỗi lan `AH12` = 17 mã × (M02 · Q1 · H1 · Y) = 68; ô 0,5 trùng ngẫu nhiên NGOÀI chuỗi = 3
@@ -172,13 +174,13 @@ def test_R1_02_615_lop_ban_ccr_vs_cf_la_engine_bang_610_hai_nguon(ne, da, bao):
     a610, _ = c5c.o_dap_an("610", da["610"])
     r = c5c.so_mot("615", da["615"], bao["615"], ne, doi_chieu=a610)
     x = [x for x in r["_lech"] if x["lop"] == c5c.LECH_CCR_CF]
-    assert len(x) == 671
+    assert len(x) == 680                                                  # WO-353 — 615 22/11: 671
     for y in x:
         e, a, b = Decimal(y["engine"]), Decimal(y["dap_an"]), a610[y["o"]]
         assert abs(e - b) <= c5c.ATOL < abs(a - b)
-    # bỏ đối chiếu ⇒ 671 ô rơi về lớp chung `lech_dap_an_nguon` *(nhãn nói ít hơn — lý do có `doi_chieu`)*
+    # bỏ đối chiếu ⇒ 680 ô rơi về lớp chung `lech_dap_an_nguon` *(nhãn nói ít hơn — lý do có `doi_chieu`)*
     r0 = c5c.so_mot("615", da["615"], bao["615"], ne)
-    assert {k: v["so_o"] for k, v in r0["lop"].items()} == {"ite_alias": 35, c5c.LECH_NGUON: 671}
+    assert {k: v["so_o"] for k, v in r0["lop"].items()} == {"ite_alias": 35, c5c.LECH_NGUON: 680}
 
 
 def test_R1_08_anh_609_615_dinh_nghia_FS3_khac_hop_FS1_FS2():
@@ -390,7 +392,7 @@ def test_AC5_kho_rong_DO_roi_nap_nen_DAT():
     assert not t0.phan_xu.dat and any("IX.PER" in x for x in t0.phan_xu.ly_do), t0.phan_xu.ly_do
     assert t1.phan_xu.dat, t1.phan_xu.ly_do[:3]
     assert t1.dat is True                                                 # 605 DỪNG ĐÃ ký 23/11 (H14-R1-01 → KY605)
-    assert (t1.hd2_cong["tong_o"], t1.hd2_cong["khop"]) == (86150, 77672)
+    assert (t1.hd2_cong["tong_o"], t1.hd2_cong["khop"]) == (86150, 77663)       # WO-353 — 22/11: 77672
 
 
 def test_AC5_hd2_cong_json_khoi_WP_C5c_khop_lan_do(tq):
@@ -399,7 +401,7 @@ def test_AC5_hd2_cong_json_khoi_WP_C5c_khop_lan_do(tq):
               "mong_lech_co_chu_dich", "lech_ngoai_ten", "dat", "dat_mong", "dap_an_dung", "check", "fs_tham_so",
               "do_phu", "khong_do_duoc", "phu_mot_phan", "dung_co_ky"):
         assert d[k] == json.loads(json.dumps(tq.hd2_cong[k], ensure_ascii=False)), k
-    assert (d["tong_o"], d["khop"], d["lech_co_chu_dich"], d["dat"], d["dat_mong"]) == (86150, 77672, 8478, True, True)
+    assert (d["tong_o"], d["khop"], d["lech_co_chu_dich"], d["dat"], d["dat_mong"]) == (86150, 77663, 8487, True, True)  # 22/11: 77672 · 8478
     assert sum(o for o, *_ in MONG_O.values()) == d["tong_o"]
 
 
@@ -437,7 +439,7 @@ def test_R2i_khop_tach_TINH_va_CHEP_khong_gop(tq):
     for ma, d in tq.theo_dap_an.items():
         assert d["dem"]["khop_tinh"] + d["dem"]["khop_chep"] == d["dem"]["khop_co_so"], ma
     d = tq.theo_dap_an["615"]["dem"]
-    assert (d["khop_tinh"], d["khop_chep"]) == (2875, 0)
+    assert (d["khop_tinh"], d["khop_chep"]) == (2866, 0)                         # WO-353 — 22/11: 2875
     assert [p["id"] for p in tq.bao["615"]["phan"] if p.get("chep")] == []
     assert (tq.hd2_cong["khop_tinh"], tq.hd2_cong["khop_chep"]) == (sum(x[2] for x in MONG_O.values()), 0)
 
@@ -450,7 +452,7 @@ def test_R2i_PHA_chep_dem_rieng_khi_phan_danh_dau_chep(ne, da, bao):
             p["chep"] = True
     a610, _ = c5c.o_dap_an("610", da["610"])
     r = c5c.so_mot("615", da["615"], b, ne, doi_chieu=a610)
-    assert (r["dem"]["khop_chep"], r["dem"]["khop_tinh"]) == (852, 2875 - 852)
+    assert (r["dem"]["khop_chep"], r["dem"]["khop_tinh"]) == (852, 2866 - 852)    # WO-353 — 22/11: 2875 − 852
 
 
 def test_R2i_PHA_doi_mot_o_so_du_thi_DUNG_o_CB_lech_va_cong_DO(ne, da):

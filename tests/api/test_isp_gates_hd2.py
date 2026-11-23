@@ -75,7 +75,8 @@ MONG_O_C4B = "1981/1981 ô"           # `hd2_cong.json` WP-C4b khop/tong_o (209 
 MONG_O_C4C = "19591/19894 ô đáp án khớp + 303 lệch có chủ đích"
 MONG_O_C5A = "40556/45674 ô"         # WP-C5a khop/tong_o — cờ BẬT ký 2025 (vòng sửa R1 KQ-293); + 5118 lệch có chủ đích (lớp đo)
 MONG_O_C5B = "3179/4102 ô"          # WP-C5b khop/tong_o — dòng PL IX.PL trên ATL của FLS; + 923 lệch thừa kế lớp từ lá
-MONG_O_C5C = "77672/86150 ô"        # WP-C5c khop/tong_o — Daily Report 2 · 3 (607–610 · 615) từng ô; + 8478 lệch thừa kế (truy ngược)
+MONG_O_C5C = "77663/86150 ô"        # WP-C5c khop/tong_o — Daily Report 2 · 3 (607–610 · 615) từng ô; + 8487 lệch thừa kế (truy ngược)
+#                                     WO-353 (615 + số dư cùng lượt 23/11) — 22/11: "77672/86150 ô" · 8478
 MONG_O_C4A = "420/420 ô"             # `hd2_cong.json` WP-C4a khop/tong_o (44 Vendor-tháng × 14 − 196 ô P chữ)
 
 
@@ -175,7 +176,7 @@ def test_CG2_B1_tep_that_qua_tuyen_9_cong_dung_dat_C5_null():
     assert {m: c["dat"] for m, c in h.items()} == MONG_THAT, h
     assert MONG_O_C5A in h["HD2_WP_C5A"]["da_do"] and "5118 lệch có chủ đích" in h["HD2_WP_C5A"]["da_do"]
     assert MONG_O_C5B in h["HD2_WP_C5B"]["da_do"] and "923 lệch có chủ đích" in h["HD2_WP_C5B"]["da_do"]
-    assert MONG_O_C5C in h["HD2_WP_C5C"]["da_do"] and "8478 lệch có chủ đích" in h["HD2_WP_C5C"]["da_do"]
+    assert MONG_O_C5C in h["HD2_WP_C5C"]["da_do"] and "8487 lệch có chủ đích" in h["HD2_WP_C5C"]["da_do"]
     # 23/11: chuỗi /gates NÓI 605 (DỪNG có chữ ký) + 615 (độ phủ) — ⛔ biến mất im lặng khi cổng true
     dd = h["HD2_WP_C5C"]["da_do"]
     assert MONG_KY_605 in dd and MONG_PHU_615 in dd, dd
@@ -205,7 +206,7 @@ def test_CG2_B1_nguon_thu_hai_dat_cua_tep_THAT_khop_mong():
     assert (d["WP-C3d"]["khop"], d["WP-C3d"]["lech_co_chu_dich"], d["WP-C3d"]["tong_o"], d["WP-C3d"]["dat"]) == (1287624, 1791, 1289415, True)
     assert (d["WP-C5a"]["khop"], d["WP-C5a"]["lech_co_chu_dich"], d["WP-C5a"]["tong_o"], d["WP-C5a"]["dat"]) == (40556, 5118, 45674, True)
     assert (d["WP-C5b"]["khop"], d["WP-C5b"]["lech_co_chu_dich"], d["WP-C5b"]["tong_o"], d["WP-C5b"]["dat"]) == (3179, 923, 4102, True)
-    assert (d["WP-C5c"]["khop"], d["WP-C5c"]["lech_co_chu_dich"], d["WP-C5c"]["tong_o"], d["WP-C5c"]["dat"]) == (77672, 8478, 86150, True)
+    assert (d["WP-C5c"]["khop"], d["WP-C5c"]["lech_co_chu_dich"], d["WP-C5c"]["tong_o"], d["WP-C5c"]["dat"]) == (77663, 8487, 86150, True)   # WO-353 — 22/11: 77672 · 8478
     assert d["WP-C5c"]["dat_mong"] is True and d["WP-C5c"]["khong_do_duoc"] == []
     assert d["WP-C5c"]["dung_co_ky"] == [MONG_KY_605]
 
@@ -557,8 +558,8 @@ def test_ITE_R1_01_qua_tuyen_THAT_gates_co_truong_lech_co_chu_dich_THEM_vao_hop_
     h = _hd2(_gates(TEP_HD2_THAT))
     assert {m: c["lech_co_chu_dich"] for m, c in h.items()} == {
         "HD2_WP_C2": 0, "HD2_WP_C3": 1921, "HD2_WP_C3A": 35, "HD2_WP_C3B": 42, "HD2_WP_C3C": 53, "HD2_WP_C3D": 1791,
-        "HD2_WP_C4": 303, "HD2_WP_C4A": 0, "HD2_WP_C4B": 0, "HD2_WP_C4C": 303, "HD2_WP_C5": 14519, "HD2_WP_C5A": 5118,
-        "HD2_WP_C5B": 923, "HD2_WP_C5C": 8478}
+        "HD2_WP_C4": 303, "HD2_WP_C4A": 0, "HD2_WP_C4B": 0, "HD2_WP_C4C": 303, "HD2_WP_C5": 14528, "HD2_WP_C5A": 5118,
+        "HD2_WP_C5B": 923, "HD2_WP_C5C": 8487}   # WO-353 — 22/11: C5c 8478 · C5 14519 (= 5118 + 923 + C5c)
     assert all({"ma", "ten", "dat", "nhan", "da_do", "ly_do", "lat_bo_nguon"} <= set(c) for c in h.values())
     assert "35 lệch có chủ đích" in h["HD2_WP_C3A"]["da_do"] and "1921 lệch có chủ đích" in h["HD2_WP_C3"]["da_do"]
     assert all(type(c["lech_co_chu_dich"]) is int for c in h.values())

@@ -45,6 +45,9 @@ KHOA_ANH = {"ccr_so_du_ccr": "dong_sheet", "ccr_so_du_cash": "dong_sheet", "ccr_
 SHA_WO345 = {
     "ccr_so_du_ccr_20261123.json": "f7a826feb0980f26f4dbb83d41774e513bfd7a477d172fe13fdecfe67f557a8f",
     "ccr_so_du_cash_20261123.json": "59030e93bb73c6117c8f38f51c3ec039e3c47c9e69155db1b681c999810a772f",
+    # WO-353 (C3 = ⓐ) — DR2 chụp lại CÙNG lượt với 615 + số dư *(A-CCR 23/11 12:11:47Z)* qua khuôn `ccr_daily_report_2_song`
+    # *(cổng ĐẠT 846 — WO-345 khuôn cũ ĐỎ `thiếu 2` ⇒ `.DO`)*. Hai ảnh số dư lượt ấy ≡ từng byte hai dòng trên *(G1)*.
+    "ccr_daily_report_2_20261123.json": "601289d86766ce6e12268278a083ad7caa1b00ba06fa72dacbc5798df88639fc",
 }
 SHA_CU = {
     "gi_cfa1.json": "74db163e8030967f80ad45c35833ca092fc718efc53baa3ec2eebf2a0e7db808",
