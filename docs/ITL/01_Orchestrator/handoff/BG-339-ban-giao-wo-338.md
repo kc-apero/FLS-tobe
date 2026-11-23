@@ -138,3 +138,16 @@ Lượt đầu của `--duong-nen` ĐỎ vì 7 bài của WO-338 bị SKIP khi v
 Đọc bảng: bar thẻ `a3-1-ref` *(0 ca phải-để-người bị nối)* vẫn **CHẶN** ở cả hai bể ở **mọi** chế độ có chạy — luật giả `luat_gia_v1` nối 2 / 1 ca bằng "ứng viên DUY NHẤT khớp tiền+tiền tệ+ngày", ⛔ dùng nội dung ⇒ `mo` ≡ `che_het` ở mọi chỉ số; bể **chưa** đo được lợi ích của việc cho agent đọc nội dung + số TK *(cần mô hình thật — ngoài WO-338)*. `fleet_eval_voi.py --be-giu-rieng` exit **1** vì CHẶN, đúng mong.
 
 **Giả định** *(Q6 — hẹp nhất, chủ xác nhận)*: `tk` = cột `Tài khoản` của `Mapping L1` *(số TK của dòng sao kê)*; cột `Số tài khoản` của `PM_Unpivot` *(người nhận)* ⛔ đưa vào ca *(ca mang MỘT dòng bank; người nhận đã nằm ở ứng viên PM, mà ứng viên chỉ mang `pm · tiền · cur · ngày`)*. Khuyến nghị: giữ.
+
+### Cổng sau vòng sửa *(cụm PG 16 cổng 5437 · 23/11 · `--duong-nen` chạy MỘT lần, một mình)*
+```
+bash tools/dung_moi_truong_isp.sh --duong-nen --cong 5437:
+[ĐẠT] đường nền toàn bộ  tập đỏ + XFAIL = đường nền: 28 = 28 node id (XFAIL 2 = 2 · thêm 0 · bớt 0) · chạy 4967 bài (mong ≥ 4967) · skipped 0 · deselected 0
+[ĐẠT] đường nền tests/web  3 = 3 node id (thêm 0 · bớt 0) · chạy 690 bài (mong ≥ 690) · skipped 0 · deselected 0
+toàn bộ: 12 failed, 4939 passed, 2 xfailed, 14 errors · tests/web: 3 failed, 687 passed · KẾT: ĐẠT — mọi phép kiểm khớp mong
+python docs/ITL/_tools/kiem_tai_lieu.py  → cong tai lieu DAT (506 file, 3027 bang)
+lint-imports                             → Contracts: 11 kept, 0 broken.
+python tools/quet_pii_repo.py            → [ĐẠT] 0 chỗ số TK cá nhân · 0 tệp
+pytest tests/agent/test_be_giu_rieng.py  → 39 passed (có bể thật)
+```
+⛔ CHƯA CHẠY: `tools/kiem_so_song.py` · `dong_bo_so_song.py --ghi` *(đường dẫn Windows cứng `.venv/Scripts/lint-imports.exe`)* · `khop_owner.py --kiem` *(nền đã đỏ theo mục R0)*. Cổng nền 33 → **28 = 28**: thêm 0.
