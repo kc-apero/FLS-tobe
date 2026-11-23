@@ -149,6 +149,8 @@ Bước **02 · 03 · 04** + `Dockerfile` + kịch bản UAT + README trình t�
 
 ### 9.1 · Khối lệnh GỠ binding thừa cho CHỦ — chạy NGAY trên `fp-a-project` *(binding thừa đang tồn tại từ lần chạy 01 ngày 23/11)*
 
+> ✅ **Chủ ĐÃ chạy 23/11 (~06:10, theo orchestrator):** cả hai lệnh in `Updated IAM policy`. Khối này giữ làm **biên bản** + để kiểm. Bài chứng cho trạng thái SAU gỡ: chạy 01 trên SA sạch ⇒ **0** lệnh `add` cho `postgres`/`fls_admin`, **0** lệnh `remove`, ⛔ lỗi; còn binding thừa ⇒ gỡ; chạy lần 2 ⇒ 0 gỡ.
+
 Chạy trong Cloud Shell, bằng danh tính chủ *(2 lệnh — ⛔ chứa khoá)*:
 
 ```bash

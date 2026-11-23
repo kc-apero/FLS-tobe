@@ -110,6 +110,9 @@ def test_SA_chi_duoc_gan_dung_3_bi_mat_app_va_KHONG_bao_gio_goi_gan_cho_postgres
     gan = [d for d in _log(tmp_path) if "secrets add-iam-policy-binding" in d]
     assert len(gan) == 3, gan
     assert not [d for d in gan if any(q in d for q in QUAN_TRI)], gan
+    # trạng thái SAU khi chủ đã gỡ tay (23/11): SA không có binding thừa ⇒ chạy lại KHÔNG gỡ, KHÔNG lỗi `GO_QUYEN_THUA_LOI`
+    assert not [d for d in _log(tmp_path) if "secrets remove-iam-policy-binding" in d], "gỡ khi không có gì để gỡ"
+    assert "GO_QUYEN_THUA_LOI" not in r.stderr, r.stderr
     assert re.search(r"\[ĐẠT\] SA đọc đúng bí mật app \(đếm/mẫu số\)\s+'3/3'", r.stdout), r.stdout[-1500:]
     assert re.search(r"\[ĐẠT\] SA đọc 0 bí mật quản trị \(đếm/mẫu số\)\s+'0/2'", r.stdout), r.stdout[-1500:]
 
