@@ -418,7 +418,7 @@ MONG_HD1_CHAY=9845
 #    thêm bài; bài `tests/test_dung_moi_truong_isp.py::test_S0_R3_02_…` đòi hằng = thu thập ⇒ quên
 #    nâng là ĐỎ. Sau vòng sửa R3: 2.481 + 9 bài mới = 2.490 bài ở 211 tệp · `tests/web` 664 ở 56 tệp.
 # WO-325 (staging 02–04 + UAT): + 93 bài ở tests/staging/ (4.772 → 4.865 → 4.868 (+3 bài IAM lan truyền bước 01); tests/web vẫn 690).
-MONG_PYTEST_TOAN_BO=4868
+MONG_PYTEST_TOAN_BO=4886
 MONG_PYTEST_WEB=690
 
 echo
