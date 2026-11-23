@@ -5,7 +5,7 @@
 | **Thuộc** | `WO-355` |
 | **Phát bởi** | `fls-dev` · 2026-11-23 |
 | **Nhận** | `fls-test` (R1 → `KQ-357`) |
-| **Nhánh** | `claude/bold-galileo-zukpaf-isp/AG2` · SHA mã ghi ở §Cổng |
+| **Nhánh** | `claude/bold-galileo-zukpaf-isp/AG2` · SHA mã **`cafbcd7`** (BG ở commit kế) |
 | **Kho thật** | `KHONG_CHAM` (G0 BÓNG) · SA Google chỉ-đọc (dựng bể) · **0** lời gọi API thật |
 
 ## Đọc trong 5 phút
@@ -49,8 +49,8 @@ Tập nhỏ = **12** ca dựng + **20/70** ca bể B (hạt 355) — theo nhóm 
 
 | cổng | kết | dòng thật |
 |---|---|---|
-| `python -m pytest` | ĐIỀN | ĐIỀN |
-| `--duong-nen --cong 5436` | ĐIỀN | ĐIỀN |
+| `python -m pytest` (trong `--duong-nen`, `PYTEST_ADDOPTS` gỡ) | ĐẠT theo đường nền | `12 failed, 4992 passed, 2 xfailed, 14 errors in 1633.05s` = **28** node đỏ/XFAIL = đúng tập `duong_nen_bai_do.txt` (thêm 0 · bớt 0) · `tests/web`: `3 failed, 687 passed` = 3 = 3 |
+| `--duong-nen --cong 5436` (chạy MỘT mình, trên `cafbcd7`) | **ĐẠT** | `[ĐẠT] đường nền toàn bộ tập đỏ + XFAIL = đường nền: 28 = 28 node id (trong đó XFAIL 2 = 2 · thêm 0 · bớt 0) · chạy 5020 bài (mong ≥ 5020)` · `[ĐẠT] đường nền tests/web … 3 = 3 … chạy 690 bài (mong ≥ 690)` · `[ĐẠT] lint-imports Contracts: 11 kept, 0 broken.` · `[ĐẠT] kho fls RỖNG fls_itl = 0 dòng` · `══ KẾT: ĐẠT — mọi phép kiểm khớp mong` |
 | `tests/agent` | ĐẠT | `133 passed` *(trước khi thêm path tự đủ)* · riêng `test_mo_hinh_that.py` + `test_mo_hinh.py`: `34 passed` |
 | `kiem_tai_lieu.py` | ĐẠT | `✅ cong tai lieu DAT — va no da do duoc that (518 file, 3060 bang, 986 o ngay, 104 ma QD)` *(trước BG này; chạy lại ở dòng cuối)* |
 | `lint-imports` | ĐẠT | `Contracts: 11 kept, 0 broken.` |
