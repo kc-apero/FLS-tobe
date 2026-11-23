@@ -5,11 +5,11 @@
 | **Thuộc** | `WO-325` |
 | **Phát bởi** | `fls-dev` làn **HẠ TẦNG** · phiên cloud Sonnet 5.5 · cụm PG **5437** · 2026-11-23 |
 | **Nhận** | `fls-test` *(R1 → `KQ-327`, R2 cuối → `KQ-328`)* |
-| **Commit** | `claude/bold-galileo-zukpaf-isp/STG` @ `@@SHA@@` *(đã đẩy)* |
+| **Commit** | `claude/bold-galileo-zukpaf-isp/STG` @ `65ab287` *(mã + bài + tài liệu; commit kế tiếp chỉ thêm phiếu này)* — đã đẩy |
 | **Kho thật** | `KHONG_CHAM` — ⛔ vào GCP · ⛔ gcloud thật · ⛔ ghi kho thật. Mọi phép ghi chạy trên kho scratch `fls_stg_*` của cụm PG phiên (dọn xong), `fls`/`fls_test` ⛔ chạm ngoài bộ pytest thường lệ |
 
 ## Kết luận một dòng
-Bước **02 · 03 · 04** + `Dockerfile` + kịch bản UAT + README trình tự **xong và chứng minh ĐỎ-khi-hỏng** *(93 bài mới ở `tests/staging/`; gcloud + cloud-sql-proxy GIẢ, `psql` · `pg_migrate` · quyền PostgreSQL THẬT)*. ⛔ **chưa chạy thật ở GCP** — bảy giả định về chính GCP ở `tools/staging/README.md` §"Giả định chưa kiểm". **Khuyến nghị nơi chạy app: VM + IAP SSH tunnel** (đo bên dưới); **bốn câu chủ ở §4 — ⛔ tự quyết.** Bảy phát hiện ngoài dự kiến ở §5, trong đó hai cái đổi thiết kế: `actor` mặc định `thu@apero.vn` và "chuỗi HD2 3–5 phút" thật ra ~28 giây.
+Bước **02 · 03 · 04** + `Dockerfile` + kịch bản UAT + README trình tự **xong và chứng minh ĐỎ-khi-hỏng** *(96 bài mới ở `tests/staging/`; gcloud + cloud-sql-proxy GIẢ, `psql` · `pg_migrate` · quyền PostgreSQL THẬT)*. ⛔ **chưa chạy thật ở GCP** — bảy giả định về chính GCP ở `tools/staging/README.md` §"Giả định chưa kiểm". **Khuyến nghị nơi chạy app: VM + IAP SSH tunnel** (đo bên dưới); **bốn câu chủ ở §4 — ⛔ tự quyết.** Bảy phát hiện ngoài dự kiến ở §5, trong đó hai cái đổi thiết kế: `actor` mặc định `thu@apero.vn` và "chuỗi HD2 3–5 phút" thật ra ~28 giây.
 
 ## Đã đổi
 | Tệp | Vì sao |
@@ -21,18 +21,37 @@ Bước **02 · 03 · 04** + `Dockerfile` + kịch bản UAT + README trình t�
 | `tools/staging/nap_cau_hinh_ix.py` · `04_nap_du_lieu.sh` | AC-3: trình ĐIỀU PHỐI mỏng gọi các hàm `cau_hinh_repo.nap_*` **sẵn có** (⛔ viết lại) + script bọc |
 | `docs/ITL/04_Test/UAT_STAGING_E2E.md` | AC-4: 13 bước người bấm · bảng số 13 hàng từ `hd2_cong.json` · giới hạn O6 |
 | `tools/staging/README.md` | AC-5: trình tự 01 → 02 → 03 → 04 → UAT, mỗi bước chạy ở đâu · bao lâu · gửi lại gì · giả định chưa kiểm |
-| `tests/staging/*` *(7 tệp)* | 93 bài (xem §2) |
+| `tests/staging/*` *(8 tệp)* | 96 bài (xem §2) |
 | `tools/dung_moi_truong_isp.sh` · `tests/test_dung_moi_truong_isp.py` | AC-6: `MONG_PYTEST_TOAN_BO` **4772 → 4865** + bài ghim cùng commit *(đo `pytest --collect-only` = 4865; chứng ĐỎ: để 4772 ⇒ `test_S0_R3_02` đỏ "≠ thu thập 4865 (301 tệp)")* |
 | `docs/ITL/03_Dev/06_CICD_PIPELINE.md` (v0.2) · `08_CHANGELOG_RELEASE.md` | hai ô `???` staging có thiết kế; nhật ký |
 
 ⛔ **Không sửa**: `fls/**` (0 tệp — Đ1: `git diff 25ab19f -- fls | wc -l` = 0) · `tools/chay_cua.py` · bảng tuyến · luật từ chối của cửa.
 
-@@CONG@@
+## 1 · Cổng *(kết quả nguyên văn — đỏ-có-sẵn ghi rõ)*
+| Lệnh | Kết quả |
+|---|---|
+| `python -m pytest` *(lần 1, trước khi vá hai bài ghim)* | `14 failed, 4835 passed, 2 xfailed, 14 errors in 1042.50s` — **12 failed + 14 errors + 2 xfailed = tập đỏ nền 28**; **2 đỏ MỚI do tôi, đã sửa**: `test_S0_R2_03` (script 4868 ↔ bài ghim 4865 lệch nhau lúc đang chạy) và `test_khong_file_test_nao_doc_PG_DSN_truc_tiep` (`tests/staging/ho_tro.py` đọc `PG_DSN` trực tiếp ⇒ đổi sang `fls.db.kho.dsn_that()`); chạy lại `tests/db/test_khong_ai_tro_lai_kho_that.py tests/test_dung_moi_truong_isp.py tests/staging` ⇒ `159 passed` |
+| `bash tools/dung_moi_truong_isp.sh --duong-nen --cong 5437` *(MỘT lần, một mình, trên SHA đã đẩy)* | **`KẾT: ĐẠT`** — toàn bộ: `28 = 28 node id (XFAIL 2 = 2 · thêm 0 · bớt 0) · chạy 4868 bài (mong ≥ 4868) · skipped 0 · deselected 0`; `tests/web`: `3 = 3 · chạy 690 (mong ≥ 690)`; `lint-imports` 11 kept; di trú 27/27 + `pg_verify` khớp 27 bảng/view |
+| `python tools/kiem_so_song.py` | ⛔ **ĐỎ-có-sẵn của container**: `…/.venv/Scripts/lint-imports.exe` (đường Windows ở `tools/kiem_so_song.py:406`) ⇒ `FileNotFoundError`; sau khi đặt liên kết `.venv/Scripts/lint-imports.exe → ../bin/lint-imports`: *"⛔ khong do duoc: kho ⛔ khong co dau thoi diem cua lan nap / anh chup — cong ⛔ khong duoc phep xanh"* (kho cục bộ rỗng; cần kho thật của chủ). ⛔ do WO này |
+| `python tools/dong_bo_so_song.py --ghi` | cùng lý do `FileNotFoundError` (`Scripts/lint-imports.exe`); 0 tệp theo dõi bị đổi |
+| `python docs/ITL/_tools/kiem_tai_lieu.py` | `✅ cong tai lieu DAT … (485 file, 2961 bang, 968 o ngay, 104 ma QD)` · K1–K6 OK |
+| `python docs/ITL/_tools/khop_owner.py --kiem` | ⛔ **ĐỎ-có-sẵn**: `A1 · B1 · C6 ⛔ DOI TRANG THAI` + `C5b ⛔ KHONG DO DUOC (so RONG)` — **chạy trên commit gốc `25ab19f` (git worktree) ra Y HỆT** ⇒ ⛔ do WO này (`TIEN_DO` 22/11 đã ghi B1·C6 là backlog) |
+| `python tools/soi_bang_tuyen.py` | `✅ ban khai KHOP SQL that o ca 49 tuyen` |
+| `python tools/kiem_thuyet_minh.py` | `✅ CONG THUYET MINH DAT — 35/35 nut co mat trong CA 2 ban` |
+| `lint-imports` | `Contracts: 11 kept, 0 broken.` |
+| `python -m fls.db.pg_migrate` | ⛔ ⛔ chạm schema (0 tệp `fls/db` đổi); `--duong-nen` đã chạy di trú + `pg_verify` khớp |
+| `python tools/quet_pii_repo.py` | `[ĐẠT] 0 chỗ số TK cá nhân · 0 tệp` |
+
 
 ## 2 · Bằng chứng từng AC
 | AC | Mong | Bằng chứng của Dev *(số đo thật, nhãn đếm gì — Đ4)* |
 |---|---|---|
-@@AC@@
+| AC-1 · bước 02 | `pg_migrate` ⇒ `pg_verify: khop`; `fls_ghi` DML riêng `fls_itl` chỉ-THÊM; `fls_doc` SELECT + `read_only on`; BÁO CÁO có `mong`, exit 1 khi ĐỎ; chứng minh ĐỎ | `tests/staging/test_02_di_tru_phan_quyen.py` **28 bài** + `test_01_iam_lan_truyen.py` 3. ĐÚNG trên kho RỖNG ⇒ `KẾT: ĐẠT`, di trú **27/27** (= số tệp `migrations/*.sql`), `pg_verify: khop`; chạy lại ⇒ `khong co gi de ap`. **15 phá riêng từng mục ⇒ ĐÚNG tập mục ĐỎ** (vd `GRANT UPDATE ON fls_itl TO fls_ghi` ⇒ đúng 2 mục; hạ `default_transaction_read_only` ⇒ đúng 3; mất luật DENY ⇒ 2). Kho rỗng ⇒ ĐỎ (Đ3); `psql` + `python` GIẢ hỏng ⇒ **0 mục ĐẠT** (Đ5). Đo ĐỘC LẬP bằng `psycopg` (không qua script): `UPDATE/DELETE fls_itl` ⇒ `InsufficientPrivilege`; `fls_doc` tự `SET … = off` rồi INSERT/UPDATE/DELETE/TRUNCATE ⇒ vẫn `InsufficientPrivilege`; `kiem_truoc_khi_mo` nhận kết nối `fls_doc`, từ chối `fls_ghi`. 0 mật khẩu giả trong stdout/stderr/log proxy; gcloud chỉ đọc 4 bí mật, 0 lệnh GHI; proxy `127.0.0.1` rồi bị dọn |
+| AC-2 · nơi chạy app | đo trước → khuyến nghị; `Dockerfile` + `03_dung_app.sh`; cửa vẫn TỪ CHỐI | §3 (đo thật: ảnh 373 MB · mở cổng 1,7 s · RAM nghỉ 31 MiB · chuỗi 27,8 s/630 MB). `test_03_dung_app.py` **42 bài**: dựng từ trống ⇒ **19/19 mục ĐẠT**; ngữ cảnh build `git archive` **389 tệp**, chim hoàng yến thật (`sao_luu/` `hien_vat/` `Input_Raw/` `.env.*`) **0 lọt**; 17 phá ⇒ đúng mục ĐỎ; `vao.sh` chạy THẬT vào kho scratch: nghe loopback, không thẻ ⇒ **401**, doc ⇒ POST **405**, ghi ⇒ ký **201** với `actor` = người ký; thiếu `FLS_JWT_SECRET` ⇒ cửa exit ≠ 0; `--dia-chi 0.0.0.0` ⇒ từ chối `GAP-WEB-01`; kết nối đọc còn ghi ⇒ `kiem_truoc_khi_mo` nổ. `docker build` + `docker run` thật: xong, xem §3 |
+| AC-3 · bước 04 | nạp config IX.* đã ký bằng công cụ SẴN CÓ; `FLS_CHO_GHI_THAT=1`; số dòng có `mong` (Đ3); riêng tư; dữ liệu = câu chủ | `test_04_nap_du_lieu.py` **19 bài**: 9 bảng/10 phiên bản, dòng bản mới nhất khớp `mong` **1.135** dòng (FX 38 · HD 74 · PL 7 · MM 73 · PER 2 · VEN 360 · ORG 72 · ALR 38 · DRV 471); kho trắng ⇒ **0 mục ĐẠT**; đổi `mong` ±1 ⇒ đúng một bảng ĐỎ; thiếu IX.DRV ⇒ đúng IX.DRV ĐỎ; chạy lại ⇒ 9/9 `có rồi`, 0 phiên bản thêm; **`fls_itl` = 0 và `fls_run` không đổi**; cột `Email Address` lọt vào kho ⇒ đúng mục ĐỎ; `actor` chứa `@` ⇒ ĐỎ; thiếu `FLS_CHO_GHI_THAT` / người nạp xấu ⇒ exit 2 *trước khi gọi gcloud*; `--nguon-that` luôn từ chối (kể cả khi đặt `FLS_STG_DU_LIEU=that`). `chay_chuoi.sh`: kho trắng ⇒ ĐỎ nêu `ChuaKhai` (≥ 7/10 gói), sau 04 ⇒ **10/10 ĐẠT**. Dữ liệu thật/ẩn danh: C3 |
+| AC-4 · kịch bản người test | từng bước bấm + SỐ từ `hd2_cong.json` + ô ghi + giới hạn O6 | `UAT_STAGING_E2E.md`: **13 bước**, bảng U3 **13 hàng / 36 con số** có thẻ `<!--hd2:…-->`; `test_uat_doc.py` **4 bài** đối chiếu từng số với `hd2_cong.json` (đổi 1 số ở tài liệu hoặc ở tệp cổng ⇒ ĐỎ đúng số); giới hạn O6 (605 · 615 · D3 · CHECK IX.PL) + sổ rỗng + lệch có tên ở §1; `kiem_tai_lieu` ĐẠT. Các bước tôi đã bấm thử thật qua API: ký tháng 202401 ⇒ 201, lần 2 ⇒ **409**, tháng 209912 ⇒ **404**, ký bản kỳ 202510 ⇒ **404** |
+| AC-5 · trình tự chủ chạy | 01→02→03→04→UAT: chạy ở đâu · bao lâu · gửi lại | `tools/staging/README.md`: bảng 5 bước + mục "Đưa mã lên Cloud Shell" + "Giả định chưa kiểm" (7). Thời gian GCP là **ước** (⛔ đo được) |
+| AC-6 (Q8) | nâng `MONG_PYTEST_TOAN_BO` + bài ghim cùng commit; `--duong-nen` ĐẠT; `kiem_tai_lieu` · `lint-imports` · `quet_pii_repo` = 0 | `4772 → 4865 → 4868` + `test_S0_R3_02` đỏ khi để số cũ (đã chứng) · `--duong-nen` **`KẾT: ĐẠT`** (28 = 28 · web 3 = 3 · chạy 4868/690) · `kiem_tai_lieu` ĐẠT · `lint-imports` 11 kept · `quet_pii_repo` 0 |
 
 ## 3 · Khuyến nghị nơi chạy app — ĐO trước rồi mới khuyến nghị
 
