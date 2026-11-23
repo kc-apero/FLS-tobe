@@ -264,3 +264,8 @@ bash tools/staging/01_dung_staging_gcp.sh --project fp-a-project --kiem
 - Mô hình lọc `.gcloudignore` hiệu chỉnh trên **MỘT** điểm đo *(398 → 292)*; nay ⛔ còn tệp ấy nên mô hình chỉ còn canh lối cũ — chỗ dựa thật cho GCP là mục BÁO CÁO đếm `tải lên = ngữ cảnh`.
 - `thu_dung_anh.sh` ⛔ là bài pytest *(đường nền đòi `skipped = 0`, dockerd ⛔ có ở mọi container)*; trong pytest chỉ có bài tĩnh cú pháp + bài giả. Ai đổi Dockerfile nên chạy công cụ ở máy có dockerd *(Cloud Shell có)*.
 - `STG-R2b-03` *(bài phụ thuộc thứ tự)* chưa sửa.
+
+### 11.4 · Thêm theo tin orchestrator *(đo của chủ ~10:50 23/11)* — chỉ tài liệu
+- `tools/staging/README.md` §"Người test vào bằng gì": ⛔ **Cloud Shell Web Preview** *(vỏ màn hình tải được, mọi `fetch` API ⇒ `FLS-MAT-KET-NOI / Failed to fetch`; cùng lúc `curl …/api/fls/v1/gates` trong Cloud Shell ⇒ **401** — app đúng; nghi proxy chặn `fetch` mang `Authorization: Bearer`, **CHƯA đo nguyên nhân**)* ⇒ người test chạy tunnel từ **máy mình**; `bind [::1]:8080: Cannot assign requested address` vô hại *(IPv6)*. Giả định GCP **#4 · #6 ĐÃ KIỂM: ĐÚNG** *(03 23/23 ĐẠT sau vá tạm)*.
+- `UAT_STAGING_E2E.md` **v0.4**: §0.1 + U1 ghi như trên.
+- ⛔ đổi mã/bài ⇒ ⛔ chạy lại `--duong-nen` *(kết quả §11.2 vẫn là của `8b498ea`)*; đã chạy `test_uat_doc.py` + `kiem_tai_lieu`.

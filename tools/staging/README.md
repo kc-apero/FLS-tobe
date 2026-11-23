@@ -37,6 +37,9 @@ gcloud compute ssh fls-staging-app --project P --zone asia-southeast1-b --tunnel
 # giữ cửa sổ mở → trình duyệt: http://localhost:8088/
 ```
 
+⛔ **Cloud Shell Web Preview ⛔ dùng được cho màn hình FLS** *(chủ đo 23/11 ~10:50)*: tunnel từ Cloud Shell `-L 8080:127.0.0.1:8088` + Web Preview ⇒ vỏ màn hình tải được nhưng **mọi** `fetch` API ⇒ `FLS-MAT-KET-NOI / Failed to fetch`; cùng lúc `curl http://127.0.0.1:8080/api/fls/v1/gates` trong Cloud Shell ⇒ **401** *(app + API đúng)*. Nghi proxy `cloudshell.dev` chặn `fetch` mang `Authorization: Bearer` — **CHƯA đo nguyên nhân**. ⇒ Người test chạy tunnel **từ MÁY MÌNH**: cài Google Cloud CLI → `gcloud auth login` → lệnh trên → mở **http://localhost:8088/**.
+Trên Cloud Shell, dòng `bind [::1]:8080: Cannot assign requested address` là **vô hại** *(IPv6; IPv4 vẫn nghe)*.
+
 ⚠ **Một thẻ chung cho cả phiên**: mọi chữ ký mang tên `--nguoi-ky` (cửa ⛔ có đăng nhập từng người; SSO là phase sau). ⛔ để mặc định — script từ chối tên `thu@apero.vn`.
 
 ## Dữ liệu nguồn (sổ kế toán) — ⛔ nạp ở đây
@@ -54,9 +57,9 @@ Bước 04 chỉ nạp **config** `IX.*`; `fls_itl` = 0 dòng. "Thật hay ẩn 
 | 1 | `postgres` (Cloud SQL) `GRANT fls_admin TO postgres` + `ALTER DATABASE … OWNER TO fls_admin` được | 02: dừng ở bước ② với lỗi PG (script ⛔ che) |
 | 2 | ~~gỡ `cloudsqlsuperuser` + `NOCREATEROLE NOCREATEDB` khỏi `fls_ghi`/`fls_doc` được (làm-hết-sức)~~ — **ĐÃ KIỂM 23/11: SAI** *(02 thật: 23/24, ĐỎ "siêu quyền … = 2")* ⇒ thay bằng #8 (`STG-R2b-02`) | 02: mục "thành viên cloudsqlsuperuser" / "siêu quyền" |
 | 3 | `cloud-sql-proxy` v2 chạy được trong Cloud Shell, VM có đường ra tới IP công khai của Cloud SQL (IP tạm của VM) | 02/04: "proxy ⛔ lên cổng"; 03 TRONG VM: container ⛔ chạy |
-| 4 | Debian 12 cài `docker.io` bằng `apt` lúc boot (VM có đường ra internet) | 03 TRONG VM: "container fls-app" |
+| 4 | Debian 12 cài `docker.io` bằng `apt` lúc boot (VM có đường ra internet) — **ĐÃ KIỂM 23/11: ĐÚNG** *(bước 03 23/23 ĐẠT sau vá tạm — orchestrator báo)* | 03 TRONG VM: "container fls-app" |
 | 5 | vai IAM `roles/iap.tunnelResourceAccessor` (cấp ở project) + `roles/compute.osLogin` (cấp ở VM) đủ để `ssh --tunnel-through-iap` | người test ⛔ vào được (U1) |
-| 6 | `gcloud compute ssh --tunnel-through-iap --command` chạy được từ Cloud Shell của chủ | 03 mục "TRONG VM" đỏ cả 5 |
+| 6 | `gcloud compute ssh --tunnel-through-iap --command` chạy được từ Cloud Shell của chủ — **ĐÃ KIỂM 23/11: ĐÚNG** *(bước 03 23/23 ĐẠT sau vá tạm — orchestrator báo)* | 03 mục "TRONG VM" đỏ cả 5 |
 | 7 | mạng `default` của project cho phép luật firewall ưu tiên 800/900 như script đặt | 03 mục firewall |
 | 8 | `postgres` (Cloud SQL PG16) chạy được `CREATE ROLE … LOGIN NOCREATEDB NOCREATEROLE PASSWORD '…'` và `DROP ROLE` vai **chính nó tạo**; vai gcloud tạo thì `DROP ROLE` SQL được (giả thuyết H-B — khớp mọi sự thật đo) **hoặc** bị từ chối ⇒ `gcloud sql users delete` (H-A). Script IN lời PG thật + dòng `có ADMIN OPTION=` ⇒ lần chạy đầu phân xử | 02: dừng ở ①b với lỗi CÓ TÊN `VAI_KHONG_XOA_DUOC` / `VAI_KHONG_TAO_DUOC` |
 | 9 | `gcloud builds submit` ⛔ `.gcloudignore` + ngữ cảnh ⛔ `.gitignore` ⇒ tải **đủ** ngữ cảnh; gcloud in `Creating temporary archive of N file(s)` | 03: mục "tệp tải lên = tệp ngữ cảnh" (⛔ đọc được dòng ⇒ ĐỎ) |
