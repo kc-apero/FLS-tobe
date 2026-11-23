@@ -13,7 +13,7 @@ Script 01 chỉ cần chính nó (đã chạy xong). Script 02/04 tự tạo ven
 
 | Bước | Lệnh (Cloud Shell) | Mất bao lâu *(ước — ⛔ đo được ở GCP)* | Gửi lại |
 |---|---|---|---|
-| **01** dựng Cloud SQL · 3 vai · bí mật · SA | `bash tools/staging/01_dung_staging_gcp.sh --project P --kiem` rồi bỏ `--kiem` | tạo máy Cloud SQL **5–15 phút** (script 01 tự ghi); còn lại < 2 phút | phần BÁO CÁO (12 mục) — cần `KẾT: ĐẠT` mới sang 02 |
+| **01** dựng Cloud SQL · 3 vai · bí mật · SA | `bash tools/staging/01_dung_staging_gcp.sh --project P --kiem` rồi bỏ `--kiem` | tạo máy Cloud SQL **5–15 phút** (script 01 tự ghi); còn lại < 2 phút | phần BÁO CÁO (mục có `mong` ĐẠT/ĐỎ, kể cả 3 mục quyền của SA: đọc đúng 3 bí mật app · 0 bí mật quản trị · gán/gỡ không lỗi — chạy lại 01 sẽ GỠ quyền thừa nếu có) — cần `KẾT: ĐẠT` mới sang 02 |
 | **02** di trú + phân quyền | `bash tools/staging/02_di_tru_phan_quyen.sh --project P --kiem` rồi bỏ `--kiem` | ~1 phút (đo cục bộ: ~3 giây; thêm tạo venv + pip `psycopg` lần đầu ~1 phút, proxy + mạng) | phần BÁO CÁO (mục có `mong`: `fls_itl` chỉ-THÊM · `fls_doc` chỉ SELECT · `pg_verify: khop`…) |
 | **03** ảnh + VM chạy app | `bash tools/staging/03_dung_app.sh --project P --kiem` rồi bỏ `--kiem`. Mặc định app **CHỈ ĐỌC**. Muốn người test KÝ: thêm `--che-do ghi --nguoi-ky <tên>`; cấp người vào: `--cap-quyen a@x.com,b@y.com` | Cloud Build **3–6 phút** (đo cục bộ: `docker build` 5 giây khi có cache, ảnh **373 MB**); VM tạo **~1 phút**, boot + cài docker + kéo ảnh **2–4 phút** ⇒ chờ rồi chạy lại `--kiem` để đo | phần BÁO CÁO (19 mục, kể cả ĐO TRONG VM: container sống · cổng 8088 chỉ nghe `127.0.0.1` · gọi không thẻ ⇒ 401) |
 | **04** nạp config IX.* đã ký | `FLS_CHO_GHI_THAT=1 bash tools/staging/04_nap_du_lieu.sh --project P --nguoi-nap <tên.người>` (`--kiem` để chỉ đo) | ~1 phút (đo cục bộ: 2 giây) | phần BÁO CÁO (9 bảng × hai chiều + riêng tư + `fls_itl = 0`) |
@@ -45,7 +45,7 @@ Bước 04 chỉ nạp **config** `IX.*`; `fls_itl` = 0 dòng. "Thật hay ẩn 
 
 ## Chuỗi HD2 trong app
 
-"Chạy chuỗi" là **lệnh**, ⛔ yêu cầu HTTP: `docker exec fls-app bash /app/tools/staging/app/chay_chuoi.sh [--ghi]` (10 gói `do_hd2.py --goi`; đo 23/11 ~**28 giây** CPU, đỉnh **630 MB** RAM trên kho đã nạp config). `--ghi` ghi lại `hd2_cong.json` trong container — cửa đọc nó mỗi yêu cầu nên F03 đổi ngay.
+"Chạy chuỗi" là **lệnh**, ⛔ yêu cầu HTTP: `sudo docker exec fls-app bash /app/tools/staging/app/chay_chuoi.sh [--ghi]` (**11** gói `do_hd2.py --goi` = `len(GOI_BIET)`; đo 23/11 trên cây đã gộp H14: ~**45 giây** CPU, đỉnh **~800 MB** RAM trên kho đã nạp config). ⛔ **Chỉ CHỦ chạy**: lệnh cần `sudo`, mà `--cap-quyen` chỉ cấp `osLogin` (không có `sudo`) — cấp `osAdminLogin` là cho người test root trên VM (`STG-R1-06`, phương án A). `--ghi` ghi lại `hd2_cong.json` trong container — cửa đọc nó mỗi yêu cầu nên F03 đổi ngay.
 
 ## Giả định chưa kiểm (chỉ lộ ra khi chạy thật ở GCP)
 

@@ -80,7 +80,7 @@ Bước **02 · 03 · 04** + `Dockerfile` + kịch bản UAT + README trình t�
 | Cửa vẫn nghe loopback? | **CÓ** — container `--network host`, cổng `127.0.0.1:8088`; SSH forward đáp vào loopback của VM | **KHÔNG** — Cloud Run đòi nghe `0.0.0.0:$PORT` ⇒ phải **nới luật từ chối** *(⛔ WO)* hoặc thêm một **proxy sidecar tự viết** đứng ngay chỗ ranh giới an ninh |
 | Cloud SQL | Auth Proxy trong container + SA `fls-staging-app` (`cloudsql.client`) — *đã đo cục bộ* | Cloud SQL connector kèm Cloud Run (sidecar proxy cũng được) |
 | Giới hạn thời gian yêu cầu của chuỗi | **không áp dụng** (chuỗi là lệnh `docker exec`, 28 giây) | không áp dụng nếu chuỗi chạy Job; mặc định 300 s/yêu cầu nếu ai nhét vào HTTP |
-| Chạy chuỗi / `--ghi` hd2_cong.json | `docker exec` tại VM (người test có `osLogin`) | cần Cloud Run Job + volume cho tệp ghi lại (hd2_cong.json nằm FS tạm của instance) |
+| Chạy chuỗi / `--ghi` hd2_cong.json | `sudo docker exec` tại VM — **chỉ CHỦ chạy** (người test có `osLogin` = ⛔ `sudo`; sửa theo `STG-R1-06`) | cần Cloud Run Job + volume cho tệp ghi lại (hd2_cong.json nằm FS tạm của instance) |
 | Rủi ro lớn nhất | một VM = một điểm hỏng; phải tự `stop`/`start` | **sidecar tự viết trong đường an ninh**; mất `hd2_cong.json` khi instance tái chế |
 
 ⇒ **Khuyến nghị: A** — duy nhất giữ NGUYÊN luật loopback, danh tính = IAM *(có nhật ký)*, chuỗi chạy cùng chỗ, và chi phí tắt-được. Phương án B rẻ hơn khi bỏ không, nhưng buộc nới/chèn thứ vào ranh giới an ninh mà `WO` cấm.
@@ -129,3 +129,45 @@ Bước **02 · 03 · 04** + `Dockerfile` + kịch bản UAT + README trình t�
 6. **Bảng chi phí là ước** — ⛔ vào GCP để đo; `e2-small` chọn theo đỉnh RSS 630 MB (chưa có số trên staging).
 7. `.dockerignore` kiểu danh sách cho phép + `git archive` chặn dữ liệu gitignore, nhưng `tests/fixture` (126 MB trong repo) **đã commit** và vào ảnh — đã quét PII ở các phiếu DT*, ⛔ quét lại ở đây (`quet_pii_repo` = 0 trên cây).
 8. `02` BÁO CÁO "gỡ `cloudsqlsuperuser`/`NOCREATEROLE`" là **làm-hết-sức**: trên Cloud SQL thật có thể ⛔ được; khi đó BÁO CÁO đỏ **đúng hai mục ấy** — chủ gửi lại, ⛔ coi là lỗi script.
+
+## 9 · Vòng sửa sau R1 (`KQ-327`) — bảng phát hiện → sửa → bằng chứng
+
+*(Dev · 2026-11-23 · cụm PG **5434** · nhánh `claude/bold-galileo-zukpaf-isp/STG` từ ngọn `5dc0b0e`; ⛔ GCP · ⛔ gcloud thật · ⛔ kho thật. Đã GỘP `origin/claude/bold-galileo-zukpaf` — có H14, ⛔ có I2 — ở commit `b642885`.)*
+
+| Phát hiện | Mức | Sửa | Bằng chứng *(chứng ĐỎ = phá nguồn → bài cắn → trả nguyên)* |
+|---|---|---|---|
+| `STG-R1-01` SA đọc 5/5 bí mật | CHẶN | `01_dung_staging_gcp.sh`: hai mảng `BI_MAT_APP` *(jwt · `fls_ghi` · `fls_doc`)* / `BI_MAT_QUAN_TRI` *(`postgres` · `fls_admin`)*; vòng gán chỉ chạy trên `BI_MAT_APP`; thêm vòng **GỠ** `secretAccessor` của SA trên hai bí mật quản trị nếu đang có *(idempotent: đo bằng `secrets get-iam-policy`, có ⇒ `remove-iam-policy-binding`, ⛔ có ⇒ bỏ qua; ⛔ đo được ⇒ lỗi `GO_QUYEN_THUA_LOI` + ĐỎ)*. BÁO CÁO thêm **3 mục có `mong`**: `SA đọc đúng bí mật app` mong `3/3` · `SA đọc 0 bí mật quản trị` mong `0/2` · `gán/gỡ vai đủ`. Grep chỗ dùng: `vao.sh:43,45` *(jwt + `fls-staging-pg-$VAI`, VAI ∈ {`fls_ghi`,`fls_doc`})* · `chay_chuoi.sh:20` *(`fls_doc`)* ⇒ 3 trên 5 | `tests/staging/test_01_iam_lan_truyen.py`: 5 bài mới/sửa — gán **đúng 3** *(đếm lệnh `add-iam-policy-binding` = 3, 0 lệnh trên `postgres`/`fls_admin`)* · trạng thái THẬT 23/11 *(SA có cả 5)* ⇒ gỡ đúng 2, **chạy lần 2 gỡ 0** · gỡ hỏng ⇒ `'2/2'` ĐỎ + chữ `PERMISSION_DENIED` · `get-iam-policy` hỏng ⇒ `'0/3'` và `'2/2'` ĐỎ *(Đ5: ⛔ đo được = ĐỎ)*. **Chứng ĐỎ:** đổi vòng gán về 5 bí mật + bỏ vòng gỡ ⇒ **4 trên 8 bài đỏ**; trả nguyên ⇒ 8/8 xanh. Bài ghim cũ `:57` *"trên 5 bí mật"* đổi thành *"3 bí mật app (0 bí mật quản trị)"* |
+| `STG-R1-02` "10 gói" cứng ⇒ 2 bài đỏ sau H14 | CHẶN | `test_04_nap_du_lieu.py`: số gói + tên + chuỗi `"N gói · ĐỎ 0"` lấy từ `tools.do_hd2.GOI_BIET` *(`len`, và so TÊN theo thứ tự)*, ⛔ hằng số. Gộp `origin/claude/bold-galileo-zukpaf` ở `b642885`. Sàn pytest = thu thập thật *(xem §9.2)* | `pytest tests/staging/test_04_nap_du_lieu.py` = **19 passed** *(trước vòng sửa trên cây gộp: 2 đỏ `assert (11 == 10)`)* ; `GOI_BIET` = 11 *(đo)* |
+| `STG-R1-04` 01 ĐẠT khi gán vai hỏng | NÊN SỬA | `IAM_LOI=1` ⇒ mục `gán/gỡ vai đủ` ĐỎ ⇒ `KẾT: ĐỎ` · exit 1; `thu_lai` giữ **dòng lỗi cuối của gcloud** *(trước: `>/dev/null 2>&1` nuốt chữ thật, nhãn "IAM lan truyền" gắn cho cả `PERMISSION_DENIED`)* và in kèm `gcloud nói: …` | bài mới: `secrets add-iam-policy-binding` `PERMISSION_DENIED` mãi ⇒ stderr đúng **3** dòng `IAM_KHONG_LAN_TRUYEN` kèm chữ `PERMISSION_DENIED` · `[ĐỎ] gán/gỡ vai đủ` · `[ĐỎ] … '0/3'` · exit 1 · `KẾT: ĐỎ` *(bị đỏ khi chứng mutation như dòng `-01`)* |
+| `STG-R1-05` UAT lệch số + bài canh vẫn xanh | NÊN SỬA | `UAT_STAGING_E2E.md` v0.2: thêm hàng `WP-C5c` *(86.150 / 77.672 / 8.478)* · cha `WP-C5` = a+b+c *(135.926 / 121.407 / 14.519, `dat` true)* · §1·615 sửa **12.380 → 13.760** và **6.753 → 5.258** *(thẻ `hd2x` mới — số lấy từ `hd2_cong.json` `WP-C5c.do_phu.615`)* · U7/U8/U10 = 11 gói · ~45 s · ~800 MB *(đo R1: 44,4 s · 797 MB)* · bỏ nhãn `[CHỜ H14]`; `[CHỜ I2]` **giữ** *(đo: `grep -rln "FxKho\|kiem_fx_thang" fls tools` = 0 — I2 chưa gộp)*. `test_uat_doc.py`: **bỏ** `CHA` đóng cứng, suy cha/con từ khoá trong `hd2_cong.json`; 39 thẻ `hd2` + 3 thẻ `hd2x` + số dòng U7 so với `len(GOI_BIET)` | `pytest tests/staging/test_uat_doc.py` = **5 passed**. **Chứng ĐỎ:** sửa tài liệu `13.760→12.380` · `77.672→77.671` · `11→10 dòng` ⇒ **3 bài đỏ**; trả nguyên ⇒ xanh |
+| `STG-R1-06` U7/U8 đòi `sudo`, `osLogin` ⛔ có | NÊN SỬA | **Phương án A** *(⛔ cần `HOI`: chỉ ghi rõ, ⛔ đổi quyền)*: U7/U8 gắn `[chỉ CHỦ chạy — cần sudo]`; `README` §chạy chuỗi + dòng `BG` §3 sửa. ⛔ cấp `osAdminLogin` *(= root trên VM)*. Phương án B *(lệnh bọc `sudoers` hẹp cho người test)* **chưa làm** — chờ chủ/BA nếu muốn người test tự chạy chuỗi | grep `osAdminLogin` trong `docs fls tools tests` = **0** *(giữ nguyên)*; `test_uat_doc` xanh |
+| `STG-R1-07` chết giữa `IX.ALR` ⇒ ⛔ tự lành | NÊN SỬA | `nap_cau_hinh_ix.py`: tách `_ky_alr`; vòng nạp tự lành **theo từng bước**: `v==0` ⇒ nền + KÝ · `0<v<2` *(chỉ IX.ALR)* ⇒ **chỉ KÝ** · `v≥2` ⇒ bỏ qua | bài mới `test_chet_giua_IX_ALR_chay_lai_tu_lanh…`: ép `ky_bat_ix_alr` nổ ⇒ exit ≠ 0 và `IX.ALR` = v1 *(mẫu số)*; chạy lại **hai lần**: cả hai `KẾT: ĐẠT`; `IX.ALR` = **2** bản · tổng bản = **10**. **Chứng ĐỎ:** trả mã cũ ⇒ đỏ *(lần 1 `exit 1`)*; mã mới ⇒ xanh |
+| `STG-R1-08` `02 --kiem` để lại bảng probe | NÊN SỬA | probe ghi của `fls_doc` bọc `BEGIN; CREATE TABLE …; ROLLBACK;` *(không còn để lại vật)* | bài mới `…KHONG_de_lai_vat…STG_R1_08`: `GRANT CREATE ON SCHEMA public TO fls_doc` + `RESET default_transaction_read_only` ⇒ `--kiem` vẫn **ĐỎ đúng mục** nhưng số bảng `fls_probe_doc_ghi` = **0**; "làm" sau đó exit 0. **Chứng ĐỎ:** trả probe cũ ⇒ `để lại 1 bảng` đỏ; mã mới ⇒ xanh. `pytest tests/staging/test_02…` = **29 passed** |
+| `STG-R1-09` xung đột sàn | GHI NHẬN | Giải ở `b642885` rồi đặt sàn = thu thập thật *(§9.2)* — bài ghim cùng commit | — |
+| `STG-R1-10` · `-11` · `-12` | GHI NHẬN | **Chưa sửa — để backlog:** `-10` *(bài chạy `DO_TRONG` bằng stub)* · `-11` *(`--password` qua đối số ×3; 7 tệp `tools/` mang tên SA cục bộ trong ảnh ⇒ `.dockerignore`)* · `-12` *(bài chuỗi phụ thuộc thứ tự test)*. Lý do: ngoài phạm vi "2 CHẶN + NÊN SỬA còn mở" của phiếu; `-11a` thấp rủi ro *(Cloud Shell = một người)*; `-11b` ảnh ⛔ có khoá/token *(Test đã đo)* | — |
+| `STG-R1-03` · `-13` | — | đã đóng ở `d04557a` | — |
+
+### 9.1 · Khối lệnh GỠ binding thừa cho CHỦ — chạy NGAY trên `fp-a-project` *(binding thừa đang tồn tại từ lần chạy 01 ngày 23/11)*
+
+Chạy trong Cloud Shell, bằng danh tính chủ *(2 lệnh — ⛔ chứa khoá)*:
+
+```bash
+gcloud --project=fp-a-project secrets remove-iam-policy-binding fls-staging-pg-postgres \
+  --member="serviceAccount:fls-staging-app@fp-a-project.iam.gserviceaccount.com" --role=roles/secretmanager.secretAccessor
+gcloud --project=fp-a-project secrets remove-iam-policy-binding fls-staging-pg-fls_admin \
+  --member="serviceAccount:fls-staging-app@fp-a-project.iam.gserviceaccount.com" --role=roles/secretmanager.secretAccessor
+```
+
+Kiểm *(mong: cả hai lệnh in rỗng)*:
+
+```bash
+for s in fls-staging-pg-postgres fls-staging-pg-fls_admin; do
+  gcloud --project=fp-a-project secrets get-iam-policy $s --flatten='bindings[].members' \
+    --filter='bindings.members:fls-staging-app@' --format='value(bindings.role,bindings.members)'; done
+```
+
+Hoặc chạy lại `bash tools/staging/01_dung_staging_gcp.sh --project fp-a-project` (bản mới) — nó tự gỡ và BÁO CÁO phải có `[ĐẠT] SA đọc đúng bí mật app '3/3'` · `[ĐẠT] SA đọc 0 bí mật quản trị '0/2'`. ⚠ Nếu từng có VM chạy app với token cũ: mật khẩu `fls_admin`/`postgres` đã **đọc được** từ VM trong khoảng thời gian đó ⇒ cân nhắc **xoay mật khẩu** hai vai này *(câu chủ — ⛔ Dev tự làm)*.
+
+### 9.2 · Cổng sau vòng sửa
+
+*(điền ở cuối phiên — xem dưới)*

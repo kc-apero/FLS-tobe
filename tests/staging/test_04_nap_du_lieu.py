@@ -4,7 +4,7 @@
      chạy lại ⛔ nạp chồng · ⛔ chạm `fls_itl` · kho trắng ⇒ ĐỎ (Đ3).
   ⓑ `04_nap_du_lieu.sh` (gcloud + proxy GIẢ, psql + trình nạp THẬT): đúng ⇒ ĐẠT; đòi `FLS_CHO_GHI_THAT=1`; chỉ đọc bí mật `fls_ghi`;
      cột "Email Address" lọt vào kho ⇒ ĐỎ; `--nguon-that` luôn từ chối.
-  ⓒ `chay_chuoi.sh`: kho trắng ⇒ ĐỎ nêu tên gói; sau khi nạp config ⇒ 10/10 gói ĐẠT (đây là bằng chứng bước 04 ĐỦ để chạy chuỗi).
+  ⓒ `chay_chuoi.sh`: kho trắng ⇒ ĐỎ nêu tên gói; sau khi nạp config ⇒ N/N gói ĐẠT (N = `len(tools.do_hd2.GOI_BIET)`, ⛔ số cứng — `STG-R1-02`: H14 thêm `WP-C5c` ⇒ 11 làm hai bài đỏ) (đây là bằng chứng bước 04 ĐỦ để chạy chuỗi).
 """
 from __future__ import annotations
 
@@ -19,6 +19,7 @@ import psycopg
 import pytest
 
 from tests.staging import ho_tro as H
+from tools.do_hd2 import GOI_BIET
 
 DRV = H.STG / "nap_cau_hinh_ix.py"
 S04 = "04_nap_du_lieu.sh"
@@ -308,19 +309,49 @@ def test_chuoi_tren_kho_TRANG_DO_nen_ten_goi_thieu_config(kho_04):
     assert "ChuaKhai" in r.stdout and "WP-C3c" in r.stdout, r.stdout
     assert re.search(r"WP-C2\s+0\s", r.stdout), "WP-C2 không cần kho ⇒ vẫn ĐẠT"
     dong = [l for l in r.stdout.splitlines() if re.match(r"WP-C\d", l)]
-    assert len(dong) == 10 and sum(l.split()[1] != "0" for l in dong) >= 7, dong        # đo 23/11: 7+ gói cần kho
+    assert GOI_BIET and len(dong) == len(GOI_BIET) and [l.split()[0] for l in dong] == list(GOI_BIET), (dong, GOI_BIET)   # `STG-R1-02`: đếm từ NGUỒN
+    assert sum(l.split()[1] != "0" for l in dong) >= 7, dong        # đo 23/11: 7+ gói cần kho
 
 
-def test_chuoi_sau_khi_nap_config_ra_DAT_10_goi(kho_04):
+def test_chuoi_sau_khi_nap_config_ra_DAT_moi_goi_cua_GOI_BIET(kho_04):
     mt = kho_04
     r = _chay_chuoi(mt)
     assert r.returncode == 0, r.stdout + r.stderr
     dong = [l for l in r.stdout.splitlines() if re.match(r"WP-C\d", l)]
-    assert len(dong) == 10 and all(l.split()[1] == "0" for l in dong), dong
-    assert "KẾT: ĐẠT" in r.stdout and "10 gói · ĐỎ 0" in r.stdout
+    assert GOI_BIET and len(dong) == len(GOI_BIET) and all(l.split()[1] == "0" for l in dong), dong
+    assert "KẾT: ĐẠT" in r.stdout and f"{len(GOI_BIET)} gói · ĐỎ 0" in r.stdout
     assert "đã ghi" not in r.stdout, "⛔ --ghi ⇒ không ghi tệp"
 
 
 def test_chuoi_tham_so_la_exit_2(kho_04):
     r = _chay_chuoi(kho_04, "--la")
     assert r.returncode == 2
+
+
+# ══ `STG-R1-07` — chết GIỮA hai việc của IX.ALR (nền v1 → KÝ v2) ⇒ chạy lại PHẢI tự lành (kho chỉ-THÊM, ⛔ xoá được) ══
+def test_chet_giua_IX_ALR_chay_lai_tu_lanh_DAT_va_khong_nap_chong(tmp_path):
+    ten = f"fls_stg_cfg_ngat_{os.getpid()}"
+    dsn = _kho_rong(ten)
+    try:
+        boom = tmp_path / "ngat.py"
+        boom.write_text(
+            "import sys\n"
+            f"sys.path.insert(0, {str(H.STG.parents[1])!r})\n"
+            "from fls.repo import cau_hinh_repo as chc\n"
+            "def _no(*a, **k):\n"
+            "    raise RuntimeError('ép nổ giữa IX.ALR: sau nap_ix_alr, trước ky_bat_ix_alr')\n"
+            "chc.ky_bat_ix_alr = _no\n"
+            "import tools.staging.nap_cau_hinh_ix as m\n"
+            "raise SystemExit(m.main())\n", encoding="utf-8")
+        env = dict(os.environ, PG_DSN=dsn, PYTHONUTF8="1", FLS_CHO_GHI_THAT="1")
+        r0 = subprocess.run([sys.executable, str(boom), "--nguoi-nap", "khanh.thu"], capture_output=True, text=True, env=env, timeout=300)
+        assert r0.returncode != 0, "ép nổ mà vẫn thoát 0 — bài vô nghĩa"
+        # MẪU SỐ (Đ3): đúng trạng thái hỏng của R1 — IX.ALR có v1 · 17 dòng, và ⛔ có v2
+        assert _dem(dsn, "SELECT max(phien_ban) FROM fls_cau_hinh_ban WHERE bang = 'IX.ALR'") == 1
+        for lan in (1, 2):                                   # hai lần liên tiếp: lần 1 TỰ LÀNH, lần 2 ⛔ nạp chồng
+            r = _chay_drv(dsn, "--nguoi-nap", "khanh.thu")
+            assert r.returncode == 0 and "KẾT: ĐẠT" in r.stdout, (lan, r.stdout, r.stderr)
+        assert _dem(dsn, "SELECT count(*) FROM fls_cau_hinh_ban WHERE bang = 'IX.ALR'") == 2
+        assert _dem(dsn, "SELECT count(*) FROM fls_cau_hinh_ban") == 10
+    finally:
+        H.chay_quan_tri(f"DROP DATABASE IF EXISTS {ten} WITH (FORCE)")

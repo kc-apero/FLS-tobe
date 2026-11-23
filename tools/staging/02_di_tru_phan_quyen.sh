@@ -218,7 +218,9 @@ export R_DOC_PHIEN="$(do_mot "$DOC" "$MK_DOC" "SHOW default_transaction_read_onl
 export R_DOC_VAI_CAU_HINH="$(do_mot "$ADMIN" "$MK_ADMIN" \
   "SELECT coalesce(bool_or('default_transaction_read_only=on' = ANY(rolconfig)), false) FROM pg_roles WHERE rolname = '$DOC'")"
 # `CREATE TABLE` trong phiên chỉ-đọc ⇒ PG nổ "read-only transaction" TRƯỚC khi xét quyền schema.
-export R_DOC_THU_GHI="$(thu_ghi "$DOC" "$MK_DOC" "CREATE TABLE fls_probe_doc_ghi (i int)")"
+# ⭐ `STG-R1-08`: bọc `BEGIN … ROLLBACK` — nếu `fls_doc` còn `CREATE` trên `public` và HẾT chỉ-đọc, bảng ⛔ được để lại (trước đây
+#   `--kiem` "chỉ ĐỌC" tạo bảng THẬT rồi `02b` chết `permission denied for table fls_probe_doc_ghi`); khi đó mục này ĐỎ vì ⛔ có chữ "read-only".
+export R_DOC_THU_GHI="$(thu_ghi "$DOC" "$MK_DOC" "BEGIN; CREATE TABLE fls_probe_doc_ghi (i int); ROLLBACK;")"
 export R_SUPER="$(do_mot "$ADMIN" "$MK_ADMIN" \
   "SELECT count(*) FROM pg_roles WHERE rolname IN ('$GHI','$DOC') AND (rolsuper OR rolcreaterole OR rolcreatedb OR rolreplication OR rolbypassrls)")"
 export R_THANH_VIEN="$(do_mot "$ADMIN" "$MK_ADMIN" \

@@ -78,6 +78,13 @@ def _nap_het(conn, actor: str) -> dict[str, str]:
     }
     for bang in BANG_THU_TU:
         v = co_san(bang)
+        # ⭐ `STG-R1-07`: IX.ALR là HAI việc liền (bản nền v1 → bản KÝ v2). Chết GIỮA hai việc ⇒ kho chỉ-THÊM giữ v1 mà
+        #   "có rồi ⇒ bỏ qua" khoá luôn bước KÝ ⇒ chạy lại ⛔ tự lành. Tự lành THEO TỪNG BƯỚC: v == 0 ⇒ nền + KÝ · 0 < v < mong ⇒ chỉ KÝ ·
+        #   v ≥ mong ⇒ bỏ qua. Các bảng khác 1 việc ⇒ giữ nguyên "có rồi ⇒ bỏ qua".
+        if bang == "IX.ALR" and 0 < v < MONG_PHIEN_BAN[bang]:
+            _ky_alr(chc, conn)
+            kq[bang] = f"có rồi v{v} · KÝ nốt"
+            continue
         if v:
             kq[bang] = f"có rồi v{v}"
             continue
@@ -89,6 +96,11 @@ def _nap_het(conn, actor: str) -> dict[str, str]:
 def _nap_alr(chc, conn, actor: str) -> None:
     """Bản nền (17 luật từ kỳ 202501, cờ TẮT — D2) rồi bản KÝ bật cờ 2025 (quyết chủ 22/11; người ký ghi trong tệp)."""
     chc.nap_ix_alr(conn, str(ANH / "mapping_master_cfg.json"), tu_ky=202501, actor=actor, nguon=NGUON)
+    _ky_alr(chc, conn)
+
+
+def _ky_alr(chc, conn) -> None:
+    """Bước KÝ riêng (tách ra để chạy lại sau khi chết giữa hai việc — `STG-R1-07`)."""
     tep = ANH / "ix_alr_2025_bat.json"
     nguoi_ky = json.loads(tep.read_text(encoding="utf-8"))["ky"]["nguoi_ky"]
     chc.ky_bat_ix_alr(conn, str(tep), actor=nguoi_ky)

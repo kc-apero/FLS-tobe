@@ -309,3 +309,22 @@ def test_tinh_script_va_sql_khong_co_thu_cam():
     assert "ALTER DEFAULT PRIVILEGES" not in sql, "bảng mới ⛔ được tự cấp quyền (xem 02b)"
     assert "GRANT ALL" not in sql.upper().replace("REVOKE ALL", "")
     assert "0.0.0.0" not in code and "--private-ip" not in code
+
+
+def test_kiem_KHONG_de_lai_vat_ke_ca_khi_fls_doc_con_CREATE_va_het_chi_doc__STG_R1_08(da_lam, mt):
+    """`STG-R1-08`: `--kiem` (chỉ ĐỌC) từng chạy `CREATE TABLE fls_probe_doc_ghi` bằng `fls_doc`; nếu vai ấy còn `CREATE` trên
+    `public` và hết chỉ-đọc thì bảng THẬT được tạo (chủ = fls_doc) ⇒ lần "làm" kế chết ở `02b`. Bài trước đo **quyền/vai** ⛔ đổi,
+    ⛔ đo "⛔ để lại VẬT" (Đ3: "không đổi quyền" ≠ "không đổi gì"). Ở đây dựng ĐÚNG hoàn cảnh ấy."""
+    assert da_lam.returncode == 0
+    kho = mt["kho"]
+    H.chay_quan_tri("GRANT CREATE ON SCHEMA public TO fls_doc; ALTER ROLE fls_doc RESET default_transaction_read_only", kho)
+    try:
+        r = _chay(mt, "--kiem")
+        vat = H.chay_quan_tri("SELECT count(*) FROM pg_class WHERE relname = 'fls_probe_doc_ghi'", kho)
+    finally:
+        H.chay_quan_tri("REVOKE CREATE ON SCHEMA public FROM fls_doc", kho)
+        H.chay_quan_tri("DROP TABLE IF EXISTS public.fls_probe_doc_ghi", kho)
+        lanh = _chay(mt)
+    assert r.returncode == 1 and "fls_doc · CREATE TABLE bị PG từ chối vì chỉ-đọc" in H.muc_do(r.stdout), r.stdout   # vẫn ĐỎ — nhưng
+    assert str(vat) == "0", f"`--kiem` để lại {vat} bảng `fls_probe_doc_ghi`"                                          # ⛔ có vật
+    assert lanh.returncode == 0 and "KẾT: ĐẠT" in lanh.stdout, lanh.stdout
