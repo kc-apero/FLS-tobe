@@ -10,8 +10,8 @@
 
 ⭐ **Vì sao có tệp này** *(AP v3.1.2 §3.5.4 WP-C2 · HD2; WO-132)*. H4 là cổng HD2 ĐẦU TIÊN: chạy
 engine `fls.bao_cao.gl.tinh_gl` *(H1)* trên **dòng sổ THẬT** *(tiền nguyên tệ `E`/`F` đọc từ sheet
-406, đóng băng ở `gl_406_dau_vao.json`)* + tỷ giá `ix_fx.json` *(qua `fls.cau_hinh.fx` — ⛔ đọc kho,
-I2)*, rồi so TỪNG Ô 8 cột `BM…BT` với đáp án `gl_406.json` *(DT4)* ở mọi kỳ có dữ liệu.
+406, đóng băng ở `gl_406_dau_vao.json`)* + tỷ giá *(I2 vòng sửa R1: mặc định TỪ KHO qua `fx_cua` của C7 —
+tháng chưa ký ⇒ `FX_CHAN` (D1); `--fx anh` = ảnh `ix_fx.json` qua `fls.cau_hinh.fx`)*, rồi so TỪNG Ô 8 cột `BM…BT` với đáp án `gl_406.json` *(DT4)* ở mọi kỳ có dữ liệu.
 
 ── Vì sao NGUỒN đầu vào là ĐỘC LẬP, ⛔ tái dựng từ `BO`/`BP` *(orchestrator 18/11)* ──────────────
 Tái dựng Nợ/Có từ `BO`/`BP` của đáp án là VÒNG TRÒN *(hai cột ấy tự khớp)*. Nguồn độc lập = cột
@@ -46,6 +46,7 @@ MINH `tinh_gl(..., so_du_dau=…)` ⇒ cả 8 cột về 0 trong dung sai. FLS C
 from __future__ import annotations
 
 import argparse
+import contextlib
 import dataclasses
 import datetime
 import json
@@ -212,9 +213,78 @@ def nap_anh(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-def nap_fx(path: Path = IX_FX) -> dict[int, dict[str, Decimal]]:
-    """`ix_fx.json` *(ảnh DT2)* → `{int yyyymm: {tiền tệ: Decimal}}` QUA `fls.cau_hinh.fx.kiem`
-    *(C1 — validate tỷ giá; ⛔ đọc kho, I2)*. Khoá nguồn là `Month` *(chuỗi 6 chữ số)*."""
+# ══ ⭐ I2 vòng sửa R1 (`KQ-317` · `I2-R1-01` · `-02`) — tỷ giá TỪ KHO qua `fx_cua` của C7 (D1 DECIDED) ══
+# Trước vòng này *mọi* gói đọc ảnh `ix_fx.json`; nối kho chỉ có TRONG bài I2 *(mock `nap_fx` 4 chỗ)* ⇒ CLI ở máy chủ
+# ⛔ hỏi chữ ký tháng, và gặp `FxChan` thì NỔ thay vì ghi khối `dat=false`. Nay: `ty_gia_kho(conn)` đặt nguồn tỷ giá
+# của CẢ lượt = `FxKho` *(mỗi tháng đọc qua `chc.fx_cua` THẬT — tháng chưa ký ⇒ `FxChan` có tên)*; `nap_fx()` gọi trần
+# trả nguồn ấy ⇒ 5 chỗ gọi *(do_hd2 · c3c · c3d · c5b · c5c qua `h.nap_fx`)* đi qua kho, ⛔ sửa chỗ gọi nào.
+# `chay_goi()` là đường sản phẩm *(CLI · bài I2)*: bắt `FxChan` ⇒ khối ĐỎ có chữ `FX_CHAN <tháng>`.
+_FX_KHO: "FxKho | None" = None
+
+
+class FxKho(Mapping):
+    """`{tháng: {tiền tệ: Decimal}}` mà MỖI lần đọc một tháng đi qua `chc.fx_cua(conn, tháng)` THẬT *(nhớ theo
+    tháng)*. Tháng chưa ký ⇒ `cfx.FxChan` NỔ ra khỏi engine *(⛔ `KeyError` — ⛔ bị hiểu là "thiếu tỷ giá")*.
+    `in` = tháng có trong IX.FX của kho *(như dict ảnh cũ)*; số đọc ra = quyền của `fx_cua`. `da_doc` = tập tháng
+    đã hỏi `fx_cua` THÀNH CÔNG *(Đ4: ⛔ gồm tháng bị chặn)*."""
+
+    def __init__(self, conn) -> None:
+        from fls.repo import cau_hinh_repo as chc
+        self._chc, self._c = chc, conn
+        self._thang = tuple(sorted(d.yyyymm for d in chc.doc_fx(conn).ky))
+        self._nho: dict[int, Mapping] = {}
+        self.da_doc: set[int] = set()
+
+    def __getitem__(self, m):
+        m = int(m)
+        if m not in self._nho:
+            self._nho[m] = self._chc.fx_cua(self._c, m)
+            self.da_doc.add(m)
+        return self._nho[m]
+
+    def __contains__(self, m) -> bool:
+        return isinstance(m, int) and m in self._thang
+
+    def __iter__(self):
+        return iter(self._thang)
+
+    def __len__(self) -> int:
+        return len(self._thang)
+
+
+@contextlib.contextmanager
+def ty_gia_kho(conn):
+    """Trong khối: `nap_fx()` *(gọi trần)* = `FxKho(conn)` ⇒ mọi gói đọc tỷ giá qua `fx_cua` *(D1)*."""
+    global _FX_KHO
+    cu, _FX_KHO = _FX_KHO, FxKho(conn)
+    try:
+        yield _FX_KHO
+    finally:
+        _FX_KHO = cu
+
+
+def kiem_fx_thang(thang) -> list[int]:
+    """`I2-R1-01` — gói có đầu vào ĐÃ quy đổi ở AS-IS *(C4a/b/c: CFA1 GI · MID1 mang mUSD sẵn)* ⛔ cần GIÁ TRỊ tỷ
+    giá, nhưng D1 vẫn CHẶN tháng chưa ký ⇒ hỏi `nap_fx()[m]` cho MỌI tháng của đầu vào TRƯỚC khi tính *(nguồn kho ⇒
+    `fx_cua` ⇒ `FxChan` có tên; nguồn ảnh thiếu tháng ⇒ `FxChan` "⛔ có trong ảnh")*. Trả tập tháng đã hỏi (Đ3)."""
+    fx = nap_fx()
+    ra: list[int] = []
+    for m in sorted({int(str(t)) for t in thang if t is not None}):
+        try:
+            fx[m]
+        except KeyError:
+            raise cfx.FxChan(m, f"tháng ⛔ có trong {IX_FX.name} (ảnh)") from None
+        ra.append(m)
+    return ra
+
+
+def nap_fx(path: Path | None = None) -> Mapping[int, Mapping[str, Decimal]]:
+    """`ix_fx.json` *(ảnh DT2)* → `{int yyyymm: {tiền tệ: Decimal}}` QUA `fls.cau_hinh.fx.kiem` *(C1 — validate tỷ
+    giá)*. Khoá nguồn là `Month` *(chuỗi 6 chữ số)*. ⭐ Gọi trần TRONG `ty_gia_kho(conn)` ⇒ trả `FxKho` *(kho đã ký —
+    D1)*. `path` đọc lúc GỌI *(⛔ ràng mặc định lúc định nghĩa — `I2-R1-04`)*."""
+    if path is None and _FX_KHO is not None:
+        return _FX_KHO
+    path = IX_FX if path is None else path
     j = json.loads(path.read_text(encoding="utf-8"), parse_float=Decimal)
     dong = [{"yyyymm": int(r["Month"]), **{c: r[c] for c in cfx.TIEN_TE}} for r in j["dong"]]
     bang = cfx.kiem(dong, thang_dau=THANG_DAU_FX, nguon=str(path.name))
@@ -1286,7 +1356,9 @@ def chay_wp_c4a(dsn: str | None = None) -> ThanhQuaC4a:
         px = PhanXu(False, (f"IX.VEN ⛔ đọc được từ kho: {type(e).__name__}: {' '.join(str(e).split())}",))
         return ThanhQuaC4a(px, {"bang": "HD2.WP-C4a", "goi": "WP-C4a", "dat": False,
                                 "ly_do": list(px.ly_do)})
-    return so_sanh_c4a(nap_anh(ANH_CFA1_GI), nap_anh(ANH_MID3), ven, MongC4a())
+    cfa1 = nap_anh(ANH_CFA1_GI)
+    kiem_fx_thang(r["thang"] for r in cfa1["dong"])      # I2-R1-01 · D1
+    return so_sanh_c4a(cfa1, nap_anh(ANH_MID3), ven, MongC4a())
 
 
 def _in_bao_c4a(tq: ThanhQuaC4a) -> None:
@@ -1477,7 +1549,9 @@ def chay_wp_c4b(dsn: str | None = None) -> ThanhQuaC4b:
     except Exception as e:  # noqa: BLE001 — Đ5: ⛔ đo được ⇒ ĐỎ có lý do
         return _do_c4b(PhanXu(False, (f"IX.VEN ⛔ đọc được từ kho: {type(e).__name__}: "
                                       f"{' '.join(str(e).split())}",)))
-    return so_sanh_c4b(nap_anh(ANH_CFA1_GI), nap_anh(ANH_MID1), nap_anh(ANH_MID3), ven, MongC4b())
+    cfa1 = nap_anh(ANH_CFA1_GI)
+    kiem_fx_thang(r["thang"] for r in cfa1["dong"])      # I2-R1-01 · D1
+    return so_sanh_c4b(cfa1, nap_anh(ANH_MID1), nap_anh(ANH_MID3), ven, MongC4b())
 
 
 def _in_bao_c4b(tq: ThanhQuaC4b) -> None:
@@ -1777,6 +1851,7 @@ def chay_wp_c4c(dsn: str | None = None) -> ThanhQuaC4c:
         px = PhanXu(False, (f"IX.VEN ⛔ đọc được từ kho: {type(e).__name__}: {' '.join(str(e).split())}",))
         return ThanhQuaC4c(px, {"bang": "HD2.WP-C4c", "goi": "WP-C4c", "dat": False, "ly_do": list(px.ly_do)})
     anh = {so: tuple(nap_anh(p) for p in anh_c4c(so)) for so in SO_C4C}
+    kiem_fx_thang(r["thang"] for m1, _ in anh.values() for r in m1["dong"])   # I2-R1-01 · D1 (MID1 = đầu vào)
     return so_sanh_c4c(anh, ven)
 
 
@@ -1813,83 +1888,78 @@ def _ghi_cong(goi: str, hop_dong: dict[str, Any]) -> None:
     print(f"  ghi: {RA_CONG.relative_to(GOC)} [{goi}]")
 
 
+def _chay_va_in(goi: str, dsn: str | None):
+    """`(chạy, in)` của gói *(gói ở tệp riêng nhập MUỘN — tệp ấy nhập tệp này)*."""
+    if goi == "WP-C2":
+        return (lambda: chay_wp_c2()), _in_bao
+    if goi == "WP-C3a":
+        return (lambda: chay_wp_c3a(dsn)), _in_bao_c3a
+    if goi == "WP-C3b":
+        return (lambda: chay_wp_c3b(dsn)), _in_bao_c3b
+    if goi == "WP-C4a":
+        return (lambda: chay_wp_c4a(dsn)), _in_bao_c4a
+    if goi == "WP-C4b":
+        return (lambda: chay_wp_c4b(dsn)), _in_bao_c4b
+    if goi == "WP-C4c":
+        return (lambda: chay_wp_c4c(dsn)), _in_bao_c4c
+    import importlib
+    m = importlib.import_module("tools.do_hd2_" + goi.split("-")[1].lower())   # H7 · H8 · H12 · H13 · H14
+    return (lambda: getattr(m, "chay_wp_" + goi.split("-")[1].lower())(dsn)), m.in_bao
+
+
+def chay_goi(goi: str, dsn: str | None = None, *, fx: str = "kho"):
+    """⭐ Đường SẢN PHẨM của một gói *(CLI · bài I2 — `I2-R1-02`)* ⇒ `(khối hd2_cong, dat, tq | None, fx_doc)`.
+
+    `fx="kho"` *(mặc định — D1)*: tỷ giá của CẢ lượt từ kho `dsn` *(⛔ thì `PG_DSN`)* qua `fx_cua` của C7, kết nối
+    CHỈ ĐỌC. Gói hỏi một tháng chưa ký *(kể cả C4a/b/c — `kiem_fx_thang`)* ⇒ `FxChan` ⇒ khối ĐỎ `dat=false`, `ly_do`
+    = `FX_CHAN <tháng>: …` — ⛔ số nào ra *(cả gói dừng)*. `fx="anh"`: đo parity ảnh↔ảnh *(`ix_fx.json` — ⛔ hỏi chữ
+    ký; nhãn rõ ở khối `nguon_ty_gia`)*. `fx_doc` = tháng đã đọc qua `fx_cua` thành công *(Đ4)*."""
+    if fx not in ("kho", "anh"):
+        raise ValueError(f"fx={fx!r} ∉ (kho, anh)")
+    chay, _ = _chay_va_in(goi, dsn)
+    fx_doc: list[int] = []
+    with contextlib.ExitStack() as st:
+        if fx == "kho":
+            from fls.db.kho import dsn_that, noi_chi_doc
+            try:
+                c = noi_chi_doc(dsn or dsn_that())
+                st.callback(c.close)
+                fxk = st.enter_context(ty_gia_kho(c))
+            except Exception as e:  # noqa: BLE001 — Đ5: ⛔ đo được (kho tắt · IX.FX chưa nạp) ⇒ ĐỎ có lý do, ⛔ nổ
+                ly = f"IX.FX ⛔ đọc được từ kho: {type(e).__name__}: {' '.join(str(e).split())}"
+                return ({"bang": f"HD2.{goi}", "goi": goi, "dat": False, "ly_do": [ly], "nguon_ty_gia": fx},
+                        False, None, [])
+        try:
+            tq = chay()
+        except cfx.FxChan as e:
+            khoi = {"bang": f"HD2.{goi}", "goi": goi, "dat": False, "ly_do": [str(e)], "fx_chan": e.thang,
+                    "nguon_ty_gia": fx}
+            return khoi, False, None, (sorted(fxk.da_doc) if fx == "kho" else fx_doc)
+        if fx == "kho":
+            fx_doc = sorted(fxk.da_doc)
+    dat = tq.dat if goi == "WP-C5c" else tq.phan_xu.dat
+    return tq.hd2_cong, dat, tq, fx_doc
+
+
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(prog="do_hd2.py", description="Cổng parity HD2.")
     p.add_argument("--goi", required=True, choices=GOI_BIET, help="gói cổng HD2")
     p.add_argument("--ghi", action="store_true", help="ghi docs/ITL/_tools/hd2_cong.json")
     p.add_argument("--dsn", default=None,
-                   help="WP-C4a/b/c: kho đọc IX.VEN (mặc định PG_DSN; ISP dùng PG_DSN_TEST — ⛔ ghi kho thật)")
+                   help="kho đọc config (IX.FX đã ký · IX.VEN · IX.PER · IX.ALR …; mặc định PG_DSN; ISP dùng PG_DSN_TEST"
+                        " — ⛔ ghi kho thật)")
+    p.add_argument("--fx", choices=("kho", "anh"), default="kho",
+                   help="nguồn tỷ giá: kho = fx_cua của C7, tháng chưa ký ⇒ FX_CHAN (D1, mặc định); "
+                        "anh = ảnh ix_fx.json (đo parity, ⛔ hỏi chữ ký)")
     a = p.parse_args(argv)
-    if a.goi == "WP-C4c":
-        tq4c = chay_wp_c4c(a.dsn)
-        _in_bao_c4c(tq4c)
-        if a.ghi:
-            _ghi_cong("WP-C4c", tq4c.hd2_cong)
-        return 0 if tq4c.phan_xu.dat else 1
-    if a.goi == "WP-C4b":
-        tq4b = chay_wp_c4b(a.dsn)
-        _in_bao_c4b(tq4b)
-        if a.ghi:
-            _ghi_cong("WP-C4b", tq4b.hd2_cong)
-        return 0 if tq4b.phan_xu.dat else 1
-    if a.goi == "WP-C4a":
-        tq4 = chay_wp_c4a(a.dsn)
-        _in_bao_c4a(tq4)
-        if a.ghi:
-            _ghi_cong("WP-C4a", tq4.hd2_cong)
-        return 0 if tq4.phan_xu.dat else 1
-    if a.goi == "WP-C5a":
-        from tools import do_hd2_c5a            # H12 — tệp riêng; nhập muộn (tệp ấy nhập tệp này)
-        tq5a = do_hd2_c5a.chay_wp_c5a(a.dsn)
-        do_hd2_c5a.in_bao(tq5a)
-        if a.ghi:
-            _ghi_cong("WP-C5a", tq5a.hd2_cong)
-        return 0 if tq5a.phan_xu.dat else 1
-    if a.goi == "WP-C5b":
-        from tools import do_hd2_c5b            # H13 — tệp riêng; nhập muộn (tệp ấy nhập tệp này)
-        tq5b = do_hd2_c5b.chay_wp_c5b(a.dsn)
-        do_hd2_c5b.in_bao(tq5b)
-        if a.ghi:
-            _ghi_cong("WP-C5b", tq5b.hd2_cong)
-        return 0 if tq5b.phan_xu.dat else 1
-    if a.goi == "WP-C5c":
-        from tools import do_hd2_c5c            # H14 — tệp riêng; nhập muộn (tệp ấy nhập tệp này)
-        tq5c = do_hd2_c5c.chay_wp_c5c(a.dsn)
-        do_hd2_c5c.in_bao(tq5c)
-        if a.ghi:
-            _ghi_cong("WP-C5c", tq5c.hd2_cong)
-        return 0 if tq5c.dat is True else 1          # H14-R1-01: `None` (⛔ đo được) ⛔ phải thành công
-    if a.goi == "WP-C3d":
-        from tools import do_hd2_c3d            # H8 — tệp riêng; nhập muộn (tệp ấy nhập tệp này)
-        tq3d = do_hd2_c3d.chay_wp_c3d(a.dsn)
-        do_hd2_c3d.in_bao(tq3d)
-        if a.ghi:
-            _ghi_cong("WP-C3d", tq3d.hd2_cong)
-        return 0 if tq3d.phan_xu.dat else 1
-    if a.goi == "WP-C3c":
-        from tools import do_hd2_c3c            # H7 — tệp riêng; nhập muộn (tệp ấy nhập tệp này)
-        tq3c = do_hd2_c3c.chay_wp_c3c(a.dsn)
-        do_hd2_c3c.in_bao(tq3c)
-        if a.ghi:
-            _ghi_cong("WP-C3c", tq3c.hd2_cong)
-        return 0 if tq3c.phan_xu.dat else 1
-    if a.goi == "WP-C3b":
-        tq3b = chay_wp_c3b()
-        _in_bao_c3b(tq3b)
-        if a.ghi:
-            _ghi_cong("WP-C3b", tq3b.hd2_cong)
-        return 0 if tq3b.phan_xu.dat else 1
-    if a.goi == "WP-C3a":
-        tq3 = chay_wp_c3a()
-        _in_bao_c3a(tq3)
-        if a.ghi:
-            _ghi_cong("WP-C3a", tq3.hd2_cong)
-        return 0 if tq3.phan_xu.dat else 1
-    tq = chay_wp_c2()
-    _in_bao(tq)
+    khoi, dat, tq, _ = chay_goi(a.goi, a.dsn, fx=a.fx)
+    if tq is not None:
+        _chay_va_in(a.goi, a.dsn)[1](tq)
+    else:
+        print(f"══ do_hd2 · {a.goi} — CHẶN: {khoi['ly_do'][0]}")
     if a.ghi:
-        _ghi_cong("WP-C2", tq.hd2_cong)
-    return 0 if tq.phan_xu.dat else 1
+        _ghi_cong(a.goi, khoi)
+    return 0 if dat is True else 1          # H14-R1-01: `None` (⛔ đo được) ⛔ phải thành công
 
 
 if __name__ == "__main__":

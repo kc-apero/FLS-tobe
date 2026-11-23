@@ -83,6 +83,34 @@ def test_so_615_o_muc_1_khop_hd2_cong_json_va_so_dong_chuoi_U7_khop_GOI_BIET():
     m = re.search(r"<!--goi:dong-->(\d+) dòng\*\* `(WP-C\w+) … (WP-C\w+)`.*<!--goi:chuoi-->(\d+) gói", van)
     assert m and (int(m.group(1)), m.group(2), m.group(3), int(m.group(4))) == (n, GOI_BIET[0], GOI_BIET[-1], n), (m and m.groups(), n)
     assert "[CHỜ H14]" not in van, "H14 đã gộp — nhãn chờ phải bỏ"
+    # `STG-R2-02`: U9 = chuỗi SAU ký; U7 = chuỗi TRƯỚC ký — hai chiều D1, số gói đều từ NGUỒN (⛔ số cứng)
+    t = re.search(r"<!--goi:truoc_dong-->(\d+) dòng.*<!--goi:truoc_chuoi-->(\d+) gói · ĐỎ (\d+)", van)
+    assert t and (int(t.group(1)), int(t.group(2))) == (n, n), (t and t.groups(), n)
+    # MONG đo 23/11 (`test_04`: tập ĐỎ trước ký = tập gói đọc tỷ giá, đo từ nguồn): MỌI gói đọc tỷ giá ⇒ ĐỎ n/n.
+    # Gói nào sau này thôi đọc tỷ giá ⇒ bài `test_04` đổi mong ⇒ bài này đỏ ⇒ sửa UAT cùng commit.
+    assert int(t.group(3)) == n, t.groups()
+    assert re.search(r"<!--goi:truoc_n-->(\d+) gói ĐỎ", van).group(1) == str(n)
+
+
+def test_UAT_I2_da_gop_khong_con_nhan_CHO_I2_va_so_thang_ky_khop_nguon():
+    """`STG-R2-02`: nhãn `[CHỜ I2]` lỗi thời ở cây gộp (I2 có `FxKho`) — canh để nó TỰ ĐỎ khi I2 vào mà UAT còn nhãn;
+    số tháng cần ký ở U8 = (số dòng ảnh `ix_fx.json` − số tháng LẠC) tính lại từ NGUỒN `fls.cau_hinh.fx.kiem`."""
+    van = DOC.read_text(encoding="utf-8")
+    from tools import do_hd2 as h
+    i2 = "class FxKho" in (H.GOC / "tools" / "do_hd2.py").read_text(encoding="utf-8")
+    assert i2, "cây này ⛔ có I2 (FxKho) — bài canh vô nghĩa (Đ3)"
+    than = van.split("## Changelog")[0]                       # Đ2: changelog là BIÊN BẢN (nó trích lại nhãn cũ) ⇒ chỉ đo phần KHAI
+    assert "[CHỜ I2]" not in than and "CHƯA có I2" not in than, "I2 đã có FxKho — UAT còn nhãn chờ"
+    j = json.loads((H.GOC / "tests" / "fixture" / "cau_hinh" / "ix_fx.json").read_text(encoding="utf-8"), parse_float=h.Decimal)
+    dong = [{"yyyymm": int(r["Month"]), **{c: r[c] for c in h.cfx.TIEN_TE}} for r in j["dong"]]
+    bang = h.cfx.kiem(dong, thang_dau=h.THANG_DAU_FX, nguon="ix_fx.json")
+    can_ky = len(bang.ky) - len(bang.lac)
+    assert bang.lac and can_ky > 0, (len(bang.ky), bang.lac)            # Đ3: có tháng lạc, có tháng cần ký
+    m = re.search(r"<!--ky:so_thang-->(\d+) tháng cần ký", van)
+    assert m and int(m.group(1)) == can_ky, (m and m.group(1), can_ky)
+    assert f"{can_ky}/{can_ky} tháng đã ký" in van
+    hang = [l for l in van.splitlines() if re.match(r"\| \*\*U\d+\*\*", l)]
+    assert [re.match(r"\| \*\*(U\d+)\*\*", l).group(1) for l in hang] == [f"U{k}" for k in range(1, len(hang) + 1)]   # đánh số liền
 
 
 def test_UAT_doi_mot_con_so_thi_bai_DO__D5():
@@ -105,7 +133,7 @@ def test_UAT_co_du_muc_AC4_va_gioi_han_O6():
         assert can.lower() in van.lower() or can in van, can
     # bảng bước: mỗi hàng có đủ 7 ô và ô "Mong" ⛔ rỗng
     hang = [l for l in van.splitlines() if re.match(r"\| \*\*U\d+\*\*", l)]
-    assert len(hang) >= 12, len(hang)
+    assert len(hang) >= 14, len(hang)
     for l in hang:
         o = [c.strip() for c in l.strip().strip("|").split("|")]
         assert len(o) == 7 and o[2], (l[:80], len(o))

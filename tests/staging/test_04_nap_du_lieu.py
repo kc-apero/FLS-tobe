@@ -4,7 +4,7 @@
      chạy lại ⛔ nạp chồng · ⛔ chạm `fls_itl` · kho trắng ⇒ ĐỎ (Đ3).
   ⓑ `04_nap_du_lieu.sh` (gcloud + proxy GIẢ, psql + trình nạp THẬT): đúng ⇒ ĐẠT; đòi `FLS_CHO_GHI_THAT=1`; chỉ đọc bí mật `fls_ghi`;
      cột "Email Address" lọt vào kho ⇒ ĐỎ; `--nguon-that` luôn từ chối.
-  ⓒ `chay_chuoi.sh`: kho trắng ⇒ ĐỎ nêu tên gói; sau khi nạp config ⇒ N/N gói ĐẠT (N = `len(tools.do_hd2.GOI_BIET)`, ⛔ số cứng — `STG-R1-02`: H14 thêm `WP-C5c` ⇒ 11 làm hai bài đỏ) (đây là bằng chứng bước 04 ĐỦ để chạy chuỗi).
+  ⓒ `chay_chuoi.sh` (D1, cây gộp I2): kho trắng ⇒ ĐỎ nêu tên gói; sau nạp config **CHƯA ký tỷ giá** ⇒ đúng các gói đọc tỷ giá ĐỎ `FX_CHAN` (tập đo từ NGUỒN, ⛔ hằng); NGƯỜI KÝ ký các tháng qua `ky_ty_gia.py` (tuyến `POST /config/fx/{yyyymm}/sign`) ⇒ N/N gói ĐẠT (N = `len(tools.do_hd2.GOI_BIET)`, ⛔ số cứng — `STG-R1-02`/`STG-R2-01`).
 """
 from __future__ import annotations
 
@@ -201,6 +201,8 @@ def kho_04(kho_san):
     H.chay_quan_tri(f"CREATE DATABASE {trang} TEMPLATE {kho_san['kho']}")
     yield dict(kho_san, trang=trang)
     H.chay_quan_tri(f"DROP DATABASE IF EXISTS {trang} WITH (FORCE)")
+    H.chay_quan_tri(f"DROP DATABASE IF EXISTS {kho_san['kho']}_ky WITH (FORCE)")      # bản sao NGƯỜI KÝ đã ký (`_kho_da_ky`)
+    _KHO_KY.clear(); _KY_KET_QUA.clear(); _CACHE_FX.clear()
 
 
 def test_04_dung_ra_DAT_chi_doc_bi_mat_fls_ghi_va_khong_lo_mat_khau(kho_04):
@@ -300,27 +302,153 @@ def _chay_chuoi(mt, *args, kho=None, thoi_gian=600):
         sv.shutdown()
 
 
+def _dong_goi(r):
+    return [l for l in r.stdout.splitlines() if re.match(r"WP-C\d", l)]
+
+
+def _goi_doc_ty_gia(kho_ky_dsn) -> set[str]:
+    """`STG-R2-01`: TẬP gói đọc tỷ giá — đo từ NGUỒN, ⛔ hằng. Mỗi gói chạy ĐƯỜNG SẢN PHẨM `do_hd2.chay_goi` trên kho ĐÃ
+    KÝ; `fx_doc` = tháng gói đã hỏi `fx_cua` THÀNH CÔNG ⇒ gói đọc tỷ giá ⇔ `fx_doc ≠ ∅`. Đo 23/11 trên cây gộp (I2 ⊕ STG): tập này = **MỌI** 11 gói
+    (đo chưa ký: 11/11 `FX_CHAN` — số "6/11" của `KQ-328` là cây gộp thử cũ hơn); gói nào sau này thôi đọc tỷ giá
+    thì rơi khỏi tập ⇒ bài tự đổi mong, ⛔ sửa số."""
+    from tools.do_hd2 import chay_goi
+    ra = set()
+    for g in GOI_BIET:
+        khoi, dat, _tq, fx_doc = chay_goi(g, kho_ky_dsn)
+        assert dat is True, (g, khoi.get("ly_do"))        # kho đã ký ⇒ mọi gói ĐẠT — bằng không phép đo vô nghĩa
+        if fx_doc:
+            ra.add(g)
+    return ra
+
+
 def test_chuoi_tren_kho_TRANG_DO_nen_ten_goi_thieu_config(kho_04):
+    """Kho TRẮNG (chưa nạp config, ⛔ chữ ký) — đo 23/11 trên cây gộp I2: `IX.FX` chưa nạp ⇒ gói đọc tỷ giá ĐỎ có tên
+    (`ChuaKhai`) — đo: ⛔ gói nào còn ĐẠT (kể cả `WP-C2`, mà trước I2 "không cần kho"), vì D1 chặn đọc IX.FX từ kho trắng ở MỌI gói."""
     mt = kho_04
     assert _dem(f"postgresql://fls_ghi:{H.MK['fls-staging-pg-fls_ghi']}@127.0.0.1:{H.cong_pg()}/{mt['trang']}",
                 "SELECT count(*) FROM fls_cau_hinh_ban") == 0, "bản sao 'trắng' đã có config — bài vô nghĩa"
     r = _chay_chuoi(mt, kho=mt["trang"])
     assert r.returncode == 1 and "KẾT: ĐỎ" in r.stdout, r.stdout + r.stderr
     assert "ChuaKhai" in r.stdout and "WP-C3c" in r.stdout, r.stdout
-    assert re.search(r"WP-C2\s+0\s", r.stdout), "WP-C2 không cần kho ⇒ vẫn ĐẠT"
-    dong = [l for l in r.stdout.splitlines() if re.match(r"WP-C\d", l)]
+    dong = _dong_goi(r)
     assert GOI_BIET and len(dong) == len(GOI_BIET) and [l.split()[0] for l in dong] == list(GOI_BIET), (dong, GOI_BIET)   # `STG-R1-02`: đếm từ NGUỒN
-    assert sum(l.split()[1] != "0" for l in dong) >= 7, dong        # đo 23/11: 7+ gói cần kho
+    do = {l.split()[0] for l in dong if l.split()[1] != "0"}
+    assert len(do) >= 7, dong                                 # đo 23/11: 7+ gói cần kho
+    assert do == set(GOI_BIET), (len(do), len(GOI_BIET), sorted(set(GOI_BIET) - do))   # MONG đo 23/11: kho trắng ⇒ MỌI gói ĐỎ
 
 
-def test_chuoi_sau_khi_nap_config_ra_DAT_moi_goi_cua_GOI_BIET(kho_04):
+def test_chuoi_sau_04_CHUA_ky_ty_gia_ra_DO_dung_cac_goi_doc_ty_gia_voi_ly_do_FX_CHAN(kho_04):
+    """`STG-R2-01(a)` — luật D1 hai chiều, chiều CHƯA ký: sau 04 (config đã nạp) mà ⛔ ký tháng nào ⇒ ĐÚNG các gói đọc
+    tỷ giá ĐỎ, mỗi gói in lý do có tên `FX_CHAN`/`ChuaKhai`; gói ⛔ đọc tỷ giá vẫn ĐẠT. Số gói đỏ = |tập gói đọc tỷ giá|
+    đo từ NGUỒN (`_goi_doc_ty_gia` trên kho đã ký) — ⛔ số cứng."""
     mt = kho_04
+    fx = _goi_doc_ty_gia_cua(mt)
     r = _chay_chuoi(mt)
-    assert r.returncode == 0, r.stdout + r.stderr
-    dong = [l for l in r.stdout.splitlines() if re.match(r"WP-C\d", l)]
-    assert GOI_BIET and len(dong) == len(GOI_BIET) and all(l.split()[1] == "0" for l in dong), dong
-    assert "KẾT: ĐẠT" in r.stdout and f"{len(GOI_BIET)} gói · ĐỎ 0" in r.stdout
-    assert "đã ghi" not in r.stdout, "⛔ --ghi ⇒ không ghi tệp"
+    dong = _dong_goi(r)
+    do = {l.split()[0] for l in dong if l.split()[1] != "0"}
+    assert fx and fx <= set(GOI_BIET), fx                      # Đ3: tập gói đọc tỷ giá ⛔ rỗng (rỗng ⇒ bài xanh trên tập rỗng)
+    assert len(dong) == len(GOI_BIET) and do == fx, (sorted(do), sorted(fx), dong)
+    assert r.returncode == 1 and "KẾT: ĐỎ" in r.stdout and f"ĐỎ {len(fx)}" in r.stdout, r.stdout
+    ly_do = [l for l in r.stdout.splitlines() if l.lstrip().startswith("⛔") and ("FX_CHAN" in l or "ChuaKhai" in l)]
+    assert len(ly_do) == len(fx), (ly_do, fx)                  # MỖI gói đỏ một dòng lý do có tên
+
+
+_CACHE_FX: dict[str, set[str]] = {}
+
+
+def _goi_doc_ty_gia_cua(mt) -> set[str]:
+    if mt["kho"] not in _CACHE_FX:
+        dsn = f"postgresql://fls_doc:{H.MK['fls-staging-pg-fls_doc']}@127.0.0.1:{H.cong_pg()}/{_kho_da_ky(mt)}"
+        _CACHE_FX[mt["kho"]] = _goi_doc_ty_gia(dsn)
+    return _CACHE_FX[mt["kho"]]
+
+
+def _kho_da_ky(mt) -> str:
+    """Bản sao kho 04 mà NGƯỜI KÝ đã ký MỌI tháng — qua `vao.sh` (app `ghi`, actor = người ký) + `ky_ty_gia.py`
+    (tuyến `POST /config/fx/{yyyymm}/sign`, actor từ thẻ). ⛔ ghi thẳng bảng. Trả tên kho; nhớ theo kho gốc."""
+    if mt["kho"] in _KHO_KY:
+        return _KHO_KY[mt["kho"]]
+    from tests.staging.test_03_dung_app import _may_chu, _vao, _doi_cong, _dung, JWT_GIA
+    ten = f"{mt['kho']}_ky"
+    H.chay_quan_tri(f"DROP DATABASE IF EXISTS {ten} WITH (FORCE)")
+    H.chay_quan_tri(f"CREATE DATABASE {ten} TEMPLATE {mt['kho']} OWNER fls_admin")      # chủ DB = vai quản trị như bước 02 (⛔ postgres: mất USAGE schema public)
+    sv = _may_chu({"fls-staging-jwt-secret": JWT_GIA, "fls-staging-pg-fls_doc": H.MK["fls-staging-pg-fls_doc"],
+                   "fls-staging-pg-fls_ghi": H.MK["fls-staging-pg-fls_ghi"]})
+    p, cong = _vao(dict(mt, kho=ten), sv, "ghi", actor=NGUOI_KY)
+    try:
+        assert _doi_cong(cong), _dung(p)
+        r = subprocess.run([sys.executable, str(H.STG / "app" / "ky_ty_gia.py"), "--cong", str(cong)],
+                           capture_output=True, text=True, timeout=300)
+        _KY_KET_QUA[mt["kho"]] = r
+    finally:
+        out, err = _dung(p)
+        sv.shutdown()
+    _KY_KET_QUA[mt["kho"]].app_log = out + err      # nhật ký app — để một lần ký đỏ ⇒ có chữ để đọc
+    _KHO_KY[mt["kho"]] = ten
+    return ten
+
+
+NGUOI_KY = "nguoi.ky"
+_KHO_KY: dict[str, str] = {}
+_KY_KET_QUA: dict = {}
+
+
+def test_nguoi_ky_ky_ty_gia_qua_tuyen_API_actor_la_nguoi_ky_roi_chuoi_ra_DAT_moi_goi_cua_GOI_BIET(kho_04):
+    """`STG-R2-01(b)` — chiều ĐÃ ký: người ký (app `ghi`, `ky_ty_gia.py` ⇒ `POST /config/fx/{yyyymm}/sign`) ký MỌI tháng
+    IX.FX ⇒ chuỗi **11/11 ĐẠT** (N = `len(GOI_BIET)`, ⛔ số cứng). Chữ ký mang tên NGƯỜI KÝ (actor từ thẻ), ⛔ tên khác."""
+    mt = kho_04
+    ten = _kho_da_ky(mt)
+    r = _KY_KET_QUA[mt["kho"]]
+    assert r.returncode == 0 and "KẾT: ĐẠT" in r.stdout, r.stdout + r.stderr + getattr(r, "app_log", "")
+    m = re.search(r"tỷ giá IX\.FX: (\d+) tháng cần ký .* · đã ký 0 · chưa ký (\d+)", r.stdout)
+    assert m and int(m.group(1)) > 0 and m.group(1) == m.group(2), r.stdout        # Đ3: trước ký 0/N, N > 0
+    assert "ký 202306" not in r.stdout, "tháng LẠC 202306: màn hình ⛔ có nút ký ⇒ ⛔ ký thay"   # cùng luật với F08
+    with psycopg.connect(f"postgresql://fls_ghi:{H.MK['fls-staging-pg-fls_ghi']}@127.0.0.1:{H.cong_pg()}/{ten}",
+                         autocommit=True) as c:
+        actors = {x[0] for x in c.execute("SELECT actor FROM fls_cau_hinh_ban WHERE bang = 'IX.FX · KY'").fetchall()}
+        n_ky = c.execute("SELECT count(*) FROM fls_cau_hinh_ban WHERE bang = 'IX.FX · KY'").fetchone()[0]
+    assert actors == {NGUOI_KY} and n_ky >= int(m.group(1)), (actors, n_ky)
+    rr = _chay_chuoi(mt, kho=ten)
+    dong = _dong_goi(rr)
+    assert GOI_BIET and len(dong) == len(GOI_BIET) and all(l.split()[1] == "0" for l in dong), (dong, rr.stdout)
+    assert rr.returncode == 0 and "KẾT: ĐẠT" in rr.stdout and f"{len(GOI_BIET)} gói · ĐỎ 0" in rr.stdout, rr.stdout
+    assert "đã ghi" not in rr.stdout, "⛔ --ghi ⇒ không ghi tệp"
+
+
+def test_ky_ty_gia_CHAY_LAI_van_DAT_409_khong_loi_va_kiem_chi_doc(kho_04):
+    mt = kho_04
+    ten = _kho_da_ky(mt)
+    from tests.staging.test_03_dung_app import _may_chu, _vao, _doi_cong, _dung, JWT_GIA
+    sv = _may_chu({"fls-staging-jwt-secret": JWT_GIA, "fls-staging-pg-fls_doc": H.MK["fls-staging-pg-fls_doc"],
+                   "fls-staging-pg-fls_ghi": H.MK["fls-staging-pg-fls_ghi"]})
+    p, cong = _vao(dict(mt, kho=ten), sv, "ghi", actor=NGUOI_KY)
+    try:
+        assert _doi_cong(cong), _dung(p)
+        ky = [sys.executable, str(H.STG / "app" / "ky_ty_gia.py"), "--cong", str(cong)]
+        k = subprocess.run(ky + ["--kiem"], capture_output=True, text=True, timeout=120)
+        assert k.returncode == 0 and "chưa ký 0" in k.stdout, k.stdout + k.stderr          # đã ký hết ⇒ --kiem ĐẠT
+        r = subprocess.run(ky, capture_output=True, text=True, timeout=120)
+        assert r.returncode == 0 and "chưa ký 0" in r.stdout and not re.search(r"^  ký \d", r.stdout, re.M), r.stdout   # đã ký hết ⇒ ⛔ POST nào
+    finally:
+        _dung(p)
+        sv.shutdown()
+
+
+def test_ky_ty_gia_app_DOC_thi_405_va_khong_ky_gi(kho_04):
+    """Người ký ⛔ qua mặt chế độ `doc` (C5: `doc` suốt UAT, `ghi` chỉ ở bước ký): app `doc` ⇒ tuyến ký `405` ⇒ ĐỎ."""
+    mt = kho_04
+    from tests.staging.test_03_dung_app import _may_chu, _vao, _doi_cong, _dung, JWT_GIA
+    sv = _may_chu({"fls-staging-jwt-secret": JWT_GIA, "fls-staging-pg-fls_doc": H.MK["fls-staging-pg-fls_doc"],
+                   "fls-staging-pg-fls_ghi": H.MK["fls-staging-pg-fls_ghi"]})
+    p, cong = _vao(mt, sv, "doc")
+    try:
+        assert _doi_cong(cong), _dung(p)
+        r = subprocess.run([sys.executable, str(H.STG / "app" / "ky_ty_gia.py"), "--cong", str(cong)],
+                           capture_output=True, text=True, timeout=120)
+        assert r.returncode == 1 and "405" in r.stdout and "KẾT: ĐỎ" in r.stdout, r.stdout + r.stderr
+    finally:
+        _dung(p)
+        sv.shutdown()
 
 
 def test_chuoi_tham_so_la_exit_2(kho_04):

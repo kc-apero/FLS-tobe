@@ -45,7 +45,7 @@ Bước 04 chỉ nạp **config** `IX.*`; `fls_itl` = 0 dòng. "Thật hay ẩn 
 
 ## Chuỗi HD2 trong app
 
-"Chạy chuỗi" là **lệnh**, ⛔ yêu cầu HTTP: `sudo docker exec fls-app bash /app/tools/staging/app/chay_chuoi.sh [--ghi]` (**11** gói `do_hd2.py --goi` = `len(GOI_BIET)`; đo 23/11 trên cây đã gộp H14: ~**45 giây** CPU, đỉnh **~800 MB** RAM trên kho đã nạp config). ⛔ **Chỉ CHỦ chạy**: lệnh cần `sudo`, mà `--cap-quyen` chỉ cấp `osLogin` (không có `sudo`) — cấp `osAdminLogin` là cho người test root trên VM (`STG-R1-06`, phương án A). `--ghi` ghi lại `hd2_cong.json` trong container — cửa đọc nó mỗi yêu cầu nên F03 đổi ngay.
+"Chạy chuỗi" là **lệnh**, ⛔ yêu cầu HTTP: `sudo docker exec fls-app bash /app/tools/staging/app/chay_chuoi.sh [--ghi]` (**11** gói `do_hd2.py --goi` = `len(GOI_BIET)`; đo 23/11 trên cây đã gộp H14: ~**45 giây** CPU, đỉnh **~800 MB** RAM trên kho đã nạp config). ⛔ **Chỉ CHỦ chạy**: lệnh cần `sudo`, mà `--cap-quyen` chỉ cấp `osLogin` (không có `sudo`) — cấp `osAdminLogin` là cho người test root trên VM (`STG-R1-06`, phương án A). **D1 (I2)**: gói đọc tỷ giá TỪ KHO ⇒ chạy chuỗi khi chưa ký tỷ giá ra **11/11 ĐỎ `FX_CHAN`** — ĐÚNG; người ký ký các tháng bằng `docker exec fls-app python /app/tools/staging/app/ky_ty_gia.py --cong 8088` *(app ở chế độ `ghi`; tuyến `POST /config/fx/{yyyymm}/sign`, tên ký lấy từ thẻ; bỏ qua tháng LẠC)* rồi mới chạy chuỗi ⇒ **11/11 ĐẠT** *(UAT v0.3 · U7–U9)*. `--ghi` ghi lại `hd2_cong.json` trong container — cửa đọc nó mỗi yêu cầu nên F03 đổi ngay.
 
 ## Giả định chưa kiểm (chỉ lộ ra khi chạy thật ở GCP)
 

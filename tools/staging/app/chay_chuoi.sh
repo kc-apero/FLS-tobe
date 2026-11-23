@@ -8,7 +8,10 @@
 #  ⭐ "Chuỗi" là LỆNH (CPU ~28 giây · đỉnh 630 MB RSS — đo ở BG-326), ⛔ phải một yêu cầu HTTP: nên ⛔ có giới hạn
 #     thời gian yêu cầu nào của cửa/Cloud Run dính vào nó.
 #  Đọc kho bằng vai `fls_doc` (chỉ-ĐỌC) qua Auth Proxy của chính container; bí mật từ Secret Manager như `vao.sh`.
-#  Danh sách gói lấy từ `tools.do_hd2.GOI_BIET` (⛔ chép tay ở đây). Gói nào ĐỎ ⇒ in tên + exit 1 (⛔ dừng giữa chừng).
+#  ⭐ Gọi `main` qua `import tools.do_hd2`, ⛔ `python tools/do_hd2.py` · ⛔ `-m tools.do_hd2` (`STG-R2-05`, đo 23/11): chạy như SCRIPT/`-m` thì `do_hd2` là `__main__`
+#     còn các gói con (`do_hd2_c3c`·`c3d`·`c5a`·`c5b`·`c5c`) `import tools.do_hd2` ⇒ HAI bản module, `_FX_KHO` của gói con =
+#     `None` ⇒ 5/11 gói đọc ẢNH `ix_fx.json` thay vì kho ⇒ ⛔ bị D1 chặn tháng chưa ký (chuỗi chỉ ra 6/11 ĐỎ thay vì 11/11).
+#  Danh sách gói lấy từ `tools.do_hd2.GOI_BIET` (⛔ chép tay ở đây). Gói nào ĐỎ ⇒ in tên + dòng LÝ DO có tên (`FX_CHAN <tháng>` khi D1 chặn tỷ giá chưa ký — `STG-R2-01`) + exit 1 (⛔ dừng giữa chừng).
 # ══════════════════════════════════════════════════════════════════════════════════════════
 set -uo pipefail
 : "${FLS_STG_PROJECT:?⛔ thiếu FLS_STG_PROJECT}"
@@ -26,10 +29,10 @@ sai=0; n=0
 printf '%-9s %-6s %s\n' GOI THOAT GIAY
 for g in $GOI; do
   t0=$(date +%s%N)
-  "$PY" tools/do_hd2.py --goi "$g" "${GHI[@]}" >"/tmp/chuoi_$g.log" 2>&1; rc=$?
+  "$PY" -c 'import sys; from tools.do_hd2 import main; sys.exit(main(sys.argv[1:]))' --goi "$g" "${GHI[@]}" >"/tmp/chuoi_$g.log" 2>&1; rc=$?
   t1=$(date +%s%N); ms=$(( (t1 - t0) / 1000000 ))
   printf '%-9s %-6s %d.%d\n' "$g" "$rc" $((ms / 1000)) $((ms % 1000 / 100))
-  [ "$rc" -eq 0 ] || { sai=$((sai+1)); grep -m1 -E "ChuaKhai|KHONG DAT|✗" "/tmp/chuoi_$g.log" | cut -c1-200 | sed 's/^/    ⛔ /'; }
+  [ "$rc" -eq 0 ] || { sai=$((sai+1)); grep -m1 -E "FX_CHAN|ChuaKhai|CHẶN|KHONG DAT|✗" "/tmp/chuoi_$g.log" | cut -c1-200 | sed 's/^/    ⛔ /'; }
   n=$((n+1))
 done
 echo "══ CHUỖI: $n gói · ĐỎ $sai · KẾT: $([ "$sai" -eq 0 ] && echo ĐẠT || echo "ĐỎ — $sai gói")${GHI[*]:+ · đã ghi hd2_cong.json}"

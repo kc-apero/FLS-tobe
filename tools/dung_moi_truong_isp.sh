@@ -419,7 +419,8 @@ MONG_HD1_CHAY=9845
 #    nâng là ĐỎ. Sau vòng sửa R3: 2.481 + 9 bài mới = 2.490 bài ở 211 tệp · `tests/web` 664 ở 56 tệp.
 # WO-325 (staging 02–04 + UAT): + 93 bài ở tests/staging/ (4.772 → 4.865 → 4.868 (+3 bài IAM lan truyền bước 01); tests/web vẫn 690).
 # Gộp H14+I2-tip (origin/claude/bold-galileo-zukpaf, 4.857) ⊕ STG (4.868 − 4.772 = +96) = 4.953; vòng sửa sau KQ-327 +8 bài (5 ở test_01 · 1 ở 04 · 1 ở 02 · 1 ở uat) ⇒ 4.961 = `pytest --collect-only` đo 23/11; tests/web 690.
-MONG_PYTEST_TOAN_BO=4961
+# Gộp I2 (origin/claude/bold-galileo-zukpaf @ 05d7a97, 4.887) ⊕ STG sau KQ-328 (`STG-R2-03`: sàn = thu thập THẬT cây gộp, ⛔ cộng tay): `pytest --collect-only` đo 23/11 = 4.995 (staging 04 +3 bài chuỗi/ký, ky_ty_gia +2 bài, uat +1); tests/web 690.
+MONG_PYTEST_TOAN_BO=4995
 MONG_PYTEST_WEB=690
 
 echo
