@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Trạng thái** | `MO` — giao 23/11 ~03:50 UTC |
+| **Trạng thái** | `CHO_TEST` — Dev bàn giao `BG-326` 23/11 *(giao 23/11 ~03:50 UTC)* |
 | **Phát bởi** | orchestrator · 2026-11-23 |
 | **Nhận** | `fls-dev` làn **HẠ TẦNG** — phiên cloud Sonnet 5.5 · medium · nhánh `claude/bold-galileo-zukpaf-isp/STG` |
 | **Nền** | ngọn nhánh làm việc `claude/bold-galileo-zukpaf` (có `tools/staging/01_dung_staging_gcp.sh`; HANDOFF 20/11 §6 khai bước 02/03) |
@@ -27,3 +27,9 @@
 - ⛔ Claude vào GCP (quyết chủ 20/11) — viết script, CHỦ chạy. ⛔ khoá/mật khẩu/`Client secret` trong repo hay chat. Ghi kho THẬT: `KHONG`.
 - ⛔ sửa engine/tuyến; cửa API ⛔ nới luật từ chối. ⛔ `docker compose down`.
 - Câu chủ (ghi vào BG, ⛔ tự quyết): nơi chạy app · cách người test vào · dữ liệu thật hay ẩn danh · ai là người test.
+
+## Nhật ký
+| Ngày | Ai | Việc |
+|---|---|---|
+| 2026-11-23 ~03:50 UTC | orchestrator | phát `WO-325` (`MO`) |
+| 2026-11-23 | `fls-dev` (HẠ TẦNG) | nhận → `DANG_LAM` → bàn giao **`BG-326`** (`claude/bold-galileo-zukpaf-isp/STG`); 6 AC có bằng chứng; **4 câu chủ** ở `BG-326` §4; ⛔ chưa chạy ở GCP ⇒ `CHO_TEST` |
