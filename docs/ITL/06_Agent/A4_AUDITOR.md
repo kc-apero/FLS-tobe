@@ -8,7 +8,8 @@
 | **Đầu vào** | đầu ra A1–A3 + số máy đã đo (`voi_so_luong.json` · `hd2_cong.json` · đếm ảnh · cổng FLS) |
 | **Đầu ra** | phán ĐẠT/TRƯỢT từng agent (MÃ) · ô `cong:HD1.*.dat` · `cong:HD2.*.dat` · `voi:dat_hd1.*` · `report.html` |
 | **Công cụ được gọi** *(CHỈ hàm FLS có sẵn)* | `doi_chieu` (mã `fls/agent/doi_chieu.py`) · `cong_hd1` = `fls.repo.doc_bao_cao.doc_cong_tep_do` · `cong_hd2` = `doc_cong_hd2` · `report` (mã `fls/agent/report.py`) |
-| **Mô hình ghim** | `gemini-3.8-flash` · họ `google` · **CHƯA ghim** (tên tạm — câu chủ C2) · phương án A (PROPOSED — câu chủ C1) |
+| **Mô hình ghim** | `gemini-3.8-flash` · họ `google` · **CHƯA ghim** (tên tạm — chủ cấp mã chính xác lúc mở tài khoản Google) · **phương án A — chủ chốt 23/11** |
+| **Dữ liệu & lưu giữ** *(chủ 23/11)* | agent đọc TOÀN BỘ nội dung giao dịch + số TK + tên (chỉ bỏ `Email Address`) · vận hành: Messages API dưới **ZDR** (bật theo tổ chức qua Anthropic) · fleet eval: **gửi theo lô** (Batches API — Anthropic giữ 29 ngày, đổi lấy −50 % giá; chủ chấp nhận) |
 | **Phiên bản** | checksum prompt `8160a71f8ba50465` + mô hình ghim + checksum tham chiếu (tệp số máy đã đo) |
 | **Bước thông minh** | Phán là MÃ; mô hình chỉ chép cổng. Đề xuất G0 (Voi 23/11–11/12): CHỈ THÊM cờ giải thích lệch, ⛔ bỏ cờ v0. |
 | **Fleet eval** | `a4-soat.eval.lot-chan` (chấm bằng họ khác: Claude Opus 5.5) |

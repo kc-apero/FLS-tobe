@@ -98,3 +98,14 @@
 | Q8: `MONG_PYTEST_TOAN_BO` 4822 → **4824** | `tests/agent` `52 passed` |
 
 ⚠ Hệ quả cần chủ biết (⛔ chặn): dữ liệu gửi API giờ gồm tên người + số TK thật ⇒ nên bật chế độ **không lưu dữ liệu (ZDR)** với nhà cung cấp trước vòng thật; `NFR-I13` (BA) cần BA ghi lại quyết định này — Dev ⛔ sửa `02_BA`.
+
+**Cổng sau vòng này:** `bash tools/dung_moi_truong_isp.sh --duong-nen --cong 5447` ⇒ **`KẾT: ĐẠT`** — toàn bộ `12 failed, 4796 passed, 2 xfailed, 14 errors` ⇒ tập đỏ + XFAIL **28 = 28** (thêm 0 · bớt 0) · chạy **4824** (mong ≥ 4824) · `tests/web` **3 = 3** · chạy 690 · lint 11 kept · `tests/agent` `52 passed`.
+
+## Quyết định chủ 23/11 (tiếp) — đã ghi vào thẻ agent
+| Câu | Chủ chốt | Ở đâu |
+|---|---|---|
+| C1 mô hình | **Phương án A** — Claude Opus 5.5 làm (A1–A3) · Gemini 3.8 Flash kiểm (A4) | 4 thẻ dòng "Mô hình ghim" |
+| ZDR | **Bật** cho vận hành (Messages API) — bật theo TỔ CHỨC qua Anthropic, ⛔ công tắc trong mã | thẻ dòng "Dữ liệu & lưu giữ" |
+| Lưu dữ liệu cho fleet eval | **Chấp nhận** gửi theo lô (Batches API — Anthropic giữ 29 ngày) để giảm 50 % giá | như trên |
+| C5 bể giữ riêng | **Dựng** — việc kế (đọc live qua SA, ngoài repo; đáp án hai tầng: PM line · HD+CDT1 cho L3) | chưa làm trong BG này |
+Còn mở: mã Gemini chính xác (A4 chưa ghim) · ZDR phía Google.

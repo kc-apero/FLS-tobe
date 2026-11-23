@@ -8,7 +8,8 @@
 | **Đầu vào** | ảnh đóng băng 4 nguồn raw: Bank (`tests/fixture/pm_join.json` bank + `itl_ledge_adjustment.json` sổ AS-IS) · FPS (`pm_join.json` pm) · H1000 (`dau_vao/hr_ledger_2024/2025.json`) · PLT (`dau_vao/gi_cfa1.json` + `dap_an/{omc,sc,ps}_mid1.json`) |
 | **Đầu ra** | ô `nguon:<nguồn>.so_dong · dem_dong · van_tay` (+ `fps.co_ref`) — 9 ảnh |
 | **Công cụ được gọi** *(CHỈ hàm FLS có sẵn)* | `nguon_bank` · `nguon_fps` · `nguon_h1000` · `nguon_plt` = đếm dòng + đọc vân tay ảnh (`tools/chay_agent_voi.py:dem_nguon`) |
-| **Mô hình ghim** | `claude-opus-5-5` · họ `anthropic` · ghim ✅ · phương án A (PROPOSED — câu chủ C1) |
+| **Mô hình ghim** | `claude-opus-5-5` · họ `anthropic` · ghim ✅ · **phương án A — chủ chốt 23/11** |
+| **Dữ liệu & lưu giữ** *(chủ 23/11)* | agent đọc TOÀN BỘ nội dung giao dịch + số TK + tên (chỉ bỏ `Email Address`) · vận hành: Messages API dưới **ZDR** (bật theo tổ chức qua Anthropic) · fleet eval: **gửi theo lô** (Batches API — Anthropic giữ 29 ngày, đổi lấy −50 % giá; chủ chấp nhận) |
 | **Phiên bản** | checksum prompt `9f84a5b36e62d7b0` + mô hình ghim + checksum tham chiếu (tệp số máy đã đo) |
 | **Bước thông minh** | Hôm nay chỉ đếm + vân tay. Đề xuất G1 (Voi roadmap 01/03): đề xuất bản khai cho sheet mới · báo đổi bố cục cột. |
 | **Fleet eval** | chưa có thẻ riêng (Voi: `a1-khai-chup.eval.lech-cot-ngay` PROPOSED) |
