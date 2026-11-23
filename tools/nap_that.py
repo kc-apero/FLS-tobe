@@ -10,6 +10,7 @@ Chay:  python tools/nap_that.py [--that]
 from __future__ import annotations
 
 import json
+import re
 import subprocess
 import sys
 import time
@@ -249,7 +250,18 @@ def doc_pm(tok: str) -> list[DongPM]:
     return ra
 
 
-def chay_that(tok: str, *, ghi: bool, dsn: str | None = None, run_id: str | None = None) -> dict:
+def dem_ly_do_loai(loai) -> dict[str, int]:
+    """`NAP-R1-04`: lý do loại có dạng `cot goc X ('ten') la o loi: <Ô THÔ>` — Ô THÔ có thể mang số TK/tên tệp. Chỉ giữ phần TRƯỚC
+    dấu `:` đầu tiên (tên cột canon) và che chuỗi ≥ 6 chữ số. → `{lý do đã che: số dòng}`."""
+    c: dict[str, int] = {}
+    for _dong, ly in loai:
+        for x in ly:
+            k = re.sub(r"\d{6,}", "#", str(x).split(":", 1)[0])[:80]
+            c[k] = c.get(k, 0) + 1
+    return c
+
+
+def chay_that(tok: str, *, ghi: bool, dsn: str | None = None, run_id: str | None = None, chi_tiet_loai: bool = True) -> dict:
     """⭐ WO-334: thân của `main` cũ, TÁCH RA để bộ điều phối `tools/staging/nap_nguon_that.py` gọi — ⛔ viết lại đường đọc.
     → dict số đếm: `header` · `hang` (dòng sheet đọc) · `tk` (ba đường adapter) · `ra` · `loai` · `pm` · `bank` · `tkg` ·
     `doc_du` · `kq` (KetQuaNap, khi đã ghi) · `da_ghi`. ⛔ Cổng đọc-đủ ĐỎ ⇒ VẪN đo (chỉ-đọc) nhưng ⛔ ghi một dòng —
@@ -269,8 +281,12 @@ def chay_that(tok: str, *, ghi: bool, dsn: str | None = None, run_id: str | None
     ra, loai, tk = nap(hang, header=header)
     print(f"ba duong cua adapter: vao {tk.vao} = canon {tk.ra} + loai {tk.loai}"
           f" + rong {tk.rong}  ·  can={tk.can()}")
-    for dong, ly in loai[:5]:
-        print(f"   loai dong {dong}: {' | '.join(ly)[:100]}")
+    if chi_tiet_loai:
+        for dong, ly in loai[:5]:
+            print(f"   loai dong {dong}: {' | '.join(ly)[:100]}")
+    else:   # `NAP-R1-04`: bộ điều phối 05 ⛔ in ô nguồn thô — chỉ ĐẾM theo lý do đã che
+        for ly, n in sorted(dem_ly_do_loai(loai).items()):
+            print(f"   loai theo ly do (dem) {n:6d}: {ly}")
 
     print()
     pm = doc_pm(tok)

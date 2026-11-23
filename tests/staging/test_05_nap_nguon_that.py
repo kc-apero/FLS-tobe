@@ -29,7 +29,7 @@ from tests.staging.sheets_gia import SheetsGia
 GOC = H.GOC
 ANH = json.loads((GOC / "tests" / "fixture" / "pm_join.json").read_text(encoding="utf-8"))
 VSL = json.loads((GOC / "docs" / "ITL" / "_tools" / "voi_so_luong.json").read_text(encoding="utf-8"))
-from tools.do_bat_bien_ngam import BANK as BANK_ID, QUY as QUY_ID   # ID THẬT làm khoá của máy chủ giả ⇒ tiến trình con (05.sh) cũng đi đúng đường
+from tools.staging.cred_sheets import ID_BANK as BANK_ID, ID_QUY as QUY_ID   # ID THẬT làm khoá của máy chủ giả ⇒ tiến trình con (05.sh) cũng đi đúng đường
 CT = "tools/staging/nap_nguon_that.py"
 EMAIL_GIA = "nguoi.gia.thu@example.invalid"
 TEN_TK_GIA = "TEN-TK-GIA-GIU"
@@ -204,14 +204,17 @@ def test_CHAY_LAI_khong_nhan_doi_fls_itl_chi_THEM(monkeypatch, moi_truong, san_0
     assert _dem(kho, "SELECT count(*) FROM fls_pm_line") == 3703
 
 
-# ═══ Đ5 — ĐỎ hai chiều: sửa MỘT dòng ở nguồn ⇒ ĐỎ có tên (nguồn "bị sửa sau chốt") ═══
+# ═══ Quyết chủ 23/11 ~07:25 (`NAP-R1-01`/`-12`): NGUỒN SỐNG là chuẩn ⇒ nguồn sửa sau ảnh = KHỐI CÓ TÊN, chỉ ĐẾM, ⛔ ĐỎ ═══
 def _doi(g: SheetsGia, sid, tab, i, j, v):
     cu = g.kho[sid][tab][i][j]
     g.kho[sid][tab][i][j] = v
     return cu
 
 
-def test_DO_sua_mot_tien_bank_sau_chot_thi_do_dung_ten(monkeypatch, moi_truong, san_0, kho, tmp_path, capsys):
+KHOI_SUA = "ⓑ NGUỒN SỬA SAU ẢNH"
+
+
+def test_ANH_CU_khac_nguon_SONG_la_KHOI_nhan_dem_KHONG_do(monkeypatch, moi_truong, san_0, kho, tmp_path, capsys):
     g = moi_truong
     cu = _doi(g, BAN_SAO_RAW.spreadsheet_id, BAN_SAO_RAW.sheet, 99, 4, 123456789.0)      # dòng sheet 100
     try:
@@ -219,14 +222,15 @@ def test_DO_sua_mot_tien_bank_sau_chot_thi_do_dung_ten(monkeypatch, moi_truong, 
         rc = _chay(monkeypatch, kho, "--kiem", "--bo-buoc", "khai,mapping,chup", ghi=False, tep_json=j)
         out = capsys.readouterr().out
         so = json.loads(j.read_text(encoding="utf-8"))["so"]
-        assert rc == 1 and so["bank_lech_tien"] == 1 and so["bank_mat_noi_dung"] == 1, out
-        assert re.search(r"\[ĐỎ\] dòng bank ảnh LỆCH `tien` ở nguồn sống \(đếm\)\s+1\s+\(mong 0\)", out), out
-        assert "LỆCH `ref`" in out and so["bank_lech_ref"] == 0            # chỉ ĐÚNG trường bị sửa đỏ
+        assert rc == 0, out                                                # ⛔ ĐỎ: nguồn sống là chuẩn
+        assert so["bank_lech_tien"] == 1 and so["bank_mat_noi_dung"] == 1 and so["bank_lech_ref"] == 0, out
+        assert KHOI_SUA in out and re.search(r"dòng bank ảnh LỆCH `tien` ở nguồn sống \(đếm\)\s+1\n", out), out
+        assert "[ĐỎ]" not in out
     finally:
         _doi(g, BAN_SAO_RAW.spreadsheet_id, BAN_SAO_RAW.sheet, 99, 4, cu)
 
 
-def test_DO_xoa_mot_dong_PM_thi_do_MAT_va_sua_hd_thi_do_hd(monkeypatch, moi_truong, san_0, kho, tmp_path, capsys):
+def test_ANH_CU_xoa_mot_dong_PM_va_sua_hd_la_KHOI_dem_KHONG_do(monkeypatch, moi_truong, san_0, kho, tmp_path, capsys):
     g = moi_truong
     pm = g.kho[BAN_SAO_RAW.spreadsheet_id]["[Importrange]PM_Unpivot"]
     cu_hd = pm[10][PM_COT["hd"]]
@@ -236,10 +240,40 @@ def test_DO_xoa_mot_dong_PM_thi_do_MAT_va_sua_hd_thi_do_hd(monkeypatch, moi_truo
         j = tmp_path / "bc.json"
         rc = _chay(monkeypatch, kho, "--kiem", "--bo-buoc", "khai,mapping,chup", ghi=False, tep_json=j)
         so = json.loads(j.read_text(encoding="utf-8"))["so"]
-        assert rc == 1 and so["pm_mat"] == 1 and so["pm_lech_hd"] == 1 and so["pm_lech_tien"] == 0, capsys.readouterr().out
+        assert so["pm_mat"] == 1 and so["pm_lech_hd"] == 1 and so["pm_lech_tien"] == 0, capsys.readouterr().out
+        assert rc == 0
     finally:
         pm.append(luu)
         pm[10][PM_COT["hd"]] = cu_hd
+
+
+def test_so_theo_ky_pure_dem_bang_thap_cao_moi_khong_ngay():
+    from tools.staging.nap_nguon_that import so_theo_ky
+    cu = {"2025-06": 10, "2025-07": 5, "2025-08": 7, "2025-09": 4}
+    song = {"2025-06": 10, "2025-07": 3, "2025-08": 9, "2026-01": 6, "(ngày không đọc được)": 2}
+    s = so_theo_ky(song, cu)
+    assert (s["bang"], s["thap"], s["cao"]) == (1, 2, 1)                   # 06 bằng · 07,09 thấp · 08 cao
+    assert s["chenh_thap"] == -2 - 4 and s["chenh_cao"] == 2
+    assert s["chi_o_cu"] == 1                                              # 2025-09: nguồn sống KHÔNG còn dòng nào (mẫu: kỳ chốt biến mất)
+    assert s["moi"] == 6 and s["khong_ngay"] == 2
+    assert s["chi_tiet"]["2025-07"] == (5, 3)
+    # đảo kỳ chốt/mở ⇒ số khác ⇒ (chặn đột biến M9/M11)
+    assert so_theo_ky({"2025-06": 10}, {"2025-06": 10, "2025-07": 5})["chi_o_cu"] == 1
+    assert so_theo_ky({"2026-02": 8}, {"2025-06": 10})["moi"] == 8
+
+
+def test_khoi_theo_ky_in_tung_ky_va_dem_ky_cu_mat_dong(monkeypatch, moi_truong, san_0, kho, tmp_path, capsys):
+    j = tmp_path / "bc.json"
+    rc = _chay(monkeypatch, kho, "--kiem", "--bo-buoc", "khai,mapping,chup", ghi=False, tep_json=j)
+    out = capsys.readouterr().out
+    so = json.loads(j.read_text(encoding="utf-8"))["so"]
+    assert rc == 0, out
+    assert so["ky_chot"] == len(VSL["theo_ky"]) == 23                      # (Đ3) mẫu số ≠ 0
+    # nguồn tổng hợp: ngày giả 45000+… phủ 2023-03…2025-02 ⇒ chỉ vài kỳ trùng 23 kỳ cũ; còn lại MẤT hết. Ba nhãn bằng/thấp/cao phải PHỦ ĐỦ 23 kỳ
+    sk = so["theo_ky_so_sanh"]
+    assert sk["bang"] + sk["thap"] + sk["cao"] == 23 and sk["chi_o_cu"] == 18 and sk["thap"] >= 18
+    assert out.count("canon SỐNG ↔ số cũ `co` (dòng)") == 23
+    assert "nguồn SỐNG là chuẩn" in out
 
 
 def test_DO_dong_MOI_sau_anh_dem_RIENG_khong_do(monkeypatch, moi_truong, san_0, kho, tmp_path, capsys):
@@ -282,7 +316,7 @@ def test_DO_403_workbook_bank_thi_dung_phan_khai_va_chup_con_so_van_chay(monkeyp
         rc = _chay(monkeypatch, kho, "--nap", "--nguoi-nap", "khanh.thu")
         out = capsys.readouterr().out
         assert rc == 1, out
-        assert re.search(r"\[ĐỎ\] HTTP đọc workbook BANK \(60 sheet `R \|` ngân hàng\)\s+403", out), out
+        assert re.search(r"\[ĐỎ\] HTTP đọc workbook BANK \(các sheet `R \|` ngân hàng\)\s+403", out), out
         assert re.search(r"\[ĐỎ\] bước khai chạy được — DỪNG vì ⛔ quyền đọc workbook BANK", out), out
         assert re.search(r"\[ĐỎ\] bước chup chạy được — DỪNG", out), out
         assert re.search(r"\[ĐẠT\] HTTP đọc workbook RAW", out)
@@ -469,3 +503,158 @@ def test_05_sh_nap_that_bang_fls_ghi_qua_proxy_cong_doc_du_do_chan_so_con_lai_va
 
 def _dem_kho(mt, sql):
     return int(H.chay_quan_tri(sql, mt["kho"]))
+
+
+# ═══ `NAP-R1-01`/`-02`: Σ nguồn = Σ kho — ĐỎ HAI CHIỀU (nguồn sống ↔ kho), kể cả sau nạp ═══
+def _nap_day_du(monkeypatch, kho, capsys):
+    assert _chay(monkeypatch, kho, "--nap", "--nguoi-nap", "khanh.thu") == 0
+    capsys.readouterr()
+
+
+def _doi_chieu(monkeypatch, kho, capsys, tep_json=None):
+    rc = _chay(monkeypatch, kho, "--doi-chieu", ghi=False, tep_json=tep_json)
+    return rc, capsys.readouterr().out
+
+
+def test_DOI_CHIEU_kho_vua_nap_khop_nguon_song_XANH(monkeypatch, moi_truong, san_0, kho, capsys):
+    _nap_day_du(monkeypatch, kho, capsys)
+    rc, out = _doi_chieu(monkeypatch, kho, capsys)
+    assert rc == 0, out
+    assert "ĐỐI CHIẾU KHO" in out and "[ĐẠT] KHO: `fls_mapping_master`" in out and "[ĐẠT] KHO ↔ NGUỒN: sheet mà dòng kho" in out
+    assert _dem(kho, "SELECT count(*) FROM fls_itl") == 9985              # (Đ3) mẫu số kho ≠ 0 — phép "khớp" không xanh trên rỗng
+
+
+def test_DOI_CHIEU_kho_RONG_thi_DO_khong_xanh_tren_tap_rong(monkeypatch, moi_truong, san_0, kho, capsys):
+    rc, out = _doi_chieu(monkeypatch, kho, capsys)
+    assert rc == 1 and "[ĐỎ] KHO: `fls_mapping_master`" in out and "[ĐỎ] KHO: `fls_pm_line`" in out, out
+
+
+def test_DOI_CHIEU_doi_MOT_dong_nguon_song_SAU_NAP_thi_DO_dung_tep(monkeypatch, moi_truong, san_0, kho, capsys):
+    """⭐ bài chốt `NAP-R1-01`: nạp xong, nguồn sống bị sửa/mất/thêm 1 dòng ⇒ Σ nguồn ≠ Σ kho ⇒ ĐỎ có tên — cả hai chiều."""
+    g = moi_truong
+    _nap_day_du(monkeypatch, kho, capsys)
+    # (a) nguồn MẤT 1 dòng PM ⇒ kho NHIỀU HƠN nguồn
+    pm = g.kho[BAN_SAO_RAW.spreadsheet_id]["[Importrange]PM_Unpivot"]
+    luu = pm.pop()
+    try:
+        rc, out = _doi_chieu(monkeypatch, kho, capsys)
+        assert rc == 1 and re.search(r"\[ĐỎ\] KHO: `fls_pm_line` \(đếm\) = dòng PM đọc từ nguồn sống\s+3703\s+\(mong 3702\)", out), out
+    finally:
+        pm.append(luu)
+    # (b) nguồn THÊM 1 dòng ngân hàng ⇒ kho ÍT HƠN nguồn
+    tml = g.kho[BAN_SAO_RAW.spreadsheet_id][BAN_SAO_RAW.sheet]
+    them = [""] * 38
+    them[0], them[1], them[3], them[4], them[5], them[6] = 47000, "FT-MOI-0002", "VND", 5000.0, 0, "R | MOI2"
+    tml.append(them)
+    try:
+        rc, out = _doi_chieu(monkeypatch, kho, capsys)
+        assert rc == 1 and re.search(r"\[ĐỎ\] KHO: `fls_itl` \+ `fls_reject` .*\s+9992\s+\(mong 9993\)", out), out
+    finally:
+        tml.pop()
+    # (c) một sheet `R |` nguồn đổi số dòng ⇒ ĐỎ ĐÚNG MỘT nguồn
+    q = g.kho[BANK_ID]["R | AAA"]
+    q.append([45999, "dien giai them", "VND", 1.0, "", "REFX"])
+    try:
+        rc, out = _doi_chieu(monkeypatch, kho, capsys)
+        assert rc == 1 and re.search(r"\[ĐỎ\] KHO ↔ NGUỒN: sheet mà dòng kho ≠ dòng nguồn sống \(đếm, từng nguồn\)\s+1\s+\(mong 0\)", out), out
+    finally:
+        q.pop()
+    rc, out = _doi_chieu(monkeypatch, kho, capsys)                         # trả nguyên ⇒ XANH lại (đỏ hai chiều)
+    assert rc == 0, out
+
+
+def test_DOI_CHIEU_kho_lech_mot_dong_Mapping_va_PM_va_nguon_chay_thi_DO(monkeypatch, moi_truong, san_0, kho, capsys):
+    """`NAP-R1-02` (chặn M7/M10: hàng Σ-kho là tautology): làm KHO lệch 1 ⇒ đúng hàng ấy ĐỎ."""
+    _nap_day_du(monkeypatch, kho, capsys)
+    for sql, mau in (("DELETE FROM fls_mapping_master WHERE ctid = (SELECT ctid FROM fls_mapping_master LIMIT 1)",
+                      r"\[ĐỎ\] KHO: `fls_mapping_master` \(đếm\) = Σ nguồn đọc được\s+5\s+\(mong 6\)"),
+                     ("DELETE FROM fls_pm_line WHERE ctid = (SELECT ctid FROM fls_pm_line LIMIT 1)",
+                      r"\[ĐỎ\] KHO: `fls_pm_line` \(đếm\) = dòng PM đọc từ nguồn sống\s+3702\s+\(mong 3703\)")):
+        H.chay_quan_tri(sql, re.search(r"/(\w+)$", kho).group(1))
+        rc, out = _doi_chieu(monkeypatch, kho, capsys)
+        assert rc == 1 and re.search(mau, out), out
+
+
+# ═══ `NAP-R1-03` — Email Address trên mẫu số 0 ⇒ ĐỎ (Đ3) ═══
+def test_RIENG_TU_mau_so_PM_kho_bang_0_thi_phep_Email_Address_ĐỎ_khong_xanh(monkeypatch, moi_truong, kho, capsys):
+    # sàn thật ⇒ cổng đọc-đủ chặn ⇒ `fls_pm_line` = 0 (đúng tình huống live 23/11)
+    _chay(monkeypatch, kho, "--nap", "--nguoi-nap", "khanh.thu", "--bo-buoc", "khai,mapping,chup")
+    out = capsys.readouterr().out
+    assert _dem(kho, "SELECT count(*) FROM fls_pm_line") == 0
+    assert "[ĐỎ] dòng PM mang khoá `Email Address` (đếm) — ⛔ đo được trên mẫu số 0" in out, out
+    assert "[ĐỎ] mẫu số PM trong kho ≠ 0" in out and "[ĐẠT] dòng PM mang khoá" not in out
+
+
+# ═══ `NAP-R1-04` — stdout ⛔ in ô nguồn thô (trước lẫn trong BÁO CÁO) ═══
+def test_STDOUT_o_loi_mang_chuoi_12_so_khong_xuat_hien_o_dau_ra(monkeypatch, moi_truong, san_0, kho, capsys):
+    g = moi_truong
+    tml = g.kho[BAN_SAO_RAW.spreadsheet_id][BAN_SAO_RAW.sheet]
+    cu = tml[100][6]
+    tml[100][6] = "#N/A (Did not find value 123456789012 in P100)"
+    try:
+        _chay(monkeypatch, kho, "--kiem", "--bo-buoc", "khai,mapping,chup", ghi=False)
+        cap = capsys.readouterr()
+        assert "123456789012" not in cap.out + cap.err and "Did not find" not in cap.out + cap.err
+        assert re.search(r"loai theo ly do \(dem\)\s+1: cot goc", cap.out), cap.out     # vẫn ĐẾM theo lý do
+    finally:
+        tml[100][6] = cu
+
+
+def test_dem_ly_do_loai_che_o_tho():
+    from tools.nap_that import dem_ly_do_loai
+    r = dem_ly_do_loai([(5, ["cot goc G ('Account') la o loi: #N/A 123456789012"]), (6, ["cot goc G ('Account') la o loi: #REF! 98765432101"])])
+    assert r == {"cot goc G ('Account') la o loi": 2}
+
+
+# ═══ `NAP-R1-05` — từ chối cổng 5433 ở MỌI dạng DSN (kể cả 5 dạng từng lọt) ═══
+@pytest.mark.parametrize("dsn", [
+    "postgresql://u:p@localhost:5433/fls", "postgresql://u:p@127.0.0.1:5433/fls", "postgresql://u:p@localhost:5433/fls?sslmode=disable",
+    "postgresql://u:p@localhost:05433/fls", "postgresql://u:p@localhost/fls?port=5433", "host=localhost port=5433 dbname=fls",
+    "postgresql://u:p@localhost:5433", "postgresql://u:p@[::1]:5433/fls", "host=/var/run port=5433",
+])
+def test_kiem_dsn_chan_moi_dang_cong_5433(dsn):
+    from tools.staging.nap_nguon_that import kiem_dsn
+    with pytest.raises(SystemExit, match="5433"):
+        kiem_dsn(dsn)
+
+
+@pytest.mark.parametrize("dsn", ["postgresql://u:p@localhost:5436/fls", "host=localhost port=5436 dbname=fls", "postgresql://u@localhost/fls"])
+def test_kiem_dsn_cho_qua_cum_phien(dsn):
+    from tools.staging.nap_nguon_that import kiem_dsn
+    kiem_dsn(dsn)
+
+
+def test_kiem_dsn_khong_phan_tich_duoc_thi_tu_choi():
+    from tools.staging.nap_nguon_that import kiem_dsn
+    with pytest.raises(SystemExit, match="phân tích"):
+        kiem_dsn("postgresql://u:p@localhost:abc/fls")
+
+
+# ═══ `NAP-R1-13` — ID nguồn khai MỘT chỗ; mong theo nguồn sống ═══
+def test_id_nguon_khai_mot_cho_va_Quy_la_ban_GOC():
+    from tools.staging import cred_sheets as c
+    assert c.ID_QUY.startswith("1QSYSzCC") and c.ID_BANK.startswith("1zJA0M")
+    for tep in ("tools/do_bat_bien_ngam.py", "tools/do_hinh_dang.py", "tools/nap_nguon_va_khai.py", "tools/staging/nap_nguon_that.py"):
+        ma = (GOC / tep).read_text(encoding="utf-8")
+        code = "\n".join(re.sub(r"#.*$", "", l) for l in ma.splitlines())               # bỏ chú thích (dòng & đuôi) — chú thích được nhắc ID cũ
+        assert "1RmmkOSC" not in re.sub(r'"""[\s\S]*?"""', "", code), tep                 # (Đ1) ID bản copy: 0 chỗ trong mã
+    from tools import do_bat_bien_ngam as b, do_hinh_dang as h
+    assert (b.BANK, b.QUY) == (c.ID_BANK, c.ID_QUY) and h.NGUON["P100-CASH"][0] == c.ID_QUY
+
+
+def test_mong_theo_nguon_song_Bank_64_Quy_8_khong_hang_so(monkeypatch, moi_truong, san_0, kho, tmp_path, capsys):
+    g = moi_truong
+    luu = dict(g.kho[BANK_ID])
+    try:
+        for i in range(64):
+            g.kho[BANK_ID][f"R | B{i:02d}"] = _luoi_r(1)
+        g.kho[QUY_ID] = {f"R | Q{i}": _luoi_r(1) for i in range(8)} | {"Index": [["x"]]}
+        j = tmp_path / "bc.json"
+        rc = _chay(monkeypatch, kho, "--kiem", "--bo-buoc", "so_pm,mapping,chup", ghi=False, tep_json=j)
+        so = json.loads(j.read_text(encoding="utf-8"))["so"]
+        out = capsys.readouterr().out
+        assert (so["khai_bank"], so["khai_quy"], so["khai_chay"]) == (64 + 3, 8, 64 + 3 + 8), out
+        assert rc == 0 and "[ĐỎ]" not in out, out                          # mong tính từ nguồn sống: ⛔ ĐỎ vì ≠ 60 / 68 / 408
+    finally:
+        g.kho[BANK_ID] = luu
+        g.kho[QUY_ID] = {"R | Q1": _luoi_r(4), "Index": [["x"]]}

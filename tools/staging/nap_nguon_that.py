@@ -17,11 +17,14 @@
    Một nguồn ⛔ đọc được ⇒ ĐỎ CÓ TÊN, các nguồn khác vẫn đo *(⛔ bỏ qua im lặng, ⛔ nổ cả lượt)*.
    Cổng đọc-đủ của `nap_that` ĐỎ ⇒ sổ ⛔ ghi, NHƯNG vẫn đo chỉ-đọc *(số đếm nguồn mới vẫn vào BÁO CÁO)*.
 
-BÁO CÁO có hai tầng, mỗi hàng `mong` + nhãn nó ĐẾM GÌ *(Đ4)*, mẫu số ≠ 0 *(Đ3)*, phép ⛔ đo được ⇒ ĐỎ *(Đ5)*:
-   ⓐ **Σ nguồn = Σ kho** — `mong` = số vừa đọc từ nguồn ở chính lượt này (động);
-   ⓑ **CŨ ↔ HIỆN TẠI** — ảnh đóng băng `tests/fixture/pm_join.json` *(9.992 dòng bank-canon · 3.703 dòng PM, khoá = SỐ DÒNG SHEET)*:
-      dòng ĐÃ có trong ảnh phải y hệt ở nguồn sống *(`mong` lệch = 0 — lệch ⇒ ĐỎ: nguồn bị sửa sau chốt)*; dòng ⛔ có trong ảnh
-      ⇒ đếm RIÊNG, nhãn `MỚI`; số đã đo `docs/ITL/_tools/voi_so_luong.json` in cạnh để đọc.
+BÁO CÁO có hai tầng, mỗi hàng nhãn nó ĐẾM GÌ *(Đ4)*, mẫu số ≠ 0 *(Đ3)*, phép ⛔ đo được ⇒ ĐỎ *(Đ5)*:
+   ⓐ **Σ nguồn = Σ kho** *(ĐỎ HAI CHIỀU)* — `mong` = số vừa đọc từ nguồn SỐNG ở chính lượt này (động), từng nguồn: sổ L1 · PM · Mapping ·
+      68 dòng chảy · từng sheet `R |` của ảnh chụp. Kho nhiều HƠN hay ÍT HƠN nguồn đều ĐỎ. `--nap` đo ngay sau khi ghi; `--doi-chieu` *(CHỈ ĐỌC)*
+      đo lại kho đã nạp với nguồn bây giờ ⇒ **đổi một dòng nguồn sống sau nạp ⇒ ĐỎ**.
+   ⓑ **NGUỒN SỬA SAU ẢNH** — chủ quyết 23/11 ~07:25: **NGUỒN SỐNG là chuẩn cho mọi kỳ, kể cả kỳ đã chốt** *(`NAP-R1-01`/`-12`)*. So nguồn
+      sống với ảnh đóng băng `tests/fixture/pm_join.json` *(9.992 dòng bank-canon · 3.703 dòng PM, khoá = SỐ DÒNG SHEET)* và với số CŨ theo kỳ
+      `docs/ITL/_tools/voi_so_luong.json` `theo_ky[k].co` *(23 kỳ)* — vẫn đo, vẫn in từng kỳ, nhưng là KHỐI CÓ TÊN, **chỉ ĐẾM** *(`mong` trống)*:
+      ⛔ ĐỎ, ⛔ chặn nạp. Lệch ở đây = *"nguồn bị sửa sau ảnh"*, ⛔ phải lỗi nạp.
 """
 from __future__ import annotations
 
@@ -177,6 +180,32 @@ def ky_cua(serial) -> str | None:
     return f"{d.year:04d}-{d.month:02d}"
 
 
+def so_theo_ky(song: dict[str, int], cu: dict[str, int]) -> dict:
+    """⭐ Pure. So canon SỐNG theo kỳ với số CŨ theo kỳ `voi_so_luong.theo_ky[k].co`. Chỉ ĐẾM *(`NAP-R1-01`)*.
+    `bang`/`thap`/`cao` đếm KỲ ở số cũ *(kỳ ở số cũ mà nguồn sống ⛔ có dòng nào ⇒ `thap` và `chi_o_cu`)*; `moi` = dòng canon ở kỳ ⛔ có
+    trong số cũ; `khong_ngay` = dòng ⛔ đọc được ngày *(khoá bắt đầu bằng `(`)*. `chi_tiet[k] = (cũ, sống)`."""
+    out = {"bang": 0, "thap": 0, "cao": 0, "chi_o_cu": 0, "chenh_thap": 0, "chenh_cao": 0, "moi": 0, "khong_ngay": 0, "chi_tiet": {}}
+    for k, c in cu.items():
+        n = int(song.get(k, 0))
+        out["chi_tiet"][k] = (c, n)
+        if n == c:
+            out["bang"] += 1
+        elif n < c:
+            out["thap"] += 1
+            out["chenh_thap"] += n - c
+        else:
+            out["cao"] += 1
+            out["chenh_cao"] += n - c
+        if n == 0:
+            out["chi_o_cu"] += 1
+    for k, n in song.items():
+        if k.startswith("("):
+            out["khong_ngay"] += n
+        elif k not in cu:
+            out["moi"] += n
+    return out
+
+
 # ──────────────────────────────── ĐẾM KHO ────────────────────────────────
 def dem(conn, sql: str, args=()) -> int | None:
     try:
@@ -207,17 +236,33 @@ def dem_kho(conn) -> dict:
     }
 
 
+def dem_chup_theo_nguon(conn) -> dict | None:
+    """`{source_id: số dòng kho}` của lần chụp `Bank` MỚI NHẤT; nguồn 0 dòng VẪN có mặt (LEFT JOIN). ⛔ đo được ⇒ `None`."""
+    try:
+        with conn.cursor() as c:
+            c.execute("SELECT n.source_id, count(d.dong_so) FROM fls_chup_nguon n"
+                      " LEFT JOIN fls_chup_dong d ON d.chup_id = n.chup_id AND d.source_id = n.source_id"
+                      " WHERE n.chup_id = (SELECT max(chup_id) FROM fls_chup WHERE lan = 'Bank') GROUP BY n.source_id")
+            return {int(s) if str(s).isdigit() else s: int(k) for s, k in c.fetchall()}
+    except Exception:
+        try:
+            conn.rollback()
+        except Exception:
+            pass
+        return None
+
+
 def do_quyen(bao: Bao, tok: str) -> dict[str, bool]:
     """Quyền ĐỌC từng workbook nguồn: HTTP 200 mới đi tiếp. ⛔ 403/404 ⇒ ĐỎ CÓ TÊN + các bước dùng workbook ấy DỪNG (⛔ im lặng)."""
     import urllib.request
 
-    from tools.do_bat_bien_ngam import BANK, QUY
     from tools.staging import cred_sheets
+    from tools.staging.cred_sheets import ID_BANK as BANK, ID_QUY as QUY
     from fls.oracle.nguon import BAN_SAO_RAW
     N = "0b · QUYỀN ĐỌC từng workbook nguồn (HTTP; ⛔ nội dung)"
     ok: dict[str, bool] = {}
     for ten, sid in (("RAW (sổ ITL · PM · Mapping Master)", BAN_SAO_RAW.spreadsheet_id),
-                     ("BANK (60 sheet `R |` ngân hàng)", BANK), ("QUỸ (8 sheet `R |` quỹ)", QUY)):
+                     ("BANK (các sheet `R |` ngân hàng)", BANK), ("QUỸ (các sheet `R |` quỹ — bản GỐC)", QUY)):
         q = urllib.request.Request(cred_sheets.api_goc() + sid + "?fields=spreadsheetId",
                                    headers={"Authorization": "Bearer " + tok})
         try:
@@ -231,28 +276,32 @@ def do_quyen(bao: Bao, tok: str) -> dict[str, bool]:
 
 
 # ──────────────────────────────── CÁC BƯỚC ────────────────────────────────
-def buoc_khai(bao: Bao, tok: str, dsn: str, ghi: bool) -> dict:
+def buoc_khai(bao: Bao, tok: str, dsn: str, ghi: bool, doi: bool = False) -> dict:
     import psycopg
     from tools import nap_nguon_va_khai as nk
-    N = "① 68 dòng chảy + bản khai (nap_nguon_va_khai)"
+    N = "① dòng chảy `R |` (Bank + Quỹ) + bản khai (nap_nguon_va_khai)"
     thu = nk.thu_thap(tok)
     n_ban = sum(1 for v in thu.values() if v[0] == "Bank")
     n_quy = sum(1 for v in thu.values() if v[0] == "Cash")
     so_khai = sum(len(v[1]) for v in thu.values())
-    bao.do(N, "NGUỒN: sheet `R |` sổ Bank (đếm sheet)", n_ban, khoa="khai_bank")
-    bao.do(N, "NGUỒN: sheet `R |` sổ Quỹ (đếm sheet)", n_quy, khoa="khai_quy")
+    # `NAP-R1-13`: ⛔ hằng 60/8/68/408 làm `mong` — số SỐNG là chuẩn; số CŨ (BG-335 §1, đo 08/09) in cạnh để đọc.
+    bao.do(N, "NGUỒN: sheet `R |` sổ Bank (đếm sheet; cũ 08/09 = 60)", n_ban, khoa="khai_bank")
+    bao.do(N, "NGUỒN: sheet `R |` sổ Quỹ (đếm sheet; cũ 08/09 = 8)", n_quy, khoa="khai_quy")
     bao.do(N, "mẫu số: dòng chảy đọc được ≠ 0", len(thu) > 0, True)
-    if ghi:
+    bao.do(N, "NGUỒN: Σ dòng chảy = Bank + Quỹ (đếm, tính từ nguồn sống)", len(thu), n_ban + n_quy, khoa="khai_chay")
+    bao.do(N, "NGUỒN: Σ trường khai (đếm; cũ 08/09 = 408)", so_khai, khoa="khai_truong")
+    if ghi or doi:
         with psycopg.connect(dsn, autocommit=True) as conn:
-            d = nk.nap(conn, thu)
+            if ghi:
+                d = nk.nap(conn, thu)
+                bao.do(N, "sheet THIẾU trường — ⛔ nạp (đếm)", d["thieu_truong"], 0)
             k = dem_kho(conn)
-        bao.do(N, "sheet THIẾU trường — ⛔ nạp (đếm)", d["thieu_truong"], 0)
         bao.do(N, "KHO: `fls_source` Bank+Cash (đếm) = Σ nguồn", k["source"], len(thu))
         bao.do(N, "KHO: `fls_khai_cot` (đếm) = Σ trường khai ở nguồn", k["khai"], so_khai)
     return thu
 
 
-def buoc_mapping(bao: Bao, tok: str, dsn: str, ghi: bool) -> None:
+def buoc_mapping(bao: Bao, tok: str, dsn: str, ghi: bool, doi: bool = False) -> None:
     import psycopg
 
     from fls.adapters.mapping_master import COT, doc_cot, tom_tat
@@ -266,14 +315,15 @@ def buoc_mapping(bao: Bao, tok: str, dsn: str, ghi: bool) -> None:
     bao.do(N, "NGUỒN: dòng bị loại (đếm, mỗi cái có lý do)", len(loai), khoa="mm_loai")
     bao.do(N, "NGUỒN: cần phân bổ / có phương pháp (đếm)", f"{t['can_phan_bo']} / {t['co_phuong_phap']}")
     bao.do(N, "mẫu số: mã đọc được ≠ 0", t["ma"] > 0, True)
-    if ghi:
+    if ghi or doi:
         with psycopg.connect(dsn, autocommit=True) as conn:
-            nap_mapping_master(conn, dong, bi_loai=len(loai))
+            if ghi:
+                nap_mapping_master(conn, dong, bi_loai=len(loai))
             k = dem_kho(conn)
         bao.do(N, "KHO: `fls_mapping_master` (đếm) = Σ nguồn đọc được", k["mapping"], t["ma"])
 
 
-def buoc_so_pm(bao: Bao, tok: str, dsn: str, ghi: bool, anh: dict) -> dict:
+def buoc_so_pm(bao: Bao, tok: str, dsn: str, ghi: bool, anh: dict, doi: bool = False) -> dict:
     import psycopg
 
     from tools import nap_that as nt
@@ -282,7 +332,7 @@ def buoc_so_pm(bao: Bao, tok: str, dsn: str, ghi: bool, anh: dict) -> dict:
     if ghi:
         with psycopg.connect(dsn, autocommit=True) as conn:
             truoc = dem_kho(conn)
-    r = nt.chay_that(tok, ghi=ghi, dsn=dsn)
+    r = nt.chay_that(tok, ghi=ghi, dsn=dsn, chi_tiet_loai=False)    # `NAP-R1-04`: ⛔ in ô nguồn thô
     tk, tkg = r["tk"], r["tkg"]
     bao.do(N, "NGUỒN `Transaction Mapping L1`: dòng đọc (đếm)", tk.vao, khoa="so_vao")
     bao.do(N, "   = canon (đếm)", tk.ra, khoa="so_ra")
@@ -317,23 +367,28 @@ def buoc_so_pm(bao: Bao, tok: str, dsn: str, ghi: bool, anh: dict) -> dict:
         bao.do(N, "chạy-lại: bỏ-qua-trùng (đếm; lần đầu = 0, lần sau = canon)", kq.bo_qua_trung)
     elif ghi:
         bao.do(N, "KHO: sổ ĐÃ ghi (cổng đọc-đủ/ba đường chặn ⇒ ⛔)", False, True)
+    if doi:
+        with psycopg.connect(dsn, autocommit=True) as conn:
+            sau = dem_kho(conn)
+        bao.do(N, "KHO: `fls_itl` + `fls_reject` (đếm) = dòng KHÔNG rỗng của nguồn sống (canon + loại)",
+               None if sau["itl"] is None or sau["reject"] is None else sau["itl"] + sau["reject"], tk.ra + tk.loai)
+        bao.do(N, "KHO: `fls_pm_line` (đếm) = dòng PM đọc từ nguồn sống", sau["pm_line"], len(r["pm"]))
 
-    # ⓑ CŨ ↔ HIỆN TẠI
-    N2 = "ⓑ CŨ (ảnh đóng băng) ↔ HIỆN TẠI (nguồn sống)"
+    # ⓑ NGUỒN SỬA SAU ẢNH — CHỈ ĐẾM, ⛔ ĐỎ (nguồn sống là chuẩn, chủ quyết 23/11 ~07:25) — `NAP-R1-01`/`-12`
+    N2 = "ⓑ NGUỒN SỬA SAU ẢNH (đếm; nguồn SỐNG là chuẩn — ⛔ ĐỎ, ⛔ chặn nạp)"
     s = so_voi_anh(r["bank"], r["pm"], anh)
     bao.do(N2, "mẫu số: dòng bank trong ảnh (đếm)", s["bank_anh"], anh["so_dong_bank"])
-    bao.do(N2, "dòng bank ảnh ⛔ còn ở đúng số dòng nguồn (MẤT, đếm)", s["bank_mat"], 0, khoa="bank_mat")
+    bao.do(N2, "dòng bank ảnh ⛔ còn ở đúng số dòng nguồn sống (đếm)", s["bank_mat"], khoa="bank_mat")
     for k in ("ref", "cur", "tien"):
-        bao.do(N2, f"dòng bank ảnh LỆCH `{k}` ở nguồn sống (đếm)", s["bank_lech"].get(k, 0), 0, khoa=f"bank_lech_{k}")
-    bao.do(N2, "bộ ba (ref,cur,tien) của ảnh ⛔ còn ở nguồn sống — SO THEO NỘI DUNG, bỏ vị trí (đếm)", s["bank_mat_noi_dung"], 0,
+        bao.do(N2, f"dòng bank ảnh LỆCH `{k}` ở nguồn sống (đếm)", s["bank_lech"].get(k, 0), khoa=f"bank_lech_{k}")
+    bao.do(N2, "bộ ba (ref,cur,tien) của ảnh ⛔ còn ở nguồn sống — SO THEO NỘI DUNG, bỏ vị trí (đếm)", s["bank_mat_noi_dung"],
            khoa="bank_mat_noi_dung")
     bao.do(N2, "MỚI — dòng canon nguồn sống ⛔ có trong ảnh (đếm, nhãn riêng)", s["bank_moi"], khoa="bank_moi")
     bao.do(N2, "mẫu số: dòng PM trong ảnh (đếm)", s["pm_anh"], anh["so_dong_pm"])
-    bao.do(N2, "dòng PM ảnh ⛔ còn ở đúng số dòng nguồn (MẤT, đếm)", s["pm_mat"], 0, khoa="pm_mat")
+    bao.do(N2, "dòng PM ảnh ⛔ còn ở đúng số dòng nguồn sống (đếm)", s["pm_mat"], khoa="pm_mat")
     for k in ("ref", "slip", "line", "cur", "status", "hd", "cdt1", "tien"):
-        bao.do(N2, f"dòng PM ảnh LỆCH `{k}` ở nguồn sống (đếm)", s["pm_lech"].get(k, 0), 0, khoa=f"pm_lech_{k}")
+        bao.do(N2, f"dòng PM ảnh LỆCH `{k}` ở nguồn sống (đếm)", s["pm_lech"].get(k, 0), khoa=f"pm_lech_{k}")
     bao.do(N2, "MỚI — dòng PM nguồn sống ⛔ có trong ảnh (đếm, nhãn riêng)", s["pm_moi"], khoa="pm_moi")
-    # số cũ in cạnh (ảnh `voi_so_luong.json`)
     vsl = json.loads(VOI_SO_LUONG.read_text(encoding="utf-8"))
     bao.do(N2, "CŨ `voi_so_luong.pm_tong.so_dong_pm` ↔ HIỆN TẠI PM đọc", f"{vsl['pm_tong']['so_dong_pm']} ↔ {len(r['pm'])}")
     bao.do(N2, "CŨ `bank_tong.dong_bank` ↔ HIỆN TẠI canon", f"{vsl['bank_tong']['dong_bank']} ↔ {tk.ra}")
@@ -341,27 +396,35 @@ def buoc_so_pm(bao: Bao, tok: str, dsn: str, ghi: bool, anh: dict) -> dict:
     for _d_, row in r["ra"]:
         theo_ky[ky_cua(row.at(0)) or "(ngày không đọc được)"] += 1
     bao.so["theo_ky_canon"] = dict(sorted(theo_ky.items()))
-    ky_cu = set(vsl["ky"])
-    bao.do(N2, "HIỆN TẠI canon thuộc kỳ ĐÃ CHỐT trong ảnh (23 kỳ; đếm)", sum(v for k, v in theo_ky.items() if k in ky_cu))
-    bao.do(N2, "HIỆN TẠI canon thuộc kỳ MỚI sau ảnh (đếm, nhãn riêng)", sum(v for k, v in theo_ky.items()
-                                                                           if k not in ky_cu and not k.startswith("(")))
-    bao.do(N2, "HIỆN TẠI canon ⛔ đọc được ngày (đếm)", sum(v for k, v in theo_ky.items() if k.startswith("(")))
+    sk = so_theo_ky(dict(theo_ky), {k: v["co"] for k, v in vsl["theo_ky"].items()})
+    bao.so["theo_ky_so_sanh"] = {k: sk[k] for k in ("bang", "thap", "cao", "chi_o_cu", "chenh_thap", "chenh_cao", "moi", "khong_ngay")}
+    bao.do(N2, "kỳ ĐÃ CHỐT trong số cũ (đếm kỳ — mẫu số)", len(vsl["theo_ky"]), khoa="ky_chot")
+    bao.do(N2, "   kỳ canon SỐNG = số cũ `co` (đếm kỳ)", sk["bang"], khoa="ky_bang")
+    bao.do(N2, "   kỳ canon SỐNG THẤP hơn số cũ — nguồn MẤT dòng sau chốt (đếm kỳ · Σ chênh dòng)", f"{sk['thap']} · {sk['chenh_thap']}",
+           khoa="ky_thap")
+    bao.do(N2, "   kỳ canon SỐNG CAO hơn số cũ — dòng thêm / kỳ còn mở ở ảnh (đếm kỳ · Σ chênh dòng)", f"{sk['cao']} · +{sk['chenh_cao']}",
+           khoa="ky_cao")
+    bao.do(N2, "   kỳ ở số cũ mà nguồn sống ⛔ còn dòng nào (đếm kỳ)", sk["chi_o_cu"], khoa="ky_chi_o_cu")
+    for k, (cu, nay) in sorted(sk["chi_tiet"].items()):
+        bao.do(N2, f"      kỳ {k}: canon SỐNG ↔ số cũ `co` (dòng)", f"{nay} ↔ {cu} (Δ {nay - cu:+d})")
+    bao.do(N2, "HIỆN TẠI canon thuộc kỳ MỚI sau số cũ (đếm, nhãn riêng)", sk["moi"], khoa="ky_moi")
+    bao.do(N2, "HIỆN TẠI canon ⛔ đọc được ngày (đếm)", sk["khong_ngay"], khoa="ky_khong_ngay")
     bao.so["bac_thang_nay"] = {"dong_theo_hinh": dict(tkg.dong_theo_hinh), "khong_co_ma": tkg.khong_co_ma,
                                "khong_thay_ma_PM": tkg.khong_thay_ma_PM, "dong_bank": tkg.dong_bank}
     return r
 
 
-def buoc_chup(bao: Bao, tok: str, dsn: str, ghi: bool, thu: dict | None) -> None:
+def buoc_chup(bao: Bao, tok: str, dsn: str, ghi: bool, thu: dict | None, doi: bool = False) -> None:
     import psycopg
 
     from fls.repo import chup as ch
-    from tools.do_bat_bien_ngam import BANK
+    from tools.staging.cred_sheets import ID_BANK as BANK
     from tools.nap_sao_ke import TRUONG_MAC_DINH, doc_vung_chuan, khai_day_du, ten_sheet_r
-    N = "④ ảnh chụp 60 sheet `R |` (chup_sao_ke)"
+    N = "④ ảnh chụp các sheet `R |` của sổ Bank (chup_sao_ke)"
     ten_r = ten_sheet_r(BANK, tok)
-    bao.do(N, "NGUỒN: sheet `R |` của sổ Bank (đếm)", len(ten_r), khoa="chup_sheet")
+    bao.do(N, "NGUỒN: sheet `R |` của sổ Bank (đếm; cũ 08/09 = 60)", len(ten_r), khoa="chup_sheet")
     bao.do(N, "mẫu số: sheet ≠ 0", len(ten_r) > 0, True)
-    if ghi:
+    if ghi or doi:
         khai = khai_day_du(ten_r, dsn)
         khai_cot = {t: b.cot for t, b in khai.items()}
     else:
@@ -387,6 +450,16 @@ def buoc_chup(bao: Bao, tok: str, dsn: str, ghi: bool, thu: dict | None) -> None
         bao.do(N, "KHO: ảnh chụp — nguồn (đếm) = sheet đọc", kq.so_nguon, len(ten_r))
         bao.do(N, "KHO: ảnh chụp — dòng (đếm) = Σ nguồn", kq.so_dong, so_dong)
         bao.do(N, "KHO: nguồn ra 0 dòng VẪN có mặt (đếm)", sum(1 for n in kq.nguon if n.so_dong == 0), n0)
+    if ghi or doi:
+        # ⭐ HAI CHIỀU, TỪNG NGUỒN: dòng nguồn sống của TỪNG sheet = dòng kho của đúng nguồn ấy trong lần chụp mới nhất.
+        with psycopg.connect(dsn, autocommit=True) as conn:
+            kho_n = dem_chup_theo_nguon(conn)
+        sid = {t: khai[t].source_id for t in ten_r}
+        lech = sum(1 for t in ten_r if kho_n.get(sid[t]) != len(o_theo[t]))
+        la = len(set(kho_n) - set(sid.values()))
+        bao.do(N, "KHO: nguồn ở lần chụp mới nhất (đếm; mẫu số ≠ 0)", len(kho_n) if kho_n is not None else None, len(ten_r))
+        bao.do(N, "KHO ↔ NGUỒN: sheet mà dòng kho ≠ dòng nguồn sống (đếm, từng nguồn)", lech, 0, khoa="chup_lech_nguon")
+        bao.do(N, "KHO: nguồn có ở kho mà sheet nguồn sống ⛔ còn (đếm)", la, 0, khoa="chup_nguon_la")
 
 
 def do_rieng_tu(bao: Bao, dsn: str) -> None:
@@ -398,17 +471,34 @@ def do_rieng_tu(bao: Bao, dsn: str) -> None:
                                                           " WHERE table_schema='public'") or 0)
         bao.do(N, "cột tên có 'email' (đếm, ⛔ vào kho)", k["cot_email"], 0)
         # `fls_pm_line.tho` là `json` (0022, giữ thứ tự cột) khoá theo TÊN cột ⇒ ép `::jsonb` để dùng toán tử `?`: ⛔ có khoá `Email Address`
+        mau = dem(conn, "SELECT count(*) FROM fls_pm_line")
         for c in sorted(PM_COT_RIENG_TU):
             n = dem(conn, "SELECT count(*) FROM fls_pm_line WHERE tho::jsonb ? %s", (c,))
-            bao.do(N, f"dòng PM mang khoá `{c}` (đếm)", n, 0)
+            if not mau:
+                bao.do_ro(N, f"dòng PM mang khoá `{c}` (đếm) — ⛔ đo được trên mẫu số 0", "mẫu số PM kho = 0")
+            else:
+                bao.do(N, f"dòng PM mang khoá `{c}` (đếm)", n, 0)
         mau = dem(conn, "SELECT count(*) FROM fls_pm_line")
         bao.do(N, "mẫu số PM trong kho (đếm; 0 ⇒ phép trên ⛔ chứng minh gì — Đ3)", mau)
+        # `NAP-R1-03` (Đ3): mẫu số 0 ⇒ phép `Email Address = 0` XANH TRÊN TẬP RỖNG ⇒ phải ĐỎ có tên, ⛔ in ĐẠT
+        bao.do(N, "mẫu số PM trong kho ≠ 0 (⛔ 0 ⇒ phép `Email Address = 0` ⛔ chứng minh gì)", bool(mau), True)
 
 
 # ──────────────────────────────── MAIN ────────────────────────────────
+def dsn_ok(dsn: str) -> bool:
+    return bool(dsn)
+
+
 def kiem_dsn(dsn: str) -> None:
-    m = re.search(r"@[^:/]+:(\d+)/", dsn)
-    if m and m.group(1) == CONG_KHO_THAT_FLS_PG_1:
+    """`NAP-R1-05`: ⛔ regex — phân tích bằng `psycopg.conninfo` rồi so `port` là SỐ. Chặn mọi dạng: URI/khoá-giá-trị · `05433` · `?port=` ·
+    không `/` sau cổng · `[::1]`. DSN ⛔ phân tích được ⇒ từ chối *(⛔ cho qua)*."""
+    from psycopg.conninfo import conninfo_to_dict
+    try:
+        port = conninfo_to_dict(dsn).get("port")
+        so = None if port in (None, "") else int(str(port))
+    except Exception:
+        raise SystemExit("⛔ PG_DSN ⛔ phân tích được — từ chối (⛔ đoán cổng).") from None
+    if so is not None and so == int(CONG_KHO_THAT_FLS_PG_1):
         raise SystemExit("⛔ PG_DSN trỏ cổng 5433 = kho THẬT `fls-pg-1` — ⛔ ghi. Dùng cụm của phiên (5434–5437…) hoặc proxy staging.")
 
 
@@ -416,14 +506,23 @@ def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[1], add_help=True)
     ap.add_argument("--kiem", action="store_true", help="CHỈ ĐỌC (mặc định)")
     ap.add_argument("--nap", action="store_true", help="GHI vào kho PG_DSN (đòi FLS_CHO_GHI_THAT=1)")
+    ap.add_argument("--doi-chieu", action="store_true",
+                    help="CHỈ ĐỌC nguồn sống + ĐẾM kho PG_DSN đã nạp ⇒ Σ nguồn = Σ kho, ĐỎ hai chiều (⛔ ghi)")
     ap.add_argument("--nguoi-nap", default="")
     ap.add_argument("--json", default="", help="ghi SỐ ĐẾM (⛔ dữ liệu) ra tệp")
     ap.add_argument("--bo-buoc", default="", help="vd `chup` — bỏ bước (chỉ để thử; BÁO CÁO nói rõ)")
     ap.add_argument("--anh-cu", default=str(ANH_PM_JOIN))
     a = ap.parse_args(argv)
     ghi = a.nap and not a.kiem
+    doi = a.doi_chieu
     if a.nap and a.kiem:
         raise SystemExit("⛔ --nap và --kiem loại trừ nhau")
+    if doi and (a.nap or a.kiem):
+        raise SystemExit("⛔ --doi-chieu đứng một mình (chỉ đọc nguồn + đếm kho)")
+    if doi:
+        if not dsn_ok(os.environ.get("PG_DSN", "")):
+            raise SystemExit("⛔ --doi-chieu cần PG_DSN")
+        kiem_dsn(os.environ["PG_DSN"])
     dsn = os.environ.get("PG_DSN", "")
     if ghi:
         if os.environ.get(BIEN_CHO_GHI) != "1":
@@ -437,7 +536,7 @@ def main(argv: list[str] | None = None) -> int:
     anh = doc_anh_cu(Path(a.anh_cu))
     bao = Bao()
     bao.do("0 · THÔNG TIN", "đường thông tin xác thực Sheets (⛔ giá trị)", cred_sheets.kieu())
-    bao.do("0 · THÔNG TIN", "chế độ", "NẠP" if ghi else "CHỈ ĐỌC (--kiem)")
+    bao.do("0 · THÔNG TIN", "chế độ", "NẠP" if ghi else "ĐỐI CHIẾU KHO (--doi-chieu, chỉ đọc)" if doi else "CHỈ ĐỌC (--kiem)")
     skip = {x for x in a.bo_buoc.split(",") if x}
     if skip:
         bao.do("0 · THÔNG TIN", "bước BỊ BỎ (chỉ để thử)", ",".join(sorted(skip)))
@@ -446,10 +545,10 @@ def main(argv: list[str] | None = None) -> int:
     thu = None
     quyen = do_quyen(bao, tok)
     can = {"khai": ("BANK", "QUỸ"), "mapping": ("RAW",), "so_pm": ("RAW",), "chup": ("BANK", "QUỸ")}
-    for ten, f in (("khai", lambda: buoc_khai(bao, tok, dsn, ghi)),
-                   ("mapping", lambda: buoc_mapping(bao, tok, dsn, ghi)),
-                   ("so_pm", lambda: buoc_so_pm(bao, tok, dsn, ghi, anh)),
-                   ("chup", lambda: buoc_chup(bao, tok, dsn, ghi, thu))):
+    for ten, f in (("khai", lambda: buoc_khai(bao, tok, dsn, ghi, doi)),
+                   ("mapping", lambda: buoc_mapping(bao, tok, dsn, ghi, doi)),
+                   ("so_pm", lambda: buoc_so_pm(bao, tok, dsn, ghi, anh, doi)),
+                   ("chup", lambda: buoc_chup(bao, tok, dsn, ghi, thu, doi))):
         if ten in skip:
             continue
         thieu_q = [w for w in can[ten] if not quyen.get(w, False)]
@@ -467,7 +566,7 @@ def main(argv: list[str] | None = None) -> int:
         except Exception as e:                     # noqa: BLE001
             bao.do_ro(f"bước {ten}", f"bước {ten} chạy được", _loi_ten(e))
             traceback.print_exc(file=sys.stderr)
-    if ghi:
+    if ghi or doi:
         try:
             do_rieng_tu(bao, dsn)
         except Exception as e:                     # noqa: BLE001

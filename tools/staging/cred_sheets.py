@@ -31,6 +31,10 @@ API_GOC_MAC_DINH = "https://sheets.googleapis.com/v4/spreadsheets/"
 SA_MAY_CHU = "claude-code-access@fpa-t-494007.iam.gserviceaccount.com"
 PHAM_VI = ("https://www.googleapis.com/auth/spreadsheets.readonly",
            "https://www.googleapis.com/auth/drive.metadata.readonly")
+# ⭐ `NAP-R1-13` — ID workbook nguồn khai ở ĐÚNG MỘT CHỖ này; mọi công cụ nạp/đo nhập từ đây (Đ1: trước đó ID bản COPY nằm ở 2 tệp).
+#   QUỸ = bản GỐC `P100 | Cash Ledger` (SA đọc 200 lúc 23/11 08:53Z). Bản copy `Copy of P100 | Cash Ledger` (`1RmmkOSC…`) vẫn 403 ⇒ ⛔ dùng.
+ID_BANK = "1zJA0MyS8u4_EC6HimREQT6RM3-DDGnBZSRa3HQsfOn8"      # `P100 | Bank Transactions`
+ID_QUY = "1QSYSzCC0_ZjDmLgEOb2Nre8lp0CXfsAYqmw_Mgs8e9Y"       # `P100 | Cash Ledger` (GỐC)
 HAN_GIU_GIAY = 30 * 60           # token sống ~60 phút; làm mới sau 30 để một lượt đọc dài ⛔ chết giữa chừng
 
 _khoa = threading.Lock()
