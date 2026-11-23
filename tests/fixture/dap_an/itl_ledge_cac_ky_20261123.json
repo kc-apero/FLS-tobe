@@ -54,6 +54,7 @@
   "2026-01": 471,
   "2026-02": 439,
   "2026-03": 584,
+  "2026-04": 600,
   "2026-05": 537,
   "2026-06": 613,
   "2026-07": 686,
@@ -62,12 +63,7 @@
   "2026-10": 1038,
   "2026-11": 748
  },
- "hong": {
-  "2026-04": {
-   "trang_thai": "blocked",
-   "ly_do": "HTTP 429"
-  }
- },
+ "hong": {},
  "anh": {
   "2024-10": {
    "so_dong": 6,
@@ -951,6 +947,55 @@
    "bytes": 695781,
    "sha256": "8816b0271b00acd55ecfc433bfba2a9198c4f1672edc1bf92fc46cbed28d89ff"
   },
+  "2026-04": {
+   "so_dong": 600,
+   "hang_sheet": [
+    7049,
+    7648
+   ],
+   "itl_id_loi": 1,
+   "checksum_noi_dung": "dd5ba3ad2517d100",
+   "cong": {
+    "mong": 600,
+    "so_dong": 600,
+    "dat": true,
+    "ly_do": []
+   },
+   "cot": [
+    "itl_id_sheet",
+    "ngay",
+    "hd_classifying",
+    "hd_manual",
+    "hd_mid",
+    "hd_final",
+    "pay_type_classifying",
+    "pay_type_manual",
+    "pay_type_mid",
+    "pay_type_final",
+    "cdt1_classifying",
+    "cdt1_manual",
+    "cdt1_mid",
+    "cdt1_final",
+    "svc_start_classifying",
+    "svc_start_manual",
+    "svc_start_mid",
+    "svc_start_final",
+    "svc_end_classifying",
+    "svc_end_manual",
+    "svc_end_mid",
+    "svc_end_final",
+    "id_payee_classifying",
+    "id_payee_manual",
+    "id_payee_mid",
+    "id_payee_final",
+    "invoice_classifying",
+    "invoice_manual",
+    "invoice_mid",
+    "invoice_final"
+   ],
+   "bytes": 715440,
+   "sha256": "0e16beb36f60412ca54c9c5a62ef8cf154026638f0321e0c3145d805e217aded"
+  },
   "2026-05": {
    "so_dong": 537,
    "hang_sheet": [
@@ -1295,6 +1340,6 @@
    "sha256": "485e813eef607b89bca6e00629fdb42fed30f6f1c6a9d2b31fa24195503c2c4a"
   }
  },
- "tong_bytes": 14307225,
+ "tong_bytes": 15022665,
  "anh_lon_hon_2MB": []
 }
