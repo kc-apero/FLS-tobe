@@ -141,7 +141,16 @@ def main() -> int:
     ap.add_argument("--chuan-hoa-anh-cu", action="store_true", help="đổi ảnh `{\"chu\"}` đã có sang hình 2026-03 (⛔ đọc sổ)")
     ap.add_argument("--giu-tho", action="store_true", help="⛔ xoá bản thô cuối lượt — cờ này chỉ để gỡ lỗi")
     ap.add_argument("--mong-ky", type=int, required=False, help="Đ5: số kỳ của sổ (gồm 2026-03)")
+    # ⭐ WO-345 (chủ 23/11: NGUỒN SỐNG là chuẩn) — đóng băng LẠI *(⛔ đè ảnh cũ — Đ2: ảnh cũ là BIÊN BẢN)*:
+    #    `--hau-to _20261123` ⇒ ảnh `itl_ledge_<kỳ>_20261123.json` + manifest `itl_ledge_cac_ky_20261123.json`;
+    #    `--ca-2026-03` ⇒ đọc CẢ kỳ 2026-03 *(ảnh cũ ở `tests/fixture/itl_ledge_2026_03.json` là sổ chụp xlsx — giữ nguyên)*;
+    #    `--hang-cuoi` ⇒ lưới đã lớn *(12.684 đo 20/11)* — ⛔ đoán: truyền số hàng LƯỚI đo bằng metadata cùng lượt.
+    ap.add_argument("--hau-to", default="", help="hậu tố tên ảnh + manifest, vd _20261123 (⛔ đè ảnh cũ)")
+    ap.add_argument("--ca-2026-03", action="store_true", help="đọc cả kỳ 2026-03 (bỏ BO_QUA)")
+    ap.add_argument("--hang-cuoi", type=int, default=HANG_CUOI, help=f"hàng cuối LƯỚI (mặc định {HANG_CUOI} — đo 20/11)")
     a = ap.parse_args()
+    bo_qua = {} if a.ca_2026_03 else BO_QUA
+    hang_cuoi = a.hang_cuoi
     if a.chuan_hoa_anh_cu:
         return chuan_hoa_anh_cu()
     if a.mong_ky is None:
@@ -156,8 +165,8 @@ def main() -> int:
         print("[ĐỎ] tên cột ≠ khuôn — ⛔ đóng băng"); return 1
     # ② cột A → số kỳ độc lập
     hang_ky: dict[str, list[int]] = OrderedDict()
-    for lo in range(HANG_DAU, HANG_CUOI + 1, LAT):
-        hi = min(lo + LAT - 1, HANG_CUOI)
+    for lo in range(HANG_DAU, hang_cuoi + 1, LAT):
+        hi = min(lo + LAT - 1, hang_cuoi)
         c = lay(s, f"'{TAB}'!A{lo}:A{hi}")
         if isinstance(c, str):
             print(f"[ĐỎ] cột A hàng {lo}…{hi} hỏng sau {K.so_lan_thu} lần: {c} — số kỳ ⛔ đo được"); return 1
@@ -178,7 +187,7 @@ def main() -> int:
     anh: dict[str, dict] = {}
     ly_do: dict[str, str] = {}
     for ky, hs in sorted(hang_ky.items()):
-        if ky in BO_QUA:
+        if ky in bo_qua:
             continue
         lo, hi = min(hs), max(hs)
         hang, hong = [], None
@@ -204,7 +213,7 @@ def main() -> int:
                                              "· khoá SA chỉ-đọc · chỉ cột A + R:AT",
                                  "ky": ky, "tieu_de": td, "hang": hang}, ensure_ascii=False), encoding="utf-8")
         os.chmod(p, 0o600)
-        ra = RA_DIR / f"itl_ledge_{ky}.json"
+        ra = RA_DIR / f"itl_ledge_{ky}{a.hau_to}.json"
         cong_p = TMP / f"cong_{ky}.json"          # ảnh của cổng *(checksum · cổng)* — trung gian, xoá cùng `TMP`
         r = subprocess.run([sys.executable, str(GOC / "tools" / "dong_bang_sheet.py"), "itl_ledge_ky", str(p),
                             "--mong", str(mong[ky]), "--ra", str(cong_p)], capture_output=True, text=True, cwd=GOC)
@@ -220,18 +229,18 @@ def main() -> int:
         anh[ky] = ghi_anh_chuan(j, ra)             # hình 2026-03; cổng/checksum ⇒ manifest
     if not a.giu_tho:
         shutil.rmtree(TMP, ignore_errors=True)
-    kq = K.phan_loai_ky(doc, mong=a.mong_ky - len(BO_QUA))
+    kq = K.phan_loai_ky(doc, mong=a.mong_ky - len(bo_qua))
     m = {"spreadsheet_id": SID, "tab": TAB,
          "nguon": "ITL I Input Transaction Ledger File 2/2 (ADJUSTED) > ITL Ledge",
-         "vung": f"A{HANG_DAU}:A{HANG_CUOI} (ngày) · R{HANG_DAU}:AT{HANG_CUOI} (itl_id + 28 cột)",
+         "vung": f"A{HANG_DAU}:A{hang_cuoi} (ngày) · R{HANG_DAU}:AT{hang_cuoi} (itl_id + 28 cột)",
          "doc_luc": ngay_doc, "so_ky_cua_so": len(mong), "mong_so_ky_cua_so": a.mong_ky,
-         "dong_theo_ky_o_cot_A": mong, "ky_bo_qua": BO_QUA, "doc_duoc": kq["doc_duoc"],
+         "dong_theo_ky_o_cot_A": mong, "ky_bo_qua": bo_qua, "doc_duoc": kq["doc_duoc"],
          "hong": {k: {"trang_thai": "blocked", "ly_do": ly_do.get(k, "?")} for k in kq["hong"]},
          "anh": anh, "tong_bytes": sum(x["bytes"] for x in anh.values()),
          "anh_lon_hon_2MB": [k for k, x in anh.items() if x["bytes"] > 2 * 1024 * 1024]}
-    (RA_DIR / "itl_ledge_cac_ky.json").write_text(json.dumps(m, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+    (RA_DIR / f"itl_ledge_cac_ky{a.hau_to}.json").write_text(json.dumps(m, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
     print(f"[cổng kỳ] {'ĐẠT' if kq['dat'] else 'ĐỎ — ' + ' · '.join(kq['ly_do'])}: đọc được {len(kq['doc_duoc'])} + hỏng "
-          f"{len(kq['hong'])} + bỏ qua {len(BO_QUA)} = {len(mong)} kỳ · {sum(kq['doc_duoc'].values())} dòng · "
+          f"{len(kq['hong'])} + bỏ qua {len(bo_qua)} = {len(mong)} kỳ · {sum(kq['doc_duoc'].values())} dòng · "
           f"{m['tong_bytes']:,} byte")
     return 0 if kq["dat"] else 1
 

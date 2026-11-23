@@ -668,11 +668,20 @@ def do(nhan: Path = NHAN, so_ly_do: Path = SO_LY_DO, hom_nay: date | None = None
 
 
 ANH_DAP_AN = FX / "dap_an"
-MANIFEST_KY = ANH_DAP_AN / "itl_ledge_cac_ky.json"   # DT12: `dong_theo_ky_o_cot_A` = 26 kỳ của sổ (đo 20/11)
+# ⭐ WO-345 (chủ 23/11: NGUỒN SỐNG là chuẩn) — đóng băng LẠI 26 kỳ từ sổ sống (`doc_itl_ledge_ky.py --hau-to _20261123
+#    --ca-2026-03 --hang-cuoi 12824`). Ảnh CŨ GIỮ làm biên bản (Đ2): manifest 20/11 `itl_ledge_cac_ky.json` + 25 ảnh
+#    `itl_ledge_<kỳ>.json` + ảnh sổ xlsx `tests/fixture/itl_ledge_2026_03.json`. Kỳ nào đóng băng lại ra checksum BẰNG ảnh
+#    20/11 thì ⛔ có tệp `_20261123` (≡ — ⛔ nhân đôi repo; manifest mới ghi checksum ấy) ⇒ đọc ảnh 20/11.
+HAU_TO_SONG = "_20261123"
+MANIFEST_KY = ANH_DAP_AN / f"itl_ledge_cac_ky{HAU_TO_SONG}.json"   # 26 kỳ · 12.722 dòng cột A (đo 23/11; 20/11: 12.633)
 
 
 def _duong_anh_ky(ky: str) -> Path:
-    """Ảnh của kỳ: 2026-03 là ảnh CŨ ở `tests/fixture/` (chụp sổ cũ — `DT12-R1-05`); 25 kỳ còn lại ở `dap_an/`."""
+    """Ảnh của kỳ: ảnh nguồn sống `_20261123` nếu có; ⛔ thì ảnh 20/11 (checksum ≡ — xem manifest). 2026-03 nay CÓ ảnh
+    sống ở `dap_an/` *(chủ 23/11 quyết — trước: ảnh CŨ chụp sổ xlsx ở `tests/fixture/`, `DT12-R1-05`, giữ làm biên bản)*."""
+    moi = ANH_DAP_AN / f"itl_ledge_{ky}{HAU_TO_SONG}.json"
+    if moi.exists():
+        return moi
     return FX / "itl_ledge_2026_03.json" if ky == "2026-03" else ANH_DAP_AN / f"itl_ledge_{ky}.json"
 
 
@@ -735,8 +744,17 @@ def do_tu_sinh_theo_ky(manifest: Path | None = None, duong_anh=None) -> dict:
     tong = {c: [sum(x[c][i] for x in theo_ky.values()) for i in (0, 1)] for c in ("o", "hd", "mid")}
     return {"so_ky_co_anh": len(cac_ky), "theo_ky": theo_ky, "chua_do": chua_do, "tong": tong,
             "loi": loi,
-            "moc_so": {k: ("20/11 (sổ hiện tại)" if k != "2026-03" else "mốc CŨ (ảnh chụp sổ cũ — chủ chưa quyết đóng băng lại)")
-                       for k in theo_ky}}
+            "moc_so": {k: _moc_so(k) for k in theo_ky}}
+
+
+def _moc_so(ky: str) -> str:
+    """Nhãn mốc của số (Đ4): ảnh nguồn sống 23/11, hay ảnh 20/11 mà đóng băng lại 23/11 ra checksum ≡."""
+    p = _duong_anh_ky(ky)
+    if p.name.endswith(f"{HAU_TO_SONG}.json"):
+        return "23/11 (nguồn sống — ảnh _20261123; chủ quyết nguồn sống là chuẩn)"
+    if p.parent == FX:
+        return "mốc CŨ (ảnh chụp sổ xlsx — ⛔ có ảnh sống)"
+    return "23/11 ≡ 20/11 (đóng băng lại ra checksum BẰNG ảnh 20/11 — đọc ảnh 20/11)"
 
 
 def do_tu_sinh() -> dict:
