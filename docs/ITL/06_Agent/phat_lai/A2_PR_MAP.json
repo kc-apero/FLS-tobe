@@ -1,0 +1,113 @@
+{
+ "_vi_sao": "Bản ghi PHÁT LẠI — sinh bằng mô hình GIẢ tất định (`--gia --ghi-phat-lai`), ⛔ lượt API thật. Tra theo vân tay yêu cầu ĐÃ CHE; prompt/dữ liệu đổi ⇒ ⛔ có lượt ⇒ ĐỎ.",
+ "agent": "A2_PR_MAP",
+ "checksum_prompt": "4b629ff21f901479",
+ "luot": [
+  {
+   "tra_loi": {
+    "content": [
+     {
+      "id": "toolu_gia_00",
+      "input": {},
+      "name": "dong_chuan",
+      "type": "tool_use"
+     }
+    ],
+    "stop_reason": "tool_use"
+   },
+   "van_tay_yeu_cau": "1c0f14782744da3e"
+  },
+  {
+   "tra_loi": {
+    "content": [
+     {
+      "text": "{\"voi:theo_ky.2024-10.chay\": 6, \"voi:theo_ky.2024-10.co\": 6, \"voi:theo_ky.2024-11.chay\": 3, \"voi:theo_ky.2024-11.co\": 3, \"voi:theo_ky.2024-12.chay\": 6, \"voi:theo_ky.2024-12.co\": 6, \"voi:theo_ky.2025-01.chay\": 747, \"voi:theo_ky.2025-01.co\": 748, \"voi:theo_ky.2025-02.chay\": 281, \"voi:theo_ky.2025-02.co\": 283, \"voi:theo_ky.2025-03.chay\": 297, \"voi:theo_ky.2025-03.co\": 297, \"voi:theo_ky.2025-04.chay\": 332, \"voi:theo_ky.2025-04.co\": 332, \"voi:theo_ky.2025-05.chay\": 407, \"voi:theo_ky.2025-05.co\": 408, \"voi:theo_ky.2025-06.chay\": 347, \"voi:theo_ky.2025-06.co\": 350, \"voi:theo_ky.2025-07.chay\": 545, \"voi:theo_ky.2025-07.co\": 549, \"voi:theo_ky.2025-08.chay\": 533, \"voi:theo_ky.2025-08.co\": 537, \"voi:theo_ky.2025-09.chay\": 497, \"voi:theo_ky.2025-09.co\": 501, \"voi:theo_ky.2025-10.chay\": 478, \"voi:theo_ky.2025-10.co\": 487, \"voi:theo_ky.2025-11.chay\": 463, \"voi:theo_ky.2025-11.co\": 477, \"voi:theo_ky.2025-12.chay\": 561, \"voi:theo_ky.2025-12.co\": 566, \"voi:theo_ky.2026-01.chay\": 467, \"voi:theo_ky.2026-01.co\": 471, \"voi:theo_ky.2026-02.chay\": 434, \"voi:theo_ky.2026-02.co\": 439, \"voi:theo_ky.2026-03.chay\": 579, \"voi:theo_ky.2026-03.co\": 584, \"voi:theo_ky.2026-04.chay\": 592, \"voi:theo_ky.2026-04.co\": 600, \"voi:theo_ky.2026-05.chay\": 532, \"voi:theo_ky.2026-05.co\": 537, \"voi:theo_ky.2026-06.chay\": 601, \"voi:theo_ky.2026-06.co\": 613, \"voi:theo_ky.2026-07.chay\": 663, \"voi:theo_ky.2026-07.co\": 686, \"voi:theo_ky.2026-08.chay\": 474, \"voi:theo_ky.2026-08.co\": 487, \"voi:tong.chay\": 9845, \"voi:tong.co\": 9967}",
+      "type": "text"
+     }
+    ],
+    "stop_reason": "end_turn"
+   },
+   "van_tay_yeu_cau": "cbef960aa3c4036a"
+  },
+  {
+   "tra_loi": {
+    "content": [
+     {
+      "id": "toolu_gia_00",
+      "input": {},
+      "name": "ghep_ref",
+      "type": "tool_use"
+     }
+    ],
+    "stop_reason": "tool_use"
+   },
+   "van_tay_yeu_cau": "0dbe2359531a8205"
+  },
+  {
+   "tra_loi": {
+    "content": [
+     {
+      "text": "{\"voi:bank_tong.dong_theo_hinh.A\": 2272, \"voi:bank_tong.dong_theo_hinh.B\": 29, \"voi:bank_tong.dong_theo_hinh.C\": 400, \"voi:bank_tong.dong_theo_hinh.D\": 27, \"voi:bank_tong.dong_theo_hinh.E\": 199, \"voi:bank_tong.dong_theo_hinh.F\": 428, \"voi:pm_tong.pm_co_ref\": 3173, \"voi:pm_tong.pm_noi_tong\": 2426, \"voi:theo_ky.2024-10.pm_noi\": 0, \"voi:theo_ky.2024-11.pm_noi\": 0, \"voi:theo_ky.2024-12.pm_noi\": 0, \"voi:theo_ky.2025-01.map_fls\": 130, \"voi:theo_ky.2025-01.pm_noi\": 126, \"voi:theo_ky.2025-02.map_fls\": 88, \"voi:theo_ky.2025-02.pm_noi\": 84, \"voi:theo_ky.2025-03.map_fls\": 122, \"voi:theo_ky.2025-03.pm_noi\": 120, \"voi:theo_ky.2025-04.map_fls\": 151, \"voi:theo_ky.2025-04.pm_noi\": 146, \"voi:theo_ky.2025-05.map_fls\": 159, \"voi:theo_ky.2025-05.pm_noi\": 152, \"voi:theo_ky.2025-06.map_fls\": 134, \"voi:theo_ky.2025-06.pm_noi\": 135, \"voi:theo_ky.2025-07.map_fls\": 204, \"voi:theo_ky.2025-07.pm_noi\": 174, \"voi:theo_ky.2025-08.map_fls\": 190, \"voi:theo_ky.2025-08.pm_noi\": 167, \"voi:theo_ky.2025-09.map_fls\": 150, \"voi:theo_ky.2025-09.pm_noi\": 128, \"voi:theo_ky.2025-10.map_fls\": 137, \"voi:theo_ky.2025-10.pm_noi\": 131, \"voi:theo_ky.2025-11.map_fls\": 117, \"voi:theo_ky.2025-11.pm_noi\": 110, \"voi:theo_ky.2025-12.map_fls\": 187, \"voi:theo_ky.2025-12.pm_noi\": 136, \"voi:theo_ky.2026-01.map_fls\": 116, \"voi:theo_ky.2026-01.pm_noi\": 113, \"voi:theo_ky.2026-02.map_fls\": 87, \"voi:theo_ky.2026-02.pm_noi\": 85, \"voi:theo_ky.2026-03.map_fls\": 113, \"voi:theo_ky.2026-03.pm_noi\": 113, \"voi:theo_ky.2026-04.map_fls\": 131, \"voi:theo_ky.2026-04.pm_noi\": 92, \"voi:theo_ky.2026-05.map_fls\": 147, \"voi:theo_ky.2026-05.pm_noi\": 107, \"voi:theo_ky.2026-06.map_fls\": 154, \"voi:theo_ky.2026-06.pm_noi\": 126, \"voi:theo_ky.2026-07.map_fls\": 131, \"voi:theo_ky.2026-07.pm_noi\": 131, \"voi:theo_ky.2026-08.map_fls\": 52, \"voi:theo_ky.2026-08.pm_noi\": 52, \"voi:tong.map_fls\": 2700, \"voi:tong.pm_noi\": 2428}",
+      "type": "text"
+     }
+    ],
+    "stop_reason": "end_turn"
+   },
+   "van_tay_yeu_cau": "df81b63512af27cb"
+  },
+  {
+   "tra_loi": {
+    "content": [
+     {
+      "id": "toolu_gia_00",
+      "input": {},
+      "name": "hang_cho",
+      "type": "tool_use"
+     }
+    ],
+    "stop_reason": "tool_use"
+   },
+   "van_tay_yeu_cau": "cd0a898d65bdeb6e"
+  },
+  {
+   "tra_loi": {
+    "content": [
+     {
+      "text": "{\"voi:dat_hd1.dem.thieu\": 122, \"voi:dat_hd1.theo_ky.2024-10.thieu\": 0, \"voi:dat_hd1.theo_ky.2024-11.thieu\": 0, \"voi:dat_hd1.theo_ky.2024-12.thieu\": 0, \"voi:dat_hd1.theo_ky.2025-01.thieu\": 1, \"voi:dat_hd1.theo_ky.2025-02.thieu\": 2, \"voi:dat_hd1.theo_ky.2025-03.thieu\": 0, \"voi:dat_hd1.theo_ky.2025-04.thieu\": 0, \"voi:dat_hd1.theo_ky.2025-05.thieu\": 1, \"voi:dat_hd1.theo_ky.2025-06.thieu\": 3, \"voi:dat_hd1.theo_ky.2025-07.thieu\": 4, \"voi:dat_hd1.theo_ky.2025-08.thieu\": 4, \"voi:dat_hd1.theo_ky.2025-09.thieu\": 4, \"voi:dat_hd1.theo_ky.2025-10.thieu\": 9, \"voi:dat_hd1.theo_ky.2025-11.thieu\": 14, \"voi:dat_hd1.theo_ky.2025-12.thieu\": 5, \"voi:dat_hd1.theo_ky.2026-01.thieu\": 4, \"voi:dat_hd1.theo_ky.2026-02.thieu\": 5, \"voi:dat_hd1.theo_ky.2026-03.thieu\": 5, \"voi:dat_hd1.theo_ky.2026-04.thieu\": 8, \"voi:dat_hd1.theo_ky.2026-05.thieu\": 5, \"voi:dat_hd1.theo_ky.2026-06.thieu\": 12, \"voi:dat_hd1.theo_ky.2026-07.thieu\": 23, \"voi:dat_hd1.theo_ky.2026-08.thieu\": 13, \"voi:theo_ky.2025-01.day_nguoi\": 30, \"voi:theo_ky.2025-01.map_now\": 154, \"voi:theo_ky.2025-02.day_nguoi\": 23, \"voi:theo_ky.2025-02.map_now\": 111, \"voi:theo_ky.2025-03.day_nguoi\": 44, \"voi:theo_ky.2025-03.map_now\": 163, \"voi:theo_ky.2025-04.day_nguoi\": 15, \"voi:theo_ky.2025-04.map_now\": 163, \"voi:theo_ky.2025-05.day_nguoi\": 92, \"voi:theo_ky.2025-05.map_now\": 251, \"voi:theo_ky.2025-06.day_nguoi\": 45, \"voi:theo_ky.2025-06.map_now\": 178, \"voi:theo_ky.2025-07.day_nguoi\": 54, \"voi:theo_ky.2025-07.map_now\": 258, \"voi:theo_ky.2025-08.day_nguoi\": 57, \"voi:theo_ky.2025-08.map_now\": 247, \"voi:theo_ky.2025-09.day_nguoi\": 37, \"voi:theo_ky.2025-09.map_now\": 187, \"voi:theo_ky.2025-10.day_nguoi\": 35, \"voi:theo_ky.2025-10.map_now\": 172, \"voi:theo_ky.2025-11.day_nguoi\": 22, \"voi:theo_ky.2025-11.map_now\": 139, \"voi:theo_ky.2025-12.day_nguoi\": 26, \"voi:theo_ky.2025-12.map_now\": 213, \"voi:theo_ky.2026-01.day_nguoi\": 17, \"voi:theo_ky.2026-01.map_now\": 133, \"voi:theo_ky.2026-02.day_nguoi\": 22, \"voi:theo_ky.2026-02.map_now\": 109, \"voi:theo_ky.2026-03.day_nguoi\": 11, \"voi:theo_ky.2026-03.map_now\": 124, \"voi:theo_ky.2026-04.day_nguoi\": 20, \"voi:theo_ky.2026-04.map_now\": 151, \"voi:theo_ky.2026-05.day_nguoi\": 29, \"voi:theo_ky.2026-05.map_now\": 176, \"voi:theo_ky.2026-06.day_nguoi\": 27, \"voi:theo_ky.2026-06.map_now\": 181, \"voi:theo_ky.2026-07.day_nguoi\": 29, \"voi:theo_ky.2026-07.map_now\": 160, \"voi:theo_ky.2026-08.day_nguoi\": 19, \"voi:theo_ky.2026-08.map_now\": 71, \"voi:tong.day_nguoi\": 654, \"voi:tong.map_now\": 3341}",
+      "type": "text"
+     }
+    ],
+    "stop_reason": "end_turn"
+   },
+   "van_tay_yeu_cau": "6dcd13d03d557341"
+  },
+  {
+   "tra_loi": {
+    "content": [
+     {
+      "id": "toolu_gia_00",
+      "input": {},
+      "name": "ung_vien_ghep",
+      "type": "tool_use"
+     }
+    ],
+    "stop_reason": "tool_use"
+   },
+   "van_tay_yeu_cau": "8dc4c341e56f2285"
+  },
+  {
+   "tra_loi": {
+    "content": [
+     {
+      "text": "{\"noi:c01.chon\": \"DE_NGUOI\", \"noi:c01.ly_do\": \"không đủ chắc\", \"noi:c02.chon\": \"PM-0201-01\", \"noi:c02.ly_do\": \"ứng viên DUY NHẤT khớp tiền + tiền tệ + ngày\", \"noi:c03.chon\": \"PM-0301-02\", \"noi:c03.ly_do\": \"ứng viên DUY NHẤT khớp tiền + tiền tệ + ngày\", \"noi:c04.chon\": \"DE_NGUOI\", \"noi:c04.ly_do\": \"không đủ chắc\", \"noi:c05.chon\": \"DE_NGUOI\", \"noi:c05.ly_do\": \"không đủ chắc\", \"noi:c06.chon\": \"DE_NGUOI\", \"noi:c06.ly_do\": \"không đủ chắc\", \"noi:c07.chon\": \"DE_NGUOI\", \"noi:c07.ly_do\": \"không đủ chắc\", \"noi:c08.chon\": \"DE_NGUOI\", \"noi:c08.ly_do\": \"không đủ chắc\", \"noi:c09.chon\": \"DE_NGUOI\", \"noi:c09.ly_do\": \"không đủ chắc\", \"noi:c10.chon\": \"DE_NGUOI\", \"noi:c10.ly_do\": \"không đủ chắc\", \"noi:c11.chon\": \"DE_NGUOI\", \"noi:c11.ly_do\": \"không đủ chắc\", \"noi:c12.chon\": \"DE_NGUOI\", \"noi:c12.ly_do\": \"không đủ chắc\"}",
+      "type": "text"
+     }
+    ],
+    "stop_reason": "end_turn"
+   },
+   "van_tay_yeu_cau": "110d4af7ee021d71"
+  }
+ ],
+ "mo_hinh": "claude-opus-5-5",
+ "nguon_tra_loi": "gia-lap"
+}

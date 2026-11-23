@@ -1,0 +1,98 @@
+# -*- coding: utf-8 -*-
+"""WO-329 AC-3 — bộ che `NFR-I13` chạy TRƯỚC mọi lời gọi; năm thứ ⛔ rời máy.
+
+Chứng minh bằng nhà cung cấp GIÁN ĐIỆP: nó ghi lại ĐÚNG byte nó nhận. Bài `..._KHONG_CHE__gian_diep_THAY_PII`
+chứng minh phép thử có răng: bỏ bộ che ⇒ gián điệp thấy PII (Đ5 — cổng phải được thấy ĐỎ).
+"""
+from __future__ import annotations
+
+import json
+
+import pytest
+
+from fls.agent import che, chuoi
+from fls.agent.mo_hinh import GiaLap
+from fls.agent.skill import nap_bo
+
+# PII BỊA (⛔ người thật): tên · số TK · email · số chứng từ · diễn giải
+TEN, TK, EMAIL, SO_CT = "NGUYEN VAN AN", "0123456789012", "ke.toan@vidu.vn", "FT25063123456789"
+DIEN_GIAI = f"CK {TEN} {TK} {EMAIL}"
+
+
+class GianDiep:
+    ten = "gian-diep"
+
+    def __init__(self):
+        self.nhan: list[str] = []
+        self.goc = GiaLap()
+
+    def goi(self, yc):
+        self.nhan.append(json.dumps(yc, ensure_ascii=False))
+        return self.goc.goi(yc)
+
+
+def _cong_cu_ban():
+    return {"voi:tong.co": 9967, "Diễn giải": DIEN_GIAI, "Số chứng từ": SO_CT, "Tên tài khoản": TEN,
+            "Email Address": EMAIL, "so_tai_khoan": TK, "voi:la.chuoi_la": DIEN_GIAI,
+            "noi:c99.noi_dung": DIEN_GIAI}
+
+
+def _chay(cho_noi_dung=False):
+    gd = GianDiep()
+    s = nap_bo("A1_RI")[0]
+    dn = chuoi.AGENT[0]
+    ks = chuoi.chay_skill(dn, "he thong", s, gd, {s.cong_cu: _cong_cu_ban}, cho_noi_dung=cho_noi_dung)
+    return gd, ks
+
+
+@pytest.mark.parametrize("pii", [TEN, TK, EMAIL, SO_CT, DIEN_GIAI, "Diễn giải", "Số chứng từ", "Tên tài khoản",
+                                 "Email Address"])
+def test_nam_thu_cam_KHONG_roi_may(pii):
+    gd, ks = _chay()
+    assert gd.nhan, "gián điệp ⛔ nhận gì ⇒ phép thử rỗng (Đ3)"
+    assert len(gd.nhan) == 2                       # lượt gọi công cụ + lượt có tool_result
+    assert all(pii not in x for x in gd.nhan), f"`{pii}` rời máy"
+    assert ks.so_bo_che == 7                       # 5 khoá cấm bỏ + 2 ô bị thay null (chuỗi lạ · nội dung TẮT)
+
+
+def test_o_hop_le_VAN_di_qua():
+    gd, _ = _chay()
+    assert '\\"voi:tong.co\\": 9967' in gd.nhan[-1]
+
+
+def test_KHONG_CHE__gian_diep_THAY_PII(monkeypatch):
+    """Phá bộ che (đồng nhất) ⇒ PII tới gián điệp — chứng minh bài trên có răng."""
+    monkeypatch.setattr(che, "che_yeu_cau", lambda yc, cho_noi_dung=False: (yc, che.BaoCaoChe()))
+    gd, _ = _chay()
+    assert any(TK in x for x in gd.nhan)
+
+
+def test_noi_dung_TAT_mac_dinh__BAT_thi_da_che():
+    gd, _ = _chay(cho_noi_dung=False)
+    assert '\\"noi:c99.noi_dung\\": null' in gd.nhan[-1]
+    gd2, ks2 = _chay(cho_noi_dung=True)
+    cuoi = gd2.nhan[-1]
+    assert "<TEN> <SO> <EMAIL>" in cuoi and TEN not in cuoi and TK not in cuoi and EMAIL not in cuoi
+    assert ks2.the_noi_dung == 3
+
+
+def test_lop2_chan_PII_trong_prompt():
+    yc = {"model": "m", "system": f"liên hệ {EMAIL}", "messages": [{"role": "user", "content": "x"}]}
+    with pytest.raises(che.CamGui):
+        che.che_yeu_cau(yc)
+    yc2 = {"model": "m", "system": "s", "messages": [{"role": "user", "content": f"TK {TK}"}]}
+    with pytest.raises(che.CamGui):
+        che.che_yeu_cau(yc2)
+
+
+def test_lop2_KHONG_bat_so_tien_dang_so_va_van_tay_hex():
+    yc = {"model": "m", "system": "s", "messages": [{"role": "user", "content": [
+        {"type": "tool_result", "tool_use_id": "t", "content": json.dumps(
+            {"noi:c1.tien": 120000000, "nguon:gi.van_tay": "0e39e49cd95901ed", "voi:a.b": 1234567890})}]}]}
+    ra, bc = che.che_yeu_cau(yc)
+    assert bc.so_bo == 0 and "120000000" in json.dumps(ra)
+
+
+def test_che_ten_KHONG_nuot_ma_PM():
+    """Bia của lỗi 23/11: bản đầu nuốt `PM` ⇒ mã mất ⇒ ca c12 trượt ghép."""
+    assert che.che_noi_dung("TRAN THI B PM-1201-01 tam ung")[0] == "<TEN> PM-1201-01 tam ung"
