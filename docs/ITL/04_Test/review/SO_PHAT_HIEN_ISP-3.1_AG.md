@@ -42,3 +42,29 @@
 
 ## Điều ĐẠT *(để vòng sau ⛔ soát lại)*
 Chuỗi tuần tự *(phá cổng skill giữa ⇒ `DỪNG ở A2_PR_MAP/02_ghep_ref`, 10/16 skill `chưa chạy`, A4 chưa chạy; A4 TRƯỢT A2 ⇒ A3 + A4 `chưa chạy`, **0** lượt API)* · 3 chốt gọi API + SDK ⛔ nhập · tầng tĩnh · 4 zip · mặc định C1 *(Opus 5.5 · G0 bóng · ⛔ `fallbacks`)* · mặc định C4 TẮT · lint 11 kept · `kiem_tai_lieu` ĐẠT *(498 file · 2.996 bảng)* · `quet_pii_repo` 0 *(cây gộp, sau khi bỏ symlink `.venv` của chính KIỂM)* · web `3 = 3`.
+
+## R1 vòng 2 `KQ-342` *(2026-11-23 · `isp/AG` `b1e08a4` + cây gộp thử với `origin/claude/bold-galileo-zukpaf` `8f727ac` · cụm 5447)*
+
+**Kết luận: ĐẠT — 0 CHẶN · 0 NÊN SỬA · 4 GHI NHẬN.** Sổ **chỉ THÊM** — các hàng `AG-R1-01…11` ở trên giữ nguyên chữ; trạng thái mới ở bảng dưới.
+
+| Mã cũ | Mức cũ | Trạng thái sau R1 vòng 2 | Bằng chứng đo lại *(nhãn đếm gì)* |
+|---|---|---|---|
+| `AG-R1-01` | CHẶN | **đóng** | report có khối §0 *"chứng minh gì / ⛔ chứng minh gì"* **2** lần chữ · "mô hình GIẢ" **5** · `gia-lap` **4** · `claude-opus-5-5 ✅` **0** · KẾT tách hai mẫu số: ĐỘC LẬP `voi` **557/557** + VÒNG TRÒN `hd2·cong·nguon` **74/74** = **631** ô *(cây gộp)*. Đột biến M1 sửa `hd2_cong.json` ⇒ KẾT vẫn ĐẠT, ô độc lập **557/557** y nguyên, ô vòng tròn **74/74** *(⛔ bị đếm là khớp độc lập)*; M2 sửa `voi_so_luong.json` `tong.map_fls`+7 ⇒ KẾT ĐỎ, `lệch 1` ở nhóm độc lập; M4 sửa engine `do_voi_so_luong.py:620` ⇒ KẾT ĐỎ; M3 sửa ảnh `pm_join.json` ⇒ KẾT ĐỎ |
+| `AG-R1-02` | CHẶN | **đóng** | cây gộp `8f727ac` + `b1e08a4`: xung đột **2 tệp**, cùng loại *(sàn `MONG_PYTEST_TOAN_BO` 4887 ↔ 4928)*, giải = thu thập thật **4.958** ⇒ 0 dấu xung đột; `tests/agent` **71 passed**; `--duong-nen --cong 5447` MỘT lần, một mình: **`KẾT: ĐẠT`** — toàn bộ `12 failed · 4930 passed · 2 xfailed · 14 errors` ⇒ **28 = 28** *(thêm 0 · bớt 0 · chạy 4958 ≥ sàn 4958)* · web `3 failed · 687 passed` ⇒ **3 = 3** *(chạy 690)* |
+| `AG-R1-03` | NÊN SỬA | **đóng** *(+ `AG-R1v2-01` GHI NHẬN)* | 14 ca khó BỊA mới của KIỂM *(⛔ trùng 7 ca của dev)*: `che_het` lọt **0/14** · `che_noi_dung` lọt **3/14** *(xem `AG-R1v2-01`)* · ngày/kỳ/mã PM che nhầm **0** · đột biến M7 *(ngưỡng che 6→60)* ⇒ **7 ĐỎ**, M8 *(lớp 2 9→90)* ⇒ **5 ĐỎ** |
+| `AG-R1-05` | NÊN SỬA | **đóng** | §6 Độ phủ: `voi` **557/1.045** lá *(số: 318/660)* · `hd2` **30/1.312** lá *(số: 30/915)* — khớp số đo KQ-331 cho `voi` |
+| `AG-R1-06` | NÊN SỬA | **đóng** | A4.01–04 đều `loai: ma` **4/4** · `can_mo_hinh(A4)` = **False** · `ncc_cho("that")` dựng **3** nhà cung cấp *(A1–A3, toàn `anthropic` · `claude-opus-5-5`)*, **0** Gemini · đột biến M5 *(A4.02 về `loai: lam`)* ⇒ **3 failed + 7 errors** |
+| `AG-R1-11` | NÊN SỬA | **đóng** | 13 tổ hợp chốt: đủ 5 chốt `mo` ⇒ MỞ **1** · còn lại thiếu `--that` / `FLS_CHO_GOI_API` vắng·`0` / khoá vắng·rỗng / **`FLS_ZDR_DA_BAT` vắng·`0` ở `mo`** / ghim=False / mã `latest` / quên truyền `che_do` ⇒ CHẶN **9**; `che_noi_dung`·`che_het` ⛔ đòi ZDR ⇒ MỞ **2**; `anthropic` nhập sau khi chặn: **không** · đột biến M6 *(`CHE_DO_CAN_ZDR = ()`)* ⇒ **1 ĐỎ** |
+| `AG-R1-04` · `07` · `08` · `09` · `10` | GHI NHẬN | **giữ** | không đổi, dev đã ghi backlog đúng chữ |
+
+### Phát hiện mới *(mã `AG-R1v2-NN`)*
+
+| Mã | Mức | Lớp | Phát hiện | Bằng chứng *(số đo)* | Trạng thái |
+|---|---|---|---|---|---|
+| `AG-R1v2-01` | GHI NHẬN | A2 | Bộ che TUỲ CHỌN `che_noi_dung` còn lọt 3/14 ca khó **mới**: số TK nối bằng dấu `/` *(`0123/4567/8901`)* · nhóm số cách **hai** khoảng trắng · tên có dấu tiếng Việt *(`Nguyễn Văn Nam` — `HO_VIET` chỉ không dấu)*. Dev đã tự khai *"danh sách ĐEN họ Việt"*; ba ca trên nằm **ngoài** phạm vi KQ-331 *(`.`/`-`/một cách + tên Hoa-thường — 7/7 che)*. Mặc định `mo` ⛔ chạm; `che_het` lọt 0/14 nên chế độ nghiêm vẫn an toàn | `che_yeu_cau(..., "che_noi_dung")` ⇒ lọt **3/14**, `che_het` **0/14** · lớp 2 `kiem_den` bắt **7/14** khi chuỗi đi thẳng | mở |
+| `AG-R1v2-02` | GHI NHẬN | B1 | Gộp vào nhánh làm việc **luôn** xung đột sàn `MONG_PYTEST_TOAN_BO` ở 2 tệp *(script + bài ghim)* — nhánh làm việc dịch tiếp *(I2: 4854→4887)*, mỗi vòng gộp phải đặt lại sàn = thu thập thật. Cây thử: thu thập **4.958** = 4.887 + **71** bài `tests/agent` *(52 WO-329 + 19 vòng sửa)* ⇒ **ĐẠT** khi đặt đúng; bài ghim `test_S0_R3_02` canh đúng. Việc của DEV/orchestrator lúc gộp, ⛔ lỗi mã | cây thử: 2 tệp `UU`, giải `--theirs` + sàn `4958` ⇒ `test_dung_moi_truong_isp.py` **60 passed** | mở — nhắc lúc gộp |
+| `AG-R1v2-03` | GHI NHẬN | A1 | Đột biến lên **engine/ảnh `voi`** *(M3 · M4)* làm chuỗi DỪNG ở `KhongCoBanGhi` *(vân tay yêu cầu đổi)* — KẾT ĐỎ đúng, nhưng ĐỎ vì **bản phát lại là ảnh chụp**, ⛔ vì ô "lệch" *(M3: lệch 0 · chưa chạy 631; M4: lệch 0 · chưa chạy 555)*. Chỉ sửa **tệp đo** *(M2)* cho `lệch 1` đo được. Đúng khai "yếu #2" của dev; ghi để đừng đọc nhầm ĐỎ ở M3/M4 là "khớp độc lập bắt được" | M2 `lệch 1` · M3/M4 `DỪNG … KhongCoBanGhi` | mở |
+| `AG-R1v2-04` | GHI NHẬN | B2 | `sinh_the_agent.py --zip` **không tái lập byte**: 4 zip sinh lại có nội dung **0** tệp khác *(cùng danh sách 7·14·9·8 tệp)* nhưng byte khác vì mtime nhúng trong zip *(`2026-11-23 06:07:02` ↔ `06:44:46`)* ⇒ mỗi lần sinh lại làm nhiễu `git diff` 4 tệp nhị phân. Bài checksum thẻ **10 passed** vẫn xanh | so từng thành viên zip: khác **0/38** | mở |
+
+### Điều ĐẠT *(để R2 cuối ⛔ soát lại)*
+Chuỗi tuần tự · 3 chốt + ZDR *(13 tổ hợp)* · ghim mô hình · C2 mã thuần A4 · tầng `lint-imports` **11 kept** · 4 zip + thẻ = nguồn *(skill `.md` khớp byte **20/20**)* · `kiem_tai_lieu` ĐẠT *(505 file · 3.016 bảng)* · `quet_pii_repo` **0** · `--duong-nen` **28 = 28 · 3 = 3** trên cây gộp thử.
