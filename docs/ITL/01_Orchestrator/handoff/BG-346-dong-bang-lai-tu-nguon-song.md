@@ -215,3 +215,13 @@ Quyết orchestrator *(theo quyết chủ "nguồn sống là chuẩn")*: **⛔ 
   - **Khuyến nghị ⓐ** — ⛔ nới; 79 ô là hệ quả hai ảnh khác thời điểm, chụp cùng lượt thì tự hết hoặc lộ lỗi thật.
 
 ### Cổng sau vòng sửa *(dán thật — `PG_DSN=…localhost:5435`)*
+| Lệnh | Kết quả *(nguyên văn)* |
+|---|---|
+| `bash tools/dung_moi_truong_isp.sh --duong-nen --cong 5435` *(MỘT lần, một mình, cây `855144c` = SONG đã gộp nhánh làm việc)* | `12 failed, 4935 passed, 2 xfailed, 14 errors in 1245.46s` · `[ĐẠT] đường nền toàn bộ tập đỏ + XFAIL = đường nền: 28 = 28 node id (trong đó XFAIL 2 = 2 · thêm 0 · bớt 0) · chạy 4963 bài (mong ≥ 4963)` · web `3 failed, 687 passed` · `[ĐẠT] … 3 = 3 … chạy 690 bài (mong ≥ 690)` · **`══ KẾT: ĐẠT — mọi phép kiểm khớp mong`** *(tập đỏ 34 của R1 ⇒ 28: 6 node thêm về 0)* |
+| `python docs/ITL/_tools/kiem_tai_lieu.py` | `✅ cong tai lieu DAT — va no da do duoc that (511 file, 3042 bang, 984 o ngay, 104 ma QD)` |
+| `lint-imports` | `Contracts: 11 kept, 0 broken.` |
+| `python tools/quet_pii_repo.py` | `[ĐẠT] 0 chỗ số TK cá nhân · 0 tệp` |
+| `python tools/soi_bang_tuyen.py` | `✅ ban khai KHOP SQL that o ca 49 tuyen` |
+| `python tools/chay_agent_voi.py` *(phát lại)* | `KẾT: ĐẠT — ô ĐỘC LẬP … 557/557 khớp · ô VÒNG TRÒN … 74/74 khớp · lệch 0 · … A4 ĐẠT 4/4 agent` |
+
+**Dev tự thấy còn yếu *(vòng sửa)*:** `report.png` chụp bằng Playwright ở khung 1240×1000 đoán theo kích thước ảnh cũ *(⛔ có công cụ sinh trong repo)*; dòng "Tham chiếu: `voi_so_luong.json` 2026-08-26" trong report đọc trường ngày của tệp đo *(ngày ảnh sổ xlsx)* — ⛔ đổi ở vòng này; C1/C3 vẫn chờ chủ.
