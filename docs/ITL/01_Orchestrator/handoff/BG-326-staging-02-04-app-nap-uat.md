@@ -203,3 +203,5 @@ Hoặc chạy lại `bash tools/staging/01_dung_staging_gcp.sh --project fp-a-pr
 | `pytest tests/staging` | 107 | **107 passed** *(~3 phút)* |
 | `pytest --collect-only` *(cây gộp)* | = sàn | **4995** *(web 690)* |
 
+| `dung_moi_truong_isp.sh --duong-nen --cong 5434` *(MỘT lần, một mình, 20 phút 42 giây)* | `KẾT: ĐẠT` 28 = 28 · web 3 = 3 | **`KẾT: ĐẠT`** — toàn bộ `12 failed · 4967 passed · 2 xfailed · 14 errors` = **4995 chạy** *(skipped 0 · deselected 0)* ⇒ tập đỏ+XFAIL **28 = 28** *(thêm 0 · bớt 0)* · web `3 failed · 687 passed` = **690 chạy**, tập đỏ **3 = 3** |
+| `kiem_tai_lieu.py` · `lint-imports` · `quet_pii_repo.py` | K1–K6 · 11 kept · 0 | **K1–K6 OK** *(502 tệp · 3.018 bảng · 985 ô ngày)* · **11 kept, 0 broken** · **0 chỗ · 0 tệp** |
