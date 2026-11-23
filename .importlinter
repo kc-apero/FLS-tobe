@@ -6,6 +6,8 @@ include_external_packages = True
 # fls.db.pg_migrate import psycopg trong HAM (lazy) de --dry-run chay offline
 # khong can driver; fls.db nam ngoai source_modules nen dung quyen.
 # Cac tang khac se duoc THEM vao source_modules ngay khi chung ton tai:
+#   fls.agent them 23/11 (WO-329) — them vao hop dong NAY, ⛔ hop dong moi: giu 11 hop dong;
+#   cam fls.db/repo/api/web cua fls.agent canh bang tests/agent/test_skill_tang.py (AST)
 #   (het — fls.api da them 28/08 o P4)
 # import-linter bao loi neu source_modules tro toi module chua ton tai, nen danh
 # sach nay lon dan theo pha thay vi khai truoc mot loat package rong.
@@ -19,6 +21,7 @@ source_modules =
     fls.oracle
     fls.adapters
     fls.api
+    fls.agent
 forbidden_modules =
     psycopg
 
