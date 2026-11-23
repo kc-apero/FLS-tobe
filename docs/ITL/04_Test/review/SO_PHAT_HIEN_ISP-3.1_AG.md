@@ -68,3 +68,10 @@ Chuỗi tuần tự *(phá cổng skill giữa ⇒ `DỪNG ở A2_PR_MAP/02_ghep
 
 ### Điều ĐẠT *(để R2 cuối ⛔ soát lại)*
 Chuỗi tuần tự · 3 chốt + ZDR *(13 tổ hợp)* · ghim mô hình · C2 mã thuần A4 · tầng `lint-imports` **11 kept** · 4 zip + thẻ = nguồn *(skill `.md` khớp byte **20/20**)* · `kiem_tai_lieu` ĐẠT *(505 file · 3.016 bảng)* · `quet_pii_repo` **0** · `--duong-nen` **28 = 28 · 3 = 3** trên cây gộp thử.
+
+## R2 cuối *(KQ-343 · 23/11 · cây gộp thử = `origin/claude/bold-galileo-zukpaf` `05d7a97` + `isp/AG` `c4c9d40`)*
+
+| Mã | Mức | Nhãn | Phát hiện |
+|---|---|---|---|
+| `AG-R2-01` | GHI NHẬN | B1 | Gộp lên `05d7a97` xung đột **đúng 2 tệp**, chỉ dòng sàn `MONG_PYTEST_TOAN_BO` *(4887 ↔ 4928)* — như `AG-R1v2-02`. Giải = thu thập thật cây gộp **4.958** *(web 690 giữ)*; orchestrator đặt lại khi gộp. Docstring bài ghim cần thêm câu gộp AG |
+| `AG-R2-02` | GHI NHẬN | A2 | Mọi GHI NHẬN R1 còn mở giữ nguyên: `AG-R1v2-01` *(che tuỳ chọn lọt 3/14 ca)* · `-03` · `-04` *(zip ⛔ tái lập byte)* · `AG-R1-04/07/08/09/10`. **0** hàng mới thành CHẶN/NÊN SỬA |
