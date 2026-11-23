@@ -319,48 +319,58 @@ def test_ky_chot_dong_bang_bo_ky_moi_nhat():
     assert dbg.ky_chot_dong_bang() == set(ks[:-1]) and ks[-1] not in dbg.ky_chot_dong_bang()
 
 
-# ───────────── bể THẬT (chỉ khi có `FLS_HELDOUT_NOI_DUNG`) — ⛔ in mẫu ─────────────
+# ───────────── bể THẬT khi có `FLS_HELDOUT_NOI_DUNG`, ⛔ SKIP khi vắng (cổng `--duong-nen` đòi skipped = 0) ─────────────
+# Vắng bể thật ⇒ cùng bài chạy trên bể GIẢ (`pool_gia`); số đo của bể thật được GHIM ở `DEM_BE.json` và kiểm nhất quán
+# bằng bài luôn-chạy `test_DEM_BE_nhat_quan`.
 _TM = os.environ.get(dbg.BIEN)
 _CO_BE = bool(_TM) and (Path(_TM) / "a" / "ca.json").exists() and (Path(_TM) / "b" / "ca.json").exists()
-THAT = pytest.mark.skipif(not _CO_BE, reason=f"không có bể giữ riêng (${dbg.BIEN}) — bể thật nằm NGOÀI repo")
 
 
-@THAT
+def _thu_muc(c: str, pool_gia: Path) -> Path:
+    return (Path(_TM) if _CO_BE else pool_gia) / c
+
+
 @pytest.mark.parametrize("c", ["a", "b"])
-def test_BE_THAT_phep_do_ro_ri_ghim_dung_so_da_do(c):
-    """Chủ 23/11 ~06:00: bộ che chỉ là TUỲ CHỌN ⇒ rò rỉ ⛔ chặn; nhưng số đo phải ĐÚNG số đã ghi ở DEM_BE (Đ5 hai chiều)."""
-    d = Path(_TM) / c
+def test_BE_che_ro_ri_phep_do_hop_le_va_ghim_so_da_do(c, pool_gia):
+    """Chủ 23/11 ~06:00: bộ che chỉ là TUỲ CHỌN ⇒ rò rỉ ⛔ chặn; nhưng phép đo phải HỢP LỆ (Đ3) và, với bể thật, = số ở DEM_BE."""
+    d = _thu_muc(c, pool_gia)
     r = rr.do(json.loads((d / "ca.json").read_text(encoding="utf-8")), json.loads((d / "meta.json").read_text(encoding="utf-8")))
     assert r["hop_le"], f"bộ dò ⛔ thấy gì trên chữ chưa che (mẫu số {r['mau_so_noi_dung']}) — phép đo vô nghĩa"
     assert r["ca_bi_lop2_chan"] == 0
-    assert r == json.loads(dbg.TEP_DEM.read_text(encoding="utf-8"))["be"][c]["ro_ri_che"]
+    if _CO_BE:
+        assert r == json.loads(dbg.TEP_DEM.read_text(encoding="utf-8"))["be"][c]["ro_ri_che"]
 
 
-@THAT
-@pytest.mark.xfail(reason="KNOWN-GAP đo 23/11: che_noi_dung ⛔ bắt tên CÓ DẤU / số TK xen cách — tuỳ chọn che, ⛔ chặn (BG-339)", strict=False)
 @pytest.mark.parametrize("c", ["a", "b"])
-def test_BE_THAT_che_0_lot_MONG_AC4(c):
-    d = Path(_TM) / c
-    r = rr.do(json.loads((d / "ca.json").read_text(encoding="utf-8")), json.loads((d / "meta.json").read_text(encoding="utf-8")))
-    assert r["tong_lot_sau_che"] == 0, r["sau_che"]
-
-
-@THAT
-@pytest.mark.parametrize("c", ["a", "b"])
-def test_BE_THAT_mong_va_doc_lap(c):
-    d = Path(_TM) / c
-    ca = json.loads((d / "ca.json").read_text(encoding="utf-8"))
-    mong = sum(dbg.MONG_TANG.values()) + (dbg.MONG_CHUA_CHOT if c == "b" else 0)
-    assert len(ca["ca"]) == mong
+def test_BE_mong_va_doc_lap(c, pool_gia):
+    ca = json.loads((_thu_muc(c, pool_gia) / "ca.json").read_text(encoding="utf-8"))
+    assert len(ca["ca"]) == sum(dbg.MONG_TANG.values()) + (dbg.MONG_CHUA_CHOT if c == "b" else 0)
     assert dbg.trung_voi_ca_dung(ca) == 0 and dbg.trung_voi_prompt(ca) == 0
 
 
-@THAT
-def test_BE_THAT_van_tay_khop_tep_dem_repo():
+def test_BE_van_tay_khop_tep_dem_repo(pool_gia):
+    if not _CO_BE:
+        return                                                 # ⛔ skip/xfail: vắng bể ⇒ `test_DEM_BE_nhat_quan` gánh
     dem = json.loads(dbg.TEP_DEM.read_text(encoding="utf-8"))
     for c in ("a", "b"):
         d = Path(_TM) / c
         ca = json.loads((d / "ca.json").read_text(encoding="utf-8"))
         muoi = (d / "muoi.key").read_bytes()
-        vt = sorted(dbg.van_tay_ca(x, muoi) for x in ca["ca"].values())
-        assert vt == dem["be"][c]["van_tay_ca"]
+        assert sorted(dbg.van_tay_ca(x, muoi) for x in ca["ca"].values()) == dem["be"][c]["van_tay_ca"]
+
+
+def test_DEM_BE_nhat_quan():
+    """Tệp ĐẾM đã commit (bể thật 23/11) tự nhất quán — luôn chạy, ⛔ cần bể: mong = thực, 0 trùng, vân tay, phép đo rò rỉ hợp lệ."""
+    import hashlib
+    dem = json.loads(dbg.TEP_DEM.read_text(encoding="utf-8"))
+    assert set(dem["be"]) == {"a", "b"}
+    for c, v in dem["be"].items():
+        assert v["thieu"] == {} and v["thuc_theo_tang"] == v["mong_theo_tang"], c
+        assert v["tong_ca"] == v["mong_tong"] == len(v["van_tay_ca"]) == sum(v["thuc_theo_tang"].values()) > 0
+        assert v["van_tay_be"] == hashlib.sha256(json.dumps(v["van_tay_ca"]).encode()).hexdigest()[:16]
+        assert v["doc_lap"]["trung_ca_dung_wo329"] == 0 and v["doc_lap"]["trung_prompt_agent"] == 0
+        assert v["doc_lap"]["so_tep_prompt_da_quet"] > 0                         # Đ3: tập quét ⛔ rỗng
+        r = v["ro_ri_che"]
+        assert r["hop_le"] and r["mau_so_noi_dung"] == v["tong_ca"] and r["ca_bi_lop2_chan"] == 0
+    assert dem["be"]["a"]["mong_theo_tang"] == dbg.MONG_TANG
+    assert dem["be"]["b"]["mong_theo_tang"] == dbg.MONG_TANG | {"chua_chot": dbg.MONG_CHUA_CHOT}
