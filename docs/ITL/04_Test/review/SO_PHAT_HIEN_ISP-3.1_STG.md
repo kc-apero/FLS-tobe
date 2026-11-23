@@ -1,6 +1,6 @@
 # SỔ PHÁT HIỆN REVIEW — ISP 3.1 · phần `STG` *(tệp riêng, chờ gộp vào `SO_PHAT_HIEN_ISP-3.1.md`)*
 
-**Version:** v0.3 · **Ngày:** 2026-11-23 · **Chủ sở hữu:** `fls-test` *(R1 `KQ-327`)* · **Nguồn:** `WO-325` · `BG-326`
+**Version:** v0.4 · **Ngày:** 2026-11-23 · **Chủ sở hữu:** `fls-test` *(R1 `KQ-327`)* · **Nguồn:** `WO-325` · `BG-326`
 
 > Thang lớp *(A1 · A2 · B1 · B2)* và mức *(CHẶN · NÊN SỬA · GHI NHẬN)*: **y như** §1 sổ chung. Sổ **chỉ THÊM**.
 > Kiểm `isp/STG` @ `65ab287` *(ngọn nhánh `claude/bold-galileo-zukpaf-isp/STG`)* + **cây gộp thử** `origin/claude/bold-galileo-zukpaf` @ `6e68811` ⊕ `65ab287` *(⛔ commit cây thử; đột biến chỉ trên bản sao `git archive`, trả nguyên, `diff` = 0)*.
@@ -63,6 +63,12 @@
 - **Cổng** `--duong-nen --cong 5446` MỘT lần, một mình: lần 1 ĐỎ do cây chưa commit *(22 bài `test_03`, `-04`)*; lần 2 **`KẾT: ĐẠT`** toàn bộ **28 = 28** *(XFAIL 2 = 2 · thêm 0 · bớt 0 · chạy 4995)* · web **3 = 3** *(chạy 690)*. `kiem_tai_lieu` 6/6 OK *(503 tệp · 3020 bảng)* · `lint-imports` 11 kept 0 broken · `quet_pii_repo` 0 chỗ.
 - **Hai CHẶN THẬT từ GCP** *(do chủ chạy, orchestrator báo; Test ⛔ đo lại được ở GCP)*: `STG-R2b-01` · `-02`. Cả hai **lọt** cổng giả vì gcloud/`psql` giả ⛔ mô phỏng `.gcloudignore` · quyền vai do Cloud SQL tạo.
 
+## Đo R2b2 *(`KQ-351`, 2026-11-23, cụm PG **5447**; mỗi số nói nó đếm gì)*
+- **Cây**: STG @ `ef96a15` · cây gộp thử = `origin/claude/bold-galileo-zukpaf` @ `f8c6d55` ⊕ `ef96a15` — gộp **sạch**; cổng lần 1 ĐỎ vì chưa commit *(25 bài `test_03`, `-04`)*, lần 2 **`KẾT: ĐẠT`** 28 = 28 · web 3 = 3 · chạy 5082 / 690.
+- **`STG-R2b-01` · `-02` · `-05` ĐÓNG**: đường chuyển vai giữ dữ liệu *(đếm dòng mọi bảng trước = sau)*, idempotent, dừng có tên `VAI_KHONG_TAO_DUOC`, 0 lần `MKGIA-` ở argv/màn/nhật ký *(bài `tests/nghiem_thu/test_kq351_duong_chuyen_vai_doc_lap.py`, ĐỎ khi bỏ `02c` 4/5 · khi mật khẩu vào argv 2/5)*; `.gcloudignore` 0 trong repo, thả lại ⇒ `436 / 329` ĐỎ; ảnh dựng bằng bộ build cũ qua, uid 10001, 0 dữ liệu riêng tư.
+- **`STG-R2b2-01` NÊN SỬA** *(§11.1 ⓪ dùng `git fetch origin` trên cây upload ⇒ `fatal`; "cây đúng" ⛔ in vì `grep '--mount'` khớp 2 dòng chú thích)* · **`-02`** *(kiểm bí mật sau DROP)* · **`-03`** *(`thu_dung_anh.sh --ca` quá dài)* — GHI NHẬN.
+
 ## Changelog
 - **v0.2** *(2026-11-23, `fls-test` R2 `KQ-328`)*: thêm `STG-R2-01…04` *(1 CHẶN · 1 NÊN SỬA · 2 GHI NHẬN)*; **đóng** *(đo lại độc lập)* `STG-R1-01 · -02 · -04 · -05 · -06 · -07 · -08` *(+ `-03` · `-13` đóng ở `d04557a`)*; `-R1-09` giải ở cây gộp *(thành `-R2-03`)*; `-R1-10 · -11 · -12` còn mở *(backlog, GHI NHẬN)*.- **v0.1** *(2026-11-23, `fls-test` R1 của `STG`, `KQ-327`)*: khởi tạo — **13** phát hiện `STG-R1-01…13` *(2 CHẶN · 6 NÊN SỬA · 5 GHI NHẬN)*; **cùng ngày**: Dev đẩy `d04557a` *(chỉ `BG-326` + `tools/staging/README.md` — `git diff 65ab287 d04557a --stat` = 2 tệp, ⛔ mã)* đóng `-03` và `-13` ⇒ **còn mở 2 CHẶN · 5 NÊN SỬA · 4 GHI NHẬN**. ⛔ chưa kiểm lại `d04557a` về lời khai *"`--duong-nen` ĐẠT"* của Dev *(đo trên cây STG riêng; không phải cây gộp — R1 chỉ đo cây gộp)*.
 - **v0.3** *(2026-11-23, `fls-test` R2b `KQ-344`)*: thêm `STG-R2b-01…05` *(3 CHẶN · 2 GHI NHẬN; `-05` = phụ lục)*; **đóng** `STG-R2-01` · `STG-R2-02` · `STG-R2-05`.
+- **v0.4** *(2026-11-23, `fls-test` R2b2 `KQ-351`)*: thêm `STG-R2b2-01…03` *(1 NÊN SỬA · 2 GHI NHẬN)*; **đóng** `STG-R2b-01` · `-02` · `-05`.
