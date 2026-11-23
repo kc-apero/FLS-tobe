@@ -111,11 +111,20 @@ def parse_ngay(v: Any, thu_tu: str | None = None) -> date | None:
     raise ValueError(f"khong doc duoc ngay: {v!r}")
 
 
-def validate(row: CanonRow) -> KetQua:
+def validate(row: CanonRow, thu_tu: str | None = None) -> KetQua:
+    """⭐ `thu_tu` — thứ tự ngày/tháng **do NGUỒN khai** (`QĐ-ITL-113`).
+
+    ⛔⛔ **`None` ⛔ KHÔNG có nghĩa "coi như `dmy`".** Nó có nghĩa *"nguồn này
+       ⛔ chưa khai"* ⇒ ngày mơ hồ vẫn **bị loại**, kèm lý do. Đo 08/09 trên
+       ảnh chụp thật: **29/29** nguồn có ngày mơ hồ là **`mdy`**, ⛔ **không
+       một nguồn nào `dmy`** *(OCBC Singapore, TCB USD — sao kê nước ngoài)*
+       ⇒ một mặc định *"vì đây là Việt Nam"* sẽ **hoán ngày↔tháng trên 1.894
+       dòng**, đúng lớp lỗi `QĐ-ITL-17` *(~181 tỷ sai kỳ)*.
+    """
     kq = KetQua()
 
     try:
-        ngay = parse_ngay(row.at(_NGAY))
+        ngay = parse_ngay(row.at(_NGAY), thu_tu)
     except ValueError as e:
         kq.loai.append(f"{_TEN_NGAY}: không đọc được — {e}")
         ngay = None

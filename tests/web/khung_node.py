@@ -68,6 +68,44 @@ DONG = [
 TEP = ["thanh_phan.js", "goi_cua.js", "trang_thai.js", "hop_thoai.js",
        "man_f02.js"]
 
+# ⭐⭐ `F04` — cung khung, **khac bo tep va khac VO** *(`P7` task `6`, 08/09)*.
+#
+# ⛔⛔ **Vi sao tham so hoa chu ⛔ KHONG chep khung sang tep thu hai.** Docstring
+# dau tep nay da noi ly do: khung quyet dinh *"man dang chay trong hoan canh
+# nao"*, va **hai ban chep se lech** — luc do hai bo bai kiem noi ve hai man
+# khac nhau ma **ca hai deu xanh**. ⇒ Them hai tham so, ⛔ khong them mot tep.
+TEP_F04 = ["thanh_phan.js", "goi_cua.js", "trang_thai.js", "man_f04.js"]
+
+# Vo man cua `F02`: hai o ma `man_f02.js` tim.
+VO_F02 = """
+const than = d.document.createElement('div'); than.id = 'than-f02';
+const man = d.document.createElement('section'); man.id = 'man-f02';
+man.className = 'screen on';
+d.body.appendChild(man); d.body.appendChild(than);
+"""
+
+# ⭐ Vo man cua `F04`: **sau** o, dung ten trong `index.html`.
+#   ⛔ Ten `nap-*` chu ⛔ khong `f04-*`: cong `test_khong_ma_the_nao_doc_duoc
+#   _thanh_mau` bat DO vi `#f04` **doc duoc thanh mau 3 so**.
+VO_F04 = """
+const man = d.document.createElement('section'); man.id = 'man-f04';
+man.className = 'screen on';
+d.body.appendChild(man);
+for (const id of ['nap-chon','nap-doc','nap-khai','nap-xem','nap-bb',
+                  'nap-nhan','nap-thu-tu','nap-thu-tu-khung']) {
+  const e = d.document.createElement('div'); e.id = id;
+  man.appendChild(e);
+}
+for (const id of ['nap-nut-soat','nap-nut-nhan']) {
+  const b = d.document.createElement('button'); b.id = id; b.disabled = true;
+  man.appendChild(b);
+}
+for (const id of ['nap-vi-sao','nap-vi-sao-2']) {
+  const vs = d.document.createElement('span'); vs.id = id;
+  man.appendChild(vs);
+}
+"""
+
 _KHUNG = r"""
 import {readFileSync} from 'node:fs';
 import vm from 'node:vm';
@@ -86,17 +124,27 @@ const hop = {
 };
 hop.globalThis = hop;
 vm.createContext(hop);
+// ⭐ `WO-023` `(h)`: bẫy lỗi **chưa bắt** *(`Uncaught (in promise)` trên trình
+// duyệt)* — **chỉ khi kịch bản bật** bằng `globalThis._BAT_TU_CHOI = []`. Bật
+// thì mỗi lời hứa bị từ chối ⛔ ai bắt được ghi lại để bài **đếm** *(mong `0`)*;
+// ⛔ bật thì giữ đúng hành vi cũ — ném tiếp ⇒ `node` sập ⇒ bài đỏ. ⛔ Bật mặc
+// định: một bẫy toàn cục nuốt lỗi sẽ làm **mọi** bài đang dựa vào cú sập lặng
+// lẽ xanh.
+process.on('unhandledRejection', (e) => {
+  if (Array.isArray(hop._BAT_TU_CHOI)) {
+    hop._BAT_TU_CHOI.push(String((e && (e.ma || e.message)) || e));
+    return;
+  }
+  throw e;
+});
 // ⭐ Duong BAN su kien — bo test dong vai nguoi go phim / dan.
 hop._ban = d.ban;
 
 // ⭐ Bang cot THAT — sinh tu `fls/api/cot_so.py`, ⛔ khong go tay o day.
 vm.runInContext(readFileSync(%(cot)s, 'utf8'), hop, {filename: 'cot.js'});
 
-// Vo man: hai o ma `man_f02.js` tim.
-const than = d.document.createElement('div'); than.id = 'than-f02';
-const man = d.document.createElement('section'); man.id = 'man-f02';
-man.className = 'screen on';
-d.body.appendChild(man); d.body.appendChild(than);
+// Vo man — do nguoi goi chon (`VO_F02` / `VO_F04`).
+%(vo)s
 
 for (const t of %(tep)s)
   vm.runInContext(readFileSync(t, 'utf8'), hop, {filename: t});
@@ -134,7 +182,8 @@ console.log(JSON.stringify(ra === undefined ? null : ra));
 """
 
 
-def _chay(kich_ban: str, *, phien: dict | None = None, dong=None):
+def _chay(kich_ban: str, *, phien: dict | None = None, dong=None,
+          tep: list[str] | None = None, vo: str | None = None):
     import tempfile
 
     cot = os.path.join(tempfile.mkdtemp(), "cot.js")
@@ -144,14 +193,25 @@ def _chay(kich_ban: str, *, phien: dict | None = None, dong=None):
         "dom": json.dumps(
             "file:///" + os.path.join(O_DAY, "dom_gia.js").replace("\\", "/")),
         "cot": json.dumps(cot),
-        "tep": json.dumps(TEP),
+        "vo": VO_F02 if vo is None else vo,
+        "tep": json.dumps(TEP if tep is None else tep),
         "phien": json.dumps(phien if phien is not None
                             else {"actor": "lan@apero.vn", "cho_ghi": True}),
         "dong": json.dumps(DONG if dong is None else dong, ensure_ascii=False),
         "kich_ban": json.dumps("(async () => {" + kich_ban + "})()"),
     }
-    r = subprocess.run([NODE, "--input-type=module", "-e", ma],
-                       capture_output=True, text=True, encoding="utf-8",
+    # ⭐ `WO-032`: bài nuôi màn bằng **thân cửa thật** *(50 ứng viên · danh sách
+    #   lệnh)* vượt trần dòng lệnh Windows *(`WinError 206`, ~32.767 ký tự)*
+    #   ⇒ kịch bản dài đi qua **tệp `.mjs` tạm**, ⛔ cắt thân cho vừa *(cắt thân
+    #   là quay lại khuôn tự dựng)*. Kịch bản ngắn giữ đường `-e` cũ.
+    if len(ma) > 20_000:
+        mjs = os.path.join(os.path.dirname(cot), "kich_ban.mjs")
+        with open(mjs, "w", encoding="utf-8") as f:
+            f.write(ma)
+        lenh = [NODE, mjs]
+    else:
+        lenh = [NODE, "--input-type=module", "-e", ma]
+    r = subprocess.run(lenh, capture_output=True, text=True, encoding="utf-8",
                        cwd=pv.THU_MUC, timeout=90)
     assert r.returncode == 0, f"⛔ node NO:\n{r.stdout}\n{r.stderr}"
     return json.loads(r.stdout.strip().splitlines()[-1])

@@ -62,6 +62,7 @@ sys.path.insert(0, GOC)
 
 from fls.api import bang_tuyen                                   # noqa: E402
 from fls.api.xu_ly import HAM                                    # noqa: E402
+from fls.cau_hinh import nguon_tinh                              # noqa: E402
 
 # ⛔ Ban TRANG: chi bam vao cac goi nay. Mot `import` ra ngoai `fls` ⇒ dung.
 GOC_GOI = "fls"
@@ -180,13 +181,42 @@ def _chuoi_trong(ham: ast.FunctionDef, m: Module) -> list[str]:
 
 
 def sql_cua_tuyen(ten_ham: str) -> tuple[set[str], set[str], list[str]]:
-    """`(bang cham, bang GHI, duong da bam)` cho mot ham xu ly."""
-    dau = ("fls.api.xu_ly", ten_ham)
-    da: set[tuple[str, str]] = set()
-    hang_doi = [dau]
+    """`(bang cham, bang GHI, duong da bam)` cho mot ham xu ly.
+
+    ⛔⛔ **Bat dau tu DUNG TEP ham that su o** (`__module__`), ⛔ khong neo cung
+    vao `fls.api.xu_ly`.
+
+    Ban truoc neo cung — dung, cho toi 08/09 khi nhom NAP ra doi o
+    `fls/api/nap_cua.py`. Luc do phep bam **⛔ khong tim thay ham** va lang le
+    tra ve *"cham 0 bang"*: mot tuyen ghi vao `fls_itl` se duoc do la **⛔ khong
+    cham gi**, va cong — cai cong sinh ra de bat dung chuyen do — se **im**.
+    ⇒ Mot phep do ⛔ khong tim thay thu can do phai **NO**, ⛔ khong duoc tra ve
+      tap rong; xem `vet` rong o cong ⓓ.
+    """
     cham: set[str] = set()
     ghi: set[str] = set()
     vet: list[str] = []
+    for ten, h, m in _bam(ten_ham):
+        vet.append(ten)
+        for s in _chuoi_trong(h, m):
+            sach = CHU_THICH_SQL.sub(" ", s)
+            cham |= set(BANG.findall(sach))
+            for g in GHI.finditer(sach):
+                ghi.add(next(x for x in g.groups() if x))
+    return cham, ghi, sorted(vet)
+
+
+def _bam(ten_ham: str) -> list[tuple[str, ast.FunctionDef, Module]]:
+    """Mọi hàm `fls.*` trên **đồ thị gọi** của một hàm xử lý — `(tên, hàm, module)`.
+
+    ⭐ Tách khỏi `sql_cua_tuyen` *(vòng sửa R1 · `C1-R1-02`)* để phép đo CHUỖI
+      (`chuoi_cua_tuyen`) bám **CÙNG một đồ thị** — hai phép đo bám hai đồ thị là
+      hai bản đồ, và đúng thứ cổng này sinh ra để chặn.
+    """
+    dau = (getattr(HAM.get(ten_ham), "__module__", "fls.api.xu_ly"), ten_ham)
+    da: set[tuple[str, str]] = set()
+    hang_doi = [dau]
+    ra: list[tuple[str, ast.FunctionDef, Module]] = []
     while hang_doi:
         khoa = hang_doi.pop()
         if khoa in da:
@@ -196,28 +226,40 @@ def sql_cua_tuyen(ten_ham: str) -> tuple[set[str], set[str], list[str]]:
         m = doc_module(ten_m)
         if m is None or ten_h not in m.ham:
             continue
-        vet.append(f"{ten_m}.{ten_h}")
         h = m.ham[ten_h]
-        for s in _chuoi_trong(h, m):
-            sach = CHU_THICH_SQL.sub(" ", s)
-            cham |= set(BANG.findall(sach))
-            for g in GHI.finditer(sach):
-                ghi.add(next(x for x in g.groups() if x))
+        ra.append((f"{ten_m}.{ten_h}", h, m))
         hang_doi += list(_goi_trong(h, m))
-    return cham, ghi, sorted(vet)
+    return ra
+
+
+def chuoi_cua_tuyen(ten_ham: str) -> set[str]:
+    """Mọi chuỗi *(⛔ docstring; kể cả hằng chuỗi mức module được gọi tên — vd tham
+    số mặc định `duong=NGUON_TINH`)* trên đồ thị gọi của hàm xử lý.
+
+    Dùng cho ⓔ: một tuyến khai `nguon_tinh=(X,)` thì chuỗi `X` phải hiện **NGUYÊN
+    VĂN** ở một hàm nó thật sự gọi tới — ⛔ thì bản khai vẽ một nguồn hàm ⛔ đọc.
+    """
+    ra: set[str] = set()
+    for _ten, h, m in _bam(ten_ham):
+        ra.update(_chuoi_trong(h, m))
+    return ra
 
 
 # ── cong ──────────────────────────────────────────────────────────────────
-def soi(bang: tuple = (), do_sql=None) -> tuple[list[str], list[dict]]:
+def soi(bang: tuple = (), do_sql=None,
+        do_chuoi=None) -> tuple[list[str], list[dict]]:
     """⛔ Rong = dat. Tra `(vi pham, bang do)`.
 
     ⚠ `do_sql` cho phep **bom mot phep do gia** — de bo test chung minh duoc
     nhanh *"co cau `INSERT INTO fls_itl` that"* co DO hay khong. ⛔ Khong co no
     thi nhanh ay ⛔ khong bao gio chay duoc, va mot nhanh chua tung chay la mot
     nhanh chua biet co song.
+    ⚠ `do_chuoi` *(vòng sửa R1 · `C1-R1-02`)* — cùng lý do, cho nhánh ⓔ *"hàm ⛔
+    mang chuỗi đường `nguon_tinh`"*.
     """
     bang = bang or bang_tuyen.BANG_TUYEN
     do_sql = do_sql or sql_cua_tuyen
+    do_chuoi = do_chuoi or chuoi_cua_tuyen
     loi: list[str] = []
     do: list[dict] = []
     for t in bang:
@@ -232,10 +274,13 @@ def soi(bang: tuple = (), do_sql=None) -> tuple[list[str], list[dict]]:
         thua = sorted(khai - cham)
         thieu_ghi = sorted(ghi - khai_ghi)
 
+        nt = t.nguon_tinh
         do.append({"duong": t.duong, "ham": t.ham,
                    "khai": sorted(khai), "that": sorted(cham),
                    "khai_ghi": sorted(khai_ghi), "that_ghi": sorted(ghi),
-                   "thieu": thieu, "thua": thua, "vet": vet})
+                   "thieu": thieu, "thua": thua, "vet": vet,
+                   # ⛔ `list(chuỗi)` = danh sách KÝ TỰ *(R1 · C)*.
+                   "nguon_tinh": list(nt) if isinstance(nt, tuple) else [repr(nt)]})
 
         # ⓐ ⛔⛔ Cai chinh: SQL cham mot bang ma ban khai ⛔ khong noi.
         if thieu:
@@ -257,6 +302,69 @@ def soi(bang: tuple = (), do_sql=None) -> tuple[list[str], list[dict]]:
             loi.append(
                 f"{t.phuong_thuc} {t.duong}: `bang` khai {thua} ma SQL ⛔ "
                 f"khong cham — ban do ve mot duong ⛔ khong co")
+        # ⓔ ⭐ ISP 3.1.2 · `C1` (`WO-075`) — tuyến **NGUỒN TĨNH** khai `bang=()`
+        #    ⇒ ⓐ–ⓓ so *"khai 0 bảng"* với *"SQL 0 bảng"*: **xanh trên tập rỗng**
+        #    (`Đ3`). Phép canh dương duy nhất cổng TĨNH làm được là: tệp khai
+        #    phải **CÓ THẬT**. ⛔ Có ⇒ bản đồ vẽ một nguồn ⛔ tồn tại — và cửa sẽ
+        #    `500` ở lần gọi đầu, ⛔ ở lúc chạy cổng.
+        #
+        # ⛔⛔ Vòng sửa sau R1 *(`C1-R1-02`, `KQ-077`)* — *"tệp có thật"* là một câu
+        #    về **HÌNH**, và R1 chứng minh nó ⛔ đủ: `('CLAUDE.md',)` và
+        #    `('../../../../../../../../etc/hostname',)` ⇒ cổng này XANH *(cả hai đều
+        #    là tệp có thật)*; một CHUỖI thay tuple ⇒ **32** câu rác *(lặp trên KÝ
+        #    TỰ)*. Luật phòng tái phạm của R1: *"một ngoại lệ mới của cổng phải có
+        #    phép canh SỰ THẬT như phép canh cũ"*. ⇒ ⓔ nay đo **ba** sự thật:
+        #      ⓔ1 kiểu + luật đường *(một chỗ: `fls/cau_hinh/nguon_tinh.py`)* + có mặt;
+        #      ⓔ2 chuỗi đường hiện **NGUYÊN VĂN** trong một hàm thuộc `vet` *(⛔ thì
+        #          bản đồ vẽ một nguồn hàm ⛔ đọc — `BG-076` yếu #3)*;
+        #      ⓔ3 tuyến TĨNH mà SQL thật chạm bảng ⇒ ĐỎ *(⛔ chỉ nhờ ⓐ: ⓐ im khi bản
+        #          khai CŨNG ghi bảng ấy — mà tuyến tĩnh ⛔ được chạm kho)*.
+        if nt != ():
+            if not isinstance(nt, tuple):
+                loi.append(
+                    f"{t.phuong_thuc} {t.duong}: `nguon_tinh` kieu "
+                    f"{type(nt).__name__} — ⛔ phai tuple[str, ...] "
+                    f"(quen dau phay `(x,)`?)")
+            else:
+                chuoi = do_chuoi(t.ham)
+                for tep in nt:
+                    ly = nguon_tinh.kiem_duong(tep)
+                    if ly:
+                        loi.append(
+                            f"{t.phuong_thuc} {t.duong}: `nguon_tinh` {tep!r} sai "
+                            f"luat duong — " + " · ".join(ly))
+                    elif not os.path.isfile(os.path.join(GOC, *tep.split("/"))):
+                        loi.append(
+                            f"{t.phuong_thuc} {t.duong}: `nguon_tinh` khai {tep} ma "
+                            f"tep ⛔ co that — ban do ve mot nguon ⛔ ton tai")
+                    if not isinstance(tep, str) or tep not in chuoi:
+                        loi.append(
+                            f"{t.phuong_thuc} {t.duong}: `nguon_tinh` khai {tep!r} "
+                            f"ma ⛔ ham nao trong vet ({len(vet)} ham) mang chuoi "
+                            f"ay — ban do ve mot nguon ham ⛔ doc")
+                if cham:
+                    loi.append(
+                        f"{t.phuong_thuc} {t.duong}: tuyen `nguon_tinh` ma SQL that "
+                        f"cham {sorted(cham)} — tuyen TINH ⛔ duoc doc kho (C5 doi "
+                        f"sang `bang` thi GO `nguon_tinh`)")
+        # ⓔ4 *(vòng sửa R2 · `C1-R2-04`, `KQ-078`)* — chiều NGƯỢC của ⓔ2. ⓔ2 đòi
+        #    đường KHAI ⊆ chuỗi của đồ thị gọi; tới R2 ⛔ có chiều *"đồ thị MANG một
+        #    đường dưới `THU_MUC/` mà tuyến ⛔ khai"* ⇒ R2 bơm `ix_fx_mau.json` vào
+        #    đồ thị của tuyến kho `so` *(`nguon_tinh=()`)*: `soi` XANH. Đúng bẫy `Đ5`
+        #    *"cổng khai ↔ thật phải đỏ CẢ HAI chiều"* — ⓐ/ⓓ đã làm đủ hai chiều cho
+        #    `bang`, ngoại lệ mới phải theo. Áp cho MỌI tuyến *(kể cả `nt == ()`)*;
+        #    `nt` sai kiểu ⇒ bỏ qua *(câu kiểu ở trên đã đỏ — giữ MỘT câu, R1 · C)*.
+        #    ⚠ So TIỀN TỐ `THU_MUC + "/"`: chính hằng `THU_MUC` nằm trong đồ thị của
+        #    `ty_gia` *(qua `nguon_tinh.giai`)*. Mẫu số đo 17/11: 1/41 tuyến mang chuỗi
+        #    như thế *(`ty_gia` — đúng đường nó khai)*.
+        if isinstance(nt, tuple):
+            for tep in sorted(x for x in do_chuoi(t.ham)
+                              if x.startswith(nguon_tinh.THU_MUC + "/")
+                              and x not in nt):
+                loi.append(
+                    f"{t.phuong_thuc} {t.duong}: ham trong vet ({len(vet)} ham) mang "
+                    f"duong tinh {tep!r} ma `nguon_tinh` ⛔ khai — ban do ⛔ ve mot "
+                    f"nguon ham doc")
     return loi, do
 
 
@@ -274,6 +382,8 @@ def main() -> int:
             print(f"     THIEU: {d['thieu']}")
         if d["thua"]:
             print(f"     THUA : {d['thua']}")
+        if d["nguon_tinh"]:
+            print(f"     TINH : {d['nguon_tinh']} · vet {len(d['vet'])} ham")
     if loi:
         print(f"\n⛔ BAN KHAI LECH SQL — {len(loi)} vi pham:")
         for x in loi:

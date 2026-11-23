@@ -1,0 +1,97 @@
+{
+ "bang": "NOEM.COM.GAG",
+ "khuon": "noem_com_gag",
+ "nguon": "[COPY] Report I General Ledger · P&L Report › tab '[2025][RPT] NOEM PL & COM' A18:B18 + F18:Q18 (hàng GAG) + F2:Q3 (tiêu đề)",
+ "cach_doc": "Sheets API v4 values.get · UNFORMATTED_VALUE · khoá SA chỉ-đọc",
+ "ngay_dong_bang": "2026-11-19",
+ "khong_mang_PII": "⛔ KHÔNG mang cột riêng tư: máy soát 2 tên cột của bản thô với PM_COT_RIENG_TU ['Email Address'] — 0 trùng (gộp khoảng trắng, ⛔ phân biệt hoa thường). Ảnh chỉ giữ khoá `thang` + 1 cột chọn; 0 cột bản thô ⛔ chọn (tên ở `cot_khong_chon`). Bản thô qua `chuan_bi` của khuôn: 2 tên cột trên là của BẢNG khuôn dựng; soát thêm 0 tên cột của 0 bảng phụ — 0 trùng. Ô bản thô mà khuôn ⛔ mang/băm: xem `ghi_chu_khuon`.",
+ "ghi_chu_khuon": "COM nhóm GAG (Apero Group), VND, dấu của tab (dương = chi phí), 12 tháng 2025 từ `[2025][RPT] NOEM PL & COM` hàng '18' cột F:Q của SỔ ATL. Ô PL5 sheet: PL5 = PL4 − COM_GAG/tỷ giá USD/10^6. ⛔ mang cột R (2026-01), ⛔ hàng khác.",
+ "khoa": "thang",
+ "kieu_khoa": "yyyymm",
+ "cot": [
+  "com_gag_vnd"
+ ],
+ "cot_khong_chon": [],
+ "so_dong": 12,
+ "trung": [],
+ "thieu": [],
+ "lac": [],
+ "khoa_hong": [],
+ "o_rong": [],
+ "o_loi": [],
+ "loi_theo_cot": {
+  "com_gag_vnd": {}
+ },
+ "loi_mong": {
+  "com_gag_vnd": 0
+ },
+ "cong": {
+  "mong": 12,
+  "so_dong": 12,
+  "dat": true,
+  "ly_do": []
+ },
+ "checksum_noi_dung": "22ec5720f8cf1360",
+ "dong": [
+  {
+   "thu_tu": 1,
+   "thang": "202501",
+   "com_gag_vnd": "156623874"
+  },
+  {
+   "thu_tu": 2,
+   "thang": "202502",
+   "com_gag_vnd": "178783890"
+  },
+  {
+   "thu_tu": 3,
+   "thang": "202503",
+   "com_gag_vnd": "96735894"
+  },
+  {
+   "thu_tu": 4,
+   "thang": "202504",
+   "com_gag_vnd": "80500000"
+  },
+  {
+   "thu_tu": 5,
+   "thang": "202505",
+   "com_gag_vnd": "57000000"
+  },
+  {
+   "thu_tu": 6,
+   "thang": "202506",
+   "com_gag_vnd": "90500000"
+  },
+  {
+   "thu_tu": 7,
+   "thang": "202507",
+   "com_gag_vnd": "86500000"
+  },
+  {
+   "thu_tu": 8,
+   "thang": "202508",
+   "com_gag_vnd": "456658374"
+  },
+  {
+   "thu_tu": 9,
+   "thang": "202509",
+   "com_gag_vnd": "187068379"
+  },
+  {
+   "thu_tu": 10,
+   "thang": "202510",
+   "com_gag_vnd": "232113717"
+  },
+  {
+   "thu_tu": 11,
+   "thang": "202511",
+   "com_gag_vnd": "189109597"
+  },
+  {
+   "thu_tu": 12,
+   "thang": "202512",
+   "com_gag_vnd": "206520084"
+  }
+ ]
+}

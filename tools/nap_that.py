@@ -24,7 +24,7 @@ from fls.adapters.bank import kiem_header, nap                    # noqa: E402
 from fls.canon.o_loi import la_o_loi                              # noqa: E402
 from fls.adapters.pm_join import (PM_DONG_DAU, PM_DONG_TIEU_DE,   # noqa: E402
                                   PM_COT, DongPM, canon_ref,
-                                  kiem_tieu_de_pm)
+                                  kiem_tieu_de_pm, loc_tho)
 from fls.ledger.build import NgucCanh                             # noqa: E402
 from fls.oracle.doc_du import NGUONG_SAN, DemCot, danh_gia        # noqa: E402
 from fls.oracle.nguon import BAN_SAO_RAW                          # noqa: E402
@@ -43,13 +43,33 @@ def _token() -> str:
     return r.stdout.strip()
 
 
-def _lat(tok: str, rng: str, lan: int = 3) -> list[list]:
-    """Mot lat. ⚠ `timeout` 45s, ⛔ khong 300s.
+# ⭐⭐⭐ Timeout cua lan `PM` — **DO DUOC**, ⛔ khong doan (09/09).
+#
+# ⛔⛔ Ban truoc ghim `45` giay cho **moi** lat, va cau van giai thich no la
+#    *"tab `[Importrange]` khi lanh co the vuot 45s MOT LAN roi chay binh
+#    thuong"*. Do that ngay 09/09 tren dung tab ay: **60s TIMEOUT · 120s OK sau
+#    78,7 giay**. ⇒ Gia thiet *"mot lan"* **SAI**: no vuot 45s **moi lan**, va
+#    ba lan thu deu timeout ⇒ `doc_pm` **⛔ khong the chay** — tuc bo nap lenh
+#    chi duy nhat cua he **dang hong tren sheet song**, va ⛔ khong ai biet vi
+#    ⛔ khong ai chay no tu 27/08.
+#
+# ⇒ Lan `PM` doi mot timeout rieng. ⛔ Va lan `Bank` **giu 45**: cau van cua no
+#   *("⛔ khong 300s")* co ly le rieng — mot lat bank cham la mot dau hieu, con
+#   mot lat PM cham la **binh thuong** (`IMPORTRANGE` keo tu mot workbook khac).
+CHO_PM = 180
+CHO_MAC_DINH = 45
+
+
+def _lat(tok: str, rng: str, lan: int = 3,
+         cho: int = CHO_MAC_DINH) -> list[list]:
+    """Mot lat. ⚠ `timeout` mac dinh 45s, ⛔ khong 300s.
 
     Co RETRY vi tab `[Importrange]` khi "lanh" co the vuot 45s mot lan roi chay
     binh thuong. ⛔ Nhung retry ⛔ khong duoc lam thay viec cua timeout: gap
     timeout 3 lan thi NO TO, khong tra lat rong — mot lat rong di qua im lang la
     dung cai da lam cong parity NOI DOI.
+
+    ⚠ `cho` — xem `CHO_PM`: gia thiet *"vuot 45s mot lan"* da bi phep do lat.
     """
     url = (f"https://sheets.googleapis.com/v4/spreadsheets/"
            f"{BAN_SAO_RAW.spreadsheet_id}/values/" + urllib.parse.quote(rng)
@@ -58,7 +78,7 @@ def _lat(tok: str, rng: str, lan: int = 3) -> list[list]:
     for i in range(1, lan + 1):
         t = time.time()
         try:
-            v = json.load(urllib.request.urlopen(q, timeout=45)).get("values", [])
+            v = json.load(urllib.request.urlopen(q, timeout=cho)).get("values", [])
         except Exception as e:                       # timeout · 500 · 503
             print(f"  {rng:34s} lan {i}/{lan} LOI {type(e).__name__}", flush=True)
             if i == lan:
@@ -135,18 +155,27 @@ def cong_doc_du(tok: str, hang: list[list]) -> None:
 def doc_pm(tok: str) -> list[DongPM]:
     """Doc `[Importrange]PM_Unpivot`. ⚠ Tieu de o dong 2, du lieu tu dong 3.
 
-    ⛔ KHONG doc cot co the chua ten nguoi (`Ten tai khoan` · `Email Address`).
+    ⭐⭐ **SUA 2026-09-11 — owner chot "co luu dong tho".** Truoc do ham nay
+      chi dung 8 truong da phan tich va **vut 20 cot con lai ngay luc doc**,
+      nen them mot truong hien thi ve sau thi ⛔ khong bu nguoc duoc cho 3.772
+      dong dang co. Nay moi dong mang them `tho` = **ca hang**, khoa theo TEN.
+
+    ⛔ Ban den rieng tu chuyen ve `pm_join.PM_COT_RIENG_TU` — **mot cho**:
+      `Email Address` **CAM** *(viec ghep ⛔ khong dung den no mot lan nao)*;
+      `Ten tai khoan` **GIU**, vi 535 dong ⛔ khong co so chung tu **chi tra
+      duoc bang no** — owner quyet 11/09.
     """
     from decimal import Decimal
     tab = "[Importrange]PM_Unpivot"
-    hdr = _lat(tok, f"'{tab}'!A{PM_DONG_TIEU_DE}:AC{PM_DONG_TIEU_DE}")
+    hdr = _lat(tok, f"'{tab}'!A{PM_DONG_TIEU_DE}:AC{PM_DONG_TIEU_DE}",
+               cho=CHO_PM)
     kiem_tieu_de_pm(hdr[0] if hdr else [])
     print(f"cong hinh dang PM: XANH ({len(hdr[0])} cot)")
 
     hang: list[list] = []
     lo = PM_DONG_DAU
     while True:
-        v = _lat(tok, f"'{tab}'!A{lo}:AC{lo + LO - 1}")
+        v = _lat(tok, f"'{tab}'!A{lo}:AC{lo + LO - 1}", cho=CHO_PM)
         if not v:
             break
         hang.extend(v)
@@ -157,6 +186,13 @@ def doc_pm(tok: str) -> list[DongPM]:
     def g(r, k):
         j = PM_COT[k]
         return r[j] if j < len(r) else None
+
+    def _chu(v):
+        """O -> chuoi da cat, hoac `None`. ⛔ Chuoi rong ⛔ KHONG phai '' — no
+        la **KHONG BIET** (`INV-I16`), va '' se lam moi phep dem sai."""
+        if v in (None, ""):
+            return None
+        return str(v).strip() or None
 
     def so(v):
         if v in (None, ""):
@@ -181,8 +217,21 @@ def doc_pm(tok: str) -> list[DongPM]:
             hd=str(g(r, "hd") or "").strip() or None,
             cdt1=str(g(r, "cdt1") or "").strip() or None,
             ref_tho=(lambda x: None if x in (None, "") else str(x).strip() or None)(
-                g(r, "ref"))))
-    print(f"PM: {len(ra)} dong · {sum(1 for x in ra if x.ref)} dong co ma")
+                g(r, "ref")),
+            # ⭐ CA HANG, khoa theo TEN COT — tru ban den rieng tu.
+            tho=loc_tho(hdr[0] if hdr else [], r),
+            # ⭐⭐ Bay khoa PE/PI len KIEU (2026-09-17). `pe_loai` do MA NAY
+            #   sinh, ⛔ khong doc thang: nguon de no o HAI cot rieng
+            #   (`Advance` / `Urgent`) va dong nao cung chi co mot.
+            pe_slip=_chu(g(r, "pe_slip")),
+            pe_line=_chu(g(r, "pe_line")),
+            pe_loai=("Advance" if _chu(g(r, "pe_adv"))
+                     else "Urgent" if _chu(g(r, "pe_urg")) else None),
+            pi_slip=_chu(g(r, "pi_slip")),
+            pi_line=_chu(g(r, "pi_line"))))
+    co_tho = sum(1 for x in ra if x.tho)
+    print(f"PM: {len(ra)} dong · {sum(1 for x in ra if x.ref)} dong co ma"
+          f" · {co_tho} dong giu duoc hang tho")
     return ra
 
 

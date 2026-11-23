@@ -1,0 +1,153 @@
+{
+ "_vi_sao": "Tệp KÝ bật cờ IX.ALR năm 2025 giống AS-IS — vòng sửa R1 H12 (KQ-293 · H12-R1-01). Căn cứ: quyết của chủ 22/11 ~10:05 UTC (TIEN_DO.md). Nạp bằng fls.repo.cau_hinh_repo.ky_bat_ix_alr ⇒ một PHIÊN BẢN MỚI của IX.ALR trong kho config chỉ-thêm (⛔ sửa bản cũ; actor = người ký). Đo AS-IS (SA FORMULA 22/11, tab ATL B5:BK1110): By GI 8 mã × 6 khối CDT × 12 tháng 2025 + By NOEM 5 mã (CAH ⛔ OFR) × 12 tháng 2025 có công thức phân bổ; 2026 ⛔ có ⇒ tắt từ 202601. By GI bật từ 202502 (⛔ 202501): D3 driver PE, lưới IX.DRV thiếu GI_PE 202501 (MID3 thiếu TOTAL 202501) ⇒ bật 202501 là DRIVER_THIEU. Đổi tệp ⇒ tăng phien_ban_tep + nạp lại (bản mới, ⛔ sửa bản cũ).",
+ "bang": "IX.ALR",
+ "loai": "ky_bat_co_IX.ALR",
+ "phien_ban_tep": 1,
+ "ky": {
+  "nguoi_ky": "KhanhCQ",
+  "ngay": "2026-11-22",
+  "can_cu": "TIEN_DO 2026-11-22 · Quyết của chủ (~10:05 UTC): ĐỒNG Ý ký BẬT luật phân bổ IX.ALR năm 2025 giống AS-IS"
+ },
+ "mong_dem": {
+  "bat": {
+   "BY_GI": 8,
+   "BY_NOEM": 5
+  },
+  "tat": {
+   "BY_GI": 8,
+   "BY_NOEM": 5
+  }
+ },
+ "luat": [
+  {
+   "hd": "LC",
+   "tu_ky": 202502,
+   "bat": true
+  },
+  {
+   "hd": "BRC",
+   "tu_ky": 202502,
+   "bat": true
+  },
+  {
+   "hd": "CXP",
+   "tu_ky": 202502,
+   "bat": true
+  },
+  {
+   "hd": "OSF",
+   "tu_ky": 202502,
+   "bat": true
+  },
+  {
+   "hd": "FNS",
+   "tu_ky": 202502,
+   "bat": true
+  },
+  {
+   "hd": "CIO",
+   "tu_ky": 202502,
+   "bat": true
+  },
+  {
+   "hd": "CXB",
+   "tu_ky": 202502,
+   "bat": true
+  },
+  {
+   "hd": "CXO",
+   "tu_ky": 202502,
+   "bat": true
+  },
+  {
+   "hd": "BON",
+   "tu_ky": 202501,
+   "bat": true
+  },
+  {
+   "hd": "HCC",
+   "tu_ky": 202501,
+   "bat": true
+  },
+  {
+   "hd": "OFR",
+   "tu_ky": 202501,
+   "bat": true
+  },
+  {
+   "hd": "OGA",
+   "tu_ky": 202501,
+   "bat": true
+  },
+  {
+   "hd": "REC",
+   "tu_ky": 202501,
+   "bat": true
+  },
+  {
+   "hd": "LC",
+   "tu_ky": 202601,
+   "bat": false
+  },
+  {
+   "hd": "BRC",
+   "tu_ky": 202601,
+   "bat": false
+  },
+  {
+   "hd": "CXP",
+   "tu_ky": 202601,
+   "bat": false
+  },
+  {
+   "hd": "OSF",
+   "tu_ky": 202601,
+   "bat": false
+  },
+  {
+   "hd": "FNS",
+   "tu_ky": 202601,
+   "bat": false
+  },
+  {
+   "hd": "CIO",
+   "tu_ky": 202601,
+   "bat": false
+  },
+  {
+   "hd": "CXB",
+   "tu_ky": 202601,
+   "bat": false
+  },
+  {
+   "hd": "CXO",
+   "tu_ky": 202601,
+   "bat": false
+  },
+  {
+   "hd": "BON",
+   "tu_ky": 202601,
+   "bat": false
+  },
+  {
+   "hd": "HCC",
+   "tu_ky": 202601,
+   "bat": false
+  },
+  {
+   "hd": "OFR",
+   "tu_ky": 202601,
+   "bat": false
+  },
+  {
+   "hd": "OGA",
+   "tu_ky": 202601,
+   "bat": false
+  },
+  {
+   "hd": "REC",
+   "tu_ky": 202601,
+   "bat": false
+  }
+ ]
+}

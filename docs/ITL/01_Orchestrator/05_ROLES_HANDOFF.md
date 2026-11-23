@@ -1,6 +1,6 @@
 # 05 — ROLES & HANDOFF: vai trò, RACI, hợp đồng bàn giao
 
-**Version:** v0.2 | **Chủ sở hữu:** COO-CFO
+**Version:** v0.3 | **Chủ sở hữu:** COO-CFO
 
 ---
 
@@ -39,6 +39,8 @@
 
 ## 3. Vai trò phiên AI (kỹ thuật)
 
+> ⭐ **Từ 2026-10-01, §3 và §5 dưới đây được THAY bởi [`10_HOP_DONG_AGENT.md`](10_HOP_DONG_AGENT.md)** — ba agent `fls-ba` · `fls-dev` · `fls-test` và bốn loại phiếu. Hai mục giữ nguyên làm biên bản.
+
 | Vai phiên | Input bắt buộc | Output | Cấm |
 |---|---|---|---|
 | BA session | `NGUỒN-*` + file BA liên quan | Spec điền, `GAP_REPORT` | Tự điền `???` |
@@ -71,5 +73,6 @@ Phiên sau đọc `06` + file được trỏ, **không đọc lại hội thoạ
 3. Nếu handoff nói "đã chạy/đã khớp": xem lại **brick/run id** cụ thể, không tin câu chữ.
 
 ## Changelog
+- v0.3 (2026-10-01): §3 + §5 (vai phiên AI, hợp đồng bàn giao) được thay bởi `10_HOP_DONG_AGENT.md` v1.0 — ba agent `fls-ba`/`fls-dev`/`fls-test` + bốn loại phiếu. Giữ nguyên hai mục làm biên bản.
 - v0.2 (2026-08-18): Bổ sung tên người thực thi lấy từ bằng chứng file (G6): ThomHT/AnhMC · LAN/THƯƠNG · ThuongCT · Hoài. Thêm 1 mắt xích người vào §2.
 - v0.1 (2026-08-18): Khởi tạo — thêm §2 bảng "ranh giới hệ thống đang là con người" (5 mắt xích) làm nợ kiến trúc phải xoá theo milestone; RACI đổi trục sang 3 hợp đồng. 5 ô `???` chờ chỉ định nhân sự.

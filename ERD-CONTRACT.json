@@ -79,9 +79,276 @@
           "pk": false,
           "unique": false,
           "fk": "fls_queue_event.evt_id"
+        },
+        {
+          "name": "nguon",
+          "type": "text",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
         }
       ],
       "pk_cols": [],
+      "unique_keys": []
+    },
+    {
+      "table": "fls_cau_hinh_ban",
+      "kind": "table",
+      "erd_entity": "CAU_HINH_BAN",
+      "island_reason": "kho config chi-THEM — ⛔ gan dong so nao; cung ho `fls_migration`",
+      "columns": [
+        {
+          "name": "ban_id",
+          "type": "bigint",
+          "null": false,
+          "pk": true,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "bang",
+          "type": "text",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "phien_ban",
+          "type": "int",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "nguon",
+          "type": "text",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "checksum",
+          "type": "text",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "actor",
+          "type": "text",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "luc",
+          "type": "timestamptz",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        }
+      ],
+      "pk_cols": [],
+      "unique_keys": [
+        [
+          "bang",
+          "phien_ban"
+        ]
+      ]
+    },
+    {
+      "table": "fls_cau_hinh_dong",
+      "kind": "table",
+      "erd_entity": "CAU_HINH_DONG",
+      "island_reason": "dong cua kho config chi-THEM — noi FK ve `fls_cau_hinh_ban`, ca cum ⛔ gan dong so nao",
+      "columns": [
+        {
+          "name": "dong_id",
+          "type": "bigint",
+          "null": false,
+          "pk": true,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "ban_id",
+          "type": "bigint",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": "fls_cau_hinh_ban.ban_id"
+        },
+        {
+          "name": "khoa",
+          "type": "text",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "gia_tri",
+          "type": "jsonb",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        }
+      ],
+      "pk_cols": [],
+      "unique_keys": [
+        [
+          "ban_id",
+          "khoa"
+        ]
+      ]
+    },
+    {
+      "table": "fls_chup",
+      "kind": "table",
+      "erd_entity": "CHUP",
+      "island_reason": "dau anh chup — `fls_run.chup_id` tro NGUOC ve day; ⛔ khong dong so nao tro toi no truc tiep",
+      "columns": [
+        {
+          "name": "chup_id",
+          "type": "bigint",
+          "null": false,
+          "pk": true,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "doc_luc",
+          "type": "timestamptz",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "spreadsheet_id",
+          "type": "text",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "lan",
+          "type": "text",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "giay",
+          "type": "numeric(8,2)",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "actor",
+          "type": "text",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        }
+      ],
+      "pk_cols": [],
+      "unique_keys": []
+    },
+    {
+      "table": "fls_chup_dong",
+      "kind": "table",
+      "erd_entity": "CHUP_DONG",
+      "island_reason": "",
+      "columns": [
+        {
+          "name": "chup_id",
+          "type": "bigint",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": "fls_chup.chup_id"
+        },
+        {
+          "name": "source_id",
+          "type": "bigint",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": "fls_source.source_id"
+        },
+        {
+          "name": "dong_so",
+          "type": "int",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "o",
+          "type": "jsonb",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        }
+      ],
+      "pk_cols": [
+        "chup_id",
+        "source_id",
+        "dong_so"
+      ],
+      "unique_keys": []
+    },
+    {
+      "table": "fls_chup_nguon",
+      "kind": "table",
+      "erd_entity": "CHUP_NGUON",
+      "island_reason": "",
+      "columns": [
+        {
+          "name": "chup_id",
+          "type": "bigint",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": "fls_chup.chup_id"
+        },
+        {
+          "name": "source_id",
+          "type": "bigint",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": "fls_source.source_id"
+        },
+        {
+          "name": "khai_version",
+          "type": "int",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        }
+      ],
+      "pk_cols": [
+        "chup_id",
+        "source_id"
+      ],
       "unique_keys": []
     },
     {
@@ -125,6 +392,40 @@
         {
           "name": "reason",
           "type": "text",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        }
+      ],
+      "pk_cols": [],
+      "unique_keys": []
+    },
+    {
+      "table": "fls_dien_giai",
+      "kind": "view",
+      "erd_entity": "STATEMENT_MEMO",
+      "island_reason": "khung xem noi fls_itl voi anh chup moi nhat — khong luu gi",
+      "columns": [
+        {
+          "name": "itl_id",
+          "type": "bigint",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "dien_giai",
+          "type": "text",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "chup_id",
+          "type": "bigint",
           "null": true,
           "pk": false,
           "unique": false,
@@ -571,6 +872,86 @@
       "unique_keys": []
     },
     {
+      "table": "fls_khai_cot",
+      "kind": "table",
+      "erd_entity": "KHAI_COT",
+      "island_reason": "",
+      "columns": [
+        {
+          "name": "khai_id",
+          "type": "bigint",
+          "null": false,
+          "pk": true,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "source_id",
+          "type": "bigint",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": "fls_source.source_id"
+        },
+        {
+          "name": "version",
+          "type": "int",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "truong",
+          "type": "text",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "cot",
+          "type": "int",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "thu_tu",
+          "type": "text",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "hieu_luc_tu",
+          "type": "timestamptz",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "actor",
+          "type": "text",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        }
+      ],
+      "pk_cols": [],
+      "unique_keys": [
+        [
+          "source_id",
+          "version",
+          "truong"
+        ]
+      ]
+    },
+    {
       "table": "fls_le",
       "kind": "table",
       "erd_entity": "LEGAL_ENTITY",
@@ -653,6 +1034,56 @@
         {
           "name": "coa2",
           "type": "text",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        }
+      ],
+      "pk_cols": [],
+      "unique_keys": []
+    },
+    {
+      "table": "fls_may_goi_y",
+      "kind": "view",
+      "erd_entity": "MACHINE_SUGGESTION",
+      "island_reason": "khung xem doc tu fls_adjustment — goi y cua may dang co hieu luc, khong luu gi",
+      "columns": [
+        {
+          "name": "itl_id",
+          "type": "bigint",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "field",
+          "type": "text",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "value_after",
+          "type": "text",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "adj_id",
+          "type": "bigint",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "at",
+          "type": "timestamptz",
           "null": true,
           "pk": false,
           "unique": false,
@@ -779,6 +1210,72 @@
       "unique_keys": []
     },
     {
+      "table": "fls_nguon_dai",
+      "kind": "table",
+      "erd_entity": "NGUON_DAI",
+      "island_reason": "",
+      "columns": [
+        {
+          "name": "dai_id",
+          "type": "bigint",
+          "null": false,
+          "pk": true,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "source_id",
+          "type": "bigint",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": "fls_source.source_id"
+        },
+        {
+          "name": "truong",
+          "type": "text",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "cot",
+          "type": "int",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "dai_tho",
+          "type": "text",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "danh_muc",
+          "type": "text",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "doc_luc",
+          "type": "timestamptz",
+          "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        }
+      ],
+      "pk_cols": [],
+      "unique_keys": []
+    },
+    {
       "table": "fls_pm_line",
       "kind": "table",
       "erd_entity": "PM_LINE_SNAP",
@@ -843,6 +1340,54 @@
         {
           "name": "status",
           "type": "text",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "pe_slip",
+          "type": "text",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "pe_line",
+          "type": "text",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "pe_loai",
+          "type": "text",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "pi_slip",
+          "type": "text",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "pi_line",
+          "type": "text",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": null
+        },
+        {
+          "name": "tho",
+          "type": "json",
           "null": true,
           "pk": false,
           "unique": false,
@@ -934,6 +1479,14 @@
           "name": "run_id",
           "type": "text",
           "null": false,
+          "pk": false,
+          "unique": false,
+          "fk": "fls_run.run_id"
+        },
+        {
+          "name": "run_pm",
+          "type": "text",
+          "null": true,
           "pk": false,
           "unique": false,
           "fk": "fls_run.run_id"
@@ -1217,6 +1770,7 @@
       "unique_keys": [
         [
           "run_id",
+          "source_sheet",
           "source_row"
         ]
       ]
@@ -1282,6 +1836,22 @@
           "pk": false,
           "unique": false,
           "fk": null
+        },
+        {
+          "name": "khai_id",
+          "type": "bigint",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": "fls_khai_cot.khai_id"
+        },
+        {
+          "name": "chup_id",
+          "type": "bigint",
+          "null": true,
+          "pk": false,
+          "unique": false,
+          "fk": "fls_chup.chup_id"
         }
       ],
       "pk_cols": [],
@@ -1291,7 +1861,7 @@
       "table": "fls_source",
       "kind": "table",
       "erd_entity": "SOURCE",
-      "island_reason": "manifest pipeline — pipeline ghi, F06 doc (DD-I07)",
+      "island_reason": "",
       "columns": [
         {
           "name": "source_id",
@@ -1429,6 +1999,31 @@
       "via": "evt_id"
     },
     {
+      "from": "fls_cau_hinh_dong",
+      "to": "fls_cau_hinh_ban",
+      "via": "ban_id"
+    },
+    {
+      "from": "fls_chup_dong",
+      "to": "fls_chup",
+      "via": "chup_id"
+    },
+    {
+      "from": "fls_chup_dong",
+      "to": "fls_source",
+      "via": "source_id"
+    },
+    {
+      "from": "fls_chup_nguon",
+      "to": "fls_chup",
+      "via": "chup_id"
+    },
+    {
+      "from": "fls_chup_nguon",
+      "to": "fls_source",
+      "via": "source_id"
+    },
+    {
       "from": "fls_itl",
       "to": "fls_le",
       "via": "le"
@@ -1449,6 +2044,16 @@
       "via": "itl_id"
     },
     {
+      "from": "fls_khai_cot",
+      "to": "fls_source",
+      "via": "source_id"
+    },
+    {
+      "from": "fls_nguon_dai",
+      "to": "fls_source",
+      "via": "source_id"
+    },
+    {
       "from": "fls_pm_line",
       "to": "fls_run",
       "via": "run_id"
@@ -1462,6 +2067,11 @@
       "from": "fls_pm_link",
       "to": "fls_run",
       "via": "run_id"
+    },
+    {
+      "from": "fls_pm_link",
+      "to": "fls_run",
+      "via": "run_pm"
     },
     {
       "from": "fls_pm_unlink",
@@ -1487,6 +2097,16 @@
       "from": "fls_reject",
       "to": "fls_run",
       "via": "run_id"
+    },
+    {
+      "from": "fls_run",
+      "to": "fls_chup",
+      "via": "chup_id"
+    },
+    {
+      "from": "fls_run",
+      "to": "fls_khai_cot",
+      "via": "khai_id"
     }
   ]
 }

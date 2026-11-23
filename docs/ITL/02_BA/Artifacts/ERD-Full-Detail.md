@@ -521,6 +521,8 @@ Phân cấp `TSI_MAP` (§10.2): **L1** = Transaction · **L2** = Slip · **L3** 
 
 ### 12.0 · Bảng tên: mã ↔ tên bảng vật lý
 
+> ⛔⛔⛔ **BIA — `itl_transaction` ĐÃ KHÔNG ĐƯỢC CHỌN** *(chốt 2026-09-17)*. Tên vật lý thi hành là **`fls_itl`**; lý do + câu nối ba cách gọi xem `FLS-ERD-Full-Detail.md §12.0` và **`BA-05` §TỪ ĐIỂN THỰC THỂ**. ⛔ Mọi tên `itl_*` trong tệp này là **đề xuất của bản `v0.2`**, giữ làm bia — kho thi hành có **23** bảng tiền tố `fls_`.
+
 | Mã | Tên bảng vật lý | Nguồn tên | PK |
 |---|---|:--:|---|
 | `CTY` | `FPS_Country` | *đề xuất* | `country_code` |
@@ -558,7 +560,7 @@ Phân cấp `TSI_MAP` (§10.2): **L1** = Transaction · **L2** = Slip · **L3** 
 | `PCSlip` | **`FPS_PaymentCompletion`** | `[E]` | `pc_id` |
 | `PCL` | `FPS_PaymentCompletionLine` | *đề xuất* | `pc_line_id` |
 | `TSI_MAP` | **`TSI_MAP`** | `[E]` | `tsi_map_id` |
-| `ITL` | `itl_transaction` | *đề xuất* | `itl_id` |
+| `ITL` | ~~`itl_transaction`~~ → **`fls_itl`** | ⛔ **đề xuất KHÔNG chọn** *(17/09)* | `itl_id` |
 | `LGT` | `itl_ledger_type` | *đề xuất* | `ledger_type` |
 | `STM` | `itl_statement_line` | *đề xuất* | `stm_id` |
 | `ADJ` | `itl_adjustment_entry` | *đề xuất* | `adj_id` |

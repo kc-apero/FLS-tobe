@@ -566,6 +566,11 @@ Phân cấp `TSI_MAP` (§10.2): **L1** = Transaction · **L2** = Slip · **L3** 
 
 ### 12.0 · Bảng tên: mã ↔ tên bảng vật lý
 
+> ⛔⛔⛔ **BIA — `itl_transaction` ĐÃ KHÔNG ĐƯỢC CHỌN** *(chốt 2026-09-17, owner hỏi *"mã tên của Giao dịch đã đúng khái niệm, tên file excel, ggsheet chưa?"*)*.
+> Tên vật lý thi hành là **`fls_itl`**, ⛔ không phải `itl_transaction`. Lý do là **nguyên tắc của owner**, ⛔ không phải sở thích: *"owner ⛔ không đặt ra tên mới, owner **đọc tên hệ đang chạy**"* — `ITL` là tên owner dùng hằng ngày, `itl_transaction` là tên **owner chưa từng dùng**.
+> ⚠ **Chỗ lệch được GIỮ, và khai ra:** `ITL` = *Input Transaction Ledger* = tên một cái **SỔ**, còn bảng giữ **DÒNG** ⇒ `fls/db/schema.py` khai `erd_entity="ITL_ROW"`. Câu nối ba cách gọi *(khái niệm · tab ggsheet · tệp excel)* sống ở **`BA-05` §TỪ ĐIỂN THỰC THỂ**, sinh bởi `tools/sinh_ban_do_tang.py`, có cổng `tests/test_tu_dien_thuc_the.py`.
+> ⛔ **Toàn bộ tên `itl_*` còn lại trong tệp này là ĐỀ XUẤT của bản `v0.2` (44 thực thể), ⛔ không phải tên đang chạy** — kho thi hành có **23** bảng, tiền tố `fls_`. Giữ nguyên chúng làm **bia**, ⛔ không đổi hàng loạt: đổi đi thì bản thiết kế `v0.2` biến mất mà ⛔ không ai thấy *(`R-A5`)*.
+
 | Mã | Tên bảng vật lý | Nguồn tên | PK |
 |---|---|:--:|---|
 | `CTY` | `FPS_Country` | *đề xuất* | `country_code` |
@@ -603,7 +608,7 @@ Phân cấp `TSI_MAP` (§10.2): **L1** = Transaction · **L2** = Slip · **L3** 
 | `PCSlip` | **`FPS_PaymentCompletion`** | `[E]` | `pc_id` |
 | `PCL` | `FPS_PaymentCompletionLine` | *đề xuất* | `pc_line_id` |
 | `TSI_MAP` | **`TSI_MAP`** | `[E]` | `tsi_map_id` |
-| `ITL` | `itl_transaction` | *đề xuất* | `itl_id` |
+| `ITL` | ~~`itl_transaction`~~ → **`fls_itl`** | ⛔ **đề xuất KHÔNG chọn** *(17/09)* | `itl_id` |
 | `LGT` | `itl_ledger_type` | *đề xuất* | `ledger_type` |
 | `STM` | `itl_statement_line` | *đề xuất* | `stm_id` |
 | `ADJ` | `itl_adjustment_entry` | *đề xuất* | `adj_id` |

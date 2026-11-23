@@ -1,0 +1,1049 @@
+<!doctype html>
+<!-- AP_FLS-Voi_v2.5.0_Doi-Chieu-NOW-TOBE_2026-11-13.html · sinh bởi docs/ITL/_tools/sinh_ap_voi_v2.py · mỗi thay đổi là một tệp mới -->
+<html lang="vi"><head>
+<meta charset="utf-8">
+<meta name="ap:lineage" content="AP_FLS-Voi">
+<meta name="ap:branch" content="">
+<meta name="ap:version" content="2.5.0">
+<meta name="ap:parent" content="">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AP Voi FLS v2.5.0</title>
+<style>
+  /* apr-build-ap references/ap-style.css — the regular light AP stylesheet (§A.31).
+     Inline this file verbatim as the start of the AP's <style>. Light theme only:
+     never add prefers-color-scheme rules or colour custom properties. */
+  body { font: 14px/1.55 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif; color: #1f2937; max-width: 1560px; margin: 24px auto; padding: 0 24px; }
+  h1 { font-size: 26px; border-bottom: 2px solid #E57347; padding-bottom: 6px; font-family: 'Space Grotesk', -apple-system, sans-serif; letter-spacing: -0.02em; }
+  h2.part { font-size: 22px; margin-top: 48px; padding-bottom: 4px; border-bottom: 2px solid #E57347; color: #b14a23; font-family: 'Space Grotesk', -apple-system, sans-serif; letter-spacing: -0.02em; }
+  h2 { font-size: 20px; margin-top: 38px; padding-bottom: 4px; border-bottom: 1px solid #e5e7eb; color: #b14a23; font-family: 'Space Grotesk', -apple-system, sans-serif; letter-spacing: -0.015em; }
+  h3 { font-size: 16px; margin-top: 24px; color: #1f2937; }
+  h4 { font-size: 14px; margin-top: 18px; color: #374151; text-transform: uppercase; letter-spacing: 0.04em; }
+  code { background: #f5f4f1; padding: 1px 5px; border-radius: 3px; font-size: 0.92em; }
+  pre { background: #f5f4f1; padding: 10px 14px; border-radius: 6px; overflow-x: auto; font-size: 12.5px; line-height: 1.4; }
+  table { border-collapse: collapse; margin: 8px 0 16px; width: 100%; max-width: 100%; }
+  th, td { border: 1px solid #d4d4d8; padding: 6px 10px; text-align: left; vertical-align: top; font-size: 13px; overflow-wrap: anywhere; word-break: break-word; }
+  th { background: #f5f4f1; }
+  .recommended { background: #fef3e8; }
+  .new { background: #ecfccb; }
+  .badge { display: inline-block; padding: 1px 6px; border-radius: 3px; font-size: 11px; font-weight: 500; }
+  .badge.new { background: #bbf7d0; color: #166534; }
+  .badge.keep { background: #e0e7ff; color: #3730a3; }
+  .badge.tbd { background: #fde68a; color: #92400e; }
+  .badge.built { background: #bbf7d0; color: #166534; }
+  .badge.miss { background: #fee2e2; color: #991b1b; }
+  .badge.partial { background: #fef3c7; color: #92400e; }
+  blockquote { border-left: 3px solid #E57347; background: #fef3e8; margin: 8px 0; padding: 8px 14px; }
+  .legend { font-size: 12px; color: #6b7280; }
+  .note { font-size: 12.5px; color: #374151; background: #f0f9ff; border-left: 3px solid #7dd3fc; margin: 6px 0 14px; padding: 8px 12px; }
+  .warn { font-size: 12.5px; color: #78350f; background: #fffbeb; border-left: 3px solid #f59e0b; margin: 6px 0 14px; padding: 8px 12px; }
+  nav.toc { position: fixed; top: 0; left: 0; width: 258px; height: 100vh; overflow-y: auto; box-sizing: border-box; background: #faf9f7; border-right: 1px solid #e5e7eb; padding: 18px 10px 48px; font-size: 12px; line-height: 1.45; z-index: 50; }
+  nav.toc .toc-title { font-size: 11.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: #b14a23; margin: 0 0 10px 6px; }
+  nav.toc a { display: block; color: #475569; text-decoration: none; padding: 3px 8px; border-radius: 4px; border-left: 2px solid transparent; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  nav.toc a:hover { background: #fef3e8; color: #b14a23; }
+  nav.toc a.lvl-1 { font-weight: 700; color: #1f2937; margin-top: 9px; }
+  nav.toc a.lvl-2 { padding-left: 18px; font-weight: 600; }
+  nav.toc a.lvl-3 { padding-left: 32px; color: #6b7280; }
+  nav.toc a.active { background: #fef3e8; color: #b14a23; border-left-color: #E57347; }
+  nav.toc a.lvl-p { font-weight: 800; color: #8a3d1c; margin-top: 12px; text-transform: uppercase; font-size: 10.5px; letter-spacing: .08em; }
+  body { margin-left: 290px; }
+  @media (max-width: 1180px) { nav.toc { display: none; } body { margin-left: auto; } }
+  @media print { nav.toc { display: none; } body { margin-left: auto; } }
+  .fig-cap { font-size: 12px; color: #6b7280; text-align: center; margin: 6px 0 4px; }
+  .fig-cap strong { color: #b14a23; }
+  ul.fig-notes, ul.tbl-notes { font-size: 12px; color: #6b7280; margin: 2px 0 14px; padding-left: 22px; }
+  figure.viz { margin: 10px 0 16px; } figure.viz svg { width: 100%; height: auto; border: 1px solid #e5e7eb; border-radius: 6px; }
+  .tw { overflow-x: auto; max-width: 100%; }
+  td.mono { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 11px; white-space: nowrap; }
+  td.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+  table.uf { table-layout: fixed; }
+  table.uf td { font-size: 12px; vertical-align: top; }
+  table.uf ol, table.uf ul { margin: 0; padding-left: 16px; }
+  .grid td { text-align: center; font-size: 11.5px; }
+  .grid td.lbl { text-align: left; white-space: nowrap; }
+  .hole { background: #fef2f2; color: #991b1b; font-weight: 700; }
+  .ctl { display: inline-block; border: 1px solid #9ca3af; border-radius: 4px; padding: 0 5px; font-size: 11.5px; background: #fff; white-space: nowrap; }
+  h2.part-divider { font-size: 13px; text-transform: uppercase; letter-spacing: .14em; color: #8a3d1c; background: #faf2ec; border: none; border-top: 3px solid #E57347; margin: 64px 0 6px; padding: 14px 2px 6px; font-weight: 800; font-family: 'Space Grotesk', -apple-system, sans-serif; }
+  html { color-scheme: light }
+  body { background: #fff }
+  /* §A.14 agreement axis: bar + tint + a pill naming the state. border-left + padding held constant. */
+  h2[data-st],h3[data-st],h4[data-st]{border-left:9px solid var(--st-bar);padding-left:11px;margin-left:-20px;background:var(--st-tint)}
+  [data-st="draft"]{--st-bar:#71717a;--st-tint:#f4f4f5}
+  [data-st="review"]{--st-bar:#c026d3;--st-tint:#fdf4ff}
+  [data-st="approved"]{--st-bar:#16a34a;--st-tint:#f0fdf4}
+  [data-st="locked"]{--st-bar:#1d4ed8;--st-tint:#eff6ff;border-left-style:double;border-left-width:11px;padding-left:9px}
+  [data-st="superseded"]{--st-bar:#a8a29e;--st-tint:transparent;border-left-style:dashed;color:#78716c;font-style:italic}
+  h2.part[data-st]::after,h3[data-st]::after,h4[data-st]::after{content:attr(data-st);float:right;margin:5px 0 0 14px;padding:0 9px;border-radius:9px;background:var(--st-bar);color:#fff;font:600 10.5px/18px -apple-system,Segoe UI,sans-serif;letter-spacing:.06em;text-transform:uppercase;font-style:normal;white-space:nowrap}
+  h2.part[data-st]::after{margin-top:7px}
+  :is(h2.part,h3,h4):is([data-st="approved"],[data-st="locked"])::after{content:attr(data-st) " \00b7 " attr(data-st-on)}
+  :is(h2.part,h3,h4)[data-st="superseded"]::after{background:transparent;color:#78716c;border:1px dashed #a8a29e;line-height:16px}
+  .stlegend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:11.5px;color:#52525b;margin:10px 0 16px}
+  .stkey{font-size:10.5px;font-weight:700;padding:1px 6px;border-radius:3px;border-left:3px solid var(--st-bar);background:var(--st-tint)}
+  details > summary { cursor: pointer; color: #6b7280; }
+  svg text { fill: #1f2937; font-family: -apple-system, 'Segoe UI', sans-serif; }
+  svg .box { fill: #fff; stroke: #E57347; stroke-width: 1.5; }
+  svg .zone { fill: none; stroke: #9ca3af; stroke-dasharray: 5 4; }
+  svg .ln { stroke: #6b7280; stroke-width: 1.4; fill: none; }
+  .nw { white-space: nowrap; }
+  table.hdr th { width: 170px; }
+
+
+/* AP-specific rules (§A.31) */
+.voi{overflow-x:auto}
+.voi svg{min-width:1600px;height:auto;display:block}
+.vo-khung{overflow-x:auto}
+table.vo-bang{table-layout:auto;font-size:11px;border-collapse:collapse;min-width:1700px}
+table.vo-bang th{position:sticky;top:0;background:#f9fafb;font-size:11px;white-space:nowrap;padding:4px 6px}
+table.vo-bang th.vo-h{position:sticky;left:0;z-index:2;background:#fff;text-align:left;min-width:150px;font-weight:400;white-space:normal}
+table.vo-bang td.vo{padding:3px 5px;vertical-align:top;white-space:nowrap;border:1px solid #e5e7eb}
+table.vo-bang td.vo div{display:flex;justify-content:space-between;gap:6px;line-height:1.35}
+table.vo-bang td.vo span{color:#6b7280}
+table.vo-bang td.vo b{font-weight:600;color:#111827}
+td.vo-ok{background:#ecfdf3} td.vo-mid{background:#fffbeb} td.vo-no{background:#fef2f2}
+td.vo-na{background:#f3f4f6;color:#9ca3af;text-align:center} td.vo-part{background:#f8fafc}
+td.vo-sum{background:#fef3e8;font-weight:600}
+table.io5{width:100%;border-collapse:collapse;font-size:13px}
+table.io5 th,table.io5 td{border-bottom:1px solid #e5e7eb;padding:6px 8px;text-align:left;vertical-align:top}
+table.io5 .mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px}
+table.io5 tr.b1 th{background:#fef3e8}
+pre{white-space:pre-wrap}
+.ghichu{color:#6b7280;font-size:13px}
+.scroll{overflow-x:auto}
+
+.voi svg text{font-family:-apple-system,Segoe UI,sans-serif;fill:#1b2420}
+.voi .ag-dai{stroke:none}
+.voi .ag-t{font:700 11.5px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.06em;fill:#fff}
+.voi .ag-t2{font:500 10.5px -apple-system,Segoe UI,sans-serif;fill:#fff}
+.voi .ag-dai.ag-ag1{fill:#2f5d8a}
+.voi .ag-dai.ag-ag2{fill:#1f7a6a}
+.voi .ag-dai.ag-ag3{fill:#7a4bb0}
+.voi .ag-dai.ag-ag4{fill:#a3332a}
+.voi .ag-khung.ag-ag4{stroke:#a3332a}
+.voi .ag-dai.ag-ma{fill:#5a655f}
+.voi .ag-khung{fill:none;stroke-width:2}
+.voi .ag-khung.ag-ag1{stroke:#2f5d8a}
+.voi .ag-khung.ag-ag2{stroke:#1f7a6a}
+.voi .ag-khung.ag-ag3{stroke:#7a4bb0}
+.voi .ag-khung.ag-ma{stroke:#5a655f;stroke-dasharray:6 4}
+.voi .buoc-l{stroke:#d4dad5;stroke-width:1.5}
+.voi .buoc-t{font:600 10.5px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.12em;fill:#5a655f}
+.voi .hop.ag-ag1 .hop-k{stroke:#2f5d8a;fill:#e6eef6}
+.voi .hop.ag-ag2 .hop-k{stroke:#1f7a6a;fill:#e2f2ee}
+.voi .hop.ag-ag3 .hop-k{stroke:#7a4bb0;fill:#f1ebf8}
+.voi .hop.ag-ma .hop-k{stroke:#5a655f;fill:#fff}
+.voi .hop.ag-ag4 .hop-k{stroke:#a3332a;fill:#fbecea}
+.voi .hop.ag-ix .hop-k{stroke:#3d4a55;fill:#eceff2;stroke-dasharray:4 3}
+.voi .hop.ag-ag1 .hop-ma{fill:#2f5d8a}
+.voi .hop.ag-ag2 .hop-ma{fill:#1f7a6a}
+.voi .hop.ag-ag3 .hop-ma{fill:#7a4bb0}
+.voi .hop.ag-ma .hop-ma{fill:#1b2420}
+.voi .hop.ag-ag4 .hop-ma{fill:#a3332a}
+.voi .hop.ag-ix .hop-ma{fill:#3d4a55}
+.voi .chip3{fill:#f1ebf8;stroke:#7a4bb0}
+.voi .chip3-t{font:700 8.5px ui-monospace,SFMono-Regular,Menlo,monospace;fill:#7a4bb0}
+.voi .hang-kiểm{fill:#fbecea!important}
+.voi .hang-kiểm+text{fill:#a3332a}
+.voi .nhom{stroke:none}
+.voi .nhom-t{font:600 12px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.08em;fill:#fff}
+.voi .nhom.g-in{fill:#2f5d8a}
+.voi .nhom.g-ca{fill:#b3362b}
+.voi .nhom.g-al{fill:#7a4bb0}
+.voi .nhom.g-dw{fill:#2f7a5b}
+.voi .nhom.g-rp{fill:#9a6a10}
+.voi .khung{fill:none;stroke-width:2}
+.voi .khung.g-in{stroke:#2f5d8a}
+.voi .khung.g-ca{stroke:#b3362b}
+.voi .khung.g-al{stroke:#7a4bb0}
+.voi .khung.g-dw{stroke:#2f7a5b}
+.voi .khung.g-rp{stroke:#9a6a10}
+.voi .cot-t{font:600 11px -apple-system,Segoe UI,sans-serif;fill:#1b2420}
+.voi .cot-ma{font:500 10.5px ui-monospace,SFMono-Regular,Menlo,monospace;fill:#5a655f}
+.voi .cot-ag{font:italic 10px -apple-system,Segoe UI,sans-serif;fill:#5a655f}
+.voi .hang-n{fill:#fff;stroke:#d4dad5}
+.voi .hang-kiểm{fill:#f4e8e8}
+.voi .hang-config{fill:#eceff2}
+.voi .hang-t{font:700 12.5px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.04em}
+.voi .hang-p{font:11px -apple-system,Segoe UI,sans-serif;fill:#5a655f}
+.voi .hang-nhom{font:700 11px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.12em;fill:#5a655f}
+.voi .plan{fill:none;stroke:#5a655f;stroke-dasharray:5 4}
+.voi .plan-t{font:italic 12px -apple-system,Segoe UI,sans-serif;fill:#5a655f}
+.voi .hop{cursor:pointer}
+.voi .hop-k{fill:#fff;stroke-width:1.6}
+.voi .hop.g-in .hop-k{stroke:#2f5d8a;fill:#e6eef6}
+.voi .hop.g-ca .hop-k{stroke:#b3362b;fill:#fbeceb}
+.voi .hop.g-al .hop-k{stroke:#7a4bb0;fill:#f1ebf8}
+.voi .hop.g-dw .hop-k{stroke:#2f7a5b;fill:#e5f2ec}
+.voi .hop.g-rp .hop-k{stroke:#9a6a10;fill:#f7f0e1}
+.voi .hop.g-ks .hop-k{stroke:#6b2f2f;fill:#f4e8e8}
+.voi .hop.g-ix .hop-k{stroke:#3d4a55;fill:#eceff2;stroke-dasharray:4 3}
+.voi .hop-ma{font:700 11.5px ui-monospace,SFMono-Regular,Menlo,monospace}
+.voi .hop.g-in .hop-ma{fill:#2f5d8a}
+.voi .hop.g-ca .hop-ma{fill:#b3362b}
+.voi .hop.g-al .hop-ma{fill:#7a4bb0}
+.voi .hop.g-dw .hop-ma{fill:#2f7a5b}
+.voi .hop.g-rp .hop-ma{fill:#9a6a10}
+.voi .hop.g-ks .hop-ma{fill:#6b2f2f}
+.voi .hop.g-ix .hop-ma{fill:#3d4a55}
+.voi .hop-ten{font:600 11px -apple-system,Segoe UI,sans-serif}
+.voi .hop-d{font:10.5px -apple-system,Segoe UI,sans-serif;fill:#5a655f}
+.voi .hop-tt{font:600 10px ui-monospace,SFMono-Regular,Menlo,monospace}
+.voi .tt-ok{fill:#1f7a45}
+.voi .tt-mid{fill:#9a6a10}
+.voi .tt-no{fill:#b3362b}
+.voi .tt-na{fill:#5a655f}
+.voi .hop-pd{font:10px ui-monospace,SFMono-Regular,Menlo,monospace;fill:#5a655f}
+.voi .nguoi{fill:#fbf1dc;stroke:#9a6a10}
+.voi .nguoi-t{font:700 8.5px ui-monospace,SFMono-Regular,Menlo,monospace;fill:#9a6a10}
+.voi .ten{stroke:#1b2420;stroke-width:1.5}
+.voi .mui{fill:#1b2420}
+.voi .hit{stroke:transparent;stroke-width:12}
+.voi .ten-g{cursor:pointer}
+.voi .ten-t{font:600 10px ui-monospace,SFMono-Regular,Menlo,monospace;fill:#5a655f}
+.voi .hop:focus-visible .hop-k,.voi .hop.sang .hop-k{stroke:#e0a100;stroke-width:3}
+.voi .ten-g:focus-visible .ten,.voi .ten-g.sang .ten{stroke:#e0a100;stroke-width:3}
+.voi .ten-g.sang .ten-t{fill:#e0a100}
+.voi svg.loc .hop:not(.sang),.voi svg.loc .ten-g:not(.sang){opacity:.28}
+.voi svg{display:block;height:auto}
+.voi .ben{stroke:none}
+.voi .ben-now{fill:#5a655f}
+.voi .ben-tobe{fill:#1b2420}
+.voi .ben-t{font:700 11.5px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.06em;fill:#fff}
+.voi .ben-k{fill:none;stroke-width:1.6}
+.voi .ben-k.ben-now{stroke:#5a655f;stroke-dasharray:6 4}
+.voi .ben-k.ben-tobe{stroke:#1b2420}
+.voi .tang2{stroke:none}
+.voi .tang2.ag-now{fill:#d4dad5}
+.voi .tang2.ag-ag1{fill:#e6eef6}
+.voi .tang2.ag-ag2{fill:#e2f2ee}
+.voi .tang2.ag-ag3{fill:#f1ebf8}
+.voi .tang2-t{font:600 10px ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.05em}
+.voi .hop2{cursor:pointer}
+.voi .hop2.now .hop-k{fill:#fff;stroke:#5a655f;stroke-dasharray:4 3;stroke-width:1.4}
+.voi .hop2.now .hop-ma{fill:#5a655f;font-weight:500}
+.voi .hop2.ag-ag1 .hop-k{stroke:#2f5d8a;fill:#e6eef6}
+.voi .hop2.ag-ag2 .hop-k{stroke:#1f7a6a;fill:#e2f2ee}
+.voi .hop2.ag-ag3 .hop-k{stroke:#7a4bb0;fill:#f1ebf8}
+.voi .hop2.ag-ag1 .hop-ma{fill:#2f5d8a}
+.voi .hop2.ag-ag2 .hop-ma{fill:#1f7a6a}
+.voi .hop2.ag-ag3 .hop-ma{fill:#7a4bb0}
+.voi .chip{cursor:pointer}
+.voi .chip-k{stroke-width:1.2}
+.voi .chip-t{font:700 9.5px ui-monospace,SFMono-Regular,Menlo,monospace}
+.voi .chip-ri{fill:#e6eef6;stroke:#2f5d8a}
+.voi .chip-pr{fill:#e2f2ee;stroke:#1f7a6a}
+.voi .chip-si{fill:#f1ebf8;stroke:#7a4bb0}
+.voi .chip-cuoi{stroke-width:2.4}
+.voi .chip-h{display:inline-block;font:700 11px ui-monospace,SFMono-Regular,Menlo,monospace;padding:0 6px;border-radius:8px;border:1.2px solid}
+.voi .ra-ngoai{font:italic 10px -apple-system,Segoe UI,sans-serif;fill:#5a655f}
+.voi svg.loc2 .hop2:not(.sang2),.voi svg.loc2 .hop:not(.sang2){opacity:.28}
+.voi svg.loc2 .ten-g{opacity:.28}
+.voi .hop.sang2 .hop-k{stroke:#e0a100!important;stroke-width:3}
+.voi .tach{stroke:#d4dad5;stroke-width:2;stroke-dasharray:2 5}
+.voi .hop2.sang2 .hop-k{stroke:#e0a100!important;stroke-width:3}
+.voi .chip.sang2 .chip-k{stroke:#e0a100;stroke-width:3}
+</style></head>
+<body>
+<nav class="toc"><p class="toc-title">Contents</p><div id="toc"></div></nav>
+<main>
+<h1>AP · Voi FLS v2.5.0 — đối chiếu NOW ↔ TO-BE và Voi số lượng dữ liệu</h1>
+<table class="hdr">
+<tr><th>Component</th><td>FLS · Voi v2 — đối chiếu NOW (Google Sheets) ↔ TO-BE (FLS) theo agent × bước FPA, kèm Voi số lượng dữ liệu</td></tr>
+<tr><th>Version</th><td>2.5.0 · 2026-11-13</td></tr>
+<tr><th>Status</th><td><span class="badge tbd">DRAFT</span> mọi mục là <code>draft</code> hoặc <code>review</code>; chỉ owner đặt <code>approved</code> (§1.4).</td></tr>
+<tr><th>Owner · operator · duyệt</th><td>Owner <b>ThuongCT</b> · operator <b>KhanhCQ</b> · duyệt độc lập <b>Lanptn</b> · thi hành: agent <code>fls-ba</code> · <code>fls-dev</code> · <code>fls-test</code> (phiếu WO / BG / KQ)</td></tr>
+<tr><th>Related</th><td>Voi FLS-tobe-phase1 v0.9.1 (<code>Voi-FLS-tobe-phase1.html</code>) · <code>AP_FLS_FleetEval_v1.3.0_2026-11-09.html</code> · <code>architecturepack_FLS_v1.0.0_current-state_2026-09-17.html</code></td></tr>
+<tr><th>Changes in v2.5.0</th><td>Dựng lại bản nháp Voi FLS v2.4 thành AP đầy đủ theo skill apr-build-ap: thêm Voi số lượng dữ liệu (Part 2: ma trận 23 tháng × 6 loại dữ liệu, mỗi ô bốn số có · chạy · mapping · sửa, sinh bởi <code>tools/do_voi_so_luong.py</code>); truy vết NOW → TO-BE → code cho 31 hộp (Part 3 phần đã có · Part 5 phần đề xuất); vòng giao việc cho agent (§1.3); Userflows · Acceptance · lưới đối chiếu (Part 4); trạng thái đồng thuận từng mục. Nội dung §0–§7 của v2.4 giữ nguyên ý, đổi số theo bảng §1.5.2.</td></tr>
+<tr><th style="vertical-align:top">Lịch sử sửa đổi</th><td><details><summary><b>6 sửa đổi trước đó</b> — v2 → v2.4 (bản nháp, ⛔ AP)</summary><table style="margin-top:8px"><tr><th style="white-space:nowrap;vertical-align:top">v2.4</th><td>2026-11-12 · STANDARD INPUT đủ 4 họ — PLT vào SI (bình luận owner).</td></tr><tr><th style="white-space:nowrap;vertical-align:top">v2.3.1</th><td>2026-11-12 · Agent 4 về đúng làn bên TO-BE.</td></tr><tr><th style="white-space:nowrap;vertical-align:top">v2.3</th><td>2026-11-12 · Gộp NOW và TO-BE vào một sơ đồ, đặt cạnh nhau.</td></tr><tr><th style="white-space:nowrap;vertical-align:top">v2.2</th><td>2026-11-12 · NOW ↔ TO-BE từ RAW tới ITL Adjust, ghép 1-1 theo output.</td></tr><tr><th style="white-space:nowrap;vertical-align:top">v2.1</th><td>2026-11-12 · Trục ngang theo agent, bỏ chữ ACTUAL, thêm zoom.</td></tr><tr><th style="white-space:nowrap;vertical-align:top">v2</th><td>2026-11-11 · Vẽ lại theo kiến trúc FPA, chưa gộp vào artifact chính.</td></tr></table></details></td></tr>
+</table>
+<h2 class="part-divider">Part 1 — SYSTEM · khung, voi và cách giao việc</h2>
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<h2 class="part" id="s1-1" data-st="draft" data-st-on="2026-11-13" data-st-hash="492165d0">§1.1 SYSTEM: Voi NOW ↔ TO-BE — hình chính</h2>
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<p>Một hình, chung hàng họ dữ liệu: nửa trái là luồng Google Sheets hôm nay (NOW) tới ITL Adjust; nửa phải là TO-BE theo agent × bước FPA. Mọi heading sau đây mở bằng tên một thành phần trên hình (RI · PR · SI · CA · SO · AL · DW · RP · KS · IX) hoặc <code>SYSTEM</code>.</p>
+<p class="fig-cap"><strong>Figure 1.1</strong> — <strong>SYSTEM:</strong> Voi FLS v2 — NOW bên trái tới ITL Adjust, TO-BE bên phải; hàng = họ dữ liệu, cột = bước.</p><ul class="fig-notes"><li>Sinh từ <code>docs/ITL/_tools/sinh_voi_v2.py</code> (nguồn sự thật của hộp, mũi tên, bước PD Now); AP import, ⛔ chép.</li><li>Máy kiểm lúc sinh: 31 hộp · 23 mũi tên, mũi tên nằm ngang, ⛔ cắt qua hộp; mã mỗi hộp nói đúng bước của cột chứa nó.</li><li>Nhãn NGƯỜI / TAY = có tay người · chip RI-1 … SI-4 = output, cùng mã ở hai bên là cùng một output.</li><li>✅ có mã · ◐ một phần · ⛔ chưa có mã — trục <b>dựng</b>, khác trục <b>đồng thuận</b> của heading (§1.4.1).</li></ul>
+<div class="tw voi"><svg viewBox="0 0 3012 786" width="100%" role="group" aria-label="Voi FLS v2: NOW (AS-IS) bên trái tới ITL Adjust, TO-BE bên phải; hàng = họ dữ liệu, cột = bước; chip cùng mã là cùng một output">
+<defs><marker id="mui" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" class="mui"/></marker></defs>
+<rect class="ben ben-now" x="170" y="4" width="738" height="36" rx="6"/><text class="ag-t" x="180" y="18">NOW · AS-IS GOOGLE SHEETS HÔM NAY</text><text class="ag-t2" x="180" y="33">tới ITL Adjust — phần sau là mã tất định, giữ nguyên</text><rect class="ben-k ben-now" x="170" y="112" width="738" height="474" rx="10"/>
+<line class="buoc-l" x1="178" y1="57" x2="336" y2="57"/><text class="buoc-t" x="257.0" y="53" text-anchor="middle">sheet nguồn</text><text class="cot-t" x="257.0" y="73" text-anchor="middle">RAW</text><text class="cot-ma" x="257.0" y="88" text-anchor="middle">PD 1xx</text>
+<line class="buoc-l" x1="366" y1="57" x2="524" y2="57"/><text class="buoc-t" x="445.0" y="53" text-anchor="middle">P100 · A-CCR · H1000</text><text class="cot-t" x="445.0" y="73" text-anchor="middle">PREPARE</text><text class="cot-ma" x="445.0" y="88" text-anchor="middle">PD 2xx</text>
+<line class="buoc-l" x1="554" y1="57" x2="712" y2="57"/><text class="buoc-t" x="633.0" y="53" text-anchor="middle">file ITL 1/2 RAW</text><text class="cot-t" x="633.0" y="73" text-anchor="middle">ITL RAW · ghép</text><text class="cot-ma" x="633.0" y="88" text-anchor="middle">PD 30x</text>
+<line class="buoc-l" x1="742" y1="57" x2="900" y2="57"/><text class="buoc-t" x="821.0" y="53" text-anchor="middle">file ITL 2/2 ADJUSTED</text><text class="cot-t" x="821.0" y="73" text-anchor="middle">ITL ADJUST</text><text class="cot-ma" x="821.0" y="88" text-anchor="middle">PD 31x</text>
+<g class="ten-g"><line class="ten" x1="336" y1="172.0" x2="365" y2="172.0" marker-end="url(#mui)"/><text class="ten-t" x="351.0" y="168.0" text-anchor="middle">n1</text></g>
+<g class="ten-g"><line class="ten" x1="336" y1="290.0" x2="365" y2="290.0" marker-end="url(#mui)"/><text class="ten-t" x="351.0" y="286.0" text-anchor="middle">n2</text></g>
+<g class="ten-g"><line class="ten" x1="336" y1="408.0" x2="365" y2="408.0" marker-end="url(#mui)"/><text class="ten-t" x="351.0" y="404.0" text-anchor="middle">n3</text></g>
+<g class="ten-g"><line class="ten" x1="336" y1="526.0" x2="365" y2="526.0" marker-end="url(#mui)"/><text class="ten-t" x="351.0" y="522.0" text-anchor="middle">n4</text></g>
+<g class="ten-g"><line class="ten" x1="524" y1="172.0" x2="553" y2="172.0" marker-end="url(#mui)"/><text class="ten-t" x="539.0" y="168.0" text-anchor="middle">n5</text></g>
+<g class="ten-g"><line class="ten" x1="524" y1="290.0" x2="553" y2="290.0" marker-end="url(#mui)"/><text class="ten-t" x="539.0" y="286.0" text-anchor="middle">n6</text></g>
+<g class="ten-g"><line class="ten" x1="712" y1="290.0" x2="741" y2="290.0" marker-end="url(#mui)"/><text class="ten-t" x="727.0" y="286.0" text-anchor="middle">n7</text></g>
+<g class="ten-g"><line class="ten" x1="524" y1="408.0" x2="741" y2="408.0" marker-end="url(#mui)"/><text class="ten-t" x="633.0" y="404.0" text-anchor="middle">n8</text></g>
+<g class="ten-g"><title>n9 · VLOOKUP Số CT → ITL ID</title><line class="ten" x1="821.0" y1="342" x2="821.0" y2="355" marker-end="url(#mui)"/><text class="ten-t" x="825.0" y="352.0">n9</text></g>
+<text class="ra-ngoai" x="554" y="530.0">→ ALLOCATE (mã tất định)</text>
+<g class="hop2 now" data-o="RI-1 RI-2 RI-3" tabindex="0" role="button" aria-label="NOW sheet R | · 2. CCR · ra RI-1 RI-2 RI-3"><title>sheet R | · 2. CCR · PD 115–116 · 200 · 202 · 204 · 209 — ra: RI-1 giao dịch sao kê thô · RI-2 giao dịch quỹ thô · RI-3 số dư ngày TK · quỹ</title><rect class="hop-k" x="178" y="120" width="158" height="104" rx="6"/><text class="hop-ma" x="186" y="135">PD 115–116 · 2…</text>
+<rect class="nguoi" x="290" y="125" width="40" height="13" rx="3"/><text class="nguoi-t" x="310" y="135" text-anchor="middle">TAY</text>
+<text class="hop-ten" x="186" y="151">sheet R | · 2. CCR</text>
+<g class="chip" data-o="RI-1"><rect class="chip-k chip-ri" x="186" y="202" width="38" height="15" rx="7.5"/><text class="chip-t" x="205" y="213" text-anchor="middle">RI-1</text></g><g class="chip" data-o="RI-2"><rect class="chip-k chip-ri" x="228" y="202" width="38" height="15" rx="7.5"/><text class="chip-t" x="247" y="213" text-anchor="middle">RI-2</text></g><g class="chip" data-o="RI-3"><rect class="chip-k chip-ri" x="270" y="202" width="38" height="15" rx="7.5"/><text class="chip-t" x="289" y="213" text-anchor="middle">RI-3</text></g>
+</g>
+<g class="hop2 now" data-o="RI-4" tabindex="0" role="button" aria-label="NOW Entry Data PE·PI·PM·PC · ra RI-4"><title>Entry Data PE·PI·PM·PC · PD 107–114 — ra: RI-4 PE·PI·PM·PC line đã duyệt</title><rect class="hop-k" x="178" y="238" width="158" height="104" rx="6"/><text class="hop-ma" x="186" y="253">PD 107–114</text>
+<rect class="nguoi" x="290" y="243" width="40" height="13" rx="3"/><text class="nguoi-t" x="310" y="253" text-anchor="middle">TAY</text>
+<text class="hop-ten" x="186" y="269">Entry Data PE·PI·PM·PC</text>
+<g class="chip" data-o="RI-4"><rect class="chip-k chip-ri" x="186" y="320" width="38" height="15" rx="7.5"/><text class="chip-t" x="205" y="331" text-anchor="middle">RI-4</text></g>
+</g>
+<g class="hop2 now" data-o="RI-5" tabindex="0" role="button" aria-label="NOW file lương tháng · ra RI-5"><title>file lương tháng · PD 101 — ra: RI-5 payroll tháng + số FT</title><rect class="hop-k" x="178" y="356" width="158" height="104" rx="6"/><text class="hop-ma" x="186" y="371">PD 101</text>
+<rect class="nguoi" x="290" y="361" width="40" height="13" rx="3"/><text class="nguoi-t" x="310" y="371" text-anchor="middle">TAY</text>
+<text class="hop-ten" x="186" y="387">file lương tháng</text>
+<g class="chip" data-o="RI-5"><rect class="chip-k chip-ri" x="186" y="438" width="38" height="15" rx="7.5"/><text class="chip-t" x="205" y="449" text-anchor="middle">RI-5</text></g>
+</g>
+<g class="hop2 now" data-o="RI-6" tabindex="0" role="button" aria-label="NOW Looker · 2 Gsheet · ra RI-6"><title>Looker · 2 Gsheet · PD 103–106 — ra: RI-6 GI·OMC·SC·PS theo vendor</title><rect class="hop-k" x="178" y="474" width="158" height="104" rx="6"/><text class="hop-ma" x="186" y="489">PD 103–106</text>
+<rect class="nguoi" x="290" y="479" width="40" height="13" rx="3"/><text class="nguoi-t" x="310" y="489" text-anchor="middle">TAY</text>
+<text class="hop-ten" x="186" y="505">Looker · 2 Gsheet</text>
+<g class="chip" data-o="RI-6"><rect class="chip-k chip-ri" x="186" y="556" width="38" height="15" rx="7.5"/><text class="chip-t" x="205" y="567" text-anchor="middle">RI-6</text></g>
+</g>
+<g class="hop2 now" data-o="PR-1 PR-2" tabindex="0" role="button" aria-label="NOW GScript gom → Ledger 112 · 111 · ra PR-1 PR-2"><title>GScript gom → Ledger 112 · 111 · PD 201 · 203 · 205–208 — ra: PR-1 giao dịch bank theo ngày (Ledger 112) · PR-2 giao dịch quỹ theo ngày (Ledger 111)</title><rect class="hop-k" x="366" y="120" width="158" height="104" rx="6"/><text class="hop-ma" x="374" y="135">PD 201 · 203…</text>
+<rect class="nguoi" x="478" y="125" width="40" height="13" rx="3"/><text class="nguoi-t" x="498" y="135" text-anchor="middle">TAY</text>
+<text class="hop-ten" x="374" y="151">GScript gom → Ledger</text>
+<text class="hop-ten" x="374" y="164">112 · 111</text>
+<g class="chip" data-o="PR-1"><rect class="chip-k chip-pr" x="374" y="202" width="38" height="15" rx="7.5"/><text class="chip-t" x="393" y="213" text-anchor="middle">PR-1</text></g><g class="chip" data-o="PR-2"><rect class="chip-k chip-pr" x="416" y="202" width="38" height="15" rx="7.5"/><text class="chip-t" x="435" y="213" text-anchor="middle">PR-2</text></g>
+</g>
+<g class="hop2 now" data-o="PR-3" tabindex="0" role="button" aria-label="NOW GScript duỗi → Unpivot · ra PR-3"><title>GScript duỗi → Unpivot · PD 214–218 — ra: PR-3 PM line đủ chiều (Unpivot)</title><rect class="hop-k" x="366" y="238" width="158" height="104" rx="6"/><text class="hop-ma" x="374" y="253">PD 214–218</text>
+<rect class="nguoi" x="478" y="243" width="40" height="13" rx="3"/><text class="nguoi-t" x="498" y="253" text-anchor="middle">TAY</text>
+<text class="hop-ten" x="374" y="269">GScript duỗi → Unpivot</text>
+<g class="chip" data-o="PR-3"><rect class="chip-k chip-pr" x="374" y="320" width="38" height="15" rx="7.5"/><text class="chip-t" x="393" y="331" text-anchor="middle">PR-3</text></g>
+</g>
+<g class="hop2 now" data-o="PR-4" tabindex="0" role="button" aria-label="NOW tách lương → 1.3 Ledger · ra PR-4"><title>tách lương → 1.3 Ledger · PD 219–222 — ra: PR-4 dòng lương theo HD·CDT1 (1.3 Ledger)</title><rect class="hop-k" x="366" y="356" width="158" height="104" rx="6"/><text class="hop-ma" x="374" y="371">PD 219–222</text>
+<rect class="nguoi" x="478" y="361" width="40" height="13" rx="3"/><text class="nguoi-t" x="498" y="371" text-anchor="middle">TAY</text>
+<text class="hop-ten" x="374" y="387">tách lương → 1.3</text>
+<text class="hop-ten" x="374" y="400">Ledger</text>
+<g class="chip" data-o="PR-4"><rect class="chip-k chip-pr" x="374" y="438" width="38" height="15" rx="7.5"/><text class="chip-t" x="393" y="449" text-anchor="middle">PR-4</text></g>
+</g>
+<g class="hop2 now" data-o="PR-5" tabindex="0" role="button" aria-label="NOW gom → Platform Ledger · ra PR-5"><title>gom → Platform Ledger · PD 210–213 — ra: PR-5 Platform Data Ledger ×4</title><rect class="hop-k" x="366" y="474" width="158" height="104" rx="6"/><text class="hop-ma" x="374" y="489">PD 210–213</text>
+<text class="hop-ten" x="374" y="505">gom → Platform Ledger</text>
+<g class="chip" data-o="PR-5"><rect class="chip-k chip-pr" x="374" y="556" width="38" height="15" rx="7.5"/><text class="chip-t" x="393" y="567" text-anchor="middle">PR-5</text></g>
+</g>
+<g class="hop2 now" data-o="SI-1" tabindex="0" role="button" aria-label="NOW ITL 1/2 RAW · VLOOKUP Ref · ra SI-1"><title>ITL 1/2 RAW · VLOOKUP Ref · PD 302–308 — ra: SI-1 giao dịch ↔ PM line (Mapping L1)</title><rect class="hop-k" x="554" y="120" width="158" height="222" rx="6"/><text class="hop-ma" x="562" y="135">PD 302–308</text>
+<text class="hop-ten" x="562" y="151">ITL 1/2 RAW · VLOOKUP</text>
+<text class="hop-ten" x="562" y="164">Ref</text>
+<g class="chip" data-o="SI-1"><rect class="chip-k chip-si" x="562" y="320" width="38" height="15" rx="7.5"/><text class="chip-t" x="581" y="331" text-anchor="middle">SI-1</text></g>
+</g>
+<g class="hop2 now" data-o="SI-2" tabindex="0" role="button" aria-label="NOW ITL 2/2 ADJUSTED · chỉnh tay R–AT · ra SI-2"><title>ITL 2/2 ADJUSTED · chỉnh tay R–AT · PD 313–314 · 319 huỷ — ra: SI-2 ITL Ledge Final</title><rect class="hop-k" x="742" y="120" width="158" height="222" rx="6"/><text class="hop-ma" x="750" y="135">PD 313–314 · 3…</text>
+<rect class="nguoi" x="854" y="125" width="40" height="13" rx="3"/><text class="nguoi-t" x="874" y="135" text-anchor="middle">TAY</text>
+<text class="hop-ten" x="750" y="151">ITL 2/2 ADJUSTED ·</text>
+<text class="hop-ten" x="750" y="164">chỉnh tay R–AT</text>
+<g class="chip" data-o="SI-2"><rect class="chip-k chip-si chip-cuoi" x="750" y="320" width="38" height="15" rx="7.5"/><text class="chip-t" x="769" y="331" text-anchor="middle">SI-2</text></g>
+</g>
+<g class="hop2 now" data-o="SI-3" tabindex="0" role="button" aria-label="NOW H1000 Ledge · VLOOKUP Số CT · ra SI-3"><title>H1000 Ledge · VLOOKUP Số CT · PD 315–318 — ra: SI-3 H1000 Ledge Final</title><rect class="hop-k" x="742" y="356" width="158" height="104" rx="6"/><text class="hop-ma" x="750" y="371">PD 315–318</text>
+<text class="hop-ten" x="750" y="387">H1000 Ledge · VLOOKUP</text>
+<text class="hop-ten" x="750" y="400">Số CT</text>
+<g class="chip" data-o="SI-3"><rect class="chip-k chip-si chip-cuoi" x="750" y="438" width="38" height="15" rx="7.5"/><text class="chip-t" x="769" y="449" text-anchor="middle">SI-3</text></g>
+</g>
+<g class="hop2 now" data-o="" tabindex="0" role="button" aria-label="NOW soát số dư bằng mắt: Ledger 111/112 ↔ 2. CCR (DIF)"><title>soát số dư bằng mắt: Ledger 111/112 ↔ 2. CCR (DIF) · PD 204 · 209</title><rect class="hop-k" x="178" y="620" width="722" height="70" rx="6"/><text class="hop-ma" x="186" y="635">PD 204 · 209</text>
+<rect class="nguoi" x="854" y="625" width="40" height="13" rx="3"/><text class="nguoi-t" x="874" y="635" text-anchor="middle">TAY</text>
+<text class="hop-ten" x="186" y="651">soát số dư bằng mắt: Ledger 111/112 ↔ 2. CCR (DIF)</text>
+
+</g>
+<g class="hop2 now" data-o="" tabindex="0" role="button" aria-label="NOW Mapping Master (sheet → LE · hd)"><title>Mapping Master (sheet → LE · hd) · PD 301</title><rect class="hop-k" x="554" y="704" width="158" height="70" rx="6"/><text class="hop-ma" x="562" y="719">PD 301</text>
+<text class="hop-ten" x="562" y="735">Mapping Master (sheet</text>
+<text class="hop-ten" x="562" y="748">→ LE · hd)</text>
+
+</g>
+<line class="tach" x1="928.0" y1="4" x2="928.0" y2="782"/>
+<g transform="translate(778,0)">
+<rect class="ag-dai ag-ag1" x="170" y="4" width="174" height="36" rx="6"/><text class="ag-t" x="180" y="18">AGENT 1 · RAW</text><text class="ag-t2" x="180" y="33">Collect_raw_data</text><rect class="ag-khung ag-ag1" x="170" y="112" width="174" height="474" rx="10"/>
+<rect class="ag-dai ag-ag2" x="358" y="4" width="362" height="36" rx="6"/><text class="ag-t" x="368" y="18">AGENT 2 · ITL RAW</text><text class="ag-t2" x="368" y="33">Generate Group Ledger</text><rect class="ag-khung ag-ag2" x="358" y="112" width="362" height="474" rx="10"/>
+<rect class="ag-dai ag-ag3" x="734" y="4" width="174" height="36" rx="6"/><text class="ag-t" x="744" y="18">AGENT 3 · ITL ADJUST</text><text class="ag-t2" x="744" y="33">Filter Fulfill &amp; Adjust</text><rect class="ag-khung ag-ag3" x="734" y="112" width="174" height="474" rx="10"/>
+<rect class="ag-dai ag-ma" x="922" y="4" width="1302" height="36" rx="6"/><text class="ag-t" x="932" y="18">MÃ TẤT ĐỊNH</text><text class="ag-t2" x="932" y="33">Calculate → Report: luật + phép cộng, không cần mô hình (F0b)</text><rect class="ag-khung ag-ma" x="922" y="112" width="1302" height="474" rx="10"/>
+<rect class="ag-dai ag-ag4" x="170" y="594" width="2054" height="20" rx="5"/><text class="ag-t" x="180" y="608">AGENT 4 · AUDITOR (COMPOUNDING LOOP)</text><text class="ag-t2" x="2214" y="608" text-anchor="end">một cổng cho mỗi bước · mô hình khác họ với Agent 1–3</text><rect class="ag-khung ag-ag4" x="170" y="614" width="2054" height="82" rx="10"/>
+<line class="buoc-l" x1="176" y1="57" x2="526" y2="57"/><text class="buoc-t" x="351.0" y="53" text-anchor="middle">INPUT</text>
+<line class="buoc-l" x1="552" y1="57" x2="1278" y2="57"/><text class="buoc-t" x="915.0" y="53" text-anchor="middle">CALCULATE</text>
+<line class="buoc-l" x1="1304" y1="57" x2="1654" y2="57"/><text class="buoc-t" x="1479.0" y="53" text-anchor="middle">ALLOCATE</text>
+<line class="buoc-l" x1="1680" y1="57" x2="1842" y2="57"/><text class="buoc-t" x="1761.0" y="53" text-anchor="middle">WAREHOUSE</text>
+<line class="buoc-l" x1="1868" y1="57" x2="2218" y2="57"/><text class="buoc-t" x="2043.0" y="53" text-anchor="middle">REPORT</text>
+<text class="cot-t" x="257.0" y="73" text-anchor="middle">RAW</text><text class="cot-ma" x="257.0" y="88" text-anchor="middle">RI · PD 1xx</text>
+<text class="cot-t" x="445.0" y="73" text-anchor="middle">PREPARE</text><text class="cot-ma" x="445.0" y="88" text-anchor="middle">PR · PD 2xx</text>
+<text class="cot-t" x="633.0" y="73" text-anchor="middle">STANDARD INPUT · ghép</text><text class="cot-ma" x="633.0" y="88" text-anchor="middle">SI · PD 3xx</text>
+<text class="cot-t" x="821.0" y="73" text-anchor="middle">STANDARD INPUT · sổ ITL</text><text class="cot-ma" x="821.0" y="88" text-anchor="middle">SI · PD 3xx</text>
+<text class="cot-t" x="1009.0" y="73" text-anchor="middle">CALCULATE</text><text class="cot-ma" x="1009.0" y="88" text-anchor="middle">CA · PD 4xx</text>
+<text class="cot-t" x="1197.0" y="73" text-anchor="middle">STANDARD OUTPUT</text><text class="cot-ma" x="1197.0" y="88" text-anchor="middle">SO · PD 409–419 · 600–606</text>
+<text class="cot-t" x="1385.0" y="73" text-anchor="middle">ALLOCATE</text><text class="cot-ma" x="1385.0" y="88" text-anchor="middle">AL · PD 5xx</text>
+<text class="cot-t" x="1573.0" y="73" text-anchor="middle">STANDARD OUTPUT</text><text class="cot-ma" x="1573.0" y="88" text-anchor="middle">SO · PD 409–419 · 600–606</text>
+<text class="cot-t" x="1761.0" y="73" text-anchor="middle">KHO FLS</text><text class="cot-ma" x="1761.0" y="88" text-anchor="middle">DW · —</text>
+<text class="cot-t" x="1949.0" y="73" text-anchor="middle">báo cáo thành phần</text><text class="cot-ma" x="1949.0" y="88" text-anchor="middle">RP · PD 6xx</text>
+<text class="cot-t" x="2137.0" y="73" text-anchor="middle">báo cáo đích · màn</text><text class="cot-ma" x="2137.0" y="88" text-anchor="middle">RP · PD 6xx</text>
+<g class="ten-g" data-id="t:e1" tabindex="0" role="button" aria-label="Mũi tên e1: RI.BANK → PR.BANK"><title>e1 · ảnh sao kê · quỹ · số dư CCR, đọc theo bản khai</title><line class="hit" x1="336" y1="172.0" x2="365" y2="172.0"/><line class="ten" x1="336" y1="172.0" x2="365" y2="172.0" marker-end="url(#mui)"/><text class="ten-t" x="350.5" y="168.0" text-anchor="middle">e1</text></g>
+<g class="ten-g" data-id="t:e2" tabindex="0" role="button" aria-label="Mũi tên e2: RI.PAY → PR.PAY"><title>e2 · ảnh dòng sổ cái PM · PC (bỏ cột Email)</title><line class="hit" x1="336" y1="290.0" x2="365" y2="290.0"/><line class="ten" x1="336" y1="290.0" x2="365" y2="290.0" marker-end="url(#mui)"/><text class="ten-t" x="350.5" y="286.0" text-anchor="middle">e2</text></g>
+<g class="ten-g" data-id="t:e3" tabindex="0" role="button" aria-label="Mũi tên e3: RI.HR → PR.HR"><title>e3 · ảnh payroll tháng đã tách HD · CDT1 · LE + số FT</title><line class="hit" x1="336" y1="408.0" x2="365" y2="408.0"/><line class="ten" x1="336" y1="408.0" x2="365" y2="408.0" marker-end="url(#mui)"/><text class="ten-t" x="350.5" y="404.0" text-anchor="middle">e3</text></g>
+<g class="ten-g" data-id="t:e4" tabindex="0" role="button" aria-label="Mũi tên e4: RI.PLT → PR.PLT"><title>e4 · ảnh 4 nguồn GI · OMC · SC · PS</title><line class="hit" x1="336" y1="526.0" x2="365" y2="526.0"/><line class="ten" x1="336" y1="526.0" x2="365" y2="526.0" marker-end="url(#mui)"/><text class="ten-t" x="350.5" y="522.0" text-anchor="middle">e4</text></g>
+<g class="ten-g" data-id="t:e5" tabindex="0" role="button" aria-label="Mũi tên e5: PR.BANK → SI.MAP"><title>e5 · dòng tiền canon hai vế + số dư ngày từng TK</title><line class="hit" x1="524" y1="172.0" x2="553" y2="172.0"/><line class="ten" x1="524" y1="172.0" x2="553" y2="172.0" marker-end="url(#mui)"/><text class="ten-t" x="538.5" y="168.0" text-anchor="middle">e5</text></g>
+<g class="ten-g" data-id="t:e6" tabindex="0" role="button" aria-label="Mũi tên e6: PR.PAY → SI.MAP"><title>e6 · dòng lệnh: Ref No · tiền · tiền tệ · HD/KRF · CDT1 · LE trả · kỳ DV</title><line class="hit" x1="524" y1="290.0" x2="553" y2="290.0"/><line class="ten" x1="524" y1="290.0" x2="553" y2="290.0" marker-end="url(#mui)"/><text class="ten-t" x="538.5" y="286.0" text-anchor="middle">e6</text></g>
+<g class="ten-g" data-id="t:e7" tabindex="0" role="button" aria-label="Mũi tên e7: PR.HR → SI.MAP"><title>e7 · dòng lương + Số CT (số FT kế toán dán)</title><line class="hit" x1="524" y1="408.0" x2="553" y2="408.0"/><line class="ten" x1="524" y1="408.0" x2="553" y2="408.0" marker-end="url(#mui)"/><text class="ten-t" x="538.5" y="404.0" text-anchor="middle">e7</text></g>
+<g class="ten-g" data-id="t:e8" tabindex="0" role="button" aria-label="Mũi tên e8: PR.PLT → SI.MAP"><title>e8 · chi phí theo loại · vendor · ngày + Combine Code — vào STANDARD INPUT như 3 họ kia</title><line class="hit" x1="524" y1="526.0" x2="553" y2="526.0"/><line class="ten" x1="524" y1="526.0" x2="553" y2="526.0" marker-end="url(#mui)"/><text class="ten-t" x="538.5" y="522.0" text-anchor="middle">e8</text></g>
+<g class="ten-g" data-id="t:e9" tabindex="0" role="button" aria-label="Mũi tên e9: SI.MAP → SI.ITL"><title>e9 · mối nối (giao dịch ↔ PM line / dòng lương, tiền chia) + lớp L1 · L1b · L2 · L3</title><line class="hit" x1="712" y1="290.0" x2="741" y2="290.0"/><line class="ten" x1="712" y1="290.0" x2="741" y2="290.0" marker-end="url(#mui)"/><text class="ten-t" x="726.5" y="286.0" text-anchor="middle">e9</text></g>
+<g class="ten-g" data-id="t:e10" tabindex="0" role="button" aria-label="Mũi tên e10: SI.ITL → CA.GL"><title>e10 · sổ ITL hiệu lực: dòng + giá trị hiệu lực + 3 vai pháp nhân</title><line class="hit" x1="900" y1="290.0" x2="929" y2="290.0"/><line class="ten" x1="900" y1="290.0" x2="929" y2="290.0" marker-end="url(#mui)"/><text class="ten-t" x="914.5" y="286.0" text-anchor="middle">e10</text></g>
+<g class="ten-g" data-id="t:e11" tabindex="0" role="button" aria-label="Mũi tên e11: CA.GL → SO.CFA1"><title>e11 · dòng GL đã quy đổi, chiều CFA1 (theo LE)</title><line class="hit" x1="1088" y1="172.0" x2="1117" y2="172.0"/><line class="ten" x1="1088" y1="172.0" x2="1117" y2="172.0" marker-end="url(#mui)"/><text class="ten-t" x="1102.5" y="168.0" text-anchor="middle">e11</text></g>
+<g class="ten-g" data-id="t:e12" tabindex="0" role="button" aria-label="Mũi tên e12: CA.GL → SO.PLA3"><title>e12 · dòng GL đã quy đổi, chiều PLA1 · CFA3 · PLA3 (theo KRF)</title><line class="hit" x1="1088" y1="290.0" x2="1117" y2="290.0"/><line class="ten" x1="1088" y1="290.0" x2="1117" y2="290.0" marker-end="url(#mui)"/><text class="ten-t" x="1102.5" y="286.0" text-anchor="middle">e12</text></g>
+<g class="ten-g" data-id="t:e13" tabindex="0" role="button" aria-label="Mũi tên e13: SO.CFA1 → DW"><title>e13 · khối CF: KRF × LE × kỳ — đi qua làn trống của ALLOCATE (CF không phân bổ)</title><line class="hit" x1="1276" y1="172.0" x2="1681" y2="172.0"/><line class="ten" x1="1276" y1="172.0" x2="1681" y2="172.0" marker-end="url(#mui)"/><text class="ten-t" x="1478.5" y="168.0" text-anchor="middle">e13</text></g>
+<g class="ten-g" data-id="t:e14" tabindex="0" role="button" aria-label="Mũi tên e14: SO.PLA3 → AL.KEY"><title>e14 · P&amp;L theo KRF trước phân bổ</title><line class="hit" x1="1276" y1="290.0" x2="1305" y2="290.0"/><line class="ten" x1="1276" y1="290.0" x2="1305" y2="290.0" marker-end="url(#mui)"/><text class="ten-t" x="1290.5" y="286.0" text-anchor="middle">e14</text></g>
+<g class="ten-g" data-id="t:e15" tabindex="0" role="button" aria-label="Mũi tên e15: SO.PLA3 → AL.PLT"><title>e15 · dòng GL mang PE nền tảng (đã nối bank qua Ref No)</title><line class="hit" x1="1276" y1="408.0" x2="1305" y2="408.0"/><line class="ten" x1="1276" y1="408.0" x2="1305" y2="408.0" marker-end="url(#mui)"/><text class="ten-t" x="1290.5" y="404.0" text-anchor="middle">e15</text></g>
+<g class="ten-g" data-id="t:e16" tabindex="0" role="button" aria-label="Mũi tên e16: AL.KEY → SO.PLA3-ATL"><title>e16 · phần chia theo LE · NOEM · GI</title><line class="hit" x1="1464" y1="290.0" x2="1493" y2="290.0"/><line class="ten" x1="1464" y1="290.0" x2="1493" y2="290.0" marker-end="url(#mui)"/><text class="ten-t" x="1478.5" y="286.0" text-anchor="middle">e16</text></g>
+<g class="ten-g" data-id="t:e17" tabindex="0" role="button" aria-label="Mũi tên e17: AL.PLT → SO.PLA3-ATL"><title>e17 · phần chia chi phí nền tảng theo CDT1 × tháng</title><line class="hit" x1="1464" y1="526.0" x2="1493" y2="526.0"/><line class="ten" x1="1464" y1="526.0" x2="1493" y2="526.0" marker-end="url(#mui)"/><text class="ten-t" x="1478.5" y="522.0" text-anchor="middle">e17</text></g>
+<g class="ten-g" data-id="t:e18" tabindex="0" role="button" aria-label="Mũi tên e18: SO.PLA3-ATL → DW"><title>e18 · khối P&amp;L sau phân bổ: KRF × CDT1 × kỳ</title><line class="hit" x1="1652" y1="290.0" x2="1681" y2="290.0"/><line class="ten" x1="1652" y1="290.0" x2="1681" y2="290.0" marker-end="url(#mui)"/><text class="ten-t" x="1666.5" y="286.0" text-anchor="middle">e18</text></g>
+<g class="ten-g" data-id="t:e19" tabindex="0" role="button" aria-label="Mũi tên e19: DW → RP.CF"><title>e19 · khối CF đã lưu</title><line class="hit" x1="1840" y1="172.0" x2="1869" y2="172.0"/><line class="ten" x1="1840" y1="172.0" x2="1869" y2="172.0" marker-end="url(#mui)"/><text class="ten-t" x="1854.5" y="168.0" text-anchor="middle">e19</text></g>
+<g class="ten-g" data-id="t:e20" tabindex="0" role="button" aria-label="Mũi tên e20: DW → RP.PL"><title>e20 · khối P&amp;L sau phân bổ đã lưu</title><line class="hit" x1="1840" y1="290.0" x2="1869" y2="290.0"/><line class="ten" x1="1840" y1="290.0" x2="1869" y2="290.0" marker-end="url(#mui)"/><text class="ten-t" x="1854.5" y="286.0" text-anchor="middle">e20</text></g>
+<g class="ten-g" data-id="t:e21" tabindex="0" role="button" aria-label="Mũi tên e21: DW → RP.FLS"><title>e21 · sổ hiệu lực + dây truy ngược</title><line class="hit" x1="1840" y1="408.0" x2="1869" y2="408.0"/><line class="ten" x1="1840" y1="408.0" x2="1869" y2="408.0" marker-end="url(#mui)"/><text class="ten-t" x="1854.5" y="404.0" text-anchor="middle">e21</text></g>
+<g class="ten-g" data-id="t:e22" tabindex="0" role="button" aria-label="Mũi tên e22: RP.CF → RP.CCR"><title>e22 · Daily Report 2 (CF) vào báo cáo daily CCR</title><line class="hit" x1="2028" y1="172.0" x2="2057" y2="172.0"/><line class="ten" x1="2028" y1="172.0" x2="2057" y2="172.0" marker-end="url(#mui)"/><text class="ten-t" x="2042.5" y="168.0" text-anchor="middle">e22</text></g>
+<g class="ten-g" data-id="t:e23" tabindex="0" role="button" aria-label="Mũi tên e23: RP.PL → RP.CCR"><title>e23 · Daily Report 3 (P&amp;L) vào báo cáo daily CCR</title><line class="hit" x1="2028" y1="290.0" x2="2057" y2="290.0"/><line class="ten" x1="2028" y1="290.0" x2="2057" y2="290.0" marker-end="url(#mui)"/><text class="ten-t" x="2042.5" y="286.0" text-anchor="middle">e23</text></g>
+<g class="hop ag-ag1" data-id="h:RI.BANK" data-o="RI-1 RI-2 RI-3" tabindex="0" role="button" aria-label="RI.BANK · ẢNH SAO KÊ · QUỸ · CCR"><title>RI.BANK · ẢNH SAO KÊ · QUỸ · CCR</title><rect class="hop-k" x="178" y="120" width="158" height="104" rx="6"/><text class="hop-ma" x="186" y="135">RI.BANK</text>
+<rect class="nguoi" x="290" y="125" width="40" height="13" rx="3"/><text class="nguoi-t" x="310" y="135" text-anchor="middle">NGƯỜI</text>
+<text class="hop-ten" x="186" y="150">ẢNH SAO KÊ · QUỸ · CCR</text>
+<text class="hop-d" x="186" y="163">60 sao kê · 8 quỹ · 2</text>
+<text class="hop-pd" x="186" y="204">PD 115–116 · 200 · 202 · 2…</text>
+<text class="hop-tt tt-mid" x="186" y="217">◐ Bank ✅ · Cash ⛔ · CC…</text>
+<g class="chip" data-o="RI-1"><rect class="chip-k chip-ri" x="186" y="174" width="38" height="15" rx="7.5"/><text class="chip-t" x="205" y="185" text-anchor="middle">RI-1</text></g><g class="chip" data-o="RI-2"><rect class="chip-k chip-ri" x="228" y="174" width="38" height="15" rx="7.5"/><text class="chip-t" x="247" y="185" text-anchor="middle">RI-2</text></g><g class="chip" data-o="RI-3"><rect class="chip-k chip-ri" x="270" y="174" width="38" height="15" rx="7.5"/><text class="chip-t" x="289" y="185" text-anchor="middle">RI-3</text></g>
+</g>
+<g class="hop ag-ag1" data-id="h:RI.PAY" data-o="RI-4" tabindex="0" role="button" aria-label="RI.PAY · ẢNH SỔ CÁI PM · PC"><title>RI.PAY · ẢNH SỔ CÁI PM · PC</title><rect class="hop-k" x="178" y="238" width="158" height="104" rx="6"/><text class="hop-ma" x="186" y="253">RI.PAY</text>
+<rect class="nguoi" x="290" y="243" width="40" height="13" rx="3"/><text class="nguoi-t" x="310" y="253" text-anchor="middle">NGƯỜI</text>
+<text class="hop-ten" x="186" y="268">ẢNH SỔ CÁI PM · PC</text>
+<text class="hop-d" x="186" y="281">PE·PI·PM·PC đã duyệt</text>
+<text class="hop-pd" x="186" y="322">PD 107–114</text>
+<text class="hop-tt tt-mid" x="186" y="335">◐ PM ✅ · PC ⛔</text>
+<g class="chip" data-o="RI-4"><rect class="chip-k chip-ri" x="186" y="292" width="38" height="15" rx="7.5"/><text class="chip-t" x="205" y="303" text-anchor="middle">RI-4</text></g>
+</g>
+<g class="hop ag-ag1" data-id="h:RI.HR" data-o="RI-5" tabindex="0" role="button" aria-label="RI.HR · ẢNH SỔ H1000"><title>RI.HR · ẢNH SỔ H1000</title><rect class="hop-k" x="178" y="356" width="158" height="104" rx="6"/><text class="hop-ma" x="186" y="371">RI.HR</text>
+<rect class="nguoi" x="290" y="361" width="40" height="13" rx="3"/><text class="nguoi-t" x="310" y="371" text-anchor="middle">NGƯỜI</text>
+<text class="hop-ten" x="186" y="386">ẢNH SỔ H1000</text>
+<text class="hop-d" x="186" y="399">payroll tháng · đã tách</text>
+<text class="hop-pd" x="186" y="440">PD 101</text>
+<text class="hop-tt tt-no" x="186" y="453">⛔</text>
+<g class="chip" data-o="RI-5"><rect class="chip-k chip-ri" x="186" y="410" width="38" height="15" rx="7.5"/><text class="chip-t" x="205" y="421" text-anchor="middle">RI-5</text></g>
+</g>
+<g class="hop ag-ag1" data-id="h:RI.PLT" data-o="RI-6" tabindex="0" role="button" aria-label="RI.PLT · ẢNH 4 NGUỒN NỀN TẢNG"><title>RI.PLT · ẢNH 4 NGUỒN NỀN TẢNG</title><rect class="hop-k" x="178" y="474" width="158" height="104" rx="6"/><text class="hop-ma" x="186" y="489">RI.PLT</text>
+<rect class="nguoi" x="290" y="479" width="40" height="13" rx="3"/><text class="nguoi-t" x="310" y="489" text-anchor="middle">NGƯỜI</text>
+<text class="hop-ten" x="186" y="504">ẢNH 4 NGUỒN NỀN TẢNG</text>
+<text class="hop-d" x="186" y="517">GI·OMC: Looker</text>
+<text class="hop-pd" x="186" y="558">PD 103–106</text>
+<text class="hop-tt tt-no" x="186" y="571">⛔</text>
+<g class="chip" data-o="RI-6"><rect class="chip-k chip-ri" x="186" y="528" width="38" height="15" rx="7.5"/><text class="chip-t" x="205" y="539" text-anchor="middle">RI-6</text></g>
+</g>
+<g class="hop ag-ag2" data-id="h:PR.BANK" data-o="PR-1 PR-2" tabindex="0" role="button" aria-label="PR.BANK · DÒNG TIỀN + SỐ DƯ NGÀY"><title>PR.BANK · DÒNG TIỀN + SỐ DƯ NGÀY</title><rect class="hop-k" x="366" y="120" width="158" height="104" rx="6"/><text class="hop-ma" x="374" y="135">PR.BANK</text>
+<text class="hop-ten" x="374" y="150">DÒNG TIỀN + SỐ DƯ NGÀY</text>
+<text class="hop-d" x="374" y="163">canon 36 trường · 2 vế</text>
+<text class="hop-pd" x="374" y="204">PD 201 · 203 · 205–208</text>
+<text class="hop-tt tt-mid" x="374" y="217">◐ bank 8.338/8.338 · q…</text>
+<g class="chip" data-o="PR-1"><rect class="chip-k chip-pr" x="374" y="174" width="38" height="15" rx="7.5"/><text class="chip-t" x="393" y="185" text-anchor="middle">PR-1</text></g><g class="chip" data-o="PR-2"><rect class="chip-k chip-pr" x="416" y="174" width="38" height="15" rx="7.5"/><text class="chip-t" x="435" y="185" text-anchor="middle">PR-2</text></g>
+</g>
+<g class="hop ag-ag2" data-id="h:PR.PAY" data-o="PR-3" tabindex="0" role="button" aria-label="PR.PAY · DÒNG LỆNH PM · PC"><title>PR.PAY · DÒNG LỆNH PM · PC</title><rect class="hop-k" x="366" y="238" width="158" height="104" rx="6"/><text class="hop-ma" x="374" y="253">PR.PAY</text>
+<text class="hop-ten" x="374" y="268">DÒNG LỆNH PM · PC</text>
+<text class="hop-d" x="374" y="281">duỗi line · đặt kiểu</text>
+<text class="hop-pd" x="374" y="322">PD 214–218</text>
+<text class="hop-tt tt-mid" x="374" y="335">◐ 14 cột có kiểu · 13…</text>
+<g class="chip" data-o="PR-3"><rect class="chip-k chip-pr" x="374" y="292" width="38" height="15" rx="7.5"/><text class="chip-t" x="393" y="303" text-anchor="middle">PR-3</text></g>
+</g>
+<g class="hop ag-ag2" data-id="h:PR.HR" data-o="PR-4" tabindex="0" role="button" aria-label="PR.HR · DÒNG LƯƠNG"><title>PR.HR · DÒNG LƯƠNG</title><rect class="hop-k" x="366" y="356" width="158" height="104" rx="6"/><text class="hop-ma" x="374" y="371">PR.HR</text>
+<text class="hop-ten" x="374" y="386">DÒNG LƯƠNG</text>
+<text class="hop-d" x="374" y="399">NIS·INT·COM·PIT ·</text>
+<text class="hop-pd" x="374" y="440">PD 219–222</text>
+<text class="hop-tt tt-no" x="374" y="453">⛔</text>
+<g class="chip" data-o="PR-4"><rect class="chip-k chip-pr" x="374" y="410" width="38" height="15" rx="7.5"/><text class="chip-t" x="393" y="421" text-anchor="middle">PR-4</text></g>
+</g>
+<g class="hop ag-ag2" data-id="h:PR.PLT" data-o="PR-5" tabindex="0" role="button" aria-label="PR.PLT · CHI PHÍ 4 LOẠI"><title>PR.PLT · CHI PHÍ 4 LOẠI</title><rect class="hop-k" x="366" y="474" width="158" height="104" rx="6"/><text class="hop-ma" x="374" y="489">PR.PLT</text>
+<text class="hop-ten" x="374" y="504">CHI PHÍ 4 LOẠI</text>
+<text class="hop-d" x="374" y="517">vendor · ngày · NoTrans ·</text>
+<text class="hop-pd" x="374" y="558">PD 210–213</text>
+<text class="hop-tt tt-no" x="374" y="571">⛔</text>
+<g class="chip" data-o="PR-5"><rect class="chip-k chip-pr" x="374" y="528" width="38" height="15" rx="7.5"/><text class="chip-t" x="393" y="539" text-anchor="middle">PR-5</text></g>
+</g>
+<g class="hop ag-ag2" data-id="h:SI.MAP" data-o="SI-1" tabindex="0" role="button" aria-label="SI.MAP · GHÉP GIAO DỊCH ↔ LỆNH"><title>SI.MAP · GHÉP GIAO DỊCH ↔ LỆNH</title><rect class="hop-k" x="554" y="120" width="158" height="458" rx="6"/><text class="hop-ma" x="562" y="135">SI.MAP</text>
+<text class="hop-ten" x="562" y="150">GHÉP GIAO DỊCH ↔ LỆNH</text>
+<text class="hop-d" x="562" y="163">PP1 Ref No → PM · PP2 Số</text>
+<text class="hop-d" x="562" y="175.5">CT → lương</text>
+<text class="hop-d" x="562" y="188.0">PP3 Combine Code → PE/PM</text>
+<text class="hop-d" x="562" y="200.5">(nền tảng)</text>
+<text class="hop-pd" x="562" y="558">PD 302–308</text>
+<text class="hop-tt tt-mid" x="562" y="571">◐ PS Có: 26,79% dòng n…</text>
+<g class="chip" data-o="SI-1"><rect class="chip-k chip-si" x="562" y="528" width="38" height="15" rx="7.5"/><text class="chip-t" x="581" y="539" text-anchor="middle">SI-1</text></g>
+</g>
+<g class="hop ag-ag3" data-id="h:SI.ITL" data-o="SI-2 SI-3 SI-4" tabindex="0" role="button" aria-label="SI.ITL · SỔ ITL HIỆU LỰC"><title>SI.ITL · SỔ ITL HIỆU LỰC</title><rect class="hop-k" x="742" y="120" width="158" height="458" rx="6"/><text class="hop-ma" x="750" y="135">SI.ITL</text>
+<rect class="nguoi" x="854" y="125" width="40" height="13" rx="3"/><text class="nguoi-t" x="874" y="135" text-anchor="middle">NGƯỜI</text>
+<text class="hop-ten" x="750" y="150">SỔ ITL HIỆU LỰC</text>
+<text class="hop-d" x="750" y="163">gốc chỉ-thêm + lớp sửa</text>
+<text class="hop-d" x="750" y="175.5">(người › máy)</text>
+<text class="hop-d" x="750" y="188.0">một bảng · đủ 4 họ:</text>
+<text class="hop-d" x="750" y="200.5">BANK·PAY·HR·PLT</text>
+<text class="hop-pd" x="750" y="558">PD 313–319</text>
+<text class="hop-tt tt-mid" x="750" y="571">◐ 1 họ nguồn · parity…</text>
+<g class="chip" data-o="SI-2"><rect class="chip-k chip-si chip-cuoi" x="750" y="528" width="38" height="15" rx="7.5"/><text class="chip-t" x="769" y="539" text-anchor="middle">SI-2</text></g><g class="chip" data-o="SI-3"><rect class="chip-k chip-si chip-cuoi" x="792" y="528" width="38" height="15" rx="7.5"/><text class="chip-t" x="811" y="539" text-anchor="middle">SI-3</text></g><g class="chip" data-o="SI-4"><rect class="chip-k chip-si chip-cuoi" x="834" y="528" width="38" height="15" rx="7.5"/><text class="chip-t" x="853" y="539" text-anchor="middle">SI-4</text></g>
+</g>
+<g class="hop ag-ma" data-id="h:CA.GL" data-o="" tabindex="0" role="button" aria-label="CA.GL · SỔ CÁI GL · QUY ĐỔI"><title>CA.GL · SỔ CÁI GL · QUY ĐỔI</title><rect class="hop-k" x="930" y="120" width="158" height="458" rx="6"/><text class="hop-ma" x="938" y="135">CA.GL</text>
+<text class="hop-ten" x="938" y="150">SỔ CÁI GL · QUY ĐỔI</text>
+<text class="hop-d" x="938" y="163">ITL → khuôn GL (Templ 2)</text>
+<text class="hop-d" x="938" y="175.5">quy đổi theo tỷ giá tháng</text>
+<text class="hop-pd" x="938" y="558">PD 400–406</text>
+<text class="hop-tt tt-no" x="938" y="571">⛔</text>
+
+</g>
+<g class="hop ag-ma" data-id="h:SO.CFA1" data-o="" tabindex="0" role="button" aria-label="SO.CFA1 · CF THEO LE"><title>SO.CFA1 · CF THEO LE</title><rect class="hop-k" x="1118" y="120" width="158" height="104" rx="6"/><text class="hop-ma" x="1126" y="135">SO.CFA1</text>
+<text class="hop-ten" x="1126" y="150">CF THEO LE</text>
+<text class="hop-d" x="1126" y="163">khối KRF × ngày</text>
+<text class="hop-d" x="1126" y="175.5">+ Y · H · Q · M</text>
+<text class="hop-pd" x="1126" y="204">PD 409–410</text>
+<text class="hop-tt tt-no" x="1126" y="217">⛔</text>
+
+</g>
+<g class="hop ag-ma" data-id="h:SO.PLA3" data-o="" tabindex="0" role="button" aria-label="SO.PLA3 · P&amp;L THEO KRF · TRƯỚC PB"><title>SO.PLA3 · P&amp;L THEO KRF · TRƯỚC PB</title><rect class="hop-k" x="1118" y="238" width="158" height="222" rx="6"/><text class="hop-ma" x="1126" y="253">SO.PLA3</text>
+<text class="hop-ten" x="1126" y="268">P&amp;L THEO KRF · TRƯỚC</text>
+<text class="hop-ten" x="1126" y="281">PB</text>
+<text class="hop-d" x="1126" y="294">PLA1 PM-only · PLA3 HR</text>
+<text class="hop-d" x="1126" y="306.5">CFA3 HR · PLA3 PM + HR</text>
+<text class="hop-pd" x="1126" y="440">PD 407–408 · 411–419</text>
+<text class="hop-tt tt-no" x="1126" y="453">⛔</text>
+
+</g>
+<g class="hop ag-ma" data-id="h:AL.KEY" data-o="" tabindex="0" role="button" aria-label="AL.KEY · PHÂN BỔ THEO KHOÁ"><title>AL.KEY · PHÂN BỔ THEO KHOÁ</title><rect class="hop-k" x="1306" y="238" width="158" height="104" rx="6"/><text class="hop-ma" x="1314" y="253">AL.KEY</text>
+<text class="hop-ten" x="1314" y="268">PHÂN BỔ THEO KHOÁ</text>
+<text class="hop-d" x="1314" y="281">By LE · By NOEM · By GI</text>
+<text class="hop-d" x="1314" y="293.5">bảng tỷ trọng</text>
+<text class="hop-pd" x="1314" y="322">PD 511–513</text>
+<text class="hop-tt tt-no" x="1314" y="335">⛔</text>
+
+</g>
+<g class="hop ag-ma" data-id="h:AL.PLT" data-o="" tabindex="0" role="button" aria-label="AL.PLT · PHÂN BỔ NỀN TẢNG"><title>AL.PLT · PHÂN BỔ NỀN TẢNG</title><rect class="hop-k" x="1306" y="356" width="158" height="222" rx="6"/><text class="hop-ma" x="1314" y="371">AL.PLT</text>
+<rect class="chip3" x="1372" y="361" width="40" height="13" rx="6.5"/><text class="chip3-t" x="1392" y="371" text-anchor="middle">A3.3</text>
+<text class="hop-ten" x="1314" y="386">PHÂN BỔ NỀN TẢNG</text>
+<text class="hop-d" x="1314" y="399">Mapping Block 1: Vendor ↔</text>
+<text class="hop-d" x="1314" y="411.5">Network ↔ CDT1</text>
+<text class="hop-d" x="1314" y="424.0">CFA2 MID 1–3 · ×7 CDT1</text>
+<text class="hop-pd" x="1314" y="558">PD 500–510</text>
+<text class="hop-tt tt-no" x="1314" y="571">⛔</text>
+
+</g>
+<g class="hop ag-ma" data-id="h:SO.PLA3-ATL" data-o="" tabindex="0" role="button" aria-label="SO.PLA3-ATL · P&amp;L SAU PHÂN BỔ"><title>SO.PLA3-ATL · P&amp;L SAU PHÂN BỔ</title><rect class="hop-k" x="1494" y="238" width="158" height="340" rx="6"/><text class="hop-ma" x="1502" y="253">SO.PLA3-ATL</text>
+<text class="hop-ten" x="1502" y="268">P&amp;L SAU PHÂN BỔ</text>
+<text class="hop-d" x="1502" y="281">theo CDT1 · LE</text>
+<text class="hop-d" x="1502" y="293.5">ngày + Y·H·Q·M</text>
+<text class="hop-pd" x="1502" y="558">PD 600–604 · 606</text>
+<text class="hop-tt tt-no" x="1502" y="571">⛔</text>
+
+</g>
+<g class="hop ag-ma" data-id="h:DW" data-o="" tabindex="0" role="button" aria-label="DW · KHO FLS"><title>DW · KHO FLS</title><rect class="hop-k" x="1682" y="120" width="158" height="458" rx="6"/><text class="hop-ma" x="1690" y="135">DW</text>
+<text class="hop-ten" x="1690" y="150">KHO FLS</text>
+<text class="hop-d" x="1690" y="163">PostgreSQL · chỉ-thêm</text>
+<text class="hop-d" x="1690" y="175.5">ảnh · dòng · sổ · lớp sửa</text>
+<text class="hop-tt tt-mid" x="1690" y="571">◐ sổ có · khối SO ⛔</text>
+
+</g>
+<g class="hop ag-ma" data-id="h:RP.CF" data-o="" tabindex="0" role="button" aria-label="RP.CF · DAILY REPORT 2 · CF"><title>RP.CF · DAILY REPORT 2 · CF</title><rect class="hop-k" x="1870" y="120" width="158" height="104" rx="6"/><text class="hop-ma" x="1878" y="135">RP.CF</text>
+<text class="hop-ten" x="1878" y="150">DAILY REPORT 2 · CF</text>
+<text class="hop-d" x="1878" y="163">Group · LE</text>
+<text class="hop-d" x="1878" y="175.5">Templ 5</text>
+<text class="hop-pd" x="1878" y="204">PD 610</text>
+<text class="hop-tt tt-no" x="1878" y="217">⛔</text>
+
+</g>
+<g class="hop ag-ma" data-id="h:RP.PL" data-o="" tabindex="0" role="button" aria-label="RP.PL · DAILY REPORT 3 · P&amp;L"><title>RP.PL · DAILY REPORT 3 · P&amp;L</title><rect class="hop-k" x="1870" y="238" width="158" height="104" rx="6"/><text class="hop-ma" x="1878" y="253">RP.PL</text>
+<text class="hop-ten" x="1878" y="268">DAILY REPORT 3 · P&amp;L</text>
+<text class="hop-d" x="1878" y="281">Group · CDT1</text>
+<text class="hop-d" x="1878" y="293.5">FS1 + FS2</text>
+<text class="hop-pd" x="1878" y="322">PD 605 · 607–609</text>
+<text class="hop-tt tt-no" x="1878" y="335">⛔</text>
+
+</g>
+<g class="hop ag-ma" data-id="h:RP.CCR" data-o="" tabindex="0" role="button" aria-label="RP.CCR · BÁO CÁO DAILY TRONG CCR"><title>RP.CCR · BÁO CÁO DAILY TRONG CCR</title><rect class="hop-k" x="2058" y="120" width="158" height="222" rx="6"/><text class="hop-ma" x="2066" y="135">RP.CCR</text>
+<rect class="nguoi" x="2170" y="125" width="40" height="13" rx="3"/><text class="nguoi-t" x="2190" y="135" text-anchor="middle">NGƯỜI</text>
+<text class="hop-ten" x="2066" y="150">BÁO CÁO DAILY TRONG</text>
+<text class="hop-ten" x="2066" y="163">CCR</text>
+<text class="hop-d" x="2066" y="176">5. Daily Report</text>
+<text class="hop-d" x="2066" y="188.5">6. CCR ký tháng (pdf)</text>
+<text class="hop-pd" x="2066" y="322">PD 614–616</text>
+<text class="hop-tt tt-mid" x="2066" y="335">◐ cơ chế ghi ✅ · bộ xu…</text>
+
+</g>
+<g class="hop ag-ma" data-id="h:RP.FLS" data-o="" tabindex="0" role="button" aria-label="RP.FLS · MÀN FLS · TRUY NGƯỢC"><title>RP.FLS · MÀN FLS · TRUY NGƯỢC</title><rect class="hop-k" x="1870" y="356" width="346" height="222" rx="6"/><text class="hop-ma" x="1878" y="371">RP.FLS</text>
+<text class="hop-ten" x="1878" y="386">MÀN FLS · TRUY NGƯỢC</text>
+<text class="hop-d" x="1878" y="399">F01 hàng chờ · F02 sổ · F03 cổng · F04 nạp lô</text>
+<text class="hop-d" x="1878" y="411.5">bấm một ô báo cáo → dòng → giao dịch → ảnh</text>
+<text class="hop-pd" x="1878" y="558">PD 613 · 617</text>
+<text class="hop-tt tt-mid" x="1878" y="571">◐ 6 màn ✅ · truy ngược báo cáo ⛔</text>
+
+</g>
+<g class="hop ag-ag4" data-id="h:KS.RI" data-o="" tabindex="0" role="button" aria-label="KS.RI · CỔNG INPUT"><title>KS.RI · CỔNG INPUT</title><rect class="hop-k" x="178" y="620" width="346" height="70" rx="6"/><text class="hop-ma" x="186" y="635">KS.RI</text>
+<text class="hop-ten" x="186" y="650">CỔNG INPUT</text>
+<text class="hop-d" x="186" y="663">bản khai đủ · bề rộng cột</text>
+<text class="hop-tt tt-mid" x="186" y="683">◐</text>
+
+</g>
+<g class="hop ag-ag4" data-id="h:KS.SI" data-o="" tabindex="0" role="button" aria-label="KS.SI · CỔNG GHÉP + SỔ"><title>KS.SI · CỔNG GHÉP + SỔ</title><rect class="hop-k" x="554" y="620" width="346" height="70" rx="6"/><text class="hop-ma" x="562" y="635">KS.SI</text>
+<rect class="nguoi" x="854" y="625" width="40" height="13" rx="3"/><text class="nguoi-t" x="874" y="635" text-anchor="middle">NGƯỜI</text>
+<text class="hop-ten" x="562" y="650">CỔNG GHÉP + SỔ</text>
+<text class="hop-d" x="562" y="663">9 luật · Σ line = tiền · 4 vế</text>
+<text class="hop-tt tt-mid" x="562" y="683">◐ 9 luật ✅ · DIF ⛔</text>
+
+</g>
+<g class="hop ag-ag4" data-id="h:KS.CA" data-o="" tabindex="0" role="button" aria-label="KS.CA · CỔNG CALCULATE"><title>KS.CA · CỔNG CALCULATE</title><rect class="hop-k" x="930" y="620" width="346" height="70" rx="6"/><text class="hop-ma" x="938" y="635">KS.CA</text>
+<text class="hop-ten" x="938" y="650">CỔNG CALCULATE</text>
+<text class="hop-d" x="938" y="663">Σ theo LE = Σ theo nguồn</text>
+<text class="hop-tt tt-no" x="938" y="683">⛔</text>
+
+</g>
+<g class="hop ag-ag4" data-id="h:KS.AL" data-o="" tabindex="0" role="button" aria-label="KS.AL · CỔNG ALLOCATE"><title>KS.AL · CỔNG ALLOCATE</title><rect class="hop-k" x="1306" y="620" width="346" height="70" rx="6"/><text class="hop-ma" x="1314" y="635">KS.AL</text>
+<text class="hop-ten" x="1314" y="650">CỔNG ALLOCATE</text>
+<text class="hop-d" x="1314" y="663">Σ phần chia = tiền GD</text>
+<text class="hop-tt tt-no" x="1314" y="683">⛔</text>
+
+</g>
+<g class="hop ag-ag4" data-id="h:KS.RP" data-o="" tabindex="0" role="button" aria-label="KS.RP · CỔNG REPORT · PARITY"><title>KS.RP · CỔNG REPORT · PARITY</title><rect class="hop-k" x="1682" y="620" width="534" height="70" rx="6"/><text class="hop-ma" x="1690" y="635">KS.RP</text>
+<text class="hop-ten" x="1690" y="650">CỔNG REPORT · PARITY</text>
+<text class="hop-d" x="1690" y="663">từng ô = ITL Ledge Final / Daily Report AS-IS</text>
+<text class="hop-tt tt-mid" x="1690" y="683">◐ parity ITL ✅ · báo cáo ⛔</text>
+
+</g>
+<g class="hop ag-ix" data-id="h:IX.KHAI" data-o="" tabindex="0" role="button" aria-label="IX.KHAI · BẢN KHAI NGUỒN"><title>IX.KHAI · BẢN KHAI NGUỒN</title><rect class="hop-k" x="178" y="704" width="346" height="70" rx="6"/><text class="hop-ma" x="186" y="719">IX.KHAI</text>
+<rect class="nguoi" x="478" y="709" width="40" height="13" rx="3"/><text class="nguoi-t" x="498" y="719" text-anchor="middle">NGƯỜI</text>
+<text class="hop-ten" x="186" y="734">BẢN KHAI NGUỒN</text>
+<text class="hop-d" x="186" y="747">cột · thứ tự ngày · LE TK</text>
+<text class="hop-tt tt-ok" x="186" y="767">✅ 408 dòng = 68 × 6</text>
+
+</g>
+<g class="hop ag-ix" data-id="h:IX.MM" data-o="" tabindex="0" role="button" aria-label="IX.MM · MAPPING MASTER"><title>IX.MM · MAPPING MASTER</title><rect class="hop-k" x="554" y="704" width="346" height="70" rx="6"/><text class="hop-ma" x="562" y="719">IX.MM</text>
+<text class="hop-ten" x="562" y="734">MAPPING MASTER</text>
+<text class="hop-pd" x="562" y="754">PD 301</text>
+<text class="hop-tt tt-mid" x="562" y="767">◐ bộ nạp có</text>
+
+</g>
+<g class="hop ag-ix" data-id="h:IX.FX" data-o="" tabindex="0" role="button" aria-label="IX.FX · TỶ GIÁ · CHIỀU ASD"><title>IX.FX · TỶ GIÁ · CHIỀU ASD</title><rect class="hop-k" x="930" y="704" width="346" height="70" rx="6"/><text class="hop-ma" x="938" y="719">IX.FX</text>
+<text class="hop-ten" x="938" y="734">TỶ GIÁ · CHIỀU ASD</text>
+<text class="hop-d" x="938" y="747">9.2 Exchange Rate theo tháng</text>
+<text class="hop-tt tt-no" x="938" y="767">⛔</text>
+
+</g>
+<g class="hop ag-ix" data-id="h:IX.MB" data-o="" tabindex="0" role="button" aria-label="IX.MB · MAPPING BLOCK · TỶ TRỌNG"><title>IX.MB · MAPPING BLOCK · TỶ TRỌNG</title><rect class="hop-k" x="1306" y="704" width="346" height="70" rx="6"/><text class="hop-ma" x="1314" y="719">IX.MB</text>
+<text class="hop-ten" x="1314" y="734">MAPPING BLOCK · TỶ TRỌNG</text>
+<text class="hop-d" x="1314" y="747">Vendor ↔ Network-Acc ↔ CDT1</text>
+<text class="hop-tt tt-no" x="1314" y="767">⛔</text>
+
+</g>
+<g class="hop ag-ix" data-id="h:IX.TMP" data-o="" tabindex="0" role="button" aria-label="IX.TMP · KHUÔN BÁO CÁO"><title>IX.TMP · KHUÔN BÁO CÁO</title><rect class="hop-k" x="1682" y="704" width="534" height="70" rx="6"/><text class="hop-ma" x="1690" y="719">IX.TMP</text>
+<text class="hop-ten" x="1690" y="734">KHUÔN BÁO CÁO</text>
+<text class="hop-d" x="1690" y="747">Templ 1–5 (PD590) · Filters (PD510)</text>
+<text class="hop-tt tt-no" x="1690" y="767">⛔</text>
+
+</g>
+</g>
+<rect class="hang-n hang-dữ" x="16" y="120" width="148" height="104" rx="6"/><text class="hang-t" x="26" y="169.0">BANK</text><text class="hang-p" x="26" y="184.0">tiền · sao kê · quỹ · CCR</text>
+<rect class="hang-n hang-dữ" x="16" y="238" width="148" height="104" rx="6"/><text class="hang-t" x="26" y="287.0">PAY</text><text class="hang-p" x="26" y="302.0">lệnh chi · PE·PI·PM·PC</text>
+<rect class="hang-n hang-dữ" x="16" y="356" width="148" height="104" rx="6"/><text class="hang-t" x="26" y="405.0">HR</text><text class="hang-p" x="26" y="420.0">lương · H1000</text>
+<rect class="hang-n hang-dữ" x="16" y="474" width="148" height="104" rx="6"/><text class="hang-t" x="26" y="523.0">PLT</text><text class="hang-p" x="26" y="538.0">nền tảng GI·OMC·SC·PS</text>
+<rect class="hang-n hang-kiểm" x="16" y="620" width="148" height="70" rx="6"/><text class="hang-t" x="26" y="652.0">KIỂM SOÁT</text><text class="hang-p" x="26" y="667.0">NOW: người · TO-BE: Agent 4</text>
+<rect class="hang-n hang-config" x="16" y="704" width="148" height="70" rx="6"/><text class="hang-t" x="26" y="736.0">INDEX</text><text class="hang-p" x="26" y="751.0">khai · danh mục · tỷ giá</text>
+</svg></div>
+<h3 id="s1-1-1" data-st="draft" data-st-on="2026-11-13" data-st-hash="91ec7a1a" data-st-inherited="s1-1">§1.1.1 SYSTEM: chỉ mục thành phần</h3>
+<div class="tw"><table style="table-layout:fixed">
+<colgroup><col style="width:16%"><col style="width:54%"><col style="width:30%"></colgroup>
+<tr><th>thành phần</th><th>là gì</th><th>chi tiết ở</th></tr>
+<tr><td><b>RI · PR</b></td><td>Agent 1 · Agent 2 — chụp nguồn thô, dựng dòng chuẩn</td><td>§3.1 · §3.2 · §5.1</td></tr>
+<tr><td><b>SI</b></td><td>STANDARD INPUT — ghép (Agent 2) · sổ ITL hiệu lực (Agent 3)</td><td>§3.3</td></tr>
+<tr><td><b>CA · SO · AL</b></td><td>mã tất định — quy đổi, khối KRF × kỳ, phân bổ</td><td>§5.2</td></tr>
+<tr><td><b>DW · RP</b></td><td>kho FLS · báo cáo · màn hình</td><td>§3.5 · §5.3</td></tr>
+<tr><td><b>KS · IX</b></td><td>Agent 4 · Auditor (cổng mỗi bước) · cấu hình</td><td>§2 · §3.4 · §5.3</td></tr>
+</table></div>
+<h3 id="s1-1-2" data-st="draft" data-st-on="2026-11-13" data-st-hash="6f5113d1" data-st-inherited="s1-1">§1.1.2 SYSTEM: ngữ pháp tên — đọc tên là biết ô ở đâu</h3>
+<p>Mỗi hộp có mã <b>bước + "." + phần</b> (như FPA ghép mã bước vào tên); máy kiểm: mã bước trong tên phải trùng bước của cột chứa hộp.</p>
+<div class="tw"><table style="table-layout:fixed">
+<colgroup><col style="width:16%"><col style="width:40%"><col style="width:18%"><col style="width:26%"></colgroup>
+<tr><th>mã bước</th><th>bước · làm gì</th><th>PD Now</th><th>ví dụ</th></tr>
+<tr><td><b>RI</b></td><td>RAW INPUT — chụp nguồn thô, đóng băng</td><td>PD 1xx</td><td>RI.BANK · RI.PAY · RI.HR · RI.PLT</td></tr>
+<tr><td><b>PR</b></td><td>PREPARE — dựng dòng chuẩn từ ảnh</td><td>PD 2xx</td><td>PR.BANK · PR.PAY · PR.HR · PR.PLT</td></tr>
+<tr><td><b>SI</b></td><td>STANDARD INPUT — ghép + sổ ITL hiệu lực</td><td>PD 3xx</td><td>SI.MAP · SI.ITL</td></tr>
+<tr><td><b>CA · SO</b></td><td>CALCULATE · STANDARD OUTPUT (trước / sau phân bổ, đuôi -ATL)</td><td>PD 4xx · 409–419 · 600–606</td><td>CA.GL · SO.CFA1 · SO.PLA3 · SO.PLA3-ATL</td></tr>
+<tr><td><b>AL · DW · RP · KS · IX</b></td><td>ALLOCATE · kho · báo cáo · cổng Agent 4 · cấu hình</td><td>PD 5xx · 6xx</td><td>AL.KEY · DW · RP.CCR · KS.SI · IX.FX</td></tr>
+</table></div>
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<h2 class="part" id="s1-2" data-st="draft" data-st-on="2026-11-13" data-st-hash="e3b0c442">§1.2 SYSTEM: mục tiêu, phạm vi và vai</h2>
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<h3 id="s1-2-1" data-st="draft" data-st-on="2026-11-13" data-st-hash="fb8376ff" data-st-inherited="s1-2">§1.2.1 SYSTEM: mục tiêu và ngoài phạm vi</h3>
+<p>AP này là bản giao việc: mỗi hộp TO-BE có đủ <b>NOW</b> (công thức Gsheet, script, bước PD Now) → <b>TO-BE</b> (phép tính) → <b>code</b> (tệp, test) → <b>số đối chiếu</b>.</p>
+<ul><li><b>Trong phạm vi:</b> 31 hộp của Figure 1.1; 116 bước PD Now (103 vào hộp, 13 ngoài GĐ1 có lý do — §5.4); Voi số lượng dữ liệu theo tháng (Part 2).</li><li><b>Ngoài phạm vi:</b> báo cáo HR từ EDD (102 · 611 · 612) · AP / AR (223 · 224 · 310–312, AS-IS "Not yet") · OTHERS 700–702 — chờ owner (§5.5).</li><li><b>⛔ ghi gì vào sổ thật:</b> AP chỉ đọc ảnh đóng băng và mã; mọi cú ghi đi qua <code>FLS_CHO_GHI_THAT=1</code> + cờ duyệt như cũ.</li></ul>
+<h3 id="s1-2-2" data-st="draft" data-st-on="2026-11-13" data-st-hash="ed3e112b" data-st-inherited="s1-2">§1.2.2 SYSTEM: vai</h3>
+<div class="tw"><table style="table-layout:fixed">
+<colgroup><col style="width:20%"><col style="width:26%"><col style="width:54%"></colgroup>
+<tr><th>vai</th><th>ai</th><th>làm gì với AP này</th></tr>
+<tr><td>owner</td><td><b>ThuongCT</b></td><td>chốt định nghĩa bốn số (§2.1) và các câu §5.5; đặt <code>approved</code></td></tr>
+<tr><td>operator</td><td><b>KhanhCQ</b></td><td>chọn hộp, phát WO cho agent, chạy cổng, cập nhật AP theo phiên bản mới</td></tr>
+<tr><td>duyệt độc lập</td><td><b>Lanptn</b></td><td>soát vòng đối chiếu (UF-1 bước 5) và số trong Figure 2.2</td></tr>
+<tr><td>agent</td><td><code>fls-ba</code> · <code>fls-dev</code> · <code>fls-test</code></td><td>đọc NOW → viết luật → code → đối chiếu; nói với nhau chỉ qua phiếu WO / HOI·TL / BG / KQ</td></tr>
+<tr><td>kế toán</td><td>AnhMC · NgaNLT</td><td>xác nhận ô lệch có tên lý do; think-aloud cho persona fleet eval</td></tr>
+</table></div>
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<h2 class="part" id="s1-3" data-st="review" data-st-on="2026-11-13" data-st-hash="08672952">§1.3 SYSTEM: giao việc cho agent — ĐỌC NOW → TÍNH TO-BE → CODE → ĐỐI CHIẾU</h2>
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<p>Mỗi gói việc là <b>một hộp</b> của Figure 1.1, chạy đủ bốn bước; một ô của Figure 2.2 đổi từ ⛔ sang số là bằng chứng gói việc xong.</p>
+<h3 id="s1-3-1" data-st="review" data-st-on="2026-11-13" data-st-hash="0cb75515" data-st-inherited="s1-3">§1.3.1 SYSTEM: vòng bốn bước của một gói việc</h3>
+<p class="fig-cap"><strong>Figure 1.3.1</strong> — <strong>SYSTEM:</strong> một gói việc chạy bốn bước, mỗi bước một agent, giao nhau bằng phiếu.</p><ul class="fig-notes"><li>Mũi tên chỉ đi trái → phải trong một làn; "lệch ⇒ quay lại ①" là một phiếu KQ TRƯỢT, ⛔ một mũi tên.</li><li>Bước ④ dùng đúng công cụ của Part 2: <code>tools/do_voi_so_luong.py</code> và <code>fls/oracle/cong_parity.py</code>.</li></ul>
+<svg viewBox="0 0 1180 150" width="100%" role="img" aria-label="Figure 1.3.1 vòng một gói việc"><defs><marker id="m131" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#374151"/></marker></defs><rect class="box" x="20" y="20" width="250" height="112" rx="8" fill="#fef3e8" stroke="#E57347"/><text x="32" y="42" font-size="13" font-weight="700" fill="#b14a23">① ĐỌC NOW</text><text x="32" y="60" font-size="11" font-style="italic" fill="#4b5563">agent fls-ba</text><text x="32" y="82" font-size="11.5" fill="#1f2937">công thức Gsheet</text><text x="32" y="98" font-size="11.5" fill="#1f2937">(valueRenderOption=FORMULA)</text><text x="32" y="114" font-size="11.5" fill="#1f2937">+ script GScript / Apps Script</text><rect class="box" x="330" y="20" width="250" height="112" rx="8" fill="#fef3e8" stroke="#E57347"/><text x="342" y="42" font-size="13" font-weight="700" fill="#b14a23">② TÍNH TO-BE</text><text x="342" y="60" font-size="11" font-style="italic" fill="#4b5563">agent fls-ba → WO</text><text x="342" y="82" font-size="11.5" fill="#1f2937">luật thành hàm thuần</text><text x="342" y="98" font-size="11.5" fill="#1f2937">+ số mong theo tháng</text><text x="342" y="114" font-size="11.5" fill="#1f2937">(Figure 2.2)</text><line x1="272" y1="76" x2="326" y2="76" stroke="#374151" stroke-width="1.6" marker-end="url(#m131)"/><rect class="box" x="640" y="20" width="250" height="112" rx="8" fill="#fef3e8" stroke="#E57347"/><text x="652" y="42" font-size="13" font-weight="700" fill="#b14a23">③ CODE</text><text x="652" y="60" font-size="11" font-style="italic" fill="#4b5563">agent fls-dev</text><text x="652" y="82" font-size="11.5" fill="#1f2937">TDD trên ảnh đóng băng</text><text x="652" y="98" font-size="11.5" fill="#1f2937">fls/ · tools/ · test</text><text x="652" y="114" font-size="11.5" fill="#1f2937">cổng chứng minh ĐỎ</text><line x1="582" y1="76" x2="636" y2="76" stroke="#374151" stroke-width="1.6" marker-end="url(#m131)"/><rect class="box" x="950" y="20" width="250" height="112" rx="8" fill="#fef3e8" stroke="#E57347"/><text x="962" y="42" font-size="13" font-weight="700" fill="#b14a23">④ ĐỐI CHIẾU</text><text x="962" y="60" font-size="11" font-style="italic" fill="#4b5563">agent fls-test → KQ</text><text x="962" y="82" font-size="11.5" fill="#1f2937">do_voi_so_luong · cong_parity</text><text x="962" y="98" font-size="11.5" fill="#1f2937">ô ⛔ → số; lệch ⇒</text><text x="962" y="114" font-size="11.5" fill="#1f2937">quay lại ① với lý do</text><line x1="892" y1="76" x2="946" y2="76" stroke="#374151" stroke-width="1.6" marker-end="url(#m131)"/></svg>
+<h3 id="s1-3-2" data-st="review" data-st-on="2026-11-13" data-st-hash="8aaba2d4" data-st-inherited="s1-3">§1.3.2 SYSTEM: khuôn một gói việc (WO)</h3>
+<div class="tw"><table style="table-layout:fixed">
+<colgroup><col style="width:22%"><col style="width:50%"><col style="width:28%"></colgroup>
+<tr><th>trường</th><th>nội dung bắt buộc</th><th>lấy ở đâu</th></tr>
+<tr><td>hộp · bước PD Now</td><td>mã hộp + mọi bước PD Now nó thay</td><td>Part 3 / Part 5, cột NOW</td></tr>
+<tr><td>công thức NGUYÊN VĂN</td><td>đọc bằng <code>valueRenderOption=FORMULA</code>, ⛔ diễn giải lại; script: tên dự án Apps Script + hàm</td><td>Gsheet · Apps Script (agent đọc live)</td></tr>
+<tr><td>luật TO-BE</td><td>hàm thuần + bảng ca mẫu 3 dòng (đầu · giữa · cuối kỳ)</td><td>spec BA</td></tr>
+<tr><td>số mong theo tháng</td><td>ô Figure 2.2 mà gói việc phải làm đổi màu, với số NOW của tháng ấy</td><td>Figure 2.2 · <code>voi_so_luong.json</code></td></tr>
+<tr><td>cổng</td><td>khai <code>mong</code>, NO khi khác cả hai chiều; chứng minh ĐỎ trước khi tin</td><td>CLAUDE.md Đ5</td></tr>
+</table></div>
+<h3 id="s1-3-3" data-st="review" data-st-on="2026-11-13" data-st-hash="b570f1ac" data-st-inherited="s1-3">§1.3.3 SYSTEM: luật cho agent — lấy từ CLAUDE.md, ⛔ nới</h3>
+<ul><li><b>Đ1</b> trước câu phủ định ("chưa có X"): grep <code>docs/</code> lẫn <code>fls/</code> + <code>tools/</code>, dán số đếm.</li><li><b>Đ3</b> phép so ra 0 hoặc 100% phải đếm mẫu số trước; mẫu số 0 là KẾT QUẢ.</li><li><b>Đ4</b> mỗi số nói nó đếm gì (dòng · ô · line · tháng) ngay tại chỗ in — Figure 2.2 ghi đơn vị ở đầu hàng.</li><li><b>Riêng tư:</b> <code>Email Address</code> cấm vào kho; <code>Diễn giải</code> · <code>Số chứng từ</code> ⛔ vào ảnh đóng băng; <code>sao_luu/</code> · <code>hien_vat/</code> giữ gitignore.</li><li><b>⛔</b> <code>docker compose down</code>; sổ <code>fls_itl</code> chỉ-thêm (<code>INV-I08</code>).</li></ul>
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<h2 class="part" id="s1-4" data-st="draft" data-st-on="2026-11-13" data-st-hash="e3b0c442">§1.4 SYSTEM: trạng thái của tài liệu</h2>
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<h3 id="s1-4-1" data-st="draft" data-st-on="2026-11-13" data-st-hash="a95ae3c5" data-st-inherited="s1-4">§1.4.1 SYSTEM: hai trục — đồng thuận và dựng</h3>
+<p>Thanh màu bên trái heading là <b>đồng thuận</b> (văn bản đã được chốt chưa); nhãn BUILT · PARTIAL · PROPOSED là <b>dựng</b> (mã có chưa). Hai trục độc lập: một mục có thể đã chốt mà chưa dựng.</p>
+<div class="tw"><table class="stlegend"><tr><th>state</th><th>nghĩa</th><th>đếm</th></tr><tr><td><span class="stkey" data-st="draft">draft</span></td><td>đã viết, chưa ai chốt</td><td>29 units</td></tr><tr><td><span class="stkey" data-st="review">review</span></td><td>có câu hỏi / quyết định chờ người đọc</td><td>15 units</td></tr><tr><td><span class="stkey" data-st="approved">approved</span></td><td>owner đã chốt văn bản này (chỉ owner đặt)</td><td>0 units</td></tr><tr><td><span class="stkey" data-st="locked">locked</span></td><td>đã chốt và một vòng đã thấy đúng trên bản chạy</td><td>0 units</td></tr><tr><td><span class="stkey" data-st="superseded">superseded</span></td><td>giữ làm biên bản, đã thay ở chỗ khác</td><td>0 units</td></tr></table></div>
+<h3 id="s1-4-2" data-st="draft" data-st-on="2026-11-13" data-st-hash="541e494d" data-st-inherited="s1-4">§1.4.2 SYSTEM: What is outstanding &#8212; 44 units</h3>
+<p>Mục chưa <code>approved</code> — tức là mọi mục của bản này, vì phiên dựng ⛔ tự chốt.</p>
+<details><summary>Mở danh sách mọi mục còn chờ quyết định</summary><div class="tw"><table><tr><th>Unit</th><th>Title</th><th>State</th><th>Marked</th></tr>
+<tr><td class="mono">s1-1</td><td>§1.1 SYSTEM: Voi NOW ↔ TO-BE — hình chính</td><td><span class="stkey" data-st="draft">draft</span></td><td>asserted here</td></tr>
+<tr><td class="mono">s1-1-1</td><td>§1.1.1 SYSTEM: chỉ mục thành phần</td><td><span class="stkey" data-st="draft">draft</span></td><td>inherited from s1.1</td></tr>
+<tr><td class="mono">s1-1-2</td><td>§1.1.2 SYSTEM: ngữ pháp tên — đọc tên là biết ô ở đâu</td><td><span class="stkey" data-st="draft">draft</span></td><td>inherited from s1.1</td></tr>
+<tr><td class="mono">s1-2</td><td>§1.2 SYSTEM: mục tiêu, phạm vi và vai</td><td><span class="stkey" data-st="draft">draft</span></td><td>asserted here</td></tr>
+<tr><td class="mono">s1-2-1</td><td>§1.2.1 SYSTEM: mục tiêu và ngoài phạm vi</td><td><span class="stkey" data-st="draft">draft</span></td><td>inherited from s1.2</td></tr>
+<tr><td class="mono">s1-2-2</td><td>§1.2.2 SYSTEM: vai</td><td><span class="stkey" data-st="draft">draft</span></td><td>inherited from s1.2</td></tr>
+<tr><td class="mono">s1-3</td><td>§1.3 SYSTEM: giao việc cho agent — ĐỌC NOW → TÍNH TO-BE → CODE → ĐỐI CHIẾU</td><td><span class="stkey" data-st="review">review</span></td><td>asserted here</td></tr>
+<tr><td class="mono">s1-3-1</td><td>§1.3.1 SYSTEM: vòng bốn bước của một gói việc</td><td><span class="stkey" data-st="review">review</span></td><td>inherited from s1.3</td></tr>
+<tr><td class="mono">s1-3-2</td><td>§1.3.2 SYSTEM: khuôn một gói việc (WO)</td><td><span class="stkey" data-st="review">review</span></td><td>inherited from s1.3</td></tr>
+<tr><td class="mono">s1-3-3</td><td>§1.3.3 SYSTEM: luật cho agent — lấy từ CLAUDE.md, ⛔ nới</td><td><span class="stkey" data-st="review">review</span></td><td>inherited from s1.3</td></tr>
+<tr><td class="mono">s1-4</td><td>§1.4 SYSTEM: trạng thái của tài liệu</td><td><span class="stkey" data-st="draft">draft</span></td><td>asserted here</td></tr>
+<tr><td class="mono">s1-4-1</td><td>§1.4.1 SYSTEM: hai trục — đồng thuận và dựng</td><td><span class="stkey" data-st="draft">draft</span></td><td>inherited from s1.4</td></tr>
+<tr><td class="mono">s1-4-2</td><td>§1.4.2 SYSTEM: What is outstanding — 44 units</td><td><span class="stkey" data-st="draft">draft</span></td><td>inherited from s1.4</td></tr>
+<tr><td class="mono">s1-5</td><td>§1.5 SYSTEM: nguồn và đổi số</td><td><span class="stkey" data-st="draft">draft</span></td><td>asserted here</td></tr>
+<tr><td class="mono">s1-5-1</td><td>§1.5.1 SYSTEM: sổ nguồn</td><td><span class="stkey" data-st="draft">draft</span></td><td>inherited from s1.5</td></tr>
+<tr><td class="mono">s1-5-2</td><td>§1.5.2 SYSTEM: đổi số từ voi v2.4 sang AP</td><td><span class="stkey" data-st="draft">draft</span></td><td>inherited from s1.5</td></tr>
+<tr><td class="mono">s2-1</td><td>§2.1 KS: bốn số đối chiếu — mỗi số đếm gì</td><td><span class="stkey" data-st="review">review</span></td><td>asserted here</td></tr>
+<tr><td class="mono">s2-1-1</td><td>§2.1.1 KS: số có · số chạy</td><td><span class="stkey" data-st="review">review</span></td><td>asserted here</td></tr>
+<tr><td class="mono">s2-1-2</td><td>§2.1.2 KS: mapping · số đã sửa sai</td><td><span class="stkey" data-st="review">review</span></td><td>asserted here</td></tr>
+<tr><td class="mono">s2-2</td><td>§2.2 KS: ma trận tháng × loại dữ liệu</td><td><span class="stkey" data-st="review">review</span></td><td>asserted here</td></tr>
+<tr><td class="mono">s2-3</td><td>§2.3 KS: voi số lượng — tổng 23 kỳ theo bước</td><td><span class="stkey" data-st="draft">draft</span></td><td>asserted here</td></tr>
+<tr><td class="mono">s2-4</td><td>§2.4 KS: ô người điền theo khối × tháng</td><td><span class="stkey" data-st="draft">draft</span></td><td>asserted here</td></tr>
+<tr><td class="mono">s2-5</td><td>§2.5 KS: đọc kết quả và đo lại</td><td><span class="stkey" data-st="draft">draft</span></td><td>asserted here</td></tr>
+<tr><td class="mono">s2-5-1</td><td>§2.5.1 KS: số liệu nói gì</td><td><span class="stkey" data-st="draft">draft</span></td><td>inherited from s2.5</td></tr>
+<tr><td class="mono">s2-5-2</td><td>§2.5.2 KS: cách đo lại</td><td><span class="stkey" data-st="draft">draft</span></td><td>inherited from s2.5</td></tr>
+<tr><td class="mono">s2-5-3</td><td>§2.5.3 KS: ô chưa đo và ai đo</td><td><span class="stkey" data-st="draft">draft</span></td><td>inherited from s2.5</td></tr>
+<tr><td class="mono">s3-1</td><td>§3.1 RI: Agent 1 · Collect_raw_data — chụp nguồn</td><td><span class="stkey" data-st="draft">draft</span></td><td>asserted here</td></tr>
+<tr><td class="mono">s3-2</td><td>§3.2 PR: Agent 2 · Generate Group Ledger — dựng dòng chuẩn</td><td><span class="stkey" data-st="draft">draft</span></td><td>asserted here</td></tr>
+<tr><td class="mono">s3-3</td><td>§3.3 SI: STANDARD INPUT — ghép và sổ ITL hiệu lực</td><td><span class="stkey" data-st="review">review</span></td><td>asserted here</td></tr>
+<tr><td class="mono">s3-3-1</td><td>§3.3.1 SI: SI.MAP — ghép giao dịch ↔ lệnh (Agent 2)</td><td><span class="stkey" data-st="review">review</span></td><td>inherited from s3.3</td></tr>
+<tr><td class="mono">s3-3-2</td><td>§3.3.2 SI: SI.ITL — sổ ITL hiệu lực, 7 khối R–AT (Agent 3)</td><td><span class="stkey" data-st="review">review</span></td><td>inherited from s3.3</td></tr>
+<tr><td class="mono">s3-4</td><td>§3.4 KS: cổng của Agent 4 và cấu hình đã có</td><td><span class="stkey" data-st="draft">draft</span></td><td>asserted here</td></tr>
+<tr><td class="mono">s3-5</td><td>§3.5 DW: kho, màn hình và ghi CCR</td><td><span class="stkey" data-st="draft">draft</span></td><td>asserted here</td></tr>
+<tr><td class="mono">s4-1</td><td>§4.1 SYSTEM: UF-1 — agent đưa một hộp từ NOW sang code</td><td><span class="stkey" data-st="review">review</span></td><td>asserted here</td></tr>
+<tr><td class="mono">s4-2</td><td>§4.2 SYSTEM: UF-2 — owner đọc voi số lượng và chốt</td><td><span class="stkey" data-st="review">review</span></td><td>asserted here</td></tr>
+<tr><td class="mono">s4-3</td><td>§4.3 SYSTEM: nghiệm thu</td><td><span class="stkey" data-st="review">review</span></td><td>asserted here</td></tr>
+<tr><td class="mono">s4-4</td><td>§4.4 SYSTEM: lưới đối chiếu bước × cấp</td><td><span class="stkey" data-st="draft">draft</span></td><td>asserted here</td></tr>
+<tr><td class="mono">s5-1</td><td>§5.1 RI: Proposed — not built · họ HR và PLT ở Agent 1 · 2 PROPOSED</td><td><span class="stkey" data-st="draft">draft</span></td><td>asserted here</td></tr>
+<tr><td class="mono">s5-2</td><td>§5.2 CA: Proposed — not built · CALCULATE, STANDARD OUTPUT, ALLOCATE PROPOSED</td><td><span class="stkey" data-st="draft">draft</span></td><td>asserted here</td></tr>
+<tr><td class="mono">s5-3</td><td>§5.3 RP: Proposed — not built · báo cáo, cổng và cấu hình còn thiếu PROPOSED</td><td><span class="stkey" data-st="draft">draft</span></td><td>asserted here</td></tr>
+<tr><td class="mono">s5-4</td><td>§5.4 SYSTEM: phủ 116 bước PD Now và soát voi AS-IS</td><td><span class="stkey" data-st="draft">draft</span></td><td>asserted here</td></tr>
+<tr><td class="mono">s5-4-1</td><td>§5.4.1 SYSTEM: mọi bước PD Now đều có chỗ</td><td><span class="stkey" data-st="draft">draft</span></td><td>inherited from s5.4</td></tr>
+<tr><td class="mono">s5-4-2</td><td>§5.4.2 SYSTEM: soát voi AS-IS v0.9 theo PD Now</td><td><span class="stkey" data-st="draft">draft</span></td><td>inherited from s5.4</td></tr>
+<tr><td class="mono">s5-5</td><td>§5.5 SYSTEM: câu chờ owner — phương án, được và mất</td><td><span class="stkey" data-st="review">review</span></td><td>asserted here</td></tr>
+</table></div></details>
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<h2 class="part" id="s1-5" data-st="draft" data-st-on="2026-11-13" data-st-hash="e3b0c442">§1.5 SYSTEM: nguồn và đổi số</h2>
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<h3 id="s1-5-1" data-st="draft" data-st-on="2026-11-13" data-st-hash="918182c8" data-st-inherited="s1-5">§1.5.1 SYSTEM: sổ nguồn</h3>
+<details><summary>Cho máy kiểm: nguồn đã gộp và dấu vân tay (8 nguồn)</summary><div class="tw"><table style="table-layout:fixed">
+<colgroup><col style="width:34%"><col style="width:14%"><col style="width:52%"></colgroup>
+<tr><th>nguồn</th><th>vai</th><th>dùng cho</th></tr>
+<tr><td><code>Voi-FLS-v2-nhap.html</code> v2.4 (artifact Voi FLS v2)</td><td>BUILT · gộp</td><td>toàn bộ §0–§7 cũ → Part 1 · 3 · 5</td></tr>
+<tr><td><code>docs/ITL/_tools/sinh_voi_v2.py</code> + <code>pdnow_buoc.json</code></td><td>nguồn sự thật</td><td>Figure 1.1, hộp, mũi tên, 116 bước PD Now</td></tr>
+<tr><td><code>tools/do_voi_so_luong.py</code> → <code>voi_so_luong.json</code></td><td>nguồn sự thật</td><td>Figure 2.2 · 2.3 · 2.4</td></tr>
+<tr><td><code>tests/fixture/itl_ledge_adjustment.json</code> (575c53379074c759)</td><td>ảnh đóng băng 26/08</td><td>sổ AS-IS 9.967 dòng × 7 khối</td></tr>
+<tr><td><code>tests/fixture/classifying_vs_canon.json</code> (7226ef112dbd00f7)</td><td>ảnh 26/08</td><td>ghép dòng sổ ↔ dòng FLS dựng lại</td></tr>
+<tr><td><code>tests/fixture/pm_join.json</code> (6ec10945e6c1636a)</td><td>ảnh 27/08</td><td>9.992 dòng bank · 3.703 dòng PM</td></tr>
+<tr><td><code>fls/ledger/final_rule.py</code> · <code>allocate.py</code> · <code>classifying.py</code></td><td>mã</td><td>công thức NOW nguyên văn trích ở §3.3</td></tr>
+<tr><td><code>docs/ITL/02_BA/Artifacts/Kiem-TOBE-theo-ASIS.md</code></td><td>biên bản</td><td>khớp / lệch TO-BE ↔ AS-IS, quyết định owner 06/11</td></tr>
+</table></div></details>
+<h3 id="s1-5-2" data-st="draft" data-st-on="2026-11-13" data-st-hash="2231324e" data-st-inherited="s1-5">§1.5.2 SYSTEM: đổi số từ voi v2.4 sang AP</h3>
+<details><summary>Cho người cầm link cũ: §0–§7 của v2.4 nằm ở đâu bây giờ (8 dòng)</summary><div class="tw"><table style="table-layout:fixed">
+<colgroup><col style="width:20%"><col style="width:30%"><col style="width:50%"></colgroup>
+<tr><th>v2.4</th><th>AP v2.5.0</th><th>ghi chú</th></tr>
+<tr><td>§0 ngữ pháp tên</td><td>§1.1.2</td><td>giữ nguyên</td></tr>
+<tr><td>§1 con voi</td><td>§1.1 · Figure 1.1</td><td>cùng bộ sinh</td></tr>
+<tr><td>§2 audit ngược</td><td>§3 cột "số đối chiếu"</td><td>gộp theo hộp</td></tr>
+<tr><td>§3 vào / ra từng hộp</td><td>Part 3 · Part 5</td><td>thêm cột CODE · còn lại</td></tr>
+<tr><td>§4 mũi tên</td><td>§3 · §5 (cột NOW)</td><td>khoá đi kèm hộp</td></tr>
+<tr><td>§5 phủ PD Now</td><td>§5.4</td><td>giữ số 116/116</td></tr>
+<tr><td>§6 soát voi AS-IS</td><td>§5.4</td><td>giữ</td></tr>
+<tr><td>§7 câu chờ owner</td><td>§5.5</td><td>thêm phương án · được · mất</td></tr>
+</table></div></details>
+<h2 class="part-divider">Part 2 — KS · Voi số lượng dữ liệu</h2>
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<h2 class="part" id="s2-1" data-st="review" data-st-on="2026-11-13" data-st-hash="96735eaa">§2.1 KS: bốn số đối chiếu — mỗi số đếm gì</h2>
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<p>Bốn số trong mỗi ô của Figure 2.2. Định nghĩa là một <b>quyết định</b> (đếm khác ⇒ màu khác), nên mỗi số có phương án, được · mất, và điều sẽ làm đổi ý.</p>
+<h3 id="s2-1-1" data-st="review" data-st-on="2026-11-13" data-st-hash="a9ed1f9e">§2.1.1 KS: số có · số chạy</h3>
+<div class="tw"><table style="table-layout:fixed">
+<colgroup><col style="width:18%"><col style="width:28%"><col style="width:30%"><col style="width:24%"></colgroup>
+<tr><th>phương án</th><th>được</th><th>mất</th><th>phán</th></tr>
+<tr><td><b>CÓ = dòng sổ AS-IS của kỳ</b></td><td>đúng thứ kế toán đang đọc; có cho 23 kỳ trên ảnh đóng băng</td><td>là số của một ngày chụp (26/08); kỳ 2026-08 còn đang chạy</td><td><span class="badge new">RECOMMENDED</span></td></tr>
+<tr><td>CÓ = dòng sao kê nguồn</td><td>gần tiền thật nhất</td><td>ảnh sao kê ⛔ mang kỳ trong repo; lẫn dòng ITL đã loại</td><td><span class="badge tbd">REJECTED</span> — chưa đo được theo tháng</td></tr>
+<tr><td><b>CHẠY = dòng FLS dựng lại + ghép 1-1</b></td><td>đo bằng chính mã FLS trên ảnh, không cần kho</td><td>chưa phải số của kho hôm nay (<code>fls_itl</code> 8.387)</td><td><span class="badge new">RECOMMENDED</span></td></tr>
+<tr><td>CHẠY = dòng <code>fls_itl</code> theo tháng</td><td>số thật của hệ đang chạy</td><td>kho ⛔ chạy ở phiên dựng; cần agent ở máy có kho</td><td><span class="badge tbd">LATER</span> — gói việc §2.5.3</td></tr>
+</table></div>
+<p><b>Điều sẽ làm đổi ý:</b> khi kho chạy lại và <code>fls_itl</code> theo tháng khác số CHẠY trên ảnh quá 1% ở một kỳ, CHẠY đổi sang số của kho.</p>
+<h3 id="s2-1-2" data-st="review" data-st-on="2026-11-13" data-st-hash="c2cb7f88">§2.1.2 KS: mapping · số đã sửa sai</h3>
+<div class="tw"><table style="table-layout:fixed">
+<colgroup><col style="width:18%"><col style="width:28%"><col style="width:30%"><col style="width:24%"></colgroup>
+<tr><th>phương án</th><th>được</th><th>mất</th><th>phán</th></tr>
+<tr><td><b>MAPPING = hai số NOW · FLS, ⛔ gộp</b></td><td>thấy ngay NOW báo ghép nhiều hơn FLS vì VLOOKUP không kiểm tiền</td><td>ô dài hơn; người đọc phải biết số nào là của ai</td><td><span class="badge new">RECOMMENDED</span></td></tr>
+<tr><td>MAPPING = chỉ số FLS</td><td>gọn</td><td>mất bằng chứng 968 dòng AS-IS "đã ghép" mà tiền không khớp</td><td><span class="badge tbd">REJECTED</span></td></tr>
+<tr><td>SỬA theo dòng (≥1 khối người điền)</td><td>dễ hiểu</td><td>ra 9.964/9.967 — gần như mọi dòng, vô nghĩa</td><td><span class="badge tbd">REJECTED</span> — đo 13/11</td></tr>
+<tr><td><b>SỬA theo ô: gõ thật · mặc định</b></td><td>tách việc người thật làm khỏi ô nhận mặc định im lặng (trái <code>NFR-I05</code>)</td><td>chỉ đo phía AS-IS; lớp sửa FLS (<code>fls_adjustment</code> 4.428) chưa theo tháng</td><td><span class="badge new">RECOMMENDED</span></td></tr>
+</table></div>
+<p><b>Điều sẽ làm đổi ý:</b> owner chốt rằng "sửa sai" là lớp sửa của FLS (người sửa trên F01 · F02) — khi ấy SỬA lấy từ <code>fls_adjustment</code> theo tháng, số AS-IS lùi về cột phụ.</p>
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<h2 class="part" id="s2-2" data-st="review" data-st-on="2026-11-13" data-st-hash="360b8006">§2.2 KS: ma trận tháng × loại dữ liệu</h2>
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<p class="fig-cap"><strong>Figure 2.2</strong> — <strong>KS:</strong> 23 tháng × 6 loại dữ liệu; mỗi ô bốn số có · chạy · mapping · sửa, đo trên ảnh đóng băng 26–27/08.</p><ul class="fig-notes"><li><b>Hàng BANK · QUỸ</b> (dòng): có = dòng sổ ITL Ledge · chạy = FLS dựng lại và ghép 1-1 · map = NOW (VLOOKUP trả mã) · FLS (ghép hình A·B·C) · sửa ⛔ (<code>ref_adjust</code> chưa vào ảnh).</li><li><b>Hàng ITL ADJUST</b> (ô, 7 khối R–AT): có = 7 × dòng · chạy = ô FLS tính lại Final (bỏ ô lỗi, bỏ dòng tự soi loại) · map = ô khớp Final AS-IS · sửa = ô người gõ · ô nhận mặc định.</li><li><b>Hàng PAY</b> (line): ảnh PM ⛔ mang tháng, nên chỉ cột map theo tháng của giao dịch bank nó nối; có · chạy ở cột Σ.</li><li><b>HR · PLT · CCR</b>: ⛔ = chưa có nguồn trong FLS (0 mã) — gói việc ở Part 5.</li><li>Màu: xanh = chạy (hoặc khớp) bằng có · vàng ≥ 95% · đỏ &lt; 95% · xám = chưa đo. Dấu – trong ô = chưa đo ở tháng ấy; lý do ở cột Σ và §2.5.3.</li></ul>
+<div class="tw vo-khung"><table class="grid vo-bang" data-figure="2.2"><tr><th class="vo-h">loại dữ liệu ↓ · tháng →</th><th>10/24</th><th>11/24</th><th>12/24</th><th>01/25</th><th>02/25</th><th>03/25</th><th>04/25</th><th>05/25</th><th>06/25</th><th>07/25</th><th>08/25</th><th>09/25</th><th>10/25</th><th>11/25</th><th>12/25</th><th>01/26</th><th>02/26</th><th>03/26</th><th>04/26</th><th>05/26</th><th>06/26</th><th>07/26</th><th>08/26</th><th>Σ 23 kỳ</th></tr><tr><th class="vo-h"><b>BANK · QUỸ</b><br>giao dịch trong sổ ITL<br><i>đơn vị: dòng</i></th><td class="vo vo-ok"><div><span>có</span><b>6</b></div><div><span>chạy</span><b>6</b></div><div><span>map</span><b>0 · 0</b></div><div><span>sửa</span><b>–</b></div></td><td class="vo vo-ok"><div><span>có</span><b>3</b></div><div><span>chạy</span><b>3</b></div><div><span>map</span><b>0 · 0</b></div><div><span>sửa</span><b>–</b></div></td><td class="vo vo-ok"><div><span>có</span><b>6</b></div><div><span>chạy</span><b>6</b></div><div><span>map</span><b>0 · 0</b></div><div><span>sửa</span><b>–</b></div></td><td class="vo vo-mid"><div><span>có</span><b>748</b></div><div><span>chạy</span><b>747</b></div><div><span>map</span><b>154 · 130</b></div><div><span>sửa</span><b>–</b></div></td><td class="vo vo-mid"><div><span>có</span><b>283</b></div><div><span>chạy</span><b>281</b></div><div><span>map</span><b>111 · 88</b></div><div><span>sửa</span><b>–</b></div></td><td class="vo vo-ok"><div><span>có</span><b>297</b></div><div><span>chạy</span><b>297</b></div><div><span>map</span><b>163 · 122</b></div><div><span>sửa</span><b>–</b></div></td><td class="vo vo-ok"><div><span>có</span><b>332</b></div><div><span>chạy</span><b>332</b></div><div><span>map</span><b>163 · 151</b></div><div><span>sửa</span><b>–</b></div></td><td class="vo vo-mid"><div><span>có</span><b>408</b></div><div><span>chạy</span><b>407</b></div><div><span>map</span><b>251 · 159</b></div><div><span>sửa</span><b>–</b></div></td><td class="vo vo-mid"><div><span>có</span><b>350</b></div><div><span>chạy</span><b>347</b></div><div><span>map</span><b>178 · 134</b></div><div><span>sửa</span><b>–</b></div></td><td class="vo vo-mid"><div><span>có</span><b>549</b></div><div><span>chạy</span><b>545</b></div><div><span>map</span><b>258 · 204</b></div><div><span>sửa</span><b>–</b></div></td><td class="vo vo-mid"><div><span>có</span><b>537</b></div><div><span>chạy</span><b>533</b></div><div><span>map</span><b>247 · 190</b></div><div><span>sửa</span><b>–</b></div></td><td class="vo vo-mid"><div><span>có</span><b>501</b></div><div><span>chạy</span><b>497</b></div><div><span>map</span><b>187 · 150</b></div><div><span>sửa</span><b>–</b></div></td><td class="vo vo-mid"><div><span>có</span><b>487</b></div><div><span>chạy</span><b>478</b></div><div><span>map</span><b>172 · 137</b></div><div><span>sửa</span><b>–</b></div></td><td class="vo vo-mid"><div><span>có</span><b>477</b></div><div><span>chạy</span><b>463</b></div><div><span>map</span><b>139 · 117</b></div><div><span>sửa</span><b>–</b></div></td><td class="vo vo-mid"><div><span>có</span><b>566</b></div><div><span>chạy</span><b>561</b></div><div><span>map</span><b>213 · 187</b></div><div><span>sửa</span><b>–</b></div></td><td class="vo vo-mid"><div><span>có</span><b>471</b></div><div><span>chạy</span><b>467</b></div><div><span>map</span><b>133 · 116</b></div><div><span>sửa</span><b>–</b></div></td><td class="vo vo-mid"><div><span>có</span><b>439</b></div><div><span>chạy</span><b>434</b></div><div><span>map</span><b>109 · 87</b></div><div><span>sửa</span><b>–</b></div></td><td class="vo vo-mid"><div><span>có</span><b>584</b></div><div><span>chạy</span><b>579</b></div><div><span>map</span><b>124 · 113</b></div><div><span>sửa</span><b>–</b></div></td><td class="vo vo-mid"><div><span>có</span><b>600</b></div><div><span>chạy</span><b>592</b></div><div><span>map</span><b>151 · 131</b></div><div><span>sửa</span><b>–</b></div></td><td class="vo vo-mid"><div><span>có</span><b>537</b></div><div><span>chạy</span><b>532</b></div><div><span>map</span><b>176 · 147</b></div><div><span>sửa</span><b>–</b></div></td><td class="vo vo-mid"><div><span>có</span><b>613</b></div><div><span>chạy</span><b>601</b></div><div><span>map</span><b>181 · 154</b></div><div><span>sửa</span><b>–</b></div></td><td class="vo vo-mid"><div><span>có</span><b>686</b></div><div><span>chạy</span><b>663</b></div><div><span>map</span><b>160 · 131</b></div><div><span>sửa</span><b>–</b></div></td><td class="vo vo-mid"><div><span>có</span><b>487</b></div><div><span>chạy</span><b>474</b></div><div><span>map</span><b>71 · 52</b></div><div><span>sửa</span><b>–</b></div></td><td class="vo vo-sum"><div><span>có</span><b>9.967</b></div><div><span>chạy</span><b>9.845</b></div><div><span>map</span><b>3.341 · 2.700</b></div><div><span>sửa</span><b>⛔</b></div></td></tr><tr><th class="vo-h"><b>ITL ADJUST</b><br>7 khối vùng R–AT<br><i>đơn vị: ô</i></th><td class="vo vo-ok"><div><span>có</span><b>42</b></div><div><span>chạy</span><b>42</b></div><div><span>map</span><b>42</b></div><div><span>sửa</span><b>29 · 13</b></div></td><td class="vo vo-ok"><div><span>có</span><b>21</b></div><div><span>chạy</span><b>21</b></div><div><span>map</span><b>21</b></div><div><span>sửa</span><b>14 · 7</b></div></td><td class="vo vo-ok"><div><span>có</span><b>42</b></div><div><span>chạy</span><b>42</b></div><div><span>map</span><b>42</b></div><div><span>sửa</span><b>30 · 12</b></div></td><td class="vo vo-ok"><div><span>có</span><b>5.236</b></div><div><span>chạy</span><b>5.236</b></div><div><span>map</span><b>5.236</b></div><div><span>sửa</span><b>2.397 · 2.304</b></div></td><td class="vo vo-ok"><div><span>có</span><b>1.981</b></div><div><span>chạy</span><b>1.981</b></div><div><span>map</span><b>1.981</b></div><div><span>sửa</span><b>813 · 605</b></div></td><td class="vo vo-ok"><div><span>có</span><b>2.079</b></div><div><span>chạy</span><b>2.079</b></div><div><span>map</span><b>2.079</b></div><div><span>sửa</span><b>661 · 571</b></div></td><td class="vo vo-ok"><div><span>có</span><b>2.324</b></div><div><span>chạy</span><b>2.324</b></div><div><span>map</span><b>2.324</b></div><div><span>sửa</span><b>745 · 707</b></div></td><td class="vo vo-ok"><div><span>có</span><b>2.856</b></div><div><span>chạy</span><b>2.856</b></div><div><span>map</span><b>2.856</b></div><div><span>sửa</span><b>838 · 701</b></div></td><td class="vo vo-ok"><div><span>có</span><b>2.450</b></div><div><span>chạy</span><b>2.450</b></div><div><span>map</span><b>2.450</b></div><div><span>sửa</span><b>828 · 709</b></div></td><td class="vo vo-ok"><div><span>có</span><b>3.843</b></div><div><span>chạy</span><b>3.843</b></div><div><span>map</span><b>3.843</b></div><div><span>sửa</span><b>1.404 · 1.088</b></div></td><td class="vo vo-ok"><div><span>có</span><b>3.759</b></div><div><span>chạy</span><b>3.759</b></div><div><span>map</span><b>3.759</b></div><div><span>sửa</span><b>1.380 · 1.069</b></div></td><td class="vo vo-ok"><div><span>có</span><b>3.507</b></div><div><span>chạy</span><b>3.507</b></div><div><span>map</span><b>3.507</b></div><div><span>sửa</span><b>1.496 · 1.039</b></div></td><td class="vo vo-ok"><div><span>có</span><b>3.409</b></div><div><span>chạy</span><b>3.409</b></div><div><span>map</span><b>3.409</b></div><div><span>sửa</span><b>1.465 · 1.053</b></div></td><td class="vo vo-ok"><div><span>có</span><b>3.339</b></div><div><span>chạy</span><b>3.339</b></div><div><span>map</span><b>3.339</b></div><div><span>sửa</span><b>1.532 · 1.069</b></div></td><td class="vo vo-ok"><div><span>có</span><b>3.962</b></div><div><span>chạy</span><b>3.962</b></div><div><span>map</span><b>3.962</b></div><div><span>sửa</span><b>1.333 · 1.541</b></div></td><td class="vo vo-ok"><div><span>có</span><b>3.297</b></div><div><span>chạy</span><b>3.297</b></div><div><span>map</span><b>3.297</b></div><div><span>sửa</span><b>1.546 · 1.078</b></div></td><td class="vo vo-ok"><div><span>có</span><b>3.073</b></div><div><span>chạy</span><b>3.073</b></div><div><span>map</span><b>3.073</b></div><div><span>sửa</span><b>1.585 · 936</b></div></td><td class="vo vo-ok"><div><span>có</span><b>4.088</b></div><div><span>chạy</span><b>4.088</b></div><div><span>map</span><b>4.088</b></div><div><span>sửa</span><b>2.244 · 1.191</b></div></td><td class="vo vo-ok"><div><span>có</span><b>4.200</b></div><div><span>chạy</span><b>4.200</b></div><div><span>map</span><b>4.200</b></div><div><span>sửa</span><b>2.172 · 1.291</b></div></td><td class="vo vo-ok"><div><span>có</span><b>3.759</b></div><div><span>chạy</span><b>3.759</b></div><div><span>map</span><b>3.759</b></div><div><span>sửa</span><b>1.832 · 1.103</b></div></td><td class="vo vo-ok"><div><span>có</span><b>4.291</b></div><div><span>chạy</span><b>4.291</b></div><div><span>map</span><b>4.291</b></div><div><span>sửa</span><b>2.072 · 1.433</b></div></td><td class="vo vo-ok"><div><span>có</span><b>4.802</b></div><div><span>chạy</span><b>4.543</b></div><div><span>map</span><b>4.543</b></div><div><span>sửa</span><b>2.432 · 1.567</b></div></td><td class="vo vo-ok"><div><span>có</span><b>3.409</b></div><div><span>chạy</span><b>3.409</b></div><div><span>map</span><b>3.409</b></div><div><span>sửa</span><b>1.908 · 1.203</b></div></td><td class="vo vo-sum"><div><span>có</span><b>69.769</b></div><div><span>chạy</span><b>69.510</b></div><div><span>map</span><b>69.510</b></div><div><span>sửa</span><b>30.756 · 22.290</b></div></td></tr><tr><th class="vo-h"><b>PAY</b><br>PM line (sổ cái FPS)<br><i>đơn vị: line</i></th><td class="vo vo-part"><div><span>có</span><b>–</b></div><div><span>chạy</span><b>–</b></div><div><span>map</span><b>0</b></div><div><span>sửa</span><b>–</b></div></td><td class="vo vo-part"><div><span>có</span><b>–</b></div><div><span>chạy</span><b>–</b></div><div><span>map</span><b>0</b></div><div><span>sửa</span><b>–</b></div></td><td class="vo vo-part"><div><span>có</span><b>–</b></div><div><span>chạy</span><b>–</b></div><div><span>map</span><b>0</b></div><div><span>sửa</span><b>–</b></div></td><td class="vo vo-part"><div><span>có</span><b>–</b></div><div><span>chạy</span><b>–</b></div><div><span>map</span><b>126</b></div><div><span>sửa</span><b>–</b></div></td><td class="vo vo-part"><div><span>có</span><b>–</b></div><div><span>chạy</span><b>–</b></div><div><span>map</span><b>84</b></div><div><span>sửa</span><b>–</b></div></td><td class="vo vo-part"><div><span>có</span><b>–</b></div><div><span>chạy</span><b>–</b></div><div><span>map</span><b>120</b></div><div><span>sửa</span><b>–</b></div></td><td class="vo vo-part"><div><span>có</span><b>–</b></div><div><span>chạy</span><b>–</b></div><div><span>map</span><b>146</b></div><div><span>sửa</span><b>–</b></div></td><td class="vo vo-part"><div><span>có</span><b>–</b></div><div><span>chạy</span><b>–</b></div><div><span>map</span><b>152</b></div><div><span>sửa</span><b>–</b></div></td><td class="vo vo-part"><div><span>có</span><b>–</b></div><div><span>chạy</span><b>–</b></div><div><span>map</span><b>135</b></div><div><span>sửa</span><b>–</b></div></td><td class="vo vo-part"><div><span>có</span><b>–</b></div><div><span>chạy</span><b>–</b></div><div><span>map</span><b>174</b></div><div><span>sửa</span><b>–</b></div></td><td class="vo vo-part"><div><span>có</span><b>–</b></div><div><span>chạy</span><b>–</b></div><div><span>map</span><b>167</b></div><div><span>sửa</span><b>–</b></div></td><td class="vo vo-part"><div><span>có</span><b>–</b></div><div><span>chạy</span><b>–</b></div><div><span>map</span><b>128</b></div><div><span>sửa</span><b>–</b></div></td><td class="vo vo-part"><div><span>có</span><b>–</b></div><div><span>chạy</span><b>–</b></div><div><span>map</span><b>131</b></div><div><span>sửa</span><b>–</b></div></td><td class="vo vo-part"><div><span>có</span><b>–</b></div><div><span>chạy</span><b>–</b></div><div><span>map</span><b>110</b></div><div><span>sửa</span><b>–</b></div></td><td class="vo vo-part"><div><span>có</span><b>–</b></div><div><span>chạy</span><b>–</b></div><div><span>map</span><b>136</b></div><div><span>sửa</span><b>–</b></div></td><td class="vo vo-part"><div><span>có</span><b>–</b></div><div><span>chạy</span><b>–</b></div><div><span>map</span><b>113</b></div><div><span>sửa</span><b>–</b></div></td><td class="vo vo-part"><div><span>có</span><b>–</b></div><div><span>chạy</span><b>–</b></div><div><span>map</span><b>85</b></div><div><span>sửa</span><b>–</b></div></td><td class="vo vo-part"><div><span>có</span><b>–</b></div><div><span>chạy</span><b>–</b></div><div><span>map</span><b>113</b></div><div><span>sửa</span><b>–</b></div></td><td class="vo vo-part"><div><span>có</span><b>–</b></div><div><span>chạy</span><b>–</b></div><div><span>map</span><b>92</b></div><div><span>sửa</span><b>–</b></div></td><td class="vo vo-part"><div><span>có</span><b>–</b></div><div><span>chạy</span><b>–</b></div><div><span>map</span><b>107</b></div><div><span>sửa</span><b>–</b></div></td><td class="vo vo-part"><div><span>có</span><b>–</b></div><div><span>chạy</span><b>–</b></div><div><span>map</span><b>126</b></div><div><span>sửa</span><b>–</b></div></td><td class="vo vo-part"><div><span>có</span><b>–</b></div><div><span>chạy</span><b>–</b></div><div><span>map</span><b>131</b></div><div><span>sửa</span><b>–</b></div></td><td class="vo vo-part"><div><span>có</span><b>–</b></div><div><span>chạy</span><b>–</b></div><div><span>map</span><b>52</b></div><div><span>sửa</span><b>–</b></div></td><td class="vo vo-sum"><div><span>có</span><b>3.703</b></div><div><span>chạy</span><b>3.703</b></div><div><span>map</span><b>2.426</b></div><div><span>sửa</span><b>⛔</b></div></td></tr><tr><th class="vo-h"><b>HR</b><br>H1000 · lương<br><i>đơn vị: dòng lương</i></th><td class="vo vo-na">–</td><td class="vo vo-na">–</td><td class="vo vo-na">–</td><td class="vo vo-na">–</td><td class="vo vo-na">–</td><td class="vo vo-na">–</td><td class="vo vo-na">–</td><td class="vo vo-na">–</td><td class="vo vo-na">–</td><td class="vo vo-na">–</td><td class="vo vo-na">–</td><td class="vo vo-na">–</td><td class="vo vo-na">–</td><td class="vo vo-na">–</td><td class="vo vo-na">–</td><td class="vo vo-na">–</td><td class="vo vo-na">–</td><td class="vo vo-na">–</td><td class="vo vo-na">–</td><td class="vo vo-na">–</td><td class="vo vo-na">–</td><td class="vo vo-na">–</td><td class="vo vo-na">–</td><td class="vo vo-sum vo-na">~34 tệp đã adjust · 0 mã</td></tr><tr><th class="vo-h"><b>PLT</b><br>GI · OMC · SC · PS<br><i>đơn vị: dòng chi phí</i></th><td class="vo vo-na">–</td><td class="vo vo-na">–</td><td class="vo vo-na">–</td><td class="vo vo-na">–</td><td class="vo vo-na">–</td><td class="vo vo-na">–</td><td class="vo vo-na">–</td><td class="vo vo-na">–</td><td class="vo vo-na">–</td><td class="vo vo-na">–</td><td class="vo vo-na">–</td><td class="vo vo-na">–</td><td class="vo vo-na">–</td><td class="vo vo-na">–</td><td class="vo vo-na">–</td><td class="vo vo-na">–</td><td class="vo vo-na">–</td><td class="vo vo-na">–</td><td class="vo vo-na">–</td><td class="vo vo-na">–</td><td class="vo vo-na">–</td><td class="vo vo-na">–</td><td class="vo vo-na">–</td><td class="vo vo-sum vo-na">4 sổ H2.2025 · 0 mã</td></tr><tr><th class="vo-h"><b>CCR</b><br>số dư ngày TK · quỹ<br><i>đơn vị: TK × ngày</i></th><td class="vo vo-na">–</td><td class="vo vo-na">–</td><td class="vo vo-na">–</td><td class="vo vo-na">–</td><td class="vo vo-na">–</td><td class="vo vo-na">–</td><td class="vo vo-na">–</td><td class="vo vo-na">–</td><td class="vo vo-na">–</td><td class="vo vo-na">–</td><td class="vo vo-na">–</td><td class="vo vo-na">–</td><td class="vo vo-na">–</td><td class="vo vo-na">–</td><td class="vo vo-na">–</td><td class="vo vo-na">–</td><td class="vo vo-na">–</td><td class="vo vo-na">–</td><td class="vo vo-na">–</td><td class="vo vo-na">–</td><td class="vo vo-na">–</td><td class="vo vo-na">–</td><td class="vo vo-na">–</td><td class="vo vo-sum vo-na">2 sheet · chỉ đo, ⛔ chụp</td></tr></table></div>
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<h2 class="part" id="s2-3" data-st="draft" data-st-on="2026-11-13" data-st-hash="6ac7bc56">§2.3 KS: voi số lượng — tổng 23 kỳ theo bước</h2>
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<p class="fig-cap"><strong>Figure 2.3</strong> — <strong>KS:</strong> tổng 23 kỳ: từ dòng có tới dòng chạy, ghép, sửa — hai làn BANK (dòng) và ADJUST (ô).</p><ul class="fig-notes"><li>Thanh cam = tỷ lệ so với ô CÓ cùng làn.</li><li>MAP NOW 33,5% &gt; MAP FLS 27,1%: VLOOKUP lấy dòng đầu tìm thấy và ⛔ kiểm tiền; FLS đòi Σ tiền trong dung sai.</li><li>SỬA = 30.756 ô gõ thật + 22.290 ô mặc định; còn 112 ô máy không trả lời mà Final rỗng; 13 ô Final ≠ Classifying dù máy có trả lời (đều ở 2026-07).</li></ul>
+<svg viewBox="0 0 1180 270" width="100%" role="img" aria-label="Figure 2.3 voi số lượng tổng"><defs><marker id="m23" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="#374151"/></marker></defs><rect x="8" y="40" width="166" height="90" rx="6" fill="#f3f4f6" stroke="#d1d5db"/><text x="18" y="88" font-size="13" font-weight="700" fill="#1f2937">BANK · QUỸ (dòng)</text><rect class="box" x="190" y="40" width="210" height="90" rx="6" fill="#fff" stroke="#9ca3af"/><text x="200" y="58" font-size="11" font-weight="700" fill="#b14a23">CÓ</text><text x="200" y="80" font-size="17" font-weight="700" fill="#111827">9.967</text><text x="390" y="80" font-size="11" text-anchor="end" fill="#374151">100,0%</text><rect x="200" y="90" width="190" height="8" rx="3" fill="#e5e7eb"/><rect x="200" y="90" width="190.0" height="8" rx="3" fill="#E57347"/><text x="200" y="118" font-size="10.5" fill="#4b5563">dòng sổ AS-IS</text><rect class="box" x="440" y="40" width="210" height="90" rx="6" fill="#fff" stroke="#9ca3af"/><text x="450" y="58" font-size="11" font-weight="700" fill="#b14a23">CHẠY</text><text x="450" y="80" font-size="17" font-weight="700" fill="#111827">9.845</text><text x="640" y="80" font-size="11" text-anchor="end" fill="#374151">98,8%</text><rect x="450" y="90" width="190" height="8" rx="3" fill="#e5e7eb"/><rect x="450" y="90" width="187.7" height="8" rx="3" fill="#E57347"/><text x="450" y="118" font-size="10.5" fill="#4b5563">FLS dựng 1-1</text><line x1="402" y1="85" x2="436" y2="85" stroke="#374151" stroke-width="1.5" marker-end="url(#m23)"/><rect class="box" x="690" y="40" width="210" height="90" rx="6" fill="#fff" stroke="#9ca3af"/><text x="700" y="58" font-size="11" font-weight="700" fill="#b14a23">MAP NOW</text><text x="700" y="80" font-size="17" font-weight="700" fill="#111827">3.341</text><text x="890" y="80" font-size="11" text-anchor="end" fill="#374151">33,5%</text><rect x="700" y="90" width="190" height="8" rx="3" fill="#e5e7eb"/><rect x="700" y="90" width="63.7" height="8" rx="3" fill="#E57347"/><text x="700" y="118" font-size="10.5" fill="#4b5563">VLOOKUP trả mã</text><line x1="652" y1="85" x2="686" y2="85" stroke="#374151" stroke-width="1.5" marker-end="url(#m23)"/><rect class="box" x="940" y="40" width="210" height="90" rx="6" fill="#fff" stroke="#9ca3af"/><text x="950" y="58" font-size="11" font-weight="700" fill="#b14a23">MAP FLS</text><text x="950" y="80" font-size="17" font-weight="700" fill="#111827">2.700</text><text x="1140" y="80" font-size="11" text-anchor="end" fill="#374151">27,1%</text><rect x="950" y="90" width="190" height="8" rx="3" fill="#e5e7eb"/><rect x="950" y="90" width="51.5" height="8" rx="3" fill="#E57347"/><text x="950" y="118" font-size="10.5" fill="#4b5563">ghép A·B·C</text><line x1="902" y1="85" x2="936" y2="85" stroke="#374151" stroke-width="1.5" marker-end="url(#m23)"/><rect x="8" y="150" width="166" height="90" rx="6" fill="#f3f4f6" stroke="#d1d5db"/><text x="18" y="198" font-size="13" font-weight="700" fill="#1f2937">ITL ADJUST (ô)</text><rect class="box" x="190" y="150" width="210" height="90" rx="6" fill="#fff" stroke="#9ca3af"/><text x="200" y="168" font-size="11" font-weight="700" fill="#b14a23">CÓ</text><text x="200" y="190" font-size="17" font-weight="700" fill="#111827">69.769</text><text x="390" y="190" font-size="11" text-anchor="end" fill="#374151">100,0%</text><rect x="200" y="200" width="190" height="8" rx="3" fill="#e5e7eb"/><rect x="200" y="200" width="190.0" height="8" rx="3" fill="#E57347"/><text x="200" y="228" font-size="10.5" fill="#4b5563">ô 7 khối</text><rect class="box" x="440" y="150" width="210" height="90" rx="6" fill="#fff" stroke="#9ca3af"/><text x="450" y="168" font-size="11" font-weight="700" fill="#b14a23">CHẠY</text><text x="450" y="190" font-size="17" font-weight="700" fill="#111827">69.510</text><text x="640" y="190" font-size="11" text-anchor="end" fill="#374151">99,6%</text><rect x="450" y="200" width="190" height="8" rx="3" fill="#e5e7eb"/><rect x="450" y="200" width="189.3" height="8" rx="3" fill="#E57347"/><text x="450" y="228" font-size="10.5" fill="#4b5563">ô FLS tính lại</text><line x1="402" y1="195" x2="436" y2="195" stroke="#374151" stroke-width="1.5" marker-end="url(#m23)"/><rect class="box" x="690" y="150" width="210" height="90" rx="6" fill="#fff" stroke="#9ca3af"/><text x="700" y="168" font-size="11" font-weight="700" fill="#b14a23">KHỚP</text><text x="700" y="190" font-size="17" font-weight="700" fill="#111827">69.510</text><text x="890" y="190" font-size="11" text-anchor="end" fill="#374151">99,6%</text><rect x="700" y="200" width="190" height="8" rx="3" fill="#e5e7eb"/><rect x="700" y="200" width="189.3" height="8" rx="3" fill="#E57347"/><text x="700" y="228" font-size="10.5" fill="#4b5563">ô = Final AS-IS</text><line x1="652" y1="195" x2="686" y2="195" stroke="#374151" stroke-width="1.5" marker-end="url(#m23)"/><rect class="box" x="940" y="150" width="210" height="90" rx="6" fill="#fff" stroke="#9ca3af"/><text x="950" y="168" font-size="11" font-weight="700" fill="#b14a23">SỬA</text><text x="950" y="190" font-size="17" font-weight="700" fill="#111827">53.046</text><text x="1140" y="190" font-size="11" text-anchor="end" fill="#374151">76,0%</text><rect x="950" y="200" width="190" height="8" rx="3" fill="#e5e7eb"/><rect x="950" y="200" width="144.5" height="8" rx="3" fill="#E57347"/><text x="950" y="228" font-size="10.5" fill="#4b5563">gõ 30.756 · mđ 22.290</text><line x1="902" y1="195" x2="936" y2="195" stroke="#374151" stroke-width="1.5" marker-end="url(#m23)"/></svg>
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<h2 class="part" id="s2-4" data-st="draft" data-st-on="2026-11-13" data-st-hash="60c94edc">§2.4 KS: ô người điền theo khối × tháng</h2>
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<p class="fig-cap"><strong>Figure 2.4</strong> — <strong>KS:</strong> 7 khối vùng R–AT × 23 tháng; mỗi ô: gõ = giá trị thật người gõ · mđ = nhận mặc định cứng của khối.</p><ul class="fig-notes"><li>Đây là bảng xếp đơn vị cho agent A3 · Filter Fulfill &amp; Adjust: khối nhiều "gõ" là việc người tốn nhất; khối nhiều "mđ" là chỗ <code>NFR-I05</code> (⛔ mặc định im lặng) phải được owner chốt.</li><li>Khối 4–5 (kỳ DV) không có mặc định cứng (<code>GAP-ORA-06</code>), nên mọi ô điền là "gõ".</li></ul>
+<div class="tw vo-khung"><table class="grid vo-bang" data-figure="2.4"><tr><th class="vo-h">khối ↓ · tháng →</th><th>10/24</th><th>11/24</th><th>12/24</th><th>01/25</th><th>02/25</th><th>03/25</th><th>04/25</th><th>05/25</th><th>06/25</th><th>07/25</th><th>08/25</th><th>09/25</th><th>10/25</th><th>11/25</th><th>12/25</th><th>01/26</th><th>02/26</th><th>03/26</th><th>04/26</th><th>05/26</th><th>06/26</th><th>07/26</th><th>08/26</th><th>Σ</th></tr><tr><th class="vo-h"><b>1 · HD (Budget Code)</b></th><td class="vo"><div><span>gõ</span><b>6</b></div><div><span>mđ</span><b>0</b></div></td><td class="vo"><div><span>gõ</span><b>3</b></div><div><span>mđ</span><b>0</b></div></td><td class="vo"><div><span>gõ</span><b>6</b></div><div><span>mđ</span><b>0</b></div></td><td class="vo"><div><span>gõ</span><b>206</b></div><div><span>mđ</span><b>388</b></div></td><td class="vo"><div><span>gõ</span><b>148</b></div><div><span>mđ</span><b>24</b></div></td><td class="vo"><div><span>gõ</span><b>106</b></div><div><span>mđ</span><b>28</b></div></td><td class="vo"><div><span>gõ</span><b>119</b></div><div><span>mđ</span><b>50</b></div></td><td class="vo"><div><span>gõ</span><b>125</b></div><div><span>mđ</span><b>32</b></div></td><td class="vo"><div><span>gõ</span><b>141</b></div><div><span>mđ</span><b>31</b></div></td><td class="vo"><div><span>gõ</span><b>244</b></div><div><span>mđ</span><b>47</b></div></td><td class="vo"><div><span>gõ</span><b>237</b></div><div><span>mđ</span><b>53</b></div></td><td class="vo"><div><span>gõ</span><b>261</b></div><div><span>mđ</span><b>53</b></div></td><td class="vo"><div><span>gõ</span><b>250</b></div><div><span>mđ</span><b>56</b></div></td><td class="vo"><div><span>gõ</span><b>286</b></div><div><span>mđ</span><b>42</b></div></td><td class="vo"><div><span>gõ</span><b>290</b></div><div><span>mđ</span><b>52</b></div></td><td class="vo"><div><span>gõ</span><b>303</b></div><div><span>mđ</span><b>35</b></div></td><td class="vo"><div><span>gõ</span><b>283</b></div><div><span>mđ</span><b>47</b></div></td><td class="vo"><div><span>gõ</span><b>405</b></div><div><span>mđ</span><b>54</b></div></td><td class="vo"><div><span>gõ</span><b>384</b></div><div><span>mđ</span><b>64</b></div></td><td class="vo"><div><span>gõ</span><b>300</b></div><div><span>mđ</span><b>61</b></div></td><td class="vo"><div><span>gõ</span><b>363</b></div><div><span>mđ</span><b>69</b></div></td><td class="vo"><div><span>gõ</span><b>443</b></div><div><span>mđ</span><b>81</b></div></td><td class="vo"><div><span>gõ</span><b>362</b></div><div><span>mđ</span><b>54</b></div></td><td class="vo vo-sum"><div><span>gõ</span><b>5.271</b></div><div><span>mđ</span><b>1.321</b></div></td></tr><tr><th class="vo-h"><b>2 · Loại giao dịch</b></th><td class="vo"><div><span>gõ</span><b>5</b></div><div><span>mđ</span><b>1</b></div></td><td class="vo"><div><span>gõ</span><b>2</b></div><div><span>mđ</span><b>1</b></div></td><td class="vo"><div><span>gõ</span><b>4</b></div><div><span>mđ</span><b>2</b></div></td><td class="vo"><div><span>gõ</span><b>77</b></div><div><span>mđ</span><b>514</b></div></td><td class="vo"><div><span>gõ</span><b>56</b></div><div><span>mđ</span><b>116</b></div></td><td class="vo"><div><span>gõ</span><b>54</b></div><div><span>mđ</span><b>80</b></div></td><td class="vo"><div><span>gõ</span><b>56</b></div><div><span>mđ</span><b>113</b></div></td><td class="vo"><div><span>gõ</span><b>56</b></div><div><span>mđ</span><b>101</b></div></td><td class="vo"><div><span>gõ</span><b>58</b></div><div><span>mđ</span><b>114</b></div></td><td class="vo"><div><span>gõ</span><b>95</b></div><div><span>mđ</span><b>196</b></div></td><td class="vo"><div><span>gõ</span><b>64</b></div><div><span>mđ</span><b>226</b></div></td><td class="vo"><div><span>gõ</span><b>70</b></div><div><span>mđ</span><b>244</b></div></td><td class="vo"><div><span>gõ</span><b>51</b></div><div><span>mđ</span><b>264</b></div></td><td class="vo"><div><span>gõ</span><b>34</b></div><div><span>mđ</span><b>304</b></div></td><td class="vo"><div><span>gõ</span><b>22</b></div><div><span>mđ</span><b>328</b></div></td><td class="vo"><div><span>gõ</span><b>58</b></div><div><span>mđ</span><b>280</b></div></td><td class="vo"><div><span>gõ</span><b>78</b></div><div><span>mđ</span><b>252</b></div></td><td class="vo"><div><span>gõ</span><b>75</b></div><div><span>mđ</span><b>385</b></div></td><td class="vo"><div><span>gõ</span><b>70</b></div><div><span>mđ</span><b>378</b></div></td><td class="vo"><div><span>gõ</span><b>75</b></div><div><span>mđ</span><b>286</b></div></td><td class="vo"><div><span>gõ</span><b>112</b></div><div><span>mđ</span><b>320</b></div></td><td class="vo"><div><span>gõ</span><b>166</b></div><div><span>mđ</span><b>356</b></div></td><td class="vo"><div><span>gõ</span><b>69</b></div><div><span>mđ</span><b>347</b></div></td><td class="vo vo-sum"><div><span>gõ</span><b>1.407</b></div><div><span>mđ</span><b>5.208</b></div></td></tr><tr><th class="vo-h"><b>3 · CDT1 (chủ dự toán)</b></th><td class="vo"><div><span>gõ</span><b>0</b></div><div><span>mđ</span><b>6</b></div></td><td class="vo"><div><span>gõ</span><b>0</b></div><div><span>mđ</span><b>3</b></div></td><td class="vo"><div><span>gõ</span><b>1</b></div><div><span>mđ</span><b>5</b></div></td><td class="vo"><div><span>gõ</span><b>48</b></div><div><span>mđ</span><b>546</b></div></td><td class="vo"><div><span>gõ</span><b>34</b></div><div><span>mđ</span><b>139</b></div></td><td class="vo"><div><span>gõ</span><b>13</b></div><div><span>mđ</span><b>121</b></div></td><td class="vo"><div><span>gõ</span><b>17</b></div><div><span>mđ</span><b>152</b></div></td><td class="vo"><div><span>gõ</span><b>12</b></div><div><span>mđ</span><b>145</b></div></td><td class="vo"><div><span>gõ</span><b>28</b></div><div><span>mđ</span><b>144</b></div></td><td class="vo"><div><span>gõ</span><b>116</b></div><div><span>mđ</span><b>175</b></div></td><td class="vo"><div><span>gõ</span><b>142</b></div><div><span>mđ</span><b>148</b></div></td><td class="vo"><div><span>gõ</span><b>161</b></div><div><span>mđ</span><b>154</b></div></td><td class="vo"><div><span>gõ</span><b>177</b></div><div><span>mđ</span><b>138</b></div></td><td class="vo"><div><span>gõ</span><b>185</b></div><div><span>mđ</span><b>153</b></div></td><td class="vo"><div><span>gõ</span><b>61</b></div><div><span>mđ</span><b>292</b></div></td><td class="vo"><div><span>gõ</span><b>127</b></div><div><span>mđ</span><b>211</b></div></td><td class="vo"><div><span>gõ</span><b>156</b></div><div><span>mđ</span><b>174</b></div></td><td class="vo"><div><span>gõ</span><b>309</b></div><div><span>mđ</span><b>151</b></div></td><td class="vo"><div><span>gõ</span><b>271</b></div><div><span>mđ</span><b>178</b></div></td><td class="vo"><div><span>gõ</span><b>263</b></div><div><span>mđ</span><b>98</b></div></td><td class="vo"><div><span>gõ</span><b>303</b></div><div><span>mđ</span><b>130</b></div></td><td class="vo"><div><span>gõ</span><b>352</b></div><div><span>mđ</span><b>168</b></div></td><td class="vo"><div><span>gõ</span><b>308</b></div><div><span>mđ</span><b>108</b></div></td><td class="vo vo-sum"><div><span>gõ</span><b>3.084</b></div><div><span>mđ</span><b>3.539</b></div></td></tr><tr><th class="vo-h"><b>4 · Bắt đầu DV</b></th><td class="vo"><div><span>gõ</span><b>6</b></div><div><span>mđ</span><b>0</b></div></td><td class="vo"><div><span>gõ</span><b>3</b></div><div><span>mđ</span><b>0</b></div></td><td class="vo"><div><span>gõ</span><b>6</b></div><div><span>mđ</span><b>0</b></div></td><td class="vo"><div><span>gõ</span><b>733</b></div><div><span>mđ</span><b>0</b></div></td><td class="vo"><div><span>gõ</span><b>206</b></div><div><span>mđ</span><b>0</b></div></td><td class="vo"><div><span>gõ</span><b>165</b></div><div><span>mđ</span><b>0</b></div></td><td class="vo"><div><span>gõ</span><b>197</b></div><div><span>mđ</span><b>0</b></div></td><td class="vo"><div><span>gõ</span><b>198</b></div><div><span>mđ</span><b>0</b></div></td><td class="vo"><div><span>gõ</span><b>217</b></div><div><span>mđ</span><b>0</b></div></td><td class="vo"><div><span>gõ</span><b>331</b></div><div><span>mđ</span><b>0</b></div></td><td class="vo"><div><span>gõ</span><b>322</b></div><div><span>mđ</span><b>0</b></div></td><td class="vo"><div><span>gõ</span><b>350</b></div><div><span>mđ</span><b>0</b></div></td><td class="vo"><div><span>gõ</span><b>363</b></div><div><span>mđ</span><b>0</b></div></td><td class="vo"><div><span>gõ</span><b>359</b></div><div><span>mđ</span><b>0</b></div></td><td class="vo"><div><span>gõ</span><b>390</b></div><div><span>mđ</span><b>0</b></div></td><td class="vo"><div><span>gõ</span><b>373</b></div><div><span>mđ</span><b>0</b></div></td><td class="vo"><div><span>gõ</span><b>358</b></div><div><span>mđ</span><b>0</b></div></td><td class="vo"><div><span>gõ</span><b>487</b></div><div><span>mđ</span><b>0</b></div></td><td class="vo"><div><span>gõ</span><b>515</b></div><div><span>mđ</span><b>0</b></div></td><td class="vo"><div><span>gõ</span><b>458</b></div><div><span>mđ</span><b>0</b></div></td><td class="vo"><div><span>gõ</span><b>524</b></div><div><span>mđ</span><b>0</b></div></td><td class="vo"><div><span>gõ</span><b>569</b></div><div><span>mđ</span><b>0</b></div></td><td class="vo"><div><span>gõ</span><b>459</b></div><div><span>mđ</span><b>0</b></div></td><td class="vo vo-sum"><div><span>gõ</span><b>7.589</b></div><div><span>mđ</span><b>0</b></div></td></tr><tr><th class="vo-h"><b>5 · Kết thúc DV</b></th><td class="vo"><div><span>gõ</span><b>6</b></div><div><span>mđ</span><b>0</b></div></td><td class="vo"><div><span>gõ</span><b>3</b></div><div><span>mđ</span><b>0</b></div></td><td class="vo"><div><span>gõ</span><b>6</b></div><div><span>mđ</span><b>0</b></div></td><td class="vo"><div><span>gõ</span><b>733</b></div><div><span>mđ</span><b>0</b></div></td><td class="vo"><div><span>gõ</span><b>206</b></div><div><span>mđ</span><b>0</b></div></td><td class="vo"><div><span>gõ</span><b>164</b></div><div><span>mđ</span><b>0</b></div></td><td class="vo"><div><span>gõ</span><b>198</b></div><div><span>mđ</span><b>0</b></div></td><td class="vo"><div><span>gõ</span><b>198</b></div><div><span>mđ</span><b>0</b></div></td><td class="vo"><div><span>gõ</span><b>217</b></div><div><span>mđ</span><b>0</b></div></td><td class="vo"><div><span>gõ</span><b>332</b></div><div><span>mđ</span><b>0</b></div></td><td class="vo"><div><span>gõ</span><b>323</b></div><div><span>mđ</span><b>0</b></div></td><td class="vo"><div><span>gõ</span><b>348</b></div><div><span>mđ</span><b>0</b></div></td><td class="vo"><div><span>gõ</span><b>364</b></div><div><span>mđ</span><b>0</b></div></td><td class="vo"><div><span>gõ</span><b>360</b></div><div><span>mđ</span><b>0</b></div></td><td class="vo"><div><span>gõ</span><b>390</b></div><div><span>mđ</span><b>0</b></div></td><td class="vo"><div><span>gõ</span><b>374</b></div><div><span>mđ</span><b>0</b></div></td><td class="vo"><div><span>gõ</span><b>358</b></div><div><span>mđ</span><b>0</b></div></td><td class="vo"><div><span>gõ</span><b>487</b></div><div><span>mđ</span><b>0</b></div></td><td class="vo"><div><span>gõ</span><b>515</b></div><div><span>mđ</span><b>0</b></div></td><td class="vo"><div><span>gõ</span><b>459</b></div><div><span>mđ</span><b>0</b></div></td><td class="vo"><div><span>gõ</span><b>530</b></div><div><span>mđ</span><b>0</b></div></td><td class="vo"><div><span>gõ</span><b>566</b></div><div><span>mđ</span><b>0</b></div></td><td class="vo"><div><span>gõ</span><b>459</b></div><div><span>mđ</span><b>0</b></div></td><td class="vo vo-sum"><div><span>gõ</span><b>7.596</b></div><div><span>mđ</span><b>0</b></div></td></tr><tr><th class="vo-h"><b>6 · ID đối tác</b></th><td class="vo"><div><span>gõ</span><b>0</b></div><div><span>mđ</span><b>6</b></div></td><td class="vo"><div><span>gõ</span><b>0</b></div><div><span>mđ</span><b>3</b></div></td><td class="vo"><div><span>gõ</span><b>1</b></div><div><span>mđ</span><b>5</b></div></td><td class="vo"><div><span>gõ</span><b>69</b></div><div><span>mđ</span><b>657</b></div></td><td class="vo"><div><span>gõ</span><b>90</b></div><div><span>mđ</span><b>179</b></div></td><td class="vo"><div><span>gõ</span><b>89</b></div><div><span>mđ</span><b>200</b></div></td><td class="vo"><div><span>gõ</span><b>65</b></div><div><span>mđ</span><b>262</b></div></td><td class="vo"><div><span>gõ</span><b>119</b></div><div><span>mđ</span><b>280</b></div></td><td class="vo"><div><span>gõ</span><b>86</b></div><div><span>mđ</span><b>243</b></div></td><td class="vo"><div><span>gõ</span><b>199</b></div><div><span>mđ</span><b>319</b></div></td><td class="vo"><div><span>gõ</span><b>222</b></div><div><span>mđ</span><b>289</b></div></td><td class="vo"><div><span>gõ</span><b>257</b></div><div><span>mđ</span><b>223</b></div></td><td class="vo"><div><span>gõ</span><b>225</b></div><div><span>mđ</span><b>227</b></div></td><td class="vo"><div><span>gõ</span><b>304</b></div><div><span>mđ</span><b>159</b></div></td><td class="vo"><div><span>gõ</span><b>179</b></div><div><span>mđ</span><b>363</b></div></td><td class="vo"><div><span>gõ</span><b>311</b></div><div><span>mđ</span><b>143</b></div></td><td class="vo"><div><span>gõ</span><b>352</b></div><div><span>mđ</span><b>77</b></div></td><td class="vo"><div><span>gõ</span><b>481</b></div><div><span>mđ</span><b>80</b></div></td><td class="vo"><div><span>gõ</span><b>417</b></div><div><span>mđ</span><b>151</b></div></td><td class="vo"><div><span>gõ</span><b>277</b></div><div><span>mđ</span><b>209</b></div></td><td class="vo"><div><span>gõ</span><b>240</b></div><div><span>mđ</span><b>341</b></div></td><td class="vo"><div><span>gõ</span><b>336</b></div><div><span>mđ</span><b>325</b></div></td><td class="vo"><div><span>gõ</span><b>251</b></div><div><span>mđ</span><b>219</b></div></td><td class="vo vo-sum"><div><span>gõ</span><b>4.570</b></div><div><span>mđ</span><b>4.960</b></div></td></tr><tr><th class="vo-h"><b>7 · Hoá đơn</b></th><td class="vo"><div><span>gõ</span><b>6</b></div><div><span>mđ</span><b>0</b></div></td><td class="vo"><div><span>gõ</span><b>3</b></div><div><span>mđ</span><b>0</b></div></td><td class="vo"><div><span>gõ</span><b>6</b></div><div><span>mđ</span><b>0</b></div></td><td class="vo"><div><span>gõ</span><b>531</b></div><div><span>mđ</span><b>199</b></div></td><td class="vo"><div><span>gõ</span><b>73</b></div><div><span>mđ</span><b>147</b></div></td><td class="vo"><div><span>gõ</span><b>70</b></div><div><span>mđ</span><b>142</b></div></td><td class="vo"><div><span>gõ</span><b>93</b></div><div><span>mđ</span><b>130</b></div></td><td class="vo"><div><span>gõ</span><b>130</b></div><div><span>mđ</span><b>143</b></div></td><td class="vo"><div><span>gõ</span><b>81</b></div><div><span>mđ</span><b>177</b></div></td><td class="vo"><div><span>gõ</span><b>87</b></div><div><span>mđ</span><b>351</b></div></td><td class="vo"><div><span>gõ</span><b>70</b></div><div><span>mđ</span><b>353</b></div></td><td class="vo"><div><span>gõ</span><b>49</b></div><div><span>mđ</span><b>365</b></div></td><td class="vo"><div><span>gõ</span><b>35</b></div><div><span>mđ</span><b>368</b></div></td><td class="vo"><div><span>gõ</span><b>4</b></div><div><span>mđ</span><b>411</b></div></td><td class="vo"><div><span>gõ</span><b>1</b></div><div><span>mđ</span><b>506</b></div></td><td class="vo"><div><span>gõ</span><b>0</b></div><div><span>mđ</span><b>409</b></div></td><td class="vo"><div><span>gõ</span><b>0</b></div><div><span>mđ</span><b>386</b></div></td><td class="vo"><div><span>gõ</span><b>0</b></div><div><span>mđ</span><b>521</b></div></td><td class="vo"><div><span>gõ</span><b>0</b></div><div><span>mđ</span><b>520</b></div></td><td class="vo"><div><span>gõ</span><b>0</b></div><div><span>mđ</span><b>449</b></div></td><td class="vo"><div><span>gõ</span><b>0</b></div><div><span>mđ</span><b>573</b></div></td><td class="vo"><div><span>gõ</span><b>0</b></div><div><span>mđ</span><b>637</b></div></td><td class="vo"><div><span>gõ</span><b>0</b></div><div><span>mđ</span><b>475</b></div></td><td class="vo vo-sum"><div><span>gõ</span><b>1.239</b></div><div><span>mđ</span><b>7.262</b></div></td></tr></table></div>
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<h2 class="part" id="s2-5" data-st="draft" data-st-on="2026-11-13" data-st-hash="e3b0c442">§2.5 KS: đọc kết quả và đo lại</h2>
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<h3 id="s2-5-1" data-st="draft" data-st-on="2026-11-13" data-st-hash="f23a3f6f" data-st-inherited="s2-5">§2.5.1 KS: số liệu nói gì</h3>
+<ul><li><b>Đọc và dựng:</b> FLS dựng lại 9.845/9.967 dòng sổ (98,8%); 122 dòng chưa có bản dựng 1-1, rải ở 20/23 tháng — gói việc PR.BANK.</li><li><b>Tính lại vùng chỉnh tay:</b> 69.510/69.510 ô Final khớp, 23/23 tháng — luật hai bước MID → Final đúng trên cả sổ.</li><li><b>Ghép:</b> NOW báo 3.341 dòng có mã, FLS ghép chắc 2.700 dòng; phần chênh là dòng VLOOKUP trả mã mà tiền không khớp, FLS đưa vào hàng chờ kèm lý do.</li><li><b>Việc người:</b> 53.046 ô vùng R–AT do người điền — 42,0% trong số đó là mặc định.</li><li><b>Chưa đo:</b> HR · PLT · CCR · sửa của BANK và PAY — ô xám của Figure 2.2.</li></ul>
+<h3 id="s2-5-2" data-st="draft" data-st-on="2026-11-13" data-st-hash="7e7eb957" data-st-inherited="s2-5">§2.5.2 KS: cách đo lại</h3>
+<details><summary>Cho máy kiểm: lệnh, cổng và bằng chứng cổng đỏ</summary><ul><li><code>python tools/do_voi_so_luong.py</code> (in bảng) · <code>--ghi</code> (ghi <code>docs/ITL/_tools/voi_so_luong.json</code>) · rồi <code>python docs/ITL/_tools/sinh_ap_voi_v2.py</code>.</li><li>Cổng khai <code>mong</code> cho 11 số, mỗi số lấy từ bài test đã ghim của chính ảnh ấy: 9.967 dòng · 23 kỳ · 9.845 ghép · 9.992 bank · 3.703 PM · 105 không mã · 6.532 không thấy mã PM · hình A–F · parity 69.510/69.510 · 37 dòng tự soi loại · 3 checksum.</li><li>Đã chứng minh ĐỎ 13/11: đổi <code>so_dong_so</code> mong 9.967 → 9.968 trên bản sao ⇒ exit 1, "số dòng sổ: đo 9967 · mong 9968"; trả nguyên ⇒ exit 0.</li><li>Công cụ ⛔ đọc kho; chạy mã FLS (<code>pm_join.xep_ca_lat</code>, <code>final_rule.tinh_final</code>, <code>tu_soi.soi_mot_dong</code>) lên ảnh.</li></ul></details>
+<h3 id="s2-5-3" data-st="draft" data-st-on="2026-11-13" data-st-hash="d9d0826a" data-st-inherited="s2-5">§2.5.3 KS: ô chưa đo và ai đo</h3>
+<div class="tw"><table style="table-layout:fixed">
+<colgroup><col style="width:22%"><col style="width:38%"><col style="width:40%"></colgroup>
+<tr><th>ô xám</th><th>vì sao chưa đo</th><th>gói việc · ai</th></tr>
+<tr><td>CHẠY theo kho (mọi hàng)</td><td>kho <code>fls-pg-1</code> ⛔ chạy ở phiên dựng (cổng 5433 từ chối)</td><td>fls-test ở máy có kho: <code>fls_itl</code> · <code>fls_pm_link</code> · <code>fls_adjustment</code> theo tháng</td></tr>
+<tr><td>BANK · sửa</td><td><code>Reference number_adjust</code> chưa vào bản khai / ảnh (<code>GAP-KHAI-02</code>)</td><td>RI.BANK (§3.1) — fls-dev</td></tr>
+<tr><td>PAY · có · chạy theo tháng</td><td>ảnh PM ⛔ mang ngày</td><td>RI.PAY — thêm ngày duyệt vào ảnh</td></tr>
+<tr><td>HR · PLT</td><td>0 mã (grep <code>H1000</code> trong fls/ = 1 dòng chú thích; <code>Combine Code</code> = 0)</td><td>RI.HR · PR.HR · RI.PLT · PR.PLT (§5.1)</td></tr>
+<tr><td>CCR</td><td>chỉ đo bằng <code>tools/do_trong_tai.py</code>, ⛔ chụp</td><td>RI.BANK + KS.SI (DIF)</td></tr>
+</table></div>
+<h2 class="part-divider">Part 3 — Truy vết NOW → TO-BE → code · phần đã có</h2>
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<h2 class="part" id="s3-1" data-st="draft" data-st-on="2026-11-13" data-st-hash="b359fd24">§3.1 RI: Agent 1 · Collect_raw_data — chụp nguồn</h2>
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<p>Chỉ hộp đã có mã (BUILT · PARTIAL); phần chưa có ở Part 5. Cột NOW là thứ agent phải đọc lại nguyên văn trước khi sửa mã.</p>
+<div class="tw"><table style="table-layout:fixed">
+<colgroup><col style="width:11%"><col style="width:27%"><col style="width:17%"><col style="width:19%"><col style="width:12%"><col style="width:14%"></colgroup>
+<tr><th>hộp</th><th>NOW · công thức · script · bước PD</th><th>TO-BE · phép tính</th><th>CODE · tệp · test</th><th>số đối chiếu</th><th>còn lại cho agent</th></tr>
+<tr><td><b class="nw">RI.BANK</b><br>ẢNH SAO KÊ · QUỸ · CCR<br><span class="badge partial">PARTIAL</span><br><span class="nw">ag1</span></td><td>Sheet <code>R | &lt;số TK&gt;_&lt;bank&gt; &lt;tiền tệ&gt;_&lt;LE&gt;</code> — pháp nhân nằm trong tên sheet; dòng 1 = bố cục cột. Script <code>Run</code> ở <code>BankAccountList</code> / <code>Cash Ledger List</code> đọc <code>Range_Condition/Debit/Credit</code>. Cột <code>Reference number_adjust</code> người gõ đè: có <code>_adjust</code> thì <code>_adjust</code> thắng.<br><span class='nw'>PD Now:</span><br><code>115</code> Bank/PO/PP › llll<br><code>116</code> llll<br><code>200</code> P100 | Bank Transactions › R | Acc No_Bank Currency_LE<br><code>202</code> P100 | Cash Ledger › R | abc_xyz_LE<br><code>204</code> P100 | Cash Ledger › 2. CCR Cash<br><code>209</code> A-CCR_V2_Working › 2. CCR</td><td>Chụp vùng chuẩn theo bản khai có version → ảnh chỉ-thêm (<code>chup_id</code>); so hai bản khai (dòng 1 ↔ Range_*) mỗi lần nạp (S10).</td><td><code>tools/chup_sao_ke.py</code> · <code>fls/repo/chup.py</code> · <code>fls/repo/khai_cot.py</code> · <code>fls/repo/nguon_dai.py</code><br>test: <code>tests/repo/test_chup_pg.py</code> · <code>test_khai_cot_pg.py</code> · <code>tests/kiem/test_s10_hai_ban_khai.py</code></td><td>Bank: 60 nguồn · 8.338/8.338 dòng đọc được · 192 phép so hai bản khai, 0 lệch. Quỹ · CCR: 0 ảnh.</td><td><ul><li>bật lằn Cash (<code>LAN</code> đã khai Bank · Cash · PM, công cụ chỉ chạy Bank)</li><li>thêm <code>ref_adjust</code> vào bản khai + ảnh, đánh dấu dòng bị đè (58/60 bank · 7/8 quỹ)</li><li>chụp 2 sheet CCR (số dư ngày) — hiện chỉ đo bằng <code>tools/do_trong_tai.py</code></li></ul></td></tr>
+<tr><td><b class="nw">RI.PAY</b><br>ẢNH SỔ CÁI PM · PC<br><span class="badge partial">PARTIAL</span><br><span class="nw">ag1</span></td><td>FPS · <code>A|PAY100</code> Entry Data PE11 / PI11 / PM11 / PC11 (Gform, sếp duyệt). <code>PM_Unpivot</code>: tiêu đề dòng 2, dữ liệu dòng 3.<br><span class='nw'>PD Now:</span><br><code>107</code> PE › llll<br><code>108</code> PE › llll<br><code>109</code> PI › llll<br><code>110</code> PI › llll<br><code>111</code> PM › llll<br><code>112</code> PM › llll<br><code>113</code> PC › llll<br><code>114</code> PC › llll</td><td>Chụp dòng sổ cái PM qua cùng lằn ảnh chụp → bản khai → soát → nạp lô; cột <code>Email Address</code> cấm vào kho.</td><td><code>fls/repo/anh_pm.py</code> · <code>fls/adapters/pm_join.py</code> (<code>kiem_tieu_de_pm</code>)<br>test: <code>tests/repo/test_anh_pm_pg.py</code> · <code>test_nap_anh_pm_pg.py</code> · <code>test_pm_line_snap_pg.py</code></td><td>PM: 3.703 dòng trên ảnh 27/08 (3.173 có Ref No) · kho: 3.772 dòng <code>fls_pm_line</code>. PC: 0 tham chiếu.</td><td><ul><li>đọc lằn PC (PC11 Entry Data, PD 113–114)</li><li>đọc PE · PI làm chiều phụ của PM line</li></ul></td></tr>
+</table></div>
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<h2 class="part" id="s3-2" data-st="draft" data-st-on="2026-11-13" data-st-hash="caa2aafd">§3.2 PR: Agent 2 · Generate Group Ledger — dựng dòng chuẩn</h2>
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<div class="tw"><table style="table-layout:fixed">
+<colgroup><col style="width:11%"><col style="width:27%"><col style="width:17%"><col style="width:19%"><col style="width:12%"><col style="width:14%"></colgroup>
+<tr><th>hộp</th><th>NOW · công thức · script · bước PD</th><th>TO-BE · phép tính</th><th>CODE · tệp · test</th><th>số đối chiếu</th><th>còn lại cho agent</th></tr>
+<tr><td><b class="nw">PR.BANK</b><br>DÒNG TIỀN + SỐ DƯ NGÀY<br><span class="badge partial">PARTIAL</span><br><span class="nw">ag2</span></td><td>GScript gom các sheet <code>R |</code> → <code>Bank Transactions</code> / <code>Cash Ledger Transactions</code> → <code>1.2 Ledger 112</code> · <code>1.1 Ledger 111</code>. <code>Bank Transactions_Filter</code> là cầu, ⛔ bộ lọc. <code>Num</code> chống trùng.<br><span class='nw'>PD Now:</span><br><code>201</code> P100 | Bank Transactions › Bank Transactions<br><code>203</code> P100 | Cash Ledger › Cash Ledger Transactions<br><code>205</code> A-CCR_V2_Working › Bank Transactions<br><code>206</code> A-CCR_V2_Working › Cash Ledger Transactions<br><code>207</code> A-CCR_V2_Working › 1.2 Ledger 112<br><code>208</code> A-CCR_V2_Working › 1.1 Ledger 111</td><td>Dựng dòng canon 36 trường, hai vế Nợ / Có, LE theo TK, <code>content_key</code>; nạp lô một giao dịch, cổng 4 vế.</td><td><code>fls/adapters/sao_ke.py</code> · <code>sao_ke_canon.py</code> · <code>fls/repo/chay_nap.py</code><br>test: <code>tests/adapters/test_sao_ke.py</code> · <code>tests/repo/test_chay_nap_pg.py</code> · <code>test_nap_lo_pg.py</code></td><td>Trên ảnh 26/08: 9.845/9.967 dòng sổ dựng lại và ghép 1-1 (98,8%) — Figure 2.2 hàng BANK.</td><td><ul><li>số dư ngày từng TK (0 mã)</li><li>dòng quỹ (Ledger 111) khi lằn Cash bật</li><li>122 dòng sổ chưa có bản dựng 1-1 — tìm vì sao (Figure 2.2: chạy &lt; có ở 20/23 tháng)</li></ul></td></tr>
+<tr><td><b class="nw">PR.PAY</b><br>DÒNG LỆNH PM · PC<br><span class="badge partial">PARTIAL</span><br><span class="nw">ag2</span></td><td>GScript duỗi → <code>PE_Unpivot</code> · <code>PI_Unpivot</code> · <code>PM_Unpivot</code> · <code>PC_Unpivot</code>: một dòng mỗi line.<br><span class='nw'>PD Now:</span><br><code>214</code> PE Ledger › PE_Unpivot<br><code>215</code> PI Ledger › PI_Unpivot<br><code>216</code> PM Ledger › PM11_Entry Data<br><code>217</code> PM Ledger › PM_Unpivot<br><code>218</code> PC Ledger › PC_Unpivot</td><td>Duỗi line, đặt kiểu 28 cột (14 có kiểu · 1 cấm · 13 thô); khoá dòng là <code>line</code>, ⛔ <code>slip</code>.</td><td><code>fls/adapters/pm_join.py</code> (<code>DongPM</code>, <code>loc_tho</code>)<br>test: <code>tests/adapters/test_pm_join.py</code> · <code>tests/repo/test_pe_pi_co_kieu.py</code> · <code>test_g_mod_3_phan_hoach_truong_pm.py</code></td><td>28 cột PM: 14 có kiểu · 13 thô.</td><td><ul><li>đặt kiểu 13 cột thô còn lại</li><li>duỗi PC</li></ul></td></tr>
+</table></div>
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<h2 class="part" id="s3-3" data-st="review" data-st-on="2026-11-13" data-st-hash="780feff1">§3.3 SI: STANDARD INPUT — ghép và sổ ITL hiệu lực</h2>
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<p>Hai hộp này mang công thức NOW đã đọc nguyên văn; AP trích đúng chỗ mã đã ghi (final_rule · allocate · classifying).</p>
+<h3 id="s3-3-1" data-st="review" data-st-on="2026-11-13" data-st-hash="c6ef8bc0" data-st-inherited="s3-3">§3.3.1 SI: SI.MAP — ghép giao dịch ↔ lệnh (Agent 2)</h3>
+<div class="tw"><table style="table-layout:fixed">
+<colgroup><col style="width:11%"><col style="width:27%"><col style="width:17%"><col style="width:19%"><col style="width:12%"><col style="width:14%"></colgroup>
+<tr><th>hộp</th><th>NOW · công thức · script · bước PD</th><th>TO-BE · phép tính</th><th>CODE · tệp · test</th><th>số đối chiếu</th><th>còn lại cho agent</th></tr>
+<tr><td><b class="nw">SI.MAP</b><br>GHÉP GIAO DỊCH ↔ LỆNH<br><span class="badge partial">PARTIAL</span><br><span class="nw">ag2</span></td><td><code>Transaction Original</code> → <code>Transaction Mapping L1</code>: VLOOKUP Số CT (Reference number) vào <code>PM_Unpivot</code> cột Z, lấy dòng đầu tiên tìm thấy. Classifying 7 khối:<pre>Classifying = iferror(&lt;cột canon của Transaction Mapping L1&gt;, "Need to manual input")</pre><br><span class='nw'>PD Now:</span><br><code>302</code> #REF! › [Importrange]1.1 Ledger 111<br><code>303</code> #REF! › [Importrange]PE_Unpivot<br><code>304</code> #REF! › [Importrange]PI_Unpivot<br><code>305</code> #REF! › [Importrange]PM_Unpivot<br><code>306</code> #REF! › [Importrange]PC11_Entry Data<br><code>307</code> #REF! › Transaction Original<br><code>308</code> #REF! › Transaction Mapping L1</td><td>Ghép theo Ref No + Σ tiền trong dung sai (1.000 VND · tiền tệ khác 0); xếp 6 hình A–F; A · B · C ghép được, D · E · F để người (kèm lý do có tên); N×M ⛔ đoán.</td><td><code>fls/adapters/pm_join.py</code> (<code>xep_ca_lat</code>, <code>xep_hinh</code>, <code>moi_noi</code>) · <code>fls/repo/may_ghep.py</code> · <code>fls/ledger/classifying.py</code><br>test: <code>tests/adapters/test_pm_join.py</code> · <code>tests/ledger/test_classifying.py</code> · <code>tests/repo/test_pm_link_pg.py</code></td><td>Bank 9.992 dòng: NOW VLOOKUP trả mã 3.341 dòng sổ; FLS ghép hình A·B·C 2.700 dòng có kỳ — Classifying suy từ canon 68.915 ô, 100%.</td><td><ul><li>PP (2): nối dòng lương H1000 theo Số CT (0 mã)</li><li>PP (3): Combine Code vendor-ngày-NoTrans (0 mã)</li><li>hình D · E · F: agent A2 gợi ý (Phase 2)</li></ul></td></tr>
+</table></div>
+<h3 id="s3-3-2" data-st="review" data-st-on="2026-11-13" data-st-hash="a5255066" data-st-inherited="s3-3">§3.3.2 SI: SI.ITL — sổ ITL hiệu lực, 7 khối R–AT (Agent 3)</h3>
+<div class="tw"><table style="table-layout:fixed">
+<colgroup><col style="width:11%"><col style="width:27%"><col style="width:17%"><col style="width:19%"><col style="width:12%"><col style="width:14%"></colgroup>
+<tr><th>hộp</th><th>NOW · công thức · script · bước PD</th><th>TO-BE · phép tính</th><th>CODE · tệp · test</th><th>số đối chiếu</th><th>còn lại cho agent</th></tr>
+<tr><td><b class="nw">SI.ITL</b><br>SỔ ITL HIỆU LỰC<br><span class="badge partial">PARTIAL</span><br><span class="nw">ag3</span></td><td>File <code>ITL 2/2 (ADJUSTED)</code> › <code>ITL Ledge</code>: <pre>A10 = filter(IMPORTRANGE($B$1,$B$2&amp;"!A4:F"), IMPORTRANGE($B$1,$B$2&amp;"!A4:A")&gt;$B$3)</pre>Vùng chỉnh tay R–AT, 7 khối, mỗi khối 4 cột S T U V:<pre>U = if(T="" và S<>"Need to manual input", S, if(T="Input here", &lt;MẶC ĐỊNH CỨNG của khối&gt;, T))
+V = if(or(S="Need to manual input", len(S)=0), U, S)   ← Final = f(Classifying, MID), ×7 khối</pre>Vùng ALLOCATE:<pre>AU =ArrayFormula(AD7:AD)
+AV =ArrayFormula(if(VLOOKUP(V7:V,{MM!H:H,MM!K:K},2,FALSE)="Need to Allocate to CFA2","Need to Allocate to CFA2",AU7:AU))
+AW =ArrayFormula(if(VLOOKUP(V7:V,{MM!H:H,MM!L:L},2,FALSE)&lt;&gt;"",VLOOKUP(V7:V,{MM!H:H,MM!L:L},2,FALSE),"No need"))</pre><br><span class='nw'>PD Now:</span><br><code>313</code> ITL I Input Transaction Ledger File 2/2 (ADJUSTED) › [Importrange]Mapping Master<br><code>314</code> ITL I Input Transaction Ledger File 2/2 (ADJUSTED) › ITL Ledge<br><code>315</code> ITL I Input Transaction Ledger File 2/2 (ADJUSTED) › H1000 Ledge NIS/INT/COM (HR Allocate HD) Y2025<br><code>316</code> ITL I Input Transaction Ledger File 2/2 (ADJUSTED) › H1000 Ledge NIS/INT/COM (HR Allocate HD) Y2024<br><code>317</code> ITL I Input Transaction Ledger File 2/2 (ADJUSTED) › H1000 Ledge PIT (HR Allocate HD) Y2025<br><code>318</code> ITL I Input Transaction Ledger File 2/2 (ADJUSTED) › H1000 Ledge PIT (HR Allocate HD) Y2024<br><code>319</code> ITL I Input Transaction Ledger File 2/2 (ADJUSTED) › ITL AGGREGATE <i>(Cancel)</i></td><td>Sổ ITL gốc chỉ-thêm + lớp sửa có actor (người › máy); giá trị hiệu lực = lớp sửa mới nhất, nếu không thì gốc; Final tái hiện đúng hai bước MID → Final; 3 cột ALLOCATE suy lại từ <code>fls_mapping_master</code>, ⛔ lưu.</td><td><code>fls/ledger/final_rule.py</code> · <code>fls/ledger/allocate.py</code> · <code>fls/ledger/build.py</code> · <code>fls/repo/itl_repo.py</code> · <code>fls/repo/ghi_tay.py</code><br>test: <code>tests/ledger/test_parity_ca_so.py</code> · <code>test_final_rule.py</code> · <code>test_allocate.py</code> · <code>tests/repo/test_ghi_tay_pg.py</code></td><td>Parity trên ảnh 26/08: 69.510/69.510 ô Final, 23 kỳ (37 dòng 2026-07 bị tự soi loại, có lý do). Kho: <code>fls_itl</code> 8.387 · <code>fls_adjustment</code> 4.428.</td><td><ul><li>MID chưa xác nhận công thức live (<code>GAP-ORA-05</code>) — đọc lại với <code>valueRenderOption=FORMULA</code></li><li>khối 4–5 kỳ DV: chưa suy được mặc định (<code>GAP-ORA-06</code>)</li><li>đủ 4 họ: dòng H1000 + dòng nền tảng vào cùng sổ (Part 5)</li></ul></td></tr>
+</table></div>
+<p><b>Câu chờ owner:</b> chuyển SI.MAP từ Agent 3 sang Agent 2 (theo hai file ITL của AS-IS) — xem §5.5.</p>
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<h2 class="part" id="s3-4" data-st="draft" data-st-on="2026-11-13" data-st-hash="ad96f70f">§3.4 KS: cổng của Agent 4 và cấu hình đã có</h2>
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<div class="tw"><table style="table-layout:fixed">
+<colgroup><col style="width:11%"><col style="width:27%"><col style="width:17%"><col style="width:19%"><col style="width:12%"><col style="width:14%"></colgroup>
+<tr><th>hộp</th><th>NOW · công thức · script · bước PD</th><th>TO-BE · phép tính</th><th>CODE · tệp · test</th><th>số đối chiếu</th><th>còn lại cho agent</th></tr>
+<tr><td><b class="nw">KS.RI</b><br>CỔNG INPUT<br><span class="badge partial">PARTIAL</span><br><span class="nw">ag4</span></td><td>— (AS-IS ⛔ có cổng; người nhìn)<br><span class='nw'>PD Now:</span><br><span class="nw">— (AS-IS không có bước này)</span></td><td>Bản khai đủ · bề rộng cột · Σ dòng ảnh = Σ dòng nguồn.</td><td><code>fls/kiem/soat_nap.py</code> · <code>kiem_tieu_de_pm</code><br>test: <code>tests/kiem/test_soat_nap.py</code></td><td>9 luật S1–S8 + S10 có ca đỏ.</td><td><ul><li>mở rộng cho PM · PC · H1000 · nền tảng</li></ul></td></tr>
+<tr><td><b class="nw">KS.SI</b><br>CỔNG GHÉP + SỔ<br><span class="badge partial">PARTIAL</span><br><span class="nw">ag4</span></td><td><code>CHECK BALANCE</code>: số dư nhập tay ở <code>2. CCR</code> ↔ lũy kế Ledger 112/111 theo ngày (DIF) — người soát bằng mắt.<br><span class='nw'>PD Now:</span><br><span class="nw">— (AS-IS không có bước này)</span></td><td>Σ PM line = tiền giao dịch · 4 vế · số dư đầu + Σ Nợ − Σ Có = CCR (DIF = 0), liệt kê lệch từng TK · ngày.</td><td><code>fls/kiem/soat_nap.py</code> · <code>fls/repo/chay_nap.py</code> (cổng 4 vế)<br>test: <code>tests/kiem/test_soat_nap.py</code> · <code>tests/repo/test_chay_nap_pg.py</code></td><td>9 luật ✅ · DIF ⛔ (chưa có ảnh CCR).</td><td><ul><li>cổng DIF khi RI.BANK chụp CCR</li></ul></td></tr>
+<tr><td><b class="nw">KS.RP</b><br>CỔNG REPORT · PARITY<br><span class="badge partial">PARTIAL</span><br><span class="nw">ag4</span></td><td>— (AS-IS ⛔ có)<br><span class='nw'>PD Now:</span><br><span class="nw">— (AS-IS không có bước này)</span></td><td>So từng ô với ITL Ledge Final / Daily Report AS-IS; chênh liệt kê từng ô, có tên.</td><td><code>fls/oracle/cong_parity.py</code> · <code>fls/oracle/tu_soi.py</code><br>test: <code>tests/oracle/test_cong_parity.py</code> · <code>test_tu_soi.py</code></td><td>ITL: 69.510/69.510 ô ✅ · báo cáo ⛔.</td><td><ul><li>parity Daily Report 2 · 3 khi RP.CF · RP.PL có</li></ul></td></tr>
+<tr><td><b class="nw">IX.KHAI</b><br>BẢN KHAI NGUỒN<br><span class="badge built">BUILT</span><br><span class="nw">ix</span></td><td>Dòng 1 của mỗi sheet <code>R |</code> + <code>Range_*</code> của danh mục.<br><span class='nw'>PD Now:</span><br><span class="nw">— (AS-IS không có bước này)</span></td><td>Bản khai cột · thứ tự ngày · LE TK, có version, owner ký; chỉ-thêm.</td><td><code>fls/repo/khai_cot.py</code> · <code>fls/repo/nguon_dai.py</code><br>test: <code>tests/repo/test_khai_cot_pg.py</code> · <code>test_nguon_dai_pg.py</code></td><td>408 dòng = 68 × 6.</td><td><ul><li>khai cho PC · H1000 · 4 nguồn nền tảng</li></ul></td></tr>
+<tr><td><b class="nw">IX.MM</b><br>MAPPING MASTER<br><span class="badge partial">PARTIAL</span><br><span class="nw">ix</span></td><td><code>Mapping Master</code> (PD 301): H = hd → K (cần phân bổ CFA2) · L (phương pháp).<br><span class='nw'>PD Now:</span><br><code>301</code> #REF! › Mapping Master</td><td>Bảng <code>fls_mapping_master(need_cfa2, method_cfa2)</code>; ALLOCATE tra theo hd.</td><td><code>fls/adapters/mapping_master.py</code> · <code>tools/nap_mapping_master.py</code><br>test: <code>tests/adapters/test_mapping_master.py</code> · <code>tests/repo/test_nap_mapping_pg.py</code></td><td>73 mã hd, 0 trùng (đo 28/08).</td><td><ul><li>Mapping Block 1 (vendor ↔ network ↔ CDT1) — Part 5</li></ul></td></tr>
+</table></div>
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<h2 class="part" id="s3-5" data-st="draft" data-st-on="2026-11-13" data-st-hash="8021367d">§3.5 DW: kho, màn hình và ghi CCR</h2>
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<div class="tw"><table style="table-layout:fixed">
+<colgroup><col style="width:11%"><col style="width:27%"><col style="width:17%"><col style="width:19%"><col style="width:12%"><col style="width:14%"></colgroup>
+<tr><th>hộp</th><th>NOW · công thức · script · bước PD</th><th>TO-BE · phép tính</th><th>CODE · tệp · test</th><th>số đối chiếu</th><th>còn lại cho agent</th></tr>
+<tr><td><b class="nw">DW</b><br>KHO FLS<br><span class="badge partial">PARTIAL</span><br><span class="nw">ma</span></td><td>— AS-IS không có kho: ~10 file Gsheet nối nhau bằng IMPORTRANGE.<br><span class='nw'>PD Now:</span><br><span class="nw">— (AS-IS không có bước này)</span></td><td>PostgreSQL chỉ-thêm: ảnh · dòng · sổ · lớp sửa; dây truy ngược ô → dòng → giao dịch → ảnh.</td><td><code>fls/db/schema.py</code> · <code>fls/db/migrations/</code><br>test: <code>tests/db/</code> · <code>tests/repo/test_kho_sach.py</code></td><td>Sổ có; bảng khối báo cáo SO: 0.</td><td><ul><li>bảng khối SO (KRF × kỳ) khi CA · SO có</li></ul></td></tr>
+<tr><td><b class="nw">RP.FLS</b><br>MÀN FLS · TRUY NGƯỢC<br><span class="badge partial">PARTIAL</span><br><span class="nw">ma</span></td><td><code>[RAW ITL] Data Management</code> (613) · <code>[CA] Nhật ký xử lý giao dịch</code> (617).<br><span class='nw'>PD Now:</span><br><code>613</code> ITL I Input Transaction Ledger File 2/2 (ADJUSTED) › [RAW ITL]Data Management<br><code>617</code> A-CCR_V2_Working › [CA]Nhật ký xử lý Giao dịch</td><td>Màn F01 hàng chờ · F02 sổ · F03 cổng · F04 nạp lô; bấm một ô → dòng → giao dịch → ảnh.</td><td><code>fls/web/tep/man_f01*.js</code> · <code>man_f02.js</code> · <code>man_f03.js</code> · <code>man_f04.js</code> · <code>fls/api/</code><br>test: <code>tests/web/</code> · <code>tests/api/</code></td><td>6 màn · 37 tuyến API.</td><td><ul><li>truy ngược từ ô báo cáo (khi RP.CF · RP.PL có)</li></ul></td></tr>
+<tr><td><b class="nw">RP.CCR</b><br>BÁO CÁO DAILY TRONG CCR<br><span class="badge partial">PARTIAL</span><br><span class="nw">ma</span></td><td><code>5. Daily Report</code> (615) · <code>6. CCR I DEL I W I Pdf</code> (616); ThuongCT ký mỗi tháng.<br><span class='nw'>PD Now:</span><br><code>614</code> A-CCR_V2_Working › 9.2.Exchange Rate<br><code>615</code> A-CCR_V2_Working › 5. Daily Report<br><code>616</code> A-CCR_V2_Working › 6. CCR I DEL I W I Pdf</td><td>Ghi ô neo theo khoá vào CCR: chạy khô → cờ duyệt.</td><td><code>fls/xuat/ghi_o.py</code> · <code>tools/ghi_o_that.py</code><br>test: <code>tests/xuat/test_ghi_o.py</code></td><td>Cơ chế ghi ✅ (27 bài) · bộ xuất ⛔.</td><td><ul><li>bộ xuất báo cáo daily theo TK · pháp nhân · ngày</li></ul></td></tr>
+</table></div>
+<h2 class="part-divider">Part 4 — SYSTEM · Userflows và nghiệm thu</h2>
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<h2 class="part" id="s4-1" data-st="review" data-st-on="2026-11-13" data-st-hash="90dc9e04">§4.1 SYSTEM: UF-1 — agent đưa một hộp từ NOW sang code</h2>
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<p>Persona: ba agent dự án dưới operator KhanhCQ. Bước đánh số ổn định — UF-1.4 mang cùng nghĩa ở mọi phiên bản sau.</p>
+<div class="tw"><table class="uf" style="table-layout:fixed">
+<colgroup><col style="width:9%"><col style="width:7%"><col style="width:22%"><col style="width:12%"><col style="width:20%"><col style="width:22%"><col style="width:8%"></colgroup>
+<tr><th>bước</th><th>ai</th><th>BẤM GÌ · ở đâu</th><th>điều kiện trước</th><th>KỲ VỌNG</th><th>FAIL trông như thế nào</th><th>probe</th></tr>
+<tr><td>1 · Chọn hộp</td><td>KhanhCQ</td><td>AP <b>§2.2</b> → ô xám / đỏ → hộp ở <b>Part 3 / Part 5</b> → phát <b>WO</b></td><td>AP v2.5.0 mở được</td><td><ul><li>WO ghi mã hộp + mọi bước PD Now</li><li>WO ghi ô Figure 2.2 sẽ đổi màu</li></ul></td><td><ul><li>WO chỉ ghi "làm H1000", không bước PD</li><li>chọn hộp không có ô nào trên Figure 2.2</li></ul></td><td>AC1</td></tr>
+<tr><td>2 · Đọc NOW</td><td>fls-ba</td><td>Gsheet → <b>valueRenderOption=FORMULA</b> → chép công thức; Apps Script → tên dự án + hàm</td><td>quyền đọc sheet · dự án script</td><td><ul><li>mỗi bước PD của hộp có công thức nguyên văn</li><li>ca mẫu 3 dòng có giá trị thật</li></ul></td><td><ul><li>diễn giải lại công thức bằng lời</li><li>đọc giá trị thay công thức (IMPORTRANGE timeout)</li></ul></td><td>AC2</td></tr>
+<tr><td>3 · Viết luật</td><td>fls-ba</td><td>spec → <b>TL / WO</b> với hàm thuần + số mong theo tháng</td><td>bước 2 xong</td><td><ul><li>số mong lấy từ Figure 2.2</li><li>luật có ca đỏ</li></ul></td><td><ul><li>không khai mong</li><li>mong chỉ có tổng, không theo tháng</li></ul></td><td>AC3</td></tr>
+<tr><td>4 · Code</td><td>fls-dev</td><td><code>fls/</code> · <code>tools/</code> → test trên ảnh đóng băng → <b>BG</b></td><td>WO MO</td><td><ul><li>bài test ghim số theo tháng</li><li>cổng được chứng minh đỏ</li></ul></td><td><ul><li>test chỉ "không lỗi"</li><li>sửa ảnh đóng băng cho xanh</li></ul></td><td>AC4</td></tr>
+<tr><td>5 · Đối chiếu</td><td>fls-test</td><td><code>python tools/do_voi_so_luong.py</code> → <b>KQ</b>; AP sinh lại</td><td>BG chờ kiểm</td><td><ul><li>ô Figure 2.2 đổi từ ⛔ sang số</li><li>lệch có tên lý do</li></ul></td><td><ul><li>cổng xanh trên tập rỗng</li><li>ô đổi màu mà số Σ không đổi</li></ul></td><td>AC5 · AC6</td></tr>
+</table></div>
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<h2 class="part" id="s4-2" data-st="review" data-st-on="2026-11-13" data-st-hash="51909dce">§4.2 SYSTEM: UF-2 — owner đọc voi số lượng và chốt</h2>
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<div class="tw"><table class="uf" style="table-layout:fixed">
+<colgroup><col style="width:9%"><col style="width:7%"><col style="width:22%"><col style="width:12%"><col style="width:20%"><col style="width:22%"><col style="width:8%"></colgroup>
+<tr><th>bước</th><th>ai</th><th>BẤM GÌ · ở đâu</th><th>điều kiện trước</th><th>KỲ VỌNG</th><th>FAIL trông như thế nào</th><th>probe</th></tr>
+<tr><td>1 · Mở voi số lượng</td><td>ThuongCT</td><td>AP → <b>§2.2</b></td><td>AP đã đăng</td><td><ul><li>thấy 23 tháng × 6 loại</li><li>đầu hàng ghi đơn vị</li></ul></td><td><ul><li>ô có số mà không nói đơn vị</li><li>tháng thiếu cột</li></ul></td><td>AC7</td></tr>
+<tr><td>2 · Soi một ô lệch</td><td>ThuongCT</td><td>ô vàng / đỏ → <b>§2.5.1</b> → hộp ở Part 3</td><td>bước 1</td><td><ul><li>biết ô lệch thuộc hộp nào</li><li>biết agent nào đang làm</li></ul></td><td><ul><li>ô lệch không trỏ tới hộp</li><li>giải thích chung chung</li></ul></td><td>AC7</td></tr>
+<tr><td>3 · Chốt định nghĩa</td><td>ThuongCT</td><td><b>§2.1</b> → chọn phương án → báo KhanhCQ đặt <code>approved</code></td><td>§2.1 ở review</td><td><ul><li>§2.1 đổi sang approved có ngày</li><li>Figure 2.2 sinh lại theo định nghĩa chốt</li></ul></td><td><ul><li>tác giả tự đặt approved</li><li>đổi định nghĩa mà số không sinh lại</li></ul></td><td>AC3</td></tr>
+<tr><td>4 · Chốt câu mở</td><td>ThuongCT</td><td><b>§5.5</b> → chọn phương án từng câu</td><td>§5.5 ở review</td><td><ul><li>mỗi câu có phán + ngày</li><li>phương án bị bác vẫn còn trong AP</li></ul></td><td><ul><li>xoá phương án bị bác</li><li>chốt mà không ghi điều làm đổi ý</li></ul></td><td>AC8</td></tr>
+</table></div>
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<h2 class="part" id="s4-3" data-st="review" data-st-on="2026-11-13" data-st-hash="18e868a0">§4.3 SYSTEM: nghiệm thu</h2>
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<p>Mỗi câu thấy được (trang đã render hoặc lệnh chạy), một người kiểm trong vài phút, mang một cấp L1–L5 và nối về bước Userflow.</p>
+<div class="tw"><table style="table-layout:fixed">
+<colgroup><col style="width:6%"><col style="width:6%"><col style="width:44%"><col style="width:14%"><col style="width:30%"></colgroup>
+<tr><th>mã</th><th>cấp</th><th>câu</th><th>bước</th><th>trạng thái · số · ngày</th></tr>
+<tr><td><b>AC1</b></td><td>L1</td><td>Mọi 31 hộp của Figure 1.1 có một dòng ở Part 3 hoặc Part 5 với NOW · TO-BE · CODE · đối chiếu.</td><td>UF-1.1</td><td>14 + 17 = 31/31 · 2026-11-13 (máy đếm lúc sinh)</td></tr>
+<tr><td><b>AC2</b></td><td>L3</td><td>Mỗi hộp PARTIAL có công thức / script NOW ghi nguyên văn hoặc ghi rõ "AS-IS không có bước".</td><td>UF-1.2</td><td>14/14 · 2026-11-13</td></tr>
+<tr><td><b>AC3</b></td><td>L3</td><td>Bốn số có định nghĩa một câu và đơn vị ghi ở đầu hàng Figure 2.2.</td><td>UF-1.3 · UF-2.3</td><td>4/4 · 2026-11-13</td></tr>
+<tr><td><b>AC4</b></td><td>L2</td><td>Mỗi hộp PARTIAL trỏ tới ít nhất một tệp test có thật trong repo.</td><td>UF-1.4</td><td>14/14 · 2026-11-13</td></tr>
+<tr><td><b>AC5</b></td><td>L5</td><td>Hàng BANK · ADJUST của Figure 2.2 tái hiện được bằng một lệnh, và cổng của lệnh ấy đã được chứng minh đỏ.</td><td>UF-1.5</td><td>exit 0 · đỏ đã thấy · 2026-11-13</td></tr>
+<tr><td><b>AC6</b></td><td>L5</td><td>Một hộp chỉ được ghi "xong" khi ô của nó trên Figure 2.2 bằng số NOW ở mọi tháng có dữ liệu.</td><td>UF-1.5</td><td>ADJUST 23/23 tháng khớp · BANK 3/23 tháng chạy = có · HR · PLT 0/23 · 2026-11-13</td></tr>
+<tr><td><b>AC7</b></td><td>L4</td><td>Từ một ô vàng / đỏ của Figure 2.2, owner tới được hộp và gói việc trong một cú bấm mục lục.</td><td>UF-2.1 · UF-2.2</td><td>chưa đo — chờ ThuongCT đọc</td></tr>
+<tr><td><b>AC8</b></td><td>L4</td><td>Mỗi câu §5.5 có ≥ 2 phương án với được · mất và một dòng "điều sẽ làm đổi ý".</td><td>UF-2.4</td><td>6/6 · 2026-11-13</td></tr>
+</table></div>
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<h2 class="part" id="s4-4" data-st="draft" data-st-on="2026-11-13" data-st-hash="774cd643">§4.4 SYSTEM: lưới đối chiếu bước × cấp</h2>
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<p class="fig-cap"><strong>Figure 4.4</strong> — <strong>SYSTEM:</strong> mỗi bước Userflow × năm cấp L1–L5; ô là mã câu nghiệm thu, ▢ = lỗ.</p><ul class="fig-notes"><li>Mọi hàng có ít nhất một câu; mọi câu phủ ít nhất một bước (AC1–AC8 đều xuất hiện).</li><li>Ô ▢ là lỗ thật, để nguyên cho người đọc và agent cùng thấy — không có cấp nào trống hẳn.</li></ul>
+<div class="tw"><table class="grid"><tr><th>bước</th><th>L1</th><th>L2</th><th>L3</th><th>L4</th><th>L5</th></tr><tr><td class="lbl">UF-1.1</td><td>AC1</td><td class="hole">▢</td><td class="hole">▢</td><td class="hole">▢</td><td class="hole">▢</td></tr><tr><td class="lbl">UF-1.2</td><td class="hole">▢</td><td class="hole">▢</td><td>AC2</td><td class="hole">▢</td><td class="hole">▢</td></tr><tr><td class="lbl">UF-1.3</td><td class="hole">▢</td><td class="hole">▢</td><td>AC3</td><td class="hole">▢</td><td class="hole">▢</td></tr><tr><td class="lbl">UF-1.4</td><td class="hole">▢</td><td>AC4</td><td class="hole">▢</td><td class="hole">▢</td><td class="hole">▢</td></tr><tr><td class="lbl">UF-1.5</td><td class="hole">▢</td><td class="hole">▢</td><td class="hole">▢</td><td class="hole">▢</td><td>AC5 · AC6</td></tr><tr><td class="lbl">UF-2.1</td><td class="hole">▢</td><td class="hole">▢</td><td class="hole">▢</td><td>AC7</td><td class="hole">▢</td></tr><tr><td class="lbl">UF-2.2</td><td class="hole">▢</td><td class="hole">▢</td><td class="hole">▢</td><td>AC7</td><td class="hole">▢</td></tr><tr><td class="lbl">UF-2.3</td><td class="hole">▢</td><td class="hole">▢</td><td>AC3</td><td class="hole">▢</td><td class="hole">▢</td></tr><tr><td class="lbl">UF-2.4</td><td class="hole">▢</td><td class="hole">▢</td><td class="hole">▢</td><td>AC8</td><td class="hole">▢</td></tr></table></div>
+<h2 class="part-divider">Part 5 — SYSTEM · Đề xuất chưa dựng, phủ PD Now, câu chờ owner</h2>
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<h2 class="part" id="s5-1" data-st="draft" data-st-on="2026-11-13" data-st-hash="4ca57c47">§5.1 RI: Proposed — not built · họ HR và PLT ở Agent 1 · 2 <span class="badge miss">PROPOSED</span></h2>
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<p>Phần này chỉ chứa hộp ⛔ có mã (§A.11): thiết kế, chưa dựng. Cùng khuôn với Part 3 để agent nhận gói việc ngay.</p>
+<div class="tw"><table style="table-layout:fixed">
+<colgroup><col style="width:13%"><col style="width:33%"><col style="width:20%"><col style="width:17%"><col style="width:17%"></colgroup>
+<tr><th>hộp</th><th>NOW · công thức · script · bước PD</th><th>TO-BE dự kiến</th><th>CODE đích</th><th>đối chiếu</th></tr>
+<tr><td><b class="nw">RI.HR</b><br>ẢNH SỔ H1000<br><span class="badge miss">PROPOSED</span></td><td>H1000 Ledger (APERO-HR Allocate HD), PD 101 — HR · C&amp;B lập, kế toán dán số FT vào dòng 4–8 sheet <i>No n</i>.<br><span class='nw'>PD Now:</span><br><code>101</code> Payroll Sheet › COLLECT RAW</td><td>Chụp ~34 tệp H1000 đã adjust qua lằn ảnh chụp thứ tư.</td><td>lằn <code>HR</code> trong <code>fls/repo/chup.py</code> + bản khai</td><td>Σ dòng ảnh = Σ dòng tệp, theo tháng (Figure 2.2 hàng HR)</td></tr>
+<tr><td><b class="nw">RI.PLT</b><br>ẢNH 4 NGUỒN NỀN TẢNG<br><span class="badge miss">PROPOSED</span></td><td>GI · OMC xuất từ Looker (Data · AnhTQ, PD 103–104); SC từ Gsheet <i>Chi phí Service Apero</i> (105); PS từ <i>AperoGroup_Payment</i> (106).<br><span class='nw'>PD Now:</span><br><code>103</code> GI › COLLECT RAW<br><code>104</code> OMC › COLLECT RAW<br><code>105</code> SC › llll<br><code>106</code> PS › llll</td><td>Chụp 4 nguồn, đóng băng theo tháng.</td><td>lằn <code>PLT</code> + bản khai 4 nguồn</td><td>Σ dòng theo loại × tháng (hàng PLT)</td></tr>
+<tr><td><b class="nw">PR.HR</b><br>DÒNG LƯƠNG<br><span class="badge miss">PROPOSED</span></td><td>Tách lương → <code>1.3 Ledger NIS/INT/COM</code> · <code>PIT</code> 2024–2025 (PD 219–222); đợt = 5 pháp nhân × 5 loại.<br><span class='nw'>PD Now:</span><br><code>219</code> H1000 Ledger › 1.3 Ledger NIS/INT/COM 2025<br><code>220</code> H1000 Ledger › 1.3 Ledger NIS/INT/COM 2024<br><code>221</code> H1000 Ledger › 1.3 Ledger PIT 2025<br><code>222</code> H1000 Ledger › 1.3 Ledger PIT 2024</td><td>Dòng lương + Số CT; Σ Có = Σ Nợ mỗi đợt; đủ tháng, ⛔ trùng.</td><td>adapter D (mới) · <code>fls/adapters/</code></td><td>Σ đợt = Σ tệp; tháng trùng · thiếu = 0</td></tr>
+<tr><td><b class="nw">PR.PLT</b><br>CHI PHÍ 4 LOẠI<br><span class="badge miss">PROPOSED</span></td><td>Gom → Platform Data Ledger ×4 (PD 210–213); Combine Code = Vendor-Date-NoTrans.<br><span class='nw'>PD Now:</span><br><code>210</code> GI Platform Data Ledger › Source (Looker)<br><code>211</code> OMC Platform Data Ledger › Source (Looker)<br><code>212</code> SC Platform Data Ledger › Source (Looker)<br><code>213</code> PS Platform Data Ledger › Source (Looker)</td><td>Chi phí theo loại · vendor · ngày + Combine Code, vào STANDARD INPUT như 3 họ kia.</td><td>adapter mới + khoá Combine Code</td><td>Σ tiền theo loại × tháng = sổ H2.2025</td></tr>
+</table></div>
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<h2 class="part" id="s5-2" data-st="draft" data-st-on="2026-11-13" data-st-hash="5edc83f8">§5.2 CA: Proposed — not built · CALCULATE, STANDARD OUTPUT, ALLOCATE <span class="badge miss">PROPOSED</span></h2>
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<div class="tw"><table style="table-layout:fixed">
+<colgroup><col style="width:13%"><col style="width:33%"><col style="width:20%"><col style="width:17%"><col style="width:17%"></colgroup>
+<tr><th>hộp</th><th>NOW · công thức · script · bước PD</th><th>TO-BE dự kiến</th><th>CODE đích</th><th>đối chiếu</th></tr>
+<tr><td><b class="nw">CA.GL</b><br>SỔ CÁI GL · QUY ĐỔI<br><span class="badge miss">PROPOSED</span></td><td><code>Report I General Ledger</code> (406), <code>9.2.Exchange Rate</code> (405); H1000 Ledge 401–404.<br><span class='nw'>PD Now:</span><br><code>400</code> Report I General Ledger | CF report › ITL Ledge<br><code>401</code> Report I General Ledger | CF report › H1000 Ledge NIS/INT/COM (HR Allocate HD) Y2025<br><code>402</code> Report I General Ledger | CF report › H1000 Ledge NIS/INT/COM (HR Allocate HD) Y2024<br><code>403</code> Report I General Ledger | CF report › H1000 Ledge PIT (HR Allocate HD) Y2025<br><code>404</code> Report I General Ledger | CF report › H1000 Ledge PIT (HR Allocate HD) Y2024<br><code>405</code> Report I General Ledger | CF report › 9.2.Exchange Rate<br><code>406</code> Report I General Ledger | CF report › Report I General Ledger</td><td>ITL hiệu lực → khuôn GL (Templ 2); quy đổi theo tỷ giá tháng; gắn chiều CFA1 (LE) · PLA1 · CFA3 · PLA3 (KRF).</td><td><code>fls/ledger/</code> (mới) — grep <code>ty_gia</code> / <code>exchange</code> trong fls/ = 0</td><td>từng ô = Report GL AS-IS</td></tr>
+<tr><td><b class="nw">SO.CFA1</b><br>CF THEO LE<br><span class="badge miss">PROPOSED</span></td><td><code>Report I CFA1 Daily</code> · <code>Y H Q M</code> (409–410).<br><span class='nw'>PD Now:</span><br><code>409</code> Report I General Ledger | CF report › Report I CFA1 Daily<br><code>410</code> Report I General Ledger | CF report › Report I CFA1 Y H Q M</td><td>Khối CF: KRF × LE × kỳ.</td><td>bảng khối SO (mới)</td><td>Σ ngày = Σ Y·H·Q·M · từng ô = 409–410</td></tr>
+<tr><td><b class="nw">SO.PLA3</b><br>P&amp;L THEO KRF · TRƯỚC PB<br><span class="badge miss">PROPOSED</span></td><td>PLA1 PM-only · PLA3 HR-only · CFA3 · PLA3 PM + HR (407–408 · 411–419).<br><span class='nw'>PD Now:</span><br><code>407</code> Report I General Ledger | CF report › Report I H1000 Ledge (HR Allocate HD) Y2025 <i>(Doing)</i><br><code>408</code> Report I General Ledger | CF report › Report I H1000 Ledge (HR Allocate HD) Y2025 | For PL Report <i>(Doing)</i><br><code>411</code> Report I General Ledger | CF report › MID I Report I CFA3 Daily<br><code>412</code> Report I General Ledger | CF report › Report I General Ledger<br><code>413</code> Report I General Ledger | CF report › Report I H1000 Ledge (HR Allocate HD) Y2025 | For PL Report<br><code>414</code> Report I General Ledger | CF report › [MID] Report I PLA1 Daily I PM only<br><code>415</code> Report I General Ledger | CF report › [MID] Report I PLA1 Y H Q M | PM Only<br><code>416</code> Report I General Ledger | CF report › [MID] Report I PLA3 Daily | HR Only<br><code>417</code> Report I General Ledger | CF report › [MID]  Report I PLA3 Y H Q M | HR Only<br><code>418</code> Report I General Ledger | CF report › [MID] Report I PLA3 Daily I PM + HR<br><code>419</code> Report I General Ledger | CF report › Report I PLA3 Y H Q M | PM + HR</td><td>Khối P&amp;L theo KRF trước phân bổ.</td><td>bảng khối SO (mới)</td><td>từng ô = 411–419</td></tr>
+<tr><td><b class="nw">AL.KEY</b><br>PHÂN BỔ THEO KHOÁ<br><span class="badge miss">PROPOSED</span></td><td>NON-HR 511–513: By LE · By NOEM · By GI.<br><span class='nw'>PD Now:</span><br><code>511</code> NON-HR<br><code>512</code> NON-HR<br><code>513</code> NON-HR</td><td>Phân bổ theo bảng tỷ trọng.</td><td><code>fls/ledger/</code> (mới) — từ vựng By GI (8) · By NOEM (5) đã có ở mapping_master</td><td>Σ phần chia = tiền GD</td></tr>
+<tr><td><b class="nw">AL.PLT</b><br>PHÂN BỔ NỀN TẢNG<br><span class="badge miss">PROPOSED</span></td><td>500–510: [Import] Report GL + Source (Looker) + Vendor &amp; Network Mapping → CFA1 | GI Platform Data Ledger → CFA2 MID 1–3.<br><span class='nw'>PD Now:</span><br><code>500</code> n/a › n/a<br><code>501</code> GI Platform Data Ledger | H2.2025 | Finance Report - ED - Dev 02-12-2023_Finance Monthly Audit_Table › [Import]Report I General Ledger<br><code>502</code> GI Platform Data Ledger | H2.2025 | Finance Report - ED - Dev 02-12-2023_Finance Monthly Audit_Table › Source (Looker)<br><code>503</code> GI Platform Data Ledger | H2.2025 | Finance Report - ED - Dev 02-12-2023_Finance Monthly Audit_Table › Vendor &amp; Network Mapping<br><code>504</code> GI Platform Data Ledger | H2.2025 | Finance Report - ED - Dev 02-12-2023_Finance Monthly Audit_Table › CFA1 | GI Platform Data Ledger<br><code>505</code> GI Platform Data Ledger | H2.2025 | Finance Report - ED - Dev 02-12-2023_Finance Monthly Audit_Table › CFA2 | MID 1 | GI Allocated Ledger<br><code>506</code> GI Platform Data Ledger | H2.2025 | Finance Report - ED - Dev 02-12-2023_Finance Monthly Audit_Table › CFA2 | MID 2 | GI Allocated Ledger<br><code>507</code> GI Platform Data Ledger | H2.2025 | Finance Report - ED - Dev 02-12-2023_Finance Monthly Audit_Table › CFA2 | MID 3 | GI Platform Data Ledger<br><code>508</code> OMC Platform Data Ledger | H2.2025 | Finance Report - ED - Dev 02-12-2023_Finance Monthly Audit_Table › NON-HR<br><code>509</code> SC Data Ledger | H2.2025 (Luận&#x27;s File) › NON-HR<br><code>510</code> PS Data Ledger | H2.2025 › NON-HR</td><td>Mapping Block 1: Vendor ↔ Network ↔ CDT1; chia ×7 CDT1.</td><td>mới — <code>allocate.py</code> hiện chỉ là cột AU</td><td>Σ % CDT1 = 100 · Σ phần chia = tiền</td></tr>
+<tr><td><b class="nw">SO.PLA3-ATL</b><br>P&amp;L SAU PHÂN BỔ<br><span class="badge miss">PROPOSED</span></td><td>600–604 · 606: CFA2 MID 3 ×4 · Allocation Table · <code>Report I PLA3 Y H Q M | PM + HR | ATL</code>.<br><span class='nw'>PD Now:</span><br><code>600</code> Report I General Ledger | P&amp;L Report › CFA2 | MID 3 | GI Platform Data Ledger<br><code>601</code> Report I General Ledger | P&amp;L Report › CFA2 | MID 3 | OMC Platform Data Ledger<br><code>602</code> Report I General Ledger | P&amp;L Report › CFA2 | MID 3 | SC Platform Data Ledger<br><code>603</code> Report I General Ledger | P&amp;L Report › CFA2 | MID 3 | PS Platform Data Ledger<br><code>604</code> Report I General Ledger | P&amp;L Report › Allocation Table | By NOEM &amp; By GI<br><code>606</code> Report I General Ledger | P&amp;L Report › Report I PLA3 Y H Q M | PM + HR | ATL</td><td>Khối P&amp;L sau phân bổ: KRF × CDT1 × kỳ.</td><td>bảng khối SO (mới)</td><td>từng ô = 606</td></tr>
+</table></div>
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<h2 class="part" id="s5-3" data-st="draft" data-st-on="2026-11-13" data-st-hash="f8513aae">§5.3 RP: Proposed — not built · báo cáo, cổng và cấu hình còn thiếu <span class="badge miss">PROPOSED</span></h2>
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<div class="tw"><table style="table-layout:fixed">
+<colgroup><col style="width:13%"><col style="width:33%"><col style="width:20%"><col style="width:17%"><col style="width:17%"></colgroup>
+<tr><th>hộp</th><th>NOW · công thức · script · bước PD</th><th>TO-BE dự kiến</th><th>CODE đích</th><th>đối chiếu</th></tr>
+<tr><td><b class="nw">RP.CF</b><br>DAILY REPORT 2 · CF<br><span class="badge miss">PROPOSED</span></td><td><code>5. Daily Report 2</code> (610).<br><span class='nw'>PD Now:</span><br><code>610</code> Report I General Ledger | CF report › 5. Daily Report 2</td><td>Daily Report 2 · CF · Group · LE (Templ 5).</td><td><code>fls/xuat/</code> (mới)</td><td>từng ô = 610</td></tr>
+<tr><td><b class="nw">RP.PL</b><br>DAILY REPORT 3 · P&amp;L<br><span class="badge miss">PROPOSED</span></td><td><code>[FS1]/[FS2] 5. Daily Report 3</code> (605 · 607–609).<br><span class='nw'>PD Now:</span><br><code>605</code> Report I General Ledger | P&amp;L Report › [MID][FS1][PLA5]5. Daily Report 3 (Sign off)<br><code>607</code> Report I General Ledger | P&amp;L Report › [FS2]5. Daily Report 3<br><code>608</code> Report I General Ledger | P&amp;L Report › [FS1]5. Daily Report 3<br><code>609</code> Report I General Ledger | P&amp;L Report › 5. Daily Report 3</td><td>Daily Report 3 · P&amp;L · Group · CDT1.</td><td><code>fls/xuat/</code> (mới)</td><td>từng ô = 609</td></tr>
+<tr><td><b class="nw">KS.CA</b><br>CỔNG CALCULATE<br><span class="badge miss">PROPOSED</span></td><td>—<br><span class='nw'>PD Now:</span><br><span class="nw">— (AS-IS không có bước này)</span></td><td>Σ theo LE = Σ theo nguồn · Σ ngày = Σ Y·H·Q·M.</td><td><code>fls/kiem/</code> (mới)</td><td>cổng đỏ được chứng minh</td></tr>
+<tr><td><b class="nw">KS.AL</b><br>CỔNG ALLOCATE<br><span class="badge miss">PROPOSED</span></td><td>—<br><span class='nw'>PD Now:</span><br><span class="nw">— (AS-IS không có bước này)</span></td><td>Σ phần chia = tiền GD · Σ % CDT1 = 100.</td><td><code>fls/kiem/</code> (mới)</td><td>cổng đỏ được chứng minh</td></tr>
+<tr><td><b class="nw">IX.FX</b><br>TỶ GIÁ · CHIỀU ASD<br><span class="badge miss">PROPOSED</span></td><td><code>9.2.Exchange Rate</code> (405 · 614).<br><span class='nw'>PD Now:</span><br><span class="nw">— (AS-IS không có bước này)</span></td><td>Tỷ giá tháng · chiều ASD · kỳ Day/Y/H/Q/M.</td><td>bảng cấu hình (mới)</td><td>tỷ giá = 9.2 theo tháng</td></tr>
+<tr><td><b class="nw">IX.MB</b><br>MAPPING BLOCK · TỶ TRỌNG<br><span class="badge miss">PROPOSED</span></td><td><code>Vendor &amp; Network Mapping</code> (503).<br><span class='nw'>PD Now:</span><br><span class="nw">— (AS-IS không có bước này)</span></td><td>Mapping Block · tỷ trọng LE · NOEM · GI.</td><td>bảng cấu hình (mới)</td><td>0 vendor không có CDT1</td></tr>
+<tr><td><b class="nw">IX.TMP</b><br>KHUÔN BÁO CÁO<br><span class="badge miss">PROPOSED</span></td><td>Templ 1–5 (PD590) · Filters (PD510) · kỳ (PD520) · KRF (PD530).<br><span class='nw'>PD Now:</span><br><span class="nw">— (AS-IS không có bước này)</span></td><td>Khuôn báo cáo có version.</td><td>bảng cấu hình (mới)</td><td>khuôn = file mẫu AS-IS</td></tr>
+</table></div>
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<h2 class="part" id="s5-4" data-st="draft" data-st-on="2026-11-13" data-st-hash="e3b0c442">§5.4 SYSTEM: phủ 116 bước PD Now và soát voi AS-IS</h2>
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<h3 id="s5-4-1" data-st="draft" data-st-on="2026-11-13" data-st-hash="f78424bb" data-st-inherited="s5-4">§5.4.1 SYSTEM: mọi bước PD Now đều có chỗ</h3>
+<div class="tw"><div class="scroll"><table class="io5"><thead><tr><th>pha PD Now</th><th>số bước</th><th>vào hộp TO-BE</th><th>ngoài GĐ1 · lý do</th></tr></thead><tbody>
+<tr><td><b>① INPUT · 1xx–2xx</b></td><td class="mono">42</td><td><b class=mono>RI.HR</b> 101 · <b class=mono>RI.PLT</b> 103–106 · <b class=mono>RI.PAY</b> 107–114 · <b class=mono>RI.BANK</b> 115–116 · 200 · 202 · 204 · 209 · <b class=mono>PR.BANK</b> 201 · 203 · 205–208 · <b class=mono>PR.PLT</b> 210–213 · <b class=mono>PR.PAY</b> 214–218 · <b class=mono>PR.HR</b> 219–222</td><td>100 · 223–224 — chưa làm ở AS-IS (Not yet) — owner chốt GĐ nào<br>102 — báo cáo HR từ EDD, ⛔ đi qua sổ tiền — ngoài GĐ1</td></tr>
+<tr><td><b>② ITL · 3xx</b></td><td class="mono">19</td><td><b class=mono>IX.MM</b> 301 · <b class=mono>SI.MAP</b> 302–308 · <b class=mono>SI.ITL</b> 313–319</td><td>309 — AS-IS đã huỷ (Cancel)<br>310–312 — chưa làm ở AS-IS (Not yet) — owner chốt GĐ nào</td></tr>
+<tr><td><b>② CALCULATE · 4xx</b></td><td class="mono">20</td><td><b class=mono>CA.GL</b> 400–406 · <b class=mono>SO.PLA3</b> 407–408 · 411–419 · <b class=mono>SO.CFA1</b> 409–410</td><td>—</td></tr>
+<tr><td><b>③ ALLOCATE · 5xx</b></td><td class="mono">14</td><td><b class=mono>AL.PLT</b> 500–510 · <b class=mono>AL.KEY</b> 511–513</td><td>—</td></tr>
+<tr><td><b>⑤ REPORT + OTHERS · 6xx–7xx</b></td><td class="mono">21</td><td><b class=mono>SO.PLA3-ATL</b> 600–604 · 606 · <b class=mono>RP.PL</b> 605 · 607–609 · <b class=mono>RP.CF</b> 610 · <b class=mono>RP.FLS</b> 613 · 617 · <b class=mono>RP.CCR</b> 614–616</td><td>611–612 — báo cáo HR từ EDD, ⛔ đi qua sổ tiền — ngoài GĐ1<br>700–702 — OTHERS · báo cáo phụ (C12, BHXH, nghiệm thu dịch vụ)</td></tr>
+</tbody></table></div><p class="ghichu">Máy đếm lúc sinh: <b>116/116</b> bước PD Now có chỗ — <b>103</b> vào một hộp TO-BE, <b>13</b> ở rổ "ngoài GĐ1" có lý do; 0 bước gán hai lần.</p></div>
+<h3 id="s5-4-2" data-st="draft" data-st-on="2026-11-13" data-st-hash="cb540173" data-st-inherited="s5-4">§5.4.2 SYSTEM: soát voi AS-IS v0.9 theo PD Now</h3>
+<div class="tw"><div class="scroll"><table class="io5"><thead><tr><th>soát</th><th>voi AS-IS (artifact v0.9) so với PD Now</th><th>bản v2 xử lý ở</th></tr></thead><tbody>
+<tr><td><b>Độ phủ</b></td><td>91/116 bước PD Now có trong một hộp AS-IS. Thiếu 25: 7 chưa làm / huỷ (100 · 223–224 · 309–312) và <b>18 bước đang chạy</b> (600–608 · 611 · 613–617 · 700–702) — toàn bộ chuỗi REPORT.</td><td class="mono">vẽ đủ: RP.CF · RP.PL · RP.CCR · RP.FLS</td></tr>
+<tr><td><b>Đúng</b></td><td>Tầng INPUT + ITL (101–319) khớp ma trận I/O: duỗi PE·PI·PM, gom bank / quỹ, chuyển A-CCR + sắp Ledger 111/112, IMPORTRANGE, Transaction Original → Mapping L1, vùng chỉnh tay R–AT, H1000 Ledge.</td><td class="mono">giữ, đổi tên theo ngữ pháp mới</td></tr>
+<tr><td><b>Nén</b></td><td>CALCULATE 400–419 (20 bước) và ALLOCATE 500–513 (14 bước) gộp vào 3 hộp đầu ra (Report GL · Report H1000 · Phân bổ nền tảng): không thấy quy đổi tỷ giá (405 · 406), khối CFA1 / PLA1 / PLA3 theo ngày và Y/H/Q/M, chuỗi Mapping Block → CFA2 MID 1–3.</td><td class="mono">tách: CA.GL · SO.CFA1 · SO.PLA3 · AL.KEY · AL.PLT · SO.PLA3-ATL</td></tr>
+<tr><td><b>Sai đầu vào</b></td><td>Mũi tên o3 vẽ <i>sổ nền tảng → PHÂN BỔ</i>. PD Now 501 phân bổ đọc <b>[Import] Report General Ledger</b> (406) + Source (502) + Vendor &amp; Network Mapping (503) — thiếu đầu vào GL: chi phí nền tảng được chia từ dòng PE đã vào sổ, không chỉ từ file nguồn.</td><td class="mono">e8 PR.PLT → SI.MAP (nền tảng vào SI) + e15 SO.PLA3 → AL.PLT</td></tr>
+<tr><td><b>Thiếu nút</b></td><td>9.2 Exchange Rate (405 · 614); CCR là cả đầu vào (204 · 209) lẫn đầu ra (615 · 616) nhưng chỉ vẽ vào SOÁT. Ma trận PD Now tự nó có 10 chỗ 'I' trỏ vào cột không bước nào sinh ra (vd 207 → [Importrange] 1.2 Ledger 112: 302 chỉ ghi 111).</td><td class="mono">IX.FX · RP.CCR; câu hỏi ④ cuối trang</td></tr>
+</tbody></table></div></div>
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<h2 class="part" id="s5-5" data-st="review" data-st-on="2026-11-13" data-st-hash="85ff86be">§5.5 SYSTEM: câu chờ owner — phương án, được và mất</h2>
+<!-- ════════════════════════════════════════════════════════════════════════ -->
+<p>Mỗi câu: phương án đề xuất (A, có cả cái mất), phương án khác (B, giữ lại kể cả khi bị bác), và điều sẽ làm đổi ý. Owner chốt — tác giả ⛔ tự chốt.</p>
+<div class="tw"><table style="table-layout:fixed">
+<colgroup><col style="width:20%"><col style="width:25%"><col style="width:25%"><col style="width:14%"><col style="width:16%"></colgroup>
+<tr><th>câu</th><th>A · đề xuất</th><th>B · phương án khác</th><th>phán</th><th>điều sẽ làm đổi ý</th></tr>
+<tr><td><b>Q1</b> Ngữ pháp tên <code>RI·PR·SI·CA·SO·AL·DW·RP·KS·IX</code> + đuôi <code>-ATL</code></td><td><b>A · giữ — đọc tên là biết bước; máy kiểm được</b><br><i>mất:</i> phải dạy người đọc 10 mã</td><td><b>B · tên tiếng Việt theo hộp v0.9</b><br><i>được:</i> dễ đọc lúc đầu<br><i>mất:</i> không kiểm bằng máy được; lệch với FPA</td><td><span class="badge new">RECOMMENDED</span> A</td><td>nếu FPA đổi ngữ pháp mã bước</td></tr>
+<tr><td><b>Q2</b> Chuyển ghép Ref No (SI.MAP, PD 302–308) từ Agent 3 sang Agent 2</td><td><b>A · chuyển — khớp đúng hai file ITL của AS-IS (1/2 RAW · 2/2 ADJUSTED)</b><br><i>mất:</i> Agent 2 nặng hơn; fleet eval A3.1 đổi tên đơn vị</td><td><b>B · giữ ở Agent 3 như v0.9</b><br><i>được:</i> không đổi AP fleet eval<br><i>mất:</i> một agent ôm cả ghép lẫn điền tay, khó đo riêng</td><td><span class="badge new">RECOMMENDED</span> A</td><td>nếu fleet eval cho thấy ghép và điền tay cần cùng ngữ cảnh</td></tr>
+<tr><td><b>Q3</b> HR ⛔ qua ALLOCATE; báo cáo HR 102 · 611 · 612 ngoài GĐ1</td><td><b>A · giữ — PD 500: HR đã phân bổ ở payroll</b><br><i>mất:</i> báo cáo HR vẫn ở EDD</td><td><b>B · đưa HR qua ALLOCATE</b><br><i>được:</i> một đường cho mọi chi phí<br><i>mất:</i> phân bổ hai lần</td><td><span class="badge new">RECOMMENDED</span> A</td><td>nếu payroll ngừng phân bổ HD · CDT1</td></tr>
+<tr><td><b>Q4</b> Kho: PostgreSQL chỉ-thêm, hay đẩy khối SO lên BigQuery như FDW của FPA</td><td><b>A · PostgreSQL cho sổ, BigQuery chỉ cho khối SO</b><br><i>mất:</i> hai kho phải đồng bộ</td><td><b>B · chỉ PostgreSQL</b><br><i>được:</i> một kho, đã có<br><i>mất:</i> REPORT không dùng chung với FPA</td><td><span class="badge new">RECOMMENDED</span> B trước, A khi REPORT cần</td><td>khi báo cáo FPA phải đọc khối SO của FLS</td></tr>
+<tr><td><b>Q5</b> AP / AR (223 · 224 · 310–312, AS-IS "Not yet")</td><td><b>A · GĐ2</b><br><i>mất:</i> không mở việc mới trong 10 ngày Phase 1</td><td><b>B · GĐ1</b><br><i>được:</i> đủ luồng tiền<br><i>mất:</i> AS-IS còn chưa làm, không có đáp án để đối chiếu</td><td><span class="badge new">RECOMMENDED</span> A</td><td>nếu AS-IS bắt đầu chạy AP / AR</td></tr>
+<tr><td><b>Q6</b> Định nghĩa bốn số của Voi số lượng (§2.1)</td><td><b>A · như §2.1 (CÓ = sổ AS-IS · CHẠY = FLS dựng 1-1 · MAP hai số · SỬA theo ô)</b><br><i>mất:</i> chưa là số của kho</td><td><b>B · mọi số lấy từ kho</b><br><i>được:</i> số của hệ đang chạy<br><i>mất:</i> chưa đo được hôm nay</td><td><span class="badge new">RECOMMENDED</span> A, đổi sang B khi kho chạy</td><td>khi kho lệch ảnh &gt; 1% ở một kỳ</td></tr>
+</table></div>
+</main>
+<script>
+// apr-build-ap references/ap-toc.js — the AP contents rail (§A.31). Inline verbatim in a
+// <script> just before </body>. It fills this shell, which goes first in <body>:
+//   <nav class="toc"><p class="toc-title">Contents</p><div id="toc"></div></nav>
+// It lists h1 / h2 / h3 that carry an id; h2.part-divider shows as a Part row.
+(function() {
+  var toc = document.getElementById('toc');
+  if (!toc) return;
+  var hs = document.querySelectorAll('h1, h2, h3');
+  var as = [];
+  hs.forEach(function(h) {
+    if (!h.id) return;
+    var a = document.createElement('a');
+    var cls = h.tagName === 'H1' ? 'lvl-1' : (h.tagName === 'H2' && h.classList.contains('part-divider')) ? 'lvl-p' : h.tagName === 'H2' ? 'lvl-2' : 'lvl-3';
+    a.className = cls;
+    a.href = '#' + h.id;
+    a.textContent = h.textContent;
+    toc.appendChild(a);
+    as.push({ a: a, el: h });
+  });
+  function spy() {
+    var scrollY = window.scrollY;
+    var cur = null;
+    as.forEach(function(item) {
+      if (item.el.getBoundingClientRect().top + scrollY - 80 <= scrollY) cur = item;
+    });
+    as.forEach(function(item) { item.a.classList.remove('active'); });
+    if (cur) cur.a.classList.add('active');
+  }
+  window.addEventListener('scroll', spy, { passive: true });
+  window.addEventListener('resize', spy);
+  spy();
+})();
+
+</script>
+</body></html>

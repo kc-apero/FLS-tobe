@@ -71,11 +71,11 @@ NGUỒN — CHỈ ĐỌC, không bao giờ ghi (QĐ-ITL-34)
 
 | Lớp | Chọn | Lý do |
 |---|---|---|
-| BE | **Python + FastAPI** | cùng ngôn ngữ với FPS/FPA ⇒ mượn pattern được; team 1–2 + AI |
+| BE | ~~**Python + FastAPI**~~ → ⭐ **Python + `http.server` thư viện chuẩn** | ⛔⛔ **SỬA 17/09 — đo mã đang chạy: repo ⛔ KHÔNG có FastAPI.** `fls/api/cua.py` dựng trên `ThreadingHTTPServer` của stdlib; ⛔ không một dòng `import fastapi` nào trong `fls/` *(chuỗi `fastapi` chỉ có trong `.venv`, là phụ thuộc gián tiếp của `import-linter`)*. Định tuyến đi qua **bản khai** `fls/api/bang_tuyen.py` — **37 tuyến**, mỗi tuyến khai sẵn bảng nó đọc/ghi, có cổng `soi_bang_tuyen` đối chiếu với **SQL thật**. ⭐ Hình ấy ⛔ không phải thiếu sót: nó là thứ cho phép cổng *«tuyến này chạm bảng nào»* **đo tĩnh được** — một router động ⛔ không cho phép |
 | DB | **PostgreSQL** — dev **Docker $0**, prod **Cloud SQL** *(PITR bật)* | `QĐ-VOI-04`; **BQ không chịu OLTP** |
 | Truy cập DB | ⭐ **Repo layer từ ngày 0** | `FLS-vs-FPS` §7 mục 2: FPS trả giá **313 call-site không abstraction** ⇒ migration 4–8 tuần rủi ro cao. SQL verbatim trong adapter, luật nghiệp vụ ở facade |
 | Đọc Sheets | Sheets API + service account, **chỉ đọc**, có retry backoff | sổ nặng, hay `503`; đo thật: **4/7 khối/buổi** |
-| FE | React *(dựng sau — cần khi làm app, không cần khi làm adapter)* | |
+| FE | ~~React~~ → ⭐ **JS thuần, ⛔ không khung** | ⛔ **SỬA 17/09:** `fls/web/tep/` là `.js`/`.css`/`.html` viết tay *(`man_f01.js`, `goi_cua.js`, `hop_thoai.js`…)*; ⛔ không `react`, ⛔ không bước dựng. Ràng buộc đi kèm: hợp đồng `import-linter` *«`fls.web` chỉ được gọi `fls.api`»* |
 | Công bố ra BQ | ⏸ **hoãn** — `QĐ-ITL-46` | |
 | AuthN/Z | JWT ngắn hạn **fail-closed** + RBAC | chuẩn kế thừa từ FPA; **tự dựng** |
 
@@ -91,8 +91,8 @@ fls/
   contract/      # ITL-CONTRACT 14 trường — SSOT dạng DATA, không phải hằng trong code
   oracle/        # ảnh chụp đóng băng + tự soi + parity (QĐ-ITL-36/37)
   repo/          # repo layer: mọi truy cập DB đi qua đây. SQL verbatim
-  api/           # FastAPI router — mỏng, không chứa luật
-  web/           # FE (sau)
+  api/           # cửa HTTP (stdlib `http.server`) + BANG_TUYEN 37 tuyen — mong, khong chua luat
+  web/           # FE: JS thuan trong `web/tep/`, phuc vu boi `web/phuc_vu.py`
 ```
 
 **Luật phụ thuộc:** mũi tên một chiều về `canon` và `contract`; **cấm import vòng**; giao tiếp chéo qua interface, **không qua bảng của nhau**. Cưỡng chế bằng `import-linter` trong CI.

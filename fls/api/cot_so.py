@@ -31,6 +31,8 @@ from __future__ import annotations
 import json
 from dataclasses import dataclass
 
+from fls.adapters.sao_ke import SAU_TRUONG as _SAU_TRUONG
+from fls.adapters.sao_ke import TRUONG_DOC_DUOC as _TRUONG_DOC_DUOC
 from fls.canon.spec import CANON_COLS
 from fls.oracle.ledge_spec import COT_LUU
 
@@ -373,4 +375,21 @@ def than_js() -> bytes:
             + ";\n"
             "window.FLS_GO_DRAWER = "
             + json.dumps(list(GO_O_DRAWER), ensure_ascii=False) + ";\n"
+            # ⭐⭐⭐ `F04` — SAU TRUONG cua vung CHUAN, kem co "co doc duoc".
+            #
+            # ⛔⛔ **Vi sao no phai SINH ra, ⛔ khong go tay trong `man_f04.js`.**
+            # Cong #15 (`kiem_bang_cot`) khai thang: *"ten cot phai TRUY DUOC
+            # ve nguon; go tay de len nguon thi DO"*. Sau ten nay song o
+            # `sao_ke.SAU_TRUONG`, va co `doc_duoc` song o `TRUONG_DOC_DUOC`
+            # (`QĐ-ITL-92` — 5/6). Go tay o tang man la tao **ban khai thu
+            # hai**, va bai `test_CHI_MOT_BAN_KHAI_ANH_XA_trong_ca_he` da bat
+            # duoc **ba** ban sao cua dung danh sach nay trong mot phien.
+            #
+            # ⭐ `doc_duoc: false` cua `Description` la mot **CAU TRA LOI**, ⛔
+            #   khong phai mot cho thieu: man PHAI hien cot ay va noi ro no
+            #   ⛔ khong duoc doc. Bo cot di thi *"cam doc"* va *"quen doc"*
+            #   trong giong het nhau (`BA-06` §7 ⓶b).
+            "window.FLS_TRUONG_CHUAN = "
+            + json.dumps([{"truong": t, "doc_duoc": t in _TRUONG_DOC_DUOC}
+                          for t in _SAU_TRUONG], ensure_ascii=False) + ";\n"
             ).encode("utf-8")

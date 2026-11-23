@@ -1,0 +1,57 @@
+# Bài ĐỀ XUẤT của R3 H1 (KQ-074 · H1-R3-03) — lưu ở docs (⛔ pytest thu thập) vì scratch mất khi chuyển container.
+# 2 bài (R3-01 pickle · R3-02 nhãn Nợ/Có) ĐỎ trên mã hiện tại cho tới khi sửa GHI NHẬN H1-R3-01/02 — đưa vào tests/ ở phiếu sửa H1 trước H4.
+
+"""R3 (`KQ-074`) — dựng lại hai bài đề xuất của R2 (`KQ-073` §Bài thử ĐỀ XUẤT; bản gốc nằm ở scratch
+container cũ, ⛔ còn) + một bài cho phát hiện mới `H1-R3-01`. Mong TÍNH TAY, ⛔ gọi công thức của mã."""
+from __future__ import annotations
+
+import copy
+import pickle
+from decimal import Decimal as D
+
+import pytest
+
+from fls.bao_cao.gl import DongGL, ThieuTyGia, TienKhongHuuHan, tinh_gl
+
+
+def test_R2_01_BM_giu_DAU_AM_cua_ton_VND():
+    """`H1-R2-01`: số hạng BI của BM (`… + BI + …`) mang DẤU. VND Có 1.000 ⇒ tồn VND −1.000
+    ⇒ BM = −1.000 VND; BN = −1.000 / 25.000 / 10^6 = −0,00000004 mUSD."""
+    (k,) = tinh_gl([DongGL(thang=202501, tien_te="VND", no=D("0"), co=D("1000"))],
+                   {202501: {"USD": D("25000"), "VND": D("1")}})
+    assert k.ton["VND"] == D("-1000")
+    assert k.vnd_ton_all == D("-1000")
+    assert k.musd_ton_all == D("-0.00000004")
+
+
+def test_R2_02_khoa_bang_ty_gia_mang_BOM_van_la_USD():
+    """`H1-R2-02`: U+FEFF là ký tự DUY NHẤT trong 30 ký tự của `ma_tien_te` mà `str.strip()`
+    ⛔ gỡ ⇒ chỉ biến thể này phân biệt hàm chung với hàm tự chế. 2,5 bVND ÷ 25.000 × 10^3 = 0,1."""
+    (k,) = tinh_gl([DongGL(thang=202501, tien_te="VND", no=D("2500000000"), co=D("0"))],
+                   {202501: {"﻿USD": D("25000"), "VND": D("1")}})
+    assert k.ty_gia_usd == D("25000")
+    assert k.musd_no == D("0.1")
+
+
+@pytest.mark.parametrize("loi", [
+    ThieuTyGia(202501, "SGD", 3, "tháng ⛔ có trong bảng tỷ giá"),
+    TienKhongHuuHan("Có", 2, D("NaN")),
+], ids=["ThieuTyGia", "TienKhongHuuHan"])
+def test_R3_01_loi_co_ten_qua_duoc_pickle_va_copy_giu_nguyen_truong(loi):
+    """`H1-R3-01`: lỗi có tên phải đi qua ranh giới tiến trình (pickle) và `copy` mà ⛔ đổi
+    thành `TypeError` — mất tên lỗi là mất đúng thứ D1 đòi."""
+    for ban in (pickle.loads(pickle.dumps(loi)), copy.copy(loi)):
+        assert type(ban) is type(loi) and str(ban) == str(loi)
+        # so qua repr: NaN ≠ NaN theo định nghĩa
+        assert {k: repr(v) for k, v in vars(ban).items()} == {k: repr(v) for k, v in vars(loi).items()}
+
+
+@pytest.mark.parametrize("phia, nhan", [("no", "Nợ"), ("co", "Có")])
+def test_R3_02_TienKhongHuuHan_mang_dung_nhan_phia(phia, nhan):
+    """`H1-R3-02`: `nhan` là trường người đọc dùng để biết ô nào hỏng (E hay F) — đột biến ghi
+    'Nợ' cho phía Có SỐNG trên bộ bài Dev (bài chỉ đòi `vi_tri`)."""
+    no, co = (D("NaN"), D("0")) if phia == "no" else (D("0"), D("NaN"))
+    with pytest.raises(TienKhongHuuHan) as e:
+        tinh_gl([DongGL(thang=202501, tien_te="USD", no=no, co=co)], {202501: {"USD": D("25000")}})
+    assert e.value.nhan == nhan and e.value.vi_tri == 1
+    assert str(e.value).startswith(f"⛔ {nhan} ở dòng thứ 1")

@@ -366,3 +366,62 @@ def test_la_chi_doc_phan_biet_duoc_hai_loai_ket_noi(conn):
         assert bc.la_chi_doc(c2) is True
     finally:
         c2.close()
+
+
+# ── cong `RUN_DEM_KHOP` dem DUNG BANG ─────────────────────────────────────
+def _cong(conn, pv, ma: str):
+    return next(c for c in bc.doc_cong(conn, pv) if c.ma == ma)
+
+
+def _lan_chup_PM(cur, so_dong: int) -> str:
+    """Mot lan chup `PM` that: ghi vao `fls_pm_line`, ⛔ KHONG vao `fls_itl`."""
+    cur.execute("INSERT INTO fls_chup (spreadsheet_id, lan, actor)"
+                " VALUES ('SS-THU','PM','thu@apero.vn') RETURNING chup_id")
+    cid = cur.fetchone()[0]
+    run = f"NAP-2000-01-01-PM{_hex()}"
+    cur.execute("INSERT INTO fls_run (run_id, contract_version, canon_version,"
+                " mapping_version, row_count, chup_id)"
+                " VALUES (%s,'v1.0','v1.0','v1.0',%s,%s)", (run, so_dong, cid))
+    for i in range(so_dong):
+        cur.execute(
+            "INSERT INTO fls_pm_line (run_id, pm_line_id, pm_slip_id, curr,"
+            " source_row) VALUES (%s,%s,%s,'VND',%s)",
+            (run, f"L{i}", f"S{i}", i + 1))
+    return run
+
+
+def test_LAN_CHUP_PM_khong_bi_to_la_co_ai_doi_so(conn):
+    """⛔⛔⛔ **Cong nay tung DEM SAI BANG, va no sai ngay tren MAN HINH.**
+
+    Ban cu do `count(fls_itl)` cho **moi** lan nap. Nhung mot lan chup `PM`
+    ⛔ **khong ghi mot dong nao** vao `fls_itl` — no ghi vao `fls_pm_line`.
+    ⇒ Moi lan chup PM deu bi to *"co ai doi so sau khi nap (`INV-I08`)"*.
+
+    Do tren so THAT 11/09: **13/16** lan nap bi bao oan *(`chot 3772 != nay
+    0`)*, sai lien tuc tu lan chup PM dau tien **09/09** — va no la thu dau
+    tien nguoi mo man `F03` nhin thay.
+
+    ⇒ Bai nay dung dung ca ay: mot lan chup PM **nguyen ven**. Tren ban cu no
+      **DO**; tren ban nay no phai XANH, vi ⛔ khong ai doi gi ca.
+    """
+    with conn.cursor() as cur:
+        run = _lan_chup_PM(cur, 5)
+    c = _cong(conn, mot_lan_nap(run), "RUN_DEM_KHOP")
+    assert c.dat is True, (
+        f"⛔ mot lan chup PM NGUYEN VEN vua bi to la bi sua: {c.ly_do!r} — "
+        f"cong dang do `fls_itl` cho mot lan nap ghi vao `fls_pm_line`")
+
+
+def test_PM_bi_XOA_BOT_thi_cong_VAN_do(conn):
+    """⚠ Ban va ⛔ khong duoc lam cong nay **mu** voi lan PM — chi doi BANG.
+
+    Neu ai do that su xoa dong PM sau khi nap thi cong phai **van** do. Bai
+    nay giu dung ve ay: bo mot dong ⇒ `chot 5 != nay 4`.
+    """
+    with conn.cursor() as cur:
+        run = _lan_chup_PM(cur, 5)
+        cur.execute("DELETE FROM fls_pm_line WHERE run_id=%s AND source_row=1",
+                    (run,))
+    c = _cong(conn, mot_lan_nap(run), "RUN_DEM_KHOP")
+    assert c.dat is False and "chot 5 != nay 4" in c.ly_do
+    assert "lan PM" in c.ly_do, "cau ly do phai noi ro no dang do lan NAO"

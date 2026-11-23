@@ -104,3 +104,77 @@
   /* ── bo goc ───────────────────────────────────────────────────────── */
   --bo-nho:4px; --bo:6px; --bo-the:8px; --bo-tron:999px;
 }
+
+/* ═══ ⭐ THEM cho MAN GHEP LENH CHI (`B3`, 22/09) ══════════════════════════
+   Bon token duoi la **delta that su moi** cua ban giao thiet ke (`§3`). Moi
+   ten khac cua ban giao *(`--font-sans`, `--radius-md`, …)* **⛔ KHONG duoc
+   nhan vao**: kho nay da co `--sans`/`--mono`/`--bo-*` va **12** tep dang
+   dung chung. Doi ten de giong ban giao la mot phep sua **toan bo he**, va
+   no ⛔ khong mua duoc mot pixel nao.                                       */
+
+:root{
+  /* ⛔⛔ **`--accent-soft` LA MOT LOI CO SAN, ⛔ khong phai token moi.**
+     No duoc DUNG o **ba** cho trong `hinh.css` va **⛔ CHUA BAO GIO duoc khai**:
+       · `@keyframes soi` — hieu ung soi dong chay tu *trong suot* sang
+         *trong suot* ⇒ **⛔ khong thay gi**;
+       · `@media (prefers-reduced-motion)` — nguoi tat chuyen dong dang le
+         nhan mot **nen tinh** thay animation, ho nhan **⛔ khong gi ca**;
+       · `.gapfold:hover` — hover ⛔ khong doi nen.
+     ⭐ Cong mau hien canh *"co hex ngoai `tokens.css` ⛔ khong"*; no ⛔ khong
+       canh *"moi `var(--x)` co ai khai ⛔ khong"*. Bai
+       `test_moi_token_deu_duoc_khai` (`tests/web/`) vá dung lo ay. */
+  --accent-soft:#0e75700f;
+
+  /* ⭐ Ke giua cac dong cua luoi **day dac**. `--line` dung cho mot duong
+     phan chia that; xep **36** dong lien nhau thi no thanh mot tam luoi ke.
+     ⚠ `color-mix` chu ⛔ khong mot hex thu hai: mot ma mau moi o day la mot
+       thu se **⛔ khong doi theo** khi ai do doi `--line`. */
+  --hair:color-mix(in srgb, var(--line) 30%, var(--surface));
+
+  /* ⭐ Nen danh dau **BANG CHUNG** trong dien giai / so CT / so tien. */
+  --evi-bg:#0e757024;
+
+  /* ⭐ Be rong rail danh sach lenh chi khi vung ghep dang mo.
+     ⚠ `clamp` chu ⛔ khong mot con so — cung mot ly do voi `--panel-san`:
+       man hep thi rail vua du doc ma lenh, man rong thi no lon ra. */
+  /* ⭐ Be rong rail danh sach lenh chi khi vung ghep dang mo.
+     ⚠ `clamp` chu ⛔ khong mot con so — cung ly do voi `--panel-san`: man
+       hep thi rail vua du doc ma lenh, man rong thi no lon ra.
+     ⭐⭐ Day cung la gia tri **tay keo ghi de** (owner 23/09). ⛔ MOT ten cho
+        MOT be rong: mot cap `--rail` (mac dinh) ＋ `--rail-w` (da keo) la
+        **hai ban su that** ve cung mot con so, va roi se co cho doc ban nay,
+        cho doc ban kia. */
+  --rail-w:clamp(300px,26vw,380px);
+
+  /* ⭐ Do bong **the** — nhe hon `--shadow-drawer` (cai kia danh cho mot lop
+     NOI len tren, cai nay chi nang the len khoi nen trang). */
+  --shadow-card:0 1px 2px rgba(20,32,30,.05), 0 4px 14px rgba(20,32,30,.05);
+
+  /* ⭐ Chieu cao mot dong **ung vien**. ⛔ Rieng khoi `--row` (30px) cua luoi
+     `F02`: dong ung vien cho **bay** cot va mot vien trai 3px, con dong luoi
+     `F02` chi cho chu. Ban giao khai **36px co dinh** (`C3`). */
+  --row-ghep:36px;
+
+  /* ══ MOT THANG CO CHU — owner 23/09: *"chua deu, roi mat"* ═══════════
+     ⛔⛔ Do TRUOC khi sua: khoi `SCR-F01` co **10** co chu khac nhau
+        (`10 · 10,5 · 11 · 11,5 · 12 · 12,5 · 13 · 13,5 · 14 · 15px`).
+        Do ⛔ khong phai mot thang — do la **10 lan chon rieng le**, moi
+        lan mot nguoi (hoac mot toi) go mot con so *"trong cho vua"*.
+        Mat nguoi doc thay dung cai do: **⛔ khong tim ra dau la bac tren,
+        dau la bac duoi**.
+
+     ⭐ NAM bac, va moi bac tra loi mot cau hoi khac nhau:
+        `--fs-nhan`  NHAN HOA / eyebrow — ten cot, ten nhom
+        `--fs-phu`   thu doc **sau** — meta, ngay, nguon, ghi chu
+        `--fs-than`  than bai — moi thu ke toan doc de LAM VIEC
+        `--fs-manh`  mot muc **nhan** — ma lenh dang mo, tieu de the
+        `--fs-to`    so tien tren the — con so **duy nhat** duoc to nhat
+
+     ⛔ Them bac thu SAU la quay lai cho cu. Neu can mot co chua co, hay
+       hoi *"no tra loi cau hoi nao trong nam cau tren"*.                */
+  --fs-nhan:10.5px;
+  --fs-phu:11.5px;
+  --fs-than:12.5px;
+  --fs-manh:14px;
+  --fs-to:16px;
+}

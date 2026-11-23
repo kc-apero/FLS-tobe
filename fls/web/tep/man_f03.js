@@ -124,7 +124,7 @@ const F03 = (function () {
         '<tr><td>' + TP.chu(r.curr || '(⛔ chưa có đơn vị tiền)') + '</td>' +
         '<td class="r">' + TP.so(r.so_dong_cho) + '</td>' +
         '<td class="r">' + TP.chu(r.pct_dong) + '%</td>' +
-        '<td class="r">' + TP.tien(r.tien_cho) + '</td>' +
+        '<td class="r">' + TP.tien(r.tien_cho, r.curr) + '</td>' +
         _o_phu(r, muc) + '</tr>'
       ).join('') + '</tbody>';
     o.appendChild(b);
@@ -156,11 +156,99 @@ const F03 = (function () {
       });
   }
 
+  /* ══ MẪU SỐ của tác vụ ① (`B0`, `QĐ-ITL-118`) ═══════════════════════════
+     ⛔⛔ **Vì sao bảng này phải ở đây, cạnh “độ phủ hàng chờ”.**
+
+     Mọi tỷ lệ độ phủ từ 27/08 đến 09/09 đều chia cho **10.030** — cả sổ. Phép
+     đo `B0` nói: dòng ghép được **dồn hẳn** về vế `PS Có` *(31,1% so với
+     7,8%)* ⇒ đó là **vế của lệnh chi**, và mẫu số thật là **8.246**. Một con
+     số đúng chia cho một mẫu số sai là một con số **⛔ không ai kiểm được**,
+     nên màn phải hiện **cả hai vế** chứ ⛔ không hiện một tỷ lệ gộp.
+
+     ⭐ Và cột `⛔ chưa nối` ⛔ **không** cùng nghĩa với `UNMAPPED`: nhãn trả
+     lời *phân loại*, mối nối trả lời *đã nối lệnh chi*. **Hai câu hỏi khác
+     nhau** — và chính chỗ lẫn hai câu ấy đã đẻ ra con số *"lệch 353"*, một
+     con số **HIỆU** che đi **1.203** dòng ngược chiều.                       */
+  function _ve_mau_so(data, meta, o) {
+    const ve = (data.ve || []).filter(r => r.so_dong > 0);
+    const b = TP.el('table');
+    b.innerHTML =
+      '<thead><tr><th>Vế của sổ</th><th class="r">Dòng</th>' +
+      '<th class="r">Đã nối lệnh chi</th><th class="r">⛔ Chưa nối</th>' +
+      '<th class="r">Độ phủ</th></tr></thead><tbody>' +
+      ve.map(r =>
+        '<tr><td class="mono">' + TP.chu(r.ve) + '</td>' +
+        '<td class="r">' + TP.so(r.so_dong) + '</td>' +
+        '<td class="r">' + TP.so(r.da_noi) + '</td>' +
+        '<td class="r">' + TP.so(r.chua_noi) + '</td>' +
+        '<td class="r"><b>' + TP.chu(r.ty_le_noi_pct) + '%</b></td></tr>'
+      ).join('') + '</tbody>';
+    o.appendChild(b);
+
+    /* ⭐⭐ Bốn ô của bảng chéo — **mỗi ô một TÊN**, ⛔ không ô nào tên "khác".
+       Một ô ⛔ không có tên là một ô ⛔ không ai giải thích được, và nó sẽ được
+       đọc thành *"lỗi"* trong lần đọc lại đầu tiên. */
+    const L = data.lech || {};
+    const n = TP.el('div', 'note');
+    n.id = 'ms-lech';
+    n.innerHTML =
+      '⭐ <b>Hai câu <i>“chưa ghép”</i> ⛔ KHÔNG phải một câu.</b> '
+      + '<b>' + TP.so(L.da_noi__nhan_con_UNMAPPED || 0) + '</b> dòng đã nối mà '
+      + 'nhãn còn <span class="mono">UNMAPPED</span> '
+      + '<span class="muted">(nhãn bị đóng băng lúc nạp — '
+      + '<span class="mono">INV-I08</span>)</span>, và <b>'
+      + TP.so(L.du_phan_loai__chua_noi || 0) + '</b> dòng đủ phân loại mà '
+      + 'chưa nối. Hiệu của chúng là <b>'
+      + TP.so(L.hieu_hai_phep_dem || 0) + '</b> — một con số <b>che đi '
+      + TP.so(L.tong_dong_bi_che || 0) + ' dòng</b> ngược chiều. '
+      + '⛔ Đừng theo dõi cái hiệu ấy.';
+    o.appendChild(n);
+
+    const vs = (data.vi_sao || []).filter(r => r.so_dong > 0);
+    if (vs.length) {
+      const t = TP.el('table');
+      t.innerHTML =
+        '<thead><tr><th>Vì sao ⛔ chưa nối được</th><th class="r">Cả sổ</th>' +
+        '<th class="r">Vế <span class="mono">PS Có</span></th></tr></thead>' +
+        '<tbody>' + vs.map(r =>
+          '<tr><td class="mono" title="' + TP.chu(r.ly_do) + '">' +
+          TP.chu(r.ma) + '</td><td class="r">' + TP.so(r.so_dong) +
+          '</td><td class="r">' + TP.so(r.so_dong_ps_co) + '</td></tr>'
+        ).join('') + '</tbody>';
+      o.appendChild(t);
+    }
+
+    const g = TP.el('div', 'hint');
+    g.id = 'ms-tu-chung';
+    g.innerHTML =
+      'Cửa ghép lô nhận ngay <b>' + TP.so(data.tu_chung || 0) + '</b> dòng '
+      + '<span class="muted">(màn <b>Hàng chờ</b>)</span> — đó là số của '
+      + '<b>cửa GHI</b>, ⛔ không phải của danh sách ứng viên. Hai luật ấy từng '
+      + 'lệch <b>8,6 lần</b>.';
+    o.appendChild(g);
+  }
+
+  function ve_mau_so(o) {
+    return TT.chay(o, () => FLS.doc('/queue/mau-so'), _ve_mau_so, {
+      so_dong: 4,
+      la_rong: d => !d || !d.tong_dong,
+      rong: {
+        icon: '⛔',
+        tieu_de: 'Sổ ⛔ không có dòng nào trong phạm vi lần nạp thật',
+        cau: 'Đây ⛔ không phải tin tốt — nó nghĩa là ⛔ chưa nạp gì. '
+           + 'Mở màn <b>Nạp sao kê</b>.'
+      }
+    });
+  }
+
   function ve(o_cong, o_phu) {
     // ⛔ Hai cửa gọi ĐỘC LẬP: một cửa hỏng ⛔ không được kéo cả màn xuống. Mỗi
     // khối tự mang bốn trạng thái của nó.
-    return Promise.all([ve_cong(o_cong), ve_phu(o_phu)]);
+    // ⛔ Ba cửa gọi ĐỘC LẬP: một cửa hỏng ⛔ không được kéo cả màn xuống.
+    const o_ms = TP.$('#than-mau-so');
+    return Promise.all([ve_cong(o_cong), ve_phu(o_phu)]
+      .concat(o_ms ? [ve_mau_so(o_ms)] : []));
   }
 
-  return { ve, ve_cong, ve_phu, _muc, _o_phu };
+  return { ve, ve_cong, ve_phu, ve_mau_so, _muc, _o_phu };
 })();

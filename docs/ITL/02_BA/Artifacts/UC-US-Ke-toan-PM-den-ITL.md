@@ -142,7 +142,7 @@ flowchart TB
 | `UC-KT-09` | Kiểm kê và **ký xác nhận quỹ** ngày cut-off + lập biên bản | ② | `AC-A` | `OP-10` · `OP-11` | biên bản lưu `6. CCR I DEL I W I Pdf` | ● |
 | `UC-KT-10` | ★ **Gõ `Reference number`** của giao dịch bank vào đúng dòng PM | ③ | `AC-B` | `OP-02` | có bảng đo — **bảng đo HỎNG** (§7.5 SSOT) | ◐ |
 | `UC-KT-11` | Giữ luật **1 khoá = 1 mã**; xử mã thiếu và mã trùng | ③ | `AC-B` | `OP-03` | **không có** — 75 mã trùng bị `VLOOKUP` bỏ im lặng | ○ |
-| `UC-KT-12` | ★ **Giải trình dòng tiền RA không có lệnh chuyển tiền** | ③ | `???` | `GAP-ITL-29` | **không có** — 4.940 dòng, ~237 tỷ | ○ |
+| ~~`UC-KT-12`~~ | ★ ~~**Giải trình dòng tiền RA không có lệnh chuyển tiền**~~ ⛔⛔ **KHAI TỬ 2026-09-14 (`QĐ-ITL-131`)** | ③ | ~~`???`~~ ⇒ **⛔ không ai, có chủ ý** | `GAP-ITL-29` **đóng** | Owner chốt: `QĐ-ITL-122` *("⛔ không cần question các `Trans` ⛔ không được map")* **chính là câu trả lời** cho UC này, và nó nói **⛔ ĐỪNG HỎI**. Đo lại `14/09` trên sổ FLS: **`4.890/7.056` = `69,3%`** dòng RA ⛔ không lệnh — `244,1` tỷ `VND` + `85,2` triệu `USD` *(vế `USD`: **`95,1%`** số dòng)*. ⇒ Con số ấy **⛔ không còn là một lỗ hổng chờ ai đó lấp**; nó là **hệ quả đã biết** của việc đo từ phía `PM` | ⛔ |
 | `UC-KT-13` | Duy trì `Mapping Master` — `Bank Sheet → LE` và `HD Code → COA / Allocate` | ③ | `AC-C` | chặng 7 `[L]` | phép kiểm `AK` **có sẵn mà chưa ai theo** | ● |
 | `UC-KT-14` | Duy trì sổ đăng ký `Index` — file · sheet · dải | ④ | `AC-C` `EX-01` | chặng 4 `[L]` | — · 278 cạnh động, đổi im lặng | ● |
 | `UC-KT-15` | Refresh ITL và soát `Export Log` | ④ | `EX-01` | `OP-20` | có log 9.784 dòng — **không ai soi** | ◐ |

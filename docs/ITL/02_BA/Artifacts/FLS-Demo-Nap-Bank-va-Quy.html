@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Nạp sao kê &amp; sổ quỹ</title>
+<!--
+  ═══════════════════════════════════════════════════════════════════════════
+  DEMO ĐỘNG · HƯỚNG DẪN SỬ DỤNG — hai ca: nạp Bank, nạp Quỹ.
+  Vẽ 2026-09-08.  Đi kèm FLS-Wireframe-Sau-Man.html.
+
+  Mỗi bước đặt CẠNH NHAU hai cột:
+     TRÁI  = đúng thao tác hôm nay trên Google Sheets, kèm mã bước AS-IS
+             (OP-01 · OP-04 · OP-05 · OP-09 · OP-21/22), người thật, giờ thật.
+     PHẢI  = thao tác tương ứng trên FLS, có màn thật để bấm.
+
+  Nguồn của cột TRÁI: FLS-Process-PM-den-ITL.md §3 chặng 1 · 3 · 3.5.
+  Nguồn của cột PHẢI: BA-06 §7 + đo trên kho 08/09.
+
+  DỰNG LẠI 08/09 theo QĐ-ITL-109. Bản trước vẽ kế toán DÁN vào FLS — sai
+  mô hình. Owner chốt FLS đọc VÙNG CHUẨN, nên cử chỉ Ctrl+V ở lại Google
+  Sheets, và thứ FLS thay là nút `Run` + cú chép tay sang A-CCR.
+
+  Tự chứa: không thư viện, không cần mạng. Bấm đúp là chạy.
+  ═══════════════════════════════════════════════════════════════════════════
+-->
+<style>
+:root{
+  --ink:#14201e; --muted:#5c6b68; --faint:#9aa8a5;
+  --line:#dde4e3; --surface:#fff; --alt:#f6f8f8; --page:#eef1f1;
+  --accent:#0e7570; --accent-hi:#0a5c58;
+  --crit:#c73a3a; --crit-bg:#fbeaea;
+  --warn:#c07414; --warn-bg:#fdf4e7;
+  --good:#2c7a4b; --good-bg:#e8f4ec; --good-line:#bcdcc8;
+  --info:#2563eb; --info-bg:#e9effd; --info-line:#b9cdf7;
+  --sheet:#0f9d58; --sheet-bg:#eaf6ee;
+  --row:29px;
+  --sans:'IBM Plex Sans','Segoe UI',system-ui,-apple-system,sans-serif;
+  --mono:'IBM Plex Mono','Cascadia Mono',Consolas,ui-monospace,monospace;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font:400 13.5px/1.55 var(--sans)}
+h1,h2,h3,h4{margin:0;letter-spacing:-.01em}
+.wrap{max-width:1400px;margin:0 auto;padding:0 20px 70px}
+.mono{font-family:var(--mono)}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}.faint{color:var(--faint)}
+a{color:var(--accent)}
+hr{border:0;border-top:1px solid var(--line);margin:0}
+
+.top{background:var(--ink);color:#fff;padding:11px 20px;display:flex;align-items:center;
+     gap:14px;flex-wrap:wrap}
+.top .brand{font:700 15px/1 var(--sans)}
+.top .sub{font:500 11.5px/1 var(--mono);color:#9aa8a5}
+.spacer{flex:1}
+.pill{border:1px solid #3a4a47;border-radius:999px;padding:4px 10px;
+      font:500 11.5px/1 var(--mono);color:#cfd8d6}
+
+.chip{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:2px 9px;
+      font:600 11px/1.5 var(--sans);border:1px solid transparent;white-space:nowrap}
+.chip.recon{background:var(--info-bg);color:var(--info);border-color:var(--info-line)}
+.chip.signed{background:var(--good-bg);color:var(--good);border-color:var(--good-line)}
+.chip.warn{background:var(--warn-bg);color:var(--warn);border-color:#f0dcbe}
+.chip.crit{background:var(--crit-bg);color:var(--crit);border-color:#f3cdcd}
+.chip.lock{background:var(--alt);color:var(--faint);border-color:var(--line)}
+.chip.sheet{background:var(--sheet-bg);color:var(--sheet);border-color:#bfe3cc}
+
+button.b{font:600 12.5px/1 var(--sans);border-radius:6px;padding:7px 12px;cursor:pointer;
+         border:1px solid var(--line);background:var(--surface);color:var(--ink)}
+button.b:hover{border-color:var(--accent);color:var(--accent)}
+button.b.pri{background:var(--accent);border-color:var(--accent);color:#fff}
+button.b.pri:hover{background:var(--accent-hi)}
+button.b[disabled]{opacity:.4;cursor:not-allowed;border-color:var(--line);color:var(--faint)}
+button.b[disabled]:hover{border-color:var(--line);color:var(--faint)}
+.tiny{font:600 11px/1 var(--sans);padding:4px 8px}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:8px}
+.card>header{padding:11px 14px;border-bottom:1px solid var(--line);display:flex;
+             align-items:center;gap:10px;flex-wrap:wrap}
+.card>header h3{font:600 15px/1.25 var(--sans);letter-spacing:-.01em}
+.pad{padding:14px}
+.stack{display:flex;flex-direction:column;gap:14px}
+.row{display:flex;gap:14px;flex-wrap:wrap;align-items:flex-start}
+.k{font:600 10.5px/1 var(--mono);letter-spacing:.12em;color:var(--muted);text-transform:uppercase}
+
+table{border-collapse:separate;border-spacing:0;width:100%;font-size:12.5px}
+th,td{text-align:left;padding:0 9px;height:var(--row);border-bottom:1px solid var(--line);
+      white-space:nowrap}
+th{background:var(--alt);font:600 11.5px/1 var(--sans);color:var(--muted)}
+td.r,th.r{text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums}
+td.w,th.w{white-space:normal}
+.scroll{overflow:auto}
+
+.note{background:var(--alt);border:1px solid var(--line);padding:9px 12px;font-size:12.5px;
+      border-radius:6px;margin:10px 0}
+.note.warn{background:var(--warn-bg);border-color:#f0dcbe}
+.note.crit{background:var(--crit-bg);border-color:#f3cdcd}
+.note.info{background:var(--info-bg);border-color:var(--info-line)}
+.note.good{background:var(--good-bg);border-color:var(--good-line)}
+
+/* ── chọn ca ───────────────────────────────────────────────────────────── */
+.cases{display:flex;gap:10px;flex-wrap:wrap;padding:18px 0 0}
+.cases button{flex:1;min-width:280px;text-align:left;border:1px solid var(--line);
+  background:var(--surface);border-radius:9px;padding:13px 15px;cursor:pointer;font:inherit}
+.cases button:hover{border-color:var(--accent)}
+.cases button[aria-pressed=true]{border-color:var(--ink);background:var(--ink);color:#fff}
+.cases .ct{font:700 14.5px/1.3 var(--sans);display:block;margin-bottom:3px}
+.cases .cs{font-size:12.5px;color:var(--muted)}
+.cases button[aria-pressed=true] .cs{color:#b7c4c2}
+
+/* ── thanh bước ────────────────────────────────────────────────────────── */
+.rail{display:flex;gap:0;border:1px solid var(--line);border-radius:8px;overflow:hidden;
+      background:var(--surface);margin-top:14px;flex-wrap:wrap}
+.rail button{flex:1;min-width:118px;border:0;border-right:1px solid var(--line);
+  background:var(--surface);padding:9px 11px;cursor:pointer;text-align:left;font:inherit;
+  color:var(--muted)}
+.rail button:last-child{border-right:0}
+.rail button .n{font:700 10px/1 var(--mono);color:var(--faint);display:block}
+.rail button .t{font:600 12.5px/1.3 var(--sans);color:var(--ink);display:block;margin-top:3px}
+.rail button[aria-pressed=true]{background:var(--accent)}
+.rail button[aria-pressed=true] .n,.rail button[aria-pressed=true] .t{color:#fff}
+.rail button.seen{background:var(--good-bg)}
+.rail button.seen .t{color:var(--good)}
+
+/* ── hai cột đối chiếu ─────────────────────────────────────────────────── */
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:960px){.duo{grid-template-columns:1fr}}
+.side{border:1px solid var(--line);border-radius:8px;background:var(--surface);overflow:hidden}
+.side>header{padding:10px 14px;border-bottom:1px solid var(--line);display:flex;
+             align-items:center;gap:9px;flex-wrap:wrap}
+.side.asis>header{background:var(--sheet-bg)}
+.side.asis{border-color:#bfe3cc}
+.side.tobe>header{background:#eef6f6}
+.side.tobe{border-color:#bcd8d6}
+.side>header h4{font:700 13.5px/1.25 var(--sans)}
+.side.asis>header h4{color:var(--sheet)}
+.side.tobe>header h4{color:var(--accent)}
+.side .body{padding:13px 14px;font-size:13px}
+.side .body p{margin:0 0 9px}
+.side .body p:last-child{margin-bottom:0}
+.meta{display:grid;grid-template-columns:96px 1fr;gap:0;font-size:12.5px;
+      border-top:1px solid var(--line)}
+.meta>div{padding:6px 14px;border-bottom:1px solid var(--line)}
+.meta>div:nth-child(odd){color:var(--muted);background:#fcfdfd}
+
+/* ── sân khấu: màn FLS thật ────────────────────────────────────────────── */
+.stage{border:1px solid var(--line);border-radius:8px;background:var(--surface);
+       margin-top:14px;overflow:hidden}
+.stage>header{padding:10px 14px;background:var(--alt);border-bottom:1px solid var(--line);
+  display:flex;gap:9px;align-items:center;font:600 12px/1 var(--mono);color:var(--muted);
+  letter-spacing:.05em;text-transform:uppercase;flex-wrap:wrap}
+.stage .inner{padding:14px}
+.gwrap{overflow:auto;max-height:260px;border:1px solid var(--line);border-radius:6px}
+table.g{font-size:12.5px}
+table.g th,table.g td{border-right:1px solid var(--line);height:27px}
+table.g th.f1,table.g td.f1{position:sticky;left:0;z-index:2;width:46px;background:var(--alt)}
+td.ro{color:var(--muted);background:var(--alt)}
+th.kh{background:#eef6f6;color:var(--accent);font-family:var(--mono);font-size:11.5px}
+th.kh.two{background:var(--warn-bg);color:var(--warn)}
+.inp{border:1px solid var(--info-line);border-radius:5px;padding:5px 8px;font:inherit;width:100%}
+select.inp{max-width:100%}
+/* Vung DAN da bi go 08/09: `QD-ITL-109` chot cu chi dan O LAI Google
+   Sheets, nen demo nay ⛔ khong con o nhap nao cho du lieu giao dich. */
+.kbd{display:inline-block;border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;
+     padding:1px 6px;font:600 11.5px/1.5 var(--mono);background:var(--alt)}
+
+.gate{border-radius:7px;border:1px solid var(--line);padding:11px 13px;background:var(--surface)}
+.gate.pass{border-color:var(--good-line);background:var(--good-bg)}
+.gate.fail{border-color:#f3cdcd;background:var(--crit-bg)}
+.gate .st{font:700 14px/1.2 var(--sans);margin:4px 0 2px}
+.gate.pass .st{color:var(--good)}.gate.fail .st{color:var(--crit)}
+.grid4{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
+
+tr.r-chan td:first-child{box-shadow:inset 3px 0 0 var(--crit)}
+tr.r-co td:first-child{box-shadow:inset 3px 0 0 var(--warn)}
+tr.r-ok td:first-child{box-shadow:inset 3px 0 0 var(--good-line)}
+
+/* ── dòng chảy ─────────────────────────────────────────────────────────── */
+.chain{display:flex;align-items:stretch;gap:0;flex-wrap:wrap;font-size:12.5px}
+.chain .st{border:1px solid var(--line);background:var(--surface);padding:9px 12px;
+  min-width:132px;flex:1;position:relative}
+.chain .st + .st{border-left:0}
+.chain .st:first-child{border-radius:7px 0 0 7px}
+.chain .st:last-child{border-radius:0 7px 7px 0}
+.chain .st .cn{font:700 9.5px/1 var(--mono);color:var(--faint);letter-spacing:.09em}
+.chain .st .cl{font:600 12.5px/1.3 var(--sans);margin-top:4px;display:block}
+.chain .st .cm{font-size:11.5px;color:var(--muted);margin-top:3px;display:block}
+.chain .st.repl{background:#eef6f6;border-color:#bcd8d6}
+.chain .st.repl .cl{color:var(--accent)}
+.chain .st.keep{background:var(--alt)}
+.chain .st.red{background:var(--crit-bg);border-color:#f3cdcd}
+.chain .st.red .cl{color:var(--crit)}
+@media(max-width:900px){.chain .st{min-width:100%;border-left:1px solid var(--line);
+  border-radius:0!important} .chain .st + .st{border-top:0}}
+
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--muted);padding-top:9px}
+.legend i{display:inline-block;width:11px;height:11px;border-radius:3px;
+  border:1px solid var(--line);vertical-align:-1px;margin-right:5px}
+.foot{font-size:12px;color:var(--muted);padding-top:8px}
+.nav{display:flex;gap:9px;align-items:center;flex-wrap:wrap;padding-top:14px}
+/* dau trang moi buoc: bac chu lon nhat cua trang, lam diem vao mat */
+.lead{padding:20px 0 2px;display:flex;align-items:baseline;gap:13px;flex-wrap:wrap}
+.lead .st{font:700 11px/1 var(--mono);letter-spacing:.15em;color:var(--accent);
+  background:#eef6f6;border:1px solid #bcd8d6;border-radius:5px;padding:5px 9px;
+  text-transform:uppercase}
+.lead h2{font:700 27px/1.15 var(--sans);letter-spacing:-.022em;text-wrap:balance}
+.lead .of{font:500 13px/1 var(--mono);color:var(--faint)}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <span class="brand">FLS · Hướng dẫn nạp</span>
+  <span class="sub">demo động · hai ca</span>
+  <span class="spacer"></span>
+  <span class="pill">đối chiếu từng bước với Google Sheets</span>
+</div>
+
+<div class="wrap">
+
+<div class="cases">
+  <button data-case="bank" aria-pressed="true">
+    <span class="ct">Ca A · Nạp sao kê ngân hàng</span>
+    <span class="cs">Từ ô dán trên Sheets tới lúc vào sổ · 5 bước</span>
+  </button>
+  <button data-case="quy">
+    <span class="ct">Ca B · Nạp sổ quỹ</span>
+    <span class="cs">8 nguồn quỹ · 5 bước · bẫy hai cột ngày + khối nhân sự bị cấm</span>
+  </button>
+  <button data-case="flow">
+    <span class="ct">Bản đồ dòng chảy Google Sheets</span>
+    <span class="cs">9 chặng · FLS thay chặng nào, giữ chặng nào</span>
+  </button>
+</div>
+
+<div id="rail" class="rail"></div>
+<div id="stage-host"></div>
+
+<div class="nav" id="nav">
+  <button class="b" id="prev">← Bước trước</button>
+  <button class="b pri" id="next">Bước sau →</button>
+  <span class="muted" id="pos" style="font-size:12.5px"></span>
+  <span class="spacer"></span>
+  <span class="muted" style="font-size:12px">Dùng phím ← → để đi nhanh</span>
+</div>
+
+<hr style="margin:26px 0 14px">
+<p class="foot">
+  <b>Cột Google Sheets</b> lấy từ <span class="mono">FLS-Process-PM-den-ITL.md §3</span>, chặng 1 · 3 · 3.5:
+  file, sheet, mã bước <span class="mono">OP-01/04/05/09/20/21/22</span>, người và giờ đều là số đọc được từ file thật.<br>
+  <b>Cột FLS</b> lấy từ <span class="mono">BA-06 §7</span> và đo trên kho ngày 08/09:
+  69 nguồn (60 Bank + 8 Cash + 1 Mapping) · 408 bản khai · 19 bố cục cột · sổ 10.030 dòng.
+  Biên bản soát là kết quả chạy thật 07/09 trên 60 sheet, 8.341 dòng.<br>
+  <b>Đây là bản vẽ</b>, chưa nối dữ liệu. Các dòng giao dịch là minh hoạ.<br>
+  <b>Dựng lại 2026-09-08</b> theo <span class="mono">QĐ-ITL-109</span>: FLS đọc
+  <b>vùng CHUẨN</b>, cử chỉ dán <b>ở lại Google Sheets</b>. Bản trước vẽ lưới dán
+  trong FLS — sai mô hình, đã gỡ.
+</p>
+</div>
+
+<script>
+/* ═══ dữ liệu hai ca ══════════════════════════════════════════════════════
+   DỰNG LẠI 2026-09-08 theo `QĐ-ITL-109`.
+
+   Bản trước vẽ kế toán DÁN vào FLS. Sai mô hình: owner chốt FLS đọc **vùng
+   CHUẨN**, nên cử chỉ `Ctrl+V` **ở lại Google Sheets**, và thứ FLS thay là
+   **nút `Run` + cú chép tay sang A-CCR**.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+const LUOI_DOC = `
+<div class="gwrap"><table class="g">
+<thead><tr><th class="f1" style="width:140px">Nguồn</th>
+  <th style="width:100px">Date</th><th style="width:126px">Reference number</th>
+  <th style="width:190px">Description</th><th style="width:124px">Debit</th>
+  <th style="width:124px">Credit</th><th style="width:74px">Currency</th></tr></thead>
+<tbody>
+<tr><td class="f1 mono">…MSB VND_VGO1</td><td class="ro mono">05/08/2026</td><td class="ro mono">FT26217B4K9</td><td class="ro">THANH TOAN HD DV T7</td><td class="ro r">1.240.000.000</td><td class="ro r faint">—</td><td class="ro">VND</td></tr>
+<tr><td class="f1 mono">…MSB VND_VGO1</td><td class="ro mono">06/08/2026</td><td class="ro mono">FT26218A7X4</td><td class="ro">THU TIEN BAN HANG</td><td class="ro r faint">—</td><td class="ro r">840.500.000</td><td class="ro">VND</td></tr>
+<tr><td class="f1 mono">…TCB USD_VGOH</td><td class="ro mono">05/08/2026</td><td class="ro mono">FT25042584880113</td><td class="ro">BAN NGOAI TE</td><td class="ro r faint">—</td><td class="ro r">66.923,25</td><td class="ro">USD</td></tr>
+<tr><td class="f1 mono faint" colspan="7" style="text-align:center;font-style:italic">… 8.338 dòng nữa</td></tr>
+</tbody></table></div>`;
+
+const VUNG_R = `
+<div class="gwrap"><table class="g">
+<thead>
+<tr><th class="f1" style="width:46px">Cột</th>
+    <th colspan="3" style="background:#eaf6ee;color:#0f9d58">VÙNG THÔ — hình của chính ngân hàng</th>
+    <th colspan="4" style="background:#eef6f6;color:var(--accent)">VÙNG CHUẨN — công thức sinh ra, FLS đọc ở đây</th></tr>
+<tr><th class="f1">tên</th>
+    <th style="width:120px">Ngày giao dịch</th><th style="width:130px">Reference_raw</th><th style="width:110px">Nợ/Debit</th>
+    <th style="width:96px">Date</th><th style="width:110px">Debit</th><th style="width:110px">Credit</th><th style="width:120px">Ref_adjust</th></tr>
+</thead>
+<tbody>
+<tr><td class="f1 mono faint">1</td>
+  <td class="ro mono">2025-02-11</td><td class="ro mono">FT25042584880113</td><td class="ro r">-66.923,25</td>
+  <td class="ro mono" style="background:#f2fafa">02/11/2025</td><td class="ro r faint" style="background:#f2fafa">—</td>
+  <td class="ro r" style="background:#f2fafa">66.923,25</td><td class="ro faint" style="background:#fdf4e7">người gõ</td></tr>
+<tr><td class="f1 mono faint" colspan="8" style="text-align:center;font-style:italic;color:var(--faint)">
+  công thức: <span class="mono">Date = ARRAYFORMULA(…)</span> · <span class="mono">Credit = &lt;thô&gt; × (−1)</span> ở 23/60 nguồn</td></tr>
+</tbody></table></div>`;
+
+function bienBan(quy) {
+  const s9 = quy
+    ? `<tr class="r-chan"><td><span class="chip crit">chặn</span></td>
+         <td><b>S9</b> · số dư cuối kỳ khớp danh mục</td>
+         <td><span class="chip signed">đạt</span></td><td class="r">8</td>
+         <td class="w">FLS cộng dòng nó đọc rồi so <span class="mono">Closing Balance</span>. Lệch <b>0</b></td></tr>`
+    : `<tr><td><span class="chip lock">chặn</span></td>
+         <td class="muted"><b>S9</b> · số dư cuối kỳ khớp danh mục</td>
+         <td><span class="chip lock">không áp dụng</span></td><td class="r faint">—</td>
+         <td class="w muted">nguồn ngân hàng, không có quỹ để đếm</td></tr>`;
+  return `
+<div class="grid4" style="margin-bottom:13px">
+  <div class="gate pass"><div class="k">Dòng vào</div><div class="st num">8.341</div>
+    <div class="muted" style="font-size:12px">đọc từ vùng CHUẨN</div></div>
+  <div class="gate pass"><div class="k">Dòng ra</div><div class="st num">8.338</div>
+    <div class="muted" style="font-size:12px">sẽ vào sổ</div></div>
+  <div class="gate"><div class="k">Dòng rỗng</div><div class="st num">3</div>
+    <div class="muted" style="font-size:12px">bỏ, có ghi nhận</div></div>
+  <div class="gate fail"><div class="k">Cờ</div><div class="st num">5</div>
+    <div class="muted" style="font-size:12px">đỏ, nhưng không chặn</div></div>
+</div>
+<div class="scroll"><table>
+<thead><tr><th style="width:34px">Hạng</th><th style="width:270px">Luật</th>
+  <th style="width:96px">Kết quả</th><th class="r" style="width:66px">Đã đo</th><th class="w">Thông điệp</th></tr></thead>
+<tbody>
+<tr class="r-ok"><td><span class="chip lock">chặn</span></td><td><b>S1</b> · ba đường cân, 0 dòng rơi im lặng</td>
+  <td><span class="chip signed">đạt</span></td><td class="r">8.341</td><td class="w">vào 8.341 = ra 8.338 + rỗng 3 + loại 0</td></tr>
+<tr class="r-co"><td><span class="chip warn">cờ</span></td><td><b>S2</b> · có tiền thì phải có mã</td>
+  <td><span class="chip crit">7 dòng</span></td><td class="r">8.338</td><td class="w">vào hàng chờ, lý do <span class="mono">S2</span></td></tr>
+<tr class="r-co"><td><span class="chip warn">cờ</span></td><td><b>S3</b> · mỗi dòng phải có tiền</td>
+  <td><span class="chip crit">2 dòng</span></td><td class="r">8.338</td><td class="w">cả Nợ lẫn Có đều trống</td></tr>
+<tr class="r-co"><td><span class="chip warn">cờ</span></td><td><b>S4</b> · mỗi dòng phải có đơn vị tiền tệ</td>
+  <td><span class="chip crit">12 dòng</span></td><td class="r">8.338</td><td class="w">không suy hộ, vào hàng chờ</td></tr>
+<tr class="r-ok"><td><span class="chip lock">canh</span></td><td><b>S5</b> · mã không bị hạ kiểu số thập phân</td>
+  <td><span class="chip signed">đạt</span></td><td class="r">8.338</td><td class="w"><b>0/8.338</b> ở nguồn, trong khi bảng đang chạy có <b>31</b> mã hỏng</td></tr>
+<tr class="r-ok"><td><span class="chip lock">canh</span></td><td><b>S6</b> · một sheet chỉ một kiểu ngày</td>
+  <td><span class="chip signed">đạt</span></td><td class="r">8.338</td><td class="w">không sheet nào trộn hai kiểu</td></tr>
+<tr class="r-co"><td><span class="chip warn">cờ</span></td><td><b>S7</b> · dòng trùng hoàn toàn</td>
+  <td><span class="chip crit">26 khoá</span></td><td class="r">8.338</td><td class="w">26 khoá lặp, phủ 92 dòng</td></tr>
+<tr class="r-co"><td><span class="chip warn">cờ</span></td><td><b>S8</b> · xuất xứ phải có trong danh mục</td>
+  <td><span class="chip crit">2 xuất xứ</span></td><td class="r">60</td><td class="w">2 sheet không khớp tên tài khoản nào</td></tr>
+${s9}
+<tr class="r-chan"><td><span class="chip crit">chặn</span></td>
+  <td><b>S10</b> · hai bản khai trỏ cùng một cột <span class="chip warn">chưa dựng</span></td>
+  <td><span class="chip lock">chạy tay</span></td><td class="r">192</td>
+  <td class="w"><b>192 phép so, 0 lệch</b> — còn là phép đo tay <span class="mono">GAP-KHAI-01</span></td></tr>
+</tbody></table></div>`;
+}
+
+const CA = {
+  bank: [
+    { t: 'Dán sao kê — không đổi gì cả', n: 'Bước 1',
+      asis: { h: 'Google Sheets · hôm nay',
+        b: `<p>Mở sổ <b>P100 | Bank Transactions</b>, tìm đúng 1 trong 60 sheet
+             <span class="mono">R | &lt;số TK&gt;</span>, rồi <span class="kbd">Ctrl</span>
+             <span class="kbd">V</span> vùng sao kê vào <b>vùng THÔ</b>.</p>`,
+        m: [['Sổ', 'P100 | Bank Transactions'], ['Mã bước', 'OP-01'],
+            ['Hạn', 'trước 11:00 mỗi ngày (OP-05)'], ['Ai', 'ThomHT · AnhMC']] },
+      tobe: { h: 'FLS',
+        b: `<p><b>Không có gì thay đổi.</b> Kế toán vẫn dán vào Google Sheets,
+             y hệt hôm nay.</p>
+            <p class="muted">Owner chốt <span class="mono">QĐ-ITL-109</span>: FLS đọc
+             <b>vùng CHUẨN</b>, ⛔ không thay phép chuẩn hoá. Nên bước này
+             <b>ở lại Sheets</b>, và kế toán ⛔ không phải học lại thao tác nào.</p>`,
+        m: [['FLS làm gì', '⛔ không gì'], ['Thói quen', 'giữ nguyên'],
+            ['Rủi ro chuyển giao', 'bằng 0 ở bước này']] },
+      stage: { h: 'Bước 1 · vùng THÔ của sheet R |', inner: VUNG_R + `
+        <div class="note info" style="margin-bottom:0">Kế toán dán vào <b>nửa trái</b>.
+          Nửa phải là <b>công thức</b>, ⛔ không ai gõ vào đó.</div>` } },
+
+    { t: 'Sheet tự chuẩn hoá', n: 'Bước 2',
+      asis: { h: 'Google Sheets · hôm nay',
+        b: `<p>Công thức của sheet biến vùng thô thành <b>6 cột chuẩn</b>:
+             <span class="mono">Date · Debit · Credit · Currency ·
+             Reference number_adjust · Reference number</span>.</p>
+            <p class="muted">Mỗi ngân hàng một phép biến đổi riêng. Đo trên 60 nguồn:
+             <b>36</b> nguồn bóc ngày bằng công thức, <b>23</b> nguồn <b>đổi dấu</b>
+             <span class="mono">× (−1)</span> kèm hoán vế Nợ ↔ Có.</p>`,
+        m: [['Ai viết', 'kế toán, từ lâu'], ['Parse ngày', '36/60 nguồn'],
+            ['Đổi dấu', '23/60 nguồn'], ['FLS đụng vào', '⛔ không']] },
+      tobe: { h: 'FLS',
+        b: `<p><b>Cũng không đụng.</b> FLS chỉ cần biết <b>6 cột chuẩn nằm ở đâu</b> —
+             đó là <b>bản khai</b>, đã có sẵn cho <b>68/68</b> nguồn.</p>
+            <p class="muted">Chở 60 phép biến đổi sang FLS là mở một chỗ để
+             <b>sai dấu tiền</b>. Đó là lý do ranh giới này được ký thành quyết định
+             chứ ⛔ không để tuỳ nghi.</p>`,
+        m: [['FLS cần', 'chỉ vị trí 6 cột'], ['Bản khai', '68/68 nguồn có'],
+            ['Bố cục cột', '19 kiểu — vì vùng thô rộng hẹp khác nhau']] },
+      stage: { h: 'Bước 2 · vì sao có 19 bố cục cột', inner: `
+        <div class="chain">
+          <div class="st keep"><span class="cn">TCB USD</span><span class="cl">thô A–K</span>
+            <span class="cm">khối chuẩn ở <b>L–Q</b></span></div>
+          <div class="st keep"><span class="cn">VPB VND</span><span class="cl">thô A–I</span>
+            <span class="cm">khối chuẩn ở <b>J–O</b></span></div>
+          <div class="st repl"><span class="cn">FLS</span><span class="cl">đọc theo BẢN KHAI</span>
+            <span class="cm">⛔ không đoán vị trí</span></div>
+        </div>
+        <div class="note" style="margin-bottom:0">Khối chuẩn hoá <b>luôn cùng bộ tên</b>;
+          chỉ <b>vị trí</b> dịch, vì vùng thô mỗi bank một bề rộng. Con số <b>19</b>
+          ⛔ không phải "kế toán tuỳ tiện" — nó là <b>hệ quả cơ học</b>.</div>` } },
+
+    { t: 'Gom lại — chỗ FLS thay', n: 'Bước 3',
+      asis: { h: 'Google Sheets · hôm nay',
+        b: `<p>Bấm <b>Run</b>. Script gom 60 sheet thành bảng <b>Bank Transactions</b>,
+             đọc theo <span class="mono">Range_Condition/Debit/Credit</span> của
+             <b>BankAccountList</b>.</p>
+            <p class="muted">Chạy xong thì <b>im lặng</b>. ⛔ Không biết bao nhiêu dòng vào,
+             bao nhiêu rơi, dòng nào hỏng.</p>`,
+        m: [['Mã bước', 'OP-09'], ['Đọc theo', 'Range_* ở BankAccountList'],
+            ['Phản hồi', '⛔ không có']] },
+      tobe: { h: 'FLS',
+        b: `<p>Chọn phạm vi <i>(mặc định <b>tất cả 68</b>, giống Run)</i> → bấm
+             <b>Đọc &amp; soát</b>. FLS đọc <b>vùng CHUẨN</b> qua kết nối
+             <b>chỉ-đọc</b>, rồi trả <b>biên bản</b>.</p>
+            <p class="muted">⛔ Không có ô nhập nào trên màn này. Sửa số nằm ở
+             <span class="mono">SCR-F02</span>, và sửa ở đó là <b>thêm bút toán</b>.</p>`,
+        m: [['Mặc định', 'tất cả 68 nguồn'], ['Kết nối', 'chỉ-đọc'],
+            ['Đọc lúc', '08/09 15:02:41']] },
+      stage: { h: 'Bước 3 · FLS đọc — xem trước, chỉ-đọc', inner: LUOI_DOC + `
+        <div style="display:flex;gap:9px;align-items:center;flex-wrap:wrap;padding-top:12px">
+          <span class="chip recon">68 nguồn · 8.341 dòng · đọc 15:02:41</span>
+          <span class="spacer"></span><button class="b tiny">Đọc lại</button>
+        </div>` } },
+
+    { t: 'Soát trước khi vào sổ', n: 'Bước 4',
+      asis: { h: 'Google Sheets · hôm nay',
+        b: `<p><b>⛔ Không có bước này.</b> Sai hay đúng chỉ lộ ra ở cuối chuỗi,
+             nếu có ai đó nhìn.</p>
+            <p class="muted">Cột đối soát ở màn hàng chờ đã <b>0 lần được gõ suốt 4 tuần</b>
+             — chỗ kiểm soát cuối cũng ⛔ không ai dùng.</p>`,
+        m: [['Có soát ⛔ không', '⛔ không'], ['Biết sai khi nào', 'cuối chuỗi, nếu ai để ý']] },
+      tobe: { h: 'FLS',
+        b: `<p>Biên bản <b>8 luật</b> <i>(quỹ có <b>S9</b>, và <b>S10</b> đang chờ dựng)</i>,
+             mỗi luật phải nói <b>đã đo bao nhiêu</b>.</p>
+            <p class="muted">Hạng <b>chặn</b> = lỗi của máy, nút Nhận tắt.
+             Hạng <b>cờ</b> = khuyết tật có sẵn trong dữ liệu kế toán: vẫn đỏ, vẫn báo to,
+             nhưng nút Nhận vẫn bật, vì những dòng ấy là <b>tiền thật</b>.</p>`,
+        m: [['Số luật', '8 (+S9 quỹ, +S10 chờ)'], ['Kết quả thật 07/09', 'S1 đạt · 5 cờ'],
+            ['Chặn', 'chỉ khi lỗi là của máy']] },
+      stage: { h: 'Bước 4 · biên bản soát', inner: bienBan(false) + `
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding-top:13px">
+          <button class="b pri">Nhận 8.338 dòng</button><button class="b">Huỷ</button>
+          <span class="chip warn">5 cờ · 139 dòng sẽ vào hàng chờ kèm lý do</span>
+        </div>` } },
+
+    { t: 'Đưa sang A-CCR', n: 'Bước 5',
+      asis: { h: 'Google Sheets · hôm nay',
+        b: `<p>Còn <b>một cú chép tay</b> nữa: từ <b>P100</b> sang <b>A-CCR</b>.
+             Đo ngày 07/09: cú đẩy này <b>trễ 19 ngày, thiếu 377 dòng</b>.</p>`,
+        m: [['Việc', 'chép tay P100 → A-CCR'], ['Trễ khi đo', '19 ngày · 377 dòng']] },
+      tobe: { h: 'FLS',
+        b: `<p>Bấm <b>Nhận</b> ⇒ mã lần nạp, số dòng vào sổ, số vào hàng chờ.
+             Đây <b>chính là</b> thứ thay cú chép tay.</p>
+            <p class="muted">⛔ Cú ghi sang <span class="mono">A-CCR</span> <b>chưa được bật</b>
+             — chặng 3, chờ owner duyệt riêng. Nút ấy <b>cố ý ⛔ không có trên màn</b>:
+             dựng sẵn một nút chưa được phép bấm là mời người bấm nhầm.</p>`,
+        m: [['Mã lần nạp', 'NAP-2026-09-08-TATCA'], ['Vào sổ', '8.199 dòng'],
+            ['Đẩy A-CCR', '⛔ chưa bật · GAP-PLAN-05']] },
+      stage: { h: 'Bước 5 · đã nhận', inner: `
+        <div class="row">
+          <div style="flex:1;min-width:330px"><table><tbody>
+            <tr><td class="muted">Lần nạp</td><td class="mono">NAP-2026-09-08-TATCA</td></tr>
+            <tr><td class="muted">Vào sổ</td><td><b class="num">8.199</b> dòng</td></tr>
+            <tr><td class="muted">Bỏ vì trùng</td><td class="num">92</td></tr>
+            <tr><td class="muted">Vào hàng chờ</td><td><span class="num">139</span> dòng, có lý do</td></tr>
+            <tr><td class="muted">Đọc từ Sheets lúc</td><td class="mono">08/09 15:02:41</td></tr>
+          </tbody></table></div>
+          <div style="flex:1;min-width:250px">
+            <div class="note good" style="margin:0"><b>Đọc lại ngay sau đó ⇒ 0 dòng nhân đôi.</b>
+              Máy nhận ra bằng nội dung dòng, ⛔ không bằng thứ tự hay số dòng.</div></div>
+        </div>
+        <div class="chain" style="margin-top:13px">
+          <div class="st repl"><span class="cn">CHẶNG 1</span><span class="cl">Dựng</span>
+            <span class="cm">8.338/8.338</span></div>
+          <div class="st repl"><span class="cn">CHẶNG 2</span><span class="cl">Soát</span>
+            <span class="cm">8 luật</span></div>
+          <div class="st red"><span class="cn">CHẶNG 3</span><span class="cl">Đẩy A-CCR</span>
+            <span class="cm">chờ owner duyệt</span></div>
+        </div>` } }
+  ],
+
+  quy: [
+    { t: 'Nhập thu chi', n: 'Bước 1',
+      asis: { h: 'Google Sheets · hôm nay',
+        b: `<p>Sổ <b>P100 | Cash Ledger</b> — <b>sổ khác</b> với sổ bank. Tám sheet quỹ:
+             <span class="mono">CNC · HoangACB · Pingpong · PO · PO BGO1 _HKD ·
+             PO BGO1 _USD · VND_CNC · VND_HotBonus</span>.</p>
+            <p class="muted">Bên quỹ ⛔ không có sao kê điện tử, nên <b>gõ tay</b> là bình
+             thường. Đo được: <b>0/8</b> sheet quỹ sinh <span class="mono">Date</span>
+             bằng công thức.</p>`,
+        m: [['Sổ', 'P100 | Cash Ledger'], ['Mã bước', 'OP-04'],
+            ['Date bằng công thức', '0/8 — gõ tay hết']] },
+      tobe: { h: 'FLS',
+        b: `<p><b>Cũng không đổi.</b> Và trên FLS, quỹ nằm <b>chung một danh sách</b>
+             với bank — lọc bằng nút <b>Quỹ 8</b>.</p>
+            <p class="muted">⛔ Không có màn riêng cho quỹ: cùng 6 trường bắt buộc,
+             cùng cửa dữ liệu, cùng bộ luật soát.</p>`,
+        m: [['Màn', 'F04, chung với bank'], ['Lọc', 'Quỹ · 8'],
+            ['Luật riêng', 'thêm đúng 1 — S9']] },
+      stage: { h: 'Bước 1 · chọn phạm vi', inner: `
+        <div class="row">
+          <div style="flex:2;min-width:320px">
+            <table><thead><tr><th style="width:26px"></th><th>Nguồn quỹ</th>
+              <th style="width:130px">Bản khai</th></tr></thead>
+            <tbody>
+              <tr><td><input type="checkbox" checked></td><td class="mono">R | VND_HotBonus</td>
+                  <td><span class="chip signed">v3 · 8 trường</span></td></tr>
+              <tr><td><input type="checkbox" checked></td><td class="mono">R | CNC</td>
+                  <td><span class="chip warn">v1 · thiếu LE/CDT</span></td></tr>
+              <tr><td><input type="checkbox" checked></td><td class="mono">R | VND_CNC</td>
+                  <td><span class="chip warn">v1 · thiếu LE/CDT</span></td></tr>
+              <tr><td><input type="checkbox" checked></td><td class="mono">R | HoangACB</td>
+                  <td><span class="chip lock">v1</span></td></tr>
+            </tbody></table></div>
+          <div style="flex:1;min-width:240px"><div class="note" style="margin:0">
+            Cột <b>Bản khai</b> là thứ để <b>xem</b>, ⛔ không phải để sửa ở đây.
+            Sửa khai sinh <b>version mới</b> nên nó nằm sau một nút riêng.</div></div>
+        </div>` } },
+
+    { t: 'Bẫy: hai cột ngày', n: 'Bước 2',
+      asis: { h: 'Google Sheets · hôm nay',
+        b: `<p><b>Sheet <span class="mono">R | HoangACB</span> có hai cột ngày</b>:
+             <i>Ngày hiệu lực</i> và <i>Ngày giao dịch</i>. Chọn nhầm là <b>sai kỳ</b> —
+             tiền rơi vào tháng khác.</p>
+            <p class="muted">Hôm nay lựa chọn ấy nằm trong <b>thói quen của một người</b>.
+             Người đó nghỉ thì ⛔ không ai biết đã chọn cột nào, và vì sao.</p>`,
+        m: [['Bẫy đã ghi nhận', 'R | HoangACB, 2 cột ngày'],
+            ['Hậu quả nếu sai', 'sai kỳ kế toán'],
+            ['Ai biết lựa chọn', 'một người, ⛔ không ghi lại']] },
+      tobe: { h: 'FLS',
+        b: `<p>Bản khai <b>ghi thẳng ra</b> cột nào được chọn làm
+             <span class="mono">Date</span>, kèm <b>tên người</b> và <b>mốc hiệu lực</b>.</p>
+            <p class="muted">Đổi ý về sau thì sinh <b>version mới</b>, bản cũ giữ nguyên.
+             Dòng đã nạp tháng trước vẫn giải thích được bằng bản khai <b>lúc ấy</b>.</p>`,
+        m: [['Trường Date', 'cột 10 · Ngày giao dịch'],
+            ['Ghi lại', 'version + actor + hiệu lực từ'],
+            ['Đổi sau này', 'sinh version mới, ⛔ không ghi đè']] },
+      stage: { h: 'Bước 2 · bản khai — xem, không sửa', inner: `
+        <div class="row">
+          <div style="flex:1;min-width:300px"><table><tbody>
+            <tr><td class="muted" style="width:140px">Trường Date</td>
+                <td><b>cột 10 · Ngày giao dịch</b> <span class="chip warn">có 2 cột ngày</span></td></tr>
+            <tr><td class="muted">Bản khai</td><td class="mono">v1</td></tr>
+            <tr><td class="muted">Người khai</td><td class="mono">máy · trích dòng 1</td></tr>
+            <tr><td class="muted">Hiệu lực từ</td><td class="mono">08/09 09:40</td></tr>
+          </tbody></table>
+          <div style="padding-top:11px"><button class="b tiny">Sửa bản khai…</button></div></div>
+          <div style="flex:1;min-width:250px"><div class="note info" style="margin:0">
+            Lần đầu kế toán <b>xác nhận</b> bản khai, máy sinh một version
+            <b>mang tên họ</b>. Từ đó "đã có người xem" là một <b>dữ kiện đọc được</b>,
+            ⛔ không phải một lời nói miệng.</div></div>
+        </div>` } },
+
+    { t: 'Hai thứ quỹ có mà bank không', n: 'Bước 3',
+      asis: { h: 'Google Sheets · hôm nay',
+        b: `<p>Sheet quỹ có sẵn cột <b>Legal Entity</b> và <b>CDT</b> — kế toán
+             <b>gõ thẳng tại nguồn</b>.</p>
+            <p class="muted">Lằn bank ⛔ không có hai cột này; nó phải <b>chờ ghép PM</b>,
+             mà tỷ lệ ghép gần <b>kịch trần 33,8%</b>.</p>`,
+        m: [['Có cột LE/CDT', '3/8 sheet quỹ'], ['Bank', '0/60'],
+            ['Khai số 8/15 ở dòng 1', '⛔ chỉ 1/8']] },
+      tobe: { h: 'FLS',
+        b: `<p>Owner chốt <span class="mono">QĐ-ITL-108</span>: <b>lấy cả hai</b>.
+             <span class="mono">R | VND_HotBonus</span> nay ở <b>v3, 8 trường</b>.</p>
+            <p class="muted">⚠ Hai sheet còn có cột nhưng <b>⛔ chưa khai số</b>
+             <span class="mono">8</span>/<span class="mono">15</span> ở dòng 1 ⇒ FLS
+             ⛔ không lấy được. Máy <b>⛔ không đoán theo tên tiêu đề</b> — đoán đúng
+             59/60 vẫn là sai ở cái thứ 60. Việc thật: kế toán gõ <b>2 ô</b> mỗi sheet
+             (<span class="mono">GAP-KT-06</span>).</p>`,
+        m: [['Lấy được', 'R | VND_HotBonus · v3'], ['Chờ 2 ô khai', 'CNC · VND_CNC'],
+            ['Nối vào ITL-CANON', '⛔ chưa · GAP-CANON-01']] },
+      stage: { h: 'Bước 3 · khối nhân sự bị cấm đọc', inner: `
+        <div class="chain">
+          <div class="st repl"><span class="cn">TRƯỜNG 8</span><span class="cl">Legal Entity</span>
+            <span class="cm">cột H · <b>LẤY</b></span></div>
+          <div class="st red"><span class="cn">TRƯỜNG 9–14</span><span class="cl">Khối nhân sự</span>
+            <span class="cm">cột I–N · <b>CẤM ĐỌC</b></span></div>
+          <div class="st repl"><span class="cn">TRƯỜNG 15</span><span class="cl">CDT</span>
+            <span class="cm">cột O · <b>LẤY</b></span></div>
+        </div>
+        <div class="note crit">
+          <b>Khối 9–14 mang dữ liệu cá nhân</b>: <span class="mono">ID Employee</span> ·
+          <span class="mono">Họ và tên (*)</span> ·
+          <span class="mono">Số CMND/CCCD/Passport (*)</span> ·
+          <span class="mono">Chức danh</span> · <span class="mono">EmpTrack 2</span>.
+          Owner chốt cấm <b>cả khối</b> (<span class="mono">QĐ-ITL-107</span>), rộng hơn
+          3 cột đo được — và rộng hơn là đúng: hai trường đáng lấy nằm <b>ngoài</b> khối,
+          nên cấm cả khối <b>⛔ không mất gì</b>.
+        </div>
+        <div class="note" style="margin-bottom:0">Cưỡng chế ở <b>TỪ VỰNG</b> chứ ⛔ không ở
+          dữ liệu: cổng đỏ <b>ngay giây</b> ai thêm một tên chạm mẫu cấm vào từ vựng —
+          ⛔ không đợi tới lúc số căn cước đã nằm trong kho.</div>` } },
+
+    { t: 'Đọc & soát — thêm luật S9', n: 'Bước 4',
+      asis: { h: 'Google Sheets · hôm nay',
+        b: `<p>Bấm <b>Run</b> ⇒ <b>Cash Ledger Transactions</b> (1.847 dòng) →
+             <b>1.1 Ledger 111</b>.</p>
+            <p class="muted"><b>Nhưng:</b> <span class="mono">A-CCR ▸ INDEX</span> ghi
+             <i>"Chưa thấy lấy P100 Cash sang"</i> — người xử là Hoài, <b>chưa xong</b>.
+             Nửa lằn quỹ có thể đang hụt.</p>`,
+        m: [['Mã bước', 'OP-09'], ['Ra', 'Cash Ledger Transactions → 111'],
+            ['Nợ đã ghi nhận', 'P100 Cash ⛔ chưa được lấy sang']] },
+      tobe: { h: 'FLS',
+        b: `<p>Cùng 8 luật của ca bank, cộng <b>S9</b>: FLS cộng dòng nó đọc rồi so với
+             <span class="mono">Closing Balance</span> của danh mục.</p>
+            <p class="muted">⚠ Nói cho đúng: đó là <b>hai phép tính trên cùng một sheet</b>.
+             So với <b>số dư thật ngoài đời</b> vẫn nằm ở
+             <span class="mono">2. CCR Cash</span> trên Sheets — FLS ⛔ chưa thay chỗ đó.</p>`,
+        m: [['Số luật', '9'], ['S9 hạng', 'chặn'],
+            ['Số dư lấy từ', 'Opening/Closing Balance của danh mục']] },
+      stage: { h: 'Bước 4 · biên bản soát', inner: bienBan(true) } },
+
+    { t: 'Đối soát cuối', n: 'Bước 5',
+      asis: { h: 'Google Sheets · hôm nay',
+        b: `<p>Cổng <b>2. CCR Cash</b>: <span class="mono">DIF = Treasury − Accounting</span>.
+             Bằng <b>0</b> là khớp.</p>
+            <p class="muted">Đọc ngày 21/08: lằn quỹ <b>DIF = 0 suốt 12 ngày</b>.
+             Nhưng lằn <b>ngân hàng</b> lệch <b>−9,53 tỷ</b> từ 20/08, mà các giai đoạn sau
+             <b>vẫn chạy</b>: ⛔ không có gì chặn.</p>`,
+        m: [['Cổng', '2. CCR Cash'], ['Lằn quỹ', 'DIF = 0 · 12 ngày'],
+            ['Lằn bank', '−9.527.063.847 từ 20/08'], ['Có chặn ⛔ không', '⛔ không']] },
+      tobe: { h: 'FLS',
+        b: `<p>Phần đối soát này <b>vẫn ở Google Sheets</b>. Cái FLS thêm là chặn
+             <b>sớm hơn</b>: <b>S9</b> bắt lệch số dư <b>ngay lúc đọc</b>, ⛔ không đợi
+             tới cuối chuỗi.</p>
+            <p class="muted">⛔ Cổng cuối vẫn cần, vì nó so với <b>sự thật bên ngoài</b> —
+             số dư đọc từ sao kê, thứ ⛔ không có trong sheet nào.</p>`,
+        m: [['FLS thay', '⛔ không'], ['FLS thêm', 'S9 chặn ngay lúc đọc'],
+            ['Cổng cuối', 'vẫn ở Sheets']] },
+      stage: { h: 'Hai cổng, hai thời điểm', inner: `
+        <div class="chain">
+          <div class="st repl"><span class="cn">FLS · LÚC ĐỌC</span><span class="cl">Luật S9</span>
+            <span class="cm">lệch số dư ⇒ chặn ngay</span></div>
+          <div class="st keep"><span class="cn">SHEETS</span><span class="cl">1.1 Ledger 111</span>
+            <span class="cm">giữ nguyên</span></div>
+          <div class="st keep"><span class="cn">SHEETS</span><span class="cl">2. CCR Cash</span>
+            <span class="cm">DIF = 0 · đang khớp</span></div>
+        </div>
+        <div class="note crit">
+          <b>Lằn ngân hàng thì ⛔ không khớp.</b> <span class="mono">2. CCR</span> lệch
+          <b class="num">−9.527.063.847 đ</b> từ 20/08/2026, và giai đoạn sau <b>vẫn chạy</b>.
+          Quy trình nói chỉ nên chạy khi <span class="mono">DIF = 0</span>, nhưng ⛔ không có
+          gì cưỡng chế điều đó.
+        </div>` } }
+  ]
+};
+
+/* ═══ bản đồ dòng chảy ════════════════════════════════════════════════════ */
+const FLOW = `
+<div class="stack" style="padding-top:14px">
+
+<div class="card"><header><h3>Chín chặng của Google Sheets, và FLS đứng ở đâu</h3>
+  <span class="spacer"></span>
+  <span class="muted" style="font-size:12px">nguồn: FLS-Process-PM-den-ITL.md §3</span></header>
+<div class="pad">
+<div class="chain">
+  <div class="st keep"><span class="cn">CHẶNG 1a</span><span class="cl">Dán vào R |</span>
+    <span class="cm">P100 · 68 sheet<br>OP-01 · OP-04</span></div>
+  <div class="st keep"><span class="cn">CHẶNG 1b</span><span class="cl">Công thức chuẩn hoá</span>
+    <span class="cm">36 parse ngày<br>23 đổi dấu</span></div>
+  <div class="st keep"><span class="cn">CHẶNG 2</span><span class="cl">Gõ Reference number</span>
+    <span class="cm">PM_Unpivot · OP-02</span></div>
+  <div class="st repl"><span class="cn">CHẶNG 3</span><span class="cl">Gom + soát</span>
+    <span class="cm"><b>FLS thay Run</b><br>đẩy A-CCR chờ duyệt</span></div>
+  <div class="st red"><span class="cn">CHẶNG 3.5</span><span class="cl">Cổng đối soát tiền</span>
+    <span class="cm">2. CCR · 2. CCR Cash<br>đang lệch −9,53 tỷ</span></div>
+  <div class="st keep"><span class="cn">CHẶNG 4–6</span><span class="cl">Index · bake · gộp</span>
+    <span class="cm">ITL RAW · OP-20</span></div>
+  <div class="st keep"><span class="cn">CHẶNG 7–9</span><span class="cl">Ghép PM · ITL Ledge</span>
+    <span class="cm">engine P&amp;L đọc</span></div>
+</div>
+<div class="legend">
+  <span><i style="background:#eef6f6;border-color:#bcd8d6"></i>FLS thay</span>
+  <span><i style="background:var(--alt)"></i>giữ nguyên trên Sheets</span>
+  <span><i style="background:var(--crit-bg);border-color:#f3cdcd"></i>đang đỏ</span>
+</div>
+<div class="note info" style="margin-bottom:0">
+  <b>FLS thay đúng MỘT chặng, và chặng ấy chỉ có hai mũi tên:</b>
+  <span class="mono">R |</span> → <span class="mono">Bank Transactions</span> →
+  <span class="mono">A-CCR</span>. Mũi tên thứ hai <b>chưa được bật</b>.
+</div>
+</div></div>
+
+<div class="card"><header><h3>Khác biệt then chốt, gói lại</h3></header>
+<div class="scroll"><table>
+<thead><tr><th style="width:190px">Việc</th><th style="width:290px">Google Sheets hôm nay</th>
+  <th class="w">FLS</th></tr></thead>
+<tbody>
+<tr><td>Dán sao kê</td><td><span class="kbd">Ctrl</span><span class="kbd">V</span> vào sheet <span class="mono">R |</span></td>
+    <td class="w"><b>y hệt — ⛔ không đổi gì.</b> Cử chỉ này ở lại Sheets</td></tr>
+<tr><td>Chuẩn hoá về 6 cột</td><td>công thức của sheet, mỗi bank một kiểu</td>
+    <td class="w"><b>⛔ không đụng.</b> FLS chỉ cần biết 6 cột ấy <b>nằm ở đâu</b></td></tr>
+<tr><td>Cột nào là cột gì</td><td>dòng 1 của sheet, ai sửa cũng được, ⛔ không lịch sử</td>
+    <td class="w">bản khai có <b>version</b>, tên người, mốc hiệu lực</td></tr>
+<tr><td>Gom 68 sheet lại</td><td>bấm <b>Run</b>, xong thì <b>im lặng</b></td>
+    <td class="w"><b>Đọc &amp; soát</b> ⇒ biên bản 8 luật, mỗi luật nói <b>đã đo bao nhiêu</b></td></tr>
+<tr><td>Đưa sang A-CCR</td><td>chép tay — đo được <b>trễ 19 ngày, thiếu 377 dòng</b></td>
+    <td class="w">đây <b>chính là</b> thứ FLS thay. ⛔ Chưa bật — chờ owner duyệt</td></tr>
+<tr><td>Nạp lại cùng dữ liệu</td><td>nhân đôi, phải tự để ý</td>
+    <td class="w"><b>0 dòng nhân đôi</b>, nhận ra bằng nội dung dòng</td></tr>
+<tr><td>Dòng hỏng</td><td>rơi im lặng hoặc nhận giá trị mặc định</td>
+    <td class="w">vào <b>hàng chờ có lý do nêu tên luật</b></td></tr>
+<tr><td>Sửa số đã nạp</td><td>gõ đè lên ô, dấu vết cũ mất</td>
+    <td class="w">thêm một bút toán, dòng gốc giữ nguyên vĩnh viễn</td></tr>
+<tr><td>Ai làm, lúc nào</td><td>biết qua Google Form ở chặng 2, ⛔ không biết ở chặng 1</td>
+    <td class="w">mọi lần nạp có mã, có người, có bản khai đã dùng</td></tr>
+</tbody></table></div></div>
+
+</div>`;
+
+/* ═══ vẽ ══════════════════════════════════════════════════════════════════ */
+let ca='bank', i=0;
+const rail=document.getElementById('rail'), host=document.getElementById('stage-host'),
+      nav=document.getElementById('nav'), pos=document.getElementById('pos');
+
+function veRail(){
+  if(ca==='flow'){ rail.innerHTML=''; rail.style.display='none'; nav.style.display='none'; return; }
+  rail.style.display='flex'; nav.style.display='flex';
+  rail.innerHTML = CA[ca].map((s,k)=>
+    `<button data-i="${k}" aria-pressed="${k===i}" class="${k<i?'seen':''}">
+       <span class="n">${s.n}</span><span class="t">${s.t}</span></button>`).join('');
+  rail.querySelectorAll('button').forEach(b=>b.onclick=()=>{i=+b.dataset.i;ve();});
+}
+
+function ve(){
+  if(ca==='flow'){ veRail();
+    host.innerHTML=`<div class="lead"><span class="st">Bản đồ</span><h2>Dòng chảy Google Sheets</h2></div>`+FLOW;
+    window.scrollTo({top:0}); return; }
+  const s=CA[ca][i];
+  const meta=o=>o.m.map(([a,b])=>`<div>${a}</div><div>${b}</div>`).join('');
+  host.innerHTML=`
+    <div class="lead"><span class="st">${s.n}</span><h2>${s.t}</h2>
+      <span class="of">${i+1} / ${CA[ca].length}</span></div>
+    <div class="duo" style="margin-top:6px">
+      <div class="side asis"><header><span class="chip sheet">AS-IS</span><h4>${s.asis.h}</h4></header>
+        <div class="body">${s.asis.b}</div><div class="meta">${meta(s.asis)}</div></div>
+      <div class="side tobe"><header><span class="chip recon">TO-BE</span><h4>${s.tobe.h}</h4></header>
+        <div class="body">${s.tobe.b}</div><div class="meta">${meta(s.tobe)}</div></div>
+    </div>
+    <div class="stage"><header>Màn FLS · ${s.stage.h}</header>
+      <div class="inner">${s.stage.inner}</div></div>`;
+  veRail();
+  pos.textContent=`Bước ${i+1} / ${CA[ca].length}`;
+  document.getElementById('prev').disabled = i===0;
+  document.getElementById('next').disabled = i===CA[ca].length-1;
+    window.scrollTo({top:0});
+}
+
+document.querySelectorAll('.cases button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('.cases button').forEach(x=>
+    x.setAttribute('aria-pressed', String(x===b)));
+  ca=b.dataset.case; i=0; ve();
+});
+document.getElementById('prev').onclick=()=>{ if(i>0){i--;ve();} };
+document.getElementById('next').onclick=()=>{ if(i<CA[ca].length-1){i++;ve();} };
+document.addEventListener('keydown',e=>{
+  if(ca==='flow') return;
+  if(e.key==='ArrowLeft'&&i>0){i--;ve();}
+  if(e.key==='ArrowRight'&&i<CA[ca].length-1){i++;ve();}
+});
+ve();
+</script>
+</body>
+</html>

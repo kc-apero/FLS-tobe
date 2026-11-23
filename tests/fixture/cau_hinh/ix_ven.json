@@ -1,0 +1,7767 @@
+{
+ "bang": "IX.VEN",
+ "khuon": "ix_ven",
+ "nguon": "GI 'Vendor & Network Mapping'!M4:S45 · OMC 'Vendor & Channel Mapping'!R4:X92 (bỏ U) · SC 'Vendor & Network Mapping'!N4:T96 (bỏ P,Q) · PS 'Vendor & Network Mapping'!M4:S138 (bỏ O,P)",
+ "cach_doc": "Sheets API v4 values.get · UNFORMATTED_VALUE · SERIAL_NUMBER · khoá SA chỉ-đọc · Block 1 M:S cột KHÔNG PII · DT9b: OMC/SC/PS đọc 19/11 cột chọn, ⛔ cột tên",
+ "ngay_dong_bang": "2026-11-19",
+ "khong_mang_PII": "⛔ KHÔNG mang cột riêng tư: máy soát 10 tên cột của bản thô với PM_COT_RIENG_TU ['Email Address'] — 0 trùng (gộp khoảng trắng, ⛔ phân biệt hoa thường). Ảnh chỉ giữ khoá `dong_sheet` + 9 cột chọn; 0 cột bản thô ⛔ chọn (tên ở `cot_khong_chon`). Bản thô qua `chuan_bi` của khuôn: 10 tên cột trên là của BẢNG khuôn dựng; soát thêm 0 tên cột của 0 bảng phụ — 0 trùng. Ô bản thô mà khuôn ⛔ mang/băm: xem `ghi_chu_khuon`.",
+ "ghi_chu_khuon": "Block 1 = 359 hàng liền *(sheet 4…362; AP ghi 36 = hàng 4–39 ⇒ errata, DT8-R1-01)* vùng M:S; MappingBlock2.gs nhân × 7 CDT1 *(C9/H9 tiêu thụ)*. Cột `cach_tinh` SUY *(⛔ đọc từ sheet)*: Network 'Max' ⇒ 'Max', ngược lại Vendor ∈ ['VD341', 'VD428', 'VD444', 'VD62'] ⇒ chính mã, ngược lại 'thường'. 5 nhãn riêng = ['Max', 'VD341', 'VD428', 'VD444', 'VD62'] *(mong ['Max', 'VD341', 'VD428', 'VD444', 'VD62']; khác ⇒ cổng ĐỎ)*. Cột `account` = Tên tài khoản *(owner GIỮ 11/09 — chỉ 'Email Address' bị cấm)*. ⛔ mang cột ngoài M:S. DT9b: cột `so` ∈ ['GI', 'OMC', 'SC', 'PS'] — đếm DÒNG theo sổ {'GI': 42, 'OMC': 89, 'SC': 93, 'PS': 135}; khoá `dong_sheet` GI = số hàng, sổ khác = `<SO>!<hàng>`; OMC/SC/PS ⛔ đọc `account`, SC/PS ⛔ đọc `network`.",
+ "khoa": "dong_sheet",
+ "kieu_khoa": "so_dong_sheet",
+ "cot": [
+  "No",
+  "vendor",
+  "network",
+  "account",
+  "pct",
+  "cashin_month",
+  "cashin_day",
+  "cach_tinh",
+  "so"
+ ],
+ "cot_khong_chon": [],
+ "so_dong": 359,
+ "trung": [],
+ "thieu": [],
+ "lac": [
+  "Max",
+  "VD341",
+  "VD428",
+  "VD444",
+  "VD62"
+ ],
+ "khoa_hong": [],
+ "o_rong": [],
+ "cong": {
+  "mong": 359,
+  "so_dong": 359,
+  "dat": true,
+  "ly_do": []
+ },
+ "checksum_noi_dung": "0f2d9287d332d698",
+ "dong": [
+  {
+   "thu_tu": 1,
+   "dong_sheet": "4",
+   "No": "1",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "network": {
+    "chu": "Admob"
+   },
+   "account": {
+    "chu": "Admob Trananhlinh"
+   },
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "23",
+   "cach_tinh": {
+    "chu": "VD341"
+   },
+   "so": {
+    "chu": "GI"
+   }
+  },
+  {
+   "thu_tu": 2,
+   "dong_sheet": "5",
+   "No": "2",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "network": {
+    "chu": "Admob"
+   },
+   "account": {
+    "chu": "Admob TaiNguyen"
+   },
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "23",
+   "cach_tinh": {
+    "chu": "VD341"
+   },
+   "so": {
+    "chu": "GI"
+   }
+  },
+  {
+   "thu_tu": 3,
+   "dong_sheet": "6",
+   "No": "3",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "network": {
+    "chu": "Admob"
+   },
+   "account": {
+    "chu": "Sài Gòn 2 - NLXBG"
+   },
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "23",
+   "cach_tinh": {
+    "chu": "VD341"
+   },
+   "so": {
+    "chu": "GI"
+   }
+  },
+  {
+   "thu_tu": 4,
+   "dong_sheet": "7",
+   "No": "4",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "network": {
+    "chu": "Admob"
+   },
+   "account": {
+    "chu": "Admob Haicoihy"
+   },
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "23",
+   "cach_tinh": {
+    "chu": "VD341"
+   },
+   "so": {
+    "chu": "GI"
+   }
+  },
+  {
+   "thu_tu": 5,
+   "dong_sheet": "8",
+   "No": "5",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "network": {
+    "chu": "Admob"
+   },
+   "account": {
+    "chu": "Admob Game - TuanLA"
+   },
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "23",
+   "cach_tinh": {
+    "chu": "VD341"
+   },
+   "so": {
+    "chu": "GI"
+   }
+  },
+  {
+   "thu_tu": 6,
+   "dong_sheet": "9",
+   "No": "6",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "network": {
+    "chu": "Admob"
+   },
+   "account": {
+    "chu": "Admob trantiepneu 10 năm tuổi"
+   },
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "23",
+   "cach_tinh": {
+    "chu": "VD341"
+   },
+   "so": {
+    "chu": "GI"
+   }
+  },
+  {
+   "thu_tu": 7,
+   "dong_sheet": "10",
+   "No": "1",
+   "vendor": {
+    "chu": "VD57"
+   },
+   "network": {
+    "chu": "Max"
+   },
+   "account": {
+    "chu": "Max Mediation"
+   },
+   "pct": "0.08333333333333333",
+   "cashin_month": "1",
+   "cashin_day": "20",
+   "cach_tinh": {
+    "chu": "Max"
+   },
+   "so": {
+    "chu": "GI"
+   }
+  },
+  {
+   "thu_tu": 8,
+   "dong_sheet": "11",
+   "No": "1",
+   "vendor": {
+    "chu": "VD429"
+   },
+   "network": {
+    "chu": "Max"
+   },
+   "account": {
+    "chu": "Max Mediation"
+   },
+   "pct": "0.08333333333333333",
+   "cashin_month": "1",
+   "cashin_day": "20",
+   "cach_tinh": {
+    "chu": "Max"
+   },
+   "so": {
+    "chu": "GI"
+   }
+  },
+  {
+   "thu_tu": 9,
+   "dong_sheet": "12",
+   "No": "1",
+   "vendor": {
+    "chu": "VD426"
+   },
+   "network": {
+    "chu": "Max"
+   },
+   "account": {
+    "chu": "Max Mediation"
+   },
+   "pct": "0.08333333333333333",
+   "cashin_month": "1",
+   "cashin_day": "20",
+   "cach_tinh": {
+    "chu": "Max"
+   },
+   "so": {
+    "chu": "GI"
+   }
+  },
+  {
+   "thu_tu": 10,
+   "dong_sheet": "13",
+   "No": "1",
+   "vendor": {
+    "chu": "VD557"
+   },
+   "network": {
+    "chu": "Max"
+   },
+   "account": {
+    "chu": "Max Mediation"
+   },
+   "pct": "0.08333333333333333",
+   "cashin_month": "1",
+   "cashin_day": "20",
+   "cach_tinh": {
+    "chu": "Max"
+   },
+   "so": {
+    "chu": "GI"
+   }
+  },
+  {
+   "thu_tu": 11,
+   "dong_sheet": "14",
+   "No": "1",
+   "vendor": {
+    "chu": "VD111"
+   },
+   "network": {
+    "chu": "Max"
+   },
+   "account": {
+    "chu": "Max Mediation"
+   },
+   "pct": "0.08333333333333333",
+   "cashin_month": "1",
+   "cashin_day": "20",
+   "cach_tinh": {
+    "chu": "Max"
+   },
+   "so": {
+    "chu": "GI"
+   }
+  },
+  {
+   "thu_tu": 12,
+   "dong_sheet": "15",
+   "No": "1",
+   "vendor": {
+    "chu": "VD427"
+   },
+   "network": {
+    "chu": "Max"
+   },
+   "account": {
+    "chu": "Max Mediation"
+   },
+   "pct": "0.08333333333333333",
+   "cashin_month": "1",
+   "cashin_day": "20",
+   "cach_tinh": {
+    "chu": "Max"
+   },
+   "so": {
+    "chu": "GI"
+   }
+  },
+  {
+   "thu_tu": 13,
+   "dong_sheet": "16",
+   "No": "1",
+   "vendor": {
+    "chu": "VD417"
+   },
+   "network": {
+    "chu": "Max"
+   },
+   "account": {
+    "chu": "Max Mediation"
+   },
+   "pct": "0.08333333333333333",
+   "cashin_month": "1",
+   "cashin_day": "20",
+   "cach_tinh": {
+    "chu": "Max"
+   },
+   "so": {
+    "chu": "GI"
+   }
+  },
+  {
+   "thu_tu": 14,
+   "dong_sheet": "17",
+   "No": "1",
+   "vendor": {
+    "chu": "VD430"
+   },
+   "network": {
+    "chu": "Max"
+   },
+   "account": {
+    "chu": "Max Mediation"
+   },
+   "pct": "0.08333333333333333",
+   "cashin_month": "1",
+   "cashin_day": "20",
+   "cach_tinh": {
+    "chu": "Max"
+   },
+   "so": {
+    "chu": "GI"
+   }
+  },
+  {
+   "thu_tu": 15,
+   "dong_sheet": "18",
+   "No": "1",
+   "vendor": {
+    "chu": "VD63"
+   },
+   "network": {
+    "chu": "Max"
+   },
+   "account": {
+    "chu": "Max Mediation"
+   },
+   "pct": "0.08333333333333333",
+   "cashin_month": "1",
+   "cashin_day": "20",
+   "cach_tinh": {
+    "chu": "Max"
+   },
+   "so": {
+    "chu": "GI"
+   }
+  },
+  {
+   "thu_tu": 16,
+   "dong_sheet": "19",
+   "No": "1",
+   "vendor": {
+    "chu": "VD424"
+   },
+   "network": {
+    "chu": "Max"
+   },
+   "account": {
+    "chu": "Max Mediation"
+   },
+   "pct": "0.08333333333333333",
+   "cashin_month": "1",
+   "cashin_day": "20",
+   "cach_tinh": {
+    "chu": "Max"
+   },
+   "so": {
+    "chu": "GI"
+   }
+  },
+  {
+   "thu_tu": 17,
+   "dong_sheet": "20",
+   "No": "1",
+   "vendor": {
+    "chu": "VD64"
+   },
+   "network": {
+    "chu": "Max"
+   },
+   "account": {
+    "chu": "Max Mediation"
+   },
+   "pct": "0.08333333333333333",
+   "cashin_month": "1",
+   "cashin_day": "20",
+   "cach_tinh": {
+    "chu": "Max"
+   },
+   "so": {
+    "chu": "GI"
+   }
+  },
+  {
+   "thu_tu": 18,
+   "dong_sheet": "21",
+   "No": "1",
+   "vendor": {
+    "chu": "VD62"
+   },
+   "network": {
+    "chu": "Max"
+   },
+   "account": {
+    "chu": "Max Mediation"
+   },
+   "pct": "0.08333333333333333",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "Max"
+   },
+   "so": {
+    "chu": "GI"
+   }
+  },
+  {
+   "thu_tu": 19,
+   "dong_sheet": "22",
+   "No": "1",
+   "vendor": {
+    "chu": "VD428"
+   },
+   "network": {
+    "chu": "Apple_store"
+   },
+   "account": null,
+   "pct": "1",
+   "cashin_month": "2",
+   "cashin_day": "5",
+   "cach_tinh": {
+    "chu": "VD428"
+   },
+   "so": {
+    "chu": "GI"
+   }
+  },
+  {
+   "thu_tu": 20,
+   "dong_sheet": "23",
+   "No": "2",
+   "vendor": {
+    "chu": "VD428"
+   },
+   "network": {
+    "chu": "IAP_tracking"
+   },
+   "account": null,
+   "pct": "1",
+   "cashin_month": "2",
+   "cashin_day": "5",
+   "cach_tinh": {
+    "chu": "VD428"
+   },
+   "so": {
+    "chu": "GI"
+   }
+  },
+  {
+   "thu_tu": 21,
+   "dong_sheet": "24",
+   "No": "1",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "network": {
+    "chu": "Ggplay_store"
+   },
+   "account": {
+    "chu": "Apero VisionLab"
+   },
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "19",
+   "cach_tinh": {
+    "chu": "VD444"
+   },
+   "so": {
+    "chu": "GI"
+   }
+  },
+  {
+   "thu_tu": 22,
+   "dong_sheet": "25",
+   "No": "2",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "network": {
+    "chu": "Ggplay_store"
+   },
+   "account": {
+    "chu": "Trusted Office"
+   },
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "19",
+   "cach_tinh": {
+    "chu": "VD444"
+   },
+   "so": {
+    "chu": "GI"
+   }
+  },
+  {
+   "thu_tu": 23,
+   "dong_sheet": "26",
+   "No": "3",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "network": {
+    "chu": "Ggplay_store"
+   },
+   "account": {
+    "chu": "Super Minds"
+   },
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "19",
+   "cach_tinh": {
+    "chu": "VD444"
+   },
+   "so": {
+    "chu": "GI"
+   }
+  },
+  {
+   "thu_tu": 24,
+   "dong_sheet": "27",
+   "No": "4",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "network": {
+    "chu": "Ggplay_store"
+   },
+   "account": {
+    "chu": "FeaturedApp"
+   },
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "19",
+   "cach_tinh": {
+    "chu": "VD444"
+   },
+   "so": {
+    "chu": "GI"
+   }
+  },
+  {
+   "thu_tu": 25,
+   "dong_sheet": "28",
+   "No": "5",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "network": {
+    "chu": "Ggplay_store"
+   },
+   "account": {
+    "chu": "Terasoft"
+   },
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "19",
+   "cach_tinh": {
+    "chu": "VD444"
+   },
+   "so": {
+    "chu": "GI"
+   }
+  },
+  {
+   "thu_tu": 26,
+   "dong_sheet": "29",
+   "No": "6",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "network": {
+    "chu": "Ggplay_store"
+   },
+   "account": {
+    "chu": "NLX AI Solutions"
+   },
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "19",
+   "cach_tinh": {
+    "chu": "VD444"
+   },
+   "so": {
+    "chu": "GI"
+   }
+  },
+  {
+   "thu_tu": 27,
+   "dong_sheet": "30",
+   "No": "7",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "network": {
+    "chu": "Ggplay_store"
+   },
+   "account": {
+    "chu": "Astronex"
+   },
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "19",
+   "cach_tinh": {
+    "chu": "VD444"
+   },
+   "so": {
+    "chu": "GI"
+   }
+  },
+  {
+   "thu_tu": 28,
+   "dong_sheet": "31",
+   "No": "8",
+   "vendor": {
+    "chu": "VD444"
+   },
+   "network": {
+    "chu": "Ggplay_store"
+   },
+   "account": {
+    "chu": "Trusted App"
+   },
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "19",
+   "cach_tinh": {
+    "chu": "VD444"
+   },
+   "so": {
+    "chu": "GI"
+   }
+  },
+  {
+   "thu_tu": 29,
+   "dong_sheet": "32",
+   "No": "1",
+   "vendor": {
+    "chu": "VD336"
+   },
+   "network": null,
+   "account": null,
+   "pct": null,
+   "cashin_month": "1",
+   "cashin_day": "20",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "GI"
+   }
+  },
+  {
+   "thu_tu": 30,
+   "dong_sheet": "33",
+   "No": "1",
+   "vendor": {
+    "chu": "VD113"
+   },
+   "network": null,
+   "account": null,
+   "pct": null,
+   "cashin_month": "1",
+   "cashin_day": "20",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "GI"
+   }
+  },
+  {
+   "thu_tu": 31,
+   "dong_sheet": "34",
+   "No": "2",
+   "vendor": {
+    "chu": "VD62"
+   },
+   "network": null,
+   "account": null,
+   "pct": null,
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "VD62"
+   },
+   "so": {
+    "chu": "GI"
+   }
+  },
+  {
+   "thu_tu": 32,
+   "dong_sheet": "35",
+   "No": "1",
+   "vendor": {
+    "chu": "VD61"
+   },
+   "network": null,
+   "account": null,
+   "pct": null,
+   "cashin_month": "1",
+   "cashin_day": "19",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "GI"
+   }
+  },
+  {
+   "thu_tu": 33,
+   "dong_sheet": "36",
+   "No": "2",
+   "vendor": {
+    "chu": "VD61"
+   },
+   "network": null,
+   "account": null,
+   "pct": null,
+   "cashin_month": "1",
+   "cashin_day": "19",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "GI"
+   }
+  },
+  {
+   "thu_tu": 34,
+   "dong_sheet": "37",
+   "No": "3",
+   "vendor": {
+    "chu": "VD428"
+   },
+   "network": null,
+   "account": null,
+   "pct": null,
+   "cashin_month": "2",
+   "cashin_day": "5",
+   "cach_tinh": {
+    "chu": "VD428"
+   },
+   "so": {
+    "chu": "GI"
+   }
+  },
+  {
+   "thu_tu": 35,
+   "dong_sheet": "38",
+   "No": "2",
+   "vendor": {
+    "chu": "VD57"
+   },
+   "network": null,
+   "account": null,
+   "pct": null,
+   "cashin_month": "1",
+   "cashin_day": "20",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "GI"
+   }
+  },
+  {
+   "thu_tu": 36,
+   "dong_sheet": "39",
+   "No": "1",
+   "vendor": {
+    "chu": "VD58"
+   },
+   "network": null,
+   "account": null,
+   "pct": null,
+   "cashin_month": "1",
+   "cashin_day": "20",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "GI"
+   }
+  },
+  {
+   "thu_tu": 37,
+   "dong_sheet": "40",
+   "No": "7",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "network": null,
+   "account": null,
+   "pct": null,
+   "cashin_month": "1",
+   "cashin_day": "23",
+   "cach_tinh": {
+    "chu": "VD341"
+   },
+   "so": {
+    "chu": "GI"
+   }
+  },
+  {
+   "thu_tu": 38,
+   "dong_sheet": "41",
+   "No": "8",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "network": null,
+   "account": null,
+   "pct": null,
+   "cashin_month": "1",
+   "cashin_day": "23",
+   "cach_tinh": {
+    "chu": "VD341"
+   },
+   "so": {
+    "chu": "GI"
+   }
+  },
+  {
+   "thu_tu": 39,
+   "dong_sheet": "42",
+   "No": "9",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "network": null,
+   "account": null,
+   "pct": null,
+   "cashin_month": "1",
+   "cashin_day": "23",
+   "cach_tinh": {
+    "chu": "VD341"
+   },
+   "so": {
+    "chu": "GI"
+   }
+  },
+  {
+   "thu_tu": 40,
+   "dong_sheet": "43",
+   "No": "10",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "network": null,
+   "account": null,
+   "pct": null,
+   "cashin_month": "1",
+   "cashin_day": "23",
+   "cach_tinh": {
+    "chu": "VD341"
+   },
+   "so": {
+    "chu": "GI"
+   }
+  },
+  {
+   "thu_tu": 41,
+   "dong_sheet": "44",
+   "No": "11",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "network": null,
+   "account": null,
+   "pct": null,
+   "cashin_month": "1",
+   "cashin_day": "23",
+   "cach_tinh": {
+    "chu": "VD341"
+   },
+   "so": {
+    "chu": "GI"
+   }
+  },
+  {
+   "thu_tu": 42,
+   "dong_sheet": "45",
+   "No": "12",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "network": null,
+   "account": null,
+   "pct": null,
+   "cashin_month": "1",
+   "cashin_day": "23",
+   "cach_tinh": {
+    "chu": "VD341"
+   },
+   "so": {
+    "chu": "GI"
+   }
+  },
+  {
+   "thu_tu": 43,
+   "dong_sheet": {
+    "chu": "OMC!4"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD59"
+   },
+   "network": {
+    "chu": "Applovin"
+   },
+   "account": null,
+   "pct": "0.3333333333333333",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 44,
+   "dong_sheet": {
+    "chu": "OMC!5"
+   },
+   "No": "2",
+   "vendor": {
+    "chu": "VD59"
+   },
+   "network": {
+    "chu": "Applovin"
+   },
+   "account": null,
+   "pct": "0.3333333333333333",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 45,
+   "dong_sheet": {
+    "chu": "OMC!6"
+   },
+   "No": "3",
+   "vendor": {
+    "chu": "VD59"
+   },
+   "network": {
+    "chu": "Applovin"
+   },
+   "account": null,
+   "pct": "0.3333333333333333",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 46,
+   "dong_sheet": {
+    "chu": "OMC!7"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD61"
+   },
+   "network": {
+    "chu": "GoogleAds"
+   },
+   "account": null,
+   "pct": "0.16666666666666666",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 47,
+   "dong_sheet": {
+    "chu": "OMC!8"
+   },
+   "No": "2",
+   "vendor": {
+    "chu": "VD61"
+   },
+   "network": {
+    "chu": "GoogleAds"
+   },
+   "account": null,
+   "pct": "0.16666666666666666",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 48,
+   "dong_sheet": {
+    "chu": "OMC!9"
+   },
+   "No": "3",
+   "vendor": {
+    "chu": "VD61"
+   },
+   "network": {
+    "chu": "GoogleAds"
+   },
+   "account": null,
+   "pct": "0.16666666666666666",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 49,
+   "dong_sheet": {
+    "chu": "OMC!10"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "network": {
+    "chu": "GoogleAds"
+   },
+   "account": null,
+   "pct": "0.16666666666666666",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "VD341"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 50,
+   "dong_sheet": {
+    "chu": "OMC!11"
+   },
+   "No": "2",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "network": {
+    "chu": "GoogleAds"
+   },
+   "account": null,
+   "pct": "0.16666666666666666",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "VD341"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 51,
+   "dong_sheet": {
+    "chu": "OMC!12"
+   },
+   "No": "3",
+   "vendor": {
+    "chu": "VD341"
+   },
+   "network": {
+    "chu": "GoogleAds"
+   },
+   "account": null,
+   "pct": "0.16666666666666666",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "VD341"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 52,
+   "dong_sheet": {
+    "chu": "OMC!13"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD654"
+   },
+   "network": {
+    "chu": "Facebook"
+   },
+   "account": null,
+   "pct": "0.1",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 53,
+   "dong_sheet": {
+    "chu": "OMC!14"
+   },
+   "No": "2",
+   "vendor": {
+    "chu": "VD654"
+   },
+   "network": {
+    "chu": "Facebook"
+   },
+   "account": null,
+   "pct": "0.1",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 54,
+   "dong_sheet": {
+    "chu": "OMC!15"
+   },
+   "No": "3",
+   "vendor": {
+    "chu": "VD654"
+   },
+   "network": {
+    "chu": "Facebook"
+   },
+   "account": null,
+   "pct": "0.1",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 55,
+   "dong_sheet": {
+    "chu": "OMC!16"
+   },
+   "No": "4",
+   "vendor": {
+    "chu": "VD654"
+   },
+   "network": {
+    "chu": "Facebook"
+   },
+   "account": null,
+   "pct": "0.1",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 56,
+   "dong_sheet": {
+    "chu": "OMC!17"
+   },
+   "No": "5",
+   "vendor": {
+    "chu": "VD654"
+   },
+   "network": {
+    "chu": "Facebook"
+   },
+   "account": null,
+   "pct": "0.1",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 57,
+   "dong_sheet": {
+    "chu": "OMC!18"
+   },
+   "No": "6",
+   "vendor": {
+    "chu": "VD654"
+   },
+   "network": {
+    "chu": "Facebook"
+   },
+   "account": null,
+   "pct": "0.1",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 58,
+   "dong_sheet": {
+    "chu": "OMC!19"
+   },
+   "No": "7",
+   "vendor": {
+    "chu": "VD654"
+   },
+   "network": {
+    "chu": "Facebook"
+   },
+   "account": null,
+   "pct": "0.1",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 59,
+   "dong_sheet": {
+    "chu": "OMC!20"
+   },
+   "No": "8",
+   "vendor": {
+    "chu": "VD654"
+   },
+   "network": {
+    "chu": "Facebook"
+   },
+   "account": null,
+   "pct": "0.1",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 60,
+   "dong_sheet": {
+    "chu": "OMC!21"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD62"
+   },
+   "network": {
+    "chu": "Facebook"
+   },
+   "account": null,
+   "pct": "0.1",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "VD62"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 61,
+   "dong_sheet": {
+    "chu": "OMC!22"
+   },
+   "No": "2",
+   "vendor": {
+    "chu": "VD62"
+   },
+   "network": {
+    "chu": "Facebook"
+   },
+   "account": null,
+   "pct": "0.1",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "VD62"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 62,
+   "dong_sheet": {
+    "chu": "OMC!23"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD109"
+   },
+   "network": {
+    "chu": "Mintegral"
+   },
+   "account": null,
+   "pct": "0.125",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 63,
+   "dong_sheet": {
+    "chu": "OMC!24"
+   },
+   "No": "2",
+   "vendor": {
+    "chu": "VD109"
+   },
+   "network": {
+    "chu": "Mintegral"
+   },
+   "account": null,
+   "pct": "0.125",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 64,
+   "dong_sheet": {
+    "chu": "OMC!25"
+   },
+   "No": "3",
+   "vendor": {
+    "chu": "VD109"
+   },
+   "network": {
+    "chu": "Mintegral"
+   },
+   "account": null,
+   "pct": "0.125",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 65,
+   "dong_sheet": {
+    "chu": "OMC!26"
+   },
+   "No": "4",
+   "vendor": {
+    "chu": "VD109"
+   },
+   "network": {
+    "chu": "Mintegral"
+   },
+   "account": null,
+   "pct": "0.125",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 66,
+   "dong_sheet": {
+    "chu": "OMC!27"
+   },
+   "No": "5",
+   "vendor": {
+    "chu": "VD109"
+   },
+   "network": {
+    "chu": "Mintegral"
+   },
+   "account": null,
+   "pct": "0.125",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 67,
+   "dong_sheet": {
+    "chu": "OMC!28"
+   },
+   "No": "6",
+   "vendor": {
+    "chu": "VD109"
+   },
+   "network": {
+    "chu": "Mintegral"
+   },
+   "account": null,
+   "pct": "0.125",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 68,
+   "dong_sheet": {
+    "chu": "OMC!29"
+   },
+   "No": "7",
+   "vendor": {
+    "chu": "VD109"
+   },
+   "network": {
+    "chu": "Mintegral"
+   },
+   "account": null,
+   "pct": "0.125",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 69,
+   "dong_sheet": {
+    "chu": "OMC!30"
+   },
+   "No": "8",
+   "vendor": {
+    "chu": "VD109"
+   },
+   "network": {
+    "chu": "Mintegral"
+   },
+   "account": null,
+   "pct": "0.125",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 70,
+   "dong_sheet": {
+    "chu": "OMC!31"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD537"
+   },
+   "network": null,
+   "account": null,
+   "pct": "0.5",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 71,
+   "dong_sheet": {
+    "chu": "OMC!32"
+   },
+   "No": "2",
+   "vendor": {
+    "chu": "VD537"
+   },
+   "network": null,
+   "account": null,
+   "pct": "0.5",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 72,
+   "dong_sheet": {
+    "chu": "OMC!33"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD111"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 73,
+   "dong_sheet": {
+    "chu": "OMC!34"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD113"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 74,
+   "dong_sheet": {
+    "chu": "OMC!35"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD60"
+   },
+   "network": {
+    "chu": "Nativex"
+   },
+   "account": null,
+   "pct": "0.5",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 75,
+   "dong_sheet": {
+    "chu": "OMC!36"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD754"
+   },
+   "network": {
+    "chu": "Nativex"
+   },
+   "account": null,
+   "pct": "0.5",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 76,
+   "dong_sheet": {
+    "chu": "OMC!37"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD512"
+   },
+   "network": {
+    "chu": "Mobikok"
+   },
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 77,
+   "dong_sheet": {
+    "chu": "OMC!38"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": {
+    "chu": "Kwai"
+   },
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 78,
+   "dong_sheet": {
+    "chu": "OMC!39"
+   },
+   "No": "2",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": {
+    "chu": "TapJoy"
+   },
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 79,
+   "dong_sheet": {
+    "chu": "OMC!40"
+   },
+   "No": "3",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": {
+    "chu": "Pubscale"
+   },
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 80,
+   "dong_sheet": {
+    "chu": "OMC!41"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD56"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 81,
+   "dong_sheet": {
+    "chu": "OMC!42"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD428"
+   },
+   "network": null,
+   "account": null,
+   "pct": "0.5",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "VD428"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 82,
+   "dong_sheet": {
+    "chu": "OMC!43"
+   },
+   "No": "2",
+   "vendor": {
+    "chu": "VD428"
+   },
+   "network": null,
+   "account": null,
+   "pct": "0.5",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "VD428"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 83,
+   "dong_sheet": {
+    "chu": "OMC!44"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD99"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 84,
+   "dong_sheet": {
+    "chu": "OMC!45"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD110"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 85,
+   "dong_sheet": {
+    "chu": "OMC!46"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD63"
+   },
+   "network": {
+    "chu": "Bigo"
+   },
+   "account": null,
+   "pct": "0.5",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 86,
+   "dong_sheet": {
+    "chu": "OMC!47"
+   },
+   "No": "2",
+   "vendor": {
+    "chu": "VD63"
+   },
+   "network": {
+    "chu": "Bigo"
+   },
+   "account": null,
+   "pct": "0.5",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 87,
+   "dong_sheet": {
+    "chu": "OMC!48"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD108"
+   },
+   "network": {
+    "chu": "Apple Search Ads"
+   },
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 88,
+   "dong_sheet": {
+    "chu": "OMC!49"
+   },
+   "No": "2",
+   "vendor": {
+    "chu": "VD108"
+   },
+   "network": {
+    "chu": "Apple Search Ads Basic"
+   },
+   "account": null,
+   "pct": "0.030303030303030304",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 89,
+   "dong_sheet": {
+    "chu": "OMC!50"
+   },
+   "No": "3",
+   "vendor": {
+    "chu": "VD108"
+   },
+   "network": {
+    "chu": "Apple Search Ads Basic"
+   },
+   "account": null,
+   "pct": "0.030303030303030304",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 90,
+   "dong_sheet": {
+    "chu": "OMC!51"
+   },
+   "No": "4",
+   "vendor": {
+    "chu": "VD108"
+   },
+   "network": {
+    "chu": "Apple Search Ads Basic"
+   },
+   "account": null,
+   "pct": "0.030303030303030304",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 91,
+   "dong_sheet": {
+    "chu": "OMC!52"
+   },
+   "No": "5",
+   "vendor": {
+    "chu": "VD108"
+   },
+   "network": {
+    "chu": "Apple Search Ads Basic"
+   },
+   "account": null,
+   "pct": "0.030303030303030304",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 92,
+   "dong_sheet": {
+    "chu": "OMC!53"
+   },
+   "No": "6",
+   "vendor": {
+    "chu": "VD108"
+   },
+   "network": {
+    "chu": "Apple Search Ads Basic"
+   },
+   "account": null,
+   "pct": "0.030303030303030304",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 93,
+   "dong_sheet": {
+    "chu": "OMC!54"
+   },
+   "No": "7",
+   "vendor": {
+    "chu": "VD108"
+   },
+   "network": {
+    "chu": "Apple Search Ads Basic"
+   },
+   "account": null,
+   "pct": "0.030303030303030304",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 94,
+   "dong_sheet": {
+    "chu": "OMC!55"
+   },
+   "No": "8",
+   "vendor": {
+    "chu": "VD108"
+   },
+   "network": {
+    "chu": "Apple Search Ads Basic"
+   },
+   "account": null,
+   "pct": "0.030303030303030304",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 95,
+   "dong_sheet": {
+    "chu": "OMC!56"
+   },
+   "No": "9",
+   "vendor": {
+    "chu": "VD108"
+   },
+   "network": {
+    "chu": "Apple Search Ads Basic"
+   },
+   "account": null,
+   "pct": "0.030303030303030304",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 96,
+   "dong_sheet": {
+    "chu": "OMC!57"
+   },
+   "No": "10",
+   "vendor": {
+    "chu": "VD108"
+   },
+   "network": {
+    "chu": "Apple Search Ads Basic"
+   },
+   "account": null,
+   "pct": "0.030303030303030304",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 97,
+   "dong_sheet": {
+    "chu": "OMC!58"
+   },
+   "No": "11",
+   "vendor": {
+    "chu": "VD108"
+   },
+   "network": {
+    "chu": "Apple Search Ads Basic"
+   },
+   "account": null,
+   "pct": "0.030303030303030304",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 98,
+   "dong_sheet": {
+    "chu": "OMC!59"
+   },
+   "No": "12",
+   "vendor": {
+    "chu": "VD108"
+   },
+   "network": {
+    "chu": "Apple Search Ads Basic"
+   },
+   "account": null,
+   "pct": "0.030303030303030304",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 99,
+   "dong_sheet": {
+    "chu": "OMC!60"
+   },
+   "No": "13",
+   "vendor": {
+    "chu": "VD108"
+   },
+   "network": {
+    "chu": "Apple Search Ads Basic"
+   },
+   "account": null,
+   "pct": "0.030303030303030304",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 100,
+   "dong_sheet": {
+    "chu": "OMC!61"
+   },
+   "No": "14",
+   "vendor": {
+    "chu": "VD108"
+   },
+   "network": {
+    "chu": "Apple Search Ads Basic"
+   },
+   "account": null,
+   "pct": "0.030303030303030304",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 101,
+   "dong_sheet": {
+    "chu": "OMC!62"
+   },
+   "No": "15",
+   "vendor": {
+    "chu": "VD108"
+   },
+   "network": {
+    "chu": "Apple Search Ads Basic"
+   },
+   "account": null,
+   "pct": "0.030303030303030304",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 102,
+   "dong_sheet": {
+    "chu": "OMC!63"
+   },
+   "No": "16",
+   "vendor": {
+    "chu": "VD108"
+   },
+   "network": {
+    "chu": "Apple Search Ads Basic"
+   },
+   "account": null,
+   "pct": "0.030303030303030304",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 103,
+   "dong_sheet": {
+    "chu": "OMC!64"
+   },
+   "No": "17",
+   "vendor": {
+    "chu": "VD108"
+   },
+   "network": {
+    "chu": "Apple Search Ads Basic"
+   },
+   "account": null,
+   "pct": "0.030303030303030304",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 104,
+   "dong_sheet": {
+    "chu": "OMC!65"
+   },
+   "No": "18",
+   "vendor": {
+    "chu": "VD108"
+   },
+   "network": {
+    "chu": "Apple Search Ads Basic"
+   },
+   "account": null,
+   "pct": "0.030303030303030304",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 105,
+   "dong_sheet": {
+    "chu": "OMC!66"
+   },
+   "No": "19",
+   "vendor": {
+    "chu": "VD108"
+   },
+   "network": {
+    "chu": "Apple Search Ads Basic"
+   },
+   "account": null,
+   "pct": "0.030303030303030304",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 106,
+   "dong_sheet": {
+    "chu": "OMC!67"
+   },
+   "No": "20",
+   "vendor": {
+    "chu": "VD108"
+   },
+   "network": {
+    "chu": "Apple Search Ads Basic"
+   },
+   "account": null,
+   "pct": "0.030303030303030304",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 107,
+   "dong_sheet": {
+    "chu": "OMC!68"
+   },
+   "No": "21",
+   "vendor": {
+    "chu": "VD108"
+   },
+   "network": {
+    "chu": "Apple Search Ads Basic"
+   },
+   "account": null,
+   "pct": "0.030303030303030304",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 108,
+   "dong_sheet": {
+    "chu": "OMC!69"
+   },
+   "No": "22",
+   "vendor": {
+    "chu": "VD108"
+   },
+   "network": {
+    "chu": "Apple Search Ads Basic"
+   },
+   "account": null,
+   "pct": "0.030303030303030304",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 109,
+   "dong_sheet": {
+    "chu": "OMC!70"
+   },
+   "No": "23",
+   "vendor": {
+    "chu": "VD108"
+   },
+   "network": {
+    "chu": "Apple Search Ads Basic"
+   },
+   "account": null,
+   "pct": "0.030303030303030304",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 110,
+   "dong_sheet": {
+    "chu": "OMC!71"
+   },
+   "No": "24",
+   "vendor": {
+    "chu": "VD108"
+   },
+   "network": {
+    "chu": "Apple Search Ads Basic"
+   },
+   "account": null,
+   "pct": "0.030303030303030304",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 111,
+   "dong_sheet": {
+    "chu": "OMC!72"
+   },
+   "No": "25",
+   "vendor": {
+    "chu": "VD108"
+   },
+   "network": {
+    "chu": "Apple Search Ads Basic"
+   },
+   "account": null,
+   "pct": "0.030303030303030304",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 112,
+   "dong_sheet": {
+    "chu": "OMC!73"
+   },
+   "No": "26",
+   "vendor": {
+    "chu": "VD108"
+   },
+   "network": {
+    "chu": "Apple Search Ads Basic"
+   },
+   "account": null,
+   "pct": "0.030303030303030304",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 113,
+   "dong_sheet": {
+    "chu": "OMC!74"
+   },
+   "No": "27",
+   "vendor": {
+    "chu": "VD108"
+   },
+   "network": {
+    "chu": "Apple Search Ads Basic"
+   },
+   "account": null,
+   "pct": "0.030303030303030304",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 114,
+   "dong_sheet": {
+    "chu": "OMC!75"
+   },
+   "No": "28",
+   "vendor": {
+    "chu": "VD108"
+   },
+   "network": {
+    "chu": "Apple Search Ads Basic"
+   },
+   "account": null,
+   "pct": "0.030303030303030304",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 115,
+   "dong_sheet": {
+    "chu": "OMC!76"
+   },
+   "No": "29",
+   "vendor": {
+    "chu": "VD108"
+   },
+   "network": {
+    "chu": "Apple Search Ads Basic"
+   },
+   "account": null,
+   "pct": "0.030303030303030304",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 116,
+   "dong_sheet": {
+    "chu": "OMC!77"
+   },
+   "No": "30",
+   "vendor": {
+    "chu": "VD108"
+   },
+   "network": {
+    "chu": "Apple Search Ads Basic"
+   },
+   "account": null,
+   "pct": "0.030303030303030304",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 117,
+   "dong_sheet": {
+    "chu": "OMC!78"
+   },
+   "No": "31",
+   "vendor": {
+    "chu": "VD108"
+   },
+   "network": {
+    "chu": "Apple Search Ads Basic"
+   },
+   "account": null,
+   "pct": "0.030303030303030304",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 118,
+   "dong_sheet": {
+    "chu": "OMC!79"
+   },
+   "No": "32",
+   "vendor": {
+    "chu": "VD108"
+   },
+   "network": {
+    "chu": "Apple Search Ads Basic"
+   },
+   "account": null,
+   "pct": "0.030303030303030304",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 119,
+   "dong_sheet": {
+    "chu": "OMC!80"
+   },
+   "No": "33",
+   "vendor": {
+    "chu": "VD108"
+   },
+   "network": {
+    "chu": "Apple Search Ads Basic"
+   },
+   "account": null,
+   "pct": "0.030303030303030304",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 120,
+   "dong_sheet": {
+    "chu": "OMC!81"
+   },
+   "No": "34",
+   "vendor": {
+    "chu": "VD108"
+   },
+   "network": {
+    "chu": "Apple Search Ads Basic"
+   },
+   "account": null,
+   "pct": "0.030303030303030304",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 121,
+   "dong_sheet": {
+    "chu": "OMC!82"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD57"
+   },
+   "network": {
+    "chu": "Unity"
+   },
+   "account": null,
+   "pct": "0.2",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 122,
+   "dong_sheet": {
+    "chu": "OMC!83"
+   },
+   "No": "2",
+   "vendor": {
+    "chu": "VD57"
+   },
+   "network": {
+    "chu": "Unity"
+   },
+   "account": null,
+   "pct": "0.2",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 123,
+   "dong_sheet": {
+    "chu": "OMC!84"
+   },
+   "No": "3",
+   "vendor": {
+    "chu": "VD57"
+   },
+   "network": {
+    "chu": "Unity"
+   },
+   "account": null,
+   "pct": "0.2",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 124,
+   "dong_sheet": {
+    "chu": "OMC!85"
+   },
+   "No": "4",
+   "vendor": {
+    "chu": "VD57"
+   },
+   "network": {
+    "chu": "Unity"
+   },
+   "account": null,
+   "pct": "0.2",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 125,
+   "dong_sheet": {
+    "chu": "OMC!86"
+   },
+   "No": "5",
+   "vendor": {
+    "chu": "VD57"
+   },
+   "network": {
+    "chu": "Unity"
+   },
+   "account": null,
+   "pct": "0.2",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 126,
+   "dong_sheet": {
+    "chu": "OMC!87"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD58"
+   },
+   "network": {
+    "chu": "Tiktok"
+   },
+   "account": null,
+   "pct": "0.16666666666666666",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 127,
+   "dong_sheet": {
+    "chu": "OMC!88"
+   },
+   "No": "2",
+   "vendor": {
+    "chu": "VD58"
+   },
+   "network": {
+    "chu": "Tiktok"
+   },
+   "account": null,
+   "pct": "0.16666666666666666",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 128,
+   "dong_sheet": {
+    "chu": "OMC!89"
+   },
+   "No": "3",
+   "vendor": {
+    "chu": "VD58"
+   },
+   "network": {
+    "chu": "Tiktok"
+   },
+   "account": null,
+   "pct": "0.16666666666666666",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 129,
+   "dong_sheet": {
+    "chu": "OMC!90"
+   },
+   "No": "4",
+   "vendor": {
+    "chu": "VD58"
+   },
+   "network": {
+    "chu": "Tiktok"
+   },
+   "account": null,
+   "pct": "0.16666666666666666",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 130,
+   "dong_sheet": {
+    "chu": "OMC!91"
+   },
+   "No": "5",
+   "vendor": {
+    "chu": "VD58"
+   },
+   "network": {
+    "chu": "Tiktok"
+   },
+   "account": null,
+   "pct": "0.16666666666666666",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 131,
+   "dong_sheet": {
+    "chu": "OMC!92"
+   },
+   "No": "6",
+   "vendor": {
+    "chu": "VD58"
+   },
+   "network": {
+    "chu": "Tiktok"
+   },
+   "account": null,
+   "pct": "0.16666666666666666",
+   "cashin_month": "1",
+   "cashin_day": "25",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "OMC"
+   }
+  },
+  {
+   "thu_tu": 132,
+   "dong_sheet": {
+    "chu": "SC!4"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD54"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 133,
+   "dong_sheet": {
+    "chu": "SC!5"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD55"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 134,
+   "dong_sheet": {
+    "chu": "SC!6"
+   },
+   "No": "2",
+   "vendor": {
+    "chu": "VD55"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 135,
+   "dong_sheet": {
+    "chu": "SC!7"
+   },
+   "No": "3",
+   "vendor": {
+    "chu": "VD55"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 136,
+   "dong_sheet": {
+    "chu": "SC!8"
+   },
+   "No": "4",
+   "vendor": {
+    "chu": "VD55"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 137,
+   "dong_sheet": {
+    "chu": "SC!9"
+   },
+   "No": "5",
+   "vendor": {
+    "chu": "VD55"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 138,
+   "dong_sheet": {
+    "chu": "SC!10"
+   },
+   "No": "6",
+   "vendor": {
+    "chu": "VD55"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 139,
+   "dong_sheet": {
+    "chu": "SC!11"
+   },
+   "No": "7",
+   "vendor": {
+    "chu": "VD55"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 140,
+   "dong_sheet": {
+    "chu": "SC!12"
+   },
+   "No": "8",
+   "vendor": {
+    "chu": "VD55"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 141,
+   "dong_sheet": {
+    "chu": "SC!13"
+   },
+   "No": "9",
+   "vendor": {
+    "chu": "VD55"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 142,
+   "dong_sheet": {
+    "chu": "SC!14"
+   },
+   "No": "10",
+   "vendor": {
+    "chu": "VD55"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 143,
+   "dong_sheet": {
+    "chu": "SC!15"
+   },
+   "No": "11",
+   "vendor": {
+    "chu": "VD55"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 144,
+   "dong_sheet": {
+    "chu": "SC!16"
+   },
+   "No": "12",
+   "vendor": {
+    "chu": "VD55"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 145,
+   "dong_sheet": {
+    "chu": "SC!17"
+   },
+   "No": "13",
+   "vendor": {
+    "chu": "VD55"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 146,
+   "dong_sheet": {
+    "chu": "SC!18"
+   },
+   "No": "14",
+   "vendor": {
+    "chu": "VD55"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 147,
+   "dong_sheet": {
+    "chu": "SC!19"
+   },
+   "No": "15",
+   "vendor": {
+    "chu": "VD55"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 148,
+   "dong_sheet": {
+    "chu": "SC!20"
+   },
+   "No": "16",
+   "vendor": {
+    "chu": "VD55"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 149,
+   "dong_sheet": {
+    "chu": "SC!21"
+   },
+   "No": "17",
+   "vendor": {
+    "chu": "VD55"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 150,
+   "dong_sheet": {
+    "chu": "SC!22"
+   },
+   "No": "18",
+   "vendor": {
+    "chu": "VD55"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 151,
+   "dong_sheet": {
+    "chu": "SC!23"
+   },
+   "No": "19",
+   "vendor": {
+    "chu": "VD55"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 152,
+   "dong_sheet": {
+    "chu": "SC!24"
+   },
+   "No": "20",
+   "vendor": {
+    "chu": "VD55"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 153,
+   "dong_sheet": {
+    "chu": "SC!25"
+   },
+   "No": "21",
+   "vendor": {
+    "chu": "VD55"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 154,
+   "dong_sheet": {
+    "chu": "SC!26"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD61"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 155,
+   "dong_sheet": {
+    "chu": "SC!27"
+   },
+   "No": "2",
+   "vendor": {
+    "chu": "VD61"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 156,
+   "dong_sheet": {
+    "chu": "SC!28"
+   },
+   "No": "3",
+   "vendor": {
+    "chu": "VD61"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 157,
+   "dong_sheet": {
+    "chu": "SC!29"
+   },
+   "No": "4",
+   "vendor": {
+    "chu": "VD61"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 158,
+   "dong_sheet": {
+    "chu": "SC!30"
+   },
+   "No": "5",
+   "vendor": {
+    "chu": "VD61"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 159,
+   "dong_sheet": {
+    "chu": "SC!31"
+   },
+   "No": "6",
+   "vendor": {
+    "chu": "VD61"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 160,
+   "dong_sheet": {
+    "chu": "SC!32"
+   },
+   "No": "7",
+   "vendor": {
+    "chu": "VD61"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 161,
+   "dong_sheet": {
+    "chu": "SC!33"
+   },
+   "No": "8",
+   "vendor": {
+    "chu": "VD61"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 162,
+   "dong_sheet": {
+    "chu": "SC!34"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD17"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 163,
+   "dong_sheet": {
+    "chu": "SC!35"
+   },
+   "No": "2",
+   "vendor": {
+    "chu": "VD17"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 164,
+   "dong_sheet": {
+    "chu": "SC!36"
+   },
+   "No": "3",
+   "vendor": {
+    "chu": "VD17"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 165,
+   "dong_sheet": {
+    "chu": "SC!37"
+   },
+   "No": "4",
+   "vendor": {
+    "chu": "VD17"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 166,
+   "dong_sheet": {
+    "chu": "SC!38"
+   },
+   "No": "5",
+   "vendor": {
+    "chu": "VD17"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 167,
+   "dong_sheet": {
+    "chu": "SC!39"
+   },
+   "No": "6",
+   "vendor": {
+    "chu": "VD17"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 168,
+   "dong_sheet": {
+    "chu": "SC!40"
+   },
+   "No": "7",
+   "vendor": {
+    "chu": "VD17"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 169,
+   "dong_sheet": {
+    "chu": "SC!41"
+   },
+   "No": "8",
+   "vendor": {
+    "chu": "VD17"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 170,
+   "dong_sheet": {
+    "chu": "SC!42"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD120"
+   },
+   "network": null,
+   "account": null,
+   "pct": "0.1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 171,
+   "dong_sheet": {
+    "chu": "SC!43"
+   },
+   "No": "2",
+   "vendor": {
+    "chu": "VD120"
+   },
+   "network": null,
+   "account": null,
+   "pct": "0.1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 172,
+   "dong_sheet": {
+    "chu": "SC!44"
+   },
+   "No": "3",
+   "vendor": {
+    "chu": "VD120"
+   },
+   "network": null,
+   "account": null,
+   "pct": "0.1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 173,
+   "dong_sheet": {
+    "chu": "SC!45"
+   },
+   "No": "4",
+   "vendor": {
+    "chu": "VD120"
+   },
+   "network": null,
+   "account": null,
+   "pct": "0.1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 174,
+   "dong_sheet": {
+    "chu": "SC!46"
+   },
+   "No": "5",
+   "vendor": {
+    "chu": "VD120"
+   },
+   "network": null,
+   "account": null,
+   "pct": "0.1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 175,
+   "dong_sheet": {
+    "chu": "SC!47"
+   },
+   "No": "6",
+   "vendor": {
+    "chu": "VD120"
+   },
+   "network": null,
+   "account": null,
+   "pct": "0.1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 176,
+   "dong_sheet": {
+    "chu": "SC!48"
+   },
+   "No": "7",
+   "vendor": {
+    "chu": "VD120"
+   },
+   "network": null,
+   "account": null,
+   "pct": "0.1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 177,
+   "dong_sheet": {
+    "chu": "SC!49"
+   },
+   "No": "8",
+   "vendor": {
+    "chu": "VD120"
+   },
+   "network": null,
+   "account": null,
+   "pct": "0.1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 178,
+   "dong_sheet": {
+    "chu": "SC!50"
+   },
+   "No": "9",
+   "vendor": {
+    "chu": "VD120"
+   },
+   "network": null,
+   "account": null,
+   "pct": "0.1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 179,
+   "dong_sheet": {
+    "chu": "SC!51"
+   },
+   "No": "10",
+   "vendor": {
+    "chu": "VD120"
+   },
+   "network": null,
+   "account": null,
+   "pct": "0.1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 180,
+   "dong_sheet": {
+    "chu": "SC!52"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD717"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 181,
+   "dong_sheet": {
+    "chu": "SC!53"
+   },
+   "No": "2",
+   "vendor": {
+    "chu": "VD717"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 182,
+   "dong_sheet": {
+    "chu": "SC!54"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD70"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 183,
+   "dong_sheet": {
+    "chu": "SC!55"
+   },
+   "No": "2",
+   "vendor": {
+    "chu": "VD70"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 184,
+   "dong_sheet": {
+    "chu": "SC!56"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD529"
+   },
+   "network": null,
+   "account": null,
+   "pct": "0.05",
+   "cashin_month": "0",
+   "cashin_day": "2",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 185,
+   "dong_sheet": {
+    "chu": "SC!57"
+   },
+   "No": "2",
+   "vendor": {
+    "chu": "VD529"
+   },
+   "network": null,
+   "account": null,
+   "pct": "0.05",
+   "cashin_month": "0",
+   "cashin_day": "2",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 186,
+   "dong_sheet": {
+    "chu": "SC!58"
+   },
+   "No": "3",
+   "vendor": {
+    "chu": "VD529"
+   },
+   "network": null,
+   "account": null,
+   "pct": "0.05",
+   "cashin_month": "0",
+   "cashin_day": "2",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 187,
+   "dong_sheet": {
+    "chu": "SC!59"
+   },
+   "No": "4",
+   "vendor": {
+    "chu": "VD529"
+   },
+   "network": null,
+   "account": null,
+   "pct": "0.05",
+   "cashin_month": "0",
+   "cashin_day": "2",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 188,
+   "dong_sheet": {
+    "chu": "SC!60"
+   },
+   "No": "5",
+   "vendor": {
+    "chu": "VD529"
+   },
+   "network": null,
+   "account": null,
+   "pct": "0.05",
+   "cashin_month": "0",
+   "cashin_day": "2",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 189,
+   "dong_sheet": {
+    "chu": "SC!61"
+   },
+   "No": "6",
+   "vendor": {
+    "chu": "VD529"
+   },
+   "network": null,
+   "account": null,
+   "pct": "0.05",
+   "cashin_month": "0",
+   "cashin_day": "2",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 190,
+   "dong_sheet": {
+    "chu": "SC!62"
+   },
+   "No": "7",
+   "vendor": {
+    "chu": "VD529"
+   },
+   "network": null,
+   "account": null,
+   "pct": "0.05",
+   "cashin_month": "0",
+   "cashin_day": "2",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 191,
+   "dong_sheet": {
+    "chu": "SC!63"
+   },
+   "No": "8",
+   "vendor": {
+    "chu": "VD529"
+   },
+   "network": null,
+   "account": null,
+   "pct": "0.05",
+   "cashin_month": "0",
+   "cashin_day": "2",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 192,
+   "dong_sheet": {
+    "chu": "SC!64"
+   },
+   "No": "9",
+   "vendor": {
+    "chu": "VD529"
+   },
+   "network": null,
+   "account": null,
+   "pct": "0.05",
+   "cashin_month": "0",
+   "cashin_day": "2",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 193,
+   "dong_sheet": {
+    "chu": "SC!65"
+   },
+   "No": "10",
+   "vendor": {
+    "chu": "VD529"
+   },
+   "network": null,
+   "account": null,
+   "pct": "0.05",
+   "cashin_month": "0",
+   "cashin_day": "2",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 194,
+   "dong_sheet": {
+    "chu": "SC!66"
+   },
+   "No": "11",
+   "vendor": {
+    "chu": "VD529"
+   },
+   "network": null,
+   "account": null,
+   "pct": "0.05",
+   "cashin_month": "0",
+   "cashin_day": "2",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 195,
+   "dong_sheet": {
+    "chu": "SC!67"
+   },
+   "No": "12",
+   "vendor": {
+    "chu": "VD529"
+   },
+   "network": null,
+   "account": null,
+   "pct": "0.05",
+   "cashin_month": "0",
+   "cashin_day": "2",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 196,
+   "dong_sheet": {
+    "chu": "SC!68"
+   },
+   "No": "13",
+   "vendor": {
+    "chu": "VD529"
+   },
+   "network": null,
+   "account": null,
+   "pct": "0.05",
+   "cashin_month": "0",
+   "cashin_day": "2",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 197,
+   "dong_sheet": {
+    "chu": "SC!69"
+   },
+   "No": "14",
+   "vendor": {
+    "chu": "VD529"
+   },
+   "network": null,
+   "account": null,
+   "pct": "0.05",
+   "cashin_month": "0",
+   "cashin_day": "2",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 198,
+   "dong_sheet": {
+    "chu": "SC!70"
+   },
+   "No": "15",
+   "vendor": {
+    "chu": "VD529"
+   },
+   "network": null,
+   "account": null,
+   "pct": "0.05",
+   "cashin_month": "0",
+   "cashin_day": "2",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 199,
+   "dong_sheet": {
+    "chu": "SC!71"
+   },
+   "No": "16",
+   "vendor": {
+    "chu": "VD529"
+   },
+   "network": null,
+   "account": null,
+   "pct": "0.05",
+   "cashin_month": "0",
+   "cashin_day": "2",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 200,
+   "dong_sheet": {
+    "chu": "SC!72"
+   },
+   "No": "17",
+   "vendor": {
+    "chu": "VD529"
+   },
+   "network": null,
+   "account": null,
+   "pct": "0.05",
+   "cashin_month": "0",
+   "cashin_day": "2",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 201,
+   "dong_sheet": {
+    "chu": "SC!73"
+   },
+   "No": "18",
+   "vendor": {
+    "chu": "VD529"
+   },
+   "network": null,
+   "account": null,
+   "pct": "0.05",
+   "cashin_month": "0",
+   "cashin_day": "2",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 202,
+   "dong_sheet": {
+    "chu": "SC!74"
+   },
+   "No": "19",
+   "vendor": {
+    "chu": "VD529"
+   },
+   "network": null,
+   "account": null,
+   "pct": "0.05",
+   "cashin_month": "0",
+   "cashin_day": "2",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 203,
+   "dong_sheet": {
+    "chu": "SC!75"
+   },
+   "No": "20",
+   "vendor": {
+    "chu": "VD529"
+   },
+   "network": null,
+   "account": null,
+   "pct": "0.05",
+   "cashin_month": "0",
+   "cashin_day": "2",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 204,
+   "dong_sheet": {
+    "chu": "SC!76"
+   },
+   "No": "21",
+   "vendor": {
+    "chu": "VD529"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "0",
+   "cashin_day": "2",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 205,
+   "dong_sheet": {
+    "chu": "SC!77"
+   },
+   "No": "22",
+   "vendor": {
+    "chu": "VD529"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "0",
+   "cashin_day": "2",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 206,
+   "dong_sheet": {
+    "chu": "SC!78"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD258"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 207,
+   "dong_sheet": {
+    "chu": "SC!79"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 208,
+   "dong_sheet": {
+    "chu": "SC!80"
+   },
+   "No": "2",
+   "vendor": {
+    "chu": "VD258"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 209,
+   "dong_sheet": {
+    "chu": "SC!81"
+   },
+   "No": "3",
+   "vendor": {
+    "chu": "VD258"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 210,
+   "dong_sheet": {
+    "chu": "SC!82"
+   },
+   "No": "4",
+   "vendor": {
+    "chu": "VD258"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 211,
+   "dong_sheet": {
+    "chu": "SC!83"
+   },
+   "No": "5",
+   "vendor": {
+    "chu": "VD258"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 212,
+   "dong_sheet": {
+    "chu": "SC!84"
+   },
+   "No": "9",
+   "vendor": {
+    "chu": "VD61"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 213,
+   "dong_sheet": {
+    "chu": "SC!85"
+   },
+   "No": "10",
+   "vendor": {
+    "chu": "VD61"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 214,
+   "dong_sheet": {
+    "chu": "SC!86"
+   },
+   "No": "11",
+   "vendor": {
+    "chu": "VD61"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 215,
+   "dong_sheet": {
+    "chu": "SC!87"
+   },
+   "No": "12",
+   "vendor": {
+    "chu": "VD61"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 216,
+   "dong_sheet": {
+    "chu": "SC!88"
+   },
+   "No": "13",
+   "vendor": {
+    "chu": "VD61"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 217,
+   "dong_sheet": {
+    "chu": "SC!89"
+   },
+   "No": "14",
+   "vendor": {
+    "chu": "VD61"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 218,
+   "dong_sheet": {
+    "chu": "SC!90"
+   },
+   "No": "15",
+   "vendor": {
+    "chu": "VD61"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 219,
+   "dong_sheet": {
+    "chu": "SC!91"
+   },
+   "No": "16",
+   "vendor": {
+    "chu": "VD61"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 220,
+   "dong_sheet": {
+    "chu": "SC!92"
+   },
+   "No": "17",
+   "vendor": {
+    "chu": "VD61"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 221,
+   "dong_sheet": {
+    "chu": "SC!93"
+   },
+   "No": "18",
+   "vendor": {
+    "chu": "VD61"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 222,
+   "dong_sheet": {
+    "chu": "SC!94"
+   },
+   "No": "19",
+   "vendor": {
+    "chu": "VD61"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 223,
+   "dong_sheet": {
+    "chu": "SC!95"
+   },
+   "No": "2",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 224,
+   "dong_sheet": {
+    "chu": "SC!96"
+   },
+   "No": "3",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "SC"
+   }
+  },
+  {
+   "thu_tu": 225,
+   "dong_sheet": {
+    "chu": "PS!4"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD73"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 226,
+   "dong_sheet": {
+    "chu": "PS!5"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD74"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 227,
+   "dong_sheet": {
+    "chu": "PS!6"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD125"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 228,
+   "dong_sheet": {
+    "chu": "PS!7"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD324"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 229,
+   "dong_sheet": {
+    "chu": "PS!8"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD131"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 230,
+   "dong_sheet": {
+    "chu": "PS!9"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD130"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 231,
+   "dong_sheet": {
+    "chu": "PS!10"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD755"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 232,
+   "dong_sheet": {
+    "chu": "PS!11"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD79"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 233,
+   "dong_sheet": {
+    "chu": "PS!12"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD128"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 234,
+   "dong_sheet": {
+    "chu": "PS!13"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD326"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 235,
+   "dong_sheet": {
+    "chu": "PS!14"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD332"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 236,
+   "dong_sheet": {
+    "chu": "PS!15"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD77"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 237,
+   "dong_sheet": {
+    "chu": "PS!16"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD469"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 238,
+   "dong_sheet": {
+    "chu": "PS!17"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD633"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 239,
+   "dong_sheet": {
+    "chu": "PS!18"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD328"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 240,
+   "dong_sheet": {
+    "chu": "PS!19"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD126"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 241,
+   "dong_sheet": {
+    "chu": "PS!20"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD322"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 242,
+   "dong_sheet": {
+    "chu": "PS!21"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD551"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 243,
+   "dong_sheet": {
+    "chu": "PS!22"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD178"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 244,
+   "dong_sheet": {
+    "chu": "PS!23"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD463"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 245,
+   "dong_sheet": {
+    "chu": "PS!24"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD468"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 246,
+   "dong_sheet": {
+    "chu": "PS!25"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD477"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 247,
+   "dong_sheet": {
+    "chu": "PS!26"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD323"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 248,
+   "dong_sheet": {
+    "chu": "PS!27"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD672"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 249,
+   "dong_sheet": {
+    "chu": "PS!28"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD552"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 250,
+   "dong_sheet": {
+    "chu": "PS!29"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD467"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 251,
+   "dong_sheet": {
+    "chu": "PS!30"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD78"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 252,
+   "dong_sheet": {
+    "chu": "PS!31"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD330"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 253,
+   "dong_sheet": {
+    "chu": "PS!32"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD132"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 254,
+   "dong_sheet": {
+    "chu": "PS!33"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD471"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 255,
+   "dong_sheet": {
+    "chu": "PS!34"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD333"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 256,
+   "dong_sheet": {
+    "chu": "PS!35"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD691"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 257,
+   "dong_sheet": {
+    "chu": "PS!36"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD692"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 258,
+   "dong_sheet": {
+    "chu": "PS!37"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD127"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 259,
+   "dong_sheet": {
+    "chu": "PS!38"
+   },
+   "No": "2",
+   "vendor": {
+    "chu": "VD127"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 260,
+   "dong_sheet": {
+    "chu": "PS!39"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD693"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 261,
+   "dong_sheet": {
+    "chu": "PS!40"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD321"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 262,
+   "dong_sheet": {
+    "chu": "PS!41"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD553"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 263,
+   "dong_sheet": {
+    "chu": "PS!42"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD764"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 264,
+   "dong_sheet": {
+    "chu": "PS!43"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD320"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 265,
+   "dong_sheet": {
+    "chu": "PS!44"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD141"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 266,
+   "dong_sheet": {
+    "chu": "PS!45"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD496"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 267,
+   "dong_sheet": {
+    "chu": "PS!46"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD325"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 268,
+   "dong_sheet": {
+    "chu": "PS!47"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD335"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 269,
+   "dong_sheet": {
+    "chu": "PS!48"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD473"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 270,
+   "dong_sheet": {
+    "chu": "PS!49"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD329"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 271,
+   "dong_sheet": {
+    "chu": "PS!50"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD495"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 272,
+   "dong_sheet": {
+    "chu": "PS!51"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD510"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 273,
+   "dong_sheet": {
+    "chu": "PS!52"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD466"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 274,
+   "dong_sheet": {
+    "chu": "PS!53"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD83"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 275,
+   "dong_sheet": {
+    "chu": "PS!54"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD478"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 276,
+   "dong_sheet": {
+    "chu": "PS!55"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD475"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 277,
+   "dong_sheet": {
+    "chu": "PS!56"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD75"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 278,
+   "dong_sheet": {
+    "chu": "PS!57"
+   },
+   "No": "2",
+   "vendor": {
+    "chu": "VD75"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 279,
+   "dong_sheet": {
+    "chu": "PS!58"
+   },
+   "No": "3",
+   "vendor": {
+    "chu": "VD75"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 280,
+   "dong_sheet": {
+    "chu": "PS!59"
+   },
+   "No": "4",
+   "vendor": {
+    "chu": "VD75"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 281,
+   "dong_sheet": {
+    "chu": "PS!60"
+   },
+   "No": "1",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 282,
+   "dong_sheet": {
+    "chu": "PS!61"
+   },
+   "No": "2",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 283,
+   "dong_sheet": {
+    "chu": "PS!62"
+   },
+   "No": "3",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 284,
+   "dong_sheet": {
+    "chu": "PS!63"
+   },
+   "No": "4",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 285,
+   "dong_sheet": {
+    "chu": "PS!64"
+   },
+   "No": "5",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 286,
+   "dong_sheet": {
+    "chu": "PS!65"
+   },
+   "No": "6",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 287,
+   "dong_sheet": {
+    "chu": "PS!66"
+   },
+   "No": "7",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 288,
+   "dong_sheet": {
+    "chu": "PS!67"
+   },
+   "No": "8",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 289,
+   "dong_sheet": {
+    "chu": "PS!68"
+   },
+   "No": "9",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 290,
+   "dong_sheet": {
+    "chu": "PS!69"
+   },
+   "No": "10",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 291,
+   "dong_sheet": {
+    "chu": "PS!70"
+   },
+   "No": "11",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 292,
+   "dong_sheet": {
+    "chu": "PS!71"
+   },
+   "No": "12",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 293,
+   "dong_sheet": {
+    "chu": "PS!72"
+   },
+   "No": "13",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 294,
+   "dong_sheet": {
+    "chu": "PS!73"
+   },
+   "No": "14",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 295,
+   "dong_sheet": {
+    "chu": "PS!74"
+   },
+   "No": "15",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 296,
+   "dong_sheet": {
+    "chu": "PS!75"
+   },
+   "No": "16",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 297,
+   "dong_sheet": {
+    "chu": "PS!76"
+   },
+   "No": "17",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 298,
+   "dong_sheet": {
+    "chu": "PS!77"
+   },
+   "No": "18",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 299,
+   "dong_sheet": {
+    "chu": "PS!78"
+   },
+   "No": "19",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 300,
+   "dong_sheet": {
+    "chu": "PS!79"
+   },
+   "No": "20",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 301,
+   "dong_sheet": {
+    "chu": "PS!80"
+   },
+   "No": "21",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 302,
+   "dong_sheet": {
+    "chu": "PS!81"
+   },
+   "No": "22",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 303,
+   "dong_sheet": {
+    "chu": "PS!82"
+   },
+   "No": "23",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 304,
+   "dong_sheet": {
+    "chu": "PS!83"
+   },
+   "No": "24",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 305,
+   "dong_sheet": {
+    "chu": "PS!84"
+   },
+   "No": "25",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 306,
+   "dong_sheet": {
+    "chu": "PS!85"
+   },
+   "No": "26",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 307,
+   "dong_sheet": {
+    "chu": "PS!86"
+   },
+   "No": "27",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 308,
+   "dong_sheet": {
+    "chu": "PS!87"
+   },
+   "No": "28",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 309,
+   "dong_sheet": {
+    "chu": "PS!88"
+   },
+   "No": "29",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 310,
+   "dong_sheet": {
+    "chu": "PS!89"
+   },
+   "No": "30",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 311,
+   "dong_sheet": {
+    "chu": "PS!90"
+   },
+   "No": "31",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 312,
+   "dong_sheet": {
+    "chu": "PS!91"
+   },
+   "No": "32",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 313,
+   "dong_sheet": {
+    "chu": "PS!92"
+   },
+   "No": "33",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 314,
+   "dong_sheet": {
+    "chu": "PS!93"
+   },
+   "No": "34",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 315,
+   "dong_sheet": {
+    "chu": "PS!94"
+   },
+   "No": "35",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 316,
+   "dong_sheet": {
+    "chu": "PS!95"
+   },
+   "No": "36",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 317,
+   "dong_sheet": {
+    "chu": "PS!96"
+   },
+   "No": "37",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 318,
+   "dong_sheet": {
+    "chu": "PS!97"
+   },
+   "No": "38",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 319,
+   "dong_sheet": {
+    "chu": "PS!98"
+   },
+   "No": "39",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 320,
+   "dong_sheet": {
+    "chu": "PS!99"
+   },
+   "No": "40",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 321,
+   "dong_sheet": {
+    "chu": "PS!100"
+   },
+   "No": "41",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 322,
+   "dong_sheet": {
+    "chu": "PS!101"
+   },
+   "No": "42",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 323,
+   "dong_sheet": {
+    "chu": "PS!102"
+   },
+   "No": "43",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 324,
+   "dong_sheet": {
+    "chu": "PS!103"
+   },
+   "No": "44",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 325,
+   "dong_sheet": {
+    "chu": "PS!104"
+   },
+   "No": "45",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 326,
+   "dong_sheet": {
+    "chu": "PS!105"
+   },
+   "No": "46",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 327,
+   "dong_sheet": {
+    "chu": "PS!106"
+   },
+   "No": "47",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 328,
+   "dong_sheet": {
+    "chu": "PS!107"
+   },
+   "No": "48",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 329,
+   "dong_sheet": {
+    "chu": "PS!108"
+   },
+   "No": "49",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 330,
+   "dong_sheet": {
+    "chu": "PS!109"
+   },
+   "No": "50",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 331,
+   "dong_sheet": {
+    "chu": "PS!110"
+   },
+   "No": "51",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 332,
+   "dong_sheet": {
+    "chu": "PS!111"
+   },
+   "No": "52",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 333,
+   "dong_sheet": {
+    "chu": "PS!112"
+   },
+   "No": "53",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 334,
+   "dong_sheet": {
+    "chu": "PS!113"
+   },
+   "No": "54",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 335,
+   "dong_sheet": {
+    "chu": "PS!114"
+   },
+   "No": "55",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 336,
+   "dong_sheet": {
+    "chu": "PS!115"
+   },
+   "No": "56",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 337,
+   "dong_sheet": {
+    "chu": "PS!116"
+   },
+   "No": "57",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 338,
+   "dong_sheet": {
+    "chu": "PS!117"
+   },
+   "No": "58",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 339,
+   "dong_sheet": {
+    "chu": "PS!118"
+   },
+   "No": "59",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 340,
+   "dong_sheet": {
+    "chu": "PS!119"
+   },
+   "No": "60",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 341,
+   "dong_sheet": {
+    "chu": "PS!120"
+   },
+   "No": "61",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 342,
+   "dong_sheet": {
+    "chu": "PS!121"
+   },
+   "No": "62",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 343,
+   "dong_sheet": {
+    "chu": "PS!122"
+   },
+   "No": "63",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 344,
+   "dong_sheet": {
+    "chu": "PS!123"
+   },
+   "No": "64",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 345,
+   "dong_sheet": {
+    "chu": "PS!124"
+   },
+   "No": "65",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 346,
+   "dong_sheet": {
+    "chu": "PS!125"
+   },
+   "No": "66",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 347,
+   "dong_sheet": {
+    "chu": "PS!126"
+   },
+   "No": "67",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 348,
+   "dong_sheet": {
+    "chu": "PS!127"
+   },
+   "No": "68",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 349,
+   "dong_sheet": {
+    "chu": "PS!128"
+   },
+   "No": "69",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 350,
+   "dong_sheet": {
+    "chu": "PS!129"
+   },
+   "No": "70",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 351,
+   "dong_sheet": {
+    "chu": "PS!130"
+   },
+   "No": "71",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 352,
+   "dong_sheet": {
+    "chu": "PS!131"
+   },
+   "No": "72",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 353,
+   "dong_sheet": {
+    "chu": "PS!132"
+   },
+   "No": "73",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 354,
+   "dong_sheet": {
+    "chu": "PS!133"
+   },
+   "No": "74",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 355,
+   "dong_sheet": {
+    "chu": "PS!134"
+   },
+   "No": "75",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 356,
+   "dong_sheet": {
+    "chu": "PS!135"
+   },
+   "No": "76",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 357,
+   "dong_sheet": {
+    "chu": "PS!136"
+   },
+   "No": "77",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 358,
+   "dong_sheet": {
+    "chu": "PS!137"
+   },
+   "No": "78",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  },
+  {
+   "thu_tu": 359,
+   "dong_sheet": {
+    "chu": "PS!138"
+   },
+   "No": "79",
+   "vendor": {
+    "chu": "VD0"
+   },
+   "network": null,
+   "account": null,
+   "pct": "1",
+   "cashin_month": "1",
+   "cashin_day": "15",
+   "cach_tinh": {
+    "chu": "thường"
+   },
+   "so": {
+    "chu": "PS"
+   }
+  }
+ ]
+}

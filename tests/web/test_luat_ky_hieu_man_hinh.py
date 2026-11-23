@@ -49,7 +49,19 @@ CHO_PHEP: str = "✓"
 
 # ⛔ Tep man hinh phai theo luat. Ban TRANG — them ten vao day la mien luat cho
 #    mot tep, nen no phai la mot quyet dinh co nguoi ky.
-THEO_LUAT: tuple[str, ...] = ("man_f02.js",)
+# ⭐⭐ `man_f04.js` vao day ngay tu luc no duoc viet *(08/09, `P7` task `6`)*.
+#
+# ⛔⛔ **Vi sao ⛔ khong de "sau nay bo sung".** Luat nay ra doi vi ke toan noi
+# nguyen van *"vung panel qua nhieu note, ky hieu → kho nhin"* — mot cau ve
+# **man kế toán**, va `F04` la mot man ke toan MOI. Cho no ngoai ban khai la
+# de no lon len voi 200 ky hieu roi moi cat: luc do cat la **sua lai**, con
+# bay gio la **viet dung tu dau**.
+#
+# ⚠ Ban TRANG nay ⛔ khong duoc co ngoai le im lang: mot ten NGOAI danh sach
+#   nghia la mot tep **duoc mien luat**, va mien luat phai la mot quyet dinh
+#   co nguoi ky. `man_f01.js`/`man_f03.js` con ngoai — do la mot **no** da biet,
+#   ⛔ khong phai mot su cho phep.
+THEO_LUAT: tuple[str, ...] = ("man_f02.js", "man_f04.js")
 
 
 def _van_ban(ten: str) -> list[str]:

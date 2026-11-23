@@ -17,6 +17,7 @@ import pytest
 
 from fls.api import cua, the
 from fls.db.kho import dsn_test, noi_chi_doc
+from fls.web import phuc_vu as pv
 from fls.web.phuc_vu import lam_nguoi_phuc_vu
 from tests.web.than_sinh import than_sinh
 
@@ -83,12 +84,38 @@ def test_vo_man_hinh_ra_duoc_khong_can_the(may):
     assert b"<title>FLS" in than
 
 
-@pytest.mark.parametrize("duong", [
-    "/tokens.css", "/hinh.css", "/goi_cua.js", "/trang_thai.js",
-    "/thanh_phan.js", "/man_f03.js", "/ung_dung.js", "/phien.js"])
+# ⛔⛔ **DANH SACH NAY TUNG LA MOT DANH SACH GO TAY, va no da lac hau — bat
+#    duoc 08/09 khi them `man_f04.js`.**
+#
+# Ban cu liet ke **8 duong** go tay, trong khi `BANG_TEP` khai **14 tep**. Ba
+# tep man hinh **`man_f01.js` · `man_f02.js`** *(va bay gio `man_f04.js`)*
+# ⛔ **chua bao gio duoc canh** — ten bai thi noi *"MOI tep khai deu ra duoc"*.
+#
+# ⚠ Hau qua ⛔ khong phai ly thuyet: mot tep khai trong `BANG_TEP` ma ⛔ khong
+#   ra duoc thi man ay la **mot tab TRONG**, va ⛔ **khong loi nao no** — cong
+#   `kiem_bang_tep` chi hoi *"khai co khop dia khong"*, ⛔ khong hoi *"cua co
+#   phuc vu duoc khong"*.
+#
+# ⇒ Suy tu **`BANG_TEP`**, ⛔ khong go tay. Them mot man thi cong tu canh no.
+_DUONG_TEP = [t.duong for t in pv.BANG_TEP]
+
+
+@pytest.mark.parametrize("duong", _DUONG_TEP)
 def test_moi_tep_khai_deu_ra_duoc(may, duong):
     ma, _, than = _goi(may, duong)
     assert ma == 200 and than
+
+
+def test_cong_tren_do_duoc_ca_14_tep_chu_KHONG_chi_8():
+    """⛔ Cong so **7**: mot phep do suy tu ban khai co the suy ra **rong**.
+
+    Neu `BANG_TEP` bong rong *(hay bi loc mat)* thi bai tren chay **0 lan** va
+    van xanh — dung lop loi *"xanh vi chua do"*. ⇒ Ghim so luong.
+    """
+    assert len(_DUONG_TEP) == len(pv.BANG_TEP) >= 14, len(_DUONG_TEP)
+    # ⭐ Va ba man hinh PHAI co mat — chung la thu ban go tay da bo sot.
+    for t in ("/man_f01.js", "/man_f02.js", "/man_f04.js"):
+        assert t in _DUONG_TEP, "⛔ `%s` ⛔ khong duoc canh" % t
 
 
 def test_dau_de_an_toan_co_du(may):

@@ -23,7 +23,7 @@
   }
   @media (prefers-color-scheme: dark){
     :root:not([data-theme="light"]){
-      --paper:#0F1411; --surface:#161C18; --bar:#1B221D;
+      --paper:#0F1412; --surface:#161C18; --bar:#1B221D;
       --ink:#E7EDE5; --ink-2:#AAB6AF; --ink-3:#77837C;
       --rule:#2A332C; --rule-2:#212a23;
       --accent:#66C4A4; --accent-soft:#17271F;
@@ -33,7 +33,7 @@
     }
   }
   :root[data-theme="dark"]{
-    --paper:#0F1411; --surface:#161C18; --bar:#1B221D;
+    --paper:#0F1412; --surface:#161C18; --bar:#1B221D;
     --ink:#E7EDE5; --ink-2:#AAB6AF; --ink-3:#77837C;
     --rule:#2A332C; --rule-2:#212a23;
     --accent:#66C4A4; --accent-soft:#17271F;
@@ -227,7 +227,7 @@
       <span class="dot">·</span><span>Bản vẽ kiến trúc</span>
     </div>
     <h1>Kiến trúc PM&nbsp;→&nbsp;ITL</h1>
-    <p class="standfirst">Mười một bản vẽ trả lời bốn câu: <strong>vì sao sổ chậm</strong>, <strong>cắt gì và giữ gì</strong>, <strong>theo thứ tự nào</strong>, và <strong>thế nào là xong</strong>. Mỗi bản vẽ kèm một đoạn đọc bằng lời thường.</p>
+    <p class="standfirst">Mười ba bản vẽ trả lời bốn câu: <strong>vì sao sổ chậm</strong>, <strong>cắt gì và giữ gì</strong>, <strong>theo thứ tự nào</strong>, và <strong>thế nào là xong</strong>. Mỗi bản vẽ kèm một đoạn đọc bằng lời thường.</p>
     <div class="meta">
       <span><b>Ngày</b> 2026-08-24 <em>(bổ sung bản vẽ 11 + đính chính: 2026-08-26)</em></span>
       <span><b>Chủ sở hữu</b> COO-CFO</span>
@@ -243,7 +243,7 @@
     <span class="tag">Đọc trước — hai điều bản vẽ này viết ngày 24/08 nay đã khác</span>
     <p><strong>① “Sheet gương do máy sở hữu” đã bị khai tử</strong> <em>(quyết định 24/08)</em>. Nhiều bản vẽ bên dưới — đặc biệt <strong>03 · 08 · 09</strong> — vẫn nhắc nó khi kể lại kế hoạch cũ. Đầu ra thật nay là: <strong>kho dữ liệu của hệ → bốn màn hình + engine báo cáo</strong>, không có Google Sheet nào ở đầu ra.</p>
     <p><strong>② Hợp đồng đầu ra là 14 trường gọi theo TÊN</strong>, không phải “13 cột theo vị trí”. Cột pháp nhân lấy từ cột người nhập đủ, không phải cột suy ra <em>(quyết định 20/08 và 24/08)</em>.</p>
-    <p>Hai chỗ này đã sửa ở <strong>bản vẽ 03</strong> và <strong>bản vẽ 06</strong>. Ở các bản vẽ kể lại kế hoạch cũ thì giữ nguyên câu gốc làm lịch sử — đọc kèm đính chính này. <strong>Bản vẽ 11</strong> và <strong>bản vẽ 12</strong> là phần mới, viết theo hiện trạng — bản vẽ 12 là <strong>bảng tiến độ sống</strong>, cập nhật bằng lệnh chứ không gõ tay.</p>
+    <p>Hai chỗ này đã sửa ở <strong>bản vẽ 03</strong> và <strong>bản vẽ 06</strong>. Ở các bản vẽ kể lại kế hoạch cũ thì giữ nguyên câu gốc làm lịch sử — đọc kèm đính chính này. <strong>Bản vẽ 11</strong>, <strong>12</strong> và <strong>13</strong> là phần mới, viết theo hiện trạng — bản vẽ 12 là <strong>bảng tiến độ sống</strong> cập nhật bằng lệnh chứ không gõ tay, và <strong>bản vẽ 13</strong> <em>(09/09)</em> là chỗ ra quyết định: <strong>bốn mốc, cổng nào đã đóng, việc nào kế tiếp</strong>.</p>
   </div>
 </div>
 <nav class="plateNav" aria-label="Danh sách bản vẽ">
@@ -260,6 +260,7 @@
     <a href="#p10">10 Nghiệm thu</a>
     <a href="#p11">11 Chín khối · xong là gì</a>
     <a href="#p12">12 Tiến độ sống</a>
+    <a href="#p13">13 Bốn mốc · cổng</a>
   </div>
 </nav>
 
@@ -1023,30 +1024,32 @@ flowchart TB
     <div class="draw">
 <pre class="mermaid">
 flowchart LR
-  subgraph X["XONG HẲN · 4 khối"]
+  subgraph X["XONG HẲN · 5 khối"]
     direction TB
     A1["Khuôn dữ liệu"]
     A2["Hợp đồng 14 trường"]
     A3["Khuôn 36 cột"]
     A4["Lớp ghi sổ"]
+    A5["Cửa vào kho"]
   end
-  subgraph D["ĐANG LÀM · 4 khối"]
+  subgraph D["ĐANG LÀM · 5 khối"]
     direction TB
-    B1["Thước chuẩn · 95%"]
-    B2["Cửa vào kho · 95%"]
-    B3["Bộ nạp nguồn · 45%"]
-    B4["Cửa vào ra · 85%"]
+    B1["Thước chuẩn"]
+    B2["Bộ nạp nguồn"]
+    B3["Cửa vào ra"]
+    B4["Bốn màn hình"]
+    B5["Đưa số ra ngoài"]
   end
-  subgraph C["CHƯA MỞ · 1 khối"]
+  subgraph C["CHƯA MỞ · 0 khối"]
     direction TB
-    C2["Bốn màn hình"]
+    C2["— không còn khối nào chưa mở —"]
   end
   X --> D --> C
   classDef good fill:#CFE6DA,stroke:#0F5C4A,stroke-width:2px,color:#0B2A22
   classDef mid fill:#F5EEDA,stroke:#87680F,stroke-width:1px,color:#43340A
   classDef non fill:#F1F4EE,stroke:#5A6661,stroke-width:1px,color:#1B2420
-  class A1,A2,A3,A4 good
-  class B1,B2,B3,B4 mid
+  class A1,A2,A3,A4,A5 good
+  class B1,B2,B3,B4,B5 mid
   class C2 non
   style X fill:#EDF6F1,stroke:#0F5C4A,stroke-width:3px,color:#0F3329
   style D fill:#FBFAF3,stroke:#87680F,stroke-width:2px,color:#43340A
@@ -1061,17 +1064,18 @@ flowchart LR
           <div class="finding">
             <span class="k">Tiến độ theo khối lượng việc</span>
             <p class="v num">82%</p>
-            <p>Không phải 5/9 = 56%. Năm khối đã xong là năm khối <strong>nhỏ nhất</strong>; khối cuối — bốn màn hình — gánh <strong>20%</strong> khối lượng và mới ở <strong>70%</strong>: ba màn đã nối cửa thật, màn thứ tư đang <strong>bị chặn</strong> vì một cửa đặc tả bảo có mà <strong>không hề tồn tại</strong>.</p>
+            <p>⛔ <strong>Con số này vừa TỤT từ 86% xuống — và đó là nó đang làm đúng việc.</strong> Ngày 09/09 dự án có <strong>module thứ mười</strong> (<em>đưa số ra ngoài</em> — cơ chế ghi ngược lên trang tính, mới xong một phần tư), nên mẫu số lớn ra: tổng trọng số <strong>100 → 111</strong>. Hai đường khác đều là nói dối: cắt trọng số của một khối khác <em>(nói phần việc của nó nhỏ đi khi nó không nhỏ đi)</em>, hay ẩn module mới đi để giữ con số cũ. ⇒ Phạm vi lớn ra thì con số phải tụt.</p>
+            <p>Không phải 5/10 = 50%. Năm khối đã xong là năm khối <strong>nhỏ nhất</strong>; khối bốn màn hình gánh <strong>20%</strong> khối lượng và <strong>nay ở 85%</strong>: <strong>cả bốn màn</strong> đã nối cửa thật — cổng hôm nay · hàng chờ · sổ ITL · <strong>và màn nạp sao kê</strong>, màn duy nhất <em>ghi</em> vào sổ, xong 09/09 sau chín cửa mới. Màn còn bị chặn là màn <strong>thứ năm</strong> — danh mục — nó phải có một cửa đọc mà đặc tả bảo có nhưng không hề tồn tại. ⛔ Nợ lớn nhất bây giờ <strong>không còn là màn hình</strong>: nó là <strong>bộ nạp nguồn</strong> — gánh 22% khối lượng mà mới 55%.</p>
           </div>
           <div class="finding">
             <span class="k">Phép thử tự động</span>
-            <p class="v num">1024</p>
-            <p>Trên <strong>8.590 dòng</strong> code chạy việc, cộng nhiều hơn thế nữa code chỉ để kiểm. Nghĩa là <strong>phần kiểm nhiều hơn phần làm</strong> — có chủ ý.</p>
+            <p class="v num">2084</p>
+            <p>Trên <strong>25.133 dòng</strong> code chạy việc, cộng nhiều hơn thế nữa code chỉ để kiểm. Nghĩa là <strong>phần kiểm nhiều hơn phần làm</strong> — có chủ ý.</p>
           </div>
           <div class="finding">
             <span class="k">Dòng sổ · mối nối lệnh chi</span>
-            <p class="v num">10.030 · 2.745</p>
-            <p>Sổ thật trong kho, và số dòng đã nối được về đúng lệnh chi <strong>mà không phải đoán</strong>. ⚠ Đây là <strong>bản sao</strong>: bản sao nạp <strong>27/08 13:42</strong> — sổ Google Sheets có thể đã chạy tiếp từ lúc đó, và con số này ⛔ không tự biết điều ấy.</p>
+            <p class="v num">8.387 · 2.262</p>
+            <p>Sổ thật trong kho, và số dòng đã nối được về đúng lệnh chi <strong>mà không phải đoán</strong>. ⚠ Đây là <strong>bản sao</strong>: bản sao nạp <strong>10/09 18:54</strong> — sổ Google Sheets có thể đã chạy tiếp từ lúc đó, và con số này ⛔ không tự biết điều ấy.</p>
           </div>
           <div class="finding amber">
             <span class="k">Chặng đã đi</span>
@@ -1080,20 +1084,29 @@ flowchart LR
           </div>
         </div>
 
-        <p><strong>Bốn con số trên đo bốn thứ khác nhau, và chúng lệch nhau là chuyện bình thường.</strong> Đếm theo khối thì được <strong>56%</strong> (5 trong 9 khối xong hẳn), đếm theo chặng thì 5,5/7 ≈ <strong>79%</strong>, đếm theo khối lượng việc thì <strong>82%</strong>. Con số đáng dùng để ra quyết định là <strong>con số theo khối lượng việc</strong> — vì nó tính cả việc chưa làm, không chỉ việc đã làm.</p>
+        <p><strong>Bốn con số trên đo bốn thứ khác nhau, và chúng lệch nhau là chuyện bình thường.</strong> Đếm theo khối thì được <strong>50%</strong> (5 trong 10 khối xong hẳn), đếm theo chặng thì 5,5/7 ≈ <strong>79%</strong>, đếm theo khối lượng việc thì <strong>82%</strong>.</p>
+
+        <p>⛔ <strong>Nhưng từ 09/09 thì cả bốn con số ấy đều thôi là con số để ra quyết định</strong>, và bản vẽ 13 ngay dưới đây là chỗ thay chúng. Lý do đo được: chủ sổ đã quy dự án về <strong>hai tác vụ nghiệp vụ</strong> và gác sáu việc thuộc lằn khác — mà <strong>bộ nạp nguồn</strong>, việc bị gác nặng nhất, một mình gánh <strong>22%</strong> khối lượng. ⇒ Một phần trăm cân theo mười khối kỹ thuật sẽ <strong>đứng yên</strong> trong khi hai tác vụ vẫn đi, hoặc tệ hơn: <strong>đi lên nhờ việc đã bị gác</strong>. Con số thay nó là <strong>bốn cổng đóng mốc</strong>, và mỗi cổng là một phép đo trên kho thật.</p>
 
         <div class="bars">
-          <div class="row"><div class="lbl">Khuôn dữ liệu <small>db · 72 phép thử</small></div><div class="track"><div class="fill" style="width:100%"></div></div><div class="val">100%</div></div>
+          <div class="row"><div class="lbl">Khuôn dữ liệu <small>db · 111 phép thử</small></div><div class="track"><div class="fill" style="width:100%"></div></div><div class="val">100%</div></div>
           <div class="row"><div class="lbl">Hợp đồng 14 trường <small>contract · 9</small></div><div class="track"><div class="fill" style="width:100%"></div></div><div class="val">100%</div></div>
           <div class="row"><div class="lbl">Khuôn 36 cột <small>canon · 34</small></div><div class="track"><div class="fill" style="width:100%"></div></div><div class="val">100%</div></div>
           <div class="row"><div class="lbl">Lớp ghi sổ <small>ledger · 73</small></div><div class="track"><div class="fill" style="width:100%"></div></div><div class="val">100%</div></div>
           <div class="row"><div class="lbl">Thước chuẩn <small>oracle · 93</small></div><div class="track"><div class="fill" style="width:95%"></div></div><div class="val">95%</div></div>
-          <div class="row"><div class="lbl">Cửa duy nhất vào kho <small>repo · 230</small></div><div class="track"><div class="fill" style="width:100%"></div></div><div class="val">100%</div></div>
-          <div class="row"><div class="lbl">Sáu bộ nạp nguồn <small>adapters · 60</small></div><div class="track"><div class="fill slow" style="width:45%"></div></div><div class="val">45%</div></div>
-          <div class="row"><div class="lbl">Cửa vào ra <small>api · 176</small></div><div class="track"><div class="fill" style="width:85%"></div></div><div class="val">85%</div></div>
-          <div class="row"><div class="lbl">Bốn màn hình <small>web · F03 + F01 + F02</small></div><div class="track"><div class="fill slow" style="width:70%"></div></div><div class="val">70%</div></div>
+          <div class="row"><div class="lbl">Cửa duy nhất vào kho <small>repo · 568</small></div><div class="track"><div class="fill" style="width:100%"></div></div><div class="val">100%</div></div>
+          <div class="row"><div class="lbl">Bảy bộ nạp nguồn <small>adapters · 102</small></div><div class="track"><div class="fill slow" style="width:55%"></div></div><div class="val">55%</div></div>
+          <div class="row"><div class="lbl">Cửa vào ra <small>api · 317</small></div><div class="track"><div class="fill" style="width:95%"></div></div><div class="val">95%</div></div>
+          <div class="row"><div class="lbl">Bốn màn hình <small>web · F03 + F01 + F02 + F04</small></div><div class="track"><div class="fill" style="width:85%"></div></div><div class="val">85%</div></div>
+          <div class="row"><div class="lbl">Đưa số ra ngoài <small>xuat · 27</small></div><div class="track"><div class="fill slow" style="width:20%"></div></div><div class="val">20%</div></div>
         </div>
         <p class="barsNote">Thanh dài = phần đã làm của riêng khối đó. Thanh đỏ = khối gánh nhiều việc nhất mà làm được ít nhất — đó là nơi thời gian sẽ đi.</p>
+
+        <div class="call">
+          <span class="tag">⛔ Bảng thanh này vừa bị bắt nói sai ba chỗ — 2026-09-09</span>
+          <p><strong>Ba dòng có con số bên phải lệch với chính độ dài thanh của nó:</strong> bộ nạp nguồn vẽ <strong>55%</strong> mà ghi <em>45%</em>, cửa vào ra vẽ <strong>95%</strong> mà ghi <em>85%</em>, bốn màn hình vẽ <strong>85%</strong> mà ghi <em>70%</em>. Và <strong>khối thứ mười thì không có dòng nào</strong>. Cổng số sống canh <strong>số phép thử</strong> trong nhãn nhỏ của mỗi dòng — nên nó thấy dòng nào <em>tồn tại</em>, ⛔ không thấy dòng nào <em>nói đúng</em>, và ⛔ không thấy dòng nào <strong>thiếu</strong>.</p>
+          <p><strong>Vì sao một cái nhãn lệch lại đáng nói.</strong> Ba con số ấy lệch <strong>về phía thấp</strong>, nên trang này <strong>tự nói xấu mình</strong> — dễ tưởng là vô hại. Nhưng cùng cơ chế lệch về phía cao thì nó là một bảng tiến độ tự thưởng, và ⛔ không cổng nào chặn được. ⇒ Sơ đồ ngay trên bảng cũng vừa được <strong>bỏ hết phần trăm khỏi nhãn</strong>: một con số nằm ở chỗ không ai đo lại thì nó chỉ là <strong>một lời hứa hết hạn</strong>.</p>
+        </div>
 
         <div class="call">
           <span class="tag">Cách cập nhật bảng này</span>
@@ -1107,7 +1120,7 @@ flowchart LR
 
         <div class="tblWrap">
           <table>
-            <caption>Khối 1 · Khuôn dữ liệu — <strong>xong</strong> · 10 tệp · 1.086 dòng · 71 phép thử</caption>
+            <caption>Khối 1 · Khuôn dữ liệu — <strong>100%</strong> · 10 tệp · 1.906 dòng · 111 phép thử</caption>
             <thead><tr><th>Cấu phần</th><th>Làm gì</th><th>Bằng chứng</th></tr></thead>
             <tbody>
               <tr><td>✔ Bản khai hình dạng</td><td>Khai <strong>một lần</strong> bằng dữ liệu, máy sinh ra <strong>cả bảng thật lẫn bản đồ</strong></td><td>Không tồn tại bản vẽ tay thứ hai để lệch</td></tr>
@@ -1124,7 +1137,7 @@ flowchart LR
 
         <div class="tblWrap">
           <table>
-            <caption>Khối 2 · Hợp đồng 14 trường — <strong>xong</strong> · 86 dòng · 9 phép thử</caption>
+            <caption>Khối 2 · Hợp đồng 14 trường — <strong>100%</strong> · 1 tệp · 86 dòng · 9 phép thử</caption>
             <thead><tr><th>Cấu phần</th><th>Làm gì</th><th>Bằng chứng</th></tr></thead>
             <tbody>
               <tr><td>✔ Hợp đồng là dữ liệu</td><td>Một bảng khai, không phải hằng số rải khắp code</td><td>Đổi được ở một chỗ, và đổi thì phép thử đỏ</td></tr>
@@ -1137,7 +1150,7 @@ flowchart LR
 
         <div class="tblWrap">
           <table>
-            <caption>Khối 3 · Khuôn 36 cột — <strong>xong</strong> · 5 tệp · 393 dòng · 34 phép thử</caption>
+            <caption>Khối 3 · Khuôn 36 cột — <strong>100%</strong> · 5 tệp · 402 dòng · 34 phép thử</caption>
             <thead><tr><th>Cấu phần</th><th>Làm gì</th><th>Bằng chứng</th></tr></thead>
             <tbody>
               <tr><td>✔ 38 vị trí / 36 trường</td><td>Giữ cột <strong>theo vị trí</strong>, không theo tên</td><td>Khuôn có <strong>bốn cột trùng tên hệt nhau</strong> — lưu theo tên là mất cột</td></tr>
@@ -1151,7 +1164,7 @@ flowchart LR
 
         <div class="tblWrap">
           <table>
-            <caption>Khối 4 · Lớp ghi sổ — <strong>xong</strong> · 3 tệp · 394 dòng · 64 phép thử</caption>
+            <caption>Khối 4 · Lớp ghi sổ — <strong>100%</strong> · 4 tệp · 585 dòng · 73 phép thử</caption>
             <thead><tr><th>Cấu phần</th><th>Làm gì</th><th>Bằng chứng</th></tr></thead>
             <tbody>
               <tr><td>✔ Luật chốt giá trị, hai bước</td><td>Giá trị cuối tính từ <strong>ô phân loại và ô trung gian</strong> — không phải từ ô người gõ</td><td><strong>4.088/4.088 ô khớp</strong> trên 584 dòng thật</td></tr>
@@ -1167,7 +1180,7 @@ flowchart LR
 
         <div class="tblWrap">
           <table>
-            <caption>Khối 5 · Thước chuẩn — <strong>95%</strong> · 9 tệp · 791 dòng · 89 phép thử</caption>
+            <caption>Khối 5 · Thước chuẩn — <strong>95%</strong> · 9 tệp · 852 dòng · 93 phép thử</caption>
             <thead><tr><th>Cấu phần</th><th>Làm gì</th><th>Bằng chứng · còn thiếu</th></tr></thead>
             <tbody>
               <tr><td>✔ Khai báo nguồn</td><td>Địa chỉ hai sổ + <strong>bốn thứ tuyệt đối không mở</strong>, mỗi cái kèm lý do là bằng chứng</td><td>Có phép thử khoá địa chỉ, và khoá cả việc nguồn đang dùng <strong>không nằm trong danh sách cấm</strong></td></tr>
@@ -1186,7 +1199,7 @@ flowchart LR
 
         <div class="tblWrap">
           <table>
-            <caption>Khối 6 · Cửa duy nhất vào kho — <strong>95%</strong> · 6 tệp · 1.454 dòng · 124 phép thử</caption>
+            <caption>Khối 6 · Cửa duy nhất vào kho — <strong>100%</strong> · 19 tệp · 7.150 dòng · 568 phép thử</caption>
             <thead><tr><th>Cấu phần</th><th>Làm gì</th><th>Bằng chứng · còn thiếu</th></tr></thead>
             <tbody>
               <tr><td>✔ Một cửa duy nhất</td><td>Chỉ khối này được nói chuyện với kho</td><td>Cưỡng chế bằng máy: <strong>6 luật ranh giới, 0 vi phạm</strong></td></tr>
@@ -1204,7 +1217,7 @@ flowchart LR
 
         <div class="tblWrap">
           <table>
-            <caption>Khối 7 · Sáu bộ nạp nguồn — <strong>45%</strong> · 2/6 bộ · 497 dòng · 48 phép thử</caption>
+            <caption>Khối 7 · Bảy bộ nạp nguồn — <strong>55%</strong> · 5 tệp · 1.350 dòng · 102 phép thử</caption>
             <thead><tr><th>Cấu phần</th><th>Làm gì</th><th>Bằng chứng · còn thiếu</th></tr></thead>
             <tbody>
               <tr><td>✔ Bộ nạp <strong>Bank</strong> — <strong>đã chạy thật</strong></td><td>Sổ thô 38 cột → khuôn chuẩn, đọc <strong>sổ sống</strong> 10.100 dòng trong 12 giây</td><td>20 phép thử theo đúng sáu điều kiện xong. Và một lệnh chạy được: <code>tools/nap_that.py --that</code></td></tr>
@@ -1226,7 +1239,7 @@ flowchart LR
 
         <div class="tblWrap">
           <table>
-            <caption>Khối 8 · Cửa vào ra — <strong>75%</strong> · 6 tệp · 1.036 dòng · 108 phép thử</caption>
+            <caption>Khối 8 · Cửa vào ra — <strong>95%</strong> · 8 tệp · 3.896 dòng · 317 phép thử</caption>
             <thead><tr><th>Cấu phần</th><th>Làm gì</th><th>Bằng chứng · còn thiếu</th></tr></thead>
             <tbody>
               <tr><td>✔ <strong>Sáu cửa đọc — đã chạy thật</strong></td><td>Sổ · một dòng đầy đủ · hàng chờ · tóm tắt hàng chờ · nhật ký · cổng hôm nay</td><td><strong>10.030 dòng sổ lật hết qua cửa</strong>, và hàng chờ trả về đúng thứ tự tiền: <strong>USD 4.492 · VND 2.987 · SGD 120 · HKD 83</strong></td></tr>
@@ -1256,13 +1269,27 @@ flowchart LR
 
         <div class="tblWrap">
           <table>
-            <caption>Khối 9 · Bốn màn hình — <strong>chưa mở</strong></caption>
+            <caption>Khối 9 · Bốn màn hình — <strong>85%</strong> · 16 tệp · 8.547 dòng · 448 phép thử</caption>
             <thead><tr><th>Cấu phần</th><th>Làm gì</th><th>Ghi chú</th></tr></thead>
             <tbody>
               <tr><td>○ Thử nghiệm lưới <em>trước</em> khi dựng màn</td><td>Chứng minh lưới chịu được thao tác quen tay</td><td>Phải đạt trước, không dựng màn rồi mới thử</td></tr>
               <tr><td>○ Bốn màn + khay nhật ký</td><td>Hàng chờ và ghép lệnh · sổ · cổng hôm nay · danh mục</td><td>Chặng 6</td></tr>
               <tr><td>○ Tám thao tác quen tay của Sheets</td><td>Thiếu một cái là kế toán quay về Sheets</td><td>—</td></tr>
               <tr><td>○ Chặn xác nhận khi lệch tổng</td><td>Không cho chia bừa</td><td>—</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="tblWrap">
+          <table>
+            <caption>Khối 10 · Đưa số ra ngoài — <strong>20%</strong> · 2 tệp · 359 dòng · 27 phép thử</caption>
+            <thead><tr><th>Cấu phần</th><th>Làm gì</th><th>Ghi chú</th></tr></thead>
+            <tbody>
+              <tr><td>● Cơ chế ghi neo theo <em>khoá dòng</em></td><td>Ô đích được <strong>giải ra từ bản sống</strong>: tên tab, cột khoá, giá trị khoá, tên cột đích. Không có một địa chỉ ô nào gõ tay</td><td><strong>Xong 09/09.</strong> Chủ sổ đang cùng mở tệp, nên một cú chèn dòng làm mọi địa chỉ dịch: ghi theo địa chỉ cứng thì cú ghi <em>thành công, vào ô sai</em>, và không báo lỗi</td></tr>
+              <tr><td>● Ghi hai lần không nhân đôi</td><td>So với <strong>giá trị đang có trên bản sống</strong>, không so với một cái thẻ “đã ghi”</td><td>Thẻ trả lời <em>“tôi đã ghi”</em>; câu hỏi thật là <em>“ô kia đang là gì”</em>. Chạy lại lần hai: <strong>0 ô</strong></td></tr>
+              <tr><td>● Biên bản chạy khô + hai khoá</td><td>Mỗi dòng nêu ô đích thật, giá trị trước và sau, một quyết định có tên. Cú ghi cần <em>cả hai</em> khoá mới chạy</td><td>Một cờ dòng lệnh là thứ gõ được trong ba giây, và ở đây không có kho thử: nó ghi vào trang tính kế toán đang mở</td></tr>
+              <tr><td>○ Bộ xuất khuôn 64 cột</td><td>Dựng lại đúng trang <em>ITL Ledge</em> mà kế toán đang dùng</td><td><strong>Chưa tồn tại.</strong> Nhưng cả bảy cột <em>Final</em> đã lưu đủ, nên khoảng cách là một bộ xuất chưa viết, không phải dữ liệu</td></tr>
+              <tr><td>○ Đối chiếu từng dòng với trang thật</td><td>Câu <em>“như trong Excel”</em> được <strong>đo</strong>, thay vì được tin</td><td>Chênh phải liệt kê từng dòng, không quy về phần trăm</td></tr>
             </tbody>
           </table>
         </div>
@@ -1289,7 +1316,267 @@ flowchart LR
 
         <div class="call">
           <span class="tag">Dấu thời điểm</span>
-          <p>Số trong bản vẽ này đo ngày <strong>03/09/2026</strong> trên nhánh <code>feat/p2-oracle-parity</code>, commit <code>17df1d9</code>. <strong>1024 phép thử xanh · 8 luật ranh giới, 0 vi phạm · cổng tài liệu 5/5 · cổng số sống 66/66 · kho dữ liệu thật khớp bản khai · bản đồ không lệch · đối chiếu cả sổ 69.510/69.510 ô trên 23 kỳ · 10.030 dòng sổ thật, 2.745 mối nối lệnh chi và <strong>bản chụp 3.703 dòng lệnh</strong> đã nằm trong kho.</strong> ⭐ <strong>Sổ bút toán và nhật ký vẫn 0 dòng</strong> — vòng ghi chưa từng chạy trên sổ thật, và đó là chủ ý. Chạy lại <code>python tools/tien_do.py</code> để lấy số mới.</p>
+          <p>Số trong bản vẽ này đo ngày <strong>02/10/2026</strong> trên nhánh <code>feat/p2-oracle-parity</code>, commit <code>88ab178</code>. <strong>2084 phép thử xanh · 9 luật ranh giới, 0 vi phạm · cổng tài liệu 5/5 · cổng số sống 110/110 · kho dữ liệu thật khớp bản khai · bản đồ không lệch · đối chiếu cả sổ 69.510/69.510 ô trên 23 kỳ · sổ thật và mối nối lệnh chi đúng như thẻ <em>“Dòng sổ · mối nối lệnh chi”</em> và <strong>68 ảnh chụp · 256.928 dòng lệnh</strong> đã nằm trong kho.</strong> ⭐ <strong>Sổ bút toán và nhật ký đã có dòng từ 18/09 — nhưng ⛔ chưa một dòng nào của kế toán</strong>: toàn bộ là <em>gợi ý của máy</em> (QĐ-ITL-143) và cú thử UAT của owner 01/10 — số đếm ở <code>09_MILESTONES</code> §3 ⓶. Chạy lại <code>python tools/tien_do.py</code> để lấy số mới.</p>
+          <p>⚠ <strong>Đính chính 01/10 khuya</strong> <em>(fls-ba, KQ-010 F-4 ⓐ)</em>: câu trên từng ghi <em>“10.030 dòng sổ thật, 2.745 mối nối lệnh chi … Sổ bút toán và nhật ký vẫn 0 dòng — vòng ghi chưa từng chạy trên sổ thật”</em> — số của 27/08–09/09. Lượt đồng bộ số 01/10 đổi <strong>dấu ngày</strong> sang 01/10 mà câu đứng yên ⇒ câu cũ thành lời khai <em>hôm nay</em>. Đo lại 01/10 khuya (chỉ SELECT): <code>fls_itl</code> 8.387 · mối nối còn hiệu lực 2.262 · <code>fls_journal</code> 4.428 (4.424 gợi ý máy ngày 18/09 · 4 dòng UAT 01/10). Hai số đầu nay <strong>trỏ</strong> về thẻ có phép so, ⛔ chép lại. Câu gốc giữ ở đây làm biên bản.</p>
+
+          <p>⛔ <strong>Và câu trên vừa già lần thứ hai — 09/09.</strong> Nó ghi <em>“bản chụp 3.703 dòng lệnh”</em>, con số của <strong>một</strong> ảnh duy nhất ngày 27/08; kho nay có <strong>hai</strong> ảnh. Cùng con số ấy ở <code>00_MASTER_INDEX</code> thì tươi, vì chỗ đó <strong>có một phép so</strong> còn chỗ này thì không. ⇒ Nay đã ghim. Đây là lần thứ ba trong một ngày cùng một hình bệnh lộ ra ở một bề mặt khác: <strong>cổng canh chỗ nào thì chỗ đó tươi, chỗ nào không canh thì chỗ đó già trong im lặng</strong> — và trang này thì <em>trông</em> y hệt một trang được canh.</p>
+
+          <p>⛔ <strong>Ba con số trong đoạn trên vừa GIÀ trong im lặng, và cổng số sống KHÔNG bắt được:</strong> ngày <em>07/09</em> đứng cạnh một commit của <em>09/09</em>; <em>8 luật ranh giới</em> khi luật thứ chín (<code>fls.xuat</code> không được biết tầng kho) đã có; <em>85/66</em> khi cổng có 85 phép so. Cổng canh <strong>SỐ</strong>, ⛔ không canh <strong>NGHĨA</strong> — nên một con số đúng đứng cạnh một câu sai vẫn XANH. Ba chỗ ấy nay đã ghim: xem <code>tools/kiem_so_song.py</code>, nhóm <em>bản vẽ · chân trang</em>.</p>
+        </div>
+
+      </div>
+    </div>
+  </article>
+
+
+  <article class="plate" id="p13">
+    <div class="cap">
+      <span class="no">BẢN VẼ 13</span>
+      <span class="ttl">Bốn mốc — cổng nào đã đóng, và việc kế tiếp là gì</span>
+      <p class="sub">Đọc ở đây: <strong>mốc 1 đã đạt chưa</strong>, ba mốc còn lại đứng ở đâu, và việc nào đi tiếp. Bản vẽ này thay bảng phần trăm ở bản vẽ 12 làm chỗ ra quyết định — mỗi ô trạng thái là một <strong>phép đo trên kho thật</strong>, không phải một lời tự đánh giá.</p>
+    </div>
+
+    <div class="draw">
+<pre class="mermaid">
+flowchart LR
+  A["MỐC 1 · Đường LẤY<br/>A1 · A2 · A3 · A4"] --> B["MỐC 2 · MAPPING<br/>tác vụ ①"]
+  B --> C["MỐC 3 · ADJUST<br/>tác vụ ②"]
+  C --> D["MỐC 4 · OUTPUT<br/>64 cột như Excel"]
+  A -.->|"cơ chế XONG · nhịp CHƯA bấm"| B
+  B -.->|"trần cứng 47,4%"| C
+  classDef ok fill:#CFE6DA,stroke:#0F5C4A,stroke-width:2px,color:#0B2A22
+  classDef mid fill:#F5EEDA,stroke:#87680F,stroke-width:2px,color:#43340A
+  classDef bad fill:#F7E0DC,stroke:#A32B23,stroke-width:2px,color:#57150F
+  class A mid
+  class B mid
+  class C bad
+  class D bad
+</pre>
+    </div>
+
+    <div class="read">
+      <div class="col">
+
+        <div class="findings">
+          <div class="finding amber">
+            <span class="k">Mốc 1 · sáu cổng: đạt · một nửa · chưa</span>
+            <p class="v num">4 · 1 · 1</p>
+            <p><strong>Ba trong bốn cổng đã đóng, và cổng còn lại chờ thời gian.</strong> Chiều 09/09 hai cú bấm đã bấm: nhịp <strong>đã đăng ký</strong> vào bộ hẹn giờ, và bốn nguồn mới đã khai. Cổng còn một nửa là cổng <em>dọn ảnh</em>: vế “xoá ảnh quá 30 ngày” đang xanh trên một <strong>tập rỗng</strong>, và nó tự đóng khoảng 10/10.</p><p>⛔ <strong>Nhưng đọc con số này cẩn thận: cổng <em>A1</em> đạt trên KHO, chưa đạt trong VẬN HÀNH.</strong> Cổng đo <em>“có ≥2 ảnh, ≥2 giờ, người tạo đúng”</em> — cả ba đều thật. Còn <strong>câu hỏi</strong> của nó là <em>“kế toán không cần Dev”</em>, và sáng 10/09 câu trả lời là <strong>CẦN</strong>: bộ hẹn giờ <strong>bỏ ba lượt</strong> vì máy ngủ, và kho dữ liệu <strong>không chạy</strong> vì Docker tắt — tôi phải bật bằng tay. Ba cài đặt điện của bộ hẹn giờ đang ở mặc định, và tôi <strong>không tự đổi</strong>: đánh thức máy theo giờ là cách máy của chủ máy xử sự.</p><p>⛔ Ba con số này <strong>máy tự đếm theo một luật khai trong mã</strong> — lần đầu tôi gõ tay <em>“2/4”</em>, và nó <strong>sai theo đúng cái bảng nằm ngay dưới đây</strong>.</p>
+          </div>
+          <div class="finding amber">
+            <span class="k">Mốc 2 · năm cổng: đạt · một nửa · chưa</span>
+            <p class="v num">1 · 1 · 3</p>
+            <p>⚠ <strong>Đính chính 01/10</strong> <em>(fls-ba, rà soát R-1 · R-2 · R-28; câu “từ 01/10 (WO-001) … thước sửa, ⛔ việc lùi” do fls-dev thêm khi chạy đồng bộ số — 10 §6 ⓑ, BG-009; fls-ba rà và giữ lúc nghiệm thu 01/10 khuya)</em>:
+               con số trên là <strong>máy đếm</strong>. Từ 18/09 đến 01/10 máy đếm <strong>2.219</strong>
+               sự kiện ghép do <strong>máy</strong> ghi thành “người bấm” và in <strong>4 · 1 · 0</strong>;
+               từ 01/10 <em>(WO-001)</em> phép đếm loại sự kiện máy và dòng UAT ⇒ máy in đúng nghĩa cổng
+               (người thật) <strong>1 · 1 · 3</strong> — <strong>thước sửa, ⛔ việc lùi</strong>. Mối nối trong kho là
+               <strong>2.262</strong>, tạo ngày <strong>10/09</strong> (câu dưới ghi 2.745 / 27/08 — số cũ).
+               Cú thử UAT của owner 01/10 tạo <strong>1</strong> lần bỏ ghép đầu tiên trên sổ thật —
+               ⛔ đó là thử đường ghi, chưa phải việc của kế toán. Câu gốc giữ làm biên bản.</p>
+            <p><strong>Mọi bảng máy điền thì đầy; mọi bảng người điền thì rỗng.</strong>
+               Cả <strong>2.745</strong> mối nối trong kho sinh <strong>cùng một
+               ngày 27/08</strong> bằng phép ghép <strong>tự động</strong>, và
+               không một cửa GHI nào của hàng chờ từng được dùng trên sổ thật.
+               ⇒ Ba trong năm cổng là <strong>chưa</strong> — không phải “một
+               nửa”, vì không một vế nào của chúng đã xảy ra.</p>
+            <p>⛔ <strong>Và phép đếm này vừa chặn một phản xạ của tôi.</strong>
+               Ngày 10/09 tôi viết ba bài chứng minh <em>đường lùi của một lô</em>
+               chạy được — một nhánh <strong>chưa ai đi qua</strong> — rồi muốn
+               ghi ngay <em>“cổng đã đạt”</em>. Sai: bài thử chạy trên kho
+               <strong>test</strong>, còn cổng hỏi sổ <strong>thật</strong>, và
+               trên sổ thật <strong>chưa một cú bỏ ghép nào từng xảy ra</strong>.
+               ⇒ <em>“Bộ test xanh” không đóng được một cổng của mốc</em>: nó
+               chứng minh <strong>mã chạy đúng</strong>, cổng hỏi <strong>việc
+               đã xảy ra</strong>.</p>
+          </div>
+          <div class="finding">
+            <span class="k">Ảnh do NHỊP sinh · tổng ảnh</span>
+            <p class="v num">135 · 147</p>
+            <p>Cổng <em>A1</em> đòi <strong>≥2 ảnh cách nhau ~1 giờ</strong> mà người tạo không phải một tệp lệnh, và điều đó <strong>đã đạt</strong>. ⛔ Nhưng con số này <strong>không nói được nhịp có ĐANG sống</strong>: các ảnh <strong>cũ</strong> vẫn nằm đó kể cả khi nhịp đã chết ba tiếng. ⇒ Câu đó do một phép đo <strong>khác</strong> trả lời — <em>giờ TRỐNG trong khung chụp</em> — và sáng 10/09 nó đếm được <strong>bốn</strong> giờ trống ở lằn sao kê. Trong số ảnh trên, <strong>một</strong> ảnh đầu là lượt tôi gõ tay chạy thử; sổ chỉ thêm nên tôi <strong>không</strong> sửa nó, và vết ấy tự sạch theo thời gian.</p>
+          </div>
+          <div class="finding">
+            <span class="k">Ảnh lệnh chi khác nhau trong kho</span>
+            <p class="v num">68</p>
+            <p>Cổng <em>A3</em> đã <strong>chạy thật 09/09</strong>: nửa PM của tác vụ ① từng đóng băng ở <strong>một</strong> lượt nạp ngày 27/08, nay có <strong>nhiều</strong> — nhịp nạp mỗi giờ, số ở trên. Đường ống hoạt động.</p>
+          </div>
+          <div class="finding">
+            <span class="k">Lệnh chi đã tìm được tiền của nó</span>
+            <p class="v num">58,1%</p>
+            <p>⭐⭐ <strong>Đây là con số của việc ghép, và nó đo trên phía PM.</strong> <strong>2.219</strong> trong <strong>3.820</strong> dòng lệnh đã nối được vào tiền thật; tính theo phiếu là <strong>869 / 1.521</strong>. ⇒ Việc còn lại là <strong>1.601 dòng lệnh</strong>, nằm trên <strong>826 phiếu</strong>.</p>
+          </div>
+          <div class="finding">
+            <span class="k">Trần của cách đo CŨ — nay chỉ còn là biên bản</span>
+            <p class="v num">53,4%</p>
+            <p>⛔ <strong>Con số này từng là con số quan trọng nhất của trang, và nó vừa thôi là thế.</strong> Nó nói: nếu đo độ phủ trên dòng tiền <em>(mẫu số ở bảng trần cứng bên dưới)</em> thì không cách nào vượt con số trên <em>(câu cũ ghi 8.246 · 47,4% — số của 09/09)</em>. Câu đó vẫn <em>đúng</em> — nhưng chủ sổ đã chốt rằng <strong>đo trên dòng tiền là đo sai phía</strong>, nên nó thôi là một cái trần và chỉ còn là <strong>tỷ lệ kích thước hai tập</strong>. Giữ lại để không ai hứa <em>“đưa độ phủ lên 100%”</em> lần nữa.</p>
+          </div>
+        </div>
+
+        <h3>Mốc 1 · Đường LẤY dữ liệu — bốn cổng, đo ngày 09/09</h3>
+
+        <div class="tblWrap">
+          <table>
+            <caption>Cổng nào đóng, đo bằng gì, và cái gì đang chặn</caption>
+            <thead><tr><th>Cổng</th><th>Đòi gì</th><th>Đo được trên kho thật</th><th>Trạng thái</th></tr></thead>
+            <tbody>
+              <tr>
+                <td><strong>A1</strong> Ảnh chụp tự sinh</td>
+                <td>≥2 ảnh cách nhau ~1 giờ, <strong>người tạo không phải một tệp lệnh</strong>, và ảnh cũ không đổi một ô</td>
+                <td>Tổng <strong>3</strong> ảnh trong kho, trong đó <strong>1</strong> ảnh do nhịp sinh. Hai ảnh còn lại mang tên một tệp lệnh, tức <em>"một người đã gõ"</em></td>
+                <td>⛔ <strong>CHƯA</strong></td>
+              </tr>
+              <tr>
+                <td><strong>A2</strong> Phép dọn ảnh</td>
+                <td>Ảnh <strong>đã dùng để nạp</strong> còn nguyên · ảnh quá 30 ngày mà không ai dùng thì xoá · vết nạp <strong>không đứt</strong></td>
+                <td><strong>0</strong> lần nạp trỏ vào một ảnh không còn. ⚠ Nhưng tập <em>cần xoá</em> hôm nay <strong>rỗng</strong>: kho chưa có ảnh nào quá 30 ngày</td>
+                <td>◐ <strong>cơ chế xong</strong></td>
+              </tr>
+              <tr>
+                <td><strong>A3</strong> PM có đường vào</td>
+                <td>Kho có ảnh <strong>lằn lệnh chi</strong> · <strong>≥2</strong> ảnh khác nhau · dòng lệnh mới vào <strong>không qua một dòng lệnh gõ tay</strong></td>
+                <td>Nhiều ảnh lằn lệnh chi khác nhau <em>(số ở thẻ “Ảnh lệnh chi khác nhau”; câu cũ ghi 1 · 2)</em> · <strong>3.820</strong> dòng lệnh trong ảnh mới. ⛔ Nhưng cú chạy ấy là <strong>tôi gõ lệnh</strong>, nên nửa sau của cổng nằm cùng chỗ với <em>A1</em></td>
+                <td>◐ <strong>đường ống xong</strong></td>
+              </tr>
+              <tr>
+                <td><strong>A4</strong> Nạp lại không nhân đôi</td>
+                <td>Nạp lại cùng một tệp lệnh chi thì <strong>không sinh một dòng trùng nào</strong></td>
+                <td><strong>0</strong> dòng lệnh trùng trong cùng một ảnh · <strong>0</strong> mối nối trùng. Đo trên <strong>cả hai</strong> bề mặt, vì mỗi bề mặt trả lời một câu khác nhau</td>
+                <td>✔ <strong>ĐẠT</strong></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="call warn">
+          <span class="tag">Vì sao mốc 1 chưa đóng, nói thẳng</span>
+          <p><strong>Cả ba phần mã của mốc 1 đã dựng và đã chạy thật.</strong> Nhịp chụp là <em>một hàm có tên</em> trả về quyết định <strong>kèm lý do</strong>, cửa sổ <strong>8h–19h giờ Việt Nam</strong> khai tường minh, và nó chặn cú bắn thứ hai trong cùng một giờ đồng hồ. Phép dọn giữ vĩnh viễn ảnh đã nạp. Đường nạp lệnh chi đã chạy trên sổ thật.</p>
+          <p><strong>Cái còn thiếu là một cú bấm ở ngoài mã:</strong> đăng ký nhịp vào bộ hẹn giờ của máy. ⛔ Tệp nhịp <strong>cố ý không tự làm việc đó</strong> — đặt một việc định kỳ vào máy của người khác là một hành vi <em>ra ngoài</em>, và nó phải là cú bấm của họ. Lệnh cụ thể nằm ở đầu tệp <code>tools/nhip_chup.py</code>.</p>
+          <p>⛔ <strong>Và một thứ hỏng thật đang chặn nửa Transaction của nhịp:</strong> trang tính sống có <strong>hai sheet ACB mới</strong> chưa ai khai. Lằn sao kê của nhịp sẽ <strong>đổ mỗi giờ</strong> cho đến khi ai đó chạy một lệnh khai nguồn — và cùng lý do ấy đang làm bộ chụp sao kê <em>hiện tại</em> hỏng. Nhịp cố ý cho <strong>hai lằn chạy độc lập</strong>, nên một sheet chưa khai <strong>không</strong> kéo lằn lệnh chi xuống theo.</p>
+        </div>
+
+        <h3>Mốc 2 · Mapping — chủ sổ vừa đổi chiều đo, và nó đổi cả con số lẫn danh sách việc</h3>
+
+        <div class="call">
+          <span class="tag">⭐ Chủ sổ chốt chiều đo — 09/09</span>
+          <p><em>“Trans map vào PM. Số lượng Trans vốn nhiều hơn PM; không cần question các Trans không được map.”</em></p>
+          <p>⛔ <strong>Câu này làm mọi con số độ phủ từ 27/08 đến nay thành đo sai phía.</strong> Chúng chia cho <strong>8.246</strong> dòng tiền và cho <strong>31,1%</strong> — một con số đọc ra là <em>thất bại</em>. Nhưng <strong>10.030</strong> dòng tiền so với <strong>3.772</strong> dòng lệnh <em>(số ngày 09/09)</em> là <strong>đúng như thiết kế</strong>: một lệnh chi không tương ứng một giao dịch bank, và những dòng tiền không map thì <strong>không phải một câu hỏi</strong>.</p>
+          <p>⇒ Đo trên đúng phía <em>(ngày 09/09)</em> thì phần việc đã làm là <strong>64,3%</strong>, và việc còn lại <em>lúc ấy</em> là <strong>1.345 dòng lệnh / 698 phiếu</strong> — không phải <strong>5.684</strong> dòng tiền. Hai cách đếm chênh <strong>4,2 lần</strong> về số cú bấm.</p>
+          <p>⚠ <em>Đính chính 01/10 khuya (fls-ba, KQ-010 F-4 ⓑ):</em> ba con số trên là <strong>biên bản ngày 09/09</strong>. Số <strong>hôm nay</strong> nằm ở thẻ <em>“Lệnh chi đã tìm được tiền của nó”</em> và bảng <em>“Việc còn lại”</em> ngay dưới — hai chỗ ấy có phép so, chỗ này thì không.</p>
+        </div>
+
+        <div class="tblWrap">
+          <table>
+            <caption>Việc còn lại, đo trên phía lệnh chi</caption>
+            <thead><tr><th>Đại lượng</th><th class="n">Đo được</th><th>Nghĩa</th></tr></thead>
+            <tbody>
+              <tr><td>Dòng lệnh chi trong ảnh hiệu lực</td><td class="n"><strong>3.820</strong></td><td>Mẫu số của việc ghép, đo trên phía lệnh chi <em>(= 2.219 + 1.601, đo 01/10)</em></td></tr>
+              <tr><td>⭐ <strong>đã tìm được tiền của nó</strong></td><td class="n"><strong>2.219</strong></td><td><strong>58,1%</strong> — con số của việc ghép</td></tr>
+              <tr><td>⛔ <strong>chưa tìm được tiền</strong></td><td class="n">⛔ <strong>1.601</strong></td><td><strong>Đây là danh sách việc.</strong> Theo phiếu: <strong>826</strong> trong <strong>1.521</strong> — trong đó <strong>174</strong> phiếu <strong>đã nối một phần</strong>, loại dễ bỏ sót nhất</td></tr>
+              <tr><td>trong đó <strong>ghép được ngay</strong></td><td class="n"><strong>205</strong></td><td>Có một dòng tiền chưa nối mang <strong>đúng</strong> mã tham chiếu ấy</td></tr>
+              <tr><td>trong đó <strong>chưa được duyệt</strong></td><td class="n"><strong>299</strong></td><td>Việc của người khác, <strong>không phải</strong> của kế toán ITL — nên nó không thuộc danh sách trên</td></tr>
+              <tr><td>Tiền của dòng chưa có tiền <em>(đo 09/09 trên 1.345 dòng — ⛔ chưa đo lại)</em></td><td class="n">—</td><td><strong>62,0 tỷ VND</strong> · <strong>133,5 triệu USD</strong> · 1,59 triệu SGD</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="call warn">
+          <span class="tag">⛔ Và câu ấy vạch ra một khuyết tật giao diện, không phải một khuyết tật số</span>
+          <p><strong>Đo trên bảng tuyến: 11 cửa khoá theo dòng tiền, và trước hôm nay là 0 cửa khoá theo dòng lệnh — nay là 6.</strong> Nghĩa là cho đến sáng nay <strong>không có đường nào hỏi được câu <em>“lệnh chi nào chưa tìm được tiền”</em></strong> — đúng câu hỏi của việc. Và màn hàng chờ hiển thị <strong>7.682 dòng tiền</strong>, tức hỏi <strong>đúng cái câu chủ sổ vừa nói là không cần hỏi</strong>.</p>
+          <p>⭐ <strong>Đã sửa cùng ngày.</strong> Màn hàng chờ nay có <strong>hai lằn</strong>, và lằn <strong>theo lệnh chi</strong> là lằn <strong>mặc định</strong>: nó hỏi <strong>1.345 dòng</strong> thay vì 7.682 <em>(số ngày 09/09)</em>, và chỉ <strong>69</strong> dòng trong đó phủ <strong>90% tiền</strong>. Lằn cũ <strong>không bị xoá</strong> — nó vẫn là đường duy nhất để ghi lý do, hoãn, bỏ ghép và bấm xong trên một dòng tiền cụ thể.</p><p>⛔ <strong>Và ba cửa mới đều là cửa ĐỌC.</strong> Cú ghép vẫn đi qua đúng cửa ghi cũ — một chuyến. Mở cửa ghi thứ hai thì hai đường sẽ lệch nhau ở bốn phép kiểm của cú ghép, và cửa dễ hơn trở thành một <strong>đường tắt vòng qua kiểm tra</strong> mà không ai thấy.</p>
+        </div>
+
+        <h3>Trần của cách đo cũ — giữ làm biên bản</h3>
+
+        <div class="tblWrap">
+          <table>
+            <caption>Trần cứng của tác vụ ① — bốn con số, đo bằng chính hàm mà cú ghép gọi</caption>
+            <thead><tr><th>Đại lượng</th><th class="n">Đo được</th><th>Nghĩa</th></tr></thead>
+            <tbody>
+              <tr><td>Dòng tiền vế <strong>PS Có</strong> <em>(vế của lệnh chi)</em></td><td class="n"><strong>7.056</strong></td><td>Mẫu số thật của tác vụ ①, không phải cả sổ <em>(số dòng sổ ở thẻ “Dòng sổ · mối nối lệnh chi”; câu cũ ghi 10.030 — số 09/09)</em></td></tr>
+              <tr><td>trong đó <strong>đã nối</strong> lệnh chi</td><td class="n"><strong>2.166</strong></td><td>Độ phủ hôm nay: <strong>30,7%</strong></td></tr>
+              <tr><td>Dòng lệnh chi trong ảnh <strong>hiệu lực</strong></td><td class="n"><strong>3.820</strong></td><td>Toàn bộ nguyên liệu mà máy có để ghép</td></tr>
+              <tr><td>trong đó <strong>đã bị dùng</strong> cho một dòng tiền khác</td><td class="n"><strong>2.219</strong></td><td>Một dòng lệnh đã ghép thì không ghép lại cho dòng khác</td></tr>
+              <tr><td><strong>Còn rảnh</strong></td><td class="n"><strong>1.601</strong></td><td>Số dòng tiền tối đa còn có thể nối thêm</td></tr>
+              <tr><td>⛔ <strong>TRẦN CỨNG</strong> = đã nối + còn rảnh</td><td class="n">⛔ <strong>3.767</strong></td><td>⛔ <strong>53,4%</strong> — và đó là <em>nếu</em> ghép được hết một-đối-một, tức một giả định lạc quan</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="call">
+          <span class="tag">⭐ Trần này lật một việc trong kế hoạch, và nó lật đúng lý lẽ của tôi</span>
+          <p><strong>Câu <em>"đưa độ phủ mapping lên 100%"</em> là một câu không thể đúng.</strong> Nguyên liệu không tồn tại: dù mọi cú ghép đều hoàn hảo, hơn một nửa vế <strong>PS Có</strong> vẫn sẽ không có lệnh chi nào để nối. ⇒ Mọi tỷ lệ đo trên <strong>8.246</strong> sẽ mãi trông như thất bại, kể cả khi việc đã làm xong.</p>
+          <p><strong>Nên việc kế tiếp không phải ghép thêm, mà là PHÂN LOẠI:</strong> dòng nào <em>cần</em> một lệnh chi, dòng nào là <em>chuyển vốn vốn không cần</em>. ⛔ Tôi đã cố ý dời việc này xuống sau, với lý lẽ <em>"phân loại trên một tập lệnh chi già 13 ngày sẽ dán nhãn sai"</em> — <strong>phép đo trần vừa bác lý lẽ đó</strong>: tập lệnh chi <em>mới</em> cũng chỉ đủ cho khoảng <strong>47%</strong>, nên chờ nó không đổi được gì. Nó khớp với một máy quét chạy ngày 22/08: <strong>3.480</strong> dòng, chở <strong>92%</strong> số tiền, và vốn <strong>không cần</strong> một lệnh chi nào.</p>
+        </div>
+
+        <div class="tblWrap">
+          <table>
+            <caption>Mốc 3 và mốc 4 — hai con số bằng KHÔNG, và cả hai là phép đo</caption>
+            <thead><tr><th>Mốc</th><th class="n">Đo được</th><th>Đọc thế nào</th></tr></thead>
+            <tbody>
+              <tr><td><strong>Mốc 3</strong> · bút toán sửa trên sổ thật</td><td class="n">⛔ <strong>0</strong></td><td>Năm cửa và một màn hình <strong>đã có</strong> và có phép thử. ⛔ Nhưng <strong>chưa một lần</strong> chạy trên sổ thật ⇒ <em>một nhánh chưa ai đi qua là một nhánh chưa biết có chạy</em>. Tiền lệ đã cắn: một đường từ chối <strong>nổ ngay lần đầu</strong> có lô thật bị chặn, vì mọi phép thử đều dùng dữ liệu sạch</td></tr>
+              <tr><td><strong>Mốc 3</strong> · thao tác của kế toán trên sổ thật</td><td class="n">⛔ <strong>0</strong></td><td>Rủi ro số một của cả dự án, và nó là <strong>hành vi</strong> chứ không phải kỹ thuật: máy xanh hết mà 2–3 kế toán quay về Sheets thì mốc này chưa xong</td></tr>
+              <tr><td><strong>Mốc 4</strong> · bộ xuất ra khuôn <strong>64</strong> cột</td><td class="n">⛔ <strong>0</strong></td><td>⭐ Tin tốt và nó đo được: <strong>cả 7 cột <em>Final</em></strong> — đúng cái output chủ sổ gọi tên — FLS <strong>đã lưu đủ</strong>, kèm phiên bản và người sửa. Khoảng cách là <strong>một bộ xuất chưa viết</strong>, không phải dữ liệu</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="call warn">
+          <span class="tag">⛔ Một việc vừa mất cả hai đích — 09/09</span>
+          <p><strong>Cơ chế ghi an toàn dựng xong sáng 09/09, và đến chiều thì không còn chỗ để ghi.</strong> Nó được dựng cho đích <em>A-CCR</em>; chủ sổ chốt <em>"không động vào trang tính kế toán đang dùng, tất cả lưu trên kho mây"</em> ⇒ cả hai đích đề xuất đều đóng. Phần đắt của nó — <strong>ô đích giải ra từ bản sống, không một địa chỉ ô nào gõ tay</strong> — vẫn đúng cho bất kỳ đích nào, nhưng <strong>tôi thôi tính nó là tiến độ</strong> cho đến khi có một đích thật.</p>
+          <p>⭐ <strong>Chủ sổ đã trả lời:</strong> <em>“kho BigQuery sẽ là nơi lưu trữ <strong>toàn bộ</strong> dữ liệu sau này”</em>. ⇒ Đích của bộ xuất là <strong>kho BigQuery</strong>, không phải trang tính nào. Phần đắt của cơ chế ghi <strong>sống nguyên</strong> — nó chỉ đổi <em>lằn chở</em>.</p>
+          <p>⛔⛔ <strong>Ba điều vẫn chưa có câu trả lời, và tôi nói ra thay vì đoán:</strong> ⓐ <em>“sau này”</em> là <strong>khi nào</strong> — hôm nay kho vận hành là kho hiện tại, và tôi đọc câu trên là <strong>đích lưu trữ dài hạn</strong>, không phải <em>“chuyển ngay”</em>; ⓑ hai luật <strong>sổ chỉ được thêm</strong> và <strong>bút toán với vết đi cùng một nhịp</strong> đang được <strong>chính kho hiện tại cưỡng chế</strong> — kho mây không có cùng ngữ nghĩa ấy và có một <strong>vùng đệm ghi</strong>, nên chuyển kho vận hành sang đó là <strong>mở lại hai luật đã đóng</strong>, không phải một phép sao chép; ⓒ hệ hôm nay có <strong>không một dòng mã nào</strong> nói chuyện với kho mây — đây là <strong>việc mới</strong>, không phải đổi một tham số.</p>
+        </div>
+
+        <h3>Kế hoạch — bốn chặng, và hai chặng đầu đã đi</h3>
+
+        <div class="tblWrap">
+          <table>
+            <caption>Việc theo chặng, và điều kiện để chặng sau mở</caption>
+            <thead><tr><th class="n">#</th><th>Việc</th><th>Trạng thái</th><th>Vì sao ở vị trí này</th></tr></thead>
+            <tbody>
+              <tr>
+                <td class="n">①</td>
+                <td>Đo lại <strong>mẫu số</strong> · cửa ghép <strong>cả lô</strong> · cơ chế <strong>ghi an toàn</strong></td>
+                <td>✔ <strong>xong 09/09</strong></td>
+                <td>⭐ Chính chặng này bắt được con số của tôi <strong>sai 8,6 lần</strong>: tôi đo <em>"ghép lô dọn được bao nhiêu"</em> bằng luật của <strong>danh sách ứng viên</strong> thay vì luật của <strong>cửa ghi</strong>. Thật: <strong>68</strong>, không phải 584</td>
+              </tr>
+              <tr>
+                <td class="n">②</td>
+                <td><strong>Nhịp chụp</strong> · <strong>phép dọn</strong> · <strong>đường nạp lệnh chi</strong></td>
+                <td>✔ <strong>xong 09/09</strong></td>
+                <td>⛔ Và nó lật <strong>ba tiền đề</strong>: phép ghép lọc lệnh chi theo <em>lượt nạp của dòng tiền</em>, nên dữ liệu lệnh chi mới <strong>không bao giờ giúp được dòng tiền cũ</strong> — đúng 6.577 dòng đang chờ. Đã sửa: phép ghép nhìn <strong>ảnh lệnh chi hiệu lực</strong>, và vết truy <strong>rõ hơn trước</strong>. Nạp mới rồi chỉ dịch được <strong>50</strong> dòng</td>
+              </tr>
+              <tr>
+                <td class="n">③</td>
+                <td>⭐⭐ <strong>Mẫu số định nghĩa bằng SỰ KIỆN, không bằng xét đoán</strong>: độ phủ trên trần, và số dòng phủ 90% tiền</td>
+                <td>✔ <strong>xong 09/09</strong></td>
+                <td>⛔⛔ <strong>Việc này ban đầu tôi viết là <em>“phân loại: cần lệnh chi ↔ vốn không cần”</em> — và đó là một việc BỊ CẤM.</strong> Chủ sổ đã trả lời ngày 27/08 rằng <strong>không có quy định nào</strong> nói khoản nào cần lệnh chi, và cùng ngày đã <strong>bỏ hẳn</strong> trạng thái giữa: máy dán cái nhãn ấy là <strong>máy tự đặt ra quy định</strong>. ⇒ Thay bằng <strong>hai phép đo</strong>: phần việc đã làm là <strong>65,6%</strong> của cái làm được, và việc người phải xem là <strong>916 dòng</strong>, không phải 4.890</td>
+              </tr>
+              <tr>
+                <td class="n">③⁺</td>
+                <td>⭐⭐ <strong>Màn ghép đổi câu hỏi: hỏi từ phía LỆNH CHI</strong></td>
+                <td>✔ <strong>xong 09/09</strong></td>
+                <td>Màn hàng chờ nay có <strong>hai lằn</strong>, và lằn <strong>theo lệnh chi</strong> là lằn <strong>mặc định</strong>: <strong>1.345</strong> dòng thay vì <strong>7.682</strong>, và <strong>69</strong> dòng trong đó phủ <strong>90% tiền</strong>. ⛔ <strong>Không một đường ghi nào mới</strong> — cú ghép vẫn đi qua đúng cửa cũ. Lằn cũ <strong>không bị xoá</strong>: nó là đường duy nhất để ghi lý do, hoãn, bỏ ghép và bấm xong</td>
+              </tr>
+              <tr>
+                <td class="n">④</td>
+                <td>Một <strong>phiên sửa thật</strong> của kế toán, rồi <strong>bộ xuất 64 cột</strong> và đối chiếu <strong>từng dòng</strong> với trang thật. ⛔ Kho mây <strong>đã hoãn</strong> — chủ sổ chốt <em>“chưa cần đến nó nếu kho hiện tại còn đáp ứng”</em></td>
+                <td>⏭ <strong>kế tiếp</strong></td>
+                <td>Xuất trước khi có bút toán sửa thật thì phép đối chiếu soi một bản xuất <strong>chưa ai chạm</strong> — nó sẽ <strong>XANH mà chưa đo gì</strong>. Và chênh phải <strong>liệt kê từng dòng</strong>, không quy về phần trăm</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="call">
+          <span class="tag">Ba việc cần người, không cần mã</span>
+          <ol class="steps">
+            <li><div>✔ <strong>Nhịp chụp: ĐÃ ĐĂNG KÝ</strong> — mỗi giờ, cửa sổ 12 giờ từ 8h, gọi một tệp bọc giữ lại đầu ra. Đã chạy thật qua bộ hẹn giờ và trả mã <strong>0</strong>.</div></li>
+            <li><div>✔ <strong>Khai nguồn mới: XONG</strong> — và là <strong>bốn</strong> nguồn chứ không phải hai như tôi báo. Lằn sao kê nay chạy được: 64 nguồn, 8.377 dòng, 3,4 giây.</div></li>
+            <li><div>✔ <strong>Đích lưu trữ: đã trả lời</strong> — kho BigQuery, cho toàn bộ dữ liệu. Còn <strong>mốc thời gian</strong> thì chưa, và nó quyết định việc chặng ④ nhỏ hay lớn.</div></li>
+            <li><div><strong>Có cho NGƯỜI gán nhãn <em>“khoản này vốn không cần lệnh chi”</em> không?</strong> Máy thì không bao giờ — chủ sổ đã chốt điều đó ngày 27/08. Nhưng <em>người</em> gán thì là một cửa khác, và nó chưa được hỏi. Không trả lời cũng được: sổ giữ đúng hai trạng thái như hiện nay.</div></li>
+          </ol>
+          <p>⛔ <strong>Ba thứ khác vẫn chặn ở chủ sổ, và cả ba thuộc lằn quỹ</strong> — ngoài phạm vi hai tác vụ, nên ⛔ đừng mở: màn sổ quỹ là màn riêng hay một bộ lọc · khuôn quỹ 11 cột · hai cột tên ở sheet quỹ <em>(có tên người ⇒ phải quyết trước khi máy đọc)</em>.</p>
         </div>
 
       </div>
@@ -1307,17 +1594,41 @@ flowchart LR
         <li><div><strong>Có một lỗi đang chảy vào báo cáo hôm nay</strong>, độc lập với lộ trình: <strong>14 tài khoản</strong> không có ô pháp nhân ⇒ <strong>211 dòng tiền</strong> (2,1%) vào báo cáo lãi lỗ không thuộc pháp nhân nào — chở 1,79 tỷ VND · 6,26 triệu USD · 3,13 triệu HKD · 10.000 SGD. Owner đã xếp <em>chưa gấp</em>; máy vẫn <strong>dán nhãn trong sổ của hệ</strong> để khi cần thì số đã có sẵn.</div></li>
       </ol>
 
-      <h3>Bước tiếp — không còn việc nào chờ owner</h3>
-      <div class="tblWrap">
-        <table>
-          <thead><tr><th class="n">#</th><th>Việc</th><th>Vì sao ở vị trí này</th></tr></thead>
-          <tbody>
-            <tr><td class="n">1</td><td><strong>Phân 1.755 cột theo phụ thuộc cạnh vượt file</strong> ⇒ chốt thước chuẩn từng cột</td><td>điều kiện vào của mọi việc code — làm từ dữ liệu đã đo, không chạm sổ</td></tr>
-            <tr><td class="n">2</td><td><strong>Chạy P1 — khuôn 36 cột + lớp ghi sổ</strong> <em>(thay việc “dựng sheet gương 3 tab” của bản gốc, đã khai tử)</em></td><td>đường mới phải có sổ bền trước khi có màn hình đọc từ nó</td></tr>
-            <tr><td class="n">3</td><td><strong>Code hoá theo thứ tự đã đo</strong>: Mapping L1 → CCR → ITL Ledge → 4 sổ H1000</td><td>xếp theo số ô × độ sâu quét, không theo cảm giác</td></tr>
-          </tbody>
-        </table>
-      </div>
+      <h3>Bước tiếp — cập nhật 2026-09-09</h3>
+
+      <p><strong>⛔ Ba việc ghi ở đây trước 09/09 là ba việc của ngày 24/08, và cả ba đã xong hoặc đã bị thay.</strong> Chúng vẫn nằm nguyên trong trang này <strong>16 ngày</strong> — trong khi đúng bên trên, chín con số tiến độ thì tươi, vì chúng được một cổng đo lại mỗi lần chạy. ⇒ Đây là chỗ rõ nhất của một hình bệnh cả dự án đang chữa: <strong>cổng canh SỐ, ⛔ không canh CÂU</strong>, nên một con số đúng có thể đứng cạnh một câu sai mà cổng vẫn xanh. Bản cũ giữ lại ở dưới làm biên bản.</p>
+
+      <p>⭐ <strong>Việc kế tiếp nay ở bản vẽ 13</strong> — <a href="#p13">Bốn mốc · cổng nào đã đóng</a>. Nó nằm ở đó chứ không ở đây vì <strong>mọi ô trạng thái của nó là một phép đo</strong>, còn một bảng ở chân trang thì không ai đo lại. Ba việc dưới đây là bản 09/09 <em>trước</em> hai chặng vừa chạy — giữ lại làm biên bản, và giữ đúng câu gốc.</p>
+
+      <details>
+        <summary>Bản 09/09 sáng — ba việc, giữ làm biên bản</summary>
+        <div class="tblWrap">
+          <table>
+            <thead><tr><th class="n">#</th><th>Việc</th><th>Vì sao ở vị trí này</th><th>Sau đó</th></tr></thead>
+            <tbody>
+              <tr><td class="n">1</td><td><strong>Cron chụp sao kê mỗi giờ, 8h–19h</strong> + <strong>phép dọn ảnh chụp</strong> <em>(giữ vĩnh viễn ảnh đã dùng để nạp, xoá ảnh không ai dùng sau 30 ngày)</em></td><td><strong>Blocker cứng duy nhất còn lại</strong> của <em>“kế toán tự đi hết một vòng”</em>: ảnh chụp đang dùng sinh ra bằng <strong>một lệnh dòng lệnh của Dev</strong>. ⛔ Hai việc này <strong>không tách rời</strong> — nhịp mỗi giờ sinh 3.000 ảnh/năm = 6,6 GB</td><td>✔ <strong>mã xong 09/09</strong>. Còn chờ <strong>một cú bấm</strong>: đăng ký nhịp vào bộ hẹn giờ của máy</td></tr>
+              <tr><td class="n">2</td><td><strong>Mã ghi sang A-CCR + biên bản CHẠY KHÔ</strong> — ⛔ <strong>không bật</strong></td><td>Làm cuối vì nó phải chạy trên một lô đã <em>nạp được cả lô</em>. ⛔ Cổng ra <strong>không phải một phép thử</strong> — nó là <strong>cú duyệt của owner</strong> trên một bản chạy khô cụ thể</td><td>⛔ <strong>mất đích</strong>. Cơ chế dựng xong sáng 09/09; chiều 09/09 chủ sổ chốt <em>lưu trên kho mây</em> ⇒ cả hai đích đề xuất đóng</td></tr>
+              <tr><td class="n">3</td><td><strong>Bốn bộ nạp nguồn còn lại</strong> <em>(C · D · E · F)</em></td><td><strong>Nợ lớn nhất theo khối lượng</strong>: khối này gánh <strong>22%</strong> mà mới <strong>55%</strong>. ⛔ Nhưng nó thuộc lằn <em>pipeline</em>, ⛔ không thuộc chặng <em>“dùng được thật”</em> — nên nó ở sau, ⛔ không phải vì nhỏ</td><td>⛔ <strong>đã GÁC</strong> — nó ⛔ không phục vụ tác vụ nào trong hai tác vụ</td></tr>
+            </tbody>
+          </table>
+        </div>
+
+        <p>⚠ <strong>Và một câu phải nói thẳng:</strong> sau cả ba việc trên, màn nạp <em>dùng được thật</em> và sổ của hệ <em>hết trễ</em> — nhưng <strong>cú copy tay trễ 19 ngày vẫn còn</strong>, vì việc 2 cố ý ⛔ không bật cú ghi. <strong>Giá trị nghiệp vụ thật đến ở cú DUYỆT bản chạy khô</strong>, ⛔ không ở việc dựng mã.</p>
+      </details>
+
+      <details>
+        <summary>Bản 24/08 — giữ làm biên bản</summary>
+        <div class="tblWrap">
+          <table>
+            <thead><tr><th class="n">#</th><th>Việc</th><th>Vì sao ở vị trí này</th></tr></thead>
+            <tbody>
+              <tr><td class="n">1</td><td><strong>Phân 1.755 cột theo phụ thuộc cạnh vượt file</strong> ⇒ chốt thước chuẩn từng cột</td><td>điều kiện vào của mọi việc code — làm từ dữ liệu đã đo, không chạm sổ ✅ <em>xong</em></td></tr>
+              <tr><td class="n">2</td><td><strong>Chạy P1 — khuôn 36 cột + lớp ghi sổ</strong></td><td>đường mới phải có sổ bền trước khi có màn hình đọc từ nó ✅ <em>xong — cả hai khối 100%</em></td></tr>
+              <tr><td class="n">3</td><td><strong>Code hoá theo thứ tự đã đo</strong>: Mapping L1 → CCR → ITL Ledge → 4 sổ H1000</td><td>xếp theo số ô × độ sâu quét ⚠ <em>đã bị thay: đường vào thật hoá ra là màn NẠP sao kê + ảnh chụp, ⛔ không phải thứ tự này</em></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </details>
     </div>
   </section>
 </main>
@@ -1326,8 +1637,8 @@ flowchart LR
   <p>Trang này là bản vẽ, không phải nguồn sự thật. Nguồn sự thật nằm trong bộ tài liệu:</p>
   <ul>
     <li><code>00_MASTER_INDEX.md</code> — sổ quyết định</li>
-    <li><code>01_Orchestrator/06_ORCHESTRATOR_DASHBOARD.md</code> v0.20 — trạng thái duy nhất</li>
-    <li><code>03_Dev/03_IMPLEMENTATION_PLAN.md</code> v1.2 §5 — <strong>Definition of Done đầy đủ của chín khối</strong>, kèm tên từng lệnh kiểm tra</li>
+    <li><code>01_Orchestrator/06_ORCHESTRATOR_DASHBOARD.md</code> <em>(sống — cập nhật mỗi phiên)</em> — trạng thái duy nhất</li>
+    <li><code>03_Dev/03_IMPLEMENTATION_PLAN.md</code> v4.7 §5 — <strong>Definition of Done đầy đủ của chín khối</strong>, kèm tên từng lệnh kiểm tra</li>
     <li><code>02_BA/Artifacts/Phuong-phap-luan-Codehoa-va-Thiet-ke-TOBE.md</code> v0.3 — phương pháp</li>
     <li><code>02_BA/Artifacts/Lo-trinh-Chuyen-doi-Gsheet-to-UI.md</code> v0.4 — lộ trình</li>
     <li><code>02_BA/Artifacts/Ket-qua-Phan-loai-4-loai-o.md</code> — số đo phân loại</li>

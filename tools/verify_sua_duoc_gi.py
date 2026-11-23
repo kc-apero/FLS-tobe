@@ -25,9 +25,16 @@ import psycopg                                                    # noqa: E402
 from fls.db.kho import dsn_test                                   # noqa: E402
 from fls.repo import doc_bao_cao as bc                            # noqa: E402
 from fls.repo import ghi_tay as gt                                # noqa: E402
+from fls.repo.danh_muc_actor import (ACTOR_VERIFY_SUA,            # noqa: E402
+                                     ACTOR_VERIFY_SUA_2)
 from fls.repo.pham_vi import mot_lan_nap                          # noqa: E402
 
-ACTOR = "ke-toan@apero.vn"
+# ⛔ `WO-011` / `HOI-012` cau 1: truoc day cong cu nay ghi `ke-toan@apero.vn`
+#   — mot ten GIONG NGUOI, trong khi no la mot CONG CU *(chay kho TEST)*, va
+#   chinh chuoi ay la actor **nguoi mau** cua bai nghiem thu `KQ-002`. Mot
+#   chuoi mang hai nghia la cho thuoc "nguoi that" vo lan thu tu. ⇒ Ten MAY,
+#   khai o SO ACTOR.
+ACTOR = ACTOR_VERIFY_SUA
 OK, NO = "  DUOC", "  ⛔ BI CHAN"
 
 
@@ -102,7 +109,7 @@ def main() -> int:
         print("③ SUA LAN THU HAI, THU BA")
         _thu("go tiep gia tri thu ba",
              gt.ghi_but_toan, c, pv, i, "hd", "OPC | Operating Cost",
-             actor="ke-toan-2@apero.vn", reason="doi lai", force=True)
+             actor=ACTOR_VERIFY_SUA_2, reason="doi lai", force=True)
         t = gt.truoc_khi_go(c, pv, i, "hd")
         print(f"  -> hieu luc: {t['gia_tri']!r}")
         n = len(bc.doc_nhat_ky(c, pv, i))

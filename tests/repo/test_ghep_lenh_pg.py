@@ -261,15 +261,51 @@ def test_TU_CHOI_dong_lenh_KHONG_co_trong_anh_chup(conn):
     assert e.value.them["khac"]["thieu"] == ["KHONG-CO"]
 
 
-def test_TU_CHOI_dong_lenh_cua_LAN_NAP_KHAC(conn):
-    """★ Anh chup gan voi LAN NAP. Dong lenh cua lan nap khac ⛔ khong dung duoc —
-    khong thi lineage `INV-I05` dut, va tien co the da doi tu luc do."""
-    r1, r2 = _run(conn), _run(conn)
-    i = _dong_bank(conn, r1, "100.00")
-    _lenh(conn, r2, ("PM8-1", "100.00", "VND", "Approve", "H", "C"))
-    with pytest.raises(gt.DongLenhLa):
-        gt.ghep_lenh(conn, chi_nap_that(), i, ["PM8-1"],
+def test_TU_CHOI_dong_lenh_cua_ANH_CU__khong_con_trong_anh_HIEU_LUC(conn):
+    """★ Dong lenh chi co trong mot anh chup **CU** ⛔ khong ghep duoc.
+
+    ⛔⛔ **Bai nay tung ghim mot luat KHAC, va luat ay da bi lat 09/09
+    (`QĐ-ITL-119`).** Nguyen van cu:
+
+        *"Anh chup gan voi LAN NAP. Dong lenh cua lan nap khac ⛔ khong dung
+        duoc — khong thi lineage `INV-I05` dut, va tien co the da doi tu luc
+        do."*
+
+    ⛔ Ly le ay **nghe dung** va no song 13 ngay. Nhung no co mot he qua
+    ⛔ khong ai viet ra: **du lieu lenh chi MOI ⛔ KHONG BAO GIO giup duoc dong
+    tien CU** — va dong tien cu chinh la **6.577 dong** ma moc `A3` duoc dat ra
+    de go. Do that: nap mot dong lenh mang dung ma vao mot `run_id` moi ⇒
+    `ung_vien_pm` tra **0 ung vien** *(xem `fls/repo/anh_pm.py`)*.
+
+    ⭐ Nen luat moi la **anh PM DOC GAN NHAT**, va bai nay giu **dung dieu no
+    lo**: mot `pm_line_id` ⛔ **khong nam trong anh dang hieu luc** thi
+    ⛔ khong ghep duoc. Chi co dinh nghia *"anh nao"* la doi.
+
+    ⇒ Kho bai: `PM8-CU` chi ton tai o anh **cu**, `PM8-MOI` o anh **moi**.
+      Anh moi la anh hieu luc ⇒ `PM8-CU` bi tu choi, `PM8-MOI` ghep duoc.
+    """
+    r_so, r_cu, r_moi = _run(conn), _run(conn), _run(conn)
+    i = _dong_bank(conn, r_so, "100.00")
+    _lenh(conn, r_cu, ("PM8-CU", "100.00", "VND", "Approve", "H", "C"))
+    _lenh(conn, r_moi, ("PM8-MOI", "100.00", "VND", "Approve", "H", "C"))
+
+    with pytest.raises(gt.DongLenhLa) as e:
+        gt.ghep_lenh(conn, chi_nap_that(), i, ["PM8-CU"],
                      actor=ACTOR, reason=LY_DO)
+    assert e.value.them["khac"]["thieu"] == ["PM8-CU"]
+
+    # ⭐⭐ Va day la nua **MOI** cua bai: dong lenh cua anh MOI ghep duoc cho
+    #    mot dong tien thuoc mot lan nap KHAC — dung cai luat cu chan.
+    ra = gt.ghep_lenh(conn, chi_nap_that(), i, ["PM8-MOI"],
+                      actor=ACTOR, reason=LY_DO)
+    assert [x["pm_line_id"] for x in ra["moi_noi"]] == ["PM8-MOI"]
+    # ⛔ Va vet truy PHAI ghi **anh PM da dung**, ⛔ khong phai lan nap cua
+    #   dong tien: do la ca ly do doi luat nay ⛔ khong lam dut vet.
+    assert ra["run_id"] == r_moi
+    assert ra["run_dong_tien"] == r_so
+    assert conn.execute(
+        "SELECT run_id FROM fls_pm_link WHERE itl_id = %s", (i,)
+    ).fetchone()[0] == r_moi
 
 
 def test_TU_CHOI_khi_dong_DA_ghep__kem_moi_noi_dang_co(conn):
@@ -321,13 +357,26 @@ def test_TU_CHOI_ky_DA_CHOT__ke_ca_force(conn):
                          actor=ACTOR, reason=LY_DO, force=f)
 
 
-def test_TU_CHOI_khi_THIEU_LY_DO(conn):
-    """Ly do la bat buoc — mot phep ghep khong noi vi sao la khong truy duoc."""
+def test_THIEU_LY_DO_thi_vet_mang_ly_do_MAC_DINH__KHONG_bao_gio_rong(conn):
+    """⛔⛔ **Bai nay tung ghim mot luat KHAC, va luat ay da bi lat 01/10
+    (`QĐ-ITL-149`, owner: *"bo yeu cau ly do cho cu Ghep"*).** Ten cu:
+    `test_TU_CHOI_khi_THIEU_LY_DO` — *"Ly do la bat buoc — mot phep ghep khong
+    noi vi sao la khong truy duoc."* Luat ay lam nut `Gan` tren may that tra
+    **400** vi man ⛔ co o ly do (`KQ-002 F-1`).
+
+    ⭐ **Lo goc VAN dung, va bai giu dung lo ay:** vet `fls_queue_event` ⛔ bao
+      gio mang `reason` RONG (lo 27/08). Chi cach giu doi: thieu ly do ⇒ may
+      dien **ly do mac dinh co nhan** `(may dien)` (`BA-07 §4h ⓼`), ⛔ tu choi.
+    """
     run = _run(conn)
     i = _dong_bank(conn, run, "100.00")
     _lenh(conn, run, ("PMD-1", "100.00", "VND", "Approve", "H", "C"))
-    with pytest.raises(gt.ThieuLyDo):
-        gt.ghep_lenh(conn, chi_nap_that(), i, ["PMD-1"], actor=ACTOR, reason="  ")
+    ra = gt.ghep_lenh(conn, chi_nap_that(), i, ["PMD-1"], actor=ACTOR,
+                      reason="  ")
+    vet = conn.execute("select reason, actor from fls_queue_event"
+                       " where evt_id=%s", (ra["evt_id"],)).fetchone()
+    assert vet[0].startswith(gt.LY_DO_MAC_DINH_GHEP), vet
+    assert vet[1] == ACTOR, "⛔ ly do do MAY dien, nhung NGUOI bam"
 
 
 def test_TU_CHOI_khi_danh_sach_RONG_hay_LAP(conn):

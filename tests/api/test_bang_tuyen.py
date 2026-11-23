@@ -28,9 +28,38 @@ def test_KHONG_duong_nao_GHI_vao_so():
 
     ⇒ Bai nay khoa dieu **khong bao gio doi**: `fls_itl` la append-only
     (`INV-I08`), nen ⛔ khong tuyen nao — du phuong thuc gi — duoc GHI vao no.
+
+    ── ⛔⛔ 2026-09-08 · VA CHINH BAI NAY DA ROI VAO CAI BAY NO VUA TA ────────
+
+    Doan tren viet: *"bai `P4` dung luc do nhung SAI LUAT — no khoa mot trang
+    thai TAM THOI thay vi mot BAT BIEN"*. Bai nay **lam y het the**, chi tinh
+    vi hon: `INV-I08` doc nguyen van la *"chi **THEM**, ⛔ khong **SUA**"*, ma
+    cau khang dinh o day lai la *"⛔ khong ai duoc **GHI**"*. **THEM cung la
+    ghi.** ⇒ No khoa *"⛔ chua tuyen nao NAP"* — dung, vi cho toi 08/09 duong
+    duy nhat dua du lieu vao kho la mot **lenh dong lenh**, va moi `POST` deu
+    SUA mot dong DA CO.
+
+    `CR#11` dung `POST /nap` (`BA-07` §4b) — tuyen **DAU TIEN THEM** dong vao
+    so. Cong cu se cam **chinh cai phep ma `INV-I08` cho phep**.
+
+    ⚠ **Noi thang: day LA noi long tren MOT truc** — truoc: `0` tuyen ghi
+      duoc; nay: `1`. ⛔ Khong giau bang cach goi no la "lam ro". Doi lai, cho
+      duy nhat ay bi siet bang **BON** dieu kien, va ba trong so do ⛔ khong he
+      ton tai truoc do:
+        ⓐ phai khai `them_vao_so` — mot **ngoai le CO TEN**, dem duoc;
+        ⓑ phai la `POST` *(`PUT`/`DELETE`/`PATCH` len so van cam TUYET DOI)*;
+        ⓒ phai ghi ca `fls_run` *(dong so ⛔ khong co lan nap = mat lineage)*;
+        ⓓ ca `fls/` ⛔ khong duoc chua mot cau `UPDATE`/`DELETE` nao nham
+           `fls_itl` — **quet ma nguon**, `tests/api/test_them_vao_so.py`.
+      ⇒ Phep **SUA** so — thu `INV-I08` that su cam — nay bi chan o **ba** lop:
+        trigger kho (`INV-I03`), bang tuyen, va quet ma nguon.
+
+    ⭐ Bai nay ⛔ **KHONG bi xoa**. No van khoa ve *"moi tuyen KHAC"*, va no
+      giu nguyen loi canh bao o tren — de nguoi sau doc duoc **ca hai lan** mot
+      cau khang dinh tuong nhu bat bien hoa ra chi la mot trang thai.
     """
     xau = [f"{t.phuong_thuc} {t.duong}" for t in bt.BANG_TUYEN
-           if bt.SO in t.bang_ghi]
+           if bt.SO in t.bang_ghi and not t.them_vao_so]
     assert xau == [], f"co tuyen khai GHI vao {bt.SO}: {xau}"
 
 

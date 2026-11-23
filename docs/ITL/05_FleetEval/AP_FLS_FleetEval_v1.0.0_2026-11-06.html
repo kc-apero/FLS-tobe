@@ -1,0 +1,548 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="ap-lineage" content="AP_FLS_FleetEval">
+<title>Fleet Eval AP · FLS phase 1 · v1.0.0</title>
+<!-- AP_FLS_FleetEval_v1.0.0_2026-11-06.html · mỗi thay đổi là một file mới; bản trước giữ nguyên -->
+<style>
+  :root {
+    --ink: #1f2933; --muted: #52606d; --line: #cbd2d9; --soft: #f5f7fa; --accent: #1d4ed8;
+    --draft: #6b7280; --review: #b45309; --agreed: #15803d; --fill: #fff4d6;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #ffffff; color: var(--ink);
+         font: 15px/1.55 -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+  main { max-width: 1040px; margin: 0 auto; padding: 28px 16px 64px; }
+  h1 { font-size: 1.7rem; margin: 0 0 4px; }
+  h2 { font-size: 1.35rem; margin: 44px 0 8px; padding-top: 10px; border-top: 2px solid var(--ink); }
+  h3 { font-size: 1.08rem; margin: 26px 0 6px; }
+  p, li { max-width: 75ch; }
+  .sub { color: var(--muted); margin: 0 0 18px; }
+  nav { background: var(--soft); border: 1px solid var(--line); border-radius: 6px; padding: 10px 16px; }
+  nav ol { margin: 4px 0; padding-left: 20px; } nav a { color: var(--accent); text-decoration: none; }
+  .tw { overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; margin: 8px 0; font-size: 0.9rem; }
+  th, td { border: 1px solid var(--line); padding: 5px 8px; text-align: left; vertical-align: top; }
+  th { background: var(--soft); }
+  tr.band td { background: var(--soft); font-weight: 600; color: var(--muted); }
+  .state { display: inline-block; font-size: 0.72rem; font-weight: 600; padding: 1px 7px; border-radius: 10px;
+           border: 1px solid currentColor; vertical-align: middle; margin-left: 6px; }
+  .state.draft { color: var(--draft); } .state.review { color: var(--review); } .state.agreed { color: var(--agreed); }
+  .fill { background: var(--fill); padding: 0 3px; border-radius: 3px; }
+  figure { margin: 12px 0; } figcaption { color: var(--muted); font-size: 0.88rem; margin-top: 6px; }
+  .grid-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 6px; }
+  .grid-wrap svg { min-width: 900px; display: block; }
+  details summary { cursor: pointer; color: var(--accent); }
+  code { background: var(--soft); padding: 0 4px; border-radius: 3px; }
+  .note { background: #fffbeb; border: 1px solid #fde68a; border-radius: 6px; padding: 8px 12px; }
+</style>
+</head>
+<body>
+<main>
+<h1>Fleet Eval AP · FLS phase 1 · vùng NẠP</h1>
+<p class="sub">Kế hoạch đo từng agent LLM của FLS, mỗi lần một phiên bản đóng băng.
+Phương pháp: <i>Fleet Eval Round how-to v1.0</i> (handoff của anh Tuấn). Tiền đề: TO-BE đã đối chiếu từng bước với AS-IS
+(<code>docs/ITL/02_BA/Artifacts/Kiem-TOBE-theo-ASIS.md</code>). Sơ đồ voi: artifact <i>Voi FLS-tobe-phase1</i> v0.5, §9.</p>
+
+<div class="tw"><table>
+<tr><th>Phiên bản</th><td>1.0.0</td><th>Ngày</th><td>2026-11-06</td></tr>
+<tr><th>Trạng thái</th><td colspan="3"><span class="state review">review</span> · mỗi mục mang trạng thái riêng: draft → review → agreed. Chỉ owner đặt agreed.</td></tr>
+<tr><th>Owner · operator · duyệt độc lập</th><td colspan="3">Owner <b>ThuongCT</b> · operator <b>KhanhCQ</b> · duyệt độc lập <b>Lanptn</b>. ⚠ KhanhCQ đồng thời <b>dựng mọi agent và prompt</b> — trái quy tắc "operator không sửa agent" của how-to; cách bù ở Q1 (§3.2) và A6 (§3.1).</td></tr>
+<tr><th>Thay đổi trong bản này</th><td colspan="3">Bản đầu: 1.1 mục tiêu · 1.2 sơ đồ 4 dải · 6 agent · 2.1 bốn thẻ (A3.1 · A3.2 · A3.3 · A4) · 2.2 vòng R1–R8 · 2.3 lưu và làm sạch · 3.1 nghiệm thu A1–A7 · 3.2 câu hỏi mở Q1–Q6.</td></tr>
+<tr><th>Bản trước</th><td colspan="3">không có</td></tr>
+</table></div>
+<details><summary>Lịch sử thay đổi</summary>
+<div class="tw"><table><tr><th>Phiên bản</th><th>Ngày</th><th>Thay đổi</th></tr>
+<tr><td>1.0.0</td><td>2026-11-06</td><td>Bản đầu, từ phỏng vấn KhanhCQ 06/11 (ba đợt câu hỏi + Gate 1–3).</td></tr></table></div>
+</details>
+
+<nav><b>Mục lục</b>
+<ol>
+  <li><a href="#p1">Khung</a><ol><li><a href="#s1-1">Mục tiêu</a></li><li><a href="#s1-2">Sơ đồ quy trình</a></li></ol></li>
+  <li><a href="#p2">Thiết kế</a><ol><li><a href="#s2-1">Thẻ eval</a></li><li><a href="#s2-2">Thiết kế vòng</a></li><li><a href="#s2-3">Lưu và làm sạch</a></li></ol></li>
+  <li><a href="#p3">Đóng</a><ol><li><a href="#s3-1">Nghiệm thu</a></li><li><a href="#s3-2">Câu hỏi mở</a></li></ol></li>
+</ol></nav>
+
+<!-- ============================== PART 1 ============================== -->
+<h2 id="p1">1. Khung</h2>
+
+<h3 id="s1-1">1.1 Mục tiêu <span class="state review">review</span></h3>
+<div class="tw"><table>
+<tr><th>Quy trình</th><td>FLS thay thế sổ ITL chạy tay trên Google Sheets: đọc sao kê, sổ quỹ, CCR, sổ cái PM·PC, sổ H1000 và file Looker, nối từng giao dịch bank với lệnh chi / dòng lương / chi phí nền tảng, soát, rồi ghi vào <b>một</b> sổ ITL chỉ-thêm. Đầu ra là sổ hiệu lực và báo cáo daily trong CCR, người đọc là ThuongCT và kế toán.</td></tr>
+<tr><th>Vì sao đo bây giờ</th><td>Các chặng NẠP sẽ chuyển từ mã tất định sang <b>agent LLM (Qwen 3.8-27B, chạy local)</b>. Mỗi phiên bản agent phải được đo trước khi dùng thật, và không được tệ hơn bản mã <code>v0</code> đang chạy.</td></tr>
+<tr><th>Kết quả</th><td>Mỗi agent có đầu ra vào sổ đều có người kiểm hoặc fleet eval. Mỗi phiên bản mới của A3.1 · A3.2 · A3.3 · A4 có một vòng đo, báo cáo vòng, và quyết định ship / chặn / chạy lại trước khi phát hành.</td></tr>
+<tr><th>Ngoài phạm vi</th><td>Thẻ eval cho A1 KHAI &amp; CHỤP và A2 DỰNG (phiên bản AP sau; hôm nay kế toán đã xem từng lô) · xây harness (skill <code>code-fleet-eval</code>) · chạy vòng và viết báo cáo vòng (skill <code>run-fleet-eval</code>) · phân bổ CFA2 (giai đoạn ALLOCATE).</td></tr>
+</table></div>
+
+<h3 id="s1-2">1.2 Sơ đồ quy trình <span class="state review">review</span></h3>
+<p>Mọi agent của vùng NẠP trên một lưới. Dòng là dải (agent làm gì với công việc); cột đi theo một mục từ người đưa vào tới nơi lưu.
+Kiểu viền = trạng thái, màu nền = độ nặng của người kiểm, cờ góc = hỏi bao lâu một lần. Sinh bằng <code>render_grid.py</code> từ
+<code>grid-spec.json</code>; ⛔ sửa SVG bằng tay.</p>
+<figure>
+<div class="grid-wrap">
+<!-- GRID:BEGIN -->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1274 850" width="100%" role="img" aria-label="FLS phase 1 · vùng NẠP: sáu agent (Qwen 3.8-27B, chạy local) và fleet eval của từng agent: process bands by columns from human input to store, with a store, scrubber and improvement loop" font-family="-apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif">
+<defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#52606d"/></marker></defs>
+<rect x="0" y="0" width="1274" height="850" fill="#ffffff"/>
+<rect x="112.0" y="10" width="548.0" height="20" rx="4" fill="#f5f7fa"/>
+<text x="386.0" y="24.0" font-size="10" font-weight="bold" fill="#52606d" text-anchor="middle">BEFORE IT GOES LIVE</text>
+<rect x="706.0" y="10" width="268.0" height="20" rx="4" fill="#f5f7fa"/>
+<text x="840.0" y="24.0" font-size="10" font-weight="bold" fill="#52606d" text-anchor="middle">LIVE</text>
+<rect x="986.0" y="10" width="268.0" height="20" rx="4" fill="#f5f7fa"/>
+<text x="1120.0" y="24.0" font-size="10" font-weight="bold" fill="#52606d" text-anchor="middle">MEASURE AND KEEP</text>
+<text x="176.0" y="50.0" font-size="10.5" font-weight="bold" fill="#b91c1c" text-anchor="middle">NGƯỜI ĐƯA VÀO</text>
+<text x="316.0" y="50.0" font-size="10.5" font-weight="bold" fill="#6d28d9" text-anchor="middle">AGENT (LLM)</text>
+<text x="456.0" y="50.0" font-size="10.5" font-weight="bold" fill="#52606d" text-anchor="middle">ĐẦU RA</text>
+<text x="596.0" y="50.0" font-size="10.5" font-weight="bold" fill="#b91c1c" text-anchor="middle">NGƯỜI KIỂM</text>
+<text x="770.0" y="50.0" font-size="10.5" font-weight="bold" fill="#52606d" text-anchor="middle">VÀO SỔ</text>
+<text x="910.0" y="50.0" font-size="10.5" font-weight="bold" fill="#b91c1c" text-anchor="middle">NGƯỜI DÙNG</text>
+<text x="1050.0" y="50.0" font-size="10.5" font-weight="bold" fill="#1d4ed8" text-anchor="middle">FLEET EVAL</text>
+<text x="1190.0" y="50.0" font-size="10.5" font-weight="bold" fill="#0f766e" text-anchor="middle">LƯU</text>
+<rect x="668.0" y="64" width="28" height="582" rx="4" fill="#0f766e" fill-opacity="0.10" stroke="#0f766e" stroke-dasharray="3 3"/>
+<text x="686.0" y="355.0" font-size="9.5" font-weight="bold" fill="#0f766e" text-anchor="middle" transform="rotate(-90 686.0 355.0)">SCRUBBER</text>
+<rect x="8" y="70" width="94" height="82" rx="6" fill="#f5f7fa" stroke="#cbd2d9"/>
+<text x="55.0" y="115.0" font-size="12" font-weight="bold" fill="#1f2933" text-anchor="middle">① KHAI·CHỤP</text>
+<text x="55.0" y="129.0" font-size="8.5" font-weight="normal" fill="#52606d" text-anchor="middle">đọc nguồn</text>
+<rect x="112.0" y="70.0" width="128.0" height="74.0" rx="6" fill="#b91c1c" fill-opacity="0.04" stroke="#b91c1c" stroke-width="1.6"><title>KT ngân hàng · quỹ | kind: human | status: built | sub: dán sao kê R |, sổ quỹ, số dư CCR</title></rect>
+<text x="119.0" y="87.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">KT ngân hàng · quỹ</text>
+<text x="119.0" y="100.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">dán sao kê R |, sổ</text>
+<text x="119.0" y="113.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">quỹ, số dư CCR</text>
+<rect x="252.0" y="70.0" width="128.0" height="74.0" rx="6" fill="#6d28d9" fill-opacity="0.04" stroke="#6d28d9" stroke-width="1.6" stroke-dasharray="2 3"><title>A1 · KHAI &amp; CHỤP | kind: llm | status: proposed | sub: Qwen 3.8-27B local · v1 (v0 = mã)</title></rect>
+<text x="259.0" y="87.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">A1 · KHAI &amp; CHỤP</text>
+<text x="259.0" y="100.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">Qwen 3.8-27B local ·</text>
+<text x="259.0" y="113.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">v1 (v0 = mã)</text>
+<line x1="241.0" y1="107.0" x2="250.0" y2="107.0" stroke="#52606d" stroke-width="1.4" marker-end="url(#arr)"/>
+<rect x="392.0" y="70.0" width="128.0" height="74.0" rx="6" fill="#52606d" fill-opacity="0.04" stroke="#52606d" stroke-width="1.6" stroke-dasharray="7 4"><title>Bản khai + ảnh | kind: artefact | status: partial | sub: cột · thứ tự ngày · LE</title></rect>
+<text x="399.0" y="87.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">Bản khai + ảnh</text>
+<text x="399.0" y="100.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">cột · thứ tự ngày ·</text>
+<text x="399.0" y="113.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">LE</text>
+<line x1="381.0" y1="107.0" x2="390.0" y2="107.0" stroke="#52606d" stroke-width="1.4" marker-end="url(#arr)"/>
+<rect x="532.0" y="70.0" width="128.0" height="74.0" rx="6" fill="#b91c1c" fill-opacity="0.28" stroke="#b91c1c" stroke-width="1.6" stroke-dasharray="7 4"><title>KT khai, owner ký | kind: human | status: partial | weight: medium | freq: each | sub: mỗi nguồn mỗi version</title></rect>
+<text x="539.0" y="96.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">KT khai, owner ký</text>
+<text x="539.0" y="109.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">mỗi nguồn mỗi</text>
+<text x="539.0" y="122.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">version</text>
+<path d="M621.2 70.0 h32.8 a6 6 0 0 1 6 6 v10 h-38.8 z" fill="#b91c1c"/>
+<text x="640.6" y="81.5" font-size="8.5" font-weight="bold" fill="#ffffff" text-anchor="middle">EACH</text>
+<line x1="521.0" y1="107.0" x2="530.0" y2="107.0" stroke="#52606d" stroke-width="1.4" marker-end="url(#arr)"/>
+<rect x="986.0" y="70.0" width="128.0" height="74.0" rx="6" fill="#1d4ed8" fill-opacity="0.04" stroke="#1d4ed8" stroke-width="1.6" stroke-dasharray="2 3"><title>a1-khai-chup.eval.lech-cot-ngay | kind: fleet | status: proposed | freq: version | sample: phiên bản sau | cost: không trần · ghi giờ GPU</title></rect>
+<text x="993.0" y="96.0" font-size="9.6" font-weight="bold" fill="#1f2933" text-anchor="start">a1-khai-chup</text>
+<text x="993.0" y="109.0" font-size="9.6" font-weight="bold" fill="#1f2933" text-anchor="start">.eval.lech-cot-ngay</text>
+<text x="993.0" y="122.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">phiên bản sau</text>
+<text x="993.0" y="135.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">không trần · ghi giờ</text>
+<path d="M1081.4 70.0 h26.6 a6 6 0 0 1 6 6 v10 h-32.6 z" fill="#1d4ed8"/>
+<text x="1097.7" y="81.5" font-size="8.5" font-weight="bold" fill="#ffffff" text-anchor="middle">VER</text>
+<line x1="661.0" y1="107.0" x2="984.0" y2="107.0" stroke="#52606d" stroke-width="1.4" marker-end="url(#arr)"/>
+<rect x="1126.0" y="70.0" width="128.0" height="74.0" rx="6" fill="#0f766e" fill-opacity="0.04" stroke="#0f766e" stroke-width="1.6"><title>fls_khai_cot | kind: store | status: built | sub: fls_chup · khai_version</title></rect>
+<text x="1133.0" y="87.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">fls_khai_cot</text>
+<text x="1133.0" y="100.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">fls_chup ·</text>
+<text x="1133.0" y="113.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">khai_version</text>
+<line x1="1115.0" y1="107.0" x2="1124.0" y2="107.0" stroke="#52606d" stroke-width="1.4" marker-end="url(#arr)"/>
+<rect x="8" y="170" width="94" height="82" rx="6" fill="#f5f7fa" stroke="#cbd2d9"/>
+<text x="55.0" y="215.0" font-size="12" font-weight="bold" fill="#1f2933" text-anchor="middle">② DỰNG</text>
+<text x="55.0" y="229.0" font-size="8.5" font-weight="normal" fill="#52606d" text-anchor="middle">chuẩn hoá dòng</text>
+<rect x="112.0" y="170.0" width="128.0" height="74.0" rx="6" fill="#b91c1c" fill-opacity="0.04" stroke="#b91c1c" stroke-width="1.6" stroke-dasharray="7 4"><title>Ảnh của A1 | kind: human | status: partial | sub: bank · quỹ · CCR · PM·PC</title></rect>
+<text x="119.0" y="187.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">Ảnh của A1</text>
+<text x="119.0" y="200.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">bank · quỹ · CCR ·</text>
+<text x="119.0" y="213.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">PM·PC</text>
+<rect x="252.0" y="170.0" width="128.0" height="74.0" rx="6" fill="#6d28d9" fill-opacity="0.04" stroke="#6d28d9" stroke-width="1.6" stroke-dasharray="2 3"><title>A2 · DỰNG | kind: llm | status: proposed | sub: Qwen 3.8-27B local · v1 (v0 = mã)</title></rect>
+<text x="259.0" y="187.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">A2 · DỰNG</text>
+<text x="259.0" y="200.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">Qwen 3.8-27B local ·</text>
+<text x="259.0" y="213.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">v1 (v0 = mã)</text>
+<line x1="241.0" y1="207.0" x2="250.0" y2="207.0" stroke="#52606d" stroke-width="1.4" marker-end="url(#arr)"/>
+<rect x="392.0" y="170.0" width="128.0" height="74.0" rx="6" fill="#52606d" fill-opacity="0.04" stroke="#52606d" stroke-width="1.6"><title>Dòng tiền hai vế | kind: artefact | status: built | sub: canon 36 · content_key</title></rect>
+<text x="399.0" y="187.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">Dòng tiền hai vế</text>
+<text x="399.0" y="200.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">canon 36 ·</text>
+<text x="399.0" y="213.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">content_key</text>
+<line x1="381.0" y1="207.0" x2="390.0" y2="207.0" stroke="#52606d" stroke-width="1.4" marker-end="url(#arr)"/>
+<rect x="532.0" y="170.0" width="128.0" height="74.0" rx="6" fill="#b91c1c" fill-opacity="0.28" stroke="#b91c1c" stroke-width="1.6"><title>KT xem trước lô | kind: human | status: built | weight: medium | freq: each | sub: F04 · S3</title></rect>
+<text x="539.0" y="202.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">KT xem trước lô</text>
+<text x="539.0" y="215.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">F04 · S3</text>
+<path d="M621.2 170.0 h32.8 a6 6 0 0 1 6 6 v10 h-38.8 z" fill="#b91c1c"/>
+<text x="640.6" y="181.5" font-size="8.5" font-weight="bold" fill="#ffffff" text-anchor="middle">EACH</text>
+<line x1="521.0" y1="207.0" x2="530.0" y2="207.0" stroke="#52606d" stroke-width="1.4" marker-end="url(#arr)"/>
+<rect x="986.0" y="170.0" width="128.0" height="74.0" rx="6" fill="#1d4ed8" fill-opacity="0.04" stroke="#1d4ed8" stroke-width="1.6" stroke-dasharray="2 3"><title>a2-dung.eval.mat-dong | kind: fleet | status: proposed | freq: version | sample: phiên bản sau | cost: không trần · ghi giờ GPU</title></rect>
+<text x="993.0" y="196.0" font-size="9.6" font-weight="bold" fill="#1f2933" text-anchor="start">a2-dung</text>
+<text x="993.0" y="209.0" font-size="9.6" font-weight="bold" fill="#1f2933" text-anchor="start">.eval.mat-dong</text>
+<text x="993.0" y="222.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">phiên bản sau</text>
+<text x="993.0" y="235.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">không trần · ghi giờ</text>
+<path d="M1081.4 170.0 h26.6 a6 6 0 0 1 6 6 v10 h-32.6 z" fill="#1d4ed8"/>
+<text x="1097.7" y="181.5" font-size="8.5" font-weight="bold" fill="#ffffff" text-anchor="middle">VER</text>
+<line x1="661.0" y1="207.0" x2="984.0" y2="207.0" stroke="#52606d" stroke-width="1.4" marker-end="url(#arr)"/>
+<rect x="1126.0" y="170.0" width="128.0" height="74.0" rx="6" fill="#0f766e" fill-opacity="0.04" stroke="#0f766e" stroke-width="1.6"><title>fls_itl | kind: store | status: built | sub: fls_reject · run_id</title></rect>
+<text x="1133.0" y="193.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">fls_itl</text>
+<text x="1133.0" y="206.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">fls_reject · run_id</text>
+<line x1="1115.0" y1="207.0" x2="1124.0" y2="207.0" stroke="#52606d" stroke-width="1.4" marker-end="url(#arr)"/>
+<rect x="8" y="270" width="94" height="262" rx="6" fill="#f5f7fa" stroke="#cbd2d9"/>
+<text x="55.0" y="405.0" font-size="12" font-weight="bold" fill="#1f2933" text-anchor="middle">③ MAPPING</text>
+<text x="55.0" y="419.0" font-size="8.5" font-weight="normal" fill="#52606d" text-anchor="middle">nối lệnh chi</text>
+<rect x="112.0" y="270.0" width="128.0" height="74.0" rx="6" fill="#b91c1c" fill-opacity="0.04" stroke="#b91c1c" stroke-width="1.6"><title>Dòng tiền + lệnh | kind: human | status: built | sub: PM·PC, Ref do CA gõ</title></rect>
+<text x="119.0" y="293.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">Dòng tiền + lệnh</text>
+<text x="119.0" y="306.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">PM·PC, Ref do CA gõ</text>
+<rect x="252.0" y="270.0" width="128.0" height="74.0" rx="6" fill="#6d28d9" fill-opacity="0.04" stroke="#6d28d9" stroke-width="1.6" stroke-dasharray="2 3"><title>A3.1 · PP (1) Ref | kind: llm | status: proposed | sub: Qwen 3.8-27B local · v1 (v0 = mã)</title></rect>
+<text x="259.0" y="287.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">A3.1 · PP (1) Ref</text>
+<text x="259.0" y="300.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">Qwen 3.8-27B local ·</text>
+<text x="259.0" y="313.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">v1 (v0 = mã)</text>
+<line x1="241.0" y1="307.0" x2="250.0" y2="307.0" stroke="#52606d" stroke-width="1.4" marker-end="url(#arr)"/>
+<rect x="392.0" y="270.0" width="128.0" height="74.0" rx="6" fill="#52606d" fill-opacity="0.04" stroke="#52606d" stroke-width="1.6"><title>L1 · L2 · L3 | kind: artefact | status: built | sub: + gợi ý HD/CDT1</title></rect>
+<text x="399.0" y="293.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">L1 · L2 · L3</text>
+<text x="399.0" y="306.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">+ gợi ý HD/CDT1</text>
+<line x1="381.0" y1="307.0" x2="390.0" y2="307.0" stroke="#52606d" stroke-width="1.4" marker-end="url(#arr)"/>
+<rect x="532.0" y="270.0" width="128.0" height="74.0" rx="6" fill="#b91c1c" fill-opacity="0.28" stroke="#b91c1c" stroke-width="1.6" stroke-dasharray="7 4"><title>KT ghép · sửa F01 | kind: human | status: partial | weight: medium | freq: each | sub: S5 · dòng hàng chờ</title></rect>
+<text x="539.0" y="302.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">KT ghép · sửa F01</text>
+<text x="539.0" y="315.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">S5 · dòng hàng chờ</text>
+<path d="M621.2 270.0 h32.8 a6 6 0 0 1 6 6 v10 h-38.8 z" fill="#b91c1c"/>
+<text x="640.6" y="281.5" font-size="8.5" font-weight="bold" fill="#ffffff" text-anchor="middle">EACH</text>
+<line x1="521.0" y1="307.0" x2="530.0" y2="307.0" stroke="#52606d" stroke-width="1.4" marker-end="url(#arr)"/>
+<rect x="706.0" y="270.0" width="128.0" height="74.0" rx="6" fill="#52606d" fill-opacity="0.04" stroke="#52606d" stroke-width="1.6" stroke-dasharray="7 4"><title>Sổ hiệu lực | kind: artefact | status: partial | sub: → báo cáo daily CCR</title></rect>
+<text x="713.0" y="293.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">Sổ hiệu lực</text>
+<text x="713.0" y="306.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">→ báo cáo daily CCR</text>
+<line x1="661.0" y1="307.0" x2="704.0" y2="307.0" stroke="#52606d" stroke-width="1.4" marker-end="url(#arr)"/>
+<rect x="846.0" y="270.0" width="128.0" height="74.0" rx="6" fill="#b91c1c" fill-opacity="0.28" stroke="#b91c1c" stroke-width="1.6" stroke-dasharray="7 4"><title>ThuongCT · kế toán | kind: human | status: partial | weight: medium | freq: each | sub: duyệt · sửa · khiếu nại</title></rect>
+<text x="853.0" y="296.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">ThuongCT · kế toán</text>
+<text x="853.0" y="309.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">duyệt · sửa · khiếu</text>
+<text x="853.0" y="322.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">nại</text>
+<path d="M935.2 270.0 h32.8 a6 6 0 0 1 6 6 v10 h-38.8 z" fill="#b91c1c"/>
+<text x="954.6" y="281.5" font-size="8.5" font-weight="bold" fill="#ffffff" text-anchor="middle">EACH</text>
+<line x1="835.0" y1="307.0" x2="844.0" y2="307.0" stroke="#52606d" stroke-width="1.4" marker-end="url(#arr)"/>
+<rect x="986.0" y="270.0" width="128.0" height="74.0" rx="6" fill="#1d4ed8" fill-opacity="0.04" stroke="#1d4ed8" stroke-width="1.6" stroke-dasharray="2 3"><title>a3-1-ref.eval.ghep-sai | kind: fleet | status: proposed | freq: version | sample: ~60 ca × 3 persona | cost: không trần · ghi giờ GPU</title></rect>
+<text x="993.0" y="296.0" font-size="9.6" font-weight="bold" fill="#1f2933" text-anchor="start">a3-1-ref</text>
+<text x="993.0" y="309.0" font-size="9.6" font-weight="bold" fill="#1f2933" text-anchor="start">.eval.ghep-sai</text>
+<text x="993.0" y="322.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">~60 ca × 3 persona</text>
+<text x="993.0" y="335.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">không trần · ghi giờ</text>
+<path d="M1081.4 270.0 h26.6 a6 6 0 0 1 6 6 v10 h-32.6 z" fill="#1d4ed8"/>
+<text x="1097.7" y="281.5" font-size="8.5" font-weight="bold" fill="#ffffff" text-anchor="middle">VER</text>
+<line x1="975.0" y1="307.0" x2="984.0" y2="307.0" stroke="#52606d" stroke-width="1.4" marker-end="url(#arr)"/>
+<rect x="1126.0" y="270.0" width="128.0" height="74.0" rx="6" fill="#0f766e" fill-opacity="0.04" stroke="#0f766e" stroke-width="1.6"><title>fls_pm_link | kind: store | status: built | sub: adjustment · journal</title></rect>
+<text x="1133.0" y="293.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">fls_pm_link</text>
+<text x="1133.0" y="306.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">adjustment · journal</text>
+<line x1="1115.0" y1="307.0" x2="1124.0" y2="307.0" stroke="#52606d" stroke-width="1.4" marker-end="url(#arr)"/>
+<rect x="112.0" y="360.0" width="128.0" height="74.0" rx="6" fill="#b91c1c" fill-opacity="0.04" stroke="#b91c1c" stroke-width="1.6"><title>Sổ H1000 đã tách | kind: human | status: built | sub: 34 file đã adjust · số FT KT dán</title></rect>
+<text x="119.0" y="377.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">Sổ H1000 đã tách</text>
+<text x="119.0" y="390.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">34 file đã adjust ·</text>
+<text x="119.0" y="403.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">số FT KT dán</text>
+<rect x="252.0" y="360.0" width="128.0" height="74.0" rx="6" fill="#6d28d9" fill-opacity="0.04" stroke="#6d28d9" stroke-width="1.6" stroke-dasharray="2 3"><title>A3.2 · PP (2) lương | kind: llm | status: proposed | sub: Qwen 3.8-27B local · v1 (v0 = mã)</title></rect>
+<text x="259.0" y="377.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">A3.2 · PP (2)</text>
+<text x="259.0" y="390.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">lương</text>
+<text x="259.0" y="403.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">Qwen 3.8-27B local ·</text>
+<text x="259.0" y="416.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">v1 (v0 = mã)</text>
+<line x1="241.0" y1="397.0" x2="250.0" y2="397.0" stroke="#52606d" stroke-width="1.4" marker-end="url(#arr)"/>
+<rect x="392.0" y="360.0" width="128.0" height="74.0" rx="6" fill="#52606d" fill-opacity="0.04" stroke="#52606d" stroke-width="1.6" stroke-dasharray="2 3"><title>Dòng lương ↔ bank | kind: artefact | status: proposed | sub: nối Số CT · pháp nhân</title></rect>
+<text x="399.0" y="377.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">Dòng lương ↔ bank</text>
+<text x="399.0" y="390.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">nối Số CT · pháp</text>
+<text x="399.0" y="403.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">nhân</text>
+<line x1="381.0" y1="397.0" x2="390.0" y2="397.0" stroke="#52606d" stroke-width="1.4" marker-end="url(#arr)"/>
+<rect x="706.0" y="360.0" width="128.0" height="74.0" rx="6" fill="#52606d" fill-opacity="0.04" stroke="#52606d" stroke-width="1.6" stroke-dasharray="2 3"><title>Sổ hiệu lực | kind: artefact | status: proposed | sub: cùng bảng ITL</title></rect>
+<text x="713.0" y="383.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">Sổ hiệu lực</text>
+<text x="713.0" y="396.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">cùng bảng ITL</text>
+<line x1="521.0" y1="397.0" x2="704.0" y2="397.0" stroke="#52606d" stroke-width="1.4" marker-end="url(#arr)"/>
+<rect x="846.0" y="360.0" width="128.0" height="74.0" rx="6" fill="#b91c1c" fill-opacity="0.28" stroke="#b91c1c" stroke-width="1.6" stroke-dasharray="7 4"><title>ThuongCT · kế toán | kind: human | status: partial | weight: medium | freq: each | sub: duyệt · sửa · khiếu nại</title></rect>
+<text x="853.0" y="386.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">ThuongCT · kế toán</text>
+<text x="853.0" y="399.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">duyệt · sửa · khiếu</text>
+<text x="853.0" y="412.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">nại</text>
+<path d="M935.2 360.0 h32.8 a6 6 0 0 1 6 6 v10 h-38.8 z" fill="#b91c1c"/>
+<text x="954.6" y="371.5" font-size="8.5" font-weight="bold" fill="#ffffff" text-anchor="middle">EACH</text>
+<line x1="835.0" y1="397.0" x2="844.0" y2="397.0" stroke="#52606d" stroke-width="1.4" marker-end="url(#arr)"/>
+<rect x="986.0" y="360.0" width="128.0" height="74.0" rx="6" fill="#1d4ed8" fill-opacity="0.04" stroke="#1d4ed8" stroke-width="1.6" stroke-dasharray="2 3"><title>a3-2-luong.eval.noi-sai-dot | kind: fleet | status: proposed | freq: version | sample: ca cài sẵn + đợt mẫu | cost: không trần · ghi giờ GPU</title></rect>
+<text x="993.0" y="386.0" font-size="9.6" font-weight="bold" fill="#1f2933" text-anchor="start">a3-2-luong</text>
+<text x="993.0" y="399.0" font-size="9.6" font-weight="bold" fill="#1f2933" text-anchor="start">.eval.noi-sai-dot</text>
+<text x="993.0" y="412.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">ca cài sẵn + đợt mẫu</text>
+<text x="993.0" y="425.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">không trần · ghi giờ</text>
+<path d="M1081.4 360.0 h26.6 a6 6 0 0 1 6 6 v10 h-32.6 z" fill="#1d4ed8"/>
+<text x="1097.7" y="371.5" font-size="8.5" font-weight="bold" fill="#ffffff" text-anchor="middle">VER</text>
+<line x1="975.0" y1="397.0" x2="984.0" y2="397.0" stroke="#52606d" stroke-width="1.4" marker-end="url(#arr)"/>
+<rect x="1126.0" y="360.0" width="128.0" height="74.0" rx="6" fill="#0f766e" fill-opacity="0.04" stroke="#0f766e" stroke-width="1.6" stroke-dasharray="2 3"><title>lớp sửa | kind: store | status: proposed | sub: chưa có bảng</title></rect>
+<text x="1133.0" y="383.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">lớp sửa</text>
+<text x="1133.0" y="396.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">chưa có bảng</text>
+<line x1="1115.0" y1="397.0" x2="1124.0" y2="397.0" stroke="#52606d" stroke-width="1.4" marker-end="url(#arr)"/>
+<rect x="112.0" y="450.0" width="128.0" height="74.0" rx="6" fill="#b91c1c" fill-opacity="0.04" stroke="#b91c1c" stroke-width="1.6"><title>File Looker + PE/PM | kind: human | status: built | sub: OMC · GI · SC · PS</title></rect>
+<text x="119.0" y="467.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">File Looker +</text>
+<text x="119.0" y="480.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">PE/PM</text>
+<text x="119.0" y="493.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">OMC · GI · SC · PS</text>
+<rect x="252.0" y="450.0" width="128.0" height="74.0" rx="6" fill="#6d28d9" fill-opacity="0.04" stroke="#6d28d9" stroke-width="1.6" stroke-dasharray="2 3"><title>A3.3 · PP (3) nền tảng | kind: llm | status: proposed | sub: Qwen 3.8-27B local · v1 (v0 = mã)</title></rect>
+<text x="259.0" y="467.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">A3.3 · PP (3) nền</text>
+<text x="259.0" y="480.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">tảng</text>
+<text x="259.0" y="493.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">Qwen 3.8-27B local ·</text>
+<text x="259.0" y="506.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">v1 (v0 = mã)</text>
+<line x1="241.0" y1="487.0" x2="250.0" y2="487.0" stroke="#52606d" stroke-width="1.4" marker-end="url(#arr)"/>
+<rect x="392.0" y="450.0" width="128.0" height="74.0" rx="6" fill="#52606d" fill-opacity="0.04" stroke="#52606d" stroke-width="1.6" stroke-dasharray="2 3"><title>Chi phí ↔ PE/PM ↔ bank | kind: artefact | status: proposed | sub: chia theo CDT1</title></rect>
+<text x="399.0" y="467.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">Chi phí ↔ PE/PM ↔</text>
+<text x="399.0" y="480.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">bank</text>
+<text x="399.0" y="493.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">chia theo CDT1</text>
+<line x1="381.0" y1="487.0" x2="390.0" y2="487.0" stroke="#52606d" stroke-width="1.4" marker-end="url(#arr)"/>
+<rect x="706.0" y="450.0" width="128.0" height="74.0" rx="6" fill="#52606d" fill-opacity="0.04" stroke="#52606d" stroke-width="1.6" stroke-dasharray="2 3"><title>Sổ hiệu lực | kind: artefact | status: proposed | sub: cùng bảng ITL</title></rect>
+<text x="713.0" y="473.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">Sổ hiệu lực</text>
+<text x="713.0" y="486.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">cùng bảng ITL</text>
+<line x1="521.0" y1="487.0" x2="704.0" y2="487.0" stroke="#52606d" stroke-width="1.4" marker-end="url(#arr)"/>
+<rect x="846.0" y="450.0" width="128.0" height="74.0" rx="6" fill="#b91c1c" fill-opacity="0.28" stroke="#b91c1c" stroke-width="1.6" stroke-dasharray="7 4"><title>ThuongCT · kế toán | kind: human | status: partial | weight: medium | freq: each | sub: duyệt · sửa · khiếu nại</title></rect>
+<text x="853.0" y="476.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">ThuongCT · kế toán</text>
+<text x="853.0" y="489.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">duyệt · sửa · khiếu</text>
+<text x="853.0" y="502.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">nại</text>
+<path d="M935.2 450.0 h32.8 a6 6 0 0 1 6 6 v10 h-38.8 z" fill="#b91c1c"/>
+<text x="954.6" y="461.5" font-size="8.5" font-weight="bold" fill="#ffffff" text-anchor="middle">EACH</text>
+<line x1="835.0" y1="487.0" x2="844.0" y2="487.0" stroke="#52606d" stroke-width="1.4" marker-end="url(#arr)"/>
+<rect x="986.0" y="450.0" width="128.0" height="74.0" rx="6" fill="#1d4ed8" fill-opacity="0.04" stroke="#1d4ed8" stroke-width="1.6" stroke-dasharray="2 3"><title>a3-3-nen-tang.eval.chia-sai | kind: fleet | status: proposed | freq: version | sample: chỉ ca cài sẵn | cost: không trần · ghi giờ GPU</title></rect>
+<text x="993.0" y="476.0" font-size="9.6" font-weight="bold" fill="#1f2933" text-anchor="start">a3-3-nen-tang</text>
+<text x="993.0" y="489.0" font-size="9.6" font-weight="bold" fill="#1f2933" text-anchor="start">.eval.chia-sai</text>
+<text x="993.0" y="502.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">chỉ ca cài sẵn</text>
+<text x="993.0" y="515.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">không trần · ghi giờ</text>
+<path d="M1081.4 450.0 h26.6 a6 6 0 0 1 6 6 v10 h-32.6 z" fill="#1d4ed8"/>
+<text x="1097.7" y="461.5" font-size="8.5" font-weight="bold" fill="#ffffff" text-anchor="middle">VER</text>
+<line x1="975.0" y1="487.0" x2="984.0" y2="487.0" stroke="#52606d" stroke-width="1.4" marker-end="url(#arr)"/>
+<rect x="1126.0" y="450.0" width="128.0" height="74.0" rx="6" fill="#0f766e" fill-opacity="0.04" stroke="#0f766e" stroke-width="1.6" stroke-dasharray="2 3"><title>lớp sửa | kind: store | status: proposed | sub: chưa có bảng</title></rect>
+<text x="1133.0" y="473.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">lớp sửa</text>
+<text x="1133.0" y="486.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">chưa có bảng</text>
+<line x1="1115.0" y1="487.0" x2="1124.0" y2="487.0" stroke="#52606d" stroke-width="1.4" marker-end="url(#arr)"/>
+<rect x="8" y="550" width="94" height="82" rx="6" fill="#f5f7fa" stroke="#cbd2d9"/>
+<text x="55.0" y="595.0" font-size="12" font-weight="bold" fill="#1f2933" text-anchor="middle">JUDGE</text>
+<text x="55.0" y="609.0" font-size="8.5" font-weight="normal" fill="#52606d" text-anchor="middle">④ SOÁT</text>
+<rect x="112.0" y="550.0" width="128.0" height="74.0" rx="6" fill="#b91c1c" fill-opacity="0.04" stroke="#b91c1c" stroke-width="1.6" stroke-dasharray="7 4"><title>Kết quả A2 · A3 | kind: human | status: partial | sub: + số dư CCR</title></rect>
+<text x="119.0" y="573.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">Kết quả A2 · A3</text>
+<text x="119.0" y="586.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">+ số dư CCR</text>
+<rect x="252.0" y="550.0" width="128.0" height="74.0" rx="6" fill="#6d28d9" fill-opacity="0.04" stroke="#6d28d9" stroke-width="1.6" stroke-dasharray="2 3"><title>A4 · SOÁT | kind: llm | status: proposed | sub: Qwen 3.8-27B local · v1 (v0 = mã)</title></rect>
+<text x="259.0" y="567.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">A4 · SOÁT</text>
+<text x="259.0" y="580.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">Qwen 3.8-27B local ·</text>
+<text x="259.0" y="593.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">v1 (v0 = mã)</text>
+<line x1="241.0" y1="587.0" x2="250.0" y2="587.0" stroke="#52606d" stroke-width="1.4" marker-end="url(#arr)"/>
+<rect x="392.0" y="550.0" width="128.0" height="74.0" rx="6" fill="#52606d" fill-opacity="0.04" stroke="#52606d" stroke-width="1.6" stroke-dasharray="7 4"><title>Đạt · CHẶN · CỜ | kind: artefact | status: partial | sub: DIF theo TK · ngày</title></rect>
+<text x="399.0" y="573.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">Đạt · CHẶN · CỜ</text>
+<text x="399.0" y="586.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">DIF theo TK · ngày</text>
+<line x1="381.0" y1="587.0" x2="390.0" y2="587.0" stroke="#52606d" stroke-width="1.4" marker-end="url(#arr)"/>
+<rect x="532.0" y="550.0" width="128.0" height="74.0" rx="6" fill="#b91c1c" fill-opacity="0.10" stroke="#b91c1c" stroke-width="1.6"><title>KT đọc biên bản | kind: human | status: built | weight: quick | freq: each | sub: 9 dòng · F04</title></rect>
+<text x="539.0" y="582.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">KT đọc biên bản</text>
+<text x="539.0" y="595.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">9 dòng · F04</text>
+<path d="M621.2 550.0 h32.8 a6 6 0 0 1 6 6 v10 h-38.8 z" fill="#b91c1c"/>
+<text x="640.6" y="561.5" font-size="8.5" font-weight="bold" fill="#ffffff" text-anchor="middle">EACH</text>
+<line x1="521.0" y1="587.0" x2="530.0" y2="587.0" stroke="#52606d" stroke-width="1.4" marker-end="url(#arr)"/>
+<rect x="986.0" y="550.0" width="128.0" height="74.0" rx="6" fill="#1d4ed8" fill-opacity="0.04" stroke="#1d4ed8" stroke-width="1.6" stroke-dasharray="2 3"><title>a4-soat.eval.lot-chan | kind: fleet | status: proposed | freq: version | sample: ≥10 lô lỗi + 5 sạch | cost: không trần · ghi giờ GPU</title></rect>
+<text x="993.0" y="576.0" font-size="9.6" font-weight="bold" fill="#1f2933" text-anchor="start">a4-soat</text>
+<text x="993.0" y="589.0" font-size="9.6" font-weight="bold" fill="#1f2933" text-anchor="start">.eval.lot-chan</text>
+<text x="993.0" y="602.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">≥10 lô lỗi + 5 sạch</text>
+<text x="993.0" y="615.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">không trần · ghi giờ</text>
+<path d="M1081.4 550.0 h26.6 a6 6 0 0 1 6 6 v10 h-32.6 z" fill="#1d4ed8"/>
+<text x="1097.7" y="561.5" font-size="8.5" font-weight="bold" fill="#ffffff" text-anchor="middle">VER</text>
+<line x1="661.0" y1="587.0" x2="984.0" y2="587.0" stroke="#52606d" stroke-width="1.4" marker-end="url(#arr)"/>
+<rect x="1126.0" y="550.0" width="128.0" height="74.0" rx="6" fill="#0f766e" fill-opacity="0.04" stroke="#0f766e" stroke-width="1.6" stroke-dasharray="7 4"><title>biên bản nạp | kind: store | status: partial | sub: fls_run</title></rect>
+<text x="1133.0" y="573.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">biên bản nạp</text>
+<text x="1133.0" y="586.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">fls_run</text>
+<line x1="1115.0" y1="587.0" x2="1124.0" y2="587.0" stroke="#52606d" stroke-width="1.4" marker-end="url(#arr)"/>
+<rect x="986.0" y="688.0" width="268.0" height="58.0" rx="6" fill="#0f766e" fill-opacity="0.04" stroke="#0f766e" stroke-width="1.6" stroke-dasharray="7 4"><title>STORE | kind: store | status: partial | sub: một bản ghi mỗi mục · lớp lưu giữ</title></rect>
+<text x="993.0" y="711.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">STORE</text>
+<text x="993.0" y="724.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">một bản ghi mỗi mục · lớp lưu giữ</text>
+<rect x="706.0" y="688.0" width="268.0" height="58.0" rx="6" fill="#0f766e" fill-opacity="0.04" stroke="#0f766e" stroke-width="1.6" stroke-dasharray="2 3"><title>SCRUBBER | kind: store | status: proposed | sub: tên người, số TK, diễn giải, khoá bí mật</title></rect>
+<text x="713.0" y="711.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">SCRUBBER</text>
+<text x="713.0" y="724.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">tên người, số TK, diễn giải, khoá bí mật</text>
+<rect x="252.0" y="688.0" width="408.0" height="58.0" rx="6" fill="#6d28d9" fill-opacity="0.04" stroke="#6d28d9" stroke-width="1.6" stroke-dasharray="2 3"><title>IMPROVE EACH AGENT | kind: llm | status: proposed | sub: luật · tham chiếu · cặp ưu tiên · ca kiểm mới</title></rect>
+<text x="259.0" y="711.0" font-size="10.5" font-weight="bold" fill="#1f2933" text-anchor="start">IMPROVE EACH AGENT</text>
+<text x="259.0" y="724.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">luật · tham chiếu · cặp ưu tiên · ca kiểm mới</text>
+<line x1="1190.0" y1="630.0" x2="1190.0" y2="686.0" stroke="#52606d" stroke-width="1.4" marker-end="url(#arr)"/>
+<text x="1184.0" y="674.0" font-size="9" font-weight="normal" fill="#52606d" text-anchor="end">human + fleet data</text>
+<line x1="985.0" y1="717.0" x2="976.0" y2="717.0" stroke="#52606d" stroke-width="1.4" marker-end="url(#arr)"/>
+<line x1="705.0" y1="717.0" x2="662.0" y2="717.0" stroke="#52606d" stroke-width="1.4" marker-end="url(#arr)"/>
+<line x1="316.0" y1="687.0" x2="316.0" y2="632.0" stroke="#52606d" stroke-width="1.4" marker-end="url(#arr)" stroke-dasharray="4 3"/>
+<text x="322.0" y="674.0" font-size="9" font-weight="normal" fill="#52606d" text-anchor="start">back into each LLM</text>
+<text x="112.0" y="772.0" font-size="9.5" font-weight="bold" fill="#52606d" text-anchor="start">Kind</text>
+<rect x="112" y="780" width="14" height="12" rx="2" fill="#b91c1c" fill-opacity="0.28" stroke="#b91c1c"/>
+<text x="131.0" y="790.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">a person</text>
+<rect x="230" y="780" width="14" height="12" rx="2" fill="#6d28d9" fill-opacity="0.28" stroke="#6d28d9"/>
+<text x="249.0" y="790.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">an LLM agent</text>
+<rect x="348" y="780" width="14" height="12" rx="2" fill="#52606d" fill-opacity="0.28" stroke="#52606d"/>
+<text x="367.0" y="790.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">artefact or step</text>
+<rect x="466" y="780" width="14" height="12" rx="2" fill="#1d4ed8" fill-opacity="0.28" stroke="#1d4ed8"/>
+<text x="485.0" y="790.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">fleet eval</text>
+<rect x="584" y="780" width="14" height="12" rx="2" fill="#0f766e" fill-opacity="0.28" stroke="#0f766e"/>
+<text x="603.0" y="790.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">store and scrub</text>
+<text x="112.0" y="812.0" font-size="9.5" font-weight="bold" fill="#52606d" text-anchor="start">Status (line) · weight (fill) · ask frequency (corner flag)</text>
+<rect x="112" y="820" width="26" height="12" rx="2" fill="none" stroke="#1f2933" stroke-width="1.6"/>
+<text x="143.0" y="830.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">BUILT</text>
+<rect x="212" y="820" width="26" height="12" rx="2" fill="none" stroke="#1f2933" stroke-width="1.6" stroke-dasharray="7 4"/>
+<text x="243.0" y="830.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">PARTIAL</text>
+<rect x="312" y="820" width="26" height="12" rx="2" fill="none" stroke="#1f2933" stroke-width="1.6" stroke-dasharray="2 3"/>
+<text x="343.0" y="830.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">PROPOSED</text>
+<rect x="412" y="820" width="26" height="12" rx="2" fill="#b91c1c" fill-opacity="0.10" stroke="#b91c1c"/>
+<text x="443.0" y="830.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">QUICK</text>
+<rect x="504" y="820" width="26" height="12" rx="2" fill="#b91c1c" fill-opacity="0.28" stroke="#b91c1c"/>
+<text x="535.0" y="830.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">MEDIUM</text>
+<rect x="596" y="820" width="26" height="12" rx="2" fill="#b91c1c" fill-opacity="0.50" stroke="#b91c1c"/>
+<text x="627.0" y="830.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">DEEP</text>
+<text x="688.0" y="830.0" font-size="9.5" font-weight="normal" fill="#1f2933" text-anchor="start">EACH = every item · VER = once per version · 10% = a sample</text>
+</svg>
+<!-- GRID:END -->
+</div>
+<figcaption>Hình 1.2. Sơ đồ quy trình: mỗi agent LLM của vùng NẠP và fleet eval của nó. Mọi agent LLM đang PROPOSED; <code>v0</code> = mã tất định hôm nay.</figcaption>
+</figure>
+<h4>Lỗ sơ đồ cho thấy</h4>
+<p><code>render_grid.py --check</code> báo <b>0</b> lỗ theo hai luật của máy (đầu ra vào sổ không người kiểm và không fleet eval · agent chấm không có fleet eval). Đọc thêm từ sơ đồ:</p>
+<div class="tw"><table>
+<tr><th>Agent</th><th>Lỗ</th><th>Sửa ở</th></tr>
+<tr><td>A3.2 · A3.3</td><td>Ghi vào sổ <b>không qua người kiểm</b>; chỉ fleet eval chặn trước. Nơi lưu của hai agent chưa có bảng.</td><td>2.1.2 · 2.1.3 · Q4</td></tr>
+<tr><td>A3.1 · A3.2 · A3.3</td><td>Người dùng (ThuongCT, kế toán) để lại tín hiệu <i>sửa</i> trong <code>fls_journal</code>, nhưng <i>duyệt</i> và <i>khiếu nại</i> chưa có chỗ lưu.</td><td>2.3 · Q5</td></tr>
+<tr><td>A4 (agent chấm)</td><td>Dùng <b>cùng mô hình</b> Qwen với các agent nó soát ⇒ fleet eval của A4 phải chấm bằng mô hình khác (gpt-oss-20b).</td><td>2.1.4</td></tr>
+<tr><td>Mọi agent</td><td>Tín hiệu người kiểm thật gần như chưa có: <code>fls_pm_link</code> 2.263 mối nối, <b>1</b> do người (UAT 01/10) ⇒ persona phải hiệu chuẩn bằng think-aloud, chưa dùng log được.</td><td>2.1 (phần chung)</td></tr>
+<tr><td>A1 · A2</td><td>Fleet eval chưa có thẻ (để phiên bản sau).</td><td>Q6</td></tr>
+</table></div>
+
+<!-- ============================== PART 2 ============================== -->
+<h2 id="p2">2. Thiết kế</h2>
+
+<h3 id="s2-1">2.1 Thẻ eval <span class="state review">review</span></h3>
+<p>Bốn thẻ, theo thứ tự trên sơ đồ: ba agent mapping (dải ③) và một agent chấm (dải ④). Thẻ đầy đủ ở
+<code>docs/ITL/05_FleetEval/eval-cards/</code>.</p>
+<h4>Phần chung của bốn thẻ</h4>
+<div class="tw"><table>
+<tr><th>Mô hình agent</th><td><code>Qwen 3.8-27B</code>, chạy local. Phiên bản LLM đầu = <code>v1</code>. <code>v0</code> = mã tất định (<code>fls/</code> tại commit đóng băng) — mốc "không tệ hơn" của vòng đầu cho A3.1 và A4.</td></tr>
+<tr><th>Bộ chấm</th><td><code>gpt-oss-20b</code>, chạy local — khác họ với Qwen. Chấm mù: chỉ thấy mã ngẫu nhiên, ⛔ tên agent, ⛔ phiên bản. Chỉ bộ chấm đọc đáp án; mọi lượt đọc ghi log.</td></tr>
+<tr><th>Mô hình persona</th><td><code>gpt-oss-20b</code>, prompt riêng, ⛔ dùng chung prompt với bộ chấm.</td></tr>
+<tr><th>Chấm lại bằng người</th><td>Lanptn chấm lại <b>10%</b> mục mỗi vòng; đồng thuận &lt; <b>0,8</b> ⇒ vòng vô hiệu.</td></tr>
+<tr><th>Nguồn đáp án</th><td>ITL Ledge Final của AS-IS (sổ kế toán đã chỉnh) + so khớp oracle (<code>fls/oracle</code>). Chỗ AS-IS đã biết sai ⇒ người xác nhận lại đáp án, <code>label_source = human-verified</code>. Ô đang mang giá trị mặc định (CDT1 = SHQ2, ID đối tác = VD0, …) được chấm theo <b>parity</b> (quyết định 06/11).</td></tr>
+<tr><th>Persona</th><td><b>P1 kế toán mới</b> (nghiệp vụ 1/5, phần mềm 2/5; biết "sao kê", "PM"; ⛔ biết "Reference No", "L1/L2/L3", "CDT1"; đọc hết, tin câu chắc chắn) · <b>P2 kế toán ngân hàng lâu năm</b> (nghiệp vụ 4/5; đọc lướt, chỉ soát tiền và mã) · <b>P3 người duyệt cuối kỳ</b> (nghiệp vụ 4/5; ít thời gian, duyệt mọi dòng "đã khớp") · <b>P4 C&amp;B HR</b> (chỉ A3.2).</td></tr>
+<tr><th>Hiệu chuẩn</th><td>Think-aloud với <b>ThuongCT · AnhMC · NgaNLT</b> trên một mục; người quan sát ghi chỗ vướng. Bar ghi trước khi xem: recall ≥ <b>0,6</b>, precision ≥ <b>0,5</b>, phải giữ trên mục thứ hai. Hôm nay <b>cả 4 persona là gợi ý</b>.</td></tr>
+<tr><th>Chi phí</th><td><b>Không đặt trần</b> (quyết định 06/11). Mỗi vòng ghi giờ GPU thực tiêu của agent, persona, bộ chấm.</td></tr>
+<tr><th>Quy tắc dừng</th><td><b>Ship:</b> đạt bar + không tệ hơn bản trước + vòng không vô hiệu. <b>Chặn:</b> một ca cài sẵn của bar chính trượt. <b>Chạy lại:</b> vòng vô hiệu, hoặc heatmap có ô "không có ca".</td></tr>
+</table></div>
+
+<h4>2.1.1 A3.1 · MAPPING PP (1) · <code>a3-1-ref.eval.ghep-sai</code></h4>
+<div class="tw"><table>
+<tr class="band"><td colspan="2">A. Cái gì và vì sao</td></tr>
+<tr><th>Agent làm gì</th><td>Dòng tiền hai vế + dòng lệnh PM/PC → L1 (nối) · L2 (FPS có, bank chưa) · L3 (bank có, FPS không) + gợi ý HD/CDT1; kế toán dựa vào đó chốt chiều chi phí.</td></tr>
+<tr><th>Mô hình và phiên bản</th><td>Qwen 3.8-27B local · <code>a3-1-ref@v1</code>; mốc <code>v0</code> = <code>fls/adapters/pm_join.py</code></td></tr>
+<tr><th>Lỗi đáng sợ nhất</th><td>Nối <b>chắc chắn nhưng sai</b> một PM line, hoặc nối một ca phải để người ⇒ HD/CDT1 sai, kế toán tin vì trông như đã khớp; sai lan vào báo cáo theo chủ dự toán.</td></tr>
+<tr><th>Dấu</th><td>dải ③ MAPPING · PROPOSED · người kiểm: kế toán ghép / sửa F01, MEDIUM, mỗi dòng hàng chờ · fleet eval PROPOSED</td></tr>
+<tr class="band"><td colspan="2">B. Đầu vào của vòng</td></tr>
+<tr><th>Bộ ca</th><td>Giao dịch có mối nối người đã chốt ở ITL Ledge Final. Bể đo theo hình ghép (<code>pm_join.py:26–31</code>): A 1×1 2.256 mã · B 1×N 27 · C N×1 80 mã / 394 dòng · D N×M 5 mã / 27 dòng · E khác tiền tệ 119 mã / 199 dòng · F Σ lệch 325 mã / 452 dòng; L3 có mã trong diễn giải (US-KT-037): mã rỗng 60 · ghi mã khác 136. <b>Cài sẵn:</b> toàn bộ D · Ref bị dùng lại · Ref người đè ở <code>_adjust</code> · phí bank cùng mã. <b>Ca chuyển:</b> tháng mới nhất chưa dùng khi tinh chỉnh.</td></tr>
+<tr><th>Đơn vị</th><td><b>phải nối:</b> A · B · C — <b>phải để người:</b> D · E · F — <b>L3:</b> không Ref · diễn giải mã khác · ca chuyển</td></tr>
+<tr><th>Persona</th><td>P1 · P2 · P3 — gợi ý</td></tr>
+<tr><th>Bộ chấm</th><td>gpt-oss-20b · 0 = nối sai / nối ca phải để người / rỗng · 1 = đúng lớp, sai PM line hoặc thiếu lý do · 2 = đúng lớp, đúng PM line, lý do nêu khoá đã so · giải thích lại 0–3</td></tr>
+<tr class="band"><td colspan="2">C. Bar, mẫu, nơi nhận</td></tr>
+<tr><th>Chỉ số và bar</th><td>Tỉ lệ nối sai = (nối sai PM line + nối ca phải-để-người) ÷ số ca agent nối. Bar: <b>0</b> trên nhóm "phải để người"; tổng ≤ <code>v0</code>; không tệ hơn bản trước. Chênh nhỏ nhất đáng kể: 1 ca nối sai ở nhóm "phải để người".</td></tr>
+<tr><th>Mẫu và chi phí</th><td>~60 ca (toàn bộ D + 10 E + 10 F + 10 C + 5 B + 10 A + 10 L3 + ca chuyển) × 3 persona × 1 lần · không trần, ghi giờ GPU</td></tr>
+<tr><th>Quy tắc dừng</th><td>theo phần chung</td></tr>
+<tr><th>Nơi nhận phát hiện</th><td>nối sai → luật ghép / prompt A3.1 (KhanhCQ) · lý do F01 người mới không dùng được → mẫu lý do F01 · Ref gõ sai ở nguồn → CA, ⛔ vá trong agent · ô không có ca → ca kiểm mới</td></tr>
+</table></div>
+
+<h4>2.1.2 A3.2 · MAPPING PP (2) lương · <code>a3-2-luong.eval.noi-sai-dot</code></h4>
+<div class="tw"><table>
+<tr class="band"><td colspan="2">A. Cái gì và vì sao</td></tr>
+<tr><th>Agent làm gì</th><td>Nạp thẳng dòng lương H1000 (đã tách HD · CDT1 · pháp nhân tới từng nhân viên) và nối giao dịch bank theo Số CT (số FT kế toán đã dán).</td></tr>
+<tr><th>Mô hình và phiên bản</th><td>Qwen 3.8-27B local · <code>a3-2-luong@v1</code>; ⛔ chưa có <code>v0</code> mã ⇒ vòng đầu so với AS-IS (H1000 Final)</td></tr>
+<tr><th>Lỗi đáng sợ nhất</th><td>Ghi một đợt sai <b>mà không báo</b>: tháng trùng, tháng thiếu, Σ Có ≠ Σ Nợ ⇒ lương ghi hai lần / sai pháp nhân / sai HD.</td></tr>
+<tr><th>Dấu</th><td>dải ③ · PROPOSED · <b>không người kiểm</b> trước khi vào sổ · người dùng ThuongCT, kế toán · fleet eval PROPOSED</td></tr>
+<tr class="band"><td colspan="2">B. Đầu vào của vòng</td></tr>
+<tr><th>Bộ ca</th><td><b>~34 file H1000 đã adjust</b> (KhanhCQ 06/11) + ITL Ledge (AS-IS nối bằng VLOOKUP Số CT ở dòng đảo). Mỗi tháng 25 đợt = 5 pháp nhân × 5 loại. <b>Cài sẵn (lỗi thật):</b> PIT 2025 gọi tháng 6 hai lần · NIS 2025 thiếu tháng 12 · 2025-10 No 4 (INT) lệch 567.500, No 5 (PIT) lệch ≈ 510,8 tr. <b>Ca chuyển:</b> sổ 2026.</td></tr>
+<tr><th>Đơn vị</th><td><b>loại đợt:</b> NIS L1 · NIS L3 · COM L2 · INT · PIT — <b>cài sẵn:</b> tháng trùng · tháng thiếu · Σ lệch · ca chuyển</td></tr>
+<tr><th>Persona</th><td>P1 · P2 · P3 · P4 C&amp;B HR — gợi ý</td></tr>
+<tr><th>Bộ chấm</th><td>gpt-oss-20b · 0 = ghi đợt lỗi / nối sai Số CT · 1 = chặn đúng, lý do sai · 2 = xử lý đúng + lý do nêu tháng, đợt, số lệch</td></tr>
+<tr class="band"><td colspan="2">C. Bar, mẫu, nơi nhận</td></tr>
+<tr><th>Chỉ số và bar</th><td>Tỉ lệ đợt lỗi bị ghi trên ca cài sẵn: <b>0</b>. Đợt sạch: dòng lương nối đúng Số CT ≥ AS-IS. Chênh nhỏ nhất: 1 đợt lỗi lọt.</td></tr>
+<tr><th>Mẫu và chi phí</th><td>mọi ca cài sẵn + 3 file tháng × 25 đợt, phân tầng theo loại × 4 persona · không trần, ghi giờ GPU</td></tr>
+<tr><th>Quy tắc dừng</th><td>theo phần chung</td></tr>
+<tr><th>Nơi nhận phát hiện</th><td>đợt lỗi lọt → luật nạp / prompt A3.2 · lỗi ở chính file lương → C&amp;B HR, ⛔ vá trong agent · lý do khó hiểu → mẫu lý do</td></tr>
+</table></div>
+
+<h4>2.1.3 A3.3 · MAPPING PP (3) nền tảng · <code>a3-3-nen-tang.eval.chia-sai</code></h4>
+<div class="tw"><table>
+<tr class="band"><td colspan="2">A. Cái gì và vì sao</td></tr>
+<tr><th>Agent làm gì</th><td>Chi phí OMC · GI · SC (server cost) · PS từ Looker → Combine Code (Vendor-Date-NoTrans) → PE/PM line → Reference No → giao dịch bank → chia theo CDT1.</td></tr>
+<tr><th>Mô hình và phiên bản</th><td>Qwen 3.8-27B local · <code>a3-3-nen-tang@v1</code>; ⛔ chưa có <code>v0</code> mã ⇒ vòng đầu so với AS-IS (PHÂN BỔ NỀN TẢNG)</td></tr>
+<tr><th>Lỗi đáng sợ nhất</th><td>Nối nhầm PE (Combine Code trúng sai) hoặc chia sai CDT1 ⇒ chi phí nền tảng về sai chủ dự toán mà vẫn cân.</td></tr>
+<tr><th>Dấu</th><td>dải ③ · PROPOSED · <b>không người kiểm</b> trước khi vào sổ · người dùng ThuongCT, kế toán · fleet eval PROPOSED</td></tr>
+<tr class="band"><td colspan="2">B. Đầu vào của vòng</td></tr>
+<tr><th>Bộ ca</th><td>File Looker theo tháng + PE/PM + bank txns. Bể <b>không giới hạn</b> (KhanhCQ 06/11). Đáp án = PHÂN BỔ NỀN TẢNG của AS-IS <b>sau khi người gán nhãn</b> (AS-IS chưa có người kiểm). <b>Cài sẵn:</b> Combine Code trúng ≥ 2 PE · trúng 0 PE · vendor đổi tên · chi phí trả trước / sau tháng · Σ % CDT1 ≠ 100. <b>Ca chuyển:</b> vendor mới.</td></tr>
+<tr><th>Đơn vị</th><td><b>loại:</b> OMC · GI · SC · PS — <b>cài sẵn:</b> trúng nhiều · trúng 0 · lệch kỳ · ca chuyển</td></tr>
+<tr><th>Persona</th><td>P1 · P2 · P3 — gợi ý</td></tr>
+<tr><th>Bộ chấm</th><td>gpt-oss-20b · 0 = nối sai PE / sai giao dịch / Σ chia sai · 1 = nối đúng, % CDT1 sai · 2 = nối đúng + chia đúng + lý do nêu Combine Code</td></tr>
+<tr class="band"><td colspan="2">C. Bar, mẫu, nơi nhận</td></tr>
+<tr><th>Chỉ số và bar</th><td><b>Không có bar tổng</b> (KhanhCQ 06/11). Bar duy nhất: <b>0</b> sai trên ca cài sẵn (trúng nhiều · trúng 0 · lệch kỳ); tỉ lệ đúng trọn chuỗi được báo cáo, không chặn.</td></tr>
+<tr><th>Mẫu và chi phí</th><td>mọi ca cài sẵn + 2 tháng × 4 loại, phân tầng theo vendor × 3 persona · không trần, ghi giờ GPU</td></tr>
+<tr><th>Quy tắc dừng</th><td>theo phần chung (bar chính = ca cài sẵn)</td></tr>
+<tr><th>Nơi nhận phát hiện</th><td>nối nhầm → luật Combine Code / prompt A3.3 · CDT1 sai trên Looker → chủ file (DATA, người cập nhật SC · PS) · ô không có ca → ca kiểm mới</td></tr>
+</table></div>
+
+<h4>2.1.4 A4 · SOÁT (agent chấm) · <code>a4-soat.eval.lot-chan</code></h4>
+<div class="tw"><table>
+<tr class="band"><td colspan="2">A. Cái gì và vì sao</td></tr>
+<tr><th>Agent làm gì</th><td>Soát kết quả A2 · A3 theo 9 luật (S1–S8 + S10) + 4 vế + Σ PM line + số dư ngày = CCR (DIF = 0) → Đạt · CHẶN · CỜ, biên bản cho kế toán quyết nhận lô.</td></tr>
+<tr><th>Mô hình và phiên bản</th><td>Qwen 3.8-27B local · <code>a4-soat@v1</code>; mốc <code>v0</code> = <code>fls/kiem/soat_nap.py</code></td></tr>
+<tr><th>Lỗi đáng sợ nhất</th><td><b>Bỏ lọt</b>: lô đáng CHẶN được báo đạt ⇒ dòng sai / mất vào sổ chỉ-thêm, không xoá được.</td></tr>
+<tr><th>Dấu</th><td>dải ④ (JUDGE) · PROPOSED · người kiểm: kế toán đọc biên bản F04, QUICK, mỗi lô · fleet eval PROPOSED</td></tr>
+<tr class="band"><td colspan="2">B. Đầu vào của vòng</td></tr>
+<tr><th>Bộ ca</th><td>Lô thật đã nạp (8.338 dòng, 60 nguồn) + lô đột biến dựng có đáp án biết trước (xoá / nhân đôi dòng · đổi dấu Nợ/Có · đổi kiểu ngày · hạ mã xuống <code>float</code> · xoá tiền tệ · sửa số dư CCR · hai bản khai trỏ khác cột). <b>Cài sẵn (lỗi thật):</b> 646 dòng bị loại không có bản ghi (<code>0020</code>, 23 nguồn) · 31 mã bị hạ <code>float</code> ở Bank Transactions của AS-IS · 10/60 nguồn rỗng (phải "chưa đo", ⛔ đỏ oan). <b>Ca chuyển:</b> nguồn có bố cục cột chưa gặp.</td></tr>
+<tr><th>Đơn vị</th><td><b>mất / thừa dòng:</b> S1 · S7 — <b>thiếu trường:</b> S2 · S3 · S4 — <b>định dạng / nguồn:</b> S5 · S6 · S8 · S10 — <b>số dư:</b> S9 · DIF CCR — ca chuyển</td></tr>
+<tr><th>Persona</th><td>P1 · P2 · P3 đọc biên bản và quyết nhận / không nhận lô — gợi ý</td></tr>
+<tr><th>Bộ chấm</th><td>gpt-oss-20b (khác mô hình với A4) · 0 = báo đạt ca phải chặn · 1 = chặn đúng, sai hạng hoặc thiếu nguồn dính · 2 = đúng hạng + đúng nguồn + đúng số đo</td></tr>
+<tr class="band"><td colspan="2">C. Bar, mẫu, nơi nhận</td></tr>
+<tr><th>Chỉ số và bar</th><td>Tỉ lệ bỏ lọt trên lô đột biến: <b>0</b>. Tỉ lệ báo động oan trên lô sạch ≤ <code>v0</code>. Chênh nhỏ nhất: 1 ca bỏ lọt.</td></tr>
+<tr><th>Mẫu và chi phí</th><td>≥ 1 lô đột biến mỗi luật (≥ 10) + 5 lô sạch + ca chuyển × 3 persona · không trần, ghi giờ GPU</td></tr>
+<tr><th>Quy tắc dừng</th><td>theo phần chung</td></tr>
+<tr><th>Nơi nhận phát hiện</th><td>bỏ lọt → luật soát / prompt A4 · biên bản khó đọc → mẫu biên bản F04 · khuyết tật ở nguồn → kế toán nhập liệu</td></tr>
+</table></div>
+
+<h3 id="s2-2">2.2 Thiết kế vòng <span class="state review">review</span></h3>
+<h4>2.2.1 Luồng một vòng</h4>
+<p>Ai làm gì trong một vòng. Mã bước giữ nguyên qua các phiên bản; mục nghiệm thu trỏ vào chúng.</p>
+<div class="tw"><table>
+<tr><th>Bước</th><th>Việc</th><th>Ai</th><th>Để lại</th><th>Hỏng trông thế nào</th></tr>
+<tr class="band"><td colspan="5">Chuẩn bị</td></tr>
+<tr><td>R1</td><td>Đóng băng phiên bản: mô hình, prompt, công cụ, dữ liệu tham chiếu dưới một mã</td><td>KhanhCQ dựng · <b>ThuongCT ký</b> manifest</td><td>manifest: mã + checksum (không nội dung)</td><td>prompt sửa sau khi đóng băng; checksum lúc chạy khác lúc ký</td></tr>
+<tr><td>R2</td><td>Rút mẫu phân tầng theo đơn vị, lấy đủ ca cài sẵn</td><td>KhanhCQ (operator)</td><td>danh sách ca (chỉ tham chiếu), seed</td><td>thiếu ca cài sẵn; đơn vị không có ca</td></tr>
+<tr class="band"><td colspan="5">Chạy</td></tr>
+<tr><td>R3</td><td>Chạy agent và persona, trước và sau khi đọc đầu ra</td><td>KhanhCQ (harness)</td><td>mỗi persona: trả lời, nhật ký vướng, giải thích lại</td><td>persona không vướng chỗ nào trên ca khó</td></tr>
+<tr><td>R4</td><td>gpt-oss-20b chấm mù; Lanptn chấm lại 10%</td><td>KhanhCQ, Lanptn</td><td>điểm; độ đồng thuận</td><td>đồng thuận &lt; 0,8 ⇒ vòng vô hiệu</td></tr>
+<tr><td>R5</td><td>Gom: heatmap đơn vị × persona, bảng tăng giảm so <code>v0</code> / bản trước</td><td>KhanhCQ</td><td>báo cáo vòng, giờ GPU thực tiêu</td><td>trộn phiên bản; thiếu ô "không có ca"</td></tr>
+<tr class="band"><td colspan="5">Đóng</td></tr>
+<tr><td>R6</td><td>Phân loại mọi phát hiện, có lý do</td><td>ThuongCT, Lanptn</td><td>danh sách phân loại</td><td>phát hiện được nhận không lý do, hoặc tự nhận</td></tr>
+<tr><td>R7</td><td>Chuyển việc sửa tới đúng chủ</td><td>ThuongCT</td><td>một phiếu cho mỗi phát hiện được nhận</td><td>vá trong agent lỗi của bước khác (CA gõ Ref sai, file lương lỗi)</td></tr>
+<tr><td>R8</td><td>Chạy lại trên mẫu mới sau khi sửa; rút ca đã dùng sang bộ hồi quy</td><td>KhanhCQ</td><td>báo cáo vòng 2, tăng giảm, bể ca cập nhật</td><td>sửa trên chính ca đã đo</td></tr>
+</table></div>
+<h4>2.2.2 Vòng cho từng agent</h4>
+<div class="tw"><table>
+<tr><th>Agent</th><th>Khi nào chạy</th><th>Mẫu</th><th>Trần</th><th>Persona (hiệu chuẩn / gợi ý)</th></tr>
+<tr><td>A3.1</td><td>vòng 0 đo <code>v0</code> (mã) · mỗi phiên bản mới · trước khi dùng thật</td><td>~60 ca × 3</td><td>không đặt · ghi giờ GPU</td><td>0 / 3</td></tr>
+<tr><td>A3.2</td><td>mỗi phiên bản mới · trước khi dùng thật</td><td>ca cài sẵn + 3 tháng × 25 đợt × 4</td><td>không đặt · ghi giờ GPU</td><td>0 / 4</td></tr>
+<tr><td>A3.3</td><td>mỗi phiên bản mới · trước khi dùng thật</td><td>ca cài sẵn + 2 tháng × 4 loại × 3</td><td>không đặt · ghi giờ GPU</td><td>0 / 3</td></tr>
+<tr><td>A4</td><td>vòng 0 đo <code>v0</code> (mã) · mỗi phiên bản mới · mỗi khi thêm luật</td><td>≥ 10 lô lỗi + 5 lô sạch × 3</td><td>không đặt · ghi giờ GPU</td><td>0 / 3</td></tr>
+</table></div>
+
+<h3 id="s2-3">2.3 Lưu và làm sạch <span class="state review">review</span></h3>
+<div class="tw"><table>
+<tr><th>Phần</th><th>Quyết định</th></tr>
+<tr><td>Lưu</td><td>Kho FLS (PostgreSQL), một bản ghi mỗi mục theo khuôn how-to 4.1: agent · phiên bản · nguồn (người kiểm · người dùng · vòng fleet + mã vòng + mã persona) · tham chiếu đầu vào (⛔ bản chép) · đầu ra · điểm · tín hiệu người · lý do · thời điểm · lớp lưu giữ. Tín hiệu <i>sửa</i> của người đã có ở <code>fls_journal</code> (có actor); <i>duyệt</i> và <i>khiếu nại</i>: chưa có chỗ (Q5).</td></tr>
+<tr><td>Làm sạch</td><td>Trước khi đăng và trước mọi lần dùng lại: tên người (diễn giải sao kê có tên người ở ~4,3–4,8% ô, <code>NFR-I13</code>) · số tài khoản · tên tài khoản · email (cấm vào kho, <code>PM_COT_RIENG_TU</code>) → chỗ giữ chỗ nhất quán; quét khoá bí mật rồi soát tay; nhật ký thay đổi.</td></tr>
+<tr><td>Lưu giữ</td><td>bản thô: ngắn nhất được phép, ngoài repo (như <code>sao_luu/</code>) · bản đã làm sạch và báo cáo vòng: suốt đời agent · bộ ca và đáp án: hạn chế quyền, suốt đời, ⛔ vào git.</td></tr>
+<tr><td>Đưa về agent</td><td>luật (phát hiện được nhận lặp lại) · tham chiếu (đầu ra người đã xác nhận, ⛔ từ bộ ca) · cặp ưu tiên (bản người sửa cạnh bản agent, từ <code>fls_journal</code>) · ca kiểm mới (loại lỗi mới, ô "không có ca").</td></tr>
+<tr><td>Báo động học thuộc</td><td>Phần ca do người xác nhận (lỗi thật của H1000, ca Ref bị đè, …) ⛔ đi vào bất kỳ kênh nào ở trên. Điểm fleet tăng mà điểm trên phần này không tăng ⇒ agent đang học bài kiểm.</td></tr>
+</table></div>
+
+<!-- ============================== PART 3 ============================== -->
+<h2 id="p3">3. Đóng</h2>
+
+<h3 id="s3-1">3.1 Nghiệm thu <span class="state review">review</span></h3>
+<p>Điều phải đúng khi kế hoạch xong. Mỗi câu thấy được (bản ghi lưu hoặc trang đã render), một người kiểm trong vài phút, trỏ vào các bước vòng nó canh, và mang số đo kèm ngày.</p>
+<div class="tw"><table>
+<tr><th>Mã</th><th>Câu</th><th>Kiểm thế nào</th><th>Canh</th><th>Trạng thái (số · ngày)</th></tr>
+<tr><td>A1</td><td>Mọi agent được chọn trên sơ đồ có thẻ eval đủ trường.</td><td>đếm thẻ so với agent được chọn</td><td>R1</td><td>4/4 thẻ · 2026-11-06 (A1 · A2 ngoài phạm vi bản này)</td></tr>
+<tr><td>A2</td><td>Agent và persona không đọc được đáp án; mọi lượt đọc có log.</td><td>danh sách quyền + log đọc</td><td>R2, R3</td><td>chưa đo — harness chưa dựng</td></tr>
+<tr><td>A3</td><td>Bộ chấm là gpt-oss-20b với prompt riêng; yêu cầu gửi bộ chấm không mang tên agent hay phiên bản.</td><td>bài kiểm của harness đỏ khi có tên</td><td>R4</td><td>chưa đo</td></tr>
+<tr><td>A4</td><td>Mỗi báo cáo vòng có heatmap, tăng giảm so bản trước, trạng thái hiệu chuẩn, độ đồng thuận và giờ GPU thực tiêu.</td><td>mở báo cáo</td><td>R5</td><td>chưa đo</td></tr>
+<tr><td>A5</td><td>Mọi phát hiện có phán quyết của owner kèm lý do; mọi phát hiện được nhận có phiếu chuyển đi.</td><td>bảng phân loại</td><td>R6, R7, R8</td><td>chưa đo</td></tr>
+<tr><td>A6</td><td>Checksum của phiên bản lúc chạy trùng manifest ThuongCT đã ký; Lanptn xác nhận trước R3.</td><td>so checksum trong báo cáo vòng</td><td>R1, R3</td><td>chưa đo</td></tr>
+<tr><td>A7</td><td>Vòng 0 của A3.1 và A4 đã đo <code>v0</code> (mã) trên cùng mẫu, để vòng LLM đầu có mốc so.</td><td>báo cáo vòng 0</td><td>R2, R5</td><td>chưa đo</td></tr>
+</table></div>
+<p><b>Phủ:</b> R1 (A1, A6) · R2 (A2, A7) · R3 (A2, A6) · R4 (A3) · R5 (A4, A7) · R6 · R7 · R8 (A5). Mọi bước có ít nhất một câu canh; mọi câu canh ít nhất một bước. Không có lỗ ▢.</p>
+
+<h3 id="s3-2">3.2 Câu hỏi mở <span class="state review">review</span></h3>
+<p>Mỗi câu có phương án, được mất, đề xuất, và do owner quyết.</p>
+<div class="tw"><table>
+<tr><th>Mã</th><th>Câu hỏi</th><th>Phương án (được · mất)</th><th>Đề xuất</th><th>Quyết định</th></tr>
+<tr><td>Q1</td><td>KhanhCQ vừa dựng mọi agent và prompt vừa là operator. How-to cấm operator sửa agent. Giữ vậy được không?</td><td>A · giữ, bù bằng: manifest do ThuongCT ký ở R1, harness khoá prompt trong vòng, Lanptn đối checksum trước R3 và chấm lại 10% — <i>được</i>: không thêm người · <i>mất</i>: người dựng vẫn chọn mẫu và đọc kết quả trước. B · một người khác chạy R2–R5 — <i>được</i>: độc lập đúng how-to · <i>mất</i>: cần thêm người biết harness.</td><td>A ngay bây giờ (A6 đã canh); chuyển sang B khi có người</td><td>ThuongCT</td></tr>
+<tr><td>Q2</td><td>Lanptn vừa duyệt độc lập vừa cho ý kiến để KhanhCQ tinh chỉnh agent. Người duyệt có được góp ý tinh chỉnh không?</td><td>A · Lanptn chỉ duyệt vòng; yêu cầu tinh chỉnh đi qua ThuongCT — <i>được</i>: người duyệt không chấm việc mình chỉnh · <i>mất</i>: chậm hơn. B · giữ như hiện tại — <i>được</i>: nhanh · <i>mất</i>: người duyệt dần thành người cùng dựng.</td><td>A</td><td>ThuongCT</td></tr>
+<tr><td>Q3</td><td>Bộ ca và đáp án để ở đâu, ai đọc?</td><td>A · thư mục ngoài repo, quyền chỉ cho harness + bộ chấm, log đọc — <i>được</i>: đúng how-to, không vào git (có tên người, tiền thật) · <i>mất</i>: phải dựng quyền. B · trong kho FLS, schema riêng — <i>được</i>: cùng chỗ với bản ghi · <i>mất</i>: superuser của kho đọc được hết.</td><td>A</td><td>ThuongCT</td></tr>
+<tr><td>Q4</td><td>A3.2 và A3.3 có cần một người kiểm trước khi ghi sổ không, hay chỉ fleet eval?</td><td>A · kế toán duyệt mẫu 10% dòng mỗi lô trong 3 tháng đầu — <i>được</i>: có tín hiệu người, hiệu chuẩn được persona · <i>mất</i>: thêm việc. B · chỉ fleet eval — <i>được</i>: không thêm việc · <i>mất</i>: lỗi giữa hai phiên bản lọt thẳng vào sổ.</td><td>A</td><td>ThuongCT</td></tr>
+<tr><td>Q5</td><td>Tín hiệu <i>duyệt</i> và <i>khiếu nại</i> của ThuongCT và kế toán trên sổ hiệu lực / báo cáo daily lưu ở đâu?</td><td>A · nút duyệt / khiếu nại trên F02, ghi vào lớp sửa có actor — <i>được</i>: cùng khuôn với <code>fls_journal</code> · <i>mất</i>: thêm một màn. B · không lưu — <i>mất</i>: cột "người dùng" trên sơ đồ mãi PARTIAL.</td><td>A</td><td>ThuongCT</td></tr>
+<tr><td>Q6</td><td>Khi nào viết thẻ cho A1 KHAI &amp; CHỤP và A2 DỰNG?</td><td>A · bản AP 1.1, sau vòng đầu của A3.1 · B · ngay khi A1/A2 chuyển sang LLM</td><td>B</td><td>ThuongCT</td></tr>
+</table></div>
+<p class="note">Câu đã chốt trong phỏng vấn 06/11 (không còn mở): đo agent LLM Qwen 3.8-27B local · bộ chấm và persona gpt-oss-20b · bar và mẫu theo đề xuất · không đặt trần chi phí · A3.3 không có bar tổng, bể không giới hạn · H1000 ~34 file đã adjust · giữ giá trị mặc định như AS-IS (parity) · vai ThuongCT / KhanhCQ / Lanptn · think-aloud với ThuongCT, AnhMC, NgaNLT.</p>
+</main>
+</body>
+</html>

@@ -19,6 +19,12 @@ import functools
 import re
 from dataclasses import dataclass
 
+# ⭐ ISP 3.1.2 · `C1` *(`WO-075`)*: đường nguồn tĩnh của `IX.FX` khai ở
+#   `fls.cau_hinh.fx` — bảng này dùng CHÍNH hằng ấy *(⛔ gõ lại chuỗi đường)*.
+#   Luật ĐƯỜNG nguồn tĩnh *(vòng sửa R1 · `C1-R1-02`)* ở `fls.cau_hinh.nguon_tinh`
+#   — một chỗ, chung với `soi_bang_tuyen` và `fx.doc_tep`.
+from fls.cau_hinh import nguon_tinh
+
 TIEN_TO = "/api/fls/v1"
 
 # Phuong thuc ⛔ KHONG BAO GIO duoc nham vao so. `INV-I03`/`INV-I08`: sua chi
@@ -36,7 +42,17 @@ SO = "fls_itl"
 # ghi ly do/hoan ⛔ khong bat buoc phai cham `fls_journal`. Ban dau toi doi ca
 # bon duong ghi phai cham `fls_journal` — cong do se do GIA, va mot cong do gia
 # thi nguoi ta go cong chu khong sua ma.
-BANG_CO_VET: frozenset[str] = frozenset({"fls_journal", "fls_queue_event"})
+# ⭐ `fls_khai_cot` (08/09) — no **mang vet that**: `actor` NOT NULL +
+# `hieu_luc_tu` NOT NULL, va no la so **CHI-THEM** (sua = `version` moi,
+# co cong quet ma nguon cam `UPDATE`/`DELETE`). ⇒ Doc lai duoc *ai khai,
+# luc nao, va khai TRUOC do la gi* — dung dinh nghia cua tap nay.
+# ⚠ Them vao day vi cong vua bat DUNG: `POST .../khai-cot` bi bao "ghi ma
+#   ⛔ khong de lai vet" — cong dung, **tap thi thieu mot ten**.
+# ⭐ `fls_cau_hinh_ban` (`C7`, `WO-212`) — vet THAT: `actor` NOT NULL + `luc` do MAY dat,
+#   CHI-THEM (trigger `0027`, `INV-I08`) ⇒ doc lai duoc *ai ky/nap config nao, luc nao*.
+#   Ban KY thang di qua dung bang nay. (⛔ them `fls_cau_hinh_dong`: no khong co actor.)
+BANG_CO_VET: frozenset[str] = frozenset({
+    "fls_journal", "fls_queue_event", "fls_khai_cot", "fls_cau_hinh_ban"})
 
 # Bang duoc phep xuat hien trong bang tuyen. ⛔ Ten la = NO, de mot duong doc
 # `fps_*` hay P100 khong the lot vao trong im lang (`QĐ-ITL-45`: FLS chi doc
@@ -52,6 +68,33 @@ BANG_CHO_PHEP: frozenset[str] = frozenset({
     "fls_moi_noi",          # khung xem: moi noi DANG CO HIEU LUC
     # ⭐ NGUOI bam "xong" (migration 0014, `QĐ-ITL-71`).
     "fls_da_xong",          # khung xem: dong da duoc NGUOI bam xong
+    # ⭐ Nhom NAP (`CR#11`): ban khai anh xa cot (migration `0016`).
+    "fls_khai_cot",
+    # ⭐ Ban khai THU HAI: `Range_*` cua danh muc (migration `0017`,
+    #   `GAP-KHAI-01`) — thu ma script `Run` cua trang tinh thuc su doc.
+    "fls_nguon_dai",
+    # ⭐⭐ Lan ANH CHUP (migration `0018`, `QĐ-ITL-110`) — cho o cua vung
+    #    CHUAN. ⛔ Truoc no, `xem-truoc`/`nap` doi nguoi goi **dua san `dong`**,
+    #    tuc he ⛔ khong co duong vao nao cho du lieu that.
+    "fls_chup", "fls_chup_nguon", "fls_chup_dong",
+    # ⭐⭐ Khung xem DIEN GIAI (migration `0026`, `QĐ-ITL-145`) — no noi dong so
+    #    voi anh chup theo nhip gio, **⛔ khong ghi mot o nao**. Dien giai sao
+    #    ke la **bang chung duy nhat** cua `49%` cuon so *(nhanh nuoc ngoai,
+    #    `DT-I13 ⓑ`)*, nen cot nay ⛔ **khong bao gio** bi hy sinh khi man hep.
+    # ⚠ Them `21/09`: cong da bat DUNG — ban khai thieu mot ten, ⛔ khong phai
+    #   cua di sai duong.
+    "fls_dien_giai",
+    # ⭐⭐ Khung xem GOI Y CUA MAY (migration `0025`, `QĐ-ITL-143`) — co tu
+    #    18/09 nhung ⛔ tuyen nao doc no cho toi `WO-003` (01/10): cu ghep TAY
+    #    nay ghi `hd`/`cdt1` vao lan may (`QĐ-ITL-149`) va bo ghep dao ca goi y
+    #    may ⇒ `match` · `match-lo` · `unmatch` doc no. Kho rieng FLS — dung
+    #    tinh than `QĐ-ITL-45`, ⛔ phai mot bang ngoai.
+    "fls_may_goi_y",
+    # ⭐⭐ `C5` (`WO-142`) — KHO CONFIG chi-THEM. `GET /config/fx` · `/config/hd`
+    #    doi nguon tu anh TINH sang hai bang nay (`nguon_tinh` GO). Chi-THEM, co
+    #    trigger chan UPDATE/DELETE ⇒ doc lai duoc *ai nap config nao, luc nao*.
+    "fls_cau_hinh_ban",
+    "fls_cau_hinh_dong",
 })
 
 
@@ -85,9 +128,82 @@ class Tuyen:
     # ⇒ Khai TUONG MINH bang nao mot duong duoc GHI, va cong chan `fls_itl` o
     #   moi phuong thuc, ⛔ khong chi ba phuong thuc kia.
     bang_ghi: tuple[str, ...] = ()
+    # ⭐⭐⭐ `CR#11` task `4` — **THEM vao so ⛔ KHONG phai SUA so**.
+    #
+    # ⛔⛔ Cho toi 08/09, luat cua bang nay la *"⛔ khong tuyen nao duoc ghi vao
+    # `fls_itl`"* — va no DUNG, vi luc ay **⛔ khong tuyen nao NAP**: duong duy
+    # nhat dua du lieu vao kho la mot lenh dong lenh. Moi `POST` deu SUA mot
+    # dong DA CO, nen "ghi vao so" chi co the nghia la **sua so**.
+    #
+    # `POST /nap` la tuyen **DAU TIEN** THEM dong vao so, va `INV-I08` doc
+    # nguyen van la *"chi THEM, ⛔ khong SUA"* — tuc phep THEM **chinh la thu
+    # bat bien ay cho phep**. Mot cong khong phan biet duoc hai viec ay se
+    # **cam ca cai no sinh ra de bao ve**.
+    #
+    # ⛔ Va vi day la mot **ngoai le co ten**, no phai **hep va CHUNG MINH
+    #   DUOC** — cong doi ba dieu kien cung luc:
+    #     ⓐ phai la `POST` *(`PUT`/`DELETE`/`PATCH` van cam tuyet doi)*;
+    #     ⓑ phai ghi ca `fls_run` — mot dong so ⛔ khong co lan nap la mot dong
+    #        **mat lineage** (`INV-I05`/`I12`), va do la thu `GAP-ERD-P0-01` da
+    #        dong bang mot FK;
+    #     ⓒ ca `fls/` ⛔ **khong duoc chua** mot cau `UPDATE`/`DELETE` nao nham
+    #        `fls_itl` — quet ma nguon, o `tests/api/test_them_vao_so.py`.
+    them_vao_so: bool = False
     ghi: bool = False
+    # ⭐ `C7` (`WO-212`): mã HTTP khi THÀNH CÔNG. Mặc định `200` ⇒ mọi tuyến cũ ⛔ đổi;
+    #   chỉ tuyến TẠO bản ghi mới *(ký tháng)* khai `201`.
+    http_ok: int = 200
+    # ⭐⭐ `CR#11` task `4` — **DOC THAN ⛔ KHONG dong nghia voi GHI**.
+    #
+    # ⛔⛔ Cho toi 08/09 `cua.py` viet `than = _doc_than() if tuyen.ghi else {}`
+    # — tuc no **gan chat** hai khai niem khac nhau. Dung, cho toi khi co
+    # `POST /nap/xem-truoc`: mot tuyen **doc ca mot lo du lieu** trong than yeu
+    # cau va **⛔ khong ghi mot dong nao**.
+    #
+    # ⛔ Cach chua SAI la khai no `ghi=True` cho "de": lam the thi no duoc cap
+    #   **ket noi GHI**, va ca dac diem cua tuyen ay — *"go nham duong ⛔ khong
+    #   mat gi"* — bien mat.
+    #
+    # ⇒ Tach thanh mot truong RIENG. Mac dinh `None` = *"theo `ghi`"*, nen
+    #   **17 tuyen cu ⛔ khong doi mot chu**.
+    #
+    # ⭐⭐ Va nho tach ma co mot bao dam manh hon moi loi hua trong ma:
+    #   `xem-truoc` chay tren **ket noi bi PostgreSQL CHAN GHI**. *"Xem truoc
+    #   ⛔ khong ghi"* vi the ⛔ khong phai mot cau hua — no la mot thu **cai
+    #   kho tu choi**.
+    doc_than: bool | None = None
+
+    @property
+    def can_than(self) -> bool:
+        return self.ghi if self.doc_than is None else self.doc_than
     ghi_nhat_ky: bool = False
     mo_ta: str = ""
+    # ⭐⭐ ISP 3.1.2 · `C1` *(`WO-075`, 16/11)* — **NGUỒN TĨNH**: tuyến đọc một TỆP
+    #    đi cùng gói, ⛔ đọc kho.
+    #
+    # ⛔⛔ Cho tới `C1`, mọi tuyến đều chạm ≥ 1 bảng `fls_*`, và cổng ⓓ của
+    #    `kiem_bang_tuyen` từ chối *"một đường ⛔ nói nó chạm gì"* — ĐÚNG, và phải
+    #    giữ *(bài `test_cong_BAT_duong_khong_khai_bang_nao`)*. `GET /config/fx`
+    #    đọc `IX.FX` từ tệp tĩnh *(tới `C5` mới có kho config)* ⇒ nó **có** chạm
+    #    một thứ, chỉ là thứ ấy ⛔ phải bảng.
+    #
+    # ⛔ Cách chữa SAI: gõ tên tệp vào `bang` *(`BANG_CHO_PHEP` chỉ nhận `fls_*`,
+    #   và `soi_bang_tuyen` sẽ báo "khai THỪA" — đúng)*, hay nới cổng ⓓ *(mọi tuyến
+    #   khác mất phép canh)*. ⇒ Một trường RIÊNG, và ngoại lệ phải **HẸP**: chỉ
+    #   `GET` ⛔ ghi *(một tệp tĩnh ⛔ ghi được)*; `soi_bang_tuyen` đòi tệp
+    #   **có thật**. `C5` đổi tuyến sang `bang=(kho config…)` và gỡ trường này.
+    #
+    # ⛔⛔ Vòng sửa sau R1 *(`C1-R1-02`, `KQ-077`)* — **"HẸP" ở trên là lời hứa CHƯA
+    #    giữ**: phép canh duy nhất là *"tệp có tồn tại"*. R1 dựng tuyến cố ý khai sai:
+    #    hàm `so` *(đọc sổ)* · `bang=()` · `nguon_tinh=('pyproject.toml',)` ⇒ cổng này
+    #    XANH; `('CLAUDE.md',)` và `('../../../../../../../../etc/hostname',)` ⇒ **cả
+    #    hai cổng** XANH; một CHUỖI thay tuple ⇒ cổng này XANH, `soi` 32 câu rác.
+    #    ⇒ Nay: ⓐ kiểu `tuple[str, ...]` *(sai kiểu ⇒ MỘT câu)*; ⓑ mỗi đường qua luật
+    #    `nguon_tinh.kiem_duong` *(NGAY dưới `fls/cau_hinh/tinh/`, `*.json`, ⛔ `..`,
+    #    ⛔ tuyệt đối, giải đường thật)*; ⓒ ⛔ khai CÙNG `bang` *(tuyến tĩnh hay tuyến
+    #    kho, ⛔ cả hai)*. Phép canh SỰ THẬT *(hàm có mang chuỗi đường · có chạm kho)*
+    #    ở `soi_bang_tuyen` ⓔ — cổng này chỉ đọc BẢN KHAI.
+    nguon_tinh: tuple[str, ...] = ()
 
     def khop(self, duong: str) -> dict[str, str] | None:
         m = _mau(self.duong).match(duong)
@@ -115,20 +231,27 @@ BANG_TUYEN: tuple[Tuyen, ...] = (
     Tuyen("GET", f"{TIEN_TO}/queue", "hang_cho",
           # ⚠ `fls_da_xong` them 03/09 (`GAP-API-05`): dieu kien "da bam xong"
           # nam TRONG cau con `q` tu `QĐ-ITL-71` ma ban khai ⛔ khong theo kip.
-          ("fls_itl", "fls_queue_state", "fls_da_xong"),
+          ("fls_itl", "fls_queue_state", "fls_da_xong", "fls_queue_event"),
           mo_ta="hang cho xep theo TIEN trong tung tien te (QĐ-ITL-58)"),
     Tuyen("GET", f"{TIEN_TO}/queue/summary", "hang_cho_tom",
           ("fls_itl", "fls_da_xong"),
           mo_ta="so dong + Σ tien hang cho THEO TUNG tien te, ⛔ khong dong tong"),
     Tuyen("GET", f"{TIEN_TO}/journal", "nhat_ky",
-          ("fls_journal", "fls_itl"),
+          # ⭐ `WO-023` `(f)` *(`BA-07` v3.6)*: `la_ban_dao` noi `fls_adjustment`
+          #   theo `(itl_id, field, at, actor)` ⇒ tuyen **doc them** bang ay.
+          ("fls_journal", "fls_itl", "fls_adjustment"),
           mo_ta="nhat ky 7 truong cua mot dong (?itl_id=)"),
     Tuyen("GET", f"{TIEN_TO}/gates", "cong",
           # ⚠⚠ Ban khai cu vua THIEU vua THUA: no ghi `fls_pm_link` +
           # `fls_reject` *(SQL ⛔ khong cham)* va bo sot `fls_moi_noi` *(SQL CO
           # cham — phep do Σ moi noi phai chay tren khung xem HIEU LUC, ⛔ khong
           # tren bang goc)*. Ca hai chieu deu la ban do ve sai.
-          ("fls_itl", "fls_moi_noi", "fls_run"),
+          # ⭐ Them 11/09: `fls_chup` + `fls_pm_line` — cong `RUN_DEM_KHOP` nay
+          # do **dung BANG ma lan nap ay ghi vao** *(`Bank`→`fls_itl`,
+          # `PM`→`fls_pm_line`)*, va no phan biet bang `fls_chup.lan`. ⭐ Chinh
+          # cong `soi_bang_tuyen` da bat thieu sot nay ngay trong buoi sua —
+          # dung viec no sinh ra de lam (`GAP-API-05`).
+          ("fls_chup", "fls_itl", "fls_moi_noi", "fls_pm_line", "fls_run"),
           mo_ta="cong do duoc + 4 cong ke toan khai la CHUA DO DUOC"),
 
     # ── ⭐ `P6·B3` — DO PHU hang cho. Mot trong **6 duong doc** cua `BA-07` §2
@@ -193,12 +316,147 @@ BANG_TUYEN: tuple[Tuyen, ...] = (
     # nao — tuc may quyet thay nguoi (`INV-I16`). Sua dac ta: `CR#6`.
     Tuyen("POST", f"{TIEN_TO}/queue/{{itl_id}}/match", "ghep",
           ("fls_itl", "fls_pm_line", "fls_pm_link", "fls_moi_noi",
-           "fls_queue_event", "fls_adjustment", "fls_journal", "fls_sua_tay"),
+           "fls_queue_event", "fls_adjustment", "fls_journal", "fls_sua_tay",
+           # ⭐ `WO-003` (`QĐ-ITL-149`): `hd`/`cdt1` suy luc ghep la GOI Y
+           #   CUA MAY ⇒ doc `fls_may_goi_y` (goi y trung ⇒ ⛔ them dong;
+           #   `value_before`) qua `ghi_tay.loc_goi_y`.
+           "fls_may_goi_y"),
           bang_ghi=("fls_pm_link", "fls_queue_event", "fls_adjustment",
                     "fls_journal"),
           ghi=True, ghi_nhat_ky=True,
           mo_ta="ghep tay: Σ dong lenh PHAI bang tien bank (dung sai theo tien "
                 "te) ⇒ lech thi 422 va GIU UNMAPPED, ⛔ khong chia bua"),
+
+    # ── ⭐⭐⭐ `B0` + `B2` (09/09, `QĐ-ITL-118`) — MAU SO va cua ghep LO.
+    #
+    # ⛔⛔ **Vi sao ba duong nay ra doi cung mot lan.** Lo trinh `13` §1 chang ①
+    # dat `B0` *(do lai mau so)* **truoc** `B2` *(cua ghep lo)*, va do la mot
+    # thu tu **co ly do do duoc**: `B2` chi co nghia neu con so *"bao nhieu dong
+    # ghep duoc ngay"* la con so cua **cua GHI**, ⛔ khong phai cua **danh sach
+    # ung vien**. Va dung `B0` bat duoc rang hai con so ay lech **8,6 lan**
+    # (`584` so voi `68`).
+    # ══ ⭐⭐⭐ `GAP-SCR-14` — HANG CHO PHIA LENH CHI (09/09) ══
+    #
+    # ⛔⛔ Truoc hom nay: **10** tuyen khoa `itl_id`, ⛔ **0** tuyen khoa dong
+    #    lenh ⇒ ⛔ khong duong nao hoi *"lenh chi nao ⛔ chua tim duoc tien"*,
+    #    trong khi `QĐ-ITL-122` noi do **la** cau hoi cua viec.
+    #
+    # ⛔⛔⛔ **Ca ba deu la `GET`.** Phep ghep van di qua
+    #    `POST /queue/{itl_id}/match` — ⛔ KHONG co duong ghi thu hai.
+    # ⭐ `11/09` (`G2`): tuyen nay nay cham them `fls_itl` — phep chia RO doc
+    #   `doc_no` de biet dong lenh co tim duoc tien khong (`BA-12 §2`).
+    Tuyen("GET", f"{TIEN_TO}/queue/lenh-cho", "lenh_cho",
+          # ⭐ `fls_dien_giai` them `22/09`: moi hang nay mang `gd` — giao dich
+          #   **de xuat dau** — de BANG SO ve duoc ba cot cuoi. ⛔ Khong khai
+          #   thi cong `soi_bang_tuyen` DO ngay, va no da do dung nhu the.
+          ("fls_pm_line", "fls_moi_noi", "fls_itl", "fls_dien_giai"),
+          mo_ta="dong lenh chi ⛔ CHUA tim duoc tien, xep theo tien GIAM trong "
+                "TUNG tien te (`PARTITION BY curr` — `QĐ-ITL-58`). `?duyet=0|1` "
+                "loc theo `status`; mac dinh HIEN CA HAI (⛔ khong mac dinh im "
+                "lang — `INV-I16`). Moi dong mang `ro` (`may`/`nguoi`/`khong`) "
+                "+ `vi_sao` + `tu_chung` (`BA-12 §2`)"),
+    Tuyen("GET", f"{TIEN_TO}/queue/lenh-cho/ro", "lenh_cho_ro",
+          ("fls_pm_line", "fls_moi_noi", "fls_itl"),
+          mo_ta="dem dong lenh cho theo RO — `may` (may tra loi duoc) · "
+                "`nguoi` (viec that) · `khong` (⛔ khong ai tra loi duoc o FLS) "
+                "+ `tu_chung` + `tong`. Ba ro phai KHEP ve `tong`"),
+    Tuyen("GET", f"{TIEN_TO}/queue/lenh-cho/summary", "lenh_cho_tom",
+          ("fls_pm_line", "fls_moi_noi"),
+          mo_ta="chan man phia lenh chi theo TUNG tien te: so dong · so phieu · "
+                "tien · so dong DUYET va CHUA DUYET (hai loai viec khac nhau) · "
+                "so dong de phu `muc_pct` tien. ⛔ khong co dong 'tong'"),
+    # ⭐⭐⭐ `GAP-API-08` — tuyen **40**. Truoc no, **2/4** chip cua man ghep
+    #    ⛔ khong goi duoc: `/queue/lenh-cho` loc cung `NOT EXISTS
+    #    (fls_moi_noi)` nen ⛔ khong duong nao hoi *"lenh nao DA co tien"*, va
+    #    ca nua *"da gan"* cua man chet theo day chuyen — nut `Bo gan` ⛔ khong
+    #    bao gio bat, `.mrow.da_gan` la CSS chet.
+    #
+    # ⛔⛔ **Mot tuyen RIENG chu ⛔ khong mot co tren `lenh-cho`:** ten
+    #    `lenh-cho` nghia la *"dang cho"*; cho no tra dong da noi la de mot cai
+    #    ten **noi doi**, va moi nguoi doc ma sau nay se tin cai ten ay.
+    Tuyen("GET", f"{TIEN_TO}/queue/lenh-da-gan", "lenh_da_gan",
+          ("fls_pm_line", "fls_moi_noi", "fls_itl", "fls_dien_giai"),
+          mo_ta="dong lenh chi **DA** tim duoc tien, kem `itl_da_gan[]` — "
+                "⭐ mot DANH SACH chu ⛔ khong mot so: do 22/09 tren kho that, "
+                "**23/2.219 = 1,0%** lenh gan NHIEU HON MOT dong tien, va mot "
+                "khoa so it se im lang bo mat phan con lai dung o cho nguoi ta "
+                "bam `Bo gan`. Bu cua `/queue/lenh-cho`; hai ro KHEP ve tong "
+                "2.219 + 1.553 = 3.772"),
+    # ⭐⭐ `11/09` — owner: *"bang PM van chua du cac truong nhu trong GGSheet"*.
+    #   Do that: `PM_Unpivot` co **28 cot**, FLS doc **8**, va 20 cot bo qua
+    #   dien **100%** — trong do co `Noi dung nhap o bank` va `Ten tai khoan`,
+    #   dung hai thu de nhan ra mot khoan tien. Cua nay mo ca 28 cot.
+    Tuyen("GET", f"{TIEN_TO}/queue/lenh/{{pm_line_id}}", "mot_dong_lenh",
+          ("fls_pm_line", "fls_moi_noi"),
+          mo_ta="MOT dong lenh: 8 truong da phan tich + `tho` (ca hang tho, "
+                "khoa theo TEN COT) + `ca_phieu` (cac dong khac cung phieu — "
+                "526 phieu mang 2-36 reference khac nhau)"),
+    Tuyen("GET", f"{TIEN_TO}/queue/lenh/{{pm_line_id}}/itl-candidates",
+          "ung_vien_tien",
+          # ⭐ `fls_dien_giai` them `21/09` (`QĐ-ITL-148`): dien giai sao ke la
+          #   **bang chung duy nhat** cua `49%` cuon so — cot ⛔ khong bao gio
+          #   bi hy sinh khi man hep.
+          ("fls_pm_line", "fls_itl", "fls_moi_noi", "fls_dien_giai"),
+          mo_ta="dong TIEN ung vien cho MOT dong lenh — chieu NGUOC cua "
+                "`pm-candidates`. 4 bac CO TEN, ten giu y nguyen. Bac `ma` "
+                "tinh o PYTHON bang `canon_ref` (kho ⛔ khong co ban chuan hoa "
+                "cua `doc_no`). Bac `cung_tien_te` BI CAT, va cua KHAI RA da "
+                "cat (`bi_cat` + `tong_cung_tien_te`)"),
+    # ⭐⭐ Tuyen 36 — TRA CUU TOAN SO. `QĐ-ITL-148` · `BA-07 §4h ⓹`.
+    #
+    # ⛔ Vi sao ⛔ KHONG dung `GET /ledger`: no loc `?period=&le=&status=` —
+    #   ⛔ khong tim chu, va ⛔ khong biet lenh nao dang mo nen ⛔ khong tinh
+    #   lai bac duoc.
+    # ⭐ Va day ⛔ khong phai tinh nang phu: che do nay **bat san** voi lenh may
+    #   ⛔ khong tim duoc ung vien nao ⇒ no la **loi thoat ngo cut** cua **768**
+    #   dong. ⛔ Khong co no thi man **LA** ngo cut.
+    Tuyen("GET", f"{TIEN_TO}/queue/lenh/{{pm_line_id}}/so", "so_theo_lenh",
+          ("fls_pm_line", "fls_itl", "fls_moi_noi", "fls_chup_dong",
+           "fls_source", "fls_dien_giai"),
+          mo_ta="TOAN SO cho MOT dong lenh — cung khuon `ung_vien[]`, nhung "
+                "bac duoc TINH LAI theo lenh dang mo (khop `canon_ref` ⇒ `ma`, "
+                "dung tien ⇒ `tien`, con lai ⇒ `cung_tien_te`). ⛔ Bac `ma` "
+                "tinh o PYTHON: `regexp` trong SQL lech 17,9% (560 vs 475). "
+                "`?q=` tim trong dien giai + so chung tu"),
+    # ⭐⭐ Tuyen 37 — CHUM moi noi. `QĐ-ITL-148 ③`.
+    #
+    # ⛔ Cua `unmatch` bo TOAN BO moi noi cua dong tien va ⛔ khong nhan
+    #   `pm_line_ids` (`QĐ-ITL-69`: bo le lam `Σ moi noi ≠ tien bank`). Owner
+    #   chot **giu cua, MAN noi ra thiet hai** ⇒ man phai hoi duoc *"cu bam nay
+    #   se go NHUNG DONG NAO"*.
+    # ⭐ Do `21/09`: chi **25/2.222 = 1,1%** dong tien mang chum, lon nhat **10**.
+    Tuyen("GET", f"{TIEN_TO}/queue/{{itl_id}}/chum", "chum_moi_noi",
+          ("fls_moi_noi", "fls_pm_line"),
+          mo_ta="cac dong lenh mot cu `Bo gan` se go — KEM TEN, ⛔ khong mot "
+                "con so. Mot con so 'se go 3 moi noi' ⛔ khong du: nguoi dung "
+                "chi dinh dong toi MOT trong so do"),
+    Tuyen("GET", f"{TIEN_TO}/queue/mau-so", "mau_so",
+          ("fls_itl", "fls_moi_noi", "fls_pm_line"),
+          mo_ta="MAU SO tac vu ①: 4 nhom VE (`PS Co`/`PS No`/ca hai/khong ve) "
+                "· 4 o `work_status` x `co moi noi` MOI O MOT TEN LY DO · 4 "
+                "nhom vi sao chua noi (PHU HET) · so dong TU CHUNG · TRAN "
+                "CUNG + do phu TREN TRAN · ⭐ `phia_pm`: mau so THAT la so "
+                "DONG LENH CHI (`QĐ-ITL-122` — `Trans` map vao `PM`)"),
+    Tuyen("GET", f"{TIEN_TO}/queue/tu-chung", "tu_chung_ds",
+          ("fls_itl", "fls_moi_noi", "fls_pm_line"),
+          mo_ta="danh sach dong TU CHUNG (ghep duoc ⛔ khong can nguoi chon) + "
+                "ly do TU CHOI cho tung dong co ma ma ⛔ khong tu chung"),
+    # ⛔⛔ Than yeu cau la `{itl_ids: [...]}` va **CHI** the — ⛔ KHONG
+    # `pm_line_ids`, ⛔ KHONG `force`. May do lai phia may chu roi ghep dung cai
+    # no do ra; cung luat voi cua khai thu tu LO (`QĐ-ITL-117`).
+    Tuyen("POST", f"{TIEN_TO}/queue/match-lo", "ghep_lo",
+          ("fls_itl", "fls_pm_line", "fls_pm_link", "fls_moi_noi",
+           "fls_queue_event", "fls_adjustment", "fls_journal", "fls_sua_tay",
+           # ⭐ `WO-003` (`QĐ-ITL-149`): `hd`/`cdt1` suy luc ghep la GOI Y
+           #   CUA MAY ⇒ doc `fls_may_goi_y` (goi y trung ⇒ ⛔ them dong;
+           #   `value_before`) qua `ghi_tay.loc_goi_y`.
+           "fls_may_goi_y"),
+          bang_ghi=("fls_pm_link", "fls_queue_event", "fls_adjustment",
+                    "fls_journal"),
+          ghi=True, ghi_nhat_ky=True, doc_than=True,
+          mo_ta="ghep CA LO, CHI dong TU CHUNG: mot dong ⛔ khong tu chung ⇒ "
+                "422 CA LO va ⛔ 0 moi noi moi. ⛔ Khong nhan `pm_line_ids` va "
+                "⛔ khong bao gio nhan `force`"),
 
     # ── ⭐⭐ DUONG LUI cua phep ghep (`GAP-JOIN-05`, `QĐ-ITL-69`).
     #
@@ -216,7 +474,15 @@ BANG_TUYEN: tuple[Tuyen, ...] = (
           # co (`GAP-API-05`).
           ("fls_itl", "fls_moi_noi", "fls_pm_unlink",
            "fls_queue_event", "fls_adjustment", "fls_journal",
+           # ⭐ `fls_sua_tay` CHI con de dung `bo_qua` (gia tri NGUOI —
+           #   `DT-I14` v0.7 dinh nghia `bo_qua`).
            "fls_sua_tay"),
+          # ⛔⛔ `WO-003` vong 2 (`KQ-005 F-1`, `DT-I14` v0.7 nhanh 6–8): BO
+          #   `fls_may_goi_y` khoi ban khai. Vong 1 doc tap "con hieu luc" =
+          #   `fls_sua_tay` ∪ `fls_may_goi_y` — hai khung xem tra **lop tren
+          #   cung** ⇒ lop goi y bi `goi_y_lai` de NOI LEN LAI thanh mo coi sau
+          #   bo ghep (2/2 kich ban kho TEST). Nay tap can dao doc thang BANG GOC
+          #   `fls_adjustment` + `reversal_of` (`NOT EXISTS` ban dao).
           bang_ghi=("fls_pm_unlink", "fls_queue_event", "fls_adjustment",
                     "fls_journal"),
           ghi=True, ghi_nhat_ky=True,
@@ -244,6 +510,244 @@ BANG_TUYEN: tuple[Tuyen, ...] = (
           bang_ghi=("fls_queue_event",), ghi=True,
           mo_ta="mo lai mot dong da bam xong = THEM su kien `reopen` (⛔ khong "
                 "xoa). `reason` BAT BUOC: keo lai la lat ket luan cua NGUOI khac"),
+
+    # ── ⭐⭐⭐ NHOM NAP (`CR#11` task `4`, `BA-07` §4b) ────────────────────
+    #
+    # ⛔⛔ **Truoc hom nay nhom nay ⛔ KHONG TON TAI.** Do duoc: **0/17** tuyen
+    # la cua nap — 8 `GET` + 9 `POST`, va **moi `POST` deu SUA mot dong DA CO**.
+    # Duong duy nhat dua du lieu vao kho la mot **lenh dong lenh doc Google
+    # Sheets**. ⇒ Bo Google Sheets ma ⛔ khong dung nhom nay thi **⛔ khong con
+    # duong nao vao**.
+    #
+    # ⛔ Van **⛔ KHONG co `PUT`/`DELETE`**: so chi-THEM (`INV-I08`). Nap nham
+    #   thi **nap ban dung roi dao**, ⛔ khong xoa.
+    # ── ⭐⭐⭐ NHOM ANH CHUP (`QĐ-ITL-110`, task `9d`, `BA-07` §4c) ────────
+    #
+    # ⛔⛔ **Bon tuyen nay sinh ra vi mot PHEP DO, ⛔ khong vi mot y tuong.**
+    # Soi man `F04` xuong CHINH bang nay ngay 08/09: man can **5 cua**, va
+    # **3 cua ⛔ KHONG TON TAI** (① danh sach nguon · ② duong doc vung CHUAN ·
+    # ③ `GET .../khai-cot` — chi co `POST`). Nang hon: **hai cua CO van ⛔
+    # khong chay duoc**, vi ca `xem-truoc` lan `nap` doi nguoi goi **dua san
+    # `dong`** — tien de *"man hinh da cam tep"* cua `QĐ-ITL-105` ⓷ ma
+    # `QĐ-ITL-109` **da lat**.
+    #
+    # ⚠ Va no noi mot dieu ve chinh cong `soi_bang_tuyen`: cong ay kiem *"ban
+    #   khai co KHOP SQL that khong"* — mot cau rat manh — nhung no ⛔ **khong
+    #   bao gio hoi** *"co du cua cho cai man hinh dang cho khong"*. Mot bang
+    #   do **dung tuyet doi** va **thieu ba duong** thi van xanh.
+    #
+    # ⛔ Ca bon deu `GET`, `bang_ghi` RONG — chung chay tren ket noi bi
+    #   PostgreSQL **chan ghi**.
+    Tuyen("GET", f"{TIEN_TO}/sources", "nguon_ds",
+          ("fls_source", "fls_khai_cot", "fls_chup", "fls_chup_nguon"),
+          mo_ta="68 NGUON + `khai_version` hien hieu luc (`null` = ⛔ chua ai "
+                "khai) + `chup_cuoi`. ⛔ KHONG co trang thai InActive/Closed — "
+                "kho ⛔ khong co cot ay (`GAP-CHUP-02`), va cua KHAI THANG "
+                "bang `trang_thai_nguon: null` chu ⛔ khong im lang bo truong"),
+    Tuyen("GET", f"{TIEN_TO}/sources/{{source_id}}/khai-cot", "khai_cua_nguon",
+          ("fls_source", "fls_khai_cot"),
+          mo_ta="ban khai hien hieu luc + CA DAY `version` (ai khai · luc nao) "
+                "— trang thai ③, **de XEM** (`BA-06` §7 ⓶b). ⛔ Chua khai ⇒ "
+                "409 FLS-KHAI-KHONG-CO, ⛔ khong 404"),
+    Tuyen("GET", f"{TIEN_TO}/chup", "chup_ds",
+          ("fls_chup", "fls_chup_nguon", "fls_chup_dong", "fls_source",
+           "fls_pm_line", "fls_run"),
+          mo_ta="danh sach ANH CHUP, moi nhat truoc. `?lan=Bank|Cash` `?limit=`"),
+    Tuyen("GET", f"{TIEN_TO}/chup/{{chup_id}}", "chup_mot",
+          ("fls_chup", "fls_chup_nguon", "fls_chup_dong", "fls_source",
+           "fls_pm_line", "fls_run"),
+          mo_ta="mot ANH CHUP: dau + tung nguon (⭐ ke ca nguon ra **0 dong**) "
+                "+ `?limit` dong dau de xem truoc — trang thai ②. ⛔ `limit` "
+                "mac dinh **50**, ⛔ khong phai 'tat ca': mot anh co 8.365 dong"),
+    # ⭐⭐ `QĐ-ITL-113` — BANG CHUNG thu tu ngay, ⛔ KHONG phai mot ket luan.
+    #    Tuyen rieng chu ⛔ khong nhet vao `chup_mot`: `chup_mot` tra **50 dong
+    #    dau**, con phep do nay phai soi **MOI dong** (bang chung quyet dinh co
+    #    the o dong cuoi) ⇒ hai cau hoi khac nhau, hai cua.
+    Tuyen("GET", f"{TIEN_TO}/chup/{{chup_id}}/thu-tu", "thu_tu_ds",
+          ("fls_chup", "fls_chup_nguon", "fls_chup_dong", "fls_source",
+           "fls_khai_cot", "fls_pm_line", "fls_run"),
+          mo_ta="BANG CHUNG thu tu ngay tung nguon trong mot anh chup: da khai "
+                "gi + de xuat cua may + SO DONG lam chung. ⛔ May ⛔ KHONG "
+                "quyet — ke toan bam khai (QĐ-ITL-113)"),
+
+    # ⭐⭐ `QĐ-ITL-113` — khai CHI thu tu ngay. Cua RIENG chu ⛔ khong dung
+    #    `khai-cot`: ban khai la chi-THEM nen mot `version` moi phai cho DU 6
+    #    truong ⇒ qua cua kia, man phai **doc `cot` roi gui lai** = mot chu
+    #    trinh doc-sua-ghi, va ai khai `cot` moi trong khe do se bi de lai
+    #    bang `cot` CU ma ⛔ khong cong nao thay. Cua nay doc+ghi mot giao dich.
+    Tuyen("POST", f"{TIEN_TO}/sources/{{source_id}}/thu-tu", "ghi_thu_tu",
+          ("fls_source", "fls_khai_cot"), bang_ghi=("fls_khai_cot",),
+          ghi=True, doc_than=True,
+          mo_ta="khai THU TU NGAY (`dmy`|`mdy`) — sinh `version` MOI, GIU "
+                "nguyen `cot`. ⛔ Chua khai `cot` ⇒ 409, ⛔ KHONG tu dung mot "
+                "ban khai rong de co cho dau (QĐ-ITL-113)"),
+    # ⭐⭐⭐ `QĐ-ITL-117` — khai thu tu CA LO, **CHI** nguon TU CHUNG.
+    #    ⛔⛔ Tuyen nay `doc_than=True` nhung than **⛔ KHONG mang `thu_tu`** —
+    #    no do lai bang chung phia may chu roi ghi dung cai no do ra. ⇒ Man
+    #    hinh ⛔ khong co duong nao khai `dmy` cho 27 nguon bang mot cu bam.
+    #    Nguon ⛔ khong tu chung ⇒ NO ca lo, va nguon ay phai qua cua mot-nguon.
+    Tuyen("POST", f"{TIEN_TO}/chup/{{chup_id}}/thu-tu", "khai_thu_tu_lo",
+          ("fls_chup", "fls_chup_nguon", "fls_chup_dong", "fls_source",
+           "fls_khai_cot", "fls_pm_line", "fls_run"), bang_ghi=("fls_khai_cot",),
+          ghi=True, doc_than=True,
+          mo_ta="khai THU TU NGAY cho NHIEU nguon — moi nguon theo bang chung "
+                "CUA NO. ⛔ Than ⛔ KHONG duoc mang `thu_tu`. Nguon ⛔ khong tu "
+                "chung / BAT DONG voi ban khai cua nguoi ⇒ 422 va ⛔ 0 ban "
+                "khai moi (QĐ-ITL-117)"),
+    Tuyen("POST", f"{TIEN_TO}/sources/{{source_id}}/khai-cot", "ghi_khai",
+          ("fls_source", "fls_khai_cot"), bang_ghi=("fls_khai_cot",),
+          ghi=True,
+          mo_ta="ghi BAN KHAI ANH XA COT — sinh `version` MOI, ⛔ khong sua "
+                "khai cu (DD-I10). Thieu truong trong 6 ⇒ 422 FLS-KHAI-THIEU"),
+
+    # ⭐⭐ **Tuyen RIENG, ⛔ khong phai mot co.** Hai viec khac nhau ve **HAU
+    # QUA** thi ⛔ khong duoc khac nhau bang **mot chu trong than yeu cau**:
+    # mot co `?that=true` go thieu la **ghi that khi dinh thu**. Hai duong
+    # rieng thi go nham duong **⛔ khong mat gi** — no chi soat.
+    #
+    # ⛔ `bang_ghi` RONG, va do la ca dac diem cua tuyen nay.
+    # ⭐⭐⭐ `QĐ-ITL-111` + `112` — NAP CA LO. Tuyen RIENG chu ⛔ khong them
+    #    mot khoa vao hai tuyen mot-nguon: khuon TRA VE khac han (bien ban GOP
+    #    mang `so_nguon_vao`/`so_nguon_chua`, moi luat mang danh sach nguon ⛔
+    #    khong dat). Mot tuyen tra HAI khuon la mot tuyen ma nguoi goi ⛔ khong
+    #    biet minh dang doc khuon nao.
+    Tuyen("POST", f"{TIEN_TO}/nap/lo/xem-truoc", "lo_xem_truoc",
+          ("fls_source", "fls_khai_cot", "fls_nguon_dai",
+           "fls_chup", "fls_chup_nguon", "fls_chup_dong",
+           # ⭐⭐ Hai bang them 09/09 (`QĐ-ITL-119`): `chup.py::_dung` nay **DO**
+           #    `so_dong` cua lan `PM` tu `fls_pm_line`, di qua
+           #    `fls_run.chup_id` — vi lan ay ⛔ khong ghi vao `fls_chup_dong`
+           #    *(`fls_pm_line` CHINH LA bang dong cua no)*.
+           # ⚠ Cong `soi_bang_tuyen` bat dung **6 tuyen** khai thieu hai bang
+           #   nay ngay lan chay dau. Ban khai la mot **ban do**, va mot ban do
+           #   ve thieu duong thi nguy hon mot ban do ve thua.
+           "fls_pm_line", "fls_run"), doc_than=True,
+          mo_ta="SOAT CA LO ma ⛔ KHONG GHI — bien ban GOP 9 dong + tung "
+                "nguon. `{chup_id, source_ids}`; ⛔ KHONG co mac dinh "
+                "lay-het (QĐ-ITL-112)"),
+    Tuyen("POST", f"{TIEN_TO}/nap/lo", "lo_nap",
+          # ⛔ Bo bang nay do CONG `soi_bang_tuyen` bat, ⛔ khong do toi
+          #    doan: ban dau toi khai thieu `fls_pm_line` va khai THUA
+          #    `fls_journal`/`fls_mapping_master`. Mot ban do ve mot duong ⛔
+          #    khong co cung sai bang mot ban do thieu duong.
+          ("fls_itl", "fls_run", "fls_reject", "fls_le", "fls_pm_link",
+           "fls_pm_line", "fls_queue_event", "fls_source", "fls_khai_cot",
+           "fls_nguon_dai", "fls_chup", "fls_chup_nguon", "fls_chup_dong"),
+          bang_ghi=("fls_itl", "fls_run", "fls_reject", "fls_le",
+                    "fls_pm_link", "fls_pm_line", "fls_queue_event"),
+          # ⛔ `ghi_nhat_ky=False` — Y HET tuyen `POST /nap` (no goi
+          #    CUNG `nap_lo`). Ban dau toi khai `True`, va HAI cong noi
+          #    hai dieu: `soi_bang_tuyen` bao SQL ⛔ khong cham
+          #    `fls_journal`, `kiem_bang_tuyen` bao `ghi_nhat_ky=True`
+          #    PHAI khai no ⇒ co sai, ⛔ khong phai ban khai bang sai.
+          ghi=True, them_vao_so=True, doc_than=True,
+          mo_ta="NAP CA LO: nguon sach VAO SO, nguon CHAN BI CHUA (QĐ-ITL-111) "
+                "— MOT `run_id`, MOT giao dich cho ca lo"),
+    Tuyen("POST", f"{TIEN_TO}/nap/xem-truoc", "xem_truoc",
+          ("fls_source", "fls_khai_cot", "fls_nguon_dai",
+           "fls_chup", "fls_chup_nguon", "fls_chup_dong",
+           # ⭐⭐ Hai bang them 09/09 (`QĐ-ITL-119`): `chup.py::_dung` nay **DO**
+           #    `so_dong` cua lan `PM` tu `fls_pm_line`, di qua
+           #    `fls_run.chup_id` — vi lan ay ⛔ khong ghi vao `fls_chup_dong`
+           #    *(`fls_pm_line` CHINH LA bang dong cua no)*.
+           # ⚠ Cong `soi_bang_tuyen` bat dung **6 tuyen** khai thieu hai bang
+           #   nay ngay lan chay dau. Ban khai la mot **ban do**, va mot ban do
+           #   ve thieu duong thi nguy hon mot ban do ve thua.
+           "fls_pm_line", "fls_run"), doc_than=True,
+          mo_ta="SOAT ma ⛔ KHONG GHI — tra bien ban 9 luat, moi luat kem "
+                "`da_do` (do duoc 0 thu ⇒ ⛔ KHONG DAT)"),
+    # ⚠ `fls_pm_line`/`fls_pm_link` khai o day vi phep NAP dung lai
+    #   `repo/chay_nap.chay()` — cho DUY NHAT giu chong trung + cong bon duong
+    #   + mot giao dich. Ham do co **mot nhanh GHEP LENH** ma tuyen nay ⛔ khong
+    #   bao gio di qua (`pm=None`), nhung phep do cua `soi_bang_tuyen` la **do
+    #   TINH** va **VUOT co chu dich**: no gom ca bang chi cham o nhanh khac.
+    #
+    #   ⛔ Cach chua ⛔ KHONG phai noi cong ra — ban khai la mot **BAN DO**, va
+    #   *"khai du hon la khai thieu"* (loi van cua chinh cong do). Khai thieu
+    #   thi cong dang canh mot ban do CU; khai du thi ban do rong hon su that,
+    #   nhung ⛔ khong che giau duong nao.
+    Tuyen("POST", f"{TIEN_TO}/nap", "nap",
+          ("fls_source", "fls_khai_cot", "fls_nguon_dai",
+           "fls_chup", "fls_chup_nguon", "fls_chup_dong",
+           "fls_run", "fls_itl", "fls_reject",
+           "fls_le", "fls_queue_event", "fls_pm_line", "fls_pm_link"),
+          bang_ghi=("fls_run", "fls_itl", "fls_reject", "fls_le",
+                    "fls_queue_event", "fls_pm_line", "fls_pm_link"),
+          them_vao_so=True, ghi=True,
+          mo_ta="nap that ⇒ `run_id` + CUNG mot bien ban voi xem-truoc. Hang "
+                "CHAN do ⇒ 422 va ⛔ 0 dong vao so; hang CO do ⇒ 201 va dong "
+                "bi co vao HANG CHO CO LY DO (chung la tien that)"),
+
+    # ── ⭐⭐ ISP 3.1.2 · `C1` (`WO-075`) — LÕI CONFIG: `IX.FX` tỷ giá tháng ─────
+    #
+    # ⛔⛔ AP v3.1.2 §3.2.4: ở AS-IS, tháng thiếu ⇒ `SUMIFS = 0` ⇒ **mất số không
+    #    báo**; tháng nhập hai dòng ⇒ **cộng đôi**. Tuyến này trả bảng tỷ giá KÈM
+    #    ba danh sách `thieu` · `trung` · `lac` — chỗ lệch là **trường có tên**,
+    #    ⛔ một con số `0`.
+    # ⭐⭐ `C5` (`WO-142`): doi NGUON tu anh TINH sang KHO config chi-them
+    #    (`fls_cau_hinh_ban`/`fls_cau_hinh_dong`) ⇒ `bang=(...)`, GO `nguon_tinh`.
+    #    So THAT (anh DT2 37 dong) toi tu kho. `GET`, ⛔ ghi — ky thang la `C7`.
+    Tuyen("GET", f"{TIEN_TO}/config/fx", "ty_gia",
+          ("fls_cau_hinh_ban", "fls_cau_hinh_dong"),
+          mo_ta="IX.FX ty gia thang × 5 tien te (VND = 1) + `thieu`/`trung`/"
+                "`lac` thanh TRUONG RIENG — ⛔ thanh 0, ⛔ cong doi. Doc tu KHO "
+                "config chi-them (C5)"),
+    # ⭐⭐ `C7` (`WO-212`): KY THANG (D1). Ghi CHI vao kho config chi-them — ⛔ cham `fls_itl`.
+    #   `actor` TU THE (cua tu choi `actor` trong than). 201 / 400 / 404 / 409 co TEN.
+    Tuyen("POST", f"{TIEN_TO}/config/fx/{{yyyymm}}/sign", "ky_thang_fx",
+          ("fls_cau_hinh_ban", "fls_cau_hinh_dong"),
+          bang_ghi=("fls_cau_hinh_ban", "fls_cau_hinh_dong"),
+          ghi=True, http_ok=201,
+          mo_ta="ky niem phong MOT thang IX.FX (D1): nguoi ky = nguoi trong THE, "
+                "ky_luc do MAY dat; ky lai ⇒ 409 FLS-CAUHINH-DA-KY; thang ⛔ co "
+                "trong IX.FX ⇒ 404; yyyymm hong ⇒ 400"),
+    # ⭐⭐ `C13` (`WO-257`): BAN BAO CAO KY CO PHIEN BAN (IX.TMP). Dung lai kho config chi-them
+    #   `0027` (⛔ di tru moi). Chi HAI tuyen (§4i): GET + POST sign — ⛔ tuyen "dua ban" (ham
+    #   `chc.dua_ban_ky`, engine noi o I2). `actor` TU THE; ky lai ⇒ 409; ky chua co ban ⇒ 404.
+    Tuyen("GET", f"{TIEN_TO}/report/snapshot/{{ky}}", "ban_ky_ds",
+          ("fls_cau_hinh_ban", "fls_cau_hinh_dong"),
+          mo_ta="danh sach phien ban ban Daily Report 3 cua ky yyyymm: checksum · trang "
+                "thai · nguoi ky; ky chua co ban ⇒ ban=[]; ky hong ⇒ 400"),
+    Tuyen("POST", f"{TIEN_TO}/report/snapshot/{{ky}}/sign", "ban_ky_ky",
+          ("fls_cau_hinh_ban", "fls_cau_hinh_dong"),
+          bang_ghi=("fls_cau_hinh_ban", "fls_cau_hinh_dong"),
+          ghi=True, http_ok=201,
+          mo_ta="ky phien ban MOI NHAT cua ky: nguoi ky = nguoi trong THE; da ky ⇒ 409 "
+                "FLS-CAUHINH-DA-KY; ky chua co ban ⇒ 404; ky hong ⇒ 400"),
+    # ⭐⭐ `C5` (`WO-142`): cay `IX.HD` + Mapping Master doc tu KHO (⛔ con anh tinh
+    #    nhu C4). Hai bang config (ATL `IX.HD`, MM `IX.HD · IX.ORG`) — cung hai
+    #    bang kho. `GET`, ⛔ ghi. ⛔ hoa giai 74 ↔ 73: tuyen chi LIET KE chenh.
+    Tuyen("GET", f"{TIEN_TO}/config/hd", "cay_hd",
+          ("fls_cau_hinh_ban", "fls_cau_hinh_dong"),
+          mo_ta="IX.HD cay ATL 74 nut · 6 nhom (HDO·HDH·HDAP·HDT·HDC·HDCI) + "
+                "con_cua/la; cay hong ⇒ loi co TEN (HD_CHU_TRINH·HD_CHA_VANG·"
+                "HD_CAP_NHAY). Doi chieu 73 ma Mapping Master: LIET KE chenh "
+                "(= {NCF}), ⛔ hoa giai. Nguon TINH (anh dong bang) toi C5"),
+    # ⭐⭐ `C6` (`WO-152`): lich ky `IX.PER` — ngay dau + luat ghi nhan doc tu KHO config
+    #    chi-them (⛔ go cung ngay). `GET`, ⛔ ghi. Luat B → LUAT_CHUA_KY.
+    Tuyen("GET", f"{TIEN_TO}/config/per", "cau_hinh_per",
+          ("fls_cau_hinh_ban", "fls_cau_hinh_dong"),
+          mo_ta="IX.PER lich ky: ngay dau cot + luat ghi nhan (A: don ngay 1 thang PL "
+                "start) doc tu KHO config (C6); luat B chua mo ⇒ LUAT_CHUA_KY"),
+    # ⭐⭐ `C9` (`WO-172`): `IX.VEN` Block 1 (vendor · network · tai khoan) + cot `cach_tinh`
+    #    (5 ma rieng = NHAN, phep tinh o H10) + 7 CDT1 doc tu KHO config. `GET`, ⛔ ghi.
+    Tuyen("GET", f"{TIEN_TO}/config/ven", "cau_hinh_ven",
+          ("fls_cau_hinh_ban", "fls_cau_hinh_dong"),
+          mo_ta="IX.VEN vendor · network · tai khoan (Block 1) + cot cach_tinh (5 ma "
+                "rieng VD341·VD444·VD428·Max·VD62 chi la NHAN, phep tinh o H10) + 7 CDT1; "
+                "doc tu KHO config chi-them (C9)"),
+    # ⭐⭐ `C11` (`WO-180`): `IX.ALR` luat phan bo hieu luc theo ky + co `bat` (D2: luon false)
+    #    doc tu KHO config chi-them. `GET`, ⛔ ghi; ⛔ tuyen bat co (owner ky — ngoai ISP).
+    Tuyen("GET", f"{TIEN_TO}/config/alr", "cau_hinh_alr",
+          ("fls_cau_hinh_ban", "fls_cau_hinh_dong"),
+          mo_ta="IX.ALR luat phan bo (By GI·By NOEM·H1000 Ledger) hieu luc tu ky + co bat "
+                "mac dinh TAT (D2); doc tu KHO config chi-them (C11); ⛔ tuyen bat co"),
+    # ⭐⭐ `C10` (`WO-295`): `IX.DRV` driver theo (loai, CDT1, thang) doc tu KHO config chi-them;
+    #    o thieu ⇒ liet ke CO TEN (⛔ 0). `GET`, ⛔ ghi. Loc `?loai=` `?ky=`.
+    Tuyen("GET", f"{TIEN_TO}/config/drv", "cau_hinh_drv",
+          ("fls_cau_hinh_ban", "fls_cau_hinh_dong"),
+          mo_ta="IX.DRV driver theo (loai GI_PE·GI_PM·NOEM, CDT1, thang) 238 o so + 146 o thieu "
+                "CO TEN (⛔ 0, ⛔ o cung H1000); doc tu KHO config chi-them (C10)"),
 )
 
 
@@ -273,10 +777,23 @@ def kiem_bang_tuyen(bang: tuple[Tuyen, ...] = BANG_TUYEN) -> list[str]:
         # ⓐ' ⛔⛔ VA khong duong nao — DU PHUONG THUC GI — duoc GHI vao so.
         #     Phep kiem ⓐ theo phuong thuc ⛔ khong bat duoc `POST .../adjust`
         #     ghi thang vao `fls_itl`, va do dung la duong de nhat.
-        if SO in t.bang_ghi:
+        if SO in t.bang_ghi and not t.them_vao_so:
             loi.append(f"{t.phuong_thuc} {t.duong} khai GHI vao {SO} — "
                        f"`INV-I08`: so la append-only, sua chi bang but toan "
                        f"moi trong `fls_adjustment`")
+        # ⓐ''' Ngoai le `them_vao_so` phai HEP: xem loi van o `Tuyen`.
+        if t.them_vao_so:
+            if SO not in t.bang_ghi:
+                loi.append(f"{t.phuong_thuc} {t.duong} khai `them_vao_so` ma "
+                           f"⛔ khong he ghi {SO} — mot ngoai le ⛔ khong dung "
+                           f"den la mot ngoai le phai GO")
+            if t.phuong_thuc != "POST":
+                loi.append(f"{t.phuong_thuc} {t.duong}: `them_vao_so` chi cho "
+                           f"`POST`. `PUT`/`DELETE`/`PATCH` len so van CAM tuyet doi")
+            if "fls_run" not in t.bang_ghi:
+                loi.append(f"{t.phuong_thuc} {t.duong}: them dong vao so ma "
+                           f"⛔ khong ghi `fls_run` — dong so ⛔ khong co lan nap "
+                           f"la dong MAT LINEAGE (`INV-I05`/`I12`)")
         # ⓐ'' bang_ghi phai la con cua bang, va `ghi` phai khop bang_ghi
         la_ghi = [b for b in t.bang_ghi if b not in t.bang]
         if la_ghi:
@@ -304,9 +821,26 @@ def kiem_bang_tuyen(bang: tuple[Tuyen, ...] = BANG_TUYEN) -> list[str]:
         if la:
             loi.append(f"{t.duong} cham bang ngoai `fls_*`: {la} — "
                        f"`QĐ-ITL-45` FLS chi doc kho rieng")
-        if not t.bang:
+        # ⚠ `nguon_tinh` (ISP 3.1.2 · `C1`) cũng là một câu *"tôi chạm cái này"*
+        #   ⇒ ⛔ bảng **VÀ** ⛔ nguồn tĩnh mới là *"⛔ nói chạm gì"*.
+        if not t.bang and not t.nguon_tinh:
             loi.append(f"{t.duong} khong khai bang nao — mot duong khong noi no "
                        f"cham gi la mot duong cong khong quet duoc")
+        # ⓓ' Ngoại lệ nguồn tĩnh phải HẸP: một tệp đi cùng gói ⛔ ghi được.
+        if t.nguon_tinh and (t.phuong_thuc != "GET" or t.ghi or t.bang_ghi):
+            loi.append(f"{t.phuong_thuc} {t.duong}: `nguon_tinh` chi cho `GET` "
+                       f"⛔ ghi — mot tep tinh ⛔ ghi duoc; tuyen ghi phai khai "
+                       f"`bang`/`bang_ghi` trong kho")
+        # ⓓ'' *(vòng sửa R1 · `C1-R1-02`)* — ⛔ `if t.nguon_tinh:`: `None`/`[]` là
+        #     falsy mà vẫn SAI KIỂU; mọi giá trị khác `()` đều phải qua luật.
+        if t.nguon_tinh != ():
+            for x in nguon_tinh.kiem_khai(t.nguon_tinh):
+                loi.append(f"{t.phuong_thuc} {t.duong}: `nguon_tinh` {x}")
+            if t.bang:
+                loi.append(f"{t.phuong_thuc} {t.duong}: `nguon_tinh` CUNG `bang` "
+                           f"{list(t.bang)} — tuyen TINH hay tuyen KHO, ⛔ ca hai "
+                           f"(C5 doi sang `bang` thi GO `nguon_tinh`)")
+            loi += _tinh_ma_cham_ket_noi(t)
         # ⓔ trung
         khoa = (t.phuong_thuc, t.duong)
         if khoa in thay:
@@ -316,3 +850,46 @@ def kiem_bang_tuyen(bang: tuple[Tuyen, ...] = BANG_TUYEN) -> list[str]:
         if t.phuong_thuc not in {"GET", "POST", "PUT", "DELETE", "PATCH"}:
             loi.append(f"phuong thuc la: {t.phuong_thuc!r}")
     return loi
+
+
+def _ten_trong_ma(ma) -> set[str]:
+    """Mọi TÊN mà một khối mã gọi tới *(toàn cục + thuộc tính — `co_names`)*, kể cả
+    khối lồng *(hàm/lambda/biểu thức sinh trong `co_consts`)*."""
+    ra = set(ma.co_names)
+    for c in ma.co_consts:
+        if hasattr(c, "co_names"):
+            ra |= _ten_trong_ma(c)
+    return ra
+
+
+def _tinh_ma_cham_ket_noi(t: Tuyen) -> list[str]:
+    """ⓓ''' *(vòng sửa R1 · `C1-R1-02`)* — tuyến TĨNH mà hàm xử lý **chạm `conn`**.
+
+    ⛔⛔ Vì sao một cổng ĐỌC BẢN KHAI lại nhìn vào hàm: bản khai *"`bang=()` +
+       `nguon_tinh` hợp lệ"* **tự nhất quán** dù hàm thật đọc kho *(R1 · A, dựng lại
+       với đường đúng khuôn)* — các luật ở trên ⛔ thấy gì để đỏ. Orchestrator đòi:
+       *"tuyến có `nguon_tinh` mà đọc bảng kho ⇒ `kiem_bang_tuyen` VÀ `soi` cùng ĐỎ"*.
+    ⭐ Phép đo rẻ mà CÓ CĂN CỨ: hàm xử lý chỉ tới được kho qua **`yc.conn`** — hợp đồng
+       tầng 7 *(`fls.api` ⛔ biết tầng kho, "ket noi phai truyen vao")*. Hàm của tuyến
+       tĩnh mà mã của nó ⛔ gọi tên `conn` thì ⛔ trao được kết nối cho `fls.repo.*`.
+    ⚠ Giới hạn, khai thẳng: đo **MỘT tầng** *(chính hàm xử lý + khối lồng)* — một
+      hàm trao NGUYÊN `yc` cho hàm phụ rồi hàm phụ chạm `yc.conn` thì lọt ở đây; phép
+      đo bắc cầu là việc của `soi_bang_tuyen` ⓔ3 *(SQL thật trên cả đồ thị gọi)*.
+      Mẫu số *(`C1-R2-03`, đo 17/11)*: **3/41** hàm của `HAM` ⛔ gọi tên `conn` ở
+      tầng đầu = `ty_gia` + **2** hàm ĐỌC KHO qua hàm phụ `xem_truoc` · `lo_xem_truoc`
+      *(trao `yc` cho `_dung_lo`/`_soat_lo`)* — tức **2** trong **40** hàm còn lại
+      lọt luật này *(`soi` ⓔ3 vẫn thấy SQL của chúng)*; giới hạn được GHIM ở
+      `test_R2_03_…` *(`tests/api/test_isp_config_fx.py`)* — sửa luật thì sửa cả bài.
+    ⛔ `Đ5`: hàm ⛔ có trong `HAM` ⇒ ⛔ đo được ⇒ ĐỎ, ⛔ "không thấy chạm".
+    """
+    from fls.api.xu_ly import HAM      # trễ: `xu_ly` ⛔ import bảng này — ⛔ vòng
+
+    ham = HAM.get(t.ham)
+    if ham is None or not hasattr(ham, "__code__"):
+        return [f"{t.phuong_thuc} {t.duong}: `nguon_tinh` ma ham `{t.ham}` ⛔ co "
+                f"trong HAM — ⛔ do duoc ham co cham kho (`conn`) hay khong"]
+    if "conn" in _ten_trong_ma(ham.__code__):
+        return [f"{t.phuong_thuc} {t.duong}: `nguon_tinh` ma ham `{t.ham}` cham "
+                f"`conn` — tuyen TINH ⛔ duoc doc kho (C5 doi sang `bang` thi GO "
+                f"`nguon_tinh`)"]
+    return []

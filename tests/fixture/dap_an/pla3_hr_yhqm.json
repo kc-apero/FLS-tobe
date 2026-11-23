@@ -1,0 +1,10299 @@
+{
+ "bang": "PD.417",
+ "khuon": "pla3_hr_yhqm",
+ "nguon": "'[MID]  Report I PLA3 Y H Q M | HR Only'!A1:VD99",
+ "cach_doc": "Sheets API v4 values.get · UNFORMATTED_VALUE · SERIAL_NUMBER · khoá SA chỉ-đọc",
+ "ngay_dong_bang": "2026-11-20",
+ "khong_mang_PII": "⛔ KHÔNG mang cột riêng tư: máy soát 5 tên cột của bản thô với PM_COT_RIENG_TU ['Email Address'] — 0 trùng (gộp khoảng trắng, ⛔ phân biệt hoa thường). Ảnh chỉ giữ khoá `o_id` + 4 cột chọn; 0 cột bản thô ⛔ chọn (tên ở `cot_khong_chon`). Bản thô qua `chuan_bi` của khuôn: 5 tên cột trên là của BẢNG khuôn dựng; soát thêm 19 tên cột của 6 bảng phụ — 0 trùng. Ô bản thô mà khuôn ⛔ mang/băm: xem `ghi_chu_khuon`.",
+ "ghi_chu_khuon": "[MID]  Report I PLA3 Y H Q M | HR Only *(lưới SA)*: 1 khối ['GROUP'] × 74 mã HD = 74 hàng *(trong đó 17 hàng `kpi`, khai RIÊNG — AC-5)*; trục KY 57 cột, cắt 437 cột tương lai (toàn 0), 33 cột `chua_co_du_lieu` *(⛔ hoá 0 — chỉ GHI)*. 486 ô số ≠ 0 ⇒ dòng chính thưa (ô 0/vắng ⇒ 0); 5 ô ⛔ số ⇒ `o_loi` (giữ chuỗi, ĐẾM theo cột, ⛔ hoá 0 — AC-6); 0 ô CHỮ ở cột tương lai bị cắt ⇒ `tuong_lai_chu` (ĐẾM, ⛔ hoá 0); 0 hàng không nhãn có ô ≠ 0. Cột A (mUSD) ⛔ vào ảnh.",
+ "khoa": "o_id",
+ "kieu_khoa": "ma",
+ "cot": [
+  "le",
+  "ma_hd",
+  "ky",
+  "gt"
+ ],
+ "cot_khong_chon": [],
+ "so_dong": 486,
+ "trung": [],
+ "thieu": [],
+ "lac": [],
+ "khoa_hong": [],
+ "o_rong": [],
+ "cong": {
+  "mong": 486,
+  "so_dong": 486,
+  "dat": true,
+  "ly_do": []
+ },
+ "checksum_noi_dung": "15e1cc9e7f76ad02",
+ "dong": [
+  {
+   "thu_tu": 1,
+   "o_id": {
+    "chu": "GROUP#OPC#2024"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "OPC"
+   },
+   "ky": {
+    "chu": "2024"
+   },
+   "gt": "-0.14365617300443217"
+  },
+  {
+   "thu_tu": 2,
+   "o_id": {
+    "chu": "GROUP#OPC#2024H2"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "OPC"
+   },
+   "ky": {
+    "chu": "2024H2"
+   },
+   "gt": "-0.14365617300443217"
+  },
+  {
+   "thu_tu": 3,
+   "o_id": {
+    "chu": "GROUP#OPC#2024Q4"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "OPC"
+   },
+   "ky": {
+    "chu": "2024Q4"
+   },
+   "gt": "-0.14365617300443217"
+  },
+  {
+   "thu_tu": 4,
+   "o_id": {
+    "chu": "GROUP#OPC#2024M11"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "OPC"
+   },
+   "ky": {
+    "chu": "2024M11"
+   },
+   "gt": "-0.058146569964036894"
+  },
+  {
+   "thu_tu": 5,
+   "o_id": {
+    "chu": "GROUP#OPC#2024M12"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "OPC"
+   },
+   "ky": {
+    "chu": "2024M12"
+   },
+   "gt": "-0.08550960304039529"
+  },
+  {
+   "thu_tu": 6,
+   "o_id": {
+    "chu": "GROUP#OPC#2025"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "OPC"
+   },
+   "ky": {
+    "chu": "2025"
+   },
+   "gt": "-1.3094656282656145"
+  },
+  {
+   "thu_tu": 7,
+   "o_id": {
+    "chu": "GROUP#OPC#2025H1"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "OPC"
+   },
+   "ky": {
+    "chu": "2025H1"
+   },
+   "gt": "-0.5868698875989466"
+  },
+  {
+   "thu_tu": 8,
+   "o_id": {
+    "chu": "GROUP#OPC#2025H2"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "OPC"
+   },
+   "ky": {
+    "chu": "2025H2"
+   },
+   "gt": "-0.722595740666668"
+  },
+  {
+   "thu_tu": 9,
+   "o_id": {
+    "chu": "GROUP#OPC#2025Q1"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "OPC"
+   },
+   "ky": {
+    "chu": "2025Q1"
+   },
+   "gt": "-0.26965660068631436"
+  },
+  {
+   "thu_tu": 10,
+   "o_id": {
+    "chu": "GROUP#OPC#2025Q2"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "OPC"
+   },
+   "ky": {
+    "chu": "2025Q2"
+   },
+   "gt": "-0.31721328691263223"
+  },
+  {
+   "thu_tu": 11,
+   "o_id": {
+    "chu": "GROUP#OPC#2025Q3"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "OPC"
+   },
+   "ky": {
+    "chu": "2025Q3"
+   },
+   "gt": "-0.36423459235294176"
+  },
+  {
+   "thu_tu": 12,
+   "o_id": {
+    "chu": "GROUP#OPC#2025Q4"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "OPC"
+   },
+   "ky": {
+    "chu": "2025Q4"
+   },
+   "gt": "-0.35836114831372623"
+  },
+  {
+   "thu_tu": 13,
+   "o_id": {
+    "chu": "GROUP#OPC#2025M01"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "OPC"
+   },
+   "ky": {
+    "chu": "2025M01"
+   },
+   "gt": "-0.09543730520779722"
+  },
+  {
+   "thu_tu": 14,
+   "o_id": {
+    "chu": "GROUP#OPC#2025M02"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "OPC"
+   },
+   "ky": {
+    "chu": "2025M02"
+   },
+   "gt": "-0.10036309158177531"
+  },
+  {
+   "thu_tu": 15,
+   "o_id": {
+    "chu": "GROUP#OPC#2025M03"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "OPC"
+   },
+   "ky": {
+    "chu": "2025M03"
+   },
+   "gt": "-0.07385620389674187"
+  },
+  {
+   "thu_tu": 16,
+   "o_id": {
+    "chu": "GROUP#OPC#2025M04"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "OPC"
+   },
+   "ky": {
+    "chu": "2025M04"
+   },
+   "gt": "-0.10496546443818588"
+  },
+  {
+   "thu_tu": 17,
+   "o_id": {
+    "chu": "GROUP#OPC#2025M05"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "OPC"
+   },
+   "ky": {
+    "chu": "2025M05"
+   },
+   "gt": "-0.10701430070773445"
+  },
+  {
+   "thu_tu": 18,
+   "o_id": {
+    "chu": "GROUP#OPC#2025M06"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "OPC"
+   },
+   "ky": {
+    "chu": "2025M06"
+   },
+   "gt": "-0.1052335217667119"
+  },
+  {
+   "thu_tu": 19,
+   "o_id": {
+    "chu": "GROUP#OPC#2025M07"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "OPC"
+   },
+   "ky": {
+    "chu": "2025M07"
+   },
+   "gt": "-0.11362390501960806"
+  },
+  {
+   "thu_tu": 20,
+   "o_id": {
+    "chu": "GROUP#OPC#2025M08"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "OPC"
+   },
+   "ky": {
+    "chu": "2025M08"
+   },
+   "gt": "-0.12725605345098068"
+  },
+  {
+   "thu_tu": 21,
+   "o_id": {
+    "chu": "GROUP#OPC#2025M09"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "OPC"
+   },
+   "ky": {
+    "chu": "2025M09"
+   },
+   "gt": "-0.12335463388235302"
+  },
+  {
+   "thu_tu": 22,
+   "o_id": {
+    "chu": "GROUP#OPC#2025M10"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "OPC"
+   },
+   "ky": {
+    "chu": "2025M10"
+   },
+   "gt": "-0.11852683313725516"
+  },
+  {
+   "thu_tu": 23,
+   "o_id": {
+    "chu": "GROUP#OPC#2025M11"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "OPC"
+   },
+   "ky": {
+    "chu": "2025M11"
+   },
+   "gt": "-0.11984198764705906"
+  },
+  {
+   "thu_tu": 24,
+   "o_id": {
+    "chu": "GROUP#OPC#2025M12"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "OPC"
+   },
+   "ky": {
+    "chu": "2025M12"
+   },
+   "gt": "-0.11999232752941202"
+  },
+  {
+   "thu_tu": 25,
+   "o_id": {
+    "chu": "GROUP#CAC#2024"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CAC"
+   },
+   "ky": {
+    "chu": "2024"
+   },
+   "gt": "-0.04123912992515377"
+  },
+  {
+   "thu_tu": 26,
+   "o_id": {
+    "chu": "GROUP#CAC#2024H2"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CAC"
+   },
+   "ky": {
+    "chu": "2024H2"
+   },
+   "gt": "-0.04123912992515377"
+  },
+  {
+   "thu_tu": 27,
+   "o_id": {
+    "chu": "GROUP#CAC#2024Q4"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CAC"
+   },
+   "ky": {
+    "chu": "2024Q4"
+   },
+   "gt": "-0.04123912992515377"
+  },
+  {
+   "thu_tu": 28,
+   "o_id": {
+    "chu": "GROUP#CAC#2024M11"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CAC"
+   },
+   "ky": {
+    "chu": "2024M11"
+   },
+   "gt": "-0.010001954149752017"
+  },
+  {
+   "thu_tu": 29,
+   "o_id": {
+    "chu": "GROUP#CAC#2024M12"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CAC"
+   },
+   "ky": {
+    "chu": "2024M12"
+   },
+   "gt": "-0.03123717577540176"
+  },
+  {
+   "thu_tu": 30,
+   "o_id": {
+    "chu": "GROUP#CAC#2025"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CAC"
+   },
+   "ky": {
+    "chu": "2025"
+   },
+   "gt": "-0.4205825318586266"
+  },
+  {
+   "thu_tu": 31,
+   "o_id": {
+    "chu": "GROUP#CAC#2025H1"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CAC"
+   },
+   "ky": {
+    "chu": "2025H1"
+   },
+   "gt": "-0.1770616917409793"
+  },
+  {
+   "thu_tu": 32,
+   "o_id": {
+    "chu": "GROUP#CAC#2025H2"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CAC"
+   },
+   "ky": {
+    "chu": "2025H2"
+   },
+   "gt": "-0.2435208401176473"
+  },
+  {
+   "thu_tu": 33,
+   "o_id": {
+    "chu": "GROUP#CAC#2025Q1"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CAC"
+   },
+   "ky": {
+    "chu": "2025Q1"
+   },
+   "gt": "-0.08349686736930073"
+  },
+  {
+   "thu_tu": 34,
+   "o_id": {
+    "chu": "GROUP#CAC#2025Q2"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CAC"
+   },
+   "ky": {
+    "chu": "2025Q2"
+   },
+   "gt": "-0.09356482437167857"
+  },
+  {
+   "thu_tu": 35,
+   "o_id": {
+    "chu": "GROUP#CAC#2025Q3"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CAC"
+   },
+   "ky": {
+    "chu": "2025Q3"
+   },
+   "gt": "-0.11792138992156875"
+  },
+  {
+   "thu_tu": 36,
+   "o_id": {
+    "chu": "GROUP#CAC#2025Q4"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CAC"
+   },
+   "ky": {
+    "chu": "2025Q4"
+   },
+   "gt": "-0.12559945019607854"
+  },
+  {
+   "thu_tu": 37,
+   "o_id": {
+    "chu": "GROUP#CAC#2025M01"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CAC"
+   },
+   "ky": {
+    "chu": "2025M01"
+   },
+   "gt": "-0.035419253328077334"
+  },
+  {
+   "thu_tu": 38,
+   "o_id": {
+    "chu": "GROUP#CAC#2025M02"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CAC"
+   },
+   "ky": {
+    "chu": "2025M02"
+   },
+   "gt": "-0.03605703194649942"
+  },
+  {
+   "thu_tu": 39,
+   "o_id": {
+    "chu": "GROUP#CAC#2025M03"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CAC"
+   },
+   "ky": {
+    "chu": "2025M03"
+   },
+   "gt": "-0.012020582094723987"
+  },
+  {
+   "thu_tu": 40,
+   "o_id": {
+    "chu": "GROUP#CAC#2025M04"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CAC"
+   },
+   "ky": {
+    "chu": "2025M04"
+   },
+   "gt": "-0.03257878811416201"
+  },
+  {
+   "thu_tu": 41,
+   "o_id": {
+    "chu": "GROUP#CAC#2025M05"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CAC"
+   },
+   "ky": {
+    "chu": "2025M05"
+   },
+   "gt": "-0.030968083148529585"
+  },
+  {
+   "thu_tu": 42,
+   "o_id": {
+    "chu": "GROUP#CAC#2025M06"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CAC"
+   },
+   "ky": {
+    "chu": "2025M06"
+   },
+   "gt": "-0.030017953108986976"
+  },
+  {
+   "thu_tu": 43,
+   "o_id": {
+    "chu": "GROUP#CAC#2025M07"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CAC"
+   },
+   "ky": {
+    "chu": "2025M07"
+   },
+   "gt": "-0.035626761490196106"
+  },
+  {
+   "thu_tu": 44,
+   "o_id": {
+    "chu": "GROUP#CAC#2025M08"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CAC"
+   },
+   "ky": {
+    "chu": "2025M08"
+   },
+   "gt": "-0.03761932768627456"
+  },
+  {
+   "thu_tu": 45,
+   "o_id": {
+    "chu": "GROUP#CAC#2025M09"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CAC"
+   },
+   "ky": {
+    "chu": "2025M09"
+   },
+   "gt": "-0.044675300745098095"
+  },
+  {
+   "thu_tu": 46,
+   "o_id": {
+    "chu": "GROUP#CAC#2025M10"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CAC"
+   },
+   "ky": {
+    "chu": "2025M10"
+   },
+   "gt": "-0.041622967450980444"
+  },
+  {
+   "thu_tu": 47,
+   "o_id": {
+    "chu": "GROUP#CAC#2025M11"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CAC"
+   },
+   "ky": {
+    "chu": "2025M11"
+   },
+   "gt": "-0.04047865317647062"
+  },
+  {
+   "thu_tu": 48,
+   "o_id": {
+    "chu": "GROUP#CAC#2025M12"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CAC"
+   },
+   "ky": {
+    "chu": "2025M12"
+   },
+   "gt": "-0.043497829568627494"
+  },
+  {
+   "thu_tu": 49,
+   "o_id": {
+    "chu": "GROUP#MAC#2024"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "MAC"
+   },
+   "ky": {
+    "chu": "2024"
+   },
+   "gt": "-0.04123912992515377"
+  },
+  {
+   "thu_tu": 50,
+   "o_id": {
+    "chu": "GROUP#MAC#2024H2"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "MAC"
+   },
+   "ky": {
+    "chu": "2024H2"
+   },
+   "gt": "-0.04123912992515377"
+  },
+  {
+   "thu_tu": 51,
+   "o_id": {
+    "chu": "GROUP#MAC#2024Q4"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "MAC"
+   },
+   "ky": {
+    "chu": "2024Q4"
+   },
+   "gt": "-0.04123912992515377"
+  },
+  {
+   "thu_tu": 52,
+   "o_id": {
+    "chu": "GROUP#MAC#2024M11"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "MAC"
+   },
+   "ky": {
+    "chu": "2024M11"
+   },
+   "gt": "-0.010001954149752017"
+  },
+  {
+   "thu_tu": 53,
+   "o_id": {
+    "chu": "GROUP#MAC#2024M12"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "MAC"
+   },
+   "ky": {
+    "chu": "2024M12"
+   },
+   "gt": "-0.03123717577540176"
+  },
+  {
+   "thu_tu": 54,
+   "o_id": {
+    "chu": "GROUP#MAC#2025"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "MAC"
+   },
+   "ky": {
+    "chu": "2025"
+   },
+   "gt": "-0.4205825318586266"
+  },
+  {
+   "thu_tu": 55,
+   "o_id": {
+    "chu": "GROUP#MAC#2025H1"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "MAC"
+   },
+   "ky": {
+    "chu": "2025H1"
+   },
+   "gt": "-0.1770616917409793"
+  },
+  {
+   "thu_tu": 56,
+   "o_id": {
+    "chu": "GROUP#MAC#2025H2"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "MAC"
+   },
+   "ky": {
+    "chu": "2025H2"
+   },
+   "gt": "-0.2435208401176473"
+  },
+  {
+   "thu_tu": 57,
+   "o_id": {
+    "chu": "GROUP#MAC#2025Q1"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "MAC"
+   },
+   "ky": {
+    "chu": "2025Q1"
+   },
+   "gt": "-0.08349686736930073"
+  },
+  {
+   "thu_tu": 58,
+   "o_id": {
+    "chu": "GROUP#MAC#2025Q2"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "MAC"
+   },
+   "ky": {
+    "chu": "2025Q2"
+   },
+   "gt": "-0.09356482437167857"
+  },
+  {
+   "thu_tu": 59,
+   "o_id": {
+    "chu": "GROUP#MAC#2025Q3"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "MAC"
+   },
+   "ky": {
+    "chu": "2025Q3"
+   },
+   "gt": "-0.11792138992156875"
+  },
+  {
+   "thu_tu": 60,
+   "o_id": {
+    "chu": "GROUP#MAC#2025Q4"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "MAC"
+   },
+   "ky": {
+    "chu": "2025Q4"
+   },
+   "gt": "-0.12559945019607854"
+  },
+  {
+   "thu_tu": 61,
+   "o_id": {
+    "chu": "GROUP#MAC#2025M01"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "MAC"
+   },
+   "ky": {
+    "chu": "2025M01"
+   },
+   "gt": "-0.035419253328077334"
+  },
+  {
+   "thu_tu": 62,
+   "o_id": {
+    "chu": "GROUP#MAC#2025M02"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "MAC"
+   },
+   "ky": {
+    "chu": "2025M02"
+   },
+   "gt": "-0.03605703194649942"
+  },
+  {
+   "thu_tu": 63,
+   "o_id": {
+    "chu": "GROUP#MAC#2025M03"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "MAC"
+   },
+   "ky": {
+    "chu": "2025M03"
+   },
+   "gt": "-0.012020582094723987"
+  },
+  {
+   "thu_tu": 64,
+   "o_id": {
+    "chu": "GROUP#MAC#2025M04"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "MAC"
+   },
+   "ky": {
+    "chu": "2025M04"
+   },
+   "gt": "-0.03257878811416201"
+  },
+  {
+   "thu_tu": 65,
+   "o_id": {
+    "chu": "GROUP#MAC#2025M05"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "MAC"
+   },
+   "ky": {
+    "chu": "2025M05"
+   },
+   "gt": "-0.030968083148529585"
+  },
+  {
+   "thu_tu": 66,
+   "o_id": {
+    "chu": "GROUP#MAC#2025M06"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "MAC"
+   },
+   "ky": {
+    "chu": "2025M06"
+   },
+   "gt": "-0.030017953108986976"
+  },
+  {
+   "thu_tu": 67,
+   "o_id": {
+    "chu": "GROUP#MAC#2025M07"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "MAC"
+   },
+   "ky": {
+    "chu": "2025M07"
+   },
+   "gt": "-0.035626761490196106"
+  },
+  {
+   "thu_tu": 68,
+   "o_id": {
+    "chu": "GROUP#MAC#2025M08"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "MAC"
+   },
+   "ky": {
+    "chu": "2025M08"
+   },
+   "gt": "-0.03761932768627456"
+  },
+  {
+   "thu_tu": 69,
+   "o_id": {
+    "chu": "GROUP#MAC#2025M09"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "MAC"
+   },
+   "ky": {
+    "chu": "2025M09"
+   },
+   "gt": "-0.044675300745098095"
+  },
+  {
+   "thu_tu": 70,
+   "o_id": {
+    "chu": "GROUP#MAC#2025M10"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "MAC"
+   },
+   "ky": {
+    "chu": "2025M10"
+   },
+   "gt": "-0.041622967450980444"
+  },
+  {
+   "thu_tu": 71,
+   "o_id": {
+    "chu": "GROUP#MAC#2025M11"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "MAC"
+   },
+   "ky": {
+    "chu": "2025M11"
+   },
+   "gt": "-0.04047865317647062"
+  },
+  {
+   "thu_tu": 72,
+   "o_id": {
+    "chu": "GROUP#MAC#2025M12"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "MAC"
+   },
+   "ky": {
+    "chu": "2025M12"
+   },
+   "gt": "-0.043497829568627494"
+  },
+  {
+   "thu_tu": 73,
+   "o_id": {
+    "chu": "GROUP#MC#2024"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "MC"
+   },
+   "ky": {
+    "chu": "2024"
+   },
+   "gt": "-0.04123912992515377"
+  },
+  {
+   "thu_tu": 74,
+   "o_id": {
+    "chu": "GROUP#MC#2024H2"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "MC"
+   },
+   "ky": {
+    "chu": "2024H2"
+   },
+   "gt": "-0.04123912992515377"
+  },
+  {
+   "thu_tu": 75,
+   "o_id": {
+    "chu": "GROUP#MC#2024Q4"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "MC"
+   },
+   "ky": {
+    "chu": "2024Q4"
+   },
+   "gt": "-0.04123912992515377"
+  },
+  {
+   "thu_tu": 76,
+   "o_id": {
+    "chu": "GROUP#MC#2024M11"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "MC"
+   },
+   "ky": {
+    "chu": "2024M11"
+   },
+   "gt": "-0.010001954149752017"
+  },
+  {
+   "thu_tu": 77,
+   "o_id": {
+    "chu": "GROUP#MC#2024M12"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "MC"
+   },
+   "ky": {
+    "chu": "2024M12"
+   },
+   "gt": "-0.03123717577540176"
+  },
+  {
+   "thu_tu": 78,
+   "o_id": {
+    "chu": "GROUP#MC#2025"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "MC"
+   },
+   "ky": {
+    "chu": "2025"
+   },
+   "gt": "-0.4205825318586266"
+  },
+  {
+   "thu_tu": 79,
+   "o_id": {
+    "chu": "GROUP#MC#2025H1"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "MC"
+   },
+   "ky": {
+    "chu": "2025H1"
+   },
+   "gt": "-0.1770616917409793"
+  },
+  {
+   "thu_tu": 80,
+   "o_id": {
+    "chu": "GROUP#MC#2025H2"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "MC"
+   },
+   "ky": {
+    "chu": "2025H2"
+   },
+   "gt": "-0.2435208401176473"
+  },
+  {
+   "thu_tu": 81,
+   "o_id": {
+    "chu": "GROUP#MC#2025Q1"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "MC"
+   },
+   "ky": {
+    "chu": "2025Q1"
+   },
+   "gt": "-0.08349686736930073"
+  },
+  {
+   "thu_tu": 82,
+   "o_id": {
+    "chu": "GROUP#MC#2025Q2"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "MC"
+   },
+   "ky": {
+    "chu": "2025Q2"
+   },
+   "gt": "-0.09356482437167857"
+  },
+  {
+   "thu_tu": 83,
+   "o_id": {
+    "chu": "GROUP#MC#2025Q3"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "MC"
+   },
+   "ky": {
+    "chu": "2025Q3"
+   },
+   "gt": "-0.11792138992156875"
+  },
+  {
+   "thu_tu": 84,
+   "o_id": {
+    "chu": "GROUP#MC#2025Q4"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "MC"
+   },
+   "ky": {
+    "chu": "2025Q4"
+   },
+   "gt": "-0.12559945019607854"
+  },
+  {
+   "thu_tu": 85,
+   "o_id": {
+    "chu": "GROUP#MC#2025M01"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "MC"
+   },
+   "ky": {
+    "chu": "2025M01"
+   },
+   "gt": "-0.035419253328077334"
+  },
+  {
+   "thu_tu": 86,
+   "o_id": {
+    "chu": "GROUP#MC#2025M02"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "MC"
+   },
+   "ky": {
+    "chu": "2025M02"
+   },
+   "gt": "-0.03605703194649942"
+  },
+  {
+   "thu_tu": 87,
+   "o_id": {
+    "chu": "GROUP#MC#2025M03"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "MC"
+   },
+   "ky": {
+    "chu": "2025M03"
+   },
+   "gt": "-0.012020582094723987"
+  },
+  {
+   "thu_tu": 88,
+   "o_id": {
+    "chu": "GROUP#MC#2025M04"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "MC"
+   },
+   "ky": {
+    "chu": "2025M04"
+   },
+   "gt": "-0.03257878811416201"
+  },
+  {
+   "thu_tu": 89,
+   "o_id": {
+    "chu": "GROUP#MC#2025M05"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "MC"
+   },
+   "ky": {
+    "chu": "2025M05"
+   },
+   "gt": "-0.030968083148529585"
+  },
+  {
+   "thu_tu": 90,
+   "o_id": {
+    "chu": "GROUP#MC#2025M06"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "MC"
+   },
+   "ky": {
+    "chu": "2025M06"
+   },
+   "gt": "-0.030017953108986976"
+  },
+  {
+   "thu_tu": 91,
+   "o_id": {
+    "chu": "GROUP#MC#2025M07"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "MC"
+   },
+   "ky": {
+    "chu": "2025M07"
+   },
+   "gt": "-0.035626761490196106"
+  },
+  {
+   "thu_tu": 92,
+   "o_id": {
+    "chu": "GROUP#MC#2025M08"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "MC"
+   },
+   "ky": {
+    "chu": "2025M08"
+   },
+   "gt": "-0.03761932768627456"
+  },
+  {
+   "thu_tu": 93,
+   "o_id": {
+    "chu": "GROUP#MC#2025M09"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "MC"
+   },
+   "ky": {
+    "chu": "2025M09"
+   },
+   "gt": "-0.044675300745098095"
+  },
+  {
+   "thu_tu": 94,
+   "o_id": {
+    "chu": "GROUP#MC#2025M10"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "MC"
+   },
+   "ky": {
+    "chu": "2025M10"
+   },
+   "gt": "-0.041622967450980444"
+  },
+  {
+   "thu_tu": 95,
+   "o_id": {
+    "chu": "GROUP#MC#2025M11"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "MC"
+   },
+   "ky": {
+    "chu": "2025M11"
+   },
+   "gt": "-0.04047865317647062"
+  },
+  {
+   "thu_tu": 96,
+   "o_id": {
+    "chu": "GROUP#MC#2025M12"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "MC"
+   },
+   "ky": {
+    "chu": "2025M12"
+   },
+   "gt": "-0.043497829568627494"
+  },
+  {
+   "thu_tu": 97,
+   "o_id": {
+    "chu": "GROUP#COS#2024"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COS"
+   },
+   "ky": {
+    "chu": "2024"
+   },
+   "gt": "-0.1024170430792784"
+  },
+  {
+   "thu_tu": 98,
+   "o_id": {
+    "chu": "GROUP#COS#2024H2"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COS"
+   },
+   "ky": {
+    "chu": "2024H2"
+   },
+   "gt": "-0.1024170430792784"
+  },
+  {
+   "thu_tu": 99,
+   "o_id": {
+    "chu": "GROUP#COS#2024Q4"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COS"
+   },
+   "ky": {
+    "chu": "2024Q4"
+   },
+   "gt": "-0.1024170430792784"
+  },
+  {
+   "thu_tu": 100,
+   "o_id": {
+    "chu": "GROUP#COS#2024M11"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COS"
+   },
+   "ky": {
+    "chu": "2024M11"
+   },
+   "gt": "-0.04814461581428488"
+  },
+  {
+   "thu_tu": 101,
+   "o_id": {
+    "chu": "GROUP#COS#2024M12"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COS"
+   },
+   "ky": {
+    "chu": "2024M12"
+   },
+   "gt": "-0.054272427264993525"
+  },
+  {
+   "thu_tu": 102,
+   "o_id": {
+    "chu": "GROUP#COS#2025"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COS"
+   },
+   "ky": {
+    "chu": "2025"
+   },
+   "gt": "-0.888883096406988"
+  },
+  {
+   "thu_tu": 103,
+   "o_id": {
+    "chu": "GROUP#COS#2025H1"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COS"
+   },
+   "ky": {
+    "chu": "2025H1"
+   },
+   "gt": "-0.40980819585796735"
+  },
+  {
+   "thu_tu": 104,
+   "o_id": {
+    "chu": "GROUP#COS#2025H2"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COS"
+   },
+   "ky": {
+    "chu": "2025H2"
+   },
+   "gt": "-0.4790749005490207"
+  },
+  {
+   "thu_tu": 105,
+   "o_id": {
+    "chu": "GROUP#COS#2025Q1"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COS"
+   },
+   "ky": {
+    "chu": "2025Q1"
+   },
+   "gt": "-0.18615973331701366"
+  },
+  {
+   "thu_tu": 106,
+   "o_id": {
+    "chu": "GROUP#COS#2025Q2"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COS"
+   },
+   "ky": {
+    "chu": "2025Q2"
+   },
+   "gt": "-0.22364846254095366"
+  },
+  {
+   "thu_tu": 107,
+   "o_id": {
+    "chu": "GROUP#COS#2025Q3"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COS"
+   },
+   "ky": {
+    "chu": "2025Q3"
+   },
+   "gt": "-0.24631320243137297"
+  },
+  {
+   "thu_tu": 108,
+   "o_id": {
+    "chu": "GROUP#COS#2025Q4"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COS"
+   },
+   "ky": {
+    "chu": "2025Q4"
+   },
+   "gt": "-0.2327616981176477"
+  },
+  {
+   "thu_tu": 109,
+   "o_id": {
+    "chu": "GROUP#COS#2025M01"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COS"
+   },
+   "ky": {
+    "chu": "2025M01"
+   },
+   "gt": "-0.06001805187971989"
+  },
+  {
+   "thu_tu": 110,
+   "o_id": {
+    "chu": "GROUP#COS#2025M02"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COS"
+   },
+   "ky": {
+    "chu": "2025M02"
+   },
+   "gt": "-0.0643060596352759"
+  },
+  {
+   "thu_tu": 111,
+   "o_id": {
+    "chu": "GROUP#COS#2025M03"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COS"
+   },
+   "ky": {
+    "chu": "2025M03"
+   },
+   "gt": "-0.06183562180201788"
+  },
+  {
+   "thu_tu": 112,
+   "o_id": {
+    "chu": "GROUP#COS#2025M04"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COS"
+   },
+   "ky": {
+    "chu": "2025M04"
+   },
+   "gt": "-0.07238667632402387"
+  },
+  {
+   "thu_tu": 113,
+   "o_id": {
+    "chu": "GROUP#COS#2025M05"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COS"
+   },
+   "ky": {
+    "chu": "2025M05"
+   },
+   "gt": "-0.07604621755920486"
+  },
+  {
+   "thu_tu": 114,
+   "o_id": {
+    "chu": "GROUP#COS#2025M06"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COS"
+   },
+   "ky": {
+    "chu": "2025M06"
+   },
+   "gt": "-0.07521556865772493"
+  },
+  {
+   "thu_tu": 115,
+   "o_id": {
+    "chu": "GROUP#COS#2025M07"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COS"
+   },
+   "ky": {
+    "chu": "2025M07"
+   },
+   "gt": "-0.07799714352941195"
+  },
+  {
+   "thu_tu": 116,
+   "o_id": {
+    "chu": "GROUP#COS#2025M08"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COS"
+   },
+   "ky": {
+    "chu": "2025M08"
+   },
+   "gt": "-0.0896367257647061"
+  },
+  {
+   "thu_tu": 117,
+   "o_id": {
+    "chu": "GROUP#COS#2025M09"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COS"
+   },
+   "ky": {
+    "chu": "2025M09"
+   },
+   "gt": "-0.07867933313725492"
+  },
+  {
+   "thu_tu": 118,
+   "o_id": {
+    "chu": "GROUP#COS#2025M10"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COS"
+   },
+   "ky": {
+    "chu": "2025M10"
+   },
+   "gt": "-0.07690386568627472"
+  },
+  {
+   "thu_tu": 119,
+   "o_id": {
+    "chu": "GROUP#COS#2025M11"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COS"
+   },
+   "ky": {
+    "chu": "2025M11"
+   },
+   "gt": "-0.07936333447058844"
+  },
+  {
+   "thu_tu": 120,
+   "o_id": {
+    "chu": "GROUP#COS#2025M12"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COS"
+   },
+   "ky": {
+    "chu": "2025M12"
+   },
+   "gt": "-0.07649449796078453"
+  },
+  {
+   "thu_tu": 121,
+   "o_id": {
+    "chu": "GROUP#DC#2024"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "DC"
+   },
+   "ky": {
+    "chu": "2024"
+   },
+   "gt": "-0.1024170430792784"
+  },
+  {
+   "thu_tu": 122,
+   "o_id": {
+    "chu": "GROUP#DC#2024H2"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "DC"
+   },
+   "ky": {
+    "chu": "2024H2"
+   },
+   "gt": "-0.1024170430792784"
+  },
+  {
+   "thu_tu": 123,
+   "o_id": {
+    "chu": "GROUP#DC#2024Q4"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "DC"
+   },
+   "ky": {
+    "chu": "2024Q4"
+   },
+   "gt": "-0.1024170430792784"
+  },
+  {
+   "thu_tu": 124,
+   "o_id": {
+    "chu": "GROUP#DC#2024M11"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "DC"
+   },
+   "ky": {
+    "chu": "2024M11"
+   },
+   "gt": "-0.04814461581428488"
+  },
+  {
+   "thu_tu": 125,
+   "o_id": {
+    "chu": "GROUP#DC#2024M12"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "DC"
+   },
+   "ky": {
+    "chu": "2024M12"
+   },
+   "gt": "-0.054272427264993525"
+  },
+  {
+   "thu_tu": 126,
+   "o_id": {
+    "chu": "GROUP#DC#2025"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "DC"
+   },
+   "ky": {
+    "chu": "2025"
+   },
+   "gt": "-0.888883096406988"
+  },
+  {
+   "thu_tu": 127,
+   "o_id": {
+    "chu": "GROUP#DC#2025H1"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "DC"
+   },
+   "ky": {
+    "chu": "2025H1"
+   },
+   "gt": "-0.40980819585796735"
+  },
+  {
+   "thu_tu": 128,
+   "o_id": {
+    "chu": "GROUP#DC#2025H2"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "DC"
+   },
+   "ky": {
+    "chu": "2025H2"
+   },
+   "gt": "-0.4790749005490207"
+  },
+  {
+   "thu_tu": 129,
+   "o_id": {
+    "chu": "GROUP#DC#2025Q1"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "DC"
+   },
+   "ky": {
+    "chu": "2025Q1"
+   },
+   "gt": "-0.18615973331701366"
+  },
+  {
+   "thu_tu": 130,
+   "o_id": {
+    "chu": "GROUP#DC#2025Q2"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "DC"
+   },
+   "ky": {
+    "chu": "2025Q2"
+   },
+   "gt": "-0.22364846254095366"
+  },
+  {
+   "thu_tu": 131,
+   "o_id": {
+    "chu": "GROUP#DC#2025Q3"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "DC"
+   },
+   "ky": {
+    "chu": "2025Q3"
+   },
+   "gt": "-0.24631320243137297"
+  },
+  {
+   "thu_tu": 132,
+   "o_id": {
+    "chu": "GROUP#DC#2025Q4"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "DC"
+   },
+   "ky": {
+    "chu": "2025Q4"
+   },
+   "gt": "-0.2327616981176477"
+  },
+  {
+   "thu_tu": 133,
+   "o_id": {
+    "chu": "GROUP#DC#2025M01"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "DC"
+   },
+   "ky": {
+    "chu": "2025M01"
+   },
+   "gt": "-0.06001805187971989"
+  },
+  {
+   "thu_tu": 134,
+   "o_id": {
+    "chu": "GROUP#DC#2025M02"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "DC"
+   },
+   "ky": {
+    "chu": "2025M02"
+   },
+   "gt": "-0.0643060596352759"
+  },
+  {
+   "thu_tu": 135,
+   "o_id": {
+    "chu": "GROUP#DC#2025M03"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "DC"
+   },
+   "ky": {
+    "chu": "2025M03"
+   },
+   "gt": "-0.06183562180201788"
+  },
+  {
+   "thu_tu": 136,
+   "o_id": {
+    "chu": "GROUP#DC#2025M04"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "DC"
+   },
+   "ky": {
+    "chu": "2025M04"
+   },
+   "gt": "-0.07238667632402387"
+  },
+  {
+   "thu_tu": 137,
+   "o_id": {
+    "chu": "GROUP#DC#2025M05"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "DC"
+   },
+   "ky": {
+    "chu": "2025M05"
+   },
+   "gt": "-0.07604621755920486"
+  },
+  {
+   "thu_tu": 138,
+   "o_id": {
+    "chu": "GROUP#DC#2025M06"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "DC"
+   },
+   "ky": {
+    "chu": "2025M06"
+   },
+   "gt": "-0.07521556865772493"
+  },
+  {
+   "thu_tu": 139,
+   "o_id": {
+    "chu": "GROUP#DC#2025M07"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "DC"
+   },
+   "ky": {
+    "chu": "2025M07"
+   },
+   "gt": "-0.07799714352941195"
+  },
+  {
+   "thu_tu": 140,
+   "o_id": {
+    "chu": "GROUP#DC#2025M08"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "DC"
+   },
+   "ky": {
+    "chu": "2025M08"
+   },
+   "gt": "-0.0896367257647061"
+  },
+  {
+   "thu_tu": 141,
+   "o_id": {
+    "chu": "GROUP#DC#2025M09"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "DC"
+   },
+   "ky": {
+    "chu": "2025M09"
+   },
+   "gt": "-0.07867933313725492"
+  },
+  {
+   "thu_tu": 142,
+   "o_id": {
+    "chu": "GROUP#DC#2025M10"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "DC"
+   },
+   "ky": {
+    "chu": "2025M10"
+   },
+   "gt": "-0.07690386568627472"
+  },
+  {
+   "thu_tu": 143,
+   "o_id": {
+    "chu": "GROUP#DC#2025M11"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "DC"
+   },
+   "ky": {
+    "chu": "2025M11"
+   },
+   "gt": "-0.07936333447058844"
+  },
+  {
+   "thu_tu": 144,
+   "o_id": {
+    "chu": "GROUP#DC#2025M12"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "DC"
+   },
+   "ky": {
+    "chu": "2025M12"
+   },
+   "gt": "-0.07649449796078453"
+  },
+  {
+   "thu_tu": 145,
+   "o_id": {
+    "chu": "GROUP#GAC#2024"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "GAC"
+   },
+   "ky": {
+    "chu": "2024"
+   },
+   "gt": "-0.24664988740970634"
+  },
+  {
+   "thu_tu": 146,
+   "o_id": {
+    "chu": "GROUP#GAC#2024H2"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "GAC"
+   },
+   "ky": {
+    "chu": "2024H2"
+   },
+   "gt": "-0.24664988740970634"
+  },
+  {
+   "thu_tu": 147,
+   "o_id": {
+    "chu": "GROUP#GAC#2024Q4"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "GAC"
+   },
+   "ky": {
+    "chu": "2024Q4"
+   },
+   "gt": "-0.24664988740970634"
+  },
+  {
+   "thu_tu": 148,
+   "o_id": {
+    "chu": "GROUP#GAC#2024M11"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "GAC"
+   },
+   "ky": {
+    "chu": "2024M11"
+   },
+   "gt": "-0.10621767589801773"
+  },
+  {
+   "thu_tu": 149,
+   "o_id": {
+    "chu": "GROUP#GAC#2024M12"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "GAC"
+   },
+   "ky": {
+    "chu": "2024M12"
+   },
+   "gt": "-0.1404322115116886"
+  },
+  {
+   "thu_tu": 150,
+   "o_id": {
+    "chu": "GROUP#GAC#2025"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "GAC"
+   },
+   "ky": {
+    "chu": "2025"
+   },
+   "gt": "-2.046779570342724"
+  },
+  {
+   "thu_tu": 151,
+   "o_id": {
+    "chu": "GROUP#GAC#2025H1"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "GAC"
+   },
+   "ky": {
+    "chu": "2025H1"
+   },
+   "gt": "-0.982156376381938"
+  },
+  {
+   "thu_tu": 152,
+   "o_id": {
+    "chu": "GROUP#GAC#2025H2"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "GAC"
+   },
+   "ky": {
+    "chu": "2025H2"
+   },
+   "gt": "-1.0646231939607862"
+  },
+  {
+   "thu_tu": 153,
+   "o_id": {
+    "chu": "GROUP#GAC#2025Q1"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "GAC"
+   },
+   "ky": {
+    "chu": "2025Q1"
+   },
+   "gt": "-0.4278815732269121"
+  },
+  {
+   "thu_tu": 154,
+   "o_id": {
+    "chu": "GROUP#GAC#2025Q2"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "GAC"
+   },
+   "ky": {
+    "chu": "2025Q2"
+   },
+   "gt": "-0.5542748031550258"
+  },
+  {
+   "thu_tu": 155,
+   "o_id": {
+    "chu": "GROUP#GAC#2025Q3"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "GAC"
+   },
+   "ky": {
+    "chu": "2025Q3"
+   },
+   "gt": "-0.5474348856470598"
+  },
+  {
+   "thu_tu": 156,
+   "o_id": {
+    "chu": "GROUP#GAC#2025Q4"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "GAC"
+   },
+   "ky": {
+    "chu": "2025Q4"
+   },
+   "gt": "-0.5171883083137264"
+  },
+  {
+   "thu_tu": 157,
+   "o_id": {
+    "chu": "GROUP#GAC#2025M01"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "GAC"
+   },
+   "ky": {
+    "chu": "2025M01"
+   },
+   "gt": "-0.147167514111591"
+  },
+  {
+   "thu_tu": 158,
+   "o_id": {
+    "chu": "GROUP#GAC#2025M02"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "GAC"
+   },
+   "ky": {
+    "chu": "2025M02"
+   },
+   "gt": "-0.1495991863693817"
+  },
+  {
+   "thu_tu": 159,
+   "o_id": {
+    "chu": "GROUP#GAC#2025M03"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "GAC"
+   },
+   "ky": {
+    "chu": "2025M03"
+   },
+   "gt": "-0.13111487274593944"
+  },
+  {
+   "thu_tu": 160,
+   "o_id": {
+    "chu": "GROUP#GAC#2025M04"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "GAC"
+   },
+   "ky": {
+    "chu": "2025M04"
+   },
+   "gt": "-0.1890729298536066"
+  },
+  {
+   "thu_tu": 161,
+   "o_id": {
+    "chu": "GROUP#GAC#2025M05"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "GAC"
+   },
+   "ky": {
+    "chu": "2025M05"
+   },
+   "gt": "-0.1909629251836082"
+  },
+  {
+   "thu_tu": 162,
+   "o_id": {
+    "chu": "GROUP#GAC#2025M06"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "GAC"
+   },
+   "ky": {
+    "chu": "2025M06"
+   },
+   "gt": "-0.1742389481178109"
+  },
+  {
+   "thu_tu": 163,
+   "o_id": {
+    "chu": "GROUP#GAC#2025M07"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "GAC"
+   },
+   "ky": {
+    "chu": "2025M07"
+   },
+   "gt": "-0.18230620447058862"
+  },
+  {
+   "thu_tu": 164,
+   "o_id": {
+    "chu": "GROUP#GAC#2025M08"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "GAC"
+   },
+   "ky": {
+    "chu": "2025M08"
+   },
+   "gt": "-0.19811725000000047"
+  },
+  {
+   "thu_tu": 165,
+   "o_id": {
+    "chu": "GROUP#GAC#2025M09"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "GAC"
+   },
+   "ky": {
+    "chu": "2025M09"
+   },
+   "gt": "-0.16701143117647071"
+  },
+  {
+   "thu_tu": 166,
+   "o_id": {
+    "chu": "GROUP#GAC#2025M10"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "GAC"
+   },
+   "ky": {
+    "chu": "2025M10"
+   },
+   "gt": "-0.16957822411764742"
+  },
+  {
+   "thu_tu": 167,
+   "o_id": {
+    "chu": "GROUP#GAC#2025M11"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "GAC"
+   },
+   "ky": {
+    "chu": "2025M11"
+   },
+   "gt": "-0.17510306360784345"
+  },
+  {
+   "thu_tu": 168,
+   "o_id": {
+    "chu": "GROUP#GAC#2025M12"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "GAC"
+   },
+   "ky": {
+    "chu": "2025M12"
+   },
+   "gt": "-0.17250702058823553"
+  },
+  {
+   "thu_tu": 169,
+   "o_id": {
+    "chu": "GROUP#GAH#2024"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "GAH"
+   },
+   "ky": {
+    "chu": "2024"
+   },
+   "gt": "-0.20252776007026793"
+  },
+  {
+   "thu_tu": 170,
+   "o_id": {
+    "chu": "GROUP#GAH#2024H2"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "GAH"
+   },
+   "ky": {
+    "chu": "2024H2"
+   },
+   "gt": "-0.20252776007026793"
+  },
+  {
+   "thu_tu": 171,
+   "o_id": {
+    "chu": "GROUP#GAH#2024Q4"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "GAH"
+   },
+   "ky": {
+    "chu": "2024Q4"
+   },
+   "gt": "-0.20252776007026793"
+  },
+  {
+   "thu_tu": 172,
+   "o_id": {
+    "chu": "GROUP#GAH#2024M11"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "GAH"
+   },
+   "ky": {
+    "chu": "2024M11"
+   },
+   "gt": "-0.09184594839814006"
+  },
+  {
+   "thu_tu": 173,
+   "o_id": {
+    "chu": "GROUP#GAH#2024M12"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "GAH"
+   },
+   "ky": {
+    "chu": "2024M12"
+   },
+   "gt": "-0.11068181167212787"
+  },
+  {
+   "thu_tu": 174,
+   "o_id": {
+    "chu": "GROUP#GAH#2025"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "GAH"
+   },
+   "ky": {
+    "chu": "2025"
+   },
+   "gt": "-1.6057986220159726"
+  },
+  {
+   "thu_tu": 175,
+   "o_id": {
+    "chu": "GROUP#GAH#2025H1"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "GAH"
+   },
+   "ky": {
+    "chu": "2025H1"
+   },
+   "gt": "-0.7897652666042061"
+  },
+  {
+   "thu_tu": 176,
+   "o_id": {
+    "chu": "GROUP#GAH#2025H2"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "GAH"
+   },
+   "ky": {
+    "chu": "2025H2"
+   },
+   "gt": "-0.8160333554117665"
+  },
+  {
+   "thu_tu": 177,
+   "o_id": {
+    "chu": "GROUP#GAH#2025Q1"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "GAH"
+   },
+   "ky": {
+    "chu": "2025Q1"
+   },
+   "gt": "-0.3526711530384729"
+  },
+  {
+   "thu_tu": 178,
+   "o_id": {
+    "chu": "GROUP#GAH#2025Q2"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "GAH"
+   },
+   "ky": {
+    "chu": "2025Q2"
+   },
+   "gt": "-0.4370941135657331"
+  },
+  {
+   "thu_tu": 179,
+   "o_id": {
+    "chu": "GROUP#GAH#2025Q3"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "GAH"
+   },
+   "ky": {
+    "chu": "2025Q3"
+   },
+   "gt": "-0.42307632541176565"
+  },
+  {
+   "thu_tu": 180,
+   "o_id": {
+    "chu": "GROUP#GAH#2025Q4"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "GAH"
+   },
+   "ky": {
+    "chu": "2025Q4"
+   },
+   "gt": "-0.3929570300000008"
+  },
+  {
+   "thu_tu": 181,
+   "o_id": {
+    "chu": "GROUP#GAH#2025M01"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "GAH"
+   },
+   "ky": {
+    "chu": "2025M01"
+   },
+   "gt": "-0.11582570483341748"
+  },
+  {
+   "thu_tu": 182,
+   "o_id": {
+    "chu": "GROUP#GAH#2025M02"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "GAH"
+   },
+   "ky": {
+    "chu": "2025M02"
+   },
+   "gt": "-0.11498251365920148"
+  },
+  {
+   "thu_tu": 183,
+   "o_id": {
+    "chu": "GROUP#GAH#2025M03"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "GAH"
+   },
+   "ky": {
+    "chu": "2025M03"
+   },
+   "gt": "-0.12186293454585397"
+  },
+  {
+   "thu_tu": 184,
+   "o_id": {
+    "chu": "GROUP#GAH#2025M04"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "GAH"
+   },
+   "ky": {
+    "chu": "2025M04"
+   },
+   "gt": "-0.15121273912833755"
+  },
+  {
+   "thu_tu": 185,
+   "o_id": {
+    "chu": "GROUP#GAH#2025M05"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "GAH"
+   },
+   "ky": {
+    "chu": "2025M05"
+   },
+   "gt": "-0.1516681210146551"
+  },
+  {
+   "thu_tu": 186,
+   "o_id": {
+    "chu": "GROUP#GAH#2025M06"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "GAH"
+   },
+   "ky": {
+    "chu": "2025M06"
+   },
+   "gt": "-0.13421325342274043"
+  },
+  {
+   "thu_tu": 187,
+   "o_id": {
+    "chu": "GROUP#GAH#2025M07"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "GAH"
+   },
+   "ky": {
+    "chu": "2025M07"
+   },
+   "gt": "-0.1405969276470592"
+  },
+  {
+   "thu_tu": 188,
+   "o_id": {
+    "chu": "GROUP#GAH#2025M08"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "GAH"
+   },
+   "ky": {
+    "chu": "2025M08"
+   },
+   "gt": "-0.15403660403921612"
+  },
+  {
+   "thu_tu": 189,
+   "o_id": {
+    "chu": "GROUP#GAH#2025M09"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "GAH"
+   },
+   "ky": {
+    "chu": "2025M09"
+   },
+   "gt": "-0.1284427937254903"
+  },
+  {
+   "thu_tu": 190,
+   "o_id": {
+    "chu": "GROUP#GAH#2025M10"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "GAH"
+   },
+   "ky": {
+    "chu": "2025M10"
+   },
+   "gt": "-0.13116856482352973"
+  },
+  {
+   "thu_tu": 191,
+   "o_id": {
+    "chu": "GROUP#GAH#2025M11"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "GAH"
+   },
+   "ky": {
+    "chu": "2025M11"
+   },
+   "gt": "-0.13120616717647088"
+  },
+  {
+   "thu_tu": 192,
+   "o_id": {
+    "chu": "GROUP#GAH#2025M12"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "GAH"
+   },
+   "ky": {
+    "chu": "2025M12"
+   },
+   "gt": "-0.1305822980000002"
+  },
+  {
+   "thu_tu": 193,
+   "o_id": {
+    "chu": "GROUP#CXA#2024"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CXA"
+   },
+   "ky": {
+    "chu": "2024"
+   },
+   "gt": "-0.049068330246101785"
+  },
+  {
+   "thu_tu": 194,
+   "o_id": {
+    "chu": "GROUP#CXA#2024H2"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CXA"
+   },
+   "ky": {
+    "chu": "2024H2"
+   },
+   "gt": "-0.049068330246101785"
+  },
+  {
+   "thu_tu": 195,
+   "o_id": {
+    "chu": "GROUP#CXA#2024Q4"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CXA"
+   },
+   "ky": {
+    "chu": "2024Q4"
+   },
+   "gt": "-0.049068330246101785"
+  },
+  {
+   "thu_tu": 196,
+   "o_id": {
+    "chu": "GROUP#CXA#2024M11"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CXA"
+   },
+   "ky": {
+    "chu": "2024M11"
+   },
+   "gt": "-0.016427734497155944"
+  },
+  {
+   "thu_tu": 197,
+   "o_id": {
+    "chu": "GROUP#CXA#2024M12"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CXA"
+   },
+   "ky": {
+    "chu": "2024M12"
+   },
+   "gt": "-0.03264059574894584"
+  },
+  {
+   "thu_tu": 198,
+   "o_id": {
+    "chu": "GROUP#CXA#2025"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CXA"
+   },
+   "ky": {
+    "chu": "2025"
+   },
+   "gt": "-0.45565115979258064"
+  },
+  {
+   "thu_tu": 199,
+   "o_id": {
+    "chu": "GROUP#CXA#2025H1"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CXA"
+   },
+   "ky": {
+    "chu": "2025H1"
+   },
+   "gt": "-0.20582312626316876"
+  },
+  {
+   "thu_tu": 200,
+   "o_id": {
+    "chu": "GROUP#CXA#2025H2"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CXA"
+   },
+   "ky": {
+    "chu": "2025H2"
+   },
+   "gt": "-0.2498280335294119"
+  },
+  {
+   "thu_tu": 201,
+   "o_id": {
+    "chu": "GROUP#CXA#2025Q1"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CXA"
+   },
+   "ky": {
+    "chu": "2025Q1"
+   },
+   "gt": "-0.08354135356276499"
+  },
+  {
+   "thu_tu": 202,
+   "o_id": {
+    "chu": "GROUP#CXA#2025Q2"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CXA"
+   },
+   "ky": {
+    "chu": "2025Q2"
+   },
+   "gt": "-0.12228177270040377"
+  },
+  {
+   "thu_tu": 203,
+   "o_id": {
+    "chu": "GROUP#CXA#2025Q3"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CXA"
+   },
+   "ky": {
+    "chu": "2025Q3"
+   },
+   "gt": "-0.12559675521568633"
+  },
+  {
+   "thu_tu": 204,
+   "o_id": {
+    "chu": "GROUP#CXA#2025Q4"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CXA"
+   },
+   "ky": {
+    "chu": "2025Q4"
+   },
+   "gt": "-0.12423127831372557"
+  },
+  {
+   "thu_tu": 205,
+   "o_id": {
+    "chu": "GROUP#CXA#2025M01"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CXA"
+   },
+   "ky": {
+    "chu": "2025M01"
+   },
+   "gt": "-0.03423200518755865"
+  },
+  {
+   "thu_tu": 206,
+   "o_id": {
+    "chu": "GROUP#CXA#2025M02"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CXA"
+   },
+   "ky": {
+    "chu": "2025M02"
+   },
+   "gt": "-0.0375068686195653"
+  },
+  {
+   "thu_tu": 207,
+   "o_id": {
+    "chu": "GROUP#CXA#2025M03"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CXA"
+   },
+   "ky": {
+    "chu": "2025M03"
+   },
+   "gt": "-0.011802479755641023"
+  },
+  {
+   "thu_tu": 208,
+   "o_id": {
+    "chu": "GROUP#CXA#2025M04"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CXA"
+   },
+   "ky": {
+    "chu": "2025M04"
+   },
+   "gt": "-0.04041073228082462"
+  },
+  {
+   "thu_tu": 209,
+   "o_id": {
+    "chu": "GROUP#CXA#2025M05"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CXA"
+   },
+   "ky": {
+    "chu": "2025M05"
+   },
+   "gt": "-0.04184534572450867"
+  },
+  {
+   "thu_tu": 210,
+   "o_id": {
+    "chu": "GROUP#CXA#2025M06"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CXA"
+   },
+   "ky": {
+    "chu": "2025M06"
+   },
+   "gt": "-0.04002569469507048"
+  },
+  {
+   "thu_tu": 211,
+   "o_id": {
+    "chu": "GROUP#CXA#2025M07"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CXA"
+   },
+   "ky": {
+    "chu": "2025M07"
+   },
+   "gt": "-0.04170927682352942"
+  },
+  {
+   "thu_tu": 212,
+   "o_id": {
+    "chu": "GROUP#CXA#2025M08"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CXA"
+   },
+   "ky": {
+    "chu": "2025M08"
+   },
+   "gt": "-0.045318840941176504"
+  },
+  {
+   "thu_tu": 213,
+   "o_id": {
+    "chu": "GROUP#CXA#2025M09"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CXA"
+   },
+   "ky": {
+    "chu": "2025M09"
+   },
+   "gt": "-0.0385686374509804"
+  },
+  {
+   "thu_tu": 214,
+   "o_id": {
+    "chu": "GROUP#CXA#2025M10"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CXA"
+   },
+   "ky": {
+    "chu": "2025M10"
+   },
+   "gt": "-0.03840965929411768"
+  },
+  {
+   "thu_tu": 215,
+   "o_id": {
+    "chu": "GROUP#CXA#2025M11"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CXA"
+   },
+   "ky": {
+    "chu": "2025M11"
+   },
+   "gt": "-0.043896896431372574"
+  },
+  {
+   "thu_tu": 216,
+   "o_id": {
+    "chu": "GROUP#CXA#2025M12"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CXA"
+   },
+   "ky": {
+    "chu": "2025M12"
+   },
+   "gt": "-0.041924722588235326"
+  },
+  {
+   "thu_tu": 217,
+   "o_id": {
+    "chu": "GROUP#OGA#2024"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "OGA"
+   },
+   "ky": {
+    "chu": "2024"
+   },
+   "gt": "0.004946202906663382"
+  },
+  {
+   "thu_tu": 218,
+   "o_id": {
+    "chu": "GROUP#OGA#2024H2"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "OGA"
+   },
+   "ky": {
+    "chu": "2024H2"
+   },
+   "gt": "0.004946202906663382"
+  },
+  {
+   "thu_tu": 219,
+   "o_id": {
+    "chu": "GROUP#OGA#2024Q4"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "OGA"
+   },
+   "ky": {
+    "chu": "2024Q4"
+   },
+   "gt": "0.004946202906663382"
+  },
+  {
+   "thu_tu": 220,
+   "o_id": {
+    "chu": "GROUP#OGA#2024M11"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "OGA"
+   },
+   "ky": {
+    "chu": "2024M11"
+   },
+   "gt": "0.0020560069972782686"
+  },
+  {
+   "thu_tu": 221,
+   "o_id": {
+    "chu": "GROUP#OGA#2024M12"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "OGA"
+   },
+   "ky": {
+    "chu": "2024M12"
+   },
+   "gt": "0.0028901959093851136"
+  },
+  {
+   "thu_tu": 222,
+   "o_id": {
+    "chu": "GROUP#OGA#2025"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "OGA"
+   },
+   "ky": {
+    "chu": "2025"
+   },
+   "gt": "0.014670211465829051"
+  },
+  {
+   "thu_tu": 223,
+   "o_id": {
+    "chu": "GROUP#OGA#2025H1"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "OGA"
+   },
+   "ky": {
+    "chu": "2025H1"
+   },
+   "gt": "0.013432016485436895"
+  },
+  {
+   "thu_tu": 224,
+   "o_id": {
+    "chu": "GROUP#OGA#2025H2"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "OGA"
+   },
+   "ky": {
+    "chu": "2025H2"
+   },
+   "gt": "0.0012381949803921568"
+  },
+  {
+   "thu_tu": 225,
+   "o_id": {
+    "chu": "GROUP#OGA#2025Q1"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "OGA"
+   },
+   "ky": {
+    "chu": "2025Q1"
+   },
+   "gt": "0.008330933374325783"
+  },
+  {
+   "thu_tu": 226,
+   "o_id": {
+    "chu": "GROUP#OGA#2025Q2"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "OGA"
+   },
+   "ky": {
+    "chu": "2025Q2"
+   },
+   "gt": "0.005101083111111112"
+  },
+  {
+   "thu_tu": 227,
+   "o_id": {
+    "chu": "GROUP#OGA#2025Q3"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "OGA"
+   },
+   "ky": {
+    "chu": "2025Q3"
+   },
+   "gt": "0.0012381949803921568"
+  },
+  {
+   "thu_tu": 228,
+   "o_id": {
+    "chu": "GROUP#OGA#2025M01"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "OGA"
+   },
+   "ky": {
+    "chu": "2025M01"
+   },
+   "gt": "0.0028901959093851136"
+  },
+  {
+   "thu_tu": 229,
+   "o_id": {
+    "chu": "GROUP#OGA#2025M02"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "OGA"
+   },
+   "ky": {
+    "chu": "2025M02"
+   },
+   "gt": "0.0028901959093851136"
+  },
+  {
+   "thu_tu": 230,
+   "o_id": {
+    "chu": "GROUP#OGA#2025M03"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "OGA"
+   },
+   "ky": {
+    "chu": "2025M03"
+   },
+   "gt": "0.002550541555555556"
+  },
+  {
+   "thu_tu": 231,
+   "o_id": {
+    "chu": "GROUP#OGA#2025M04"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "OGA"
+   },
+   "ky": {
+    "chu": "2025M04"
+   },
+   "gt": "0.002550541555555556"
+  },
+  {
+   "thu_tu": 232,
+   "o_id": {
+    "chu": "GROUP#OGA#2025M05"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "OGA"
+   },
+   "ky": {
+    "chu": "2025M05"
+   },
+   "gt": "0.002550541555555556"
+  },
+  {
+   "thu_tu": 233,
+   "o_id": {
+    "chu": "GROUP#OGA#2025M08"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "OGA"
+   },
+   "ky": {
+    "chu": "2025M08"
+   },
+   "gt": "0.0012381949803921568"
+  },
+  {
+   "thu_tu": 234,
+   "o_id": {
+    "chu": "GROUP#CDC#2024"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CDC"
+   },
+   "ky": {
+    "chu": "2024"
+   },
+   "gt": "-0.0022696678384511713"
+  },
+  {
+   "thu_tu": 235,
+   "o_id": {
+    "chu": "GROUP#CDC#2024H2"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CDC"
+   },
+   "ky": {
+    "chu": "2024H2"
+   },
+   "gt": "-0.0022696678384511713"
+  },
+  {
+   "thu_tu": 236,
+   "o_id": {
+    "chu": "GROUP#CDC#2024Q4"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CDC"
+   },
+   "ky": {
+    "chu": "2024Q4"
+   },
+   "gt": "-0.0022696678384511713"
+  },
+  {
+   "thu_tu": 237,
+   "o_id": {
+    "chu": "GROUP#CDC#2024M11"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CDC"
+   },
+   "ky": {
+    "chu": "2024M11"
+   },
+   "gt": "-0.0008030849564569781"
+  },
+  {
+   "thu_tu": 238,
+   "o_id": {
+    "chu": "GROUP#CDC#2024M12"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CDC"
+   },
+   "ky": {
+    "chu": "2024M12"
+   },
+   "gt": "-0.0014665828819941933"
+  },
+  {
+   "thu_tu": 239,
+   "o_id": {
+    "chu": "GROUP#CDC#2025"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CDC"
+   },
+   "ky": {
+    "chu": "2025"
+   },
+   "gt": "-0.08363403026835607"
+  },
+  {
+   "thu_tu": 240,
+   "o_id": {
+    "chu": "GROUP#CDC#2025H1"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CDC"
+   },
+   "ky": {
+    "chu": "2025H1"
+   },
+   "gt": "-0.029887516778159998"
+  },
+  {
+   "thu_tu": 241,
+   "o_id": {
+    "chu": "GROUP#CDC#2025H2"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CDC"
+   },
+   "ky": {
+    "chu": "2025H2"
+   },
+   "gt": "-0.053746513490196074"
+  },
+  {
+   "thu_tu": 242,
+   "o_id": {
+    "chu": "GROUP#CDC#2025Q1"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CDC"
+   },
+   "ky": {
+    "chu": "2025Q1"
+   },
+   "gt": "-0.007458811445848396"
+  },
+  {
+   "thu_tu": 243,
+   "o_id": {
+    "chu": "GROUP#CDC#2025Q2"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CDC"
+   },
+   "ky": {
+    "chu": "2025Q2"
+   },
+   "gt": "-0.022428705332311602"
+  },
+  {
+   "thu_tu": 244,
+   "o_id": {
+    "chu": "GROUP#CDC#2025Q3"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CDC"
+   },
+   "ky": {
+    "chu": "2025Q3"
+   },
+   "gt": "-0.03726360160784313"
+  },
+  {
+   "thu_tu": 245,
+   "o_id": {
+    "chu": "GROUP#CDC#2025Q4"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CDC"
+   },
+   "ky": {
+    "chu": "2025Q4"
+   },
+   "gt": "-0.01648291188235294"
+  },
+  {
+   "thu_tu": 246,
+   "o_id": {
+    "chu": "GROUP#CDC#2025M01"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CDC"
+   },
+   "ky": {
+    "chu": "2025M01"
+   },
+   "gt": "-0.0025519468091521123"
+  },
+  {
+   "thu_tu": 247,
+   "o_id": {
+    "chu": "GROUP#CDC#2025M02"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CDC"
+   },
+   "ky": {
+    "chu": "2025M02"
+   },
+   "gt": "-0.002350668294796416"
+  },
+  {
+   "thu_tu": 248,
+   "o_id": {
+    "chu": "GROUP#CDC#2025M03"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CDC"
+   },
+   "ky": {
+    "chu": "2025M03"
+   },
+   "gt": "-0.002556196341899867"
+  },
+  {
+   "thu_tu": 249,
+   "o_id": {
+    "chu": "GROUP#CDC#2025M04"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CDC"
+   },
+   "ky": {
+    "chu": "2025M04"
+   },
+   "gt": "-0.0049272775593307136"
+  },
+  {
+   "thu_tu": 250,
+   "o_id": {
+    "chu": "GROUP#CDC#2025M05"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CDC"
+   },
+   "ky": {
+    "chu": "2025M05"
+   },
+   "gt": "-0.007324323106314224"
+  },
+  {
+   "thu_tu": 251,
+   "o_id": {
+    "chu": "GROUP#CDC#2025M06"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CDC"
+   },
+   "ky": {
+    "chu": "2025M06"
+   },
+   "gt": "-0.010177104666666667"
+  },
+  {
+   "thu_tu": 252,
+   "o_id": {
+    "chu": "GROUP#CDC#2025M07"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CDC"
+   },
+   "ky": {
+    "chu": "2025M07"
+   },
+   "gt": "-0.01070723486274509"
+  },
+  {
+   "thu_tu": 253,
+   "o_id": {
+    "chu": "GROUP#CDC#2025M08"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CDC"
+   },
+   "ky": {
+    "chu": "2025M08"
+   },
+   "gt": "-0.013631935490196083"
+  },
+  {
+   "thu_tu": 254,
+   "o_id": {
+    "chu": "GROUP#CDC#2025M09"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CDC"
+   },
+   "ky": {
+    "chu": "2025M09"
+   },
+   "gt": "-0.01292443125490196"
+  },
+  {
+   "thu_tu": 255,
+   "o_id": {
+    "chu": "GROUP#CDC#2025M10"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CDC"
+   },
+   "ky": {
+    "chu": "2025M10"
+   },
+   "gt": "-0.004661780980392156"
+  },
+  {
+   "thu_tu": 256,
+   "o_id": {
+    "chu": "GROUP#CDC#2025M11"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CDC"
+   },
+   "ky": {
+    "chu": "2025M11"
+   },
+   "gt": "-0.0051090257647058825"
+  },
+  {
+   "thu_tu": 257,
+   "o_id": {
+    "chu": "GROUP#CDC#2025M12"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CDC"
+   },
+   "ky": {
+    "chu": "2025M12"
+   },
+   "gt": "-0.006712105137254902"
+  },
+  {
+   "thu_tu": 258,
+   "o_id": {
+    "chu": "GROUP#CXB#2024"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CXB"
+   },
+   "ky": {
+    "chu": "2024"
+   },
+   "gt": "-0.0022696678384511713"
+  },
+  {
+   "thu_tu": 259,
+   "o_id": {
+    "chu": "GROUP#CXB#2024H2"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CXB"
+   },
+   "ky": {
+    "chu": "2024H2"
+   },
+   "gt": "-0.0022696678384511713"
+  },
+  {
+   "thu_tu": 260,
+   "o_id": {
+    "chu": "GROUP#CXB#2024Q4"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CXB"
+   },
+   "ky": {
+    "chu": "2024Q4"
+   },
+   "gt": "-0.0022696678384511713"
+  },
+  {
+   "thu_tu": 261,
+   "o_id": {
+    "chu": "GROUP#CXB#2024M11"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CXB"
+   },
+   "ky": {
+    "chu": "2024M11"
+   },
+   "gt": "-0.0008030849564569781"
+  },
+  {
+   "thu_tu": 262,
+   "o_id": {
+    "chu": "GROUP#CXB#2024M12"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CXB"
+   },
+   "ky": {
+    "chu": "2024M12"
+   },
+   "gt": "-0.0014665828819941933"
+  },
+  {
+   "thu_tu": 263,
+   "o_id": {
+    "chu": "GROUP#CXB#2025"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CXB"
+   },
+   "ky": {
+    "chu": "2025"
+   },
+   "gt": "-0.08363403026835607"
+  },
+  {
+   "thu_tu": 264,
+   "o_id": {
+    "chu": "GROUP#CXB#2025H1"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CXB"
+   },
+   "ky": {
+    "chu": "2025H1"
+   },
+   "gt": "-0.029887516778159998"
+  },
+  {
+   "thu_tu": 265,
+   "o_id": {
+    "chu": "GROUP#CXB#2025H2"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CXB"
+   },
+   "ky": {
+    "chu": "2025H2"
+   },
+   "gt": "-0.053746513490196074"
+  },
+  {
+   "thu_tu": 266,
+   "o_id": {
+    "chu": "GROUP#CXB#2025Q1"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CXB"
+   },
+   "ky": {
+    "chu": "2025Q1"
+   },
+   "gt": "-0.007458811445848396"
+  },
+  {
+   "thu_tu": 267,
+   "o_id": {
+    "chu": "GROUP#CXB#2025Q2"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CXB"
+   },
+   "ky": {
+    "chu": "2025Q2"
+   },
+   "gt": "-0.022428705332311602"
+  },
+  {
+   "thu_tu": 268,
+   "o_id": {
+    "chu": "GROUP#CXB#2025Q3"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CXB"
+   },
+   "ky": {
+    "chu": "2025Q3"
+   },
+   "gt": "-0.03726360160784313"
+  },
+  {
+   "thu_tu": 269,
+   "o_id": {
+    "chu": "GROUP#CXB#2025Q4"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CXB"
+   },
+   "ky": {
+    "chu": "2025Q4"
+   },
+   "gt": "-0.01648291188235294"
+  },
+  {
+   "thu_tu": 270,
+   "o_id": {
+    "chu": "GROUP#CXB#2025M01"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CXB"
+   },
+   "ky": {
+    "chu": "2025M01"
+   },
+   "gt": "-0.0025519468091521123"
+  },
+  {
+   "thu_tu": 271,
+   "o_id": {
+    "chu": "GROUP#CXB#2025M02"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CXB"
+   },
+   "ky": {
+    "chu": "2025M02"
+   },
+   "gt": "-0.002350668294796416"
+  },
+  {
+   "thu_tu": 272,
+   "o_id": {
+    "chu": "GROUP#CXB#2025M03"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CXB"
+   },
+   "ky": {
+    "chu": "2025M03"
+   },
+   "gt": "-0.002556196341899867"
+  },
+  {
+   "thu_tu": 273,
+   "o_id": {
+    "chu": "GROUP#CXB#2025M04"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CXB"
+   },
+   "ky": {
+    "chu": "2025M04"
+   },
+   "gt": "-0.0049272775593307136"
+  },
+  {
+   "thu_tu": 274,
+   "o_id": {
+    "chu": "GROUP#CXB#2025M05"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CXB"
+   },
+   "ky": {
+    "chu": "2025M05"
+   },
+   "gt": "-0.007324323106314224"
+  },
+  {
+   "thu_tu": 275,
+   "o_id": {
+    "chu": "GROUP#CXB#2025M06"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CXB"
+   },
+   "ky": {
+    "chu": "2025M06"
+   },
+   "gt": "-0.010177104666666667"
+  },
+  {
+   "thu_tu": 276,
+   "o_id": {
+    "chu": "GROUP#CXB#2025M07"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CXB"
+   },
+   "ky": {
+    "chu": "2025M07"
+   },
+   "gt": "-0.01070723486274509"
+  },
+  {
+   "thu_tu": 277,
+   "o_id": {
+    "chu": "GROUP#CXB#2025M08"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CXB"
+   },
+   "ky": {
+    "chu": "2025M08"
+   },
+   "gt": "-0.013631935490196083"
+  },
+  {
+   "thu_tu": 278,
+   "o_id": {
+    "chu": "GROUP#CXB#2025M09"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CXB"
+   },
+   "ky": {
+    "chu": "2025M09"
+   },
+   "gt": "-0.01292443125490196"
+  },
+  {
+   "thu_tu": 279,
+   "o_id": {
+    "chu": "GROUP#CXB#2025M10"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CXB"
+   },
+   "ky": {
+    "chu": "2025M10"
+   },
+   "gt": "-0.004661780980392156"
+  },
+  {
+   "thu_tu": 280,
+   "o_id": {
+    "chu": "GROUP#CXB#2025M11"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CXB"
+   },
+   "ky": {
+    "chu": "2025M11"
+   },
+   "gt": "-0.0051090257647058825"
+  },
+  {
+   "thu_tu": 281,
+   "o_id": {
+    "chu": "GROUP#CXB#2025M12"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "CXB"
+   },
+   "ky": {
+    "chu": "2025M12"
+   },
+   "gt": "-0.006712105137254902"
+  },
+  {
+   "thu_tu": 282,
+   "o_id": {
+    "chu": "GROUP#NIS#2024"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NIS"
+   },
+   "ky": {
+    "chu": "2024"
+   },
+   "gt": "0.3584109833758735"
+  },
+  {
+   "thu_tu": 283,
+   "o_id": {
+    "chu": "GROUP#NIS#2024H2"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NIS"
+   },
+   "ky": {
+    "chu": "2024H2"
+   },
+   "gt": "0.3584109833758735"
+  },
+  {
+   "thu_tu": 284,
+   "o_id": {
+    "chu": "GROUP#NIS#2024Q4"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NIS"
+   },
+   "ky": {
+    "chu": "2024Q4"
+   },
+   "gt": "0.3584109833758735"
+  },
+  {
+   "thu_tu": 285,
+   "o_id": {
+    "chu": "GROUP#NIS#2024M11"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NIS"
+   },
+   "ky": {
+    "chu": "2024M11"
+   },
+   "gt": "0.16186531953184044"
+  },
+  {
+   "thu_tu": 286,
+   "o_id": {
+    "chu": "GROUP#NIS#2024M12"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NIS"
+   },
+   "ky": {
+    "chu": "2024M12"
+   },
+   "gt": "0.1965456638440331"
+  },
+  {
+   "thu_tu": 287,
+   "o_id": {
+    "chu": "GROUP#NIS#2025"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NIS"
+   },
+   "ky": {
+    "chu": "2025"
+   },
+   "gt": "3.157010928861593"
+  },
+  {
+   "thu_tu": 288,
+   "o_id": {
+    "chu": "GROUP#NIS#2025H1"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NIS"
+   },
+   "ky": {
+    "chu": "2025H1"
+   },
+   "gt": "1.4111909791753183"
+  },
+  {
+   "thu_tu": 289,
+   "o_id": {
+    "chu": "GROUP#NIS#2025H2"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NIS"
+   },
+   "ky": {
+    "chu": "2025H2"
+   },
+   "gt": "1.7458199496862745"
+  },
+  {
+   "thu_tu": 290,
+   "o_id": {
+    "chu": "GROUP#NIS#2025Q1"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NIS"
+   },
+   "ky": {
+    "chu": "2025Q1"
+   },
+   "gt": "0.611114548235965"
+  },
+  {
+   "thu_tu": 291,
+   "o_id": {
+    "chu": "GROUP#NIS#2025Q2"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NIS"
+   },
+   "ky": {
+    "chu": "2025Q2"
+   },
+   "gt": "0.8000764309393533"
+  },
+  {
+   "thu_tu": 292,
+   "o_id": {
+    "chu": "GROUP#NIS#2025Q3"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NIS"
+   },
+   "ky": {
+    "chu": "2025Q3"
+   },
+   "gt": "0.9056874556862745"
+  },
+  {
+   "thu_tu": 293,
+   "o_id": {
+    "chu": "GROUP#NIS#2025Q4"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NIS"
+   },
+   "ky": {
+    "chu": "2025Q4"
+   },
+   "gt": "0.840132494"
+  },
+  {
+   "thu_tu": 294,
+   "o_id": {
+    "chu": "GROUP#NIS#2025M01"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NIS"
+   },
+   "ky": {
+    "chu": "2025M01"
+   },
+   "gt": "0.2099072359085534"
+  },
+  {
+   "thu_tu": 295,
+   "o_id": {
+    "chu": "GROUP#NIS#2025M02"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NIS"
+   },
+   "ky": {
+    "chu": "2025M02"
+   },
+   "gt": "0.2144007430846931"
+  },
+  {
+   "thu_tu": 296,
+   "o_id": {
+    "chu": "GROUP#NIS#2025M03"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NIS"
+   },
+   "ky": {
+    "chu": "2025M03"
+   },
+   "gt": "0.1868065692427185"
+  },
+  {
+   "thu_tu": 297,
+   "o_id": {
+    "chu": "GROUP#NIS#2025M04"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NIS"
+   },
+   "ky": {
+    "chu": "2025M04"
+   },
+   "gt": "0.2540016379863231"
+  },
+  {
+   "thu_tu": 298,
+   "o_id": {
+    "chu": "GROUP#NIS#2025M05"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NIS"
+   },
+   "ky": {
+    "chu": "2025M05"
+   },
+   "gt": "0.2676399802079322"
+  },
+  {
+   "thu_tu": 299,
+   "o_id": {
+    "chu": "GROUP#NIS#2025M06"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NIS"
+   },
+   "ky": {
+    "chu": "2025M06"
+   },
+   "gt": "0.278434812745098"
+  },
+  {
+   "thu_tu": 300,
+   "o_id": {
+    "chu": "GROUP#NIS#2025M07"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NIS"
+   },
+   "ky": {
+    "chu": "2025M07"
+   },
+   "gt": "0.2856519900392157"
+  },
+  {
+   "thu_tu": 301,
+   "o_id": {
+    "chu": "GROUP#NIS#2025M08"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NIS"
+   },
+   "ky": {
+    "chu": "2025M08"
+   },
+   "gt": "0.324045361490196"
+  },
+  {
+   "thu_tu": 302,
+   "o_id": {
+    "chu": "GROUP#NIS#2025M09"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NIS"
+   },
+   "ky": {
+    "chu": "2025M09"
+   },
+   "gt": "0.2959901041568628"
+  },
+  {
+   "thu_tu": 303,
+   "o_id": {
+    "chu": "GROUP#NIS#2025M10"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NIS"
+   },
+   "ky": {
+    "chu": "2025M10"
+   },
+   "gt": "0.2760008578431372"
+  },
+  {
+   "thu_tu": 304,
+   "o_id": {
+    "chu": "GROUP#NIS#2025M11"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NIS"
+   },
+   "ky": {
+    "chu": "2025M11"
+   },
+   "gt": "0.2834545672156863"
+  },
+  {
+   "thu_tu": 305,
+   "o_id": {
+    "chu": "GROUP#NIS#2025M12"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NIS"
+   },
+   "ky": {
+    "chu": "2025M12"
+   },
+   "gt": "0.2806770689411765"
+  },
+  {
+   "thu_tu": 306,
+   "o_id": {
+    "chu": "GROUP#INT#2024"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "INT"
+   },
+   "ky": {
+    "chu": "2024"
+   },
+   "gt": "0.02018650761988351"
+  },
+  {
+   "thu_tu": 307,
+   "o_id": {
+    "chu": "GROUP#INT#2024H2"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "INT"
+   },
+   "ky": {
+    "chu": "2024H2"
+   },
+   "gt": "0.02018650761988351"
+  },
+  {
+   "thu_tu": 308,
+   "o_id": {
+    "chu": "GROUP#INT#2024Q4"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "INT"
+   },
+   "ky": {
+    "chu": "2024Q4"
+   },
+   "gt": "0.02018650761988351"
+  },
+  {
+   "thu_tu": 309,
+   "o_id": {
+    "chu": "GROUP#INT#2024M11"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "INT"
+   },
+   "ky": {
+    "chu": "2024M11"
+   },
+   "gt": "0.008171926115056252"
+  },
+  {
+   "thu_tu": 310,
+   "o_id": {
+    "chu": "GROUP#INT#2024M12"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "INT"
+   },
+   "ky": {
+    "chu": "2024M12"
+   },
+   "gt": "0.012014581504827256"
+  },
+  {
+   "thu_tu": 311,
+   "o_id": {
+    "chu": "GROUP#INT#2025"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "INT"
+   },
+   "ky": {
+    "chu": "2025"
+   },
+   "gt": "0.16283938527714187"
+  },
+  {
+   "thu_tu": 312,
+   "o_id": {
+    "chu": "GROUP#INT#2025H1"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "INT"
+   },
+   "ky": {
+    "chu": "2025H1"
+   },
+   "gt": "0.07332586841439674"
+  },
+  {
+   "thu_tu": 313,
+   "o_id": {
+    "chu": "GROUP#INT#2025H2"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "INT"
+   },
+   "ky": {
+    "chu": "2025H2"
+   },
+   "gt": "0.0895135168627451"
+  },
+  {
+   "thu_tu": 314,
+   "o_id": {
+    "chu": "GROUP#INT#2025Q1"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "INT"
+   },
+   "ky": {
+    "chu": "2025Q1"
+   },
+   "gt": "0.027444439325816816"
+  },
+  {
+   "thu_tu": 315,
+   "o_id": {
+    "chu": "GROUP#INT#2025Q2"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "INT"
+   },
+   "ky": {
+    "chu": "2025Q2"
+   },
+   "gt": "0.04588142908857992"
+  },
+  {
+   "thu_tu": 316,
+   "o_id": {
+    "chu": "GROUP#INT#2025Q3"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "INT"
+   },
+   "ky": {
+    "chu": "2025Q3"
+   },
+   "gt": "0.04225049019607843"
+  },
+  {
+   "thu_tu": 317,
+   "o_id": {
+    "chu": "GROUP#INT#2025Q4"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "INT"
+   },
+   "ky": {
+    "chu": "2025Q4"
+   },
+   "gt": "0.047263026666666666"
+  },
+  {
+   "thu_tu": 318,
+   "o_id": {
+    "chu": "GROUP#INT#2025M01"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "INT"
+   },
+   "ky": {
+    "chu": "2025M01"
+   },
+   "gt": "0.012666797951949587"
+  },
+  {
+   "thu_tu": 319,
+   "o_id": {
+    "chu": "GROUP#INT#2025M02"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "INT"
+   },
+   "ky": {
+    "chu": "2025M02"
+   },
+   "gt": "0.013220240441466299"
+  },
+  {
+   "thu_tu": 320,
+   "o_id": {
+    "chu": "GROUP#INT#2025M03"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "INT"
+   },
+   "ky": {
+    "chu": "2025M03"
+   },
+   "gt": "0.0015574009324009323"
+  },
+  {
+   "thu_tu": 321,
+   "o_id": {
+    "chu": "GROUP#INT#2025M04"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "INT"
+   },
+   "ky": {
+    "chu": "2025M04"
+   },
+   "gt": "0.014569530744336569"
+  },
+  {
+   "thu_tu": 322,
+   "o_id": {
+    "chu": "GROUP#INT#2025M05"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "INT"
+   },
+   "ky": {
+    "chu": "2025M05"
+   },
+   "gt": "0.015291875240662302"
+  },
+  {
+   "thu_tu": 323,
+   "o_id": {
+    "chu": "GROUP#INT#2025M06"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "INT"
+   },
+   "ky": {
+    "chu": "2025M06"
+   },
+   "gt": "0.016020023103581055"
+  },
+  {
+   "thu_tu": 324,
+   "o_id": {
+    "chu": "GROUP#INT#2025M07"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "INT"
+   },
+   "ky": {
+    "chu": "2025M07"
+   },
+   "gt": "0.017219313725490196"
+  },
+  {
+   "thu_tu": 325,
+   "o_id": {
+    "chu": "GROUP#INT#2025M08"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "INT"
+   },
+   "ky": {
+    "chu": "2025M08"
+   },
+   "gt": "0.017762352941176472"
+  },
+  {
+   "thu_tu": 326,
+   "o_id": {
+    "chu": "GROUP#INT#2025M09"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "INT"
+   },
+   "ky": {
+    "chu": "2025M09"
+   },
+   "gt": "0.007268823529411765"
+  },
+  {
+   "thu_tu": 327,
+   "o_id": {
+    "chu": "GROUP#INT#2025M10"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "INT"
+   },
+   "ky": {
+    "chu": "2025M10"
+   },
+   "gt": "0.0160478431372549"
+  },
+  {
+   "thu_tu": 328,
+   "o_id": {
+    "chu": "GROUP#INT#2025M11"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "INT"
+   },
+   "ky": {
+    "chu": "2025M11"
+   },
+   "gt": "0.016528124705882354"
+  },
+  {
+   "thu_tu": 329,
+   "o_id": {
+    "chu": "GROUP#INT#2025M12"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "INT"
+   },
+   "ky": {
+    "chu": "2025M12"
+   },
+   "gt": "0.01468705882352941"
+  },
+  {
+   "thu_tu": 330,
+   "o_id": {
+    "chu": "GROUP#PIT#2024"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "PIT"
+   },
+   "ky": {
+    "chu": "2024"
+   },
+   "gt": "0.028607981035598706"
+  },
+  {
+   "thu_tu": 331,
+   "o_id": {
+    "chu": "GROUP#PIT#2024H2"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "PIT"
+   },
+   "ky": {
+    "chu": "2024H2"
+   },
+   "gt": "0.028607981035598706"
+  },
+  {
+   "thu_tu": 332,
+   "o_id": {
+    "chu": "GROUP#PIT#2024Q4"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "PIT"
+   },
+   "ky": {
+    "chu": "2024Q4"
+   },
+   "gt": "0.028607981035598706"
+  },
+  {
+   "thu_tu": 333,
+   "o_id": {
+    "chu": "GROUP#PIT#2024M12"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "PIT"
+   },
+   "ky": {
+    "chu": "2024M12"
+   },
+   "gt": "0.028607981035598706"
+  },
+  {
+   "thu_tu": 334,
+   "o_id": {
+    "chu": "GROUP#PIT#2025"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "PIT"
+   },
+   "ky": {
+    "chu": "2025"
+   },
+   "gt": "0.14171713003198172"
+  },
+  {
+   "thu_tu": 335,
+   "o_id": {
+    "chu": "GROUP#PIT#2025H1"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "PIT"
+   },
+   "ky": {
+    "chu": "2025H1"
+   },
+   "gt": "0.14171713003198172"
+  },
+  {
+   "thu_tu": 336,
+   "o_id": {
+    "chu": "GROUP#PIT#2025Q1"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "PIT"
+   },
+   "ky": {
+    "chu": "2025Q1"
+   },
+   "gt": "0.08538301805812551"
+  },
+  {
+   "thu_tu": 337,
+   "o_id": {
+    "chu": "GROUP#PIT#2025Q2"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "PIT"
+   },
+   "ky": {
+    "chu": "2025Q2"
+   },
+   "gt": "0.0563341119738562"
+  },
+  {
+   "thu_tu": 338,
+   "o_id": {
+    "chu": "GROUP#PIT#2025M01"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "PIT"
+   },
+   "ky": {
+    "chu": "2025M01"
+   },
+   "gt": "0.028607981035598706"
+  },
+  {
+   "thu_tu": 339,
+   "o_id": {
+    "chu": "GROUP#PIT#2025M02"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "PIT"
+   },
+   "ky": {
+    "chu": "2025M02"
+   },
+   "gt": "0.028607981035598706"
+  },
+  {
+   "thu_tu": 340,
+   "o_id": {
+    "chu": "GROUP#PIT#2025M03"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "PIT"
+   },
+   "ky": {
+    "chu": "2025M03"
+   },
+   "gt": "0.0281670559869281"
+  },
+  {
+   "thu_tu": 341,
+   "o_id": {
+    "chu": "GROUP#PIT#2025M04"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "PIT"
+   },
+   "ky": {
+    "chu": "2025M04"
+   },
+   "gt": "0.0281670559869281"
+  },
+  {
+   "thu_tu": 342,
+   "o_id": {
+    "chu": "GROUP#PIT#2025M05"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "PIT"
+   },
+   "ky": {
+    "chu": "2025M05"
+   },
+   "gt": "0.0281670559869281"
+  },
+  {
+   "thu_tu": 343,
+   "o_id": {
+    "chu": "GROUP#COM#2024"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COM"
+   },
+   "ky": {
+    "chu": "2024"
+   },
+   "gt": "0.004804122174084285"
+  },
+  {
+   "thu_tu": 344,
+   "o_id": {
+    "chu": "GROUP#COM#2024H2"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COM"
+   },
+   "ky": {
+    "chu": "2024H2"
+   },
+   "gt": "0.004804122174084285"
+  },
+  {
+   "thu_tu": 345,
+   "o_id": {
+    "chu": "GROUP#COM#2024Q4"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COM"
+   },
+   "ky": {
+    "chu": "2024Q4"
+   },
+   "gt": "0.004804122174084285"
+  },
+  {
+   "thu_tu": 346,
+   "o_id": {
+    "chu": "GROUP#COM#2024M12"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COM"
+   },
+   "ky": {
+    "chu": "2024M12"
+   },
+   "gt": "0.004804122174084285"
+  },
+  {
+   "thu_tu": 347,
+   "o_id": {
+    "chu": "GROUP#COM#2025"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COM"
+   },
+   "ky": {
+    "chu": "2025"
+   },
+   "gt": "0.016432117245848636"
+  },
+  {
+   "thu_tu": 348,
+   "o_id": {
+    "chu": "GROUP#COM#2025H1"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COM"
+   },
+   "ky": {
+    "chu": "2025H1"
+   },
+   "gt": "0.01343876195173099"
+  },
+  {
+   "thu_tu": 349,
+   "o_id": {
+    "chu": "GROUP#COM#2025H2"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COM"
+   },
+   "ky": {
+    "chu": "2025H2"
+   },
+   "gt": "0.002993355294117647"
+  },
+  {
+   "thu_tu": 350,
+   "o_id": {
+    "chu": "GROUP#COM#2025Q1"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COM"
+   },
+   "ky": {
+    "chu": "2025Q1"
+   },
+   "gt": "0.007669473843036042"
+  },
+  {
+   "thu_tu": 351,
+   "o_id": {
+    "chu": "GROUP#COM#2025Q2"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COM"
+   },
+   "ky": {
+    "chu": "2025Q2"
+   },
+   "gt": "0.005769288108694948"
+  },
+  {
+   "thu_tu": 352,
+   "o_id": {
+    "chu": "GROUP#COM#2025Q3"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COM"
+   },
+   "ky": {
+    "chu": "2025Q3"
+   },
+   "gt": "0.002993355294117647"
+  },
+  {
+   "thu_tu": 353,
+   "o_id": {
+    "chu": "GROUP#COM#2025M01"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COM"
+   },
+   "ky": {
+    "chu": "2025M01"
+   },
+   "gt": "0.0026545478912100903"
+  },
+  {
+   "thu_tu": 354,
+   "o_id": {
+    "chu": "GROUP#COM#2025M02"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COM"
+   },
+   "ky": {
+    "chu": "2025M02"
+   },
+   "gt": "0.005014925951825951"
+  },
+  {
+   "thu_tu": 355,
+   "o_id": {
+    "chu": "GROUP#COM#2025M04"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COM"
+   },
+   "ky": {
+    "chu": "2025M04"
+   },
+   "gt": "0.002726029362902291"
+  },
+  {
+   "thu_tu": 356,
+   "o_id": {
+    "chu": "GROUP#COM#2025M05"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COM"
+   },
+   "ky": {
+    "chu": "2025M05"
+   },
+   "gt": "0.00198219145167501"
+  },
+  {
+   "thu_tu": 357,
+   "o_id": {
+    "chu": "GROUP#COM#2025M06"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COM"
+   },
+   "ky": {
+    "chu": "2025M06"
+   },
+   "gt": "0.001061067294117647"
+  },
+  {
+   "thu_tu": 358,
+   "o_id": {
+    "chu": "GROUP#COM#2025M07"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COM"
+   },
+   "ky": {
+    "chu": "2025M07"
+   },
+   "gt": "0.002993355294117647"
+  },
+  {
+   "thu_tu": 359,
+   "o_id": {
+    "chu": "GROUP#EBITDA#2024"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "EBITDA"
+   },
+   "ky": {
+    "chu": "2024"
+   },
+   "gt": "0.3903060604141385"
+  },
+  {
+   "thu_tu": 360,
+   "o_id": {
+    "chu": "GROUP#EBIT#2024"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "EBIT"
+   },
+   "ky": {
+    "chu": "2024"
+   },
+   "gt": "0.3925757282525897"
+  },
+  {
+   "thu_tu": 361,
+   "o_id": {
+    "chu": "GROUP#EBT#2024"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "EBT"
+   },
+   "ky": {
+    "chu": "2024"
+   },
+   "gt": "0.3925757282525897"
+  },
+  {
+   "thu_tu": 362,
+   "o_id": {
+    "chu": "GROUP#NP#2024"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NP"
+   },
+   "ky": {
+    "chu": "2024"
+   },
+   "gt": "0.3925757282525897"
+  },
+  {
+   "thu_tu": 363,
+   "o_id": {
+    "chu": "GROUP#NPC#2024"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NPC"
+   },
+   "ky": {
+    "chu": "2024"
+   },
+   "gt": "0.3925757282525897"
+  },
+  {
+   "thu_tu": 364,
+   "o_id": {
+    "chu": "GROUP#NCF#2024"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NCF"
+   },
+   "ky": {
+    "chu": "2024"
+   },
+   "gt": "0.01943386595285033"
+  },
+  {
+   "thu_tu": 365,
+   "o_id": {
+    "chu": "GROUP#NCF#2024H2"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NCF"
+   },
+   "ky": {
+    "chu": "2024H2"
+   },
+   "gt": "0.01943386595285033"
+  },
+  {
+   "thu_tu": 366,
+   "o_id": {
+    "chu": "GROUP#NCF#2024Q4"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NCF"
+   },
+   "ky": {
+    "chu": "2024Q4"
+   },
+   "gt": "0.01943386595285033"
+  },
+  {
+   "thu_tu": 367,
+   "o_id": {
+    "chu": "GROUP#NCF#2024M11"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NCF"
+   },
+   "ky": {
+    "chu": "2024M11"
+   },
+   "gt": "0.0048699148283851005"
+  },
+  {
+   "thu_tu": 368,
+   "o_id": {
+    "chu": "GROUP#NCF#2024M12"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NCF"
+   },
+   "ky": {
+    "chu": "2024M12"
+   },
+   "gt": "0.01456395112446526"
+  },
+  {
+   "thu_tu": 369,
+   "o_id": {
+    "chu": "GROUP#NCF#2025"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NCF"
+   },
+   "ky": {
+    "chu": "2025"
+   },
+   "gt": "0.03812033253987064"
+  },
+  {
+   "thu_tu": 370,
+   "o_id": {
+    "chu": "GROUP#NCF#2025H1"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NCF"
+   },
+   "ky": {
+    "chu": "2025H1"
+   },
+   "gt": "0.040758958814383045"
+  },
+  {
+   "thu_tu": 371,
+   "o_id": {
+    "chu": "GROUP#NCF#2025H2"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NCF"
+   },
+   "ky": {
+    "chu": "2025H2"
+   },
+   "gt": "-0.002638626274513098"
+  },
+  {
+   "thu_tu": 372,
+   "o_id": {
+    "chu": "GROUP#NCF#2025Q1"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NCF"
+   },
+   "ky": {
+    "chu": "2025Q1"
+   },
+   "gt": "0.0266144941038685"
+  },
+  {
+   "thu_tu": 373,
+   "o_id": {
+    "chu": "GROUP#NCF#2025Q2"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NCF"
+   },
+   "ky": {
+    "chu": "2025Q2"
+   },
+   "gt": "0.014144464710514754"
+  },
+  {
+   "thu_tu": 374,
+   "o_id": {
+    "chu": "GROUP#NCF#2025Q3"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NCF"
+   },
+   "ky": {
+    "chu": "2025Q3"
+   },
+   "gt": "0.0019982215686259325"
+  },
+  {
+   "thu_tu": 375,
+   "o_id": {
+    "chu": "GROUP#NCF#2025Q4"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NCF"
+   },
+   "ky": {
+    "chu": "2025Q4"
+   },
+   "gt": "-0.004636847843138916"
+  },
+  {
+   "thu_tu": 376,
+   "o_id": {
+    "chu": "GROUP#NCF#2025M01"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NCF"
+   },
+   "ky": {
+    "chu": "2025M01"
+   },
+   "gt": "0.008679796658771432"
+  },
+  {
+   "thu_tu": 377,
+   "o_id": {
+    "chu": "GROUP#NCF#2025M02"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NCF"
+   },
+   "ky": {
+    "chu": "2025M02"
+   },
+   "gt": "0.008930944267630633"
+  },
+  {
+   "thu_tu": 378,
+   "o_id": {
+    "chu": "GROUP#NCF#2025M03"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NCF"
+   },
+   "ky": {
+    "chu": "2025M03"
+   },
+   "gt": "0.00900375317746633"
+  },
+  {
+   "thu_tu": 379,
+   "o_id": {
+    "chu": "GROUP#NCF#2025M04"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NCF"
+   },
+   "ky": {
+    "chu": "2025M04"
+   },
+   "gt": "0.0004985822293668693"
+  },
+  {
+   "thu_tu": 380,
+   "o_id": {
+    "chu": "GROUP#NCF#2025M05"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NCF"
+   },
+   "ky": {
+    "chu": "2025M05"
+   },
+   "gt": "0.007779553889540793"
+  },
+  {
+   "thu_tu": 381,
+   "o_id": {
+    "chu": "GROUP#NCF#2025M06"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NCF"
+   },
+   "ky": {
+    "chu": "2025M06"
+   },
+   "gt": "0.0058663285916072585"
+  },
+  {
+   "thu_tu": 382,
+   "o_id": {
+    "chu": "GROUP#NCF#2025M07"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NCF"
+   },
+   "ky": {
+    "chu": "2025M07"
+   },
+   "gt": "-0.0007726852941182527"
+  },
+  {
+   "thu_tu": 383,
+   "o_id": {
+    "chu": "GROUP#NCF#2025M08"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NCF"
+   },
+   "ky": {
+    "chu": "2025M08"
+   },
+   "gt": "0.002802475490195272"
+  },
+  {
+   "thu_tu": 384,
+   "o_id": {
+    "chu": "GROUP#NCF#2025M09"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NCF"
+   },
+   "ky": {
+    "chu": "2025M09"
+   },
+   "gt": "-0.000031568627451149245"
+  },
+  {
+   "thu_tu": 385,
+   "o_id": {
+    "chu": "GROUP#NCF#2025M10"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NCF"
+   },
+   "ky": {
+    "chu": "2025M10"
+   },
+   "gt": "-0.000718137254902637"
+  },
+  {
+   "thu_tu": 386,
+   "o_id": {
+    "chu": "GROUP#NCF#2025M11"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NCF"
+   },
+   "ky": {
+    "chu": "2025M11"
+   },
+   "gt": "-0.00007138509803973712"
+  },
+  {
+   "thu_tu": 387,
+   "o_id": {
+    "chu": "GROUP#NCF#2025M12"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NCF"
+   },
+   "ky": {
+    "chu": "2025M12"
+   },
+   "gt": "-0.0038473254901965426"
+  },
+  {
+   "thu_tu": 388,
+   "o_id": {
+    "chu": "GROUP#NCFO#2024"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NCFO"
+   },
+   "ky": {
+    "chu": "2024"
+   },
+   "gt": "0.021703533791301504"
+  },
+  {
+   "thu_tu": 389,
+   "o_id": {
+    "chu": "GROUP#NCFO#2024H2"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NCFO"
+   },
+   "ky": {
+    "chu": "2024H2"
+   },
+   "gt": "0.021703533791301504"
+  },
+  {
+   "thu_tu": 390,
+   "o_id": {
+    "chu": "GROUP#NCFO#2024Q4"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NCFO"
+   },
+   "ky": {
+    "chu": "2024Q4"
+   },
+   "gt": "0.021703533791301504"
+  },
+  {
+   "thu_tu": 391,
+   "o_id": {
+    "chu": "GROUP#NCFO#2024M11"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NCFO"
+   },
+   "ky": {
+    "chu": "2024M11"
+   },
+   "gt": "0.005672999784842078"
+  },
+  {
+   "thu_tu": 392,
+   "o_id": {
+    "chu": "GROUP#NCFO#2024M12"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NCFO"
+   },
+   "ky": {
+    "chu": "2024M12"
+   },
+   "gt": "0.016030534006459454"
+  },
+  {
+   "thu_tu": 393,
+   "o_id": {
+    "chu": "GROUP#NCFO#2025"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NCFO"
+   },
+   "ky": {
+    "chu": "2025"
+   },
+   "gt": "0.12175436280822671"
+  },
+  {
+   "thu_tu": 394,
+   "o_id": {
+    "chu": "GROUP#NCFO#2025H1"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NCFO"
+   },
+   "ky": {
+    "chu": "2025H1"
+   },
+   "gt": "0.07064647559254304"
+  },
+  {
+   "thu_tu": 395,
+   "o_id": {
+    "chu": "GROUP#NCFO#2025H2"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NCFO"
+   },
+   "ky": {
+    "chu": "2025H2"
+   },
+   "gt": "0.051107887215682976"
+  },
+  {
+   "thu_tu": 396,
+   "o_id": {
+    "chu": "GROUP#NCFO#2025Q1"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NCFO"
+   },
+   "ky": {
+    "chu": "2025Q1"
+   },
+   "gt": "0.034073305549716895"
+  },
+  {
+   "thu_tu": 397,
+   "o_id": {
+    "chu": "GROUP#NCFO#2025Q2"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NCFO"
+   },
+   "ky": {
+    "chu": "2025Q2"
+   },
+   "gt": "0.036573170042826356"
+  },
+  {
+   "thu_tu": 398,
+   "o_id": {
+    "chu": "GROUP#NCFO#2025Q3"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NCFO"
+   },
+   "ky": {
+    "chu": "2025Q3"
+   },
+   "gt": "0.03926182317646906"
+  },
+  {
+   "thu_tu": 399,
+   "o_id": {
+    "chu": "GROUP#NCFO#2025Q4"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NCFO"
+   },
+   "ky": {
+    "chu": "2025Q4"
+   },
+   "gt": "0.011846064039214024"
+  },
+  {
+   "thu_tu": 400,
+   "o_id": {
+    "chu": "GROUP#NCFO#2025M01"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NCFO"
+   },
+   "ky": {
+    "chu": "2025M01"
+   },
+   "gt": "0.011231743467923544"
+  },
+  {
+   "thu_tu": 401,
+   "o_id": {
+    "chu": "GROUP#NCFO#2025M02"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NCFO"
+   },
+   "ky": {
+    "chu": "2025M02"
+   },
+   "gt": "0.01128161256242705"
+  },
+  {
+   "thu_tu": 402,
+   "o_id": {
+    "chu": "GROUP#NCFO#2025M03"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NCFO"
+   },
+   "ky": {
+    "chu": "2025M03"
+   },
+   "gt": "0.011559949519366196"
+  },
+  {
+   "thu_tu": 403,
+   "o_id": {
+    "chu": "GROUP#NCFO#2025M04"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NCFO"
+   },
+   "ky": {
+    "chu": "2025M04"
+   },
+   "gt": "0.005425859788697583"
+  },
+  {
+   "thu_tu": 404,
+   "o_id": {
+    "chu": "GROUP#NCFO#2025M05"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NCFO"
+   },
+   "ky": {
+    "chu": "2025M05"
+   },
+   "gt": "0.015103876995855017"
+  },
+  {
+   "thu_tu": 405,
+   "o_id": {
+    "chu": "GROUP#NCFO#2025M06"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NCFO"
+   },
+   "ky": {
+    "chu": "2025M06"
+   },
+   "gt": "0.016043433258273926"
+  },
+  {
+   "thu_tu": 406,
+   "o_id": {
+    "chu": "GROUP#NCFO#2025M07"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NCFO"
+   },
+   "ky": {
+    "chu": "2025M07"
+   },
+   "gt": "0.009934549568626837"
+  },
+  {
+   "thu_tu": 407,
+   "o_id": {
+    "chu": "GROUP#NCFO#2025M08"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NCFO"
+   },
+   "ky": {
+    "chu": "2025M08"
+   },
+   "gt": "0.016434410980391355"
+  },
+  {
+   "thu_tu": 408,
+   "o_id": {
+    "chu": "GROUP#NCFO#2025M09"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NCFO"
+   },
+   "ky": {
+    "chu": "2025M09"
+   },
+   "gt": "0.012892862627450812"
+  },
+  {
+   "thu_tu": 409,
+   "o_id": {
+    "chu": "GROUP#NCFO#2025M10"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NCFO"
+   },
+   "ky": {
+    "chu": "2025M10"
+   },
+   "gt": "0.003943643725489519"
+  },
+  {
+   "thu_tu": 410,
+   "o_id": {
+    "chu": "GROUP#NCFO#2025M11"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NCFO"
+   },
+   "ky": {
+    "chu": "2025M11"
+   },
+   "gt": "0.005037640666666145"
+  },
+  {
+   "thu_tu": 411,
+   "o_id": {
+    "chu": "GROUP#NCFO#2025M12"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NCFO"
+   },
+   "ky": {
+    "chu": "2025M12"
+   },
+   "gt": "0.0028647796470583596"
+  },
+  {
+   "thu_tu": 412,
+   "o_id": {
+    "chu": "GROUP#COO#2024"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COO"
+   },
+   "ky": {
+    "chu": "2024"
+   },
+   "gt": "0.021703533791301504"
+  },
+  {
+   "thu_tu": 413,
+   "o_id": {
+    "chu": "GROUP#COO#2024H2"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COO"
+   },
+   "ky": {
+    "chu": "2024H2"
+   },
+   "gt": "0.021703533791301504"
+  },
+  {
+   "thu_tu": 414,
+   "o_id": {
+    "chu": "GROUP#COO#2024Q4"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COO"
+   },
+   "ky": {
+    "chu": "2024Q4"
+   },
+   "gt": "0.021703533791301504"
+  },
+  {
+   "thu_tu": 415,
+   "o_id": {
+    "chu": "GROUP#COO#2024M11"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COO"
+   },
+   "ky": {
+    "chu": "2024M11"
+   },
+   "gt": "0.005672999784842078"
+  },
+  {
+   "thu_tu": 416,
+   "o_id": {
+    "chu": "GROUP#COO#2024M12"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COO"
+   },
+   "ky": {
+    "chu": "2024M12"
+   },
+   "gt": "0.016030534006459454"
+  },
+  {
+   "thu_tu": 417,
+   "o_id": {
+    "chu": "GROUP#COO#2025"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COO"
+   },
+   "ky": {
+    "chu": "2025"
+   },
+   "gt": "0.12175436280822671"
+  },
+  {
+   "thu_tu": 418,
+   "o_id": {
+    "chu": "GROUP#COO#2025H1"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COO"
+   },
+   "ky": {
+    "chu": "2025H1"
+   },
+   "gt": "0.07064647559254304"
+  },
+  {
+   "thu_tu": 419,
+   "o_id": {
+    "chu": "GROUP#COO#2025H2"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COO"
+   },
+   "ky": {
+    "chu": "2025H2"
+   },
+   "gt": "0.051107887215682976"
+  },
+  {
+   "thu_tu": 420,
+   "o_id": {
+    "chu": "GROUP#COO#2025Q1"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COO"
+   },
+   "ky": {
+    "chu": "2025Q1"
+   },
+   "gt": "0.034073305549716895"
+  },
+  {
+   "thu_tu": 421,
+   "o_id": {
+    "chu": "GROUP#COO#2025Q2"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COO"
+   },
+   "ky": {
+    "chu": "2025Q2"
+   },
+   "gt": "0.036573170042826356"
+  },
+  {
+   "thu_tu": 422,
+   "o_id": {
+    "chu": "GROUP#COO#2025Q3"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COO"
+   },
+   "ky": {
+    "chu": "2025Q3"
+   },
+   "gt": "0.03926182317646906"
+  },
+  {
+   "thu_tu": 423,
+   "o_id": {
+    "chu": "GROUP#COO#2025Q4"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COO"
+   },
+   "ky": {
+    "chu": "2025Q4"
+   },
+   "gt": "0.011846064039214024"
+  },
+  {
+   "thu_tu": 424,
+   "o_id": {
+    "chu": "GROUP#COO#2025M01"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COO"
+   },
+   "ky": {
+    "chu": "2025M01"
+   },
+   "gt": "0.011231743467923544"
+  },
+  {
+   "thu_tu": 425,
+   "o_id": {
+    "chu": "GROUP#COO#2025M02"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COO"
+   },
+   "ky": {
+    "chu": "2025M02"
+   },
+   "gt": "0.01128161256242705"
+  },
+  {
+   "thu_tu": 426,
+   "o_id": {
+    "chu": "GROUP#COO#2025M03"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COO"
+   },
+   "ky": {
+    "chu": "2025M03"
+   },
+   "gt": "0.011559949519366196"
+  },
+  {
+   "thu_tu": 427,
+   "o_id": {
+    "chu": "GROUP#COO#2025M04"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COO"
+   },
+   "ky": {
+    "chu": "2025M04"
+   },
+   "gt": "0.005425859788697583"
+  },
+  {
+   "thu_tu": 428,
+   "o_id": {
+    "chu": "GROUP#COO#2025M05"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COO"
+   },
+   "ky": {
+    "chu": "2025M05"
+   },
+   "gt": "0.015103876995855017"
+  },
+  {
+   "thu_tu": 429,
+   "o_id": {
+    "chu": "GROUP#COO#2025M06"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COO"
+   },
+   "ky": {
+    "chu": "2025M06"
+   },
+   "gt": "0.016043433258273926"
+  },
+  {
+   "thu_tu": 430,
+   "o_id": {
+    "chu": "GROUP#COO#2025M07"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COO"
+   },
+   "ky": {
+    "chu": "2025M07"
+   },
+   "gt": "0.009934549568626837"
+  },
+  {
+   "thu_tu": 431,
+   "o_id": {
+    "chu": "GROUP#COO#2025M08"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COO"
+   },
+   "ky": {
+    "chu": "2025M08"
+   },
+   "gt": "0.016434410980391355"
+  },
+  {
+   "thu_tu": 432,
+   "o_id": {
+    "chu": "GROUP#COO#2025M09"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COO"
+   },
+   "ky": {
+    "chu": "2025M09"
+   },
+   "gt": "0.012892862627450812"
+  },
+  {
+   "thu_tu": 433,
+   "o_id": {
+    "chu": "GROUP#COO#2025M10"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COO"
+   },
+   "ky": {
+    "chu": "2025M10"
+   },
+   "gt": "0.003943643725489519"
+  },
+  {
+   "thu_tu": 434,
+   "o_id": {
+    "chu": "GROUP#COO#2025M11"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COO"
+   },
+   "ky": {
+    "chu": "2025M11"
+   },
+   "gt": "0.005037640666666145"
+  },
+  {
+   "thu_tu": 435,
+   "o_id": {
+    "chu": "GROUP#COO#2025M12"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COO"
+   },
+   "ky": {
+    "chu": "2025M12"
+   },
+   "gt": "0.0028647796470583596"
+  },
+  {
+   "thu_tu": 436,
+   "o_id": {
+    "chu": "GROUP#NCFI#2024"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NCFI"
+   },
+   "ky": {
+    "chu": "2024"
+   },
+   "gt": "-0.0022696678384511713"
+  },
+  {
+   "thu_tu": 437,
+   "o_id": {
+    "chu": "GROUP#NCFI#2024H2"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NCFI"
+   },
+   "ky": {
+    "chu": "2024H2"
+   },
+   "gt": "-0.0022696678384511713"
+  },
+  {
+   "thu_tu": 438,
+   "o_id": {
+    "chu": "GROUP#NCFI#2024Q4"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NCFI"
+   },
+   "ky": {
+    "chu": "2024Q4"
+   },
+   "gt": "-0.0022696678384511713"
+  },
+  {
+   "thu_tu": 439,
+   "o_id": {
+    "chu": "GROUP#NCFI#2024M11"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NCFI"
+   },
+   "ky": {
+    "chu": "2024M11"
+   },
+   "gt": "-0.0008030849564569781"
+  },
+  {
+   "thu_tu": 440,
+   "o_id": {
+    "chu": "GROUP#NCFI#2024M12"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NCFI"
+   },
+   "ky": {
+    "chu": "2024M12"
+   },
+   "gt": "-0.0014665828819941933"
+  },
+  {
+   "thu_tu": 441,
+   "o_id": {
+    "chu": "GROUP#NCFI#2025"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NCFI"
+   },
+   "ky": {
+    "chu": "2025"
+   },
+   "gt": "-0.08363403026835607"
+  },
+  {
+   "thu_tu": 442,
+   "o_id": {
+    "chu": "GROUP#NCFI#2025H1"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NCFI"
+   },
+   "ky": {
+    "chu": "2025H1"
+   },
+   "gt": "-0.029887516778159998"
+  },
+  {
+   "thu_tu": 443,
+   "o_id": {
+    "chu": "GROUP#NCFI#2025H2"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NCFI"
+   },
+   "ky": {
+    "chu": "2025H2"
+   },
+   "gt": "-0.053746513490196074"
+  },
+  {
+   "thu_tu": 444,
+   "o_id": {
+    "chu": "GROUP#NCFI#2025Q1"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NCFI"
+   },
+   "ky": {
+    "chu": "2025Q1"
+   },
+   "gt": "-0.007458811445848396"
+  },
+  {
+   "thu_tu": 445,
+   "o_id": {
+    "chu": "GROUP#NCFI#2025Q2"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NCFI"
+   },
+   "ky": {
+    "chu": "2025Q2"
+   },
+   "gt": "-0.022428705332311602"
+  },
+  {
+   "thu_tu": 446,
+   "o_id": {
+    "chu": "GROUP#NCFI#2025Q3"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NCFI"
+   },
+   "ky": {
+    "chu": "2025Q3"
+   },
+   "gt": "-0.03726360160784313"
+  },
+  {
+   "thu_tu": 447,
+   "o_id": {
+    "chu": "GROUP#NCFI#2025Q4"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NCFI"
+   },
+   "ky": {
+    "chu": "2025Q4"
+   },
+   "gt": "-0.01648291188235294"
+  },
+  {
+   "thu_tu": 448,
+   "o_id": {
+    "chu": "GROUP#NCFI#2025M01"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NCFI"
+   },
+   "ky": {
+    "chu": "2025M01"
+   },
+   "gt": "-0.0025519468091521123"
+  },
+  {
+   "thu_tu": 449,
+   "o_id": {
+    "chu": "GROUP#NCFI#2025M02"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NCFI"
+   },
+   "ky": {
+    "chu": "2025M02"
+   },
+   "gt": "-0.002350668294796416"
+  },
+  {
+   "thu_tu": 450,
+   "o_id": {
+    "chu": "GROUP#NCFI#2025M03"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NCFI"
+   },
+   "ky": {
+    "chu": "2025M03"
+   },
+   "gt": "-0.002556196341899867"
+  },
+  {
+   "thu_tu": 451,
+   "o_id": {
+    "chu": "GROUP#NCFI#2025M04"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NCFI"
+   },
+   "ky": {
+    "chu": "2025M04"
+   },
+   "gt": "-0.0049272775593307136"
+  },
+  {
+   "thu_tu": 452,
+   "o_id": {
+    "chu": "GROUP#NCFI#2025M05"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NCFI"
+   },
+   "ky": {
+    "chu": "2025M05"
+   },
+   "gt": "-0.007324323106314224"
+  },
+  {
+   "thu_tu": 453,
+   "o_id": {
+    "chu": "GROUP#NCFI#2025M06"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NCFI"
+   },
+   "ky": {
+    "chu": "2025M06"
+   },
+   "gt": "-0.010177104666666667"
+  },
+  {
+   "thu_tu": 454,
+   "o_id": {
+    "chu": "GROUP#NCFI#2025M07"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NCFI"
+   },
+   "ky": {
+    "chu": "2025M07"
+   },
+   "gt": "-0.01070723486274509"
+  },
+  {
+   "thu_tu": 455,
+   "o_id": {
+    "chu": "GROUP#NCFI#2025M08"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NCFI"
+   },
+   "ky": {
+    "chu": "2025M08"
+   },
+   "gt": "-0.013631935490196083"
+  },
+  {
+   "thu_tu": 456,
+   "o_id": {
+    "chu": "GROUP#NCFI#2025M09"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NCFI"
+   },
+   "ky": {
+    "chu": "2025M09"
+   },
+   "gt": "-0.01292443125490196"
+  },
+  {
+   "thu_tu": 457,
+   "o_id": {
+    "chu": "GROUP#NCFI#2025M10"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NCFI"
+   },
+   "ky": {
+    "chu": "2025M10"
+   },
+   "gt": "-0.004661780980392156"
+  },
+  {
+   "thu_tu": 458,
+   "o_id": {
+    "chu": "GROUP#NCFI#2025M11"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NCFI"
+   },
+   "ky": {
+    "chu": "2025M11"
+   },
+   "gt": "-0.0051090257647058825"
+  },
+  {
+   "thu_tu": 459,
+   "o_id": {
+    "chu": "GROUP#NCFI#2025M12"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "NCFI"
+   },
+   "ky": {
+    "chu": "2025M12"
+   },
+   "gt": "-0.006712105137254902"
+  },
+  {
+   "thu_tu": 460,
+   "o_id": {
+    "chu": "GROUP#COI#2024"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COI"
+   },
+   "ky": {
+    "chu": "2024"
+   },
+   "gt": "-0.0022696678384511713"
+  },
+  {
+   "thu_tu": 461,
+   "o_id": {
+    "chu": "GROUP#COI#2024H2"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COI"
+   },
+   "ky": {
+    "chu": "2024H2"
+   },
+   "gt": "-0.0022696678384511713"
+  },
+  {
+   "thu_tu": 462,
+   "o_id": {
+    "chu": "GROUP#COI#2024Q4"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COI"
+   },
+   "ky": {
+    "chu": "2024Q4"
+   },
+   "gt": "-0.0022696678384511713"
+  },
+  {
+   "thu_tu": 463,
+   "o_id": {
+    "chu": "GROUP#COI#2024M11"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COI"
+   },
+   "ky": {
+    "chu": "2024M11"
+   },
+   "gt": "-0.0008030849564569781"
+  },
+  {
+   "thu_tu": 464,
+   "o_id": {
+    "chu": "GROUP#COI#2024M12"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COI"
+   },
+   "ky": {
+    "chu": "2024M12"
+   },
+   "gt": "-0.0014665828819941933"
+  },
+  {
+   "thu_tu": 465,
+   "o_id": {
+    "chu": "GROUP#COI#2025"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COI"
+   },
+   "ky": {
+    "chu": "2025"
+   },
+   "gt": "-0.08363403026835607"
+  },
+  {
+   "thu_tu": 466,
+   "o_id": {
+    "chu": "GROUP#COI#2025H1"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COI"
+   },
+   "ky": {
+    "chu": "2025H1"
+   },
+   "gt": "-0.029887516778159998"
+  },
+  {
+   "thu_tu": 467,
+   "o_id": {
+    "chu": "GROUP#COI#2025H2"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COI"
+   },
+   "ky": {
+    "chu": "2025H2"
+   },
+   "gt": "-0.053746513490196074"
+  },
+  {
+   "thu_tu": 468,
+   "o_id": {
+    "chu": "GROUP#COI#2025Q1"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COI"
+   },
+   "ky": {
+    "chu": "2025Q1"
+   },
+   "gt": "-0.007458811445848396"
+  },
+  {
+   "thu_tu": 469,
+   "o_id": {
+    "chu": "GROUP#COI#2025Q2"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COI"
+   },
+   "ky": {
+    "chu": "2025Q2"
+   },
+   "gt": "-0.022428705332311602"
+  },
+  {
+   "thu_tu": 470,
+   "o_id": {
+    "chu": "GROUP#COI#2025Q3"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COI"
+   },
+   "ky": {
+    "chu": "2025Q3"
+   },
+   "gt": "-0.03726360160784313"
+  },
+  {
+   "thu_tu": 471,
+   "o_id": {
+    "chu": "GROUP#COI#2025Q4"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COI"
+   },
+   "ky": {
+    "chu": "2025Q4"
+   },
+   "gt": "-0.01648291188235294"
+  },
+  {
+   "thu_tu": 472,
+   "o_id": {
+    "chu": "GROUP#COI#2025M01"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COI"
+   },
+   "ky": {
+    "chu": "2025M01"
+   },
+   "gt": "-0.0025519468091521123"
+  },
+  {
+   "thu_tu": 473,
+   "o_id": {
+    "chu": "GROUP#COI#2025M02"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COI"
+   },
+   "ky": {
+    "chu": "2025M02"
+   },
+   "gt": "-0.002350668294796416"
+  },
+  {
+   "thu_tu": 474,
+   "o_id": {
+    "chu": "GROUP#COI#2025M03"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COI"
+   },
+   "ky": {
+    "chu": "2025M03"
+   },
+   "gt": "-0.002556196341899867"
+  },
+  {
+   "thu_tu": 475,
+   "o_id": {
+    "chu": "GROUP#COI#2025M04"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COI"
+   },
+   "ky": {
+    "chu": "2025M04"
+   },
+   "gt": "-0.0049272775593307136"
+  },
+  {
+   "thu_tu": 476,
+   "o_id": {
+    "chu": "GROUP#COI#2025M05"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COI"
+   },
+   "ky": {
+    "chu": "2025M05"
+   },
+   "gt": "-0.007324323106314224"
+  },
+  {
+   "thu_tu": 477,
+   "o_id": {
+    "chu": "GROUP#COI#2025M06"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COI"
+   },
+   "ky": {
+    "chu": "2025M06"
+   },
+   "gt": "-0.010177104666666667"
+  },
+  {
+   "thu_tu": 478,
+   "o_id": {
+    "chu": "GROUP#COI#2025M07"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COI"
+   },
+   "ky": {
+    "chu": "2025M07"
+   },
+   "gt": "-0.01070723486274509"
+  },
+  {
+   "thu_tu": 479,
+   "o_id": {
+    "chu": "GROUP#COI#2025M08"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COI"
+   },
+   "ky": {
+    "chu": "2025M08"
+   },
+   "gt": "-0.013631935490196083"
+  },
+  {
+   "thu_tu": 480,
+   "o_id": {
+    "chu": "GROUP#COI#2025M09"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COI"
+   },
+   "ky": {
+    "chu": "2025M09"
+   },
+   "gt": "-0.01292443125490196"
+  },
+  {
+   "thu_tu": 481,
+   "o_id": {
+    "chu": "GROUP#COI#2025M10"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COI"
+   },
+   "ky": {
+    "chu": "2025M10"
+   },
+   "gt": "-0.004661780980392156"
+  },
+  {
+   "thu_tu": 482,
+   "o_id": {
+    "chu": "GROUP#COI#2025M11"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COI"
+   },
+   "ky": {
+    "chu": "2025M11"
+   },
+   "gt": "-0.0051090257647058825"
+  },
+  {
+   "thu_tu": 483,
+   "o_id": {
+    "chu": "GROUP#COI#2025M12"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "COI"
+   },
+   "ky": {
+    "chu": "2025M12"
+   },
+   "gt": "-0.006712105137254902"
+  },
+  {
+   "thu_tu": 484,
+   "o_id": {
+    "chu": "GROUP#PL6#2024"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "PL6"
+   },
+   "ky": {
+    "chu": "2024"
+   },
+   "gt": "0.14365617300443217"
+  },
+  {
+   "thu_tu": 485,
+   "o_id": {
+    "chu": "GROUP#PL7#2024"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "PL7"
+   },
+   "ky": {
+    "chu": "2024"
+   },
+   "gt": "0.3925757282525897"
+  },
+  {
+   "thu_tu": 486,
+   "o_id": {
+    "chu": "GROUP#PL8#2024"
+   },
+   "le": {
+    "chu": "GROUP"
+   },
+   "ma_hd": {
+    "chu": "PL8"
+   },
+   "ky": {
+    "chu": "2024"
+   },
+   "gt": "0.3925757282525897"
+  }
+ ],
+ "phu": {
+  "hang_khong_nhan": {
+   "mong": 0,
+   "so_dong": 0,
+   "dong": []
+  },
+  "hd": {
+   "mong": 74,
+   "so_dong": 74,
+   "dong": [
+    {
+     "thu_tu": 1,
+     "le": {
+      "chu": "GROUP"
+     },
+     "ma": {
+      "chu": "GI"
+     },
+     "ten": {
+      "chu": "Gross Inflow"
+     },
+     "cha": null,
+     "cap": "1",
+     "nhom": {
+      "chu": "HDO"
+     },
+     "dong_sheet": "8",
+     "loai": {
+      "chu": "la"
+     }
+    },
+    {
+     "thu_tu": 2,
+     "le": {
+      "chu": "GROUP"
+     },
+     "ma": {
+      "chu": "OPC"
+     },
+     "ten": {
+      "chu": "Operating Cost"
+     },
+     "cha": null,
+     "cap": "1",
+     "nhom": {
+      "chu": "HDO"
+     },
+     "dong_sheet": "9",
+     "loai": {
+      "chu": "tong"
+     }
+    },
+    {
+     "thu_tu": 3,
+     "le": {
+      "chu": "GROUP"
+     },
+     "ma": {
+      "chu": "CAC"
+     },
+     "ten": {
+      "chu": "Customer Acquisition Cost"
+     },
+     "cha": {
+      "chu": "OPC"
+     },
+     "cap": "2",
+     "nhom": {
+      "chu": "HDO"
+     },
+     "dong_sheet": "10",
+     "loai": {
+      "chu": "tong"
+     }
+    },
+    {
+     "thu_tu": 4,
+     "le": {
+      "chu": "GROUP"
+     },
+     "ma": {
+      "chu": "MAC"
+     },
+     "ten": {
+      "chu": "Marketing Cost"
+     },
+     "cha": {
+      "chu": "CAC"
+     },
+     "cap": "3",
+     "nhom": {
+      "chu": "HDO"
+     },
+     "dong_sheet": "11",
+     "loai": {
+      "chu": "tong"
+     }
+    },
+    {
+     "thu_tu": 5,
+     "le": {
+      "chu": "GROUP"
+     },
+     "ma": {
+      "chu": "OMC"
+     },
+     "ten": {
+      "chu": "Online Marketing Cost"
+     },
+     "cha": {
+      "chu": "MAC"
+     },
+     "cap": "4",
+     "nhom": {
+      "chu": "HDO"
+     },
+     "dong_sheet": "12",
+     "loai": {
+      "chu": "la"
+     }
+    },
+    {
+     "thu_tu": 6,
+     "le": {
+      "chu": "GROUP"
+     },
+     "ma": {
+      "chu": "MC"
+     },
+     "ten": {
+      "chu": "Maketer Cost"
+     },
+     "cha": {
+      "chu": "MAC"
+     },
+     "cap": "4",
+     "nhom": {
+      "chu": "HDO"
+     },
+     "dong_sheet": "13",
+     "loai": {
+      "chu": "la"
+     }
+    },
+    {
+     "thu_tu": 7,
+     "le": {
+      "chu": "GROUP"
+     },
+     "ma": {
+      "chu": "OTMC"
+     },
+     "ten": {
+      "chu": "Other Marketing Cost"
+     },
+     "cha": {
+      "chu": "MAC"
+     },
+     "cap": "4",
+     "nhom": {
+      "chu": "HDO"
+     },
+     "dong_sheet": "14",
+     "loai": {
+      "chu": "la"
+     }
+    },
+    {
+     "thu_tu": 8,
+     "le": {
+      "chu": "GROUP"
+     },
+     "ma": {
+      "chu": "COT"
+     },
+     "ten": {
+      "chu": "CAC - Other"
+     },
+     "cha": {
+      "chu": "CAC"
+     },
+     "cap": "3",
+     "nhom": {
+      "chu": "HDO"
+     },
+     "dong_sheet": "15",
+     "loai": {
+      "chu": "la"
+     }
+    },
+    {
+     "thu_tu": 9,
+     "le": {
+      "chu": "GROUP"
+     },
+     "ma": {
+      "chu": "COS"
+     },
+     "ten": {
+      "chu": "Cost of Servies"
+     },
+     "cha": {
+      "chu": "OPC"
+     },
+     "cap": "2",
+     "nhom": {
+      "chu": "HDO"
+     },
+     "dong_sheet": "16",
+     "loai": {
+      "chu": "tong"
+     }
+    },
+    {
+     "thu_tu": 10,
+     "le": {
+      "chu": "GROUP"
+     },
+     "ma": {
+      "chu": "PS"
+     },
+     "ten": {
+      "chu": "Profit Share"
+     },
+     "cha": {
+      "chu": "COS"
+     },
+     "cap": "3",
+     "nhom": {
+      "chu": "HDO"
+     },
+     "dong_sheet": "17",
+     "loai": {
+      "chu": "la"
+     }
+    },
+    {
+     "thu_tu": 11,
+     "le": {
+      "chu": "GROUP"
+     },
+     "ma": {
+      "chu": "API"
+     },
+     "ten": {
+      "chu": "API"
+     },
+     "cha": {
+      "chu": "COS"
+     },
+     "cap": "3",
+     "nhom": {
+      "chu": "HDO"
+     },
+     "dong_sheet": "18",
+     "loai": {
+      "chu": "la"
+     }
+    },
+    {
+     "thu_tu": 12,
+     "le": {
+      "chu": "GROUP"
+     },
+     "ma": {
+      "chu": "SC"
+     },
+     "ten": {
+      "chu": "Server Cost"
+     },
+     "cha": {
+      "chu": "COS"
+     },
+     "cap": "3",
+     "nhom": {
+      "chu": "HDO"
+     },
+     "dong_sheet": "19",
+     "loai": {
+      "chu": "la"
+     }
+    },
+    {
+     "thu_tu": 13,
+     "le": {
+      "chu": "GROUP"
+     },
+     "ma": {
+      "chu": "LC"
+     },
+     "ten": {
+      "chu": "License Cost"
+     },
+     "cha": {
+      "chu": "COS"
+     },
+     "cap": "3",
+     "nhom": {
+      "chu": "HDO"
+     },
+     "dong_sheet": "20",
+     "loai": {
+      "chu": "la"
+     }
+    },
+    {
+     "thu_tu": 14,
+     "le": {
+      "chu": "GROUP"
+     },
+     "ma": {
+      "chu": "DC"
+     },
+     "ten": {
+      "chu": "Dev Cost (Maintain App)"
+     },
+     "cha": {
+      "chu": "COS"
+     },
+     "cap": "3",
+     "nhom": {
+      "chu": "HDO"
+     },
+     "dong_sheet": "21",
+     "loai": {
+      "chu": "la"
+     }
+    },
+    {
+     "thu_tu": 15,
+     "le": {
+      "chu": "GROUP"
+     },
+     "ma": {
+      "chu": "CSO"
+     },
+     "ten": {
+      "chu": "Service Cost - Other"
+     },
+     "cha": {
+      "chu": "COS"
+     },
+     "cap": "3",
+     "nhom": {
+      "chu": "HDO"
+     },
+     "dong_sheet": "22",
+     "loai": {
+      "chu": "la"
+     }
+    },
+    {
+     "thu_tu": 16,
+     "le": {
+      "chu": "GROUP"
+     },
+     "ma": {
+      "chu": "GAC"
+     },
+     "ten": {
+      "chu": "General Admin Cost"
+     },
+     "cha": null,
+     "cap": "1",
+     "nhom": {
+      "chu": "HDO"
+     },
+     "dong_sheet": "23",
+     "loai": {
+      "chu": "tong"
+     }
+    },
+    {
+     "thu_tu": 17,
+     "le": {
+      "chu": "GROUP"
+     },
+     "ma": {
+      "chu": "OFR"
+     },
+     "ten": {
+      "chu": "Office Rental Cost"
+     },
+     "cha": {
+      "chu": "GAC"
+     },
+     "cap": "2",
+     "nhom": {
+      "chu": "HDO"
+     },
+     "dong_sheet": "24",
+     "loai": {
+      "chu": "la"
+     }
+    },
+    {
+     "thu_tu": 18,
+     "le": {
+      "chu": "GROUP"
+     },
+     "ma": {
+      "chu": "GAH"
+     },
+     "ten": {
+      "chu": "GA HR Cost"
+     },
+     "cha": {
+      "chu": "GAC"
+     },
+     "cap": "2",
+     "nhom": {
+      "chu": "HDO"
+     },
+     "dong_sheet": "25",
+     "loai": {
+      "chu": "la"
+     }
+    },
+    {
+     "thu_tu": 19,
+     "le": {
+      "chu": "GROUP"
+     },
+     "ma": {
+      "chu": "BRC"
+     },
+     "ten": {
+      "chu": "Branding Cost"
+     },
+     "cha": {
+      "chu": "GAC"
+     },
+     "cap": "2",
+     "nhom": {
+      "chu": "HDO"
+     },
+     "dong_sheet": "26",
+     "loai": {
+      "chu": "la"
+     }
+    },
+    {
+     "thu_tu": 20,
+     "le": {
+      "chu": "GROUP"
+     },
+     "ma": {
+      "chu": "HCC"
+     },
+     "ten": {
+      "chu": "HR Culture Activities Cost"
+     },
+     "cha": {
+      "chu": "GAC"
+     },
+     "cap": "2",
+     "nhom": {
+      "chu": "HDO"
+     },
+     "dong_sheet": "27",
+     "loai": {
+      "chu": "la"
+     }
+    },
+    {
+     "thu_tu": 21,
+     "le": {
+      "chu": "GROUP"
+     },
+     "ma": {
+      "chu": "REC"
+     },
+     "ten": {
+      "chu": "Recruitment Cost"
+     },
+     "cha": {
+      "chu": "GAC"
+     },
+     "cap": "2",
+     "nhom": {
+      "chu": "HDO"
+     },
+     "dong_sheet": "28",
+     "loai": {
+      "chu": "la"
+     }
+    },
+    {
+     "thu_tu": 22,
+     "le": {
+      "chu": "GROUP"
+     },
+     "ma": {
+      "chu": "BON"
+     },
+     "ten": {
+      "chu": "Bonus"
+     },
+     "cha": {
+      "chu": "GAC"
+     },
+     "cap": "2",
+     "nhom": {
+      "chu": "HDO"
+     },
+     "dong_sheet": "29",
+     "loai": {
+      "chu": "la"
+     }
+    },
+    {
+     "thu_tu": 23,
+     "le": {
+      "chu": "GROUP"
+     },
+     "ma": {
+      "chu": "BUT"
+     },
+     "ten": {
+      "chu": "Travel Cost"
+     },
+     "cha": {
+      "chu": "GAC"
+     },
+     "cap": "2",
+     "nhom": {
+      "chu": "HDO"
+     },
+     "dong_sheet": "30",
+     "loai": {
+      "chu": "la"
+     }
+    },
+    {
+     "thu_tu": 24,
+     "le": {
+      "chu": "GROUP"
+     },
+     "ma": {
+      "chu": "OPO"
+     },
+     "ten": {
+      "chu": "Operating - Other"
+     },
+     "cha": {
+      "chu": "GAC"
+     },
+     "cap": "2",
+     "nhom": {
+      "chu": "HDO"
+     },
+     "dong_sheet": "31",
+     "loai": {
+      "chu": "la"
+     }
+    },
+    {
+     "thu_tu": 25,
+     "le": {
+      "chu": "GROUP"
+     },
+     "ma": {
+      "chu": "CXA"
+     },
+     "ten": {
+      "chu": "Product Cost In-House Development App"
+     },
+     "cha": {
+      "chu": "GAC"
+     },
+     "cap": "2",
+     "nhom": {
+      "chu": "HDO"
+     },
+     "dong_sheet": "32",
+     "loai": {
+      "chu": "la"
+     }
+    },
+    {
+     "thu_tu": 26,
+     "le": {
+      "chu": "GROUP"
+     },
+     "ma": {
+      "chu": "OGA"
+     },
+     "ten": {
+      "chu": "GAC - Other"
+     },
+     "cha": {
+      "chu": "GAC"
+     },
+     "cap": "2",
+     "nhom": {
+      "chu": "HDO"
+     },
+     "dong_sheet": "33",
+     "loai": {
+      "chu": "la"
+     }
+    },
+    {
+     "thu_tu": 27,
+     "le": {
+      "chu": "GROUP"
+     },
+     "ma": {
+      "chu": "CDC"
+     },
+     "ten": {
+      "chu": "Capex and Depreciation"
+     },
+     "cha": null,
+     "cap": "1",
+     "nhom": {
+      "chu": "HDO"
+     },
+     "dong_sheet": "34",
+     "loai": {
+      "chu": "tong"
+     }
+    },
+    {
+     "thu_tu": 28,
+     "le": {
+      "chu": "GROUP"
+     },
+     "ma": {
+      "chu": "CXP"
+     },
+     "ten": {
+      "chu": "Partnership Development"
+     },
+     "cha": {
+      "chu": "CDC"
+     },
+     "cap": "2",
+     "nhom": {
+      "chu": "HDO"
+     },
+     "dong_sheet": "36",
+     "loai": {
+      "chu": "la"
+     }
+    },
+    {
+     "thu_tu": 29,
+     "le": {
+      "chu": "GROUP"
+     },
+     "ma": {
+      "chu": "CXI"
+     },
+     "ten": {
+      "chu": "Infrastructure"
+     },
+     "cha": {
+      "chu": "CDC"
+     },
+     "cap": "2",
+     "nhom": {
+      "chu": "HDO"
+     },
+     "dong_sheet": "37",
+     "loai": {
+      "chu": "tong"
+     }
+    },
+    {
+     "thu_tu": 30,
+     "le": {
+      "chu": "GROUP"
+     },
+     "ma": {
+      "chu": "OSF"
+     },
+     "ten": {
+      "chu": "Office Setup Fee"
+     },
+     "cha": {
+      "chu": "CXI"
+     },
+     "cap": "3",
+     "nhom": {
+      "chu": "HDO"
+     },
+     "dong_sheet": "38",
+     "loai": {
+      "chu": "la"
+     }
+    },
+    {
+     "thu_tu": 31,
+     "le": {
+      "chu": "GROUP"
+     },
+     "ma": {
+      "chu": "FNS"
+     },
+     "ten": {
+      "chu": "Facilities for New Staff"
+     },
+     "cha": {
+      "chu": "CXI"
+     },
+     "cap": "3",
+     "nhom": {
+      "chu": "HDO"
+     },
+     "dong_sheet": "39",
+     "loai": {
+      "chu": "la"
+     }
+    },
+    {
+     "thu_tu": 32,
+     "le": {
+      "chu": "GROUP"
+     },
+     "ma": {
+      "chu": "CIO"
+     },
+     "ten": {
+      "chu": "Infrastructure - Other"
+     },
+     "cha": {
+      "chu": "CXI"
+     },
+     "cap": "3",
+     "nhom": {
+      "chu": "HDO"
+     },
+     "dong_sheet": "40",
+     "loai": {
+      "chu": "la"
+     }
+    },
+    {
+     "thu_tu": 33,
+     "le": {
+      "chu": "GROUP"
+     },
+     "ma": {
+      "chu": "CXB"
+     },
+     "ten": {
+      "chu": "Biz Development"
+     },
+     "cha": {
+      "chu": "CDC"
+     },
+     "cap": "2",
+     "nhom": {
+      "chu": "HDO"
+     },
+     "dong_sheet": "41",
+     "loai": {
+      "chu": "la"
+     }
+    },
+    {
+     "thu_tu": 34,
+     "le": {
+      "chu": "GROUP"
+     },
+     "ma": {
+      "chu": "CXO"
+     },
+     "ten": {
+      "chu": "CPX - Other"
+     },
+     "cha": {
+      "chu": "CDC"
+     },
+     "cap": "2",
+     "nhom": {
+      "chu": "HDO"
+     },
+     "dong_sheet": "42",
+     "loai": {
+      "chu": "la"
+     }
+    },
+    {
+     "thu_tu": 35,
+     "le": {
+      "chu": "GROUP"
+     },
+     "ma": {
+      "chu": "ITE"
+     },
+     "ten": {
+      "chu": "Interest"
+     },
+     "cha": null,
+     "cap": "1",
+     "nhom": {
+      "chu": "HDO"
+     },
+     "dong_sheet": "43",
+     "loai": {
+      "chu": "la"
+     }
+    },
+    {
+     "thu_tu": 36,
+     "le": {
+      "chu": "GROUP"
+     },
+     "ma": {
+      "chu": "CFI"
+     },
+     "ten": {
+      "chu": "Issuance of Stock"
+     },
+     "cha": null,
+     "cap": "1",
+     "nhom": {
+      "chu": "HDO"
+     },
+     "dong_sheet": "44",
+     "loai": {
+      "chu": "la"
+     }
+    },
+    {
+     "thu_tu": 37,
+     "le": {
+      "chu": "GROUP"
+     },
+     "ma": {
+      "chu": "LMN"
+     },
+     "ten": {
+      "chu": "Loan/Borrowing"
+     },
+     "cha": null,
+     "cap": "1",
+     "nhom": {
+      "chu": "HDO"
+     },
+     "dong_sheet": "45",
+     "loai": {
+      "chu": "la"
+     }
+    },
+    {
+     "thu_tu": 38,
+     "le": {
+      "chu": "GROUP"
+     },
+     "ma": {
+      "chu": "OMN"
+     },
+     "ten": {
+      "chu": "Repayment of Loan"
+     },
+     "cha": null,
+     "cap": "1",
+     "nhom": {
+      "chu": "HDO"
+     },
+     "dong_sheet": "46",
+     "loai": {
+      "chu": "la"
+     }
+    },
+    {
+     "thu_tu": 39,
+     "le": {
+      "chu": "GROUP"
+     },
+     "ma": {
+      "chu": "NIS"
+     },
+     "ten": {
+      "chu": "Net Income Staff"
+     },
+     "cha": null,
+     "cap": "1",
+     "nhom": {
+      "chu": "HDH"
+     },
+     "dong_sheet": "48",
+     "loai": {
+      "chu": "la"
+     }
+    },
+    {
+     "thu_tu": 40,
+     "le": {
+      "chu": "GROUP"
+     },
+     "ma": {
+      "chu": "INT"
+     },
+     "ten": {
+      "chu": "Insurance Total"
+     },
+     "cha": null,
+     "cap": "1",
+     "nhom": {
+      "chu": "HDH"
+     },
+     "dong_sheet": "49",
+     "loai": {
+      "chu": "la"
+     }
+    },
+    {
+     "thu_tu": 41,
+     "le": {
+      "chu": "GROUP"
+     },
+     "ma": {
+      "chu": "PIT"
+     },
+     "ten": {
+      "chu": "PIT Total"
+     },
+     "cha": null,
+     "cap": "1",
+     "nhom": {
+      "chu": "HDH"
+     },
+     "dong_sheet": "50",
+     "loai": {
+      "chu": "la"
+     }
+    },
+    {
+     "thu_tu": 42,
+     "le": {
+      "chu": "GROUP"
+     },
+     "ma": {
+      "chu": "COM"
+     },
+     "ten": {
+      "chu": "COM Total"
+     },
+     "cha": null,
+     "cap": "1",
+     "nhom": {
+      "chu": "HDH"
+     },
+     "dong_sheet": "51",
+     "loai": {
+      "chu": "la"
+     }
+    },
+    {
+     "thu_tu": 43,
+     "le": {
+      "chu": "GROUP"
+     },
+     "ma": {
+      "chu": "DEP"
+     },
+     "ten": {
+      "chu": "Deposit"
+     },
+     "cha": null,
+     "cap": "1",
+     "nhom": {
+      "chu": "HDAP"
+     },
+     "dong_sheet": "53",
+     "loai": {
+      "chu": "la"
+     }
+    },
+    {
+     "thu_tu": 44,
+     "le": {
+      "chu": "GROUP"
+     },
+     "ma": {
+      "chu": "NB"
+     },
+     "ten": {
+      "chu": "Lưu chuyển nội bộ"
+     },
+     "cha": null,
+     "cap": "1",
+     "nhom": {
+      "chu": "HDT"
+     },
+     "dong_sheet": "55",
+     "loai": {
+      "chu": "la"
+     }
+    },
+    {
+     "thu_tu": 45,
+     "le": {
+      "chu": "GROUP"
+     },
+     "ma": {
+      "chu": "TAC"
+     },
+     "ten": {
+      "chu": "Tax Cash"
+     },
+     "cha": null,
+     "cap": "1",
+     "nhom": {
+      "chu": "HDC"
+     },
+     "dong_sheet": "57",
+     "loai": {
+      "chu": "la"
+     }
+    },
+    {
+     "thu_tu": 46,
+     "le": {
+      "chu": "GROUP"
+     },
+     "ma": {
+      "chu": "CIT"
+     },
+     "ten": {
+      "chu": "Corporate Incomes Tax"
+     },
+     "cha": null,
+     "cap": "1",
+     "nhom": {
+      "chu": "HDC"
+     },
+     "dong_sheet": "58",
+     "loai": {
+      "chu": "la"
+     }
+    },
+    {
+     "thu_tu": 47,
+     "le": {
+      "chu": "GROUP"
+     },
+     "ma": {
+      "chu": "AR"
+     },
+     "ten": {
+      "chu": "Adjustment Revenue"
+     },
+     "cha": null,
+     "cap": "1",
+     "nhom": {
+      "chu": "HDC"
+     },
+     "dong_sheet": "59",
+     "loai": {
+      "chu": "trong"
+     }
+    },
+    {
+     "thu_tu": 48,
+     "le": {
+      "chu": "GROUP"
+     },
+     "ma": {
+      "chu": "CP1.1 (PL2)"
+     },
+     "ten": {
+      "chu": "Contribution Profit 11"
+     },
+     "cha": null,
+     "cap": "1",
+     "nhom": {
+      "chu": "HDC"
+     },
+     "dong_sheet": "60",
+     "loai": {
+      "chu": "trong"
+     }
+    },
+    {
+     "thu_tu": 49,
+     "le": {
+      "chu": "GROUP"
+     },
+     "ma": {
+      "chu": "CP1.2"
+     },
+     "ten": {
+      "chu": "Contribution Profit 12"
+     },
+     "cha": null,
+     "cap": "1",
+     "nhom": {
+      "chu": "HDC"
+     },
+     "dong_sheet": "61",
+     "loai": {
+      "chu": "trong"
+     }
+    },
+    {
+     "thu_tu": 50,
+     "le": {
+      "chu": "GROUP"
+     },
+     "ma": {
+      "chu": "CP2"
+     },
+     "ten": {
+      "chu": "Contribution Profit 2"
+     },
+     "cha": null,
+     "cap": "1",
+     "nhom": {
+      "chu": "HDC"
+     },
+     "dong_sheet": "62",
+     "loai": {
+      "chu": "trong"
+     }
+    },
+    {
+     "thu_tu": 51,
+     "le": {
+      "chu": "GROUP"
+     },
+     "ma": {
+      "chu": "CP3"
+     },
+     "ten": {
+      "chu": "Contribution Profit 3"
+     },
+     "cha": null,
+     "cap": "1",
+     "nhom": {
+      "chu": "HDC"
+     },
+     "dong_sheet": "63",
+     "loai": {
+      "chu": "trong"
+     }
+    },
+    {
+     "thu_tu": 52,
+     "le": {
+      "chu": "GROUP"
+     },
+     "ma": {
+      "chu": "EBITDA"
+     },
+     "ten": {
+      "chu": "EBITDA"
+     },
+     "cha": null,
+     "cap": "1",
+     "nhom": {
+      "chu": "HDC"
+     },
+     "dong_sheet": "64",
+     "loai": {
+      "chu": "kpi"
+     }
+    },
+    {
+     "thu_tu": 53,
+     "le": {
+      "chu": "GROUP"
+     },
+     "ma": {
+      "chu": "EBIT"
+     },
+     "ten": {
+      "chu": "EBIT"
+     },
+     "cha": null,
+     "cap": "1",
+     "nhom": {
+      "chu": "HDC"
+     },
+     "dong_sheet": "65",
+     "loai": {
+      "chu": "kpi"
+     }
+    },
+    {
+     "thu_tu": 54,
+     "le": {
+      "chu": "GROUP"
+     },
+     "ma": {
+      "chu": "EBT"
+     },
+     "ten": {
+      "chu": "EBT"
+     },
+     "cha": null,
+     "cap": "1",
+     "nhom": {
+      "chu": "HDC"
+     },
+     "dong_sheet": "66",
+     "loai": {
+      "chu": "kpi"
+     }
+    },
+    {
+     "thu_tu": 55,
+     "le": {
+      "chu": "GROUP"
+     },
+     "ma": {
+      "chu": "NP"
+     },
+     "ten": {
+      "chu": "NP"
+     },
+     "cha": null,
+     "cap": "1",
+     "nhom": {
+      "chu": "HDC"
+     },
+     "dong_sheet": "67",
+     "loai": {
+      "chu": "kpi"
+     }
+    },
+    {
+     "thu_tu": 56,
+     "le": {
+      "chu": "GROUP"
+     },
+     "ma": {
+      "chu": "NPC"
+     },
+     "ten": {
+      "chu": "Net Profit Cumulative"
+     },
+     "cha": null,
+     "cap": "1",
+     "nhom": {
+      "chu": "HDC"
+     },
+     "dong_sheet": "68",
+     "loai": {
+      "chu": "kpi"
+     }
+    },
+    {
+     "thu_tu": 57,
+     "le": {
+      "chu": "GROUP"
+     },
+     "ma": {
+      "chu": "NCF"
+     },
+     "ten": {
+      "chu": "Net Cashflow (Burn Rate)"
+     },
+     "cha": null,
+     "cap": "1",
+     "nhom": {
+      "chu": "HDC"
+     },
+     "dong_sheet": "69",
+     "loai": {
+      "chu": "kpi"
+     }
+    },
+    {
+     "thu_tu": 58,
+     "le": {
+      "chu": "GROUP"
+     },
+     "ma": {
+      "chu": "NCFO"
+     },
+     "ten": {
+      "chu": "Net Cashflow from Operating"
+     },
+     "cha": null,
+     "cap": "1",
+     "nhom": {
+      "chu": "HDC"
+     },
+     "dong_sheet": "70",
+     "loai": {
+      "chu": "tong"
+     }
+    },
+    {
+     "thu_tu": 59,
+     "le": {
+      "chu": "GROUP"
+     },
+     "ma": {
+      "chu": "CRO"
+     },
+     "ten": {
+      "chu": "Cash Received from Operating"
+     },
+     "cha": {
+      "chu": "NCFO"
+     },
+     "cap": "2",
+     "nhom": {
+      "chu": "HDC"
+     },
+     "dong_sheet": "71",
+     "loai": {
+      "chu": "kpi"
+     }
+    },
+    {
+     "thu_tu": 60,
+     "le": {
+      "chu": "GROUP"
+     },
+     "ma": {
+      "chu": "COO"
+     },
+     "ten": {
+      "chu": "Cash Outflow from Operating"
+     },
+     "cha": {
+      "chu": "NCFO"
+     },
+     "cap": "2",
+     "nhom": {
+      "chu": "HDC"
+     },
+     "dong_sheet": "72",
+     "loai": {
+      "chu": "kpi"
+     }
+    },
+    {
+     "thu_tu": 61,
+     "le": {
+      "chu": "GROUP"
+     },
+     "ma": {
+      "chu": "NCFI"
+     },
+     "ten": {
+      "chu": "Net Cashflow from Investing"
+     },
+     "cha": null,
+     "cap": "1",
+     "nhom": {
+      "chu": "HDC"
+     },
+     "dong_sheet": "73",
+     "loai": {
+      "chu": "tong"
+     }
+    },
+    {
+     "thu_tu": 62,
+     "le": {
+      "chu": "GROUP"
+     },
+     "ma": {
+      "chu": "CRI"
+     },
+     "ten": {
+      "chu": "Cash Received from Investing"
+     },
+     "cha": {
+      "chu": "NCFI"
+     },
+     "cap": "2",
+     "nhom": {
+      "chu": "HDC"
+     },
+     "dong_sheet": "74",
+     "loai": {
+      "chu": "la"
+     }
+    },
+    {
+     "thu_tu": 63,
+     "le": {
+      "chu": "GROUP"
+     },
+     "ma": {
+      "chu": "COI"
+     },
+     "ten": {
+      "chu": "Cash Outflow from Investing"
+     },
+     "cha": {
+      "chu": "NCFI"
+     },
+     "cap": "2",
+     "nhom": {
+      "chu": "HDC"
+     },
+     "dong_sheet": "75",
+     "loai": {
+      "chu": "kpi"
+     }
+    },
+    {
+     "thu_tu": 64,
+     "le": {
+      "chu": "GROUP"
+     },
+     "ma": {
+      "chu": "NCFF"
+     },
+     "ten": {
+      "chu": "Net Cashflow from Financing"
+     },
+     "cha": null,
+     "cap": "1",
+     "nhom": {
+      "chu": "HDC"
+     },
+     "dong_sheet": "76",
+     "loai": {
+      "chu": "tong"
+     }
+    },
+    {
+     "thu_tu": 65,
+     "le": {
+      "chu": "GROUP"
+     },
+     "ma": {
+      "chu": "CRF"
+     },
+     "ten": {
+      "chu": "Cash Received from Financing"
+     },
+     "cha": {
+      "chu": "NCFF"
+     },
+     "cap": "2",
+     "nhom": {
+      "chu": "HDC"
+     },
+     "dong_sheet": "77",
+     "loai": {
+      "chu": "kpi"
+     }
+    },
+    {
+     "thu_tu": 66,
+     "le": {
+      "chu": "GROUP"
+     },
+     "ma": {
+      "chu": "COF"
+     },
+     "ten": {
+      "chu": "Cash Outflow from Financing"
+     },
+     "cha": {
+      "chu": "NCFF"
+     },
+     "cap": "2",
+     "nhom": {
+      "chu": "HDC"
+     },
+     "dong_sheet": "78",
+     "loai": {
+      "chu": "kpi"
+     }
+    },
+    {
+     "thu_tu": 67,
+     "le": {
+      "chu": "GROUP"
+     },
+     "ma": {
+      "chu": "CFO"
+     },
+     "ten": {
+      "chu": "NCFF - Other"
+     },
+     "cha": {
+      "chu": "NCFF"
+     },
+     "cap": "2",
+     "nhom": {
+      "chu": "HDC"
+     },
+     "dong_sheet": "79",
+     "loai": {
+      "chu": "trong"
+     }
+    },
+    {
+     "thu_tu": 68,
+     "le": {
+      "chu": "GROUP"
+     },
+     "ma": {
+      "chu": "PL2"
+     },
+     "ten": {
+      "chu": "= GI - OMC"
+     },
+     "cha": null,
+     "cap": "1",
+     "nhom": {
+      "chu": "HDCI"
+     },
+     "dong_sheet": "81",
+     "loai": {
+      "chu": "kpi"
+     }
+    },
+    {
+     "thu_tu": 69,
+     "le": {
+      "chu": "GROUP"
+     },
+     "ma": {
+      "chu": "PL3"
+     },
+     "ten": {
+      "chu": "= PL2 - Tech Service Cost (none HR: server, API.. + Tools)"
+     },
+     "cha": null,
+     "cap": "1",
+     "nhom": {
+      "chu": "HDCI"
+     },
+     "dong_sheet": "82",
+     "loai": {
+      "chu": "kpi"
+     }
+    },
+    {
+     "thu_tu": 70,
+     "le": {
+      "chu": "GROUP"
+     },
+     "ma": {
+      "chu": "PL4"
+     },
+     "ten": {
+      "chu": "= PL3 - Profit share (Partners)"
+     },
+     "cha": null,
+     "cap": "1",
+     "nhom": {
+      "chu": "HDCI"
+     },
+     "dong_sheet": "83",
+     "loai": {
+      "chu": "kpi"
+     }
+    },
+    {
+     "thu_tu": 71,
+     "le": {
+      "chu": "GROUP"
+     },
+     "ma": {
+      "chu": "PL5"
+     },
+     "ten": {
+      "chu": "= PL4 - COM"
+     },
+     "cha": null,
+     "cap": "1",
+     "nhom": {
+      "chu": "HDCI"
+     },
+     "dong_sheet": "84",
+     "loai": {
+      "chu": "trong"
+     }
+    },
+    {
+     "thu_tu": 72,
+     "le": {
+      "chu": "GROUP"
+     },
+     "ma": {
+      "chu": "PL6"
+     },
+     "ten": {
+      "chu": "= PL5 - Other Venture cost (Marketer + product dev + Tech dev)"
+     },
+     "cha": null,
+     "cap": "1",
+     "nhom": {
+      "chu": "HDCI"
+     },
+     "dong_sheet": "85",
+     "loai": {
+      "chu": "kpi"
+     }
+    },
+    {
+     "thu_tu": 73,
+     "le": {
+      "chu": "GROUP"
+     },
+     "ma": {
+      "chu": "PL7"
+     },
+     "ten": {
+      "chu": "= PL6 - HQ Cost"
+     },
+     "cha": null,
+     "cap": "1",
+     "nhom": {
+      "chu": "HDCI"
+     },
+     "dong_sheet": "86",
+     "loai": {
+      "chu": "kpi"
+     }
+    },
+    {
+     "thu_tu": 74,
+     "le": {
+      "chu": "GROUP"
+     },
+     "ma": {
+      "chu": "PL8"
+     },
+     "ten": {
+      "chu": "= PL7 - Tax (CIT)"
+     },
+     "cha": null,
+     "cap": "1",
+     "nhom": {
+      "chu": "HDCI"
+     },
+     "dong_sheet": "87",
+     "loai": {
+      "chu": "kpi"
+     }
+    }
+   ]
+  },
+  "ky_truc": {
+   "mong": 57,
+   "so_dong": 57,
+   "dong": [
+    {
+     "thu_tu": 1,
+     "ky": {
+      "chu": "2024"
+     },
+     "nam": "2024",
+     "loai": {
+      "chu": "Y"
+     },
+     "trang_thai": {
+      "chu": "co_so"
+     }
+    },
+    {
+     "thu_tu": 2,
+     "ky": {
+      "chu": "2024H1"
+     },
+     "nam": "2024",
+     "loai": {
+      "chu": "H"
+     },
+     "trang_thai": {
+      "chu": "chua_co_du_lieu"
+     }
+    },
+    {
+     "thu_tu": 3,
+     "ky": {
+      "chu": "2024H2"
+     },
+     "nam": "2024",
+     "loai": {
+      "chu": "H"
+     },
+     "trang_thai": {
+      "chu": "co_so"
+     }
+    },
+    {
+     "thu_tu": 4,
+     "ky": {
+      "chu": "2024Q1"
+     },
+     "nam": "2024",
+     "loai": {
+      "chu": "Q"
+     },
+     "trang_thai": {
+      "chu": "chua_co_du_lieu"
+     }
+    },
+    {
+     "thu_tu": 5,
+     "ky": {
+      "chu": "2024Q2"
+     },
+     "nam": "2024",
+     "loai": {
+      "chu": "Q"
+     },
+     "trang_thai": {
+      "chu": "chua_co_du_lieu"
+     }
+    },
+    {
+     "thu_tu": 6,
+     "ky": {
+      "chu": "2024Q3"
+     },
+     "nam": "2024",
+     "loai": {
+      "chu": "Q"
+     },
+     "trang_thai": {
+      "chu": "chua_co_du_lieu"
+     }
+    },
+    {
+     "thu_tu": 7,
+     "ky": {
+      "chu": "2024Q4"
+     },
+     "nam": "2024",
+     "loai": {
+      "chu": "Q"
+     },
+     "trang_thai": {
+      "chu": "co_so"
+     }
+    },
+    {
+     "thu_tu": 8,
+     "ky": {
+      "chu": "2024M01"
+     },
+     "nam": "2024",
+     "loai": {
+      "chu": "M"
+     },
+     "trang_thai": {
+      "chu": "chua_co_du_lieu"
+     }
+    },
+    {
+     "thu_tu": 9,
+     "ky": {
+      "chu": "2024M02"
+     },
+     "nam": "2024",
+     "loai": {
+      "chu": "M"
+     },
+     "trang_thai": {
+      "chu": "chua_co_du_lieu"
+     }
+    },
+    {
+     "thu_tu": 10,
+     "ky": {
+      "chu": "2024M03"
+     },
+     "nam": "2024",
+     "loai": {
+      "chu": "M"
+     },
+     "trang_thai": {
+      "chu": "chua_co_du_lieu"
+     }
+    },
+    {
+     "thu_tu": 11,
+     "ky": {
+      "chu": "2024M04"
+     },
+     "nam": "2024",
+     "loai": {
+      "chu": "M"
+     },
+     "trang_thai": {
+      "chu": "chua_co_du_lieu"
+     }
+    },
+    {
+     "thu_tu": 12,
+     "ky": {
+      "chu": "2024M05"
+     },
+     "nam": "2024",
+     "loai": {
+      "chu": "M"
+     },
+     "trang_thai": {
+      "chu": "chua_co_du_lieu"
+     }
+    },
+    {
+     "thu_tu": 13,
+     "ky": {
+      "chu": "2024M06"
+     },
+     "nam": "2024",
+     "loai": {
+      "chu": "M"
+     },
+     "trang_thai": {
+      "chu": "chua_co_du_lieu"
+     }
+    },
+    {
+     "thu_tu": 14,
+     "ky": {
+      "chu": "2024M07"
+     },
+     "nam": "2024",
+     "loai": {
+      "chu": "M"
+     },
+     "trang_thai": {
+      "chu": "chua_co_du_lieu"
+     }
+    },
+    {
+     "thu_tu": 15,
+     "ky": {
+      "chu": "2024M08"
+     },
+     "nam": "2024",
+     "loai": {
+      "chu": "M"
+     },
+     "trang_thai": {
+      "chu": "chua_co_du_lieu"
+     }
+    },
+    {
+     "thu_tu": 16,
+     "ky": {
+      "chu": "2024M09"
+     },
+     "nam": "2024",
+     "loai": {
+      "chu": "M"
+     },
+     "trang_thai": {
+      "chu": "chua_co_du_lieu"
+     }
+    },
+    {
+     "thu_tu": 17,
+     "ky": {
+      "chu": "2024M10"
+     },
+     "nam": "2024",
+     "loai": {
+      "chu": "M"
+     },
+     "trang_thai": {
+      "chu": "chua_co_du_lieu"
+     }
+    },
+    {
+     "thu_tu": 18,
+     "ky": {
+      "chu": "2024M11"
+     },
+     "nam": "2024",
+     "loai": {
+      "chu": "M"
+     },
+     "trang_thai": {
+      "chu": "co_so"
+     }
+    },
+    {
+     "thu_tu": 19,
+     "ky": {
+      "chu": "2024M12"
+     },
+     "nam": "2024",
+     "loai": {
+      "chu": "M"
+     },
+     "trang_thai": {
+      "chu": "co_so"
+     }
+    },
+    {
+     "thu_tu": 20,
+     "ky": {
+      "chu": "2025"
+     },
+     "nam": "2025",
+     "loai": {
+      "chu": "Y"
+     },
+     "trang_thai": {
+      "chu": "co_so"
+     }
+    },
+    {
+     "thu_tu": 21,
+     "ky": {
+      "chu": "2025H1"
+     },
+     "nam": "2025",
+     "loai": {
+      "chu": "H"
+     },
+     "trang_thai": {
+      "chu": "co_so"
+     }
+    },
+    {
+     "thu_tu": 22,
+     "ky": {
+      "chu": "2025H2"
+     },
+     "nam": "2025",
+     "loai": {
+      "chu": "H"
+     },
+     "trang_thai": {
+      "chu": "co_so"
+     }
+    },
+    {
+     "thu_tu": 23,
+     "ky": {
+      "chu": "2025Q1"
+     },
+     "nam": "2025",
+     "loai": {
+      "chu": "Q"
+     },
+     "trang_thai": {
+      "chu": "co_so"
+     }
+    },
+    {
+     "thu_tu": 24,
+     "ky": {
+      "chu": "2025Q2"
+     },
+     "nam": "2025",
+     "loai": {
+      "chu": "Q"
+     },
+     "trang_thai": {
+      "chu": "co_so"
+     }
+    },
+    {
+     "thu_tu": 25,
+     "ky": {
+      "chu": "2025Q3"
+     },
+     "nam": "2025",
+     "loai": {
+      "chu": "Q"
+     },
+     "trang_thai": {
+      "chu": "co_so"
+     }
+    },
+    {
+     "thu_tu": 26,
+     "ky": {
+      "chu": "2025Q4"
+     },
+     "nam": "2025",
+     "loai": {
+      "chu": "Q"
+     },
+     "trang_thai": {
+      "chu": "co_so"
+     }
+    },
+    {
+     "thu_tu": 27,
+     "ky": {
+      "chu": "2025M01"
+     },
+     "nam": "2025",
+     "loai": {
+      "chu": "M"
+     },
+     "trang_thai": {
+      "chu": "co_so"
+     }
+    },
+    {
+     "thu_tu": 28,
+     "ky": {
+      "chu": "2025M02"
+     },
+     "nam": "2025",
+     "loai": {
+      "chu": "M"
+     },
+     "trang_thai": {
+      "chu": "co_so"
+     }
+    },
+    {
+     "thu_tu": 29,
+     "ky": {
+      "chu": "2025M03"
+     },
+     "nam": "2025",
+     "loai": {
+      "chu": "M"
+     },
+     "trang_thai": {
+      "chu": "co_so"
+     }
+    },
+    {
+     "thu_tu": 30,
+     "ky": {
+      "chu": "2025M04"
+     },
+     "nam": "2025",
+     "loai": {
+      "chu": "M"
+     },
+     "trang_thai": {
+      "chu": "co_so"
+     }
+    },
+    {
+     "thu_tu": 31,
+     "ky": {
+      "chu": "2025M05"
+     },
+     "nam": "2025",
+     "loai": {
+      "chu": "M"
+     },
+     "trang_thai": {
+      "chu": "co_so"
+     }
+    },
+    {
+     "thu_tu": 32,
+     "ky": {
+      "chu": "2025M06"
+     },
+     "nam": "2025",
+     "loai": {
+      "chu": "M"
+     },
+     "trang_thai": {
+      "chu": "co_so"
+     }
+    },
+    {
+     "thu_tu": 33,
+     "ky": {
+      "chu": "2025M07"
+     },
+     "nam": "2025",
+     "loai": {
+      "chu": "M"
+     },
+     "trang_thai": {
+      "chu": "co_so"
+     }
+    },
+    {
+     "thu_tu": 34,
+     "ky": {
+      "chu": "2025M08"
+     },
+     "nam": "2025",
+     "loai": {
+      "chu": "M"
+     },
+     "trang_thai": {
+      "chu": "co_so"
+     }
+    },
+    {
+     "thu_tu": 35,
+     "ky": {
+      "chu": "2025M09"
+     },
+     "nam": "2025",
+     "loai": {
+      "chu": "M"
+     },
+     "trang_thai": {
+      "chu": "co_so"
+     }
+    },
+    {
+     "thu_tu": 36,
+     "ky": {
+      "chu": "2025M10"
+     },
+     "nam": "2025",
+     "loai": {
+      "chu": "M"
+     },
+     "trang_thai": {
+      "chu": "co_so"
+     }
+    },
+    {
+     "thu_tu": 37,
+     "ky": {
+      "chu": "2025M11"
+     },
+     "nam": "2025",
+     "loai": {
+      "chu": "M"
+     },
+     "trang_thai": {
+      "chu": "co_so"
+     }
+    },
+    {
+     "thu_tu": 38,
+     "ky": {
+      "chu": "2025M12"
+     },
+     "nam": "2025",
+     "loai": {
+      "chu": "M"
+     },
+     "trang_thai": {
+      "chu": "co_so"
+     }
+    },
+    {
+     "thu_tu": 39,
+     "ky": {
+      "chu": "2026"
+     },
+     "nam": "2026",
+     "loai": {
+      "chu": "Y"
+     },
+     "trang_thai": {
+      "chu": "chua_co_du_lieu"
+     }
+    },
+    {
+     "thu_tu": 40,
+     "ky": {
+      "chu": "2026H1"
+     },
+     "nam": "2026",
+     "loai": {
+      "chu": "H"
+     },
+     "trang_thai": {
+      "chu": "chua_co_du_lieu"
+     }
+    },
+    {
+     "thu_tu": 41,
+     "ky": {
+      "chu": "2026H2"
+     },
+     "nam": "2026",
+     "loai": {
+      "chu": "H"
+     },
+     "trang_thai": {
+      "chu": "chua_co_du_lieu"
+     }
+    },
+    {
+     "thu_tu": 42,
+     "ky": {
+      "chu": "2026Q1"
+     },
+     "nam": "2026",
+     "loai": {
+      "chu": "Q"
+     },
+     "trang_thai": {
+      "chu": "chua_co_du_lieu"
+     }
+    },
+    {
+     "thu_tu": 43,
+     "ky": {
+      "chu": "2026Q2"
+     },
+     "nam": "2026",
+     "loai": {
+      "chu": "Q"
+     },
+     "trang_thai": {
+      "chu": "chua_co_du_lieu"
+     }
+    },
+    {
+     "thu_tu": 44,
+     "ky": {
+      "chu": "2026Q3"
+     },
+     "nam": "2026",
+     "loai": {
+      "chu": "Q"
+     },
+     "trang_thai": {
+      "chu": "chua_co_du_lieu"
+     }
+    },
+    {
+     "thu_tu": 45,
+     "ky": {
+      "chu": "2026Q4"
+     },
+     "nam": "2026",
+     "loai": {
+      "chu": "Q"
+     },
+     "trang_thai": {
+      "chu": "chua_co_du_lieu"
+     }
+    },
+    {
+     "thu_tu": 46,
+     "ky": {
+      "chu": "2026M01"
+     },
+     "nam": "2026",
+     "loai": {
+      "chu": "M"
+     },
+     "trang_thai": {
+      "chu": "chua_co_du_lieu"
+     }
+    },
+    {
+     "thu_tu": 47,
+     "ky": {
+      "chu": "2026M02"
+     },
+     "nam": "2026",
+     "loai": {
+      "chu": "M"
+     },
+     "trang_thai": {
+      "chu": "chua_co_du_lieu"
+     }
+    },
+    {
+     "thu_tu": 48,
+     "ky": {
+      "chu": "2026M03"
+     },
+     "nam": "2026",
+     "loai": {
+      "chu": "M"
+     },
+     "trang_thai": {
+      "chu": "chua_co_du_lieu"
+     }
+    },
+    {
+     "thu_tu": 49,
+     "ky": {
+      "chu": "2026M04"
+     },
+     "nam": "2026",
+     "loai": {
+      "chu": "M"
+     },
+     "trang_thai": {
+      "chu": "chua_co_du_lieu"
+     }
+    },
+    {
+     "thu_tu": 50,
+     "ky": {
+      "chu": "2026M05"
+     },
+     "nam": "2026",
+     "loai": {
+      "chu": "M"
+     },
+     "trang_thai": {
+      "chu": "chua_co_du_lieu"
+     }
+    },
+    {
+     "thu_tu": 51,
+     "ky": {
+      "chu": "2026M06"
+     },
+     "nam": "2026",
+     "loai": {
+      "chu": "M"
+     },
+     "trang_thai": {
+      "chu": "chua_co_du_lieu"
+     }
+    },
+    {
+     "thu_tu": 52,
+     "ky": {
+      "chu": "2026M07"
+     },
+     "nam": "2026",
+     "loai": {
+      "chu": "M"
+     },
+     "trang_thai": {
+      "chu": "chua_co_du_lieu"
+     }
+    },
+    {
+     "thu_tu": 53,
+     "ky": {
+      "chu": "2026M08"
+     },
+     "nam": "2026",
+     "loai": {
+      "chu": "M"
+     },
+     "trang_thai": {
+      "chu": "chua_co_du_lieu"
+     }
+    },
+    {
+     "thu_tu": 54,
+     "ky": {
+      "chu": "2026M09"
+     },
+     "nam": "2026",
+     "loai": {
+      "chu": "M"
+     },
+     "trang_thai": {
+      "chu": "chua_co_du_lieu"
+     }
+    },
+    {
+     "thu_tu": 55,
+     "ky": {
+      "chu": "2026M10"
+     },
+     "nam": "2026",
+     "loai": {
+      "chu": "M"
+     },
+     "trang_thai": {
+      "chu": "chua_co_du_lieu"
+     }
+    },
+    {
+     "thu_tu": 56,
+     "ky": {
+      "chu": "2026M11"
+     },
+     "nam": "2026",
+     "loai": {
+      "chu": "M"
+     },
+     "trang_thai": {
+      "chu": "chua_co_du_lieu"
+     }
+    },
+    {
+     "thu_tu": 57,
+     "ky": {
+      "chu": "2026M12"
+     },
+     "nam": "2026",
+     "loai": {
+      "chu": "M"
+     },
+     "trang_thai": {
+      "chu": "chua_co_du_lieu"
+     }
+    }
+   ]
+  },
+  "le": {
+   "mong": 1,
+   "so_dong": 1,
+   "dong": [
+    {
+     "thu_tu": 1,
+     "le": {
+      "chu": "GROUP"
+     },
+     "ten_le": {
+      "chu": "GROUP"
+     },
+     "dong_dau": "7"
+    }
+   ]
+  },
+  "o_loi": {
+   "mong": 5,
+   "so_dong": 5,
+   "dong": [
+    {
+     "thu_tu": 1,
+     "le": {
+      "chu": "GROUP"
+     },
+     "ma_hd": {
+      "chu": "AR"
+     },
+     "ky": {
+      "chu": "2024"
+     },
+     "gia": {
+      "chu": "-"
+     }
+    },
+    {
+     "thu_tu": 2,
+     "le": {
+      "chu": "GROUP"
+     },
+     "ma_hd": {
+      "chu": "CP1.1 (PL2)"
+     },
+     "ky": {
+      "chu": "2024"
+     },
+     "gia": {
+      "chu": "-"
+     }
+    },
+    {
+     "thu_tu": 3,
+     "le": {
+      "chu": "GROUP"
+     },
+     "ma_hd": {
+      "chu": "CP1.2"
+     },
+     "ky": {
+      "chu": "2024"
+     },
+     "gia": {
+      "chu": "-"
+     }
+    },
+    {
+     "thu_tu": 4,
+     "le": {
+      "chu": "GROUP"
+     },
+     "ma_hd": {
+      "chu": "CP2"
+     },
+     "ky": {
+      "chu": "2024"
+     },
+     "gia": {
+      "chu": "-"
+     }
+    },
+    {
+     "thu_tu": 5,
+     "le": {
+      "chu": "GROUP"
+     },
+     "ma_hd": {
+      "chu": "CP3"
+     },
+     "ky": {
+      "chu": "2024"
+     },
+     "gia": {
+      "chu": "-"
+     }
+    }
+   ]
+  },
+  "tuong_lai_chu": {
+   "mong": 0,
+   "so_dong": 0,
+   "dong": []
+  }
+ }
+}

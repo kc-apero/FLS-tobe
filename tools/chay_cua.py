@@ -22,9 +22,23 @@ import time
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+# ⭐ CG1 (ISP 3.1.2 · Step 7 · `WO-101`): tệp đo của hai cổng HD1 trong `GET /gates`
+#   (`FINAL` · `HD1_THANG`) — ảnh tĩnh đã commit, sinh máy bằng
+#   `python tools/do_voi_so_luong.py --ghi`. ⛔⛔ Mặc định nằm Ở ĐÂY, ⛔ trong `fls/`: cùng chỗ
+#   với chuỗi kết nối kho *(hợp đồng tầng 7 — cửa ⛔ tự chọn kho nào, ⛔ tự chọn tệp đo nào)*.
+TEP_DO_MAC_DINH = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+    "docs", "ITL", "_tools", "voi_so_luong.json")
+
+# ⭐ CG2 (`WO-208`): tệp cổng HD2 theo gói — ghi bởi `python tools/do_hd2.py --goi … --ghi`.
+TEP_HD2_MAC_DINH = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+    "docs", "ITL", "_tools", "hd2_cong.json")
+
 from fls.api import cua                                          # noqa: E402
 from fls.api.the import dong_the, khoa                           # noqa: E402
 from fls.db.kho import dsn_that, noi_chi_doc                     # noqa: E402
+from fls.repo.danh_muc_actor import ACTOR_CHAY_CUA               # noqa: E402
 
 
 def _mo_ket_noi(dsn: str):
@@ -131,7 +145,7 @@ def main() -> int:
                     help="⛔ mac dinh chi nghe may nay")
     ap.add_argument("--the-tam", type=int, metavar="GIAY",
                     help="in mot the song GIAY giay roi thoat (de thu bang curl)")
-    ap.add_argument("--actor", default="thu@apero.vn")
+    ap.add_argument("--actor", default=ACTOR_CHAY_CUA)
     ap.add_argument("--in-bang-tuyen", action="store_true")
     ap.add_argument("--cho-ghi", action="store_true",
                     help="⛔ MO NHOM GHI (P5). Mac dinh TAT: cua chay o che do "
@@ -144,6 +158,13 @@ def main() -> int:
     ap.add_argument("--the-song", type=int, default=8 * 3600, metavar="GIAY",
                     help="han cua the cap cho man hinh (mac dinh mot ngay lam "
                          "viec). ⛔ Khong co che do 'khong han'.")
+    ap.add_argument("--tep-do", default=TEP_DO_MAC_DINH, metavar="DUONG",
+                    help="⭐ tệp đo của cổng HD1 (`FINAL` · `HD1_THANG` trong "
+                         "/gates). Rỗng ('') ⇒ ⛔ truyền: hai cổng ấy CHƯA ĐO "
+                         "ĐƯỢC. Tệp vắng ⇒ cũng CHƯA ĐO ĐƯỢC, ⛔ bao giờ xanh.")
+    ap.add_argument("--tep-hd2", default=TEP_HD2_MAC_DINH, metavar="DUONG",
+                    help="⭐ tệp cổng HD2 (`HD2_WP_*` trong /gates). Rỗng ('') ⇒ ⛔ truyền: "
+                         "các cổng ấy CHƯA ĐO ĐƯỢC. Tệp vắng ⇒ cũng CHƯA ĐO ĐƯỢC.")
     a = ap.parse_args()
 
     if a.in_bang_tuyen:
@@ -197,10 +218,20 @@ def main() -> int:
     dsn = dsn_that()
     may = cua.dung_may(_mo_ket_noi(dsn), cong=a.cong, dia_chi=a.dia_chi,
                        mo_ghi=_mo_ghi(dsn) if a.cho_ghi else None,
-                       phuc_vu_tep=phuc_vu)
+                       phuc_vu_tep=phuc_vu, tep_do=a.tep_do or None,
+                       tep_hd2=a.tep_hd2 or None)
     print(f"cua FLS: http://{a.dia_chi}:{a.cong}/api/fls/v1/  "
           f"({'DOC + GHI' if a.cho_ghi else 'CHI DOC'} · the bat buoc · "
           f"pham vi = lan nap that)")
+    # ⚠ In RA tệp đo nào — số của cổng HD1 là số của ẢNH, ⛔ của kho đang mở.
+    print("  cổng HD1 (FINAL · HD1_THANG) đọc tệp đo: "
+          + (f"{a.tep_do}" + ("" if os.path.isfile(a.tep_do)
+                               else "  ⛔ VẮNG — hai cổng CHƯA ĐO ĐƯỢC")
+             if a.tep_do else "⛔ (không truyền) — hai cổng CHƯA ĐO ĐƯỢC"))
+    print("  cổng HD2 (HD2_WP_*) đọc tệp: "
+          + (f"{a.tep_hd2}" + ("" if os.path.isfile(a.tep_hd2)
+                                else "  ⛔ VẮNG — CHƯA ĐO ĐƯỢC")
+             if a.tep_hd2 else "⛔ (không truyền) — CHƯA ĐO ĐƯỢC"))
     if a.cho_web:
         print(f"⭐ man hinh: http://{a.dia_chi}:{a.cong}/   "
               f"(the cap cho `{a.actor}`, song {a.the_song // 3600} gio)")

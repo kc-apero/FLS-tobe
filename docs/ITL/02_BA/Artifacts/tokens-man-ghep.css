@@ -1,0 +1,43 @@
+/* Bộ token màn "Gán lệnh chi với giao dịch"
+   — phần lớn lấy NGUYÊN VĂN từ fls/web/tep/tokens.css.
+   Token THÊM (có lý do trong thiet-ke-man-gan-lenh-chi.md §3):
+     --hair   đường kẻ giữa các dòng của lưới dày đặc
+     --evi-bg nền đánh dấu bằng chứng trong diễn giải / số CT / số tiền
+     --rail   bề rộng danh sách lệnh chi khi panel ghép đang mở
+     --b      màu bậc của một dòng ứng viên (đặt inline theo dòng)
+   Chạy được cả nền sáng và nền tối. */
+
+:root{
+  --font-sans:'IBM Plex Sans','Segoe UI',system-ui,-apple-system,sans-serif;
+  --font-mono:'IBM Plex Mono','Cascadia Mono',Consolas,ui-monospace,monospace;
+  --ink:#14201e; --muted:#5c6b68; --faint:#9aa8a5;
+  --line:#dde4e3; --surface:#fff; --alt:#f6f8f8; --page:#eef1f1;
+  --row-hover:#fafcfc; --label-bg:#fcfdfd;
+  --accent:#0e7570; --accent-hi:#0a5c58; --focus-ring:#0e757022;
+  --crit:#c73a3a; --crit-bg:#fbeaea; --crit-line:#f3cdcd;
+  --warn:#c07414; --warn-bg:#fdf4e7; --warn-line:#f0dcbe;
+  --good:#2c7a4b; --good-bg:#e8f4ec; --good-line:#bcdcc8;
+  --info:#2563eb; --info-bg:#e9effd; --info-line:#b9cdf7;
+  --on-ink:#fff; --on-ink-muted:#cfd8d6;
+  --shadow-card:0 1px 2px rgba(20,32,30,.05), 0 4px 14px rgba(20,32,30,.05);
+  --radius-sm:4px; --radius-md:6px; --radius-lg:8px; --radius-pill:999px;
+  --hair:color-mix(in srgb, var(--line) 30%, var(--surface));
+  --evi-bg:#0e757024;
+  --rail:clamp(300px,26vw,380px);
+}
+:root:not([data-theme="light"]){ @media (prefers-color-scheme: dark){
+  --ink:#e7eeec; --muted:#9dadaa; --faint:#6d7b78; --line:#2b3a37; --surface:#16211f; --alt:#1b2725; --page:#0e1716;
+  --row-hover:#1c2826; --label-bg:#1a2523; --accent:#4bb5ad; --accent-hi:#6ccbc3; --focus-ring:#4bb5ad33;
+  --crit:#e97676; --crit-bg:#33201f; --crit-line:#4d2b2a; --warn:#dfa451; --warn-bg:#2e2416; --warn-line:#4a3a21;
+  --good:#66bd86; --good-bg:#17291e; --good-line:#27412f; --info:#7ba4f5; --info-bg:#1a2338; --info-line:#2b3a5c;
+  --on-ink:#0e1716; --on-ink-muted:#7e8c89; --shadow-card:0 1px 2px rgba(0,0,0,.3), 0 4px 14px rgba(0,0,0,.25);
+  --hair:color-mix(in srgb, var(--line) 34%, var(--surface)); --evi-bg:#4bb5ad33;
+} }
+:root[data-theme="dark"]{
+  --ink:#e7eeec; --muted:#9dadaa; --faint:#6d7b78; --line:#2b3a37; --surface:#16211f; --alt:#1b2725; --page:#0e1716;
+  --row-hover:#1c2826; --label-bg:#1a2523; --accent:#4bb5ad; --accent-hi:#6ccbc3; --focus-ring:#4bb5ad33;
+  --crit:#e97676; --crit-bg:#33201f; --crit-line:#4d2b2a; --warn:#dfa451; --warn-bg:#2e2416; --warn-line:#4a3a21;
+  --good:#66bd86; --good-bg:#17291e; --good-line:#27412f; --info:#7ba4f5; --info-bg:#1a2338; --info-line:#2b3a5c;
+  --on-ink:#0e1716; --on-ink-muted:#7e8c89; --shadow-card:0 1px 2px rgba(0,0,0,.3), 0 4px 14px rgba(0,0,0,.25);
+  --hair:color-mix(in srgb, var(--line) 34%, var(--surface)); --evi-bg:#4bb5ad33;
+}

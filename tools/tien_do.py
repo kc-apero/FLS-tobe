@@ -1,4 +1,4 @@
-"""Do tien do 9 module — sinh so cho BAN VE 12 (`Ban-ve-Kien-truc-TOBE.html`).
+"""Do tien do 10 module — sinh so cho BAN VE 12 (`Ban-ve-Kien-truc-TOBE.html`).
 
 ★ Vi sao co file nay. Bang tien do go tay se gia di trong im lang — dung benh ma
 ca du an nay dang chua. Nen so trong bang phai SINH RA duoc, va lech thi thay ngay.
@@ -8,7 +8,16 @@ Chay:  python tools/tien_do.py            (bang doc cho nguoi)
 
 `xong` la % TU KHAI theo DoD (`03_IMPLEMENTATION_PLAN` §5) — day la phan xet
 doan cua nguoi, ⛔ khong phai so do duoc. Con `test` va `dong` thi do that.
-`trong_so` = phan cong viec uoc luong cua module trong ca he, cong lai = 100.
+`trong_so` = phan cong viec uoc luong cua module trong ca he.
+
+⛔⛔ **Tong trong so ⛔ KHONG con bi ghim o 100 — va do la mot sua co chu y
+(09/09).** Ban truoc cong `gop_pct` lai roi goi ket qua la phan tram, tuc **ngam
+dinh** Σ trong so = 100. Khi `fls/xuat` ra doi *(module thu 10, `D3` cua chang
+④)* thi hoac ⓐ phai **cat bot trong so cua mot module khac** — mot cau noi rang
+phan viec cua no **nho di**, ma no ⛔ khong nho di — hoac ⓑ chap nhan Σ > 100 va
+**chia cho dung Σ ay**. Chon ⓑ: pham vi lon ra thi mau so lon ra, va mot module
+moi **chua xong** thi keo con so **XUONG**. Do la hanh vi dung; an module moi di
+de giu con so cu la dung cai benh ca bo tai lieu nay dang chua.
 """
 
 from __future__ import annotations
@@ -211,6 +220,36 @@ GOC = Path(__file__).resolve().parents[1]
 #                               ⛔ **khong dong duoc** (cong so 8 khai thang).
 #                               ⛔ Vung PHAN BO cua drawer ⛔ khong ve duoc —
 #                               `GET /mapping-master` chua co.
+#   2026-09-09  api 92 -> 95    ⭐⭐ **CHIN tuyen moi tu 03/09: 20 -> 29.** Lan
+#                               ANH CHUP 4 (`QĐ-ITL-110`) + THU TU NGAY 2
+#                               (`113`) + NAP CA LO 2 (`111`/`112`) + KHAI THU
+#                               TU CA LO 1 (`117`). ⭐ Ca chin da **chay that**
+#                               qua HTTP tren kho THAT: lo 60 nguon ra
+#                               **58 vao so · 2 bi chua · 8.356 dong**.
+#                               ⛔ **⛔ Chua len 100**: `GET /catalog`
+#                               (`GAP-SPEC-01` — chan `B6`) va
+#                               `GET /mapping-master` (chan vung PHAN BO cua
+#                               drawer `F02`) van ⛔ KHONG ton tai.
+#                               ⚠ Va mot lo do 09/09: hai tuyen `/nap/lo*`
+#                               song **tron mot ngay ngoai `BA-07`** — cong
+#                               `test_ba07_phu_het_tuyen` sinh ra tu do.
+#   2026-09-09  web 70 -> 85    ⭐⭐⭐ **`F04` XONG — man thu tu, va la man DUY
+#                               NHAT GHI vao so.** Nam trang thai + khoi `②b`
+#                               chay that; man **LUON** di duong lo. ⛔ Luu y
+#                               `F04` ⛔ **khong nam trong ke hoach `B1`–`B7`**
+#                               cua `DEV-12` — no den sau, tu `CR#11` +
+#                               `QĐ-ITL-105`/`109`/`110`. ⇒ Bon man cua module
+#                               (`F01`·`F02`·`F03`·`F04`) nay **du**.
+#                               ⛔ **⛔ Chua len qua 85**: `B6` (`F06` Danh muc)
+#                               con bi `GAP-SPEC-01` chan, va `B7` UAT thi may
+#                               ⛔ **khong dong duoc** (Lan/Thuong go that).
+#   2026-09-09  xuat 0 -> 20    MODULE MOI (thu 10). `D3` co che ghi an toan
+#                               xong that: neo theo `(tab, cot khoa, khoa, ten
+#                               cot)` ⛔ khong dia chi `A1` · ghi hai lan ⇒ ⛔ 0
+#                               o · HAI KHOA (`--duyet` + bien moi truong) · 27
+#                               bai. ⛔ CON LAI: `D1` bo xuat 64 cot · `D2` doi
+#                               chieu tung dong voi sheet that · `D5` vong khep
+#                               kin — va `D4` cho owner chot dich (`QĐ-ITL-116`).
 MODULE = (
     ("db", "Khuôn dữ liệu · schema SSOT", 8, 100, "P0"),
     ("contract", "Hợp đồng 14 trường", 2, 100, "P0"),
@@ -219,9 +258,35 @@ MODULE = (
     ("repo", "Cửa duy nhất vào kho", 8, 100, "P1→P5"),
     ("oracle", "Thước chuẩn", 9, 95, "P2"),
     ("adapters", "Sáu bộ nạp nguồn", 22, 55, "P2→P3"),
-    ("api", "Cửa vào ra", 17, 92, "P4·P5"),
-    ("web", "Bốn màn hình", 20, 70, "P6"),
+    ("api", "Cửa vào ra", 17, 95, "P4·P5"),
+    ("web", "Bốn màn hình", 20, 85, "P6"),
+    # ⭐⭐ Module thu 10 — ra doi 09/09 cung `D3` (`QĐ-ITL-118`).
+    #
+    # ⚠ `trong_so = 6`: no giu **ca chang ④** cua lo trinh — `D3` co che ghi
+    #   an toan *(xong)* + `D1` bo xuat khuon 64 cot + `D2` doi chieu tung dong
+    #   + `D5` vong khep kin *(ca ba ⛔ chua co)*. Dat ngang `canon` (6) vi khoi
+    #   luong tuong duong: mot khuon co dinh + mot phep doi chieu.
+    #   ⛔ Con so nay la **xet doan cua toi**, owner sua duoc.
+    #
+    # ⚠ `xong_pct = 20`: `D3` xong that *(27 bai, ke ca bai "chen mot dong ⇒ o
+    #   dich tu dich theo")*. ⛔ Nhung `D1`/`D2`/`D5` **⛔ khong ton tai**, va
+    #   `D4` con cho mot quyet dinh cua owner (`QĐ-ITL-116`: dich `A-CCR` hay
+    #   ITL adjust). ⇒ 1/4 viec + phan ha tang ⇒ 20, ⛔ khong 25.
+    ("xuat", "Đưa số ra ngoài", 6, 20, "P8·chặng ④"),
 )
+
+# ⛔⛔ **Cổng chặn DRIFT trọng số — và vì sao nó ⛔ KHÔNG còn là `== 100`.**
+#
+# Bản trước đòi `Σ trọng số == 100`. Cổng ấy canh đúng một thứ: **trọng số bị
+# sửa lẻ trong im lặng**. Nhưng nó làm điều đó bằng cách ghim một con số mà
+# **phạm vi dự án ⛔ không thể lớn ra được** — nên khi `fls/xuat` ra đời, đường
+# duy nhất cho cổng xanh là **cắt trọng số của một module khác**, tức nói rằng
+# phần việc của module ấy **nhỏ đi** khi nó ⛔ không nhỏ đi.
+#
+# ⇒ Cổng này nay canh **một con số ĐƯỢC KHAI**: đổi `Σ` thì phải đổi hằng số
+#   này **VÀ viết lý do vào nhật ký trên**. Drift vẫn bị bắt *(sửa lẻ một trọng
+#   số ⇒ `Σ` lệch ⇒ ĐỎ)*, nhưng phạm vi lớn ra ⛔ không còn buộc phải nói dối.
+TONG_TRONG_SO = 106      # 09/09: 100 → 106, +6 cho module `xuat` (chặng ④)
 
 
 def dem_test() -> Counter:
@@ -235,18 +300,49 @@ def dem_test() -> Counter:
     return c
 
 
+# ⭐ Duoi tep duoc coi la MA. ⛔ `.json`/`.md` ⛔ khong vao — chung la du lieu
+#   va van ban, va dem chung vao *"dong ma"* se lam con so phong len vo nghia.
+DUOI_MA = frozenset({".py", ".js", ".css", ".html"})
+
+
 def dem_dong(ma: str) -> tuple[int, int, int]:
-    """(dong code, so file, so ham) cua `fls/<ma>/`."""
+    """(dong code, so file, so ham) cua module `fls/<ma>/` — **DE QUY**.
+
+    ⛔⛔⛔ **Ban truoc chi `glob("*.py")` o DUNG mot tang, va no lam module
+      `web` noi doi 22 lan.**
+
+    `fls/web/` co `phuc_vu.py` *(265 dong)* va `fls/web/tep/` *(**5.961**
+    dong `.js`/`.css`/`.html` — tuc TOAN BO man hinh)*. Phep dem cu bao
+    **265**. Nen bang tien do in ra `web  265 dong  ·  333 test` — **nhieu
+    bai thu hon dong ma**, mot dieu vo ly nam trong tai lieu **da duoc cong
+    so song GHIM**, va ⛔ khong ai thay trong 7 ngay.
+
+    ⚠ Do la mot cai cong **canh dung mot con so SAI**: `va_so_song.py` giu
+      cho `265` luon khop, nen no **bao ve** con so sai thay vi bat no.
+
+    ★ Bai hoc chep lai o day vi no la luat cho moi phep dem sau: **mot phep
+      dem phai phu HET vat lieu cua thu no dem**. `fls.web` ⛔ khong phai
+      *"mot tep Python"* — no la **bon man hinh**, va bon man hinh ay viet
+      bang `.js`. Dem theo duoi tep quen thuoc thay vi theo **thu module ay
+      thuc su lam bang gi** la cung mot lop loi voi *"do o cua DOC roi khai
+      la ket qua cua cua GHI"*.
+
+    ⛔ `ham` van chi dem cho `.py` *(can `ast`)* — khai ra chu ⛔ khong de
+      nguoi doc tuong no gom ca ham JS.
+    """
     d = GOC / "fls" / ma
     if not d.is_dir():
         return 0, 0, 0
     dong = ham = 0
-    files = [p for p in sorted(d.glob("*.py")) if p.stat().st_size]
+    files = [p for p in sorted(d.rglob("*"))
+             if p.is_file() and p.suffix in DUOI_MA and p.stat().st_size
+             and "__pycache__" not in p.parts]
     for p in files:
         src = p.read_text(encoding="utf-8")
         dong += len(src.splitlines())
-        ham += sum(1 for n in ast.walk(ast.parse(src))
-                   if isinstance(n, ast.FunctionDef))
+        if p.suffix == ".py":
+            ham += sum(1 for n in ast.walk(ast.parse(src))
+                       if isinstance(n, ast.FunctionDef))
     return dong, len(files), ham
 
 
@@ -261,7 +357,10 @@ def main() -> int:
                      "gop_pct": round(tsl * xong / 100, 2)})
 
     tong_ts = sum(h["trong_so"] for h in hang)
-    tien_do = sum(h["gop_pct"] for h in hang)
+    if not tong_ts:
+        raise SystemExit("⛔ Σ trong so = 0 ⇒ ⛔ khong chia duoc")
+    # ⛔ Chia cho **dung Σ trong so**, ⛔ khong ngam dinh 100. Xem dau tep.
+    tien_do = 100 * sum(h["gop_pct"] for h in hang) / tong_ts
     tong_test = sum(test.values())
     xong_han = sum(1 for h in hang if h["xong_pct"] == 100)
     dang = sum(1 for h in hang if 0 < h["xong_pct"] < 100)
@@ -284,13 +383,18 @@ def main() -> int:
           f"{sum(h['file'] for h in hang):>5}{sum(h['dong'] for h in hang):>6}"
           f"{sum(h['ham'] for h in hang):>5}{sum(h['test'] for h in hang):>6}"
           f"{'':>7}{tong_ts:>9}{tien_do:>7.2f}")
-    if tong_ts != 100:
-        print(f"\n[X] trọng số cộng lại {tong_ts}, phải bằng 100")
+    if tong_ts != TONG_TRONG_SO:
+        print(f"\n[X] trọng số cộng lại {tong_ts}, bản khai nói "
+              f"{TONG_TRONG_SO} — sửa `TONG_TRONG_SO` VÀ viết lý do vào nhật ký")
     print(f"\ntest thu được ở mọi nơi: {tong_test} "
-          f"(ngoài 9 module: {tong_test - sum(h['test'] for h in hang)})")
-    print(f"module xong hẳn: {xong_han}/9 · đang làm: {dang}/9")
+          f"(ngoài {len(MODULE)} module: "
+          f"{tong_test - sum(h['test'] for h in hang)})")
+    # ⛔ Đếm `len(MODULE)`, ⛔ không gõ `9`: một con số gõ tay cạnh một bảng
+    #   sinh ra được là đúng chỗ mà `GAP-DOC-08` sống.
+    print(f"module xong hẳn: {xong_han}/{len(MODULE)} · "
+          f"đang làm: {dang}/{len(MODULE)}")
     print(f"TIẾN ĐỘ THEO KHỐI LƯỢNG VIỆC: {tien_do:.0f}%")
-    return 0 if tong_ts == 100 else 1
+    return 0 if tong_ts == TONG_TRONG_SO else 1
 
 
 if __name__ == "__main__":

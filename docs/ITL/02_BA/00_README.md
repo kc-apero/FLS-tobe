@@ -6,7 +6,9 @@ Bộ spec nghiệp vụ của dự án ITL, tối ưu cho AI đọc và thực t
 
 ---
 
-## 1. Cấu trúc bộ (12 file, 4 lớp)
+## 1. Cấu trúc bộ (**14 file** + `Artifacts/`, 4 lớp)
+
+> ⚠ **SỬA 17/09:** tiêu đề cũ ghi *"12 file"* — đếm thật trong thư mục là **14** tệp đánh số `00`…`13` *(cộng `_BA_UPDATE_ROADMAP.md` và thư mục `Artifacts/`)*. `12_BA_MAN_GHEP_PM` và `13_THUYET_MINH_MAN_HINH` thêm sau khi tiêu đề này được viết, và ⛔ không ai sửa con số.
 
 ### Lớp 1 — Bối cảnh nghiệp vụ
 | File | Vai trò | Độ chín |
@@ -37,6 +39,8 @@ Bộ spec nghiệp vụ của dự án ITL, tối ưu cho AI đọc và thực t
 | `09_STATE_MACHINE_SPEC.md` | 5 máy trạng thái | ● nội dung thật |
 | `10_DECISION_TABLE.md` | 9 bảng quyết định + thứ tự áp bắt buộc | ● nội dung thật |
 | `11_INVARIANTS.md` | 14 bất biến, mỗi cái có tầng enforce | ● nội dung thật |
+| `12_BA_MAN_GHEP_PM.md` | BA lại màn ghép `PM ↔ Giao dịch` — lộ trình `G1…G5`, **đã xong** | ● nội dung thật |
+| ⭐ `13_THUYET_MINH_MAN_HINH.md` | **Từng nút, từng ô, và `US` nào đứng sau** — đọc từ **mã đang chạy**, ⛔ không từ đặc tả. Có cổng `tools/kiem_thuyet_minh.py` canh: thêm một nút mà ⛔ không giải thích ⇒ **⛔ không qua** | ● nội dung thật |
 
 ## 2. Chuỗi truy vết
 

@@ -1,6 +1,8 @@
 # _DOC_REWRITE_ROADMAP — Lộ trình viết lại bộ tài liệu dự án ITL
 
-**Version:** v0.4 | **Chủ sở hữu:** COO-CFO | **Ngày:** 2026-08-18
+**Version:** v0.5 | **Chủ sở hữu:** COO-CFO | **Ngày:** 2026-09-07
+
+> ⏸ **TỆP LỊCH SỬ — ⛔ KHÔNG phải kế hoạch đang sống** *(ghi 2026-09-07, `QĐ-ITL-103`)*. Lộ trình bốn sóng `S0`–`S3` **đã chạy xong**. Kế hoạch sống: **`01_Orchestrator/06_ORCHESTRATOR_DASHBOARD` §6** *(việc)* + **`03_Dev/03_IMPLEMENTATION_PLAN`** *(pha)*.
 **Phạm vi lộ trình:** `01_Orchestrator/` → `02_BA/` (Dev/Test hoãn theo JIT, xem §7)
 **Trạng thái:** ✅ **S0** · ✅ **S1** (8 file Orchestrator) · ✅ **S2** (7 file BA lõi, đọc từ 12 workbook thật) · ⏭ tiếp theo: **S3 BA JIT**
 
@@ -207,7 +209,7 @@ Theo đúng thứ tự soạn thảo mà `BA-00` đã quy định (`01+02 → 09
 
 ## §7 · Việc KHÔNG làm trong lộ trình này
 
-- **Không viết `03_Dev/` và `04_Test/`** — mở sau `G-DOC-3`. Viết trước = spec chết trên kệ (P-08); và Dev không thể viết trước khi Output Contract đóng băng.
+- ~~**Không viết `03_Dev/` và `04_Test/`**~~ ⛔ **HẾT HIỆU LỰC từ 26/08 — ghi rõ 2026-09-07.** `03_Dev/` nay có **13 tệp** *(`DEV-03` roadmap **8 pha**, `DEV-12` kế hoạch bốn màn, 2 spec ghép PM…)* và code đã chạy **1.073 phép thử**. ⇒ Lộ trình này là **bản ghi lịch sử của sóng `S0`–`S3`**, ⛔ **không phải kế hoạch đang sống**; kế hoạch sống nằm ở **`01_Orchestrator/06_ORCHESTRATOR_DASHBOARD` §6** *(việc)* và **`03_Dev/03_IMPLEMENTATION_PLAN`** *(pha)*. ⬇ Lý do gốc giữ nguyên bên dưới vì nó vẫn đúng **cho sóng ấy**: mở sau `G-DOC-3`. Viết trước = spec chết trên kệ (P-08); và Dev không thể viết trước khi Output Contract đóng băng.
 - **Không sửa `AS-IS system/FS2 PD Now.xlsx`** — bản gốc chỉ đọc.
 - **Không sửa `0. Standard Documentation/`** — mọi thay đổi chương trình đi qua `ORC-07` bằng CR riêng.
 - **Không viết code** — lộ trình này thuần tài liệu.
@@ -222,6 +224,7 @@ Theo đúng thứ tự soạn thảo mà `BA-00` đã quy định (`01+02 → 09
 2. **Dự án này không bắt đầu từ 0.** FPA-T4 **đã** đọc `ITL_altered` và xuất P&L thật; A-CCR đã xong BE P3.2. Nghĩa là một phần IM1/IM2 đã có tiền lệ chạy được, và Output Contract phải reverse-engineer từ **reader đang chạy thật**, không phải thiết kế mới. `ORC-06` phải ghi rõ điều này, nếu không phiên AI sau sẽ dựng lại thứ đã có.
 
 ## Changelog
+- **v0.5** (2026-09-07, `QĐ-ITL-103`): ⛔ **Treo tệp này là LỊCH SỬ.** §7 còn ghi *"Không viết `03_Dev/` và `04_Test/`"* trong khi `03_Dev/` đã có **13 tệp** và code đã chạy **1.073 phép thử** — một **kế hoạch đã hoàn thành mà ⛔ không ai tuyên bố hoàn thành** thì đọc như **một lệnh cấm còn hiệu lực**. ⇒ Chỉ tôi trỏ sang chỗ chứa kế hoạch sống, ⛔ **không viết lại nội dung sóng `S0`–`S3`** *(nó vẫn đúng cho thời của nó)*.
 - v0.4 (2026-08-18): **S2 xong** — 7 file BA lõi v0.1, dẫn xuất từ 12 workbook thật. Mở `GAP-ITL-10..16`. `G-DOC-2` chưa qua (chờ `GAP-ITL-16` xác nhận reader engine).
 - v0.3 (2026-08-18): **S1 xong** — 8 file Orchestrator v0.1 (`ORC-08` là file mới). `G-DOC-1` qua. Mở `GAP-ITL-09` (mâu thuẫn ưu tiên VALUE-FIRST, chặn `IM0`).
 - v0.2 (2026-08-18): **S0 xong.** Owner chốt `QĐ-ITL-01..04`. Đổi luật **W2** (độc lập + chốt kế thừa có version) theo `QĐ-ITL-04` ⇒ xoá hạng mục `🔗 THIN+LINK`, 7 file chuyển sang `🔁` tự chứa. Đóng `GAP-ITL-01`, mở `GAP-ITL-08` (nhịp rà trôi kế thừa). Dán banner `⏸` 33 file.

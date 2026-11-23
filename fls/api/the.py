@@ -107,7 +107,10 @@ def kiem(the: str, k: bytes | None = None, bay_gio: int | None = None) -> Nguoi:
     try:
         dau = json.loads(_b64(b_dau))
         than = json.loads(_b64(b_than))
-    except json.JSONDecodeError as e:
+    except ValueError as e:
+        # ⭐ `C7` (`WO-212`, AC-5): `json.JSONDecodeError` ⛔ la loi DUY NHAT — the rac
+        #   (`rac.rac.rac`) di qua `_b64` ra byte ⛔ phai UTF-8 ⇒ `UnicodeDecodeError`
+        #   (cung la `ValueError`), truoc day lot ra ngoai ⇒ may DUT ket noi, ⛔ 401.
         raise TheKhongHopLe(f"JSON sai: {e}") from e
     if not isinstance(dau, dict) or not isinstance(than, dict):
         raise TheKhongHopLe("dau hay than khong phai doi tuong JSON")

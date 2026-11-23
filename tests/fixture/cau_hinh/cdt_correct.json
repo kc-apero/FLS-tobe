@@ -1,0 +1,147 @@
+{
+ "bang": "IX.ORG",
+ "khuon": "cdt_correct",
+ "nguon": "'Report I H1000 Ledge (HR Allocate HD) Y2025 | For PL Report'!BR11:BS32",
+ "cach_doc": "Sheets API v4 values.get · UNFORMATTED_VALUE · SERIAL_NUMBER · khoá SA chỉ-đọc",
+ "ngay_dong_bang": "2026-11-17",
+ "khong_mang_PII": "⛔ KHÔNG mang cột riêng tư: máy soát 2 tên cột của bản thô với PM_COT_RIENG_TU ['Email Address'] — 0 trùng (gộp khoảng trắng, ⛔ phân biệt hoa thường). Ảnh chỉ giữ khoá `cdt_nguon` + 1 cột chọn; 0 cột bản thô ⛔ chọn (tên ở `cot_khong_chon`). Bản thô qua `chuan_bi` của khuôn: 2 tên cột trên là của BẢNG khuôn dựng; soát thêm 0 tên cột của 0 bảng phụ — 0 trùng. Ô bản thô mà khuôn ⛔ mang/băm: xem `ghi_chu_khuon`.",
+ "ghi_chu_khuon": "CDT Correct: lưới SA 13 hàng (vùng BR11:BS32); biên dư tới 32 (DT3-R1-02 — vùng > dữ liệu). Cột BR = cdt_nguon, BS = cdt1_chuan; tiêu đề BR10 ngoài vùng. ⛔ bảng đóng (C8).",
+ "khoa": "cdt_nguon",
+ "kieu_khoa": "ma",
+ "cot": [
+  "cdt1_chuan"
+ ],
+ "cot_khong_chon": [],
+ "so_dong": 13,
+ "trung": [],
+ "thieu": [],
+ "lac": [],
+ "khoa_hong": [],
+ "o_rong": [],
+ "cong": {
+  "mong": 13,
+  "so_dong": 13,
+  "dat": true,
+  "ly_do": []
+ },
+ "checksum_noi_dung": "994571a670e75cec",
+ "dong": [
+  {
+   "thu_tu": 1,
+   "cdt_nguon": {
+    "chu": "SHQ2 | Headquarters2"
+   },
+   "cdt1_chuan": {
+    "chu": "SHQ2 | Headquarters2"
+   }
+  },
+  {
+   "thu_tu": 2,
+   "cdt_nguon": {
+    "chu": "SHQ2_Headquarters2"
+   },
+   "cdt1_chuan": {
+    "chu": "SHQ2 | Headquarters2"
+   }
+  },
+  {
+   "thu_tu": 3,
+   "cdt_nguon": {
+    "chu": "SHQ1_Headquarters1"
+   },
+   "cdt1_chuan": {
+    "chu": "SHQ1 | Headquarters1"
+   }
+  },
+  {
+   "thu_tu": 4,
+   "cdt_nguon": {
+    "chu": "CMN_Management"
+   },
+   "cdt1_chuan": {
+    "chu": "SHQ1 | Headquarters1"
+   }
+  },
+  {
+   "thu_tu": 5,
+   "cdt_nguon": {
+    "chu": "CSM_SuperMinds"
+   },
+   "cdt1_chuan": {
+    "chu": "CSM | SuperMinds"
+   }
+  },
+  {
+   "thu_tu": 6,
+   "cdt_nguon": {
+    "chu": "ASA_Super App (IOs)"
+   },
+   "cdt1_chuan": {
+    "chu": "ASA | Super App"
+   }
+  },
+  {
+   "thu_tu": 7,
+   "cdt_nguon": {
+    "chu": "CVL_VisionLab"
+   },
+   "cdt1_chuan": {
+    "chu": "CVL | VisionLab"
+   }
+  },
+  {
+   "thu_tu": 8,
+   "cdt_nguon": {
+    "chu": "COR_TeraSofts"
+   },
+   "cdt1_chuan": {
+    "chu": "COR | TeraSofts"
+   }
+  },
+  {
+   "thu_tu": 9,
+   "cdt_nguon": {
+    "chu": "CAH_Astronex"
+   },
+   "cdt1_chuan": {
+    "chu": "CAH | Astronex"
+   }
+  },
+  {
+   "thu_tu": 10,
+   "cdt_nguon": {
+    "chu": "CSM | SuperMinds"
+   },
+   "cdt1_chuan": {
+    "chu": "CSM | SuperMinds"
+   }
+  },
+  {
+   "thu_tu": 11,
+   "cdt_nguon": {
+    "chu": "CVL | VisionLab"
+   },
+   "cdt1_chuan": {
+    "chu": "CVL | VisionLab"
+   }
+  },
+  {
+   "thu_tu": 12,
+   "cdt_nguon": {
+    "chu": "COR | TeraSofts"
+   },
+   "cdt1_chuan": {
+    "chu": "COR | TeraSofts"
+   }
+  },
+  {
+   "thu_tu": 13,
+   "cdt_nguon": {
+    "chu": "CAH | Astronex"
+   },
+   "cdt1_chuan": {
+    "chu": "CAH | Astronex"
+   }
+  }
+ ]
+}

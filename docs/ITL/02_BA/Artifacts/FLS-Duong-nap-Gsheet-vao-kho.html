@@ -1,0 +1,741 @@
+<title>Đường nạp sao kê FLS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bitter:wght@600;700&family=Be+Vietnam+Pro:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<style>
+:root{
+  --paper:#F7F8F5; --surface:#fff; --ink:#1B2420; --ink-2:#5A6661;
+  --ink-3:#84908A; --rule:#D2DAD3; --accent:#0F5C4A; --accent-soft:#E1EDE7;
+  --amber:#87680F; --amber-soft:#F5EEDA; --do:#A32B23; --do-soft:#F6E3E0;
+  --plate:#F1F4EE; --plate-rule:#C7D1C6; --mo:#9AA69F;
+}
+@media (prefers-color-scheme:dark){ :root:not([data-theme=light]){
+  --paper:#0F1412; --surface:#161C18; --ink:#E7EDE5; --ink-2:#AAB6AF;
+  --ink-3:#77837C; --rule:#2A332C; --accent:#66C4A4; --accent-soft:#17271F;
+  --amber:#D9B455; --amber-soft:#2A2213; --do:#E9897C; --do-soft:#2E1A18;
+  --plate:#1B221D; --plate-rule:#2A332C; --mo:#5E6A64;
+}}
+:root[data-theme=dark]{
+  --paper:#0F1412; --surface:#161C18; --ink:#E7EDE5; --ink-2:#AAB6AF;
+  --ink-3:#77837C; --rule:#2A332C; --accent:#66C4A4; --accent-soft:#17271F;
+  --amber:#D9B455; --amber-soft:#2A2213; --do:#E9897C; --do-soft:#2E1A18;
+  --plate:#1B221D; --plate-rule:#2A332C; --mo:#5E6A64;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);
+  font:400 15px/1.62 "Be Vietnam Pro",system-ui,-apple-system,sans-serif;
+  -webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:40px 24px 90px}
+
+h1{font:700 30px/1.2 Bitter,Georgia,serif;margin:0 0 8px;letter-spacing:-.015em;
+  text-wrap:balance}
+.lede{color:var(--ink-2);font:400 18.5px/1.52 Bitter,Georgia,serif;margin:0 0 10px;
+  max-width:62ch;text-wrap:balance}
+.meta{color:var(--ink-3);font:400 12.5px/1.6 "IBM Plex Mono",ui-monospace,monospace}
+.meta a{color:inherit}
+code,.mono{font-family:"IBM Plex Mono",ui-monospace,monospace;font-size:.9em}
+strong{font-weight:600}
+
+h2{font:600 22px/1.28 Bitter,Georgia,serif;margin:52px 0 6px;padding-top:20px;
+  border-top:1px solid var(--rule);text-wrap:balance}
+h2 .so{font:600 12px/1 "IBM Plex Mono",monospace;color:var(--accent);
+  display:block;margin-bottom:7px;letter-spacing:.1em;text-transform:uppercase}
+h2+.sub{color:var(--ink-2);margin:0 0 20px;max-width:64ch}
+h3{font:600 12.5px/1.4 "IBM Plex Mono",ui-monospace,monospace;margin:30px 0 10px;
+  text-transform:uppercase;letter-spacing:.08em;color:var(--accent)}
+
+/* ── định vị: ba sự thật nền ─────────────────────────────────────── */
+.dinhvi{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin:26px 0 4px;
+  border:1px solid var(--plate-rule);border-radius:10px;overflow:hidden;
+  background:var(--plate)}
+.dinhvi>div{padding:14px 16px;border-right:1px solid var(--plate-rule)}
+.dinhvi>div:last-child{border-right:0}
+.dinhvi dt{font:600 10.5px/1.4 "IBM Plex Mono",monospace;color:var(--ink-3);
+  text-transform:uppercase;letter-spacing:.09em;margin:0 0 5px}
+.dinhvi dd{margin:0;font:600 15px/1.4 Bitter,Georgia,serif}
+.dinhvi dd em{display:block;font:400 12.5px/1.5 "Be Vietnam Pro",sans-serif;
+  font-style:normal;color:var(--ink-2);margin-top:4px}
+@media(max-width:760px){.dinhvi{grid-template-columns:1fr}
+  .dinhvi>div{border-right:0;border-bottom:1px solid var(--plate-rule)}}
+
+/* ── ghi chú ─────────────────────────────────────────────────────── */
+.note{border:1px solid var(--rule);background:var(--surface);border-radius:8px;
+  padding:12px 15px;margin:18px 0;font-size:13.5px;line-height:1.58}
+.note.amb{border-color:var(--amber);background:var(--amber-soft)}
+.note.do{border-color:var(--do);background:var(--do-soft)}
+
+/* ── bản vẽ ──────────────────────────────────────────────────────── */
+.ve{--nen:var(--paper);--vien:var(--plate-rule);--nhan:var(--ink);
+  --phu:var(--ink-2);--o:var(--surface);--o-dau:var(--accent-soft);
+  --o-chu:var(--accent);--ten:var(--ink-3);--tenx:var(--do);--lu:var(--mo);
+  margin:22px 0 10px;overflow-x:auto}
+.chu-giai{display:flex;gap:18px;flex-wrap:wrap;font-size:12.5px;
+  color:var(--ink-2);margin:6px 0 0;align-items:center}
+.chu-giai i{font-style:normal;font-family:"IBM Plex Mono",monospace;font-weight:600;
+  color:var(--ink)}
+.chu-giai svg{vertical-align:middle}
+
+/* ── một thực thể = một thẻ ──────────────────────────────────────── */
+.luoi-tt{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;
+  margin:18px 0}
+@media(max-width:880px){.luoi-tt{grid-template-columns:1fr}}
+.tt{border:1px solid var(--rule);border-radius:9px;background:var(--surface);
+  overflow:hidden;display:flex;flex-direction:column}
+.tt>.dau{padding:10px 14px;background:var(--accent-soft);
+  border-bottom:1px solid var(--rule)}
+.tt>.dau b{font:600 14px/1.3 "IBM Plex Mono",monospace;color:var(--accent)}
+.tt>.dau .vt{display:block;font-size:12px;color:var(--ink-2);margin-top:3px;
+  line-height:1.45}
+.tt table{margin:0;font-size:12.5px;width:100%;border-collapse:collapse}
+.tt td{border-bottom:1px solid var(--rule);padding:6px 10px;vertical-align:top}
+.tt tr:last-child td{border-bottom:0}
+.tt td:first-child{font:500 12px/1.5 "IBM Plex Mono",monospace;white-space:nowrap}
+.tt td:last-child{color:var(--ink-2);font-size:12.5px;line-height:1.5}
+.tt>.chan{margin-top:auto;padding:9px 14px;border-top:1px solid var(--rule);
+  background:var(--plate);font-size:12.5px;line-height:1.55;color:var(--ink-2)}
+.k{display:inline-block;font:600 9.5px/1.6 "IBM Plex Mono",monospace;
+  padding:0 5px;border-radius:3px;border:1px solid;margin-left:5px;
+  white-space:nowrap;vertical-align:1px}
+.k.pk{color:var(--amber);background:var(--amber-soft);border-color:var(--amber)}
+.k.fk{color:var(--accent);background:var(--accent-soft);border-color:var(--accent)}
+.k.u{color:var(--ink-2);border-color:var(--rule)}
+
+/* ── bảng ────────────────────────────────────────────────────────── */
+.scroll{overflow-x:auto;margin:16px 0}
+table.b{width:100%;border-collapse:collapse;font-size:13.5px;min-width:560px}
+table.b th,table.b td{text-align:left;padding:8px 10px;
+  border-bottom:1px solid var(--rule);vertical-align:top}
+table.b th{font:600 12px/1.4 "Be Vietnam Pro",sans-serif;color:var(--ink-2);
+  background:var(--accent-soft);text-transform:uppercase;letter-spacing:.05em}
+table.b td.c{text-align:center}
+table.b tbody tr:hover{background:var(--plate)}
+.hang{display:inline-block;font:600 10.5px/1.7 "IBM Plex Mono",monospace;
+  padding:0 7px;border-radius:3px;border:1px solid;white-space:nowrap}
+.hang.chan{color:var(--do);background:var(--do-soft);border-color:var(--do)}
+.hang.co{color:var(--amber);background:var(--amber-soft);border-color:var(--amber)}
+.hang.canh{color:var(--ink-2);background:var(--plate);border-color:var(--rule)}
+.verb{font:600 11px/1.7 "IBM Plex Mono",monospace;padding:0 6px;border-radius:3px;
+  border:1px solid var(--rule);color:var(--ink-2);background:var(--plate)}
+.verb.ghi{color:var(--do);border-color:var(--do);background:var(--do-soft)}
+
+/* ── chặng workflow: rail trái + thân ────────────────────────────── */
+.chang{display:grid;grid-template-columns:232px minmax(0,1fr);
+  border:1px solid var(--plate-rule);border-radius:10px;margin:0 0 6px;
+  overflow:hidden;background:var(--plate)}
+@media(max-width:820px){.chang{grid-template-columns:1fr}}
+.chang>.rail{padding:16px 17px;background:var(--surface);
+  border-right:1px solid var(--plate-rule)}
+.chang>.rail .n{font:600 11px/1 "IBM Plex Mono",monospace;color:var(--accent);
+  letter-spacing:.1em}
+.chang>.rail b{display:block;font:600 16px/1.3 Bitter,Georgia,serif;margin:7px 0 6px}
+.chang>.rail .ma{font:400 11.5px/1.6 "IBM Plex Mono",monospace;color:var(--ink-3);
+  word-break:break-word}
+.chang>.than{padding:15px 17px}
+.buoc{display:flex;gap:11px;align-items:flex-start;padding:7px 0;font-size:13.5px;
+  line-height:1.55}
+.buoc+.buoc{border-top:1px dotted var(--plate-rule)}
+.buoc>.i{flex:0 0 auto;font:600 11px/1.55 "IBM Plex Mono",monospace;
+  color:var(--accent);padding-top:2px;min-width:18px}
+.mui{text-align:center;color:var(--ink-3);font-size:17px;margin:2px 0 4px;
+  line-height:1}
+
+/* ── nhánh hạng ──────────────────────────────────────────────────── */
+.nhanh{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:16px 0 4px}
+@media(max-width:820px){.nhanh{grid-template-columns:1fr}}
+.nhanh>div{border:1px solid var(--rule);border-radius:9px;background:var(--surface);
+  padding:0;overflow:hidden}
+.nhanh .top{padding:10px 13px;border-bottom:1px solid var(--rule);
+  display:flex;align-items:center;justify-content:space-between;gap:8px}
+.nhanh .body{padding:11px 13px;font-size:13px;line-height:1.55;color:var(--ink-2)}
+.nhanh .hq{display:block;margin-top:8px;font:600 12.5px/1.45 "Be Vietnam Pro",sans-serif;
+  color:var(--ink)}
+.nhanh .chan-vach{border-top:3px solid var(--do)}
+.nhanh .co-vach{border-top:3px solid var(--amber)}
+.nhanh .canh-vach{border-top:3px solid var(--ink-3)}
+
+/* ── phương trình cổng bốn đường ─────────────────────────────────── */
+.pt{border:1px solid var(--accent);border-radius:9px;background:var(--accent-soft);
+  padding:16px 18px;margin:18px 0;text-align:center}
+.pt .ct{font:600 17px/1.7 "IBM Plex Mono",monospace;color:var(--accent);
+  font-variant-numeric:tabular-nums}
+.pt .gt{display:block;margin-top:8px;font-size:13px;color:var(--ink-2);
+  line-height:1.55}
+
+/* ── dải 15 số của bản khai dòng 1 ───────────────────────────────── */
+.dai{display:flex;flex-wrap:wrap;gap:7px;margin:16px 0 10px}
+.dai .o{border:1px solid var(--rule);background:var(--surface);border-radius:7px;
+  padding:7px 10px 8px;min-width:88px;flex:0 0 auto}
+.dai .o b{display:block;font:600 11px/1.3 "IBM Plex Mono",monospace;color:var(--ink-3)}
+.dai .o span{display:block;font:500 12.5px/1.4 "Be Vietnam Pro",sans-serif;
+  margin-top:3px}
+.dai .o.ok{border-color:var(--accent);background:var(--accent-soft)}
+.dai .o.ok b{color:var(--accent)}
+.dai .o.cam{border-color:var(--do);background:var(--do-soft)}
+.dai .o.cam b,.dai .o.cam span{color:var(--do)}
+.dai .o.bo{opacity:.62;border-style:dashed}
+.dai .o.rong span{color:var(--ink-3);font-style:italic}
+
+ul.gon{margin:12px 0;padding-left:20px}
+ul.gon li{margin:7px 0;line-height:1.6}
+.cuoi{margin-top:56px;padding-top:16px;border-top:1px solid var(--rule);
+  font:400 12.5px/1.7 "IBM Plex Mono",monospace;color:var(--ink-3)}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:3px}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+
+<div class="wrap">
+
+<h1>Đường nạp sao kê — <span class="mono">Google Sheets → kho FLS</span></h1>
+<p class="lede">Kế toán vẫn gõ trên Sheets. FLS <strong>đọc vùng CHUẨN</strong> của <strong>68 dòng chảy</strong> — 60 sheet <code>R |</code> bank + 8 quỹ — chụp lại, soát bằng 9 luật, rồi ghi vào sổ trong <strong>một giao dịch duy nhất</strong>.</p>
+<p class="meta">Nguồn + ERD + workflow · khâu Ⓐ NẠP DATA · đọc từ <code>fls/db/schema.py</code> · <code>fls/repo/chup.py</code> · <code>chay_nap.py</code> · <code>nap_lo.py</code> · <code>fls/kiem/soat_nap.py</code> · <code>fls/api/bang_tuyen.py</code> — 2026-09-17</p>
+
+<div class="dinhvi">
+  <div><dt>Khâu</dt><dd>Ⓐ NẠP DATA<em>8 trên 23 thực thể của kho — mốc <code>A</code>, đường LẤY dữ liệu</em></dd></div>
+  <div><dt>Tầng</dt><dd>① ẢNH CHỤP + ② NẠP<em>6 bảng ảnh chụp <span class="mono">+</span> 2 bảng lô nạp; dừng đúng ở cửa sổ <code>fls_itl</code></em></dd></div>
+  <div><dt>Ranh giới</dt><dd>⛔ Không ghi ngược<em><code>QĐ-ITL-34</code>: không một ô nào được ghi về file kế toán</em></dd></div>
+</div>
+
+<div class="note amb">⛔⛔ <strong>Một tiền đề đã bị lật — nhớ trước khi đọc tiếp.</strong> Bản đặc tả <span class="mono">v2.5</span> vẽ TO-BE là <em>“kế toán TẢI TỆP lên”</em>. <strong><code>QĐ-ITL-109</code> lật</strong>: đo sống 60 nguồn bank thì <strong>36</strong> nguồn bóc ngày bằng công thức riêng và <strong>23</strong> nguồn <strong>ĐỔI DẤU</strong> (<code>Credit = &lt;cột thô&gt; × (−1)</code>) — chở 60 phép biến đổi ấy sang FLS là mở chỗ để <strong>sai DẤU tiền</strong>.<br>⇒ Cử chỉ nhập <strong>ở lại Google Sheets</strong>; màn <code>F04</code> ⛔ <strong>không có một ô nhập giao dịch nào</strong>, và ⛔ <strong>không gọi Sheets</strong> — nó đọc <strong>ảnh chụp trong kho</strong> (<code>QĐ-ITL-110</code>).</div>
+
+
+<h2><span class="so">§1 · Đầu nguồn</span>Nguồn — workbook nào, sheet nào, dòng nào là dòng đầu</h2>
+<p class="sub">Năm domain nguồn nuôi cả hệ ITL. Đường nạp đang mô tả ở trang này <strong>chỉ chạm lằn Treasury</strong> — và trong lằn ấy, chỉ <strong>bank</strong>. Mọi lằn còn lại đã khai schema nhưng <strong>chưa có đường chụp</strong>.</p>
+
+<div class="scroll">
+<table class="b">
+  <thead><tr><th style="width:17%">Domain</th><th style="width:34%">Workbook thật</th><th style="width:26%">Đóng góp</th><th>FLS hôm nay</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Treasury<br>Dòng tiền</strong></td><td class="mono">P100 _ Bank Transactions <span style="color:var(--ink-3)">(66 sheet · 60+ <code>R |</code>)</span><br>P100 _ Cash Ledger <span style="color:var(--ink-3)">(25 sheet)</span><br>A-CCR_V2_Working <span style="color:var(--ink-3)">(29 sheet)</span></td><td>Dòng tiền thực — cơ sở <code>CFA</code>, đối soát số dư</td><td><strong>Đang chạy</strong> ở lằn <code>Bank</code>. Lằn <strong>quỹ</strong> chờ <code>GAP-CANON-02</code> (khuôn RA 11 cột)</td></tr>
+    <tr><td><strong>Procure-to-Pay</strong></td><td class="mono">AperoGroup_Payment <span style="color:var(--ink-3)">(136 sheet)</span><br>PE → PI → PM → PC</td><td>Cam kết chi, công nợ, khớp thanh toán</td><td>Nạp qua <code>PM_Unpivot</code> → <code>fls_pm_line</code> (14 vị trí, <code>PM_KHAI_VERSION</code> 2)</td></tr>
+    <tr><td><strong>Payroll</strong></td><td class="mono">H1000 Ledger <span style="color:var(--ink-3)">(108 sheet)</span></td><td>Chi phí lao động — <strong>đã phân bổ sẵn</strong> theo HD/KRF <em>tại nguồn</em></td><td>Đã khai schema, ⛔ chưa có đường chụp</td></tr>
+    <tr><td><strong>Revenue / Nền tảng</strong></td><td class="mono">GI (18) · OMC (18) · SC (9) · PS (9)<br><span style="color:var(--ink-3)">export Looker</span></td><td>Doanh thu &amp; chi phí nền tảng — cơ sở <code>PLA</code></td><td>Đã khai schema, ⛔ chưa có đường chụp</td></tr>
+    <tr><td><strong>Budget</strong></td><td class="mono">RTB — Real-Time Budget</td><td>Đối chiếu kế hoạch vs thực</td><td><strong>⛔ Chưa dựng</strong></td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3>Bốn địa chỉ mã đang thật sự mở</h3>
+<div class="luoi-tt">
+
+  <div class="tt">
+    <div class="dau"><b>P100 _ Bank Transactions</b><span class="vt"><code>1zJA0My…FOn8</code> · lằn <code>Bank</code> · <strong>đang nạp</strong></span></div>
+    <table>
+      <tr><td>60 sheet <code>R | …</code></td><td>vùng <strong>THÔ</strong> — mỗi ngân hàng/ví một định dạng; đây là chỗ <code>chup_sao_ke</code> đọc</td></tr>
+      <tr><td><code>Bank Transactions</code></td><td>vùng <strong>CHUẨN</strong> — header dòng <strong>2</strong>, dữ liệu từ dòng <strong>3</strong>, <strong>8.338</strong> dòng × <strong>10</strong> cột</td></tr>
+      <tr><td><code>Bank Transactions_Filter</code></td><td>lát lọc, đọc khi đối soát</td></tr>
+    </table>
+    <div class="chan">⚠ <strong>Dữ liệu bắt đầu từ dòng 3, ⛔ không phải dòng 4</strong> — dòng 3 là một dòng <strong>cụt</strong> (có <code>Source</code> + <code>Num</code>, ⛔ không ngày ⛔ không mã). Lưới khai <strong>8.341</strong>.<br>⭐ <strong>Dòng 1 là một BỘ ĐẾM SỐNG</strong> — <code>8331</code> mã · <code>8339</code> xuất xứ: cái sổ <strong>tự đếm chính nó</strong>.</div>
+  </div>
+
+  <div class="tt">
+    <div class="dau"><b>P100 _ Cash Ledger</b><span class="vt"><code>1RmmkOS…kF7U</code> · lằn <strong>quỹ</strong> · chờ <code>GAP-CANON-02</code></span></div>
+    <table>
+      <tr><td>8 sheet <code>R | …</code></td><td>8 dòng chảy — ⚠ <strong>2 sheet bị nhiều dòng danh mục cùng trỏ tới</strong> (<code>R | CNC</code> ← 4 dòng · <code>R | Pingpong</code> ← 3)</td></tr>
+      <tr><td><code>Cash Ledger Transactions</code></td><td>vùng CHUẨN — header dòng 2, thêm <code>Check trùng_Reference number</code> và <code>Month</code></td></tr>
+      <tr><td><code>[CA]Nhật ký xử lý Giao dịch</code></td><td>nhật ký xử lý bên quỹ</td></tr>
+    </table>
+    <div class="chan">⭐ <strong>Quỹ gõ sẵn hai thứ mà bank ⛔ không có:</strong> pháp nhân và chủ dự toán ngay tại sheet nguồn — lằn bank phải <strong>chờ ghép PM</strong>, mà tỷ lệ ghép gần <strong>kịch trần 33,8%</strong>.<br>⚠ Nhưng chỉ <strong>3/8</strong> sheet quỹ có hai cột ấy, và <strong>0/60</strong> bên bank ⇒ chúng là <strong>TUỲ CHỌN</strong>; bắt buộc chúng là làm <strong>65 nguồn ⛔ không nạp được</strong>.</div>
+  </div>
+
+  <div class="tt">
+    <div class="dau"><b>Bản sao RAW</b><span class="vt"><code>1md85t…1_4E</code> ▸ <code>Transaction Mapping L1</code> · <code>QĐ-ITL-50</code></span></div>
+    <table>
+      <tr><td>dòng đầu</td><td><strong>5</strong> — header ở dòng <strong>3</strong>, <strong>dòng 4 TRỐNG</strong></td></tr>
+      <tr><td>vì sao bản sao</td><td>file gốc trả <code>HTTP 403</code>; owner chốt <em>“bản sao này là y chang bản gốc, sống”</em></td></tr>
+      <tr><td>bằng chứng</td><td><strong>6.648</strong> ô <code>#N/A</code> được <strong>bảo toàn</strong>; tỷ lệ ghép <strong>33,5%</strong> trùng khít <strong>33,8%</strong> đã đo độc lập</td></tr>
+    </table>
+    <div class="chan">⭐ <strong>Vì sao bản sao RAW được mà bản sao ADJUSTED thì không:</strong> <code>ITL Ledge</code> khi phụ thuộc đứt thì <code>iferror</code> bắt cả <code>Input here</code> rồi <code>MID</code> nhận <strong>MỘT HÀNG MẶC ĐỊNH</strong> — <strong>0 ô lỗi, sai ~5.000 dòng im lặng</strong>. <code>Transaction Mapping L1</code> thì <strong>GIỮ NGUYÊN <code>#N/A</code></strong>, nên ⛔ không bịa.</div>
+  </div>
+
+  <div class="tt">
+    <div class="dau"><b>Sổ gốc ADJUSTED</b><span class="vt"><code>1r4WemI…1yXA</code> ▸ <code>ITL Ledge</code> · <code>QĐ-ITL-49</code></span></div>
+    <table>
+      <tr><td>dòng đầu</td><td><strong>10</strong> — header dòng 7</td></tr>
+      <tr><td>đọc gì</td><td>7 khối <code>Manual input</code> của vùng ADJUSTMENT, đọc từ <strong>FILE GỐC</strong></td></tr>
+      <tr><td>4 vùng</td><td>BASE+IMPORT (A–Q) · ADJUSTMENT (R→AT, 7 khối × 4 cột) · ALLOCATE (AU–AW) · AUDIT (AX–BL)</td></tr>
+    </table>
+    <div class="chan">⚠ <strong>6.843 ô <em>“Input here”</em></strong> trong <code>ITL Ledge</code> ⛔ không phải ô trống chờ nhập — chúng là <strong>số lần đã dùng giá trị mặc định</strong> (<code>GAC-Other</code>/<code>Headquarters2</code>). Đó là mẫu hỏng mà <code>fls_khai_cot</code> ra đời để ⛔ không lặp lại.</div>
+  </div>
+
+</div>
+
+<h3>Vùng THÔ → vùng CHUẨN: dòng 1 của mỗi sheet <code>R |</code> là một BẢN KHAI</h3>
+<p>Kế toán <strong>đã tự giải</strong> bài <em>“60+ định dạng sao kê”</em>: dòng 1 mỗi sheet ghi <strong>số thứ tự trường</strong>, và họ tự duy trì bằng tay. Đo sống <strong>68/68</strong> sheet khai đủ 6 trường trên <strong>19 bố cục cột</strong> khác nhau. Lằn quỹ đánh số tiếp <strong>tới 15</strong> — và đó là chỗ phải cẩn thận:</p>
+
+<div class="dai">
+  <div class="o ok"><b>1</b><span>Date</span></div>
+  <div class="o ok rong"><b>2</b><span>Description</span></div>
+  <div class="o ok"><b>3</b><span>Currency</span></div>
+  <div class="o ok"><b>4</b><span>Debit</span></div>
+  <div class="o ok"><b>5</b><span>Credit</span></div>
+  <div class="o ok"><b>6</b><span>Reference number</span></div>
+  <div class="o bo"><b>7</b><span>Note — ⛔ không nhận</span></div>
+  <div class="o ok"><b>8</b><span>Legal Entity <em>(tuỳ chọn)</em></span></div>
+  <div class="o cam"><b>9…14</b><span>KHỐI NHÂN SỰ — ⛔ CẤM</span></div>
+  <div class="o ok"><b>15</b><span>CDT <em>(tuỳ chọn)</em></span></div>
+</div>
+
+<div class="note do">⛔⛔ <strong>Vì sao khối <code>9…14</code> bị cấm CẢ KHỐI, ⛔ không chỉ ba cột đã đo.</strong> Đo sống 08/09: <strong>3/8</strong> sheet quỹ mang cột dữ liệu cá nhân — <code>10 = ID Employee</code> · <code>11 = Họ và tên</code> · <code>12 = Số CMND/CCCD/Passport</code>. Ai mở danh sách trường <em>“từ 6 lên 15 một cách máy móc”</em> sẽ <strong>kéo số căn cước vào kho</strong>. Mà nới nó là việc <strong>hoàn toàn hợp lý sẽ có người làm</strong>: <code>8</code> và <code>15</code> thật sự đáng lấy, và chúng nằm <strong>NGOÀI</strong> khối ấy (đo: <code>LE</code> ở cột <code>H</code>, khối nhân sự <code>I…N</code>, <code>CDT</code> ở <code>O</code> — <strong>liền mạch</strong>).<br>⇒ Phép canh đặt ở <strong>TỪ VỰNG</strong>, ⛔ không ở dữ liệu: bài <code>test_tu_vung_doc_duoc_KHONG_duoc_chua_truong_CAM</code> đỏ <strong>ngay giây</strong> ai thêm một tên chạm mẫu ấy — ⛔ không đợi tới lúc dữ liệu cá nhân <strong>đã nằm trong kho</strong>.</div>
+
+<div class="note">⚠ <strong><code>Description</code> được KHAI nhưng ô LUÔN RỖNG</strong> — hai luật ⛔ không xung đột: <code>kiem_ban_khai</code> đòi <strong>đủ 6 trường</strong> (thiếu một trường là <strong>mất cột trong im lặng</strong>, mà cột mất có thể là cột tiền), còn <code>QĐ-ITL-92</code> cấm <strong>ĐỌC</strong> nó. Trường <strong>được khai</strong>, giá trị <strong>⛔ không bao giờ được lấy</strong>; ảnh chụp mà <em>có</em> khoá ấy thì tầng kho <strong>NỔ</strong>, ⛔ không lặng lẽ ném đi.</div>
+
+<h3>Sáu trường → khuôn ra 10 cột của <code>Bank Transactions</code></h3>
+<div class="scroll">
+<table class="b">
+  <thead><tr><th style="width:22%">Trường bản khai</th><th style="width:24%">Cột khuôn ra</th><th>Ghi chú đo được</th></tr></thead>
+  <tbody>
+    <tr><td class="mono">Date</td><td class="mono">Transaction date → <strong>A</strong></td><td><code>thu_tu</code> quyết định <code>dmy</code>/<code>mdy</code> — <strong>29/29</strong> nguồn mơ hồ là <code>mdy</code></td></tr>
+    <tr><td class="mono">Description</td><td class="mono">Description → <strong>C</strong></td><td>⛔ <strong>khai mà ⛔ không đọc</strong> — ô luôn rỗng (<code>QĐ-ITL-92</code>)</td></tr>
+    <tr><td class="mono">Currency</td><td class="mono">Currency → <strong>D</strong></td><td>luật <code>S4</code> canh</td></tr>
+    <tr><td class="mono">Debit</td><td class="mono"><strong>PS Nợ</strong> → <strong>E</strong></td><td rowspan="2">⚠ <strong>23/60</strong> nguồn <strong>ĐỔI DẤU</strong> tại sheet (<code>Credit = &lt;cột thô&gt; × (−1)</code>, kèm hoán vế) ⇒ phép chuẩn hoá <strong>ở lại Sheets</strong></td></tr>
+    <tr><td class="mono">Credit</td><td class="mono"><strong>PS Có</strong> → <strong>F</strong></td></tr>
+    <tr><td class="mono">Reference number</td><td class="mono">Reference number</td><td>khoá chống trùng + khoá ghép PM</td></tr>
+    <tr><td class="mono" style="color:var(--ink-3)">— máy sinh —</td><td class="mono">Source</td><td>mã sheet tài khoản dạng <code>R | 24138888_TCB VND_TERASOFTS</code> → khoá tra <code>MAPPING-MASTER.Bank Sheet</code></td></tr>
+    <tr><td class="mono" style="color:var(--ink-3)">— máy sinh —</td><td class="mono">Num</td><td>⭐ thứ tự lần xuất hiện của mã — khớp <strong>8.331/8.331 = 100,0%</strong> ⇒ phép chống trùng của AS-IS <strong>đã chạy đúng tuyệt đối</strong>, FLS chỉ phải <strong>GIỮ</strong>, ⛔ không phát minh lại</td></tr>
+    <tr><td class="mono" style="color:var(--ink-3)">— của sheet —</td><td class="mono">Check trùng</td><td>⛔ <strong>⛔ không đáng tin</strong>: khớp <strong>92,1%</strong> và <strong>luôn đếm thiếu</strong> ⇒ ⛔ không đưa vào canonical</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3>Các sheet đã khai schema — chưa có đường chụp</h3>
+<div class="scroll">
+<table class="b">
+  <thead><tr><th style="width:9%">Adapter</th><th style="width:30%">Workbook ▸ Sheet</th><th>Hình dạng phải biết trước khi viết adapter</th></tr></thead>
+  <tbody>
+    <tr><td class="c mono">C</td><td class="mono">A-CCR_V2_Working ▸ <code>1.2 Ledger 112</code></td><td>Header dòng 2. ⚠ <strong>Lệch thứ tự cột</strong>: ở đây <code>G = Source</code>, <code>H = Tài khoản</code>; còn <code>Transaction Original</code> thì <code>G = Tài khoản</code> ⇒ adapter <strong>phải map theo TÊN, ⛔ không theo vị trí</strong>.</td></tr>
+    <tr><td class="c mono">C</td><td class="mono">A-CCR_V2_Working ▸ <code>2. CCR</code></td><td><strong>Ma trận, ⛔ không phải bảng phẳng.</strong> Dòng 3 là chiều tài khoản; từ cột <code>L</code> trở đi <strong>một cột một ngày</strong> (dòng 5 = ngày, dòng 6 = tỷ giá <code>USD/VND</code>) ⇒ phải <strong>unpivot</strong> về (tài khoản × ngày × số dư × tỷ giá).</td></tr>
+    <tr><td class="c mono">C</td><td class="mono">A-CCR_V2_Working ▸ <code>Bank Transactions</code></td><td>⛔⛔ <strong>TRÙNG TÊN mà ⛔ KHÔNG phải sheet cần đọc.</strong> <strong>7.961</strong> dòng và nó <strong>dừng ở 19/08/2026</strong>, trong khi bản <code>P100</code> chạy tới <strong>06/09</strong> (<code>QĐ-ITL-96</code>). Bản <code>A-CCR</code> là bản đã hút về; bản <code>P100</code> là bản <code>OP-09</code> sinh ra từ 60 sheet <code>R |</code>.</td></tr>
+    <tr><td class="c mono">D</td><td class="mono">H1000 Ledger ▸ <code>1.3 Ledger NISINTCOM 2025</code></td><td>Header dòng <strong>3</strong>. Dùng <em>cùng khuôn</em> với <code>Transaction Mapping L1</code> <strong>nhưng khác ở đuôi</strong>: <code>Y</code> = <em>File đính kèm: Hóa đơn</em> (thay <em>Mã đối tác</em>), <code>Z</code>/<code>AA</code> có nội dung, <strong>⛔ không có <code>AL</code></strong> ⇒ ⛔ đừng giả định khuôn giống hệt.</td></tr>
+    <tr><td class="c mono">D</td><td class="mono">H1000 Ledger ▸ <code>HR Allocate_L500_v2</code></td><td>Header dòng 2. Tên cột chép <strong>nguyên văn</strong> kể cả lỗi nguồn: <code>Tháng kết thúc sử dụng dịch vụ (yyyymm</code> — <strong>thiếu dấu đóng ngoặc</strong>.</td></tr>
+    <tr><td class="c mono">D</td><td class="mono">H1000 Ledger ▸ <code>Allocation Driver</code></td><td>Header dòng 2 — <code>Sheet Name</code> · <code>Month PL</code> · <code>CDT</code> · <code>Number of Employee</code> · <code>Dịch vụ</code>…</td></tr>
+    <tr><td class="c mono">E</td><td class="mono">GI · OMC · SC · PS ▸ <code>CFA1 | …</code>, <code>CFA2 | MID n | …</code></td><td>Cùng khuôn 4 vùng như <code>ITL Ledge</code> (header dòng 7, dữ liệu dòng 10), khác 3 điểm: <code>E</code> = <em>PS Nợ (PE Amount)</em>, <code>Q</code> = <em>No Transactions Per Vendor</em>, khối 1–2 ADJUSTMENT là <em>PM/PE Amount · Date</em>. ⚠ Ô nhập tay <strong>ngoài</strong> <code>ITL Ledge</code>: <code>GI CFA1</code> = 173+173 · <code>GI CFA2 MID1</code> = 4.689 ⇒ <strong>tổng nhập tay của cả hệ lớn hơn 6.843 nhiều</strong>.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3>Bốn thứ tuyệt đối ⛔ không mở — mỗi cái đã sập một lần</h3>
+<div class="scroll">
+<table class="b">
+  <thead><tr><th style="width:34%">Hiện vật</th><th>Vì sao cấm — đây là <strong>bằng chứng</strong>, ⛔ không phải cảnh báo chung chung</th></tr></thead>
+  <tbody>
+    <tr><td class="mono">[Master] ITL_Ledge_raw.xlsx</td><td>~<strong>84 dòng MẤT MÃ</strong> (<code>ITL#</code> trỏ hỏng) làm <strong>bốc hơi 19,9 tỷ</strong> — mà <strong>tổng VẪN tự khớp</strong>.</td></tr>
+    <tr><td class="mono">1Pqg_G8…xbN0<br><span style="color:var(--ink-3);font-size:11.5px">bản sao ADJUSTED ngoài kiểm soát</span></td><td><strong>TỰ SẢN XUẤT giá trị mặc định với 0 ô lỗi</strong> ⇒ <strong>nguy hơn <code>#REF!</code></strong>: ai kiểm theo <code>AUD-5</code> sẽ kết luận <em>“sạch”</em>.</td></tr>
+    <tr><td class="mono">ITL_altered</td><td>Sai <strong>680 HD</strong> + <strong>1.048 CDT</strong>; <code>QĐ-ITL-36</code> loại khỏi vai tham chiếu.</td></tr>
+    <tr><td class="mono">*.xlsx xuất offline</td><td>Chỉ <strong>2,7%</strong> ô ngày còn nguyên kiểu — <strong>4.117 hoán</strong> · <strong>5.369 mất kiểu</strong> · <strong>38 rơi</strong>.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="note amb">⚠ <strong>Sổ đăng ký nguồn của hệ hiện tại đang HỎNG.</strong> <code>RAW ITLData Management</code> (có mặt ở <em>cả hai</em> file ITL, header dòng 3) chính là bản thô của run manifest: khai mỗi nguồn nạp từ file/sheet/ô nào, cắt kỳ ngày nào, độ trễ bao nhiêu, bao nhiêu giao dịch. Nhưng trong file thật, <strong>phần lớn ô từ dòng 6 trở đi là <code>#REF!</code></strong> ⇒ <strong>⛔ không ai biết chắc nguồn nào đã nạp tới đâu</strong>. <code>fls_source</code> + <code>fls_run</code> là chỗ dựng lại bảng này thành metadata thật.</div>
+
+<h2><span class="so">§2 · Mô hình dữ liệu</span>ERD — tám bảng, và mỗi bảng trả lời một câu</h2>
+<p class="sub">Mũi tên là <strong>khoá ngoại thật</strong>, đọc từ bản khai <code>fls/db/schema.py</code>. Hai bảng mờ bên phải nằm <em>ngoài</em> khâu này — chúng là chỗ đường nạp đổ vào.</p>
+
+<div class="ve">
+<svg viewBox="0 0 1190 450" width="100%" style="max-width:1190px;min-width:900px" xmlns="http://www.w3.org/2000/svg" font-family="ui-monospace,'IBM Plex Mono',monospace" role="img" aria-label="ERD tám bảng của khâu nạp: fls_source, fls_khai_cot, fls_nguon_dai, fls_chup, fls_chup_nguon, fls_chup_dong, fls_run, fls_reject">
+<defs>
+  <marker id="m1" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--ten)"/></marker>
+  <marker id="m2" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="var(--tenx)"/></marker>
+</defs>
+
+<!-- nhóm nhãn cột -->
+<text x="210" y="60" font-size="10.5" font-weight="600" fill="var(--phu)" text-anchor="middle" letter-spacing="1.4">KHAI NGUỒN</text>
+<text x="535" y="378" font-size="10.5" font-weight="600" fill="var(--phu)" text-anchor="middle" letter-spacing="1.4">MỘT LẦN ĐỌC SHEETS</text>
+<text x="815" y="378" font-size="10.5" font-weight="600" fill="var(--phu)" text-anchor="middle" letter-spacing="1.4">MỘT LÔ NẠP</text>
+<text x="1082" y="378" font-size="10.5" font-weight="600" fill="var(--lu)" text-anchor="middle" letter-spacing="1.4">NGOÀI KHÂU</text>
+
+<!-- ─── cạnh (vẽ trước để hộp đè lên) ─── -->
+<!-- source → khai_cot -->
+<path d="M210 225 V144" stroke="var(--ten)" stroke-width="1.4" fill="none" marker-end="url(#m1)"/>
+<text x="218" y="188" font-size="10" fill="var(--ten)">source_id</text>
+<!-- source → nguon_dai -->
+<path d="M210 275 V356" stroke="var(--ten)" stroke-width="1.4" fill="none" marker-end="url(#m1)"/>
+<text x="218" y="320" font-size="10" fill="var(--ten)">source_id</text>
+<!-- source → chup_nguon -->
+<path d="M310 240 L386 200" stroke="var(--ten)" stroke-width="1.4" fill="none" marker-end="url(#m1)"/>
+<text x="348" y="212" font-size="10" fill="var(--ten)" text-anchor="middle">source_id</text>
+<!-- source → chup_dong -->
+<path d="M310 262 L426 299" stroke="var(--ten)" stroke-width="1.4" fill="none" marker-end="url(#m1)"/>
+<text x="366" y="274" font-size="10" fill="var(--ten)" text-anchor="middle">source_id</text>
+<!-- chup → chup_nguon -->
+<path d="M470 90 V166" stroke="var(--ten)" stroke-width="1.4" fill="none" marker-end="url(#m1)"/>
+<text x="477" y="132" font-size="10" fill="var(--ten)">chup_id</text>
+<!-- chup → chup_dong -->
+<path d="M610 90 V276" stroke="var(--ten)" stroke-width="1.4" fill="none" marker-end="url(#m1)"/>
+<text x="617" y="200" font-size="10" fill="var(--ten)">chup_id</text>
+<!-- khai_cot → run (đi vòng trên) -->
+<path d="M210 90 V22 H780 V86" stroke="var(--ten)" stroke-width="1.4" fill="none" marker-end="url(#m1)"/>
+<text x="495" y="16" font-size="10" fill="var(--ten)" text-anchor="middle">khai_id — lô này đọc bằng BẢN KHAI nào</text>
+<!-- chup → run -->
+<path d="M640 62 L716 100" stroke="var(--ten)" stroke-width="1.4" fill="none" marker-end="url(#m1)"/>
+<text x="676" y="72" font-size="10" fill="var(--ten)" text-anchor="middle">chup_id</text>
+<!-- run → reject -->
+<path d="M815 140 V226" stroke="var(--ten)" stroke-width="1.4" fill="none" marker-end="url(#m1)"/>
+<text x="822" y="188" font-size="10" fill="var(--ten)">run_id</text>
+<!-- run → pm_line -->
+<path d="M910 126 L996 240" stroke="var(--ten)" stroke-width="1.4" fill="none" marker-end="url(#m1)"/>
+<text x="948" y="180" font-size="10" fill="var(--ten)" text-anchor="middle">run_id</text>
+<!-- run → itl : FK CÓ THẬT (baseline 0001) -->
+<path d="M910 106 L996 110" stroke="var(--ten)" stroke-width="1.4" fill="none" marker-end="url(#m1)"/>
+<text x="953" y="98" font-size="10" fill="var(--ten)" text-anchor="middle">run_id</text>
+
+<!-- ─── hộp ─── -->
+<g>
+  <rect x="110" y="90" width="200" height="50" rx="7" fill="var(--o)" stroke="var(--vien)"/>
+  <text x="124" y="112" font-size="13" font-weight="600" fill="var(--o-chu)">fls_khai_cot</text>
+  <text x="124" y="128" font-size="10" fill="var(--phu)" font-family="'Be Vietnam Pro',sans-serif">CÁCH ĐỌC, không phải dữ liệu</text>
+</g>
+<g>
+  <rect x="110" y="225" width="200" height="50" rx="7" fill="var(--o-dau)" stroke="var(--o-chu)" stroke-width="1.6"/>
+  <text x="124" y="247" font-size="13" font-weight="600" fill="var(--o-chu)">fls_source</text>
+  <text x="124" y="263" font-size="10" fill="var(--phu)" font-family="'Be Vietnam Pro',sans-serif">một DÒNG CHẢY, không phải tài khoản</text>
+</g>
+<g>
+  <rect x="110" y="360" width="200" height="50" rx="7" fill="var(--o)" stroke="var(--vien)"/>
+  <text x="124" y="382" font-size="13" font-weight="600" fill="var(--o-chu)">fls_nguon_dai</text>
+  <text x="124" y="398" font-size="10" fill="var(--phu)" font-family="'Be Vietnam Pro',sans-serif">nhãn thô ↔ danh mục</text>
+</g>
+<g>
+  <rect x="430" y="40" width="210" height="50" rx="7" fill="var(--o)" stroke="var(--vien)"/>
+  <text x="444" y="62" font-size="13" font-weight="600" fill="var(--o-chu)">fls_chup</text>
+  <text x="444" y="78" font-size="10" fill="var(--phu)" font-family="'Be Vietnam Pro',sans-serif">doc_luc · workbook · lằn · giây</text>
+</g>
+<g>
+  <rect x="390" y="170" width="190" height="50" rx="7" fill="var(--o)" stroke="var(--vien)"/>
+  <text x="404" y="192" font-size="13" font-weight="600" fill="var(--o-chu)">fls_chup_nguon</text>
+  <text x="404" y="208" font-size="10" fill="var(--phu)" font-family="'Be Vietnam Pro',sans-serif">nguồn ra 0 dòng vẫn CÓ MẶT</text>
+</g>
+<g>
+  <rect x="430" y="280" width="210" height="50" rx="7" fill="var(--o)" stroke="var(--vien)"/>
+  <text x="444" y="302" font-size="13" font-weight="600" fill="var(--o-chu)">fls_chup_dong</text>
+  <text x="444" y="318" font-size="10" fill="var(--phu)" font-family="'Be Vietnam Pro',sans-serif">ô để jsonb THEO TÊN TRƯỜNG</text>
+</g>
+<g>
+  <rect x="720" y="90" width="190" height="50" rx="7" fill="var(--o-dau)" stroke="var(--o-chu)" stroke-width="1.6"/>
+  <text x="734" y="112" font-size="13" font-weight="600" fill="var(--o-chu)">fls_run</text>
+  <text x="734" y="128" font-size="10" fill="var(--phu)" font-family="'Be Vietnam Pro',sans-serif">ghim 3 version + khai + ảnh</text>
+</g>
+<g>
+  <rect x="720" y="230" width="190" height="50" rx="7" fill="var(--o)" stroke="var(--vien)"/>
+  <text x="734" y="252" font-size="13" font-weight="600" fill="var(--o-chu)">fls_reject</text>
+  <text x="734" y="268" font-size="10" fill="var(--phu)" font-family="'Be Vietnam Pro',sans-serif">bị loại — CÓ LÝ DO</text>
+</g>
+<g opacity="0.62">
+  <rect x="996" y="85" width="168" height="50" rx="7" fill="var(--o)" stroke="var(--lu)" stroke-dasharray="4 3"/>
+  <text x="1010" y="107" font-size="13" font-weight="600" fill="var(--lu)">fls_itl</text>
+  <text x="1010" y="123" font-size="10" fill="var(--lu)" font-family="'Be Vietnam Pro',sans-serif">SỔ — append-only</text>
+</g>
+<g opacity="0.62">
+  <rect x="996" y="225" width="168" height="50" rx="7" fill="var(--o)" stroke="var(--lu)" stroke-dasharray="4 3"/>
+  <text x="1010" y="247" font-size="13" font-weight="600" fill="var(--lu)">fls_pm_line</text>
+  <text x="1010" y="263" font-size="10" fill="var(--lu)" font-family="'Be Vietnam Pro',sans-serif">ảnh lệnh chi</text>
+</g>
+</svg>
+</div>
+
+<div class="chu-giai">
+  <span><svg width="34" height="10" aria-hidden="true"><line x1="0" y1="5" x2="30" y2="5" stroke="var(--ink-3)" stroke-width="1.4"/></svg> khoá ngoại thật</span>
+  <span><svg width="14" height="12" aria-hidden="true"><rect x="0.5" y="0.5" width="13" height="11" rx="2.5" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="1.6"/></svg> trục của khâu</span>
+  <span><svg width="14" height="12" aria-hidden="true"><rect x="0.5" y="0.5" width="13" height="11" rx="2.5" fill="none" stroke="var(--mo)" stroke-dasharray="3 2"/></svg> ngoài khâu — chỗ đường nạp <strong>đổ vào</strong></span>
+</div>
+
+<div class="note amb">⚠ <strong>Một chỗ tài liệu nói trái chính cái ERD in ngay bên dưới nó — kiểm lại trên bản khai.</strong> <code>05_DATA_DICTIONARY_ERD §DD-I11</code> ghi <em>“<code>GAP-ERD-P0-01</code> (mở): <code>fls_itl.run_id</code> ⛔ không có FK”</em>. <strong>Sai — FK có thật</strong>: <code>fls/db/migrations/0001_baseline.sql:33</code> ghi <code>run_id text NOT NULL REFERENCES fls_run(run_id)</code>, <code>schema.py</code> khai <code>fk="fls_run.run_id"</code>, và khối <code>erDiagram</code> do máy sinh <strong>có</strong> cạnh ấy. <code>ERD_ISLANDS</code> nay còn <strong>2 tên</strong> (<code>fls_mapping_master</code> · <code>fls_migration</code>), ⛔ không phải 4.<br>⇒ Đây đúng lớp lỗi mà chính bộ tài liệu cảnh báo: <strong>lời văn già đi cạnh một hiện vật do máy sinh</strong>, và cổng chỉ canh hiện vật.</div>
+
+<h3>Tám thực thể — cột và lý do tồn tại</h3>
+<div class="luoi-tt">
+
+  <div class="tt">
+    <div class="dau"><b>fls_source</b><span class="vt">⟨7 cột⟩ · tầng ① · <em>“có những dòng chảy nào”</em></span></div>
+    <table>
+      <tr><td>source_id <span class="k pk">PK</span></td><td>danh tính</td></tr>
+      <tr><td>source_key</td><td>khoá nghiệp vụ của dòng chảy</td></tr>
+      <tr><td>src_type</td><td>bank · quỹ — lời văn, chặn ở tầng ghi</td></tr>
+      <tr><td>last_seen_at</td><td>lần cuối thấy dữ liệu</td></tr>
+      <tr><td>lag_days</td><td>độ trễ so với hôm nay</td></tr>
+      <tr><td>cutoff_date</td><td>cắt kỳ</td></tr>
+      <tr><td>txn_count</td><td>số giao dịch</td></tr>
+    </table>
+    <div class="chan">⭐ <strong>Một nguồn ⛔ KHÔNG phải một tài khoản</strong> (<code>QĐ-ITL-106</code>) — nó là <strong>một dòng chảy sao kê có MỘT bố cục cột</strong>. Neo vào tài khoản thì bên quỹ có <strong>7 bản khai cho 2 bố cục</strong>, và ngày nào đó chúng lệch nhau.<br>⚠ <strong>Không cột nào là trạng thái</strong> — <code>Account Status</code> (<code>Closed</code> 10 · <code>InActive</code> 5) mới chỉ đọc sống từ sheet (<code>GAP-CHUP-02</code>).</div>
+  </div>
+
+  <div class="tt">
+    <div class="dau"><b>fls_khai_cot</b><span class="vt">⟨8 cột⟩ · tầng ① · <em>“đọc nguồn ấy THẾ NÀO”</em></span></div>
+    <table>
+      <tr><td>khai_id <span class="k pk">PK</span></td><td><code>nextval('seq_itl_id')</code></td></tr>
+      <tr><td>source_id <span class="k fk">FK</span></td><td>khai này của nguồn nào</td></tr>
+      <tr><td>version <span class="k u">UQ</span></td><td>ngân hàng đổi mẫu ⇒ khai MỚI</td></tr>
+      <tr><td>truong <span class="k u">UQ</span></td><td>tên trường — đọc theo TÊN</td></tr>
+      <tr><td>cot</td><td>chỉ số cột <strong>0-based</strong> — đọc theo SỐ</td></tr>
+      <tr><td>thu_tu</td><td><code>dmy</code> · <code>mdy</code> — cách đọc NGÀY</td></tr>
+      <tr><td>hieu_luc_tu</td><td>máy đặt, người gọi ⛔ không truyền được</td></tr>
+      <tr><td>actor</td><td>khai là <strong>hành vi của người</strong></td></tr>
+    </table>
+    <div class="chan">⛔ Bảng này <strong>không lưu dữ liệu — nó lưu CÁCH ĐỌC dữ liệu.</strong> Kế toán đã tự giải bài <em>“60+ định dạng”</em> ở <strong>dòng 1 mỗi sheet <code>R |</code></strong>: đo được <strong>68/68</strong> sheet khai đủ 6 trường trên <strong>19 bố cục cột</strong>.<br>⭐ <code>thu_tu</code> là <strong><code>CHECK</code> đầu tiên của cả kho</strong> — vì nó neo vào giá trị của <em>cột khác</em> (<code>truong = 'Date'</code>), thứ lời văn ⛔ không nói được với kho.</div>
+  </div>
+
+  <div class="tt">
+    <div class="dau"><b>fls_chup</b><span class="vt">⟨6 cột⟩ · tầng ① · <em>“một LẦN ĐỌC Sheets”</em></span></div>
+    <table>
+      <tr><td>chup_id <span class="k pk">PK</span></td><td>chụp lại ⇒ <code>chup_id</code> MỚI</td></tr>
+      <tr><td>doc_luc</td><td>tuổi của ảnh — cửa đọc phải trả cùng danh sách</td></tr>
+      <tr><td>spreadsheet_id</td><td>workbook nguồn</td></tr>
+      <tr><td>lan</td><td>lằn — <code>Bank</code> (quỹ chờ <code>GAP-CANON-02</code>)</td></tr>
+      <tr><td>giay</td><td>giữ, vì nó ⛔ không suy được từ đâu</td></tr>
+      <tr><td>actor</td><td>ai chụp</td></tr>
+    </table>
+    <div class="chan">⛔ <strong>Cố ý KHÔNG lưu <code>so_dong</code>/<code>so_nguon</code></strong> — cả hai suy được, và một cái đầu ghi <code>8.365</code> cạnh một bảng dòng <strong>RỖNG</strong> là <strong>một lời nói dối không cổng nào thấy</strong>.<br>⛔ <strong>CHỈ-THÊM</strong>, cưỡng chế ở <strong>tầng mã nguồn</strong>: cổng quét cấm mọi <code>UPDATE</code>/<code>DELETE</code> trong <code>chup.py</code>.</div>
+  </div>
+
+  <div class="tt">
+    <div class="dau"><b>fls_chup_nguon</b><span class="vt">⟨3 cột⟩ · tầng ① · <em>“lần đọc ấy chạm nguồn nào”</em></span></div>
+    <table>
+      <tr><td>chup_id <span class="k pk">PK</span></td><td>lần đọc</td></tr>
+      <tr><td>source_id <span class="k pk">PK</span></td><td>nguồn</td></tr>
+      <tr><td>khai_version</td><td>bản khai <strong>đã dùng</strong> để đọc</td></tr>
+    </table>
+    <div class="chan">⭐⭐ <strong>Vì sao phải là bảng riêng thay vì suy từ bảng dòng:</strong> một nguồn đọc ra <strong>0 dòng</strong> thì nó <strong>biến mất</strong> khỏi bảng dòng — đúng điểm mù mà <code>S8</code> từng tự lộ ra (<em>“sheet ra 0 dòng biến mất khỏi chính phép kiểm sinh ra để tìm nó”</em>). Bảng này làm nó <strong>CÓ MẶT</strong>.</div>
+  </div>
+
+  <div class="tt">
+    <div class="dau"><b>fls_chup_dong</b><span class="vt">⟨4 cột⟩ · tầng ① · <em>“một DÒNG vùng CHUẨN”</em></span></div>
+    <table>
+      <tr><td>chup_id <span class="k pk">PK</span></td><td rowspan="3">khoá ba phần: một dòng của một nguồn trong một lần đọc</td></tr>
+      <tr><td>source_id <span class="k pk">PK</span></td></tr>
+      <tr><td>dong_so <span class="k pk">PK</span></td></tr>
+      <tr><td>o</td><td><code>jsonb</code> — ô <strong>theo TÊN TRƯỜNG</strong>, ⛔ không theo vị trí</td></tr>
+    </table>
+    <div class="chan">⛔ <strong><code>Description</code> KHÔNG BAO GIỜ vào đây</strong> (<code>QĐ-ITL-92</code>/<code>107</code>) — chặn ở <strong>tầng GHI</strong>, ⛔ không ở tầng đọc: chặn lúc đọc thì dữ liệu cá nhân <strong>đã nằm trong kho rồi</strong>, và giữa hai lúc ấy nó đã đi vào mọi bản sao lưu.<br>⚠ Từ <code>QĐ-ITL-128</code>, <code>TRUONG_DOC_DUOC == SAU_TRUONG</code> ⇒ trường <strong>được khai đủ 6</strong>, nhưng ô <code>Description</code> <strong>luôn rỗng</strong>; ảnh chụp mà <em>có</em> khoá ấy thì <strong>NỔ</strong>.</div>
+  </div>
+
+  <div class="tt">
+    <div class="dau"><b>fls_run</b><span class="vt">⟨9 cột⟩ · tầng ② · <em>“một LÔ NẠP”</em></span></div>
+    <table>
+      <tr><td>run_id <span class="k pk">PK</span></td><td>vd. <code>NAP-2026-08-27-RAW</code></td></tr>
+      <tr><td>contract_version</td><td rowspan="3">ba version ghim lúc nạp — dòng sổ giải thích được bằng <strong>hợp đồng lúc ấy</strong></td></tr>
+      <tr><td>canon_version</td></tr>
+      <tr><td>mapping_version</td></tr>
+      <tr><td>started_at · row_count</td><td>mốc + số dòng vào</td></tr>
+      <tr><td>state</td><td><code>queued</code> → <code>mapped</code> (<code>SM-I04</code>)</td></tr>
+      <tr><td>khai_id <span class="k fk">FK</span></td><td>nullable — lô <code>NAP-2026-08-27-RAW</code> có <strong>trước</strong> bảng khai</td></tr>
+      <tr><td>chup_id <span class="k fk">FK</span></td><td>nạp từ <strong>ảnh nào</strong></td></tr>
+    </table>
+    <div class="chan">⭐ <code>khai_id</code> <strong>nối liền một ĐẢO.</strong> Trước migration <code>0016</code>, <code>fls_source</code> là manifest mà ⛔ không dòng sổ nào trỏ tới được. Nay đi bộ được cả chuỗi <code>fls_itl → fls_run → fls_khai_cot → fls_source</code>: <em>“dòng sổ này đến từ NGUỒN này, đọc bằng BẢN KHAI này”</em>. <code>ERD_ISLANDS</code> <strong>3 → 2</strong>.</div>
+  </div>
+
+  <div class="tt">
+    <div class="dau"><b>fls_reject</b><span class="vt">⟨6 cột⟩ · tầng ② · <em>“dòng nào BỊ LOẠI và VÌ SAO”</em></span></div>
+    <table>
+      <tr><td>rej_id <span class="k pk">PK</span></td><td>danh tính</td></tr>
+      <tr><td>run_id <span class="k fk">FK</span></td><td>lô nào loại nó</td></tr>
+      <tr><td>source_system · source_sheet · source_row</td><td>toạ độ để tìm lại trên sheet</td></tr>
+      <tr><td>reason</td><td><strong>lý do bằng chữ</strong> — không có thì dòng ấy biến mất</td></tr>
+    </table>
+    <div class="chan">Luật của tầng ②: <strong>phần bị loại phải lưu lại</strong> — một dòng biến mất ⛔ không dấu vết là một dòng <strong>⛔ không ai tìm lại được</strong>.</div>
+  </div>
+
+  <div class="tt">
+    <div class="dau"><b>fls_nguon_dai</b><span class="vt">⟨7 cột⟩ · tầng ① · <em>“nhãn thô ↔ danh mục”</em></span></div>
+    <table>
+      <tr><td>dai_id <span class="k pk">PK</span></td><td>danh tính</td></tr>
+      <tr><td>source_id <span class="k fk">FK</span></td><td>nguồn</td></tr>
+      <tr><td>truong · cot</td><td>trường nào, cột nào</td></tr>
+      <tr><td>dai_tho</td><td>nhãn <strong>nguyên văn</strong> trong sheet</td></tr>
+      <tr><td>danh_muc</td><td>giá trị chuẩn tương ứng</td></tr>
+      <tr><td>doc_luc</td><td>đọc lúc nào</td></tr>
+    </table>
+    <div class="chan">Đây là bảng mà luật <code>S8</code> tra tới: <em>“xuất xứ đang nạp có trong danh mục ⛔ không?”</em> — xem §3.</div>
+  </div>
+
+</div>
+
+
+<h3>Ngoài khâu: giao dịch, và <code>PM</code> · <code>PE</code> · <code>PI</code> nằm ở đâu</h3>
+
+<div class="note do">⛔⛔ <strong>ĐƯỜNG VÀO ≠ THỰC THỂ</strong> — đây là hai thứ bộ tài liệu từng trộn. <code>PM</code>, <code>PE</code>, <code>PI</code> <strong>đi nhờ MỘT đường nạp</strong> (<code>PM_Unpivot</code>); ⛔ nhưng chúng là <strong>BA thực thể khác nhau</strong>. Owner chốt <strong>17/09</strong>: <em>“<code>PE</code>/<code>PI</code> <strong>cột có kiểu</strong> trong <code>fls_pm_line</code>, chưa cần làm bảng riêng”</em>.</div>
+
+<div class="scroll">
+<table class="b">
+  <thead><tr><th style="width:13%">Khái niệm</th><th style="width:26%">Thực thể trong kho</th><th>Hình dạng — và vì sao</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Giao dịch</strong><br><span style="color:var(--ink-3);font-size:12px">transaction</span></td><td class="mono">fls_itl <span style="color:var(--ink-3)">⟨43 cột⟩</span></td><td><strong>MỘT bảng ba lớp, ⛔ không phải view.</strong> <code>ITL_RAW</code> và <code>ITL_LEDGE</code> ⛔ không còn là hai thực thể — <strong>cùng một bảng</strong>, phân biệt bằng <code>raw_frozen</code> (<code>true</code> ⇒ <strong>trigger cấm <code>UPDATE</code>/<code>DELETE</code></strong>, <code>INV-I03</code>). Sáu entity của ERD cũ nay là <strong>cột</strong>: <code>STAGED_ROW</code>→trạng thái · <code>ALLOCATION</code>→3 cột · <code>AUDIT_RESULT</code>→<code>audit_status</code> · <code>PERIOD</code>→<code>period_state</code>.</td></tr>
+    <tr><td><strong>PM</strong><br><span style="color:var(--ink-3);font-size:12px">lệnh chi</span></td><td class="mono">fls_pm_line <span style="color:var(--ink-3)">⟨18 cột⟩</span><br>fls_pm_link · fls_pm_unlink<br>fls_moi_noi <em style="color:var(--ink-3)">(khung xem)</em></td><td><strong>⛔ KHÔNG phải danh mục lệnh chi</strong> — là <strong>ẢNH CHỤP của MỘT lần nạp</strong>: <code>run_id</code> nằm <em>trong</em> khoá chính. Đo: <strong>3.703 dòng · 1.468 phiếu</strong>; <code>pm_slip_id</code> chỉ để <strong>GOM khi hiện</strong>, ⛔ không phải trục ghép — mã tham chiếu sống ở <strong>DÒNG</strong>.</td></tr>
+    <tr><td><strong>PE</strong><br><span style="color:var(--ink-3);font-size:12px">đề nghị chi</span></td><td class="mono">⛔ <strong>không có bảng riêng</strong><br>→ <code>pe_slip</code> · <code>pe_line</code> · <code>pe_loai</code><br><span style="color:var(--ink-3);font-size:11.5px">trong <code>fls_pm_line</code>, migration <code>0023</code></span></td><td>Trước 17/09, bảy khoá này <strong>chỉ sống trong <code>tho</code> (JSON)</strong>: kho <strong>CÓ dữ liệu mà ⛔ KHÔNG có kiểu</strong> ⇒ ⛔ không tra được, ⛔ không nói được, ⛔ không canh được. ⭐ <code>pe_loai</code> là <strong>MÃ SINH RA</strong> từ hai cột nguồn <code>(Advance)</code>/<code>(Urgent)</code>, ⛔ không chép thẳng.</td></tr>
+    <tr><td><strong>PI</strong><br><span style="color:var(--ink-3);font-size:12px">hoá đơn</span></td><td class="mono">⛔ <strong>không có bảng riêng</strong><br>→ <code>pi_slip</code> · <code>pi_line</code></td><td>Cùng lý do. Hai cột đi <strong>theo CẶP</strong> — đo <strong>26.404</strong> dòng: <strong>lệch 0</strong>.</td></tr>
+    <tr><td><strong>PC</strong></td><td>— ⛔ <strong>chưa có gì</strong></td><td>Chuỗi AS-IS là <code>PE → PI → PM → PC</code>; mắt cuối ⛔ chưa có thực thể nào trong kho.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<h3>Năm cột <code>PE</code>/<code>PI</code> — đo trên <code>PM_Unpivot</code> ngày 17/09</h3>
+<div class="scroll">
+<table class="b">
+  <thead><tr><th style="width:15%">Cột</th><th style="width:27%">Nguồn <code>PM_Unpivot</code></th><th style="width:16%">Đo được</th><th>Ghi chú</th></tr></thead>
+  <tbody>
+    <tr><td class="mono">pe_slip</td><td class="mono">ID PESlip <span style="color:var(--ink-3)">(vị trí 17)</span></td><td class="mono"><strong>3.500</strong></td><td rowspan="2">Đi <strong>cặp</strong> — lệch <strong>0</strong>/26.404</td></tr>
+    <tr><td class="mono">pe_line</td><td class="mono">ID PELine <span style="color:var(--ink-3)">(18)</span></td><td class="mono"><strong>3.500</strong></td></tr>
+    <tr><td class="mono">pe_loai</td><td class="mono">⭐ <strong>máy sinh</strong> từ <code>(Advance)</code> (3) / <code>(Urgent)</code> (4)</td><td class="mono">Advance <strong>3.381</strong><br>Urgent <strong>119</strong></td><td>⭐ <code>CHECK</code> <strong>thứ hai của cả kho</strong> — an toàn <em>chỉ vì</em> giá trị do <strong>mã của ta</strong> sinh ra, nên nguồn <strong>⛔ không thể</strong> làm nó vỡ.</td></tr>
+    <tr><td class="mono">pi_slip</td><td class="mono">ID PISlip <span style="color:var(--ink-3)">(19)</span></td><td class="mono"><strong>22.904</strong></td><td rowspan="2">Đi <strong>cặp</strong> — lệch <strong>0</strong></td></tr>
+    <tr><td class="mono">pi_line</td><td class="mono">ID PILine <span style="color:var(--ink-3)">(20)</span></td><td class="mono"><strong>22.904</strong></td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="note">⭐⭐ <strong>Một dòng có ĐÚNG MỘT cha</strong> — đo trên <strong>26.404</strong> dòng có <code>tho</code>: chỉ <code>PI</code> <strong>22.904</strong> · chỉ <code>PE</code> <strong>3.500</strong> · <strong>cả hai 0</strong> · <strong>không cha 0</strong>.<br>⛔⛔ <strong>Và bất biến ấy CỐ Ý ⛔ KHÔNG thành <code>CHECK</code></strong> (trừ <code>pe_loai</code>): phép chèn chạy trong <strong>MỘT giao dịch cho cả lần nạp</strong> ⇒ một <code>CHECK</code> ở đây biến <strong>một dòng lạ</strong> thành <strong>đổ cả lượt nạp</strong> — tin tức thành sự cố, và kế toán mất cả ảnh chụp. Chúng được <strong>ĐẾM và NÊU TÊN</strong> lúc nạp (<code>INV-I16</code>).<br>⭐ Quyết định <em>“⛔ không đặt <code>CHECK</code>”</em> được ghim bằng bài thử <code>test_CO_Y_khong_dat_CHECK_tren_khoa_PE_PI</code> — vì con số <em>“0 ngoại lệ/26.404”</em> <strong>mời</strong> người sau thêm <code>CHECK</code> cho chắc.</div>
+
+<div class="note amb">⚠ <strong><code>52.808</code>/79.212 dòng mang <code>NULL</code> ở năm cột này</strong> — chúng nạp <strong>trước 11/09</strong> nên ⛔ không có <code>tho</code> để nạp bù: đọc bằng bản khai cột chỉ có <strong>8</strong> vị trí. Hợp đồng cột lằn <code>PM</code> nay mở <strong>8 → 14</strong> (<code>PM_KHAI_VERSION</code> <strong>1 → 2</strong>), và <strong>cả 14 đã đo lại</strong> trên <code>A _ PAY100 _ PM11 Entry Data ▸ PM_Unpivot</code>: <strong>lệch 0</strong>. ⇒ Đó là <strong>sự thật</strong>, ⛔ không phải thiếu sót.</div>
+
+<h3>Mối nối: một dòng sổ, N mối nối</h3>
+<div class="scroll">
+<table class="b">
+  <thead><tr><th style="width:20%">Thực thể</th><th style="width:16%">Đo được</th><th>Luật</th></tr></thead>
+  <tbody>
+    <tr><td class="mono">fls_pm_link</td><td>hình <strong>A</strong> 2.256<br>hình <strong>B</strong> 27<br>hình <strong>C</strong> 394</td><td><code>A</code> 1×1 · <code>B</code> 1 bank × N PM (chia tiền) · <code>C</code> N bank × 1 PM (trả nhiều lần). ⛔ Cột <code>fls_itl.pm_line_id</code> <strong>ĐÃ BỎ</strong> (migration <code>0007</code>) — nó chỉ giữ được <strong>một</strong> mối nối nên hình <code>B</code> ⛔ không thể đậu; giữ cả cột lẫn bảng là <strong>hai bản sự thật</strong>.</td></tr>
+    <tr><td class="mono">fls_pm_unlink</td><td>—</td><td><strong>Bỏ ghép là THÊM một dòng, ⛔ không xoá</strong> ⇒ lịch sử mọi lần ghép đọc lại được.</td></tr>
+    <tr><td class="mono">fls_moi_noi <em style="color:var(--ink-3)">khung xem</em></td><td>—</td><td><code>fls_pm_link</code> <strong>trừ</strong> <code>fls_pm_unlink</code> = mối nối <strong>đang hiệu lực</strong>. ⚠ Mọi chỗ ĐỌC còn trỏ thẳng vào <code>fls_pm_link</code> là một cái bẫy — nó đọc cả mối nối đã bỏ.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="note">⛔ <strong><code>fls_pm_line</code> ⛔ KHÔNG mang PII</strong> (Timestamp · Email · Tên/Số tài khoản · Ghi chú · Diễn giải). <strong>Hệ quả phải nói thẳng:</strong> xếp ứng viên lúc ghép tay chỉ còn <strong>hai trục</strong> — <strong>mã tham chiếu</strong> và <strong>tiền</strong> — ⛔ <strong>không có <code>ngày</code> và <code>payee</code></strong> như <code>BA-07</code> §2 mong (<code>GAP-JOIN-04</code>).<br>⚠ Và <code>status</code> rỗng lưu là <code>NULL</code> = <strong>“không biết”</strong>, ⛔ không phải <em>“đã duyệt”</em>: đo <code>Approve</code> <strong>3.347</strong> · <code>NULL</code> <strong>251</strong> · <code>Reject</code> <strong>105</strong>. Cửa ghép <strong>từ chối cả <code>Reject</code> lẫn <code>NULL</code></strong>, trừ khi có <code>force</code> kèm lý do — và <code>force</code> <strong>để lại vết</strong>.</div>
+
+<h2><span class="so">§3 · Vận hành</span>Workflow — ba chặng, và ranh giới giữa chúng là một quyết định</h2>
+<p class="sub">Phép đọc Sheets ⛔ <strong>không được sống ở tầng cửa</strong>: <code>import-linter</code> hợp đồng <code>1</code> cấm <code>fls.api</code> chạm <code>psycopg</code>, hợp đồng <code>7</code> cấm nó biết tầng kho. ⇒ Chụp ở <code>tools/</code>, cửa đọc <strong>ảnh chụp</strong>.</p>
+
+<div class="chang">
+  <div class="rail">
+    <span class="n">CHẶNG ①</span>
+    <b>CHỤP</b>
+    <span class="ma">tools/chup_sao_ke.py<br>fls/repo/chup.py<br>fls/repo/nhip_chup.py</span>
+  </div>
+  <div class="than">
+    <div class="buoc"><span class="i">1</span><div><strong>Nhịp quyết định trước, ⛔ không phải cron quyết định.</strong> <code>QĐ-ITL-114</code>: <strong>mỗi giờ, 8h–19h giờ Việt Nam</strong>. <code>nhip_chup</code> trả <strong>quyết định + LÝ DO</strong>, ⛔ không trả một <code>bool</code> trơ — một cron chạy theo <code>UTC</code> sẽ chụp từ <code>15h</code> đến <code>2h sáng</code>: <strong>đúng số lần, sai mọi giờ</strong>, và ⛔ không gì báo.</div></div>
+    <div class="buoc"><span class="i">2</span><div><strong>Đọc vùng CHUẨN của 60 sheet <code>R |</code></strong> qua <code>nap_sao_ke.doc_vung_chuan</code> — <strong>đúng một đường đọc</strong>, cùng đường mà <code>nap()</code> đi. Chạy lại cổng chặng 1 sau cú tách: <strong>8.365/8.365 = 100,00%</strong>.</div></div>
+    <div class="buoc"><span class="i">3</span><div><strong>Bản khai quyết định cột nào là cột nào</strong> — <code>fls_khai_cot</code> cấp <code>cot</code> + <code>thu_tu</code>. Nguồn chưa ai khai ⇒ <code>KhongCoKhai</code>, ⛔ <strong>không đoán</strong>.</div></div>
+    <div class="buoc"><span class="i">4</span><div>Ghi <strong>3 bảng, ⛔ không một con số nào lưu hai lần</strong>: <code>fls_chup</code> · <code>fls_chup_nguon</code> · <code>fls_chup_dong</code>.</div></div>
+    <div class="buoc"><span class="i">5</span><div><strong>Dọn có hàng rào</strong> (<code>QĐ-ITL-115</code>): giữ <strong>VĨNH VIỄN</strong> ảnh đã dùng để nạp, xoá ảnh ⛔ không ai dùng sau <strong>30 ngày</strong>. Mọi <code>DELETE</code> mang <code>NOT EXISTS … fls_run</code>. Lý do là số học: <strong>3.000 ảnh/năm = 6,6 GB</strong> trong khi ảnh thật sự được nạp chỉ <strong>~250 = 0,55 GB</strong> ⇒ <strong>11/12 ảnh mỗi ngày</strong> ⛔ không bút toán nào trỏ tới.</div></div>
+  </div>
+</div>
+<div class="mui" aria-hidden="true">↓</div>
+
+<div class="chang">
+  <div class="rail">
+    <span class="n">CHẶNG ②</span>
+    <b>SOÁT</b>
+    <span class="ma">POST /nap/xem-truoc<br>POST /nap/lo/xem-truoc<br>fls/kiem/soat_nap.py</span>
+  </div>
+  <div class="than">
+    <div class="buoc"><span class="i">1</span><div><strong>Xem trước là một TUYẾN RIÊNG, ⛔ không phải một cờ.</strong> Hai việc khác nhau về <strong>HẬU QUẢ</strong> thì ⛔ không được khác nhau bằng <strong>một chữ trong thân yêu cầu</strong>: một cờ <code>?that=true</code> gõ thiếu là <strong>ghi thật khi định thử</strong>. Hai đường riêng thì gõ nhầm đường ⛔ <strong>không mất gì</strong> — nó chỉ soát.</div></div>
+    <div class="buoc"><span class="i">2</span><div><strong>9 luật</strong> chạy trên ảnh chụp, mỗi luật trả một dòng biên bản kèm <strong><code>da_do</code> — đã đo bao nhiêu</strong>. Luật nền: <em>đo được 0 thứ ⇒ ⛔ KHÔNG ĐẠT</em>.</div></div>
+    <div class="buoc"><span class="i">3</span><div><strong>Lô:</strong> <code>{chup_id, source_ids}</code> — ⛔ <strong>không có mặc định lấy-hết</strong> (<code>QĐ-ITL-112</code>). Biên bản GỘP mang <code>so_nguon_vao</code>/<code>so_nguon_chua</code>; tuyến riêng chứ ⛔ không thêm một khoá vào tuyến một-nguồn, vì <strong>một tuyến trả hai khuôn là một tuyến người gọi ⛔ không biết mình đang đọc khuôn nào</strong>.</div></div>
+  </div>
+</div>
+
+<div class="nhanh">
+  <div><div class="top chan-vach"><span class="hang chan">CHẶN</span><span class="mono" style="font-size:11.5px;color:var(--ink-3)">2 luật</span></div>
+    <div class="body">Lỗi <strong>của FLS</strong> — dòng rơi im lặng, số thiếu mà ⛔ không ai biết thiếu bao nhiêu.
+    <span class="hq">⇒ ⛔ KHÔNG ghi một dòng nào. Nút <em>Nhận</em> TẮT.</span></div></div>
+  <div><div class="top co-vach"><span class="hang co">CỜ</span><span class="mono" style="font-size:11.5px;color:var(--ink-3)">5 luật</span></div>
+    <div class="body">Khuyết tật <strong>có sẵn trong sổ kế toán</strong>. Chặn ở đây nghĩa là FLS ⛔ <strong>không bao giờ nạp được gì</strong> — mà những dòng ấy là <strong>TIỀN THẬT</strong>.
+    <span class="hq">⇒ VẪN ghi. Dòng bị cờ vào hàng chờ, <strong>mang một lý do</strong>, và <strong>có người phải trả lời</strong>.</span></div></div>
+  <div><div class="top canh-vach"><span class="hang canh">CẢNH</span><span class="mono" style="font-size:11.5px;color:var(--ink-3)">2 luật</span></div>
+    <div class="body">Tin tức về hình dạng dữ liệu — cần biết, chưa cần ai làm gì.
+    <span class="hq">⇒ Ghi, và báo to.</span></div></div>
+</div>
+<div class="mui" aria-hidden="true">↓</div>
+
+<div class="chang">
+  <div class="rail">
+    <span class="n">CHẶNG ③</span>
+    <b>NẠP</b>
+    <span class="ma">POST /nap · POST /nap/lo<br>fls/repo/nap_lo.py<br>→ chay_nap.chay()</span>
+  </div>
+  <div class="than">
+    <div class="buoc"><span class="i">1</span><div><code>nap_lo</code> ⛔ <strong>không tự ghi một dòng nào</strong> — nó gọi <code>chay_nap.chay()</code>, chỗ <strong>duy nhất</strong> giữ ba thứ ⛔ không được có bản sao (§4).</div></div>
+    <div class="buoc"><span class="i">2</span><div><strong>Cổng bốn đường kiểm TRƯỚC khi ghi.</strong> Lệch ⇒ NỔ, ⛔ không ghi một dòng nào.</div></div>
+    <div class="buoc"><span class="i">3</span><div><strong>MỘT giao dịch cho cả lần nạp</strong>: <code>mo_run</code> → <code>them_le</code> → <code>fls_reject</code> → <code>fls_itl</code> (<code>ON CONFLICT DO NOTHING</code>) → <code>fls_pm_link</code> → <code>fls_pm_line</code> → <code>dong_run(state=mapped)</code>.</div></div>
+    <div class="buoc"><span class="i">4</span><div><strong>Lý do cắm cờ ⛔ không được <code>INSERT</code> thẳng.</strong> <code>fls_queue_event</code> là 1 trong <strong>4 bảng chỉ-một-chỗ-ghi</strong> — sau khi <code>QĐ-ITL-16</code> bỏ bước duyệt và <code>QĐ-ITL-27</code> khai tử vai hậu kiểm, <strong>nhật ký là lớp kiểm soát DUY NHẤT còn lại</strong>. ⇒ Đi qua <code>ghi_tay.ghi_ly_do()</code>, ⛔ không viết câu SQL nào.</div></div>
+    <div class="buoc"><span class="i">5</span><div><code>actor</code> <strong>phải đến TỪ NGƯỜI</strong> bấm <em>Nhận</em>, ⛔ không phải một hằng trong tệp. Máy tự đứng tên thì cột <code>actor</code> của cả hàng chờ <strong>mất nghĩa ngay từ lô đầu tiên</strong>.</div></div>
+  </div>
+</div>
+
+<div class="pt">
+  <div class="ct">vào &nbsp;=&nbsp; sổ &nbsp;+&nbsp; loại &nbsp;+&nbsp; rỗng &nbsp;+&nbsp; trùng</div>
+  <span class="gt"><strong>Cổng bốn đường</strong> — kiểm <strong>hai lần</strong>: trước khi ghi, và sau khi ghi.<br>⛔ Không cân thì hàm <strong>NỔ</strong> và ⛔ <strong>không ghi một dòng nào</strong> — một lần nạp lệch mà vẫn commit thì từ đó trở đi <strong>⛔ không ai biết số thiếu bao nhiêu</strong>.</span>
+</div>
+
+
+<h2><span class="so">§4 · Chín luật</span>Biên bản soát — và hạng của một luật là một quyết định, ⛔ không phải một cảm giác</h2>
+<p class="sub">Hạng nói <em>lỗi này của ai</em>: <code>CHẶN</code> = lỗi của <strong>FLS</strong>; <code>CỜ</code> = khuyết tật của <strong>sổ kế toán</strong>. Xếp sai hạng một lần đã đủ để hoặc vứt tiền thật, hoặc nạp một lô đã biết là hỏng.</p>
+
+<div class="scroll">
+<table class="b">
+  <thead><tr><th style="width:13%">Luật</th><th style="width:30%">Nó hỏi gì</th><th style="width:9%">Hạng</th><th>Chứng cứ đo được</th></tr></thead>
+  <tbody>
+    <tr><td class="mono">S1</td><td>ba đường cân — ⛔ 0 dòng rơi im lặng</td><td><span class="hang chan">CHẶN</span></td><td>Lệch là <strong>dòng rơi im lặng</strong>, và đó là lỗi của FLS.</td></tr>
+    <tr><td class="mono">S2</td><td>có tiền thì phải có MÃ</td><td><span class="hang co">CỜ</span></td><td>⛔ Không mã thì ⛔ không truy ngược về sao kê được — nhưng đó là <strong>tiền thật</strong> trong sổ kế toán. Chặn lại là <strong>vứt tiền</strong>.</td></tr>
+    <tr><td class="mono">S3</td><td>mọi dòng phải có TIỀN (Nợ hoặc Có)</td><td><span class="hang co">CỜ</span></td><td>⚠ Từng gán <strong>2.596</strong> dòng — và cả <strong>2.596</strong> dòng ấy <strong>ĐỀU CÓ TIỀN</strong>. Báo oan <strong>100%</strong>.</td></tr>
+    <tr><td class="mono">S4</td><td>mọi dòng phải có ĐƠN VỊ TIỀN TỆ</td><td><span class="hang co">CỜ</span></td><td>—</td></tr>
+    <tr><td class="mono">S5</td><td>mã ⛔ không bị hạ xuống kiểu <code>float</code></td><td><span class="hang canh">CẢNH</span></td><td>Chặng 1 đếm <strong>31</strong> mã bị hạ kiểu.</td></tr>
+    <tr><td class="mono">S6</td><td>một sheet chỉ một kiểu ngày</td><td><span class="hang canh">CẢNH</span></td><td>Nối thẳng vào cột <code>thu_tu</code> của bản khai.</td></tr>
+    <tr><td class="mono">S7</td><td>dòng trùng HOÀN TOÀN (⛔ không tính <code>Num</code>)</td><td><span class="hang co">CỜ</span></td><td>⚠ Gán <strong>5.952</strong> dòng — chỉ <strong>66</strong> thật sự trùng. <code>Num</code> cố ý ⛔ không nằm trong khoá vì <strong>chính FLS sinh ra nó</strong>.</td></tr>
+    <tr><td class="mono">S8</td><td>xuất xứ phải có trong danh mục</td><td><span class="hang co">CỜ</span></td><td>⭐ <strong>Từng là <code>CHẶN</code>, và đó là lỗi của tác giả — sửa sau khi ĐO.</strong> Đây là khuyết tật của <strong>kế toán</strong>, ⛔ không phải của FLS; mà định nghĩa <code>CHẶN</code> là <em>“lỗi của FLS”</em> ⇒ xếp <code>CHẶN</code> là <strong>tự mâu thuẫn</strong>.</td></tr>
+    <tr><td class="mono">S10</td><td>hai bản khai trỏ CÙNG một cột</td><td><span class="hang chan">CHẶN</span></td><td>⭐ Ở đây hạng <code>CHẶN</code> <strong>đúng</strong> — khác <code>S8</code>: hai bản khai cãi nhau là <strong>FLS ⛔ không biết mình đang đọc cột nào</strong>.</td></tr>
+  </tbody>
+</table>
+</div>
+<p class="meta">⛔ ⛔ Không có <code>S9</code> — bảng luật <strong>nhảy số</strong>. Đây là sự thật của mã đang chạy (<code>soat_nap.py</code> định nghĩa <code>s1…s8</code> + <code>s10</code>), ⛔ không phải một chỗ thiếu của trang này.</p>
+
+
+<h2><span class="so">§5 · Bất biến</span>Ba thứ ⛔ không được có bản sao — và mỗi thứ chống một hỏng CỤ THỂ đã gặp</h2>
+<p class="sub">Đây là lý do mọi lằn nạp đều đi qua <strong>một</strong> hàm <code>chay_nap.chay()</code>. Lằn <code>F04</code> chỉ thay <strong>bộ đọc</strong> (<code>bo_nap</code>), ⛔ không thay phép ghi — một bản thứ hai là <strong>ba cơ hội để chúng lệch nhau</strong>.</p>
+
+<div class="scroll">
+<table class="b">
+  <thead><tr><th style="width:5%"></th><th style="width:32%">Cơ chế</th><th>Hỏng nó chống — đã xảy ra thật</th></tr></thead>
+  <tbody>
+    <tr><td class="c mono">ⓐ</td><td><strong>Chống trùng bằng <code>content_key</code></strong><br><span style="font-size:12.5px;color:var(--ink-2)">hash(nguồn, sheet, ngày, PS Nợ, PS Có, số CT, <strong><code>seq_trung</code></strong>)</span></td><td>Sổ thật có <strong>281 dòng trùng nội dung</strong> + <strong>103 dòng không có số chứng từ</strong>. ⛔ Không đánh <code>seq</code> thì 281 dòng ấy dùng <strong>một khoá</strong> ⇒ <code>ON CONFLICT DO NOTHING</code> bỏ im lặng gần hết, và con số <em>“bỏ qua”</em> bị đọc thành <em>“nạp lại lần hai”</em> thay vì <strong>MẤT DỮ LIỆU</strong>. ⭐ <code>seq_trung</code> phải do <strong>người gọi</strong> tính, ⛔ không để DB tự xử.</td></tr>
+    <tr><td class="c mono">ⓑ</td><td><strong>Cổng bốn đường, kiểm TRƯỚC ghi</strong></td><td>Ghi rồi mới phát hiện tiền lệch thì <strong>cổng chỉ còn là một báo cáo</strong>. Phép ghép PM cũng thế: <strong>Σ mối nối phải bằng tiền dòng bank</strong>, lệch ⇒ NỔ và ⛔ không ghi gì.</td></tr>
+    <tr><td class="c mono">ⓒ</td><td><strong>MỘT giao dịch cho cả lần nạp</strong></td><td>Ban đầu hàm ghi từng bước với <code>autocommit=True</code>, và <strong>hai lần nạp thật ĐẦU TIÊN đều NỔ giữa đường</strong> (<code>fls_le</code> rỗng, rồi kiểu <code>date</code> của <code>svc_*</code>) — mỗi lần để lại <strong>394 dòng ĐÃ COMMIT</strong> trong sổ. Cổng bốn đường ⛔ không thể gỡ cái đã commit.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="note">⭐⭐ <strong>Một chỗ lệch spec, khai ra chứ ⛔ không âm thầm.</strong> <code>DEV-10</code> <code>T-JOIN-03</code> đòi <em>“phiếu 3 dòng, Σ = tiền bank ⇒ <strong>3 dòng ITL</strong>”</em>. Mã ⛔ <strong>không</strong> làm thế: tách một dòng bank thành N dòng sổ <strong>làm vỡ thế 1-1 giữa sổ và nguồn</strong> — thứ mà mọi cổng đối soát đang dựa vào. Đổi lại được <strong>27 dòng</strong>; đổi lại mất một cổng ⛔ không ngoại lệ. ⇒ Cả ba hình ghép (<code>A</code> 2.256 · <code>B</code> 27 · <code>C</code> 394) đều vào <strong>bảng nối</strong> <code>fls_pm_link</code>: <strong>một dòng sổ, N mối nối</strong>, và số dòng <code>fls_itl</code> ⛔ không đổi.</div>
+
+
+<h2><span class="so">§6 · Cửa</span>Bảng tuyến — bốn cửa của nhóm NẠP</h2>
+<p class="sub">Trước <code>CR#11</code>, đo được <strong>0/17</strong> tuyến là cửa nạp — 8 <code>GET</code> + 9 <code>POST</code>, và <strong>mọi <code>POST</code> đều SỬA một dòng ĐÃ CÓ</strong>. Đường duy nhất đưa dữ liệu vào kho là một lệnh dòng lệnh. Bỏ Google Sheets mà ⛔ không dựng nhóm này thì <strong>⛔ không còn đường nào vào</strong>.</p>
+
+<div class="scroll">
+<table class="b">
+  <thead><tr><th style="width:30%">Tuyến</th><th style="width:9%">Ghi?</th><th>Việc</th></tr></thead>
+  <tbody>
+    <tr><td class="mono">POST /sources/{id}/khai-cot</td><td><span class="verb ghi">GHI</span></td><td>Ghi <strong>bản khai ánh xạ cột</strong> — sinh <code>version</code> MỚI, ⛔ không sửa khai cũ. Thiếu một trong 6 trường ⇒ <code>422 FLS-KHAI-THIEU</code>, và ⛔ <strong>không ghi một phần</strong>: ghi một phần là <strong>mất cột trong im lặng</strong>, mà cột mất có thể là cột <strong>tiền</strong>.</td></tr>
+    <tr><td class="mono">POST /nap/xem-truoc</td><td><span class="verb">⛔ không</span></td><td>Biên bản 9 luật cho <strong>một nguồn</strong>, mỗi luật kèm <code>da_do</code>.</td></tr>
+    <tr><td class="mono">POST /nap/lo/xem-truoc</td><td><span class="verb">⛔ không</span></td><td>Biên bản <strong>GỘP</strong> + từng nguồn. <code>{chup_id, source_ids}</code>.</td></tr>
+    <tr><td class="mono">POST /nap · POST /nap/lo</td><td><span class="verb ghi">GHI</span></td><td>Nạp thật. Lô: <strong>MỘT <code>run_id</code>, MỘT giao dịch</strong> — nguồn sạch <strong>VÀO SỔ</strong>, nguồn <code>CHẶN</code> bị <strong>CHỪA</strong> (<code>QĐ-ITL-111</code>). Ghi: <code>fls_itl</code> · <code>fls_run</code> · <code>fls_reject</code> · <code>fls_le</code> · <code>fls_pm_link</code> · <code>fls_pm_line</code> · <code>fls_queue_event</code>.</td></tr>
+  </tbody>
+</table>
+</div>
+
+<div class="note">⚠ <strong><code>FLS-NGUON-LA</code> (404) và <code>FLS-KHAI-KHONG-CO</code> (409) là HAI câu khác nhau.</strong> <em>“⛔ không có nguồn ấy”</em> ≠ <em>“có nguồn, nhưng ⛔ chưa ai khai cách đọc nó”</em> — hai câu dẫn người dùng đi <strong>hai đường sửa khác nhau</strong>, nên cửa soi nguồn <strong>trước</strong>, ⛔ không gộp cả hai vào một lỗi.</div>
+
+
+<h2><span class="so">§7 · Bẫy</span>Bốn chỗ dễ đọc sai — mỗi chỗ đã có người vấp</h2>
+
+<ul class="gon">
+  <li><strong><code>fls_khai_cot</code> ⛔ không phải config kỹ thuật — nó là HIỆN VẬT CỦA KẾ TOÁN.</strong> Dòng 1 mỗi sheet <code>R |</code> là một bản khai ánh xạ, kế toán <strong>tự duy trì bằng tay</strong>, và <strong>68/68</strong> sheet khai đủ 6 trường trên <strong>19 bố cục</strong>. Đó là thứ tốt nhất trong cả hệ AS-IS và nó ⛔ <strong>không có bản sao ở đâu khác</strong>: bỏ Sheets khỏi đường nạp mà ⛔ không dựng chỗ ở mới thì FLS phải <strong>đoán vị trí cột</strong> — <em>“đoán ⛔ không phải là kém chính xác, nó là <strong>sai tiền</strong>”</em>.</li>
+
+  <li><strong><code>thu_tu</code> <code>NULL</code> = “nguồn CHƯA khai”, ⛔ KHÔNG = “coi như <code>dmy</code>”.</strong> Đo được <strong>29/29</strong> nguồn mơ hồ là <code>mdy</code>, <strong>0</strong> nguồn <code>dmy</code> ⇒ một mặc định <em>“vì đây là Việt Nam”</em> sẽ <strong>hoán ngày↔tháng trên 1.894 dòng</strong>. Và ⛔ <strong>không có bản khai mặc định</strong> nói chung: một mặc định im lặng chính là cơ chế đẻ ra <strong>6.843 ô <em>“Input here”</em></strong> của AS-IS — sai mà ⛔ không ai thấy.</li>
+
+  <li><strong><code>fls_pm_line</code> là ẢNH CHỤP của MỘT lần nạp, ⛔ không phải danh mục lệnh chi</strong> — <code>run_id</code> nằm <strong>trong khoá chính</strong>. Và phép ghép nhìn <strong>ảnh PM đọc gần nhất trong phạm vi</strong>, ⛔ không nhìn ảnh của lần nạp dòng tiền. ⚠ Nó thuộc tầng ④ / khâu Ⓑ <strong>nhưng khâu Ⓐ GHI nó</strong>: sửa đường nạp mà quên rằng <em>người hưởng</em> là màn ghép là cách <strong>làm hỏng Ⓑ từ Ⓐ</strong>.</li>
+
+  <li><strong><code>DD-I06</code> tả ĐÍCH, ⛔ không tả thứ mã đang chạy</strong> (<code>GAP-DOC-07</code>). Tài liệu khai Adapter B đọc <code>P100 _ Bank Transactions</code>; mã thật mở đầu bằng <code>Transaction Mapping L1</code> — <strong>hai chỗ cách nhau BA lần biến đổi</strong>. Lệch này có sẵn từ trước <code>CR#10</code> và ⛔ <strong>chưa cổng nào canh</strong>: cổng chỉ canh <em>phiên bản · số · cột · ngày</em>, ⛔ không canh <strong>tài liệu có tả đúng chỗ mã đang đọc hay không</strong>.</li>
+</ul>
+
+<div class="note amb">⚠ <strong>Còn nợ, khai thẳng:</strong> <code>GAP-JOIN-04</code> (ảnh chụp PM ⛔ không mang <code>ngày</code>/<code>payee</code> ⇒ xếp ứng viên chỉ còn 2 trục) · <code>GAP-CHUP-02</code> (<code>fls_source</code> ⛔ không có cột trạng thái, <code>Account Status</code> mới chỉ đọc sống) · <code>GAP-CANON-02</code> (lằn <strong>quỹ</strong> chưa chụp — khuôn RA 11 cột) · <code>GAP-DOC-07</code> (tài liệu tả sai chỗ adapter đang đọc) · <strong>52.808/79.212</strong> dòng <code>fls_pm_line</code> mang <code>NULL</code> ở 5 cột <code>PE</code>/<code>PI</code> vì nạp <strong>trước 11/09</strong> bằng bản khai chỉ có 8 vị trí — <strong>đó là sự thật, ⛔ không phải thiếu sót</strong>.</div>
+
+<p class="cuoi">Nguồn: <code>docs/ITL/02_BA/05_DATA_DICTIONARY_ERD.md</code> · <code>02_PROCESS_FLOW.md</code> · <code>06_SCREEN_SPEC.md §7</code> — đối chiếu với mã đang chạy: <code>fls/db/schema.py</code> · <code>fls/repo/{chup,chay_nap,nap_lo,khai_cot,anh_pm,nhip_chup,don_chup}.py</code> · <code>fls/kiem/soat_nap.py</code> · <code>fls/api/{nap_cua,bang_tuyen}.py</code> · <code>tools/chup_sao_ke.py</code>.<br>⛔ Trang này <strong>viết tay</strong> — ⛔ không có cổng nào canh nó. Bản đồ sinh bởi máy là <code>Ban-do-Kien-truc-7-Tang.html</code>.</p>
+
+</div>

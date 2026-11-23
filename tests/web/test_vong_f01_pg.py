@@ -352,17 +352,28 @@ def test_ten_truong_man_hinh_dua_vao_deu_CO_THAT(may, du_lieu):
         "§8 luc do moi dung (`GAP-SPEC-02`)")
 
 
-def test_moi_thao_tac_ghi_TRU_xong_deu_DOI_ly_do(may, du_lieu):
+def test_thao_tac_nao_DOI_ly_do__va_GHEP_BO_GHEP_thi_KHONG(may, du_lieu):
     """⚠ Cua doi `reason` o **5/6** thao tac; chi `Xong` la tuy y
-    (`QĐ-ITL-72`). `BA-06` §8 ⛔ khong noi mot chu nao ve dieu nay."""
+    (`QĐ-ITL-72`). `BA-06` §8 ⛔ khong noi mot chu nao ve dieu nay.
+
+    ⛔⛔ **Viet lai 01/10** — ten cu `test_moi_thao_tac_ghi_TRU_xong_deu_DOI_ly_do`
+    ghim `match` vao nhom *"doi ly do"* (5/6). Owner lat (`QĐ-ITL-149`): *"bo
+    yeu cau ly do cho cu Ghep"* — vi man ghep ⛔ co o ly do, va chinh than
+    `{pm_line_ids}` cua man bi **400** (`KQ-002 F-1`). `unmatch` cung tuy y
+    (`BA-07 §4h ⓻ⓑ` + `§4h ⓼`). Lo goc giu: **hop dong ly do cua TUNG cua**
+    ghim bang mot lan goi THAT — ⛔ de tai lieu va cua lech im lang."""
     itl = du_lieu["itl"]
     doi = [(f"{V}/queue/{itl}/reason", {}),
-           (f"{V}/queue/{itl}/defer", {"until": "2026-12-31"}),
-           (f"{V}/queue/{itl}/match", {"pm_line_ids": ["PMV1-1"]})]
+           (f"{V}/queue/{itl}/defer", {"until": "2026-12-31"})]
     for duong, than in doi:
         ma, r = _goi(may, duong, pt="POST", than=than)
         assert ma == 400 and "reason" in (r["error"].get("detail") or ""), \
             f"⛔ {duong} phai DOI `reason`, nhung tra {ma}"
+    # ⭐ `match` / `unmatch` ⛔ doi — dung than man gui (`{pm_line_ids}` / `{}`).
+    for duong, than in ((f"{V}/queue/{itl}/match", {"pm_line_ids": ["PMV1-1"]}),
+                        (f"{V}/queue/{itl}/unmatch", {})):
+        ma, r = _goi(may, duong, pt="POST", than=than)
+        assert ma == 200, f"⛔ {duong} thieu `reason` phai qua, nhung tra {ma}: {r}"
     # ⭐ `Xong` thi ⛔ KHONG doi — bat ly do cho thao tac pho bien nhat la mot
     #   ma sat ⛔ khong thu duoc gi (nguoi ta se go bua mot chu roi bam).
     ma, _ = _goi(may, f"{V}/queue/{itl}/done", pt="POST", than={})

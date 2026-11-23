@@ -1,0 +1,252 @@
+<svg viewBox="0 0 1320 861" width="100%" style="max-width:1320px;background:#fff" xmlns="http://www.w3.org/2000/svg" font-family="ui-monospace,'IBM Plex Mono',monospace" role="img" aria-label="Bản đồ kiến trúc kho FLS theo 7 tầng">
+<defs>
+<marker id="mt" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="#6b7280"/></marker>
+<marker id="mtx" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L8 4 L0 8 z" fill="#A32B23"/></marker>
+</defs>
+<rect x="10" y="45" width="1300" height="103" rx="10" fill="#f5f4f1" stroke="#d4d4d8"/>
+<text x="26" y="70" font-size="13" font-weight="700" fill="#1f2937">① ẢNH CHỤP</text>
+<text x="26" y="87" font-size="10" fill="#6b7280">tờ giấy lúc ấy ghi gì</text>
+<text x="26" y="100" font-size="10" fill="#6b7280">— chỉ-THÊM, ⛔ không</text>
+<text x="26" y="113" font-size="10" fill="#6b7280">ai sửa</text>
+<rect x="10" y="162" width="1300" height="103" rx="10" fill="transparent" stroke="#d4d4d8"/>
+<text x="26" y="187" font-size="13" font-weight="700" fill="#1f2937">② NẠP</text>
+<text x="26" y="204" font-size="10" fill="#6b7280">dòng nào vào sổ, dòng</text>
+<text x="26" y="217" font-size="10" fill="#6b7280">nào BỊ LOẠI và vì sao</text>
+<rect x="10" y="279" width="1300" height="118" rx="10" fill="#f5f4f1" stroke="#d4d4d8"/>
+<text x="26" y="304" font-size="13" font-weight="700" fill="#1f2937">③ SỔ KẾ TOÁN</text>
+<text x="26" y="321" font-size="10" fill="#6b7280">append-only (INV-I08)</text>
+<text x="26" y="334" font-size="10" fill="#6b7280">+ hai danh mục nó tra</text>
+<text x="26" y="347" font-size="10" fill="#6b7280">tới</text>
+<rect x="10" y="411" width="1300" height="118" rx="10" fill="transparent" stroke="#d4d4d8"/>
+<text x="26" y="436" font-size="13" font-weight="700" fill="#1f2937">④ GHÉP LỆNH CHI</text>
+<text x="26" y="453" font-size="10" fill="#6b7280">dòng tiền này chi</text>
+<text x="26" y="466" font-size="10" fill="#6b7280">theo lệnh nào</text>
+<rect x="10" y="543" width="1300" height="88" rx="10" fill="#f5f4f1" stroke="#d4d4d8"/>
+<text x="26" y="568" font-size="13" font-weight="700" fill="#1f2937">⑤ VIỆC CỦA NGƯỜI</text>
+<text x="26" y="585" font-size="10" fill="#6b7280">người còn phải làm gì</text>
+<rect x="10" y="645" width="1300" height="118" rx="10" fill="transparent" stroke="#d4d4d8"/>
+<text x="26" y="670" font-size="13" font-weight="700" fill="#1f2937">⑥ SỬA &amp; VẾT</text>
+<text x="26" y="687" font-size="10" fill="#6b7280">ai đã gõ gì, lúc nào,</text>
+<text x="26" y="700" font-size="10" fill="#6b7280">vì sao</text>
+<rect x="10" y="777" width="1300" height="73" rx="10" fill="#f5f4f1" stroke="#d4d4d8"/>
+<text x="26" y="802" font-size="13" font-weight="700" fill="#1f2937">⑦ HẠ TẦNG</text>
+<text x="26" y="819" font-size="10" fill="#6b7280">sổ di trú</text>
+<path d="M565 658 Q598 521 562 384" fill="none" stroke="#6b7280" stroke-width="1.5" opacity=".8" marker-end="url(#mt)"/>
+<text x="598" y="517" font-size="9.5" text-anchor="middle" fill="#6b7280" style="paint-order:stroke;stroke:#faf9f7;stroke-width:3px">itl_id</text>
+<path d="M639 670 c 26 -13 26 26 0 13" fill="none" stroke="#A32B23" stroke-width="1.6" marker-end="url(#mtx)"/>
+<text x="670" y="680" font-size="9.5" fill="#A32B23">reversal_of</text>
+<path d="M591 658 Q609 642 614 618" fill="none" stroke="#6b7280" stroke-width="1.5" opacity=".8" marker-end="url(#mt)"/>
+<text x="609" y="638" font-size="9.5" text-anchor="middle" fill="#6b7280" style="paint-order:stroke;stroke:#faf9f7;stroke-width:3px">evt_id</text>
+<path d="M404 96 Q391 92 378 96" fill="none" stroke="#6b7280" stroke-width="1.5" opacity=".8" marker-end="url(#mt)"/>
+<text x="391" y="88" font-size="9.5" text-anchor="middle" fill="#6b7280" style="paint-order:stroke;stroke:#faf9f7;stroke-width:3px">chup_id</text>
+<path d="M552 96 Q826 130 1100 96" fill="none" stroke="#6b7280" stroke-width="1.5" opacity=".8" marker-end="url(#mt)"/>
+<text x="826" y="126" font-size="9.5" text-anchor="middle" fill="#6b7280" style="paint-order:stroke;stroke:#faf9f7;stroke-width:3px">source_id</text>
+<path d="M578 96 Q478 64 378 96" fill="none" stroke="#6b7280" stroke-width="1.5" opacity=".8" marker-end="url(#mt)"/>
+<text x="478" y="60" font-size="9.5" text-anchor="middle" fill="#6b7280" style="paint-order:stroke;stroke:#faf9f7;stroke-width:3px">chup_id</text>
+<path d="M726 96 Q913 130 1100 96" fill="none" stroke="#6b7280" stroke-width="1.5" opacity=".8" marker-end="url(#mt)"/>
+<text x="913" y="126" font-size="9.5" text-anchor="middle" fill="#6b7280" style="paint-order:stroke;stroke:#faf9f7;stroke-width:3px">source_id</text>
+<path d="M636 303 Q703 294 752 248" fill="none" stroke="#6b7280" stroke-width="1.5" opacity=".8" marker-end="url(#mt)"/>
+<text x="703" y="290" font-size="9.5" text-anchor="middle" fill="#6b7280" style="paint-order:stroke;stroke:#faf9f7;stroke-width:3px">run_id</text>
+<path d="M636 338 Q649 342 662 338" fill="none" stroke="#6b7280" stroke-width="1.5" opacity=".8" marker-end="url(#mt)"/>
+<text x="649" y="338" font-size="9.5" text-anchor="middle" fill="#6b7280" style="paint-order:stroke;stroke:#faf9f7;stroke-width:3px">le</text>
+<path d="M636 338 Q649 342 662 338" fill="none" stroke="#6b7280" stroke-width="1.5" opacity=".8" marker-end="url(#mt)"/>
+<text x="649" y="338" font-size="9.5" text-anchor="middle" fill="#6b7280" style="paint-order:stroke;stroke:#faf9f7;stroke-width:3px">le_payer</text>
+<path d="M724 673 Q685 514 584 384" fill="none" stroke="#6b7280" stroke-width="1.5" opacity=".8" marker-end="url(#mt)"/>
+<text x="685" y="510" font-size="9.5" text-anchor="middle" fill="#6b7280" style="paint-order:stroke;stroke:#faf9f7;stroke-width:3px">itl_id</text>
+<path d="M900 96 Q1000 128 1100 96" fill="none" stroke="#6b7280" stroke-width="1.5" opacity=".8" marker-end="url(#mt)"/>
+<text x="1000" y="124" font-size="9.5" text-anchor="middle" fill="#6b7280" style="paint-order:stroke;stroke:#faf9f7;stroke-width:3px">source_id</text>
+<path d="M1074 96 Q1087 101 1100 96" fill="none" stroke="#6b7280" stroke-width="1.5" opacity=".8" marker-end="url(#mt)"/>
+<text x="1087" y="97" font-size="9.5" text-anchor="middle" fill="#6b7280" style="paint-order:stroke;stroke:#faf9f7;stroke-width:3px">source_id</text>
+<path d="M673 439 Q765 365 800 252" fill="none" stroke="#6b7280" stroke-width="1.5" opacity=".8" marker-end="url(#mt)"/>
+<text x="765" y="361" font-size="9.5" text-anchor="middle" fill="#6b7280" style="paint-order:stroke;stroke:#faf9f7;stroke-width:3px">run_id</text>
+<path d="M752 433 Q703 385 636 375" fill="none" stroke="#6b7280" stroke-width="1.5" opacity=".8" marker-end="url(#mt)"/>
+<text x="703" y="381" font-size="9.5" text-anchor="middle" fill="#6b7280" style="paint-order:stroke;stroke:#faf9f7;stroke-width:3px">itl_id</text>
+<path d="M826 432 Q855 342 826 252" fill="none" stroke="#6b7280" stroke-width="1.5" opacity=".8" marker-end="url(#mt)"/>
+<text x="855" y="338" font-size="9.5" text-anchor="middle" fill="#6b7280" style="paint-order:stroke;stroke:#faf9f7;stroke-width:3px">run_id</text>
+<path d="M926 470 Q913 466 900 470" fill="none" stroke="#6b7280" stroke-width="1.5" opacity=".8" marker-end="url(#mt)"/>
+<text x="913" y="462" font-size="9.5" text-anchor="middle" fill="#6b7280" style="paint-order:stroke;stroke:#faf9f7;stroke-width:3px">link_id</text>
+<path d="M926 448 Q791 371 636 360" fill="none" stroke="#6b7280" stroke-width="1.5" opacity=".8" marker-end="url(#mt)"/>
+<text x="791" y="367" font-size="9.5" text-anchor="middle" fill="#6b7280" style="paint-order:stroke;stroke:#faf9f7;stroke-width:3px">itl_id</text>
+<path d="M926 493 Q805 496 705 564" fill="none" stroke="#A32B23" stroke-width="1.5" opacity=".8" marker-end="url(#mtx)"/>
+<text x="805" y="492" font-size="9.5" text-anchor="middle" fill="#A32B23" style="paint-order:stroke;stroke:#faf9f7;stroke-width:3px">evt_id</text>
+<path d="M623 556 Q626 462 575 384" fill="none" stroke="#6b7280" stroke-width="1.5" opacity=".8" marker-end="url(#mt)"/>
+<text x="626" y="458" font-size="9.5" text-anchor="middle" fill="#6b7280" style="paint-order:stroke;stroke:#faf9f7;stroke-width:3px">itl_id</text>
+<path d="M726 214 Q739 218 752 214" fill="none" stroke="#6b7280" stroke-width="1.5" opacity=".8" marker-end="url(#mt)"/>
+<text x="739" y="214" font-size="9.5" text-anchor="middle" fill="#6b7280" style="paint-order:stroke;stroke:#faf9f7;stroke-width:3px">run_id</text>
+<path d="M826 175 Q834 151 826 128" fill="none" stroke="#6b7280" stroke-width="1.5" opacity=".8" marker-end="url(#mt)"/>
+<text x="834" y="147" font-size="9.5" text-anchor="middle" fill="#6b7280" style="paint-order:stroke;stroke:#faf9f7;stroke-width:3px">khai_id</text>
+<path d="M752 197 Q572 122 378 113" fill="none" stroke="#6b7280" stroke-width="1.5" opacity=".8" marker-end="url(#mt)"/>
+<text x="572" y="118" font-size="9.5" text-anchor="middle" fill="#6b7280" style="paint-order:stroke;stroke:#faf9f7;stroke-width:3px">chup_id</text>
+<rect x="491" y="658" width="148" height="92" rx="7" fill="#ffffff" stroke="#d4d4d8" stroke-width="1.3"/>
+<rect x="491" y="658" width="148" height="25" rx="7" fill="#fef3e8"/>
+<rect x="491" y="676" width="148" height="7" fill="#fef3e8"/>
+<text x="501" y="675" font-size="11.5" font-weight="600" fill="#b14a23">fls_adjustment</text>
+<text x="501" y="694" font-size="9.5" fill="#8A5A00">PK</text>
+<text x="521" y="694" font-size="9.5" fill="#6b7280">adj_id</text>
+<text x="501" y="709" font-size="9.5" fill="#b14a23">FK</text>
+<text x="521" y="709" font-size="9.5" fill="#6b7280">itl_id</text>
+<text x="501" y="724" font-size="9.5" fill="#b14a23">FK</text>
+<text x="521" y="724" font-size="9.5" fill="#6b7280">reversal_of</text>
+<text x="501" y="739" font-size="9.5" fill="#b14a23">FK</text>
+<text x="521" y="739" font-size="9.5" fill="#6b7280">evt_id</text>
+<rect x="230" y="73" width="148" height="47" rx="7" fill="#ffffff" stroke="#d4d4d8" stroke-width="1.3"/>
+<rect x="230" y="73" width="148" height="25" rx="7" fill="#fef3e8"/>
+<rect x="230" y="91" width="148" height="7" fill="#fef3e8"/>
+<text x="240" y="90" font-size="11.5" font-weight="600" fill="#b14a23">fls_chup</text>
+<text x="240" y="109" font-size="9.5" fill="#8A5A00">PK</text>
+<text x="260" y="109" font-size="9.5" fill="#6b7280">chup_id</text>
+<rect x="404" y="58" width="148" height="77" rx="7" fill="#ffffff" stroke="#d4d4d8" stroke-width="1.3"/>
+<rect x="404" y="58" width="148" height="25" rx="7" fill="#fef3e8"/>
+<rect x="404" y="76" width="148" height="7" fill="#fef3e8"/>
+<text x="414" y="75" font-size="11.5" font-weight="600" fill="#b14a23">fls_chup_dong</text>
+<text x="414" y="94" font-size="9.5" fill="#8A5A00">PK</text>
+<text x="434" y="94" font-size="9.5" fill="#6b7280">chup_id</text>
+<text x="414" y="109" font-size="9.5" fill="#8A5A00">PK</text>
+<text x="434" y="109" font-size="9.5" fill="#6b7280">source_id</text>
+<text x="414" y="124" font-size="9.5" fill="#8A5A00">PK</text>
+<text x="434" y="124" font-size="9.5" fill="#6b7280">dong_so</text>
+<rect x="578" y="66" width="148" height="62" rx="7" fill="#ffffff" stroke="#d4d4d8" stroke-width="1.3"/>
+<rect x="578" y="66" width="148" height="25" rx="7" fill="#fef3e8"/>
+<rect x="578" y="84" width="148" height="7" fill="#fef3e8"/>
+<text x="588" y="82" font-size="11.5" font-weight="600" fill="#b14a23">fls_chup_nguon</text>
+<text x="588" y="102" font-size="9.5" fill="#8A5A00">PK</text>
+<text x="608" y="102" font-size="9.5" fill="#6b7280">chup_id</text>
+<text x="588" y="116" font-size="9.5" fill="#8A5A00">PK</text>
+<text x="608" y="116" font-size="9.5" fill="#6b7280">source_id</text>
+<rect x="383" y="571" width="148" height="32" rx="7" fill="#ffffff" stroke="#d4d4d8" stroke-width="1.3" stroke-dasharray="5 3"/>
+<rect x="383" y="571" width="148" height="25" rx="7" fill="#fef3e8"/>
+<rect x="383" y="589" width="148" height="7" fill="#fef3e8"/>
+<text x="393" y="588" font-size="11.5" font-weight="600" fill="#b14a23">fls_da_xong  ◇</text>
+<rect x="488" y="292" width="148" height="92" rx="7" fill="#ffffff" stroke="#d4d4d8" stroke-width="1.3"/>
+<rect x="488" y="292" width="148" height="25" rx="7" fill="#fef3e8"/>
+<rect x="488" y="310" width="148" height="7" fill="#fef3e8"/>
+<text x="498" y="309" font-size="11.5" font-weight="600" fill="#b14a23">fls_itl</text>
+<text x="498" y="328" font-size="9.5" fill="#8A5A00">PK</text>
+<text x="518" y="328" font-size="9.5" fill="#6b7280">itl_id</text>
+<text x="498" y="343" font-size="9.5" fill="#b14a23">FK</text>
+<text x="518" y="343" font-size="9.5" fill="#6b7280">run_id</text>
+<text x="498" y="358" font-size="9.5" fill="#b14a23">FK</text>
+<text x="518" y="358" font-size="9.5" fill="#6b7280">le</text>
+<text x="498" y="373" font-size="9.5" fill="#b14a23">FK</text>
+<text x="518" y="373" font-size="9.5" fill="#6b7280">le_payer</text>
+<rect x="665" y="673" width="148" height="62" rx="7" fill="#ffffff" stroke="#d4d4d8" stroke-width="1.3"/>
+<rect x="665" y="673" width="148" height="25" rx="7" fill="#fef3e8"/>
+<rect x="665" y="691" width="148" height="7" fill="#fef3e8"/>
+<text x="675" y="690" font-size="11.5" font-weight="600" fill="#b14a23">fls_journal</text>
+<text x="675" y="709" font-size="9.5" fill="#8A5A00">PK</text>
+<text x="695" y="709" font-size="9.5" fill="#6b7280">jrn_id</text>
+<text x="675" y="724" font-size="9.5" fill="#b14a23">FK</text>
+<text x="695" y="724" font-size="9.5" fill="#6b7280">itl_id</text>
+<rect x="752" y="66" width="148" height="62" rx="7" fill="#ffffff" stroke="#d4d4d8" stroke-width="1.3"/>
+<rect x="752" y="66" width="148" height="25" rx="7" fill="#fef3e8"/>
+<rect x="752" y="84" width="148" height="7" fill="#fef3e8"/>
+<text x="762" y="82" font-size="11.5" font-weight="600" fill="#b14a23">fls_khai_cot</text>
+<text x="762" y="102" font-size="9.5" fill="#8A5A00">PK</text>
+<text x="782" y="102" font-size="9.5" fill="#6b7280">khai_id</text>
+<text x="762" y="116" font-size="9.5" fill="#b14a23">FK</text>
+<text x="782" y="116" font-size="9.5" fill="#6b7280">source_id</text>
+<rect x="662" y="314" width="148" height="47" rx="7" fill="#ffffff" stroke="#d4d4d8" stroke-width="1.3"/>
+<rect x="662" y="314" width="148" height="25" rx="7" fill="#fef3e8"/>
+<rect x="662" y="332" width="148" height="7" fill="#fef3e8"/>
+<text x="672" y="332" font-size="11.5" font-weight="600" fill="#b14a23">fls_le</text>
+<text x="672" y="350" font-size="9.5" fill="#8A5A00">PK</text>
+<text x="692" y="350" font-size="9.5" fill="#6b7280">le_code</text>
+<rect x="836" y="314" width="154" height="47" rx="7" fill="#ffffff" stroke="#d4d4d8" stroke-width="1.3"/>
+<rect x="836" y="314" width="154" height="25" rx="7" fill="#fef3e8"/>
+<rect x="836" y="332" width="154" height="7" fill="#fef3e8"/>
+<text x="846" y="332" font-size="11.5" font-weight="600" fill="#b14a23">fls_mapping_master</text>
+<text x="846" y="350" font-size="9.5" fill="#8A5A00">PK</text>
+<text x="866" y="350" font-size="9.5" fill="#6b7280">hd_code</text>
+<rect x="665" y="790" width="148" height="47" rx="7" fill="#ffffff" stroke="#d4d4d8" stroke-width="1.3"/>
+<rect x="665" y="790" width="148" height="25" rx="7" fill="#fef3e8"/>
+<rect x="665" y="808" width="148" height="7" fill="#fef3e8"/>
+<text x="675" y="807" font-size="11.5" font-weight="600" fill="#b14a23">fls_migration</text>
+<text x="675" y="826" font-size="9.5" fill="#8A5A00">PK</text>
+<text x="695" y="826" font-size="9.5" fill="#6b7280">version</text>
+<rect x="404" y="454" width="148" height="32" rx="7" fill="#ffffff" stroke="#d4d4d8" stroke-width="1.3" stroke-dasharray="5 3"/>
+<rect x="404" y="454" width="148" height="25" rx="7" fill="#fef3e8"/>
+<rect x="404" y="472" width="148" height="7" fill="#fef3e8"/>
+<text x="414" y="471" font-size="11.5" font-weight="600" fill="#b14a23">fls_moi_noi  ◇</text>
+<rect x="926" y="66" width="148" height="62" rx="7" fill="#ffffff" stroke="#d4d4d8" stroke-width="1.3"/>
+<rect x="926" y="66" width="148" height="25" rx="7" fill="#fef3e8"/>
+<rect x="926" y="84" width="148" height="7" fill="#fef3e8"/>
+<text x="936" y="82" font-size="11.5" font-weight="600" fill="#b14a23">fls_nguon_dai</text>
+<text x="936" y="102" font-size="9.5" fill="#8A5A00">PK</text>
+<text x="956" y="102" font-size="9.5" fill="#6b7280">dai_id</text>
+<text x="936" y="116" font-size="9.5" fill="#b14a23">FK</text>
+<text x="956" y="116" font-size="9.5" fill="#6b7280">source_id</text>
+<rect x="578" y="439" width="148" height="62" rx="7" fill="#ffffff" stroke="#d4d4d8" stroke-width="1.3"/>
+<rect x="578" y="439" width="148" height="25" rx="7" fill="#fef3e8"/>
+<rect x="578" y="457" width="148" height="7" fill="#fef3e8"/>
+<text x="588" y="456" font-size="11.5" font-weight="600" fill="#b14a23">fls_pm_line</text>
+<text x="588" y="475" font-size="9.5" fill="#8A5A00">PK</text>
+<text x="608" y="475" font-size="9.5" fill="#6b7280">run_id</text>
+<text x="588" y="490" font-size="9.5" fill="#8A5A00">PK</text>
+<text x="608" y="490" font-size="9.5" fill="#6b7280">pm_line_id</text>
+<rect x="752" y="432" width="148" height="77" rx="7" fill="#ffffff" stroke="#d4d4d8" stroke-width="1.3"/>
+<rect x="752" y="432" width="148" height="25" rx="7" fill="#fef3e8"/>
+<rect x="752" y="450" width="148" height="7" fill="#fef3e8"/>
+<text x="762" y="448" font-size="11.5" font-weight="600" fill="#b14a23">fls_pm_link</text>
+<text x="762" y="468" font-size="9.5" fill="#b14a23">FK</text>
+<text x="782" y="468" font-size="9.5" fill="#6b7280">itl_id</text>
+<text x="762" y="482" font-size="9.5" fill="#b14a23">FK</text>
+<text x="782" y="482" font-size="9.5" fill="#6b7280">run_id</text>
+<text x="762" y="498" font-size="9.5" fill="#8A5A00">PK</text>
+<text x="782" y="498" font-size="9.5" fill="#6b7280">link_id</text>
+<rect x="926" y="424" width="148" height="92" rx="7" fill="#ffffff" stroke="#d4d4d8" stroke-width="1.3"/>
+<rect x="926" y="424" width="148" height="25" rx="7" fill="#fef3e8"/>
+<rect x="926" y="442" width="148" height="7" fill="#fef3e8"/>
+<text x="936" y="441" font-size="11.5" font-weight="600" fill="#b14a23">fls_pm_unlink</text>
+<text x="936" y="460" font-size="9.5" fill="#8A5A00">PK</text>
+<text x="956" y="460" font-size="9.5" fill="#6b7280">unlink_id</text>
+<text x="936" y="475" font-size="9.5" fill="#b14a23">FK</text>
+<text x="956" y="475" font-size="9.5" fill="#6b7280">link_id</text>
+<text x="936" y="490" font-size="9.5" fill="#b14a23">FK</text>
+<text x="956" y="490" font-size="9.5" fill="#6b7280">itl_id</text>
+<text x="936" y="505" font-size="9.5" fill="#b14a23">FK</text>
+<text x="956" y="505" font-size="9.5" fill="#6b7280">evt_id</text>
+<rect x="557" y="556" width="148" height="62" rx="7" fill="#ffffff" stroke="#d4d4d8" stroke-width="1.3"/>
+<rect x="557" y="556" width="148" height="25" rx="7" fill="#fef3e8"/>
+<rect x="557" y="574" width="148" height="7" fill="#fef3e8"/>
+<text x="567" y="573" font-size="11.5" font-weight="600" fill="#b14a23">fls_queue_event</text>
+<text x="567" y="592" font-size="9.5" fill="#8A5A00">PK</text>
+<text x="587" y="592" font-size="9.5" fill="#6b7280">evt_id</text>
+<text x="567" y="607" font-size="9.5" fill="#b14a23">FK</text>
+<text x="587" y="607" font-size="9.5" fill="#6b7280">itl_id</text>
+<rect x="731" y="571" width="189" height="32" rx="7" fill="#ffffff" stroke="#d4d4d8" stroke-width="1.3" stroke-dasharray="5 3"/>
+<rect x="731" y="571" width="189" height="25" rx="7" fill="#fef3e8"/>
+<rect x="731" y="589" width="189" height="7" fill="#fef3e8"/>
+<text x="741" y="588" font-size="11.5" font-weight="600" fill="#b14a23">fls_queue_reason_weekly  ◇</text>
+<rect x="947" y="571" width="148" height="32" rx="7" fill="#ffffff" stroke="#d4d4d8" stroke-width="1.3" stroke-dasharray="5 3"/>
+<rect x="947" y="571" width="148" height="25" rx="7" fill="#fef3e8"/>
+<rect x="947" y="589" width="148" height="7" fill="#fef3e8"/>
+<text x="957" y="588" font-size="11.5" font-weight="600" fill="#b14a23">fls_queue_state  ◇</text>
+<rect x="578" y="182" width="148" height="62" rx="7" fill="#ffffff" stroke="#d4d4d8" stroke-width="1.3"/>
+<rect x="578" y="182" width="148" height="25" rx="7" fill="#fef3e8"/>
+<rect x="578" y="200" width="148" height="7" fill="#fef3e8"/>
+<text x="588" y="200" font-size="11.5" font-weight="600" fill="#b14a23">fls_reject</text>
+<text x="588" y="218" font-size="9.5" fill="#8A5A00">PK</text>
+<text x="608" y="218" font-size="9.5" fill="#6b7280">rej_id</text>
+<text x="588" y="234" font-size="9.5" fill="#b14a23">FK</text>
+<text x="608" y="234" font-size="9.5" fill="#6b7280">run_id</text>
+<rect x="752" y="175" width="148" height="77" rx="7" fill="#ffffff" stroke="#d4d4d8" stroke-width="1.3"/>
+<rect x="752" y="175" width="148" height="25" rx="7" fill="#fef3e8"/>
+<rect x="752" y="193" width="148" height="7" fill="#fef3e8"/>
+<text x="762" y="192" font-size="11.5" font-weight="600" fill="#b14a23">fls_run</text>
+<text x="762" y="211" font-size="9.5" fill="#8A5A00">PK</text>
+<text x="782" y="211" font-size="9.5" fill="#6b7280">run_id</text>
+<text x="762" y="226" font-size="9.5" fill="#b14a23">FK</text>
+<text x="782" y="226" font-size="9.5" fill="#6b7280">khai_id</text>
+<text x="762" y="241" font-size="9.5" fill="#b14a23">FK</text>
+<text x="782" y="241" font-size="9.5" fill="#6b7280">chup_id</text>
+<rect x="1100" y="73" width="148" height="47" rx="7" fill="#ffffff" stroke="#d4d4d8" stroke-width="1.3"/>
+<rect x="1100" y="73" width="148" height="25" rx="7" fill="#fef3e8"/>
+<rect x="1100" y="91" width="148" height="7" fill="#fef3e8"/>
+<text x="1110" y="90" font-size="11.5" font-weight="600" fill="#b14a23">fls_source</text>
+<text x="1110" y="109" font-size="9.5" fill="#8A5A00">PK</text>
+<text x="1130" y="109" font-size="9.5" fill="#6b7280">source_id</text>
+<rect x="839" y="688" width="148" height="32" rx="7" fill="#ffffff" stroke="#d4d4d8" stroke-width="1.3" stroke-dasharray="5 3"/>
+<rect x="839" y="688" width="148" height="25" rx="7" fill="#fef3e8"/>
+<rect x="839" y="706" width="148" height="7" fill="#fef3e8"/>
+<text x="849" y="705" font-size="11.5" font-weight="600" fill="#b14a23">fls_sua_tay  ◇</text>
+</svg>

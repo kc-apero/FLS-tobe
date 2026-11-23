@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>BẢN VẼ 14 — Luồng FLS và cái nút</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bitter:wght@500;600;700&family=Be+Vietnam+Pro:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --paper:#F7F8F5; --surface:#FFFFFF; --bar:#EAF0E8; --ink:#1B2420;
+  --ink-soft:#5A6660; --rule:#D2DAD3; --accent:#0F5C4A; --accent-soft:#E1EDE7;
+  --red:#A32B23; --red-soft:#F7E6E3; --amber:#87680F; --amber-soft:#F5EEDA;
+  --plate:#F1F4EE; --plate-rule:#C7D1C6; --plate-band:#E2E9DF;
+  --shadow:0 1px 2px rgba(27,36,32,.06), 0 8px 24px -16px rgba(27,36,32,.18);
+  /* Ba ho chu — LAY NGUYEN tu BAN VE 12, de bo ban ve doc nhu MOT bo. */
+  --serif:Bitter,Georgia,"Times New Roman",serif;
+  --sans:"Be Vietnam Pro","Segoe UI",system-ui,ui-sans-serif,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"Cascadia Mono",Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#0F1412; --surface:#161C18; --bar:#1B221D; --ink:#E7EDE5;
+    --ink-soft:#9BA8A0; --rule:#2A332C; --accent:#66C4A4; --accent-soft:#17271F;
+    --red:#E9897C; --red-soft:#2E1A17; --amber:#D9B84E; --amber-soft:#2A2412;
+    --plate:#141A16; --plate-rule:#2A332C; --plate-band:#1B221D;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.6);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0F1412; --surface:#161C18; --bar:#1B221D; --ink:#E7EDE5;
+  --ink-soft:#9BA8A0; --rule:#2A332C; --accent:#66C4A4; --accent-soft:#17271F;
+  --red:#E9897C; --red-soft:#2E1A17; --amber:#D9B84E; --amber-soft:#2A2412;
+  --plate:#141A16; --plate-rule:#2A332C; --plate-band:#1B221D;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px -16px rgba(0,0,0,.6);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--paper);color:var(--ink);
+  font:15px/1.62 var(--sans);-webkit-font-smoothing:antialiased}
+.wrap{max-width:1120px;margin:0 auto;padding:32px 20px 80px}
+header{border-bottom:2px solid var(--accent);padding-bottom:18px;margin-bottom:28px}
+/* Thang chu: 32 / 22 / 15 / 12 — moi bac cach nhau >=1.25 lan. Ban truoc
+   dung 27/20/15/14/13/12, va cac bac 15-14-13 sat nhau den muc ⛔ khong con
+   la mot thang. */
+h1{font:700 32px/1.18 var(--serif);margin:0 0 8px;letter-spacing:-.012em}
+.sub{color:var(--ink-soft);font-size:15px}
+.sub b{color:var(--ink)}
+h2{font:600 22px/1.28 var(--serif);margin:48px 0 7px;letter-spacing:-.008em}
+.lede{color:var(--ink-soft);margin:0 0 18px;max-width:78ch}
+section{scroll-margin-top:20px}
+
+/* --- thẻ số --- */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(158px,1fr));gap:10px;margin:18px 0}
+.kpi{background:var(--surface);border:1px solid var(--rule);border-radius:10px;padding:12px 14px;box-shadow:var(--shadow)}
+.kpi .v{font:600 22px/1.15 var(--mono);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.kpi .k{font-size:12px;color:var(--ink-soft);margin-top:4px}
+.kpi.bad .v{color:var(--red)} .kpi.ok .v{color:var(--accent)} .kpi.mid .v{color:var(--amber)}
+
+/* --- khối cảnh báo --- */
+/* Vien DEU bon phia, ⛔ khong phai mot thanh mau mot ben: BAN VE 12 ⛔ khong
+   dung side-tab o dau, va mot thanh day mot ben la net de nhan nhat cua
+   giao dien may sinh. Sac thai di bang NEN + mau VIEN, ⛔ khong bang be day. */
+.note{border:1px solid var(--rule);background:var(--surface);padding:14px 18px;
+  border-radius:10px;margin:18px 0;box-shadow:var(--shadow)}
+.note.red{border-color:var(--red);background:var(--red-soft)}
+.note.amber{border-color:var(--amber);background:var(--amber-soft)}
+.note.green{border-color:var(--accent);background:var(--accent-soft)}
+.note p{margin:0} .note p+p{margin-top:9px}
+
+/* --- bảng --- */
+.tw{overflow-x:auto;margin:18px 0;border:1px solid var(--rule);border-radius:10px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:15px;min-width:520px}
+th,td{padding:9px 13px;text-align:left;border-bottom:1px solid var(--rule);vertical-align:top}
+thead th{background:var(--bar);font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-soft);font-weight:600;white-space:nowrap}
+tbody tr:last-child td{border-bottom:0}
+td.num{font-family:var(--mono);font-variant-numeric:tabular-nums;text-align:right;white-space:nowrap}
+code{font-family:var(--mono);font-size:.9em;background:var(--plate);border:1px solid var(--plate-rule);border-radius:4px;padding:1px 5px}
+.tag{display:inline-block;font:600 12px/1 var(--mono);padding:4px 7px;border-radius:5px;white-space:nowrap}
+.t-ok{background:var(--accent-soft);color:var(--accent)}
+.t-bad{background:var(--red-soft);color:var(--red)}
+.t-mid{background:var(--amber-soft);color:var(--amber)}
+figure{margin:22px 0}
+figcaption{font-size:12px;color:var(--ink-soft);margin-top:11px}
+svg{display:block;width:100%;height:auto;background:var(--surface);border:1px solid var(--rule);border-radius:10px}
+.svgtext{font:12px/1.3 var(--sans);fill:var(--ink)}
+.svgnum{font:600 12px/1 var(--mono);fill:var(--ink)}
+.svgsm{font:10.5px/1.2 var(--sans);fill:var(--ink-soft)}
+.svgttl{font:600 12px/1 var(--sans);fill:var(--ink)}
+.lane{font:600 10.5px/1 var(--sans);fill:var(--ink-soft);letter-spacing:.09em}
+footer{margin-top:56px;padding-top:18px;border-top:1px solid var(--rule);font-size:12px;color:var(--ink-soft)}
+ol,ul{padding-left:22px} li{margin:5px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <h1>BẢN VẼ 14 — Luồng FLS, và cái nút nằm ở đâu</h1>
+  <div class="sub">Đo trên kho <b>THẬT</b> lúc <b>10/09/2026 16:59</b> · mọi con số dưới đây do <b>máy đếm</b>, không ai gõ ·
+  nút: <code>NUT-CHAY-FLS.cmd</code></div>
+</header>
+
+<!-- ══════════════ 1 · MỘT MÀN HÌNH ══════════════ -->
+<section>
+<h2>Đọc một màn: hệ đang ở đâu</h2>
+<p class="lede">Ba con số đầu là <b>tin tốt</b>. Ba con số sau là <b>toàn bộ vấn đề</b>: dữ liệu chảy vào kho đều đặn,
+nhưng nó <b>dừng ngay trước sổ kế toán</b>, và chưa một người nào chạm vào hệ.</p>
+
+<div class="kpis">
+  <div class="kpi ok"><div class="v">8.406</div><div class="k">dòng sao kê · chụp mỗi giờ · 3–5 giây</div></div>
+  <div class="kpi ok"><div class="v">3.772</div><div class="k">dòng lệnh chi · đã nạp vào kho ✅</div></div>
+  <div class="kpi ok"><div class="v">1.593</div><div class="k">phép thử · 20.403 dòng mã</div></div>
+  <div class="kpi bad"><div class="v">27/08</div><div class="k">sổ nạp lần cuối — <b>đóng băng 14 ngày</b></div></div>
+  <div class="kpi bad"><div class="v">0</div><div class="k">bút toán sửa của người thật</div></div>
+  <div class="kpi bad"><div class="v">0</div><div class="k">cú bấm hàng chờ của người thật</div></div>
+</div>
+</section>
+
+<!-- ══════════════ 2 · LUỒNG ══════════════ -->
+<section>
+<h2>Luồng, và chỗ nó bị cắt</h2>
+<p class="lede">Hai lằn vào <b>song song và độc lập</b> (một lằn đổ không kéo lằn kia xuống). Lằn <b>PM đi trọn</b> chụp→nạp.
+Lằn <b>Bank chỉ đi được nửa đường</b>: 12 ảnh trong kho, <b>0 ảnh</b> được nạp vào sổ.</p>
+
+<figure>
+<svg viewBox="0 0 1080 520" role="img" aria-label="Sơ đồ luồng FLS từ Google Sheets qua kho PostgreSQL tới BigQuery, với chỗ cắt trước sổ kế toán">
+  <defs>
+    <marker id="ar" markerWidth="9" markerHeight="9" refX="7.5" refY="4.5" orient="auto">
+      <path d="M0,1 L8,4.5 L0,8 z" fill="var(--accent)"/>
+    </marker>
+    <marker id="arg" markerWidth="9" markerHeight="9" refX="7.5" refY="4.5" orient="auto">
+      <path d="M0,1 L8,4.5 L0,8 z" fill="var(--ink-soft)"/>
+    </marker>
+  </defs>
+
+  <!-- ba dải nền -->
+  <rect x="8" y="42" width="268" height="440" rx="9" fill="var(--plate)" stroke="var(--plate-rule)"/>
+  <rect x="296" y="42" width="516" height="440" rx="9" fill="var(--plate-band)" stroke="var(--plate-rule)"/>
+  <rect x="832" y="42" width="240" height="440" rx="9" fill="var(--plate)" stroke="var(--plate-rule)"/>
+  <text class="lane" x="22" y="30">GOOGLE SHEETS · CHỈ ĐỌC</text>
+  <text class="lane" x="310" y="30">KHO PostgreSQL · SYSTEM OF RECORD</text>
+  <text class="lane" x="846" y="30">ĐÍCH</text>
+
+  <!-- nguồn Bank -->
+  <rect x="26" y="66" width="232" height="80" rx="8" fill="var(--surface)" stroke="var(--rule)"/>
+  <text class="svgttl" x="40" y="88">65 sheet <tspan font-family="var(--mono)">R | &lt;tài khoản&gt;</tspan></text>
+  <text class="svgnum" x="40" y="110">8.406 dòng · 20 bố cục cột</text>
+  <text class="svgsm" x="40" y="130">13 nguồn ra 0 dòng · 2 là template</text>
+
+  <!-- nguồn PM -->
+  <rect x="26" y="176" width="232" height="66" rx="8" fill="var(--surface)" stroke="var(--rule)"/>
+  <text class="svgttl" x="40" y="198">PM_Unpivot · lệnh chi</text>
+  <text class="svgnum" x="40" y="220">3.772 dòng · 3.237 có mã</text>
+
+  <!-- NÚT -->
+  <rect x="26" y="290" width="232" height="86" rx="8" fill="var(--accent-soft)" stroke="var(--accent)" stroke-width="2"/>
+  <text class="svgttl" x="40" y="312" fill="var(--accent)">▶ NÚT-CHAY-FLS.cmd</text>
+  <text class="svgsm" x="40" y="331">bấm đôi chuột · không cần Dev</text>
+  <text class="svgsm" x="40" y="347">kho → token → chụp 2 lằn → báo cáo</text>
+  <text class="svgsm" x="40" y="363" fill="var(--red)">chỉ CHỤP · không nạp vào sổ</text>
+
+  <!-- mũi tên nút -> chụp -->
+  <path d="M258 320 C 285 320, 285 150, 320 150" fill="none" stroke="var(--accent)" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#ar)"/>
+  <path d="M258 330 C 285 330, 285 240, 320 240" fill="none" stroke="var(--accent)" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#ar)"/>
+
+  <!-- chụp Bank -->
+  <rect x="324" y="118" width="212" height="66" rx="8" fill="var(--surface)" stroke="var(--accent)"/>
+  <text class="svgttl" x="338" y="140">fls_chup · lằn Bank</text>
+  <text class="svgnum" x="338" y="161">12 ảnh · bất biến</text>
+  <text class="svgsm" x="338" y="177">chụp 2 lần ⇒ ảnh cũ nguyên vẹn</text>
+
+  <!-- chụp PM -->
+  <rect x="324" y="208" width="212" height="66" rx="8" fill="var(--surface)" stroke="var(--accent)"/>
+  <text class="svgttl" x="338" y="230">fls_pm_line · lằn PM</text>
+  <text class="svgnum" x="338" y="251">12 lượt nạp ✅</text>
+  <text class="svgsm" x="338" y="267">đi TRỌN chụp → nạp</text>
+
+  <!-- SỔ -->
+  <rect x="600" y="118" width="196" height="86" rx="8" fill="var(--surface)" stroke="var(--red)" stroke-width="2"/>
+  <text class="svgttl" x="614" y="140">fls_itl · SỔ KẾ TOÁN</text>
+  <text class="svgnum" x="614" y="162">10.030 dòng</text>
+  <text class="svgsm" x="614" y="180">1 lần nạp · 27/08 · nguồn RAW</text>
+  <text class="svgsm" x="614" y="196" fill="var(--red)">đóng băng 14 ngày</text>
+
+  <!-- mũi tên Bank -> sổ, BỊ CẮT -->
+  <path d="M536 151 L 592 151" fill="none" stroke="var(--red)" stroke-width="2.5" stroke-dasharray="6 5"/>
+  <g stroke="var(--red)" stroke-width="3" stroke-linecap="round">
+    <path d="M556 138 L 574 164"/><path d="M574 138 L 556 164"/>
+  </g>
+  <text class="svgsm" x="528" y="112" fill="var(--red)" font-weight="600">CỔNG CHẶN</text>
+
+  <!-- PM -> map -->
+  <path d="M536 241 C 570 241, 570 250, 600 250" fill="none" stroke="var(--accent)" stroke-width="2" marker-end="url(#ar)"/>
+  <!-- sổ -> map -->
+  <path d="M698 204 L 698 232" fill="none" stroke="var(--ink-soft)" stroke-width="2" marker-end="url(#arg)"/>
+
+  <!-- MAP -->
+  <rect x="600" y="236" width="196" height="70" rx="8" fill="var(--surface)" stroke="var(--rule)"/>
+  <text class="svgttl" x="614" y="258">① MAP  PM ↔ Transaction</text>
+  <text class="svgnum" x="614" y="279">2.745 mối nối</text>
+  <text class="svgsm" x="614" y="296" fill="var(--red)">100% do MÁY · 0 cú bấm người</text>
+
+  <path d="M698 306 L 698 336" fill="none" stroke="var(--ink-soft)" stroke-width="2" marker-end="url(#arg)"/>
+
+  <!-- ADJUST -->
+  <rect x="600" y="340" width="196" height="70" rx="8" fill="var(--surface)" stroke="var(--rule)"/>
+  <text class="svgttl" x="614" y="362">② ADJUST · 7 ô Final</text>
+  <text class="svgnum" x="614" y="383">7/7 ô đã lưu được</text>
+  <text class="svgsm" x="614" y="400" fill="var(--red)">0 bút toán thật</text>
+
+  <path d="M698 410 L 698 438" fill="none" stroke="var(--ink-soft)" stroke-width="2" marker-end="url(#arg)"/>
+
+  <!-- XUAT -->
+  <rect x="600" y="442" width="196" height="32" rx="8" fill="var(--surface)" stroke="var(--rule)"/>
+  <text class="svgttl" x="614" y="463">XUẤT 64 cột · 20%</text>
+
+  <!-- BQ -->
+  <rect x="852" y="118" width="200" height="80" rx="8" fill="var(--surface)" stroke="var(--rule)"/>
+  <text class="svgttl" x="866" y="140">Engine FPA-T4</text>
+  <text class="svgsm" x="866" y="159">đọc qua ITL-CONTRACT</text>
+  <text class="svgnum" x="866" y="180">14 trường · v1.0 đóng băng</text>
+
+  <rect x="852" y="430" width="200" height="52" rx="8" fill="var(--surface)" stroke="var(--rule)"/>
+  <text class="svgttl" x="866" y="452">BigQuery</text>
+  <text class="svgsm" x="866" y="470">đích CÔNG BỐ · không phải kho sổ</text>
+
+  <path d="M796 458 L 844 458" fill="none" stroke="var(--ink-soft)" stroke-width="2" marker-end="url(#arg)"/>
+  <path d="M796 158 L 844 158" fill="none" stroke="var(--ink-soft)" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#arg)"/>
+</svg>
+<figcaption><b>Dấu ✗ đỏ là toàn bộ câu chuyện.</b> Nút lấp đầy hộp CHỤP; mũi tên từ ảnh Bank vào sổ đang bị
+<b>cố ý cắt</b> — §3 nói vì sao. Mũi tên nét đứt sang engine là đường <b>chưa cutover</b>: engine hôm nay vẫn đọc sổ Google Sheets.</figcaption>
+</figure>
+</section>
+
+<!-- ══════════════ 3 · VÌ SAO CẮT ══════════════ -->
+<section>
+<h2>Vì sao cổng chặn: sổ có <b>hai đường vào</b> không nhìn thấy nhau</h2>
+<p class="lede">Đây là phát hiện của lượt nạp thử trên kho nháp <code>fls_thu</code> (kho thật không bị chạm).
+Nó không phải một con bug — nó là <b>hai biên giới System of Record</b> cùng tồn tại trong một cái sổ.</p>
+
+<div class="tw"><table>
+<thead><tr><th></th><th>Lần nạp <b>27/08</b> (sổ hiện tại)</th><th>Cửa lô — <b>đường thiết kế</b></th></tr></thead>
+<tbody>
+<tr><td>đọc từ tầng</td><td><code>Transaction Mapping L1</code><br><span class="svgsm">tầng PHÁI SINH của Google Sheets</span></td><td><code>R | &lt;tài khoản&gt;</code> — 49 sheet<br><span class="svgsm">tầng kế toán GÕ VÀO</span></td></tr>
+<tr><td><code>source_system</code></td><td><code>RAW</code></td><td><code>P100</code></td></tr>
+<tr><td>số dòng</td><td class="num">10.030</td><td class="num">6.617</td></tr>
+<tr><td>kỳ tới</td><td class="num">2026-08-27</td><td class="num">2026-09-08</td></tr>
+<tr><td>PS Nợ</td><td class="num">607,57 tỷ</td><td class="num">387,33 tỷ</td></tr>
+</tbody></table></div>
+
+<div class="note red">
+<p><b>Chống trùng bị mù giữa hai tầng.</b> Khoá đối sánh là
+<code>content_key = source_system + source_sheet + ngày + PS&nbsp;Nợ + PS&nbsp;Có + số&nbsp;CT + seq</code>.
+Đổi tên tầng ⇒ <b>cùng một giao dịch sinh hai khoá khác nhau</b>.</p>
+<p>Đo được trên kho nháp: <b>3.694 dòng</b> khớp cả <b>bốn</b> khoá nghiệp vụ (số CT + ngày + PS Nợ + PS Có) mà
+nằm <b>hai lần</b> trong sổ. Nếu ai nạp ảnh Bank lên sổ thật hôm nay: <b>10.030 → 16.647</b>, và
+<b>không một cổng nào kêu</b> — bài thử idempotent vẫn đậu, vì nó chỉ chạy lại <i>cùng một tầng</i>.</p>
+</div>
+
+<div class="note amber">
+<p><b>Nhưng cũng chưa được dựng lại ngay.</b> Cân đối của lượt thử: <code>8.389 ra</code> =
+<code>6.617 vào sổ</code> + <code>1.143 loại</code> + <b>629 chưa giải thích</b>; và lệch so với sổ hiện tại là
+<b>3.413 dòng</b>. Không ai được phép tái lập một System of Record với 3.413 dòng chưa giải thích —
+cổng vào là <b>liệt kê từng dòng</b>, không phải một tỷ lệ phần trăm.</p>
+</div>
+
+<div class="note green">
+<p><b>Tin tốt, và nó định giá cả quyết định:</b> mọi thứ neo vào <code>itl_id</code> đều do <b>MÁY</b> sinh và
+<b>tái tạo được</b> — <code>fls_adjustment</code> 0 · <code>fls_journal</code> 0 · <code>fls_queue_event</code> 0 ·
+<code>fls_da_xong</code> 0 · <code>fls_pm_unlink</code> 0; 2.745 mối nối là máy ghép.
+560 dòng bản khai cột (96 do người sửa) neo <code>source_id</code>, <b>không</b> neo <code>itl_id</code> ⇒ sống sót.
+⇒ <b>Giá dựng lại sổ hôm nay ≈ 0, và nó sẽ không bao giờ rẻ hơn.</b></p>
+</div>
+</section>
+
+<!-- ══════════════ 4 · CÁI NÚT ══════════════ -->
+<section>
+<h2>Cái nút: làm gì, và <b>cố ý</b> không làm gì</h2>
+<p class="lede">Bấm đôi chuột vào <code>NUT-CHAY-FLS.cmd</code> ở gốc kho. Bốn lớp, mỗi lớp nói ra nó đang làm gì —
+một nút im lặng rồi báo &ldquo;xong&rdquo; đúng là thứ cổng <code>A1</code> sinh ra để tránh.</p>
+
+<div class="tw"><table>
+<thead><tr><th style="width:3em"></th><th>Lớp</th><th>Làm gì</th><th>Nếu hỏng thì nói gì</th></tr></thead>
+<tbody>
+<tr><td class="num">1</td><td>Kho</td><td>Kiểm <code>fls-pg-1</code>; chưa chạy thì bật Docker + chờ tới khi kho trả lời</td><td>“KHO KHÔNG LÊN sau ~2 phút — mở Docker Desktop bằng tay”</td></tr>
+<tr><td class="num">2</td><td>Token</td><td>Kiểm token Google Sheets còn hạn</td><td>“chạy một lần: <code>gcloud auth login</code>”</td></tr>
+<tr><td class="num">3</td><td>Chụp</td><td>Chụp <b>cả hai</b> lằn Bank + PM, <code>actor = nhip@fls(tay)</code></td><td>nêu <b>tên sheet</b> vừa đổi tên làm bản khai mồ côi</td></tr>
+<tr><td class="num">4</td><td>Báo cáo</td><td>Sổ bao nhiêu dòng · ảnh mới nhất <b>đã nạp chưa</b> · nguồn ra 0 dòng</td><td>cảnh báo nếu sổ có <b>&gt;1 tầng nguồn</b></td></tr>
+</tbody></table></div>
+
+<div class="note">
+<p><b>Hai chỗ nút cố ý làm khác cái dễ làm:</b></p>
+<p><b>⓵ Không nạp vào sổ.</b> Đó là cổng chặn ở §3, không phải một thiếu sót. Nút <b>in ra lý do</b> mỗi lần chạy,
+để không ai đọc “xong” thành “sổ đã cập nhật”.</p>
+<p><b>⓶ Không đeo nhãn tự-động.</b> Cờ <code>--tu-bo-hen-gio</code> ghi <code>actor = nhip@fls</code> và cổng
+<code>A1</code> đếm theo actor ấy. Một lượt gõ tay đeo nhãn tự-động là <b>tự bấm cho cổng xanh</b> — nên nút dùng
+<code>nhip@fls(tay)</code>, và máy cũng <b>tự từ chối</b> cờ kia khi gõ tay.</p>
+</div>
+
+<div class="note amber">
+<p><b>Nút là giải pháp TẠM.</b> Nó thay được <i>“phải gọi Dev chạy lệnh”</i>, nhưng ⛔ không thay được
+<b>nhịp tự chạy</b>: đo 10/09 lằn Bank thiếu <b>4 giờ ảnh</b>, lằn PM thiếu <b>5</b>, vì
+<code>WakeToRun=False</code> · <code>DisallowStartIfOnBatteries=True</code> · Docker không tự lên.
+Ba thứ ấy là <b>cách máy của chủ máy xử sự</b>, không phải tham số của FLS.</p>
+</div>
+</section>
+
+<!-- ══════════════ 5 · BỐN MỐC ══════════════ -->
+<section>
+<h2>Bốn mốc, do máy đếm chứ không ai gõ</h2>
+
+<div class="tw"><table>
+<thead><tr><th>Mốc</th><th>Tác vụ</th><th>Hôm nay</th><th>Cổng</th></tr></thead>
+<tbody>
+<tr><td><b>A</b> Đường lấy</td><td>cả hai</td><td>Bank + PM <b>đều chảy</b> · quỹ chưa mở · <span class="svgsm">A1 đạt trên KHO, chưa đạt trong VẬN HÀNH</span></td><td><span class="tag t-ok">3 đạt</span> <span class="tag t-mid">1 nửa</span></td></tr>
+<tr><td><b>B</b> Mapping</td><td>①</td><td>64,3% dòng lệnh đã có tiền · việc thật <b>1.345 dòng / 698 phiếu</b> <span class="svgsm">(số 09/09 — số hôm nay ở bản vẽ 13, thẻ “Lệnh chi đã tìm được tiền của nó”; đính chính 01/10, KQ-010 F-4)</span> · <span class="svgsm">0 cú bấm người</span></td><td><span class="tag t-ok">1 đạt</span> <span class="tag t-mid">1 nửa</span> <span class="tag t-bad">3 chưa</span></td></tr>
+<tr><td><b>C</b> Adjust</td><td>②</td><td>5 cửa + màn xong · <b>0 bút toán thật</b></td><td><span class="tag t-bad">C1–C5 chưa</span></td></tr>
+<tr><td><b>D</b> Output</td><td>②</td><td>7/7 ô <code>Final</code> đã lưu · <b>0 bộ xuất</b> · 64 cột thì FLS lưu 18, 22 cột là giàn giáo đã khai tử</td><td><span class="tag t-bad">D1–D5 chưa</span></td></tr>
+</tbody></table></div>
+
+<div class="note red">
+<p><b>Và một lỗ của chính bộ cổng, phải nói ra:</b> ⛔ không cổng nào trong <code>A1</code>–<code>A4</code> hỏi
+<i>“ảnh sao kê có vào sổ không”</i>. ⇒ Mốc <b>A đóng được</b> trong khi sổ vẫn là ảnh của 27/08.
+Đề xuất thêm <code>A5a</code>: <code>count(DISTINCT source_system) = 1</code> ·
+<code>A5b</code>: ảnh mới nhất mỗi lằn phải có đường vào sổ trong ≤ N giờ.</p>
+</div>
+</section>
+
+<!-- ══════════════ 6 · THỨ TỰ ══════════════ -->
+<section>
+<h2>Thứ tự thi hành, và đường găng không phải mã</h2>
+
+<div class="tw"><table>
+<thead><tr><th style="width:3em">#</th><th>Việc</th><th style="width:9em">Ai</th><th>Cổng ra</th></tr></thead>
+<tbody>
+<tr><td class="num">1</td><td>Dựng lại sổ từ tầng <code>R |</code> <b>trên kho nháp</b> + giải thích <b>3.413 dòng lệch từng dòng</b></td><td>máy</td><td><span class="tag t-bad">CỔNG CHẶN</span> không đạt ⇒ không áp</td></tr>
+<tr><td class="num">2</td><td><code>pm_join</code> chạy lại trên ảnh PM 3.772 — công bố <b>cả hai</b> cách đếm</td><td>máy</td><td>cổng Σ</td></tr>
+<tr><td class="num">3</td><td>Áp lên kho thật + <code>A5a</code>/<code>A5b</code> + vá <code>fls_reject</code> (đang <b>+1.143/lượt</b>)</td><td>máy</td><td><code>pg_verify</code> · số sống</td></tr>
+<tr><td class="num">4</td><td><b>Buổi 90 phút: một kế toán · một tháng dữ liệu · ghép → adjust → xuất</b></td><td><b>owner + kế toán</b></td><td><code>B5</code> · <code>C1</code> · <code>C5</code></td></tr>
+<tr><td class="num">5</td><td><code>xuat</code> → 64 cột → BigQuery (công bố)</td><td>máy</td><td><code>D1</code> · <code>D2</code> từng dòng</td></tr>
+<tr><td class="num">6</td><td>Mở lằn <b>quỹ</b> · adapter <code>C/D/E/F</code></td><td>máy</td><td>sau khi ④ nói giao diện đúng</td></tr>
+</tbody></table></div>
+
+<div class="note green">
+<p><b>Đường găng là bước ④, không phải một dòng mã.</b> Bước 1–3 chạy được ngay. Nhưng 20% còn lại của
+<code>web</code>, 45% của <code>adapters</code> và 80% của <code>xuat</code> đang được ước lượng trên
+<b>giả định về hành vi kế toán mà chưa ai kiểm</b> — và đó đúng là cách con số <b>82%</b> trở thành
+một con số không ai dùng được.</p>
+</div>
+</section>
+
+<footer>
+<b>BẢN VẼ 14</b> · <code>docs/ITL/02_BA/Artifacts/FLS-Luong-va-Nut.html</code> · tự chứa; ba họ chữ lấy từ BẢN VẼ 12, có bản dự phòng hệ thống nên đọc được cả khi mất mạng.<br>
+Nguồn số: <code>tools/tien_do.py</code> · <code>tools/soi_nhip.py</code> · <code>tools/kiem_so_song.py</code> ·
+<code>tools/nut_trang_thai.py</code> · lượt nạp thử trên kho nháp <code>fls_thu</code> (kho thật không bị chạm).<br>
+Quyết định owner ghi nhận 10/09: hai sheet <code>ACB … Coretap</code> là <b>template để dành chỗ, chưa có data</b>
+⇒ 0 dòng là <b>đúng</b>, không phải khuyết tật.
+</footer>
+
+</div>
+</body>
+</html>

@@ -1,6 +1,6 @@
 # 04 — ROLE & PERMISSION MATRIX
 
-**Version:** v0.3 | **Chủ sở hữu:** COO-CFO | **Nguyên tắc:** tách quyền tạo–duyệt (SoD), đặc biệt ở điều chỉnh ITL & treasury
+**Version:** v0.4 | **Chủ sở hữu:** COO-CFO | **Nguyên tắc:** tách quyền tạo–duyệt (SoD), đặc biệt ở điều chỉnh ITL & treasury
 
 ---
 
@@ -19,7 +19,7 @@ kiểm soát mà ⛔ không ai đứng ở đó.
 | Vai | Người thật | Làm gì | Vai cũ tương ứng |
 |---|---|---|---|
 | `AC-A` Kế toán tiền | ThomHT · AnhMC · ThuongCT | nạp sao kê · thu chi quỹ · số dư | `RP-I01` · `RP-I06` |
-| `AC-B` Kế toán phân loại | **LAN · THƯƠNG** | gõ **7 trường** · xử hàng chờ | `RP-I03` |
+| `AC-B` Kế toán phân loại | **LAN · THƯƠNG** | gõ **7 trường** · ⭐ **ghép** — `Tự động` *(duyệt lô)* ＋ `Thủ công` *(từng dòng)* | `RP-I03` |
 | `AC-C` Giữ danh mục | *(kiêm nhiệm)* | tài khoản · quỹ · `Mapping Master` | `RP-I02` |
 | **`MÁY`** | hệ thống FLS | ghép · phân loại · cấp `itl_id` · xếp hàng chờ · **nhật ký** · **từ chối giá trị sai** | thay `RP-I04` · `RP-I11` |
 
@@ -124,6 +124,7 @@ File AS-IS đang nhúng tên người vào **cấu trúc dữ liệu**: cột `P
 | `GAP-ITL-13` | Có cần tách quyền theo **pháp nhân** không (người của LE này không thấy dữ liệu LE khác)? | COO-CFO |
 
 ## Changelog
+- **v0.4** *(2026-09-18, `CR#12`)*: ⭐ Dòng `AC-B` đổi *"xử hàng chờ"* → **ghép: `Tự động` ＋ `Thủ công`**. ⛔⛔ **Chữ cũ ⛔ không sai, nó MỜ** — và cái mờ ấy che đúng chỗ owner vừa sửa: `QĐ-ITL-136` chốt trục là **AI ghép** *(máy hay người)*, ⛔ không phải *việc gì*. ⚠ **`AC-B` ⛔ KHÔNG nhận thêm quyền nào**: cả hai chế độ đều đi qua `POST /queue/{itl_id}/match` *(hoặc `match-lo`)* — cửa ghi **một**, chỉ **thứ tự hỏi** đổi. ⛔ Và vai `MÁY` ⛔ **không** được thêm chữ *duyệt*: ở lằn `Tự động` máy **đề xuất**, người **gật** *(`INV-I16`)*. ⭐ Đo `18/09`: `hinh='T'` *(mối nối do NGƯỜI tạo)* = **`0`** ⇒ vai `AC-B` ⛔ **chưa từng** thực hiện phần *ghép* của chính nó — dòng này mô tả một quyền **chưa ai dùng**.
 - **v0.3** *(2026-09-04, `QĐ-ITL-27`)*: ⭐⭐ **Đóng `GAP-DOC-01`** — bản v0.2 (19/08) viết **trước `QĐ-ITL-27` ba ngày** nên lạc hậu 3 quyết định. Thêm **§0: ba vai NGƯỜI + một vai MÁY**. ⛔ **Lý do khai tử là lý do VẬN HÀNH, ⛔ không phải lý do thiết kế:** luồng `PM → ITL` thật sự chỉ có **2–3 kế toán**; kế toán trưởng và CFO-COO hầu như không tham gia, nên một bước duyệt sẽ **leo vào chỗ trống** — trông như kiểm soát mà ⛔ không ai đứng ở đó. ⇒ `RP-I04` **chết** *(`QĐ-ITL-16`)* · `RP-I11` **chết** *(`QĐ-ITL-27` — ⛔ không có người soi, và sẽ ⛔ không có)* · `RP-I07` **chưa có người nhận VÀ chưa có nút** *(`GAP-PLAN-04`)*. Thêm **§0b**: danh sách **ĐO ĐƯỢC** *"máy kiểm soát bằng gì"* — **7 phép chặn**, kèm **3 thứ máy ⛔ KHÔNG chặn được**, khai thẳng chứ ⛔ không để người đọc tự suy. ⭐ **Rủi ro số một ⛔ không phải gian lận mà là MỘT NGƯỜI RỜI ĐI** — đó là lý do nhật ký `AUD-1` vẫn **bắt buộc** dù ⛔ không ai soi nó theo nhịp. **§1–§2 cũ GIỮ NGUYÊN làm biên bản, ⛔ không xoá**
 - v0.2 (2026-08-19): **`QĐ-ITL-16`** — bỏ vai `RP-I04` adjustment checker và ràng buộc `SoD-1`; thêm `AUD-1` (nhật ký thay đổi bắt buộc, 7 trường) + vai `RP-I11` nhật ký reviewer. Kiểm soát chuyển từ tiền kiểm sang hậu kiểm. Mở `GAP-ITL-24`.
 - v0.1 (2026-08-18): Khởi tạo — 10 vai, ma trận 16 hành động, 3 ràng buộc SoD, luật cấm nhúng tên người vào schema.
