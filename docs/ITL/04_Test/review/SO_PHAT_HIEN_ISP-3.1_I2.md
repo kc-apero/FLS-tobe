@@ -1,6 +1,6 @@
 # SỔ PHÁT HIỆN REVIEW — ISP 3.1 · phần `I2` *(tệp riêng, chờ gộp vào `SO_PHAT_HIEN_ISP-3.1.md`)*
 
-**Version:** v0.3 · **Ngày:** 2026-11-23 · **Chủ sở hữu:** `fls-test` *(R1 `KQ-317`; R2 cuối `KQ-318` thêm 4 dòng)* · **Nguồn:** `IncrementalStepPlan-FLS-Voi_v3.1.2.md` Step 47 · I2 · `WO-315` · `BG-316` *(`isp/I2` @ `ce771cc`; đo trên cây gộp thử cục bộ `16fbf6d` = + ngọn nhánh làm việc, có DT13)*
+**Version:** v0.4 · **Ngày:** 2026-11-23 · **Chủ sở hữu:** `fls-test` *(R1 `KQ-317`; R2 cuối `KQ-318` thêm 4 dòng)* · **Nguồn:** `IncrementalStepPlan-FLS-Voi_v3.1.2.md` Step 47 · I2 · `WO-315` · `BG-316` *(`isp/I2` @ `ce771cc`; đo trên cây gộp thử cục bộ `16fbf6d` = + ngọn nhánh làm việc, có DT13)*
 
 > Thang lớp *(A1 · A2 · B1 · B2)* và mức *(CHẶN · NÊN SỬA · GHI NHẬN)*: y như §1 sổ chung. Sổ **chỉ THÊM**. Vai KIỂM: ⛔ sửa mã.
 
@@ -48,7 +48,13 @@
 - **Lượt hỏng trước đó:** DSN `localhost` ⇒ `no tests ran in 904.56s` — xem `I2-O4-01`.
 - **Khác chữ O4:** ISP ghi *"chạy lại trên máy owner (`fls-pg-1`, chỉ đọc)"*; lượt này là máy chủ + PG TẠM ⇒ **chủ quyết** có tính là O4 hay không *(bài ⛔ đọc `fls` — kho thật ⛔ góp số nào)*.
 
+## O6 — chữ ký ThuongCT
+- **Ký:** ThuongCT · **ngày** 23/11/26 · ô kiểm *"ThuongCT đồng ý gộp ISP 3.1.2 (gồm I2) vào `main` với các giới hạn nêu trên"* **đã tích**. **Ghi chú của người ký:** *"Cho phép lên staging và bắt đầu test full luồng e2e bằng human."*
+- **Nơi ký:** tài liệu trình ký *"FLS ISP 3.1.2 — I2 trình ký"* (Claude Docs, rev 45). ⚠ Dòng ký được gõ trong phiên của chủ KhanhCQ — hệ thống ⛔ xác thực được người gõ là ThuongCT; ghi nhận theo lời chủ.
+- **"Giới hạn nêu trên"** gồm: chạy máy chủ trên PG TẠM *(⛔ `fls-pg-1`)* · 605 DỪNG có tên · 615 so 13.760/48.021 ô số · C5a khớp thật 6.646/11.764 ô có số · D3 + CHECK IX.PL chưa quyết · HD4/HD5 ngoài ISP ⇒ người ký **chấp nhận O4 trên PG tạm**.
+
 ## Changelog
 - **v0.1** *(2026-11-22, `fls-test` R1 của `I2`, `KQ-317`)*: khởi tạo — **6** phát hiện *(1 CHẶN · 2 NÊN SỬA · 3 GHI NHẬN)*.
 - **v0.2** *(2026-11-22, `fls-test` R2 cuối của `I2`, `KQ-318`)*: R1 `-01 -02 -03 -04 -05` ĐÃ sửa đúng *(đo lại độc lập)*; thêm **4** hàng GHI NHẬN `R2-01…04` *(0 CHẶN · 0 NÊN SỬA)*.
 - **v0.3** *(2026-11-23, orchestrator — kết quả chạy lại máy chủ O4)*: thêm §Đo O4 *(27 passed, 1 skipped — PG tạm, ⛔ `fls-pg-1`)* + **1** hàng GHI NHẬN `I2-O4-01` *(DSN `localhost` treo trên Windows)*.
+- **v0.4** *(2026-11-23, orchestrator)*: thêm §O6 — ThuongCT ký 23/11/26 *(ghi chú: cho phép lên staging + test e2e bằng người)*.
