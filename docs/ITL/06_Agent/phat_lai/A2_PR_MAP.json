@@ -1,7 +1,7 @@
 {
  "_vi_sao": "Bản ghi PHÁT LẠI — sinh bằng mô hình GIẢ tất định (`--gia --ghi-phat-lai`), ⛔ lượt API thật. Tra theo vân tay yêu cầu ĐÃ CHE; prompt/dữ liệu đổi ⇒ ⛔ có lượt ⇒ ĐỎ.",
  "agent": "A2_PR_MAP",
- "checksum_prompt": "4b629ff21f901479",
+ "checksum_prompt": "e9d149e87fff5474",
  "luot": [
   {
    "tra_loi": {
@@ -15,7 +15,7 @@
     ],
     "stop_reason": "tool_use"
    },
-   "van_tay_yeu_cau": "1c0f14782744da3e"
+   "van_tay_yeu_cau": "f4fa24268f66e966"
   },
   {
    "tra_loi": {
@@ -27,7 +27,7 @@
     ],
     "stop_reason": "end_turn"
    },
-   "van_tay_yeu_cau": "cbef960aa3c4036a"
+   "van_tay_yeu_cau": "7cf1ddb03a5ef513"
   },
   {
    "tra_loi": {
@@ -41,7 +41,7 @@
     ],
     "stop_reason": "tool_use"
    },
-   "van_tay_yeu_cau": "0dbe2359531a8205"
+   "van_tay_yeu_cau": "f3d6ee7737cfbf06"
   },
   {
    "tra_loi": {
@@ -53,7 +53,7 @@
     ],
     "stop_reason": "end_turn"
    },
-   "van_tay_yeu_cau": "df81b63512af27cb"
+   "van_tay_yeu_cau": "7cb3f4f16f44cc7c"
   },
   {
    "tra_loi": {
@@ -67,7 +67,7 @@
     ],
     "stop_reason": "tool_use"
    },
-   "van_tay_yeu_cau": "cd0a898d65bdeb6e"
+   "van_tay_yeu_cau": "6587c92fe1e36b87"
   },
   {
    "tra_loi": {
@@ -79,7 +79,7 @@
     ],
     "stop_reason": "end_turn"
    },
-   "van_tay_yeu_cau": "6dcd13d03d557341"
+   "van_tay_yeu_cau": "c795d7f18502a5f8"
   },
   {
    "tra_loi": {
@@ -93,19 +93,19 @@
     ],
     "stop_reason": "tool_use"
    },
-   "van_tay_yeu_cau": "8dc4c341e56f2285"
+   "van_tay_yeu_cau": "f3d583bc41c82b87"
   },
   {
    "tra_loi": {
     "content": [
      {
-      "text": "{\"noi:c01.chon\": \"DE_NGUOI\", \"noi:c01.ly_do\": \"không đủ chắc\", \"noi:c02.chon\": \"PM-0201-01\", \"noi:c02.ly_do\": \"ứng viên DUY NHẤT khớp tiền + tiền tệ + ngày\", \"noi:c03.chon\": \"PM-0301-02\", \"noi:c03.ly_do\": \"ứng viên DUY NHẤT khớp tiền + tiền tệ + ngày\", \"noi:c04.chon\": \"DE_NGUOI\", \"noi:c04.ly_do\": \"không đủ chắc\", \"noi:c05.chon\": \"DE_NGUOI\", \"noi:c05.ly_do\": \"không đủ chắc\", \"noi:c06.chon\": \"DE_NGUOI\", \"noi:c06.ly_do\": \"không đủ chắc\", \"noi:c07.chon\": \"DE_NGUOI\", \"noi:c07.ly_do\": \"không đủ chắc\", \"noi:c08.chon\": \"DE_NGUOI\", \"noi:c08.ly_do\": \"không đủ chắc\", \"noi:c09.chon\": \"DE_NGUOI\", \"noi:c09.ly_do\": \"không đủ chắc\", \"noi:c10.chon\": \"DE_NGUOI\", \"noi:c10.ly_do\": \"không đủ chắc\", \"noi:c11.chon\": \"DE_NGUOI\", \"noi:c11.ly_do\": \"không đủ chắc\", \"noi:c12.chon\": \"DE_NGUOI\", \"noi:c12.ly_do\": \"không đủ chắc\"}",
+      "text": "{\"noi:c01.chon\": \"PM-0101-01\", \"noi:c01.ly_do\": \"mã PM trong nội dung + tiền + tiền tệ\", \"noi:c02.chon\": \"PM-0201-01\", \"noi:c02.ly_do\": \"ứng viên DUY NHẤT khớp tiền + tiền tệ + ngày\", \"noi:c03.chon\": \"PM-0301-02\", \"noi:c03.ly_do\": \"mã PM trong nội dung + tiền + tiền tệ\", \"noi:c04.chon\": \"DE_NGUOI\", \"noi:c04.ly_do\": \"không đủ chắc\", \"noi:c05.chon\": \"DE_NGUOI\", \"noi:c05.ly_do\": \"không đủ chắc\", \"noi:c06.chon\": \"DE_NGUOI\", \"noi:c06.ly_do\": \"không đủ chắc\", \"noi:c07.chon\": \"DE_NGUOI\", \"noi:c07.ly_do\": \"không đủ chắc\", \"noi:c08.chon\": \"PM-0801-01\", \"noi:c08.ly_do\": \"mã PM trong nội dung + tiền + tiền tệ\", \"noi:c09.chon\": \"PM-0901-01\", \"noi:c09.ly_do\": \"mã PM trong nội dung + tiền + tiền tệ\", \"noi:c10.chon\": \"DE_NGUOI\", \"noi:c10.ly_do\": \"không đủ chắc\", \"noi:c11.chon\": \"DE_NGUOI\", \"noi:c11.ly_do\": \"không đủ chắc\", \"noi:c12.chon\": \"PM-1201-01\", \"noi:c12.ly_do\": \"mã PM trong nội dung + tiền + tiền tệ\"}",
       "type": "text"
      }
     ],
     "stop_reason": "end_turn"
    },
-   "van_tay_yeu_cau": "110d4af7ee021d71"
+   "van_tay_yeu_cau": "d0cb4e48e8a8f2f6"
   }
  ],
  "mo_hinh": "claude-opus-5-5",

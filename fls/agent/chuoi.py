@@ -10,7 +10,7 @@
 ⭐ Skill `ma` ⛔ gọi mô hình: `01_soat_lop` = chính cửa ②; `04_report` = sinh trang (tools/chay_agent_voi.py).
 
 Vòng một skill `lam`/`bong` (khuôn Messages, xem `mo_hinh.py`): user = prompt skill · mô hình gọi ĐÚNG công cụ
-của skill (tên khác ⇒ dừng) · kết quả công cụ (phía máy) đi vào `tool_result` · MỌI yêu cầu qua `che.che_yeu_cau`
+của skill (tên khác ⇒ dừng) · kết quả công cụ (phía máy) đi vào `tool_result` · MỌI yêu cầu qua `che.che_yeu_cau` (chế độ mặc định `mo` — chủ 23/11)
 TRƯỚC khi tới nhà cung cấp · mô hình trả chữ JSON `{mã ô: giá trị}`. Tối đa `SO_LUOT_TOI_DA` lượt.
 """
 from __future__ import annotations
@@ -96,7 +96,7 @@ def _cong_cu_def(s: Skill) -> dict:
 
 
 def chay_skill(dn: DinhNghiaAgent, he: str, s: Skill, ncc: NhaCungCap,
-               cong_cu: dict[str, Callable[[], dict]], cho_noi_dung: bool = False) -> KqSkill:
+               cong_cu: dict[str, Callable[[], dict]], che_do: str | None = None) -> KqSkill:
     kq = KqSkill(skill=s)
     if s.cong_cu not in cong_cu:
         kq.loi = f"công cụ `{s.cong_cu}` ⛔ được tiêm"
@@ -106,7 +106,7 @@ def chay_skill(dn: DinhNghiaAgent, he: str, s: Skill, ncc: NhaCungCap,
         for _ in range(SO_LUOT_TOI_DA):
             yc = {"model": dn.mo_hinh.ma, "max_tokens": MAX_TOKENS, "system": he,
                   "tools": [_cong_cu_def(s)], "messages": messages}
-            yc_che, bc = che_mod.che_yeu_cau(yc, cho_noi_dung=cho_noi_dung)
+            yc_che, bc = che_mod.che_yeu_cau(yc, che_do or che_mod.CHE_DO_MAC_DINH)
             kq.so_bo_che, kq.the_noi_dung = bc.so_bo, bc.the_noi_dung
             tl = ncc.goi(yc_che)
             kq.so_luot += 1
@@ -144,7 +144,7 @@ def chay_skill(dn: DinhNghiaAgent, he: str, s: Skill, ncc: NhaCungCap,
 
 
 def chay_chuoi(ncc_theo_agent: dict[str, NhaCungCap], cong_cu: dict[str, Callable[[], dict]],
-               may: dict[str, Any], dap_an: dict[str, Any] | None = None, cho_noi_dung: bool = False,
+               may: dict[str, Any], dap_an: dict[str, Any] | None = None, che_do: str | None = None,
                agent: tuple[DinhNghiaAgent, ...] = AGENT) -> KqChuoi:
     """Chạy chuỗi. `may` = số máy đã đo theo nguồn ô (`voi` · `hd2` · `nguon` · `cong`); `dap_an` = `{"noi": …}`."""
     kiem_hai_ho(agent)
@@ -165,7 +165,7 @@ def chay_chuoi(ncc_theo_agent: dict[str, NhaCungCap], cong_cu: dict[str, Callabl
             if ncc is None:
                 ks = KqSkill(skill=s, loi=f"⛔ có nhà cung cấp cho {dn.ma}")
             else:
-                ks = chay_skill(dn, he, s, ncc, cong_cu, cho_noi_dung)
+                ks = chay_skill(dn, he, s, ncc, cong_cu, che_do)
             ka.skills.append(ks)
             if ks.loi or not ks.dat_cong:
                 kc.dung_o = f"DỪNG ở {s.nhan} — " + (ks.loi or f"cổng `{s.cong}` ĐỎ: {ks.ly_do}")

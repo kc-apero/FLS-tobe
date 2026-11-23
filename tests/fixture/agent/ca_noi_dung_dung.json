@@ -1,5 +1,5 @@
 {
- "_vi_sao": "BỂ CA DỰNG cho skill A2.04 (ghép theo nội dung) — ⛔ dữ liệu thật: mã PM, tên (NGUYEN VAN AN · TRAN THI B), số TK, email, điện thoại đều BỊA để thử bộ che và luật cứng. Bể thật (đáp án = ITL Ledge Final AS-IS) GIỮ RIÊNG ngoài repo — biến FLS_HELDOUT_NOI_DUNG.",
+ "_vi_sao": "BỂ CA DỰNG cho skill A2.04 (ghép theo nội dung) — ⛔ dữ liệu thật: mã PM, tên (NGUYEN VAN AN · TRAN THI B), số TK, email, điện thoại đều BỊA để thử bộ che và luật cứng. Bể thật (đáp án = ITL Ledge Final AS-IS) GIỮ RIÊNG ngoài repo — biến FLS_HELDOUT_NOI_DUNG. · `tk` = số TK nguồn chi (BỊA) — chủ 23/11: agent đọc số TK vì một số TK chỉ chi một loại giao dịch.",
  "ca": {
   "c01": {
    "tien": 15000000,
@@ -19,7 +19,8 @@
      "cur": "VND",
      "ngay": "2025-03-04"
     }
-   ]
+   ],
+   "tk": "1903000000001"
   },
   "c02": {
    "tien": 2500000,
@@ -33,7 +34,8 @@
      "cur": "VND",
      "ngay": "2025-03-05"
     }
-   ]
+   ],
+   "tk": "1903000000001"
   },
   "c03": {
    "tien": 1200,
@@ -47,7 +49,8 @@
      "cur": "USD",
      "ngay": "2025-04-01"
     }
-   ]
+   ],
+   "tk": "0071000000002"
   },
   "c04": {
    "tien": 5000000,
@@ -67,7 +70,8 @@
      "cur": "VND",
      "ngay": "2025-04-02"
     }
-   ]
+   ],
+   "tk": "1903000000001"
   },
   "c05": {
    "tien": 100,
@@ -81,7 +85,8 @@
      "cur": "VND",
      "ngay": "2025-04-03"
     }
-   ]
+   ],
+   "tk": "0071000000002"
   },
   "c06": {
    "tien": 7000000,
@@ -95,7 +100,8 @@
      "cur": "VND",
      "ngay": "2025-04-04"
     }
-   ]
+   ],
+   "tk": "1903000000001"
   },
   "c07": {
    "tien": 3000000,
@@ -115,7 +121,8 @@
      "cur": "VND",
      "ngay": "2025-05-06"
     }
-   ]
+   ],
+   "tk": "1903000000001"
   },
   "c08": {
    "tien": 9999000,
@@ -135,7 +142,8 @@
      "cur": "VND",
      "ngay": "2025-05-07"
     }
-   ]
+   ],
+   "tk": "1903000000001"
   },
   "c09": {
    "tien": 450000,
@@ -155,7 +163,8 @@
      "cur": "VND",
      "ngay": "2025-05-08"
     }
-   ]
+   ],
+   "tk": "1903000000003"
   },
   "c10": {
    "tien": 880000,
@@ -169,7 +178,8 @@
      "cur": "VND",
      "ngay": "2025-05-28"
     }
-   ]
+   ],
+   "tk": "1903000000003"
   },
   "c11": {
    "tien": 600000,
@@ -189,7 +199,8 @@
      "cur": "VND",
      "ngay": "2025-06-03"
     }
-   ]
+   ],
+   "tk": "1903000000001"
   },
   "c12": {
    "tien": 120000000,
@@ -209,7 +220,8 @@
      "cur": "VND",
      "ngay": "2025-06-04"
     }
-   ]
+   ],
+   "tk": "1903000000001"
   }
  }
 }

@@ -17,7 +17,7 @@
 | agent | thẻ | mô hình ghim *(phương án A — PROPOSED)* | checksum prompt | bộ skill — chạy TUẦN TỰ |
 |---|---|---|---|---|
 | A1 · Collect_raw_data | [`A1_RI.md`](../../06_Agent/A1_RI.md) | `claude-opus-5-5` ✅ | `9f84a5b36e62d7b0` | 01 Bank txns (sao kê + sổ AS-IS) → 02 FPS (PM line) → 03 H1000 → 04 PLT (GI · OMC · SC · PS) |
-| A2 · Group Ledger + Mapping | [`A2_PR_MAP.md`](../../06_Agent/A2_PR_MAP.md) | `claude-opus-5-5` ✅ | `4b629ff21f901479` | 01 dòng chuẩn 1-1 → 02 ghép Ref hình A–F → 03 hàng chờ người → **04 ghép theo NỘI DUNG (G0 bóng)** |
+| A2 · Group Ledger + Mapping | [`A2_PR_MAP.md`](../../06_Agent/A2_PR_MAP.md) | `claude-opus-5-5` ✅ | `e9d149e87fff5474` | 01 dòng chuẩn 1-1 → 02 ghép Ref hình A–F → 03 hàng chờ người → **04 ghép theo NỘI DUNG (G0 bóng)** |
 | A3 · SI.ITL — Adjust + Allocate | [`A3_SI_ITL.md`](../../06_Agent/A3_SI_ITL.md) | `claude-opus-5-5` ✅ | `fe71100066e826c8` | 01 ô Final 7 khối → 02 vùng sửa R–AT → 03 tự sinh MID → 04 Calculate · Allocate · Report (10 gói HD2) |
 | A4 · Auditor | [`A4_AUDITOR.md`](../../06_Agent/A4_AUDITOR.md) | `gemini-3.8-flash` — **CHƯA ghim** (C2) | `8160a71f8ba50465` | 01 soát lớp (MÃ) → 02 cổng HD1 → 03 cổng HD2 → 04 report (MÃ) |
 
@@ -85,3 +85,16 @@
 5. `fls.agent` cấm `fls.db/repo/api/web` bằng **bài AST**, ⛔ hợp đồng import-linter riêng (giữ 11 để khỏi kéo theo `gop_buoc_isp.py` · `kiem_so_song` · tài liệu `NFR-I16`). Test soi xem có muốn hợp đồng thứ 12.
 6. `test_report_html_khop_tep_trong_repo` chỉ soát dòng KẾT, ⛔ so cả trang (trang mang ngày sinh).
 7. Adapter Anthropic viết theo skill `claude-api` (`messages.create`, `output_config.effort`), **⛔ chạy thật lần nào** — SDK `anthropic` ⛔ có trong `requirements.txt`.
+
+## Vòng sửa sau quyết định chủ 23/11 *(sau `d8898c3`)*
+
+> Chủ: *"Không cần che nội dung hay stk, cho phép agents access toàn bộ, vì agents có thể học mapping, sẽ có 1 vài stk ngân hàng sẽ chỉ chi một loại giao dịch nhất định."* ⇒ **C4 đã chốt: MỞ**.
+
+| Đổi | Bằng chứng |
+|---|---|
+| `fls/agent/che.py`: chế độ mặc định `mo` — dữ liệu công cụ đi NGUYÊN VĂN (nội dung · số TK · tên); chỉ bỏ `Email Address` (`PM_COT_RIENG_TU`, CLAUDE.md). Hai chế độ cũ giữ làm tuỳ chọn `--che che_noi_dung` / `--che che_het` | `test_MAC_DINH_mo__noi_dung_va_so_TK_di_nguyen__chi_bo_Email_Address` · bài che cũ gọi RÕ chế độ |
+| A2.04 đọc thêm `noi:<ca>.tk` (số TK nguồn chi) — prompt: TK là tín hiệu thu hẹp ứng viên, ⛔ thay luật cứng | checksum prompt A2 → `e9d149e87fff5474` (thẻ + zip sinh lại) |
+| Fleet eval thêm vòng 4 `v1-gia-mo` | `6 nối · 0 sai · recall 0.8571 · 0 ca phải-để-người bị nối` (luật GIẢ chưa dùng TK — mô hình thật mới học được TK) |
+| Q8: `MONG_PYTEST_TOAN_BO` 4822 → **4824** | `tests/agent` `52 passed` |
+
+⚠ Hệ quả cần chủ biết (⛔ chặn): dữ liệu gửi API giờ gồm tên người + số TK thật ⇒ nên bật chế độ **không lưu dữ liệu (ZDR)** với nhà cung cấp trước vòng thật; `NFR-I13` (BA) cần BA ghi lại quyết định này — Dev ⛔ sửa `02_BA`.

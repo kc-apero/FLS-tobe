@@ -4,7 +4,7 @@
     python tools/chay_agent_voi.py                     # phát lại · in KẾT · exit 0 khi ĐẠT
     python tools/chay_agent_voi.py --ghi-report        # + ghi docs/ITL/06_Agent/report.html
     python tools/chay_agent_voi.py --gia --ghi-phat-lai  # mô hình GIẢ tất định ⇒ ghi lại bản phát lại
-    python tools/chay_agent_voi.py --cho-noi-dung      # bật gửi nội dung giao dịch ĐÃ CHE (câu chủ C4)
+    python tools/chay_agent_voi.py --che che_het       # che lại (mặc định `mo` — chủ 23/11: agent đọc toàn bộ)
     python tools/chay_agent_voi.py --that              # ⛔ WO-329. Chỉ chạy khi thêm FLS_CHO_GOI_API=1 + khoá
 
 ⭐ Công cụ agent gọi = CHỈ hàm FLS có sẵn, tiêm vào chuỗi từ đây (gói `fls.agent` ⛔ biết kho/tuyến):
@@ -133,7 +133,7 @@ def bo_ca(cho_heldout: bool = True) -> tuple[dict, dict, str]:
 def o_ca(ca: dict) -> dict[str, Any]:
     ra: dict[str, Any] = {}
     for k, c in ca["ca"].items():
-        for f in ("tien", "cur", "ngay", "noi_dung"):
+        for f in ("tien", "cur", "ngay", "tk", "noi_dung"):
             ra[f"noi:{k}.{f}"] = c[f]
         for i, u in enumerate(c["ung_vien"]):
             for f in ("pm", "tien", "cur", "ngay"):
@@ -242,14 +242,14 @@ def g0_tong_hop(kc: ch.KqChuoi, dap_an: dict, nhan_be: str) -> dict[str, Any] | 
     return {"be": nhan_be, **gnd.tong_hop(gnd.cham(ks[0].ra, phang))}
 
 
-def chay(che_do: str = "phat_lai", cho_noi_dung: bool = False, co_that: bool = False,
+def chay(che_do: str = "phat_lai", che: str | None = None, co_that: bool = False,
          tep_voi: Path = TEP_VOI, tep_hd2: Path = TEP_HD2, fx: Path = FX, ncc: dict | None = None,
          cho_heldout: bool = True) -> tuple[ch.KqChuoi, dict, dict, str]:
     ca, dap_an, nhan_be = bo_ca(cho_heldout)
     cc = dung_cong_cu(tep_voi, tep_hd2, fx, ca)
     may = dung_may(tep_voi, tep_hd2, fx)
     ncc = ncc if ncc is not None else ncc_cho(che_do, co_that)
-    kc = ch.chay_chuoi(ncc, cc, may, dap_an=dap_an, cho_noi_dung=cho_noi_dung)
+    kc = ch.chay_chuoi(ncc, cc, may, dap_an=dap_an, che_do=che)
     return kc, may, dap_an, nhan_be
 
 
@@ -259,7 +259,8 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--that", action="store_true", help="gọi API THẬT — ⛔ trong WO-329; cần FLS_CHO_GOI_API=1 + khoá")
     p.add_argument("--ghi-phat-lai", action="store_true", help="(với --gia) ghi docs/ITL/06_Agent/phat_lai/*.json")
     p.add_argument("--ghi-report", action="store_true", help="ghi docs/ITL/06_Agent/report.html")
-    p.add_argument("--cho-noi-dung", action="store_true", help="gửi nội dung giao dịch ĐÃ CHE (câu chủ C4)")
+    p.add_argument("--che", choices=("mo", "che_noi_dung", "che_het"), default=None,
+                   help="chế độ che (mặc định `mo` — chủ 23/11: agent đọc toàn bộ nội dung + số TK)")
     a = p.parse_args(argv)
     che_do = "that" if a.that else ("gia" if a.gia else "phat_lai")
     try:
@@ -272,7 +273,7 @@ def main(argv: list[str] | None = None) -> int:
             print("⛔ --ghi-phat-lai chỉ đi với --gia")
             return 2
         ncc = {k: mh.GhiLai(v) for k, v in ncc.items()}
-    kc, may, dap_an, nhan_be = chay(che_do, a.cho_noi_dung, a.that, ncc=ncc)
+    kc, may, dap_an, nhan_be = chay(che_do, a.che, a.that, ncc=ncc)
     html_, tom = rp.sinh(kc, {}, as_is_co_ten(may), g0_tong_hop(kc, dap_an, nhan_be),
                          {"voi_so_luong.json": (may.get("voi") or {}).get("nguon", {}).get("so_dong_bang", "VẮNG")
                           if may.get("voi") else "VẮNG", "hd2_cong.json": "có" if may.get("hd2") else "VẮNG"},

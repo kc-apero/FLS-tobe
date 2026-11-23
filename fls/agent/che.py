@@ -52,6 +52,17 @@ MAU_TEN = re.compile(r"\b(?:" + "|".join(HO_VIET) + r")(?:\s+[A-Z]{1,8}\b(?![\-\
 KHOA_NOI_DUNG = re.compile(r"noi:[A-Za-z0-9_\-]+\.noi_dung")
 
 
+# ⭐⭐ QUYẾT ĐỊNH CHỦ 23/11 (sau BG-330): *"Không cần che nội dung hay stk, cho phép agents access toàn bộ, vì
+#   agents có thể học mapping, sẽ có 1 vài stk ngân hàng sẽ chỉ chi một loại giao dịch nhất định."*
+#   ⇒ chế độ MẶC ĐỊNH = `mo`: dữ liệu công cụ đi NGUYÊN VĂN (nội dung giao dịch · số TK · tên). Chỉ còn bỏ cột
+#   `PM_COT_RIENG_TU = {"Email Address"}` (CLAUDE.md — cột ấy ⛔ bao giờ vào kho nên ⛔ có lý do rời máy).
+#   Hai chế độ cũ GIỮ làm tuỳ chọn (`--che`), có bài: `che_noi_dung` (thay số/tên/email/ĐT bằng thẻ) ·
+#   `che_het` (danh sách trắng mã ô, nội dung thành null — đúng WO-329 AC-3 bản gốc).
+CHE_DO = ("mo", "che_noi_dung", "che_het")
+CHE_DO_MAC_DINH = "mo"
+COT_RIENG_TU = ("Email Address",)
+
+
 class CamGui(RuntimeError):
     """Lớp 2 bắt được dữ liệu cấm SAU khi che ⇒ lời gọi bị từ chối (⛔ gửi)."""
 
@@ -161,15 +172,45 @@ def kiem_den(yeu_cau: dict) -> list[str]:
     return ly
 
 
-def che_yeu_cau(yeu_cau: dict, cho_noi_dung: bool = False) -> tuple[dict, BaoCaoChe]:
+def _bo_rieng_tu(x: Any, bc: BaoCaoChe) -> Any:
+    if isinstance(x, dict):
+        ra = {}
+        for k, v in x.items():
+            if k in COT_RIENG_TU or (isinstance(k, str) and k.rsplit(".", 1)[-1] in COT_RIENG_TU):
+                bc.bo_khoa.append(str(k)[:40])
+                continue
+            ra[k] = _bo_rieng_tu(v, bc)
+        return ra
+    if isinstance(x, list):
+        return [_bo_rieng_tu(v, bc) for v in x]
+    return x
+
+
+def che_yeu_cau(yeu_cau: dict, che_do: str = CHE_DO_MAC_DINH) -> tuple[dict, BaoCaoChe]:
     """Che MỘT yêu cầu Messages trước khi giao cho nhà cung cấp.
+
+    · `mo` (MẶC ĐỊNH, chủ 23/11): chỉ bỏ `COT_RIENG_TU`; ⛔ lớp 2.
+    · `che_noi_dung` · `che_het`: như dưới.
 
     · `tool_result.content` (JSON) ⇒ lớp 1. Nội dung ⛔ phải JSON dict ⇒ bỏ hết (`{}`).
     · `system` + chữ `user` là PROMPT trong repo (đã ghim checksum) ⇒ ⛔ che, nhưng VẪN qua lớp 2.
     · Lớp 2 bắt được gì ⇒ `CamGui`.
     """
+    if che_do not in CHE_DO:
+        raise ValueError(f"chế độ che `{che_do}` ⛔ thuộc {CHE_DO}")
     bc = BaoCaoChe()
     ra = json.loads(json.dumps(yeu_cau, ensure_ascii=False))
+    if che_do == "mo":
+        for tn in ra.get("messages", []):
+            for khoi in (tn.get("content") if isinstance(tn.get("content"), list) else []):
+                if isinstance(khoi, dict) and khoi.get("type") == "tool_result":
+                    try:
+                        du = json.loads(khoi.get("content") or "")
+                    except (TypeError, json.JSONDecodeError):
+                        continue
+                    khoi["content"] = json.dumps(_bo_rieng_tu(du, bc), ensure_ascii=False, sort_keys=True)
+        return ra, bc
+    cho_noi_dung = che_do == "che_noi_dung"
     for tn in ra.get("messages", []):
         noi = tn.get("content")
         if not isinstance(noi, list):

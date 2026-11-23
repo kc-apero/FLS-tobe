@@ -35,9 +35,10 @@ import chay_agent_voi as cav  # noqa: E402
 TM_VONG = GOC / "docs" / "ITL" / "05_FleetEval" / "vong"
 #: (mã phiên bản, luật đứng thay mô hình, cờ gửi nội dung đã che). Thêm vòng = thêm MỘT dòng.
 VONG = (
-    ("v0-ma-tat-dinh", gnd.luat_v0, False),
-    ("v1-gia-tat-noi-dung", gnd.luat_gia_v1, False),
-    ("v1-gia-bat-noi-dung", gnd.luat_gia_v1, True),
+    ("v0-ma-tat-dinh", gnd.luat_v0, "che_het"),
+    ("v1-gia-che-het", gnd.luat_gia_v1, "che_het"),
+    ("v1-gia-che-noi-dung", gnd.luat_gia_v1, "che_noi_dung"),
+    ("v1-gia-mo", gnd.luat_gia_v1, "mo"),           # chủ 23/11: mặc định — nội dung + số TK nguyên văn
 )
 #: Bar (thẻ a3-1-ref, đề xuất): 0 ca "phải để người" bị nối · tỉ lệ nối sai ≤ v0 (v0 0/0 ⇒ bar = 0).
 BAR_PHAI_NGUOI_BI_NOI = 0
@@ -47,11 +48,11 @@ def _sha(p: Path) -> str:
     return hashlib.sha256(p.read_bytes()).hexdigest()[:16]
 
 
-def chay_vong(ma: str, luat, cho_noi_dung: bool, ca: dict, dap_an: dict, hat: int = 23) -> dict:
+def chay_vong(ma: str, luat, che_do: str, ca: dict, dap_an: dict, hat: int = 23) -> dict:
     s = [x for x in nap_bo("A2_PR_MAP") if x.loai == "bong"][0]
     dn = [a for a in ch.AGENT if a.ma == "A2_PR_MAP"][0]
     ks = ch.chay_skill(dn, he_thong(dn.ma), s, mh.GiaLap({"ung_vien_ghep": luat}),
-                       {"ung_vien_ghep": lambda: cav.o_ca(ca)}, cho_noi_dung=cho_noi_dung)
+                       {"ung_vien_ghep": lambda: cav.o_ca(ca)}, che_do=che_do)
     if ks.loi or ks.ra is None:
         return {"phien_ban": ma, "loi": ks.loi or "⛔ đầu ra"}
     # chấm MÙ: xáo mã ca (hạt cố định), bộ chấm chỉ thấy mã xáo
@@ -67,7 +68,7 @@ def chay_vong(ma: str, luat, cho_noi_dung: bool, ca: dict, dap_an: dict, hat: in
         x["ca"] = nguoc[x["ca"]]
     th = gnd.tong_hop(cham)
     return {"phien_ban": ma, "mo_hinh": f"GIẢ ({luat.__name__}) thay {dn.mo_hinh.ma}",
-            "checksum_prompt": checksum_prompt("A2_PR_MAP"), "cho_noi_dung": cho_noi_dung,
+            "checksum_prompt": checksum_prompt("A2_PR_MAP"), "che_do": che_do,
             "cong_skill": {"dat": ks.dat_cong, "ly_do": ks.ly_do}, "the_noi_dung_che": ks.the_noi_dung,
             "tong_hop": th, "theo_nhom": {n: gnd.tong_hop([x for x in cham if x["nhom"] == n])
                                           for n in ("phai_noi", "phai_nguoi")},

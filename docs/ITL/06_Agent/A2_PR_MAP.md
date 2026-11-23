@@ -9,7 +9,7 @@
 | **Đầu ra** | ô `voi:theo_ky.*.{co,chay,map_fls,pm_noi,map_now,day_nguoi}` · `voi:bank_tong.dong_theo_hinh.A–F` · `voi:dat_hd1.theo_ky.*.thieu` · G0: `noi:<ca>.chon` + `ly_do` |
 | **Công cụ được gọi** *(CHỈ hàm FLS có sẵn)* | `dong_chuan` · `ghep_ref` · `hang_cho` = `tools/do_voi_so_luong.do()` (gọi `pm_join.xep_ca_lat` · `moi_noi`) · `ung_vien_ghep` = bể ca (dựng trong repo / GIỮ RIÊNG qua `FLS_HELDOUT_NOI_DUNG`) |
 | **Mô hình ghim** | `claude-opus-5-5` · họ `anthropic` · ghim ✅ · phương án A (PROPOSED — câu chủ C1) |
-| **Phiên bản** | checksum prompt `4b629ff21f901479` + mô hình ghim + checksum tham chiếu (tệp số máy đã đo) |
+| **Phiên bản** | checksum prompt `e9d149e87fff5474` + mô hình ghim + checksum tham chiếu (tệp số máy đã đo) |
 | **Bước thông minh** | Skill 04 ghép theo NỘI DUNG giao dịch (G0 bóng): mã PM trong nội dung đã che + tiền + tiền tệ + ngày; luật cứng chặn chọn ngoài ứng viên / lệch tiền / dùng lại PM line. Gửi nội dung TẮT mặc định — câu chủ C4. |
 | **Fleet eval** | `a3-1-ref.eval.ghep-sai` (rubric 0–2; bar: 0 ca phải-để-người bị nối) — vòng: `docs/ITL/05_FleetEval/vong/TONG_HOP.md` |
 
