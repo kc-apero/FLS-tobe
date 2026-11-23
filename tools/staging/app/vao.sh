@@ -7,6 +7,10 @@
 #    FLS_STG_CONN     connectionName `project:region:instance`     (bắt buộc)
 #    FLS_STG_CHE_DO   `doc` (mặc định, CHỈ ĐỌC · vai fls_doc) | `ghi` (vai fls_ghi + `--cho-ghi`: cho người
 #                     test KÝ — tỷ giá tháng, bản báo cáo; nhóm ghi mở ⇒ sửa số THẬT trên staging)
+#    FLS_STG_ACTOR    TÊN NGƯỜI đứng sau MỌI chữ ký/ghi của phiên này (cột `actor` của config, nhật ký…). ⛔⛔ Cửa phát MỘT thẻ
+#                     chung (`GAP-WEB-01`) ⇒ `actor` = người khởi động máy, ⛔ người bấm. Mặc định của `tools/chay_cua.py` là
+#                     `thu@apero.vn` — ⛔ dùng: chữ ký của mọi người test sẽ mang tên một người thật (chữ ký GIẢ). Chế độ `ghi`
+#                     ĐÒI biến này; `doc` mặc định `staging-doc`.
 #    FLS_STG_CONG_PROXY (5432) · FLS_STG_CONG (8088)
 #    FLS_STG_PYTHON · FLS_STG_PROXY (đường dẫn cloud-sql-proxy) · FLS_STG_KHO (fls)   — chỉ để bài thử
 #
@@ -26,10 +30,13 @@ PY="${FLS_STG_PYTHON:-python}"
 PROXY="${FLS_STG_PROXY:-cloud-sql-proxy}"
 GOC="$(cd "$(dirname "${BASH_SOURCE[0]}")/../../.." && pwd)"
 case "$CHE_DO" in
-  doc) VAI="fls_doc"; CO_GHI=() ;;
-  ghi) VAI="fls_ghi"; CO_GHI=(--cho-ghi) ;;
+  doc) VAI="fls_doc"; CO_GHI=(); ACTOR_MAC_DINH="staging-doc" ;;
+  ghi) VAI="fls_ghi"; CO_GHI=(--cho-ghi); ACTOR_MAC_DINH="" ;;
   *) echo "⛔ FLS_STG_CHE_DO phải là doc|ghi (nhận: $CHE_DO)" >&2; exit 2 ;;
 esac
+ACTOR="${FLS_STG_ACTOR:-$ACTOR_MAC_DINH}"
+[ -n "$ACTOR" ] || { echo "⛔ chế độ ghi đòi FLS_STG_ACTOR (tên người ký) — ⛔ để mặc định: chữ ký của mọi người test sẽ mang tên thu@apero.vn" >&2; exit 2; }
+case "$ACTOR" in *[!A-Za-z0-9._@-]*|thu@apero.vn) echo "⛔ FLS_STG_ACTOR chỉ [A-Za-z0-9._@-] và ⛔ là mặc định thu@apero.vn" >&2; exit 2 ;; esac
 
 lay() { "$PY" "$GOC/tools/staging/app/lay_bi_mat.py" "$1"; }
 # Thiếu khoá JWT ⇒ DỪNG TRƯỚC khi mở proxy/kho (cùng tinh thần cửa: "không có chìa khoá thì không mở cửa").
@@ -56,11 +63,11 @@ while time.time() < han:
 sys.exit("⛔ Cloud SQL Auth Proxy ⛔ lên cổng %d sau 30 giây" % cong)
 PYEOF
 
-echo "vao.sh: chế độ=$CHE_DO vai=$VAI kho=$KHO proxy=127.0.0.1:$CONG_PROXY cửa=127.0.0.1:$CONG"
+echo "vao.sh: chế độ=$CHE_DO vai=$VAI actor=$ACTOR kho=$KHO proxy=127.0.0.1:$CONG_PROXY cửa=127.0.0.1:$CONG"
 # Bí mật chỉ vào môi trường của MỘT tiến trình con (cửa). `PG_DSN` KHÔNG mang mật khẩu — psycopg đọc PGPASSWORD.
 cd "$GOC"
 FLS_JWT_SECRET="$JWT" PGPASSWORD="$MK" PG_DSN="postgresql://$VAI@127.0.0.1:$CONG_PROXY/$KHO" \
-  "$PY" tools/chay_cua.py --cho-web --dia-chi 127.0.0.1 --cong "$CONG" "${CO_GHI[@]}" &
+  "$PY" tools/chay_cua.py --cho-web --dia-chi 127.0.0.1 --cong "$CONG" --actor "$ACTOR" "${CO_GHI[@]}" &
 APP_PID=$!
 unset JWT MK
 wait "$APP_PID"

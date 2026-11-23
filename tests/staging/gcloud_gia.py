@@ -104,6 +104,9 @@ elif lenh("compute", "instances", "add-metadata"):
         for i in S["vm"]["metadata"]["items"]:
             if i["key"] == k:
                 i["value"] = v
+                break
+        else:
+            S["vm"]["metadata"]["items"].append({"key": k, "value": v})
     luu()
 elif lenh("compute", "instances", "reset"):
     S["vm"]["status"] = "RUNNING"

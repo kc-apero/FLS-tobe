@@ -8,7 +8,8 @@
 #
 #    bash tools/staging/03_dung_app.sh --project <PROJECT_ID> --kiem                 # chỉ ĐỌC — đo trạng thái
 #    bash tools/staging/03_dung_app.sh --project <PROJECT_ID>                        # dựng, app CHỈ-ĐỌC (vai fls_doc)
-#    bash tools/staging/03_dung_app.sh --project <PROJECT_ID> --che-do ghi           # app GHI được (vai fls_ghi) — để người test KÝ
+#    bash tools/staging/03_dung_app.sh --project <PROJECT_ID> --che-do ghi --nguoi-ky <tên>   # app GHI được (vai fls_ghi) — để KÝ;
+#         ⛔ --nguoi-ky = tên đứng sau MỌI chữ ký của phiên (cửa phát MỘT thẻ chung — GAP-WEB-01)
 #    … --cap-quyen a@x.com,b@y.com                                                    # cho những người này vào (xem dưới)
 #
 #  Tuỳ chọn: --region (asia-southeast1) · --zone (<region>-b) · --vm (fls-staging-app) · --may (e2-small)
@@ -43,7 +44,7 @@
 set -euo pipefail
 
 PROJECT="" ; REGION="asia-southeast1" ; ZONE="" ; VM="fls-staging-app" ; MAY="e2-small" ; INSTANCE="fls-staging"
-CHE_DO="doc" ; TAG="" ; KIEM=0 ; CAP_QUYEN=""
+CHE_DO="doc" ; TAG="" ; KIEM=0 ; CAP_QUYEN="" ; NGUOI_KY=""
 while [ $# -gt 0 ]; do
   case "$1" in
     --project)   PROJECT="$2"; shift 2 ;;
@@ -55,6 +56,7 @@ while [ $# -gt 0 ]; do
     --che-do)    CHE_DO="$2"; shift 2 ;;
     --tag)       TAG="$2"; shift 2 ;;
     --cap-quyen) CAP_QUYEN="$2"; shift 2 ;;
+    --nguoi-ky)  NGUOI_KY="$2"; shift 2 ;;
     --kiem)      KIEM=1; shift ;;
     -h|--help)   sed -n 2,45p "$0"; exit 0 ;;
     *) echo "⛔ tham số lạ: $1" >&2; exit 2 ;;
@@ -62,6 +64,14 @@ while [ $# -gt 0 ]; do
 done
 [ -n "$PROJECT" ] || { echo "⛔ thiếu --project <PROJECT_ID>" >&2; exit 2; }
 case "$CHE_DO" in doc|ghi) ;; *) echo "⛔ --che-do phải là doc|ghi" >&2; exit 2 ;; esac
+# ⭐ `actor` của MỌI chữ ký trên staging = người khởi động app (cửa phát một thẻ chung — GAP-WEB-01). ⛔ để mặc định
+#   `thu@apero.vn` của chay_cua.py: chữ ký của người test sẽ mang tên một người thật. Chế độ ghi ĐÒI --nguoi-ky.
+if [ "$CHE_DO" = ghi ]; then
+  [ -n "$NGUOI_KY" ] || { echo "⛔ --che-do ghi đòi --nguoi-ky <tên> (tên đứng sau MỌI chữ ký; ⛔ mặc định thu@apero.vn)" >&2; exit 2; }
+else
+  [ -n "$NGUOI_KY" ] || NGUOI_KY="staging-doc"
+fi
+case "$NGUOI_KY" in thu@apero.vn|*[!A-Za-z0-9._@-]*) echo "⛔ --nguoi-ky chỉ [A-Za-z0-9._@-] và ⛔ là thu@apero.vn (mặc định của chay_cua.py)" >&2; exit 2 ;; esac
 case "$VM$MAY$REGION" in *[!a-z0-9-]*) echo "⛔ --vm/--may/--region chỉ gồm [a-z0-9-]" >&2; exit 2 ;; esac
 if [ -n "$CAP_QUYEN" ]; then
   case "$CAP_QUYEN" in *[!A-Za-z0-9@._+,-]*) echo "⛔ --cap-quyen: danh sách email cách nhau dấu phẩy" >&2; exit 2 ;; esac
@@ -123,14 +133,14 @@ if [ "$KIEM" -eq 0 ]; then
   if co compute instances describe "$VM" --zone="$ZONE"; then
     echo "   có rồi ⇒ cập nhật ảnh/chế độ rồi KHỞI ĐỘNG LẠI (startup-script kéo ảnh mới)"
     "${G[@]}" compute instances add-metadata "$VM" --zone="$ZONE" \
-        --metadata="fls-image=$IMAGE,fls-che-do=$CHE_DO,fls-project=$PROJECT,fls-conn=$CONN"
+        --metadata="fls-image=$IMAGE,fls-che-do=$CHE_DO,fls-actor=$NGUOI_KY,fls-project=$PROJECT,fls-conn=$CONN"
     "${G[@]}" compute instances reset "$VM" --zone="$ZONE"
   else
     "${G[@]}" compute instances create "$VM" --zone="$ZONE" --machine-type="$MAY" \
         --image-family=debian-12 --image-project=debian-cloud --boot-disk-size=20GB --boot-disk-type=pd-balanced \
         --service-account="$SA_EMAIL" --scopes=cloud-platform --tags="$NET_TAG" \
         --shielded-secure-boot --shielded-vtpm --shielded-integrity-monitoring \
-        --metadata="enable-oslogin=TRUE,fls-image=$IMAGE,fls-che-do=$CHE_DO,fls-project=$PROJECT,fls-conn=$CONN" \
+        --metadata="enable-oslogin=TRUE,fls-image=$IMAGE,fls-che-do=$CHE_DO,fls-actor=$NGUOI_KY,fls-project=$PROJECT,fls-conn=$CONN" \
         --metadata-from-file="startup-script=$GOC/tools/staging/vm_khoi_dong.sh"
   fi
 
@@ -150,7 +160,7 @@ fi
 
 # ══════════════════════════════ BÁO CÁO — gửi lại phần này ══════════════════════════════
 buoc "BÁO CÁO (KHÔNG chứa mật khẩu/khoá) — chép từ dòng này tới hết, gửi lại"
-export PROJECT REGION ZONE VM IMAGE TAG SA_EMAIL NET_TAG FW_DENY FW_IAP PRI_DENY DAI_IAP CHE_DO KIEM AR_REPO AR_ANH
+export PROJECT REGION ZONE VM IMAGE TAG SA_EMAIL NET_TAG FW_DENY FW_IAP PRI_DENY DAI_IAP CHE_DO KIEM AR_REPO AR_ANH NGUOI_KY
 export R_APIS="$("${G[@]}" services list --enabled --format='value(config.name)' 2>/dev/null | tr '\n' ' ' || true)"
 export R_REPO="$("${G[@]}" artifacts repositories describe "$AR_REPO" --location="$REGION" --format='value(name)' 2>/dev/null || true)"
 export R_ANH="$("${G[@]}" artifacts docker images list "${REGION}-docker.pkg.dev/${PROJECT}/${AR_REPO}/${AR_ANH}" --include-tags --format='value(tags)' 2>/dev/null | tr '\n' ' ' || true)"
@@ -212,6 +222,7 @@ hang = [
   ("VM dùng OS Login",            str(meta.get("enable-oslogin", "")).upper(),        "TRUE"),
   ("VM chạy đúng ảnh mong",       meta.get("fls-image"),                              e["IMAGE"]),
   ("VM chế độ app",               meta.get("fls-che-do"),                             e["CHE_DO"]),
+  ("VM actor của mọi chữ ký",     meta.get("fls-actor"),                              e["NGUOI_KY"]),
   ("VM IP ngoài (thông tin — Cloud SQL cần đường ra)", ip or "—",                     None),
   ("firewall: luật CHẶN vào (tag, ưu tiên 900)", len(chan),                           1),
   ("firewall: luật cho IAP vào cổng 22", len(cho_iap),                                1),

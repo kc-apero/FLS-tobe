@@ -154,19 +154,20 @@ def test_chi_goi_lenh_GHI_dung_danh_sach_va_firewall_chan_TRUOC_khi_co_VM(gcp):
     assert "--shielded-secure-boot" in tao_vm and "enable-oslogin=TRUE" in tao_vm
     assert "--no-address" not in tao_vm and "--address" not in tao_vm.replace("--metadata", "")   # IP tạm: Cloud SQL cần đường ra
     assert "fls-che-do=doc" in tao_vm, "mặc định CHỈ-ĐỌC"
+    assert "fls-actor=staging-doc" in tao_vm and "thu@apero.vn" not in tao_vm
 
 
 def test_chay_lai_khong_tao_lai_ha_tang_chi_cap_nhat_va_khoi_dong_lai(gcp):
     assert gcp.chay().returncode == 0
     truoc = len(gcp.lenh_da_goi())
-    r = gcp.chay("--che-do", "ghi")
+    r = gcp.chay("--che-do", "ghi", "--nguoi-ky", "tester.mot")
     assert r.returncode == 0, r.stdout + r.stderr
     moi = gcp.lenh_da_goi()[truoc:]
     assert not [d for d in moi if re.match(r"(artifacts repositories create|compute firewall-rules create|compute instances create)", d)], moi
     assert any(d.startswith("compute instances add-metadata") and "fls-che-do=ghi" in d for d in moi)
     assert any(d.startswith("compute instances reset") for d in moi)
     md = {i["key"]: i["value"] for i in gcp.doc()["vm"]["metadata"]["items"]}
-    assert md["fls-che-do"] == "ghi" and md["fls-image"] == IMAGE
+    assert md["fls-che-do"] == "ghi" and md["fls-image"] == IMAGE and md["fls-actor"] == "tester.mot"
 
 
 def test_kiem_chi_goi_lenh_DOC_va_khong_doi_trang_thai(gcp):
@@ -212,6 +213,8 @@ PHA = [
      {"VM chạy đúng ảnh mong"}),
     ("vm_sai_che_do", lambda s: [i.__setitem__("value", "ghi") for i in s["vm"]["metadata"]["items"] if i["key"] == "fls-che-do"],
      {"VM chế độ app"}),
+    ("vm_actor_la_thu_apero", lambda s: [i.__setitem__("value", "thu@apero.vn") for i in s["vm"]["metadata"]["items"] if i["key"] == "fls-actor"],
+     {"VM actor của mọi chữ ký"}),
     ("vm_het_oslogin", lambda s: [i.__setitem__("value", "FALSE") for i in s["vm"]["metadata"]["items"] if i["key"] == "enable-oslogin"],
      {"VM dùng OS Login"}),
     ("vm_mat_tag", lambda s: s["vm"].__setitem__("tags", {"items": []}), {"VM gắn tag firewall"}),
@@ -262,6 +265,9 @@ def test_gcloud_HONG_het_thi_0_muc_DAT__D5(gcp, tmp_path):
     (("--vm", "a;b"), "chỉ gồm"),
     (("--cap-quyen", "a b;rm -rf"), "--cap-quyen"),
     (("--la",), "tham số lạ"),
+    (("--che-do", "ghi"), "--nguoi-ky"),                                   # ghi mà ⛔ nói ai ký ⇒ chữ ký mang tên mặc định
+    (("--nguoi-ky", "thu@apero.vn"), "thu@apero.vn"),                      # ⛔ mượn tên mặc định của chay_cua.py
+    (("--che-do", "ghi", "--nguoi-ky", "a b;rm"), "--nguoi-ky chỉ"),
 ])
 def test_tham_so_xau_exit_2_va_khong_goi_gcloud(gcp, args, loi):
     r = gcp.chay(*args)
@@ -351,7 +357,7 @@ def _cong_trong():
     s = socket.socket(); s.bind(("127.0.0.1", 0)); p = s.getsockname()[1]; s.close(); return p
 
 
-def _vao(kho_san, sv, che_do="doc", thieu_jwt=False, chay=True):
+def _vao(kho_san, sv, che_do="doc", actor=None):
     """Chạy `vao.sh` thật (host python, proxy GIẢ ngủ, kho = scratch cục bộ). Trả (Popen, cổng cửa)."""
     cong = _cong_trong()
     gia = kho_san["gia"]["dir"]
@@ -362,8 +368,10 @@ def _vao(kho_san, sv, che_do="doc", thieu_jwt=False, chay=True):
                FLS_STG_KHO=kho_san["kho"], FLS_STG_PYTHON=sys.executable, FLS_STG_PROXY=str(proxy),
                FLS_STG_URL_METADATA=f"http://127.0.0.1:{sv.server_port}", FLS_STG_URL_SM=f"http://127.0.0.1:{sv.server_port}",
                PYTHONUTF8="1")
-    for k in ("PG_DSN", "PG_DSN_TEST", "PGPASSWORD", "FLS_JWT_SECRET"):
+    for k in ("PG_DSN", "PG_DSN_TEST", "PGPASSWORD", "FLS_JWT_SECRET", "FLS_STG_ACTOR"):
         env.pop(k, None)
+    if actor is not None:
+        env["FLS_STG_ACTOR"] = actor
     p = subprocess.Popen(["bash", str(H.STG / "app" / "vao.sh")], env=env, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
     return p, cong
 
@@ -379,8 +387,10 @@ def _doi_cong(cong, han=40):
 
 
 def _get(cong, duong, the=None, ph="GET"):
-    req = urllib.request.Request(f"http://127.0.0.1:{cong}{duong}", method=ph, data=b"{}" if ph == "POST" else None,
-                                 headers={"Authorization": f"Bearer {the}"} if the else {})
+    h = {"Authorization": f"Bearer {the}"} if the else {}
+    if ph == "POST":
+        h["Content-Type"] = "application/json"
+    req = urllib.request.Request(f"http://127.0.0.1:{cong}{duong}", method=ph, data=b"{}" if ph == "POST" else None, headers=h)
     try:
         with urllib.request.urlopen(req, timeout=20) as r:
             return r.status, r.read()
@@ -459,26 +469,54 @@ def test_vao_sh_che_do_doc_cua_nghe_loopback_401_khong_the_405_ghi(kho_san):
         sv.shutdown()
     gop = out + err
     assert JWT_GIA not in gop and "MKGIA" not in gop and "TOKEN-GIA" not in gop, "bí mật rò ra log"
-    assert "chế độ=doc vai=fls_doc" in out
+    assert "chế độ=doc vai=fls_doc actor=staging-doc" in out
 
 
-def test_vao_sh_che_do_ghi_mo_nhom_ghi_dung_vai_fls_ghi(kho_san):
+def test_vao_sh_che_do_ghi_mo_nhom_ghi_dung_vai_fls_ghi_va_actor_la_NGUOI_KY(kho_san):
+    # nạp config (IX.FX) vào kho scratch bằng ĐÚNG trình nạp của bước 04 ⇒ có tháng để ký
+    dsn_ghi = f"postgresql://fls_ghi:{H.MK['fls-staging-pg-fls_ghi']}@127.0.0.1:{H.cong_pg()}/{kho_san['kho']}"
+    nap = subprocess.run([sys.executable, str(H.STG / "nap_cau_hinh_ix.py"), "--nguoi-nap", "khanh.thu"],
+                         env=dict(os.environ, PG_DSN=dsn_ghi, FLS_CHO_GHI_THAT="1", PYTHONUTF8="1"), capture_output=True, text=True)
+    assert nap.returncode == 0, nap.stdout + nap.stderr
     sv = _may_chu({"fls-staging-jwt-secret": JWT_GIA, "fls-staging-pg-fls_doc": H.MK["fls-staging-pg-fls_doc"],
                    "fls-staging-pg-fls_ghi": H.MK["fls-staging-pg-fls_ghi"]})
-    p, cong = _vao(kho_san, sv, "ghi")
+    p, cong = _vao(kho_san, sv, "ghi", actor="tester.mot")
     try:
         assert _doi_cong(cong), _dung(p)
-        the = _the(kho_san)
-        ma, _ = _get(cong, "/api/fls/v1/config/fx/202601/sign", the, "POST")
-        assert ma in (400, 404, 409, 201), ma           # tuyến GHI MỞ (⛔ 405); lỗi nghiệp vụ có TÊN vì kho chưa có IX.FX
-        assert ma != 405
+        # ⭐ thẻ do cửa tự phát cho `--actor` — ⛔ thẻ ta tự đúc: lấy từ màn hình (phien.js) như trình duyệt
+        ma_js, js = _get(cong, "/phien.js")
+        assert ma_js == 200, js[:200]
+        the = re.search(rb'"the"\s*:\s*"([^"]+)"', js) or re.search(rb"'the'\s*:\s*'([^']+)'", js) or re.search(rb"([A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+)", js)
+        assert the, js[:300]
+        the = the.group(1).decode()
+        ma, than = _get(cong, "/api/fls/v1/config/fx/202401/sign", the, "POST")
+        assert ma == 201, (ma, than[:300])                  # tuyến GHI MỞ (⛔ 405) và ký được
+        chi_tiet = json.loads(than)["data"]
+        assert chi_tiet["actor"] == "tester.mot", f"chữ ký mang tên {chi_tiet['actor']!r} thay vì người ký"
+        assert chi_tiet["actor"] != "thu@apero.vn"
+        with psycopg.connect(dsn_ghi, autocommit=True) as c:      # và ở KHO: cột actor của bản ký
+            actors = {r[0] for r in c.execute("SELECT actor FROM fls_cau_hinh_ban WHERE bang = 'IX.FX · KY'").fetchall()}
+        assert actors == {"tester.mot"}, actors
+        assert _get(cong, "/api/fls/v1/config/fx/202401/sign", the, "POST")[0] == 409        # ký lại ⇒ 409 có tên
         # kết nối ĐỌC của cửa vẫn chỉ-đọc dù vai là fls_ghi (`noi_chi_doc`): GET không ghi được gì
         assert _get(cong, "/api/fls/v1/ledger", the)[0] == 200
         assert ("du-an-gia", "fls-staging-pg-fls_ghi") in sv.da_doc
     finally:
         out, err = _dung(p)
         sv.shutdown()
-    assert "chế độ=ghi vai=fls_ghi" in out
+    assert "chế độ=ghi vai=fls_ghi actor=tester.mot" in out
+
+
+def test_vao_sh_che_do_ghi_ma_KHONG_noi_ai_ky_hay_la_ten_mac_dinh_thi_exit_2(kho_san):
+    sv = _may_chu({})
+    try:
+        for actor, loi in ((None, "FLS_STG_ACTOR"), ("", "FLS_STG_ACTOR"), ("thu@apero.vn", "thu@apero.vn"), ("a b", "FLS_STG_ACTOR")):
+            p, _ = _vao(kho_san, sv, "ghi", actor=actor)
+            out, err = p.communicate(timeout=30)
+            assert p.returncode == 2 and loi in err, (actor, p.returncode, err)
+        assert sv.da_doc == [], "đã đọc bí mật trước khi kiểm actor"
+    finally:
+        sv.shutdown()
 
 
 def test_vao_sh_thieu_khoa_JWT_dung_TRUOC_khi_mo_proxy_hay_kho(kho_san):
