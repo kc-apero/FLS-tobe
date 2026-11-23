@@ -48,3 +48,23 @@ def test_tra_nguyen_open_sau_khoi(tmp_path):
     (tmp_path / "x_20261123.json").write_text('{"checksum_noi_dung": "sai"}', encoding="utf-8")
     with t.chuyen_huong("_20261123", da):
         assert _ck(ngoai) == "ngoai"                                          # ngoài tests/fixture ⇒ ⛔ chuyển
+
+
+#: ⭐ `SONG-R1-03` (KQ-347): R1 đọc trường `goi` ở GỐC tệp *(= `WP-C2`)* rồi kết luận *"chỉ có MỘT gói"* — sai cấu
+#: trúc: `do_hd2._ghi_cong` giữ WP-C2 ở GỐC *(hợp đồng H4)*, 10 gói kia ở khoá `<gói>`. Vòng sửa sinh lại CẢ 11 bằng
+#: `do_hd2.py --goi <g> --dsn <kho TEST đã nạp nền> --ghi` *(bẫy `H14-R2-04`)*: 11/11 `KẾT: ĐẠT`, số **lệch 0** —
+#: khác duy nhất 2 chuỗi `truc.nguon_ngay_dau` *(actor nạp IX.PER của kho TEST)* ⇒ giữ tệp. Bài này ghim số khối
+#: + `tong_o`/`khop` từng gói *(Đ4: ô so · ô khớp)* để câu "11 gói = `hd2_cong.json`" kiểm được bằng máy.
+MONG_HD2_11 = {"WP-C2": (63016, 63016), "WP-C3a": (205175, 205140), "WP-C3b": (11585, 11543),
+               "WP-C3c": (888, 835), "WP-C3d": (1289415, 1287624), "WP-C4a": (420, 420), "WP-C4b": (1981, 1981),
+               "WP-C4c": (19894, 19591), "WP-C5a": (45674, 40556), "WP-C5b": (4102, 3179), "WP-C5c": (86150, 77672)}
+
+
+def test_SONG_R1_03_hd2_cong_du_11_khoi_dat_va_so_ghim():
+    d = json.loads((t.GOC / "docs" / "ITL" / "_tools" / "hd2_cong.json").read_text(encoding="utf-8"))
+    khoi = {"WP-C2": d, **{k: v for k, v in d.items() if k.startswith("WP-")}}
+    assert d["goi"] == "WP-C2" and tuple(sorted(khoi)) == tuple(sorted(t.GOI)) and len(khoi) == 11
+    for g, (tong, khop) in MONG_HD2_11.items():
+        b = khoi[g]
+        assert b["goi"] == g and b["dat"] is True and (b["tong_o"], b["khop"]) == (tong, khop), g
+        assert tong > 0                                                      # Đ3: mẫu số ≠ 0
