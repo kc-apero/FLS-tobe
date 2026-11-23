@@ -2,7 +2,7 @@
 
 > ⏸ **BẢN COPY CHƯƠNG TRÌNH — CHƯA DẪN XUẤT CHO ITL.** Nội dung dưới đây là scope chương trình FIN ERP, **chưa phải spec dự án ITL**. Sẽ viết lại theo `_DOC_REWRITE_ROADMAP.md`. Đừng dùng làm căn cứ build ITL.
 
-**Version:** v0.1 | **Chủ sở hữu:** Tech Lead | **Độ chín:** thiết kế — dựng thật ở T0.x trước go-live GĐ0
+**Version:** v0.2 | **Chủ sở hữu:** Tech Lead | **Độ chín:** thiết kế — dựng thật ở T0.x trước go-live GĐ0
 
 ---
 
@@ -27,10 +27,11 @@ Test chạm BQ live: job riêng nightly (không chặn PR) — kết quả vào 
 | Tầng | Cách | Ghi chú |
 |---|---|---|
 | dev | Docker compose local | $0 |
-| staging | ??? (VM/Cloud Run — chốt trước GĐ1) | dữ liệu thật ẩn danh hóa? ??? |
+| staging | **VM Compute Engine + Cloud SQL PG16, vào bằng IAP SSH tunnel** — *khuyến nghị `BG-326`, **chờ chủ chốt** (nơi chạy · cách vào · dữ liệu · ai test)*. Dựng bằng `tools/staging/01…04` (`tools/staging/README.md`); ảnh `Dockerfile`; ⛔ mạng công khai (cửa tự từ chối nghe ngoài loopback — `GAP-WEB-01`) | dữ liệu: **config `IX.*` đã ký — nạp rồi** (bước 04); **sổ kế toán — CHƯA nạp, "thật hay ẩn danh hóa" = câu chủ** (⛔ tự quyết). Chưa chạy thật ở GCP (23/11) |
 | prod | deploy tay có checklist (`07` runbook) giai đoạn đầu; tự động hóa dần | team 1-2 người — đơn giản trước |
 
 Mỗi go-live GĐ: tag + manifest (ORC-02 §4) + backup DB trước migrate.
 
 ## Changelog
 - v0.1 (2026-07-17): Khởi tạo thiết kế; 2 ô ??? staging.
+- v0.2 (2026-11-23): `WO-325` — ô staging có THIẾT KẾ + script (01–04, `Dockerfile`, UAT) thay `???`; nơi chạy/dữ liệu vẫn chờ chủ chốt (`BG-326` §Câu chủ). Phần pipeline CI (§1) và prod giữ nguyên.
