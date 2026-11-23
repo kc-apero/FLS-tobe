@@ -279,12 +279,13 @@ def pool_gia(be_a, be_b, tmp_path_factory):
 def test_chay_be_chi_so_va_chua_chot_khong_vao_recall(pool_gia):
     kq = fe.chay_be(pool_gia / "b")
     n_pn = sum(1 for d in json.loads((pool_gia / "b" / "dap_an.json").read_text())["noi"].values() if d["nhom"] == "phai_noi")
-    assert "loi" not in kq and [v["phien_ban"] for v in kq["vong"]] == [m for m, _, _ in fe.VONG]
+    assert "loi" not in kq and [v["phien_ban"] for v in kq["vong"]] == [m for m, _, _ in fe.VONG + fe.VONG_BE_THEM]
     for v in kq["vong"]:
         t = v["be"]
         assert t["mau_so_chinh"] == 65 and t["chua_chot"]["so_ca"] == 5       # 70 ca − 5 chưa chốt
         assert t["so_phai_noi"] == n_pn >= 25          # A10 + B5 + C10 (+ ca chuyển hình A·B·C — nhóm theo ĐÁP ÁN)
-    v0, v2, v3 = (v["be"] for v in kq["vong"])
+    v0, v2, v3, v4 = (v["be"] for v in kq["vong"])
+    assert v4["so_noi"] >= v3["so_noi"] and v4["mau_so_chinh"] == 65         # KHÔNG CHE thấy nhiều hơn bản đã che
     assert v0["so_noi"] == 0 and v0["phai_nguoi_bi_noi"] == 0
     assert v3["so_noi"] >= v2["so_noi"]
 
@@ -326,12 +327,22 @@ THAT = pytest.mark.skipif(not _CO_BE, reason=f"không có bể giữ riêng (${d
 
 @THAT
 @pytest.mark.parametrize("c", ["a", "b"])
-def test_BE_THAT_che_0_lot(c):
+def test_BE_THAT_phep_do_ro_ri_ghim_dung_so_da_do(c):
+    """Chủ 23/11 ~06:00: bộ che chỉ là TUỲ CHỌN ⇒ rò rỉ ⛔ chặn; nhưng số đo phải ĐÚNG số đã ghi ở DEM_BE (Đ5 hai chiều)."""
     d = Path(_TM) / c
     r = rr.do(json.loads((d / "ca.json").read_text(encoding="utf-8")), json.loads((d / "meta.json").read_text(encoding="utf-8")))
     assert r["hop_le"], f"bộ dò ⛔ thấy gì trên chữ chưa che (mẫu số {r['mau_so_noi_dung']}) — phép đo vô nghĩa"
-    assert r["sau_che"] == {"email": 0, "so_tk": 0, "so_chung_tu": 0, "ten_ung_vien": 0}, {"sau": r["sau_che"], "truoc": r["truoc_che"]}
     assert r["ca_bi_lop2_chan"] == 0
+    assert r == json.loads(dbg.TEP_DEM.read_text(encoding="utf-8"))["be"][c]["ro_ri_che"]
+
+
+@THAT
+@pytest.mark.xfail(reason="KNOWN-GAP đo 23/11: che_noi_dung ⛔ bắt tên CÓ DẤU / số TK xen cách — tuỳ chọn che, ⛔ chặn (BG-339)", strict=False)
+@pytest.mark.parametrize("c", ["a", "b"])
+def test_BE_THAT_che_0_lot_MONG_AC4(c):
+    d = Path(_TM) / c
+    r = rr.do(json.loads((d / "ca.json").read_text(encoding="utf-8")), json.loads((d / "meta.json").read_text(encoding="utf-8")))
+    assert r["tong_lot_sau_che"] == 0, r["sau_che"]
 
 
 @THAT

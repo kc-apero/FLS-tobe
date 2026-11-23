@@ -215,6 +215,10 @@ def ky_cua(d: dt.date) -> str:
 
 
 MAU_TOKEN = re.compile(r"[A-Za-z0-9]{8,}")
+#: Hình của mã Reference ở PM_Unpivot — đo 23/11 trên 3.909 dòng lệnh chi: `FT…` 1.617 · `IBDN…` 526 · `PC…` 470 (+ số thuần 300).
+#: Thẻ `a3-1-ref` tầng L3 "diễn giải ghi mã KHÁC" = nội dung có một mã DẠNG Reference mà ⛔ phải Số chứng từ của dòng.
+#: ⚠ Định nghĩa "mã khớp một dòng PM có thật" chỉ cho 1 dòng/12.710 (đo) ⇒ ⛔ đủ làm tầng; dùng HÌNH mã.
+MAU_MA_DANG_REF = re.compile(r"(?<![A-Za-z0-9])(?:FT|IBDN|PC)[0-9A-Z]{5,}(?![A-Za-z0-9])")
 
 
 @dataclass
@@ -250,7 +254,8 @@ def phan_tang(bank: list[DongNguon], pm: list[DongPM]) -> tuple[list[Ung], dict[
             ra.append(Ung("L3_khong_ref", ky_cua(b.ngay), b, (), "L3"))
         else:                                               # mã bank ⛔ có ở PM
             tk_nd = {canon_ref(t) for t in MAU_TOKEN.findall(b.nd)}
-            if tk_nd & pm_ref:
+            ma_khac = {canon_ref(t) for t in MAU_MA_DANG_REF.findall(b.nd.upper())} - {b.ref}
+            if (tk_nd & pm_ref) or ma_khac:
                 ra.append(Ung("L3_ma_khac", ky_cua(b.ngay), b, (), "L3"))
             else:
                 loai["L3_khac(⛔ vào tầng nào)"] += 1
@@ -276,7 +281,8 @@ def _ung_vien(u: Ung, pm: list[DongPM], ngay_pm_: dict, muoi: bytes, rng: random
     """Ứng viên = dòng lệnh chi ĐÚNG của mã (≤3) + mồi cùng tiền tệ, tiền gần nhất (≤2; L3: ≤3 + dòng ghi trong nội dung)."""
     dung = list(u.pm_dung)[:3]
     co = {p.line for p in dung}
-    nd_ref = {canon_ref(t) for t in MAU_TOKEN.findall(u.dong.nd)} if u.hinh == "L3" else set()
+    nd_ref = ({canon_ref(t) for t in MAU_TOKEN.findall(u.dong.nd)} | {canon_ref(t) for t in MAU_MA_DANG_REF.findall(u.dong.nd.upper())}
+              if u.hinh == "L3" else set())
     moi = sorted((p for p in pm if p.line not in co and p.cur == u.dong.cur and p.tien is not None),
                  key=lambda p: (abs(p.tien - u.dong.tien), p.line))
     ten_moi = [p for p in moi if p.ref in nd_ref][:1]            # L3_ma_khac: dòng mà nội dung nhắc tới
@@ -502,8 +508,11 @@ def main(argv: list[str] | None = None) -> int:
     dc["lat_ledge_hong"] = nguon.get("ledge_loi", [])
     do_duoc = not dc["lat_ledge_hong"] and dc["mau_so_o_ngay_song"] > 0              # Đ3/Đ5: ⛔ đo được ⇒ ĐỎ
     ket_ky = be_a["ky_chot"] == be_b["ky_chot"] and not dc["ky_lech_so_dong"] and do_duoc
+    sys.path.insert(0, str(GOC / "tools"))
+    import do_ro_ri_che as rr            # cùng thư mục tools/ — phép đo của TUỲ CHỌN che (chủ 23/11 ~06:00: ⛔ điều kiện chặn)
     out = {"ngay_doc": nguon["ngay_doc"], "ky_mo_ngay_chay": sorted(ky_mo),
-           "be": {"a": dem_cua(be_a, da[0]), "b": dem_cua(be_b, da[1])},
+           "be": {"a": dem_cua(be_a, da[0], {"ro_ri_che": rr.do(be_a["ca"], be_a["meta"])}),
+                  "b": dem_cua(be_b, da[1], {"ro_ri_che": rr.do(be_b["ca"], be_b["meta"])})},
            "doi_chieu_A_B": {"ledge_song_vs_dong_bang": dc, "ky_chot_A": be_a["ky_chot"], "ky_chot_B": be_b["ky_chot"],
                              "ket": "KHỚP" if ket_ky else ("ĐỎ — ⛔ đo được: lát Ledge hỏng " + str(dc["lat_ledge_hong"]) if not do_duoc
                                                 else "ĐỎ — kỳ đã chốt lệch (nguồn đã sửa sau chốt?)")}}

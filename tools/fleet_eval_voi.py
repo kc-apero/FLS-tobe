@@ -49,25 +49,35 @@ def _sha(p: Path) -> str:
     return hashlib.sha256(p.read_bytes()).hexdigest()[:16]
 
 
-def chay_vong(ma: str, luat, cho_noi_dung: bool, ca: dict, dap_an: dict, hat: int = 23) -> dict:
-    s = [x for x in nap_bo("A2_PR_MAP") if x.loai == "bong"][0]
-    dn = [a for a in ch.AGENT if a.ma == "A2_PR_MAP"][0]
-    ks = ch.chay_skill(dn, he_thong(dn.ma), s, mh.GiaLap({"ung_vien_ghep": luat}),
-                       {"ung_vien_ghep": lambda: cav.o_ca(ca)}, cho_noi_dung=cho_noi_dung)
-    if ks.loi or ks.ra is None:
-        return {"phien_ban": ma, "loi": ks.loi or "⛔ đầu ra"}
-    # chấm MÙ: xáo mã ca (hạt cố định), bộ chấm chỉ thấy mã xáo
+def _cham_mu(ra: dict, dap_an: dict, hat: int = 23) -> tuple[list[dict], dict]:
+    """chấm MÙ: xáo mã ca (hạt cố định), bộ chấm chỉ thấy mã xáo."""
     ma_ca = sorted(dap_an["noi"])
     xao = ma_ca[:]
     random.Random(hat).shuffle(xao)
     doi = {c: f"x{i:03d}" for i, c in enumerate(xao)}
-    chon_mu = {f"noi:{doi[c]}.{f}": ks.ra.get(f"noi:{c}.{f}") for c in ma_ca for f in ("chon", "ly_do")}
+    chon_mu = {f"noi:{doi[c]}.{f}": ra.get(f"noi:{c}.{f}") for c in ma_ca for f in ("chon", "ly_do")}
     dap_mu = {f"noi:{doi[c]}.{f}": v for c, b in dap_an["noi"].items() for f, v in b.items()}
     cham = gnd.cham(chon_mu, dap_mu)
     nguoc = {v: k for k, v in doi.items()}
     for x in cham:
         x["ca"] = nguoc[x["ca"]]
-    th = gnd.tong_hop(cham)
+    return cham, gnd.tong_hop(cham)
+
+
+def chay_vong(ma: str, luat, cho_noi_dung: bool, ca: dict, dap_an: dict, hat: int = 23, khong_che: bool = False) -> dict:
+    """`khong_che=True` (chủ 23/11 ~06:00: agent được đọc TOÀN BỘ nội dung): luật đọc thẳng ô thô, ⛔ qua bộ che."""
+    dn = [a for a in ch.AGENT if a.ma == "A2_PR_MAP"][0]
+    if khong_che:
+        cham, th = _cham_mu(luat(cav.o_ca(ca)), dap_an, hat)
+        return {"phien_ban": ma, "mo_hinh": f"GIẢ ({luat.__name__}) thay {dn.mo_hinh.ma}", "cho_noi_dung": "KHÔNG CHE",
+                "tong_hop": th, "theo_nhom": {n: gnd.tong_hop([x for x in cham if x["nhom"] == n])
+                                              for n in ("phai_noi", "phai_nguoi")}, "cham": cham}
+    s = [x for x in nap_bo("A2_PR_MAP") if x.loai == "bong"][0]
+    ks = ch.chay_skill(dn, he_thong(dn.ma), s, mh.GiaLap({"ung_vien_ghep": luat}),
+                       {"ung_vien_ghep": lambda: cav.o_ca(ca)}, cho_noi_dung=cho_noi_dung)
+    if ks.loi or ks.ra is None:
+        return {"phien_ban": ma, "loi": ks.loi or "⛔ đầu ra"}
+    cham, th = _cham_mu(ks.ra, dap_an, hat)
     return {"phien_ban": ma, "mo_hinh": f"GIẢ ({luat.__name__}) thay {dn.mo_hinh.ma}",
             "checksum_prompt": checksum_prompt("A2_PR_MAP"), "cho_noi_dung": cho_noi_dung,
             "cong_skill": {"dat": ks.dat_cong, "ly_do": ks.ly_do}, "the_noi_dung_che": ks.the_noi_dung,
@@ -95,6 +105,7 @@ BIEN_BE = cav.BIEN_HELDOUT
 TEP_BE_MD = TM_VONG / "BE_GIU_RIENG.md"
 TEP_BE_JSON = TM_VONG / "BE_GIU_RIENG.json"
 TEP_DEM_BE = GOC / "docs" / "ITL" / "05_FleetEval" / "be" / "DEM_BE.json"
+VONG_BE_THEM = (("v1-gia-khong-che", gnd.luat_gia_v1, "KHÔNG CHE"),)      # chủ 23/11 ~06:00: chế độ chính = KHÔNG che
 NHOM_CHINH = ("phai_noi", "phai_nguoi", "l3")        # `chua_chot` ⛔ vào recall chính (WO-338 AC-7)
 
 
@@ -136,9 +147,9 @@ def chay_be(thu_muc: Path) -> dict:
     ca = json.loads((thu_muc / "ca.json").read_text(encoding="utf-8"))
     dap_an = json.loads((thu_muc / "dap_an.json").read_text(encoding="utf-8"))
     vong = []
-    for m, luat, cho in VONG:
-        # `bật nội dung` ở vòng 3 ⇒ cờ BẬT-đã-che; hai vòng đầu TẮT (mặc định WO-329 AC-3)
-        v = chay_vong(m, luat, cho, ca, dap_an)
+    for m, luat, cho in VONG + VONG_BE_THEM:
+        # `bật nội dung` ở vòng 3 ⇒ cờ BẬT-đã-che; hai vòng đầu TẮT (mặc định WO-329 AC-3); vòng cuối KHÔNG CHE
+        v = chay_vong(m, luat, cho, ca, dap_an, khong_che=cho == "KHÔNG CHE")
         if "loi" in v:
             return {"loi": v["loi"]}
         v["be"] = tong_hop_be(v["cham"])
@@ -172,8 +183,8 @@ def md_be(kq: dict, dem: dict) -> str:
         f"{d[c]['doc_lap']['trung_ca_dung_wo329']} · {d[c]['doc_lap']['trung_prompt_agent']}"))
     L += ["", "## Vòng GIẢ trên bể (recall CHÍNH = nhóm `phai_noi`; `chua_chot` ⛔ vào)", "",
           "| phiên bản (nội dung) | chỉ số | bể A | bể B |", "|---|---|---|---|"]
-    for i, (m, _, cho) in enumerate(VONG):
-        nhan = f"`{m}` ({'BẬT-đã-che' if cho else 'TẮT'})"
+    for i, (m, _, cho) in enumerate(VONG + VONG_BE_THEM):
+        nhan = f"`{m}` ({cho if isinstance(cho, str) else ('BẬT-đã-che' if cho else 'TẮT')})"
         for ten, k in (("mẫu số chính (ca)", "mau_so_chinh"), ("nối", "so_noi"), ("nối sai", "noi_sai"), ("tỉ lệ nối sai", "ti_le_noi_sai"),
                        ("recall phải-nối", "recall_phai_noi"), ("ca phải-để-người bị nối", "phai_nguoi_bi_noi"),
                        ("L3 bị nối", "l3_bi_noi"), ("điểm TB (0–2)", "diem_tb")):
@@ -215,10 +226,10 @@ def main_be(ghi: bool) -> int:
     chan = False
     for c in ("a", "b"):
         print(f"── bể {c.upper()} · {dem['be'][c]['tong_ca']}/{dem['be'][c]['mong_tong']} ca ──")
-        for (m, _, cho), v in zip(VONG, kq[c]["vong"]):
+        for (m, _, cho), v in zip(VONG + VONG_BE_THEM, kq[c]["vong"]):
             t = v["be"]
             chan |= t["phai_nguoi_bi_noi"] > BAR_PHAI_NGUOI_BI_NOI
-            print(f"  {m:24s} {'BẬT' if cho else 'TẮT'}  nối {t['so_noi']:3d} sai {t['noi_sai']:3d} recall {_x(t['recall_phai_noi']):>6s} "
+            print(f"  {m:24s} {cho if isinstance(cho, str) else ('BẬT' if cho else 'TẮT')}  nối {t['so_noi']:3d} sai {t['noi_sai']:3d} recall {_x(t['recall_phai_noi']):>6s} "
                   f"người-bị-nối {t['phai_nguoi_bi_noi']} L3-bị-nối {t['l3_bi_noi']} chưa-chốt-nối {t['chua_chot']['agent_noi']}/{t['chua_chot']['so_ca']}")
     print("đối chiếu kỳ A↔B:", dem["doi_chieu_A_B"]["ket"])
     if ghi:
