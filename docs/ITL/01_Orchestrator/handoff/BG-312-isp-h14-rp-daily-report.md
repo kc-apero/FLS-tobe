@@ -173,3 +173,16 @@ DT13 (`BG-320` §2) đóng băng `sign_off_dau_vao` với **nội dung Y HỆT �
 | `lint-imports` | 11 kept, 0 broken |
 | `kiem_tai_lieu.py` | ĐẠT *(484 file · 2.954 bảng)* |
 | `soi_bang_tuyen.py` · `kiem_thuyet_minh.py` · `sinh_ban_do_tang.py --kiem` | KHỚP 49 tuyến · 35/35 nút · bản đồ khớp |
+
+## Chữ ký chủ 605 (23/11)
+Chủ đã ký *"605 DỪNG có tên"* ngày 23/11 *(`TIEN_DO.md` hàng 2026-11-23)*; sửa nhỏ này đóng `H14-R2-02`.
+
+| Việc | Kết quả đo được |
+|---|---|
+| `DUNG_KY["605"]` | bản ghi **4 khoá**: `nguoi_ky` = `KhanhCQ` *(⛔ email)* · `ngay` = `2026-11-23` · `ly_do` *(tab `[FS1][PLA5]` đã xoá — 0 ứng viên, DT13 `BG-320`; tái lập bằng `sign_off_dau_vao` = vòng tròn, rào DT13)* · `nguon_quyet` = `TIEN_DO 2026-11-23` |
+| `kiem_dung_ky()` | thiếu/thừa trường · người ký rỗng hoặc là email · `ly_do` rỗng · ngày sai khuôn hoặc không có thật · mã ⛔ đáp án DỪNG · chuỗi tự do `"x"` ⇒ lỗi CÓ TÊN `DUNG_KY 605: …` ⇒ cổng **ĐỎ** *(⛔ coi như không ký, ⛔ mở cổng)* |
+| Cổng `HD2_WP_C5C` | 605 hết chặn: `khong_do_duoc = []` ⇒ `dat = true`; khối mới `dung_co_ky` = `["605: DỪNG có chữ ký KhanhCQ 2026-11-23"]` in ở `da_do` của `/gates` cùng câu *"độ phủ 615: ô so 13760/48021 ô số · 34261 ô số chưa so"* *(giữ nguyên chữ)* |
+| Cha `HD2_WP_C5` | theo luật cũ *(mọi con true ⇒ true)*; còn `None` vì lý do khác? **không** — 615 ô so 13760 > 0 *(độ phủ chỉ IN, ⛔ chặn)* |
+| `hd2_cong.json` | sinh lại bằng chính `so_sanh_c5c` trên kho `fls_test` đã nạp nền *(schema tạm, ROLLBACK)*: 11+/5−, ⛔ sửa tay *(⛔ `do_hd2.py --ghi` trên kho chưa nạp nền — đúng bẫy `H14-R2-04`, đã trả tệp bằng `git checkout`)* |
+| Bài *(Đ5 hai chiều)* | `test_do_hd2_c5c.py` +12 *(`KY605`: cấu trúc · 8 ca hỏng ĐỎ có tên · chuỗi tự do/mã lạ ĐỎ · hợp lệ ⇒ 605 rời danh sách chặn · gỡ chữ ký ⇒ `None`)* · `test_isp_gates_hd2.py` +2 *(tệp thật có chữ ký ⇒ true, gỡ ⇒ `None`; `dung_co_ky` sai kiểu ⇒ `None` tệp hỏng)* · 12 bài cũ đổi kỳ vọng `None → true` |
+| Sàn *(Q8)* | `MONG_PYTEST_TOAN_BO` 4843 → **4857** = thu thập thật; web giữ 690 |

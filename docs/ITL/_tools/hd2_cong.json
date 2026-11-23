@@ -3311,17 +3311,23 @@
     "o_so": 0,
     "o_so_chua_so": 13706,
     "ngoai_mau_so_co_ten": {},
-    "dung_ky": null
+    "dung_ky": {
+     "nguoi_ky": "KhanhCQ",
+     "ngay": "2026-11-23",
+     "ly_do": "tab nguồn [FS1][PLA5] đã xoá khỏi sổ P&L — 0 ứng viên (DT13 BG-320); tái lập bằng sign_off_dau_vao = vòng tròn (rào DT13)",
+     "nguon_quyet": "TIEN_DO 2026-11-23"
+    }
    }
   },
-  "khong_do_duoc": [
-   "605: ô so 0/13706 ô số — DỪNG `chua_co_dau_vao` CHƯA có chữ ký chủ 'DỪNG có tên' (cần: nguồn `[MID][FS1][PLA5]` (P&L VND theo 8 thực thể × 24 tháng 2024–2025, bản dán giá trị Sign off): ảnh `[FS1][PLA3]`/`[PLA5]` Y/H/Q/M trước khi dán + đường VND)"
-  ],
+  "khong_do_duoc": [],
   "phu_mot_phan": [
    "615: ô so 13760/48021 ô số · 34261 ô số chưa so (chua_co_dau_vao:hr 3147 · chua_co_dau_vao:raw_data_management 1040 · chua_co_dau_vao:tien_dau_bao_cao 1071 · ngoai_khuon:ban_sao_DR3_A_CCR 18046 · ngoai_khuon:cb_cong_thuc_doi_theo_cot 32 · ngoai_khuon:daily_transactions 0 · ngoai_khuon:person_hang_khong_khoi 2)"
   ],
+  "dung_co_ky": [
+   "605: DỪNG có chữ ký KhanhCQ 2026-11-23"
+  ],
   "dat_mong": true,
-  "dat": null,
+  "dat": true,
   "ly_do": []
  }
 }

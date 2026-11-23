@@ -116,9 +116,60 @@ DUNG: dict[str, dict[str, str]] = {
                    "(trước ITL 10/2024) ⛔ có sổ nguồn; DT13 (`BG-320`): tab gốc `[FS1][PLA5]` ⛔ còn trong sổ — 0 ứng "
                    "viên; ⛔ dùng `sign_off_dau_vao` (= chính đáp án 605 ⇒ vòng tròn)"},
 }
-#: ⭐ chữ ký chủ "DỪNG có tên" *(mã đáp án → văn bản + ngày + người ký)*. RỖNG tới khi chủ ký ⇒ 605 giữ cổng `null`.
-#: ⛔ tự điền: orchestrator hỏi chủ *(KQ-313 · câu 1)*.
-DUNG_KY: dict[str, str] = {}
+#: ⭐ chữ ký chủ "DỪNG có tên" *(mã đáp án → BẢN GHI CÓ CẤU TRÚC, ⛔ chuỗi tự do — đóng `H14-R2-02`: trước đây
+#: `{"605": "x"}` mở cổng, đỏ chỉ vì ghim JSON)*. Bốn khoá bắt buộc: `nguoi_ky` *(tên, ⛔ email)* · `ngay` *(ISO
+#: `YYYY-MM-DD`, ngày có thật)* · `ly_do` · `nguon_quyet` *(dòng sổ quyết định)*. Hợp lệ ⇔ `kiem_dung_ky(...) == []`;
+#: bản ghi hỏng ⇒ cổng ĐỎ có tên *(⛔ coi như không ký)*. 605 ký 23/11 *(`TIEN_DO.md` hàng 2026-11-23)*.
+DUNG_KY: dict[str, dict[str, str]] = {
+    "605": {
+        "nguoi_ky": "KhanhCQ",
+        "ngay": "2026-11-23",
+        "ly_do": "tab nguồn [FS1][PLA5] đã xoá khỏi sổ P&L — 0 ứng viên (DT13 BG-320); tái lập bằng sign_off_dau_vao "
+                 "= vòng tròn (rào DT13)",
+        "nguon_quyet": "TIEN_DO 2026-11-23",
+    },
+}
+KHOA_DUNG_KY = ("nguoi_ky", "ngay", "ly_do", "nguon_quyet")
+
+
+def kiem_dung_ky(dung_ky: Any) -> list[str]:
+    """Kiểm hợp lệ `DUNG_KY`: mỗi mã phải là đáp án DỪNG *(`DUNG`)* · bản ghi đủ `KHOA_DUNG_KY` *(⛔ thừa)* · mọi trường là
+    chuỗi không rỗng · ngày đúng khuôn ISO và có thật · người ký ⛔ email. Trả danh sách lỗi CÓ TÊN *(rỗng = hợp lệ)*."""
+    if not isinstance(dung_ky, dict):
+        return [f"DUNG_KY kiểu {type(dung_ky).__name__} ⛔ phải đối tượng {{mã: bản ghi}}"]
+    loi: list[str] = []
+    for ma, ky in dung_ky.items():
+        if ma not in DUNG:
+            loi.append(f"{ma}: ⛔ phải mã đáp án DỪNG {sorted(DUNG)}")
+            continue
+        if not isinstance(ky, dict):
+            loi.append(f"{ma}: chữ ký ⛔ phải bản ghi 4 khoá {list(KHOA_DUNG_KY)} (chuỗi tự do ⛔ mở cổng)")
+            continue
+        thieu = [k for k in KHOA_DUNG_KY if k not in ky]
+        thua = [k for k in ky if k not in KHOA_DUNG_KY]
+        if thieu or thua:
+            loi.append(f"{ma}: thiếu trường {thieu} · thừa trường {thua}")
+            continue
+        for k in KHOA_DUNG_KY:
+            if not isinstance(ky[k], str) or not ky[k].strip():
+                loi.append(f"{ma}: {'người ký' if k == 'nguoi_ky' else 'lý do' if k == 'ly_do' else k} rỗng "
+                           f"hoặc ⛔ chuỗi ({k} = {ky[k]!r})")
+        if isinstance(ky["nguoi_ky"], str) and "@" in ky["nguoi_ky"]:
+            loi.append(f"{ma}: người ký là email ⛔ (ghi tên, riêng tư)")
+        ng = ky["ngay"]
+        if isinstance(ng, str) and ng.strip():
+            try:
+                ok = datetime.date.fromisoformat(ng).isoformat() == ng
+            except ValueError:
+                ok = False
+            if not ok:
+                loi.append(f"{ma}: ngày {ng!r} ⛔ đúng khuôn YYYY-MM-DD / ngày có thật")
+    return loi
+
+
+def _dung_ky_hop_le() -> dict[str, dict[str, str]]:
+    """Chỉ các chữ ký HỢP LỆ *(từng mã — một mã hỏng ⛔ kéo mã khác)*; hỏng ⇒ coi như chưa ký + cổng ĐỎ ở `so_sanh_c5c`."""
+    return {m: k for m, k in DUNG_KY.items() if not kiem_dung_ky({m: k})} if isinstance(DUNG_KY, dict) else {}
 
 #: ⭐ `H14-R1-04` — gốc ô chỉnh tay ⛔ actor: ATL `AH12` = `GROUP·OMC·2025M02` `='…'!AH12-0.5` *(ghi ở ảnh 605
 #: `phu.o_chinh_tay`: `dong_sheet_atl` 12 · `cot_anh_atl` `y2025_m02` — bài đối chiếu hai nguồn)*. Chuỗi lan = mọi mã của
@@ -617,10 +668,12 @@ def so_sanh_c5c(ne: NguonEngine, dap_an: Mapping[str, Mapping[str, Any]], mong: 
     _khac(check, m.get("check"), "check", ly)
     fs = {ma_da: {"fs": b["fs"], "phan": [p["id"] for p in b["phan"]]} for ma_da, b in bao.items()}
     lech_co_chu_dich = sum(v for l, v in lop_tong.items() if l != LECH_FLS)
+    ly += [f"DUNG_KY {x}" for x in kiem_dung_ky(DUNG_KY)]      # chữ ký hỏng ⇒ ĐỎ có tên (H14-R2-02)
     px = PhanXu(not ly, tuple(ly))
     # ── ⭐ `H14-R1-01` (Đ3 · Đ5): ô so > 0 cho TỪNG đáp án. Đáp án ô so = 0 ⇒ ⛔ đo được ⇒ cổng `null` CÓ TÊN *(⛔ `true`)*,
     #    trừ khi chủ ký "DỪNG có tên" (`DUNG_KY`). Độ phủ mỗi đáp án = ô so / ô SỐ của ảnh — in cạnh nhau *(Đ4)*. ──
     do_phu: dict[str, dict[str, Any]] = {}
+    ky_hop_le = _dung_ky_hop_le()
     for ma_da in list(DAP_AN) + list(DUNG):
         n = dem_dap_an_dung(dap_an[ma_da])
         o = theo[ma_da]["dem"].get("tong_o", 0) if ma_da in theo else 0
@@ -629,7 +682,7 @@ def so_sanh_c5c(ne: NguonEngine, dap_an: Mapping[str, Mapping[str, Any]], mong: 
             ngoai = {**{f"chua_co_dau_vao:{k}": v for k, v in theo[ma_da]["chua_co_dau_vao"].items()},
                      **{f"ngoai_khuon:{k}": v for k, v in theo[ma_da].get("ngoai_khuon", {}).items()}}
         do_phu[ma_da] = {"o_dap_an_so": n, "o_so": o, "o_so_chua_so": n - o, "ngoai_mau_so_co_ten": ngoai,
-                         "dung_ky": DUNG_KY.get(ma_da)}
+                         "dung_ky": ky_hop_le.get(ma_da)}
     khong_do: list[str] = []
     for ma_da, v in do_phu.items():
         if v["o_so"] > 0:
@@ -687,6 +740,7 @@ def so_sanh_c5c(ne: NguonEngine, dap_an: Mapping[str, Mapping[str, Any]], mong: 
         "pl5_bo_khoi_luoi": ne.pl5_bo,
         "do_phu": do_phu,
         "khong_do_duoc": khong_do, "phu_mot_phan": phu_mot_phan,
+        "dung_co_ky": [f"{m}: DỪNG có chữ ký {k['nguoi_ky']} {k['ngay']}" for m, k in ky_hop_le.items()],
         "dat_mong": px.dat,
         "dat": dat_cong, "ly_do": list(px.ly_do),
     }

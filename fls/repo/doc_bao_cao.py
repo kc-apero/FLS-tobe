@@ -1207,7 +1207,8 @@ def _goi_la(goi: str, b: dict, ten: str) -> Cong:
     #   rỗng ⇒ tự mâu thuẫn ⇒ `None`. Vắng ⇒ [] *(gói cũ)*. `phu_mot_phan` *(tuỳ chọn)* = câu độ phủ, chỉ IN.
     kdd = b.get("khong_do_duoc", [])
     phu = b.get("phu_mot_phan", [])
-    for k, v in (("khong_do_duoc", kdd), ("phu_mot_phan", phu)):
+    ky = b.get("dung_co_ky", [])      # H14 (23/11): đáp án DỪNG ĐÃ có chữ ký chủ — IN ở chuỗi cổng, ⛔ biến mất im lặng
+    for k, v in (("khong_do_duoc", kdd), ("phu_mot_phan", phu), ("dung_co_ky", ky)):
         if not isinstance(v, list) or not all(isinstance(x, str) and x for x in v):
             return chua(f"`{k}` = {v!r} ⛔ phải danh sách chuỗi")
     if dat is True and kdd:
@@ -1274,7 +1275,8 @@ def _goi_la(goi: str, b: dict, ten: str) -> Cong:
                     da_do=f"{khop}/{o} ô đáp án khớp{cum_lech}{vang}",
                     ly_do=f"lệch có chủ đích {lech} ≠ mong {mong_lech} (`mong_lech_co_chu_dich`) ⇒ ⛔ đã khai trước")
     return Cong(ma=ma, ten=tn, dat=True, lat_bo_nguon=nguon, lech_co_chu_dich=lech,
-                da_do=f"{khop}/{o} ô đáp án khớp{cum_lech} (gói {goi}){vang}")
+                da_do=f"{khop}/{o} ô đáp án khớp{cum_lech} (gói {goi}){vang}"
+                      + "".join(f" · {x}" for x in ky) + "".join(f" · độ phủ {x}" for x in phu))
 
 
 def _nguon_cha(phan) -> str:

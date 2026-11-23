@@ -82,11 +82,15 @@ KHOA_SO = ("tong_o", "khop", "khop_co_so", "o_co_so", "o_0_0", "so_o_dap_an_so_d
 #: ⇒ `WP-C5c` ĐỎ với ĐÚNG 18 dòng lý do `check.<đáp án>.….NB = 0.…` *(đo 22/11: y hệt khi chạy bằng ảnh `ix_fx.json` ⇒
 #: ⛔ do I2)*. Gộp lại ngọn H14 đã sửa ⇒ đặt `False` ⇒ C5c `dat = None` (605 chờ chủ) ⇒ bài ghim này ĐỎ cho tới khi khai lại.
 MONG_H14_R2_01_CHUA_SUA = False         # gộp ngọn H14 `4b49d00` (R2-01 đã sửa) ⇒ khai lại 22/11
-MONG_C5C_DAT = False if MONG_H14_R2_01_CHUA_SUA else None
+#: ⭐ 23/11 chủ KÝ "605 DỪNG có tên" (`do_hd2_c5c.DUNG_KY["605"]`, KhanhCQ — KQ-324 ĐẠT) ⇒ C5c + cha C5 = `True` (đã đo,
+#: ⛔ `None`). Trước ký: `None` "KHÔNG ĐO ĐƯỢC (605)" — nay là CA ĐỎ dựng bằng gỡ `DUNG_KY` (xem `chuoi["go_ky"]`, Đ5 hai chiều).
+MONG_C5C_DAT = False if MONG_H14_R2_01_CHUA_SUA else True
 MONG_C5C_SO_LY_DO_NB0 = 18 if MONG_H14_R2_01_CHUA_SUA else 0
-#: cổng cha F03 — WP-C5 = None vì `WP-C5c` 605 DỪNG chờ chủ ký `DUNG_KY` (H14-R1-01) — lệch CÓ TÊN so với chữ ISP I2-F1
-#: *(trong lúc `H14-R2-01` chưa gộp: False — xem trên)*
+#: cổng cha F03 — WP-C5 = True: `WP-C5c` 605 DỪNG ĐÃ KÝ có tên `DUNG_KY` (H14-R1-01 → chủ ký 23/11) *(trong lúc
+#: `H14-R2-01` chưa gộp: False — xem trên)*. Ca CHƯA ký (gỡ `DUNG_KY`) = `MONG_CHA_GO_KY` — cha C5 lại `None`.
 MONG_CHA = {"WP-C2": True, "WP-C3": True, "WP-C4": True, "WP-C5": MONG_C5C_DAT}
+MONG_CHA_GO_KY = {**MONG_CHA, "WP-C5": None}
+CHU_KY_605 = "605: DỪNG có chữ ký KhanhCQ 2026-11-23"        # chuỗi `dung_co_ky` ở khối C5c *(`do_hd2_c5c`)*
 
 
 # ══ ② chuỗi = ĐƯỜNG SẢN PHẨM `h.chay_goi` ═════════════════════════════════════════════════════════════════════════
@@ -196,6 +200,8 @@ def chuoi(tmp_path_factory):
         a = chay_chuoi(dsn)                               # 202510 CHƯA ký
         st_bo, _ = _goi(m, f"{V}/config/fx/{THANG_BO_KY}/sign", "POST")
         b = chay_chuoi(dsn)                               # đủ 36 tháng đã ký
+        with mock.patch.object(do_hd2_c5c, "DUNG_KY", {}):   # ca CHƯA ký 605 (Đ5 hai chiều): gỡ chữ ký chủ
+            go_ky = chay_chuoi(dsn)
         ky[THANG_BO_KY] = st_bo
         that = chc.fx_cua
         dot = {}
@@ -209,7 +215,8 @@ def chuoi(tmp_path_factory):
         v_dua = chc.dua_ban_ky(c, KY_BAN, noi_dung, actor="engine-h14-i2")
         v_ky = chc.ky_ban(c, KY_BAN, actor=ACTOR)
         nd_kho = chc.doc_noi_dung_ban_ky(c, KY_BAN, v_ky.phien_ban)
-    return {"dsn": dsn, "thang": thang, "ky": ky, "nguoi_ky": nguoi_ky, "alr": alr_ky, "a": a, "b": b, "dot": dot,
+    return {"dsn": dsn, "thang": thang, "ky": ky, "nguoi_ky": nguoi_ky, "alr": alr_ky, "a": a, "b": b, "dot": dot, "go_ky": go_ky,
+            "p_go_ky": ghi_cong(go_ky["khoi"], tmp / "hd2_cong_go_ky605.json"),
             "p_a": ghi_cong(a["khoi"], tmp / "hd2_cong_bo_ky.json"), "p_b": ghi_cong(b["khoi"], tmp / "hd2_cong.json"),
             "noi_dung": noi_dung, "v_dua": v_dua, "v_ky": v_ky, "nd_kho": nd_kho}
 
@@ -370,7 +377,10 @@ def test_F1_cong_bon_cha_sau_chuoi_du(chuoi):
     g = {x["ma"]: x for x in d["cong"]}
     assert {c: g[f"HD2_{c.replace('-', '_')}"]["dat"] for c in MONG_CHA} == MONG_CHA
     c5 = json.dumps(g["HD2_WP_C5"], ensure_ascii=False)
-    assert ("NB = 0" if MONG_H14_R2_01_CHUA_SUA else "605") in c5, c5             # lý do có TÊN
+    assert ("NB = 0" if MONG_H14_R2_01_CHUA_SUA else "3/3 gói con đạt") in c5, c5   # cha: lý do / 3 gói con đạt
+    c5c = json.dumps(g["HD2_WP_C5C"], ensure_ascii=False)                       # chữ ký 605 + độ phủ 615 nằm ở cổng C5c
+    assert MONG_H14_R2_01_CHUA_SUA or (CHU_KY_605 in c5c and "độ phủ 615: ô so" in c5c), c5c
+    assert g["HD2_WP_C5C"]["dat"] is MONG_C5C_DAT
 
 
 def test_C5c_H14_R2_01_ly_do_dung_18_dong_check_NB0_ngoai_ra_khop(chuoi):
@@ -378,7 +388,13 @@ def test_C5c_H14_R2_01_ly_do_dung_18_dong_check_NB0_ngoai_ra_khop(chuoi):
     assert len(k["ly_do"]) == MONG_C5C_SO_LY_DO_NB0, k["ly_do"][:3]
     assert all(x.startswith("check.") and ".NB = 0." in x for x in k["ly_do"])
     assert k["dat_mong"] is (not MONG_H14_R2_01_CHUA_SUA)
-    assert any(x.startswith("605:") for x in k["khong_do_duoc"])                 # 605 vẫn DỪNG có tên
+    if MONG_H14_R2_01_CHUA_SUA:
+        assert any(x.startswith("605:") for x in k["khong_do_duoc"])
+    else:                                                                         # 605 ĐÃ KÝ: hết "không đo được", chữ ký hiện tên
+        assert k["khong_do_duoc"] == [] and CHU_KY_605 in k["dung_co_ky"], (k["khong_do_duoc"], k["dung_co_ky"])
+        p = k["do_phu"]["615"]
+        assert 0 < p["o_so"] <= p["o_dap_an_so"], p                              # Đ3: độ phủ 615 mẫu số ⛔ rỗng
+        assert k["do_phu"]["605"]["o_so"] == 0 and k["do_phu"]["605"]["dung_ky"]["nguoi_ky"] == "KhanhCQ"
 
 
 def test_F1_vm_bon_the_HD2_co_so_C5_khong_do_duoc_co_ly_do(chuoi):
@@ -388,7 +404,7 @@ def test_F1_vm_bon_the_HD2_co_so_C5_khong_do_duoc_co_ly_do(chuoi):
     for g, x in t.items():
         assert any(ch.isdigit() for ch in x["txt"].split(":", 1)[1]), (g, x["txt"][:120])
     if not MONG_H14_R2_01_CHUA_SUA:
-        assert "KHÔNG ĐO ĐƯỢC" in t["WP-C5"]["txt"] and "605" in t["WP-C5"]["txt"]
+        assert "ĐẠT" in t["WP-C5"]["txt"] and "KHÔNG ĐẠT" not in t["WP-C5"]["txt"], t["WP-C5"]["txt"][:200]
     else:
         assert "KHÔNG ĐẠT" in t["WP-C5"]["txt"] and "NB = 0" in t["WP-C5"]["txt"]
 
@@ -401,9 +417,31 @@ def test_F1_F2_chromium_that(chuoi):
         t = _cha(res)
         if mong is not None:
             assert {g: _muc(x) for g, x in t.items()} == mong
-            assert ("KHÔNG ĐẠT" if MONG_H14_R2_01_CHUA_SUA else "KHÔNG ĐO ĐƯỢC") in t["WP-C5"]["txt"]
+            if MONG_H14_R2_01_CHUA_SUA:
+                assert "KHÔNG ĐẠT" in t["WP-C5"]["txt"]
+            else:
+                assert "ĐẠT" in t["WP-C5"]["txt"] and "KHÔNG ĐẠT" not in t["WP-C5"]["txt"], t["WP-C5"]["txt"][:200]
         else:
             assert _muc(t["WP-C2"]) is False and f"FX_CHAN {THANG_BO_KY}" in t["WP-C2"]["txt"]
+
+
+# ══ Đ5 hai chiều · gỡ chữ ký 605 ⇒ ca "KHÔNG ĐO ĐƯỢC (605)" (bài cũ của I2 sống tiếp như CA ĐỎ) ═════════════════════
+def test_C5c_go_ky_605_khoi_None_khong_do_duoc_co_ten(chuoi):
+    k = chuoi["go_ky"]["khoi"]["WP-C5c"]
+    assert k["dat"] is None and k["dat_mong"] is True and k["ly_do"] == [], (k["dat"], k["ly_do"][:3])
+    assert [x.split(":")[0] for x in k["khong_do_duoc"]] == ["605"] and k["dung_co_ky"] == []
+    assert chuoi["b"]["khoi"]["WP-C5c"]["dat"] is True                            # đủ ký ⇒ ngược lại
+
+
+def test_F1_go_ky_605_cong_cha_C5_None_co_chu_605(chuoi):
+    d = _gates(chuoi["dsn"], chuoi["p_go_ky"])
+    g = {x["ma"]: x for x in d["cong"]}
+    assert {c: g[f"HD2_{c.replace('-', '_')}"]["dat"] for c in MONG_CHA_GO_KY} == MONG_CHA_GO_KY
+    assert "605" in json.dumps(g["HD2_WP_C5"], ensure_ascii=False) and CHU_KY_605 not in json.dumps(g, ensure_ascii=False)
+    assert g["HD2_WP_C5C"]["dat"] is None
+    t = _cha(_ve_f03(d))
+    assert {x: _muc(v) for x, v in t.items()} == MONG_CHA_GO_KY
+    assert "KHÔNG ĐO ĐƯỢC" in t["WP-C5"]["txt"] and "605" in t["WP-C5"]["txt"]
 
 
 def test_F2_vm_bo_ky_the_C2_do_co_chu(chuoi):

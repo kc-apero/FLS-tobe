@@ -56,10 +56,13 @@ V = cua.bang_tuyen.TIEN_TO
 # 4 cha khai sẵn + 10 con có trong tệp = 14 cổng. WP-C4 (cha, 3 con) ⇒ true; WP-C5 (cha, 3 con C5a · C5b · C5c) ⇒ None.
 MONG_THAT = {
     "HD2_WP_C2": True, "HD2_WP_C3": True, "HD2_WP_C3A": True, "HD2_WP_C3B": True, "HD2_WP_C3C": True, "HD2_WP_C3D": True,
-    "HD2_WP_C4": True, "HD2_WP_C4A": True, "HD2_WP_C4B": True, "HD2_WP_C4C": True, "HD2_WP_C5": None, "HD2_WP_C5A": True,
-    "HD2_WP_C5B": True, "HD2_WP_C5C": None,
+    "HD2_WP_C4": True, "HD2_WP_C4A": True, "HD2_WP_C4B": True, "HD2_WP_C4C": True, "HD2_WP_C5": True, "HD2_WP_C5A": True,
+    "HD2_WP_C5B": True, "HD2_WP_C5C": True,
 }
-MONG_NULL_THAT = ["HD2_WP_C5", "HD2_WP_C5C"]        # H14-R1-01: 605 ô so 0 chưa ký ⇒ ⛔ đo được, CÓ TÊN
+# ⭐ 23/11: chủ ký "605 DỪNG có tên" (`DUNG_KY` bản ghi có cấu trúc) ⇒ 605 hết chặn ⇒ C5c + cha C5 = true; 605 hiện ở chuỗi.
+MONG_NULL_THAT: list[str] = []
+MONG_KY_605 = "605: DỪNG có chữ ký KhanhCQ 2026-11-23"
+MONG_PHU_615 = "độ phủ 615: ô so 13760/48021 ô số · 34261 ô số chưa so"
 MONG_CHA_KHAI_SAN = ("HD2_WP_C2", "HD2_WP_C3", "HD2_WP_C4", "HD2_WP_C5")
 MONG_O_C2 = "63016/63016 ô"          # `hd2_cong.json` WP-C2 khop/tong_o (BM…BT × 7877 dòng)
 # ⭐ KQ-231 (Đ4): tử số = ô KHỚP đáp án THẬT; mẫu số 205.175 gồm 35 ô lệch có chủ đích (ITE) khai riêng
@@ -173,10 +176,9 @@ def test_CG2_B1_tep_that_qua_tuyen_9_cong_dung_dat_C5_null():
     assert MONG_O_C5A in h["HD2_WP_C5A"]["da_do"] and "5118 lệch có chủ đích" in h["HD2_WP_C5A"]["da_do"]
     assert MONG_O_C5B in h["HD2_WP_C5B"]["da_do"] and "923 lệch có chủ đích" in h["HD2_WP_C5B"]["da_do"]
     assert MONG_O_C5C in h["HD2_WP_C5C"]["da_do"] and "8478 lệch có chủ đích" in h["HD2_WP_C5C"]["da_do"]
-    # H14-R1-01: chuỗi /gates NÓI 605 (ô so 0) + 615 (độ phủ) — ⛔ chỉ "khớp/ô so"
-    ly = h["HD2_WP_C5C"]["ly_do"]
-    assert "605: ô so 0/13706 ô số" in ly and "615: ô so 13760/48021 ô số · 34261 ô số chưa so" in ly, ly
-    assert h["HD2_WP_C5"]["ly_do"].startswith("WP-C5c: 1 đáp án ô so = 0"), h["HD2_WP_C5"]
+    # 23/11: chuỗi /gates NÓI 605 (DỪNG có chữ ký) + 615 (độ phủ) — ⛔ biến mất im lặng khi cổng true
+    dd = h["HD2_WP_C5C"]["da_do"]
+    assert MONG_KY_605 in dd and MONG_PHU_615 in dd, dd
     assert MONG_O_C4A in h["HD2_WP_C4A"]["da_do"] and "3/3 gói con đạt (WP-C4a · WP-C4b · WP-C4c)" in h["HD2_WP_C4"]["da_do"]
     assert MONG_O_C4B in h["HD2_WP_C4B"]["da_do"] and MONG_O_C4C in h["HD2_WP_C4C"]["da_do"]
     assert MONG_O_C2 in h["HD2_WP_C2"]["da_do"]
@@ -203,8 +205,9 @@ def test_CG2_B1_nguon_thu_hai_dat_cua_tep_THAT_khop_mong():
     assert (d["WP-C3d"]["khop"], d["WP-C3d"]["lech_co_chu_dich"], d["WP-C3d"]["tong_o"], d["WP-C3d"]["dat"]) == (1287624, 1791, 1289415, True)
     assert (d["WP-C5a"]["khop"], d["WP-C5a"]["lech_co_chu_dich"], d["WP-C5a"]["tong_o"], d["WP-C5a"]["dat"]) == (40556, 5118, 45674, True)
     assert (d["WP-C5b"]["khop"], d["WP-C5b"]["lech_co_chu_dich"], d["WP-C5b"]["tong_o"], d["WP-C5b"]["dat"]) == (3179, 923, 4102, True)
-    assert (d["WP-C5c"]["khop"], d["WP-C5c"]["lech_co_chu_dich"], d["WP-C5c"]["tong_o"], d["WP-C5c"]["dat"]) == (77672, 8478, 86150, None)
-    assert d["WP-C5c"]["dat_mong"] is True and [x[:4] for x in d["WP-C5c"]["khong_do_duoc"]] == ["605:"]
+    assert (d["WP-C5c"]["khop"], d["WP-C5c"]["lech_co_chu_dich"], d["WP-C5c"]["tong_o"], d["WP-C5c"]["dat"]) == (77672, 8478, 86150, True)
+    assert d["WP-C5c"]["dat_mong"] is True and d["WP-C5c"]["khong_do_duoc"] == []
+    assert d["WP-C5c"]["dung_co_ky"] == [MONG_KY_605]
 
 
 def test_CG2_B1_tep_CHI_co_C2_cac_goi_khac_null(tmp_path):
@@ -353,12 +356,12 @@ def test_AC5_gates_cu_chi_THEM_phan_tu_va_3_con_so_tom_dem_dung():
     assert "FINAL" in cu and "KHO_SACH" in cu and "HD1_THANG" in cu
     assert [c["ma"] for c in b["cong"] if not c["ma"].startswith("HD2_")] == cu
     assert {c["ma"] for c in b["cong"]} >= set(cu) | set(MONG_THAT)
-    # `None` ⇒ 4 cổng HD2 null; tệp thật ⇒ 12 true + 2 null (C5c + cha C5 — H14-R1-01: 605 ô so 0 chưa ký): chua_do_duoc GIẢM đúng 2
+    # `None` ⇒ 4 cổng HD2 null; tệp thật ⇒ 14 true + 0 null (23/11: 605 đã ký DỪNG có tên): chua_do_duoc GIẢM đúng 4
     for d in (a, b):
         dat = [c["dat"] for c in d["cong"]]
         assert (d["dat"], d["khong_dat"], d["chua_do_duoc"]) == (
             dat.count(True), dat.count(False), sum(1 for x in dat if x is None))
-    assert b["dat"] - a["dat"] == 12 and b["chua_do_duoc"] - a["chua_do_duoc"] == -2
+    assert b["dat"] - a["dat"] == 14 and b["chua_do_duoc"] - a["chua_do_duoc"] == -4
 
 
 def test_chay_cua_MAC_DINH_tro_DUNG_tep_hd2_that():
@@ -394,7 +397,7 @@ def test_CG2_R1_01_vang_thi_true_nhung_da_do_noi_thang_va_nguon_vang():
     for m in ("HD2_WP_C2", "HD2_WP_C3A", "HD2_WP_C3B", "HD2_WP_C3C", "HD2_WP_C3D", "HD2_WP_C3", "HD2_WP_C4A", "HD2_WP_C4B", "HD2_WP_C4C",
               "HD2_WP_C4", "HD2_WP_C5A", "HD2_WP_C5B"):
         assert x[m].dat is True and _LOI_VANG in x[m].da_do, x[m]
-    assert x["HD2_WP_C5C"].dat is None and _LOI_VANG in x["HD2_WP_C5C"].da_do      # H14-R1-01
+    assert x["HD2_WP_C5C"].dat is True and _LOI_VANG in x["HD2_WP_C5C"].da_do
     assert x["HD2_WP_C2"].da_do.startswith(MONG_O_C2)          # nhãn Đ4 cũ giữ nguyên
 
 
@@ -591,11 +594,32 @@ def test_H7_R1_02_nhan_mau_thuan_thieu_sai_kieu_thi_NULL_co_ten(tmp_path, pha):
 # ══ H14-R1-01 (`KQ-313`, Đ3 · Đ5) · khoá `khong_do_duoc` — đáp án ô so = 0 ⇒ cổng `None` CÓ TÊN ══════════════════
 # Lỗi đã xảy ra: `HD2_WP_C5C = true` + cha C5 `3/3` trong khi 605 · 615 *(61.727 ô số, 615 = bản CHÍNH THỨC D5)* ô so = 0;
 # chuỗi `/gates` chỉ in "64618/72390" — 0 chữ về hai đáp án ngoài mẫu số.
+def _chua_ky(d):
+    """Trạng thái TRƯỚC chữ ký 23/11 dựng từ tệp thật: 605 ô so 0 chặn, `dung_co_ky` rỗng, `dat = null`."""
+    d["WP-C5c"].update(dat=None, dung_co_ky=[], khong_do_duoc=[
+        "605: ô so 0/13706 ô số — DỪNG `chua_co_dau_vao` CHƯA có chữ ký chủ 'DỪNG có tên' (cần: nguồn `[MID][FS1][PLA5]`)"],
+        phu_mot_phan=[MONG_PHU_615[len("độ phủ "):]])
+
+
 def test_H14_R1_01_dat_null_co_danh_sach_thi_None_noi_ten(tmp_path):
-    c = {x.ma: x for x in bc.doc_cong_hd2(_tep(tmp_path, lambda d: None))}
+    c = {x.ma: x for x in bc.doc_cong_hd2(_tep(tmp_path, _chua_ky))}
     x = c["HD2_WP_C5C"]
     assert x.dat is None and "605: ô so 0/13706 ô số" in x.ly_do and "tệp" not in x.ly_do.split("⇒")[0]
-    assert MONG_O_C5C in x.da_do and c["HD2_WP_C5"].dat is None
+    assert MONG_PHU_615 in x.ly_do and MONG_O_C5C in x.da_do and c["HD2_WP_C5"].dat is None
+
+
+def test_KY605_tep_that_gat_chu_ky_thi_None_hai_chieu(tmp_path):
+    """Đ5 hai chiều ở tầng `/gates`: tệp thật (có chữ ký) ⇒ true + chuỗi nêu 605; gỡ chữ ký ⇒ None có tên."""
+    c = {x.ma: x for x in bc.doc_cong_hd2(_tep(tmp_path, lambda d: None))}
+    assert c["HD2_WP_C5C"].dat is True and c["HD2_WP_C5"].dat is True
+    assert MONG_KY_605 in c["HD2_WP_C5C"].da_do and MONG_PHU_615 in c["HD2_WP_C5C"].da_do
+    g = {x.ma: x for x in bc.doc_cong_hd2(_tep(tmp_path, _chua_ky))}
+    assert g["HD2_WP_C5C"].dat is None and g["HD2_WP_C5"].dat is None
+
+
+def test_KY605_dung_co_ky_sai_kieu_thi_None_tep_hong(tmp_path):
+    x = {y.ma: y for y in bc.doc_cong_hd2(_tep(tmp_path, lambda d: d["WP-C5c"].__setitem__("dung_co_ky", "605")))}["HD2_WP_C5C"]
+    assert x.dat is None and "hỏng ở gói WP-C5c" in x.ly_do and "phải danh sách chuỗi" in x.ly_do
 
 
 @pytest.mark.parametrize("pha, mau", [
@@ -605,7 +629,10 @@ def test_H14_R1_01_dat_null_co_danh_sach_thi_None_noi_ten(tmp_path):
     (lambda b: b.__setitem__("phu_mot_phan", [1]), "phải danh sách chuỗi"),
 ])
 def test_H14_R1_01_khong_do_duoc_hong_hoac_mau_thuan_thi_None_tep_hong(tmp_path, pha, mau):
-    x = {y.ma: y for y in bc.doc_cong_hd2(_tep(tmp_path, lambda d: pha(d["WP-C5c"])))}["HD2_WP_C5C"]
+    def hong(d):
+        _chua_ky(d)
+        pha(d["WP-C5c"])
+    x = {y.ma: y for y in bc.doc_cong_hd2(_tep(tmp_path, hong))}["HD2_WP_C5C"]
     assert x.dat is None and "hỏng ở gói WP-C5c" in x.ly_do and mau in x.ly_do, x.ly_do
 
 

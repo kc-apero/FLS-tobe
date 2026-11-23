@@ -179,3 +179,11 @@ $env:FLS_CHROMIUM=(Get-ChildItem "$env:LOCALAPPDATA\ms-playwright\chromium-*\chr
 | `kiem_tai_lieu.py` | ĐẠT *(sau BG này)* |
 | `soi_bang_tuyen.py` | khớp SQL ở **49/49** tuyến |
 | `kiem_thuyet_minh.py` | **35/35** nút |
+
+## Sửa tích hợp × H14 ký 605 (23/11)
+- **Gộp:** `origin/…-isp/H14` `b1038a7` *(chủ KhanhCQ ký "605 DỪNG có tên" 23/11 — `DUNG_KY["605"]`, `KQ-324` ĐẠT)* vào nhánh I2 `cd04d58`. Xung đột **chỉ** `tools/dung_moi_truong_isp.sh` + `tests/test_dung_moi_truong_isp.py` *(sàn)* ⇒ giữ bản I2, đặt sàn `MONG_PYTEST_TOAN_BO` = **số thu thập thật** cây gộp **4.885** *(`pytest --collect-only`)*, sau +2 bài mới = **4.887**; web giữ **690**.
+- **Đo trước sửa** *(cụm 5445)*: `test_hd2_xuyen_suot.py` ⇒ **5 failed · 83 passed** *(chạy chung `test_dung_moi_truong_isp.py`)*: `B1[WP-C5c]` · `F1_cong_bon_cha` · `C5c_H14_R2_01` · `F1_vm_bon_the` · `F1_F2_chromium_that`.
+- **Nguyên nhân từng bài** *(đo, ⛔ đoán)*: **cả 5** cùng một gốc — kỳ vọng cũ "605 chưa ký": `WP-C5c` · cha `WP-C5` thực ra `True` (diff `{'dat': True} != {'dat': None}`, 7 khoá số khác bằng khối commit ⇒ 0 lệch số giữa tầng); `C5c_H14_R2_01` đỏ vì `khong_do_duoc` nay rỗng *(605 đã ký)*.
+- **Sửa chỉ bài** *(⛔ `fls/` · engine · tuyến)*: `MONG_C5C_DAT = True`, `MONG_CHA["WP-C5"] = True`; chuỗi `605: DỪNG có chữ ký KhanhCQ 2026-11-23` + `độ phủ 615: ô so` ở cổng `HD2_WP_C5C`; thẻ web C5 ✓ ĐẠT. **Hai chiều (Đ5):** fixture `chuoi` thêm `go_ky` *(gỡ `DUNG_KY` bằng mock, chạy lại 11 gói)* + 2 bài: `test_C5c_go_ky_605_khoi_None_khong_do_duoc_co_ten` · `test_F1_go_ky_605_cong_cha_C5_None_co_chu_605` ⇒ gỡ ký ⇒ C5c `None`, C5 `None`, thẻ "KHÔNG ĐO ĐƯỢC (605)" — bài cũ sống như ca đỏ.
+- **Sau sửa:** 5 bài F1/go_ky ⇒ **5 passed** *(127 s)*; D1 *(`test_B2_*` bỏ ký 202510 ⇒ FX_CHAN, thẻ C2 đỏ có chữ)* **không đổi mã** ⇒ xanh *(chạy toàn tệp bên dưới)*.
+- Phát hiện: `I2-TH-01` *(GHI NHẬN)* ở `SO_PHAT_HIEN_ISP-3.1_I2.md`.
