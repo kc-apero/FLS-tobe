@@ -107,7 +107,7 @@ def _lay(s, sid: str, vung: str, lan: int = 4) -> list[list]:
     raise RuntimeError(f"⛔ không đọc được `{vung[:40]}` sau {lan} lần: {loi}")
 
 
-def doc_nguon_song(lat: int = 2500) -> dict[str, Any]:
+def doc_nguon_song(lat: int = 2500, luu=None) -> dict[str, Any]:
     """Một lượt đọc CHỈ-ĐỌC → bản thô `{l1, pm, pm_tieu_de, l1_tieu_de, ledge_ngay, ngay_doc}`. ⛔ in giá trị."""
     s = _phien()
     q = lambda t: "'" + t + "'"                     # noqa: E731
@@ -117,9 +117,16 @@ def doc_nguon_song(lat: int = 2500) -> dict[str, Any]:
     for a in range(L1_DONG1, 14269 + 1, lat):
         nguon["l1"] += _lay(s, SID_RAW, f"{q(TAB_L1)}!A{a}:N{min(a + lat - 1, 14269)}")
     nguon["pm"] = _lay(s, SID_RAW, f"{q(TAB_PM)}!A{PM_DONG1}:Z4412")
-    for a in range(LEDGE_DONG1, LEDGE_CUOI + 1, 4000):
-        nguon["ledge_ngay"] += [r[0] if r else None for r in
-                                _lay(s, SID_ADJ, f"{q(TAB_LEDGE)}!A{a}:A{min(a + 3999, LEDGE_CUOI)}")]
+    if luu:
+        luu(nguon)                                   # ⭐ lưu thô TRƯỚC Ledge: lượt 23/11 mất 16 phút vì Ledge hết giờ
+    nguon["ledge_loi"] = []
+    for a in range(LEDGE_DONG1, LEDGE_CUOI + 1, 1500):
+        vung = f"{q(TAB_LEDGE)}!A{a}:A{min(a + 1499, LEDGE_CUOI)}"
+        try:
+            nguon["ledge_ngay"] += [r[0] if r else None for r in _lay(s, SID_ADJ, vung)]
+        except RuntimeError as e:                    # lát hỏng ⇒ CÓ TÊN, ⛔ bỏ im
+            nguon["ledge_loi"].append(vung.split("!")[1])
+            nguon["ledge_ngay"] += [None] * (min(a + 1499, LEDGE_CUOI) - a + 1)
     return nguon
 
 
@@ -473,11 +480,14 @@ def main(argv: list[str] | None = None) -> int:
     if a.tu_tep:
         nguon = json.loads(a.tu_tep.read_text(encoding="utf-8"))
     else:
-        nguon = doc_nguon_song()
         a.tho.parent.mkdir(parents=True, exist_ok=True)
         os.chmod(a.tho.parent, 0o700)
-        a.tho.write_text(json.dumps(nguon, ensure_ascii=False), encoding="utf-8")
-        os.chmod(a.tho, 0o600)
+
+        def luu(n: dict) -> None:
+            a.tho.write_text(json.dumps(n, ensure_ascii=False), encoding="utf-8")
+            os.chmod(a.tho, 0o600)
+        nguon = doc_nguon_song(luu=luu)
+        luu(nguon)
     loi = kiem_tieu_de(nguon)
     if loi:
         print("⛔ ĐỎ tiêu đề nguồn:", loi)
@@ -489,11 +499,14 @@ def main(argv: list[str] | None = None) -> int:
     be_b = dung_be(nguon, ten="b", ky_chot_dong_bang=chot_db, ky_mo_ngay_chay=ky_mo)
     da = ghi_be(ra, be_a), ghi_be(ra, be_b)
     dc = doi_chieu_ky(nguon["ledge_ngay"])
-    ket_ky = be_a["ky_chot"] == be_b["ky_chot"] and not dc["ky_lech_so_dong"]
+    dc["lat_ledge_hong"] = nguon.get("ledge_loi", [])
+    do_duoc = not dc["lat_ledge_hong"] and dc["mau_so_o_ngay_song"] > 0              # Đ3/Đ5: ⛔ đo được ⇒ ĐỎ
+    ket_ky = be_a["ky_chot"] == be_b["ky_chot"] and not dc["ky_lech_so_dong"] and do_duoc
     out = {"ngay_doc": nguon["ngay_doc"], "ky_mo_ngay_chay": sorted(ky_mo),
            "be": {"a": dem_cua(be_a, da[0]), "b": dem_cua(be_b, da[1])},
            "doi_chieu_A_B": {"ledge_song_vs_dong_bang": dc, "ky_chot_A": be_a["ky_chot"], "ky_chot_B": be_b["ky_chot"],
-                             "ket": "KHỚP" if ket_ky else "ĐỎ — kỳ đã chốt lệch (nguồn đã sửa sau chốt?)"}}
+                             "ket": "KHỚP" if ket_ky else ("ĐỎ — ⛔ đo được: lát Ledge hỏng " + str(dc["lat_ledge_hong"]) if not do_duoc
+                                                else "ĐỎ — kỳ đã chốt lệch (nguồn đã sửa sau chốt?)")}}
     TEP_DEM.parent.mkdir(parents=True, exist_ok=True)
     TEP_DEM.write_text(json.dumps(out, ensure_ascii=False, indent=1, sort_keys=True) + "\n", encoding="utf-8")
     for k, v in out["be"].items():
