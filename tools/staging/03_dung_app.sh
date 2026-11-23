@@ -180,7 +180,7 @@ for ni in vm.get("networkInterfaces", []):
 trong = dict(l.split("=", 1) for l in e["R_TRONG"].splitlines() if "=" in l)
 cap = set(e["R_APIS"].split())
 can = {"compute.googleapis.com", "artifactregistry.googleapis.com", "cloudbuild.googleapis.com", "iap.googleapis.com"}
-reader = any("artifactregistry.reader" == b.get("role") and f"serviceAccount:{e['SA_EMAIL']}" in b.get("members", [])
+reader = any("roles/artifactregistry.reader" == b.get("role") and f"serviceAccount:{e['SA_EMAIL']}" in b.get("members", [])
              for b in iam.get("bindings", []))
 tag, pri_deny, iap = e["NET_TAG"], int(e["PRI_DENY"]), ipaddress.ip_network(e["DAI_IAP"])
 
@@ -215,7 +215,7 @@ hang = [
   ("VM IP ngoài (thông tin — Cloud SQL cần đường ra)", ip or "—",                     None),
   ("firewall: luật CHẶN vào (tag, ưu tiên 900)", len(chan),                           1),
   ("firewall: luật cho IAP vào cổng 22", len(cho_iap),                                1),
-  ("firewall: luật ALLOW áp lên VM, nguồn ngoài dải IAP, ⛔ bị DENY đè (đếm)", len(mo), 0),
+  ("firewall: luật ALLOW áp lên VM, nguồn ngoài dải IAP, ⛔ bị DENY đè (đếm)", len(mo) if fw else None, 0),   # Đ3: ⛔ đọc được luật nào ⇒ ĐỎ, ⛔ "0 luật mở"
   ("TRONG VM · container fls-app", trong.get("container"),                            "running"),
   ("TRONG VM · cổng 8088 nghe (số địa chỉ)", len(nghe),                               1),
   ("TRONG VM · cổng 8088 chỉ nghe 127.0.0.1", nghe == ["127.0.0.1:8088"],             True),

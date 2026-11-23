@@ -23,9 +23,12 @@ def luu():
 
 
 def co(flag):
-    for x in a:
+    """`--cờ=giá-trị` HOẶC `--cờ giá-trị` (gcloud nhận cả hai)."""
+    for i, x in enumerate(a):
         if x.startswith(flag + "="):
             return x.split("=", 1)[1]
+        if x == flag and i + 1 < len(a):
+            return a[i + 1]
     return None
 
 

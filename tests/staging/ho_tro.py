@@ -31,7 +31,7 @@ MK = {   # mật khẩu GIẢ của "Secret Manager" — chuỗi dễ nhận đ�
     "fls-staging-pg-fls_admin": "MKGIA-admin-5b8e21aa90c3d4f1",
     "fls-staging-pg-fls_ghi": "MKGIA-ghi-71c0e6d4b2a8953f",
     "fls-staging-pg-fls_doc": "MKGIA-doc-c4d19e7a3b60f258",
-    "fls-staging-jwt-secret": "MKGIA-jwt-0a6f3e8d1c5b9472",
+    "fls-staging-jwt-secret": "MKGIA-jwt-0a6f3e8d1c5b9472-e71b4c09d2f85a36",
 }
 
 
