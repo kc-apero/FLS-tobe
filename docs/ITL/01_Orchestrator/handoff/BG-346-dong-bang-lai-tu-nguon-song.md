@@ -312,3 +312,23 @@ Quyết orchestrator *(theo quyết chủ "nguồn sống là chuẩn")*: **⛔ 
 - **G4** mẫu số HD1 trên bộ ba sống = 23 kỳ của ảnh tháng 8 *(C1 = ⓐ "⛔ đổi mẫu số")*; dòng 2026-09…11 đo nhưng ⛔ phán.
 - **G5** ghép sổ ↔ canon = luật `ghep_bang` của ảnh tháng 8 *(5 trường + seq trùng theo hàng sheet)*, chạy lại bằng mã thay cho ảnh kết quả ⛔ có mã sinh.
 - **G6** khuôn ANH EM `_song` thay vì sửa khuôn DT13 tại chỗ — khuôn cũ còn là cổng của ảnh 22/11 biên bản.
+
+### Cổng *(WO-353 — dán thật, `PG_DSN=…localhost:5435`, cây `e767536`)*
+| Lệnh | Kết quả *(nguyên văn)* |
+|---|---|
+| `bash tools/dung_moi_truong_isp.sh --duong-nen --cong 5435` *(MỘT lần, một mình)* | `12 failed, 4966 passed, 2 xfailed, 14 errors in 1260.68s` · `[ĐẠT] đường nền toàn bộ tập đỏ + XFAIL = đường nền: 28 = 28 node id (trong đó XFAIL 2 = 2 · thêm 0 · bớt 0) · chạy 4994 bài (mong ≥ 4994)` · web `3 failed, 687 passed` · `[ĐẠT] … 3 = 3 … chạy 690 bài (mong ≥ 690)` · `[ĐẠT] HD1 do_voi_so_luong chay 9845 / co 9967` · **`══ KẾT: ĐẠT — mọi phép kiểm khớp mong`** |
+| sàn pytest | 4963 → **4994** = thu thập thật; đối chiếu node id với `2f4e7fd`: **thêm 31 · bớt 0** *(25 `test_bo_ba_hd1_song.py` + 5 giao kèo khuôn tham số hoá + 1 rào)* |
+| `python tools/doc_bo_ba_hd1.py --chi-dong-bang --ghi` | 7/7 khuôn `exit 0 · [ĐẠT] cổng --mong …` *(12722 · 12601 · 3909 · 2056 · 846 · 191 · 62)* |
+| `python tools/do_voi_so_luong.py` *(cổng, bộ ba cũ)* · `--bo-ba song` | exit 0 · 5/23 *(`voi_so_luong.json` 0 byte đổi)* · exit 0 · **16/23** |
+| `python tools/do_hd2.py --goi WP-C5c … --ghi` | `KẾT: ĐẠT · so mong: DAT` |
+| `python tools/chay_agent_voi.py` *(phát lại)* | `KẾT: ĐẠT — ô ĐỘC LẬP … 557/557 khớp · ô VÒNG TRÒN … 74/74 khớp · lệch 0 · … A4 ĐẠT 4/4 agent` |
+| `python docs/ITL/_tools/kiem_tai_lieu.py` | `✅ cong tai lieu DAT — va no da do duoc that (512 file, 3050 bang, 984 o ngay, 104 ma QD)` |
+| `lint-imports` | `Contracts: 11 kept, 0 broken.` |
+| `python tools/quet_pii_repo.py` | `[ĐẠT] 0 chỗ số TK cá nhân · 0 tệp` |
+| `python tools/soi_bang_tuyen.py` | `✅ ban khai KHOP SQL that o ca 49 tuyen` |
+| `python tools/kiem_thuyet_minh.py` | `✅ CONG THUYET MINH DAT — 35/35 nut co mat trong CA 2 ban` |
+| `python -m fls.db.pg_migrate` | `khong co gi de ap` · `pg_verify: khop` |
+| `python docs/ITL/_tools/khop_owner.py --kiem` | exit 1 `C6 ⛔ DOI TRANG THAI …` — **có sẵn ở nền**: chạy ở `2f4e7fd` exit 1, đầu ra trùng *(khác duy nhất dòng ngữ cảnh `SyntaxWarning`)* |
+| `python tools/kiem_so_song.py` | `FileNotFoundError … .venv/Scripts/lint-imports.exe` — ⛔ chạy được trên Linux *(có sẵn — BG-326 #7)* |
+
+**Dev tự thấy còn yếu *(WO-353)*:** ảnh sổ 17,2 MB + L1 11,1 MB *(lớn nhất repo trước đó 8,5 MB — `indent=1` của công cụ, ⛔ đổi)*; danh tính "121 dòng thiếu = 121 hàng L1 loại" đo trên bản thô *(đã xoá)* — bài chỉ ghim SỐ 121 = `MONG_BA_DUONG.loai`; khuôn `ccr_daily_report_2_song` tạm thay `MONG_CHECK` của module khuôn cũ trong lời gọi *(⛔ an toàn đa luồng)*; HD1 sống chưa vào cổng mặc định *(C6)*.
