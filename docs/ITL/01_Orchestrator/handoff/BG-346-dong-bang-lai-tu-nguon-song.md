@@ -165,3 +165,53 @@ Cách đo người đọc: **audit-hook `open`** khi chạy 11 gói *(`tools/do_
 - 52 ảnh HD2 do 4 nhánh con dựng bản thô theo BG từng bước DT — script ở scratchpad *(⛔ trong repo)* ⇒ R1 ⛔ chạy lại đúng từng byte được; bằng chứng ≡ là checksum *(độc lập cách dựng)*.
 - Bộ ba bank 18 ≠ 37 *(BG-335)*: tôi so `ref` chuẩn hoá, BG-335 so `ref` thô — hai phép, chưa đối chiếu tập.
 - `tools/do_tren_anh_song.py` ký 37 tháng FX trong kho nháp bằng gọi repo thẳng *(⛔ qua tuyến C7 như I2)* — chỉ để đo.
+
+---
+
+## Vòng sửa sau R1 (`KQ-347`) *(fls-dev làn DATA · 23/11 · cụm PG 5435 · chỉ THÊM)*
+
+Quyết orchestrator *(theo quyết chủ "nguồn sống là chuẩn")*: **⛔ chấp nhận tập đỏ nền 34** — 6 node thêm về 0 bằng sửa gốc.
+
+| Mã | Sửa | ĐỎ trước *(đúng đột biến reviewer)* | Sau |
+|---|---|---|---|
+| `SONG-R1-01` CHẶN | `tests/du_lieu/test_dau_vao_dt13.py`: bỏ ghim sha256 ảnh `ccr_daily_report_2_20261123.DO.json` *(`.gitignore:26` cấm commit `*.DO.json` — DT2 Q6 = ⓐ)*; tập "⛔ ảnh lạ" lọc `*.DO.json`; **bài mới** `test_AC2_anh_DO_bi_gitignore_nen_bai_khong_duoc_doi_no` ghim luật ignore khớp **đúng 1** dòng + ⛔ khoá `.DO.json` trong `SHA_WO345`. Ảnh `.DO` = biên bản §1 *(số đếm)*, ⛔ vào repo | container sạch *(⛔ tệp `.DO` ở máy)*: **1 failed, 39 passed** `FileNotFoundError` | **41 passed**; đột biến: thêm `la.json` ⇒ 1 failed · gỡ dòng `.gitignore` ⇒ 1 failed · đặt `.DO.json` ở máy ⇒ 41 passed *(bài ⛔ phụ thuộc máy)* |
+| `SONG-R1-02` CHẶN | gộp `origin/claude/bold-galileo-zukpaf` @ `f8c6d55` *(có AG)* vào SONG *(xung đột: changelog giữ cả hai · sàn ⇒ bản nhánh làm việc rồi đặt = thu thập)*; **sinh lại bằng công cụ** *(⛔ sửa tay số)*: `tools/chay_agent_voi.py --gia --ghi-phat-lai` ⇒ `phat_lai/A3_SI_ITL.json` · `--ghi-report` ⇒ `report.html` · `tools/sinh_the_agent.py --zip` ⇒ `goi/A3_SI_ITL.zip` · `goi/A4_AUDITOR.zip` *(A1/A2 zip chỉ khác dấu giờ trong zip, nội dung giải nén 0 khác ⇒ giữ; 4 thẻ `A*.md` 0 khác — prompt ⛔ đổi)*; `report.png` chụp lại từ `report.html` mới *(Playwright 1240×1000 — ảnh cũ còn ở bản 627/627)* | `chay_agent_voi.py` phát lại: **`KẾT: ĐỎ`** `KhongCoBanGhi … 19d358a5b379ca84` · 475/557 · 28/74 · chưa chạy 128 · A4 2/4; `tests/agent/test_chuoi.py` **5 failed, 8 passed** | `KẾT: ĐẠT` — ô ĐỘC LẬP **557/557** · ô VÒNG TRÒN **74/74** · lệch 0 · chưa chạy 0 · A4 **4/4**; `tests/agent` **71 passed** |
+| `SONG-R1-03` NÊN SỬA | ⚠ Đ1: `hd2_cong.json` **ĐÃ có 11 khối** — `do_hd2._ghi_cong` giữ `WP-C2` ở GỐC *(trường `goi` gốc = `WP-C2` — chỗ R1 đọc)*, 10 gói kia ở khoá `<gói>`. Vẫn **sinh lại cả 11** bằng `do_hd2.py --goi <g> --dsn <kho TEST fls_song_r1_03> --ghi` trên kho ĐÃ nạp nền *(`_nap_config` của `do_tren_anh_song` = I2; 37 tháng FX ký actor TEST; bẫy `H14-R2-04`: gói exit ≠ 0 ⇒ DỪNG + trả tệp)* ⇒ **11/11 `KẾT: ĐẠT`**, số lệch **0**; diff duy nhất 2 chuỗi `truc.nguon_ngay_dau` *(actor nạp IX.PER của kho TEST)* ⇒ **giữ tệp cũ** *(⛔ đổi nguồn gốc ghi bằng actor TEST)*. **Bài mới** `test_SONG_R1_03_hd2_cong_du_11_khoi_dat_va_so_ghim` *(`tests/test_do_tren_anh_song.py`)* ghim 11 khối · `dat` · `tong_o`/`khop` từng gói | — *(bài mới)* | đột biến: xoá khối `WP-C4b` ⇒ 1 failed · `WP-C5c.khop` 77.672 → 77.593 ⇒ 1 failed |
+| `SONG-R1-04` GHI NHẬN | — *(SHA/cổng đã điền ở `85138dd`)* | | |
+| `SONG-R1-05` GHI NHẬN | backlog — 52 ảnh HD2: script dựng bản thô ở scratchpad 4 nhánh con, ⛔ chạy lại từng byte ở vòng này *(bằng chứng ≡ vẫn là checksum)*; đột biến ≥ 6 *(phiếu R1 ⛔ đòi)* — giao R2 nếu cần | | |
+| `SONG-R1-06` GHI NHẬN | → câu chủ **C3** dưới | | |
+
+**Số đổi ở bản ghi agent *(`phat_lai/A3_SI_ITL.json` — 3/395 ô của A3, đo bằng so hai bản JSON)*:**
+| Ô *(nhãn — Đ4)* | CŨ *(ảnh 20/11)* | MỚI *(ảnh sống 23/11)* |
+|---|---|---|
+| `voi:tu_sinh.mid` *(2026-03 · MID tự tính = MID sổ / ô)* | 4.020/4.088 | **4.022/4.088** |
+| `voi:tu_sinh.theo_ky.2026-11.hd` *(dòng HD)* | 659/659 | **748/748** |
+| `voi:tu_sinh.theo_ky.2026-11.o` *(ô Final)* | 4.613/4.613 | **5.236/5.236** |
+| độ phủ `voi` *(lá tệp đo · lá số — ⛔ vào mẫu số)* | 1.045 · 660 | **1.043 · 658** *(2 lá `lech_mid.id_payee` biến mất: 2026-03 lệch 2 → 0; `la_vao` 557 · `so_vao` 318 ⛔ đổi)* — `mong` bài `test_AG_R1_05_…` đổi cùng commit, số cũ ở chú thích |
+| `van_tay_yeu_cau` lượt `03_tu_sinh` | `9a6f87ea98497fd7` | `19d358a5b379ca84` |
+
+**Sàn pytest** *(Q8 — thu thập thật cây SONG sau gộp)*: 4958 *(AG)* + 3 *(`WO-345`)* + 1 *(R1-01)* + 1 *(R1-03)* = **4963**; web **690** ⛔ đổi.
+
+### Số cần chủ / ThuongCT ký lại *(cập nhật sau vòng sửa — ⛔ tự coi đã ký)*
+| # | Số đã ký *(O6, ảnh 20/11)* | Số MỚI *(ảnh sống 23/11)* | Đổi ở vòng sửa |
+|---|---|---|---|
+| 1 | HD1 tự sinh 26 kỳ — ô Final 88.339/88.431 | **88.962/89.054** | — |
+| 2 | HD1 tự sinh — HD 12.633/12.633 · MID 82.362/88.431 | **12.722/12.722 · 82.987/89.054** | — |
+| 3 | 2026-03 MID 4.020/4.088 | **4.022/4.088** | — |
+| 4 | 2026-11: 659 dòng · ô 4.613 | **748 dòng · ô 5.236** | — |
+| 5 | HD1 5/23 kỳ đạt · 9.845/9.967 dòng ghép | **chưa đo lại được** *(câu C1)* | — |
+| 6 | HD2 11 gói *(ảnh cổng đọc)* | **⛔ đổi** — sinh lại 11/11 ĐẠT, lệch số 0 | ⭐ nay có bài ghim 11 khối |
+| 7 | WP-C5c đọc số dư MỚI | `khop` 77.672 → **77.593** · lệch FLS **79** | câu C3 |
+| 8 | Report agent `WO-329` *(ô A3 + độ phủ)* | 3 ô A3 = #3 · #4; độ phủ `voi` 1.043/658 · KẾT vẫn **ĐẠT 557/557 · 74/74** | ⭐ sinh lại vòng này |
+
+### Câu chủ *(2 phương án + khuyến nghị)*
+- **C1 — bộ ba ảnh HD1 tháng 8 *(`itl_ledge_adjustment` · `classifying_vs_canon` · `pm_join`)* ⛔ có khuôn.**
+  - ⓐ WO mới viết khuôn `pm_join` + `l1_canon` trên `fls.adapters.pm_join`/`bank` + `nap_that.doc_pm`/`doc_nguon` *(hàm có sẵn)* ⇒ đóng băng lại bộ ba từ nguồn sống, đo lại "5/23 kỳ · 9.845/9.967". Cái giá: ~1 WO DATA + R1/R2; số ghép 1-1 sẽ đổi *(nguồn sống: L1 14.265 dòng · PM 3.909 · `cdt1` lệch 534)* ⇒ ký lại toàn bộ HD1 ghép.
+  - ⓑ Bỏ bộ ba làm mẫu số HD1; lấy sổ HD1 từ **ITL Ledge sống** *(DT12, đã đóng băng 26 kỳ 23/11)* — mẫu số 23 → 26 kỳ. Cái giá: đổi định nghĩa "kỳ đạt HD1" *(quyết BA/chủ)*; bộ ba giữ làm biên bản tháng 8.
+  - **Khuyến nghị ⓐ trước, ⓑ sau**: ⓐ giữ nguyên định nghĩa đã ký, chỉ thay dữ liệu — đúng tinh thần "nguồn sống là chuẩn" mà ⛔ đổi luật đo cùng lúc.
+- **C3 — `WP-C5c` × ảnh số dư 23/11: 79 lệch FLS** *(toàn bộ phần `cb` Cash Balance by LE của đáp án 615, ngày 19–30/11, 6 LE — lớp **lệch thời điểm ảnh**: số dư 23/11 ↔ đáp án 615 chụp 22/11)*.
+  - ⓐ Giữ cổng trên ảnh số dư 22/11 *(cùng thời điểm đáp án — G3, hiện trạng)*; mở WO khuôn DT13 khai lại `N_HANG` *(2.502 → 2.566)* + `MONG_CHECK` theo nguồn sống ⇒ đóng băng lại 615 + DR2 + số dư **CÙNG một lượt** ⇒ đo lại WP-C5c *(mong lệch FLS 0)*. Cái giá: 1 WO DATA nhỏ.
+  - ⓑ Chuyển cổng sang ảnh số dư 23/11 ngay và khai 79 ô thành lớp lệch có tên `lech_thoi_diem_anh`. Cái giá: cổng mang một lớp lệch **⛔ có trong engine** — gần với "nới `mong`", và che lỗi thật nếu sau này lệch cùng ngày.
+  - **Khuyến nghị ⓐ** — ⛔ nới; 79 ô là hệ quả hai ảnh khác thời điểm, chụp cùng lượt thì tự hết hoặc lộ lỗi thật.
+
+### Cổng sau vòng sửa *(dán thật — `PG_DSN=…localhost:5435`)*
