@@ -54,3 +54,9 @@ Không thêm bài ở R1 *(hợp đồng R1 = tái đo + đột biến + sổ; D
 
 ## Việc kế
 `TRƯỢT` ⇒ vòng sửa `fls-dev` *(`NAP-R1-01` CHẶN + 5 NÊN SỬA)* ⇒ R2 cuối trên cây gộp thử **sau khi** gộp sửa STG *(`KQ-328`)* — sàn pytest đặt lại theo số thu thập cây gộp cuối. **Câu cho chủ:** số live đã tái lập; "kỳ đã chốt" ≠ số cũ ở 9 kỳ + 37 bộ ba bank — chủ quyết nguồn nào là chuẩn *(đã có ở BG #3, nay có thêm số theo kỳ)*.
+
+## Phụ lục — đo lại sau khi chủ chia Viewer *(`2026-11-23T08:41Z`, SA của container, kho scratch `fls_stg_r1_336b`, cụm `5447` bật lại vì container khởi động lại)*
+- **Workbook BANK: 403 → `200`** ✅ · **QUỸ: vẫn `403`** *(`HTTP … 403 (mong 200)`, ĐỎ có tên)* · RAW `200`.
+- Vì ① *(68 dòng chảy = Bank + Quỹ)* cần cả hai nên **vẫn DỪNG có tên**, và ④ *(chụp 60 sheet)* phụ thuộc bản khai ① nên **vẫn DỪNG** ⇒ số `68 · 408 · 60 nguồn · 8.368 dòng` **⛔ đo được** ở lượt này. Cần chủ chia Viewer nốt `Copy of P100 | Cash Ledger` *(hoặc độ trễ lan truyền — đo lại sau)*. Ghi nhận thêm: SA của container có thể khác SA `fls-sheets-reader` mà chủ đã chia — phải chia cho **cả hai**.
+- Số còn lại **y hệt** hai lượt 07:22Z/07:26Z: L1 14.265 · PM 3.909 · `T·CDT1` 3.056 < 3.300 · 37 bộ ba · PM lệch `hd` 117 · `cdt1` 534 · Mapping 73/73. `KẾT: ĐỎ — 14` mục *(trước 15: hết ĐỎ Bank)*.
+- Phán quyết `TRƯỢT` **không đổi**.
