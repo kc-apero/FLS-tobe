@@ -199,7 +199,10 @@ def test_AG_R1_05_do_phu_khai_phan_KHONG_vao_mau_so(phat_lai):
     html_, tom = cav.sinh_report(kc, may, dap, be, cav.ncc_cho("phat_lai"), ngay="2026-11-23")
     assert "Độ phủ — phần tệp đo ⛔ vào mẫu số" in html_
     # số đo KQ-331 (voi) · hd2 đổi theo gói WP-C5c của cây gộp
-    assert tom["do_phu"]["voi"] == {"la": 1045, "la_vao": 557, "so": 660, "so_vao": 318}
+    # ⭐ SONG-R1-02 (WO-345, nguồn sống 23/11): la 1045 → 1043 · so 660 → 658 — ĐÚNG 2 lá biến mất khỏi
+    # `voi_so_luong.json`: `tu_sinh.lech_mid.id_payee` + `tu_sinh.theo_ky.2026-03.lech_mid.id_payee` *(2026-03 lệch
+    # `id_payee` 2 → 0 trên ảnh sống)*; `la_vao`/`so_vao` ⛔ đổi *(lá ấy ⛔ vào mẫu số)*. Đo: so tập lá hai tệp.
+    assert tom["do_phu"]["voi"] == {"la": 1043, "la_vao": 557, "so": 658, "so_vao": 318}
     assert tom["do_phu"]["hd2"]["la_vao"] == 30 and tom["do_phu"]["hd2"]["la"] > 900
 
 
