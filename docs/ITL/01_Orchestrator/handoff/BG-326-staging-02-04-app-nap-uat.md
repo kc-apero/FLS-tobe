@@ -253,10 +253,10 @@ bash tools/staging/01_dung_staging_gcp.sh --project fp-a-project --kiem
 ### 11.2 · Cổng — chạy ở cụm 5434 trên cây ĐÃ gộp
 | Lệnh | Mong | Đo |
 |---|---|---|
-| `pytest tests/staging` | 124 + 16 mới | ⏳ |
+| `pytest tests/staging` | 124 *(108 + 16 mới)* | **123 passed · 1 failed** ở `5e70562` *(bài tĩnh chỉ miễn `COPY --from=proxy` ⇒ sửa miễn mọi `--from=<tầng>` có tên)* ⇒ trong `--duong-nen` dưới: **0** bài `tests/staging` trong tập đỏ |
 | `pytest --collect-only` *(cây gộp)* | = sàn | **5082** *(= 4995 STG + 71 AG + 16 mới: `test_02_chuyen_vai_gcp` 8 · `test_01` 1 · `test_03` 7)* · web **690** |
-| `dung_moi_truong_isp.sh --duong-nen --cong 5434` *(MỘT lần, một mình)* | `KẾT: ĐẠT` 28 = 28 · web 3 = 3 | ⏳ |
-| `kiem_tai_lieu.py` · `lint-imports` · `quet_pii_repo.py` | K1–K6 · 11 kept · 0 | ⏳ |
+| `dung_moi_truong_isp.sh --duong-nen --cong 5434` *(MỘT lần, một mình)* | `KẾT: ĐẠT` 28 = 28 · web 3 = 3 | **`KẾT: ĐẠT`** @ `8b498ea` *(26 phút 34 giây)* — toàn bộ `12 failed · 5054 passed · 2 xfailed · 14 errors` = **5082 chạy** *(skipped 0 · deselected 0)* ⇒ tập đỏ+XFAIL **28 = 28** *(thêm 0 · bớt 0)* · web `3 failed · 687 passed` = **690**, tập đỏ **3 = 3** |
+| `kiem_tai_lieu.py` · `lint-imports` · `quet_pii_repo.py` | K1–K6 · 11 kept · 0 | **ĐẠT** *(514 tệp · 3.058 bảng · 988 ô ngày)* · **11 kept, 0 broken** · **0 chỗ · 0 tệp** |
 | `thu_dung_anh.sh` *(dockerd cục bộ)* | `KẾT: ĐẠT` | **ĐỎ 3 mục** @ `7cff610` → **ĐẠT 4/4** @ `5e70562` |
 
 ### 11.3 · Dev tự thấy còn yếu
