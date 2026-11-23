@@ -5,7 +5,7 @@
 | **Thuộc** | `WO-345` |
 | **Phát bởi** | `fls-dev` làn DATA · 2026-11-23 *(phiên cloud con; 4 nhánh con song song cho 52 khuôn HD2)* |
 | **Nhận** | `fls-test` *(R1 `KQ-347` · R2 cuối `KQ-348`)* |
-| **Commit** | `claude/bold-galileo-zukpaf-isp/SONG` @ `__SHA__` *(đã đẩy)* — ⛔ gộp *(chủ: chờ PR #1; PR #1 đã merge `c5ea872`, orchestrator gộp sau R2)* |
+| **Commit** | `claude/bold-galileo-zukpaf-isp/SONG` @ `26edcf1` *(mã + ảnh + bài; BG này ở commit kế)* *(đã đẩy)* — ⛔ gộp *(chủ: chờ PR #1; PR #1 đã merge `c5ea872`, orchestrator gộp sau R2)* |
 | **Ghi kho thật** | `KHONG` *(kho nháp `fls_wo345_cu` · `fls_wo345_moi` trên cụm PG 5435, dựng lại từ 0)* |
 
 ## Kết luận một dòng
@@ -135,7 +135,21 @@ Cách đo người đọc: **audit-hook `open`** khi chạy 11 gói *(`tools/do_
 - **C5 — Quỹ:** COPY `1RmmkO…` 403; GỐC `1QSYSz…` 200 ⇒ đổi danh mục nguồn Quỹ sang GỐC *(⛔ sửa `tools/do_hinh_dang.py` ở WO này)*.
 
 ## 5 · Cổng `CLAUDE.md` *(dán thật — `PG_DSN=…localhost:5435`)*
-__CONG__
+| Lệnh | Kết quả *(nguyên văn)* |
+|---|---|
+| `bash tools/dung_moi_truong_isp.sh --duong-nen --cong 5435` *(lần 2, một mình)* | `12 failed, 4862 passed, 2 xfailed, 14 errors in 1389.46s` · `[ĐẠT] đường nền toàn bộ tập đỏ + XFAIL = đường nền: 28 = 28 node id (trong đó XFAIL 2 = 2 · thêm 0 · bớt 0) · chạy 4890 bài (mong ≥ 4890)` · web `3 failed, 687 passed` · `[ĐẠT] … 3 = 3 … chạy 690 bài` · **`══ KẾT: ĐẠT — mọi phép kiểm khớp mong`** |
+| ↳ lần 1 *(trước sửa bài DT13)* | `13 failed, 4861 passed …` · `[ĐỎ] … đo: 29 · thêm 1` — `+ THÊM tests/du_lieu/test_dau_vao_dt13.py::test_AC2_anh_cu_va_cong_cu_chung_dung_tung_byte` *(bài canh "⛔ ảnh lạ" trong `dau_vao/` thấy 3 ảnh `_20261123`)* ⇒ khai đích danh 3 tệp + sha256, chứng ĐỎ: thêm `la.json` ⇒ `1 failed` |
+| `python -m pytest` *(trong `--duong-nen`)* | như trên — tập đỏ nền **28**, ⛔ thêm |
+| `python tools/kiem_so_song.py` | `FileNotFoundError: … '.venv/Scripts/lint-imports.exe'` exit 1 — ⛔ CHƯA CHẠY được trên Linux *(đường Windows; có sẵn — BG-326 #7 · BG-335 #6)* |
+| `python docs/ITL/_tools/kiem_tai_lieu.py` | `✅ cong tai lieu DAT — va no da do duoc that (499 file, 3001 bang, 982 o ngay, 104 ma QD)` |
+| `python docs/ITL/_tools/khop_owner.py --kiem` | exit 1 — `A1`/`B1`/`C6 ⛔ DOI TRANG THAI` + `khoi trong lo trinh LECH` — **có sẵn ở nền**: chạy ở `c173338` *(đầu phiếu)* cùng `PG_DSN` ⇒ exit 1, đầu ra **trùng** *(khác duy nhất: `SyntaxWarning` biên dịch lần đầu của worktree)* |
+| `python tools/soi_bang_tuyen.py` | `✅ ban khai KHOP SQL that o ca 49 tuyen` |
+| `python tools/kiem_thuyet_minh.py` | `✅ CONG THUYET MINH DAT — 35/35 nut co mat trong CA 2 ban` |
+| `python tools/quet_pii_repo.py` | `[ĐẠT] 0 chỗ số TK cá nhân · 0 tệp` |
+| `lint-imports` | `Contracts: 11 kept, 0 broken.` |
+| `python -m fls.db.pg_migrate` *(⛔ chạm schema)* | `khong co gi de ap` · `pg_verify: khop` |
+| `python tools/do_voi_so_luong.py` | exit 0 *(HD1 kỳ đạt 5/23; tự sinh 26 kỳ khớp MONG mới)* |
+| `python tools/do_tren_anh_song.py --anh cu` · `--anh moi` | exit 0 · CŨ = `hd2_cong.json` 0 khoá lệch 11/11; MỚI: 2 tệp chuyển hướng, WP-C5c `dat=False` lệch FLS 79 *(§2)* |
 
 ## Giả định *(phương án hẹp nhất — R1 soi)*
 - **G1** ảnh đóng băng lại ra checksum ≡ ⇒ ⛔ ghi tệp `_20261123` *(⛔ nhân đôi repo — 22+1 kỳ DT12 · 61 ảnh HD2)*; manifest DT12 mới ghi checksum mọi kỳ.
