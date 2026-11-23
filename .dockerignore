@@ -1,0 +1,15 @@
+# ⛔ DANH SÁCH CHO PHÉP: bỏ hết, rồi mở đúng những thứ ảnh cần (xem Dockerfile).
+*
+!requirements.txt
+!fls
+!tools
+!docs/ITL/_tools
+!tests/fixture
+# ... và trong những thứ được mở vẫn loại rác sinh máy / dữ liệu thật nếu lỡ nằm lẫn:
+**/__pycache__
+**/*.pyc
+**/*.DO.json
+**/sao_luu
+**/hien_vat
+**/Input_Raw
+**/.env*
