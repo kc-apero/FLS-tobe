@@ -36,8 +36,8 @@ MK = {   # mật khẩu GIẢ của "Secret Manager" — chuỗi dễ nhận đ�
 
 
 def cong_pg() -> int:
-    dsn = os.environ.get("PG_DSN_TEST") or os.environ.get("PG_DSN") or ""
-    return urllib.parse.urlparse(dsn).port or 5432
+    from fls.db.kho import dsn_that          # ⛔ đọc `PG_DSN` trực tiếp trong tệp test (luật `test_khong_ai_tro_lai_kho_that`)
+    return urllib.parse.urlparse(dsn_that()).port or 5432
 
 
 def chay_quan_tri(sql: str, kho: str = "postgres") -> str:
