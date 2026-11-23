@@ -109,3 +109,26 @@
 | Lưu dữ liệu cho fleet eval | **Chấp nhận** gửi theo lô (Batches API — Anthropic giữ 29 ngày) để giảm 50 % giá | như trên |
 | C5 bể giữ riêng | **Dựng** — việc kế (đọc live qua SA, ngoài repo; đáp án hai tầng: PM line · HD+CDT1 cho L3) | chưa làm trong BG này |
 Còn mở: mã Gemini chính xác (A4 chưa ghim) · ZDR phía Google.
+
+## Vòng sửa sau R1 (KQ-331) *(`isp/AG` `d07afda` → `231b870` + `29dc736` · cụm 5435)*
+⭐ Quyết chủ C4 **thay bằng "agent đọc toàn bộ"** (05:20 · chủ XÁC NHẬN lại ~06:00 qua orchestrator): mặc định bộ che giữ `mo`; `AG-R1-03` chỉ sửa chế độ TUỲ CHỌN `che_noi_dung`/`che_het`, ⛔ đổi mặc định.
+
+| Mã | Mức | Sửa | Đỏ trước *(đột biến của reviewer / phá mã ⇒ bài cắn)* · sau sửa |
+|---|---|---|---|
+| `AG-R1-01` | CHẶN | `report.html` có khối **§0 "Báo cáo này chứng minh gì / ⛔ chứng minh gì"**; cột §1 *"câu trả lời do ai sinh"* đọc từ NHÀ CUNG CẤP (`phien_ban_cua`) ⇒ **"bản phát lại sinh bằng mô hình GIẢ (`gia-lap`) — 0 lượt API thật"** · ghim ⇒ *"ghim · CHƯA gọi thật"* (⛔ `✅`); KẾT tách hai nhóm, hai mẫu số (`doi_chieu.nhom_o`): **ĐỘC LẬP `voi` 557/557** · **VÒNG TRÒN `hd2`·`cong`·`nguon` 74/74** | cây gộp chưa sửa: report ghi `claude-opus-5-5 ✅`, 0 chữ "GIẢ". Bài `test_AG_R1_01_sua_hd2__…`: sửa `hd2_cong.json` ⇒ chuỗi vẫn ĐẠT (vòng tròn) nhưng ô ấy ở nhóm `vòng tròn`, độc lập giữ **557/557**; đối chứng sửa `voi` ⇒ LECH 1 ở nhóm độc lập. Phá `NGUON_DOC_LAP += hd2` ⇒ **3 bài ĐỎ** · phá `NGUON_THAT += gia-lap` ⇒ **2 bài ĐỎ** |
+| `AG-R1-02` | CHẶN | gộp `origin/claude/bold-galileo-zukpaf` `4f88282` (H14 `WP-C5c`); xung đột 2 tệp, chỉ sàn ⇒ đặt = thu thập thật; `--gia --ghi-phat-lai` · `--ghi-report` · `sinh_the_agent.py --zip` | trước: `tests/agent` **2 failed** · chuỗi `560/631 · chưa chạy 71 · KhongCoBanGhi A3.04`. Sau: **631/631**, `tests/agent` **71 passed** |
+| `AG-R1-06` | NÊN SỬA | A4.02/03 `loai: ma` — MÃ chạy công cụ cổng, đầu ra vẫn qua cổng ① + cửa ② (`chuoi.chay_skill_ma`); `ncc_cho` chỉ dựng nhà cung cấp cho agent có skill `lam`/`bong` (`can_mo_hinh`) ⇒ `--that` ⛔ dựng Gemini; bỏ `phat_lai/A4_AUDITOR.json`; thẻ A4: *"MÃ THUẦN tới G1"* | phá `02_cong_hd1.md` về `loai: lam` ⇒ **3 failed + 7 errors** |
+| `AG-R1-05` | NÊN SỬA | khối **§6 Độ phủ** theo khối cấp 1: `voi` **557/1.045** lá *(số: 318/660)* · `hd2` **30/1.312** lá *(số: 30/915)* — khai, ⛔ mở rộng mẫu ô | bài ghim đúng số đo KQ-331 cho `voi` |
+| `AG-R1-03` | NÊN SỬA | `che_noi_dung` bắt cụm số nối `.`/`-`/cách (≥ 6 chữ số sau khi bỏ dấu, ⛔ ngày/kỳ) + tên Hoa-thường; lớp 2 `kiem_den` bắt cụm ≥ 9 chữ số SAU KHI BỎ DẤU | 7 ca khó BỊA (5 ca KQ-331 + thẻ cách + tên giữa câu): trước lọt, nay **7/7** che · lớp 2 **5/5** `CamGui`; bài `…co_RANG…` phá luật cụm ⇒ lọt; phá `MAU_TEN` về chỉ-HOA ⇒ **2 ĐỎ**; ⛔ che nhầm kỳ/ngày/mã PM/từ thường. Chuỗi chạy ĐẠT ở cả 3 chế độ; fleet eval 4 vòng **y nguyên** |
+| `AG-R1-11` | NÊN SỬA | ZDR vào MÃ: chế độ `mo` ⇒ chốt thật thứ năm `FLS_ZDR_DA_BAT=1` (người vận hành xác nhận tổ chức đã bật ZDR — ⛔ công tắc ZDR); `che_noi_dung`/`che_het` ⛔ đòi | phá `CHE_DO_CAN_ZDR = ()` ⇒ **1 ĐỎ**. ⚠ bài `test_du_chot__khong_nem`: `DU` thêm `FLS_ZDR_DA_BAT` vì "đủ chốt" nay gồm chốt mới — lo gốc giữ nguyên |
+
+**GHI NHẬN ⇒ backlog** *(⛔ sửa vòng này)*: `AG-R1-04` — đã thay bằng `--che`, quyết chủ xác nhận mặc định `mo` ⇒ ⛔ còn là lỗi mã · `AG-R1-07` (ghim bằng danh sách ĐEN) — mã mô hình là hằng trong mã, ⛔ từ người dùng; nên chuyển khuôn TRẮNG khi thêm mô hình thứ hai · `AG-R1-08` (import động) — cần quét `importlib` trong bài tầng, gói ⛔ có ca nào hôm nay · `AG-R1-09` (`anthropic` ⛔ trong `requirements.txt`) — thêm khi chủ mở vòng thật, đã chặn trước khi tạo client · `AG-R1-10` (luật "2 vòng liên tiếp" C3) — thuộc G1, hôm nay chỉ G0 · Sổ `QĐ-ITL` + `CLAUDE.md §Riêng tư` ghi quyết "đọc toàn bộ" là việc **BA/chủ** (Dev ⛔ sửa `02_BA`/CLAUDE.md).
+
+**Cổng *(nguyên văn)*:**
+- `bash tools/dung_moi_truong_isp.sh --duong-nen --cong 5435` *(MỘT lần, một mình, ở `231b870`)* ⇒ **`KẾT: ĐẠT`** — toàn bộ `12 failed, 4900 passed, 2 xfailed, 14 errors` ⇒ tập đỏ + XFAIL **28 = 28** (thêm 0 · bớt 0) · chạy **4928** (mong ≥ 4928) · `tests/web` `3 failed, 687 passed` ⇒ **3 = 3** · chạy 690 · lint **11 kept** · di trú 27/27
+- `kiem_tai_lieu.py` ⇒ ĐẠT *(500 file · 3.002 bảng)* · `lint-imports` ⇒ `11 kept, 0 broken` · `quet_pii_repo.py` ⇒ `[ĐẠT] 0 chỗ số TK cá nhân · 0 tệp`
+- `chay_agent_voi.py` ⇒ `KẾT: ĐẠT — ô ĐỘC LẬP (voi: engine chạy lại ↔ tệp đo) 557/557 khớp · ô VÒNG TRÒN (hd2·cong·nguon: chỉ bắt lỗi chép) 74/74 khớp · lệch 0 · ⛔ đo được 0 · thiếu 0 · thừa 0 · chưa chạy 0 · A4 ĐẠT 4/4 agent · câu trả lời do mô hình GIẢ (0 lượt API thật)`
+- Sàn `MONG_PYTEST_TOAN_BO` 4857 → **4928** = thu thập thật cây gộp (`WO-329` +52 ⇒ 4909 · vòng này +19) — cùng commit với bài ghim.
+- ⛔ CHƯA CHẠY vòng này (giống KQ-331): `kiem_so_song.py` · `khop_owner.py --kiem`.
+
+**Dev tự thấy còn yếu:** (1) ô ĐỘC LẬP vẫn là *engine ↔ tệp đo*, ⛔ *mô hình ↔ sự thật* — report nói rõ, nhưng chất lượng mô hình chỉ đo được ở vòng thật · (2) bản phát lại vẫn là ảnh chụp một ngày dữ liệu: đổi `hd2_cong.json` thượng nguồn (vd. I2) ⇒ lại phải `--ghi-phat-lai` · (3) nhận diện tên vẫn là danh sách ĐEN họ Việt — tên không có họ trong danh sách vẫn lọt ở `che_noi_dung` · (4) chốt ZDR là lời xác nhận của người vận hành, ⛔ máy kiểm được tổ chức đã bật ZDR.
