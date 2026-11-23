@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Phán quyết** | **`TRƯỢT`** — **2 CHẶN · 0 NÊN SỬA · 2 GHI NHẬN** *(`STG-R2b-01…04`, sổ `docs/ITL/04_Test/review/SO_PHAT_HIEN_ISP-3.1_STG.md` v0.3)* |
+| **Phán quyết** | **`TRƯỢT`** — **3 CHẶN · 0 NÊN SỬA · 2 GHI NHẬN** *(`STG-R2b-01…05`, sổ `docs/ITL/04_Test/review/SO_PHAT_HIEN_ISP-3.1_STG.md` v0.3)* |
 | **Kiểm bởi** | `fls-test` *(phiên cloud · cụm PG **5446**)* · 2026-11-23 |
 | **Kiểm ở** | `isp/STG` @ `c4a0f39` · cây gộp thử = `origin/main` @ `c5ea872` ⊕ `c4a0f39` *(gộp sạch; commit CỤC BỘ để `git archive HEAD` chạy, ⛔ đẩy)* |
 | **Kho thật** | `KHONG_CHAM` — ⛔ GCP · ⛔ `gcloud` thật · ⛔ kho thật |
@@ -10,6 +10,7 @@
 ## ⛔ CHẶN — lỗi THẬT trên GCP (chủ chạy từ `c4a0f39`, orchestrator báo; Test ⛔ đo lại ở GCP)
 1. **`STG-R2b-02` · bước 02** (`02_di_tru_phan_quyen.sh:133-140,269`): 23/24 ĐẠT, **1 ĐỎ** — `fls_ghi`/`fls_doc` còn CREATEROLE/CREATEDB (đếm vai = **2**, mong 0); `ALTER ROLE … NOCREATEROLE NOCREATEDB` bị từ chối, script nuốt lỗi rồi chỉ in `⚠`. Giả thuyết *(chưa đo)*: vai tạo bằng `gcloud sql users create`. Rủi ro dữ liệu thật: `fls_doc` lộ mật khẩu ⇒ tự đổi `default_transaction_read_only`. Sửa: tạo vai bằng SQL do `postgres` chạy `NOCREATEDB NOCREATEROLE`; có đường chuyển cho vai đã có.
 2. **`STG-R2b-01` · bước 03**: `gcloud builds submit` tải **292**/398 tệp, `lstat /workspace/Dockerfile` ⇒ BUILD FAILURE. Mã: `.gcloudignore` `*` rồi ⛔ `!Dockerfile` *(và `!fls` ⛔ mở lại tệp con theo ngữ nghĩa gitignore ⇒ thiếu 106 tệp)*. Bài gcloud giả ⛔ áp `.gcloudignore` ⇒ xanh giả. Sửa: bỏ `.gcloudignore` khỏi ngữ cảnh / `--ignore-file` rỗng + báo cáo đếm tệp ngữ cảnh = tải lên, có `mong`.
+3. **`STG-R2b-05` · bước 03 *(phụ lục, nhận sau khi push lần đầu)***: Cloud Build Step 9/16 `the --mount option requires BuildKit` — `Dockerfile:31` `RUN --mount=type=secret` ⛔ chạy với `gcloud builds submit --tag` *(bộ build cũ)*; `docker build` cục bộ có BuildKit ⇒ xanh giả. Sửa: `cloudbuild.yaml` bật `DOCKER_BUILDKIT=1` hoặc Dockerfile GCP ⛔ `--mount`; bài ghim `DOCKER_BUILDKIT=0 docker build` phải qua.
 
 ## Bốn mục được giao
 | # | Kiểm | Đo được |
@@ -24,4 +25,4 @@
 - `STG-R2b-04`: cây gộp chưa commit ⇒ `03` `git archive HEAD` ⇒ 22 bài `test_03` ĐỎ với thông báo `tar` khó hiểu *(lần chạy cổng đầu ĐỎ vì lý do này; lần 2 ĐẠT sau commit cục bộ)*.
 
 ## Kết luận
-Phần sửa R2 *(`STG-R2-01/02/05`)* **đúng**, cổng cây gộp **ĐẠT**. Nhưng staging thật **chưa dùng được**: 2 CHẶN từ GCP lọt qua cổng giả ⇒ gửi `DEV` vòng sửa riêng; sau sửa cần R2b lại + chủ chạy lại 02/03 ở GCP.
+Phần sửa R2 *(`STG-R2-01/02/05`)* **đúng**, cổng cây gộp **ĐẠT**. Nhưng staging thật **chưa dùng được**: 3 CHẶN từ GCP lọt qua cổng giả ⇒ gửi `DEV` vòng sửa riêng; sau sửa cần R2b lại + chủ chạy lại 02/03 ở GCP.
