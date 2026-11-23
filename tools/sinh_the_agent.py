@@ -84,7 +84,10 @@ def the(ag) -> str:
             f"| **Đầu vào** | {v['vao']} |",
             f"| **Đầu ra** | {v['ra']} |",
             f"| **Công cụ được gọi** *(CHỈ hàm FLS có sẵn)* | {v['cong_cu']} |",
-            f"| **Mô hình ghim** | `{m.ma}` · họ `{m.ho}` · {'ghim ✅' if m.ghim else '**CHƯA ghim** (tên tạm — câu chủ C2)'} · phương án A (PROPOSED — câu chủ C1) |",
+            f"| **Mô hình ghim** | `{m.ma}` · họ `{m.ho}` · {'ghim ✅' if m.ghim else '**CHƯA ghim** (tên tạm — chủ cấp mã chính xác lúc mở tài khoản Google)'} · **phương án A — chủ chốt 23/11** |",
+            "| **Dữ liệu & lưu giữ** *(chủ 23/11)* | agent đọc TOÀN BỘ nội dung giao dịch + số TK + tên (chỉ bỏ `Email Address`) · "
+            "vận hành: Messages API dưới **ZDR** (bật theo tổ chức qua Anthropic) · fleet eval: **gửi theo lô** (Batches API — "
+            "Anthropic giữ 29 ngày, đổi lấy −50 % giá; chủ chấp nhận) |",
             f"| **Phiên bản** | checksum prompt `{checksum_prompt(ag.ma)}` + mô hình ghim + checksum tham chiếu (tệp số máy đã đo) |",
             f"| **Bước thông minh** | {v['thong_minh']} |",
             f"| **Fleet eval** | {v['eval']} |",
