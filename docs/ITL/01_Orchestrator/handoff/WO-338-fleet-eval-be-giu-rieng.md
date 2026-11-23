@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Trạng thái** | `MO` — viết 23/11 ~05:05 UTC; giao khi có chỗ phiên (≤ 3) |
+| **Trạng thái** | `MO` — viết 23/11 ~05:05 UTC; giao NGAY 23/11 ~05:25 (lời chủ) |
 | **Phát bởi** | orchestrator · 2026-11-23 |
 | **Nhận** | `fls-dev` làn **DATA** — phiên cloud Sonnet 5.5 · medium · nhánh `claude/bold-galileo-zukpaf-isp/HELD` (nền = ngọn `isp/AG` — tăng tốc ③) |
 | **Dải phiếu** | `BG-339` · `KQ-340` (R1) · `KQ-341` (R2 cuối). Số trống kế tiếp sau dải: **342** |
@@ -23,3 +23,11 @@
 
 ## Ràng buộc
 - ⛔ gọi API mô hình thật · ⛔ bật agent · ⛔ ghi kho THẬT · ⛔ commit nội dung giao dịch thật. Khoá SA CHỈ-ĐỌC (⛔ ghi/nhận xét sheet của chủ). Bản thô `/tmp` chmod 600, xoá sau.
+
+## Bổ sung 23/11 ~05:25 — lời chủ: *"Làm cả 2, test trên dữ liệu cũ và dữ liệu thật hiện tại."*
+- Giao NGAY (⛔ chờ R1 AG `KQ-331`) — chủ chỉ định; nền vẫn là ngọn `isp/AG`.
+| AC | Mong *(đo được)* | Cách đo |
+|---|---|---|
+| AC-6 · dữ liệu CŨ | bể A: ca lấy từ **kỳ đã chốt** (đáp án = ITL Ledge Final đã chốt) — chạy chuỗi 4 agent ở chế độ phát lại + fleet eval ⇒ report một trang trên bể A: mẫu số · khớp · lệch (agent ↔ máy) + recall/nối sai (A2.04) | pytest + BG |
+| AC-7 · dữ liệu THẬT hiện tại | bể B: ca từ **dữ liệu live hiện tại** (đọc SA chỉ-đọc ngay hôm chạy) — kỳ đã chốt ⇒ đáp án Final; kỳ đang mở ⇒ đáp án CHƯA chốt, nhãn `chua_chot` riêng, ⛔ tính vào recall chính. Report một trang hiện **hai cột bể A ↔ bể B**; số kỳ đã chốt ở bể B phải = bể A (lệch ⇒ ĐỎ có tên — nguồn đã sửa sau chốt) | chạy thật chỉ-đọc + BG |
+- Cả hai bể: ⛔ gọi API mô hình thật (agent ở chế độ phát lại/GIẢ — ghi rõ report đo ĐƯỜNG ỐNG + cổng, ⛔ chất lượng mô hình); nội dung ngoài repo; repo chỉ đếm.

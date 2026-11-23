@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Trạng thái** | `MO` — viết 23/11 ~05:05 UTC; giao khi có chỗ phiên (≤ 3) |
+| **Trạng thái** | `MO` — viết 23/11 ~05:05 UTC; giao NGAY 23/11 ~05:25 (lời chủ) |
 | **Phát bởi** | orchestrator · 2026-11-23 |
 | **Nhận** | `fls-dev` làn **DATA** — phiên cloud Sonnet 5.5 · medium · nhánh `claude/bold-galileo-zukpaf-isp/STG-NAP` (nền = ngọn `isp/STG` — tăng tốc ③) |
 | **Dải phiếu** | `BG-335` · `KQ-336` (R1) · `KQ-337` (R2 cuối). Số trống kế tiếp sau dải: **338** |
@@ -25,3 +25,10 @@
 ## Ràng buộc
 - ⛔ Claude vào GCP — viết script, CHỦ chạy. ⛔ ghi kho THẬT `fls-pg-1`. ⛔ sửa engine/tuyến/luật cửa. ⛔ `docker compose down`.
 - Thiếu quyền đọc một sheet ⇒ DỪNG phần ấy, BÁO CÁO ĐỎ có tên (⛔ bỏ qua im lặng).
+
+## Bổ sung 23/11 ~05:25 — lời chủ: *"Làm cả 2, test trên dữ liệu cũ và dữ liệu thật hiện tại."*
+- Giao NGAY (⛔ chờ R1 STG `KQ-327`) — chủ chỉ định; nền vẫn là ngọn `isp/STG`, sửa từ R1 sẽ gộp lại sau.
+| AC | Mong *(đo được)* | Cách đo |
+|---|---|---|
+| AC-7 · dữ liệu CŨ | chạy công cụ nạp trên **ảnh đã đóng băng / kỳ đã chốt** (nguồn GIẢ phát lại từ ảnh commit + `voi_so_luong.json`) vào kho test ⇒ BÁO CÁO khớp 100 % số đã đo (vd sổ 9.967 dòng · 23 kỳ · bank 8.338) — lệch 0 | pytest |
+| AC-8 · dữ liệu THẬT hiện tại | chạy công cụ nạp đọc **live** các sheet nguồn bằng SA CHỈ-ĐỌC (khoá có sẵn của container — ⛔ in, ⛔ commit) vào **cụm PG cục bộ của phiên** (⛔ Cloud SQL — Claude ⛔ vào GCP) ⇒ BÁO CÁO: Σ dòng nguồn = Σ dòng kho từng nguồn (khớp 100 %); với các kỳ đã chốt: số = dữ liệu cũ (lệch ⇒ ĐỎ có tên — nguồn đã bị sửa sau chốt); kỳ MỚI sau ảnh: đếm riêng, nhãn rõ. Chỉ dán SỐ ĐẾM + checksum vào BG (⛔ tên người/số TK/tiền dòng). Bản thô `/tmp` chmod 600, xoá sau | chạy thật chỉ-đọc + BG |
