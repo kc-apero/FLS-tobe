@@ -41,8 +41,11 @@
 | dòng `[Importrange]PM_Unpivot` · có mã tham chiếu | 3.703 · 3.173 | 3.909 · 3.369 |
 | bậc thang ghép PM `A·B·C·D·E·F` (dòng) | 2.272·29·400·27·199·428 + 105 không mã + 6.532 không thấy mã PM | 2.438·30·404·27·201·438 + 100 + 8.963 |
 | `Mapping Master` mã `hd` | — | 73 *(cần phân bổ 23 · có phương pháp 21)* |
-| sheet `R \|` Bank · Quỹ · dòng chụp | 60 · 8 · **8.368** dòng *(10 nguồn ra 0 dòng)* — 08/09 | ⛔ chưa đo được: SA của phiên nhận **403** trên hai workbook sao kê (BG-335 §Phát hiện 1) |
+| sheet `R \|` Bank · Quỹ *(bản GỐC)* · Σ dòng chảy · Σ trường khai · dòng chụp · nguồn 0 dòng | 60 · 8 · 68 · 408 · **8.368** · 10 — 08/09 | **64 · 8 · 72 · 434 · 10.586 · 10** *(đo 23/11 sau vòng sửa `KQ-336`; Quỹ gốc `1QSYSzCC…`, bản copy `1RmmkOSC…` vẫn 403)* |
+| `fls_nguon_dai` *(bản khai THỨ HAI `Range_*`, công cụ `tools/nap_nguon_dai.py`)* | — | **0 dòng — NGOÀI phạm vi bước 05** *(BG-335 §1 · backlog `NAP-BL-01`)*: tuyến `bang_tuyen` đọc nó sẽ ra rỗng, đúng |
 | cổng đọc-đủ (cột `T · CDT1`) | 3.339 ô có giá trị (27/08), sàn 3.300 | **3.056** < sàn ⇒ **ĐỎ**: sổ ⛔ được ghi cho tới khi BA/chủ xử lý (BG-335 §Phát hiện 2) |
+
+⭐ **Nguồn SỐNG là chuẩn cho mọi kỳ** *(chủ quyết 23/11 ~07:25)*: khối `ⓑ NGUỒN SỬA SAU ẢNH` của BÁO CÁO chỉ ĐẾM *(ảnh cũ khác nguồn sống ⇒ nhãn, ⛔ ĐỎ)*; ĐỎ chỉ còn: 403 · cổng đọc-đủ · Σ nguồn ≠ Σ kho *(`--doi-chieu` đo lại kho đã nạp với nguồn bây giờ, hai chiều)*.
 
 ⇒ Nếu BÁO CÁO 05 của chủ có `fls_itl` = 0: kho **vẫn ở trạng thái §0.4** (F01/F02 trống ĐÚNG). Nếu `fls_itl` > 0 thì §1 dòng "Sổ rỗng" **hết hiệu lực** và cổng `KHO_SACH` đổi theo; người test điền các số THẤY cạnh BÁO CÁO.
 

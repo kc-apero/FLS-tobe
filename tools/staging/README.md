@@ -43,20 +43,22 @@ gcloud compute ssh fls-staging-app --project P --zone asia-southeast1-b --tunnel
 ## Dữ liệu nguồn (sổ kế toán) — bước 05 `WO-334`
 
 Quyết chủ 23/11: staging dùng **dữ liệu THẬT** (chủ chấp nhận rủi ro tên người + tiền thật). `05_nap_nguon_that.sh` điều phối `tools/staging/nap_nguon_that.py`, gọi **đúng các công cụ nạp sẵn có** theo thứ tự phụ thuộc:
-① `nap_nguon_va_khai` (68 dòng chảy + bản khai) → ② `nap_mapping_master` → ③ `nap_that.chay_that` (sổ `fls_itl` + `fls_reject` + PM `fls_pm_line`) → ④ `chup_sao_ke` (ảnh chụp 60 sheet `R |`). Token Sheets đi qua `tools/staging/cred_sheets.py` (⛔ SA gắn cứng như trước).
+① `nap_nguon_va_khai` (dòng chảy `R |` Bank + Quỹ + bản khai) → ② `nap_mapping_master` → ③ `nap_that.chay_that` (sổ `fls_itl` + `fls_reject` + PM `fls_pm_line`) → ④ `chup_sao_ke` (ảnh chụp các sheet `R |` của sổ Bank). Token Sheets đi qua `tools/staging/cred_sheets.py` (⛔ SA gắn cứng như trước).
 
 ### Quyền đọc sheet — chủ cấp MỘT trong ba cách (⛔ khoá trong repo/chat; ⛔ ghi sheet — `QĐ-ITL-34`)
 | Cách | Lệnh | Ghi chú |
 |---|---|---|
-| `--sa-json-tep` | tải tệp khoá SA lên Cloud Shell, `chmod 600`, truyền đường dẫn; **xoá sau khi nạp** | SA phải được **chia sẻ "Người xem"** trên cả **ba** workbook: RAW `1md85t…` (sổ · PM · Mapping Master), sổ Bank `1zJA0M…`, sổ Quỹ `1RmmkO…`. Thiếu một ⇒ BÁO CÁO mục "HTTP đọc workbook …" ĐỎ **403** và phần dùng workbook đó DỪNG (phần khác vẫn chạy) |
+| `--sa-json-tep` | tải tệp khoá SA lên Cloud Shell, `chmod 600`, truyền đường dẫn; **xoá sau khi nạp** | SA phải được **chia sẻ "Người xem"** trên cả **ba** workbook: RAW `1md85t…` (sổ · PM · Mapping Master), sổ Bank `1zJA0M…`, sổ Quỹ **gốc** `1QSYSz…` (⛔ bản copy `1RmmkO…` — 403). Thiếu một ⇒ BÁO CÁO mục "HTTP đọc workbook …" ĐỎ **403** và phần dùng workbook đó DỪNG (phần khác vẫn chạy) |
 | `--adc` | `gcloud auth application-default login --scopes=https://www.googleapis.com/auth/spreadsheets.readonly,https://www.googleapis.com/auth/drive.metadata.readonly` | dùng tài khoản của chủ (phải xem được 3 workbook) hoặc SA gắn với máy |
 | `--token-gcloud` | script tự gọi `gcloud auth print-access-token --scopes=…readonly` | token ~60 phút; hết ⇒ chạy lại (công cụ chạy lại được) |
 
 ### Đọc BÁO CÁO
 - **Σ nguồn = Σ kho**: `mong` = số vừa đọc từ nguồn ở chính lượt này (đếm: dòng sheet · canon · loại · rỗng · PM · 68 dòng chảy · 60 sheet chụp). `fls_itl` chỉ-THÊM ⇒ chạy lại ⛔ nhân đôi; Σ so **sau** nạp.
-- **CŨ ↔ HIỆN TẠI**: ảnh đóng băng `tests/fixture/pm_join.json` (9.992 dòng bank-canon · 3.703 dòng PM, khoá = số dòng sheet). Dòng ĐÃ có trong ảnh mà nguồn sống khác ⇒ ĐỎ có tên *(nguồn bị sửa sau chốt)*; dòng ⛔ có trong ảnh ⇒ đếm riêng nhãn `MỚI`.
+- **NGUỒN SỬA SAU ẢNH** *(chủ quyết 23/11 ~07:25: **nguồn SỐNG là chuẩn cho mọi kỳ**, kể cả kỳ đã chốt)*: so nguồn sống với ảnh đóng băng `tests/fixture/pm_join.json` *(9.992 dòng bank-canon · 3.703 dòng PM)* và với số cũ theo kỳ `voi_so_luong.theo_ky[k].co` *(23 kỳ, in từng kỳ)* — khối có tên, **chỉ ĐẾM**, ⛔ ĐỎ, ⛔ chặn nạp.
+- **ĐỐI CHIẾU KHO** `--doi-chieu` *(CHỈ ĐỌC; đòi `PG_DSN`)*: đọc nguồn sống rồi ĐẾM kho đã nạp — sổ L1 · PM · Mapping · dòng chảy · **từng** sheet chụp; kho nhiều hơn hay ít hơn nguồn đều ĐỎ ⇒ đổi một dòng nguồn sau nạp là ĐỎ.
 - **Cổng đọc-đủ** của `nap_that` (sàn đo 27/08) ĐỎ ⇒ sổ ⛔ ghi một dòng nhưng nguồn vẫn được ĐO. ⛔ Hạ sàn để "cho qua": việc của BA/chủ, có bản khai.
 - **Riêng tư**: `PM_COT_RIENG_TU = {"Email Address"}` ⛔ vào kho (BÁO CÁO đếm cột tên có "email" + khoá `Email Address` trong `fls_pm_line.tho`, kèm mẫu số). `Tên tài khoản` GIỮ (quyết 11/09). BÁO CÁO chỉ SỐ ĐẾM.
+- **Ngoài phạm vi 05** *(`NAP-R1-06`, Đ1: `grep -rl nap_nguon_dai docs fls tools tests`)*: `tools/nap_nguon_dai.py` — bản khai THỨ HAI `Range_*` → `fls_nguon_dai` (7 tệp `fls/` dùng; tuyến `bang_tuyen` đọc). Sau 05 `fls_nguon_dai` = **0 dòng** ⇒ tuyến ấy rỗng, ĐÚNG; việc của backlog `NAP-BL-01` *(BG-335 §1)*.
 - Hết nạp: `rm -f <tệp khoá SA>` nếu đã tải lên.
 
 ⚠ **Dùng `fls_ghi`** (đã được cấp INSERT trên `fls_itl`, ⛔ UPDATE/DELETE) — ⛔ cần vai khác. Hạn chế đã đo: **H1000 · nền tảng (CCR/Platform) · FPS không có công cụ nạp trong repo** (BG-335 AC-1) ⇒ bước 05 ⛔ nạp chúng.
