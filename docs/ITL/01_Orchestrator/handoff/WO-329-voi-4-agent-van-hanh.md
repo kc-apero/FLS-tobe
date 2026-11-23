@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Trạng thái** | `MO` — giao 23/11 ~04:20 UTC |
+| **Trạng thái** | `CHO_TEST` — giao 23/11 ~04:20 UTC · `fls-dev` bàn giao [`BG-330`](BG-330-ban-giao-wo-329.md) 23/11 |
 | **Phát bởi** | orchestrator · 2026-11-23 |
 | **Nhận** | `fls-dev` — phiên cloud **Opus 5.5 · medium** · nhánh `claude/bold-galileo-zukpaf-isp/AG` |
 | **Nền** | ngọn nhánh làm việc `claude/bold-galileo-zukpaf` |
@@ -37,3 +37,8 @@
 - ⛔ sửa engine tất định / tuyến (agent GỌI chúng). ⛔ đổi quyết định AP (mô hình, cửa G0–G3) — chỗ AP còn PROPOSED/chưa ký ⇒ ghi **câu chủ** kèm khuyến nghị trong BG.
 - Riêng tư `CLAUDE.md` · `PM_COT_RIENG_TU` · `sao_luu/` `hien_vat/` ⛔ commit.
 - Sản phẩm để CHỦ KIỂM trước: BG-330 mở đầu bằng mục "Đọc 4 agent trong 10 phút" — trỏ 4 thẻ + danh sách skill theo thứ tự + ảnh chụp report.
+
+## §5 · Nhật ký
+| Ngày | Ai | Việc |
+|---|---|---|
+| 2026-11-23 | `fls-dev` | `DANG_LAM` → `CHO_TEST`: [`BG-330`](BG-330-ban-giao-wo-329.md). Hai lời chủ giữa lượt (4 nguồn raw · ghép theo nội dung · fleet eval nhiều vòng · 4 zip) đã gộp vào phạm vi — xem BG |

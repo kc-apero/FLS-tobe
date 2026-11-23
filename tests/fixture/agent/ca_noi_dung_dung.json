@@ -1,0 +1,227 @@
+{
+ "_vi_sao": "BỂ CA DỰNG cho skill A2.04 (ghép theo nội dung) — ⛔ dữ liệu thật: mã PM, tên (NGUYEN VAN AN · TRAN THI B), số TK, email, điện thoại đều BỊA để thử bộ che và luật cứng. Bể thật (đáp án = ITL Ledge Final AS-IS) GIỮ RIÊNG ngoài repo — biến FLS_HELDOUT_NOI_DUNG. · `tk` = số TK nguồn chi (BỊA) — chủ 23/11: agent đọc số TK vì một số TK chỉ chi một loại giao dịch.",
+ "ca": {
+  "c01": {
+   "tien": 15000000,
+   "cur": "VND",
+   "ngay": "2025-03-04",
+   "noi_dung": "TT PM-0101-01 phi quang cao thang 3",
+   "ung_vien": [
+    {
+     "pm": "PM-0101-01",
+     "tien": 15000000,
+     "cur": "VND",
+     "ngay": "2025-03-04"
+    },
+    {
+     "pm": "PM-0102-01",
+     "tien": 15000000,
+     "cur": "VND",
+     "ngay": "2025-03-04"
+    }
+   ],
+   "tk": "1903000000001"
+  },
+  "c02": {
+   "tien": 2500000,
+   "cur": "VND",
+   "ngay": "2025-03-05",
+   "noi_dung": "CK NGUYEN VAN AN 0123456789012 hoan ung",
+   "ung_vien": [
+    {
+     "pm": "PM-0201-01",
+     "tien": 2500000,
+     "cur": "VND",
+     "ngay": "2025-03-05"
+    }
+   ],
+   "tk": "1903000000001"
+  },
+  "c03": {
+   "tien": 1200,
+   "cur": "USD",
+   "ngay": "2025-04-01",
+   "noi_dung": "PM-0301-02 server fee",
+   "ung_vien": [
+    {
+     "pm": "PM-0301-02",
+     "tien": 1200,
+     "cur": "USD",
+     "ngay": "2025-04-01"
+    }
+   ],
+   "tk": "0071000000002"
+  },
+  "c04": {
+   "tien": 5000000,
+   "cur": "VND",
+   "ngay": "2025-04-02",
+   "noi_dung": "TT nhieu phieu gop",
+   "ung_vien": [
+    {
+     "pm": "PM-0401-01",
+     "tien": 5000000,
+     "cur": "VND",
+     "ngay": "2025-04-02"
+    },
+    {
+     "pm": "PM-0402-01",
+     "tien": 5000000,
+     "cur": "VND",
+     "ngay": "2025-04-02"
+    }
+   ],
+   "tk": "1903000000001"
+  },
+  "c05": {
+   "tien": 100,
+   "cur": "USD",
+   "ngay": "2025-04-03",
+   "noi_dung": "PM-0501-01 tra tien",
+   "ung_vien": [
+    {
+     "pm": "PM-0501-01",
+     "tien": 2500000,
+     "cur": "VND",
+     "ngay": "2025-04-03"
+    }
+   ],
+   "tk": "0071000000002"
+  },
+  "c06": {
+   "tien": 7000000,
+   "cur": "VND",
+   "ngay": "2025-04-04",
+   "noi_dung": "PM-0601-01 thanh toan dot 1",
+   "ung_vien": [
+    {
+     "pm": "PM-0601-01",
+     "tien": 7500000,
+     "cur": "VND",
+     "ngay": "2025-04-04"
+    }
+   ],
+   "tk": "1903000000001"
+  },
+  "c07": {
+   "tien": 3000000,
+   "cur": "VND",
+   "ngay": "2025-05-06",
+   "noi_dung": "TT PM-0702-01",
+   "ung_vien": [
+    {
+     "pm": "PM-0701-01",
+     "tien": 3000000,
+     "cur": "VND",
+     "ngay": "2025-05-01"
+    },
+    {
+     "pm": "PM-0702-01",
+     "tien": 4000000,
+     "cur": "VND",
+     "ngay": "2025-05-06"
+    }
+   ],
+   "tk": "1903000000001"
+  },
+  "c08": {
+   "tien": 9999000,
+   "cur": "VND",
+   "ngay": "2025-05-07",
+   "noi_dung": "lien he ke.toan@vidu.vn PM-0801-01",
+   "ung_vien": [
+    {
+     "pm": "PM-0801-01",
+     "tien": 9999000,
+     "cur": "VND",
+     "ngay": "2025-05-07"
+    },
+    {
+     "pm": "PM-0802-01",
+     "tien": 9999000,
+     "cur": "VND",
+     "ngay": "2025-05-07"
+    }
+   ],
+   "tk": "1903000000001"
+  },
+  "c09": {
+   "tien": 450000,
+   "cur": "VND",
+   "ngay": "2025-05-08",
+   "noi_dung": "0912345678 PM-0901-01 phi dich vu",
+   "ung_vien": [
+    {
+     "pm": "PM-0901-01",
+     "tien": 450500,
+     "cur": "VND",
+     "ngay": "2025-05-08"
+    },
+    {
+     "pm": "PM-0902-01",
+     "tien": 450000,
+     "cur": "VND",
+     "ngay": "2025-05-08"
+    }
+   ],
+   "tk": "1903000000003"
+  },
+  "c10": {
+   "tien": 880000,
+   "cur": "VND",
+   "ngay": "2025-06-02",
+   "noi_dung": "chuyen khoan",
+   "ung_vien": [
+    {
+     "pm": "PM-1001-01",
+     "tien": 880000,
+     "cur": "VND",
+     "ngay": "2025-05-28"
+    }
+   ],
+   "tk": "1903000000003"
+  },
+  "c11": {
+   "tien": 600000,
+   "cur": "VND",
+   "ngay": "2025-06-03",
+   "noi_dung": "TT PM-9999-01",
+   "ung_vien": [
+    {
+     "pm": "PM-1101-01",
+     "tien": 600000,
+     "cur": "VND",
+     "ngay": "2025-06-03"
+    },
+    {
+     "pm": "PM-1102-01",
+     "tien": 600000,
+     "cur": "VND",
+     "ngay": "2025-06-03"
+    }
+   ],
+   "tk": "1903000000001"
+  },
+  "c12": {
+   "tien": 120000000,
+   "cur": "VND",
+   "ngay": "2025-06-04",
+   "noi_dung": "TRAN THI B PM-1201-01 tam ung",
+   "ung_vien": [
+    {
+     "pm": "PM-1201-01",
+     "tien": 120000000,
+     "cur": "VND",
+     "ngay": "2025-06-04"
+    },
+    {
+     "pm": "PM-1202-01",
+     "tien": 120000000,
+     "cur": "VND",
+     "ngay": "2025-06-04"
+    }
+   ],
+   "tk": "1903000000001"
+  }
+ }
+}

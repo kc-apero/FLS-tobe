@@ -1,0 +1,140 @@
+{
+ "be": "ca DỰNG trong repo (⛔ dữ liệu thật)",
+ "checksum_be": "1a792ab498f2c45f",
+ "phien_ban": "v0-ma-tat-dinh",
+ "mo_hinh": "GIẢ (luat_v0) thay claude-opus-5-5",
+ "checksum_prompt": "e9d149e87fff5474",
+ "che_do": "che_het",
+ "cong_skill": {
+  "dat": true,
+  "ly_do": "12 ca: 0 vi phạm luật cứng"
+ },
+ "the_noi_dung_che": 0,
+ "tong_hop": {
+  "so_ca": 12,
+  "so_noi": 0,
+  "noi_sai": 0,
+  "ti_le_noi_sai": null,
+  "recall_phai_noi": 0.0,
+  "phai_nguoi_bi_noi": 0,
+  "diem_tb": 1.4167
+ },
+ "theo_nhom": {
+  "phai_noi": {
+   "so_ca": 7,
+   "so_noi": 0,
+   "noi_sai": 0,
+   "ti_le_noi_sai": null,
+   "recall_phai_noi": 0.0,
+   "phai_nguoi_bi_noi": 0,
+   "diem_tb": 1.0
+  },
+  "phai_nguoi": {
+   "so_ca": 5,
+   "so_noi": 0,
+   "noi_sai": 0,
+   "ti_le_noi_sai": null,
+   "recall_phai_noi": null,
+   "phai_nguoi_bi_noi": 0,
+   "diem_tb": 2.0
+  }
+ },
+ "cham": [
+  {
+   "ca": "c08",
+   "nhom": "phai_noi",
+   "diem": 1,
+   "vi_sao": "để người — an toàn, bỏ lỡ nối",
+   "noi": false,
+   "dung_line": false
+  },
+  {
+   "ca": "c10",
+   "nhom": "phai_noi",
+   "diem": 1,
+   "vi_sao": "để người — an toàn, bỏ lỡ nối",
+   "noi": false,
+   "dung_line": false
+  },
+  {
+   "ca": "c06",
+   "nhom": "phai_nguoi",
+   "diem": 2,
+   "vi_sao": "để người đúng",
+   "noi": false,
+   "dung_line": false
+  },
+  {
+   "ca": "c11",
+   "nhom": "phai_nguoi",
+   "diem": 2,
+   "vi_sao": "để người đúng",
+   "noi": false,
+   "dung_line": false
+  },
+  {
+   "ca": "c03",
+   "nhom": "phai_noi",
+   "diem": 1,
+   "vi_sao": "để người — an toàn, bỏ lỡ nối",
+   "noi": false,
+   "dung_line": false
+  },
+  {
+   "ca": "c09",
+   "nhom": "phai_noi",
+   "diem": 1,
+   "vi_sao": "để người — an toàn, bỏ lỡ nối",
+   "noi": false,
+   "dung_line": false
+  },
+  {
+   "ca": "c04",
+   "nhom": "phai_nguoi",
+   "diem": 2,
+   "vi_sao": "để người đúng",
+   "noi": false,
+   "dung_line": false
+  },
+  {
+   "ca": "c07",
+   "nhom": "phai_nguoi",
+   "diem": 2,
+   "vi_sao": "để người đúng",
+   "noi": false,
+   "dung_line": false
+  },
+  {
+   "ca": "c12",
+   "nhom": "phai_noi",
+   "diem": 1,
+   "vi_sao": "để người — an toàn, bỏ lỡ nối",
+   "noi": false,
+   "dung_line": false
+  },
+  {
+   "ca": "c01",
+   "nhom": "phai_noi",
+   "diem": 1,
+   "vi_sao": "để người — an toàn, bỏ lỡ nối",
+   "noi": false,
+   "dung_line": false
+  },
+  {
+   "ca": "c02",
+   "nhom": "phai_noi",
+   "diem": 1,
+   "vi_sao": "để người — an toàn, bỏ lỡ nối",
+   "noi": false,
+   "dung_line": false
+  },
+  {
+   "ca": "c05",
+   "nhom": "phai_nguoi",
+   "diem": 2,
+   "vi_sao": "để người đúng",
+   "noi": false,
+   "dung_line": false
+  }
+ ]
+}
