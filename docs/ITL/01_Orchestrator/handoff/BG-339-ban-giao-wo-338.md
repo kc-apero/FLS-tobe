@@ -22,7 +22,7 @@
 | AC-2 | 0 trùng ca dựng WO-329 · 0 trùng prompt | **ĐẠT** | bài `test_doc_lap_*` + 2 bài CẤY ca trùng ⇒ phép đo cắn (=1) · thật: **0 · 0** ở cả A, B |
 | AC-3 | `fleet_eval_voi.py --be-giu-rieng` GIẢ/phát lại ⇒ recall · nối sai · phải-để-người bị nối, TẮT vs BẬT-đã-che | **ĐẠT** *(chạy được, in số; exit 1 vì bar CHẶN — xem trên)* | `docs/ITL/05_FleetEval/vong/BE_GIU_RIENG.md` + `.json` · bảng dưới |
 | AC-4 | bộ che trên bể thật: 0 lọt; `quet_pii_repo` 0; ⛔ commit bể | **KHÔNG ĐẠT phần "0 lọt"** (bộ che là TUỲ CHỌN theo chủ 06:00 ⇒ ⛔ chặn) · `quet_pii_repo` **0** ĐẠT · bể ⛔ commit ĐẠT | `tools/do_ro_ri_che.py` · bài `test_BE_THAT_phep_do_ro_ri_ghim_dung_so_da_do` (xanh) + `test_BE_THAT_che_0_lot_MONG_AC4` (**XFAIL** có lý do) |
-| AC-5 | `--duong-nen` ĐẠT; nâng sàn + bài ghim cùng commit | xem §Cổng | `MONG_PYTEST_TOAN_BO` 4822 → **4855** *(= số thu thập thật, web 690 không đổi)* + `tests/test_dung_moi_truong_isp.py` cùng commit |
+| AC-5 | `--duong-nen` ĐẠT; nâng sàn + bài ghim cùng commit | **ĐẠT** | `MONG_PYTEST_TOAN_BO` 4822 → **4854** *(= số thu thập thật, web 690 không đổi)* + `tests/test_dung_moi_truong_isp.py` cùng commit |
 | AC-6 | bể A: chuỗi 4 agent phát lại/GIẢ + fleet eval ⇒ mẫu số · khớp · lệch + recall/nối sai | **ĐẠT** | chuỗi **627/627 ô khớp · lệch 0 · ⛔ đo được 0** (TẮT và BẬT-đã-che) + G0 A2.04 ở bảng dưới |
 | AC-7 | bể B: kỳ mở nhãn `chua_chot` ⛔ vào recall chính; report hai cột A ↔ B; kỳ chốt B = A | **ĐẠT một phần** | `chua_chot` 5 ca, `agent nối 0/5`, loại khỏi mẫu số recall (bài `test_chay_be_chi_so_va_chua_chot_khong_vao_recall`). Tập kỳ chốt A = B: **25 = 25**. Đối chiếu Ledge sống: **⛔ đo được (ĐỎ có tên)** |
 
@@ -78,5 +78,22 @@ Lớp 2 (`che.kiem_den`) chặn **0** ca. ⇒ bộ che `che_noi_dung` **bỏ só
 3. Đối chiếu Ledge sống **ĐỎ (⛔ đo được)** — chưa kết luận "nguồn đã sửa sau chốt" hay không.
 4. Tên người trong phép đo rò rỉ là **ứng viên** (dò theo họ), ⛔ khẳng định.
 
-## Cổng (CLAUDE.md) — dán thật
-*(điền ở commit kế — xem cuối tệp)*
+## Cổng (CLAUDE.md) — dán thật *(cụm PG cổng 5437, 23/11)*
+```
+python -m pytest tests/agent/test_be_giu_rieng.py     → 32 passed (có và không có FLS_HELDOUT_NOI_DUNG), 0 skipped
+python tools/quet_pii_repo.py                         → [ĐẠT] 0 chỗ số TK cá nhân · 0 tệp
+python docs/ITL/_tools/kiem_tai_lieu.py               → cong tai lieu DAT (493 file, 2982 bang, 968 o ngay, 104 ma QD)
+python tools/soi_bang_tuyen.py                        → ban khai KHOP SQL that o ca 49 tuyen
+python tools/kiem_thuyet_minh.py                      → CONG THUYET MINH DAT — 35/35 nut
+lint-imports                                          → Contracts: 11 kept, 0 broken.
+python -m fls.db.pg_migrate                           → khong co gi de ap · pg_verify: khop
+bash tools/dung_moi_truong_isp.sh --duong-nen --cong 5437:
+[ĐẠT] đường nền toàn bộ tập đỏ + XFAIL = đường nền: 28 = 28 node id (trong đó XFAIL 2 = 2 · thêm 0 · bớt 0) · chạy 4854 bài (mong ≥ 4854) · skipped 0 · deselected 0
+  [ĐẠT] đường nền tests/web  tập đỏ + XFAIL = đường nền: 3 = 3 node id (trong đó XFAIL 0 = 0 · thêm 0 · bớt 0) · chạy 690 bài (mong ≥ 690) · skipped 0 · deselected 0
+  toàn bộ: 12 failed, 4826 passed, 2 xfailed, 14 errors · tests/web: 3 failed, 687 passed · KẾT: ĐẠT — mọi phép kiểm khớp mong
+```
+**Hai cổng ĐỎ có sẵn từ nền — ⛔ do WO-338** *(đã chạy lại ở `9840f27`, ra y hệt)*:
+- `docs/ITL/_tools/khop_owner.py --kiem` → exit 1 (`B1`, `C6` đổi trạng thái; khối lộ trình lệch bản sinh lại).
+- `tools/kiem_so_song.py` · `tools/dong_bo_so_song.py --ghi` → `FileNotFoundError: .venv/Scripts/lint-imports.exe` — đường dẫn Windows cứng, ⛔ chạy được trên Linux cloud. *(⛔ đo được ở máy này; chưa chạy ở máy chủ)*
+
+Lượt đầu của `--duong-nen` ĐỎ vì 7 bài của WO-338 bị SKIP khi vắng bể thật (cổng đòi skipped = 0) → sửa: bài chạy trên bể giả khi vắng bể + `test_DEM_BE_nhat_quan` luôn chạy; lượt hai ĐẠT.
