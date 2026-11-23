@@ -444,3 +444,6 @@ Toàn bộ: `15 failed · 4.994 passed · 2 xfailed · 14 errors` trong 1.698 s 
 | `tests/db/test_khong_ai_tro_lai_kho_that.py::test_khong_file_test_nao_ghi_cung_dia_chi_kho_that` | **LỖI CỦA TÔI**: bài `test_kiem_dsn_*` mới gõ DSN kết thúc `/fls` *(cổng quét mã nguồn cấm)* | **đã sửa** *(đổi tên kho trong DSN thử sang `/kho_x`)*; chạy lại riêng: `16 passed` *(cổng này + `test_kiem_dsn_*`)*. ⛔ **chưa** chạy lại `--duong-nen` toàn bộ *(luật C: MỘT lần)* ⇒ phần này chỉ có bằng chứng cục bộ |
 
 Đúng ra kỳ vọng sau sửa + gộp STG: THÊM 0 ⇒ `ĐẠT`; **chưa được chứng minh** ở phiên này.
+
+### 10.2 · `--duong-nen --cong 5436` sau gộp `isp/STG` `ef96a15` + nhánh làm việc `f8c6d55` *(MỘT lần, một mình, cây `961bd0e`)* — **`KẾT: ĐẠT`**
+Toàn bộ: `12 failed · 5.096 passed · 2 xfailed · 14 errors` = **28** node id = `duong_nen_bai_do.txt` *(thêm **0** · bớt **0**; 2 bài `STG-R1-02` và bài `test_khong_ai_tro_lai_kho_that` **đã hết**)*; chạy **5.124** ≥ sàn **5.124** *(sàn = `pytest --collect-only` cây gộp)*, skipped 0, deselected 0. `tests/web` **3 = 3**, chạy 690 ✅. Môi trường: HD1 `chay 9845 / co 9967` · `lint-imports` 11 kept · `pg_verify` 27/27 — mọi phép ĐẠT. *(Thay §10.1: §10.1 là lượt trước khi gộp STG.)*
