@@ -112,8 +112,13 @@ def moi_truong(monkeypatch, nguon):
     for k in ("FLS_GSHEETS_SA_JSON", "FLS_GSHEETS_SA_JSON_B64", "FLS_SHEETS_SA_JSON_TEP", "FLS_SHEETS_ADC"):
         monkeypatch.delenv(k, raising=False)
     # `tools.do_hinh_dang.API` được chốt lúc nhập — trỏ lại về máy chủ giả
-    import tools.do_hinh_dang as dh
+    import tools.do_chenh_lech, tools.do_hinh_dang as dh, tools.nap_sao_ke      # noqa: F401,E401  (nhập TRƯỚC để thấy đủ module)
     monkeypatch.setattr(dh, "API", goc)
+    # `API` bị CHỐT lúc nhập ở nhiều module (`from tools.do_hinh_dang import API`): khi chạy cả bộ pytest, module khác đã nhập
+    # chúng trước ⇒ trỏ lại MỌI bản sao còn mang địa chỉ Google (bài này từng ĐỎ chỉ khi chạy trọn bộ — `--duong-nen` 23/11).
+    for ten, mod in list(sys.modules.items()):
+        if ten.startswith("tools.") and getattr(mod, "API", None) == "https://sheets.googleapis.com/v4/spreadsheets/":
+            monkeypatch.setattr(mod, "API", goc)
     # sàn của cổng đọc-đủ đo trên NGUỒN THẬT — nguồn tổng hợp không có Budget Code…: hạ sàn CHỈ ở bài nào nói rõ (`san_0`)
     return g
 
@@ -345,7 +350,9 @@ def test_TU_CHOI_thieu_cong_ghi_nguoi_nap_xau_va_kho_5433(monkeypatch, moi_truon
     for xau in ("", "a@b.com", "x;rm"):
         with pytest.raises(SystemExit, match="nguoi-nap"):
             nn.main(["--nap", "--nguoi-nap", xau])
-    monkeypatch.setenv("PG_DSN", "postgresql://fls:x@localhost:5433/fls")
+    # DSN lấy từ kho scratch (đường duy nhất tới kho là `fls.db.kho` — luật `test_khong_ai_tro_lai_kho_that`), chỉ đổi CỔNG
+    # sang 5433 = `fls-pg-1`: bài thử việc công cụ TỪ CHỐI cổng ấy, ⛔ nối tới nó.
+    monkeypatch.setenv("PG_DSN", re.sub(r":\d+/", ":5433/", kho))
     with pytest.raises(SystemExit, match="5433"):
         nn.main(["--nap", "--nguoi-nap", "khanh.thu"])
 
