@@ -4,7 +4,7 @@
 |---|---|
 | **Thuộc** | `BG-335` · `WO-334` *(gồm mục Bổ sung 05:25)* |
 | **Kiểm bởi** | `fls-test` · 2026-11-23 · phiên cloud, cụm PG `5447` |
-| **Phán quyết** | **`TRƯỢT`** — **1 CHẶN · 6 NÊN SỬA · 5 GHI NHẬN** *(sổ riêng `docs/ITL/04_Test/review/SO_PHAT_HIEN_ISP-3.1_NAP.md`, mã `NAP-R1-01…12`)* |
+| **Phán quyết** | **`TRƯỢT`** — **1 CHẶN · 7 NÊN SỬA · 5 GHI NHẬN** *(sổ riêng `docs/ITL/04_Test/review/SO_PHAT_HIEN_ISP-3.1_NAP.md`, mã `NAP-R1-01…13`)* |
 | **Cây kiểm** | `origin/claude/bold-galileo-zukpaf-isp/STG-NAP` @ `b990629` *(git thật = hash trong `BG`; vào cổng ✅)* · cây gộp thử = `origin/claude/bold-galileo-zukpaf` @ `52b5763` ⊕ `b990629`, **chưa** gồm sửa STG *(R2 STG `KQ-328` còn TRƯỢT)* |
 | **Kho thật** | `KHONG_CHAM` — cụm `5447`, kho scratch `fls_stg_r1_336`; ⛔ GCP · ⛔ `fls-pg-1` · ⛔ ghi sheet. Chỉ SỐ ĐẾM *(⛔ tên người · số TK · tiền dòng)*; bản thô scratchpad đã xoá |
 
