@@ -37,11 +37,14 @@ KHOA_ANH = {"ccr_so_du_ccr": "dong_sheet", "ccr_so_du_cash": "dong_sheet", "ccr_
             "mid3_total": "so_dong_sheet", "noem_com_cdt": "dong_sheet", "sign_off_dau_vao": "dong_sheet"}
 #: 6 ảnh `dau_vao` CÓ SẴN trước DT13 — đúng từng byte *(AC-2)*.
 #: WO-345 (chủ 23/11: nguồn sống là chuẩn) — ảnh đóng băng LẠI từ nguồn sống, nằm CẠNH ảnh cũ (ảnh cũ GIỮ làm biên bản).
-#: Khai ĐÍCH DANH + sha256: thêm/sửa/xoá một tệp ⇒ ĐỎ như mọi "ảnh lạ" (bài AC2 giữ lo gốc). `.DO.json` = cổng khuôn ĐỎ.
+#: Khai ĐÍCH DANH + sha256: thêm/sửa/xoá một tệp ⇒ ĐỎ như mọi "ảnh lạ" (bài AC2 giữ lo gốc).
+#: ⛔ `ccr_daily_report_2_20261123.DO.json` *(cổng khuôn ĐỎ `thiếu 2`)* KHÔNG khai ở đây: `.gitignore:26`
+#: cấm commit `tests/fixture/**/*.DO.json` *(DT2 Q6 = ⓐ)* ⇒ ghim nó thì bài chỉ xanh ở máy đã chụp, ĐỎ trên
+#: cây sạch `FileNotFoundError` *(`SONG-R1-01` · KQ-347: 1 failed / 42 passed trên checkout sạch)*. Ảnh `.DO`
+#: có ở máy hay ⛔ đều ⛔ được làm bài đổi màu ⇒ bài lọc `*.DO.json` + ghim luật ignore *(bài dưới)*.
 SHA_WO345 = {
     "ccr_so_du_ccr_20261123.json": "f7a826feb0980f26f4dbb83d41774e513bfd7a477d172fe13fdecfe67f557a8f",
     "ccr_so_du_cash_20261123.json": "59030e93bb73c6117c8f38f51c3ec039e3c47c9e69155db1b681c999810a772f",
-    "ccr_daily_report_2_20261123.DO.json": "4a4b47ccacea57232851727837da79a64bc6855700d48aaf36e627ed36781ad5",
 }
 SHA_CU = {
     "gi_cfa1.json": "74db163e8030967f80ad45c35833ca092fc718efc53baa3ec2eebf2a0e7db808",
@@ -131,7 +134,16 @@ def test_AC2_anh_cu_va_cong_cu_chung_dung_tung_byte():
     assert hashlib.sha256((GOC / "tools" / "dong_bang_sheet.py").read_bytes()).hexdigest() == SHA_DONG_BANG_SHEET
     for k, sha in SHA_WO345.items():
         assert hashlib.sha256((DV / k).read_bytes()).hexdigest() == sha, k
-    assert {p.name for p in DV.glob("*.json")} == {*SHA_CU, *(f"{t}.json" for t in TEN), *SHA_WO345}   # ⛔ ảnh lạ
+    co = {p.name for p in DV.glob("*.json") if not p.name.endswith(".DO.json")}      # `.DO` ⛔ vào repo — R1-01
+    assert co == {*SHA_CU, *(f"{t}.json" for t in TEN), *SHA_WO345}   # ⛔ ảnh lạ
+
+
+def test_AC2_anh_DO_bi_gitignore_nen_bai_khong_duoc_doi_no():
+    """⭐ `SONG-R1-01`: bài trên lọc `*.DO.json` CHỈ đúng khi luật ignore còn đó — gỡ luật ⇒ ảnh ĐỎ vào được
+    repo mà bài ⛔ thấy ⇒ ĐỎ ở đây. Đọc chữ `.gitignore` *(⛔ gọi git — cây xuất tarball vẫn đo được)*."""
+    dong = [d.strip() for d in (GOC / ".gitignore").read_text(encoding="utf-8").splitlines()]
+    assert dong.count("tests/fixture/**/*.DO.json") == 1                  # Đ5: khớp đúng 1 lần
+    assert not [k for k in SHA_WO345 if k.endswith(".DO.json")]           # ⛔ ghim sha của ảnh `.DO`
 
 
 def test_AC2_khuon_la_tep_rieng_va_tai_dung_than_co_san():
