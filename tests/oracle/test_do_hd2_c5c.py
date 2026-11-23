@@ -110,9 +110,11 @@ def test_AC1_dap_an_dung_co_ten_va_mau_so_khong_rong(tq):
 
 # ── H14-R1-01 · đáp án ô so = 0 ⇒ cổng ⛔ `true` ─────────────────────────────────────────────────────────────────────
 
-def test_R1_01_cong_null_co_ten_khi_605_o_so_0_chua_ky(tq):
-    """Đ3 · Đ5: phép ⛔ đo được ⛔ xanh. 605 ô so 0/13.706 + chưa chữ ký chủ ⇒ `dat = None`, chuỗi nói 605 + 615."""
-    assert c5c.DUNG_KY == {}                                              # chưa có chữ ký chủ "DỪNG có tên"
+def test_R1_01_cong_null_co_ten_khi_605_o_so_0_chua_ky(ne, da, bao, monkeypatch):
+    """Đ3 · Đ5: phép ⛔ đo được ⛔ xanh. 605 ô so 0/13.706 + chưa chữ ký chủ ⇒ `dat = None`, chuỗi nói 605 + 615.
+    *(23/11 chủ đã ký ⇒ dựng trạng thái CHƯA ký bằng cách gỡ `DUNG_KY`.)*"""
+    monkeypatch.setattr(c5c, "DUNG_KY", {})
+    tq = c5c.so_sanh_c5c(ne, da, c5c.mong_c5c_mac_dinh(), bao=bao)
     assert tq.phan_xu.dat is True and tq.dat is None and tq.hd2_cong["dat"] is None
     (k,) = tq.hd2_cong["khong_do_duoc"]
     assert k.startswith("605: ô so 0/13706 ô số") and "chữ ký" in k
@@ -131,7 +133,9 @@ def test_R1_01_o_so_lon_hon_0_TUNG_dap_an_va_do_phu_khai(tq):
 
 
 def test_R1_01_chu_ky_DUNG_co_ten_la_ngoai_le_duy_nhat(ne, da, bao, monkeypatch):
-    monkeypatch.setitem(c5c.DUNG_KY, "605", "chủ ký 'DỪNG có tên' (bài — giả lập)")
+    monkeypatch.setattr(c5c, "DUNG_KY", {})
+    assert c5c.so_sanh_c5c(ne, da, c5c.mong_c5c_mac_dinh(), bao=bao).dat is None      # chưa ký ⇒ None
+    monkeypatch.setitem(c5c.DUNG_KY, "605", dict(KY_605, ly_do="bài — giả lập chữ ký có cấu trúc"))
     t = c5c.so_sanh_c5c(ne, da, c5c.mong_c5c_mac_dinh(), bao=bao)
     assert t.dat is True and t.hd2_cong["khong_do_duoc"] == []
 
@@ -385,7 +389,7 @@ def test_AC5_kho_rong_DO_roi_nap_nen_DAT():
         c.rollback()
     assert not t0.phan_xu.dat and any("IX.PER" in x for x in t0.phan_xu.ly_do), t0.phan_xu.ly_do
     assert t1.phan_xu.dat, t1.phan_xu.ly_do[:3]
-    assert t1.dat is None                                                 # 605 DỪNG chưa ký (H14-R1-01)
+    assert t1.dat is True                                                 # 605 DỪNG ĐÃ ký 23/11 (H14-R1-01 → KY605)
     assert (t1.hd2_cong["tong_o"], t1.hd2_cong["khop"]) == (86150, 77672)
 
 
@@ -393,9 +397,9 @@ def test_AC5_hd2_cong_json_khoi_WP_C5c_khop_lan_do(tq):
     d = json.loads(FILE_HD2.read_text(encoding="utf-8"))["WP-C5c"]
     for k in ("goi", "tong_o", "khop", "khop_co_so", "o_co_so", "o_0_0", "lech_co_chu_dich",
               "mong_lech_co_chu_dich", "lech_ngoai_ten", "dat", "dat_mong", "dap_an_dung", "check", "fs_tham_so",
-              "do_phu", "khong_do_duoc", "phu_mot_phan"):
+              "do_phu", "khong_do_duoc", "phu_mot_phan", "dung_co_ky"):
         assert d[k] == json.loads(json.dumps(tq.hd2_cong[k], ensure_ascii=False)), k
-    assert (d["tong_o"], d["khop"], d["lech_co_chu_dich"], d["dat"], d["dat_mong"]) == (86150, 77672, 8478, None, True)
+    assert (d["tong_o"], d["khop"], d["lech_co_chu_dich"], d["dat"], d["dat_mong"]) == (86150, 77672, 8478, True, True)
     assert sum(o for o, *_ in MONG_O.values()) == d["tong_o"]
 
 
@@ -474,3 +478,64 @@ def test_R2i_rao_DT13_engine_goi_kiem_va_ket_qua_vao_ly_do(ne, da, bao, monkeypa
     monkeypatch.setitem(c5c.rao.RAO, "sign_off_dau_vao", (frozenset({"608", "605"}), frozenset()))
     t = c5c.so_sanh_c5c(ne, da, c5c.mong_c5c_mac_dinh(), bao=bao)
     assert t.dat is False and any("rào DT13" in x and "605" in x for x in t.phan_xu.ly_do), t.phan_xu.ly_do[:3]
+
+
+# ── Chữ ký chủ "605 DỪNG có tên" (23/11) · đóng `H14-R2-02` — chữ ký = BẢN GHI CÓ CẤU TRÚC, ⛔ mọi chuỗi ────────────
+KY_605 = {"nguoi_ky": "KhanhCQ", "ngay": "2026-11-23", "nguon_quyet": "TIEN_DO 2026-11-23"}
+
+
+def test_KY605_dung_ky_la_ban_ghi_co_cau_truc_dung_4_khoa():
+    ky = c5c.DUNG_KY["605"]
+    assert set(ky) == {"nguoi_ky", "ngay", "ly_do", "nguon_quyet"}
+    assert {k: ky[k] for k in KY_605} == KY_605
+    assert "[FS1][PLA5]" in ky["ly_do"] and "0 ứng viên" in ky["ly_do"] and "BG-320" in ky["ly_do"]
+    assert "@" not in ky["nguoi_ky"]                                      # ⛔ email
+    assert c5c.kiem_dung_ky(c5c.DUNG_KY) == []                            # chữ ký thật HỢP LỆ
+
+
+@pytest.mark.parametrize("hong, mau", [
+    (lambda k: k.pop("ly_do"), "thiếu trường"),
+    (lambda k: k.pop("nguon_quyet"), "thiếu trường"),
+    (lambda k: k.__setitem__("nguoi_ky", ""), "người ký rỗng"),
+    (lambda k: k.__setitem__("nguoi_ky", "   "), "người ký rỗng"),
+    (lambda k: k.__setitem__("ngay", "23/11/2026"), "ngày"),
+    (lambda k: k.__setitem__("ngay", "2026-13-40"), "ngày"),
+    (lambda k: k.__setitem__("ly_do", ""), "lý do rỗng"),
+    (lambda k: k.__setitem__("nguoi_ky", "khanhcq@apero.vn"), "email"),
+])
+def test_KY605_chu_ky_hong_thi_DO_co_ten(ne, da, bao, monkeypatch, hong, mau):
+    ky = dict(c5c.DUNG_KY["605"])
+    hong(ky)
+    monkeypatch.setattr(c5c, "DUNG_KY", {"605": ky})
+    loi = c5c.kiem_dung_ky(c5c.DUNG_KY)
+    assert loi and all(x.startswith("605:") for x in loi) and any(mau in x for x in loi), loi
+    t = c5c.so_sanh_c5c(ne, da, c5c.mong_c5c_mac_dinh(), bao=bao)
+    assert t.dat is False and any(x.startswith("DUNG_KY 605:") for x in t.phan_xu.ly_do), t.phan_xu.ly_do[:3]
+
+
+def test_KY605_chuoi_tu_do_va_ma_la_deu_DO(ne, da, bao, monkeypatch):
+    """H14-R2-02 gốc: `{"605": "x"}` từng mở cổng. Nay chuỗi tự do ⇒ ĐỎ; mã ⛔ phải đáp án DỪNG ⇒ ĐỎ."""
+    for sai in ({"605": "x"}, {"999": dict(KY_605, ly_do="x")}):
+        monkeypatch.setattr(c5c, "DUNG_KY", sai)
+        assert c5c.kiem_dung_ky(sai)
+        t = c5c.so_sanh_c5c(ne, da, c5c.mong_c5c_mac_dinh(), bao=bao)
+        assert t.dat is False, sai
+
+
+def test_KY605_hop_le_thi_605_roi_danh_sach_chan_va_hien_trong_chuoi(tq):
+    """Đ5 chiều 1: chữ ký hợp lệ ⇒ 605 ⛔ chặn; 605 hiện là 'DỪNG có chữ ký KhanhCQ 2026-11-23' (⛔ biến mất im lặng)."""
+    h = tq.hd2_cong
+    assert h["khong_do_duoc"] == [] and tq.dat is True and h["dat"] is True
+    assert h["dung_co_ky"] == ["605: DỪNG có chữ ký KhanhCQ 2026-11-23"]
+    assert h["do_phu"]["605"]["o_so"] == 0 and h["do_phu"]["605"]["dung_ky"]["nguoi_ky"] == "KhanhCQ"
+    (p,) = h["phu_mot_phan"]
+    assert p.startswith("615: ô so 13760/48021 ô số · 34261 ô số chưa so")      # độ phủ 615 giữ nguyên chữ
+
+
+def test_KY605_go_chu_ky_thi_lai_None_co_ten(ne, da, bao, monkeypatch):
+    """Đ5 chiều 2: gỡ chữ ký ⇒ 605 lại chặn, cổng `None` có tên."""
+    monkeypatch.setattr(c5c, "DUNG_KY", {})
+    t = c5c.so_sanh_c5c(ne, da, c5c.mong_c5c_mac_dinh(), bao=bao)
+    assert t.dat is None and t.hd2_cong["dung_co_ky"] == []
+    (k,) = t.hd2_cong["khong_do_duoc"]
+    assert k.startswith("605: ô so 0/13706 ô số") and "CHƯA có chữ ký" in k
