@@ -48,7 +48,30 @@ HO_VIET = ("NGUYEN", "TRAN", "LE", "PHAM", "HOANG", "HUYNH", "PHAN", "VU", "VO",
            "TA", "TO", "VUONG", "KIEU", "THAI", "QUACH", "DAO", "DOAN", "LUU", "CHU", "TANG")
 # ⚠ từ ngay sau tên mà dính `-`/số (mã `PM-1201-01`) ⛔ thuộc tên — đo 23/11: bản đầu nuốt `PM` của
 #   "TRAN THI B PM-1201-01" ⇒ mã PM mất ⇒ ca dựng c12 trượt ghép (fleet eval vòng 3 bắt được).
-MAU_TEN = re.compile(r"\b(?:" + "|".join(HO_VIET) + r")(?:\s+[A-Z]{1,8}\b(?![\-\d])){1,3}")
+# ⚠ Bia `AG-R1-03` (KQ-331): bản đầu chỉ bắt tên HOA ⇒ `Vo Thi Lan` (Hoa-thường) lọt. Nay: họ viết HOA hoặc
+#   Hoa-thường, các từ sau cùng kiểu (HOA `[A-Z]{1,8}` hoặc Hoa-thường `[A-Z][a-z]{1,7}`) — ⛔ IGNORECASE: chữ
+#   thường `do`/`to`/`ha` là từ thường của nội dung, ⛔ phải họ.
+_HO = "|".join(HO_VIET + tuple(h.capitalize() for h in HO_VIET))
+MAU_TEN = re.compile(r"\b(?:" + _HO + r")(?:\s+(?:[A-Z]{1,8}|[A-Z][a-z]{1,7})\b(?![\-\d])){1,3}")
+# ⚠ Bia `AG-R1-03`: `\d{6,}` chỉ bắt dãy LIỀN ⇒ `1234.5678.9012` · `0123-4567-8901-2` · `9704 1234 5678 9012` ·
+#   `098-765-4321` lọt **5/10** ca khó. Nay: một CỤM số = nhóm chữ số nối bằng MỘT dấu `.`/`-`/cách; đếm chữ số SAU
+#   KHI BỎ DẤU. Ngày/kỳ (`2026-08-26` · `2025-01`) ⛔ là cụm (khuôn `MAU_NGAY_KY`) — ⛔ che nhầm kỳ.
+MAU_CUM_SO = re.compile(r"(?<![\w.\-])\+?\d+(?:[.\- ]\d+)*(?![\w])")
+MAU_NGAY_KY = re.compile(r"\d{4}-\d{2}(?:-\d{2})?(?:\s+\d{4}-\d{2}(?:-\d{2})?)*")
+SO_CHU_SO_CHE = 6       # lớp nội dung: cụm ≥ 6 chữ số ⇒ <SO>
+SO_CHU_SO_CAM = 9       # lớp 2: cụm ≥ 9 chữ số ⇒ CamGui
+
+
+def cum_so_dai(van: str, toi_thieu: int) -> list[str]:
+    """Các cụm số có ≥ `toi_thieu` chữ số SAU KHI BỎ DẤU `.`/`-`/cách/`+` (⛔ tính ngày/kỳ)."""
+    ra = []
+    for m in MAU_CUM_SO.finditer(van):
+        cum = m.group(0)
+        if MAU_NGAY_KY.fullmatch(cum):
+            continue
+        if sum(c.isdigit() for c in cum) >= toi_thieu:
+            ra.append(cum)
+    return ra
 KHOA_NOI_DUNG = re.compile(r"noi:[A-Za-z0-9_\-]+\.noi_dung")
 
 
@@ -89,7 +112,10 @@ def che_noi_dung(van: str) -> tuple[str, int]:
         return s2
     s = thay(MAU_EMAIL, "<EMAIL>", van)
     s = thay(MAU_DIEN_THOAI, "<DT>", s)
-    s = thay(re.compile(r"\d{6,}"), "<SO>", s)
+    for cum in sorted(set(cum_so_dai(s, SO_CHU_SO_CHE)), key=len, reverse=True):
+        k = len(re.findall(r"(?<![\w.\-])" + re.escape(cum) + r"(?![\w])", s))
+        s = re.sub(r"(?<![\w.\-])" + re.escape(cum) + r"(?![\w])", "<SO>", s)
+        n += k
     s = thay(MAU_TEN, "<TEN>", s)
     return s, n
 
@@ -154,7 +180,10 @@ def kiem_den(yeu_cau: dict) -> list[str]:
                 except json.JSONDecodeError:
                     pass
             dem["email"] += len(MAU_EMAIL.findall(x))
-            dem["so_dai"] += len(MAU_SO_DAI.findall(x))
+            # bia `AG-R1-03`: `MAU_SO_DAI` chỉ bắt dãy LIỀN ⇒ 0/5 ca có dấu bị chặn. Cộng cụm có dấu (bỏ dấu ≥ 9 số);
+            # dãy liền đã đếm bằng `MAU_SO_DAI` (giữ luật ⛔ bắt trong vân tay hex) ⇒ ⛔ đếm hai lần.
+            dem["so_dai"] += len(MAU_SO_DAI.findall(x)) + sum(
+                1 for c in cum_so_dai(x, SO_CHU_SO_CAM) if not c.isdigit())
             dem["dt"] += len(MAU_DIEN_THOAI.findall(x))
     # Khoá của KHUÔN API (`tools[].description` · `input_schema`) ⛔ là dữ liệu: soát khoá chỉ ở `messages`/`system`;
     # chuỗi thì soát MỌI nơi (kể cả mô tả công cụ).

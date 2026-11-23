@@ -88,6 +88,28 @@ def doi_chieu_skill(nhan_skill: str, mau_o: tuple[str, ...], ra_agent: dict[str,
     return ra
 
 
+#: ⭐ Bia `AG-R1-01` (KQ-331): report in *"627/627 khớp"* MỘT mẫu số, trong khi **70/627** ô là phép so VÒNG TRÒN —
+#:    công cụ của agent và cột "máy" cùng đọc MỘT tệp/ảnh (sửa `hd2_cong.json` ⇒ vẫn 627/627). Nay tách hai nhóm,
+#:    HAI mẫu số riêng (Đ4 — mỗi số nói nó đếm gì):
+#:    · ĐỘC LẬP   `voi` — đường agent chạy LẠI engine FLS trên ảnh đóng băng; cột máy đọc `voi_so_luong.json` đã ghi
+#:                (sửa 1 ô tệp ⇒ LECH 1). Vẫn là engine ↔ tệp đo, ⛔ mô hình ↔ sự thật.
+#:    · VÒNG TRÒN `hd2` · `cong` · `nguon` — hai đường cùng đọc một nguồn ⇒ khớp HIỂN NHIÊN khi chép đúng; chỉ bắt
+#:                lỗi CHÉP của agent, ⛔ bắt lỗi dữ liệu.
+NGUON_DOC_LAP = ("voi",)
+NGUON_VONG_TRON = ("hd2", "cong", "nguon")
+DOC_LAP, VONG_TRON = "doc_lap", "vong_tron"
+
+
+def nhom_o(ma: str) -> str:
+    """Nhóm của một ô theo NGUỒN. Nguồn lạ ⇒ `vong_tron` (⛔ tự nhận độc lập khi chưa chứng minh)."""
+    return DOC_LAP if ma.split(":", 1)[0] in NGUON_DOC_LAP else VONG_TRON
+
+
+def tom_tat_nhom(ds: list[O]) -> dict[str, dict[str, int]]:
+    """`{doc_lap: tom_tat, vong_tron: tom_tat}` — hai mẫu số riêng."""
+    return {n: tom_tat([o for o in ds if nhom_o(o.ma) == n]) for n in (DOC_LAP, VONG_TRON)}
+
+
 def tom_tat(ds: list[O]) -> dict[str, int]:
     dem = {k: 0 for k in (KHOP,) + TRANG_THAI_DO}
     for o in ds:

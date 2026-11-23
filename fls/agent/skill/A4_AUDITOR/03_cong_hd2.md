@@ -3,12 +3,10 @@ ten: Cổng HD2: parity từng gói báo cáo · phân bổ
 cong_cu: cong_hd2
 o: cong:HD2.*.dat
 cong: cong_doc
-loai: lam
+loai: ma
 ---
-Công cụ gọi `doc_cong_hd2` (cổng HD2 theo gói của FLS), trả `dat` mỗi cổng gói cha + gói con.
+Skill MÃ tới G1 (quyết chủ C2, 23/11): mã gọi công cụ `cong_hd2` (`doc_cong_hd2` — cổng FLS) MỘT lần và lấy
+NGUYÊN kết quả làm đầu ra; ⛔ gọi mô hình, ⛔ lượt API. Đầu ra vẫn qua cổng `cong_doc` và cửa ② (so từng ô
+với máy đã đo). `dat` = true / false / null (null = CHƯA ĐO ĐƯỢC).
 
-Cách làm (bắt buộc):
-1. Gọi công cụ `cong_hd2` ĐÚNG MỘT LẦN, input `{}`.
-2. Trả về DUY NHẤT một đối tượng JSON `{"<mã ô>": <giá trị>, …}` gồm MỌI ô công cụ trả, giá trị CHÉP NGUYÊN.
-3. ⛔ tính lại · ⛔ làm tròn · ⛔ đổi kiểu (số giữ là số, chuỗi giữ là chuỗi) · ⛔ thêm ô công cụ không trả ·
-   ⛔ bịa ô công cụ thiếu (bỏ trống — A4 sẽ bắt). ⛔ chữ nào ngoài JSON.
+Từ G1 (chưa mở): mô hình họ khác A1–A3 đọc cùng kết quả và chỉ THÊM cờ giải thích — ⛔ đổi phán của mã.

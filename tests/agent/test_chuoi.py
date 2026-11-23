@@ -23,7 +23,11 @@ from fls.agent import mo_hinh as mh  # noqa: E402
 from fls.agent import report as rp  # noqa: E402
 
 #: Mong (Đ5) — số ô của bản phát lại hôm nay. Thêm/bớt mẫu ô ⇒ ĐỎ ⇒ khai lại ở đây + BG.
-MONG_SO_O = 627
+#: 627 → 631 (vòng sửa sau KQ-331, AG-R1-02): gộp nhánh làm việc mang gói H14 `WP-C5c` ⇒ +3 ô `hd2` A3.04 · +1 ô
+#: `cong:HD2` A4.03. Hai nhóm (AG-R1-01, Đ4): ĐỘC LẬP `voi` 557 · VÒNG TRÒN `hd2`+`cong`+`nguon` 74.
+MONG_SO_O = 631
+MONG_DOC_LAP = 557
+MONG_VONG_TRON = 74
 
 
 @pytest.fixture(scope="module")
@@ -38,6 +42,9 @@ def test_AC5_phat_lai__KET_DAT_lech_0(phat_lai):
     assert dem["mau_so"] == MONG_SO_O and dem[dc.KHOP] == MONG_SO_O
     assert all(dem[k] == 0 for k in dc.TRANG_THAI_DO)
     assert [a.dat_a4 for a in kc.agents] == [True] * 4
+    nhom = dc.tom_tat_nhom([o for a in kc.agents for o in a.o])
+    assert (nhom[dc.DOC_LAP]["mau_so"], nhom[dc.DOC_LAP][dc.KHOP]) == (MONG_DOC_LAP, MONG_DOC_LAP)
+    assert (nhom[dc.VONG_TRON]["mau_so"], nhom[dc.VONG_TRON][dc.KHOP]) == (MONG_VONG_TRON, MONG_VONG_TRON)
 
 
 def test_AC2_thu_tu_skill_va_agent(phat_lai):
@@ -129,7 +136,81 @@ def test_phat_lai_cu__DO_co_ten(tmp_path, monkeypatch):
 
 
 def test_report_html_khop_tep_trong_repo(phat_lai):
-    """`docs/ITL/06_Agent/report.html` phải là bản sinh từ bản phát lại hiện tại (trừ dòng ngày)."""
+    """`docs/ITL/06_Agent/report.html` phải là bản sinh từ bản phát lại hiện tại — BẰNG TỪNG BYTE (lấy ngày của tệp).
+
+    Bản đầu chỉ tìm chuỗi `"KẾT: ĐẠT — 627/627 ô khớp"` ⇒ trang đổi khối nào khác cũng xanh.
+    """
+    import re
     kc, may, dap, be = phat_lai
     tep = (GOC / "docs" / "ITL" / "06_Agent" / "report.html").read_text(encoding="utf-8")
-    assert "KẾT: ĐẠT — 627/627 ô khớp" in tep
+    ngay = re.findall(r"--ghi-report</code> · (\d{4}-\d{2}-\d{2})", tep)
+    assert len(ngay) == 1
+    html_, tom = cav.sinh_report(kc, may, dap, be, cav.ncc_cho("phat_lai"), ngay=ngay[0])
+    assert tom["dat"] and html_ == tep
+
+
+# ── AG-R1-01 · trung thực của report ─────────────────────────────────────────────────────────────────────────
+def _o_hd2_dau(kc) -> str:
+    return next(o.ma for a in kc.agents for o in a.o if o.ma.startswith("hd2:") and o.ma.endswith(".khop"))
+
+
+def test_AG_R1_01_sua_hd2__o_VONG_TRON_van_khop__KHONG_duoc_dem_la_doc_lap(tmp_path, phat_lai):
+    """Sửa `hd2_cong.json` ⇒ vẫn ĐẠT (vòng tròn: công cụ và máy cùng đọc tệp) — nên ô ấy ⛔ được vào nhóm ĐỘC LẬP,
+    và mẫu số độc lập ⛔ đổi. Đối chứng cùng bài: sửa `voi_so_luong.json` ⇒ ô ĐỘC LẬP LECH 1 (nhóm độc lập có răng)."""
+    ma = _o_hd2_dau(phat_lai[0])
+    goi, truong = ma.split(":", 1)[1].split(".")
+    d = json.loads(cav.TEP_HD2.read_text(encoding="utf-8"))
+    (d[goi] if goi in d else d)[truong] -= 1
+    hd2 = tmp_path / "hd2_cong.json"
+    hd2.write_text(json.dumps(d, ensure_ascii=False), encoding="utf-8")
+    kc, may, dap, be = cav.chay("gia", tep_hd2=hd2, ncc=cav.ncc_cho("gia"), cho_heldout=False)
+    assert kc.dat, "sửa hd2 mà ĐỎ ⇒ tiền đề vòng tròn đã đổi — khai lại AG-R1-01"
+    o = [x for a in kc.agents for x in a.o if x.ma == ma]
+    assert len(o) == 1 and o[0].trang_thai == dc.KHOP and dc.nhom_o(ma) == dc.VONG_TRON
+    html_, tom = cav.sinh_report(kc, may, dap, be, cav.ncc_cho("gia"), ngay="2026-11-23")
+    assert tom["doc_lap"] == {"mau_so": MONG_DOC_LAP, "khop": MONG_DOC_LAP}
+    assert tom["vong_tron"] == {"mau_so": MONG_VONG_TRON, "khop": MONG_VONG_TRON}
+    assert f"<code>{ma}</code></td><td>vòng tròn</td>" in html_
+
+    v = json.loads(cav.TEP_VOI.read_text(encoding="utf-8"))
+    v["bank_tong"]["dong_theo_hinh"]["A"] += 1
+    voi = tmp_path / "voi_so_luong.json"
+    voi.write_text(json.dumps(v, ensure_ascii=False), encoding="utf-8")
+    kc2 = cav.chay("gia", tep_voi=voi, ncc=cav.ncc_cho("gia"), cho_heldout=False)[0]
+    lech = [x for a in kc2.agents for x in a.o if x.trang_thai == dc.LECH]
+    assert [(x.ma, dc.nhom_o(x.ma)) for x in lech] == [("voi:bank_tong.dong_theo_hinh.A", dc.DOC_LAP)]
+
+
+def test_AG_R1_01_trang_khai_chung_minh_gi__va_nhan_mo_hinh_GIA(phat_lai):
+    kc, may, dap, be = phat_lai
+    html_, tom = cav.sinh_report(kc, may, dap, be, cav.ncc_cho("phat_lai"), ngay="2026-11-23")
+    assert "Báo cáo này chứng minh gì / ⛔ chứng minh gì" in html_
+    assert html_.count("bản phát lại sinh bằng mô hình GIẢ") == 3            # A1 · A2 · A3 (A4 là mã)
+    assert "<td>✅</td>" not in html_ and tom["mo_hinh_that"] == 0 and tom["nguon_tra_loi"] == ["gia-lap"]
+    assert "câu trả lời do mô hình GIẢ (0 lượt API thật)" in rp.dong_ket(tom)
+    # đối chứng: nguồn trả lời THẬT ⇒ nhãn GIẢ biến mất, ✅ được in (nhãn đọc từ nhà cung cấp, ⛔ hằng)
+    pb = {a.dn.ma: {"nguon_tra_loi": "anthropic"} for a in kc.agents}
+    html2, tom2 = rp.sinh(kc, pb, [], None, {}, "2026-11-23", may=may)
+    assert "mô hình GIẢ" not in html2 and "<td>✅</td>" in html2 and tom2["mo_hinh_that"] == 3
+
+
+def test_AG_R1_05_do_phu_khai_phan_KHONG_vao_mau_so(phat_lai):
+    kc, may, dap, be = phat_lai
+    html_, tom = cav.sinh_report(kc, may, dap, be, cav.ncc_cho("phat_lai"), ngay="2026-11-23")
+    assert "Độ phủ — phần tệp đo ⛔ vào mẫu số" in html_
+    # số đo KQ-331 (voi) · hd2 đổi theo gói WP-C5c của cây gộp
+    assert tom["do_phu"]["voi"] == {"la": 1045, "la_vao": 557, "so": 660, "so_vao": 318}
+    assert tom["do_phu"]["hd2"]["la_vao"] == 30 and tom["do_phu"]["hd2"]["la"] > 900
+
+
+# ── AG-R1-06 · A4 mã thuần tới G1 (quyết chủ C2) ─────────────────────────────────────────────────────────────
+def test_AG_R1_06_A4_ma_thuan__KHONG_dung_nha_cung_cap(monkeypatch, phat_lai):
+    from fls.agent.skill import nap_bo
+    assert {s.loai for s in nap_bo("A4_AUDITOR")} == {"ma"} and not ch.can_mo_hinh("A4_AUDITOR")
+    goi: list[str] = []
+    monkeypatch.setattr(cav.mh, "tao_that", lambda m, co, che_do="mo": goi.append(m.ma) or object())
+    ncc = cav.ncc_cho("that", True)
+    assert sorted(ncc) == ["A1_RI", "A2_PR_MAP", "A3_SI_ITL"] and mh.GEMINI_FLASH.ma not in goi
+    a4 = phat_lai[0].agents[3]
+    assert [k.so_luot for k in a4.skills] == [0, 0, 0, 0] and a4.dat_a4
+    assert {o.ma.split(":")[0] for o in a4.o} == {"cong", "voi"}               # ô A4 vẫn qua cửa ②

@@ -99,13 +99,13 @@
    "tra_loi": {
     "content": [
      {
-      "text": "{\"hd2:WP-C2.khop\": 63016, \"hd2:WP-C2.tong_o\": 63016, \"hd2:WP-C3a.khop\": 205140, \"hd2:WP-C3a.lech_co_chu_dich\": 35, \"hd2:WP-C3a.tong_o\": 205175, \"hd2:WP-C3b.khop\": 11543, \"hd2:WP-C3b.lech_co_chu_dich\": 42, \"hd2:WP-C3b.tong_o\": 11585, \"hd2:WP-C3c.khop\": 835, \"hd2:WP-C3c.lech_co_chu_dich\": 53, \"hd2:WP-C3c.tong_o\": 888, \"hd2:WP-C3d.khop\": 1287624, \"hd2:WP-C3d.lech_co_chu_dich\": 1791, \"hd2:WP-C3d.tong_o\": 1289415, \"hd2:WP-C4a.khop\": 420, \"hd2:WP-C4a.tong_o\": 420, \"hd2:WP-C4b.khop\": 1981, \"hd2:WP-C4b.tong_o\": 1981, \"hd2:WP-C4c.khop\": 19591, \"hd2:WP-C4c.lech_co_chu_dich\": 303, \"hd2:WP-C4c.tong_o\": 19894, \"hd2:WP-C5a.khop\": 40556, \"hd2:WP-C5a.lech_co_chu_dich\": 5118, \"hd2:WP-C5a.tong_o\": 45674, \"hd2:WP-C5b.khop\": 3179, \"hd2:WP-C5b.lech_co_chu_dich\": 923, \"hd2:WP-C5b.tong_o\": 4102}",
+      "text": "{\"hd2:WP-C2.khop\": 63016, \"hd2:WP-C2.tong_o\": 63016, \"hd2:WP-C3a.khop\": 205140, \"hd2:WP-C3a.lech_co_chu_dich\": 35, \"hd2:WP-C3a.tong_o\": 205175, \"hd2:WP-C3b.khop\": 11543, \"hd2:WP-C3b.lech_co_chu_dich\": 42, \"hd2:WP-C3b.tong_o\": 11585, \"hd2:WP-C3c.khop\": 835, \"hd2:WP-C3c.lech_co_chu_dich\": 53, \"hd2:WP-C3c.tong_o\": 888, \"hd2:WP-C3d.khop\": 1287624, \"hd2:WP-C3d.lech_co_chu_dich\": 1791, \"hd2:WP-C3d.tong_o\": 1289415, \"hd2:WP-C4a.khop\": 420, \"hd2:WP-C4a.tong_o\": 420, \"hd2:WP-C4b.khop\": 1981, \"hd2:WP-C4b.tong_o\": 1981, \"hd2:WP-C4c.khop\": 19591, \"hd2:WP-C4c.lech_co_chu_dich\": 303, \"hd2:WP-C4c.tong_o\": 19894, \"hd2:WP-C5a.khop\": 40556, \"hd2:WP-C5a.lech_co_chu_dich\": 5118, \"hd2:WP-C5a.tong_o\": 45674, \"hd2:WP-C5b.khop\": 3179, \"hd2:WP-C5b.lech_co_chu_dich\": 923, \"hd2:WP-C5b.tong_o\": 4102, \"hd2:WP-C5c.khop\": 77672, \"hd2:WP-C5c.lech_co_chu_dich\": 8478, \"hd2:WP-C5c.tong_o\": 86150}",
       "type": "text"
      }
     ],
     "stop_reason": "end_turn"
    },
-   "van_tay_yeu_cau": "7dae8fa0f2949523"
+   "van_tay_yeu_cau": "ab7bc4c0ca4d7e20"
   }
  ],
  "mo_hinh": "claude-opus-5-5",

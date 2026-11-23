@@ -101,6 +101,46 @@ def test_che_ten_KHONG_nuot_ma_PM():
     assert che.che_noi_dung("TRAN THI B PM-1201-01 tam ung")[0] == "<TEN> PM-1201-01 tam ung"
 
 
+# ── AG-R1-03 · ca khó (chuỗi BỊA của KQ-331 — ⛔ người thật) ──────────────────────────────────────────────────
+CA_KHO = [
+    ("CK 1234.5678.9012 tien hang", "1234.5678.9012"),          # số TK chấm
+    ("TK 0123-4567-8901-2 nhan", "0123-4567-8901-2"),            # số TK gạch
+    ("the 9704-1234-5678-9012", "9704-1234-5678-9012"),          # số thẻ gạch
+    ("the 9704 1234 5678 9012", "9704 1234 5678 9012"),          # số thẻ cách
+    ("goi 098-765-4321 xac nhan", "098-765-4321"),               # điện thoại gạch
+    ("Vo Thi Lan chuyen tien", "Vo Thi Lan"),                    # tên Hoa-thường
+    ("hoan ung Nguyen Van An", "Nguyen Van An"),                 # tên Hoa-thường, giữa câu
+]
+
+
+@pytest.mark.parametrize("van,bi_mat", CA_KHO)
+def test_AG_R1_03_ca_kho__che_noi_dung_BAT(van, bi_mat):
+    ra, n = che.che_noi_dung(van)
+    assert bi_mat not in ra and n >= 1, ra
+    assert not any(t in ra for t in bi_mat.replace(".", " ").replace("-", " ").split() if len(t) >= 3), ra
+
+
+@pytest.mark.parametrize("van,bi_mat", [c for c in CA_KHO if any(ch.isdigit() for ch in c[1])])
+def test_AG_R1_03_lop2_bat_cum_so_CO_DAU(van, bi_mat):
+    """Lớp 2 (`kiem_den`): cụm ≥ 9 chữ số SAU KHI BỎ DẤU ⇒ `CamGui` — kể cả khi lớp 1 bị vượt (prompt)."""
+    yc = {"model": "m", "system": "s", "messages": [{"role": "user", "content": van}]}
+    with pytest.raises(che.CamGui, match="dãy ≥ 9"):
+        che.che_yeu_cau(yc, "che_het")
+
+
+def test_AG_R1_03_co_RANG__bo_luat_cum_so_thi_LOT(monkeypatch):
+    """Phá luật cụm (về bản cũ chỉ bắt dãy liền) ⇒ ca khó LỌT ⇒ hai bài trên có răng (Đ5)."""
+    monkeypatch.setattr(che, "cum_so_dai", lambda van, toi_thieu: [])
+    assert "1234.5678.9012" in che.che_noi_dung(CA_KHO[0][0])[0]
+    assert che.kiem_den({"messages": [{"role": "user", "content": CA_KHO[1][0]}]}) == []
+
+
+def test_AG_R1_03_KHONG_che_nham__ky_ngay_ma_PM_chu_thuong():
+    for van in ("ky 2025-01 2025-02 ngay 2026-08-26", "PM-1201-01 tam ung do to ha", "so tien 15.000"):
+        assert che.che_noi_dung(van) == (van, 0)
+    assert che.kiem_den({"messages": [{"role": "user", "content": "ky 2025-01 2025-02 2025-03 ngay 2026-08-26"}]}) == []
+
+
 def test_MAC_DINH_mo__noi_dung_va_so_TK_di_nguyen__chi_bo_Email_Address():
     """Quyết định chủ 23/11: agent học mapping từ nội dung + số TK ⇒ ⛔ che. `Email Address` vẫn bỏ (CLAUDE.md)."""
     assert che.CHE_DO_MAC_DINH == "mo"

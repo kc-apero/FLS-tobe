@@ -8,7 +8,7 @@
 | **Đầu vào** | sổ ITL đóng băng 23 kỳ + ảnh Manual input 2026-03 + kết quả 10 gói engine HD2 |
 | **Đầu ra** | ô `voi:theo_ky.*.{o_parity,hd_parity,o_go_that,o_mac_dinh}(_khop)` · `voi:khoi_theo_ky.*.*` · `voi:tu_sinh.*` · `hd2:<gói>.{khop,tong_o,lech_co_chu_dich}` |
 | **Công cụ được gọi** *(CHỈ hàm FLS có sẵn)* | `final_7_khoi` · `vung_sua` · `tu_sinh` = `do_voi_so_luong.do()` (`final_rule.tinh_final` · `tu_soi.soi_mot_dong`) · `phan_bo_bao_cao` = số gói HD2 (`hd2_cong.json`, ghi bởi `tools/do_hd2.py`) |
-| **Mô hình ghim** | `claude-opus-5-5` · họ `anthropic` · ghim ✅ · **phương án A — chủ chốt 23/11** |
+| **Mô hình ghim** | `claude-opus-5-5` · họ `anthropic` · ghim — **CHƯA gọi thật** (bản phát lại do mô hình GIẢ sinh) · **phương án A — chủ chốt 23/11** |
 | **Dữ liệu & lưu giữ** *(chủ 23/11)* | agent đọc TOÀN BỘ nội dung giao dịch + số TK + tên (chỉ bỏ `Email Address`) · vận hành: Messages API dưới **ZDR** (bật theo tổ chức qua Anthropic) · fleet eval: **gửi theo lô** (Batches API — Anthropic giữ 29 ngày, đổi lấy −50 % giá; chủ chấp nhận) |
 | **Phiên bản** | checksum prompt `fe71100066e826c8` + mô hình ghim + checksum tham chiếu (tệp số máy đã đo) |
 | **Bước thông minh** | Hôm nay chép số engine. Đề xuất G0 (Voi roadmap 23/11): gợi ý ô vùng sửa khối 2 Loại GD + 7 Hoá đơn (ô máy ⛔ trả lời) — CHƯA dựng; cần ảnh Manual input 22 tháng. |
@@ -27,11 +27,11 @@ Loại: `lam` = mô hình làm, A4 so 100 % với máy · `bong` = G0 bóng, so 
 
 ## Cổng ra của agent
 
-A4 (mã `fls/agent/doi_chieu.py`) so MỌI ô skill `lam` với số máy đã đo — mong: lệch 0 · ⛔ đo được 0 · thiếu 0 · thừa 0. Khác ⇒ agent TRƯỢT, chuỗi DỪNG, agent sau ⛔ chạy.
+A4 (mã `fls/agent/doi_chieu.py`) so MỌI ô skill `lam` (và skill `ma` có công cụ) với số máy đã đo — mong: lệch 0 · ⛔ đo được 0 · thiếu 0 · thừa 0. Khác ⇒ agent TRƯỢT, chuỗi DỪNG, agent sau ⛔ chạy.
 
 ## ⛔ Không được làm
 
 - ⛔ gọi API thật khi thiếu chốt (`--that` + `FLS_CHO_GOI_API=1` + khoá + mô hình ghim)
 - ⛔ ghi kho · ⛔ sửa ảnh · ⛔ sửa engine/tuyến — chỉ GỌI công cụ được cấp
 - ⛔ tính lại / làm tròn / thêm ô / bịa ô — A4 so từng ô với máy
-- ⛔ gửi `Diễn giải` · `Số chứng từ` · tên người · email · số TK — bộ che `NFR-I13` chạy trước mọi lời gọi
+- ⛔ gửi `Email Address` (`PM_COT_RIENG_TU`) — bộ che chạy trước mọi lời gọi; mặc định `mo` (chủ 23/11: nội dung · số TK · tên đi nguyên văn) ⇒ chạy thật đòi thêm chốt `FLS_ZDR_DA_BAT=1` (ZDR); `--che che_noi_dung`/`che_het` che lại

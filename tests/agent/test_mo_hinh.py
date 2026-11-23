@@ -8,7 +8,8 @@ import pytest
 
 from fls.agent import mo_hinh as mh
 
-DU = {"FLS_CHO_GOI_API": "1", "ANTHROPIC_API_KEY": "khoa-gia-de-thu"}
+#: + `FLS_ZDR_DA_BAT` (vòng sửa sau KQ-331, AG-R1-11): chốt thứ năm khi chế độ che `mo` — "đủ chốt" nay gồm nó.
+DU = {"FLS_CHO_GOI_API": "1", "ANTHROPIC_API_KEY": "khoa-gia-de-thu", "FLS_ZDR_DA_BAT": "1"}
 
 
 def test_du_chot__khong_nem():
@@ -24,6 +25,17 @@ def test_du_chot__khong_nem():
 def test_thieu_mot_chot__CamGoiThat(co_that, mt, chu):
     with pytest.raises(mh.CamGoiThat, match=chu):
         mh.kiem_chot_that(mh.OPUS_5_5, co_that, mt)
+
+
+def test_AG_R1_11_che_do_mo_thieu_ZDR__CamGoiThat__che_het_KHONG_doi():
+    """Quyết chủ 23/11: `mo` gửi nguyên văn tên · số TK ⇒ đi KÈM ZDR — nay là chốt trong mã (bia AG-R1-11)."""
+    khong_zdr = {k: v for k, v in DU.items() if k != "FLS_ZDR_DA_BAT"}
+    with pytest.raises(mh.CamGoiThat, match="FLS_ZDR_DA_BAT"):
+        mh.kiem_chot_that(mh.OPUS_5_5, True, khong_zdr)                       # mặc định = `mo`
+    with pytest.raises(mh.CamGoiThat, match="FLS_ZDR_DA_BAT"):
+        mh.kiem_chot_that(mh.OPUS_5_5, True, {**khong_zdr, "FLS_ZDR_DA_BAT": "0"}, che_do="mo")
+    mh.kiem_chot_that(mh.OPUS_5_5, True, khong_zdr, che_do="che_het")
+    mh.kiem_chot_that(mh.OPUS_5_5, True, khong_zdr, che_do="che_noi_dung")
 
 
 def test_bi_danh_va_chua_ghim__bi_chan():

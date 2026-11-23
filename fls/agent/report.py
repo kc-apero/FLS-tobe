@@ -6,6 +6,11 @@
    Khác MỘT trong các số ấy ⇒ KẾT ĐỎ (cả hai chiều: thêm ô lệch hay bớt ô mong đều ĐỎ).
 ⭐ Lệch AS-IS CÓ TÊN (HD2 `lech_co_chu_dich` · HD1 dòng thiếu chưa ký) ở khối RIÊNG — ⛔ cộng vào lệch agent ↔ máy.
 ⭐ G0 bóng (ghép theo nội dung) ở khối RIÊNG — so với đáp án giữ riêng, ⛔ vào KẾT agent ↔ máy.
+⭐ Bia `AG-R1-01` (KQ-331 — chủ đòi "khớp 100 %"): trang cũ ghi `claude-opus-5-5 ✅` cạnh "627/627" trong khi bản
+   phát lại do mô hình GIẢ sinh, **0** chữ "giả", **0** chữ "chứng minh". Nay trang PHẢI có: khối *"Báo cáo này
+   chứng minh gì / ⛔ chứng minh gì"* · nhãn nguồn trả lời cạnh cột mô hình (giả ⇒ ⛔ dấu ✅) · KẾT tách ô ĐỘC LẬP
+   khỏi ô VÒNG TRÒN (`doi_chieu.nhom_o`), hai mẫu số riêng.
+⭐ Bia `AG-R1-05`: mẫu số = ô của các mẫu skill, ⛔ "mọi dữ liệu" — khối *Độ phủ* khai phần tệp đo ⛔ vào mẫu số.
 """
 from __future__ import annotations
 
@@ -62,6 +67,55 @@ details{margin:2px 0} summary{cursor:pointer}
 """
 
 
+#: Nguồn trả lời ⇒ có phải lượt API THẬT không. Khác danh sách này (giả · phát lại của giả · ⛔ rõ) ⇒ ⛔ thật.
+NGUON_THAT = ("anthropic", "google")
+
+
+def _la_that(pb: dict[str, Any] | None) -> bool:
+    return bool(pb) and str(pb.get("nguon_tra_loi", "")) in NGUON_THAT
+
+
+def _o_la(x: Any, duong: list[str], ra: list[tuple[str, bool]]) -> None:
+    """Lá của tệp đo theo đúng luật `o.mo_rong` (vô hướng · danh sách vô hướng). `(đường, là số vô hướng)`."""
+    if isinstance(x, dict):
+        for k, v in x.items():
+            _o_la(v, duong + [str(k)], ra)
+        return
+    if isinstance(x, list) and any(isinstance(y, (dict, list)) for y in x):
+        for i, y in enumerate(x):
+            _o_la(y, duong + [str(i)], ra)
+        return
+    ra.append((".".join(duong), isinstance(x, (int, float)) and not isinstance(x, bool)))
+
+
+def do_phu(may: dict[str, Any], ma_o: set[str], nguon: tuple[str, ...] = ("voi", "hd2")) -> list[dict[str, Any]]:
+    """Độ phủ mẫu số trên từng tệp đo, theo khối cấp 1: lá · lá vào mẫu số · lá SỐ · lá số vào mẫu số."""
+    ra: list[dict[str, Any]] = []
+    for n in nguon:
+        goc = may.get(n)
+        if not isinstance(goc, dict):
+            ra.append({"nguon": n, "khoi": "(VẮNG)", "la": 0, "la_vao": 0, "so": 0, "so_vao": 0})
+            continue
+        for k, v in goc.items():
+            la: list[tuple[str, bool]] = []
+            _o_la(v, [str(k)], la)
+            vao = [(d, s) for d, s in la if f"{n}:{d}" in ma_o]
+            ra.append({"nguon": n, "khoi": str(k), "la": len(la), "la_vao": len(vao),
+                       "so": sum(1 for _, s in la if s), "so_vao": sum(1 for _, s in vao if s)})
+    return ra
+
+
+def dong_ket(tom: dict[str, Any]) -> str:
+    """Dòng KẾT dùng chung cho trang và CLI — hai nhóm ô, hai mẫu số (Đ4), nhãn nguồn trả lời."""
+    dl, vt = tom["doc_lap"], tom["vong_tron"]
+    gia = "" if tom.get("mo_hinh_that") else " · câu trả lời do mô hình GIẢ (0 lượt API thật)"
+    return (f"{'ĐẠT' if tom['dat'] else 'ĐỎ'} — ô ĐỘC LẬP (voi: engine chạy lại ↔ tệp đo) {dl['khop']}/{dl['mau_so']} khớp"
+            f" · ô VÒNG TRÒN (hd2·cong·nguon: chỉ bắt lỗi chép) {vt['khop']}/{vt['mau_so']} khớp"
+            f" · lệch {tom[dc.LECH]} · ⛔ đo được {tom[dc.KHONG_DO_DUOC]} · thiếu {tom[dc.AGENT_THIEU]}"
+            f" · thừa {tom[dc.AGENT_THUA]} · chưa chạy {tom[dc.CHUA_CHAY]} · A4 ĐẠT {tom['agent_dat']}/{tom['agent']} agent"
+            + gia)
+
+
 def _dem_html(dem: dict[str, int]) -> str:
     cot = ("mau_so", dc.KHOP, dc.LECH, dc.KHONG_DO_DUOC, dc.AGENT_THIEU, dc.AGENT_THUA, dc.CHUA_CHAY)
     return "".join(f'<td class="s{" do" if k in dc.TRANG_THAI_DO and dem.get(k) else ""}">{dem.get(k, 0)}</td>'
@@ -69,16 +123,29 @@ def _dem_html(dem: dict[str, int]) -> str:
 
 
 def sinh(kc: KqChuoi, phien_ban: dict[str, Any], as_is: list[tuple[str, str, Any]],
-         g0: dict[str, Any] | None, nguon_may: dict[str, str], ngay: str) -> tuple[str, dict[str, Any]]:
-    """Trả (HTML, tóm tắt KẾT). `as_is` = [(nhóm, tên lệch, số)] · `g0` = tổng hợp chấm ghép nội dung."""
+         g0: dict[str, Any] | None, nguon_may: dict[str, str], ngay: str,
+         may: dict[str, Any] | None = None) -> tuple[str, dict[str, Any]]:
+    """Trả (HTML, tóm tắt KẾT). `as_is` = [(nhóm, tên lệch, số)] · `g0` = tổng hợp chấm ghép nội dung.
+
+    `phien_ban` = `{mã agent: {"nguon_tra_loi": …}}` — thiếu ⇒ coi là ⛔ gọi thật (⛔ được in ✅).
+    `may` = số máy đã đo (cho khối Độ phủ); `None` ⇒ khối ấy ghi ⛔ đo được.
+    """
     moi_o = [o for a in kc.agents for o in a.o]
     dem = dc.tom_tat(moi_o)
+    nhom = dc.tom_tat_nhom(moi_o)
+    dl, vt = nhom[dc.DOC_LAP], nhom[dc.VONG_TRON]
+    agent_mh = [a for a in kc.agents if any(k.skill.loai in ("lam", "bong") for k in a.skills)]
+    so_that = sum(1 for a in agent_mh if _la_that(phien_ban.get(a.dn.ma)))
+    nguon_tl = sorted({str((phien_ban.get(a.dn.ma) or {}).get("nguon_tra_loi", "⛔ rõ")) for a in agent_mh})
     so_agent_dat = sum(1 for a in kc.agents if a.dat_a4)
     mong = {dc.LECH: 0, dc.KHONG_DO_DUOC: 0, dc.AGENT_THIEU: 0, dc.AGENT_THUA: 0, dc.CHUA_CHAY: 0}
     lech_mong = {k: dem[k] for k, v in mong.items() if dem[k] != v}
     dat = (not lech_mong) and dem["mau_so"] > 0 and so_agent_dat == len(kc.agents) and kc.dung_o is None
     tom = {"dat": dat, "mau_so": dem["mau_so"], "khop": dem[dc.KHOP],
-           **{k: dem[k] for k in mong}, "agent_dat": so_agent_dat, "agent": len(kc.agents), "dung_o": kc.dung_o}
+           **{k: dem[k] for k in mong}, "agent_dat": so_agent_dat, "agent": len(kc.agents), "dung_o": kc.dung_o,
+           "doc_lap": {"mau_so": dl["mau_so"], "khop": dl[dc.KHOP]},
+           "vong_tron": {"mau_so": vt["mau_so"], "khop": vt[dc.KHOP]},
+           "mo_hinh_that": so_that, "agent_mo_hinh": len(agent_mh), "nguon_tra_loi": nguon_tl}
     h: list[str] = []
     w = h.append
     w(f"<!doctype html><html lang='vi'><head><meta charset='utf-8'><meta name='viewport' "
@@ -87,22 +154,50 @@ def sinh(kc: KqChuoi, phien_ban: dict[str, Any], as_is: list[tuple[str, str, Any
     w(f"<div class='mo'>Sinh bằng <code>python tools/chay_agent_voi.py --ghi-report</code> · {html.escape(ngay)} · "
       "chế độ PHÁT LẠI (⛔ gọi API thật) · ⛔ sửa tay.</div>")
     lop = "ok" if dat else "do"
-    w(f"<div class='ket {lop}'>KẾT: {'ĐẠT' if dat else 'ĐỎ'} — {dem[dc.KHOP]}/{dem['mau_so']} ô khớp · lệch {dem[dc.LECH]}"
-      f" · ⛔ đo được {dem[dc.KHONG_DO_DUOC]} · thiếu {dem[dc.AGENT_THIEU]} · thừa {dem[dc.AGENT_THUA]}"
-      f" · chưa chạy {dem[dc.CHUA_CHAY]} · A4 ĐẠT {so_agent_dat}/{len(kc.agents)} agent</div>")
-    w("<div class='mo'>Mong (khai trước, Đ5): lệch 0 · ⛔ đo được 0 · thiếu 0 · thừa 0 · chưa chạy 0 · A4 ĐẠT 4/4. "
-      "Khác một số ⇒ ĐỎ.</div>")
+    w(f"<div class='ket {lop}'>KẾT: {dong_ket(tom)}</div>")
+    gia = so_that == 0
+    w("<h2>0 · Báo cáo này chứng minh gì / ⛔ chứng minh gì</h2><table>"
+      "<tr><th>✅ chứng minh</th><th>⛔ KHÔNG chứng minh</th></tr><tr><td><ul>"
+      "<li><b>Đường ống</b>: 4 agent chạy TUẦN TỰ, cổng ra từng skill, A4 (MÃ) so từng ô; phá một cổng hay một ô ⇒ "
+      "chuỗi DỪNG có tên, agent sau ⛔ chạy (bài <code>tests/agent/test_chuoi.py</code>).</li>"
+      f"<li><b>Ô ĐỘC LẬP</b> <code>voi</code> — {dl[dc.KHOP]}/{dl['mau_so']}: engine FLS chạy LẠI trên ảnh đóng băng "
+      "bằng đúng tệp đo đã ghi (<code>voi_so_luong.json</code>); sửa 1 ô tệp ⇒ LECH 1.</li>"
+      "<li><b>A4 bắt lỗi CHÉP</b>: agent trả sai/thiếu/thừa 1 ô ⇒ A4 TRƯỢT, chuỗi DỪNG.</li></ul></td><td><ul>"
+      + (f"<li><b>Chất lượng mô hình</b>: bản phát lại sinh bằng <b>mô hình GIẢ</b> (nguồn trả lời "
+         f"<code>{html.escape(', '.join(nguon_tl))}</code> — chép nguyên kết quả công cụ); <b>0</b> lượt API thật. "
+         "Mã mô hình ở §1 là mô hình GHIM cho lần chạy thật — CHƯA chạy.</li>" if gia else
+         f"<li>Lượt API thật: {so_that}/{len(agent_mh)} agent gọi mô hình — xem §1.</li>")
+      + f"<li><b>Ô VÒNG TRÒN</b> <code>hd2</code> · <code>cong</code> · <code>nguon</code> — {vt[dc.KHOP]}/{vt['mau_so']}: "
+      "công cụ của agent và cột máy cùng đọc MỘT tệp/ảnh ⇒ khớp hiển nhiên khi chép đúng; sửa tệp ⇒ VẪN khớp. "
+      "Chỉ bắt lỗi chép, ⛔ bắt lỗi dữ liệu hay engine HD2.</li>"
+      "<li><b>\"Mọi dữ liệu\"</b>: mẫu số = ô của các mẫu skill — phần tệp đo ⛔ vào mẫu số khai ở §6 Độ phủ.</li>"
+      "<li><b>Đúng nghiệp vụ so với sổ AS-IS</b>: chỗ FLS ≠ AS-IS có tên ở §4, ⛔ tính vào khớp.</li>"
+      "</ul></td></tr></table>")
+    w("<div class='mo'>Mong (khai trước, Đ5): lệch 0 · ⛔ đo được 0 · thiếu 0 · thừa 0 · chưa chạy 0 · A4 ĐẠT 4/4 — "
+      "trên CẢ HAI nhóm ô. Khác một số ⇒ ĐỎ.</div>")
     if kc.dung_o:
         w(f"<p class='do'>⛔ {html.escape(kc.dung_o)}</p>")
     if lech_mong:
         w(f"<p class='do'>Lệch so với mong: {html.escape(json.dumps(lech_mong, ensure_ascii=False))}</p>")
 
-    w("<h2>1 · Phiên bản agent (mô hình ghim + checksum prompt + checksum tham chiếu)</h2><table>"
-      "<tr><th>agent</th><th>mô hình</th><th>họ</th><th>ghim</th><th>checksum prompt</th><th>A4</th></tr>")
+    w("<h2>1 · Phiên bản agent (mô hình ghim + nguồn trả lời + checksum prompt)</h2><table>"
+      "<tr><th>agent</th><th>mô hình ghim</th><th>câu trả lời trong report do ai sinh</th><th>họ</th><th>ghim</th>"
+      "<th>checksum prompt</th><th>A4</th></tr>")
     for a in kc.agents:
         m = a.dn.mo_hinh
-        w(f"<tr><td>{html.escape(a.dn.ten)}</td><td><code>{m.ma}</code></td><td>{m.ho}</td>"
-          f"<td>{'✅' if m.ghim else '<span class=do>CHƯA ghim</span>'}</td><td><code>{a.checksum}</code></td>"
+        pb = phien_ban.get(a.dn.ma) or {}
+        if a not in agent_mh:
+            ai = ("<b>MÃ thuần</b> — ⛔ gọi mô hình tới G1 (quyết chủ C2); mô hình bên trái là mô hình DỰ KIẾN cho G1")
+            ghim = "—"
+        elif _la_that(pb):
+            ai = f"API THẬT <code>{html.escape(str(pb.get('nguon_tra_loi')))}</code>"
+            ghim = "✅" if m.ghim else "<span class=do>CHƯA ghim</span>"
+        else:
+            ai = (f"<span class=do>bản phát lại sinh bằng mô hình GIẢ</span> (<code>"
+                  f"{html.escape(str(pb.get('nguon_tra_loi', '⛔ rõ')))}</code>) — 0 lượt API thật")
+            ghim = ("ghim · <span class=do>CHƯA gọi thật</span>" if m.ghim else "<span class=do>CHƯA ghim</span>")
+        w(f"<tr><td>{html.escape(a.dn.ten)}</td><td><code>{m.ma}</code></td><td>{ai}</td><td>{m.ho}</td>"
+          f"<td>{ghim}</td><td><code>{a.checksum}</code></td>"
           f"<td class='{'ok' if a.dat_a4 else 'do'}'>{'ĐẠT' if a.dat_a4 else 'TRƯỢT'}</td></tr>")
     w("</table><div class='mo'>Tham chiếu (số máy đã đo): " +
       " · ".join(f"<code>{html.escape(k)}</code> {html.escape(v)}" for k, v in nguon_may.items()) + "</div>")
@@ -124,27 +219,35 @@ def sinh(kc: KqChuoi, phien_ban: dict[str, Any], as_is: list[tuple[str, str, Any
               f"<td class=s>{ks.so_bo_che}</td></tr>")
     w("</table>")
 
-    w("<h2>3 · Mọi ô — agent ↔ máy, theo lớp và skill</h2><table><tr><th>lớp · skill</th><th>mẫu số</th>"
-      "<th>khớp</th><th>lệch</th><th>⛔ đo được</th><th>thiếu</th><th>thừa</th><th>chưa chạy</th></tr>")
+    w("<h2>3 · Mọi ô — agent ↔ máy, theo lớp và skill (hai nhóm, hai mẫu số)</h2><table><tr><th>lớp · skill</th>"
+      "<th>nhóm</th><th>mẫu số</th><th>khớp</th><th>lệch</th><th>⛔ đo được</th><th>thiếu</th><th>thừa</th><th>chưa chạy</th></tr>")
+    ten_nhom = {dc.DOC_LAP: "ĐỘC LẬP (voi)", dc.VONG_TRON: "VÒNG TRÒN (hd2·cong·nguon)"}
     for a in kc.agents:
         for ks in a.skills:
-            if ks.skill.loai != "lam":
+            if not ks.skill.mau_o or ks.skill.loai == "bong":
                 continue
-            ds = [o for o in a.o if o.skill == ks.skill.nhan]
-            w(f"<tr><td>{html.escape(ks.skill.nhan)}</td>{_dem_html(dc.tom_tat(ds))}</tr>")
-    w(f"<tr><th>TỔNG</th>{_dem_html(dem)}</tr></table>")
+            for n in (dc.DOC_LAP, dc.VONG_TRON):
+                ds = [o for o in a.o if o.skill == ks.skill.nhan and dc.nhom_o(o.ma) == n]
+                if ds:
+                    w(f"<tr><td>{html.escape(ks.skill.nhan)}{' <span class=mo>(mã)</span>' if ks.skill.loai == 'ma' else ''}"
+                      f"</td><td>{ten_nhom[n]}</td>{_dem_html(dc.tom_tat(ds))}</tr>")
+    for n in (dc.DOC_LAP, dc.VONG_TRON):
+        w(f"<tr><th>TỔNG {ten_nhom[n]}</th><th></th>{_dem_html(nhom[n])}</tr>")
+    w("</table>")
     for a in kc.agents:
         for ks in a.skills:
-            if ks.skill.loai != "lam":
+            if not ks.skill.mau_o or ks.skill.loai == "bong":
                 continue
             ds = [o for o in a.o if o.skill == ks.skill.nhan]
             t = dc.tom_tat(ds)
             co_do = any(o.do for o in ds)
             w(f"<details{' open' if co_do else ''}><summary><b>{html.escape(ks.skill.nhan)}</b> — "
               f"{t[dc.KHOP]}/{t['mau_so']} ô khớp{' · <span class=do>CÓ ĐỎ</span>' if co_do else ''}</summary>"
-              "<div class='bang-cuon'><table><tr><th>mã ô</th><th>đếm gì</th><th>agent</th><th>máy</th><th>trạng thái</th></tr>")
+              "<div class='bang-cuon'><table><tr><th>mã ô</th><th>nhóm</th><th>đếm gì</th><th>agent</th><th>máy</th>"
+              "<th>trạng thái</th></tr>")
             for o in ds:
-                w(f"<tr><td><code>{html.escape(o.ma)}</code></td><td>{html.escape(_nhan(o.ma))}</td>"
+                w(f"<tr><td><code>{html.escape(o.ma)}</code></td>"
+                  f"<td>{'độc lập' if dc.nhom_o(o.ma) == dc.DOC_LAP else 'vòng tròn'}</td><td>{html.escape(_nhan(o.ma))}</td>"
                   f"<td class=s>{_gt(o.agent)}</td><td class=s>{_gt(o.may)}</td>"
                   f"<td class={'do' if o.do else 'ok'}>{o.trang_thai}{(' · ' + html.escape(o.ly_do)) if o.ly_do else ''}</td></tr>")
             w("</table></div></details>")
@@ -165,5 +268,26 @@ def sinh(kc: KqChuoi, phien_ban: dict[str, Any], as_is: list[tuple[str, str, Any
         w("</table>")
     else:
         w("<p class=do>⛔ đo được — không có bể ca.</p>")
+
+    w("<h2>6 · Độ phủ — phần tệp đo ⛔ vào mẫu số</h2><div class='mo'>Lá = giá trị vô hướng hoặc danh sách vô hướng "
+      "(đúng luật mở mẫu ô). Mẫu số của KẾT chỉ gồm lá mà một mẫu skill đưa vào; phần còn lại chưa có agent nào chép.</div>")
+    if may is None:
+        w("<p class=do>⛔ đo được — thiếu số máy.</p>")
+    else:
+        dp = do_phu(may, {o.ma for o in moi_o})
+        w("<table><tr><th>tệp</th><th>khối</th><th>lá</th><th>lá vào mẫu số</th><th>lá ⛔ vào</th>"
+          "<th>lá SỐ</th><th>lá số vào</th></tr>")
+        for r in dp:
+            w(f"<tr><td>{r['nguon']}</td><td><code>{html.escape(r['khoi'])}</code></td><td class=s>{r['la']}</td>"
+              f"<td class=s>{r['la_vao']}</td><td class=s>{r['la'] - r['la_vao']}</td><td class=s>{r['so']}</td>"
+              f"<td class=s>{r['so_vao']}</td></tr>")
+        for n in ("voi", "hd2"):
+            rr = [r for r in dp if r["nguon"] == n]
+            la, vao = sum(r["la"] for r in rr), sum(r["la_vao"] for r in rr)
+            so, so_vao = sum(r["so"] for r in rr), sum(r["so_vao"] for r in rr)
+            tom.setdefault("do_phu", {})[n] = {"la": la, "la_vao": vao, "so": so, "so_vao": so_vao}
+            w(f"<tr><th>{n}</th><th>TỔNG</th><th class=s>{la}</th><th class=s>{vao}</th><th class=s>{la - vao}</th>"
+              f"<th class=s>{so}</th><th class=s>{so_vao}</th></tr>")
+        w("</table>")
     w("</body></html>")
     return "".join(h), tom

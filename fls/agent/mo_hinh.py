@@ -31,6 +31,12 @@ from pathlib import Path
 from typing import Any, Protocol
 
 BIEN_CHO_GOI = "FLS_CHO_GOI_API"
+#: ⭐ Quyết chủ 23/11: chế độ che `mo` (mặc định) gửi NGUYÊN VĂN nội dung · số TK · tên ra API — đi KÈM điều kiện
+#:    ZDR (zero data retention: nhà cung cấp ⛔ lưu dữ liệu). Bia `AG-R1-11` (KQ-331): điều kiện ấy chỉ nằm ở thẻ/BG,
+#:    **0** chỗ trong mã ⇒ nay là CHỐT THỨ NĂM của chế độ THẬT: `mo` ⇒ đòi `FLS_ZDR_DA_BAT=1` (người vận hành
+#:    xác nhận tài khoản API đã bật ZDR). Chế độ `che_noi_dung` · `che_het` ⛔ đòi (dữ liệu đã che).
+BIEN_ZDR = "FLS_ZDR_DA_BAT"
+CHE_DO_CAN_ZDR = ("mo",)
 #: Bí danh "mới nhất" ⛔ được ghim (Voi phase 1: *"mã mô hình đã ghim, ⛔ bí danh 'mới nhất'"*).
 DAU_BI_DANH = ("latest", "moi-nhat", "newest")
 
@@ -144,8 +150,12 @@ class GhiLai:
 
 
 # ── THẬT — chốt ba lớp + ghim ─────────────────────────────────────────────────────────────────
-def kiem_chot_that(mo_hinh: MoHinh, co_that: bool, moi_truong: dict[str, str] | None = None) -> None:
-    """⛔ trả về = được gọi thật. Thiếu bất kỳ chốt nào ⇒ `CamGoiThat` kèm TÊN chốt (⛔ giá trị khoá)."""
+def kiem_chot_that(mo_hinh: MoHinh, co_that: bool, moi_truong: dict[str, str] | None = None,
+                   che_do: str = "mo") -> None:
+    """⛔ trả về = được gọi thật. Thiếu bất kỳ chốt nào ⇒ `CamGoiThat` kèm TÊN chốt (⛔ giá trị khoá).
+
+    `che_do` mặc định `mo` (= mặc định của bộ che) ⇒ ⛔ quên truyền thì bị đòi ZDR, ⛔ lọt.
+    """
     mt = os.environ if moi_truong is None else moi_truong
     thieu = []
     if not co_that:
@@ -157,6 +167,8 @@ def kiem_chot_that(mo_hinh: MoHinh, co_that: bool, moi_truong: dict[str, str] | 
     lg = mo_hinh.loi_ghim()
     if lg:
         thieu.append(lg)
+    if che_do in CHE_DO_CAN_ZDR and mt.get(BIEN_ZDR) != "1":
+        thieu.append(f"chế độ che `{che_do}` gửi nguyên văn tên · số TK ⇒ đòi `{BIEN_ZDR}=1` (ZDR — quyết chủ 23/11)")
     if thieu:
         raise CamGoiThat("⛔ gọi API thật: " + " · ".join(thieu))
 
@@ -165,8 +177,8 @@ class AnthropicMessages:
     """Adapter Anthropic Messages API (SDK `anthropic`, nhập MUỘN — ⛔ có trong `requirements.txt`)."""
     ten = "anthropic"
 
-    def __init__(self, mo_hinh: MoHinh, co_that: bool = False, effort: str = "medium"):
-        kiem_chot_that(mo_hinh, co_that)
+    def __init__(self, mo_hinh: MoHinh, co_that: bool = False, effort: str = "medium", che_do: str = "mo"):
+        kiem_chot_that(mo_hinh, co_that, che_do=che_do)
         import anthropic  # noqa: PLC0415 — chỉ tới đây khi đủ chốt
         self.mo_hinh, self.effort = mo_hinh, effort
         self.client = anthropic.Anthropic()          # khoá đọc từ biến môi trường, ⛔ truyền tay
@@ -185,18 +197,18 @@ class GoogleChuaDung:
     """Chỗ cắm adapter họ Google (A4 · phương án A). Chốt chạy TRƯỚC — rồi mới báo chưa dựng."""
     ten = "google"
 
-    def __init__(self, mo_hinh: MoHinh, co_that: bool = False):
-        kiem_chot_that(mo_hinh, co_that)
+    def __init__(self, mo_hinh: MoHinh, co_that: bool = False, che_do: str = "mo"):
+        kiem_chot_that(mo_hinh, co_that, che_do=che_do)
         raise ChuaDung("adapter Gemini chưa dựng — chờ chủ chốt phương án A/B (câu chủ C1, C2 ở BG-330)")
 
     def goi(self, yeu_cau: dict) -> dict:  # pragma: no cover
         raise ChuaDung
 
 
-def tao_that(mo_hinh: MoHinh, co_that: bool) -> Any:
+def tao_that(mo_hinh: MoHinh, co_that: bool, che_do: str = "mo") -> Any:
     """Nhà cung cấp THẬT theo HỌ của mô hình — ⛔ cứng một hãng."""
     if mo_hinh.ho == "anthropic":
-        return AnthropicMessages(mo_hinh, co_that)
+        return AnthropicMessages(mo_hinh, co_that, che_do=che_do)
     if mo_hinh.ho == "google":
-        return GoogleChuaDung(mo_hinh, co_that)
+        return GoogleChuaDung(mo_hinh, co_that, che_do=che_do)
     raise ChuaDung(f"họ `{mo_hinh.ho}` chưa có adapter")
