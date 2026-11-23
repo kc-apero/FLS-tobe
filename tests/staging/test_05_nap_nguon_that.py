@@ -352,9 +352,11 @@ def test_TU_CHOI_thieu_cong_ghi_nguoi_nap_xau_va_kho_5433(monkeypatch, moi_truon
             nn.main(["--nap", "--nguoi-nap", xau])
     # DSN lấy từ kho scratch (đường duy nhất tới kho là `fls.db.kho` — luật `test_khong_ai_tro_lai_kho_that`), chỉ đổi CỔNG
     # sang 5433 = `fls-pg-1`: bài thử việc công cụ TỪ CHỐI cổng ấy, ⛔ nối tới nó.
-    monkeypatch.setenv("PG_DSN", re.sub(r":\d+/", ":5433/", kho))
-    with pytest.raises(SystemExit, match="5433"):
-        nn.main(["--nap", "--nguoi-nap", "khanh.thu"])
+    # `monkeypatch.context()`: trả `PG_DSN` về kho scratch TRƯỚC khi fixture `kho` dọn (dọn cần đúng cổng cụm phiên)
+    with monkeypatch.context() as m:
+        m.setenv("PG_DSN", re.sub(r":\d+/", ":5433/", kho))
+        with pytest.raises(SystemExit, match="5433"):
+            nn.main(["--nap", "--nguoi-nap", "khanh.thu"])
 
 
 def test_KHONG_GHI_ve_sheet_may_chu_khong_thay_yeu_cau_ghi_va_ma_khong_co_duong_ghi(monkeypatch, moi_truong, san_0, kho, nguon):
