@@ -1087,15 +1087,14 @@
    584
   ],
   "mid": [
-   4020,
+   4022,
    4088
   ],
   "lech_final": {},
   "lech_mid": {
    "invoice": 62,
-   "pay_type": 2,
    "cdt1": 2,
-   "id_payee": 2
+   "pay_type": 2
   },
   "o_loi": 0,
   "theo_ky": {
@@ -1533,15 +1532,14 @@
      584
     ],
     "mid": [
-     4020,
+     4022,
      4088
     ],
     "lech_final": {},
     "lech_mid": {
      "invoice": 62,
-     "pay_type": 2,
      "cdt1": 2,
-     "id_payee": 2
+     "pay_type": 2
     },
     "o_loi": 0
    },
@@ -1703,18 +1701,18 @@
    },
    "2026-11": {
     "ky": "2026-11",
-    "so_dong": 659,
+    "so_dong": 748,
     "o": [
-     4613,
-     4613
+     5236,
+     5236
     ],
     "hd": [
-     659,
-     659
+     748,
+     748
     ],
     "mid": [
-     4610,
-     4613
+     5233,
+     5236
     ],
     "lech_final": {},
     "lech_mid": {
@@ -1727,45 +1725,45 @@
   "chua_do": {},
   "tong": {
    "o": [
-    88339,
-    88431
+    88962,
+    89054
    ],
    "hd": [
-    12633,
-    12633
+    12722,
+    12722
    ],
    "mid": [
-    82362,
-    88431
+    82987,
+    89054
    ]
   },
   "moc_so": {
-   "2024-10": "20/11 (sổ hiện tại)",
-   "2024-11": "20/11 (sổ hiện tại)",
-   "2024-12": "20/11 (sổ hiện tại)",
-   "2025-01": "20/11 (sổ hiện tại)",
-   "2025-02": "20/11 (sổ hiện tại)",
-   "2025-03": "20/11 (sổ hiện tại)",
-   "2025-04": "20/11 (sổ hiện tại)",
-   "2025-05": "20/11 (sổ hiện tại)",
-   "2025-06": "20/11 (sổ hiện tại)",
-   "2025-07": "20/11 (sổ hiện tại)",
-   "2025-08": "20/11 (sổ hiện tại)",
-   "2025-09": "20/11 (sổ hiện tại)",
-   "2025-10": "20/11 (sổ hiện tại)",
-   "2025-11": "20/11 (sổ hiện tại)",
-   "2025-12": "20/11 (sổ hiện tại)",
-   "2026-01": "20/11 (sổ hiện tại)",
-   "2026-02": "20/11 (sổ hiện tại)",
-   "2026-03": "mốc CŨ (ảnh chụp sổ cũ — chủ chưa quyết đóng băng lại)",
-   "2026-04": "20/11 (sổ hiện tại)",
-   "2026-05": "20/11 (sổ hiện tại)",
-   "2026-06": "20/11 (sổ hiện tại)",
-   "2026-07": "20/11 (sổ hiện tại)",
-   "2026-08": "20/11 (sổ hiện tại)",
-   "2026-09": "20/11 (sổ hiện tại)",
-   "2026-10": "20/11 (sổ hiện tại)",
-   "2026-11": "20/11 (sổ hiện tại)"
+   "2024-10": "23/11 ≡ 20/11 (đóng băng lại ra checksum BẰNG ảnh 20/11 — đọc ảnh 20/11)",
+   "2024-11": "23/11 ≡ 20/11 (đóng băng lại ra checksum BẰNG ảnh 20/11 — đọc ảnh 20/11)",
+   "2024-12": "23/11 ≡ 20/11 (đóng băng lại ra checksum BẰNG ảnh 20/11 — đọc ảnh 20/11)",
+   "2025-01": "23/11 ≡ 20/11 (đóng băng lại ra checksum BẰNG ảnh 20/11 — đọc ảnh 20/11)",
+   "2025-02": "23/11 ≡ 20/11 (đóng băng lại ra checksum BẰNG ảnh 20/11 — đọc ảnh 20/11)",
+   "2025-03": "23/11 ≡ 20/11 (đóng băng lại ra checksum BẰNG ảnh 20/11 — đọc ảnh 20/11)",
+   "2025-04": "23/11 ≡ 20/11 (đóng băng lại ra checksum BẰNG ảnh 20/11 — đọc ảnh 20/11)",
+   "2025-05": "23/11 ≡ 20/11 (đóng băng lại ra checksum BẰNG ảnh 20/11 — đọc ảnh 20/11)",
+   "2025-06": "23/11 ≡ 20/11 (đóng băng lại ra checksum BẰNG ảnh 20/11 — đọc ảnh 20/11)",
+   "2025-07": "23/11 ≡ 20/11 (đóng băng lại ra checksum BẰNG ảnh 20/11 — đọc ảnh 20/11)",
+   "2025-08": "23/11 ≡ 20/11 (đóng băng lại ra checksum BẰNG ảnh 20/11 — đọc ảnh 20/11)",
+   "2025-09": "23/11 ≡ 20/11 (đóng băng lại ra checksum BẰNG ảnh 20/11 — đọc ảnh 20/11)",
+   "2025-10": "23/11 (nguồn sống — ảnh _20261123; chủ quyết nguồn sống là chuẩn)",
+   "2025-11": "23/11 ≡ 20/11 (đóng băng lại ra checksum BẰNG ảnh 20/11 — đọc ảnh 20/11)",
+   "2025-12": "23/11 ≡ 20/11 (đóng băng lại ra checksum BẰNG ảnh 20/11 — đọc ảnh 20/11)",
+   "2026-01": "23/11 ≡ 20/11 (đóng băng lại ra checksum BẰNG ảnh 20/11 — đọc ảnh 20/11)",
+   "2026-02": "23/11 ≡ 20/11 (đóng băng lại ra checksum BẰNG ảnh 20/11 — đọc ảnh 20/11)",
+   "2026-03": "23/11 (nguồn sống — ảnh _20261123; chủ quyết nguồn sống là chuẩn)",
+   "2026-04": "23/11 ≡ 20/11 (đóng băng lại ra checksum BẰNG ảnh 20/11 — đọc ảnh 20/11)",
+   "2026-05": "23/11 ≡ 20/11 (đóng băng lại ra checksum BẰNG ảnh 20/11 — đọc ảnh 20/11)",
+   "2026-06": "23/11 ≡ 20/11 (đóng băng lại ra checksum BẰNG ảnh 20/11 — đọc ảnh 20/11)",
+   "2026-07": "23/11 ≡ 20/11 (đóng băng lại ra checksum BẰNG ảnh 20/11 — đọc ảnh 20/11)",
+   "2026-08": "23/11 ≡ 20/11 (đóng băng lại ra checksum BẰNG ảnh 20/11 — đọc ảnh 20/11)",
+   "2026-09": "23/11 ≡ 20/11 (đóng băng lại ra checksum BẰNG ảnh 20/11 — đọc ảnh 20/11)",
+   "2026-10": "23/11 ≡ 20/11 (đóng băng lại ra checksum BẰNG ảnh 20/11 — đọc ảnh 20/11)",
+   "2026-11": "23/11 (nguồn sống — ảnh _20261123; chủ quyết nguồn sống là chuẩn)"
   }
  },
  "bank_tong": {

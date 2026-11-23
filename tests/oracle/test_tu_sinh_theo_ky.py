@@ -23,7 +23,8 @@ import pytest
 GOC = Path(__file__).resolve().parents[2]
 TOOL = GOC / "tools" / "do_voi_so_luong.py"
 F = GOC / "tests" / "fixture"
-MANIFEST = F / "dap_an" / "itl_ledge_cac_ky.json"
+# WO-345: manifest đóng băng lại 23/11 (nguồn sống) — manifest 20/11 `itl_ledge_cac_ky.json` giữ làm biên bản
+MANIFEST = F / "dap_an" / "itl_ledge_cac_ky_20261123.json"
 RA = GOC / "docs" / "ITL" / "_tools" / "voi_so_luong.json"
 
 
@@ -54,7 +55,7 @@ def test_B1_26_ky_co_anh_khong_chua_do(tsk):
     assert tsk["so_ky_co_anh"] == 26 == len(mf) and len(tsk["theo_ky"]) == 26      # Đ3: mẫu số 26 ≠ 0
     assert tsk["chua_do"] == {} and tsk["loi"] == []
     assert {k: x["so_dong"] for k, x in tsk["theo_ky"].items()} == mf               # số dòng đo = số dòng manifest
-    assert tsk["tong"]["hd"] == [sum(mf.values())] * 2 == [12633, 12633]
+    assert tsk["tong"]["hd"] == [sum(mf.values())] * 2 == [12722, 12722]          # WO-345 · CŨ 20/11: 12.633
 
 
 def test_B1_lech_theo_lop_co_ten(tsk):
@@ -71,9 +72,10 @@ def test_B1_lech_theo_lop_co_ten(tsk):
 # ── H15-B2 ──────────────────────────────────────────────────────────────────
 def test_B2_hoi_quy_2026_03(m, tsk):
     x = tsk["theo_ky"]["2026-03"]
-    assert tuple(x["hd"]) == (584, 584) and tuple(x["o"]) == (4088, 4088) and tuple(x["mid"]) == (4020, 4088)
+    # WO-345 · ảnh sống 23/11 — CŨ (ảnh sổ xlsx): MID (4020, 4088)
+    assert tuple(x["hd"]) == (584, 584) and tuple(x["o"]) == (4088, 4088) and tuple(x["mid"]) == (4022, 4088)
     assert (m.do_tu_sinh()["hd"], m.do_tu_sinh()["o"]) == ((584, 584), (4088, 4088))
-    assert "CŨ" in tsk["moc_so"]["2026-03"] and "20/11" in tsk["moc_so"]["2026-10"]      # hai mốc có nhãn (Đ4)
+    assert "nguồn sống" in tsk["moc_so"]["2026-03"] and "≡ 20/11" in tsk["moc_so"]["2026-10"]   # hai mốc có nhãn (Đ4)
 
 
 # ── H15-B3 ──────────────────────────────────────────────────────────────────
@@ -119,8 +121,8 @@ def _o_svc(d):
 def _do_voi_anh(m, ky, d, tmp_path, monkeypatch):
     p = tmp_path / f"{ky}.json"
     p.write_text(json.dumps(d, ensure_ascii=False), encoding="utf-8")
-    monkeypatch.setattr(m, "_duong_anh_ky", lambda k: p if k == ky else F / "dap_an" / f"itl_ledge_{k}.json"
-                        if k != "2026-03" else F / "itl_ledge_2026_03.json")
+    goc = m._duong_anh_ky        # WO-345: kỳ khác đi qua ĐƯỜNG THẬT (ảnh sống hoặc ảnh ≡) — ⛔ chép luật chọn ảnh
+    monkeypatch.setattr(m, "_duong_anh_ky", lambda k: p if k == ky else goc(k))
     return m
 
 
