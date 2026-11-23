@@ -347,14 +347,6 @@ def test_lay_bi_mat_loi_KHONG_in_gia_tri_hay_token():
         sv.shutdown()
 
 
-@pytest.fixture(scope="module")
-def kho_san(mt):
-    """Kho scratch đã qua bước 02 (di trú + phân quyền) — nền để chạy `vao.sh` bằng vai `fls_doc`/`fls_ghi` THẬT."""
-    r = H.chay_script("02_di_tru_phan_quyen.sh", mt["gia"], mt["kho"], mt["qt"])
-    assert r.returncode == 0, r.stdout + r.stderr
-    return mt
-
-
 def _cong_trong():
     s = socket.socket(); s.bind(("127.0.0.1", 0)); p = s.getsockname()[1]; s.close(); return p
 
@@ -542,11 +534,10 @@ def test_tinh_dockerfile_la_DANH_SACH_CHO_PHEP_va_dockerignore_khop():
     assert di[0] == "*", "`.dockerignore` phải mở đầu bằng `*` (danh sách CHO PHÉP)"
     code = [l for l in df.splitlines() if l.strip() and not l.lstrip().startswith("#")]
     copy = [l.split() for l in code if l.startswith("COPY ")]
-    nguon = [c[-2] if "--from=proxy" not in c else None for c in copy]
     for c in copy:
         if "--from=proxy" in c:
             continue
-        src = c[1]
+        src = [x for x in c[1:] if not x.startswith("--")][0]       # bỏ cờ (`--chown=…`)
         assert src not in (".", "./", "*") and not src.startswith(("/", "..")), f"COPY quá rộng: {c}"
         assert any(src.rstrip("/") == a.rstrip("/") for a in cho_phep), f"COPY {src} ⛔ nằm trong `!` của .dockerignore"
     for loai in ("sao_luu", "hien_vat", "Input_Raw", ".env"):

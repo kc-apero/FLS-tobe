@@ -35,3 +35,11 @@ def mt(tmp_path_factory):
         H.chay_quan_tri(f"DROP ROLE IF EXISTS {v}")
     if tao_csu:
         H.chay_quan_tri("DROP ROLE IF EXISTS cloudsqlsuperuser")
+
+
+@pytest.fixture(scope="module")
+def kho_san(mt):
+    """Kho scratch đã qua bước 02 (di trú + phân quyền) — nền để chạy `vao.sh`/`04` bằng vai `fls_doc`/`fls_ghi` THẬT."""
+    r = H.chay_script("02_di_tru_phan_quyen.sh", mt["gia"], mt["kho"], mt["qt"])
+    assert r.returncode == 0, r.stdout + r.stderr
+    return mt

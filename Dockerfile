@@ -36,7 +36,8 @@ RUN --mount=type=secret,id=pipca,required=false \
 COPY --from=proxy /cloud-sql-proxy /usr/local/bin/cloud-sql-proxy
 COPY fls ./fls
 COPY tools ./tools
-COPY docs/ITL/_tools ./docs/ITL/_tools
+# `--chown`: `tools/staging/app/chay_chuoi.sh --ghi` (người test bấm "chạy chuỗi") ghi lại `hd2_cong.json` — cửa đọc nó MỖI yêu cầu.
+COPY --chown=fls:fls docs/ITL/_tools ./docs/ITL/_tools
 # Ảnh đáp án + đầu vào đã đóng băng (đã commit, đã quét PII) — chuỗi HD2 `tools/do_hd2.py` đọc chúng.
 COPY tests/fixture ./tests/fixture
 
