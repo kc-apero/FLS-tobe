@@ -119,6 +119,10 @@ def test_dung_tu_trong_ra_DAT_va_ngu_canh_build_SACH(gcp, chim_hoang_yen):
                 "tests/fixture/dap_an/gl_406_dau_vao.json"):
         assert can in tep, (can, len(tep))
     assert len(tep) > 200
+    # ⭐ `STG-R2b-01`: gcloud tải lên ĐÚNG cả ngữ cảnh (giả nay lọc theo `.gcloudignore` như GCP đo) + mục BÁO CÁO có `mong`
+    assert len(tep) == gcp.doc()["builds"][0]["ngu_canh"] and ".gcloudignore" not in tep, len(tep)
+    assert H.dong_bao_cao(r.stdout)["ngữ cảnh build · tệp tải lên = tệp ngữ cảnh (≠ 0)"] == "ĐẠT"
+    assert re.search(rf"tệp ngữ cảnh / tệp gcloud tải lên \(đếm\)\s+{len(tep)} / {len(tep)}\b", r.stdout), r.stdout
     # ⛔ rồi chứng minh ÂM: chim hoàng yến (đã tồn tại thật trên đĩa) ⛔ có mặt
     tren_dia = [p for p in chim_hoang_yen if (H.GOC / "sao_luu" / p).exists() or (H.GOC / "hien_vat" / p).exists()
                 or (H.GOC / "Input_Raw" / p).exists() or (H.GOC / p).exists()]
@@ -573,7 +577,8 @@ def test_tinh_dockerfile_la_DANH_SACH_CHO_PHEP_va_dockerignore_khop():
     code = [l for l in df.splitlines() if l.strip() and not l.lstrip().startswith("#")]
     copy = [l.split() for l in code if l.startswith("COPY ")]
     for c in copy:
-        if "--from=proxy" in c:
+        if any(x.startswith("--from=") for x in c):   # chép từ TẦNG khác (proxy · goi — STG-R2b-05), ⛔ từ ngữ cảnh
+            assert [x for x in c if x.startswith("--from=")][0] in ("--from=proxy", "--from=goi"), c
             continue
         src = [x for x in c[1:] if not x.startswith("--")][0]       # bỏ cờ (`--chown=…`)
         assert src not in (".", "./", "*") and not src.startswith(("/", "..")), f"COPY quá rộng: {c}"
@@ -586,8 +591,10 @@ def test_tinh_dockerfile_la_DANH_SACH_CHO_PHEP_va_dockerignore_khop():
         "⛔ bí mật trong ENV/ARG của ảnh"
     assert any(l.startswith("USER fls") for l in code) and "ENTRYPOINT" in df
     assert re.search(r"cloud-sql-proxy:\d+\.\d+\.\d+", df) and ":latest" not in df, "ghim phiên bản proxy"
-    gi = (H.GOC / ".gcloudignore").read_text(encoding="utf-8")
-    assert [l for l in gi.splitlines() if l.strip() and not l.startswith("#")] == di, ".gcloudignore ≠ .dockerignore"
+    # ⭐ `STG-R2b-01` (lỗi THẬT GCP): bài cũ ở đây đòi `.gcloudignore` == `.dockerignore` — chính tệp ấy làm gcloud lọc mất
+    #   106/398 tệp (có Dockerfile). Ngữ cảnh đã là danh sách cho phép (`ngu_canh_build.sh`) ⇒ tệp bị XOÁ; lo gốc (ngữ cảnh
+    #   ⛔ mang rác/dữ liệu) giữ nguyên ở `.dockerignore` + bài chim hoàng yến.
+    assert not (H.GOC / ".gcloudignore").exists(), "`.gcloudignore` quay lại — gcloud sẽ lọc ngữ cảnh (STG-R2b-01)"
 
 
 def test_tinh_vm_khoi_dong_va_vao_sh_khong_cong_ra_khong_bi_mat():
@@ -608,5 +615,98 @@ def test_tinh_vm_khoi_dong_va_vao_sh_khong_cong_ra_khong_bi_mat():
         assert subprocess.run(["bash", "-n", str(sh)]).returncode == 0, sh
     s03 = "\n".join(l for l in S03.read_text(encoding="utf-8").splitlines() if not l.lstrip().startswith("#"))
     assert "--allow-unauthenticated" not in s03 and "allUsers" not in s03 and "allAuthenticatedUsers" not in s03
-    assert "git archive" in s03 and "builds submit \"$CTX\"" in s03, "ngữ cảnh build PHẢI từ git archive"
+    nc = (H.STG / "ngu_canh_build.sh").read_text(encoding="utf-8")
+    assert "ngu_canh_build.sh" in s03 and "git -C \"$GOC\" archive --format=tar HEAD" in nc \
+        and "builds submit \"$CTX\"" in s03, "ngữ cảnh build PHẢI từ git archive (qua ngu_canh_build.sh — STG-R2b-01)"
     assert not re.search(r"builds submit\s+(\.|\"?\$GOC)", s03), "⛔ submit cả thư mục làm việc"
+
+
+# ══ `STG-R2b-01` · `-04` · `-05` — lỗi THẬT GCP bước 03 (23/11): `.gcloudignore` lọc mất Dockerfile · Cloud Build ⛔ BuildKit ══
+
+def _ngu_canh(goc_rev: str, dich, them_gcloudignore: bool):
+    """Ngữ cảnh như bước 03 CŨ ở commit `goc_rev` (có/không `.gcloudignore`)."""
+    ds = ["Dockerfile", ".dockerignore", "requirements.txt", "fls", "tools", "docs/ITL/_tools", "tests/fixture"]
+    if them_gcloudignore:
+        ds.insert(2, ".gcloudignore")
+    dich.mkdir()
+    a = subprocess.run(["git", "-C", str(H.GOC), "archive", "--format=tar", goc_rev, "--", *ds], capture_output=True, check=True)
+    subprocess.run(["tar", "-x", "-C", str(dich)], input=a.stdout, check=True)
+    return sum(len(ns) for _, _, ns in os.walk(dich))
+
+
+def _submit_gia(gcp, ctx):
+    env = dict(os.environ, FLS_GIA_TRANG_THAI=str(gcp.tt))
+    return subprocess.run([sys.executable, str(GCLOUD_GIA), "--project=du-an-gia", "--quiet", "builds", "submit", str(ctx),
+                           "--tag", IMAGE], capture_output=True, text=True, env=env, timeout=60)
+
+
+def test_gia_gcloudignore_khop_so_do_THAT_GCP_398_ra_292_va_thieu_Dockerfile(gcp, tmp_path):
+    """Hiệu chỉnh đồ GIẢ trên SỐ ĐO THẬT (chủ chạy bước 03 ở `c4a0f39`): ngữ cảnh 398 tệp, gcloud tải 292, Cloud Build
+    `lstat /workspace/Dockerfile`. Giả cũ "tải" cả 398 ⇒ xanh giả. ⚠ Ngữ nghĩa gitignore THUẦN cho 1 (⛔ 292) — đã đo."""
+    n = _ngu_canh("c4a0f39", tmp_path / "ctx", True)
+    assert n == 398, n
+    r = _submit_gia(gcp, tmp_path / "ctx")
+    assert r.returncode == 1 and "Creating temporary archive of 292 file(s)" in r.stderr, r.stderr
+    assert "lstat /workspace/Dockerfile: no such file or directory" in r.stderr
+    tep = gcp.doc()["builds"][-1]["tep"]
+    assert sum(t.startswith("fls/") for t in tep) == 141 and sum(t.startswith("tools/") for t in tep) == 150 \
+        and "requirements.txt" in tep and not [t for t in tep if t.startswith(("docs/", "tests/"))], len(tep)
+
+
+def test_gia_bo_build_CU_tu_choi_RUN_mount_dung_chu_docker(gcp, tmp_path):
+    """`gcloud builds submit --tag` = bộ build CŨ. Đo cục bộ `DOCKER_BUILDKIT=0 docker build` (23/11) trên Dockerfile `c4a0f39`:
+    `the --mount option requires BuildKit` ở Step 9/16 — ĐÚNG câu Cloud Build in. Giả phải từ chối y vậy."""
+    _ngu_canh("c4a0f39", tmp_path / "ctx", False)
+    r = _submit_gia(gcp, tmp_path / "ctx")
+    assert r.returncode == 1 and "the --mount option requires BuildKit" in r.stderr, r.stderr
+    assert "Creating temporary archive of 397 file(s)" in r.stderr     # ⛔ .gcloudignore ⇒ ⛔ lọc gì
+
+
+def test_tinh_Dockerfile_KHONG_cu_phap_doi_BuildKit_va_co_cong_cu_thu_bo_build_cu():
+    df = (H.GOC / "Dockerfile").read_text(encoding="utf-8")
+    code = [l.strip() for l in df.splitlines() if l.strip() and not l.lstrip().startswith("#")]
+    assert not [l for l in code if re.match(r"RUN\s+--", l)], "RUN --mount/--network/--security đòi BuildKit (STG-R2b-05)"
+    assert not [l for l in code if re.match(r"(COPY|ADD)\s.*--(link|parents|exclude|chmod)\b", l)]
+    assert not re.search(r"^#\s*syntax\s*=", df, re.M) and not [l for l in code if re.search(r"<<-?\w", l)]
+    # CA proxy của máy dev chỉ sống ở tầng `goi`; tầng chạy ⛔ ARG/ENV nào mang nó
+    tang = df.split("\nFROM ")
+    assert len(tang) >= 4 and "AS goi" in tang[2] and "PIP_CA_PEM" in tang[2], "tầng gói riêng (multi-stage)"
+    assert "PIP_CA_PEM" not in tang[-1] and "COPY --from=goi /goi /usr/local" in tang[-1]
+    cc = H.STG / "thu_dung_anh.sh"
+    assert subprocess.run(["bash", "-n", str(cc)]).returncode == 0 and "DOCKER_BUILDKIT=0 docker build" in cc.read_text(encoding="utf-8")
+
+
+def test_ngu_canh_build_KHONG_co_tep_loc_va_tu_choi_dich_ban(tmp_path):
+    d = tmp_path / "ctx"
+    d.mkdir()
+    r = subprocess.run(["bash", str(H.STG / "ngu_canh_build.sh"), str(H.GOC), str(d)], capture_output=True, text=True, timeout=120)
+    assert r.returncode == 0, r.stderr
+    tep = {os.path.relpath(os.path.join(a, n), d) for a, _, ns in os.walk(d) for n in ns}
+    assert "Dockerfile" in tep and ".gcloudignore" not in tep and ".gitignore" not in tep and len(tep) > 200
+    assert re.search(rf"ngữ cảnh: {len(tep)} tệp, commit [0-9a-f]+", r.stdout), r.stdout
+    r2 = subprocess.run(["bash", str(H.STG / "ngu_canh_build.sh"), str(H.GOC), str(d)], capture_output=True, text=True)
+    assert r2.returncode == 2 and "NGU_CANH_DICH_BAN" in r2.stderr
+
+
+def test_ngu_canh_build_repo_CHUA_commit_thi_loi_CO_TEN__STG_R2b_04(tmp_path):
+    g = tmp_path / "repo"
+    subprocess.run(["git", "init", "-q", str(g)], check=True)
+    (tmp_path / "ctx").mkdir()
+    r = subprocess.run(["bash", str(H.STG / "ngu_canh_build.sh"), str(g), str(tmp_path / "ctx")], capture_output=True, text=True)
+    assert r.returncode == 2 and "NGU_CANH_RONG" in r.stderr, r.stderr
+
+
+def test_gcloud_loc_mat_Dockerfile_thi_BUILD_LOI_khong_dung_VM_va_BAO_CAO_DO_co_ten(gcp):
+    gcp.sua(lambda s: s.__setitem__("bo_tep", ["Dockerfile"]))
+    r = gcp.chay()
+    assert r.returncode == 1 and "BUILD_LOI" in r.stderr and "BÁO CÁO" in r.stdout, r.stdout + r.stderr
+    do = H.muc_do(r.stdout)
+    assert {"ngữ cảnh build · tệp tải lên = tệp ngữ cảnh (≠ 0)", "dựng ảnh · gcloud builds submit (exit)", "ảnh có tag mong"} <= do, do
+    assert not [d for d in gcp.lenh_da_goi() if d.startswith(("compute instances create", "compute firewall-rules create"))]
+
+
+def test_gcloud_loc_mat_MOT_tep_ma_build_van_qua_thi_DUNG_muc_dem_ĐỎ(gcp):
+    """Mục đếm phải có răng ngay cả khi Cloud Build tình cờ qua (tệp mất ⛔ phải Dockerfile)."""
+    gcp.sua(lambda s: s.__setitem__("bo_tep", ["tools/chay_cua.py"]))
+    r = gcp.chay()
+    assert r.returncode == 1 and H.muc_do(r.stdout) == {"ngữ cảnh build · tệp tải lên = tệp ngữ cảnh (≠ 0)"}, r.stdout

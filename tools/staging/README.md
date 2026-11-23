@@ -1,7 +1,7 @@
 # FLS staging — trình tự CHỦ chạy (01 → 02 → 03 → 04 → 05 → UAT)
 
 > ⛔ **Claude KHÔNG vào GCP** (quyết chủ 20/11): mọi script ở đây do **chủ** chạy trong **Google Cloud Shell**; chủ gửi lại **chỉ phần `BÁO CÁO`** (từ dòng `── BÁO CÁO` tới hết).
-> ⛔ **Chưa script nào chạy thật trên GCP** (đo 23/11). Mỗi script đã được thử với `gcloud` GIẢ + `cloud-sql-proxy` GIẢ + **`psql` · `pg_migrate` · quyền PostgreSQL THẬT** trên kho cục bộ (`tests/staging/`, 130 bài) — nên cú pháp, thứ tự, quyền và BÁO CÁO đã được chứng minh ĐỎ-khi-hỏng; còn những giả định về **chính GCP** ở §"Giả định chưa kiểm" bên dưới sẽ lộ ra ở BÁO CÁO thật.
+> ⛔ **Chưa script nào chạy thật trên GCP** (đo 23/11). Mỗi script đã được thử với `gcloud` GIẢ + `cloud-sql-proxy` GIẢ + **`psql` · `pg_migrate` · quyền PostgreSQL THẬT** trên kho cục bộ (`tests/staging/`, 96 bài) — nên cú pháp, thứ tự, quyền và BÁO CÁO đã được chứng minh ĐỎ-khi-hỏng; còn những giả định về **chính GCP** ở §"Giả định chưa kiểm" bên dưới sẽ lộ ra ở BÁO CÁO thật.
 > Nội dung gửi lại ⛔ chứa mật khẩu/khoá: BÁO CÁO chỉ có tên, cấu hình, số đếm (bài thử quét rò rỉ: 0 chỗ).
 
 Chuẩn bị một lần. Dưới đây viết `P` = `<PROJECT_ID>` (staging thật: `fp-a-project`, instance `fls-staging`, `asia-southeast1`; bước 01 đã ĐẠT 12/12 ngày 23/11).
@@ -13,9 +13,9 @@ Script 01 chỉ cần chính nó (đã chạy xong). Script 02/04 tự tạo ven
 
 | Bước | Lệnh (Cloud Shell) | Mất bao lâu *(ước — ⛔ đo được ở GCP)* | Gửi lại |
 |---|---|---|---|
-| **01** dựng Cloud SQL · 3 vai · bí mật · SA | `bash tools/staging/01_dung_staging_gcp.sh --project P --kiem` rồi bỏ `--kiem` | tạo máy Cloud SQL **5–15 phút** (script 01 tự ghi); còn lại < 2 phút | phần BÁO CÁO (12 mục) — cần `KẾT: ĐẠT` mới sang 02 |
-| **02** di trú + phân quyền | `bash tools/staging/02_di_tru_phan_quyen.sh --project P --kiem` rồi bỏ `--kiem` | ~1 phút (đo cục bộ: ~3 giây; thêm tạo venv + pip `psycopg` lần đầu ~1 phút, proxy + mạng) | phần BÁO CÁO (27 mục: `fls_itl` chỉ-THÊM · `fls_doc` chỉ SELECT · `pg_verify: khop`…) |
-| **03** ảnh + VM chạy app | `bash tools/staging/03_dung_app.sh --project P --kiem` rồi bỏ `--kiem`. Mặc định app **CHỈ ĐỌC**. Muốn người test KÝ: thêm `--che-do ghi --nguoi-ky <tên>`; cấp người vào: `--cap-quyen a@x.com,b@y.com` | Cloud Build **3–6 phút** (đo cục bộ: `docker build` 5 giây khi có cache, ảnh **373 MB**); VM tạo **~1 phút**, boot + cài docker + kéo ảnh **2–4 phút** ⇒ chờ rồi chạy lại `--kiem` để đo | phần BÁO CÁO (22 mục, kể cả ĐO TRONG VM: container sống · cổng 8088 chỉ nghe `127.0.0.1` · gọi không thẻ ⇒ 401) |
+| **01** dựng Cloud SQL · `fls_admin` · 5 bí mật · SA *(vai app `fls_ghi`/`fls_doc` do **02** tạo bằng SQL — `STG-R2b-02`)* | `bash tools/staging/01_dung_staging_gcp.sh --project P --kiem` rồi bỏ `--kiem` | tạo máy Cloud SQL **5–15 phút** (script 01 tự ghi); còn lại < 2 phút | phần BÁO CÁO (mục có `mong` ĐẠT/ĐỎ, kể cả 3 mục quyền của SA: đọc đúng 3 bí mật app · 0 bí mật quản trị · gán/gỡ không lỗi — chạy lại 01 sẽ GỠ quyền thừa nếu có) — cần `KẾT: ĐẠT` mới sang 02 |
+| **02** di trú + phân quyền | `bash tools/staging/02_di_tru_phan_quyen.sh --project P --kiem` rồi bỏ `--kiem` | ~1 phút (đo cục bộ: ~3 giây; thêm tạo venv + pip `psycopg` lần đầu ~1 phút, proxy + mạng) | phần BÁO CÁO (mục có `mong`: `fls_itl` chỉ-THÊM · `fls_doc` chỉ SELECT · `pg_verify: khop`…) |
+| **03** ảnh + VM chạy app | `bash tools/staging/03_dung_app.sh --project P --kiem` rồi bỏ `--kiem`. Mặc định app **CHỈ ĐỌC**. Muốn người test KÝ: thêm `--che-do ghi --nguoi-ky <tên>`; cấp người vào: `--cap-quyen a@x.com,b@y.com` | Cloud Build **3–6 phút** (đo cục bộ: `docker build` 5 giây khi có cache, ảnh **373 MB**); VM tạo **~1 phút**, boot + cài docker + kéo ảnh **2–4 phút** ⇒ chờ rồi chạy lại `--kiem` để đo | phần BÁO CÁO (19 mục, kể cả ĐO TRONG VM: container sống · cổng 8088 chỉ nghe `127.0.0.1` · gọi không thẻ ⇒ 401) |
 | **04** nạp config IX.* đã ký | `FLS_CHO_GHI_THAT=1 bash tools/staging/04_nap_du_lieu.sh --project P --nguoi-nap <tên.người>` (`--kiem` để chỉ đo) | ~1 phút (đo cục bộ: 2 giây) | phần BÁO CÁO (9 bảng × hai chiều + riêng tư + `fls_itl = 0`) |
 | **05** nạp DỮ LIỆU NGUỒN THẬT *(quyết chủ 23/11: dữ liệu THẬT)* | `FLS_CHO_GHI_THAT=1 bash tools/staging/05_nap_nguon_that.sh --project P --nguoi-nap <tên.người> <CÁCH CẤP QUYỀN ĐỌC SHEET>` — `--kiem` để chỉ ĐỌC nguồn + in số đếm (⛔ ghi một dòng). Cách cấp quyền, chọn MỘT: `--sa-json-tep <tệp khoá SA đọc-sheet>` · `--adc` · `--token-gcloud` (§"Quyền đọc sheet" dưới) | 4 bước nạp, đo cục bộ: **sổ+PM ~1–2 phút** + chụp 60 sheet vài giây — ⚠ workbook nguồn "nguội" có thể chậm hơn (đo 23/11: lượt đọc tiêu đề đầu tiên 30 giây) | phần BÁO CÁO (số đếm nguồn · số đếm kho · CŨ ↔ HIỆN TẠI · riêng tư) — `KẾT: ĐẠT` hoặc ĐỎ **có tên** (⛔ ĐỎ không phải lỗi script: nó là tín hiệu về NGUỒN, xem BG-335) |
 | **UAT** người test | `docs/ITL/04_Test/UAT_STAGING_E2E.md` — 13 bước, bảng số từ `hd2_cong.json` | ~1–2 giờ/người | bảng đã điền (người test · ngày · ĐẠT/ĐỎ · ghi chú) |
@@ -37,6 +37,9 @@ App nghe `127.0.0.1:8088` **trên VM**; cửa tự từ chối nghe ra ngoài (`
 gcloud compute ssh fls-staging-app --project P --zone asia-southeast1-b --tunnel-through-iap -- -N -L 8088:127.0.0.1:8088
 # giữ cửa sổ mở → trình duyệt: http://localhost:8088/
 ```
+
+⛔ **Cloud Shell Web Preview ⛔ dùng được cho màn hình FLS** *(chủ đo 23/11 ~10:50)*: tunnel từ Cloud Shell `-L 8080:127.0.0.1:8088` + Web Preview ⇒ vỏ màn hình tải được nhưng **mọi** `fetch` API ⇒ `FLS-MAT-KET-NOI / Failed to fetch`; cùng lúc `curl http://127.0.0.1:8080/api/fls/v1/gates` trong Cloud Shell ⇒ **401** *(app + API đúng)*. Nghi proxy `cloudshell.dev` chặn `fetch` mang `Authorization: Bearer` — **CHƯA đo nguyên nhân**. ⇒ Người test chạy tunnel **từ MÁY MÌNH**: cài Google Cloud CLI → `gcloud auth login` → lệnh trên → mở **http://localhost:8088/**.
+Trên Cloud Shell, dòng `bind [::1]:8080: Cannot assign requested address` là **vô hại** *(IPv6; IPv4 vẫn nghe)*.
 
 ⚠ **Một thẻ chung cho cả phiên**: mọi chữ ký mang tên `--nguoi-ky` (cửa ⛔ có đăng nhập từng người; SSO là phase sau). ⛔ để mặc định — script từ chối tên `thu@apero.vn`.
 
@@ -65,16 +68,18 @@ Quyết chủ 23/11: staging dùng **dữ liệu THẬT** (chủ chấp nhận r
 
 ## Chuỗi HD2 trong app
 
-"Chạy chuỗi" là **lệnh**, ⛔ yêu cầu HTTP: `docker exec fls-app bash /app/tools/staging/app/chay_chuoi.sh [--ghi]` (10 gói `do_hd2.py --goi`; đo 23/11 ~**28 giây** CPU, đỉnh **630 MB** RAM trên kho đã nạp config). `--ghi` ghi lại `hd2_cong.json` trong container — cửa đọc nó mỗi yêu cầu nên F03 đổi ngay.
+"Chạy chuỗi" là **lệnh**, ⛔ yêu cầu HTTP: `sudo docker exec fls-app bash /app/tools/staging/app/chay_chuoi.sh [--ghi]` (**11** gói `do_hd2.py --goi` = `len(GOI_BIET)`; đo 23/11 trên cây đã gộp H14: ~**45 giây** CPU, đỉnh **~800 MB** RAM trên kho đã nạp config). ⛔ **Chỉ CHỦ chạy**: lệnh cần `sudo`, mà `--cap-quyen` chỉ cấp `osLogin` (không có `sudo`) — cấp `osAdminLogin` là cho người test root trên VM (`STG-R1-06`, phương án A). **D1 (I2)**: gói đọc tỷ giá TỪ KHO ⇒ chạy chuỗi khi chưa ký tỷ giá ra **11/11 ĐỎ `FX_CHAN`** — ĐÚNG; người ký ký các tháng bằng `docker exec fls-app python /app/tools/staging/app/ky_ty_gia.py --cong 8088` *(app ở chế độ `ghi`; tuyến `POST /config/fx/{yyyymm}/sign`, tên ký lấy từ thẻ; bỏ qua tháng LẠC)* rồi mới chạy chuỗi ⇒ **11/11 ĐẠT** *(UAT v0.3 · U7–U9)*. `--ghi` ghi lại `hd2_cong.json` trong container — cửa đọc nó mỗi yêu cầu nên F03 đổi ngay.
 
 ## Giả định chưa kiểm (chỉ lộ ra khi chạy thật ở GCP)
 
 | # | Giả định | Nếu sai, BÁO CÁO nào ĐỎ |
 |---|---|---|
 | 1 | `postgres` (Cloud SQL) `GRANT fls_admin TO postgres` + `ALTER DATABASE … OWNER TO fls_admin` được | 02: dừng ở bước ② với lỗi PG (script ⛔ che) |
-| 2 | gỡ `cloudsqlsuperuser` + `NOCREATEROLE NOCREATEDB` khỏi `fls_ghi`/`fls_doc` được (làm-hết-sức) | 02: mục "thành viên cloudsqlsuperuser" / "siêu quyền" |
+| 2 | ~~gỡ `cloudsqlsuperuser` + `NOCREATEROLE NOCREATEDB` khỏi `fls_ghi`/`fls_doc` được (làm-hết-sức)~~ — **ĐÃ KIỂM 23/11: SAI** *(02 thật: 23/24, ĐỎ "siêu quyền … = 2")* ⇒ thay bằng #8 (`STG-R2b-02`) | 02: mục "thành viên cloudsqlsuperuser" / "siêu quyền" |
 | 3 | `cloud-sql-proxy` v2 chạy được trong Cloud Shell, VM có đường ra tới IP công khai của Cloud SQL (IP tạm của VM) | 02/04: "proxy ⛔ lên cổng"; 03 TRONG VM: container ⛔ chạy |
-| 4 | Debian 12 cài `docker.io` bằng `apt` lúc boot (VM có đường ra internet) | 03 TRONG VM: "container fls-app" |
+| 4 | Debian 12 cài `docker.io` bằng `apt` lúc boot (VM có đường ra internet) — **ĐÃ KIỂM 23/11: ĐÚNG** *(bước 03 23/23 ĐẠT sau vá tạm — orchestrator báo)* | 03 TRONG VM: "container fls-app" |
 | 5 | vai IAM `roles/iap.tunnelResourceAccessor` (cấp ở project) + `roles/compute.osLogin` (cấp ở VM) đủ để `ssh --tunnel-through-iap` | người test ⛔ vào được (U1) |
-| 6 | `gcloud compute ssh --tunnel-through-iap --command` chạy được từ Cloud Shell của chủ | 03 mục "TRONG VM" đỏ cả 5 |
+| 6 | `gcloud compute ssh --tunnel-through-iap --command` chạy được từ Cloud Shell của chủ — **ĐÃ KIỂM 23/11: ĐÚNG** *(bước 03 23/23 ĐẠT sau vá tạm — orchestrator báo)* | 03 mục "TRONG VM" đỏ cả 5 |
 | 7 | mạng `default` của project cho phép luật firewall ưu tiên 800/900 như script đặt | 03 mục firewall |
+| 8 | `postgres` (Cloud SQL PG16) chạy được `CREATE ROLE … LOGIN NOCREATEDB NOCREATEROLE PASSWORD '…'` và `DROP ROLE` vai **chính nó tạo**; vai gcloud tạo thì `DROP ROLE` SQL được (giả thuyết H-B — khớp mọi sự thật đo) **hoặc** bị từ chối ⇒ `gcloud sql users delete` (H-A). Script IN lời PG thật + dòng `có ADMIN OPTION=` ⇒ lần chạy đầu phân xử | 02: dừng ở ①b với lỗi CÓ TÊN `VAI_KHONG_XOA_DUOC` / `VAI_KHONG_TAO_DUOC` |
+| 9 | `gcloud builds submit` ⛔ `.gcloudignore` + ngữ cảnh ⛔ `.gitignore` ⇒ tải **đủ** ngữ cảnh; gcloud in `Creating temporary archive of N file(s)` | 03: mục "tệp tải lên = tệp ngữ cảnh" (⛔ đọc được dòng ⇒ ĐỎ) |

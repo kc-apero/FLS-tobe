@@ -6,7 +6,7 @@ Biến: FLS_STG_PROJECT (bắt buộc) · FLS_STG_URL_METADATA / FLS_STG_URL_SM 
 
 ⛔ Giá trị bí mật CHỈ đi ra stdout (để `$(...)` bắt). Lỗi ⛔ in giá trị, ⛔ in token; chỉ in TÊN bí mật + mã HTTP.
 ⭐ Vì sao ⛔ dùng `gcloud` trong ảnh: ảnh slim ⛔ có gcloud; metadata server + REST là đường ngắn nhất và
-   chạy bằng ĐÚNG SA `fls-staging-app` (đã được `01_dung_staging_gcp.sh` cấp `secretAccessor` trên 5 bí mật).
+   chạy bằng ĐÚNG SA `fls-staging-app` (đã được `01_dung_staging_gcp.sh` cấp `secretAccessor` trên ĐÚNG 3 bí mật app — `jwt` · `fls_ghi` · `fls_doc`; ⛔ `postgres` · `fls_admin`, `STG-R1-01`).
 """
 from __future__ import annotations
 

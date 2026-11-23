@@ -20,10 +20,13 @@
 #  LÀM GÌ (mỗi việc chạy lại được, ⛔ phá gì đã có):
 #   ① đọc `connectionName` của máy Cloud SQL → bật Cloud SQL Auth Proxy (127.0.0.1, ⛔ mở ra ngoài;
 #      xác thực = danh tính gcloud của chủ; SSL do proxy lo)
+#   ①b (vai `postgres`) VAI ỨNG DỤNG `fls_ghi`/`fls_doc` TẠO BẰNG SQL (`STG-R2b-02`, lỗi THẬT GCP 23/11):
+#      chưa có ⇒ `CREATE ROLE … LOGIN NOCREATEDB NOCREATEROLE` · có mà SẠCH ⇒ đồng bộ mật khẩu ·
+#      có mà còn CREATEROLE/CREATEDB/siêu quyền (= do `gcloud sql users create` tạo — bản cũ của bước 01)
+#      ⇒ ĐƯỜNG CHUYỂN: thu mọi quyền (`sql/02c_thu_quyen_vai.sql`, vai `fls_admin`) → `DROP ROLE` bằng SQL
+#      (⛔ được ⇒ `gcloud sql users delete`) → tạo lại bằng SQL → ②–④ cấp lại như thường.
 #   ② (vai `postgres`) `sql/02a_quan_tri.sql`: đổi chủ kho sang `fls_admin` · đóng cửa PUBLIC ·
 #      `ALTER ROLE fls_doc SET default_transaction_read_only = on`
-#      + gỡ siêu quyền (`cloudsqlsuperuser` · CREATEROLE · CREATEDB) khỏi `fls_ghi`/`fls_doc` nếu
-#      `gcloud sql users create` đã gắn — LÀM-HẾT-SỨC, kết quả thật nằm ở BÁO CÁO
 #   ③ (vai `fls_admin`) `python -m fls.db.pg_migrate` ⇒ phải in `pg_verify: khop`
 #   ④ (vai `fls_admin`) `sql/02b_phan_quyen.sql`: `fls_ghi` DML — **riêng `fls_itl` chỉ-THÊM**
 #      (`INV-I08`: ⛔ UPDATE/DELETE) · `fls_doc` chỉ SELECT
@@ -113,6 +116,80 @@ done
 [ "$sang" -eq 1 ] || { echo "⛔ proxy ⛔ lên cổng $CONG_PROXY (log proxy bên dưới)" >&2; sed -n 1,20p "$PROXY_LOG" >&2; exit 2; }
 echo "   proxy lên ở $HOST:$CONG_PROXY (cục bộ — ⛔ mở ra ngoài)"
 
+# psql bằng vai quản trị vào kho HỆ THỐNG `postgres` (vai là đối tượng của CỤM, ⛔ của kho `$KHO`; nối
+# `postgres` ⇒ đường chuyển vai chạy được cả khi kho `$KHO` đã đóng PUBLIC). VERBOSITY=terse ⇒ psql ⛔ in
+# lại dòng lệnh lỗi (`LINE 1: CREATE ROLE … PASSWORD '…'`) — nơi duy nhất mật khẩu có thể lọt ra màn.
+psql_qt_he() {
+  PGPASSWORD="$MK_QT" PGCONNECT_TIMEOUT=20 psql -X -q -h "$HOST" -p "$CONG_PROXY" -U "$QT_USER" -d postgres \
+    -v ON_ERROR_STOP=1 -v VERBOSITY=terse "$@"
+}
+
+# ⭐ `STG-R2b-02` (lỗi THẬT GCP, bước 02 chủ chạy 23/11 trên `c4a0f39`): 23/24 ĐẠT, ĐỎ đúng mục
+#   "siêu quyền hay CREATEROLE/CREATEDB (đếm vai) = 2"; bản cũ chạy `ALTER ROLE … NOSUPERUSER NOCREATEROLE
+#   NOCREATEDB NOREPLICATION NOBYPASSRLS` và NUỐT lỗi (`>/dev/null 2>&1` ⇒ chỉ `⚠`).
+#   Hai giả thuyết — CẢ HAI ⛔ đo ở GCP (lỗi gốc bị nuốt):
+#     H-A  `postgres` ⛔ có ADMIN OPTION trên vai gcloud tạo ⇒ mọi ALTER/DROP bị từ chối.
+#          ⚠ MÂU THUẪN với hai sự thật đã đo cùng lần chạy: `ALTER ROLE fls_doc SET …` (02a) ĐẠT và
+#          `GRANT fls_admin TO CURRENT_USER` ĐẠT — PG16 đòi ADMIN OPTION cho cả hai.
+#     H-B  `postgres` CÓ ADMIN OPTION nhưng ⛔ phải siêu người dùng ⇒ PG16 từ chối CẢ CÂU vì mệnh đề
+#          `NOSUPERUSER` ("Only roles with the SUPERUSER attribute may change the SUPERUSER attribute")
+#          — đo được trên PG 16 cục bộ 23/11; khớp mọi sự thật GCP đã đo.
+#   ⇒ Đường dưới đây ĐÚNG với CẢ HAI: tạo lại bằng SQL (người tạo có ADMIN OPTION — PG16 tự cấp), và
+#   `DROP ROLE` ⛔ được (H-A) thì rơi sang `gcloud sql users delete`. Lỗi THẬT của PG được IN (⛔ nuốt)
+#   kèm phép đo ADMIN OPTION ⇒ lần chạy của chủ phân xử H-A/H-B.
+VAI_APP=("$GHI" "$DOC")
+mk_cua() { case "$1" in "$GHI") printf '%s' "$MK_GHI" ;; "$DOC") printf '%s' "$MK_DOC" ;; esac; }
+# Mật khẩu nằm trong câu SQL (đi qua ỐNG từ `printf` — lệnh dựng sẵn của bash ⇒ ⛔ hiện ở `ps`, ⛔ tệp tạm).
+# Bí mật do bước 01 sinh bằng `secrets.token_urlsafe(32)` ⇒ chỉ [A-Za-z0-9_-]; ký tự khác ⇒ DỪNG (⛔ tự trích dẫn).
+mk_hop_le() { [[ "$1" =~ ^[A-Za-z0-9_-]{16,}$ ]]; }
+che_mk() { local o="$1" m; for m in "$MK_QT" "$MK_ADMIN" "$MK_GHI" "$MK_DOC"; do [ -n "$m" ] && o="${o//"$m"/***}"; done; printf '%s' "$o"; }
+# `ban` = còn thuộc tính thừa HOẶC là thành viên `cloudsqlsuperuser` (PG16: `REVOKE` chỉ thu grant do CHÍNH người
+# thu cấp ⇒ `postgres` ⛔ gỡ được grant Cloud SQL đã cấp — đo trên PG 16 cục bộ; bản cũ gỡ trong khối nuốt lỗi).
+trang_thai_vai() {   # $1=vai → khong | sach | ban | (rỗng = ⛔ đo được)
+  psql_qt_he -tA -c "SELECT CASE WHEN count(*) = 0 THEN 'khong'
+      WHEN bool_or(r.rolsuper OR r.rolcreaterole OR r.rolcreatedb OR r.rolreplication OR r.rolbypassrls
+                   OR EXISTS (SELECT 1 FROM pg_auth_members m JOIN pg_roles g ON g.oid = m.roleid
+                              WHERE m.member = r.oid AND g.rolname = 'cloudsqlsuperuser')) THEN 'ban'
+      ELSE 'sach' END FROM pg_roles r WHERE r.rolname = '$1'" 2>/dev/null | head -1 | tr -d '\r' || true
+}
+tao_vai_sql() {   # $1=vai $2=CREATE|ALTER → 0/1; in lỗi PG đã che mật khẩu
+  local vai="$1" lenh="$2" mk out rc=0 cau
+  mk="$(mk_cua "$vai")"
+  mk_hop_le "$mk" || { echo "⛔ bí mật fls-staging-pg-$vai có ký tự ngoài [A-Za-z0-9_-] (hoặc < 16) — DỪNG" >&2; return 1; }
+  if [ "$lenh" = CREATE ]; then cau="CREATE ROLE %s LOGIN NOCREATEDB NOCREATEROLE PASSWORD '%s';\n"
+  else cau="ALTER ROLE %s PASSWORD '%s';\n"; fi
+  # shellcheck disable=SC2059   # khuôn là hằng của script, ⛔ dữ liệu ngoài
+  out="$(printf "$cau" "$vai" "$mk" | psql_qt_he 2>&1)" || rc=$?
+  [ -z "$out" ] || printf '      PG nói: %s\n' "$(che_mk "$out" | tr '\n' ' ')"
+  return "$rc"
+}
+chuyen_vai() {    # đường chuyển cho vai gcloud tạo: thu quyền → DROP (SQL, rồi gcloud) → CREATE bằng SQL
+  local vai="$1" out
+  echo "   $vai: còn CREATEROLE/CREATEDB/siêu quyền/cloudsqlsuperuser ⇒ ĐƯỜNG CHUYỂN (thu quyền → xoá → tạo lại bằng SQL)"
+  echo "      đo trước: $(psql_qt_he -tA -c "SELECT 'rolcreaterole=' || rolcreaterole || ' rolcreatedb=' || rolcreatedb
+      || ' rolsuper=' || rolsuper || ' · $QT_USER có ADMIN OPTION=' || coalesce((SELECT bool_or(m.admin_option)
+      FROM pg_auth_members m WHERE m.roleid = r.oid AND m.member = (SELECT oid FROM pg_roles WHERE rolname = current_user)), false)
+      FROM pg_roles r WHERE rolname = '$vai'" 2>&1 | head -1)"
+  out="$(PGOPTIONS='--client-min-messages=error' psql_vai "$ADMIN" "$MK_ADMIN" -q -v ON_ERROR_STOP=1 -v VERBOSITY=terse \
+          -v "kho=$KHO" -v "vai=$vai" -f "$SQL_DIR/02c_thu_quyen_vai.sql" 2>&1)" \
+    || { echo "⛔ VAI_THU_QUYEN_LOI: $ADMIN ⛔ thu được quyền của $vai — PG nói: $(che_mk "$out" | tr '\n' ' ')" >&2; return 1; }
+  echo "      ⓐ thu mọi quyền của $vai trong kho $KHO ($ADMIN): xong"
+  # VERBOSITY=default (⛔ terse): câu ⛔ mang mật khẩu, và dòng DETAIL của PG là thứ PHÂN XỬ H-A/H-B ở GCP.
+  if out="$(printf 'DROP ROLE %s;\n' "$vai" | psql_qt_he -v VERBOSITY=default 2>&1)"; then
+    echo "      ⓑ DROP ROLE $vai bằng SQL ($QT_USER): xong"
+  else
+    echo "      ⓑ DROP ROLE $vai bằng SQL bị từ chối — PG nói: $(che_mk "$out" | tr '\n' ' ')"
+    echo "         ⇒ xoá qua Cloud SQL Admin API: gcloud sql users delete $vai"
+    out="$("${G[@]}" sql users delete "$vai" --instance="$INSTANCE" 2>&1)" \
+      || { echo "⛔ VAI_KHONG_XOA_DUOC: $vai — gcloud nói: $(printf '%s' "$out" | grep -v '^[[:space:]]*$' | tail -1)" >&2; return 1; }
+    [ "$(trang_thai_vai "$vai")" = khong ] \
+      || { echo "⛔ VAI_KHONG_XOA_DUOC: gcloud báo xong nhưng $vai VẪN còn trong pg_roles" >&2; return 1; }
+    echo "         gcloud sql users delete $vai: xong"
+  fi
+  tao_vai_sql "$vai" CREATE || { echo "⛔ VAI_KHONG_TAO_DUOC: $vai (đã xoá!) — sửa rồi chạy lại 02 ngay; app ⛔ nối được tới khi xong" >&2; return 1; }
+  echo "      ⓒ CREATE ROLE $vai LOGIN NOCREATEDB NOCREATEROLE (mật khẩu từ bí mật): xong"
+}
+
 # ── python có `psycopg` cho pg_migrate/pg_verify
 tim_python() {
   if [ -n "${FLS_STG_PYTHON:-}" ]; then printf '%s' "$FLS_STG_PYTHON"; return; fi
@@ -125,27 +202,27 @@ tim_python() {
 }
 
 if [ "$KIEM" -eq 0 ]; then
+  # ①b ─────────────────────────────── vai ứng dụng — TẠO BẰNG SQL (`STG-R2b-02`)
+  buoc "①b vai ứng dụng ${VAI_APP[*]}: tạo/tái tạo bằng SQL ($QT_USER) — ⛔ gcloud sql users create"
+  for vai in "${VAI_APP[@]}"; do
+    case "$(trang_thai_vai "$vai")" in
+      khong) tao_vai_sql "$vai" CREATE || { echo "⛔ VAI_KHONG_TAO_DUOC: $vai" >&2; exit 1; }
+             echo "   $vai: tạo bằng SQL (LOGIN NOCREATEDB NOCREATEROLE)" ;;
+      sach)  tao_vai_sql "$vai" ALTER || { echo "⛔ VAI_KHONG_DONG_BO_MK: $vai — $QT_USER ⛔ đổi được mật khẩu" >&2; exit 1; }
+             echo "   $vai: có rồi, SẠCH ⇒ đồng bộ mật khẩu với bí mật" ;;
+      ban)   chuyen_vai "$vai" || exit 1 ;;
+      *)     echo "⛔ ⛔ đo được trạng thái vai $vai ($QT_USER nối kho postgres?) — DỪNG" >&2; exit 1 ;;
+    esac
+  done
+
   # ② ──────────────────────────────── quản trị (postgres)
   buoc "② quản trị: đổi chủ kho · đóng PUBLIC · fls_doc mặc định chỉ-đọc"
   PGOPTIONS='--client-min-messages=warning' psql_vai "$QT_USER" "$MK_QT" -v ON_ERROR_STOP=1 \
       -v "kho=$KHO" -v "admin=$ADMIN" -v "ghi=$GHI" -v "doc=$DOC" -f "$SQL_DIR/02a_quan_tri.sql" >/dev/null
   echo "   02a_quan_tri.sql: xong"
-  # Cloud SQL gắn `cloudsqlsuperuser` (+ CREATEROLE/CREATEDB) cho người dùng tạo bằng gcloud —
-  # fls_ghi/fls_doc ⛔ cần chúng (mở đường tự nới quyền). Gỡ LÀM-HẾT-SỨC: ⛔ nổ nếu Cloud SQL ⛔ cho
-  # (⛔ kiểm chứng được ngoài GCP) — kết quả THẬT nằm ở hai mục BÁO CÁO cuối.
-  psql_vai "$QT_USER" "$MK_QT" -v ON_ERROR_STOP=1 \
-      -c "ALTER ROLE $GHI NOSUPERUSER NOCREATEROLE NOCREATEDB NOREPLICATION NOBYPASSRLS" \
-      -c "ALTER ROLE $DOC NOSUPERUSER NOCREATEROLE NOCREATEDB NOREPLICATION NOBYPASSRLS" >/dev/null 2>&1 \
-    && echo "   hạ thuộc tính $GHI/$DOC (NOCREATEROLE NOCREATEDB…): xong" \
-    || echo "   ⚠ không hạ được thuộc tính $GHI/$DOC — xem mục BÁO CÁO"
-  psql_vai "$QT_USER" "$MK_QT" -v ON_ERROR_STOP=1 -c "
-    DO \$\$ BEGIN
-      IF EXISTS (SELECT 1 FROM pg_roles WHERE rolname = 'cloudsqlsuperuser') THEN
-        EXECUTE 'REVOKE cloudsqlsuperuser FROM $GHI, $DOC';
-      END IF;
-    END \$\$;" >/dev/null 2>&1 \
-    && echo "   gỡ cloudsqlsuperuser khỏi $GHI/$DOC (nếu có): xong" \
-    || echo "   ⚠ không gỡ được cloudsqlsuperuser khỏi $GHI/$DOC — xem mục BÁO CÁO"
+  # ⭐ `STG-R2b-02`: bản cũ ở đây `ALTER ROLE … NOSUPERUSER NOCREATEROLE …` + `REVOKE cloudsqlsuperuser …` rồi NUỐT lỗi
+  #   (`>/dev/null 2>&1` ⇒ chỉ `⚠`). Đã thay bằng ①b: vai app tạo bằng SQL ⇒ ⛔ còn thuộc tính/nhóm nào để gỡ;
+  #   vai lạc vào lại ⇒ lần chạy kế đi đường chuyển. Kết quả THẬT vẫn ở hai mục BÁO CÁO cuối (ĐỎ hai chiều).
 
   # ③ ──────────────────────────────── di trú
   buoc "③ di trú — python -m fls.db.pg_migrate (vai $ADMIN)"
@@ -218,13 +295,19 @@ export R_DOC_PHIEN="$(do_mot "$DOC" "$MK_DOC" "SHOW default_transaction_read_onl
 export R_DOC_VAI_CAU_HINH="$(do_mot "$ADMIN" "$MK_ADMIN" \
   "SELECT coalesce(bool_or('default_transaction_read_only=on' = ANY(rolconfig)), false) FROM pg_roles WHERE rolname = '$DOC'")"
 # `CREATE TABLE` trong phiên chỉ-đọc ⇒ PG nổ "read-only transaction" TRƯỚC khi xét quyền schema.
-export R_DOC_THU_GHI="$(thu_ghi "$DOC" "$MK_DOC" "CREATE TABLE fls_probe_doc_ghi (i int)")"
+# ⭐ `STG-R1-08`: bọc `BEGIN … ROLLBACK` — nếu `fls_doc` còn `CREATE` trên `public` và HẾT chỉ-đọc, bảng ⛔ được để lại (trước đây
+#   `--kiem` "chỉ ĐỌC" tạo bảng THẬT rồi `02b` chết `permission denied for table fls_probe_doc_ghi`); khi đó mục này ĐỎ vì ⛔ có chữ "read-only".
+export R_DOC_THU_GHI="$(thu_ghi "$DOC" "$MK_DOC" "BEGIN; CREATE TABLE fls_probe_doc_ghi (i int); ROLLBACK;")"
 export R_SUPER="$(do_mot "$ADMIN" "$MK_ADMIN" \
   "SELECT count(*) FROM pg_roles WHERE rolname IN ('$GHI','$DOC') AND (rolsuper OR rolcreaterole OR rolcreatedb OR rolreplication OR rolbypassrls)")"
 export R_THANH_VIEN="$(do_mot "$ADMIN" "$MK_ADMIN" \
   "SELECT count(*) FROM pg_auth_members m JOIN pg_roles g ON g.oid = m.roleid JOIN pg_roles u ON u.oid = m.member
     WHERE g.rolname = 'cloudsqlsuperuser' AND u.rolname IN ('$GHI','$DOC')")"
 export R_MAU_VAI="$(do_mot "$ADMIN" "$MK_ADMIN" "SELECT count(*) FROM pg_roles WHERE rolname IN ('$GHI','$DOC','$ADMIN')")"
+# Phép đo phân xử H-A/H-B (`STG-R2b-02`) — CHỈ IN, ⛔ chấm: vai SQL tạo ⇒ PG16 cấp ADMIN OPTION cho người tạo ⇒ mong 2.
+export R_QT_ADMIN="$(do_mot "$ADMIN" "$MK_ADMIN" \
+  "SELECT count(DISTINCT r.rolname) FROM pg_auth_members m JOIN pg_roles r ON r.oid = m.roleid JOIN pg_roles u ON u.oid = m.member
+    WHERE r.rolname IN ('$GHI','$DOC') AND u.rolname = '$QT_USER' AND m.admin_option")"
 
 python3 - <<'PY'
 import os, re
@@ -266,6 +349,7 @@ hang = [
   ("MẪU SỐ vai (fls_admin·ghi·doc)",    so(e["R_MAU_VAI"]),                         3),
   ("fls_ghi/fls_doc: siêu quyền hay CREATEROLE/CREATEDB (đếm vai)", so(e["R_SUPER"]), 0),
   ("fls_ghi/fls_doc là thành viên cloudsqlsuperuser (đếm)", so(e["R_THANH_VIEN"]), 0),
+  ("(đo, ⛔ chấm) vai quản trị có ADMIN OPTION trên fls_ghi/fls_doc (đếm vai)", so(e["R_QT_ADMIN"]), None),
 ]
 do = 0
 for ten, gt, mong in hang:

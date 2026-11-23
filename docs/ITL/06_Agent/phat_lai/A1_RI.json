@@ -1,0 +1,113 @@
+{
+ "_vi_sao": "Bản ghi PHÁT LẠI — sinh bằng mô hình GIẢ tất định (`--gia --ghi-phat-lai`), ⛔ lượt API thật. Tra theo vân tay yêu cầu ĐÃ CHE; prompt/dữ liệu đổi ⇒ ⛔ có lượt ⇒ ĐỎ.",
+ "agent": "A1_RI",
+ "checksum_prompt": "9f84a5b36e62d7b0",
+ "luot": [
+  {
+   "tra_loi": {
+    "content": [
+     {
+      "id": "toolu_gia_00",
+      "input": {},
+      "name": "nguon_bank",
+      "type": "tool_use"
+     }
+    ],
+    "stop_reason": "tool_use"
+   },
+   "van_tay_yeu_cau": "4817a654cd8ab57c"
+  },
+  {
+   "tra_loi": {
+    "content": [
+     {
+      "text": "{\"nguon:bank.dem_dong\": 9992, \"nguon:bank.so_dong\": 9992, \"nguon:bank.van_tay\": \"6ec10945e6c1636a\", \"nguon:so_asis.dem_dong\": 9967, \"nguon:so_asis.so_dong\": 9967, \"nguon:so_asis.van_tay\": \"575c53379074c759\"}",
+      "type": "text"
+     }
+    ],
+    "stop_reason": "end_turn"
+   },
+   "van_tay_yeu_cau": "88afdbfa9518acf6"
+  },
+  {
+   "tra_loi": {
+    "content": [
+     {
+      "id": "toolu_gia_00",
+      "input": {},
+      "name": "nguon_fps",
+      "type": "tool_use"
+     }
+    ],
+    "stop_reason": "tool_use"
+   },
+   "van_tay_yeu_cau": "bc817868d4dd5681"
+  },
+  {
+   "tra_loi": {
+    "content": [
+     {
+      "text": "{\"nguon:fps.co_ref\": 3173, \"nguon:fps.dem_dong\": 3703, \"nguon:fps.so_dong\": 3703, \"nguon:fps.van_tay\": \"6ec10945e6c1636a\"}",
+      "type": "text"
+     }
+    ],
+    "stop_reason": "end_turn"
+   },
+   "van_tay_yeu_cau": "02cb1726b4c56161"
+  },
+  {
+   "tra_loi": {
+    "content": [
+     {
+      "id": "toolu_gia_00",
+      "input": {},
+      "name": "nguon_h1000",
+      "type": "tool_use"
+     }
+    ],
+    "stop_reason": "tool_use"
+   },
+   "van_tay_yeu_cau": "82017fb24d7f0cb7"
+  },
+  {
+   "tra_loi": {
+    "content": [
+     {
+      "text": "{\"nguon:hr2024.dem_dong\": 1381, \"nguon:hr2024.so_dong\": 1381, \"nguon:hr2024.van_tay\": \"4905b28f88819142\", \"nguon:hr2025.dem_dong\": 10105, \"nguon:hr2025.so_dong\": 10105, \"nguon:hr2025.van_tay\": \"c27a12e49b7aa875\"}",
+      "type": "text"
+     }
+    ],
+    "stop_reason": "end_turn"
+   },
+   "van_tay_yeu_cau": "c2f86133930093f1"
+  },
+  {
+   "tra_loi": {
+    "content": [
+     {
+      "id": "toolu_gia_00",
+      "input": {},
+      "name": "nguon_plt",
+      "type": "tool_use"
+     }
+    ],
+    "stop_reason": "tool_use"
+   },
+   "van_tay_yeu_cau": "d903fb0fbb272294"
+  },
+  {
+   "tra_loi": {
+    "content": [
+     {
+      "text": "{\"nguon:gi.dem_dong\": 408, \"nguon:gi.so_dong\": 408, \"nguon:gi.van_tay\": \"0e39e49cd95901ed\", \"nguon:omc.dem_dong\": 6230, \"nguon:omc.so_dong\": 6230, \"nguon:omc.van_tay\": \"a2149d4ec0384a88\", \"nguon:ps.dem_dong\": 8505, \"nguon:ps.so_dong\": 8505, \"nguon:ps.van_tay\": \"977dd197ff287f06\", \"nguon:sc.dem_dong\": 5187, \"nguon:sc.so_dong\": 5187, \"nguon:sc.van_tay\": \"a0122790698b1e24\"}",
+      "type": "text"
+     }
+    ],
+    "stop_reason": "end_turn"
+   },
+   "van_tay_yeu_cau": "7de131a1f6cdae9f"
+  }
+ ],
+ "mo_hinh": "claude-opus-5-5",
+ "nguon_tra_loi": "gia-lap"
+}

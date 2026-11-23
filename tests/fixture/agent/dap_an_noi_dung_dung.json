@@ -1,0 +1,53 @@
+{
+ "_vi_sao": "ĐÁP ÁN của bể ca dựng — chỉ bộ chấm đọc (⛔ vào đầu vào agent).",
+ "noi": {
+  "c01": {
+   "chon": "PM-0101-01",
+   "nhom": "phai_noi"
+  },
+  "c02": {
+   "chon": "PM-0201-01",
+   "nhom": "phai_noi"
+  },
+  "c03": {
+   "chon": "PM-0301-02",
+   "nhom": "phai_noi"
+  },
+  "c04": {
+   "chon": "DE_NGUOI",
+   "nhom": "phai_nguoi"
+  },
+  "c05": {
+   "chon": "DE_NGUOI",
+   "nhom": "phai_nguoi"
+  },
+  "c06": {
+   "chon": "DE_NGUOI",
+   "nhom": "phai_nguoi"
+  },
+  "c07": {
+   "chon": "DE_NGUOI",
+   "nhom": "phai_nguoi"
+  },
+  "c08": {
+   "chon": "PM-0801-01",
+   "nhom": "phai_noi"
+  },
+  "c09": {
+   "chon": "PM-0901-01",
+   "nhom": "phai_noi"
+  },
+  "c10": {
+   "chon": "PM-1001-01",
+   "nhom": "phai_noi"
+  },
+  "c11": {
+   "chon": "DE_NGUOI",
+   "nhom": "phai_nguoi"
+  },
+  "c12": {
+   "chon": "PM-1201-01",
+   "nhom": "phai_noi"
+  }
+ }
+}

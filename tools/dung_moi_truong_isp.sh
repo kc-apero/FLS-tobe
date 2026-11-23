@@ -417,8 +417,12 @@ MONG_HD1_CHAY=9845
 #    --collect-only` — đường nền: 0 skipped · 0 deselected ⇒ thu thập = chạy), nâng TRONG CÙNG commit
 #    thêm bài; bài `tests/test_dung_moi_truong_isp.py::test_S0_R3_02_…` đòi hằng = thu thập ⇒ quên
 #    nâng là ĐỎ. Sau vòng sửa R3: 2.481 + 9 bài mới = 2.490 bài ở 211 tệp · `tests/web` 664 ở 56 tệp.
-# `STG-NAP` vòng sửa R1 `KQ-336`: gộp `origin/main` (4887) ⊕ nhánh STG-NAP (+93 bài tests/staging + 25 bài mới ở `test_05_nap_nguon_that.py`) — xung đột sàn ⇒ ĐẶT = `pytest --collect-only` cây gộp = 5025 (web 690).
-MONG_PYTEST_TOAN_BO=5025
+# WO-325 (staging 02–04 + UAT): + 93 bài ở tests/staging/ (4.772 → 4.865 → 4.868 (+3 bài IAM lan truyền bước 01); tests/web vẫn 690).
+# Gộp H14+I2-tip (origin/claude/bold-galileo-zukpaf, 4.857) ⊕ STG (4.868 − 4.772 = +96) = 4.953; vòng sửa sau KQ-327 +8 bài (5 ở test_01 · 1 ở 04 · 1 ở 02 · 1 ở uat) ⇒ 4.961 = `pytest --collect-only` đo 23/11; tests/web 690.
+# Gộp I2 (origin/claude/bold-galileo-zukpaf @ 05d7a97, 4.887) ⊕ STG sau KQ-328 (`STG-R2-03`: sàn = thu thập THẬT cây gộp, ⛔ cộng tay): `pytest --collect-only` đo 23/11 = 4.995 (staging 04 +3 bài chuỗi/ký, ky_ty_gia +2 bài, uat +1); tests/web 690.
+# Gộp origin/claude/bold-galileo-zukpaf (main c5ea872 + AG 8a1eca4, 4.958) ⊕ STG (4.995) + vòng sửa sau R2b `KQ-344` +16 bài (test_02_chuyen_vai_gcp 8 · test_01 1 · test_03 7): `pytest --collect-only` đo 23/11 = 5.082; tests/web 690.
+# `STG-NAP` vòng sửa R1 `KQ-336`: gộp ngọn `isp/STG` `ef96a15` (5082) ⊕ STG-NAP (+bài `tests/staging/test_05`) — xung đột sàn ⇒ ĐẶT = `pytest --collect-only` cây gộp = 5124 (web 690).
+MONG_PYTEST_TOAN_BO=5124
 MONG_PYTEST_WEB=690
 
 echo
