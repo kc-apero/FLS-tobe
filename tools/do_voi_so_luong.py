@@ -135,7 +135,8 @@ MONG = {
     "hd_parity": (9930, 9930),       # khối 1 HD, chế độ oracle (đọc MID của sổ) — đo 16/11 rồi ghim
     "tu_sinh_o": (4088, 4088),       # chế độ TỰ SINH 2026-03: FLS tự tính MID từ Manual input (tinh_mid) → Final
     "tu_sinh_hd": (584, 584),
-    "tu_sinh_mid": (4020, 4088),     # MID tự tính = MID của sổ ở 4.020 ô (Final vẫn khớp đủ vì Classifying có trả lời)
+    # WO-345 (23/11, ảnh sống 2026-03 thay ảnh sổ xlsx): MID 4.022/4.088 — CŨ (ảnh xlsx): (4020, 4088); lệch `id_payee` 2 → 0
+    "tu_sinh_mid": (4022, 4088),     # MID tự tính = MID của sổ ở 4.022 ô (Final vẫn khớp đủ vì Classifying có trả lời)
     # ⭐ H15 (ISP 3.1.2 · Step 43 · WO-287) — HD1 TỰ SINH theo kỳ, khai SAU lần đo đầu (22/11, 26 kỳ có ảnh DT12). Mỗi kỳ:
     #    ô Final (khớp, tổng ô 7 khối) · khối HD · MID tự tính = MID sổ · lệch Final / lệch MID THEO KHỐI · ô bỏ vì mã lỗi.
     #    ⛔ sửa lệch MID (ISP loại trừ). Sửa được 1 kỳ ⇒ ĐỎ ⇒ khai lại ở đây (Đ5). 2026-03 = ảnh sổ CŨ; 25 kỳ còn lại = mốc 20/11.
@@ -176,8 +177,9 @@ MONG = {
                     "lech_final": {'svc_end': 7}, "lech_mid": {'id_payee': 4, 'invoice': 62, 'pay_type': 26, 'svc_end': 21}, "o_loi": 0},
         "2026-02": {"o": (3073, 3073), "hd": (439, 439), "mid": (3020, 3073),
                     "lech_final": {}, "lech_mid": {'invoice': 53}, "o_loi": 0},
-        "2026-03": {"o": (4088, 4088), "hd": (584, 584), "mid": (4020, 4088),
-                    "lech_final": {}, "lech_mid": {'cdt1': 2, 'id_payee': 2, 'invoice': 62, 'pay_type': 2}, "o_loi": 0},
+        # WO-345 · ảnh sống 23/11 — CŨ (ảnh sổ xlsx): mid (4020, 4088) · lech_mid {'cdt1': 2, 'id_payee': 2, 'invoice': 62, 'pay_type': 2}
+        "2026-03": {"o": (4088, 4088), "hd": (584, 584), "mid": (4022, 4088),
+                    "lech_final": {}, "lech_mid": {'cdt1': 2, 'invoice': 62, 'pay_type': 2}, "o_loi": 0},
         "2026-04": {"o": (4200, 4200), "hd": (600, 600), "mid": (4126, 4200),
                     "lech_final": {}, "lech_mid": {'invoice': 66, 'pay_type': 8}, "o_loi": 0},
         "2026-05": {"o": (3759, 3759), "hd": (537, 537), "mid": (3682, 3759),
@@ -192,7 +194,8 @@ MONG = {
                     "lech_final": {}, "lech_mid": {'invoice': 40}, "o_loi": 0},
         "2026-10": {"o": (7266, 7266), "hd": (1038, 1038), "mid": (7249, 7266),
                     "lech_final": {}, "lech_mid": {'invoice': 17}, "o_loi": 0},
-        "2026-11": {"o": (4613, 4613), "hd": (659, 659), "mid": (4610, 4613),
+        # WO-345 · ảnh sống 23/11 (659 → 748 dòng) — CŨ 20/11: o (4613, 4613) · hd (659, 659) · mid (4610, 4613)
+        "2026-11": {"o": (5236, 5236), "hd": (748, 748), "mid": (5233, 5236),
                     "lech_final": {}, "lech_mid": {'invoice': 3}, "o_loi": 0},
     },
     "checksum": {"itl_ledge_adjustment.json": "575c53379074c759",
