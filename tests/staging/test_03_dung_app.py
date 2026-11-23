@@ -577,7 +577,8 @@ def test_tinh_dockerfile_la_DANH_SACH_CHO_PHEP_va_dockerignore_khop():
     code = [l for l in df.splitlines() if l.strip() and not l.lstrip().startswith("#")]
     copy = [l.split() for l in code if l.startswith("COPY ")]
     for c in copy:
-        if "--from=proxy" in c:
+        if any(x.startswith("--from=") for x in c):   # chép từ TẦNG khác (proxy · goi — STG-R2b-05), ⛔ từ ngữ cảnh
+            assert [x for x in c if x.startswith("--from=")][0] in ("--from=proxy", "--from=goi"), c
             continue
         src = [x for x in c[1:] if not x.startswith("--")][0]       # bỏ cờ (`--chown=…`)
         assert src not in (".", "./", "*") and not src.startswith(("/", "..")), f"COPY quá rộng: {c}"

@@ -13,7 +13,7 @@ Script 01 chỉ cần chính nó (đã chạy xong). Script 02/04 tự tạo ven
 
 | Bước | Lệnh (Cloud Shell) | Mất bao lâu *(ước — ⛔ đo được ở GCP)* | Gửi lại |
 |---|---|---|---|
-| **01** dựng Cloud SQL · 3 vai · bí mật · SA | `bash tools/staging/01_dung_staging_gcp.sh --project P --kiem` rồi bỏ `--kiem` | tạo máy Cloud SQL **5–15 phút** (script 01 tự ghi); còn lại < 2 phút | phần BÁO CÁO (mục có `mong` ĐẠT/ĐỎ, kể cả 3 mục quyền của SA: đọc đúng 3 bí mật app · 0 bí mật quản trị · gán/gỡ không lỗi — chạy lại 01 sẽ GỠ quyền thừa nếu có) — cần `KẾT: ĐẠT` mới sang 02 |
+| **01** dựng Cloud SQL · `fls_admin` · 5 bí mật · SA *(vai app `fls_ghi`/`fls_doc` do **02** tạo bằng SQL — `STG-R2b-02`)* | `bash tools/staging/01_dung_staging_gcp.sh --project P --kiem` rồi bỏ `--kiem` | tạo máy Cloud SQL **5–15 phút** (script 01 tự ghi); còn lại < 2 phút | phần BÁO CÁO (mục có `mong` ĐẠT/ĐỎ, kể cả 3 mục quyền của SA: đọc đúng 3 bí mật app · 0 bí mật quản trị · gán/gỡ không lỗi — chạy lại 01 sẽ GỠ quyền thừa nếu có) — cần `KẾT: ĐẠT` mới sang 02 |
 | **02** di trú + phân quyền | `bash tools/staging/02_di_tru_phan_quyen.sh --project P --kiem` rồi bỏ `--kiem` | ~1 phút (đo cục bộ: ~3 giây; thêm tạo venv + pip `psycopg` lần đầu ~1 phút, proxy + mạng) | phần BÁO CÁO (mục có `mong`: `fls_itl` chỉ-THÊM · `fls_doc` chỉ SELECT · `pg_verify: khop`…) |
 | **03** ảnh + VM chạy app | `bash tools/staging/03_dung_app.sh --project P --kiem` rồi bỏ `--kiem`. Mặc định app **CHỈ ĐỌC**. Muốn người test KÝ: thêm `--che-do ghi --nguoi-ky <tên>`; cấp người vào: `--cap-quyen a@x.com,b@y.com` | Cloud Build **3–6 phút** (đo cục bộ: `docker build` 5 giây khi có cache, ảnh **373 MB**); VM tạo **~1 phút**, boot + cài docker + kéo ảnh **2–4 phút** ⇒ chờ rồi chạy lại `--kiem` để đo | phần BÁO CÁO (19 mục, kể cả ĐO TRONG VM: container sống · cổng 8088 chỉ nghe `127.0.0.1` · gọi không thẻ ⇒ 401) |
 | **04** nạp config IX.* đã ký | `FLS_CHO_GHI_THAT=1 bash tools/staging/04_nap_du_lieu.sh --project P --nguoi-nap <tên.người>` (`--kiem` để chỉ đo) | ~1 phút (đo cục bộ: 2 giây) | phần BÁO CÁO (9 bảng × hai chiều + riêng tư + `fls_itl = 0`) |
@@ -52,9 +52,11 @@ Bước 04 chỉ nạp **config** `IX.*`; `fls_itl` = 0 dòng. "Thật hay ẩn 
 | # | Giả định | Nếu sai, BÁO CÁO nào ĐỎ |
 |---|---|---|
 | 1 | `postgres` (Cloud SQL) `GRANT fls_admin TO postgres` + `ALTER DATABASE … OWNER TO fls_admin` được | 02: dừng ở bước ② với lỗi PG (script ⛔ che) |
-| 2 | gỡ `cloudsqlsuperuser` + `NOCREATEROLE NOCREATEDB` khỏi `fls_ghi`/`fls_doc` được (làm-hết-sức) | 02: mục "thành viên cloudsqlsuperuser" / "siêu quyền" |
+| 2 | ~~gỡ `cloudsqlsuperuser` + `NOCREATEROLE NOCREATEDB` khỏi `fls_ghi`/`fls_doc` được (làm-hết-sức)~~ — **ĐÃ KIỂM 23/11: SAI** *(02 thật: 23/24, ĐỎ "siêu quyền … = 2")* ⇒ thay bằng #8 (`STG-R2b-02`) | 02: mục "thành viên cloudsqlsuperuser" / "siêu quyền" |
 | 3 | `cloud-sql-proxy` v2 chạy được trong Cloud Shell, VM có đường ra tới IP công khai của Cloud SQL (IP tạm của VM) | 02/04: "proxy ⛔ lên cổng"; 03 TRONG VM: container ⛔ chạy |
 | 4 | Debian 12 cài `docker.io` bằng `apt` lúc boot (VM có đường ra internet) | 03 TRONG VM: "container fls-app" |
 | 5 | vai IAM `roles/iap.tunnelResourceAccessor` (cấp ở project) + `roles/compute.osLogin` (cấp ở VM) đủ để `ssh --tunnel-through-iap` | người test ⛔ vào được (U1) |
 | 6 | `gcloud compute ssh --tunnel-through-iap --command` chạy được từ Cloud Shell của chủ | 03 mục "TRONG VM" đỏ cả 5 |
 | 7 | mạng `default` của project cho phép luật firewall ưu tiên 800/900 như script đặt | 03 mục firewall |
+| 8 | `postgres` (Cloud SQL PG16) chạy được `CREATE ROLE … LOGIN NOCREATEDB NOCREATEROLE PASSWORD '…'` và `DROP ROLE` vai **chính nó tạo**; vai gcloud tạo thì `DROP ROLE` SQL được (giả thuyết H-B — khớp mọi sự thật đo) **hoặc** bị từ chối ⇒ `gcloud sql users delete` (H-A). Script IN lời PG thật + dòng `có ADMIN OPTION=` ⇒ lần chạy đầu phân xử | 02: dừng ở ①b với lỗi CÓ TÊN `VAI_KHONG_XOA_DUOC` / `VAI_KHONG_TAO_DUOC` |
+| 9 | `gcloud builds submit` ⛔ `.gcloudignore` + ngữ cảnh ⛔ `.gitignore` ⇒ tải **đủ** ngữ cảnh; gcloud in `Creating temporary archive of N file(s)` | 03: mục "tệp tải lên = tệp ngữ cảnh" (⛔ đọc được dòng ⇒ ĐỎ) |

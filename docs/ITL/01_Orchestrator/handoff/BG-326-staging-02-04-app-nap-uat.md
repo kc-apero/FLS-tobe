@@ -205,3 +205,62 @@ Hoặc chạy lại `bash tools/staging/01_dung_staging_gcp.sh --project fp-a-pr
 
 | `dung_moi_truong_isp.sh --duong-nen --cong 5434` *(MỘT lần, một mình, 20 phút 42 giây)* | `KẾT: ĐẠT` 28 = 28 · web 3 = 3 | **`KẾT: ĐẠT`** — toàn bộ `12 failed · 4967 passed · 2 xfailed · 14 errors` = **4995 chạy** *(skipped 0 · deselected 0)* ⇒ tập đỏ+XFAIL **28 = 28** *(thêm 0 · bớt 0)* · web `3 failed · 687 passed` = **690 chạy**, tập đỏ **3 = 3** |
 | `kiem_tai_lieu.py` · `lint-imports` · `quet_pii_repo.py` | K1–K6 · 11 kept · 0 | **K1–K6 OK** *(502 tệp · 3.018 bảng · 985 ô ngày)* · **11 kept, 0 broken** · **0 chỗ · 0 tệp** |
+
+## 11 · Vòng sửa sau R2b (`KQ-344`) — lỗi thật GCP
+
+*(Dev · 2026-11-23 · cụm PG **5434** · nhánh `claude/bold-galileo-zukpaf-isp/STG` từ ngọn `fa2c07e`; ⛔ gcloud thật · ⛔ kho thật · ⛔ khoá trong repo. Việc ĐẦU: **gộp `origin/claude/bold-galileo-zukpaf` @ `577044e`** *(= main `c5ea872` + AG `8a1eca4` + TIEN_DO)* ⇒ `7cff610`; xung đột changelog *(giữ cả hai)* + sàn *(giữ bản STG rồi đặt = thu thập thật)*. Ba CHẶN là lỗi **chủ gặp khi chạy thật**; mỗi sửa được chứng minh ĐỎ trên mã cũ bằng đồ GIẢ **đã hiệu chỉnh theo hành vi GCP đo được**, rồi ĐẠT trên mã mới.)*
+
+| Phát hiện | Mức | Sửa | Bằng chứng *(ĐỎ trên mã cũ → ĐẠT trên mã mới)* |
+|---|---|---|---|
+| `STG-R2b-02` bước 02: `fls_ghi`/`fls_doc` còn CREATEROLE/CREATEDB | CHẶN | ⓐ `02`: bước mới **①b** — vai app **tạo bằng SQL** do `postgres` chạy *(`CREATE ROLE … LOGIN NOCREATEDB NOCREATEROLE`, mật khẩu đọc từ Secret Manager, đi qua ống từ `printf` dựng sẵn ⇒ ⛔ `ps`/tệp; `VERBOSITY=terse` + che mật khẩu trong mọi lời PG in ra; bí mật ngoài `[A-Za-z0-9_-]{16,}` ⇒ DỪNG)*. Chưa có ⇒ tạo · SẠCH ⇒ đồng bộ mật khẩu · **bẩn** *(thuộc tính thừa HOẶC thành viên `cloudsqlsuperuser`)* ⇒ **đường chuyển**: in phép đo trước *(`rolcreaterole/rolcreatedb/rolsuper` + `postgres có ADMIN OPTION=`)* → thu mọi quyền bằng `fls_admin` *(`sql/02c_thu_quyen_vai.sql`)* → `DROP ROLE` SQL *(lời PG đầy đủ, kể DETAIL)* → bị từ chối ⇒ `gcloud sql users delete` + kiểm vai đã mất → `CREATE ROLE` bằng SQL → ②–④ cấp lại. Lỗi CÓ TÊN `VAI_THU_QUYEN_LOI` · `VAI_KHONG_XOA_DUOC` · `VAI_KHONG_TAO_DUOC` · `VAI_KHONG_DONG_BO_MK`. Bỏ câu `ALTER ROLE … NOSUPERUSER …` + `REVOKE cloudsqlsuperuser` nuốt lỗi. BÁO CÁO: mục `siêu quyền hay CREATEROLE/CREATEDB (đếm vai)` **giữ nguyên `mong 0`** *(ĐỎ khi `2`, ĐỎ khi ⛔ đo được — bài `vai_ghi_co_CREATEROLE` + `psql` giả hỏng)*; thêm dòng **đo, ⛔ chấm** `vai quản trị có ADMIN OPTION … (đếm vai)`. ⓑ `01`: ⛔ còn `gcloud sql users create/set-password` cho `fls_ghi`/`fls_doc` — chỉ sinh **bí mật** của chúng; mục BÁO CÁO `đủ 4 tài khoản` ⇒ `đủ tài khoản gcloud (postgres · fls_admin)`. | **Mô phỏng Cloud SQL PG16** `H.dung_vai_cloud_sql`: vai quản trị ⛔ SUPERUSER, `CREATEROLE CREATEDB`, ADMIN OPTION thừa kế qua `cloudsqlsuperuser` *(grant `INHERIT FALSE, SET FALSE` — ⛔ thừa kế quyền chủ bảng)*. Fixture `mt` *(mọi bài staging)* = **H-B**. Mã cũ trên H-B ⇒ tái hiện **ĐÚNG** báo cáo GCP: `1 mục khác mong` · `= 2 (mong 0)` · `⚠ không hạ được thuộc tính`. Tệp mới `test_02_chuyen_vai_gcp.py` **8 bài**: mã cũ **8/8 ĐỎ** · mã mới **8/8 ĐẠT** *(H-A từ kho rỗng: 2 lần `gcloud sql users delete`, đúng 2 lời PG `ADMIN option`; trạng thái GCP HIỆN TẠI — 02 cũ đã chạy, quyền đã cấp, vai bẩn — ×H-A/H-B ⇒ `--kiem` trước ĐỎ đúng mục, "làm" ⇒ ĐẠT, đăng nhập bằng mật khẩu bí mật được, `fls_doc` vẫn `read_only on`; gcloud xoá hỏng ⇒ `VAI_KHONG_XOA_DUOC` exit 1, ⛔ BÁO CÁO; PG từ chối tạo ⇒ lời PG ⛔ mang mật khẩu; bí mật có `'` ⇒ DỪNG trước khi chạm vai)*. `test_02_di_tru_phan_quyen.py` **29/29** trên H-B. `test_01` +1: mã cũ ĐỎ *(`sql users create fls_doc`)* · mới ĐẠT |
+| `STG-R2b-01` bước 03: `.gcloudignore` lọc mất `Dockerfile` | CHẶN | Ngữ cảnh build tách ra `tools/staging/ngu_canh_build.sh` *(dùng chung 03 + công cụ thử)*: `git archive HEAD -- <danh sách cho phép>` **⛔ `.gcloudignore`**; ngữ cảnh có `.gcloudignore`/`.gitignore` ⇒ `NGU_CANH_CO_TEP_LOC`; cây chưa commit/rỗng ⇒ `NGU_CANH_RONG` *(gộp luôn `STG-R2b-04`)*. **Xoá `.gcloudignore` khỏi repo** *(bài cũ ghim `.gcloudignore == .dockerignore` — chính nó là bẫy; nay ghim "⛔ tồn tại")*. `03`: giữ lời `gcloud builds submit` *(tee)*, đọc dòng `Creating temporary archive of N file(s)`; BÁO CÁO thêm `ngữ cảnh build · tệp ngữ cảnh / tệp gcloud tải lên (đếm)` *(in)* + **`tệp tải lên = tệp ngữ cảnh (≠ 0)` `mong True`** *(⛔ đọc được ⇒ None ⇒ ĐỎ)* + `gcloud builds submit (exit)` `mong 0`; build đỏ ⇒ `BUILD_LOI`, **bỏ ④–⑥** *(⛔ dựng VM cho ảnh ⛔ có)* rồi vẫn in BÁO CÁO. | **Hiệu chỉnh giả trên SỐ ĐO THẬT**: ngữ cảnh `c4a0f39` = **398** tệp; ngữ nghĩa gitignore THUẦN *(`git ls-files --exclude-from`)* cho **1** — ⛔ khớp 292; mô hình "xét từng tiền tố đường dẫn, mẫu khớp cả đường dẫn, `*` ⛔ qua `/`" cho **292 = `fls` 141 + `tools` 150 + `requirements.txt` 1** — khớp ĐÚNG số GCP *(bài `test_gia_gcloudignore_khop_so_do_THAT_GCP_398_ra_292…`)*. `gcloud_gia.py` nay lọc theo mô hình ấy, in dòng `Creating temporary archive…`, ⛔ Dockerfile ⇒ `lstat /workspace/Dockerfile`. Mã cũ ⇒ `test_03` **27 ĐỎ** *(mọi bài dựng ⇒ `lstat`)*; mới ⇒ **49/49**. Phá: gcloud "lọc mất" `Dockerfile` ⇒ `BUILD_LOI` + 3 mục ĐỎ, 0 lệnh tạo VM/firewall; lọc mất MỘT tệp mà build vẫn qua ⇒ **đúng 1** mục ĐỎ *(đếm có răng)* |
+| `STG-R2b-05` Cloud Build ⛔ BuildKit — `RUN --mount` | CHẶN | `Dockerfile` **đa tầng**: tầng `goi` cài `psycopg` vào `/goi` *(CA proxy CHỈ máy dev qua `--build-arg PIP_CA_PEM` — CA là chứng chỉ công khai; Cloud Build ⛔ cần)*, tầng chạy `COPY --from=goi /goi /usr/local` ⇒ ⛔ ARG/ENV/tệp CA. ⛔ cú pháp nào đòi BuildKit. Công cụ **`tools/staging/thu_dung_anh.sh`**: ngữ cảnh y bước 03 + `DOCKER_BUILDKIT=0 docker build`, 4 phép có `mong` *(exit 0 · 0 dòng `requires BuildKit` · 0 dòng CA/`PIP_CA_PEM` trong `docker history` ảnh cuối · uid 10001)*; ⛔ dockerd ⇒ ĐỎ. Giả: `builds submit` gặp `RUN --mount` ⇒ đúng câu docker. | `DOCKER_BUILDKIT=0 docker build` *(dockerd cục bộ)* trên Dockerfile cũ ⇒ **`Step 9/16 … the --mount option requires BuildKit`** — đúng câu + đúng bước Cloud Build báo. `thu_dung_anh.sh`: ở `7cff610` **KẾT: ĐỎ — 3 mục** · ở `5e70562` **KẾT: ĐẠT** *(4/4; ảnh: `psycopg 3.3.9`, uid 10001, 0 tệp `pipca*`, env ⛔ `PIP_CERT`)*. Bài tĩnh `test_tinh_Dockerfile_KHONG_cu_phap_doi_BuildKit…` *(luôn chạy)* ĐỎ trên cũ · ĐẠT mới; bài giả `…tu_choi_RUN_mount…` |
+| `STG-R2b-04` `git archive` cây chưa commit ⇒ lỗi khó hiểu | GHI NHẬN | Gộp vào `ngu_canh_build.sh`: `NGU_CANH_RONG` có tên; tệp trong danh sách cho phép chưa commit ⇒ `⚠ N tệp … CHƯA commit — ảnh dựng từ HEAD`. | bài `test_ngu_canh_build_repo_CHUA_commit…` |
+| `STG-R2b-03` `test_04_chay_lai_van_DAT…` phụ thuộc thứ tự | GHI NHẬN | **⛔ sửa vòng này** *(ngoài 3 CHẶN; bài xanh trong cả tệp — đường nền chạy cả tệp)*. Backlog. | — |
+
+**Hai giả thuyết cho `STG-R2b-02` — CẢ HAI CHƯA đo ở GCP** *(lỗi gốc bị `>/dev/null 2>&1` nuốt)*. Đo trên PG 16 cục bộ 23/11 *(vai ⛔ SUPERUSER)*:
+- **H-A** *(phiếu giao việc)* — `postgres` ⛔ ADMIN OPTION trên vai gcloud tạo. PG16 ⇒ `ALTER ROLE x SET …` **cũng** bị từ chối *("Only roles with the CREATEROLE attribute and the ADMIN option on role")*. ⚠ **Mâu thuẫn** với hai sự thật đã đo cùng lần chạy: `fls_doc · ALTER ROLE đã đặt` **ĐẠT** và `chủ kho = fls_admin` **ĐẠT** *(`GRANT fls_admin TO CURRENT_USER` cũng đòi ADMIN OPTION)*.
+- **H-B** — `postgres` CÓ ADMIN OPTION; câu cũ bị từ chối CẢ CÂU vì mệnh đề `NOSUPERUSER` *("Only roles with the SUPERUSER attribute may change the SUPERUSER attribute")*; `ALTER ROLE x NOCREATEROLE NOCREATEDB` riêng thì ĐƯỢC. **Khớp mọi sự thật đã đo.**
+- Đường chuyển ĐÚNG với cả hai *(đã chứng ở bài)*. Lần chạy 02 của chủ **phân xử**: dòng `đo trước: … có ADMIN OPTION=true|false` và — nếu có — `ⓑ DROP ROLE … PG nói: … DETAIL …`.
+- **Chưa đo ở GCP, script in kết quả**: ① `postgres` `CREATE ROLE … PASSWORD` được; ② `DROP ROLE` SQL được *(H-B)* hay phải `gcloud sql users delete` *(H-A)*; ③ `gcloud sql users delete` xoá được vai sau khi đã thu quyền; ④ vai SQL tạo có hiện ở `gcloud sql users list` không *(⛔ chấm ở 01)*; ⑤ `gcloud builds submit` ⛔ `.gcloudignore` tải ĐỦ ngữ cảnh và in đúng dòng `Creating temporary archive of N file(s)` *(⛔ đọc được ⇒ mục ĐỎ có tên — ⛔ xanh giả)*. Ghi ở `tools/staging/README.md` giả định **#8 · #9**; **#2 gạch: ĐÃ KIỂM 23/11 — SAI**.
+
+### 11.1 · Khối lệnh CHỦ chạy lại *(Cloud Shell · `fp-a-project`)*
+
+```bash
+cd ~/fls                                   # repo trong Cloud Shell
+# ⓪ lấy mã sửa — nhánh MỚI từ origin (commit vá tạm cục bộ ở nhánh cũ được GIỮ, ⛔ xoá):
+git fetch origin claude/bold-galileo-zukpaf-isp/STG
+git switch -C stg-r2b origin/claude/bold-galileo-zukpaf-isp/STG
+git log --oneline -1                       # mong: ngọn nhánh STG (commit BG-326 §11)
+test ! -e .gcloudignore && ! grep -n -- '--mount' Dockerfile && echo "cây đúng"   # mong: in "cây đúng"
+
+# ① 02 — ĐƯỜNG CHUYỂN VAI (vai gcloud tạo ⇒ thu quyền → xoá → tạo lại bằng SQL → cấp lại 02b)
+bash tools/staging/02_di_tru_phan_quyen.sh --project fp-a-project --kiem   # TRƯỚC: mong ĐỎ đúng 1 mục "siêu quyền … = 2"
+bash tools/staging/02_di_tru_phan_quyen.sh --project fp-a-project          # LÀM: ①b in "ĐƯỜNG CHUYỂN" ×2 · KẾT: ĐẠT
+#   gửi lại: khối "①b" (dòng "đo trước …", "ⓑ DROP ROLE …" — phân xử H-A/H-B) + BÁO CÁO
+#   ⛔ dừng ở VAI_KHONG_TAO_DUOC ⇒ vai đã xoá, app ⛔ nối được: gửi ngay dòng lỗi, ⛔ chạy 03
+
+# ② 03 — ảnh + VM
+bash tools/staging/03_dung_app.sh --project fp-a-project
+#   mong BÁO CÁO: "tệp tải lên = tệp ngữ cảnh (≠ 0)" ĐẠT · "gcloud builds submit (exit)" 0
+#   chờ 2–4 phút (VM cài docker + kéo ảnh) rồi:
+bash tools/staging/03_dung_app.sh --project fp-a-project --kiem            # mong KẾT: ĐẠT (kể cả 5 mục TRONG VM)
+
+# (tuỳ) 01 --kiem chỉ đọc: mục "đủ tài khoản gcloud (postgres · fls_admin)"
+bash tools/staging/01_dung_staging_gcp.sh --project fp-a-project --kiem
+```
+
+### 11.2 · Cổng — chạy ở cụm 5434 trên cây ĐÃ gộp
+| Lệnh | Mong | Đo |
+|---|---|---|
+| `pytest tests/staging` | 124 + 16 mới | ⏳ |
+| `pytest --collect-only` *(cây gộp)* | = sàn | **5082** *(= 4995 STG + 71 AG + 16 mới: `test_02_chuyen_vai_gcp` 8 · `test_01` 1 · `test_03` 7)* · web **690** |
+| `dung_moi_truong_isp.sh --duong-nen --cong 5434` *(MỘT lần, một mình)* | `KẾT: ĐẠT` 28 = 28 · web 3 = 3 | ⏳ |
+| `kiem_tai_lieu.py` · `lint-imports` · `quet_pii_repo.py` | K1–K6 · 11 kept · 0 | ⏳ |
+| `thu_dung_anh.sh` *(dockerd cục bộ)* | `KẾT: ĐẠT` | **ĐỎ 3 mục** @ `7cff610` → **ĐẠT 4/4** @ `5e70562` |
+
+### 11.3 · Dev tự thấy còn yếu
+- Mô phỏng Cloud SQL là **suy từ sự thật đã đo**, ⛔ đo trực tiếp: nếu GCP thật khác cả H-A lẫn H-B *(vd `postgres` ⛔ `CREATE ROLE` được)* thì 02 dừng ở `VAI_KHONG_TAO_DUOC` **sau khi đã xoá vai** — app ⛔ nối được tới khi sửa. Đã chọn thứ tự này vì `CREATE` trước `DROP` ⛔ được *(trùng tên)*; khối lệnh chủ ghi rõ: dừng ở lỗi ấy ⇒ ⛔ chạy 03.
+- Mô hình lọc `.gcloudignore` hiệu chỉnh trên **MỘT** điểm đo *(398 → 292)*; nay ⛔ còn tệp ấy nên mô hình chỉ còn canh lối cũ — chỗ dựa thật cho GCP là mục BÁO CÁO đếm `tải lên = ngữ cảnh`.
+- `thu_dung_anh.sh` ⛔ là bài pytest *(đường nền đòi `skipped = 0`, dockerd ⛔ có ở mọi container)*; trong pytest chỉ có bài tĩnh cú pháp + bài giả. Ai đổi Dockerfile nên chạy công cụ ở máy có dockerd *(Cloud Shell có)*.
+- `STG-R2b-03` *(bài phụ thuộc thứ tự)* chưa sửa.
