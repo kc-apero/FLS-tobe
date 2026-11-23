@@ -417,8 +417,8 @@ MONG_HD1_CHAY=9845
 #    --collect-only` — đường nền: 0 skipped · 0 deselected ⇒ thu thập = chạy), nâng TRONG CÙNG commit
 #    thêm bài; bài `tests/test_dung_moi_truong_isp.py::test_S0_R3_02_…` đòi hằng = thu thập ⇒ quên
 #    nâng là ĐỎ. Sau vòng sửa R3: 2.481 + 9 bài mới = 2.490 bài ở 211 tệp · `tests/web` 664 ở 56 tệp.
-# WO-325 (staging 02–04 + UAT): + 93 bài ở tests/staging/ (4.772 → 4.865 → 4.868 (+3 bài IAM lan truyền bước 01); tests/web vẫn 690).
-MONG_PYTEST_TOAN_BO=4886
+# `STG-NAP` vòng sửa R1 `KQ-336`: gộp `origin/main` (4887) ⊕ nhánh STG-NAP (+93 bài tests/staging + 25 bài mới ở `test_05_nap_nguon_that.py`) — xung đột sàn ⇒ ĐẶT = `pytest --collect-only` cây gộp = 5025 (web 690).
+MONG_PYTEST_TOAN_BO=5025
 MONG_PYTEST_WEB=690
 
 echo
