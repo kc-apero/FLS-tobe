@@ -172,4 +172,14 @@ Hoặc chạy lại `bash tools/staging/01_dung_staging_gcp.sh --project fp-a-pr
 
 ### 9.2 · Cổng sau vòng sửa
 
-*(điền ở cuối phiên — xem dưới)*
+Đo 23/11 trên ngọn `4042079` ⊕ chỉnh tài liệu/bài `f22dcc3` *(cụm PG 5434)*:
+
+| Cổng | Mong | Đo được |
+|---|---|---|
+| `bash tools/dung_moi_truong_isp.sh --duong-nen --cong 5434` *(MỘT lần, một mình)* | `KẾT: ĐẠT` | **`KẾT: ĐẠT`** — toàn bộ: `12 failed · 4933 passed · 2 xfailed · 14 errors` ⇒ tập đỏ+XFAIL **28 = 28** node id *(thêm 0 · bớt 0)* · chạy **4.961** bài *(sàn ≥ 4.961)*; web: `3 failed · 687 passed` ⇒ **3 = 3** *(thêm 0 · bớt 0)* · **690** bài *(sàn ≥ 690)* |
+| `pytest tests/staging` | — | **104 passed** *(96 + 8 bài mới)* |
+| `kiem_tai_lieu.py` | K1–K6 OK | **OK** *(496 tệp · 2.998 bảng · 976 ô ngày · 104 mã QĐ)* |
+| `lint-imports` | 11 kept | **11 kept · 0 broken** |
+| `quet_pii_repo.py` | 0 | **0 chỗ · 0 tệp** |
+
+⚠ `f22dcc3` chỉ đổi tài liệu + 1 assert của `test_01` *(8/8 xanh sau đổi)*; `--duong-nen` chạy trước commit ấy nhưng thu thập 4.961 vẫn đúng *(bài mới không thêm — chỉ thêm assert)*.
