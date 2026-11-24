@@ -186,6 +186,98 @@ elif lenh("compute", "ssh"):
     if not S["vm"] or S.get("ssh_hong"):
         sys.exit(255)
     print(S["ssh_ra"])
+# ══ bước 07 (WO-363) · Cloud Run + IAP ═══════════════════════════════════════════════════════════════════
+#  ⭐ Học từ 3 lỗi THẬT 23/11 (giả cũ "cho qua" ⇒ xanh giả): mỗi nhánh dưới mô phỏng một HÀNH VI GCP đã biết, kể cả
+#  khi nó LÀM HỎNG script: tác tử IAP CHƯA tồn tại trước `services identity create` ⇒ gán quyền đỏ "does not exist";
+#  `deploy` ảnh chưa có ⇒ đỏ; `deploy` của service ĐÃ có `allUsers` ⇒ GIỮ `allUsers` (`--no-allow-unauthenticated`
+#  ⛔ gỡ binding cũ — giả định bi quan, BG-364 G-4); `iap_chi_beta` ⇒ GA ⛔ biết `--iap` (đúng câu gcloud).
+#  Mỗi revision mới "khởi động MỘT instance lúc deploy" (giả định G-5) ⇒ ghi một dòng `TU_DO` vào nhật ký.
+elif lenh("config", "get-value", "account"):
+    print(S.get("tai_khoan", ""))
+elif lenh("projects", "describe"):
+    print(S.get("so_project", "123456789012"))
+elif lenh("services", "identity", "create"):
+    if co("--service") != "iap.googleapis.com":
+        sys.exit(99)
+    S["tac_tu_iap"] = True
+    luu()
+    print(f"Service identity created: service-{S.get('so_project', '123456789012')}@gcp-sa-iap.iam.gserviceaccount.com")
+elif lenh("run", "deploy") or lenh("beta", "run", "deploy"):
+    beta = a[0] == "beta"
+    if "--iap" in a and S.get("iap_chi_beta") and not beta:
+        print("ERROR: (gcloud.run.deploy) unrecognized arguments: --iap", file=sys.stderr)
+        sys.exit(2)
+    if "run.googleapis.com" not in S["apis"]:
+        print("ERROR: (gcloud.run.deploy) PERMISSION_DENIED: Cloud Run Admin API has not been used in project", file=sys.stderr)
+        sys.exit(1)
+    anh = co("--image")
+    if anh.rsplit(":", 1)[1] not in S["anh_tags"]:
+        print(f"ERROR: (gcloud.run.deploy) Image '{anh}' not found.", file=sys.stderr)
+        sys.exit(1)
+    ten = a[3] if beta else a[2]
+    env = [{"name": k, "value": v} for k, v in kv(co("--set-env-vars")).items()]
+    cu = S.get("run") or {}
+    so = int(re.search(r"-(\d{5})-", cu.get("status", {}).get("latestReadyRevisionName") or "x-00000-").group(1)) + 1
+    rev = f"{ten}-{so:05d}-gia"
+    ann = {"run.googleapis.com/ingress": co("--ingress") or "all"}
+    if "--iap" in a:
+        ann["run.googleapis.com/iap-enabled"] = "true"
+    S["run"] = {"apiVersion": "serving.knative.dev/v1", "kind": "Service",
+                "metadata": {"name": ten, "annotations": ann},
+                "spec": {"template": {"metadata": {"annotations": {"autoscaling.knative.dev/maxScale": co("--max-instances"),
+                                                                    "autoscaling.knative.dev/minScale": co("--min-instances")}},
+                                      "spec": {"serviceAccountName": co("--service-account"),
+                                               "containers": [{"image": anh, "command": [co("--command")],
+                                                               "args": [co("--args")],
+                                                               "ports": [{"containerPort": int(co("--port")), "name": "http1"}],
+                                                               "env": env}]}}},
+                "status": {"url": S.get("url", "https://fls-staging-web-gia123-as.a.run.app"), "latestReadyRevisionName": rev,
+                           "conditions": [{"type": "Ready", "status": "True"}]}}
+    S.setdefault("run_iam", [])
+    if "--allow-unauthenticated" in a:
+        S["run_iam"].append({"role": "roles/run.invoker", "members": ["allUsers"]})
+    S.setdefault("nhat_ky", []).append(S.get("tu_do", "TU_DO revision={rev} man_hinh=200 api_khong_the=401 "
+                                                     "nghe_cua=127.0.0.1:8088 cong_khong_iap=403 cong_iap_gia=403 jwks=3")
+                                       .format(rev=rev))
+    luu()
+elif lenh("run", "services", "describe"):
+    if not S.get("run"):
+        print("ERROR: (gcloud.run.services.describe) Cannot find service", file=sys.stderr)
+        sys.exit(1)
+    xuat_json(S["run"])
+elif lenh("run", "services", "get-iam-policy"):
+    if not S.get("run"):
+        sys.exit(1)
+    xuat_json({"bindings": S.get("run_iam", [])})
+elif lenh("run", "services", "add-iam-policy-binding"):
+    m = co("--member")
+    if "gcp-sa-iap" in m and not S.get("tac_tu_iap"):
+        print(f"ERROR: (gcloud.run.services.add-iam-policy-binding) INVALID_ARGUMENT: Service account {m.split(':', 1)[1]} "
+              "does not exist.", file=sys.stderr)
+        sys.exit(1)
+    S.setdefault("run_iam", []).append({"role": co("--role"), "members": [m]})
+    luu()
+elif lenh("run", "services", "remove-iam-policy-binding"):
+    for b in S.get("run_iam", []):
+        if b["role"] == co("--role") and co("--member") in b["members"]:
+            b["members"].remove(co("--member"))
+    S["run_iam"] = [b for b in S.get("run_iam", []) if b["members"]]
+    luu()
+elif lenh("iap", "web", "add-iam-policy-binding"):
+    if co("--resource-type") != "cloud-run" or not S.get("run"):
+        print("ERROR: (gcloud.iap.web.add-iam-policy-binding) NOT_FOUND", file=sys.stderr)
+        sys.exit(1)
+    S.setdefault("iap_iam", []).append({"role": co("--role"), "members": [co("--member")]})
+    luu()
+elif lenh("iap", "web", "get-iam-policy"):
+    if not S.get("run") or S.get("iap_iam_hong"):
+        sys.exit(1)
+    xuat_json({"bindings": S.get("iap_iam", [])})
+elif lenh("logging", "read"):
+    for d in reversed(S.get("nhat_ky", [])):
+        if "TU_DO " in a[2] and d.startswith("TU_DO "):
+            print(d)
+            break
 else:
     print("gcloud GIẢ: lệnh lạ: " + " ".join(args), file=sys.stderr)
     sys.exit(99)
