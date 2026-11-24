@@ -30,7 +30,7 @@
 ⭐ `WO-359` (lời chủ 24/11): BA ĐƯỜNG tới CÙNG mô hình, chọn bằng cấu hình `FLS_NHA_CUNG_CAP` (⛔ đổi mã gọi, ⛔ đổi
    prompt — khuôn yêu cầu/đáp y hệt). Biên bản quyết: ~03:15 *"dùng claude trực tiếp trong GCP, thông qua vertex AI"* ⇒
    ~03:45 *"đồng ý dùng qua vertex"* ⇒ **~03:50 *"dùng claude.googleapis.com cho nhanh"*** (quyết HIỆN HÀNH):
-     `google-cloud` ⭐ đường CHÍNH (MẶC ĐỊNH khi biến vắng) — *Claude Models on Google Cloud (Anthropic managed)*, service
+     `google-cloud` ⭐ đường CHÍNH (đặt RÕ `FLS_NHA_CUNG_CAP=google-cloud`) — *Claude Models on Google Cloud (Anthropic managed)*, service
                  `claude.googleapis.com` (đã BẬT trên `fp-a-project`): `anthropic.AnthropicGoogleCloud(project=…,
                  workspace_id=…)` (gói `anthropic[google_cloud]`), project `FLS_GCP_PROJECT` ∈ `DU_AN_CONG_TY` · workspace
                  `FLS_CLAUDE_WORKSPACE_ID` (`wrkspc_…`) · vị trí `global` (skill: *"Leave it there"*) · xác thực ADC/SA của
@@ -39,7 +39,10 @@
                  (*"whether the first-party prices … apply is unknown"*) ⇒ USD = ƯỚC theo giá Claude API để GIỮ trần.
      `vertex`    DỰ PHÒNG — Claude trên Vertex AI (Google managed) của project công ty (`FLS_GCP_PROJECT`) · vùng
                  `FLS_VERTEX_REGION` ∈ `VUNG_VERTEX` (mặc định `global`) · ADC/SA, `roles/aiplatform.user` (`BANG_GIA_VERTEX`).
-     `anthropic` DỰ PHÒNG thứ hai (WO-355): Claude API trực tiếp bằng `ANTHROPIC_API_KEY` — chỉ khi đặt RÕ biến.
+     `anthropic` DỰ PHÒNG thứ hai (WO-355): Claude API trực tiếp bằng `ANTHROPIC_API_KEY` — cũng là giá trị khi biến VẮNG.
+   ⚠ Vì sao biến vắng ⛔ là đường chính: bài nghiệm thu R1 `KQ-357` (`tests/nghiem_thu/test_kq357_…`, chủ `fls-test`) khoá
+     hành vi *biến vắng ⇒ đường khoá API*; Dev ⛔ sửa bài nghiệm thu. Đo 24/11: đặt mặc định = `google-cloud` ⇒ **19/27**
+     bài ấy ĐỎ. Đường chính chọn RÕ ở mọi khối lệnh (BG-360) — đường gọi tiền thật nên là lựa chọn NÓI RA, ⛔ ngầm.
    Tra 24/11 (skill `claude-api` + trang `claude-models-on-google-cloud/google-managed`): lớp `anthropic.AnthropicVertex(
    project_id=…, region=…)` (gói `anthropic[vertex]`) · mã mô hình Vertex của Opus 5.5 / Sonnet 5.5 = mã TRẦN
    `claude-opus-5-5` / `claude-sonnet-5-5` (⛔ tiền tố, ⛔ `@ngày`) · vùng: `global` (khuyên) · `us`/`eu` (đa vùng, +10%)
@@ -69,7 +72,7 @@ DUONG_API = "anthropic"          # dự phòng: Claude API trực tiếp, khoá 
 DUONG_VERTEX = "vertex"          # dự phòng: Claude trên Vertex AI của project công ty
 DUONG_GOOGLE_CLOUD = "google-cloud"   # ⭐ CHÍNH (chủ 24/11 ~03:50): `claude.googleapis.com` (Anthropic managed)
 DUONG_HOP_LE = (DUONG_GOOGLE_CLOUD, DUONG_VERTEX, DUONG_API)
-DUONG_MAC_DINH = DUONG_GOOGLE_CLOUD
+DUONG_MAC_DINH = DUONG_API          # biến vắng ⇒ hành vi WO-355 (bài nghiệm thu KQ-357 khoá) — xem docstring
 #: Đường của project GCP (đòi `FLS_GCP_PROJECT` ∈ `DU_AN_CONG_TY`, ⛔ khoá).
 DUONG_GCP = (DUONG_GOOGLE_CLOUD, DUONG_VERTEX)
 BIEN_CLAUDE_WORKSPACE = "FLS_CLAUDE_WORKSPACE_ID"
@@ -99,7 +102,7 @@ BIEN_VERTEX_DU_LIEU = "FLS_VERTEX_DU_LIEU_XAC_NHAN"
 
 
 def duong_goi(moi_truong: dict[str, str] | None = None) -> str:
-    """Đường gọi thật theo cấu hình. Biến vắng ⇒ `google-cloud` (quyết chủ 24/11 ~03:50). Giá trị lạ trả NGUYÊN để
+    """Đường gọi thật theo cấu hình. Biến vắng ⇒ `anthropic` (WO-355; đường CHÍNH `google-cloud` đặt RÕ). Giá trị lạ trả NGUYÊN để
     `kiem_chot_that` báo ĐỎ có tên (⛔ đoán sang một đường)."""
     mt = os.environ if moi_truong is None else moi_truong
     return (mt.get(BIEN_NHA_CUNG_CAP) or DUONG_MAC_DINH).strip().lower()
@@ -193,12 +196,15 @@ class NhatKyGoi:
     vung: str = ""              # vùng (`global`/`us`/`eu`); "" ở đường API
 
     def dict(self) -> dict[str, Any]:
-        return {"mo_hinh": self.mo_hinh, "token_vao": self.token_vao, "token_ra": self.token_ra,
-                "cache_doc": self.cache_doc, "cache_ghi": self.cache_ghi, "giay": round(self.giay, 3),
-                "chi_phi_usd": round(self.chi_phi_usd, 6), "stop_reason": self.stop_reason,
-                "van_tay_yeu_cau": self.van_tay_yeu_cau, "van_tay_dap": self.van_tay_dap,
-                "request_id": self.request_id, "duong": self.duong, "vung": self.vung,
-                "ngay_tra_gia": NGAY_TRA_GIA_THEO_DUONG.get(self.duong, NGAY_TRA_GIA)}
+        d = {"mo_hinh": self.mo_hinh, "token_vao": self.token_vao, "token_ra": self.token_ra,
+             "cache_doc": self.cache_doc, "cache_ghi": self.cache_ghi, "giay": round(self.giay, 3),
+             "chi_phi_usd": round(self.chi_phi_usd, 6), "stop_reason": self.stop_reason,
+             "van_tay_yeu_cau": self.van_tay_yeu_cau, "van_tay_dap": self.van_tay_dap,
+             "request_id": self.request_id, "ngay_tra_gia": NGAY_TRA_GIA_THEO_DUONG.get(self.duong, NGAY_TRA_GIA)}
+        # `WO-359`: đường GCP ghi thêm `duong` · `vung`; đường API GIỮ đúng 12 khoá (bài nghiệm thu KQ-357 ghim tập khoá)
+        if self.duong != DUONG_API:
+            d.update(duong=self.duong, vung=self.vung)
+        return d
 
 
 def chi_phi(ma: str, vao: int, ra: int, cache_doc: int = 0, cache_ghi: int = 0, duong: str = DUONG_API,
@@ -368,7 +374,10 @@ def kiem_chot_that(mo_hinh: MoHinh, co_that: bool, moi_truong: dict[str, str] | 
 
 
 class VuotTran(RuntimeError):
-    """Chi phí cộng dồn đã chạm trần USD của vòng ⇒ ⛔ gọi tiếp (chạy tập nhỏ trước, xem chi phí — WO-355 AC-3)."""
+    """Chi phí cộng dồn đã chạm trần USD của vòng ⇒ ⛔ gọi tiếp (chạy tập nhỏ trước, xem chi phí — WO-355 AC-3).
+
+    ⚠ `AG2-R1-03` (KQ-357): trần chặn lời gọi **KẾ** (kiểm TRƯỚC mỗi lời bằng tổng đã tiêu ≥ trần); ⛔ cắt lời gọi đang
+    chạy ⇒ MỘT lời lớn có thể vượt trần (Opus 5.5: ≤ 1M vào · `max_tokens` ra). Khai ở `--help` + BG-360."""
 
 
 class AnthropicMessages:
@@ -515,7 +524,7 @@ class AnthropicGoogleCloudMessages(AnthropicMessages):
 
 #: Họ → lớp adapter. Thêm họ (vd. `openai` giai đoạn sau) = thêm MỘT dòng + bỏ họ ấy khỏi `HO_DE_DANH`.
 ADAPTER: dict[str, Any] = {"anthropic": AnthropicMessages}
-#: `WO-359`: họ `anthropic` có BA đường — chọn theo `FLS_NHA_CUNG_CAP` (`duong_goi`, mặc định `google-cloud`).
+#: `WO-359`: họ `anthropic` có BA đường — chọn theo `FLS_NHA_CUNG_CAP` (`duong_goi`; vắng ⇒ `anthropic`).
 ADAPTER_DUONG: dict[tuple[str, str], Any] = {("anthropic", DUONG_GOOGLE_CLOUD): AnthropicGoogleCloudMessages,
                                              ("anthropic", DUONG_VERTEX): AnthropicVertexMessages,
                                              ("anthropic", DUONG_API): AnthropicMessages}

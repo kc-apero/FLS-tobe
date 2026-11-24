@@ -209,6 +209,9 @@ GIA = {"claude-opus-5-5": (4.00, 20.00), "claude-sonnet-5-5": (2.00, 10.00)}
 HE = {"global": 1.0, "us": 1.1, "eu": 1.1}[e["REGION"]] if e["DUONG"] == "vertex" else 1.0
 apis = e["R_APIS"].split()
 usd = 0.0
+# Tên ĐỎ khi gọi thử ≠ 200 (orchestrator 24/11: trước khi được duyệt phải ĐỎ CÓ TÊN, ⛔ "đang chờ").
+GOI_Y = {"vertex": "mô hình CHƯA bật / CHƯA được Anthropic duyệt ở Model Garden, hoặc thiếu roles/aiplatform.user",
+         "google-cloud": "CHƯA Subscribe/Activate gói Marketplace, workspace sai, mô hình ⛔ mở cho tổ chức, hoặc thiếu roles/claude.user"}
 def tach(k):
     p = (dong.get(k) or "").split("|")
     return (p + [""] * 6)[:6] if dong.get(k) else [None] * 6
@@ -236,7 +239,7 @@ for nguon, nhan in (("cs", "Cloud Shell · người chạy"), ("vm", "TRONG VM �
         hang.append((f"{nhan} · {m} · HTTP", ma, "200"))
         hang.append((f"{nhan} · {m} · mô hình trả về (= mã ghim)", mo if ma == "200" else None, m))
         if ma and ma != "200":
-            hang.append((f"{nhan} · {m} · trạng thái lỗi (⛔ nội dung)", loi or "—", None))
+            hang.append((f"{nhan} · {m} · trạng thái lỗi (⛔ nội dung)", f"{loi or '—'} ⇒ {GOI_Y[e['DUONG']]}", None))
         if ma == "200":
             try:
                 v, r = int(vao or 0), int(ra or 0)

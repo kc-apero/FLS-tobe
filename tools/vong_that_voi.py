@@ -6,10 +6,10 @@
     python tools/vong_that_voi.py --that --tran-usd 2      # API THẬT: (a) tập nhỏ trước, in chi phí, DỪNG
     python tools/vong_that_voi.py --that --be --tran-usd 6 # + (b) fleet eval A2.04 trên bể A/B (sau khi xem chi phí (a))
 
-⭐ `WO-359` (chủ 24/11 ~03:50): đường CHÍNH (mặc định) = **`claude.googleapis.com`** (Anthropic managed) của `fp-a-project`
-   — đặt `FLS_GCP_PROJECT=fp-a-project` · `FLS_CLAUDE_WORKSPACE_ID=wrkspc_…` · `FLS_GC_DU_LIEU_XAC_NHAN=1` (+
+⭐ `WO-359` (chủ 24/11 ~03:50): đường CHÍNH = **`claude.googleapis.com`** (Anthropic managed) của `fp-a-project`
+   — đặt `FLS_NHA_CUNG_CAP=google-cloud` · `FLS_GCP_PROJECT=fp-a-project` · `FLS_CLAUDE_WORKSPACE_ID=wrkspc_…` · `FLS_GC_DU_LIEU_XAC_NHAN=1` (+
    `FLS_CHO_GOI_API=1`, `--that`); xác thực = ADC của GCP. Dự phòng: `FLS_NHA_CUNG_CAP=vertex` (Vertex AI) ·
-   `FLS_NHA_CUNG_CAP=anthropic` (khoá, WO-355). Khối lệnh cho chủ: BG-360 §B.
+   `FLS_NHA_CUNG_CAP=anthropic` (khoá, WO-355 — cũng là đường khi biến VẮNG). Khối lệnh cho chủ: BG-360 §B.
 
 ⭐ (a) CHUỖI 4 agent trên TẬP NHỎ có đáp án = 12 ca DỰNG (`tests/fixture/agent/`) + mẫu ≤ `--mau` ca (mặc định 20) của
    bể B giữ riêng (`$FLS_HELDOUT_NOI_DUNG/b`, hạt 355). Bể vắng ⇒ chỉ 12 ca dựng, report KHAI rõ (⛔ im lặng).
@@ -255,10 +255,11 @@ def md(kq: dict[str, Any]) -> str:
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(prog="vong_that_voi.py")
     p.add_argument("--that", action="store_true",
-                   help="gọi THẬT — FLS_CHO_GOI_API=1 + đường mặc định google-cloud (FLS_GCP_PROJECT · "
-                        "FLS_CLAUDE_WORKSPACE_ID · FLS_GC_DU_LIEU_XAC_NHAN=1) | vertex | anthropic (FLS_NHA_CUNG_CAP)")
+                   help="gọi THẬT — FLS_CHO_GOI_API=1 + đường FLS_NHA_CUNG_CAP=google-cloud (FLS_GCP_PROJECT · "
+                        "FLS_CLAUDE_WORKSPACE_ID · FLS_GC_DU_LIEU_XAC_NHAN=1) | vertex | anthropic (vắng ⇒ anthropic)")
     p.add_argument("--be", action="store_true", help="(b) fleet eval A2.04 trên bể A/B — chạy SAU khi xem chi phí (a)")
-    p.add_argument("--tran-usd", type=float, default=cav.TRAN_USD_MAC_DINH)
+    p.add_argument("--tran-usd", type=float, default=cav.TRAN_USD_MAC_DINH,
+                   help="trần USD ƯỚC của cả vòng — chặn lời gọi KẾ khi tổng đã tiêu ≥ trần; ⛔ cắt lời gọi ĐANG chạy (một lời có thể vượt trần — AG2-R1-03)")
     p.add_argument("--mau", type=int, default=MAU_MAC_DINH, help="số ca bể B thêm vào tập nhỏ (≤ 20 theo WO-355)")
     p.add_argument("--ghi", action="store_true")
     a = p.parse_args(argv)
@@ -275,10 +276,12 @@ def main(argv: list[str] | None = None) -> int:
         TEP_MD.write_text(trang, encoding="utf-8")
         TEP_JSON.write_text(json.dumps(kq, ensure_ascii=False, indent=1, sort_keys=True, default=str) + "\n", encoding="utf-8")
         print(f"  đã ghi {TEP_MD.relative_to(GOC)} · {TEP_JSON.relative_to(GOC)}")
-        if ncc:
-            pn = cav.ghi_nhat_ky(ncc, "vong_that")
-            if pn:
-                print(f"  đã ghi nhật ký {pn.relative_to(GOC)}")
+    # ⭐ `AG2-R1-04` (KQ-357): nhật ký lời gọi THẬT ghi LUÔN (⛔ phụ thuộc `--ghi`) — tiền đã tiêu phải để lại dấu vết.
+    #   `ghi_nhat_ky` trả None khi 0 lời gọi (Đ3) ⇒ lượt thiếu chốt ⛔ sinh tệp.
+    if ncc:
+        pn = cav.ghi_nhat_ky(ncc, "vong_that")
+        if pn:
+            print(f"  đã ghi nhật ký {pn.relative_to(GOC) if pn.is_relative_to(GOC) else pn}")
     if "do" in kq["that"]:
         return 2
     return 0 if dat else 1

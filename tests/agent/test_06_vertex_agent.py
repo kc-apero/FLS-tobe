@@ -104,9 +104,11 @@ def test_dung_tu_trong__DO_dung_buoc_bam_tay_roi_DAT(g):
     if g.duong == "vertex":
         r = g.chay()                                               # Model Garden chưa bật
         assert "FAILED_PRECONDITION" in r.stdout and "model-garden/claude-opus-5-5?project=fp-a-project" in r.stdout
+        assert "FAILED_PRECONDITION ⇒ mô hình CHƯA bật / CHƯA được Anthropic duyệt" in r.stdout      # ĐỎ CÓ TÊN
     else:
         r = g.chay(ws="wrkspc_SaiWorkspace")                       # workspace chép sai
         assert "not_found_error" in r.stdout and "Settings → Workspaces" in r.stdout
+        assert "not_found_error ⇒ CHƯA Subscribe/Activate gói Marketplace, workspace sai" in r.stdout
     assert r.returncode == 1, r.stdout + r.stderr
     assert do_cua(r.stdout) == TAT_CA_GOI, do_cua(r.stdout)       # CHỈ 8 mục gọi thử ĐỎ — API + IAM đã dựng ĐẠT
     g.bam_tay()

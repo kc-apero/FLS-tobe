@@ -8,7 +8,9 @@
 | **Nhánh** | `claude/bold-galileo-zukpaf-isp/AG3` · SHA mã: xem §F (commit trước BG) |
 | **Kho thật** | `KHONG_CHAM` (G0 BÓNG) · **0** lời gọi mô hình thật từ phiên này (Claude ⛔ vào GCP — quyết chủ 20/11) |
 
-**Biên bản quyết đường (24/11, qua orchestrator):** ~03:15 *"dùng claude trực tiếp trong GCP, thông qua vertex AI"* ⇒ ~03:45 *"đồng ý dùng qua vertex"* ⇒ ảnh console: `fp-a-project` đã BẬT **"Anthropic managed Claude API"** (`claude.googleapis.com`) ⇒ **~03:50 *"dùng claude.googleapis.com cho nhanh"*** = quyết HIỆN HÀNH. Mã có CẢ BA đường qua MỘT lớp nhà cung cấp, chọn bằng `FLS_NHA_CUNG_CAP`: **`google-cloud` (mặc định)** · `vertex` (dự phòng — làm trước, giữ nguyên) · `anthropic` (khoá API, WO-355).
+**Biên bản quyết đường (24/11, qua orchestrator):** ~03:15 *"dùng claude trực tiếp trong GCP, thông qua vertex AI"* ⇒ ~03:45 *"đồng ý dùng qua vertex"* ⇒ ảnh console: `fp-a-project` đã BẬT **"Anthropic managed Claude API"** (`claude.googleapis.com`) ⇒ **~03:50 *"dùng claude.googleapis.com cho nhanh"*** = quyết HIỆN HÀNH. Mã có CẢ BA đường qua MỘT lớp nhà cung cấp, chọn bằng `FLS_NHA_CUNG_CAP`: **`google-cloud` (chính — đặt RÕ)** · `vertex` (dự phòng — làm trước, giữ nguyên) · `anthropic` (khoá API, WO-355 — **cũng là đường khi biến VẮNG**: bài nghiệm thu R1 `KQ-357` khoá hành vi ấy, đặt mặc định `google-cloud` ⇒ **19/27** bài ấy ĐỎ — đo 24/11; Dev ⛔ sửa bài nghiệm thu).
+
+> ⛔⛔ **Hôm nay (24/11 ~04:30, chủ qua orchestrator): CẢ HAI đường CHƯA gọi thật được** — Marketplace *Subscribe* chặn vì chủ ⛔ admin billing; *Enable* ở Model Garden mở FORM *"subject to approval by Anthropic"* và chủ hoãn tới mai (dính pháp nhân billing). ⇒ 06 `--kiem` mong **ĐỎ có tên** ở 8 mục gọi thử (`… ⇒ mô hình CHƯA bật / CHƯA được Anthropic duyệt …` hoặc `… CHƯA Subscribe/Activate …`), ⛔ "đang chờ". **Bước e2e §B CHƯA sẵn sàng** tới khi MỘT lời gọi thật = 200.
 
 ## ⓪ · Tiền đề BẤM TAY — chủ đánh dấu TRƯỚC khi chạy 06
 
@@ -21,8 +23,11 @@ Nguồn: trang Anthropic `platform.claude.com/docs/en/build-with-claude/claude-m
 - [ ] **Open Claude Console** (cần `roles/claude.admin`) → **Settings → Workspaces** → chép ID của *Default Workspace* (`wrkspc_…`) vào biến shell `WS` — ⛔ dán chat.
 - [ ] ⛔ gỡ vai của **service agent** mà `claude.googleapis.com` tạo (*"Don't remove its role grants"*) — 06 ⛔ có bước gỡ vai nào (bài `CAM_GHI`).
 
-**Đường `vertex` (dự phòng — chủ đang thử 24/11 vì Subscribe bị chặn)**
-- [ ] Bật Claude Opus 5.5 + Sonnet 5.5 ở **Model Garden** (06 in 2 đường dẫn). Orchestrator ghi chủ cần vai `entitlementManager` trên project để bấm *Enable* — ⛔ tôi chưa tra được tài liệu xác nhận (giả định G10).
+**Đường `vertex` (dự phòng — chủ đang thử 24/11 vì Subscribe bị chặn)** — nguồn: trang Google `vertex-ai/generative-ai/docs/partner-models/use-partner-models` §Set required permissions (tôi đọc 24/11) + đo của chủ.
+- [ ] Người bấm *Enable* có vai **Consumer Procurement Entitlement Manager** (*"Anyone who's been granted this role can enable partner models in Model Garden"*) — chủ đã cấp ở project (orchestrator đo 24/11).
+- [ ] Org policy cho phép `cloudcommerceconsumerprocurement.googleapis.com` — chủ đã bật (orchestrator đo).
+- [ ] **FORM duyệt của Anthropic cho TỪNG mô hình** — Opus 5.5 **và** Sonnet 5.5 (tên doanh nghiệp · website · email · trụ sở · ngành · số người dùng · mục đích · AUP) ⇒ **CHỜ DUYỆT** (trang Google ⛔ nhắc form; chủ đo trên console). ⏳ hoãn tới mai.
+- [ ] `roles/aiplatform.user` cho SA `fls-staging-app` — 06 `--duong vertex` cấp, `--condition=None`.
 
 **Chung**: mọi lệnh cấp vai mức project trong 06 mang `--condition=None` (project có **2** binding CÓ ĐIỀU KIỆN — thiếu cờ là gcloud dừng hỏi; bài tĩnh `test_moi_lenh_cap_vai_muc_project__co_condition_None` đếm **2/2**).
 
@@ -52,7 +57,7 @@ python3 -m venv ~/.fls-agent-venv && ~/.fls-agent-venv/bin/pip install -q -r req
 PY=~/.fls-agent-venv/bin/python
 
 # ── đường gọi: claude.googleapis.com của project công ty (MẶC ĐỊNH — ⛔ khoá sk-ant) ──
-export PYTHONUTF8=1 FLS_GCP_PROJECT=fp-a-project
+export PYTHONUTF8=1 FLS_NHA_CUNG_CAP=google-cloud FLS_GCP_PROJECT=fp-a-project     # đường chọn RÕ (vắng ⇒ khoá API)
 export FLS_CLAUDE_WORKSPACE_ID="$WS"        # wrkspc_… (bước A1) — ⛔ ghi vào tệp repo
 export FLS_CHO_GOI_API=1
 export FLS_GC_DU_LIEU_XAC_NHAN=1            # ⛔ đặt trước khi trả lời câu chủ C1 (§E) — đây là lời XÁC NHẬN của người vận hành
@@ -71,6 +76,7 @@ unset FLS_SHEETS_TOKEN
 
 # ── (a) TẬP NHỎ: 12 ca dựng + ≤ 20 ca bể B — chạy TRƯỚC, xem chi phí ──
 $PY tools/vong_that_voi.py --that --tran-usd 2 --ghi
+#   trần = chặn lời gọi KẾ khi tổng ≥ trần — ⛔ cắt lời đang chạy (AG2-R1-03); nhật ký lời gọi ghi LUÔN (AG2-R1-04)
 #   mong: exit 0 · "**KẾT: ĐẠT**" · "| đường gọi thật | `google-cloud` …" · "Sau tập nhỏ (a): N lời gọi · ~X USD"
 
 # ── (b) BỂ A/B — CHỈ sau khi xem chi phí (a) trên hoá đơn ──
@@ -93,7 +99,7 @@ rm -rf /tmp/fls_be_tho ; rm -f $HOME/sa_doc_sheet.json      # bể ~/fls_heldout
 | AC-3 · script GCP cho CHỦ | `06_vertex_agent.sh --project fp-a-project [--kiem]`: bật API · bước bấm tay ghi rõ · cấp vai cho SA · gọi thử 1 lời/mô hình ⇒ BÁO CÁO có `mong`, ĐỎ hai chiều, ⛔ in khoá/token | **ĐẠT** (gcloud + curl GIẢ có trạng thái) | `tools/staging/06_vertex_agent.sh` (`--duong google-cloud` mặc định · `vertex`) + **41** bài `tests/agent/test_06_vertex_agent.py` (đa số chạy CHO CẢ HAI đường) với `tests/agent/vertex_gia.py` (một tệp, hai tên `gcloud`/`curl`; lệnh TRONG VM **chạy thật bằng bash**). Đo: từ trống + bước bấm tay chưa xong (workspace sai · Model Garden chưa bật) ⇒ ĐỎ **đúng 8** mục gọi thử, service + IAM ĐẠT · xong ⇒ **14/14** (google-cloud, 2 service) · **13/13** (vertex) · thiếu service Marketplace ⇒ ĐỎ ĐÚNG mục ấy dù lời gọi 200 · `--condition=None` **2/2** lệnh cấp vai (bài tĩnh) · chạy 3 lần ⇒ IAM **1** binding, service **2** (google-cloud) / **1** (vertex) · `--kiem` **0** lệnh ghi · 8 phép phá × 2 đường ⇒ ĐÚNG tập mục ĐỎ · `--cap-nguoi` cấp + đo vai người chạy · `--khong-goi-thu` ⇒ 8 mục ĐỎ (Đ5) · tham số xấu ⇒ exit 2 trước MỌI lệnh · 5 lính canh (token người · token SA · nội dung trả lời · thông điệp lỗi · workspace đầy đủ) **0** lần trong đầu ra. BÁO CÁO kèm trạng thái API của đường kia (thông tin) |
 | AC-4 · test e2e trên staging | lệnh CHỦ chạy: dựng bể giữ riêng từ nguồn sống (ngoài repo) ⇒ chuỗi 4 agent THẬT (tập nhỏ ⇒ xem chi phí ⇒ bể A/B) ⇒ report MỘT trang GIẢ ↔ THẬT; G0 BÓNG | **ĐẠT phần mã + khối lệnh** · số THẬT **chờ chủ** (§A 4–5) | §B. `vong_that_voi.py` ghi `đường gọi thật` + `đường · vùng` + nhãn giá; thiếu chốt ⇒ exit **2** có tên (`thiếu FLS_CLAUDE_WORKSPACE_ID` · `thiếu FLS_GCP_PROJECT`) (bài); đủ chốt + SDK giả ⇒ exit **0** `KẾT: ĐẠT` với chữ `CHƯA có bảng giá` (bài). `dung_be_giu_rieng.py` đọc sheet bằng `FLS_SHEETS_TOKEN` / `FLS_SHEETS_SA_JSON_TEP` (Cloud Shell), phạm vi CHỈ `spreadsheets.readonly` (bài). Report trong repo = lượt KHÔNG chốt (đường mặc định `google-cloud`, thiếu project/workspace) — sinh lại bởi `--ghi`, ⛔ số THẬT |
 | AC-5 · an toàn | ⛔ nội dung/phản hồi thô vào repo; ⛔ khoá; `quet_pii_repo` 0; đọc toàn bộ nội dung + số TK chỉ trong GCP công ty | **ĐẠT** | `DU_AN_CONG_TY = ("fp-a-project",)` — project khác ⇒ `CamGoiThat` ở cả hai đường (5 bài); 06 có mục `project = GCP công ty` mong `fp-a-project`. Nhật ký ⛔ chứa `"lam di"` · `0123456789` (STK giả trong yêu cầu) · khoá · workspace (bài). Script 06: token chỉ ở biến + tệp 600, header đọc `@tệp`, thân trả lời → tệp tạm → CHỈ in `model`/`stop_reason`/số token, xoá ngay. `quet_pii_repo` **0** (§F) |
-| AC-6 | `--duong-nen` ĐẠT (sàn = thu thập thật + bài ghim cùng commit); `kiem_tai_lieu` · `lint-imports` | xem §F | sàn `MONG_PYTEST_TOAN_BO` **5020 → 5116** = thu thập thật (`pytest --collect-only` ⇒ **5116 tests collected**; +34 `test_mo_hinh_vertex.py` · +21 `test_mo_hinh_google_cloud.py` · +41 `test_06_vertex_agent.py`; web **690** giữ) + `tests/test_dung_moi_truong_isp.py` cùng commit |
+| AC-6 | `--duong-nen` ĐẠT (sàn = thu thập thật + bài ghim cùng commit); `kiem_tai_lieu` · `lint-imports` | xem §F | sàn `MONG_PYTEST_TOAN_BO` **5020 → 5150** = thu thập thật sau gộp AG2 + vòng sửa §H (`pytest --collect-only` ⇒ **5150 tests collected**; WO-359 đến 5116: +34 `test_mo_hinh_vertex.py` · +21 `test_mo_hinh_google_cloud.py` · +41 `test_06_vertex_agent.py`; web **690** giữ) + `tests/test_dung_moi_truong_isp.py` cùng commit |
 
 **Bài mới đã CHỨNG MINH ĐỎ** (phá nguồn → chạy → xem cắn → trả nguyên; `cmp` xác nhận mỗi phép phá ĂN vào tệp và tệp được trả nguyên):
 
@@ -104,7 +110,7 @@ rm -rf /tmp/fls_be_tho ; rm -f $HOME/sa_doc_sheet.json      # bể ~/fls_heldout
 | `mo_hinh`: bỏ chốt `DU_AN_CONG_TY` | ″ | **3** / 31 |
 | `mo_hinh` vertex: bỏ chốt `FLS_VERTEX_DU_LIEU_XAC_NHAN` | ″ | **2** / 31 |
 | `mo_hinh` google-cloud: `workspace_id=None` | `test_mo_hinh_google_cloud.py` | **1** / 21 |
-| `mo_hinh`: mặc định về `anthropic` | ″ | **19** / 21 |
+| `mo_hinh`: mặc định (biến vắng) về `google-cloud` | `tests/nghiem_thu/test_kq357_…` (chủ `fls-test`) | **19** / 27 — lý do giữ mặc định `anthropic` |
 | `mo_hinh` google-cloud: bỏ kiểm dạng workspace | ″ | **4** / 21 |
 | `mo_hinh` google-cloud: bỏ chốt `FLS_GC_DU_LIEU_XAC_NHAN` | ″ | **2** / 21 |
 | 06: `cat` tệp header (lộ token) | `test_06_vertex_agent.py` | **23** / 39 |
@@ -136,13 +142,28 @@ rm -rf /tmp/fls_be_tho ; rm -f $HOME/sa_doc_sheet.json      # bể ~/fls_heldout
 | G6 | VM `fls-staging-app` (bước 03) có `python3` + `curl` (Debian 12) và phạm vi `cloud-platform` (03 tạo với `--scopes=cloud-platform` — đọc mã nhánh `isp/STG` `03_dung_app.sh:152`) | mục VM ĐỎ có tên |
 | G7 | Cloud Shell có ADC dùng được cho SDK (`google.auth.default()`) | `LoiApi: DefaultCredentialsError …` ⇒ `gcloud auth application-default login` |
 | G8 | Tài khoản chủ xem được 2 workbook nguồn (cách `FLS_SHEETS_TOKEN`) | dùng cách tệp khoá SA đọc-sheet |
-| G10 *(vertex)* | Bấm *Enable* ở Model Garden cần vai `entitlementManager` trên project (orchestrator ghi 24/11, ⛔ tôi tra được tài liệu) | chủ báo vai thật cần |
+| ~~G10~~ *(vertex)* | ĐÃ ĐÓNG bằng nguồn: vai *Consumer Procurement Entitlement Manager* (trang Google `use-partner-models`, đọc 24/11) | — |
 | G9 *(vertex)* | bật Claude ở Model Garden là BẤM TAY; mã lỗi chưa bật 400 `FAILED_PRECONDITION`; `anthropic_version: "vertex-2023-10-16"` trong thân được nhận (trang Anthropic: *"vertex-2023-10-16 or … 2026-10-21"*) | như G2 |
 
 ## E · Câu chủ
 
 - **C1 · dữ liệu trên `claude.googleapis.com` (thay `FLS_ZDR_DA_BAT`).** Tra 24/11 (skill `claude-api` + trang Anthropic `anthropic-managed` §Data retention): nền do **Anthropic vận hành**, truy cập qua project GCP; *"follows the same data retention policy as the Claude API … Zero Data Retention (ZDR) is available on request. Contact your Anthropic account representative."* Việc dựng tạo **một tổ chức Anthropic MỚI** — *"A ZDR arrangement on another Anthropic organization doesn't carry over"*. ⇒ Trước khi đặt `FLS_GC_DU_LIEU_XAC_NHAN=1`, chủ xác nhận: **(1)** project là `fp-a-project` của công ty; **(2)** chấp nhận chế độ giữ dữ liệu MẶC ĐỊNH của tổ chức Anthropic mới (theo điều khoản gói Marketplace) **hoặc** đã xin ZDR cho tổ chức ấy. Khuyến nghị: chấp nhận cho test e2e staging; xin ZDR song song trước khi chạy định kỳ (quyết 23/11 *agent đọc toàn bộ nội dung + số TK* đi kèm điều kiện ZDR). *(Đường Vertex dự phòng: Google quản dữ liệu; request-response logging mặc định TẮT; ZDR đối tác xin qua account team Google — trang `data-governance` ⛔ có câu riêng về Claude.)*
 - **C2 · workspace ID** là định danh của tổ chức Anthropic — tôi coi là NHẠY: chỉ ở biến môi trường (Cloud Shell) / Secret Manager, ⛔ commit, BÁO CÁO in che. Chủ đồng ý? Nếu muốn app staging gọi tự động, đề xuất lưu Secret Manager `fls-staging-claude-workspace` (phiếu sau).
+
+## H · Vòng sửa sau R1 `KQ-357` (AG2 gộp vào AG3 — orchestrator 24/11 ~04:35)
+
+Gộp `origin/…-isp/AG2` @ `a37f2bb` (KQ-357 + sổ `SO_PHAT_HIEN_ISP-3.1_AG2.md` + 27 bài nghiệm thu) — ⛔ xung đột. 27/27 bài KQ-357 **xanh** trên AG3 (sau khi giữ mặc định = đường khoá và 12 khoá nhật ký ở đường API).
+
+| Mã | Mức | Xử lý | Bằng chứng |
+|---|---|---|---|
+| `AG2-R1-01` | NÊN SỬA *(orchestrator: NẶNG)* | **SỬA** — `requirements.txt` + `google-auth>=2.0` · `requests>=2.0` · `anthropic[google_cloud,vertex]`. Bài canh MỌI import bên thứ ba (kể cả nhập muộn) của `fls/agent/**` + `tools/*voi*.py` + `dung_be_giu_rieng.py` ⊆ requirements; hiểu `google.auth.transport.requests` ⇒ cần `requests`; extra `anthropic` khớp lớp mã gọi | `tests/agent/test_phu_thuoc_agent.py` **3** bài; 3 phép phá (xoá `google-auth` · xoá `requests` · bỏ extra `google_cloud`) ⇒ mỗi phép **1** đỏ. **Venv MỚI** dựng từ `requirements.txt` (scratchpad, xoá sau): nhập được `google.auth` · `requests` · `AnthropicGoogleCloud` · `AnthropicVertex` (`anthropic 2.13.0`); `dung_be_giu_rieng.py --doc-song` chạy TRỌN bằng SA chỉ-đọc ⇒ `bể a: 65/65 · bể b: 70/70 · thiếu không · kỳ A↔B KHỚP` (bể ngoài repo, đã xoá). ⚠ Ảnh Docker staging (`Dockerfile` nhánh `isp/STG`, ⛔ có trên AG3) chỉ cài `psycopg` — agent chạy ở venv Cloud Shell theo §B, ⛔ trong ảnh; cài gói agent vào ảnh là việc của phiếu "agent chạy trong VM" |
+| `AG2-R1-02` | GHI NHẬN | **SỬA** — `chay_agent_voi.bo_ca` nhận cả bố cục phẳng lẫn `a/ b/` (⇒ bể **B**); thư mục thiếu cả hai ⇒ `FileNotFoundError` có tên | `test_vong_sua_kq357.py` 2 bài; phá (bỏ nhánh `b/`) ⇒ **1** đỏ |
+| `AG2-R1-03` | GHI NHẬN | **KHAI** — `--help` của 2 công cụ + docstring `VuotTran` + §B: *"chặn lời gọi KẾ khi tổng ≥ trần; ⛔ cắt lời gọi ĐANG chạy"* (đổi ngữ nghĩa trần = đổi bài nghiệm thu `test_tran_usd_vuot_trong_MOT_lan_goi…` ⇒ ⛔ làm) | đọc `--help` |
+| `AG2-R1-04` | GHI NHẬN | **SỬA** — `vong_that_voi.py` ghi nhật ký vòng LUÔN khi ≥ 1 lời gọi thật (⛔ phụ thuộc `--ghi`); 0 lời gọi ⇒ ⛔ sinh tệp (Đ3) | 2 bài; phá (`if ncc and a.ghi`) ⇒ **1** đỏ |
+| `AG2-R1-05` | GHI NHẬN | **⛔ SỬA (chủ BA)** — thẻ eval `_chung.md` · `a4-soat.md` còn Gemini; nay thêm: đường vận hành GCP, giá chưa đo ⇒ đề xuất `HOI`/`WO` cho `fls-ba` | — |
+| `AG2-R1-06` | GHI NHẬN | **SỬA** — `dung_be_giu_rieng.py` ⛔ ghi `DEM_BE.json` khi chỉ khác `ngay_doc`; + thư mục bể GỐC `chmod 700` (đo 24/11: `--ra` mới tạo ⇒ `755`) | chạy `--doc-song` thật ở venv mới TRƯỚC khi sửa ⇒ `M DEM_BE.json` chỉ dòng `ngay_doc` (tái hiện); ⚠ chưa có bài tự động (cần nguồn sống) |
+| `AG2-R1-07` | GHI NHẬN | **KHAI** — `refusal` ⇒ chuỗi DỪNG có tên, ⛔ `fallbacks` (quyết một mô hình ghim). Trên Vertex `fallbacks` phía máy chủ vốn ⛔ có | §C AC-1 |
+| `AG2-R1-08` | GHI NHẬN | **ĐÓNG bởi WO-359** — chốt tương đương cho 2 đường GCP (project · workspace/vùng · xác nhận dữ liệu), mỗi chốt chứng minh ĐỎ | §C bảng phá |
 
 ## F · Cổng (dán thật — container cloud, cụm PG 16 cổng **5437**)
 
@@ -153,8 +174,8 @@ _điền ở commit kế sau `--duong-nen`_
 1. **Đ1 — `vertex` / `claude.googleapis.com` trước WO-359**: WO khai `git grep -i vertex` trên `docs/ fls/ tools/` = **0**. Nay mã sống ở `fls/agent/mo_hinh.py` · `tools/staging/06_vertex_agent.sh` · `tools/vong_that_voi.py` · `tools/chay_agent_voi.py` · `tools/sinh_the_agent.py` + 4 thẻ.
 2. **Tên tệp `06_vertex_agent.sh` giữ theo WO** dù đường chính nay là `claude.googleapis.com` — đổi tên là việc của phiếu (tránh lệch WO ↔ repo).
 3. **Thẻ eval của BA** (`05_FleetEval/eval-cards/_chung.md` · `a4-soat.md`) — BG-356 phát hiện #3 vẫn mở (Gemini / "khác họ"); nay thêm: đường vận hành `claude.googleapis.com`, ⛔ bảng giá ⇒ cột chi phí thẻ eval cần BA cập nhật. Dev ⛔ sửa spec.
-4. **Mặc định đổi** `FLS_NHA_CUNG_CAP` vắng ⇒ `google-cloud` (trước: `anthropic`). Bài WO-329/WO-355 đo đường khoá nay chọn RÕ `FLS_NHA_CUNG_CAP=anthropic` (`test_mo_hinh.py` · `test_mo_hinh_that.py` — sửa cùng commit, lý do ghi tại chỗ). Họ khác `anthropic` (vd `openai` chừa chỗ) ⛔ chịu luật đường — giữ chốt khoá của họ.
-5. `NhatKyGoi.dict()` +2 khoá (`duong` · `vung`) — bài ghim tập khoá WO-355 cập nhật cùng commit (14 trường).
+4. **Mặc định GIỮ** `FLS_NHA_CUNG_CAP` vắng ⇒ `anthropic` (đã thử đổi sang `google-cloud` ở `87cfb3d` → `b20fbcd`; gộp KQ-357 cho thấy 19/27 bài nghiệm thu ĐỎ ⇒ trả về). Bài Dev WO-329/WO-355 vẫn chọn RÕ `FLS_NHA_CUNG_CAP=anthropic` (vô hại). Họ khác `anthropic` (vd `openai` chừa chỗ) ⛔ chịu luật đường — giữ chốt khoá của họ.
+5. `NhatKyGoi.dict()`: đường API giữ ĐÚNG **12** khoá (bài nghiệm thu KQ-357 ghim); đường GCP thêm `duong` · `vung` (14).
 6. `AnthropicMessages.__init__` nhận `moi_truong` (tiêm được) và **từ chối** dựng khi `FLS_NHA_CUNG_CAP` ≠ đường của lớp ⇒ ⛔ ai dựng thẳng lớp khoá khi cấu hình nói đường GCP.
 7. `requirements.txt`: `anthropic[google_cloud,vertex]>=2.12`; venv container đã cài `2.13.0` với cả hai phần thêm.
 8. Bể dựng ở Cloud Shell có **muối riêng** (`~/.fls_muoi_be`) ⇒ vân tay ≠ `DEM_BE.json` trong repo — đúng thiết kế `HELD-R1-05`; ⛔ commit `DEM_BE.json` sinh ở Cloud Shell.

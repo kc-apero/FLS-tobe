@@ -125,14 +125,14 @@ def test_AC1_vung_da_vung__nhan_va_gui_dung(monkeypatch, vx, vung):
 
 
 def test_AC1_duong_API_du_phong__chon_RO_bang_bien(monkeypatch):
-    """`FLS_NHA_CUNG_CAP=anthropic` ⇒ đường khoá (WO-355 giữ làm dự phòng). Biến VẮNG nay ⇒ `google-cloud` (chủ 24/11 ~03:50)."""
+    """`FLS_NHA_CUNG_CAP=anthropic` ⇒ đường khoá (WO-355 giữ làm dự phòng). Biến VẮNG ⇒ cũng `anthropic` (KQ-357 khoá)."""
     for k, v in {"FLS_CHO_GOI_API": "1", "ANTHROPIC_API_KEY": KHOA_GIA, "FLS_ZDR_DA_BAT": "1",
                  "FLS_NHA_CUNG_CAP": "anthropic"}.items():
         monkeypatch.setenv(k, v)
     ncc, sdk = _dung(monkeypatch)
     assert type(ncc) is mh.AnthropicMessages and sdk.lop == "Anthropic" and mh.duong_goi() == "anthropic"
     monkeypatch.delenv("FLS_NHA_CUNG_CAP")
-    assert mh.duong_goi() == "google-cloud"
+    assert mh.duong_goi() == "anthropic"
 
 
 def test_AC1_chu_ky_lop_SDK_that__co_region_project_id():

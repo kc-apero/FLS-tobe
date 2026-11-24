@@ -452,6 +452,7 @@ def thu_muc_be(goc: Path, ten: str) -> Path:
 def ghi_be(goc: Path, be: dict) -> Path:
     d = thu_muc_be(goc, be["ten"])
     d.mkdir(parents=True, exist_ok=True)
+    os.chmod(goc, 0o700)                  # thư mục bể GỐC cũng 700 (đo 24/11: `--ra` mới tạo ⇒ 755)
     os.chmod(d, 0o700)
     for ten_tep, du in (("ca.json", be["ca"]), ("dap_an.json", be["dap_an"]), ("meta.json", be["meta"])):
         p = d / ten_tep
@@ -573,7 +574,12 @@ def main(argv: list[str] | None = None) -> int:
                              "ket": "KHỚP" if ket_ky else (f"ĐỎ — ⛔ đo được: Ledge sống ⛔ đọc hết giờ (ô ngày giải mã {dc['mau_so_o_ngay_song']}, lát hỏng {len(dc['lat_ledge_hong'])})" if not do_duoc
                                                 else "ĐỎ — kỳ đã chốt lệch (nguồn đã sửa sau chốt?)")}}
     TEP_DEM.parent.mkdir(parents=True, exist_ok=True)
-    TEP_DEM.write_text(json.dumps(out, ensure_ascii=False, indent=1, sort_keys=True) + "\n", encoding="utf-8")
+    # ⭐ `AG2-R1-06` (KQ-357): chỉ khác `ngay_doc` ⇒ ⛔ ghi (dựng lại đúng làm cây repo bẩn 1 dòng ngày, dễ lỡ commit).
+    cu = json.loads(TEP_DEM.read_text(encoding="utf-8")) if TEP_DEM.exists() else None
+    if cu is not None and {**cu, "ngay_doc": None} == {**out, "ngay_doc": None}:
+        print(f"  {TEP_DEM.relative_to(GOC)}: mọi số đếm KHÔNG đổi (chỉ ngày đọc) ⇒ ⛔ ghi")
+    else:
+        TEP_DEM.write_text(json.dumps(out, ensure_ascii=False, indent=1, sort_keys=True) + "\n", encoding="utf-8")
     for k, v in out["be"].items():
         print(f"bể {k}: {v['tong_ca']}/{v['mong_tong']} ca · thiếu {v['thieu'] or 'không'} · "
               f"trùng ca dựng {v['doc_lap']['trung_ca_dung_wo329']} · trùng prompt {v['doc_lap']['trung_prompt_agent']}")

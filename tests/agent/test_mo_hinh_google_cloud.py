@@ -20,8 +20,8 @@ from fls.agent import mo_hinh as mh
 from tests.agent.test_mo_hinh_vertex import KHOA_GIA, YC, sdk_gia
 
 WS = "wrkspc_01GiaChiDeThu"
-#: Đủ chốt đường google-cloud — ⛔ `FLS_NHA_CUNG_CAP` (MẶC ĐỊNH), ⛔ khoá, ⛔ `FLS_ZDR_DA_BAT`.
-DU_GC = {"FLS_CHO_GOI_API": "1", "FLS_GCP_PROJECT": "fp-a-project", "FLS_CLAUDE_WORKSPACE_ID": WS,
+#: Đủ chốt đường google-cloud — đường chọn RÕ, ⛔ khoá, ⛔ `FLS_ZDR_DA_BAT`.
+DU_GC = {"FLS_CHO_GOI_API": "1", "FLS_NHA_CUNG_CAP": "google-cloud", "FLS_GCP_PROJECT": "fp-a-project", "FLS_CLAUDE_WORKSPACE_ID": WS,
          "FLS_GC_DU_LIEU_XAC_NHAN": "1"}
 
 
@@ -40,8 +40,9 @@ def _dung(monkeypatch, mo_hinh=mh.OPUS_5_5, **kw):
     return mh.tao_that(mo_hinh, co_that=True), sdk
 
 
-def test_mac_dinh_la_google_cloud__dung_AnthropicGoogleCloud_project_workspace(monkeypatch, gc):
-    assert mh.duong_goi() == "google-cloud" == mh.DUONG_MAC_DINH
+def test_chon_ro_google_cloud__dung_AnthropicGoogleCloud_project_workspace(monkeypatch, gc):
+    assert mh.duong_goi() == "google-cloud"
+    assert mh.duong_goi({}) == mh.DUONG_MAC_DINH == "anthropic"     # biến vắng ⇒ WO-355 (bài nghiệm thu KQ-357 khoá)
     ncc, sdk = _dung(monkeypatch)
     assert isinstance(ncc, mh.AnthropicGoogleCloudMessages) and ncc.ten == "anthropic-google-cloud"
     assert sdk.lop == "AnthropicGoogleCloud"
@@ -132,7 +133,7 @@ def test_HTTP_403_thieu_claude_user__LoiApi(monkeypatch, gc):
         ncc.goi(YC)
 
 
-def test_chuoi_4_agent__mac_dinh_google_cloud__A4_4_4(monkeypatch, gc):
+def test_chuoi_4_agent__duong_google_cloud__A4_4_4(monkeypatch, gc):
     import chay_agent_voi as cav
     from fls.agent import ghep_noi_dung as gnd
     sdk = sdk_gia(luat={"ung_vien_ghep": gnd.luat_gia_v1})

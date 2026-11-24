@@ -197,8 +197,8 @@ def test_chuoi_qua_adapter_that__A4_4_4__report_tinh_la_THAT__nhat_ky_chi_so(mon
     d = json.loads(p.read_text(encoding="utf-8"))
     assert d["tong"]["so_goi"] == len(nk)
     assert set(d["goi"][0]) == {"mo_hinh", "token_vao", "token_ra", "cache_doc", "cache_ghi", "giay", "chi_phi_usd",
-                                "stop_reason", "van_tay_yeu_cau", "van_tay_dap", "request_id", "ngay_tra_gia",
-                                "duong", "vung"}                   # WO-359: + đường đã gọi · vùng Vertex
+                                "stop_reason", "van_tay_yeu_cau", "van_tay_dap", "request_id", "ngay_tra_gia"}
+    # WO-359: đường API giữ đúng 12 khoá (KQ-357 ghim); `duong`/`vung` chỉ có ở đường GCP (test_mo_hinh_vertex/_google_cloud)
     assert KHOA_GIA not in p.read_text(encoding="utf-8")
 
 

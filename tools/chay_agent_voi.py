@@ -8,9 +8,10 @@
     python tools/chay_agent_voi.py --that --tran-usd 2 # API THẬT (WO-355) — cần FLS_CHO_GOI_API=1 + ANTHROPIC_API_KEY
                                                        #   + FLS_ZDR_DA_BAT=1 (chế độ `mo`); in token + USD ước;
                                                        #   ghi nhật ký vòng (CHỈ số đếm + vân tay) docs/ITL/06_Agent/nhat_ky/
-    FLS_GCP_PROJECT=fp-a-project FLS_CLAUDE_WORKSPACE_ID=wrkspc_… FLS_GC_DU_LIEU_XAC_NHAN=1 FLS_CHO_GOI_API=1 \
-      python tools/chay_agent_voi.py --that            # ⭐ WO-359: đường MẶC ĐỊNH claude.googleapis.com (ADC/SA, ⛔ khoá)
-                                                       #   dự phòng: FLS_NHA_CUNG_CAP=vertex | anthropic
+    FLS_NHA_CUNG_CAP=google-cloud FLS_GCP_PROJECT=fp-a-project FLS_CLAUDE_WORKSPACE_ID=wrkspc_… \
+      FLS_GC_DU_LIEU_XAC_NHAN=1 FLS_CHO_GOI_API=1 python tools/chay_agent_voi.py --that
+                                                       # ⭐ WO-359: đường CHÍNH claude.googleapis.com (ADC/SA, ⛔ khoá)
+                                                       #   dự phòng: FLS_NHA_CUNG_CAP=vertex | anthropic (= khi vắng)
 
 ⭐ Công cụ agent gọi = CHỈ hàm FLS có sẵn, tiêm vào chuỗi từ đây (gói `fls.agent` ⛔ biết kho/tuyến):
    nguon_bank · nguon_fps · nguon_h1000 · nguon_plt   đếm ảnh đóng băng 4 nguồn raw (`tests/fixture/…`)
@@ -130,10 +131,19 @@ def dung_may(tep_voi: Path = TEP_VOI, tep_hd2: Path = TEP_HD2, fx: Path = FX) ->
 
 
 def bo_ca(cho_heldout: bool = True) -> tuple[dict, dict, str]:
-    """(ca, đáp án, nhãn bể). Có `FLS_HELDOUT_NOI_DUNG` ⇒ bể GIỮ RIÊNG; ⛔ thì bể DỰNG trong repo."""
+    """(ca, đáp án, nhãn bể). Có `FLS_HELDOUT_NOI_DUNG` ⇒ bể GIỮ RIÊNG; ⛔ thì bể DỰNG trong repo.
+
+    ⭐ `AG2-R1-02` (KQ-357): `dung_be_giu_rieng.py` ghi bố cục `$DIR/a/` · `$DIR/b/` (BG-356/360 đặt biến cho
+    `vong_that_voi.py`) còn bản cũ đọc `$DIR/ca.json` ⇒ `FileNotFoundError`. Nay nhận CẢ HAI: phẳng (`$DIR/ca.json`) ·
+    hai bể ⇒ bể **B** (dữ liệu THẬT hiện tại). Cả hai vắng ⇒ `FileNotFoundError` có tên (⛔ rơi về bể dựng im lặng)."""
     tm = os.environ.get(BIEN_HELDOUT)
     if cho_heldout and tm:
-        return _nap(Path(tm) / "ca.json"), _nap(Path(tm) / "dap_an.json"), "giữ riêng (ngoài repo)"
+        if (Path(tm) / "ca.json").exists():
+            return _nap(Path(tm) / "ca.json"), _nap(Path(tm) / "dap_an.json"), "giữ riêng (ngoài repo)"
+        if (Path(tm) / "b" / "ca.json").exists():
+            return (_nap(Path(tm) / "b" / "ca.json"), _nap(Path(tm) / "b" / "dap_an.json"),
+                    "giữ riêng — bể B (ngoài repo)")
+        raise FileNotFoundError(f"${BIEN_HELDOUT} ⛔ có `ca.json` lẫn `b/ca.json`")
     return _nap(CA_DUNG), _nap(DAP_AN_DUNG), "ca DỰNG trong repo (⛔ dữ liệu thật)"
 
 
@@ -324,9 +334,9 @@ def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(prog="chay_agent_voi.py")
     p.add_argument("--gia", action="store_true", help="mô hình GIẢ tất định (thay phát lại)")
     p.add_argument("--that", action="store_true",
-                   help="gọi API THẬT — FLS_CHO_GOI_API=1 + đường (FLS_NHA_CUNG_CAP, mặc định google-cloud: "
-                        "FLS_GCP_PROJECT · FLS_CLAUDE_WORKSPACE_ID · FLS_GC_DU_LIEU_XAC_NHAN=1 ở `mo`) | vertex | anthropic")
-    p.add_argument("--tran-usd", type=float, default=TRAN_USD_MAC_DINH, help="trần USD ước của vòng thật (chạm ⇒ DỪNG)")
+                   help="gọi API THẬT — FLS_CHO_GOI_API=1 + đường (FLS_NHA_CUNG_CAP=google-cloud: "
+                        "FLS_GCP_PROJECT · FLS_CLAUDE_WORKSPACE_ID · FLS_GC_DU_LIEU_XAC_NHAN=1 ở `mo`) | vertex | anthropic (vắng ⇒ anthropic)")
+    p.add_argument("--tran-usd", type=float, default=TRAN_USD_MAC_DINH, help="trần USD ƯỚC của cả vòng — chặn lời gọi KẾ khi tổng đã tiêu ≥ trần; ⛔ cắt lời gọi ĐANG chạy (một lời có thể vượt trần — AG2-R1-03)")
     p.add_argument("--ghi-phat-lai", action="store_true", help="(với --gia) ghi docs/ITL/06_Agent/phat_lai/*.json")
     p.add_argument("--ghi-report", action="store_true", help="ghi docs/ITL/06_Agent/report.html")
     p.add_argument("--che", choices=("mo", "che_noi_dung", "che_het"), default=None,
