@@ -200,6 +200,7 @@ Gộp `origin/…-isp/AG2` @ `a37f2bb` (KQ-357 + sổ `SO_PHAT_HIEN_ISP-3.1_AG2.
 | `khop_owner.py --kiem` | **ĐỎ — có sẵn, ⛔ do WO-359** | exit **1** · `A1 · B1 · C6 ⛔ DOI TRANG THAI: mong KHOP, do duoc LECH`. Đo trên cây GỐC `93f3e5a` (`git stash -u`) cho đầu ra **giống từng byte** (`diff` rỗng) ⇒ do kho 5437 của container RỖNG (chưa nạp) |
 | `kiem_so_song.py` | **⛔ ĐO ĐƯỢC — ĐỎ (môi trường)** | `⛔ khong do duoc: kho ⛔ khong co dau thoi diem cua lan nap / anh chup — cong ⛔ khong duoc phep xanh` (kho trống; đường Windows `.venv/Scripts/lint-imports.exe` nối symlink cục bộ để đo được) |
 | bài mới WO-359 + vòng sửa | **ĐẠT** | `tests/agent` + `tests/nghiem_thu/test_kq357_…` + `tests/test_dung_moi_truong_isp.py` ⇒ `323 passed` (trước mục 06 mới; sau: +8 bài, nằm trong đường nền) |
+| **sau vòng sửa KQ-361** — `--duong-nen` trên **`dbd4a90`** | **ĐẠT** | toàn bộ `12 failed, 5150 passed, 2 xfailed, 14 errors in 1334.18s` · `[ĐẠT] … 28 = 28 node id (trong đó XFAIL 2 = 2 · thêm 0 · bớt 0) · chạy 5178 bài (mong ≥ 5178) · skipped 0 · deselected 0` · web `3 failed, 687 passed` · `[ĐẠT] … 3 = 3 … chạy 690 bài (mong ≥ 690)` · `══ KẾT: ĐẠT`. Sàn **5178 / 690**. `git status --porcelain` NGAY sau đường nền = **0** dòng (`AG3-R1-02`: bộ bài ⛔ để lại tệp). `kiem_tai_lieu` 524 file / 3086 bảng · `lint-imports` 11 kept · `quet_pii_repo` 0 |
 
 ## G · Phát hiện / ghi chú cho R1
 
