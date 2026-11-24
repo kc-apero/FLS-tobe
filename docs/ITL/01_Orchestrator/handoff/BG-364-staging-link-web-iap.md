@@ -74,7 +74,7 @@ bash tools/staging/07_link_web.sh --project fp-a-project --cho-vao a@apero.vn,b@
 |---|---|
 | `pytest tests/staging` | **205 passed** in 297 s *(124 cũ + 81 mới)* — lượt trước bổ sung: 179 passed |
 | `pytest --collect-only` | **5168** tests collected · `tests/web` **690** |
-| `bash tools/dung_moi_truong_isp.sh --duong-nen --cong 5434` *(MỘT lần, một mình)* | xem §1.1 |
+| `bash tools/dung_moi_truong_isp.sh --duong-nen --cong 5434` *(MỘT lần, một mình)* | **`KẾT: ĐẠT`** — 28 = 28 · web 3 = 3 · chạy 5168 / 690 *(§1.1)* |
 | `python docs/ITL/_tools/kiem_tai_lieu.py` | `✅ cong tai lieu DAT — … (516 file, 3062 bang, 989 o ngay, 104 ma QD)` |
 | `.venv/bin/lint-imports` | `Contracts: 11 kept, 0 broken.` |
 | `python tools/quet_pii_repo.py` | `[ĐẠT] 0 chỗ số TK cá nhân · 0 tệp` |
@@ -86,7 +86,10 @@ bash tools/staging/07_link_web.sh --project fp-a-project --cho-vao a@apero.vn,b@
 | `docker compose down` | ⛔ ⛔ chạy *(container cloud ⛔ Docker; luật CLAUDE.md)* |
 
 ### 1.1 · `--duong-nen`
-*(điền sau khi chạy — xem mục cuối "Đường nền")*
+**`KẾT: ĐẠT`** @ `86a5003` *(chạy MỘT lần, một mình, cụm 5434; lượt trước ở `0942e3e` bị DỪNG giữa chừng vì phần bổ sung đăng nhập)*:
+- toàn bộ: `12 failed, 5140 passed, 2 xfailed, 14 errors in 1705.25s (0:28:25)` ⇒ `[ĐẠT] tập đỏ + XFAIL = đường nền: 28 = 28 node id (XFAIL 2 = 2 · thêm 0 · bớt 0) · chạy 5168 bài (mong ≥ 5168) · skipped 0 · deselected 0`
+- `tests/web`: `3 failed, 687 passed in 210.12s` ⇒ `[ĐẠT] … 3 = 3 node id (thêm 0 · bớt 0) · chạy 690 bài (mong ≥ 690)`
+- 7 phép kiểm môi trường ĐẠT *(27/27 di trú · `pg_verify` 0 lệch · lint 11 kept · HD1 `chay 9845 / co 9967` · `fls_itl` = 0)* ⇒ **0** bài `tests/staging` trong tập đỏ.
 
 ## 2 · Bằng chứng từng AC
 
@@ -161,4 +164,4 @@ bash tools/staging/07_link_web.sh --project fp-a-project --cho-vao a@apero.vn,b@
 - Chế độ `ghi` trên Cloud Run: `--max-instances=1` nhưng Cloud Run có thể **tạm có 2 instance** khi chuyển revision *(chưa đo)* — cùng một thẻ chung, cùng một `actor`, nên ⛔ lệch chữ ký; chỉ là hai tiến trình ghi cùng lúc trong vài giây.
 
 ## Đường nền
-*(điền sau `--duong-nen`)*
+Xem §1.1 — `KẾT: ĐẠT` @ `86a5003`.
