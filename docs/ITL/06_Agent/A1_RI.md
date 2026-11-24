@@ -9,7 +9,7 @@
 | **Đầu ra** | ô `nguon:<nguồn>.so_dong · dem_dong · van_tay` (+ `fps.co_ref`) — 9 ảnh |
 | **Công cụ được gọi** *(CHỈ hàm FLS có sẵn)* | `nguon_bank` · `nguon_fps` · `nguon_h1000` · `nguon_plt` = đếm dòng + đọc vân tay ảnh (`tools/chay_agent_voi.py:dem_nguon`) |
 | **Mô hình ghim** | `claude-opus-5-5` · họ `anthropic` · ghim — **CHƯA gọi thật** (bản phát lại do mô hình GIẢ sinh) · **quyết chủ 23/11 ~12:45 (`WO-355`): MỘT nhà cung cấp Anthropic — Opus 5.5 cho agent LÀM** |
-| **Dữ liệu & lưu giữ** *(chủ 23/11)* | agent đọc TOÀN BỘ nội dung giao dịch + số TK + tên (chỉ bỏ `Email Address`) · vận hành: Messages API dưới **ZDR** (bật theo tổ chức qua Anthropic) · fleet eval: **gửi theo lô** (Batches API — Anthropic giữ 29 ngày, đổi lấy −50 % giá; chủ chấp nhận) |
+| **Dữ liệu & lưu giữ** *(chủ 23/11)* | agent đọc TOÀN BỘ nội dung giao dịch + số TK + tên (chỉ bỏ `Email Address`) · vận hành *(chủ 24/11, `WO-359`)*: **Claude trên Vertex AI** của `fp-a-project` — dữ liệu ở GCP công ty, Google quản xử lý dữ liệu; request-response logging TẮT; ZDR đối tác xin qua account team (BG-360) · dự phòng: Messages API dưới **ZDR** · ⚠ Batches API ⛔ có trên Vertex ⇒ fleet eval gửi TỪNG lời (⛔ −50 %) |
 | **Phiên bản** | checksum prompt `9f84a5b36e62d7b0` + mô hình ghim + checksum tham chiếu (tệp số máy đã đo) |
 | **Bước thông minh** | Hôm nay chỉ đếm + vân tay. Đề xuất G1 (Voi roadmap 01/03): đề xuất bản khai cho sheet mới · báo đổi bố cục cột. |
 | **Fleet eval** | chưa có thẻ riêng (Voi: `a1-khai-chup.eval.lech-cot-ngay` PROPOSED) |
@@ -31,7 +31,7 @@ A4 (mã `fls/agent/doi_chieu.py`) so MỌI ô skill `lam` (và skill `ma` có c�
 
 ## ⛔ Không được làm
 
-- ⛔ gọi API thật khi thiếu chốt (`--that` + `FLS_CHO_GOI_API=1` + khoá + mô hình ghim)
+- ⛔ gọi API thật khi thiếu chốt (`--that` + `FLS_CHO_GOI_API=1` + mô hình ghim + đường: Vertex `FLS_GCP_PROJECT` ∈ GCP công ty · hoặc khoá API)
 - ⛔ ghi kho · ⛔ sửa ảnh · ⛔ sửa engine/tuyến — chỉ GỌI công cụ được cấp
 - ⛔ tính lại / làm tròn / thêm ô / bịa ô — A4 so từng ô với máy
-- ⛔ gửi `Email Address` (`PM_COT_RIENG_TU`) — bộ che chạy trước mọi lời gọi; mặc định `mo` (chủ 23/11: nội dung · số TK · tên đi nguyên văn) ⇒ chạy thật đòi thêm chốt `FLS_ZDR_DA_BAT=1` (ZDR); `--che che_noi_dung`/`che_het` che lại
+- ⛔ gửi `Email Address` (`PM_COT_RIENG_TU`) — bộ che chạy trước mọi lời gọi; mặc định `mo` (chủ 23/11: nội dung · số TK · tên đi nguyên văn) ⇒ chạy thật đòi thêm chốt `FLS_VERTEX_DU_LIEU_XAC_NHAN=1` (đường Vertex, WO-359) hoặc `FLS_ZDR_DA_BAT=1` (đường API); `--che che_noi_dung`/`che_het` che lại

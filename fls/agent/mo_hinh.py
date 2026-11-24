@@ -26,6 +26,18 @@
    `tool_choice` ép `any`/`tool` ⇒ 400 (dùng `auto` + lời dặn trong prompt) · effort mặc định `medium` ⇒
    đặt RÕ. Đáp `refusal` ⇒ chuỗi DỪNG có tên — ⛔ bật `fallbacks` sang mô hình khác: phiên bản agent =
    mã mô hình GHIM; rơi sang mô hình khác là đổi phiên bản trong im lặng (câu chủ C1 ở BG-330).
+
+⭐ `WO-359` (lời chủ 24/11 ~03:15 — *"dùng claude trực tiếp trong GCP, thông qua vertex AI"*): HAI ĐƯỜNG tới CÙNG mô hình,
+   chọn bằng cấu hình `FLS_NHA_CUNG_CAP` (⛔ đổi mã gọi, ⛔ đổi prompt — khuôn yêu cầu/đáp y hệt):
+     `vertex`    ⭐ đường CHÍNH — Claude trên Vertex AI (Google managed) của project công ty (`FLS_GCP_PROJECT`, chỉ nhận
+                 `DU_AN_CONG_TY`) · vùng `FLS_VERTEX_REGION` ∈ `VUNG_VERTEX` (mặc định `global`) · xác thực ADC/service
+                 account của GCP (⛔ khoá `sk-ant` — `ANTHROPIC_API_KEY` ⛔ bị đòi) · tính tiền qua GCP (`BANG_GIA_VERTEX`).
+     `anthropic` đường DỰ PHÒNG (mặc định khi biến vắng — giữ hành vi WO-355): Claude API trực tiếp bằng `ANTHROPIC_API_KEY`.
+   Tra 24/11 (skill `claude-api` + trang `claude-models-on-google-cloud/google-managed`): lớp `anthropic.AnthropicVertex(
+   project_id=…, region=…)` (gói `anthropic[vertex]`) · mã mô hình Vertex của Opus 5.5 / Sonnet 5.5 = mã TRẦN
+   `claude-opus-5-5` / `claude-sonnet-5-5` (⛔ tiền tố, ⛔ `@ngày`) · vùng: `global` (khuyên) · `us`/`eu` (đa vùng, +10%)
+   · vùng ĐƠN (vd `asia-southeast1`) **chỉ phục vụ Sonnet 4.6 trở về trước** ⇒ ⛔ nhận · `fallbacks` phía máy chủ ⛔ có
+   trên Vertex (ta vốn ⛔ dùng).
 """
 from __future__ import annotations
 
@@ -43,6 +55,35 @@ BIEN_CHO_GOI = "FLS_CHO_GOI_API"
 #:    xác nhận tài khoản API đã bật ZDR). Chế độ `che_noi_dung` · `che_het` ⛔ đòi (dữ liệu đã che).
 BIEN_ZDR = "FLS_ZDR_DA_BAT"
 CHE_DO_CAN_ZDR = ("mo",)
+
+# ── Chọn ĐƯỜNG (`WO-359` AC-1) ─────────────────────────────────────────────────────────────────
+BIEN_NHA_CUNG_CAP = "FLS_NHA_CUNG_CAP"
+DUONG_API = "anthropic"          # dự phòng: Claude API trực tiếp, khoá `ANTHROPIC_API_KEY`
+DUONG_VERTEX = "vertex"          # chính (24/11): Claude trên Vertex AI của project công ty
+DUONG_HOP_LE = (DUONG_API, DUONG_VERTEX)
+BIEN_GCP_PROJECT = "FLS_GCP_PROJECT"
+BIEN_VERTEX_REGION = "FLS_VERTEX_REGION"
+#: ⭐ AC-5 (quyết chủ 23/11 + 24/11): agent đọc TOÀN BỘ nội dung + số TK **chỉ trong GCP của công ty** ⇒ đường Vertex chỉ
+#:    nhận project trong danh sách này. Thêm project = sửa MÃ (có review), ⛔ một biến môi trường.
+DU_AN_CONG_TY = ("fp-a-project",)
+VUNG_VERTEX_MAC_DINH = "global"
+#: Vùng phục vụ được Opus 5.5 / Sonnet 5.5 (tra 24/11: *"Regional endpoints serve Claude Sonnet 4.6 and earlier models
+#:   only. For newer models, use a global or multi-region endpoint."*). Hệ số giá: đa vùng +10% so với global.
+VUNG_VERTEX: dict[str, float] = {"global": 1.00, "us": 1.10, "eu": 1.10}
+#: ⭐ AC-2 — THAY `FLS_ZDR_DA_BAT` ở đường Vertex. Tra 24/11: trang Anthropic *"Google Cloud governs data handling for Claude
+#:    Models on Google Cloud (Google managed)"*; trang Google `data-governance`: ⛔ huấn luyện trên dữ liệu khách khi chưa
+#:    cho phép (mọi mô hình managed) · *request-response logging "is disabled by default"* — để ZDR *"do not enable this
+#:    feature"* · ZDR cho mô hình ĐỐI TÁC phải XIN qua account team (trang chỉ tả quy trình cho OpenAI, ⛔ một câu riêng về
+#:    Claude). ⇒ Người vận hành xác nhận BA điều (BG-360 §câu chủ): ① project = `fp-a-project` của công ty · ② request-
+#:    response logging cho mô hình Claude ĐANG TẮT · ③ đã đọc trạng thái ZDR (đã xin / chấp nhận giữ theo điều khoản GCP).
+BIEN_VERTEX_DU_LIEU = "FLS_VERTEX_DU_LIEU_XAC_NHAN"
+
+
+def duong_goi(moi_truong: dict[str, str] | None = None) -> str:
+    """Đường gọi thật theo cấu hình. Biến vắng ⇒ `anthropic` (dự phòng, hành vi WO-355). Giá trị lạ trả NGUYÊN để
+    `kiem_chot_that` báo ĐỎ có tên (⛔ đoán sang một đường)."""
+    mt = os.environ if moi_truong is None else moi_truong
+    return (mt.get(BIEN_NHA_CUNG_CAP) or DUONG_API).strip().lower()
 #: Bí danh "mới nhất" ⛔ được ghim (Voi phase 1: *"mã mô hình đã ghim, ⛔ bí danh 'mới nhất'"*).
 DAU_BI_DANH = ("latest", "moi-nhat", "newest")
 
@@ -73,12 +114,21 @@ HO_CO_ADAPTER = ("anthropic",)
 HO_DE_DANH = ("openai",)
 
 #: Bảng giá USD / 1 triệu token — tra skill `claude-api` NGÀY 2026-11-23 (bảng "Current Models", cache 2026-11-03).
+#: ✔ Đối chiếu lại 24/11 với trang `about-claude/pricing`: Opus 5.5 $4 · ghi cache 5 phút $5 · đọc cache $0,20 · ra $20;
+#:    Sonnet 5.5 $2 · $2,50 · $0,10 · $10 — khớp 8/8 ô.
 #: Ghi cache 5 phút = 1,25 × giá vào (skill: "~1.25x cost"). Giá đổi ⇒ sửa bảng + NGÀY; chi phí in ra luôn là ƯỚC.
 NGAY_TRA_GIA = "2026-11-23"
 BANG_GIA: dict[str, dict[str, float]] = {
     "claude-opus-5-5": {"vao": 4.00, "ra": 20.00, "cache_doc": 0.20, "cache_ghi": 5.00},
     "claude-sonnet-5-5": {"vao": 2.00, "ra": 10.00, "cache_doc": 0.10, "cache_ghi": 2.50},
 }
+#: ⭐ Giá Vertex (`WO-359` AC-2) — tra NGÀY 2026-11-24. Trang Anthropic `pricing` §Cloud platform: GCP tự đặt giá + tự lập hoá
+#:    đơn; *"Regional and multi-region endpoints include a 10 percent premium over global endpoints"* (Claude 4.5 trở đi).
+#:    ⚠ GIẢ ĐỊNH CHƯA KIỂM: trang giá Google (`cloud.google.com/vertex-ai/generative-ai/pricing#claude-models`) ⛔ đọc được từ
+#:    phiên này (trang trả rỗng); các bảng tổng hợp bên thứ ba ghi Opus 5.5 global $4/$20 · đa vùng $4,40/$22 — khớp giả định
+#:    "global = giá Claude API". ⇒ Bảng dưới = `BANG_GIA` × hệ số vùng; USD in ra là ƯỚC — Billing GCP là số thật (BG-360).
+NGAY_TRA_GIA_VERTEX = "2026-11-24"
+BANG_GIA_VERTEX: dict[str, dict[str, float]] = {k: dict(v) for k, v in BANG_GIA.items()}
 
 
 class CamGoiThat(RuntimeError):
@@ -113,25 +163,35 @@ class NhatKyGoi:
     van_tay_yeu_cau: str
     van_tay_dap: str
     request_id: str = ""
+    duong: str = DUONG_API      # `WO-359`: đường đã gọi — `anthropic` | `vertex`
+    vung: str = ""              # vùng Vertex (`global`/`us`/`eu`); "" ở đường API
 
     def dict(self) -> dict[str, Any]:
         return {"mo_hinh": self.mo_hinh, "token_vao": self.token_vao, "token_ra": self.token_ra,
                 "cache_doc": self.cache_doc, "cache_ghi": self.cache_ghi, "giay": round(self.giay, 3),
                 "chi_phi_usd": round(self.chi_phi_usd, 6), "stop_reason": self.stop_reason,
                 "van_tay_yeu_cau": self.van_tay_yeu_cau, "van_tay_dap": self.van_tay_dap,
-                "request_id": self.request_id, "ngay_tra_gia": NGAY_TRA_GIA}
+                "request_id": self.request_id, "duong": self.duong, "vung": self.vung,
+                "ngay_tra_gia": NGAY_TRA_GIA_VERTEX if self.duong == DUONG_VERTEX else NGAY_TRA_GIA}
 
 
-def chi_phi(ma: str, vao: int, ra: int, cache_doc: int = 0, cache_ghi: int = 0) -> float:
-    """USD ước. Mô hình ⛔ có trong `BANG_GIA` ⇒ `KeyError` (ĐỎ — ⛔ đoán giá 0)."""
-    g = BANG_GIA[ma]
-    return (vao * g["vao"] + ra * g["ra"] + cache_doc * g["cache_doc"] + cache_ghi * g["cache_ghi"]) / 1_000_000
+def chi_phi(ma: str, vao: int, ra: int, cache_doc: int = 0, cache_ghi: int = 0, duong: str = DUONG_API,
+            vung: str = "") -> float:
+    """USD ước. Mô hình ⛔ có trong bảng giá của đường ⇒ `KeyError`; vùng Vertex lạ ⇒ `KeyError` (ĐỎ — ⛔ đoán giá 0)."""
+    if duong == DUONG_VERTEX:
+        g, he_so = BANG_GIA_VERTEX[ma], VUNG_VERTEX[vung]
+    else:
+        g, he_so = BANG_GIA[ma], 1.0
+    return he_so * (vao * g["vao"] + ra * g["ra"] + cache_doc * g["cache_doc"] + cache_ghi * g["cache_ghi"]) / 1_000_000
 
 
 def tong_nhat_ky(ds: list[NhatKyGoi]) -> dict[str, Any]:
     """Cộng nhật ký theo mô hình — số lời gọi · token · giây · USD. Rỗng ⇒ mọi số 0 và `so_goi` 0 (Đ3: nói rõ)."""
+    duong = sorted({x.duong for x in ds})
     ra: dict[str, Any] = {"so_goi": len(ds), "token_vao": 0, "token_ra": 0, "cache_doc": 0, "cache_ghi": 0,
-                          "giay": 0.0, "chi_phi_usd": 0.0, "theo_mo_hinh": {}, "ngay_tra_gia": NGAY_TRA_GIA}
+                          "giay": 0.0, "chi_phi_usd": 0.0, "theo_mo_hinh": {}, "duong": duong,
+                          "vung": sorted({x.vung for x in ds if x.vung}),
+                          "ngay_tra_gia": NGAY_TRA_GIA_VERTEX if duong == [DUONG_VERTEX] else NGAY_TRA_GIA}
     for x in ds:
         for k in ("token_vao", "token_ra", "cache_doc", "cache_ghi", "giay", "chi_phi_usd"):
             ra[k] += getattr(x, k)
@@ -225,6 +285,10 @@ def kiem_chot_that(mo_hinh: MoHinh, co_that: bool, moi_truong: dict[str, str] | 
     """⛔ trả về = được gọi thật. Thiếu bất kỳ chốt nào ⇒ `CamGoiThat` kèm TÊN chốt (⛔ giá trị khoá).
 
     `che_do` mặc định `mo` (= mặc định của bộ che) ⇒ ⛔ quên truyền thì bị đòi ZDR, ⛔ lọt.
+
+    `WO-359`: đường `vertex` THAY hai chốt của đường API — khoá `ANTHROPIC_API_KEY` ⇒ project công ty + vùng hỗ trợ
+    (xác thực là ADC của GCP, ⛔ kiểm được ở đây mà ⛔ gọi mạng ⇒ lỗi xác thực về sau là `LoiApi` CÓ TÊN);
+    `FLS_ZDR_DA_BAT` ⇒ `FLS_VERTEX_DU_LIEU_XAC_NHAN`. Ba chốt chung (`--that` · `FLS_CHO_GOI_API` · ghim) GIỮ NGUYÊN.
     """
     mt = os.environ if moi_truong is None else moi_truong
     thieu = []
@@ -232,13 +296,32 @@ def kiem_chot_that(mo_hinh: MoHinh, co_that: bool, moi_truong: dict[str, str] | 
         thieu.append("cờ `--that` vắng")
     if mt.get(BIEN_CHO_GOI) != "1":
         thieu.append(f"`{BIEN_CHO_GOI}` ≠ 1")
-    if not mt.get(mo_hinh.bien_khoa):
-        thieu.append(f"khoá `{mo_hinh.bien_khoa}` vắng trong biến môi trường")
+    duong = duong_goi(mt)
+    if duong == DUONG_VERTEX:
+        du_an = mt.get(BIEN_GCP_PROJECT) or ""
+        if not du_an:
+            thieu.append(f"`{BIEN_GCP_PROJECT}` vắng (đường vertex)")
+        elif du_an not in DU_AN_CONG_TY:
+            thieu.append(f"project `{du_an}` ⛔ thuộc GCP công ty {list(DU_AN_CONG_TY)} — agent đọc nguyên văn số TK chỉ "
+                         "trong GCP công ty (AC-5)")
+        vung = mt.get(BIEN_VERTEX_REGION) or VUNG_VERTEX_MAC_DINH
+        if vung not in VUNG_VERTEX:
+            thieu.append(f"vùng Vertex `{vung}` ⛔ phục vụ {mo_hinh.ma} (vùng đơn chỉ tới Sonnet 4.6) — dùng "
+                         f"{'/'.join(VUNG_VERTEX)}")
+    elif duong == DUONG_API:
+        if not mt.get(mo_hinh.bien_khoa):
+            thieu.append(f"khoá `{mo_hinh.bien_khoa}` vắng trong biến môi trường")
+    else:
+        thieu.append(f"`{BIEN_NHA_CUNG_CAP}={duong}` lạ — chỉ nhận {'/'.join(DUONG_HOP_LE)}")
     lg = mo_hinh.loi_ghim()
     if lg:
         thieu.append(lg)
-    if che_do in CHE_DO_CAN_ZDR and mt.get(BIEN_ZDR) != "1":
-        thieu.append(f"chế độ che `{che_do}` gửi nguyên văn tên · số TK ⇒ đòi `{BIEN_ZDR}=1` (ZDR — quyết chủ 23/11)")
+    if che_do in CHE_DO_CAN_ZDR:
+        if duong == DUONG_VERTEX and mt.get(BIEN_VERTEX_DU_LIEU) != "1":
+            thieu.append(f"chế độ che `{che_do}` gửi nguyên văn tên · số TK ⇒ đòi `{BIEN_VERTEX_DU_LIEU}=1` (người vận "
+                         "hành xác nhận: project công ty · request-response logging TẮT · trạng thái ZDR — BG-360)")
+        elif duong != DUONG_VERTEX and mt.get(BIEN_ZDR) != "1":
+            thieu.append(f"chế độ che `{che_do}` gửi nguyên văn tên · số TK ⇒ đòi `{BIEN_ZDR}=1` (ZDR — quyết chủ 23/11)")
     if thieu:
         raise CamGoiThat("⛔ gọi API thật: " + " · ".join(thieu))
 
@@ -260,20 +343,34 @@ class AnthropicMessages:
     `client` tiêm được cho bài thử (SDK GIẢ) — ⛔ mạng trong pytest.
     """
     ten = "anthropic"
+    duong = DUONG_API
+    vung = ""
+    bang_gia = BANG_GIA
 
     def __init__(self, mo_hinh: MoHinh, co_that: bool = False, effort: str = "medium", che_do: str = "mo",
                  client: Any = None, tran_usd: float | None = None, max_retries: int = 2,
-                 nhat_ky: list[NhatKyGoi] | None = None):
-        kiem_chot_that(mo_hinh, co_that, che_do=che_do)
-        if mo_hinh.ma not in BANG_GIA:
-            raise CamGoiThat(f"mô hình `{mo_hinh.ma}` ⛔ có trong `BANG_GIA` ⇒ ⛔ ước được chi phí ⇒ ⛔ gọi thật")
+                 nhat_ky: list[NhatKyGoi] | None = None, moi_truong: dict[str, str] | None = None):
+        mt = os.environ if moi_truong is None else moi_truong
+        kiem_chot_that(mo_hinh, co_that, mt, che_do=che_do)
+        if duong_goi(mt) != self.duong:
+            raise CamGoiThat(f"`{BIEN_NHA_CUNG_CAP}={duong_goi(mt)}` ≠ đường của adapter `{self.duong}` — dựng qua `tao_that`")
+        if mo_hinh.ma not in self.bang_gia:
+            raise CamGoiThat(f"mô hình `{mo_hinh.ma}` ⛔ có trong bảng giá đường `{self.duong}` ⇒ ⛔ ước được chi phí ⇒ "
+                             "⛔ gọi thật")
         import anthropic  # noqa: PLC0415 — chỉ tới đây khi đủ chốt
         self._sdk = anthropic
         self.mo_hinh, self.effort, self.tran_usd = mo_hinh, effort, tran_usd
-        # khoá đọc từ biến môi trường bên trong SDK — ⛔ truyền tay, ⛔ in
-        self.client = client if client is not None else anthropic.Anthropic(max_retries=max_retries)
+        self.client = client if client is not None else self._dung_client(anthropic, mt, max_retries)
         # `nhat_ky` DÙNG CHUNG giữa các agent của một vòng ⇒ trần `tran_usd` tính trên CẢ vòng, ⛔ từng agent
         self.nhat_ky: list[NhatKyGoi] = nhat_ky if nhat_ky is not None else []
+
+    def _dung_client(self, sdk: Any, mt: Any, max_retries: int) -> Any:
+        # khoá đọc từ biến môi trường bên trong SDK — ⛔ truyền tay, ⛔ in
+        return sdk.Anthropic(max_retries=max_retries)
+
+    def _loi_xac_thuc(self, e: Exception) -> bool:
+        """Lỗi xác thực ngoài lớp lỗi SDK (đường Vertex: `google.auth`) ⇒ True ⇒ `LoiApi` CÓ TÊN. Đường API: ⛔."""
+        return False
 
     def _tham_so(self, yeu_cau: dict) -> dict[str, Any]:
         ts: dict[str, Any] = {"model": self.mo_hinh.ma, "max_tokens": yeu_cau.get("max_tokens", 16000),
@@ -299,6 +396,11 @@ class AnthropicMessages:
                          f" · mô hình `{self.mo_hinh.ma}`") from None
         except self._sdk.APIConnectionError as e:  # mạng / hết giờ
             raise LoiApi(f"{type(e).__name__} (mạng/hết giờ) · mô hình `{self.mo_hinh.ma}`") from None
+        except Exception as e:                     # noqa: BLE001 — chỉ đổi tên lỗi XÁC THỰC; lỗi khác ném nguyên
+            if not self._loi_xac_thuc(e):
+                raise
+            raise LoiApi(f"{type(e).__name__} (xác thực GCP/ADC — `gcloud auth application-default login` hoặc SA gắn máy)"
+                         f" · đường `{self.duong}` · mô hình `{self.mo_hinh.ma}`") from None
         giay = time.monotonic() - t0
         d = tl.to_dict()
         u = d.get("usage") or {}
@@ -306,25 +408,64 @@ class AnthropicMessages:
         cd, cg = int(u.get("cache_read_input_tokens") or 0), int(u.get("cache_creation_input_tokens") or 0)
         self.nhat_ky.append(NhatKyGoi(
             mo_hinh=str(d.get("model") or self.mo_hinh.ma), token_vao=vao, token_ra=ra, cache_doc=cd, cache_ghi=cg,
-            giay=giay, chi_phi_usd=chi_phi(self.mo_hinh.ma, vao, ra, cd, cg), stop_reason=str(d.get("stop_reason")),
-            van_tay_yeu_cau=van_tay(yeu_cau), van_tay_dap=van_tay(d), request_id=str(getattr(tl, "_request_id", "") or "")))
+            giay=giay, chi_phi_usd=chi_phi(self.mo_hinh.ma, vao, ra, cd, cg, self.duong, self.vung),
+            stop_reason=str(d.get("stop_reason")), van_tay_yeu_cau=van_tay(yeu_cau), van_tay_dap=van_tay(d),
+            request_id=str(getattr(tl, "_request_id", "") or ""), duong=self.duong, vung=self.vung))
         if d.get("model") and d["model"] != self.mo_hinh.ma:
             # API phục vụ bằng mô hình khác mã ghim ⇒ phiên bản agent đã đổi ⇒ ĐỎ có tên (⛔ nhận im lặng)
             raise LoiApi(f"API trả bằng mô hình `{d['model']}` ≠ ghim `{self.mo_hinh.ma}`")
         return {"stop_reason": d.get("stop_reason"), "content": d.get("content") or []}
 
 
+class AnthropicVertexMessages(AnthropicMessages):
+    """Claude trên **Vertex AI** (Google managed) — `WO-359` AC-1. CÙNG khuôn yêu cầu/đáp, CÙNG tham số mô hình, CÙNG
+    nhật ký + trần USD như `AnthropicMessages`; chỉ khác client và bảng giá.
+
+    · client = `anthropic.AnthropicVertex(project_id=FLS_GCP_PROJECT, region=FLS_VERTEX_REGION)` — SDK chuyển `model` vào
+      URL `…/publishers/anthropic/models/<mã>:rawPredict` và tự đặt `anthropic_version`; xác thực = ADC của GCP (SA gắn
+      VM `fls-staging-app` / `gcloud auth application-default login` ở Cloud Shell) — ⛔ khoá nào đi qua mã này.
+    · Lỗi xác thực của `google.auth` (⛔ ADC, token hết hạn) ⇒ `LoiApi` CÓ TÊN (⛔ rơi về GIẢ).
+    · USD ước = `BANG_GIA_VERTEX` × hệ số vùng (`global` 1,0 · `us`/`eu` 1,1) — giá tra `NGAY_TRA_GIA_VERTEX`.
+    """
+    ten = "anthropic-vertex"
+    duong = DUONG_VERTEX
+    bang_gia = BANG_GIA_VERTEX
+
+    def _dung_client(self, sdk: Any, mt: Any, max_retries: int) -> Any:
+        return sdk.AnthropicVertex(project_id=mt[BIEN_GCP_PROJECT], region=self.vung, max_retries=max_retries)
+
+    def __init__(self, mo_hinh: MoHinh, co_that: bool = False, effort: str = "medium", che_do: str = "mo",
+                 client: Any = None, tran_usd: float | None = None, max_retries: int = 2,
+                 nhat_ky: list[NhatKyGoi] | None = None, moi_truong: dict[str, str] | None = None):
+        mt = os.environ if moi_truong is None else moi_truong
+        self.vung = mt.get(BIEN_VERTEX_REGION) or VUNG_VERTEX_MAC_DINH
+        self.du_an = mt.get(BIEN_GCP_PROJECT) or ""
+        super().__init__(mo_hinh, co_that, effort=effort, che_do=che_do, client=client, tran_usd=tran_usd,
+                         max_retries=max_retries, nhat_ky=nhat_ky, moi_truong=mt)
+
+    def _loi_xac_thuc(self, e: Exception) -> bool:
+        return any(k.__module__.startswith("google.auth") for k in type(e).__mro__)
+
+
 #: Họ → lớp adapter. Thêm họ (vd. `openai` giai đoạn sau) = thêm MỘT dòng + bỏ họ ấy khỏi `HO_DE_DANH`.
 ADAPTER: dict[str, Any] = {"anthropic": AnthropicMessages}
+#: `WO-359`: họ `anthropic` có HAI đường — chọn theo `FLS_NHA_CUNG_CAP` (`duong_goi`).
+ADAPTER_DUONG: dict[tuple[str, str], Any] = {("anthropic", DUONG_API): AnthropicMessages,
+                                             ("anthropic", DUONG_VERTEX): AnthropicVertexMessages}
 
 
 def tao_that(mo_hinh: MoHinh, co_that: bool, che_do: str = "mo", **kw: Any) -> Any:
     """Nhà cung cấp THẬT theo HỌ của mô hình — ⛔ cứng một hãng trong giao diện.
 
     Họ chừa chỗ (`HO_DE_DANH`, hôm nay `openai`): chốt chạy TRƯỚC (thiếu chốt ⇒ `CamGoiThat`), rồi `ChuaDung`.
-    Họ lạ ⇒ `ChuaDung` ngay."""
+    Họ lạ ⇒ `ChuaDung` ngay. `WO-359`: họ `anthropic` ⇒ adapter theo ĐƯỜNG (`FLS_NHA_CUNG_CAP`); đường lạ ⇒ chốt báo ĐỎ."""
     if mo_hinh.ho in ADAPTER:
-        return ADAPTER[mo_hinh.ho](mo_hinh, co_that, che_do=che_do, **kw)
+        mt = kw.get("moi_truong")
+        lop = ADAPTER_DUONG.get((mo_hinh.ho, duong_goi(mt)))
+        if lop is None:                       # đường lạ: chốt chạy để báo ĐỎ CÓ TÊN (kèm mọi chốt thiếu khác)
+            kiem_chot_that(mo_hinh, co_that, mt, che_do=che_do)
+            raise CamGoiThat(f"đường `{duong_goi(mt)}` ⛔ có adapter")
+        return lop(mo_hinh, co_that, che_do=che_do, **kw)
     if mo_hinh.ho in HO_DE_DANH:
         kiem_chot_that(mo_hinh, co_that, che_do=che_do)
         raise ChuaDung(f"họ `{mo_hinh.ho}` CHỪA CHỖ cho giai đoạn sau (quyết chủ 23/11) — ⛔ adapter hôm nay")

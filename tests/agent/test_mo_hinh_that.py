@@ -76,6 +76,7 @@ def sdk_gia(dap=None, loi=None, mo_hinh_phuc_vu=None, usage=(1000, 200)):
 def du_chot(monkeypatch):
     for k, v in DU.items():
         monkeypatch.setenv(k, v)
+    monkeypatch.delenv("FLS_NHA_CUNG_CAP", raising=False)     # WO-359: bài này đo đường API-key (dự phòng)
 
 
 def _dung(monkeypatch, mo_hinh=mh.OPUS_5_5, **kw_sdk):
@@ -196,7 +197,8 @@ def test_chuoi_qua_adapter_that__A4_4_4__report_tinh_la_THAT__nhat_ky_chi_so(mon
     d = json.loads(p.read_text(encoding="utf-8"))
     assert d["tong"]["so_goi"] == len(nk)
     assert set(d["goi"][0]) == {"mo_hinh", "token_vao", "token_ra", "cache_doc", "cache_ghi", "giay", "chi_phi_usd",
-                                "stop_reason", "van_tay_yeu_cau", "van_tay_dap", "request_id", "ngay_tra_gia"}
+                                "stop_reason", "van_tay_yeu_cau", "van_tay_dap", "request_id", "ngay_tra_gia",
+                                "duong", "vung"}                   # WO-359: + đường đã gọi · vùng Vertex
     assert KHOA_GIA not in p.read_text(encoding="utf-8")
 
 
@@ -230,6 +232,7 @@ def test_doc_json_tra_loi__chu_thua__DO(van):
 def test_AC3_thieu_khoa__exit_2__DO_co_ten__khong_so_THAT(monkeypatch, capsys, tmp_path):
     import vong_that_voi as vt
     monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
+    monkeypatch.delenv("FLS_NHA_CUNG_CAP", raising=False)        # WO-359: bài này đo đường API-key
     monkeypatch.delenv(vt.cav.BIEN_HELDOUT, raising=False)
     monkeypatch.setattr(vt, "TM_RA", tmp_path)
     rc = vt.main(["--that"])

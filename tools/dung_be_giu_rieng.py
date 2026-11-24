@@ -83,12 +83,33 @@ NHOM_CUA = {"A": "phai_noi", "B": "phai_noi", "C": "phai_noi", "D": "phai_nguoi"
 
 
 # ───────────────────────────── đọc nguồn (SA chỉ-đọc) ─────────────────────────────
+PHAM_VI_DOC = ["https://www.googleapis.com/auth/spreadsheets.readonly"]   # ⛔ chỉ đọc (QĐ-ITL-34)
+
+
+def cach_xac_thuc(mt: dict[str, str] | None = None) -> str:
+    """TÊN cách lấy quyền đọc sheet (⛔ giá trị). `WO-359` AC-4: chạy được ở Cloud Shell của chủ — thứ tự dừng ở cái đầu:
+    ① `FLS_SHEETS_TOKEN` (access token đưa sẵn) ② `FLS_SHEETS_SA_JSON_TEP` (ĐƯỜNG DẪN tệp khoá SA, chmod 600 — ⛔ nội dung
+    khoá qua biến) ③ `FLS_GSHEETS_SA_JSON(_B64)` (environment secrets của phiên cloud — đường cũ WO-338). Khuôn theo
+    `tools/staging/cred_sheets.py` (nhánh STG-NAP) nhưng ⛔ phụ thuộc nó (nhánh này ⛔ có tệp ấy)."""
+    mt = os.environ if mt is None else mt
+    for k in ("FLS_SHEETS_TOKEN", "FLS_SHEETS_SA_JSON_TEP", "FLS_GSHEETS_SA_JSON", "FLS_GSHEETS_SA_JSON_B64"):
+        if mt.get(k):
+            return k
+    raise RuntimeError("⛔ thiếu quyền đọc sheet: đặt FLS_SHEETS_TOKEN · FLS_SHEETS_SA_JSON_TEP · FLS_GSHEETS_SA_JSON(_B64)")
+
+
 def _phien():
     from google.auth.transport.requests import AuthorizedSession
     from google.oauth2 import service_account
+    cach = cach_xac_thuc()
+    if cach == "FLS_SHEETS_TOKEN":
+        from google.oauth2.credentials import Credentials
+        return AuthorizedSession(Credentials(token=os.environ["FLS_SHEETS_TOKEN"]))
+    if cach == "FLS_SHEETS_SA_JSON_TEP":
+        return AuthorizedSession(service_account.Credentials.from_service_account_file(
+            os.environ["FLS_SHEETS_SA_JSON_TEP"], scopes=PHAM_VI_DOC))
     raw = os.environ.get("FLS_GSHEETS_SA_JSON") or base64.b64decode(os.environ["FLS_GSHEETS_SA_JSON_B64"]).decode()
-    return AuthorizedSession(service_account.Credentials.from_service_account_info(
-        json.loads(raw), scopes=["https://www.googleapis.com/auth/spreadsheets.readonly"]))   # ⛔ chỉ đọc
+    return AuthorizedSession(service_account.Credentials.from_service_account_info(json.loads(raw), scopes=PHAM_VI_DOC))
 
 
 def _lay(s, sid: str, vung: str, lan: int = 4) -> list[list]:
