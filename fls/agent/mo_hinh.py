@@ -54,6 +54,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
+import re
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Protocol
@@ -77,6 +78,8 @@ DUONG_MAC_DINH = DUONG_API          # biến vắng ⇒ hành vi WO-355 (bài ng
 DUONG_GCP = (DUONG_GOOGLE_CLOUD, DUONG_VERTEX)
 BIEN_CLAUDE_WORKSPACE = "FLS_CLAUDE_WORKSPACE_ID"
 DAU_WORKSPACE = "wrkspc_"
+#: Dạng workspace: `wrkspc_` + ≥ 1 ký tự ASCII chữ/số ĐẦU, rồi chữ/số/`_` (`re.ASCII` ⇒ ⛔ chữ Unicode).
+MAU_WORKSPACE = re.compile(r"wrkspc_[A-Za-z0-9][A-Za-z0-9_]*", re.ASCII)
 #: ⭐ AC-2 ở đường `google-cloud` — THAY `FLS_ZDR_DA_BAT`. Tra 24/11 (skill `claude-api` · `google-cloud-anthropic-managed` +
 #:    trang `platform.claude.com/…/claude-models-on-google-cloud/anthropic-managed` §Data retention): nền do ANTHROPIC vận
 #:    hành; *"follows the same data retention policy as the Claude API … ZDR is available on request"*; việc dựng tạo **một
@@ -345,7 +348,7 @@ def kiem_chot_that(mo_hinh: MoHinh, co_that: bool, moi_truong: dict[str, str] | 
         if not ws:
             thieu.append(f"`{BIEN_CLAUDE_WORKSPACE}` vắng (đường google-cloud — workspace `{DAU_WORKSPACE}…` của tổ chức "
                          "Anthropic gắn với project)")
-        elif not ws.startswith(DAU_WORKSPACE) or not ws.replace("_", "").isalnum():
+        elif not MAU_WORKSPACE.fullmatch(ws):      # `AG3-R1-04`: bản cũ `isalnum` nhận `wrkspc_` · `wrkspc_é` · `wrkspc____`
             thieu.append(f"`{BIEN_CLAUDE_WORKSPACE}` ⛔ đúng dạng `{DAU_WORKSPACE}…`")
     elif duong == DUONG_VERTEX:
         vung = mt.get(BIEN_VERTEX_REGION) or VUNG_VERTEX_MAC_DINH

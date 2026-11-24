@@ -449,11 +449,27 @@ def thu_muc_be(goc: Path, ten: str) -> Path:
     return goc / ten
 
 
+def tao_thu_muc_rieng(d: Path) -> list[Path]:
+    """Tạo `d` (và cha thiếu) với quyền 700 — ⭐ `AG3-R1-05` (KQ-361): CHỈ `chmod` thư mục do CHÍNH hàm này tạo; thư mục
+    CÓ SẴN (vd `/tmp`, `$HOME`) ⛔ bị đổi quyền — rộng hơn 700 thì IN cảnh báo (tên + quyền, ⛔ nội dung). Trả danh
+    sách thư mục đã tạo."""
+    thieu = []
+    p = Path(d)
+    while not p.exists():
+        thieu.append(p)
+        p = p.parent
+    for t in reversed(thieu):
+        t.mkdir(mode=0o700)
+        os.chmod(t, 0o700)                    # mkdir chịu umask ⇒ đặt lại cho chắc
+    for c in [Path(d), *Path(d).parents][len(thieu):len(thieu) + 1]:   # thư mục có sẵn gần nhất
+        if c.exists() and c.stat().st_mode & 0o077:
+            print(f"  ⚠ thư mục có sẵn `{c}` quyền {oct(c.stat().st_mode & 0o777)} (rộng hơn 700) — ⛔ đổi; tự kiểm")
+    return thieu
+
+
 def ghi_be(goc: Path, be: dict) -> Path:
     d = thu_muc_be(goc, be["ten"])
-    d.mkdir(parents=True, exist_ok=True)
-    os.chmod(goc, 0o700)                  # thư mục bể GỐC cũng 700 (đo 24/11: `--ra` mới tạo ⇒ 755)
-    os.chmod(d, 0o700)
+    tao_thu_muc_rieng(d)                      # bản cũ `chmod 700` cả `goc` có sẵn (`AG3-R1-05`)
     for ten_tep, du in (("ca.json", be["ca"]), ("dap_an.json", be["dap_an"]), ("meta.json", be["meta"])):
         p = d / ten_tep
         p.write_text(json.dumps(du, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
@@ -537,8 +553,7 @@ def main(argv: list[str] | None = None) -> int:
     if a.tu_tep:
         nguon = json.loads(a.tu_tep.read_text(encoding="utf-8"))
     else:
-        a.tho.parent.mkdir(parents=True, exist_ok=True)
-        os.chmod(a.tho.parent, 0o700)
+        tao_thu_muc_rieng(a.tho.parent)       # ⛔ `chmod` thư mục có sẵn (vd `--tho /tmp/x.json` từng làm `/tmp` thành 700)
 
         def luu(n: dict) -> None:
             a.tho.write_text(json.dumps(n, ensure_ascii=False), encoding="utf-8")

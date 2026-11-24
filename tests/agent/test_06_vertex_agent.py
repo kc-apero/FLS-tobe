@@ -63,13 +63,21 @@ class Gcp:
         p = Path(str(self.tt) + ".log")
         return [re.sub(r" --project=\S+ --quiet", "", x) for x in p.read_text(encoding="utf-8").splitlines()] if p.exists() else []
 
+    def urls(self):
+        """URL hiệu lực curl giả đã gọi (đọc từ argv HOẶC tệp `-K`) — sổ riêng, ⛔ phải argv."""
+        p = Path(str(self.tt) + ".url")
+        return p.read_text(encoding="utf-8").splitlines() if p.exists() else []
+
     def chay(self, *a, du_an=DU_AN, ws=WS, them_duong=True, ncc="__duong__"):
         env = dict(os.environ, PATH=f"{self.d}{os.pathsep}{os.environ['PATH']}", FLS_GIA_TRANG_THAI=str(self.tt))
         env.pop("FLS_GIA_DANH_TINH", None)
         env.pop("FLS_NHA_CUNG_CAP", None)
         if ncc is not None:
             env["FLS_NHA_CUNG_CAP"] = self.duong if ncc == "__duong__" else ncc
-        duong = (["--duong", self.duong] if them_duong else []) + (["--workspace-id", ws] if self.duong == "google-cloud" else [])
+        duong = ["--duong", self.duong] if them_duong else []
+        env.pop("FLS_CLAUDE_WORKSPACE_ID", None)
+        if self.duong == "google-cloud" and ws is not None:     # AG3-R1-06: workspace qua BIẾN, ⛔ argv
+            env["FLS_CLAUDE_WORKSPACE_ID"] = ws
         return subprocess.run(["bash", str(S06), "--project", du_an, *duong, *a], capture_output=True, text=True, env=env,
                               timeout=120)
 
@@ -100,7 +108,7 @@ def test_mac_dinh_la_google_cloud(tmp_path):
     gg = Gcp(tmp_path, "google-cloud")
     r = gg.chay(them_duong=False)
     assert "══ đường google-cloud" in r.stdout and r.returncode == 0, r.stdout + r.stderr
-    assert any("claude.googleapis.com/v1/projects/fp-a-project/locations/global/workspaces/" in x for x in gg.lenh())
+    assert any("claude.googleapis.com/v1/projects/fp-a-project/locations/global/workspaces/" in x for x in gg.urls())
 
 
 def test_dung_tu_trong__DO_dung_buoc_bam_tay_roi_DAT(g):
@@ -142,7 +150,7 @@ def test_KHONG_in_token_noi_dung_workspace(g):
     assert r.returncode == 0, r.stdout
     for lc in LINH_CANH:
         assert lc not in r.stdout + r.stderr, lc
-    assert any(x.startswith("curl ") and "https://" in x for x in g.lenh())   # lời gọi THẬT đã đi (lính canh vắng vì ⛔ in)
+    assert any(x.startswith("https://") for x in g.urls())   # lời gọi THẬT đã đi (lính canh vắng vì ⛔ in)
     if g.duong == "google-cloud":
         assert f"wrkspc_…({len(WS)} ký tự)" in r.stdout                 # chỉ tiền tố + độ dài
 
@@ -226,7 +234,7 @@ def test_vertex_da_vung__dung_host_rep(tmp_path, vung):
     gg.bam_tay()
     r = gg.chay("--region", vung)
     assert r.returncode == 0, r.stdout
-    assert f"aiplatform.{vung}.rep.googleapis.com/v1/projects/{DU_AN}/locations/{vung}/" in "\n".join(gg.lenh())
+    assert f"aiplatform.{vung}.rep.googleapis.com/v1/projects/{DU_AN}/locations/{vung}/" in "\n".join(gg.urls())
 
 
 @pytest.mark.parametrize("a,duong", [
@@ -239,7 +247,7 @@ def test_tham_so_xau__exit_2_truoc_moi_lenh(tmp_path, a, duong):
     assert r.returncode == 2 and not gg.lenh(), r.stderr
 
 
-@pytest.mark.parametrize("ws", ["", "ws_123", "wrkspc_a;b"])
+@pytest.mark.parametrize("ws", ["", "ws_123", "wrkspc_a;b", "wrkspc_", "wrkspc_é", "wrkspc____", "WRKSPC_x", None])
 def test_google_cloud_workspace_xau__exit_2(tmp_path, ws):
     gg = Gcp(tmp_path, "google-cloud")
     r = gg.chay(ws=ws)
@@ -277,3 +285,30 @@ def test_bien_FLS_NHA_CUNG_CAP_vang_hoac_lech__DO_co_ten(g, ncc):
     r = g.chay(ncc=ncc)
     assert do_cua(r.stdout) == {"biến FLS_NHA_CUNG_CAP của shell = --duong (vắng ⇒ agent đi đường khoá API)"}, do_cua(r.stdout)
     assert r.returncode == 1
+
+
+def test_AG3_R1_06__argv_moi_lenh_gia__0_lan_wrkspc(tmp_path):
+    """Workspace ID ⛔ trong argv của BẤT KỲ lệnh nào (gcloud · curl · ssh) — đo trên nhật ký argv của lệnh giả;
+    mẫu số (Đ3): đã có lời gọi Cloud Shell + lệnh ssh, và workspace THẬT SỰ được dùng (gọi thử 200 ⇒ URL đúng)."""
+    gg = Gcp(tmp_path, "google-cloud")
+    r = gg.chay()
+    assert r.returncode == 0, r.stdout + r.stderr
+    lenh = gg.lenh()
+    assert sum(x.startswith("curl ") and "-K" in x for x in lenh) >= 2 and any(" ssh " in x for x in lenh)
+    assert not [x for x in lenh if "wrkspc_" in x], [x for x in lenh if "wrkspc_" in x]
+    assert "bash -s" in next(x for x in lenh if " ssh " in x)
+
+
+def test_AG3_R1_06__co_workspace_id_trong_argv__exit_2(tmp_path):
+    gg = Gcp(tmp_path, "google-cloud")
+    r = gg.chay("--workspace-id", WS)
+    assert r.returncode == 2 and "AG3-R1-06" in r.stderr and not gg.lenh()
+
+
+def test_AG3_R1_06__workspace_id_file(tmp_path):
+    gg = Gcp(tmp_path, "google-cloud")
+    f = tmp_path / "ws.txt"
+    f.write_text(WS + "\n", encoding="utf-8")
+    f.chmod(0o600)
+    r = gg.chay("--workspace-id-file", str(f), ws=None)
+    assert r.returncode == 0, r.stdout + r.stderr

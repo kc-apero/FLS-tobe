@@ -13,8 +13,10 @@
 #    --duong vertex        dự phòng — Claude trên Vertex AI (Google managed), service `aiplatform.googleapis.com`,
 #                          vai `roles/aiplatform.user`, bật mô hình ở Model Garden (bấm tay).
 #
-#    bash tools/staging/06_vertex_agent.sh --project fp-a-project --workspace-id wrkspc_… --kiem   # ĐỌC + gọi THỬ
-#    bash tools/staging/06_vertex_agent.sh --project fp-a-project --workspace-id wrkspc_…          # bật API + cấp vai, rồi đo
+#    export FLS_NHA_CUNG_CAP=google-cloud FLS_CLAUDE_WORKSPACE_ID=wrkspc_…     # workspace qua BIẾN (⛔ argv — AG3-R1-06)
+#    bash tools/staging/06_vertex_agent.sh --project fp-a-project --kiem       # ĐỌC + gọi THỬ
+#    bash tools/staging/06_vertex_agent.sh --project fp-a-project              # bật API + cấp vai, rồi đo
+#    (hoặc --workspace-id-file <tệp chmod 600 chứa wrkspc_…>)
 #    bash tools/staging/06_vertex_agent.sh --project fp-a-project --duong vertex [--kiem]           # đường dự phòng
 #
 #  Tuỳ chọn: --region global|us|eu (chỉ vertex; mặc định global) · --vm fls-staging-app · --zone asia-southeast1-b
@@ -39,12 +41,15 @@
 #  ⚠ Đặt `export FLS_NHA_CUNG_CAP=<đường>` TRƯỚC khi chạy (cùng shell chạy agent ở BG-360 §B): BÁO CÁO đo nó = `--duong`.
 #  ⛔ KHÔNG làm ở bước 06: chạy agent (khối lệnh BG-360 §B) · ghi kho (G0 BÓNG) · tạo khoá SA · in workspace ID đầy đủ.
 #  ⛔ token/khoá: token chỉ ở biến shell + tệp tạm chmod 600 (header curl đọc từ tệp — ⛔ lộ ở `ps`), xoá khi thoát.
+#  ⭐ `AG3-R1-06` (KQ-361): workspace ID ⛔ nằm trong argv NÀO — đọc từ biến `FLS_CLAUDE_WORKSPACE_ID` (cùng biến agent
+#     dùng) hoặc `--workspace-id-file`; URL chứa nó đưa cho curl qua tệp `-K` chmod 600; lệnh vào VM đi qua STDIN của
+#     `gcloud compute ssh --command='bash -s'` (argv chỉ còn `bash -s`). Bài: argv MỌI lệnh giả chứa 0 lần `wrkspc_`.
 #  Luật đo (CLAUDE.md Đ3·Đ5): mỗi mục có `mong`; mục ⛔ ĐO ĐƯỢC ⇒ ĐỎ (không phải "không thấy lệch").
 # ══════════════════════════════════════════════════════════════════════════════════════════
 set -euo pipefail
 
 PROJECT="" ; DUONG="google-cloud" ; REGION="global" ; VM="fls-staging-app" ; ZONE="asia-southeast1-b"
-SA_NAME="fls-staging-app" ; WS="" ; CAP_NGUOI="" ; KIEM=0 ; GOI_THU=1
+SA_NAME="fls-staging-app" ; WS="${FLS_CLAUDE_WORKSPACE_ID:-}" ; WS_TEP="" ; CAP_NGUOI="" ; KIEM=0 ; GOI_THU=1
 while [ $# -gt 0 ]; do
   case "$1" in
     --project)      PROJECT="$2"; shift 2 ;;
@@ -53,7 +58,8 @@ while [ $# -gt 0 ]; do
     --vm)           VM="$2"; shift 2 ;;
     --zone)         ZONE="$2"; shift 2 ;;
     --sa)           SA_NAME="$2"; shift 2 ;;
-    --workspace-id) WS="$2"; shift 2 ;;
+    --workspace-id) echo "⛔ --workspace-id đã bỏ (argv lộ ở ps — AG3-R1-06): đặt FLS_CLAUDE_WORKSPACE_ID hoặc --workspace-id-file" >&2; exit 2 ;;
+    --workspace-id-file) WS_TEP="$2"; shift 2 ;;
     --cap-nguoi)    CAP_NGUOI="$2"; shift 2 ;;
     --kiem)         KIEM=1; shift ;;
     --khong-goi-thu) GOI_THU=0; shift ;;
@@ -66,8 +72,14 @@ case "$DUONG" in google-cloud|vertex) ;; *) echo "⛔ --duong phải là google-
 case "$REGION" in global|us|eu) ;; *) echo "⛔ --region phải là global|us|eu — vùng đơn ($REGION) ⛔ phục vụ Opus 5.5/Sonnet 5.5" >&2; exit 2 ;; esac
 if [ "$DUONG" = google-cloud ]; then
   [ "$REGION" = global ] || { echo "⛔ đường google-cloud: vị trí giữ global (skill: \"Leave it there\")" >&2; exit 2; }
-  case "$WS" in wrkspc_*) ;; *) echo "⛔ đường google-cloud cần --workspace-id wrkspc_… (Claude Console → Settings → Workspaces)" >&2; exit 2 ;; esac
-  case "$WS" in *[!A-Za-z0-9_]*) echo "⛔ --workspace-id chỉ gồm [A-Za-z0-9_]" >&2; exit 2 ;; esac
+  if [ -n "$WS_TEP" ]; then
+    [ -r "$WS_TEP" ] || { echo "⛔ --workspace-id-file: ⛔ đọc được tệp" >&2; exit 2; }
+    WS="$(head -n1 "$WS_TEP" | tr -d '[:space:]')"
+  fi
+  # `AG3-R1-04`: ASCII, ≥ 1 chữ/số sau tiền tố (bản cũ nhận `wrkspc_` · `wrkspc_é`). ⛔ in giá trị khi sai.
+  if ! LC_ALL=C bash -c '[[ "$1" =~ ^wrkspc_[A-Za-z0-9][A-Za-z0-9_]*$ ]]' _ "$WS"; then
+    echo "⛔ đường google-cloud cần workspace dạng wrkspc_<chữ/số…> trong FLS_CLAUDE_WORKSPACE_ID hoặc --workspace-id-file (Claude Console → Settings → Workspaces)" >&2; exit 2
+  fi
 fi
 case "$PROJECT$VM$ZONE$SA_NAME" in *[!a-z0-9-]*) echo "⛔ --project/--vm/--zone/--sa chỉ gồm [a-z0-9-]" >&2; exit 2 ;; esac
 if [ -n "$CAP_NGUOI" ]; then
@@ -118,7 +130,7 @@ if [ "$DUONG" = google-cloud ]; then
   echo "      ⇒ chạy bằng tài khoản đã mua (trang Anthropic)."
   echo "   b) Trang Claude (Agent Platform → Models → Claude Platform → Anthropic managed) → Activate → mở thư xác nhận."
   echo "   c) WORKSPACE ID: nút Open Claude Console (cần roles/claude.admin) → Settings → Workspaces → ID 'Default Workspace'"
-  echo "      dạng wrkspc_… ⇒ --workspace-id"
+  echo "      dạng wrkspc_… ⇒ export FLS_CLAUDE_WORKSPACE_ID=… (⛔ dán chat · ⛔ đặt trong argv)"
 else
   buoc "③ Model Garden — BƯỚC BẤM TAY (mỗi mô hình một lần cho project; script ⛔ tự bật)"
   for m in "${MO_HINH[@]}"; do
@@ -155,9 +167,10 @@ goi_thu_cloud_shell() {    # $1 = mã mô hình ⇒ in "http|model|stop|vao|ra|t
   [ -n "$tok" ] || { echo "000|||||khong-lay-duoc-token"; return; }
   printf 'Authorization: Bearer %s\n' "$tok" > "$TM/h" ; chmod 600 "$TM/h" ; tok=""
   yeu_cau "$m" > "$TM/yc"
-  ma="$(curl -sS -o "$TM/dap" -w '%{http_code}' --max-time 120 -X POST "${URL_MAU/MOHINH/$m}" \
+  printf 'url = "%s"\n' "${URL_MAU/MOHINH/$m}" > "$TM/cfg" ; chmod 600 "$TM/cfg"   # URL (có workspace) ⛔ ở argv
+  ma="$(curl -sS -o "$TM/dap" -w '%{http_code}' --max-time 120 -X POST -K "$TM/cfg" \
         -H @"$TM/h" -H 'Content-Type: application/json' -H "$HDR_THEM" --data-binary @"$TM/yc" 2>/dev/null || echo 000)"
-  rm -f "$TM/h"
+  rm -f "$TM/h" "$TM/cfg"
   echo "${ma}|$(python3 -c "$DOC_DAP" "$TM/dap" 2>/dev/null || echo '|||||')"
   rm -f "$TM/dap"
 }
@@ -173,8 +186,8 @@ cat > \$T/doc.py <<'PYEOF'
 $DOC_DAP
 PYEOF
 for m in ${MO_HINH[*]}; do
-  u='$URL_MAU'; u=\${u/MOHINH/\$m};
-  ma=\$(curl -sS -o \$T/dap -w '%{http_code}' --max-time 120 -X POST \"\$u\" -H @\$T/h -H 'Content-Type: application/json' -H '$HDR_THEM' --data-binary @\$T/yc_\$m 2>/dev/null || echo 000);
+  u='$URL_MAU'; u=\${u/MOHINH/\$m}; printf 'url = \"%s\"\\n' \"\$u\" > \$T/cfg; chmod 600 \$T/cfg;
+  ma=\$(curl -sS -o \$T/dap -w '%{http_code}' --max-time 120 -X POST -K \$T/cfg -H @\$T/h -H 'Content-Type: application/json' -H '$HDR_THEM' --data-binary @\$T/yc_\$m 2>/dev/null || echo 000);
   echo \"vm_\$m=\$ma|\$(python3 \$T/doc.py \$T/dap 2>/dev/null)\"; rm -f \$T/dap;
 done; rm -rf \$T"
 
@@ -190,7 +203,8 @@ export R_VM="$("${G[@]}" compute instances describe "$VM" --zone="$ZONE" --forma
 export R_CS="" R_TRONG=""
 if [ "$GOI_THU" -eq 1 ]; then
   for m in "${MO_HINH[@]}"; do R_CS+="cs_${m}=$(goi_thu_cloud_shell "$m")"$'\n'; done
-  R_TRONG="$("${G[@]}" compute ssh "$VM" --zone="$ZONE" --tunnel-through-iap --command="$DO_TRONG" 2>/dev/null || true)"
+  # lệnh vào VM qua STDIN (`bash -s`) ⇒ argv của gcloud/ssh ⛔ mang URL/workspace (AG3-R1-06)
+  R_TRONG="$(printf '%s\n' "$DO_TRONG" | "${G[@]}" compute ssh "$VM" --zone="$ZONE" --tunnel-through-iap --command='bash -s' 2>/dev/null || true)"
 fi
 export R_CS R_TRONG
 

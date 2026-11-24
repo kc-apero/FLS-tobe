@@ -254,17 +254,37 @@ def nhat_ky_cua(ncc: dict[str, Any]) -> list:
     return []
 
 
-def ghi_nhat_ky(ncc: dict[str, Any], nhan: str, tm: Path = TM_NHAT_KY) -> Path | None:
+def nhan_usd(t: dict[str, Any]) -> str:
+    """`~X USD ƯỚC (…)` — ⭐ `AG3-R1-03` (KQ-361): MỌI số USD in ra mang nhãn ƯỚC + nguồn giá theo ĐƯỜNG. Đường
+    `google-cloud` nói rõ CHƯA có bảng giá (giá Claude API dùng để giữ trần); số thật ở hoá đơn GCP."""
+    duong = t.get("duong") or []
+    if duong == [mh.DUONG_GOOGLE_CLOUD]:
+        nguon = "giá Claude API — nền claude.googleapis.com CHƯA có bảng giá; số thật ở hoá đơn GCP"
+    elif duong == [mh.DUONG_VERTEX]:
+        nguon = "Vertex: global = giá Claude API (giả định chưa kiểm), us/eu +10%; số thật ở Billing GCP"
+    else:
+        nguon = "giá Claude API"
+    return f"~{t['chi_phi_usd']} USD ƯỚC ({nguon}; tra {t['ngay_tra_gia']})"
+
+
+def ghi_nhat_ky(ncc: dict[str, Any], nhan: str, tm: Path | None = None, loi: str | None = None) -> Path | None:
     """Ghi nhật ký vòng: mỗi lời gọi = mô hình · token · giây · USD ước · stop_reason · VÂN TAY yêu cầu/đáp.
-    ⛔ nội dung yêu cầu, ⛔ phản hồi thô, ⛔ khoá (luật cứng WO-355). 0 lời gọi ⇒ ⛔ ghi (Đ3: ⛔ tệp rỗng giả vờ có số)."""
+    ⛔ nội dung yêu cầu, ⛔ phản hồi thô, ⛔ khoá (luật cứng WO-355). 0 lời gọi ⇒ ⛔ ghi (Đ3: ⛔ tệp rỗng giả vờ có số).
+
+    `tm` vắng ⇒ đọc `TM_NHAT_KY` LÚC GỌI (⛔ lúc định nghĩa) ⇒ bài thử đổi hướng được bằng `monkeypatch` (`AG3-R1-02`).
+    `loi` (`AG3-R1-01`): lượt DỪNG giữa chừng ⇒ thêm MỘT dòng `loi` = TÊN lỗi (⛔ nội dung) cạnh các lời đã tính tiền."""
     nk = nhat_ky_cua(ncc)
     if not nk:
         return None
+    tm = TM_NHAT_KY if tm is None else tm
     from datetime import datetime, timezone
     tm.mkdir(parents=True, exist_ok=True)
     p = tm / f"{datetime.now(timezone.utc).strftime('%Y-%m-%dT%H%M%SZ')}_{nhan}.json"
-    p.write_text(json.dumps({"_vi_sao": "Nhật ký vòng API THẬT — CHỈ số đếm + vân tay (WO-355 AC-2/AC-4 · WO-359).",
-                             "tong": mh.tong_nhat_ky(nk), "goi": [x.dict() for x in nk]},
+    d = {"_vi_sao": "Nhật ký vòng API THẬT — CHỈ số đếm + vân tay (WO-355 AC-2/AC-4 · WO-359).",
+         "tong": mh.tong_nhat_ky(nk), "goi": [x.dict() for x in nk]}
+    if loi:
+        d["loi"] = loi
+    p.write_text(json.dumps(d,
                             ensure_ascii=False, indent=1, sort_keys=True) + "\n", encoding="utf-8")
     return p
 
@@ -366,11 +386,11 @@ def main(argv: list[str] | None = None) -> int:
     if che_do == "that":
         t = mh.tong_nhat_ky(nhat_ky_cua(ncc))
         print(f"  API THẬT: {t['so_goi']} lời gọi · token vào {t['token_vao']} · ra {t['token_ra']} · cache đọc "
-              f"{t['cache_doc']} · ghi {t['cache_ghi']} · {t['giay']} s · ~{t['chi_phi_usd']} USD (giá tra {t['ngay_tra_gia']}"
-              f" · đường {'/'.join(t['duong']) or '—'}{' · vùng ' + '/'.join(t['vung']) if t['vung'] else ''})")
+              f"{t['cache_doc']} · ghi {t['cache_ghi']} · {t['giay']} s · {nhan_usd(t)}"
+              f" · đường {'/'.join(t['duong']) or '—'}{' · vùng ' + '/'.join(t['vung']) if t['vung'] else ''}")
         p_ = ghi_nhat_ky(ncc, f"chuoi_{a.che or ch.che_mod.CHE_DO_MAC_DINH}")
         if p_:
-            print(f"  đã ghi nhật ký {p_.relative_to(GOC)}")
+            print(f"  đã ghi nhật ký {p_.relative_to(GOC) if p_.is_relative_to(GOC) else p_}")
     if a.ghi_phat_lai:
         ghi_phat_lai(ncc)
         print(f"  đã ghi bản phát lại: {TM_PHAT_LAI.relative_to(GOC)}/")

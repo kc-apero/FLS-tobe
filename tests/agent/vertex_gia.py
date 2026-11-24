@@ -47,9 +47,17 @@ def curl():
         x = args[i]
         if x in ("-sS", "-s", "-S"):
             i += 1
-        elif x in ("-o", "-w", "--max-time", "-X", "-H", "--data-binary"):
+        elif x in ("-o", "-w", "--max-time", "-X", "-H", "--data-binary", "-K"):
             v = args[i + 1]
-            if x == "-o":
+            if x == "-K":                       # tệp cấu hình curl: `url = "…"` (AG3-R1-06 — URL ⛔ ở argv)
+                for d in open(v, encoding="utf-8").read().splitlines():
+                    mm = re.match(r'\s*url\s*=\s*"([^"]*)"\s*$', d)
+                    if mm:
+                        url = mm.group(1)
+                    elif d.strip():
+                        print(f"curl GIẢ: dòng -K lạ {d!r}", file=sys.stderr)
+                        sys.exit(99)
+            elif x == "-o":
                 ra = v
             elif x == "-w":
                 viet = v
@@ -64,6 +72,8 @@ def curl():
         else:
             print(f"curl GIẢ: cờ lạ {x}", file=sys.stderr)
             sys.exit(99)
+    with open(TT + ".url", "a", encoding="utf-8") as f:        # URL HIỆU LỰC (kể cả từ `-K`) — sổ RIÊNG, ⛔ phải argv
+        f.write(url + "\n")
     # metadata server (chỉ có TRONG VM)
     if url.startswith("http://metadata.google.internal/"):
         if os.environ.get("FLS_GIA_DANH_TINH") != "sa" or "Metadata-Flavor: Google" not in hdr:
@@ -204,7 +214,8 @@ def gcloud():
             sys.exit(255)
         lenh_vm = co("--command")
         env = dict(os.environ, FLS_GIA_DANH_TINH="sa")
-        r = subprocess.run(["bash", "-c", lenh_vm], env=env, capture_output=True, text=True)
+        # ssh chuyển STDIN của gcloud vào lệnh từ xa (`bash -s` đọc script từ stdin — AG3-R1-06)
+        r = subprocess.run(["bash", "-c", lenh_vm], env=env, stdin=sys.stdin, capture_output=True, text=True)
         sys.stdout.write(r.stdout)
         sys.stderr.write(r.stderr)
         sys.exit(r.returncode)

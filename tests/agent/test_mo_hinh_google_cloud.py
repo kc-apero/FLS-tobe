@@ -72,7 +72,8 @@ def test_moi_chot_thieu__CamGoiThat_co_ten(monkeypatch, gc, bo, ten):
         mh.kiem_chot_that(mh.OPUS_5_5, True)
 
 
-@pytest.mark.parametrize("ws", ["wrkspc", "ws_123", "wrkspc_a;b", "sk-ant-xyz"])
+@pytest.mark.parametrize("ws", ["wrkspc", "ws_123", "wrkspc_a;b", "sk-ant-xyz",
+                                "wrkspc_", "wrkspc_é", "wrkspc____", "wrkspc_a b", "WRKSPC_x"])   # +5: `AG3-R1-04`
 def test_workspace_sai_dang__CHAN(monkeypatch, gc, ws):
     monkeypatch.setenv("FLS_CLAUDE_WORKSPACE_ID", ws)
     with pytest.raises(mh.CamGoiThat, match="đúng dạng"):

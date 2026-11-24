@@ -128,7 +128,9 @@ def nhan_do(ly: str) -> str:
 
 
 def chay(co_that: bool = False, tran_usd: float = cav.TRAN_USD_MAC_DINH, mau: int = MAU_MAC_DINH,
-         co_be: bool = False, be: Path | None = None) -> dict[str, Any]:
+         co_be: bool = False, be: Path | None = None, hop: dict[str, Any] | None = None) -> dict[str, Any]:
+    """`hop` (`AG3-R1-01`): nhận nhà cung cấp THẬT NGAY khi dựng xong ⇒ `main` ghi nhật ký trên MỌI lối thoát (kể cả
+    ngoại lệ chưa lường), ⛔ chỉ khi `chay` trả về bình thường."""
     be = be if be is not None else thu_muc_be()
     ca, dap, khai = tap_nho(mau, be)
     kq: dict[str, Any] = {"ngay": date.today().isoformat(), "tap_nho": khai, "che": CHE, "duong": mh.duong_goi(),
@@ -139,6 +141,8 @@ def chay(co_that: bool = False, tran_usd: float = cav.TRAN_USD_MAC_DINH, mau: in
         kq["gia"]["be"] = chay_be(be, None)
     nk: list = []
     ncc, ly = dung_that(co_that, tran_usd, nk)
+    if hop is not None and ncc is not None:
+        hop["ncc"] = ncc
     if ncc is None:
         kq["that"] = {"do": nhan_do(ly or "")}
         kq["nhat_ky"] = mh.tong_nhat_ky([])
@@ -146,12 +150,19 @@ def chay(co_that: bool = False, tran_usd: float = cav.TRAN_USD_MAC_DINH, mau: in
     try:
         kq["that"]["chuoi"] = chay_chuoi_tap(ncc, ca, dap)
         kq["that"]["sau_tap_nho"] = mh.tong_nhat_ky(nk)
+        dung = kq["that"]["chuoi"].get("dung_o") or ""
+        if "LoiApi" in dung:                  # chuỗi tự bắt `LoiApi` (⇒ `dung_o`) — vẫn là lượt dừng GIỮA CHỪNG
+            kq["that"]["loi_api"] = dung
         if co_be and be is not None:
             kq["that"]["be"] = chay_be(be, ncc["A2_PR_MAP"])
         elif co_be:
             kq["that"]["be"] = {"do": "ĐỎ — bể giữ riêng VẮNG"}
     except mh.VuotTran as e:
         kq["that"]["vuot_tran"] = str(e)
+    except mh.LoiApi as e:
+        # ⭐ `AG3-R1-01` (KQ-361): lỗi API/xác thực GIỮA CHỪNG (mạng · token ADC hết hạn · 403) ⇒ ĐỎ CÓ TÊN trong report,
+        #   các lời đã tính tiền VẪN vào nhật ký (bản cũ: traceback, 0 tệp nhật ký). `str(LoiApi)` chỉ mang TÊN lỗi.
+        kq["that"]["loi_api"] = str(e)
     kq["nhat_ky"] = mh.tong_nhat_ky(nk)
     kq["_ncc"] = ncc
     return kq
@@ -165,6 +176,8 @@ def ket(kq: dict[str, Any]) -> tuple[bool, list[str]]:
         return False, [t["do"]]
     if "vuot_tran" in t:
         do.append("vượt trần USD: " + t["vuot_tran"])
+    if "loi_api" in t:
+        do.append("LoiApi giữa chừng: " + t["loi_api"])
     c = t.get("chuoi") or {}
     if c.get("agent_dat") != c.get("agent"):
         do.append(f"A4 ĐẠT {c.get('agent_dat')}/{c.get('agent')} — dừng ở: {c.get('dung_o')}")
@@ -246,7 +259,7 @@ def md(kq: dict[str, Any]) -> str:
           f"| {n['so_goi']} | {n['token_vao']} | {n['token_ra']} | {n['cache_doc']} | {n['cache_ghi']} | {n['giay']} | {n['chi_phi_usd']} |"]
     if t.get("sau_tap_nho"):
         s = t["sau_tap_nho"]
-        L.append(f"\nSau tập nhỏ (a): {s['so_goi']} lời gọi · ~{s['chi_phi_usd']} USD.")
+        L.append(f"\nSau tập nhỏ (a): {s['so_goi']} lời gọi · {cav.nhan_usd(s)}.")
     if n["so_goi"] == 0:
         L.append("\n**0 lời gọi thật** (Đ3: mẫu số 0 ⇒ ⛔ có số token/chi phí để báo — đây là KẾT QUẢ, ⛔ là \"rẻ\").")
     return "\n".join(L) + "\n"
@@ -266,7 +279,16 @@ def main(argv: list[str] | None = None) -> int:
     if a.mau > MAU_MAC_DINH:
         print(f"⛔ --mau {a.mau} > {MAU_MAC_DINH} (WO-355: mẫu ≤ 20 ca)")
         return 2
-    kq = chay(a.that, a.tran_usd, a.mau, a.be)
+    hop: dict[str, Any] = {}
+    try:
+        kq = chay(a.that, a.tran_usd, a.mau, a.be, hop=hop)
+    except BaseException as e:
+        # ⭐ `AG3-R1-01`: ngoại lệ CHƯA lường (⛔ `LoiApi`/`VuotTran`) — tiền đã tiêu vẫn để lại nhật ký + TÊN lỗi, rồi ném lại
+        if hop.get("ncc"):
+            pn = cav.ghi_nhat_ky(hop["ncc"], "vong_that", loi=f"{type(e).__name__} (lượt dừng ngoài dự kiến)")
+            if pn:
+                print(f"  ⛔ lượt dừng ({type(e).__name__}) — đã ghi nhật ký {pn.relative_to(GOC) if pn.is_relative_to(GOC) else pn}")
+        raise
     ncc = kq.pop("_ncc", None)
     dat, ly = ket(kq)
     trang = md(kq)
@@ -279,7 +301,8 @@ def main(argv: list[str] | None = None) -> int:
     # ⭐ `AG2-R1-04` (KQ-357): nhật ký lời gọi THẬT ghi LUÔN (⛔ phụ thuộc `--ghi`) — tiền đã tiêu phải để lại dấu vết.
     #   `ghi_nhat_ky` trả None khi 0 lời gọi (Đ3) ⇒ lượt thiếu chốt ⛔ sinh tệp.
     if ncc:
-        pn = cav.ghi_nhat_ky(ncc, "vong_that")
+        loi = kq["that"].get("loi_api") or kq["that"].get("vuot_tran")
+        pn = cav.ghi_nhat_ky(ncc, "vong_that", loi=loi) if loi else cav.ghi_nhat_ky(ncc, "vong_that")
         if pn:
             print(f"  đã ghi nhật ký {pn.relative_to(GOC) if pn.is_relative_to(GOC) else pn}")
     if "do" in kq["that"]:
