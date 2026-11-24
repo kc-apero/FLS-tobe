@@ -332,3 +332,20 @@ Quyết orchestrator *(theo quyết chủ "nguồn sống là chuẩn")*: **⛔ 
 | `python tools/kiem_so_song.py` | `FileNotFoundError … .venv/Scripts/lint-imports.exe` — ⛔ chạy được trên Linux *(có sẵn — BG-326 #7)* |
 
 **Dev tự thấy còn yếu *(WO-353)*:** ảnh sổ 17,2 MB + L1 11,1 MB *(lớn nhất repo trước đó 8,5 MB — `indent=1` của công cụ, ⛔ đổi)*; danh tính "121 dòng thiếu = 121 hàng L1 loại" đo trên bản thô *(đã xoá)* — bài chỉ ghim SỐ 121 = `MONG_BA_DUONG.loai`; khuôn `ccr_daily_report_2_song` tạm thay `MONG_CHECK` của module khuôn cũ trong lời gọi *(⛔ an toàn đa luồng)*; HD1 sống chưa vào cổng mặc định *(C6)*.
+
+## Vòng sửa tích hợp sau gộp thử (orchestrator 24/11) *(fls-dev · 24/11 · cụm PG 5446)*
+**Nguyên nhân (orchestrator đo):** gộp `isp/SONG` `fc6e540` vào nhánh làm việc `f02e89b` (đã có `isp/STG`) ⇒ 2 bài THÊM đỏ `tests/staging/test_uat_doc.py` — SONG đóng băng lại ⇒ `hd2_cong.json` đổi `WP-C5c`, UAT của STG còn số cũ.
+
+**Đã làm:** gộp `f02e89b` vào `isp/SONG` `300b883`. Xung đột: sàn script + bài ghim ⇒ bản nhánh làm việc rồi đặt = thu thập thật cây gộp **5.162** (web **690**) · `WO-353` ⇒ bản SONG · `08_CHANGELOG_RELEASE.md` ⇒ giữ CẢ HAI. ⛔ công cụ sinh thẻ (grep `<!--hd2` ở `tools/` `docs/ITL/_tools/` `fls/` = **0** tệp) ⇒ đồng bộ bằng script đọc `hd2_cong.json` qua CHÍNH hàm `_mong` của bài (⛔ gõ tay, ⛔ sửa bài). UAT v0.5:
+
+| Số | Thẻ | Cũ | Mới | Nguồn |
+|---|---|---|---|---|
+| `WP-C5c.khop` | có | 77.672 | **77.663** | `hd2_cong.json` |
+| `WP-C5c.lech` | có | 8.478 | **8.487** | 〃 |
+| `WP-C5.khop` (cha) | có | 121.407 | **121.398** | Σ C5a+b+c |
+| `WP-C5.lech` (cha) | có | 14.519 | **14.528** | 〃 |
+| §1·615 `lech_ban_ccr_vs_cf` | ⛔ thẻ | 671 | **680** | `WP-C5c.theo_dap_an.615.lop` |
+
+Không đổi (đã so): 35/39 thẻ còn lại · 3/3 thẻ `hd2x:615` · `ite_alias` 35 · `lech_D3` 3.099. Đối chiếu bảng ký lại `KQ-354` hàng 6: `WP-C5c` 77.663 · 8.487 **trùng**; `WP-C5` cha (121.398 · 14.528) là tổng suy ra — ⛔ hàng riêng; 615 `671→680` **⛔ có** trong bảng ký lại.
+
+**Cổng (dán thật, `PG_DSN=…localhost:5446`, cây `300b883`):** `--duong-nen --cong 5446` *(MỘT lần, một mình)* `12 failed, 5134 passed, 2 xfailed, 14 errors` · `28 = 28 node id (XFAIL 2 = 2 · thêm 0 · bớt 0) · chạy 5162 (mong ≥ 5162)` · web `3 = 3 · chạy 690 (mong ≥ 690)` · `KẾT: ĐẠT` · `kiem_tai_lieu` `✅ cong tai lieu DAT (530 file, 3119 bang, 992 o ngay, 104 ma QD)` · `lint-imports` `11 kept, 0 broken`. Ghi chú: chạy `tests/test_dung_moi_truong_isp.py` + `tests/staging` khi cây CHƯA commit gộp ⇒ 25 đỏ; sau commit ⇒ `184 passed` — bài đọc trạng thái git.
