@@ -595,3 +595,6 @@ Toàn bộ: `12 failed · 5.096 passed · 2 xfailed · 14 errors` = **28** node 
 
 ══ KẾT: ĐẠT
 ```
+
+### 11.5 · `--duong-nen --cong 5436` *(MỘT lần, một mình, cây `25ddbc5`)* — **`KẾT: ĐẠT`**
+Toàn bộ: `12 failed · 5.100 passed · 2 xfailed · 14 errors` = **28** node id = `duong_nen_bai_do.txt` *(thêm **0** · bớt **0**)*; chạy **5.128** ≥ sàn **5.128** *(= `pytest --collect-only`)*, skipped 0, deselected 0. `tests/web` **3 = 3**, chạy 690 ✅. Môi trường: HD1 `chay 9845 / co 9967` · `lint-imports` 11 kept · `pg_verify` 27/27. Cổng khác: `kiem_tai_lieu` ĐẠT · `quet_pii_repo` 0 chỗ · 0 tệp.
