@@ -29,7 +29,11 @@ GHI_CHO_PHEP = ("services enable", "services identity create", "builds submit", 
                 "run services add-iam-policy-binding", "run services remove-iam-policy-binding",
                 "iap web add-iam-policy-binding")
 DOC = ("config get-value", "projects describe", "services list", "artifacts docker images list", "sql instances describe",
-       "run services describe", "run services get-iam-policy", "iap web get-iam-policy", "logging read")
+       "run services describe", "run services get-iam-policy", "iap web get-iam-policy", "logging read",
+       "secrets describe", "secrets get-iam-policy")
+SA_APP = "serviceAccount:fls-staging-app@du-an-gia.iam.gserviceaccount.com"
+DN_DA_DAT = {"fls-staging-login": {"versions": ['{"ten": "HondurasGesha", "bam": "scrypt$16384$8$1$gia$gia"}'],
+                                   "iam": [{"role": "roles/secretmanager.secretAccessor", "members": [SA_APP]}]}}
 
 
 class Gcp:
@@ -42,7 +46,8 @@ class Gcp:
             shutil.copy(src, thu_muc / ten)
             (thu_muc / ten).chmod(0o755)
         s = {"apis": [], "conn": "du-an-gia:asia-southeast1:fls-staging", "repo": True, "repo_iam": [], "anh_tags": [TAG],
-             "builds": [], "vm": None, "quyen": [], "ssh_ra": "", "fw": [], "tai_khoan": CHU}
+             "builds": [], "vm": None, "quyen": [], "ssh_ra": "", "fw": [], "tai_khoan": CHU,
+             "secrets": json.loads(json.dumps(DN_DA_DAT))}      # như chủ đã chạy 08 trước 07
         s.update(them)
         self.dat(s)
 
@@ -84,7 +89,7 @@ def test_dung_tu_trong_ra_DAT_va_in_LINK(gcp):
     assert "KẾT: ĐẠT" in r.stdout and not H.muc_do(r.stdout)
     assert "⭐ LINK: https://fls-staging-web-gia123-as.a.run.app" in r.stdout
     n_dat = len([k for k, v in H.dong_bao_cao(r.stdout).items() if v == "ĐẠT"])
-    assert n_dat == 26, f"số mục có `mong` = {n_dat} (mong 26: 25 mục + `run deploy (exit)`) — đổi thì ghi lại bản khai"
+    assert n_dat == 29, f"số mục có `mong` = {n_dat} (mong 29: 28 mục + `run deploy (exit)`) — đổi thì ghi lại bản khai"
     s = gcp.doc()
     vao = {m for b in s["iap_iam"] if b["role"] == "roles/iap.httpsResourceAccessor" for m in b["members"]}
     assert vao == {f"user:{CHU}", "user:nguoi1@vi-du.vn", "user:nguoi2@vi-du.vn"}
@@ -203,6 +208,7 @@ PHA = [
      {"TRONG container · dòng TU_DO của revision đang chạy"}),
     ("⛔ có dòng TU_DO", lambda s: s.update(nhat_ky=[]),
      {"TRONG container · dòng TU_DO của revision đang chạy", "TRONG · màn hình / qua cửa ⇒ HTTP", "TRONG · API ⛔ thẻ ⇒ HTTP",
+      "TRONG · tài khoản đăng nhập FLS lúc khởi động",
       "TRONG · cửa CHỈ nghe 127.0.0.1", "TRONG · cổng: yêu cầu ⛔ JWT IAP ⇒ HTTP", "TRONG · cổng: JWT IAP chữ ký GIẢ ⇒ HTTP",
       "TRONG · khoá công khai IAP lấy được (đếm ≥ 1)"}),
     ("trang lạ ⛔ phải Google", lambda s: s.update(http_ngoai={"GET /": "302 https://dang-nhap-gia.vi-du.vn/x"}),
@@ -215,6 +221,10 @@ PHA = [
      {"cho vào qua IAP: tài khoản mong có quyền (đếm)"}),
     ("ảnh khác tag", lambda s: s["run"]["spec"]["template"]["spec"]["containers"][0].update(image=IMAGE + "x"),
      {"service chạy đúng ảnh mong"}),
+    ("bí mật đăng nhập bị xoá", lambda s: s.update(secrets={}),
+     {"ĐĂNG NHẬP · bí mật fls-staging-login có (chạy 08 trước)", "ĐĂNG NHẬP · SA đọc được bí mật đăng nhập"}),
+    ("SA mất quyền đọc bí mật đăng nhập", lambda s: s["secrets"]["fls-staging-login"].update(iam=[]),
+     {"ĐĂNG NHẬP · SA đọc được bí mật đăng nhập"}),
     ("chạy 2 instance", lambda s: s["run"]["spec"]["template"]["metadata"]["annotations"].update(
         {"autoscaling.knative.dev/maxScale": "2"}), {"số instance tối đa (MỘT thẻ chung)"}),
 ]
@@ -230,11 +240,11 @@ def test_pha_mot_thu_thi_DUNG_muc_do__kiem(gcp, ten, pha, mong_do):
 
 
 def test_project_TRONG_thi_kiem_DO_het_khong_muc_nao_xanh_suong__D3_D5(tmp_path):
-    g = Gcp(tmp_path, anh_tags=[], tai_khoan="")
+    g = Gcp(tmp_path, anh_tags=[], tai_khoan="", secrets={})
     r = g.chay("--kiem")
     assert r.returncode == 1
     assert [k for k, v in H.dong_bao_cao(r.stdout).items() if v == "ĐẠT"] == []
-    assert len(H.muc_do(r.stdout)) == 25
+    assert len(H.muc_do(r.stdout)) == 28
 
 
 def test_che_do_ghi_dat_actor_NGUOI_KY(gcp):
@@ -270,3 +280,12 @@ def test_tham_so_xau_exit_2_va_khong_goi_gcloud(gcp, args, loi):
 def test_thieu_project_exit_2():
     r = subprocess.run(["bash", str(S07)], capture_output=True, text=True)
     assert r.returncode == 2 and "--project" in r.stderr
+
+
+def test_CHUA_chay_08_truoc_07_thi_DO_dung_3_muc_dang_nhap_co_ten(tmp_path):
+    g = Gcp(tmp_path, secrets={})
+    r = g.chay()
+    assert r.returncode == 1
+    assert H.muc_do(r.stdout) == {"ĐĂNG NHẬP · bí mật fls-staging-login có (chạy 08 trước)",
+                                  "ĐĂNG NHẬP · SA đọc được bí mật đăng nhập",
+                                  "TRONG · tài khoản đăng nhập FLS lúc khởi động"}

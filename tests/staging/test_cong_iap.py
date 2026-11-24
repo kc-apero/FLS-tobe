@@ -23,7 +23,9 @@ import sys
 import threading
 import time
 import urllib.error
+import urllib.parse
 import urllib.request
+import http.client
 
 import pytest
 
@@ -32,6 +34,7 @@ from tests.staging import ho_tro as H
 APP = H.STG / "app"
 sys.path.insert(0, str(APP))
 import cong_iap as C  # noqa: E402
+import dang_nhap as DN  # noqa: E402
 
 # ══ ⓐ ES256 — RFC 6979 §A.2.5 (P-256, SHA-256) ═════════════════════════════════════════════════════════
 RFC_X = 0xC9AFA9D845BA75166B5C215767B1D6934E50C3DB36E89B127B8A622B120F6721
@@ -166,39 +169,58 @@ def _doi(cong, han=20):
 
 
 def _goi(cong, duong="/", dau=None, ph="GET", than=None):
-    req = urllib.request.Request(f"http://127.0.0.1:{cong}{duong}", method=ph, data=than, headers=dau or {})
-    try:
-        with urllib.request.urlopen(req, timeout=20) as r:
-            return r.status, r.read(), dict(r.headers)
-    except urllib.error.HTTPError as e:
-        return e.code, e.read(), dict(e.headers)
+    """Một yêu cầu, ⛔ đi theo chuyển hướng (303 → /login phải THẤY được)."""
+    c = http.client.HTTPConnection("127.0.0.1", cong, timeout=20)
+    c.request(ph, duong, body=than, headers=dau or {})
+    r = c.getresponse()
+    b = r.read()
+    c.close()
+    return r.status, b, {k: v for k, v in r.getheaders()}
+
+
+TEN_DN = "HondurasGesha"
+MK_THU = "mat-khau-THU-chi-cho-bai-7f3a"          # chuỗi dễ nhận để quét rò rỉ — ⛔ mật khẩu thật
+BAN_GHI_DN = json.dumps({"ten": TEN_DN, "bam": DN.bam(MK_THU)})
+
+
+def _dang_nhap(cong, jwt, ten=TEN_DN, mk=MK_THU):
+    than = urllib.parse.urlencode({"ten": ten, "mat_khau": mk}).encode()
+    return _goi(cong, "/login", {C.HEADER_IAP: jwt, "Content-Type": "application/x-www-form-urlencoded"}, "POST", than)
+
+
+def _cookie(hd):
+    sc = hd.get("Set-Cookie", "")
+    return sc.split(";", 1)[0], sc
 
 
 @pytest.fixture
 def cong_chay():
     dang = []
 
-    def chay(jwks_hong=False, env_them=None):
+    def chay(jwks_hong=False, env_them=None, ban_ghi=BAN_GHI_DN):
+        from tests.staging.test_03_dung_app import _may_chu
         jw, cua = _jwks_sv(jwks_hong), _cua_gia()
+        sm = _may_chu({"fls-staging-login": ban_ghi} if ban_ghi else {})
         cong = _cong_trong()
         env = dict(os.environ, K_SERVICE="fls-staging-web", PYTHONUTF8="1",
-                   FLS_IAP_URL_JWKS=f"http://127.0.0.1:{jw.server_port}/jwk")
+                   FLS_IAP_URL_JWKS=f"http://127.0.0.1:{jw.server_port}/jwk", FLS_STG_PROJECT="du-an-gia",
+                   FLS_STG_URL_METADATA=f"http://127.0.0.1:{sm.server_port}", FLS_STG_URL_SM=f"http://127.0.0.1:{sm.server_port}")
         env.update(env_them or {})
         p = subprocess.Popen([sys.executable, "-I", str(APP / "cong_iap.py"), "--cong", str(cong),
                               "--cong-cua", str(cua.server_port)], env=env, stdout=subprocess.PIPE,
                              stderr=subprocess.PIPE, text=True)
-        dang.append((p, jw, cua))
+        dang.append((p, jw, cua, sm))
         assert _doi(cong), p.communicate(timeout=5)
         return p, cong, cua
     yield chay
-    for p, jw, cua in dang:
+    for p, jw, cua, sm in dang:
         if p.poll() is None:
             p.terminate()
             try:
                 p.communicate(timeout=10)
             except subprocess.TimeoutExpired:
                 p.kill()
-        jw.shutdown(); cua.shutdown()
+        jw.shutdown(); cua.shutdown(); sm.shutdown()
 
 
 def _xong(p):
@@ -223,8 +245,9 @@ def test_cong_khong_JWT_hay_JWT_gia_thi_403_va_CUA_KHONG_bi_cham(cong_chay):
 def test_cong_JWT_dung_thi_chuyen_tiep_Authorization_NGUYEN_VEN_go_X_Goog_va_ghi_ai_vao(cong_chay):
     p, cong, cua = cong_chay()
     jwt = ky(than_dung())
+    ck, _ = _cookie(_dang_nhap(cong, jwt)[2])
     dau = {C.HEADER_IAP: jwt, "Authorization": "Bearer the-fls-123", C.HEADER_EMAIL: "accounts.google.com:nguoi@vi-du.vn",
-           "X-Serverless-Authorization": "Bearer noi-bo", "Content-Type": "application/json"}
+           "X-Serverless-Authorization": "Bearer noi-bo", "Content-Type": "application/json", "Cookie": ck}
     ma, than, hd = _goi(cong, "/api/fls/v1/ledger?bi_mat_trong_query=1", dau)
     assert (ma, than) == (207, b'{"data":"tu-cua"}') and hd.get("X-Tu-Cua") == "1", "mã/thân/header của cửa phải về NGUYÊN"
     ma2, _, _ = _goi(cong, "/api/fls/v1/config/fx/202601/sign", dau, ph="POST", than=b'{"x":1}')
@@ -232,7 +255,7 @@ def test_cong_JWT_dung_thi_chuyen_tiep_Authorization_NGUYEN_VEN_go_X_Goog_va_ghi
     (m1, d1, h1, b1), (m2, d2, h2, b2) = cua.thay
     assert (m1, d1) == ("GET", "/api/fls/v1/ledger?bi_mat_trong_query=1") and (m2, d2, b2) == ("POST", "/api/fls/v1/config/fx/202601/sign", b'{"x":1}')
     assert h1.get("Authorization") == "Bearer the-fls-123", "thẻ FLS phải đi qua NGUYÊN VẸN (cửa vẫn là nơi xét thẻ)"
-    assert not [k for k in h1 if k.lower().startswith("x-goog-") or k.lower() == "x-serverless-authorization"], h1
+    assert not [k for k in h1 if k.lower().startswith("x-goog-") or k.lower() in ("x-serverless-authorization", "cookie")], h1
     log = _xong(p)
     assert "IAP_VAO email=nguoi@vi-du.vn GET /api/fls/v1/ledger 207" in log
     assert "IAP_VAO email=nguoi@vi-du.vn POST /api/fls/v1/config/fx/202601/sign 207" in log
@@ -244,6 +267,7 @@ def test_cong_KHONG_lay_duoc_khoa_IAP_thi_503_DONG(cong_chay):
     p, cong, cua = cong_chay(jwks_hong=True)
     ma, than, _ = _goi(cong, "/", {C.HEADER_IAP: ky(than_dung())})
     assert ma == 503 and json.loads(than)["error"]["code"] == "FLS-IAP-KHOA"
+    assert _dang_nhap(cong, ky(than_dung()))[0] == 503, "khoá IAP hỏng ⇒ cả /login cũng ĐÓNG"
     assert cua.thay == []
 
 
@@ -265,7 +289,8 @@ def test_cong_TU_CHOI_khoi_dong_ngoai_Cloud_Run_hoac_cong_trung_cong_cua():
 # ══ ⓓ vao_cloud_run.sh + vao.sh + cửa THẬT (kho scratch) ═════════════════════════════════════════════════
 def test_vao_cloud_run_cua_that_TU_DO_dung_mong_va_cua_van_gac_the(kho_san):
     from tests.staging.test_03_dung_app import JWT_GIA, _cay_tien_trinh, _may_chu, _the
-    sv = _may_chu({"fls-staging-jwt-secret": JWT_GIA, "fls-staging-pg-fls_doc": H.MK["fls-staging-pg-fls_doc"]})
+    sv = _may_chu({"fls-staging-jwt-secret": JWT_GIA, "fls-staging-pg-fls_doc": H.MK["fls-staging-pg-fls_doc"],
+                   "fls-staging-login": BAN_GHI_DN})
     jw = _jwks_sv()
     cong, cong_cua = _cong_trong(), _cong_trong()
     gia = kho_san["gia"]["dir"]
@@ -291,8 +316,13 @@ def test_vao_cloud_run_cua_that_TU_DO_dung_mong_va_cua_van_gac_the(kho_san):
             time.sleep(0.2)
         assert any(l.startswith("TU_DO ") for l in dong_ra), "⛔ có dòng TU_DO sau 60 giây"
         assert _doi(cong, 5), "cổng ⛔ mở"
-        iap = {C.HEADER_IAP: ky(than_dung())}
+        jwt = ky(than_dung())
+        assert _goi(cong, "/", {C.HEADER_IAP: jwt})[:1] == (303,), "chưa đăng nhập FLS ⇒ chuyển /login"
+        assert _goi(cong, "/phien.js", {C.HEADER_IAP: jwt})[0] == 303, "thẻ `ke_toan` ⛔ ra trước đăng nhập"
+        ck, _ = _cookie(_dang_nhap(cong, jwt)[2])
+        iap = {C.HEADER_IAP: jwt, "Cookie": ck}
         assert _goi(cong, "/", iap)[0] == 200, "màn hình qua cổng"
+        assert _goi(cong, "/phien.js", iap)[0] == 200, "sau đăng nhập mới phát thẻ"
         assert _goi(cong, "/api/fls/v1/gates", iap)[0] == 401, "⛔ thẻ FLS ⇒ cửa VẪN 401 dù đã qua IAP"
         the = _the(kho_san)
         assert _goi(cong, "/api/fls/v1/gates", dict(iap, Authorization=f"Bearer {the}"))[0] == 200
@@ -318,8 +348,8 @@ def test_vao_cloud_run_cua_that_TU_DO_dung_mong_va_cua_van_gac_the(kho_san):
     assert len(dong) == 1, out[-2000:] + err[-2000:]
     tu = dict(x.split("=", 1) for x in dong[0].split()[1:])
     assert tu == {"revision": "fls-staging-web-00001-thu", "man_hinh": "200", "api_khong_the": "401",
-                  "nghe_cua": f"127.0.0.1:{cong_cua}", "cong_khong_iap": "403", "cong_iap_gia": "403", "jwks": "1"}, tu
-    assert JWT_GIA not in out + err and "MKGIA" not in out + err
+                  "nghe_cua": f"127.0.0.1:{cong_cua}", "cong_khong_iap": "403", "cong_iap_gia": "403", "jwks": "1", "dang_nhap": "san_sang"}, tu
+    assert JWT_GIA not in out + err and "MKGIA" not in out + err and MK_THU not in out + err
 
 
 def test_vao_cloud_run_TU_CHOI_ngoai_Cloud_Run_va_PORT_trung_cong_cua():
@@ -338,3 +368,143 @@ def test_tinh_vao_cloud_run_KHONG_dua_PORT_cho_cua_va_KHONG_doi_dia_chi_cua():
     assert 'FLS_STG_CONG="$CONG_CUA" bash' in ma and "FLS_STG_CONG=\"$PORT\"" not in ma
     assert 'ENTRYPOINT ["bash", "/app/tools/staging/app/vao.sh"]' in (H.GOC / "Dockerfile").read_text(encoding="utf-8"), \
         "đường VM (bước 03) giữ nguyên điểm vào"
+
+
+# ══ ⓔ ĐĂNG NHẬP FLS sau IAP (bổ sung chủ 24/11 ~03:45) ═════════════════════════════════════════════════
+def test_bam_scrypt_khop_dung_sai_va_ban_ghi_hong():
+    b = DN.bam(MK_THU)
+    assert b.startswith("scrypt$16384$8$1$") and MK_THU not in b
+    assert DN.khop(MK_THU, b) and not DN.khop(MK_THU + "x", b) and not DN.khop("", b)
+    assert DN.bam(MK_THU) != b, "muối ngẫu nhiên — hai lần băm khác nhau"
+    for hong in ("", "bcrypt$x", b.replace("scrypt", "md5"), "scrypt$1048577$8$1$AAAAAAAAAAA$AAAAAAAAAAAAAAAAAAAAAA",
+                 "scrypt$16384$8$1$x$y"):
+        assert not DN.khop(MK_THU, hong), hong
+    nguon = (APP / "dang_nhap.py").read_text(encoding="utf-8")
+    assert nguon.count("hmac.compare_digest") >= 2 and "== h" not in nguon, "so khớp thời gian hằng"
+
+
+def test_khoa_tam_sau_5_lan_sai_theo_tung_email_va_het_khoa():
+    gio = [1000.0]
+    k = DN.KhoaSai(lambda: gio[0])
+    for i in range(1, 5):
+        assert k.ghi_sai("a@x") == i and k.con_khoa("a@x") == 0
+    k.ghi_sai("a@x")
+    assert k.con_khoa("a@x") == DN.KHOA_GIAY and k.con_khoa("b@x") == 0, "khoá theo email, ⛔ khoá người khác"
+    gio[0] += DN.KHOA_GIAY + 1
+    assert k.con_khoa("a@x") == 0
+    gio[0] += DN.CUA_SO_GIAY + 1
+    for _ in range(4):
+        k.ghi_sai("c@x")
+    gio[0] += DN.CUA_SO_GIAY + 1
+    assert k.ghi_sai("c@x") == 1, "lần sai cũ ngoài cửa sổ ⛔ tính"
+
+
+def test_phien_gan_email_het_han_sua_thu_hoi_va_doi_mat_khau():
+    gio = [1000.0]
+    ph = DN.Phien(lambda: gio[0])
+    b = DN.bam(MK_THU)
+    t = ph.tao("a@x", b)
+    assert ph.hop_le(t, "a@x", b)
+    assert not ph.hop_le(t, "b@x", b), "cookie mang sang tài khoản Google khác"
+    assert not ph.hop_le(t[:-2] + ("AA" if not t.endswith("AA") else "BB"), "a@x", b), "sửa chữ ký"
+    assert not ph.hop_le(t, "a@x", DN.bam(MK_THU)), "đổi mật khẩu (bản ghi mới) ⇒ phiên cũ mất"
+    assert not ph.hop_le(None, "a@x", b) and not ph.hop_le("rac", "a@x", b)
+    gio[0] += DN.PHIEN_GIAY + 1
+    assert not ph.hop_le(t, "a@x", b), "hết hạn"
+    gio[0] = 1000.0
+    ph.thu_hoi_the(t)
+    assert not ph.hop_le(t, "a@x", b), "đã đăng xuất"
+
+
+def test_cong_CHUA_dang_nhap_API_401_trang_303_login_va_CUA_KHONG_bi_cham(cong_chay):
+    p, cong, cua = cong_chay()
+    jwt = ky(than_dung())
+    ma, than, _ = _goi(cong, "/api/fls/v1/gates", {C.HEADER_IAP: jwt, "Authorization": "Bearer the-fls"})
+    assert ma == 401 and json.loads(than)["error"]["code"] == "FLS-CHUA-DANG-NHAP"
+    ma, _, hd = _goi(cong, "/", {C.HEADER_IAP: jwt})
+    assert ma == 303 and hd["Location"] == "/login"
+    assert _goi(cong, "/phien.js", {C.HEADER_IAP: jwt})[0] == 303
+    assert _goi(cong, "/api/fls/v1/config/fx/202601/sign", {C.HEADER_IAP: jwt}, "POST", b"{}")[0] == 401
+    ma, than, hd = _goi(cong, "/login", {C.HEADER_IAP: jwt})
+    assert ma == 200 and b'name="mat_khau"' in than and b'type="password"' in than and b"<script" not in than
+    assert _goi(cong, "/login")[0] == 403, "/login cũng nằm SAU IAP"
+    assert _goi(cong, "/", {C.HEADER_IAP: jwt, "Cookie": f"{DN.COOKIE}=v1.9999999999.YUB4.gia"})[0] == 303, "cookie giả"
+    assert cua.thay == [], cua.thay
+
+
+def test_cong_dang_nhap_DUNG_dat_cookie_an_toan_roi_di_qua__dang_xuat_thu_hoi(cong_chay):
+    p, cong, cua = cong_chay()
+    jwt = ky(than_dung())
+    ma, _, hd = _dang_nhap(cong, jwt)
+    assert ma == 303 and hd["Location"] == "/"
+    ck, sc = _cookie(hd)
+    assert ck.startswith(DN.COOKIE + "=v1.")
+    for c in ("HttpOnly", "Secure", "SameSite=Strict", "Path=/", f"Max-Age={DN.PHIEN_GIAY}"):
+        assert c in sc, (c, sc)
+    assert _goi(cong, "/api/fls/v1/gates", {C.HEADER_IAP: jwt, "Cookie": ck})[0] == 207
+    assert _goi(cong, "/login", {C.HEADER_IAP: jwt, "Cookie": ck})[:1] == (303,), "đã đăng nhập ⇒ về /"
+    khac = ky(than_dung(email="nguoi-khac@vi-du.vn"))
+    assert _goi(cong, "/api/fls/v1/gates", {C.HEADER_IAP: khac, "Cookie": ck})[0] == 401, "cookie ⛔ dùng được cho email IAP khác"
+    ma, _, hd = _goi(cong, "/logout", {C.HEADER_IAP: jwt, "Cookie": ck})
+    assert ma == 303 and hd["Location"] == "/login" and "Max-Age=0" in hd["Set-Cookie"]
+    assert _goi(cong, "/api/fls/v1/gates", {C.HEADER_IAP: jwt, "Cookie": ck})[0] == 401, "phiên đã thu hồi"
+    assert len(cua.thay) == 1
+    log = _xong(p)
+    assert "DANG_NHAP email=nguoi@vi-du.vn dung" in log and "dang_xuat" in log
+    assert MK_THU not in log
+
+
+def test_cong_dang_nhap_SAI_401__5_lan_khoa_429_ca_khi_dung__email_khac_van_vao(cong_chay):
+    p, cong, cua = cong_chay()
+    jwt = ky(than_dung())
+    assert _dang_nhap(cong, jwt, mk="sai-mat-khau-1")[0] == 401
+    assert _dang_nhap(cong, jwt, ten="NguoiKhac")[0] == 401, "tên sai ⇒ 401 (cùng thời gian scrypt)"
+    for _ in range(2):
+        assert _dang_nhap(cong, jwt, mk="sai-mat-khau-2")[0] == 401
+    ma, than, hd = _dang_nhap(cong, jwt, mk="sai-lan-5")
+    assert ma == 429 and "Retry-After" in hd
+    ma, than, _ = _dang_nhap(cong, jwt)
+    assert ma == 429 and "Set-Cookie" not in _, "đang khoá ⇒ mật khẩu ĐÚNG cũng ⛔ vào"
+    assert _dang_nhap(cong, ky(than_dung(email="nguoi-khac@vi-du.vn")))[0] == 303, "khoá theo email IAP"
+    assert cua.thay == []
+    log = _xong(p)
+    assert "sai 1/5" in log and "khoa con=" in log
+    assert MK_THU not in log and "sai-mat-khau" not in log and "sai-lan-5" not in log
+
+
+def test_cong_CHUA_dat_tai_khoan_thi_login_503_va_KHONG_ai_vao(cong_chay):
+    p, cong, cua = cong_chay(ban_ghi=None)
+    jwt = ky(than_dung())
+    assert _dang_nhap(cong, jwt)[0] == 503
+    assert _goi(cong, "/", {C.HEADER_IAP: jwt})[0] == 303
+    assert _goi(cong, "/api/fls/v1/gates", {C.HEADER_IAP: jwt})[0] == 401
+    assert cua.thay == []
+
+
+def test_dang_nhap_cli_bam_tu_STDIN_tu_choi_ngan_va_trung_ten():
+    def chay(mk, ten=TEN_DN):
+        return subprocess.run([sys.executable, "-I", str(APP / "dang_nhap.py"), "--bam", "--ten", ten], input=mk,
+                              capture_output=True, text=True, timeout=60)
+    r = chay(MK_THU + "\n")
+    o = json.loads(r.stdout)
+    assert r.returncode == 0 and o["ten"] == TEN_DN and DN.khop(MK_THU, o["bam"]) and MK_THU not in r.stdout + r.stderr
+    assert chay("ngan").returncode == 2
+    assert chay("HondurasGesha12", ten="HondurasGesha12").returncode == 2
+
+
+@pytest.mark.parametrize("co_bi_mat,mong", [(True, "san_sang"), (False, "chua_dat")])
+def test_tu_do_bao_dang_nhap_DUNG_ca_hai_chieu(co_bi_mat, mong):
+    """`TU_DO dang_nhap=` là mục BÁO CÁO của 07 — phải ĐO bí mật, ⛔ gắn cứng (đột biến `"san_sang"` cố định lọt bài cũ)."""
+    from tests.staging.test_03_dung_app import _may_chu
+    sm = _may_chu({"fls-staging-login": BAN_GHI_DN} if co_bi_mat else {})
+    try:
+        env = dict(os.environ, K_SERVICE="x", PYTHONUTF8="1", FLS_STG_PROJECT="du-an-gia",
+                   FLS_STG_URL_METADATA=f"http://127.0.0.1:{sm.server_port}", FLS_STG_URL_SM=f"http://127.0.0.1:{sm.server_port}",
+                   FLS_IAP_URL_JWKS="http://127.0.0.1:9/khong")
+        r = subprocess.run([sys.executable, "-I", str(APP / "cong_iap.py"), "--tu-do", "--cong", str(_cong_trong()),
+                            "--cong-cua", str(_cong_trong())], env=env, capture_output=True, text=True, timeout=60)
+    finally:
+        sm.shutdown()
+    tu = dict(x.split("=", 1) for x in r.stdout.split()[1:])
+    assert r.returncode == 0 and tu["dang_nhap"] == mong, r.stdout + r.stderr
+    assert tu["jwks"] == "0" and tu["man_hinh"] == "000", "khoá/cửa vắng ⇒ số đo ĐỎ (07 chấm), ⛔ xanh"

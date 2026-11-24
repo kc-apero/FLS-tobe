@@ -29,3 +29,4 @@
 |---|---|---|
 | 24/11 | `fls-dev` | `MO` → `DANG_LAM`: đọc WO + `BG-326` §3 · §11 + `KQ-327/328/344/351`; tra tài liệu GCP hiện hành *(Cloud Run IAP tích hợp · IAP FAQ · programmatic auth)* |
 | 24/11 | `fls-dev` | `DANG_LAM` → `CHO_TEST`: `BG-364` — đường **(a) Cloud Run + IAP**; `07_link_web.sh` + `cong_iap.py` + `vao_cloud_run.sh`; +55 bài; sàn 5142 |
+| 24/11 | `fls-dev` | Bổ sung theo orchestrator (lời chủ ~03:45 "tạo 1 tài khoản để đăng nhập chung"): màn `/login` FLS sau IAP, tài khoản `HondurasGesha`, băm scrypt ở Secret Manager `fls-staging-login` (`08_dat_dang_nhap.sh`); +26 bài; sàn 5168; `BG-364` cập nhật (AC-6) |

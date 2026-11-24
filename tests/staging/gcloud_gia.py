@@ -236,9 +236,13 @@ elif lenh("run", "deploy") or lenh("beta", "run", "deploy"):
     S.setdefault("run_iam", [])
     if "--allow-unauthenticated" in a:
         S["run_iam"].append({"role": "roles/run.invoker", "members": ["allUsers"]})
+    dn = S.get("secrets", {}).get("fls-staging-login")
+    sa = "serviceAccount:" + co("--service-account")
+    san_sang = bool(dn and dn["versions"] and any(sa in b["members"] for b in dn["iam"]))
     S.setdefault("nhat_ky", []).append(S.get("tu_do", "TU_DO revision={rev} man_hinh=200 api_khong_the=401 "
-                                                     "nghe_cua=127.0.0.1:8088 cong_khong_iap=403 cong_iap_gia=403 jwks=3")
-                                       .format(rev=rev))
+                                                     "nghe_cua=127.0.0.1:8088 cong_khong_iap=403 cong_iap_gia=403 jwks=3 "
+                                                     "dang_nhap={dn}")
+                                       .format(rev=rev, dn="san_sang" if san_sang else "chua_dat"))
     luu()
 elif lenh("run", "services", "describe"):
     if not S.get("run"):
@@ -273,6 +277,36 @@ elif lenh("iap", "web", "get-iam-policy"):
     if not S.get("run") or S.get("iap_iam_hong"):
         sys.exit(1)
     xuat_json({"bindings": S.get("iap_iam", [])})
+elif lenh("secrets", "describe"):
+    if a[2] not in S.get("secrets", {}):
+        sys.exit(1)
+    print(f"projects/{S.get('so_project', '123456789012')}/secrets/{a[2]}")
+elif lenh("secrets", "create"):
+    if a[2] in S.setdefault("secrets", {}):
+        print("ERROR: (gcloud.secrets.create) ALREADY_EXISTS", file=sys.stderr)
+        sys.exit(1)
+    S["secrets"][a[2]] = {"versions": [sys.stdin.read()], "iam": []}
+    luu()
+elif lenh("secrets", "versions", "add"):
+    if a[3] not in S.get("secrets", {}):
+        print("ERROR: (gcloud.secrets.versions.add) NOT_FOUND", file=sys.stderr)
+        sys.exit(1)
+    S["secrets"][a[3]]["versions"].append(sys.stdin.read())
+    luu()
+elif lenh("secrets", "versions", "access"):
+    ten = co("--secret")
+    if ten not in S.get("secrets", {}):
+        sys.exit(1)
+    sys.stdout.write(S["secrets"][ten]["versions"][-1])
+elif lenh("secrets", "add-iam-policy-binding"):
+    if a[2] not in S.get("secrets", {}):
+        sys.exit(1)
+    S["secrets"][a[2]]["iam"].append({"role": co("--role"), "members": [co("--member")]})
+    luu()
+elif lenh("secrets", "get-iam-policy"):
+    if a[2] not in S.get("secrets", {}) or S.get("secrets_iam_hong"):
+        sys.exit(1)
+    xuat_json({"bindings": S["secrets"][a[2]]["iam"]})
 elif lenh("logging", "read"):
     for d in reversed(S.get("nhat_ky", [])):
         if "TU_DO " in a[2] and d.startswith("TU_DO "):

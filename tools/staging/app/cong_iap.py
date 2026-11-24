@@ -21,7 +21,12 @@
    ⓓ `Authorization` của app (thẻ FLS) đi qua NGUYÊN VẸN — tệp này ⛔ phát thẻ, ⛔ đổi luật ký. `actor` của mọi
       chữ ký vẫn là `--nguoi-ky` lúc dựng (cửa phát MỘT thẻ chung). Email IAP CHỈ để GHI NHẬT KÝ ai vào
       (dòng `IAP_VAO email=… GET /đường 200`) — SSO theo người là phase sau (`GAP-WEB-01`, câu chủ ở BG-364).
-   ⓔ gỡ mọi header `X-Goog-*` / `X-Serverless-Authorization` trước khi chuyển tiếp — cửa ⛔ thấy gì của IAP.
+   ⓔ gỡ mọi header `X-Goog-*` / `X-Serverless-Authorization` / `Cookie` trước khi chuyển tiếp — cửa ⛔ thấy gì của IAP
+      hay của phiên đăng nhập.
+   ⓕ (bổ sung chủ 24/11 ~03:45) ĐĂNG NHẬP FLS — lớp thứ hai SAU IAP: chưa có phiên `__Host-fls_phien` hợp lệ ⇒ API
+      `401 FLS-CHUA-DANG-NHAP`, trang ⇒ `303 /login`; cửa ⛔ bị chạm. Chỉ `/login` · `/logout` đi được khi chưa đăng
+      nhập ⇒ `phien.js` (thẻ `ke_toan`) chỉ ra SAU đăng nhập. Một tài khoản chung, băm scrypt trong Secret Manager
+      `fls-staging-login` — chi tiết + lý do ở `dang_nhap.py`.
 
 ⭐ Kiểm ES256 bằng stdlib (P-256 thuần Python): ảnh chạy chỉ có `psycopg` (Dockerfile) — ⛔ thêm `cryptography`
    chỉ cho mấy chục dòng toán. Đúng/sai được ghim bằng VECTƠ CHUẨN RFC 6979 §A.2.5 (bài `test_cong_iap.py`) —
@@ -33,6 +38,7 @@ from __future__ import annotations
 import argparse
 import base64
 import hashlib
+import hmac
 import http.client
 import http.server
 import json
@@ -42,7 +48,11 @@ import sys
 import threading
 import time
 import urllib.error
+import urllib.parse
 import urllib.request
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))   # `dang_nhap` · `lay_bi_mat` cùng thư mục (chạy được cả `-I`)
+import dang_nhap as DN  # noqa: E402
 
 URL_JWKS_MAC_DINH = "https://www.gstatic.com/iap/verify/public_key-jwk"
 ISS_IAP = "https://cloud.google.com/iap"
@@ -178,7 +188,7 @@ class Cong(http.server.ThreadingHTTPServer):
     allow_reuse_address = True
 
 
-def _tay(cong_cua: int, khoa: KhoaIap, aud: str | None):
+def _tay(cong_cua: int, khoa: KhoaIap, aud: str | None, tk: DN.TaiKhoan, khoa_sai: DN.KhoaSai, phien: DN.Phien):
     class Tay(http.server.BaseHTTPRequestHandler):
         protocol_version = "HTTP/1.1"
         server_version = "fls-cong-iap"
@@ -205,6 +215,55 @@ def _tay(cong_cua: int, khoa: KhoaIap, aud: str | None):
             if self.command != "HEAD":
                 self.wfile.write(b)
             self._ghi("", ma, ly_do)
+
+        def _tra(self, ma: int, than: bytes = b"", loai: str = "text/html; charset=utf-8", them: dict | None = None):
+            self.send_response(ma)
+            for k2, v in (them or {}).items():
+                self.send_header(k2, v)
+            if than:
+                self.send_header("Content-Type", loai)
+            self.send_header("Content-Length", str(len(than)))
+            self.send_header("Cache-Control", "no-store")
+            self.end_headers()
+            if self.command != "HEAD" and than:
+                self.wfile.write(than)
+
+        def _dang_nhap(self, email: str, duong: str, than: bytes):
+            """Xử lý `/login` (GET màn · POST so khớp) và `/logout`. ⛔ phản chiếu chữ người gõ, ⛔ ghi mật khẩu."""
+            if duong == "/logout":
+                phien.thu_hoi_the(DN.doc_cookie(self.headers.get("Cookie")))
+                print(f"DANG_NHAP email={email} dang_xuat", flush=True)
+                return self._tra(303, them={"Location": "/login", "Set-Cookie": DN.cookie_xoa()})
+            t = tk.lay()
+            if self.command not in ("POST",):
+                if t and phien.hop_le(DN.doc_cookie(self.headers.get("Cookie")), email, t["bam"]):
+                    return self._tra(303, them={"Location": "/"})
+                return self._tra(200, DN.trang("" if t else "⛔ Chưa đặt tài khoản đăng nhập — báo chủ (08_dat_dang_nhap.sh).",
+                                               "" if t else "loi"))
+            if not t:
+                return self._tra(503, DN.trang("⛔ Chưa đặt tài khoản đăng nhập — báo chủ (08_dat_dang_nhap.sh).", "loi"))
+            con = khoa_sai.con_khoa(email)
+            if con:
+                print(f"DANG_NHAP email={email} khoa con={con}s", flush=True)
+                return self._tra(429, DN.trang(f"⛔ Sai quá {DN.SAI_TOI_DA} lần — khoá tạm, thử lại sau {(con + 59) // 60} phút.", "loi"),
+                                 them={"Retry-After": str(con)})
+            if len(than) > 4096:
+                return self._tra(413, DN.trang("⛔ Yêu cầu quá dài.", "loi"))
+            o = urllib.parse.parse_qs(than.decode("utf-8", "replace"), keep_blank_values=True)
+            ten, mk = (o.get("ten") or [""])[0], (o.get("mat_khau") or [""])[0]
+            ten_dung = hmac.compare_digest(ten.encode(), str(t["ten"]).encode())
+            mk_dung = DN.khop(mk, t["bam"] if ten_dung else DN._bam_moi())    # tên sai vẫn tốn một lần scrypt
+            del mk
+            if ten_dung and mk_dung:
+                khoa_sai.xoa(email)
+                print(f"DANG_NHAP email={email} dung", flush=True)
+                return self._tra(303, them={"Location": "/", "Set-Cookie": DN.cookie_dat(phien.tao(email, t["bam"]))})
+            n = khoa_sai.ghi_sai(email)
+            print(f"DANG_NHAP email={email} sai {n}/{DN.SAI_TOI_DA}", flush=True)
+            if khoa_sai.con_khoa(email):
+                return self._tra(429, DN.trang(f"⛔ Sai quá {DN.SAI_TOI_DA} lần — khoá tạm {DN.KHOA_GIAY // 60} phút.", "loi"),
+                                 them={"Retry-After": str(DN.KHOA_GIAY)})
+            return self._tra(401, DN.trang("⛔ Sai tên đăng nhập hoặc mật khẩu.", "loi"))
 
         def _than(self) -> bytes:
             if "chunked" in (self.headers.get("Transfer-Encoding") or "").lower():
@@ -236,9 +295,19 @@ def _tay(cong_cua: int, khoa: KhoaIap, aud: str | None):
             if not getattr(self.server, "da_in_aud", False):
                 self.server.da_in_aud = True
                 print(f"IAP_AUD {claims.get('aud')}", flush=True)
+            # ⓕ ĐĂNG NHẬP FLS — sau IAP, trước cửa.
+            duong = self.path.split("?", 1)[0]
+            if duong in ("/login", "/logout"):
+                return self._dang_nhap(email, duong, than)
+            t = tk.lay()
+            if not (t and phien.hop_le(DN.doc_cookie(self.headers.get("Cookie")), email, t["bam"])):
+                if duong.startswith("/api/") or self.command not in ("GET", "HEAD"):
+                    return self._tu_choi(401, "FLS-CHUA-DANG-NHAP", "chua dang nhap FLS (hoac phien het han) — mo /login")
+                self._tra(303, them={"Location": "/login"})
+                return self._ghi(email, 303, "chua dang nhap")
             dau = {k2: v for k2, v in self.headers.items()
                    if k2.lower() not in HOP and not k2.lower().startswith("x-goog-")
-                   and k2.lower() != "x-serverless-authorization"}
+                   and k2.lower() not in ("x-serverless-authorization", "cookie")}
             try:
                 c = http.client.HTTPConnection("127.0.0.1", cong_cua, timeout=120)
                 c.request(self.command, self.path, body=than if than or self.command in ("POST", "PUT", "PATCH") else None,
@@ -263,8 +332,24 @@ def _tay(cong_cua: int, khoa: KhoaIap, aud: str | None):
     return Tay
 
 
+TEN_BI_MAT_DANG_NHAP = os.environ.get("FLS_LOGIN_BI_MAT") or "fls-staging-login"
+
+
+def doc_bi_mat_dang_nhap() -> str:
+    """Bản ghi băm từ Secret Manager bằng danh tính SA của Cloud Run (`lay_bi_mat.py`). Hỏng ⇒ "" (⛔ mở cửa)."""
+    import lay_bi_mat
+    try:
+        return lay_bi_mat.lay_bi_mat(TEN_BI_MAT_DANG_NHAP, os.environ.get("FLS_STG_PROJECT", ""),
+                                     os.environ.get("FLS_STG_URL_METADATA", lay_bi_mat.MAC_DINH_METADATA),
+                                     os.environ.get("FLS_STG_URL_SM", lay_bi_mat.MAC_DINH_SM))
+    except SystemExit as e:
+        print(f"⛔ DANG_NHAP_BI_MAT {e}", file=sys.stderr, flush=True)
+        return ""
+
+
 def chay_cong(cong: int, cong_cua: int, url_jwks: str, aud: str | None) -> int:
-    sv = Cong(("0.0.0.0", cong), _tay(cong_cua, KhoaIap(url_jwks), aud))
+    sv = Cong(("0.0.0.0", cong), _tay(cong_cua, KhoaIap(url_jwks), aud,
+                                      DN.TaiKhoan(doc_bi_mat_dang_nhap), DN.KhoaSai(), DN.Phien()))
     print(f"cong_iap: nghe 0.0.0.0:{cong} → 127.0.0.1:{cong_cua} · khoá IAP {url_jwks}"
           + (f" · aud ghim" if aud else " · aud ⛔ ghim"), flush=True)
     try:
@@ -331,6 +416,7 @@ def tu_do(cong: int, cong_cua: int, url_jwks: str) -> str:
         "cong_khong_iap": _ma(cong, "/"),
         "cong_iap_gia": _ma(cong, "/", {HEADER_IAP: jwt_gia(kid)}),
         "jwks": str(len(k)),
+        "dang_nhap": "san_sang" if DN.TaiKhoan(doc_bi_mat_dang_nhap).lay() else "chua_dat",
     }
     return "TU_DO " + " ".join(f"{a}={b}" for a, b in gt.items())
 

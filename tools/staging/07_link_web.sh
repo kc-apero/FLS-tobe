@@ -30,6 +30,8 @@
 #      `--max-instances 1` (MỘT thẻ chung, MỘT tiến trình ghi) · `--min-instances 0` · cổng 8080
 #   ⑤ tác tử IAP được `roles/run.invoker` trên service; GỠ `allUsers`/`allAuthenticatedUsers` nếu có (⛔ lối tắt IAP)
 #   ⑥ `roles/iap.httpsResourceAccessor` (IAP · cloud-run · service) cho TÀI KHOẢN NGƯỜI CHẠY + từng `--cho-vao`
+#   ⓑ ĐĂNG NHẬP FLS (bổ sung chủ 24/11): lớp thứ hai SAU IAP nằm trong cổng `cong_iap.py` — tài khoản chung đặt bằng
+#      `08_dat_dang_nhap.sh` (bí mật `fls-staging-login`, băm scrypt). CHẠY 08 TRƯỚC 07: dòng `TU_DO` đo lúc khởi động.
 #   ⑦ BÁO CÁO: mỗi mục khai `mong`; ĐẠT/ĐỎ hai chiều; exit 1 khi ĐỎ. Đo NGOÀI (curl ⛔ cookie ⇒ 302 về Google ·
 #      POST ⇒ 401) + đo TRONG container (dòng `TU_DO` từ nhật ký Cloud Run). In URL.
 #
@@ -181,6 +183,8 @@ export R_APIS="$("${G[@]}" services list --enabled --format='value(config.name)'
 export R_SVC="$("${G[@]}" run services describe "$SVC" --region="$REGION" --format=json 2>/dev/null || echo '{}')"
 export R_RUN_IAM="$("${G[@]}" run services get-iam-policy "$SVC" --region="$REGION" --format=json 2>/dev/null || echo '')"
 export R_IAP_IAM="$("${G[@]}" iap web get-iam-policy --resource-type=cloud-run --service="$SVC" --region="$REGION" --format=json 2>/dev/null || echo '')"
+export R_DN_CO="$("${G[@]}" secrets describe fls-staging-login --format='value(name)' >/dev/null 2>&1 && echo co || echo khong)"
+export R_DN_IAM="$("${G[@]}" secrets get-iam-policy fls-staging-login --format=json 2>/dev/null || echo '')"
 export R_TU_DO="$("${G[@]}" logging read "resource.type=\"cloud_run_revision\" AND resource.labels.service_name=\"$SVC\" AND textPayload:\"TU_DO \"" \
     --limit=1 --freshness=7d --format='value(textPayload)' 2>/dev/null | head -1 || true)"
 URL="$(printf '%s' "$R_SVC" | python3 -c 'import json,sys
@@ -219,6 +223,7 @@ inv = thanh_vien(run_iam, "roles/run.invoker")
 cong_khai = None if run_iam is None else sum(m in ("allUsers", "allAuthenticatedUsers")
                                               for b in run_iam.get("bindings", []) or [] for m in b.get("members", []))
 vao = thanh_vien(iap_iam, "roles/iap.httpsResourceAccessor")
+dn_doc = thanh_vien(js("R_DN_IAM"), "roles/secretmanager.secretAccessor")
 can_vao = ["user:" + x for x in ([e["TAI_KHOAN"]] if e["TAI_KHOAN"] else []) + [y for y in e["CHO_VAO"].split(",") if y]]
 iap_bat = ann.get("run.googleapis.com/iap-enabled")           # ⚠ giả định G-3 (BG-364): khoá chú thích này
 def http(k):
@@ -261,6 +266,9 @@ hang = [
   ("TRONG · cửa CHỈ nghe 127.0.0.1",                   tu.get("nghe_cua"),                                   "127.0.0.1:8088"),
   ("TRONG · cổng: yêu cầu ⛔ JWT IAP ⇒ HTTP",           tu.get("cong_khong_iap"),                             "403"),
   ("TRONG · cổng: JWT IAP chữ ký GIẢ ⇒ HTTP",          tu.get("cong_iap_gia"),                               "403"),
+  ("ĐĂNG NHẬP · bí mật fls-staging-login có (chạy 08 trước)", e["R_DN_CO"],                            "co"),
+  ("ĐĂNG NHẬP · SA đọc được bí mật đăng nhập",       None if dn_doc is None else f'serviceAccount:{e["SA_EMAIL"]}' in dn_doc, True),
+  ("TRONG · tài khoản đăng nhập FLS lúc khởi động",  tu.get("dang_nhap"),                                  "san_sang"),
   ("TRONG · khoá công khai IAP lấy được (đếm ≥ 1)",    (tu.get("jwks", "0").isdigit() and int(tu["jwks"]) >= 1) if tu else None, True),
 ]
 if e["KIEM"] != "1":
@@ -284,7 +292,7 @@ for ten, gt, mong in hang:
         do += not ok
         print(f"   [{'ĐẠT' if ok else 'ĐỎ'}] {ten:70}  {gt!r}  (mong {mong!r})")
 print(f"\n   ⭐ LINK: {e['URL'] or '— (chưa có service)'}")
-print("      mở bằng trình duyệt ⇒ đăng nhập Google ⇒ màn hình FLS (tài khoản phải có trong IAP — mục 'cho vào qua IAP')")
+print("      mở bằng trình duyệt ⇒ đăng nhập Google ⇒ /login (tài khoản chung của 08) ⇒ màn hình FLS")
 che_do = "--kiem (chỉ đọc)" if e["KIEM"] == "1" else "dựng"
 print(f"\n══ chế độ: {che_do} · KẾT: {'ĐẠT' if do == 0 else f'ĐỎ — {do} mục khác mong'}")
 raise SystemExit(1 if do else 0)
