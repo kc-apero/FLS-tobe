@@ -5,7 +5,7 @@
 | **Thuộc** | `WO-359` |
 | **Phát bởi** | `fls-dev` · 2026-11-24 |
 | **Nhận** | `fls-test` (R1 → `KQ-361`) · CHỦ (chạy trên GCP — §A) |
-| **Nhánh** | `claude/bold-galileo-zukpaf-isp/AG3` · SHA mã: xem §F (commit trước BG) |
+| **Nhánh** | `claude/bold-galileo-zukpaf-isp/AG3` · SHA đo **`fa43d51`** (gồm gộp `isp/AG2` @ `a37f2bb` + vòng sửa KQ-357) |
 | **Kho thật** | `KHONG_CHAM` (G0 BÓNG) · **0** lời gọi mô hình thật từ phiên này (Claude ⛔ vào GCP — quyết chủ 20/11) |
 
 **Biên bản quyết đường (24/11, qua orchestrator):** ~03:15 *"dùng claude trực tiếp trong GCP, thông qua vertex AI"* ⇒ ~03:45 *"đồng ý dùng qua vertex"* ⇒ ảnh console: `fp-a-project` đã BẬT **"Anthropic managed Claude API"** (`claude.googleapis.com`) ⇒ **~03:50 *"dùng claude.googleapis.com cho nhanh"*** = quyết HIỆN HÀNH. Mã có CẢ BA đường qua MỘT lớp nhà cung cấp, chọn bằng `FLS_NHA_CUNG_CAP`: **`google-cloud` (chính — đặt RÕ)** · `vertex` (dự phòng — làm trước, giữ nguyên) · `anthropic` (khoá API, WO-355 — **cũng là đường khi biến VẮNG**: bài nghiệm thu R1 `KQ-357` khoá hành vi ấy, đặt mặc định `google-cloud` ⇒ **19/27** bài ấy ĐỎ — đo 24/11; Dev ⛔ sửa bài nghiệm thu).
@@ -172,7 +172,21 @@ Gộp `origin/…-isp/AG2` @ `a37f2bb` (KQ-357 + sổ `SO_PHAT_HIEN_ISP-3.1_AG2.
 
 ## F · Cổng (dán thật — container cloud, cụm PG 16 cổng **5437**)
 
-_điền ở commit kế sau `--duong-nen`_
+SHA đo: **`fa43d51`** (mã + BG trước khi điền mục này; commit kế CHỈ điền bảng dưới).
+
+| cổng | kết | dán |
+|---|---|---|
+| `--duong-nen` | **ĐẠT** | toàn bộ: `12 failed, 5130 passed, 2 xfailed, 14 errors in 1414.99s` · `[ĐẠT] … tập đỏ + XFAIL = đường nền: 28 = 28 node id (trong đó XFAIL 2 = 2 · thêm 0 · bớt 0) · chạy 5158 bài (mong ≥ 5158) · skipped 0 · deselected 0` · `tests/web`: `3 failed, 687 passed` · `[ĐẠT] … 3 = 3 node id … chạy 690 bài (mong ≥ 690)` · `══ KẾT: ĐẠT — mọi phép kiểm khớp mong` |
+| sàn | **5158** (toàn bộ) · **690** (web) | = `pytest --collect-only` ⇒ `5158 tests collected`; ghim ở `tools/dung_moi_truong_isp.sh` + `tests/test_dung_moi_truong_isp.py` cùng commit |
+| `kiem_tai_lieu.py` | **ĐẠT** | `✅ cong tai lieu DAT — va no da do duoc that (523 file, 3080 bang, 987 o ngay, 104 ma QD)` |
+| `lint-imports` | **ĐẠT** | `Contracts: 11 kept, 0 broken.` |
+| `quet_pii_repo.py` | **ĐẠT** | `[ĐẠT] 0 chỗ số TK cá nhân · 0 tệp` |
+| `soi_bang_tuyen.py` | **ĐẠT** | `✅ ban khai KHOP SQL that o ca 49 tuyen` |
+| `kiem_thuyet_minh.py` | **ĐẠT** | exit 0 · `✅ CONG THUYET MINH DAT — 35/35 nut co mat trong CA 2 ban` |
+| `pg_migrate` | **ĐẠT** | `khong co gi de ap` · `pg_verify: khop` |
+| `khop_owner.py --kiem` | **ĐỎ — có sẵn, ⛔ do WO-359** | exit **1** · `A1 · B1 · C6 ⛔ DOI TRANG THAI: mong KHOP, do duoc LECH`. Đo trên cây GỐC `93f3e5a` (`git stash -u`) cho đầu ra **giống từng byte** (`diff` rỗng) ⇒ do kho 5437 của container RỖNG (chưa nạp) |
+| `kiem_so_song.py` | **⛔ ĐO ĐƯỢC — ĐỎ (môi trường)** | `⛔ khong do duoc: kho ⛔ khong co dau thoi diem cua lan nap / anh chup — cong ⛔ khong duoc phep xanh` (kho trống; đường Windows `.venv/Scripts/lint-imports.exe` nối symlink cục bộ để đo được) |
+| bài mới WO-359 + vòng sửa | **ĐẠT** | `tests/agent` + `tests/nghiem_thu/test_kq357_…` + `tests/test_dung_moi_truong_isp.py` ⇒ `323 passed` (trước mục 06 mới; sau: +8 bài, nằm trong đường nền) |
 
 ## G · Phát hiện / ghi chú cho R1
 
