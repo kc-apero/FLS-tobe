@@ -9,7 +9,8 @@ import pytest
 from fls.agent import mo_hinh as mh
 
 #: + `FLS_ZDR_DA_BAT` (vòng sửa sau KQ-331, AG-R1-11): chốt thứ năm khi chế độ che `mo` — "đủ chốt" nay gồm nó.
-DU = {"FLS_CHO_GOI_API": "1", "ANTHROPIC_API_KEY": "khoa-gia-de-thu", "FLS_ZDR_DA_BAT": "1"}
+#: + `FLS_NHA_CUNG_CAP=anthropic` (`WO-359`): mặc định nay là đường `google-cloud` ⇒ bài đường KHOÁ phải chọn RÕ đường.
+DU = {"FLS_CHO_GOI_API": "1", "ANTHROPIC_API_KEY": "khoa-gia-de-thu", "FLS_ZDR_DA_BAT": "1", "FLS_NHA_CUNG_CAP": "anthropic"}
 
 
 def test_du_chot__khong_nem():
@@ -18,9 +19,9 @@ def test_du_chot__khong_nem():
 
 @pytest.mark.parametrize("co_that,mt,chu", [
     (False, DU, "--that"),
-    (True, {"ANTHROPIC_API_KEY": "k"}, "FLS_CHO_GOI_API"),
-    (True, {"FLS_CHO_GOI_API": "0", "ANTHROPIC_API_KEY": "k"}, "FLS_CHO_GOI_API"),
-    (True, {"FLS_CHO_GOI_API": "1"}, "ANTHROPIC_API_KEY"),
+    (True, {"FLS_NHA_CUNG_CAP": "anthropic", "ANTHROPIC_API_KEY": "k"}, "FLS_CHO_GOI_API"),
+    (True, {"FLS_NHA_CUNG_CAP": "anthropic", "FLS_CHO_GOI_API": "0", "ANTHROPIC_API_KEY": "k"}, "FLS_CHO_GOI_API"),
+    (True, {"FLS_NHA_CUNG_CAP": "anthropic", "FLS_CHO_GOI_API": "1"}, "ANTHROPIC_API_KEY"),
 ])
 def test_thieu_mot_chot__CamGoiThat(co_that, mt, chu):
     with pytest.raises(mh.CamGoiThat, match=chu):

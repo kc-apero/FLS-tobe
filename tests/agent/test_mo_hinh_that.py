@@ -76,7 +76,7 @@ def sdk_gia(dap=None, loi=None, mo_hinh_phuc_vu=None, usage=(1000, 200)):
 def du_chot(monkeypatch):
     for k, v in DU.items():
         monkeypatch.setenv(k, v)
-    monkeypatch.delenv("FLS_NHA_CUNG_CAP", raising=False)     # WO-359: bài này đo đường API-key (dự phòng)
+    monkeypatch.setenv("FLS_NHA_CUNG_CAP", "anthropic")      # WO-359: mặc định nay là google-cloud ⇒ chọn RÕ đường khoá
 
 
 def _dung(monkeypatch, mo_hinh=mh.OPUS_5_5, **kw_sdk):
@@ -232,7 +232,7 @@ def test_doc_json_tra_loi__chu_thua__DO(van):
 def test_AC3_thieu_khoa__exit_2__DO_co_ten__khong_so_THAT(monkeypatch, capsys, tmp_path):
     import vong_that_voi as vt
     monkeypatch.delenv("ANTHROPIC_API_KEY", raising=False)
-    monkeypatch.delenv("FLS_NHA_CUNG_CAP", raising=False)        # WO-359: bài này đo đường API-key
+    monkeypatch.setenv("FLS_NHA_CUNG_CAP", "anthropic")         # WO-359: bài này đo đường API-key
     monkeypatch.delenv(vt.cav.BIEN_HELDOUT, raising=False)
     monkeypatch.setattr(vt, "TM_RA", tmp_path)
     rc = vt.main(["--that"])
@@ -245,6 +245,7 @@ def test_AC4_khoa_co_nhung_thieu_chot__khoa_KHONG_in(monkeypatch, capsys):
     import vong_that_voi as vt
     monkeypatch.setenv("ANTHROPIC_API_KEY", KHOA_GIA)
     monkeypatch.delenv("FLS_CHO_GOI_API", raising=False)
+    monkeypatch.setenv("FLS_NHA_CUNG_CAP", "anthropic")         # WO-359: đo đường khoá
     monkeypatch.delenv(vt.cav.BIEN_HELDOUT, raising=False)
     assert vt.main(["--that"]) == 2
     ra = capsys.readouterr().out

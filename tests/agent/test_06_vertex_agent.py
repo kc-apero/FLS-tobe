@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 """`WO-359` AC-3 — `tools/staging/06_vertex_agent.sh` vs một project GCP GIẢ có trạng thái (`vertex_gia.py`).
 
-Đo: dựng từ trống ⇒ chỉ còn ĐỎ ở Model Garden (bước bấm tay) · sau khi "bấm" ⇒ ĐẠT · chạy lại được (⛔ nhân đôi IAM) ·
-`--kiem` ⛔ lệnh GHI · ĐỎ HAI CHIỀU (mỗi thứ phá ⇒ ĐÚNG mục ĐỎ) · ⛔ token/nội dung trả lời trong đầu ra ·
-lệnh trong VM chạy THẬT bằng bash (gcloud giả chạy `--command`) ⇒ chuỗi lệnh gửi vào VM được đo, ⛔ chỉ được tin.
+HAI đường (chủ 24/11 ~03:50): `google-cloud` (`claude.googleapis.com`, MẶC ĐỊNH) · `vertex` (dự phòng). Mỗi bài chạy cho CẢ
+hai (tham số `duong`). Đo: dựng từ trống ⇒ ĐỎ đúng ở bước bấm tay (workspace sai · Model Garden chưa bật) · sửa xong ⇒ ĐẠT ·
+chạy lại được (⛔ nhân đôi IAM) · `--kiem` ⛔ lệnh GHI · ĐỎ HAI CHIỀU (mỗi thứ phá ⇒ ĐÚNG mục ĐỎ) · ⛔ token/nội dung trả
+lời/workspace đầy đủ trong đầu ra · lệnh trong VM chạy THẬT bằng bash (gcloud giả thi hành `--command`).
 """
 from __future__ import annotations
 
@@ -22,18 +23,22 @@ GIA = Path(__file__).with_name("vertex_gia.py")
 DU_AN = "fp-a-project"
 SA = f"fls-staging-app@{DU_AN}.iam.gserviceaccount.com"
 CP = "https://www.googleapis.com/auth/cloud-platform"
-LINH_CANH = ("TOKGIA-nguoi", "TOKGIA-sa", "NOIDUNG-GIA", "chi tiet GIA")
+WS = "wrkspc_01GiaChiDeThuABCDEF"
+LINH_CANH = ("TOKGIA-nguoi", "TOKGIA-sa", "NOIDUNG-GIA", "chi tiet GIA", WS)
 CAM_GHI = re.compile(r"\b(delete|remove|disable|destroy|set-iam-policy|remove-iam-policy-binding|keys create)\b")
 GHI = re.compile(r"^gcloud (services enable|projects add-iam-policy-binding)")
+VAI = {"google-cloud": "roles/claude.user", "vertex": "roles/aiplatform.user"}
+API = {"google-cloud": "claude.googleapis.com", "vertex": "aiplatform.googleapis.com"}
+MO_HINH = ("claude-opus-5-5", "claude-sonnet-5-5")
 
 
 class Gcp:
-    def __init__(self, d: Path):
-        self.d, self.tt = d, d / "tt.json"
+    def __init__(self, d: Path, duong: str):
+        self.d, self.tt, self.duong = d, d / "tt.json", duong
         for ten in ("gcloud", "curl"):
             shutil.copy(GIA, d / ten)
             (d / ten).chmod(0o755)
-        self.dat({"project": DU_AN, "sa": SA, "apis": [], "iam": [], "model_garden": [],
+        self.dat({"project": DU_AN, "sa": SA, "apis": [], "iam": [], "model_garden": [], "workspace": WS,
                   "vm": {"sa": SA, "scopes": [CP]}})
 
     def doc(self):
@@ -47,14 +52,19 @@ class Gcp:
         f(s)
         self.dat(s)
 
+    def bam_tay(self):
+        """Bước bấm tay của đường: vertex ⇒ bật 2 mô hình ở Model Garden; google-cloud ⇒ (workspace đúng sẵn) ⛔ gì."""
+        self.sua(lambda s: s.update(model_garden=list(MO_HINH)))
+
     def lenh(self):
         p = Path(str(self.tt) + ".log")
         return [re.sub(r" --project=\S+ --quiet", "", x) for x in p.read_text(encoding="utf-8").splitlines()] if p.exists() else []
 
-    def chay(self, *a, du_an=DU_AN):
+    def chay(self, *a, du_an=DU_AN, ws=WS, them_duong=True):
         env = dict(os.environ, PATH=f"{self.d}{os.pathsep}{os.environ['PATH']}", FLS_GIA_TRANG_THAI=str(self.tt))
         env.pop("FLS_GIA_DANH_TINH", None)
-        return subprocess.run(["bash", str(S06), "--project", du_an, *a], capture_output=True, text=True, env=env,
+        duong = (["--duong", self.duong] if them_duong else []) + (["--workspace-id", ws] if self.duong == "google-cloud" else [])
+        return subprocess.run(["bash", str(S06), "--project", du_an, *duong, *a], capture_output=True, text=True, env=env,
                               timeout=120)
 
 
@@ -67,119 +77,167 @@ def do_cua(out: str) -> set[str]:
     return {k for k, v in muc(out).items() if v == "ĐỎ"}
 
 
-@pytest.fixture
-def g(tmp_path):
-    return Gcp(tmp_path)
+def goi(nhan_ng: str, m: str, k: str = "HTTP") -> str:
+    return f"{'Cloud Shell · người chạy' if nhan_ng == 'cs' else 'TRONG VM · SA'} · {m} · " + (
+        "HTTP" if k == "HTTP" else "mô hình trả về (= mã ghim)")
 
 
-def _bat_mg(s):
-    s["model_garden"] = ["claude-opus-5-5", "claude-sonnet-5-5"]
+TAT_CA_GOI = {goi(n, m, k) for n in ("cs", "vm") for m in MO_HINH for k in ("HTTP", "mo")}
 
 
-def test_dung_tu_trong__chi_DO_o_Model_Garden_roi_DAT_sau_khi_bam(g):
-    r = g.chay()
+@pytest.fixture(params=["google-cloud", "vertex"])
+def g(tmp_path, request):
+    return Gcp(tmp_path, request.param)
+
+
+def test_mac_dinh_la_google_cloud(tmp_path):
+    gg = Gcp(tmp_path, "google-cloud")
+    r = gg.chay(them_duong=False)
+    assert "══ đường google-cloud" in r.stdout and r.returncode == 0, r.stdout + r.stderr
+    assert any("claude.googleapis.com/v1/projects/fp-a-project/locations/global/workspaces/" in x for x in gg.lenh())
+
+
+def test_dung_tu_trong__DO_dung_buoc_bam_tay_roi_DAT(g):
+    if g.duong == "vertex":
+        r = g.chay()                                               # Model Garden chưa bật
+        assert "FAILED_PRECONDITION" in r.stdout and "model-garden/claude-opus-5-5?project=fp-a-project" in r.stdout
+    else:
+        r = g.chay(ws="wrkspc_SaiWorkspace")                       # workspace chép sai
+        assert "not_found_error" in r.stdout and "Settings → Workspaces" in r.stdout
     assert r.returncode == 1, r.stdout + r.stderr
-    do = do_cua(r.stdout)
-    # mong: CHỈ mục gọi thử ĐỎ (Model Garden chưa bật = bước bấm tay) — 2 danh tính × 2 mô hình × (HTTP + mô hình)
-    assert do and all("· HTTP" in k or "mô hình trả về" in k for k in do), do
-    assert len(do) == 8, do
-    assert "FAILED_PRECONDITION" in r.stdout                      # trạng thái Google được BÁO (⛔ nội dung)
-    assert "model-garden/claude-opus-5-5?project=fp-a-project" in r.stdout
-    g.sua(_bat_mg)                                                # chủ "bấm Enable"
+    assert do_cua(r.stdout) == TAT_CA_GOI, do_cua(r.stdout)       # CHỈ 8 mục gọi thử ĐỎ — API + IAM đã dựng ĐẠT
+    g.bam_tay()
     r2 = g.chay("--kiem")
     assert r2.returncode == 0, r2.stdout + r2.stderr
-    # 13 mục có mong = AC-5 · API · IAM · VM-SA · VM-phạm-vi (5) + 2 danh tính × 2 mô hình × (HTTP + mô hình) (8)
+    # 13 mục có mong = AC-5 · API · IAM SA · VM-SA · VM-phạm-vi (5) + 2 danh tính × 2 mô hình × (HTTP + mô hình) (8)
     assert "KẾT: ĐẠT" in r2.stdout and len(muc(r2.stdout)) == 13 and not do_cua(r2.stdout)
     assert "18/5 · end_turn" in r2.stdout                         # số token đọc được (⛔ nội dung)
+    assert f"API {API[g.duong]} bật" in muc(r2.stdout)
 
 
 def test_kiem__KHONG_lenh_ghi_va_chay_lai_KHONG_nhan_doi(g):
-    g.sua(_bat_mg)
+    g.bam_tay()
     r = g.chay("--kiem")
     assert r.returncode == 1                                       # API chưa bật, IAM chưa cấp ⇒ ĐỎ
     assert not [x for x in g.lenh() if GHI.match(x)]
-    assert {"API aiplatform.googleapis.com bật", "SA có roles/aiplatform.user ở project (⛔ điều kiện)"} <= do_cua(r.stdout)
+    assert {f"API {API[g.duong]} bật", f"SA có {VAI[g.duong]} ở project (⛔ điều kiện)"} <= do_cua(r.stdout)
     g.chay()
     g.chay()
-    iam = g.doc()["iam"]
-    assert iam == [{"role": "roles/aiplatform.user", "members": [f"serviceAccount:{SA}"]}]
+    assert g.doc()["iam"] == [{"role": VAI[g.duong], "members": [f"serviceAccount:{SA}"]}]
+    assert g.doc()["apis"] == [API[g.duong]]
     assert not [x for x in g.lenh() if CAM_GHI.search(x)]
 
 
-def test_KHONG_in_token_noi_dung_tra_loi(g):
-    g.sua(_bat_mg)
+def test_KHONG_in_token_noi_dung_workspace(g):
+    g.bam_tay()
     r = g.chay()
     assert r.returncode == 0, r.stdout
     for lc in LINH_CANH:
         assert lc not in r.stdout + r.stderr, lc
-    # lời gọi thật có mang token (⇒ lính canh ⛔ vắng vì ⛔ dùng tới)
-    assert any(x.startswith("curl ") and ":rawPredict" in x for x in g.lenh())
+    assert any(x.startswith("curl ") and "https://" in x for x in g.lenh())   # lời gọi THẬT đã đi (lính canh vắng vì ⛔ in)
+    if g.duong == "google-cloud":
+        assert f"wrkspc_…({len(WS)} ký tự)" in r.stdout                 # chỉ tiền tố + độ dài
 
 
-@pytest.mark.parametrize("pha,mong_do", [
-    (lambda s: s["model_garden"].remove("claude-sonnet-5-5"),
-     {"Cloud Shell · người chạy · claude-sonnet-5-5 · HTTP", "TRONG VM · SA · claude-sonnet-5-5 · HTTP"}),
-    (lambda s: s.update(vm={"sa": SA, "scopes": ["https://www.googleapis.com/auth/devstorage.read_only"]}),
-     {"VM phạm vi OAuth có cloud-platform", "TRONG VM · SA · claude-opus-5-5 · HTTP", "TRONG VM · SA · claude-sonnet-5-5 · HTTP"}),
-    (lambda s: s.update(vm=None),
-     {"VM tồn tại · chạy bằng SA", "VM phạm vi OAuth có cloud-platform",
-      "TRONG VM · SA · claude-opus-5-5 · HTTP", "TRONG VM · SA · claude-sonnet-5-5 · HTTP"}),
-    (lambda s: s.update(phuc_vu={"claude-opus-5-5": "claude-opus-5"}),
-     {"Cloud Shell · người chạy · claude-opus-5-5 · mô hình trả về (= mã ghim)",
-      "TRONG VM · SA · claude-opus-5-5 · mô hình trả về (= mã ghim)"}),
-    (lambda s: s.update(dang_nhap=False),
-     {"Cloud Shell · người chạy · claude-opus-5-5 · HTTP", "Cloud Shell · người chạy · claude-sonnet-5-5 · HTTP"}),
-    (lambda s: s.update(ssh_duoc=False),
-     {"TRONG VM · SA · claude-opus-5-5 · HTTP", "TRONG VM · SA · claude-sonnet-5-5 · HTTP"}),
-])
-def test_DO_hai_chieu__pha_tung_thu__DUNG_muc_DO(g, pha, mong_do):
-    g.sua(_bat_mg)
+PHA = [
+    ("mo_hinh_thieu", {goi("cs", "claude-sonnet-5-5"), goi("vm", "claude-sonnet-5-5")}),
+    ("vm_pham_vi", {"VM phạm vi OAuth có cloud-platform", goi("vm", "claude-opus-5-5"), goi("vm", "claude-sonnet-5-5")}),
+    ("vm_mat", {"VM tồn tại · chạy bằng SA", "VM phạm vi OAuth có cloud-platform",
+                goi("vm", "claude-opus-5-5"), goi("vm", "claude-sonnet-5-5")}),
+    ("phuc_vu_khac", {goi("cs", "claude-opus-5-5", "mo"), goi("vm", "claude-opus-5-5", "mo")}),
+    ("chua_dang_nhap", {goi("cs", "claude-opus-5-5"), goi("cs", "claude-sonnet-5-5")}),
+    ("ssh_hong", {goi("vm", "claude-opus-5-5"), goi("vm", "claude-sonnet-5-5")}),
+    ("iam_go", {"SA có {vai} ở project (⛔ điều kiện)", goi("vm", "claude-opus-5-5"), goi("vm", "claude-sonnet-5-5")}),
+    ("api_tat", {"API {api} bật"} | {goi(n, m) for n in ("cs", "vm") for m in MO_HINH}),
+]
+
+
+def _pha(s, ten, duong):
+    if ten == "mo_hinh_thieu":
+        if duong == "vertex":
+            s["model_garden"].remove("claude-sonnet-5-5")
+        else:
+            s["to_chuc_mo_hinh"] = ["claude-opus-5-5"]   # tổ chức Anthropic ⛔ được dùng Sonnet 5.5
+    elif ten == "vm_pham_vi":
+        s["vm"] = {"sa": SA, "scopes": ["https://www.googleapis.com/auth/devstorage.read_only"]}
+    elif ten == "vm_mat":
+        s["vm"] = None
+    elif ten == "phuc_vu_khac":
+        s["phuc_vu"] = {"claude-opus-5-5": "claude-opus-5"}
+    elif ten == "chua_dang_nhap":
+        s["dang_nhap"] = False
+    elif ten == "ssh_hong":
+        s["ssh_duoc"] = False
+    elif ten == "iam_go":
+        s["iam"] = []
+    elif ten == "api_tat":
+        s["apis"] = []
+
+
+@pytest.mark.parametrize("ten,mong_do", PHA, ids=[p[0] for p in PHA])
+def test_DO_hai_chieu__pha_tung_thu__DUNG_muc_DO(g, ten, mong_do):
+    g.bam_tay()
     assert g.chay().returncode == 0                                # nền ĐẠT
-    g.sua(pha)
+    g.sua(lambda s: _pha(s, ten, g.duong))
     r = g.chay("--kiem")
     assert r.returncode == 1
-    do = {k for k in do_cua(r.stdout) if "mô hình trả về" not in k or "mô hình trả về" in " ".join(mong_do)}
-    assert mong_do <= do_cua(r.stdout) and do == mong_do, (do, mong_do)
-
-
-def test_IAM_SA_bi_go__DO_ca_muc_IAM_lan_goi_trong_VM(g):
-    g.sua(_bat_mg)
-    g.chay()
-    g.sua(lambda s: s.update(iam=[]))
-    r = g.chay("--kiem")
+    mong = {x.format(vai=VAI[g.duong], api=API[g.duong]) for x in mong_do}
     do = do_cua(r.stdout)
-    assert "SA có roles/aiplatform.user ở project (⛔ điều kiện)" in do
-    assert {"TRONG VM · SA · claude-opus-5-5 · HTTP", "TRONG VM · SA · claude-sonnet-5-5 · HTTP"} <= do
-    assert "PERMISSION_DENIED" in r.stdout
-    assert not any(k.startswith("Cloud Shell") for k in do)        # người chạy (chủ) vẫn gọi được — đúng hai danh tính
+    # mục "mô hình trả về" ĐỎ kèm khi HTTP ≠ 200 — chỉ so tập HTTP/hạ tầng, trừ ca phá chính mục ấy
+    if ten != "phuc_vu_khac":
+        do = {k for k in do if "mô hình trả về" not in k}
+    assert do == mong, (do, mong)
+
+
+def test_google_cloud__nguoi_chay_thieu_vai__DO_chi_Cloud_Shell__cap_nguoi_sua(tmp_path):
+    gg = Gcp(tmp_path, "google-cloud")
+    gg.sua(lambda s: s.update(nguoi_quyen=False))
+    r = gg.chay()
+    assert {goi("cs", m) for m in MO_HINH} <= do_cua(r.stdout)
+    assert not {goi("vm", m) for m in MO_HINH} & do_cua(r.stdout)
+    r2 = gg.chay("--cap-nguoi", "chu.du.an@vi-du.vn")
+    assert "người chạy (--cap-nguoi) có roles/claude.user" in muc(r2.stdout)
+    assert any(x.startswith("gcloud projects add-iam-policy-binding") and "user:chu.du.an@vi-du.vn" in x for x in gg.lenh())
 
 
 def test_khong_goi_thu__muc_goi_thu_la_DO_khong_phai_bo_qua(g):
-    g.sua(_bat_mg)
+    g.bam_tay()
     g.chay()
     truoc = len(g.lenh())
     r = g.chay("--kiem", "--khong-goi-thu")
-    assert r.returncode == 1 and len(do_cua(r.stdout)) == 8        # Đ5: ⛔ đo được ⇒ ĐỎ
+    assert r.returncode == 1 and do_cua(r.stdout) == TAT_CA_GOI        # Đ5: ⛔ đo được ⇒ ĐỎ
     moi = g.lenh()[truoc:]
     assert len(moi) == 3 and not any(x.startswith("curl ") or " ssh " in x for x in moi), moi   # 3 lệnh ĐỌC, ⛔ gọi
 
 
 @pytest.mark.parametrize("vung", ["us", "eu"])
-def test_vung_da_vung__dung_host_rep(g, vung):
-    g.sua(_bat_mg)
-    r = g.chay("--region", vung)
+def test_vertex_da_vung__dung_host_rep(tmp_path, vung):
+    gg = Gcp(tmp_path, "vertex")
+    gg.bam_tay()
+    r = gg.chay("--region", vung)
     assert r.returncode == 0, r.stdout
-    assert f"aiplatform.{vung}.rep.googleapis.com/v1/projects/{DU_AN}/locations/{vung}/" in "\n".join(g.lenh())
+    assert f"aiplatform.{vung}.rep.googleapis.com/v1/projects/{DU_AN}/locations/{vung}/" in "\n".join(gg.lenh())
 
 
-@pytest.mark.parametrize("a", [["--region", "asia-southeast1"], ["--region", "us-east5"], ["--vm", "X;rm"], ["--la"]])
-def test_tham_so_xau__exit_2_truoc_moi_lenh(g, a):
-    r = g.chay(*a)
-    assert r.returncode == 2 and not g.lenh()
+@pytest.mark.parametrize("a,duong", [
+    (["--region", "asia-southeast1"], "vertex"), (["--region", "us-east5"], "vertex"), (["--vm", "X;rm"], "vertex"),
+    (["--la"], "vertex"), (["--region", "us"], "google-cloud"), (["--cap-nguoi", "khong-phai-email"], "google-cloud"),
+])
+def test_tham_so_xau__exit_2_truoc_moi_lenh(tmp_path, a, duong):
+    gg = Gcp(tmp_path, duong)
+    r = gg.chay(*a)
+    assert r.returncode == 2 and not gg.lenh(), r.stderr
+
+
+@pytest.mark.parametrize("ws", ["", "ws_123", "wrkspc_a;b"])
+def test_google_cloud_workspace_xau__exit_2(tmp_path, ws):
+    gg = Gcp(tmp_path, "google-cloud")
+    r = gg.chay(ws=ws)
+    assert r.returncode == 2 and not gg.lenh()
 
 
 def test_project_khac_cong_ty__DO_muc_AC5(g):
     g.sua(lambda s: s.update(project="du-an-khac"))
-    g.sua(_bat_mg)
+    g.bam_tay()
     r = g.chay(du_an="du-an-khac")
     assert "project = GCP công ty (fp-a-project — AC-5)" in do_cua(r.stdout)

@@ -1,4 +1,4 @@
 psycopg[binary]>=3.2.0
 pytest>=8.0.0
 import-linter>=2.0
-anthropic[vertex]>=2.12  # WO-355: adapter THẬT `fls/agent/mo_hinh.py` (nhập muộn) · WO-359: `[vertex]` kéo `google-auth` cho `AnthropicVertex`
+anthropic[google_cloud,vertex]>=2.12  # WO-355: adapter THẬT `fls/agent/mo_hinh.py` (nhập muộn) · WO-359: `AnthropicGoogleCloud` (chính) + `AnthropicVertex` (dự phòng), cả hai kéo `google-auth`

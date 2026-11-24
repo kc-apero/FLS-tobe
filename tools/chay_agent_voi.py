@@ -8,8 +8,9 @@
     python tools/chay_agent_voi.py --that --tran-usd 2 # API THẬT (WO-355) — cần FLS_CHO_GOI_API=1 + ANTHROPIC_API_KEY
                                                        #   + FLS_ZDR_DA_BAT=1 (chế độ `mo`); in token + USD ước;
                                                        #   ghi nhật ký vòng (CHỈ số đếm + vân tay) docs/ITL/06_Agent/nhat_ky/
-    FLS_NHA_CUNG_CAP=vertex FLS_GCP_PROJECT=fp-a-project FLS_VERTEX_DU_LIEU_XAC_NHAN=1 FLS_CHO_GOI_API=1 \
-      python tools/chay_agent_voi.py --that            # ⭐ WO-359: Claude trên VERTEX AI (ADC/SA của GCP, ⛔ khoá sk-ant)
+    FLS_GCP_PROJECT=fp-a-project FLS_CLAUDE_WORKSPACE_ID=wrkspc_… FLS_GC_DU_LIEU_XAC_NHAN=1 FLS_CHO_GOI_API=1 \
+      python tools/chay_agent_voi.py --that            # ⭐ WO-359: đường MẶC ĐỊNH claude.googleapis.com (ADC/SA, ⛔ khoá)
+                                                       #   dự phòng: FLS_NHA_CUNG_CAP=vertex | anthropic
 
 ⭐ Công cụ agent gọi = CHỈ hàm FLS có sẵn, tiêm vào chuỗi từ đây (gói `fls.agent` ⛔ biết kho/tuyến):
    nguon_bank · nguon_fps · nguon_h1000 · nguon_plt   đếm ảnh đóng băng 4 nguồn raw (`tests/fixture/…`)
@@ -323,8 +324,8 @@ def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(prog="chay_agent_voi.py")
     p.add_argument("--gia", action="store_true", help="mô hình GIẢ tất định (thay phát lại)")
     p.add_argument("--that", action="store_true",
-                   help="gọi API THẬT — FLS_CHO_GOI_API=1 + (đường vertex: FLS_NHA_CUNG_CAP=vertex · FLS_GCP_PROJECT · "
-                        "FLS_VERTEX_DU_LIEU_XAC_NHAN=1 ở `mo`) hoặc (đường API: ANTHROPIC_API_KEY · FLS_ZDR_DA_BAT=1 ở `mo`)")
+                   help="gọi API THẬT — FLS_CHO_GOI_API=1 + đường (FLS_NHA_CUNG_CAP, mặc định google-cloud: "
+                        "FLS_GCP_PROJECT · FLS_CLAUDE_WORKSPACE_ID · FLS_GC_DU_LIEU_XAC_NHAN=1 ở `mo`) | vertex | anthropic")
     p.add_argument("--tran-usd", type=float, default=TRAN_USD_MAC_DINH, help="trần USD ước của vòng thật (chạm ⇒ DỪNG)")
     p.add_argument("--ghi-phat-lai", action="store_true", help="(với --gia) ghi docs/ITL/06_Agent/phat_lai/*.json")
     p.add_argument("--ghi-report", action="store_true", help="ghi docs/ITL/06_Agent/report.html")

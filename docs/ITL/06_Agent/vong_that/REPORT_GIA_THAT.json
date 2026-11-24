@@ -1,7 +1,7 @@
 {
  "be": "VẮNG",
  "che": "mo",
- "duong": "anthropic",
+ "duong": "google-cloud",
  "gia": {
   "chuoi": {
    "agent": 4,
@@ -61,6 +61,6 @@
   "van_tay_tap": "0669118e3590e44b"
  },
  "that": {
-  "do": "thiếu ANTHROPIC_API_KEY · CamGoiThat: ⛔ gọi API thật: cờ `--that` vắng · `FLS_CHO_GOI_API` ≠ 1 · khoá `ANTHROPIC_API_KEY` vắng trong biến môi trường · chế độ che `mo` gửi nguyên văn tên · số TK ⇒ đòi `FLS_ZDR_DA_BAT=1` (ZDR — quyết chủ 23/11)"
+  "do": "thiếu FLS_GCP_PROJECT (đường google-cloud) · CamGoiThat: ⛔ gọi API thật: cờ `--that` vắng · `FLS_CHO_GOI_API` ≠ 1 · `FLS_GCP_PROJECT` vắng (đường google-cloud) · `FLS_CLAUDE_WORKSPACE_ID` vắng (đường google-cloud — workspace `wrkspc_…` của tổ chức Anthropic gắn với project) · chế độ che `mo` gửi nguyên văn tên · số TK ⇒ đòi `FLS_GC_DU_LIEU_XAC_NHAN=1` (người vận hành xác nhận: project công ty · chế độ giữ dữ liệu của tổ chức Anthropic MỚI — ZDR cũ ⛔ mang sang; BG-360)"
  }
 }

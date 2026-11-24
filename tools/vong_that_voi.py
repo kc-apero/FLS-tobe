@@ -6,9 +6,10 @@
     python tools/vong_that_voi.py --that --tran-usd 2      # API THẬT: (a) tập nhỏ trước, in chi phí, DỪNG
     python tools/vong_that_voi.py --that --be --tran-usd 6 # + (b) fleet eval A2.04 trên bể A/B (sau khi xem chi phí (a))
 
-⭐ `WO-359` (chủ 24/11): đường CHÍNH = Claude trên **Vertex AI** của `fp-a-project` — đặt `FLS_NHA_CUNG_CAP=vertex` ·
-   `FLS_GCP_PROJECT=fp-a-project` · `FLS_VERTEX_DU_LIEU_XAC_NHAN=1` (+ `FLS_CHO_GOI_API=1`, `--that`); xác thực = ADC của
-   GCP. Khối lệnh cho chủ: BG-360 §B. Biến vắng ⇒ đường API-key (dự phòng WO-355).
+⭐ `WO-359` (chủ 24/11 ~03:50): đường CHÍNH (mặc định) = **`claude.googleapis.com`** (Anthropic managed) của `fp-a-project`
+   — đặt `FLS_GCP_PROJECT=fp-a-project` · `FLS_CLAUDE_WORKSPACE_ID=wrkspc_…` · `FLS_GC_DU_LIEU_XAC_NHAN=1` (+
+   `FLS_CHO_GOI_API=1`, `--that`); xác thực = ADC của GCP. Dự phòng: `FLS_NHA_CUNG_CAP=vertex` (Vertex AI) ·
+   `FLS_NHA_CUNG_CAP=anthropic` (khoá, WO-355). Khối lệnh cho chủ: BG-360 §B.
 
 ⭐ (a) CHUỖI 4 agent trên TẬP NHỎ có đáp án = 12 ca DỰNG (`tests/fixture/agent/`) + mẫu ≤ `--mau` ca (mặc định 20) của
    bể B giữ riêng (`$FLS_HELDOUT_NOI_DUNG/b`, hạt 355). Bể vắng ⇒ chỉ 12 ca dựng, report KHAI rõ (⛔ im lặng).
@@ -120,8 +121,9 @@ def nhan_do(ly: str) -> str:
     """Tên ĐỎ khi ⛔ chạy được thật — chốt THIẾU QUAN TRỌNG NHẤT của đường đứng ĐẦU (WO-355: khoá; WO-359: project)."""
     if "ANTHROPIC_API_KEY" in ly and "vắng" in ly:
         return "thiếu ANTHROPIC_API_KEY · " + ly
-    if mh.BIEN_GCP_PROJECT in ly and "vắng" in ly:
-        return f"thiếu {mh.BIEN_GCP_PROJECT} (đường vertex) · " + ly
+    for b in (mh.BIEN_GCP_PROJECT, mh.BIEN_CLAUDE_WORKSPACE):
+        if f"`{b}` vắng" in ly:
+            return f"thiếu {b} (đường {mh.duong_goi()}) · " + ly
     return ly
 
 
@@ -183,7 +185,8 @@ def md(kq: dict[str, Any]) -> str:
     dat, ly = ket(kq)
     g, t = kq["gia"], kq["that"]
     # ô bảng ghi nhãn NGẮN; lý do đầy đủ (tên mọi chốt thiếu) chỉ ở dòng KẾT
-    tc = None if "do" not in t else next((n for n in ("thiếu ANTHROPIC_API_KEY", f"thiếu {mh.BIEN_GCP_PROJECT}")
+    tc = None if "do" not in t else next((n for n in ("thiếu ANTHROPIC_API_KEY", f"thiếu {mh.BIEN_GCP_PROJECT}",
+                                                      f"thiếu {mh.BIEN_CLAUDE_WORKSPACE}")
                                           if t["do"].startswith(n)), "ĐỎ — xem KẾT")
     L = [f"# Vòng 1 test THẬT — GIẢ ↔ THẬT · {kq['ngay']}", "",
          "> Sinh bởi `python tools/vong_that_voi.py --ghi` (`WO-355` AC-3) — ⛔ sửa tay. CHỈ số đếm + vân tay; ⛔ nội dung "
@@ -195,8 +198,10 @@ def md(kq: dict[str, Any]) -> str:
          f"| tập nhỏ | {kq['tap_nho']['ca_dung']} ca dựng + {kq['tap_nho']['ca_be_b']} ca bể B · {_x(kq['tap_nho']['be_b'])} · "
          f"theo nhóm {_x(kq['tap_nho']['theo_nhom'])} · vân tay `{kq['tap_nho']['van_tay_tap']}` |",
          f"| bể A/B | {kq['be']} |", f"| che | `{kq['che']}` (chủ 23/11: đọc toàn bộ) |",
-         f"| đường gọi thật | `{_x(kq.get('duong'))}` " + ("(Claude trên Vertex AI — WO-359)" if kq.get("duong") == mh.DUONG_VERTEX
-                                                         else "(Claude API, khoá — dự phòng WO-355)") + " |", "",
+         f"| đường gọi thật | `{_x(kq.get('duong'))}` " + {
+             mh.DUONG_GOOGLE_CLOUD: "(claude.googleapis.com, Anthropic managed — CHÍNH, WO-359)",
+             mh.DUONG_VERTEX: "(Claude trên Vertex AI — dự phòng, WO-359)"}.get(
+             kq.get("duong"), "(Claude API, khoá — dự phòng WO-355)") + " |", "",
          "## (a) Chuỗi 4 agent trên tập nhỏ", "", "| chỉ số | GIẢ | THẬT |", "|---|---|---|"]
     gc, tcz = g["chuoi"], (t.get("chuoi") or {})
     hang = (("ô ĐỘC LẬP khớp / mẫu số", lambda d: f"{d['doc_lap']['khop']}/{d['doc_lap']['mau_so']}"),
@@ -233,7 +238,9 @@ def md(kq: dict[str, Any]) -> str:
     L += ["", "## Token + chi phí (THẬT)", "",
           f"Giá tra ngày **{n['ngay_tra_gia']}** (Opus 5.5 $4/$20 · Sonnet 5.5 $2/$10 / 1M token vào/ra"
           + (" · Vertex: global = giá Claude API, `us`/`eu` +10% — giả định chưa kiểm, số thật ở Billing GCP"
-             if n.get("duong") == [mh.DUONG_VERTEX] else "") + f") · đường {_x('/'.join(n.get('duong') or []) or '—')}"
+             if n.get("duong") == [mh.DUONG_VERTEX] else "")
+          + (" · google-cloud: CHƯA có bảng giá chính thức — ƯỚC theo giá Claude API để giữ trần; số thật ở hoá đơn "
+             "Marketplace GCP" if n.get("duong") == [mh.DUONG_GOOGLE_CLOUD] else "") + f") · đường {_x('/'.join(n.get('duong') or []) or '—')}"
           + (f" · vùng {_x('/'.join(n['vung']))}" if n.get("vung") else "") + " — USD là ƯỚC.", "",
           "| lời gọi | token vào | token ra | cache đọc | cache ghi | giây | USD ước |", "|---|---|---|---|---|---|---|",
           f"| {n['so_goi']} | {n['token_vao']} | {n['token_ra']} | {n['cache_doc']} | {n['cache_ghi']} | {n['giay']} | {n['chi_phi_usd']} |"]
@@ -248,8 +255,8 @@ def md(kq: dict[str, Any]) -> str:
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(prog="vong_that_voi.py")
     p.add_argument("--that", action="store_true",
-                   help="gọi THẬT — FLS_CHO_GOI_API=1 + đường vertex (FLS_NHA_CUNG_CAP=vertex · FLS_GCP_PROJECT · "
-                        "FLS_VERTEX_DU_LIEU_XAC_NHAN=1) hoặc đường API (ANTHROPIC_API_KEY · FLS_ZDR_DA_BAT=1)")
+                   help="gọi THẬT — FLS_CHO_GOI_API=1 + đường mặc định google-cloud (FLS_GCP_PROJECT · "
+                        "FLS_CLAUDE_WORKSPACE_ID · FLS_GC_DU_LIEU_XAC_NHAN=1) | vertex | anthropic (FLS_NHA_CUNG_CAP)")
     p.add_argument("--be", action="store_true", help="(b) fleet eval A2.04 trên bể A/B — chạy SAU khi xem chi phí (a)")
     p.add_argument("--tran-usd", type=float, default=cav.TRAN_USD_MAC_DINH)
     p.add_argument("--mau", type=int, default=MAU_MAC_DINH, help="số ca bể B thêm vào tập nhỏ (≤ 20 theo WO-355)")

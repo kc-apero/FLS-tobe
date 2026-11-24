@@ -73,7 +73,13 @@ def sdk_gia(loi=None, mo_hinh_phuc_vu=None, usage=(1000, 200), luat=None):
             m.tao_voi, m.lop = kw, "Anthropic"
             self.messages = _Messages()
 
-    m.AnthropicVertex, m.Anthropic = AnthropicVertex, Anthropic
+    class AnthropicGoogleCloud:                       # WO-359 đường chính: chữ ký đối chiếu SDK 2.13.0 (`project` · `workspace_id`)
+        def __init__(self, *, project=None, workspace_id=None, max_retries=2, **kw):
+            m.tao_voi = {"project": project, "workspace_id": workspace_id, "max_retries": max_retries, **kw}
+            m.lop = "AnthropicGoogleCloud"
+            self.messages = _Messages()
+
+    m.AnthropicVertex, m.Anthropic, m.AnthropicGoogleCloud = AnthropicVertex, Anthropic, AnthropicGoogleCloud
     return m
 
 
@@ -118,13 +124,15 @@ def test_AC1_vung_da_vung__nhan_va_gui_dung(monkeypatch, vx, vung):
     assert sdk.tao_voi["region"] == vung
 
 
-def test_AC1_bien_vang__van_la_duong_API_du_phong(monkeypatch):
-    """Biến `FLS_NHA_CUNG_CAP` vắng ⇒ đường `anthropic` (WO-355 giữ nguyên làm dự phòng)."""
-    for k, v in {"FLS_CHO_GOI_API": "1", "ANTHROPIC_API_KEY": KHOA_GIA, "FLS_ZDR_DA_BAT": "1"}.items():
+def test_AC1_duong_API_du_phong__chon_RO_bang_bien(monkeypatch):
+    """`FLS_NHA_CUNG_CAP=anthropic` ⇒ đường khoá (WO-355 giữ làm dự phòng). Biến VẮNG nay ⇒ `google-cloud` (chủ 24/11 ~03:50)."""
+    for k, v in {"FLS_CHO_GOI_API": "1", "ANTHROPIC_API_KEY": KHOA_GIA, "FLS_ZDR_DA_BAT": "1",
+                 "FLS_NHA_CUNG_CAP": "anthropic"}.items():
         monkeypatch.setenv(k, v)
-    monkeypatch.delenv("FLS_NHA_CUNG_CAP", raising=False)
     ncc, sdk = _dung(monkeypatch)
     assert type(ncc) is mh.AnthropicMessages and sdk.lop == "Anthropic" and mh.duong_goi() == "anthropic"
+    monkeypatch.delenv("FLS_NHA_CUNG_CAP")
+    assert mh.duong_goi() == "google-cloud"
 
 
 def test_AC1_chu_ky_lop_SDK_that__co_region_project_id():
@@ -305,7 +313,7 @@ def test_AC4_vong_that__duong_vertex_thieu_project__exit_2__DO_co_ten(monkeypatc
     assert vt.main(["--that"]) == 2
     ra = capsys.readouterr().out
     assert "**KẾT: ĐỎ** — thiếu FLS_GCP_PROJECT (đường vertex)" in ra
-    assert "| đường gọi thật | `vertex` (Claude trên Vertex AI — WO-359) |" in ra
+    assert "| đường gọi thật | `vertex` (Claude trên Vertex AI — dự phòng, WO-359) |" in ra
     assert "| A4 ĐẠT (agent) | 4/4 | ⛔ thiếu FLS_GCP_PROJECT |" in ra and "**0 lời gọi thật**" in ra
     assert "ANTHROPIC_API_KEY" not in ra                              # AC-2: đường vertex ⛔ đòi khoá
 

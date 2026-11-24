@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""`gcloud` + `curl` GIẢ CÓ TRẠNG THÁI — mô phỏng MỘT project GCP đủ cho `tools/staging/06_vertex_agent.sh` (`WO-359` AC-3).
+"""`gcloud` + `curl` GIẢ CÓ TRẠNG THÁI — mô phỏng MỘT project GCP đủ cho `tools/staging/06_vertex_agent.sh` (`WO-359` AC-3):
+đường `google-cloud` (`claude.googleapis.com`, hàm `claude_gc`) và đường `vertex` (`aiplatform`, phần dưới).
 
 Cùng tệp, chép thành hai tên: `gcloud` và `curl` (hành vi theo tên gọi). Trạng thái ở `$FLS_GIA_TRANG_THAI` (JSON);
 mọi lệnh ghi một dòng vào `<trang_thai>.log`. Lệnh LẠ ⇒ exit 99 (một lệnh script gọi mà giả ⛔ biết = lỗi bài thử).
@@ -69,13 +70,16 @@ def curl():
             sys.exit(6)                                          # curl: (6) Could not resolve host
         print(json.dumps({"access_token": TOK_SA, "expires_in": 3599, "token_type": "Bearer"}))
         return
+    auth = next((h for h in hdr if h.startswith("Authorization: Bearer ")), "")
+    tok = auth.split(" ", 2)[2] if auth else ""
+    g = re.match(r"https://claude\.googleapis\.com/v1/projects/([^/]+)/locations/([^/]+)/workspaces/([^/]+)/invoke/v1/messages$", url)
+    if g:
+        return claude_gc(g, tok, hdr, du_lieu, ra, viet)
     m = re.match(r"https://([^/]+)/v1/projects/([^/]+)/locations/([^/]+)/publishers/anthropic/models/([^/:]+):rawPredict$", url)
     if not m:
         print(f"curl GIẢ: URL lạ {url}", file=sys.stderr)
         sys.exit(99)
     host, du_an, vung, mo_hinh = m.groups()
-    auth = next((h for h in hdr if h.startswith("Authorization: Bearer ")), "")
-    tok = auth.split(" ", 2)[2] if auth else ""
 
     def tra(ma, body):
         if ra:
@@ -105,6 +109,49 @@ def curl():
         return loi(400, "FAILED_PRECONDITION")
     if "anthropic_version" not in yc or "model" in yc or not yc.get("messages"):
         return loi(400, "INVALID_ARGUMENT")
+    tra(200, {"id": "msg_gia", "type": "message", "role": "assistant", "model": S.get("phuc_vu", {}).get(mo_hinh, mo_hinh),
+              "content": [{"type": "text", "text": "NOIDUNG-GIA-khong-duoc-in"}], "stop_reason": "end_turn",
+              "usage": {"input_tokens": 18, "output_tokens": 5}})
+
+
+def claude_gc(g, tok, hdr, du_lieu, ra, viet):
+    """`claude.googleapis.com` (Anthropic managed). ĐÃ TRA (skill `claude-api` 24/11): URL
+    `/v1/projects/<p>/locations/global/workspaces/<wrkspc_…>/invoke/v1/messages` · `Authorization: Bearer <token Google>` ·
+    header `anthropic-version` · thân như Claude API (`model` trong thân) · cần API `claude.googleapis.com` bật + vai
+    `roles/claude.user` · lỗi theo khuôn Claude API `{"type":"error","error":{"type":…}}`.
+    ⚠ GIẢ ĐỊNH CHƯA KIỂM: thiếu vai/API ⇒ 403 · workspace sai ⇒ 404 `not_found_error` · tài khoản người chạy (Owner)
+    gọi được khi có `roles/claude.user` (trạng thái `nguoi_quyen`)."""
+    du_an, vi_tri, ws = g.groups()
+
+    def tra(ma, body):
+        if ra:
+            open(ra, "w", encoding="utf-8").write(json.dumps(body))
+        sys.stdout.write(viet.replace("%{http_code}", str(ma)) if viet else "")
+
+    def loi(ma, kieu):
+        tra(ma, {"type": "error", "error": {"type": kieu, "message": "chi tiet GIA — KHONG duoc in"}})
+
+    yc = json.loads(du_lieu or "{}")
+    if du_an != S["project"] or vi_tri != "global":
+        return loi(404, "not_found_error")
+    if tok not in (TOK_NGUOI, TOK_SA):
+        return loi(401, "authentication_error")
+    if "claude.googleapis.com" not in S["apis"]:
+        return loi(403, "permission_error")
+    if tok == TOK_SA:
+        if "https://www.googleapis.com/auth/cloud-platform" not in (S["vm"] or {}).get("scopes", []):
+            return loi(403, "permission_error")
+        if not any(b["role"] == "roles/claude.user" and f"serviceAccount:{S['sa']}" in b["members"] for b in S["iam"]):
+            return loi(403, "permission_error")
+    elif not S.get("nguoi_quyen", True):
+        return loi(403, "permission_error")
+    if ws != S.get("workspace"):
+        return loi(404, "not_found_error")
+    if not any(h.lower().startswith("anthropic-version: ") for h in hdr) or "anthropic_version" in yc:
+        return loi(400, "invalid_request_error")
+    mo_hinh = yc.get("model")
+    if mo_hinh not in S.get("to_chuc_mo_hinh", ["claude-opus-5-5", "claude-sonnet-5-5"]):
+        return loi(400, "invalid_request_error")
     tra(200, {"id": "msg_gia", "type": "message", "role": "assistant", "model": S.get("phuc_vu", {}).get(mo_hinh, mo_hinh),
               "content": [{"type": "text", "text": "NOIDUNG-GIA-khong-duoc-in"}], "stop_reason": "end_turn",
               "usage": {"input_tokens": 18, "output_tokens": 5}})
