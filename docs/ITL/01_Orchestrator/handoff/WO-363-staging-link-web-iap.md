@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Trạng thái** | `MO` — 24/11 ~03:40 UTC |
+| **Trạng thái** | `CHO_TEST` — 24/11 *(bàn giao [`BG-364`](BG-364-staging-link-web-iap.md); trước: `MO` 24/11 ~03:40 UTC → `DANG_LAM`)* |
 | **Phát bởi** | orchestrator · 2026-11-24 |
 | **Nhận** | `fls-dev` — phiên cloud Opus 5.5 · medium · nhánh `claude/bold-galileo-zukpaf-isp/STG-WEB` (nền = ngọn `isp/STG` `3223419`, staging đã chạy THẬT 01–04) |
 | **Dải phiếu** | `BG-364` · `KQ-365` (R1) · `KQ-366` (R2 cuối). Số trống kế tiếp sau dải: **367** |
@@ -23,3 +23,9 @@
 
 ## Ràng buộc
 - ⛔ URL công khai không xác thực · ⛔ nới luật cửa · ⛔ khoá trong repo/chat · ⛔ gcloud thật (CHỦ chạy) · ⛔ ghi kho THẬT · ⛔ `docker compose down`.
+
+## Nhật ký
+| Lúc | Ai | Việc |
+|---|---|---|
+| 24/11 | `fls-dev` | `MO` → `DANG_LAM`: đọc WO + `BG-326` §3 · §11 + `KQ-327/328/344/351`; tra tài liệu GCP hiện hành *(Cloud Run IAP tích hợp · IAP FAQ · programmatic auth)* |
+| 24/11 | `fls-dev` | `DANG_LAM` → `CHO_TEST`: `BG-364` — đường **(a) Cloud Run + IAP**; `07_link_web.sh` + `cong_iap.py` + `vao_cloud_run.sh`; +55 bài; sàn 5142 |

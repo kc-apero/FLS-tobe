@@ -421,7 +421,8 @@ MONG_HD1_CHAY=9845
 # Gộp H14+I2-tip (origin/claude/bold-galileo-zukpaf, 4.857) ⊕ STG (4.868 − 4.772 = +96) = 4.953; vòng sửa sau KQ-327 +8 bài (5 ở test_01 · 1 ở 04 · 1 ở 02 · 1 ở uat) ⇒ 4.961 = `pytest --collect-only` đo 23/11; tests/web 690.
 # Gộp I2 (origin/claude/bold-galileo-zukpaf @ 05d7a97, 4.887) ⊕ STG sau KQ-328 (`STG-R2-03`: sàn = thu thập THẬT cây gộp, ⛔ cộng tay): `pytest --collect-only` đo 23/11 = 4.995 (staging 04 +3 bài chuỗi/ký, ky_ty_gia +2 bài, uat +1); tests/web 690.
 # Gộp origin/claude/bold-galileo-zukpaf (main c5ea872 + AG 8a1eca4, 4.958) ⊕ STG (4.995) + vòng sửa sau R2b `KQ-344` +16 bài (test_02_chuyen_vai_gcp 8 · test_01 1 · test_03 7): `pytest --collect-only` đo 23/11 = 5.082; tests/web 690.
-MONG_PYTEST_TOAN_BO=5082
+# WO-363 (staging link web sau IAP): nền `isp/STG` 3223419 (KQ-351 +5 bài độc lập) đo = 5.087; + 55 bài (test_07_link_web 34 · test_cong_iap 21): `pytest --collect-only` đo 24/11 = 5.142; tests/web 690.
+MONG_PYTEST_TOAN_BO=5142
 MONG_PYTEST_WEB=690
 
 echo
