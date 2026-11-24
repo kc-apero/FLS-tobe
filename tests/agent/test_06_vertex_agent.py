@@ -29,6 +29,9 @@ CAM_GHI = re.compile(r"\b(delete|remove|disable|destroy|set-iam-policy|remove-ia
 GHI = re.compile(r"^gcloud (services enable|projects add-iam-policy-binding)")
 VAI = {"google-cloud": "roles/claude.user", "vertex": "roles/aiplatform.user"}
 API = {"google-cloud": "claude.googleapis.com", "vertex": "aiplatform.googleapis.com"}
+#: Đường google-cloud cần HAI service (trang Anthropic `anthropic-managed` 24/11: *"Enable two services"*).
+API2 = {"google-cloud": "anthropic-managed-claude.cloudpartnerservices.goog", "vertex": None}
+SO_MUC = {"google-cloud": 14, "vertex": 13}
 MO_HINH = ("claude-opus-5-5", "claude-sonnet-5-5")
 
 
@@ -109,8 +112,8 @@ def test_dung_tu_trong__DO_dung_buoc_bam_tay_roi_DAT(g):
     g.bam_tay()
     r2 = g.chay("--kiem")
     assert r2.returncode == 0, r2.stdout + r2.stderr
-    # 13 mục có mong = AC-5 · API · IAM SA · VM-SA · VM-phạm-vi (5) + 2 danh tính × 2 mô hình × (HTTP + mô hình) (8)
-    assert "KẾT: ĐẠT" in r2.stdout and len(muc(r2.stdout)) == 13 and not do_cua(r2.stdout)
+    # mục có mong = AC-5 · service (1 vertex / 2 google-cloud) · IAM SA · VM-SA · VM-phạm-vi + 2 danh tính × 2 mô hình × 2 (8)
+    assert "KẾT: ĐẠT" in r2.stdout and len(muc(r2.stdout)) == SO_MUC[g.duong] and not do_cua(r2.stdout)
     assert "18/5 · end_turn" in r2.stdout                         # số token đọc được (⛔ nội dung)
     assert f"API {API[g.duong]} bật" in muc(r2.stdout)
 
@@ -124,7 +127,7 @@ def test_kiem__KHONG_lenh_ghi_va_chay_lai_KHONG_nhan_doi(g):
     g.chay()
     g.chay()
     assert g.doc()["iam"] == [{"role": VAI[g.duong], "members": [f"serviceAccount:{SA}"]}]
-    assert g.doc()["apis"] == [API[g.duong]]
+    assert g.doc()["apis"] == [x for x in (API[g.duong], API2[g.duong]) if x]
     assert not [x for x in g.lenh() if CAM_GHI.search(x)]
 
 
@@ -182,6 +185,8 @@ def test_DO_hai_chieu__pha_tung_thu__DUNG_muc_DO(g, ten, mong_do):
     r = g.chay("--kiem")
     assert r.returncode == 1
     mong = {x.format(vai=VAI[g.duong], api=API[g.duong]) for x in mong_do}
+    if ten == "api_tat" and API2[g.duong]:
+        mong.add(f"API {API2[g.duong]} bật (Marketplace)")
     do = do_cua(r.stdout)
     # mục "mô hình trả về" ĐỎ kèm khi HTTP ≠ 200 — chỉ so tập HTTP/hạ tầng, trừ ca phá chính mục ấy
     if ten != "phuc_vu_khac":
@@ -241,3 +246,20 @@ def test_project_khac_cong_ty__DO_muc_AC5(g):
     g.bam_tay()
     r = g.chay(du_an="du-an-khac")
     assert "project = GCP công ty (fp-a-project — AC-5)" in do_cua(r.stdout)
+
+
+def test_moi_lenh_cap_vai_muc_project__co_condition_None():
+    """Orchestrator đo 24/11: IAM `fp-a-project` có binding CÓ ĐIỀU KIỆN ⇒ `add-iam-policy-binding` thiếu `--condition=None`
+    dừng ở câu hỏi tương tác. Mong: số lệnh có cờ = tổng số lệnh (và tổng ≥ 1 — Đ3)."""
+    van = S06.read_text(encoding="utf-8")
+    lenh = re.findall(r'projects add-iam-policy-binding[^\n]*\n?[^\n]*', van)
+    assert len(lenh) == 2 and sum("--condition=None" in x for x in lenh) == len(lenh), lenh
+
+
+def test_google_cloud__chi_bat_service_claude__thieu_Marketplace_van_DO(tmp_path):
+    """Thiếu service Marketplace ⇒ mục ấy ĐỎ dù lời gọi (giả định G2) vẫn 200 — ⛔ coi 'gọi được' là đủ."""
+    gg = Gcp(tmp_path, "google-cloud")
+    gg.chay()
+    gg.sua(lambda s: s.update(apis=["claude.googleapis.com"]))
+    r = gg.chay("--kiem")
+    assert do_cua(r.stdout) == {"API anthropic-managed-claude.cloudpartnerservices.goog bật (Marketplace)"}

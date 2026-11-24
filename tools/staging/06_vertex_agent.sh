@@ -22,8 +22,12 @@
 #            Cloud Shell — e2e §B BG-360 chạy bằng danh tính ấy) · --khong-goi-thu (⛔ gọi — mục gọi thử ⇒ ĐỎ, Đ5)
 #
 #  LÀM GÌ (mỗi việc: có rồi ⇒ bỏ qua, ⛔ phá gì đã có):
-#   ① bật API của đường (`claude.googleapis.com` — ⚠ trước đó phải ĐĂNG KÝ gói Marketplace "Claude" trên console;
-#      hoặc `aiplatform.googleapis.com`)
+#   ① bật service của đường — google-cloud: HAI service `claude.googleapis.com` (API + quyền IAM) và
+#      `anthropic-managed-claude.cloudpartnerservices.goog` (Marketplace — ghi nhận dùng vào gói); ⚠ trước đó phải ĐĂNG KÝ
+#      gói Marketplace "Claude Models on Google Cloud (Anthropic managed)" bằng tài khoản có quyền MUA trên billing account
+#      (trang Anthropic 24/11) · vertex: `aiplatform.googleapis.com`. ⛔ gỡ vai nào (service agent của claude.googleapis.com
+#      có vai riêng — *"Don't remove its role grants"*); mọi lệnh cấp vai mức project mang `--condition=None` (project có
+#      binding CÓ ĐIỀU KIỆN ⇒ thiếu cờ là gcloud dừng hỏi — orchestrator đo 24/11).
 #   ② cấp vai của đường cho SA `fls-staging-app` ở mức PROJECT (+ người chạy nếu `--cap-nguoi`)
 #   ③ BƯỚC BẤM TAY, script IN chỗ bấm: google-cloud ⇒ lấy WORKSPACE ID (skill `claude-api` 24/11: *"In the Claude Console,
 #      under Settings > Workspaces"*; Console mở TỪ Google Cloud console và chỉ vai `roles/claude.admin` mở được) ·
@@ -76,12 +80,13 @@ command -v python3 >/dev/null || { echo "⛔ không có python3" >&2; exit 2; }
 SA_EMAIL="${SA_NAME}@${PROJECT}.iam.gserviceaccount.com"
 MO_HINH=(claude-opus-5-5 claude-sonnet-5-5)      # mã TRẦN ở cả hai đường (⛔ tiền tố, ⛔ `@ngày`) — tra 24/11
 if [ "$DUONG" = google-cloud ]; then
-  API="claude.googleapis.com" ; API_KIA="aiplatform.googleapis.com" ; VAI="roles/claude.user"
+  API="claude.googleapis.com" ; API2="anthropic-managed-claude.cloudpartnerservices.goog"
+  API_KIA="aiplatform.googleapis.com" ; VAI="roles/claude.user"
   HOST="claude.googleapis.com"
   # URL theo trang Anthropic *Claude Models on Google Cloud* (24/11): …/locations/global/workspaces/<ws>/invoke/v1/messages
   URL_MAU="https://${HOST}/v1/projects/${PROJECT}/locations/global/workspaces/${WS}/invoke/v1/messages"
 else
-  API="aiplatform.googleapis.com" ; API_KIA="claude.googleapis.com" ; VAI="roles/aiplatform.user"
+  API="aiplatform.googleapis.com" ; API2="" ; API_KIA="claude.googleapis.com" ; VAI="roles/aiplatform.user"
   if [ "$REGION" = global ]; then HOST="aiplatform.googleapis.com"; else HOST="aiplatform.${REGION}.rep.googleapis.com"; fi
   URL_MAU="https://${HOST}/v1/projects/${PROJECT}/locations/${REGION}/publishers/anthropic/models/MOHINH:rawPredict"
 fi
@@ -91,8 +96,8 @@ TM="$(mktemp -d)" ; chmod 700 "$TM" ; trap 'rm -rf "$TM"' EXIT
 buoc() { printf '\n── %s\n' "$*"; }
 
 if [ "$KIEM" -eq 0 ]; then
-  buoc "① bật API $API"
-  "${G[@]}" services enable "$API"
+  buoc "① bật service $API${API2:+ + $API2}"
+  "${G[@]}" services enable "$API" ${API2:+"$API2"}
 
   buoc "② cấp $VAI (mức project)"
   "${G[@]}" projects add-iam-policy-binding "$PROJECT" --member="serviceAccount:$SA_EMAIL" \
@@ -107,10 +112,12 @@ fi
 
 if [ "$DUONG" = google-cloud ]; then
   buoc "③ BƯỚC BẤM TAY — chỉ khi chưa xong (script ⛔ làm thay được)"
-  echo "   a) gói Marketplace: https://console.cloud.google.com/marketplace/product/anthropic/claude?project=${PROJECT}"
-  echo "      (đường dẫn = giả định chưa kiểm; nếu ⛔ mở: Marketplace → tìm \"Claude\" → Subscribe). Đã bật API ⇒ thường đã xong."
-  echo "   b) WORKSPACE ID: Google Cloud console → trang sản phẩm \"Anthropic managed Claude API\" → mở Claude Console"
-  echo "      (cần vai roles/claude.admin) → Settings → Workspaces → chép ID dạng wrkspc_… ⇒ --workspace-id"
+  echo "   a) Marketplace → listing \"Claude Models on Google Cloud (Anthropic managed)\" → Subscribe (tài khoản có quyền MUA"
+  echo "      trên billing account) → Manage on Console. ⚠ ① ĐỎ 'không tìm thấy anthropic-managed-claude.cloudpartnerservices.goog'"
+  echo "      ⇒ chạy bằng tài khoản đã mua (trang Anthropic)."
+  echo "   b) Trang Claude (Agent Platform → Models → Claude Platform → Anthropic managed) → Activate → mở thư xác nhận."
+  echo "   c) WORKSPACE ID: nút Open Claude Console (cần roles/claude.admin) → Settings → Workspaces → ID 'Default Workspace'"
+  echo "      dạng wrkspc_… ⇒ --workspace-id"
 else
   buoc "③ Model Garden — BƯỚC BẤM TAY (mỗi mô hình một lần cho project; script ⛔ tự bật)"
   for m in "${MO_HINH[@]}"; do
@@ -172,7 +179,7 @@ done; rm -rf \$T"
 
 # ══════════════════════════════ BÁO CÁO — gửi lại phần này ══════════════════════════════
 buoc "BÁO CÁO (KHÔNG chứa token/khoá/nội dung trả lời/workspace đầy đủ) — chép từ dòng này tới hết, gửi lại"
-export PROJECT DUONG REGION VM ZONE SA_EMAIL VAI API API_KIA KIEM GOI_THU HOST CAP_NGUOI
+export PROJECT DUONG REGION VM ZONE SA_EMAIL VAI API API2 API_KIA KIEM GOI_THU HOST CAP_NGUOI
 export WS_CHE="${WS:+${WS:0:7}…(${#WS} ký tự)}"
 export R_APIS="$("${G[@]}" services list --enabled --format='value(config.name)' 2>/dev/null | tr '\n' ' ' || true)"
 export R_IAM="$("${G[@]}" projects get-iam-policy "$PROJECT" --format=json 2>/dev/null || echo '{}')"
@@ -209,6 +216,7 @@ hang = [
   ("đường · project · vùng · host · SA", f'{e["DUONG"]} · {e["PROJECT"]} · {e["REGION"]} · {e["HOST"]} · {e["SA_EMAIL"]}', None),
   ("project = GCP công ty (fp-a-project — AC-5)", e["PROJECT"], "fp-a-project"),
   (f"API {e['API']} bật", e["API"] in apis, True),
+] + ([(f"API {e['API2']} bật (Marketplace)", e["API2"] in apis, True)] if e["API2"] else []) + [
   (f"API {e['API_KIA']} (đường kia — thông tin)", e["API_KIA"] in apis, None),
   (f"SA có {e['VAI']} ở project (⛔ điều kiện)", co_vai(f"serviceAccount:{e['SA_EMAIL']}") if iam else None, True),
 ]

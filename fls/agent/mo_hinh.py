@@ -74,9 +74,11 @@ DUONG_MAC_DINH = DUONG_GOOGLE_CLOUD
 DUONG_GCP = (DUONG_GOOGLE_CLOUD, DUONG_VERTEX)
 BIEN_CLAUDE_WORKSPACE = "FLS_CLAUDE_WORKSPACE_ID"
 DAU_WORKSPACE = "wrkspc_"
-#: ⭐ AC-2 ở đường `google-cloud` — THAY `FLS_ZDR_DA_BAT`. Tra 24/11 (skill `claude-api` · `google-cloud-anthropic-managed`):
-#:    nền do ANTHROPIC vận hành; việc dựng tạo **một tổ chức Anthropic MỚI** — *"A Zero Data Retention arrangement doesn't
-#:    carry over"* ⇒ xác nhận ZDR cũ của tài khoản API ⛔ dùng lại được. Người vận hành xác nhận (BG-360 §E C1).
+#: ⭐ AC-2 ở đường `google-cloud` — THAY `FLS_ZDR_DA_BAT`. Tra 24/11 (skill `claude-api` · `google-cloud-anthropic-managed` +
+#:    trang `platform.claude.com/…/claude-models-on-google-cloud/anthropic-managed` §Data retention): nền do ANTHROPIC vận
+#:    hành; *"follows the same data retention policy as the Claude API … ZDR is available on request"*; việc dựng tạo **một
+#:    tổ chức Anthropic MỚI** — *"A ZDR arrangement on another Anthropic organization doesn't carry over"* ⇒ xác nhận ZDR cũ
+#:    ⛔ dùng lại được. Người vận hành xác nhận (BG-360 §E C1).
 BIEN_GC_DU_LIEU = "FLS_GC_DU_LIEU_XAC_NHAN"
 BIEN_GCP_PROJECT = "FLS_GCP_PROJECT"
 BIEN_VERTEX_REGION = "FLS_VERTEX_REGION"
