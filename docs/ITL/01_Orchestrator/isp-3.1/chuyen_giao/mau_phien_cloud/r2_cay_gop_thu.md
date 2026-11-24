@@ -2,6 +2,7 @@
 
 > Nguyên văn prompt `create_session` orchestrator đã dùng 19/11 (trích từ nhật ký phiên, đã soát: ⛔ PII · ⛔ khoá).
 > Thay: mã bước · số phiếu · `## Step NN` · sha mong · cổng PG (mỗi phiên song song một cổng khác: 5434–5437, 5444–5447) · tên nhánh nếu tài khoản mới đổi tiền tố. Giữ nguyên các khối luật.
+> ⭐ **24/11 (bẫy cắn 3 lần: AG · HELD · SONG):** sổ phát hiện riêng của bước PHẢI dùng đúng **10 cột** của sổ chung `SO_PHAT_HIEN_ISP-3.1.md` — `| Mã | Bước | Vòng | Lớp | Mức | Tệp:dòng | Mô tả | Khuyến nghị | Luật phòng tái phạm | Trạng thái |` — ghi câu này vào prompt; sổ khác khuôn ⇒ `gop_so.py` chép hàng lệch cột ⇒ `kiem_tai_lieu` K3 ĐỎ lúc gộp.
 
 ````text
 Phiên cloud CON của orchestrator ISP 3.1.2 (repo kc-apero/FLS-tobe). Việc: **R2 CUỐI · Step 35 · H11 (+DT9b) · phiếu KQ-237**. Nhẹ: soát vòng sửa sau R1 (`KQ-236`) + **cây gộp thử** lên nhánh làm việc. GHI NHẬN ⇒ backlog. GỌN; tin nhắn cuối ≤ 15 dòng. Người dùng đã duyệt. Vai KIỂM: ⛔ sửa mã. Đọc `KQ-236`, mục "Vòng sửa sau R1 (KQ-236)" trong `BG-235`, sổ `docs/ITL/04_Test/review/SO_PHAT_HIEN_ISP-3.1_H11.md`, `CLAUDE.md` (Đ1–Đ5).
