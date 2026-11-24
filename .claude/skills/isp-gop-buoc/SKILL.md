@@ -32,4 +32,7 @@ Nguồn: `HANDOFF_ORCHESTRATOR_2026-11-19.md` §5.3 · bảng quyết §5.2. Ch�
 - Sàn ở nhánh bước lệch cây gộp 2–9 bài ⇒ luôn đếm trên CÂY GỘP sau khi hết dấu xung đột.
 - Khối HD2 gói mới thiếu `tong_o`/`khop` ⇒ `/gates` null + bài CG2 đỏ khi gộp (cắn 2 lần) — R2 phải chạy trên cây gộp thử.
 - Bước có ảnh dữ liệu mới ⇒ `quet_pii_repo.py` trên cây gộp đòi 0.
+- ⭐ **24/11 — cụm gộp ở container cloud = `5434`, ⛔ `5433`.** `NAP-R1-05` (gộp STG-NAP) cho `tools/staging/05_*` CHẶN `PG_DSN` cổng 5433 vì trên máy chủ 5433 = `fls-pg-1` THẬT ⇒ chạy đường nền ở 5433 container ⇒ **15** bài `test_05` ĐỎ đúng thiết kế. Dùng `dung_moi_truong_isp.sh --cong 5434` + `--duong-nen --cong 5434` (226/226 bài staging xanh ở 5434). `gop_buoc_isp.py` vẫn ghi `5433` trong lời nhắc — theo dòng này.
+- `gop_buoc_isp.py tiep` tìm sổ riêng `SO_PHAT_HIEN_ISP-3.1_<ID>.md` theo ĐÚNG mã nhánh ⇒ nhánh `STG-NAP` có sổ `_NAP.md` ⇒ công cụ bỏ bước 7 ⇒ chạy tay `gop_so.py <R> NAP v0.NN <ngày> <sha>`.
+- Sổ riêng khác khuôn **10 cột** (AG 6 · HELD 4 · SONG 5) ⇒ `gop_so.py` chép hàng lệch cột ⇒ `kiem_tai_lieu` K3 ĐỎ ⇒ đổi cột tay trước commit (mẫu prompt R1/R2/sửa nay đòi 10 cột).
 - Nhánh đã gộp **giữ nguyên** làm lịch sử (⛔ xoá). ⛔ PR · ⛔ force push.
