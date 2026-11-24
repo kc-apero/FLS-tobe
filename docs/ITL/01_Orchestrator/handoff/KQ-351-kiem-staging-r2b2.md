@@ -1,0 +1,33 @@
+# KQ-351 — R2b2 STG *(vòng sửa sau R2b `KQ-344` · `BG-326` §11)*
+
+| | |
+|---|---|
+| **Phán quyết** | **`ĐẠT`** — **0 CHẶN · 1 NÊN SỬA · 2 GHI NHẬN** *(`STG-R2b2-01…03`, sổ `docs/ITL/04_Test/review/SO_PHAT_HIEN_ISP-3.1_STG.md` v0.4)* |
+| **Đường chuyển vai an toàn để chủ chạy** | **CÓ** — kèm **một sửa tài liệu nên làm TRƯỚC** *(`STG-R2b2-01`: khối lệnh §11.1 dòng ⓪; lỗi ở đó **dừng sớm, ⛔ phá gì**)* |
+| **Kiểm bởi** | `fls-test` *(phiên cloud · cụm PG **5447**)* · 2026-11-23 |
+| **Kiểm ở** | STG @ `ef96a15` *(diff `fa2c07e..ef96a15`)* · cây gộp thử = `origin/claude/bold-galileo-zukpaf` @ `f8c6d55` ⊕ `ef96a15` — gộp **sạch** *(0 tệp xung đột)*; commit **CỤC BỘ** để `git archive HEAD` chạy, ⛔ đẩy |
+| **Kho thật** | `KHONG_CHAM` — ⛔ GCP · ⛔ `gcloud` thật · ⛔ kho thật |
+
+## Năm mục được giao
+| # | Kiểm | Đo được |
+|---|---|---|
+| 1 | Đường chuyển vai `STG-R2b-02` | **ĐẠT.** Bài ĐỘC LẬP `tests/nghiem_thu/test_kq351_duong_chuyen_vai_doc_lap.py` *(5 bài = 2 giả thuyết × 2 + 1 tĩnh)*, PG 16 thật. Trạng thái đầu: **H-B** dựng bằng CHÍNH script 02 CŨ `fa2c07e` *(ra ĐỎ đúng mục "siêu quyền … = 2" như báo cáo chủ)*; **H-A** mâu thuẫn *(02a cũ nổ `permission denied to alter role`)* ⇒ dựng bằng 02 mới rồi trả vai về hình gcloud-tạo. Sau 02 mới: `fls_ghi`/`fls_doc` = `NOCREATEROLE NOCREATEDB` + 3 thuộc tính khác `false` *(mẫu số: 2 vai có mặt)*; `fls_itl` cho `fls_ghi` = `INSERT,SELECT` · `fls_migration` = `SELECT` · bảng thường = `DELETE,INSERT,SELECT,UPDATE` · `fls_doc` chỉ `SELECT`, `rolconfig = {default_transaction_read_only=on}`. **Dữ liệu**: đếm dòng **mọi** bảng public *(≥ 20 bảng, tổng > 0 — nạp 2 dòng `fls_mapping_master` + 27 dòng `fls_migration`)*: trước = sau, chủ bảng vẫn `fls_admin`. **Chạy lại lần 2**: `SẠCH ⇒ đồng bộ mật khẩu` ×2, 0 `ĐƯỜNG CHUYỂN`, đếm dòng y nguyên. **Lỗi giữa chừng** *(bí mật `fls_ghi` sai khuôn sau khi `DROP` đã chạy)*: exit 1, `VAI_KHONG_TAO_DUOC: fls_ghi (đã xoá!) — sửa rồi chạy lại 02 ngay; app ⛔ nối được tới khi xong`; đo thật: `fls_ghi` = 0 *(đã xoá)*, `fls_doc` = 1 *(⛔ chạm)*, dữ liệu nguyên, ⛔ in `BÁO CÁO`; sửa bí mật + chạy lại ⇒ `KẾT: ĐẠT`. **Mật khẩu**: quét `/proc/*/cmdline` mỗi 20 ms suốt lúc chạy *(≥ 20 lượt, có thấy tiến trình `psql` — phép đo ⛔ rỗng)*: **0** lần thấy `MKGIA-`; màn + stderr + nhật ký proxy + nhật ký gcloud: **0**; tĩnh: ⛔ `set -x`, ⛔ `echo $MK_*`, ⛔ `-c "…$MK_*"`. **H-A/H-B**: dòng `đo trước: … có ADMIN OPTION=` và `ⓑ DROP ROLE … bị từ chối — PG nói: …` in ra *(H-A: ×2, H-B: DROP SQL được)* ⇒ lần chạy thật phân xử được. **ĐỎ hai chiều**: đột biến `02c` rỗng ⇒ **4/5 bài ĐỎ**; đột biến mật khẩu đi argv `psql -c` ⇒ **2/5 ĐỎ** *(bài argv)*; trả nguyên `git diff` = 0. Bài Dev `tests/staging` **124 passed** *(247 s)*. |
+| 2 | `.gcloudignore` `-01` | `git ls-files` lọc `gcloudignore` đếm = **0**; ngữ cảnh build **435** tệp. Đột biến thả lại `.gcloudignore` kiểu cũ ⇒ BÁO CÁO `436 / 329` ⇒ mục "tải lên = ngữ cảnh" **ĐỎ**, 2 bài `test_03` ĐỎ; `bo_tep` mất 1 tệp ⇒ ĐỎ *(bài Dev)*; giả 398 → 292 ⇒ ĐỎ *(bài Dev `…398_ra_292…` xanh)*. Trả nguyên. |
+| 3 | BuildKit `-05` | `Dockerfile`: **0** dòng `RUN --…` *(2 lần `--mount` còn lại đều ở chú thích 23 · 25)*. `dockerd` có *(tự bật)*. `thu_dung_anh.sh` ⇒ ĐỎ vì môi trường *(`--ca` gói 182 KB ⇒ `Argument list too long`; CA nhỏ ⇒ pip trong container không ra mạng — xem `-03`)*. Dựng THẬT bằng tay **cùng ngữ cảnh** `ngu_canh_build.sh` + `DOCKER_BUILDKIT=0 docker build --network host` ⇒ **`Successfully built`** *(20/20 bước, 0 lần `requires BuildKit`)*; ảnh: `id -u` = **10001**; tìm `sao_luu\|hien_vat\|.env*\|*.DO.json\|Input_Raw` = **0**; `docker history` mang CA/`PIP_CA_PEM`/`HTTPS_PROXY` = **0**. |
+| 4 | README + UAT v0.4 + §11.1 | README §"Người test vào bằng gì" + UAT §0.1/U1: ⛔ Web Preview, tunnel từ máy người test ✔; giả định #4 #6 ghi ĐÃ KIỂM ✔. **§11.1 KHÔNG chạy được từ cây UPLOAD** ⇒ **`STG-R2b2-01`** *(2 lỗi, xem dưới)*. |
+| 5 | Cây gộp thử + cổng | Thu thập thật **5082** = sàn · web **690**. `--duong-nen --cong 5447` MỘT lần một mình: lần 1 **ĐỎ** vì cây gộp chưa commit *(25 bài `test_03` — `-04` cũ, đúng như KQ-344)*; lần 2 sau commit cục bộ: **`KẾT: ĐẠT`** — toàn bộ **28 = 28** *(XFAIL 2 = 2 · thêm 0 · bớt 0 · chạy 5082 · skipped 0 · deselected 0)* · web **3 = 3** *(chạy 690)*. `kiem_tai_lieu` OK *(514 tệp · 3058 bảng · 988 ô ngày · 104 mã QĐ)* · `lint-imports` **11 kept, 0 broken** · `quet_pii_repo` **0** chỗ · **0** tệp. |
+
+## NÊN SỬA
+- **`STG-R2b2-01`** *(tài liệu — `BG-326` §11.1 ⓪)*: khối lệnh chủ sắp chạy giả định `~/fls` có `origin`, nhưng Cloud Shell là bản `git init` từ tarball *(README §cách 2)*. Hai lỗi, đo trên bản `git archive` + `git init` giống hệt:
+  1. `git fetch origin claude/bold-galileo-zukpaf-isp/STG` ⇒ `fatal: 'origin' does not appear to be a git repository`.
+  2. Dòng "cây đúng": `test ! -e .gcloudignore && ! grep -n -- '--mount' Dockerfile && echo "cây đúng"` ⇒ **exit 1, ⛔ in "cây đúng"** *(in 2 dòng chú thích `Dockerfile:23,25`)* — cây ĐÚNG mà chủ thấy như SAI. Thay: `! grep -nE '^[[:space:]]*RUN[[:space:]]+--' Dockerfile`.
+  - Cách thay ⓪: máy người đẩy `git archive --format=tar.gz -o fls.tar.gz <ngọn STG>` → Upload → **thư mục MỚI** `rm -rf ~/fls && mkdir ~/fls && tar -xzf fls.tar.gz -C ~/fls && cd ~/fls && git init -q && git add -A && git -c user.email=x -c user.name=x commit -qm snap` *(⛔ giải nén chồng lên `~/fls` cũ: `.gcloudignore` cũ còn lại làm "cây đúng" ĐỎ)*.
+  - ⇒ lỗi này **dừng sớm** *(trước mọi lệnh chạm GCP)*, ⛔ phá gì — nên không CHẶN.
+
+## GHI NHẬN *(⛔ chặn)*
+- **`STG-R2b2-02`** *(`02_di_tru_phan_quyen.sh`, `chuyen_vai`)*: `mk_hop_le` kiểm bí mật **SAU** `DROP ROLE` *(trong `tao_vai_sql`)* ⇒ bí mật sai khuôn làm vai bị xoá rồi mới dừng *(bài trên: `fls_ghi` = 0)*. Dừng có tên, nói rõ "đã xoá", chạy lại phục hồi ⇒ chấp nhận được; bí mật do bước 01 sinh `token_urlsafe(32)` nên xác suất ≈ 0. Nên sửa lúc rảnh: kiểm cả bốn bí mật trước bước phá huỷ đầu tiên.
+- **`STG-R2b2-03`** *(`thu_dung_anh.sh`)*: `--ca` truyền cả bó CA qua `--build-arg` ⇒ bó 182 KB ⇒ `Argument list too long` (exit 126 ⇒ ĐỎ, ⛔ xanh giả); không có `--network host`/proxy ⇒ ở container có proxy chặn, tầng pip ⛔ ra mạng. Chỉ ảnh hưởng máy dev sau proxy; Cloud Shell/Cloud Build ⛔ cần `--ca`.
+
+## Kết luận
+Ba sửa của §11 **đúng** *(đường chuyển giữ dữ liệu, idempotent, dừng có tên, ⛔ rò mật khẩu — đo bằng bài riêng, ĐỎ hai chiều)*, cổng cây gộp **ĐẠT** *(28 = 28 · 3 = 3)*. Chủ chạy được §11.1 **sau khi** thay dòng ⓪ + dòng "cây đúng" theo `-01`.
+⚠ Bài mới ở `tests/nghiem_thu/` làm thu thập thật **5082 → 5087**; sàn `MONG_PYTEST_TOAN_BO` **cần nâng + ghim cùng commit** khi orchestrator gộp *(Q8)*.

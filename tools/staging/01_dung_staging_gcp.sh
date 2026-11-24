@@ -20,15 +20,24 @@
 #      (`deletion-protection`) · cờ `cloudsql.iam_authentication=on` để phase SSO sau gắn
 #      người dùng IAM vào kho mà ⛔ cần mật khẩu.
 #   ③ kho `fls`
-#   ④ 3 tài khoản kho (mật khẩu ngẫu nhiên 43 ký tự, cất ở Secret Manager, ⛔ in):
-#        `fls_admin` — chủ sở hữu kho, chạy di trú (`python -m fls.db.pg_migrate`)
+#   ④ 3 mật khẩu kho (ngẫu nhiên 43 ký tự, cất ở Secret Manager, ⛔ in) — nhưng CHỈ `fls_admin` là
+#      tài khoản tạo bằng gcloud:
+#        `fls_admin` — chủ sở hữu kho, chạy di trú (`python -m fls.db.pg_migrate`) — `gcloud sql users create`
 #        `fls_ghi`   — đường GHI của ứng dụng (`mo_ghi`; công cụ ghi sổ còn đòi `FLS_CHO_GHI_THAT=1`)
 #        `fls_doc`   — đường ĐỌC của cửa API: `tools/chay_cua.py` TỪ CHỐI chạy nếu kết nối còn ghi
 #                      được ⇒ bước 02 đặt `default_transaction_read_only = on` cho vai này
+#        ⭐ `fls_ghi`/`fls_doc` ⛔ tạo ở đây (`STG-R2b-02`, lỗi THẬT GCP 23/11): `gcloud sql users create` gắn
+#           CREATEROLE + CREATEDB mà `postgres` ⛔ hạ được ⇒ bước 02 tạo chúng bằng SQL (`CREATE ROLE … LOGIN
+#           NOCREATEDB NOCREATEROLE`, mật khẩu từ CHÍNH bí mật bước này sinh). Bước 01 chỉ sinh bí mật của chúng.
 #      + mật khẩu `postgres` (quản trị Cloud SQL) cũng ngẫu nhiên, cất Secret Manager.
 #   ⑤ bí mật `fls-staging-jwt-secret` (cửa API tự từ chối nếu thiếu `FLS_JWT_SECRET`)
-#   ⑥ service account `fls-staging-app` — vai `roles/cloudsql.client` + đọc ĐÚNG 5 bí mật trên
-#      (dùng cho máy chạy cửa API ở bước sau). Người dùng thật: phase SSO, ⛔ ở đây.
+#   ⑥ service account `fls-staging-app` — vai `roles/cloudsql.client` + `secretAccessor` trên ĐÚNG 3 bí mật
+#      app dùng: `fls-staging-jwt-secret` · `fls-staging-pg-fls_ghi` · `fls-staging-pg-fls_doc`
+#      (dùng cho máy chạy cửa API ở bước sau). ⛔⛔ KHÔNG đọc được `fls-staging-pg-postgres` · `fls-staging-pg-fls_admin`:
+#      hai bí mật quản trị chỉ danh tính CHỦ (bước 02/04 chạy trong Cloud Shell) — người có shell trên VM gọi được
+#      máy chủ metadata lấy token của SA, nên SA đọc được `fls_admin` ⇒ vòng quanh cả hai tường quyền của bước 02
+#      (`STG-R1-01`). Chạy lại script ⇒ GỠ `secretAccessor` thừa nếu bản chạy cũ đã gán (idempotent).
+#      Người dùng thật: phase SSO, ⛔ ở đây.
 #
 #  ⛔ KHÔNG làm ở bước 01: di trú · phân quyền bảng · nạp dữ liệu thật · mở cửa API (bước 02, 03).
 #  Chi phí ước tính tier mặc định: ~ 50–60 USD/tháng (instance) + lưu trữ/sao lưu — tự kiểm ở
@@ -55,15 +64,29 @@ command -v gcloud >/dev/null || { echo "⛔ không có gcloud — chạy trong C
 command -v python3 >/dev/null || { echo "⛔ không có python3" >&2; exit 2; }
 
 DB="fls"
-USERS=(fls_admin fls_ghi fls_doc)
+USERS=(fls_admin)                 # tài khoản kho tạo bằng gcloud (⛔ vai ứng dụng — `STG-R2b-02`)
+VAI_APP=(fls_ghi fls_doc)          # bước 01 chỉ sinh BÍ MẬT; bước 02 tạo vai bằng SQL
 SA_NAME="fls-staging-app"
 SA_EMAIL="${SA_NAME}@${PROJECT}.iam.gserviceaccount.com"
-SECRETS=(fls-staging-pg-postgres fls-staging-pg-fls_admin fls-staging-pg-fls_ghi fls-staging-pg-fls_doc fls-staging-jwt-secret)
+# ⭐ `STG-R1-01`: tách hai nhóm. `BI_MAT_APP` = ĐÚNG những gì app đọc (đo bằng grep chỗ dùng: `vao.sh` đọc
+#   `fls-staging-jwt-secret` + `fls-staging-pg-$VAI` với VAI ∈ {fls_ghi, fls_doc}; `chay_chuoi.sh` đọc `fls-staging-pg-fls_doc`).
+#   `BI_MAT_QUAN_TRI` = ⛔ gán cho SA, và còn bị GỠ nếu đã lỡ gán.
+BI_MAT_APP=(fls-staging-pg-fls_ghi fls-staging-pg-fls_doc fls-staging-jwt-secret)
+BI_MAT_QUAN_TRI=(fls-staging-pg-postgres fls-staging-pg-fls_admin)
+SECRETS=("${BI_MAT_QUAN_TRI[@]}" "${BI_MAT_APP[@]}")   # 5 bí mật phải TỒN TẠI; ⛔ nghĩa là SA đọc cả 5
 G=(gcloud --project="$PROJECT" --quiet)
 
 buoc() { printf '\n── %s\n' "$*"; }
 co_instance() { "${G[@]}" sql instances describe "$INSTANCE" --format='value(name)' >/dev/null 2>&1; }
 co_secret()   { "${G[@]}" secrets describe "$1" --format='value(name)' >/dev/null 2>&1; }
+# SA đang đọc được bí mật $1? In `co`/`khong`; ⛔ đo được ⇒ `khong_do` (Đ5: phép ⛔ đo được là ĐỎ, ⛔ là "không thấy lệch").
+sa_doc_duoc() {
+  local out
+  out="$("${G[@]}" secrets get-iam-policy "$1" --flatten='bindings[].members' \
+      --filter="bindings.role=roles/secretmanager.secretAccessor AND bindings.members=serviceAccount:$SA_EMAIL" \
+      --format='value(bindings.members)' 2>/dev/null)" || { echo khong_do; return 0; }
+  [ -n "$out" ] && echo co || echo khong
+}
 mat_khau()    { python3 -c 'import secrets; print(secrets.token_urlsafe(32))'; }
 
 # Lấy mật khẩu từ Secret Manager nếu đã có, nếu chưa thì sinh + cất. ⛔ in giá trị.
@@ -119,6 +142,10 @@ if [ "$KIEM" -eq 0 ]; then
       echo "   $u: tạo"
     fi
   done
+  for u in "${VAI_APP[@]}"; do
+    bi_mat "fls-staging-pg-$u" >/dev/null
+    echo "   $u: bí mật sẵn — vai tạo ở BƯỚC 02 bằng SQL (⛔ gcloud sql users create: gắn CREATEROLE/CREATEDB)"
+  done
   unset PW
 
   buoc "⑤ bí mật JWT của cửa API"
@@ -131,13 +158,45 @@ if [ "$KIEM" -eq 0 ]; then
   else
     "${G[@]}" iam service-accounts create "$SA_NAME" --display-name="FLS staging — máy chạy cửa API"
   fi
-  "${G[@]}" projects add-iam-policy-binding "$PROJECT" \
-      --member="serviceAccount:$SA_EMAIL" --role=roles/cloudsql.client --condition=None >/dev/null
-  for s in "${SECRETS[@]}"; do
-    "${G[@]}" secrets add-iam-policy-binding "$s" \
-        --member="serviceAccount:$SA_EMAIL" --role=roles/secretmanager.secretAccessor >/dev/null
+  # ⭐ Lần chạy THẬT 23/11: `iam service-accounts create` xong ngay, nhưng `add-iam-policy-binding` ngay sau đó báo
+  #   `INVALID_ARGUMENT: Service account … does not exist` (IAM lan truyền trễ) ⇒ `set -e` chết im, ⛔ in BÁO CÁO.
+  #   ⇒ thử lại CÓ HẠN (≤ 12 lần × 5 giây, chỉnh bằng FLS_STG_THU_LAI / FLS_STG_CHO_GIAY); hết hạn ⇒ lỗi CÓ TÊN, ⛔ dừng:
+  #   vẫn đi tiếp tới BÁO CÁO để phép ⛔ đo được hiện ĐỎ (Đ5).
+  THU_LAI="${FLS_STG_THU_LAI:-12}"; CHO_GIAY="${FLS_STG_CHO_GIAY:-5}"
+  LOI_CUOI=""
+  thu_lai() {   # chạy "$@" tới khi được hoặc hết lượt; giữ DÒNG LỖI CUỐI của gcloud trong LOI_CUOI (`STG-R1-04b`:
+                # trước đây `>/dev/null 2>&1` nuốt chữ thật ⇒ PERMISSION_DENIED bị dán nhãn "IAM lan truyền")
+    local i out
+    for i in $(seq 1 "$THU_LAI"); do
+      if out="$("$@" 2>&1 >/dev/null)"; then return 0; fi
+      LOI_CUOI="$(printf '%s\n' "$out" | grep -v '^[[:space:]]*$' | tail -1)"
+      [ "$i" -lt "$THU_LAI" ] && { echo "   (lần $i/$THU_LAI chưa được — chờ ${CHO_GIAY}s cho IAM lan truyền)"; sleep "$CHO_GIAY"; }
+    done
+    return 1
+  }
+  IAM_LOI=0
+  thu_lai "${G[@]}" projects add-iam-policy-binding "$PROJECT" \
+      --member="serviceAccount:$SA_EMAIL" --role=roles/cloudsql.client --condition=None \
+    || { echo "⛔ IAM_KHONG_LAN_TRUYEN: không gán được roles/cloudsql.client cho $SA_EMAIL sau $THU_LAI lần — gcloud nói: $LOI_CUOI" >&2; IAM_LOI=1; }
+  for s in "${BI_MAT_APP[@]}"; do
+    thu_lai "${G[@]}" secrets add-iam-policy-binding "$s" \
+        --member="serviceAccount:$SA_EMAIL" --role=roles/secretmanager.secretAccessor \
+      || { echo "⛔ IAM_KHONG_LAN_TRUYEN: không gán được secretAccessor trên $s sau $THU_LAI lần — gcloud nói: $LOI_CUOI" >&2; IAM_LOI=1; }
   done
-  echo "   cloudsql.client + secretAccessor trên ${#SECRETS[@]} bí mật"
+  # ⭐ `STG-R1-01`: GỠ secretAccessor của SA trên hai bí mật quản trị nếu bản chạy cũ (23/11) đã lỡ gán. Có ⇒ gỡ; ⛔ có ⇒ bỏ qua.
+  #   `khong_do` ⇒ KHÔNG đoán là sạch: báo lỗi có tên, BÁO CÁO sẽ ĐỎ.
+  for s in "${BI_MAT_QUAN_TRI[@]}"; do
+    case "$(sa_doc_duoc "$s")" in
+      co)  thu_lai "${G[@]}" secrets remove-iam-policy-binding "$s" \
+               --member="serviceAccount:$SA_EMAIL" --role=roles/secretmanager.secretAccessor \
+             && echo "   gỡ secretAccessor thừa của SA trên $s" \
+             || { echo "⛔ GO_QUYEN_THUA_LOI: không gỡ được secretAccessor của SA trên $s — gcloud nói: $LOI_CUOI" >&2; IAM_LOI=1; } ;;
+      khong_do) echo "⛔ GO_QUYEN_THUA_LOI: ⛔ đo được chính sách IAM của $s" >&2; IAM_LOI=1 ;;
+      *)   echo "   SA ⛔ đọc được $s ✔" ;;
+    esac
+  done
+  [ "$IAM_LOI" -eq 0 ] && echo "   cloudsql.client + secretAccessor trên ${#BI_MAT_APP[@]} bí mật app (0 bí mật quản trị)" \
+    || echo "   ⛔ gán/gỡ vai chưa đủ — sang BÁO CÁO (mục \"gán vai đủ\" ĐỎ); chạy lại script khi IAM ổn"
 fi
 
 # ══════════════════════════════ BÁO CÁO — gửi lại phần này ══════════════════════════════
@@ -153,6 +212,10 @@ for s in "${SECRETS[@]}"; do
   SEC_DONG+="$s=$n "
 done
 export SEC_DONG
+export SA_DOC_APP="" SA_DOC_QT=""
+for s in "${BI_MAT_APP[@]}";      do SA_DOC_APP+="$s=$(sa_doc_duoc "$s") "; done
+for s in "${BI_MAT_QUAN_TRI[@]}"; do SA_DOC_QT+="$s=$(sa_doc_duoc "$s") ";  done
+export BI_MAT_APP_S="${BI_MAT_APP[*]}" IAM_LOI="${IAM_LOI:-0}"
 export SA_CO="$("${G[@]}" iam service-accounts describe "$SA_EMAIL" --format='value(email)' 2>/dev/null || true)"
 export SA_VAI="$("${G[@]}" projects get-iam-policy "$PROJECT" --flatten='bindings[].members' \
    --filter="bindings.members:serviceAccount:$SA_EMAIL" --format='value(bindings.role)' 2>/dev/null | tr '\n' ' ' || true)"
@@ -169,6 +232,8 @@ co = {f.get("name"): f.get("value") for f in s.get("databaseFlags", [])}
 users = sorted(u.get("name") for u in json.loads(e["USERS_JSON"] or "[]"))
 dbs = sorted(d.get("name") for d in json.loads(e["DBS_JSON"] or "[]"))
 sec = dict(x.split("=") for x in e["SEC_DONG"].split())
+app = dict(x.split("=") for x in e["SA_DOC_APP"].split())
+qt = dict(x.split("=") for x in e["SA_DOC_QT"].split())
 mong_users = sorted(["postgres"] + e["USERS_S"].split())
 hang = [
   ("project · region · instance", f'{e["PROJECT"]} · {e["REGION"]} · {e["INSTANCE"]}', None),
@@ -185,11 +250,18 @@ hang = [
   ("kho",                 ",".join(dbs),                          None),
   ("có kho fls",          "fls" in dbs,                           True),
   ("tài khoản kho",       ",".join(users),                        None),
-  ("đủ 4 tài khoản",      all(u in users for u in mong_users),   True),
+  # ⭐ `STG-R2b-02`: chỉ ĐÒI hai tài khoản gcloud; `fls_ghi`/`fls_doc` do bước 02 tạo bằng SQL (có/không tuỳ đã chạy 02).
+  ("đủ tài khoản gcloud (postgres · fls_admin)", all(u in users for u in mong_users), True),
   ("bí mật (số bản bật)", " ".join(f"{k}:{v}" for k, v in sec.items()), None),
   ("đủ 5 bí mật ≥ 1 bản", len(sec) == 5 and all(int(v) >= 1 for v in sec.values()), True),
   ("service account",     e["SA_CO"] or "—",                      None),
   ("SA có cloudsql.client", "roles/cloudsql.client" in e["SA_VAI"], True),
+  # ⭐ `STG-R1-01` — quyền THỪA (trước đây chỉ canh quyền THIẾU). Hai chiều: thiếu bí mật app ⇒ ĐỎ · còn đọc bí mật quản trị ⇒ ĐỎ ·
+  #   ⛔ đo được (`khong_do`) ⇒ ĐỎ. Mẫu số in ra cạnh: số bí mật app mong = len(APP) ≠ 0 (Đ3).
+  # `mong` GHIM CỨNG "3/3" · "0/2" (khai trước kết quả): thêm/bớt một bí mật ở mảng ⇒ cổng ĐỎ ⇒ buộc ghi lại bản khai.
+  ("SA đọc đúng bí mật app (đếm/mẫu số)", f'{sum(v == "co" for v in app.values())}/{len(app)}', "3/3"),
+  ("SA đọc 0 bí mật quản trị (đếm/mẫu số)", f'{sum(v != "khong" for v in qt.values())}/{len(qt)}', "0/2"),
+  ("gán/gỡ vai đủ (không lỗi IAM)", e["IAM_LOI"] == "0", True),
 ]
 do = 0
 for ten, gt, mong in hang:
