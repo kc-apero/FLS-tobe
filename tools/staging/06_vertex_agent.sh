@@ -36,6 +36,7 @@
 #      tính: (a) người chạy trong Cloud Shell (`gcloud auth print-access-token`) · (b) TRONG VM qua IAP SSH bằng SA gắn VM
 #      (token từ metadata server) — đúng danh tính app staging dùng. Kèm trạng thái API của đường KIA (thông tin).
 #
+#  ⚠ Đặt `export FLS_NHA_CUNG_CAP=<đường>` TRƯỚC khi chạy (cùng shell chạy agent ở BG-360 §B): BÁO CÁO đo nó = `--duong`.
 #  ⛔ KHÔNG làm ở bước 06: chạy agent (khối lệnh BG-360 §B) · ghi kho (G0 BÓNG) · tạo khoá SA · in workspace ID đầy đủ.
 #  ⛔ token/khoá: token chỉ ở biến shell + tệp tạm chmod 600 (header curl đọc từ tệp — ⛔ lộ ở `ps`), xoá khi thoát.
 #  Luật đo (CLAUDE.md Đ3·Đ5): mỗi mục có `mong`; mục ⛔ ĐO ĐƯỢC ⇒ ĐỎ (không phải "không thấy lệch").
@@ -180,6 +181,8 @@ done; rm -rf \$T"
 # ══════════════════════════════ BÁO CÁO — gửi lại phần này ══════════════════════════════
 buoc "BÁO CÁO (KHÔNG chứa token/khoá/nội dung trả lời/workspace đầy đủ) — chép từ dòng này tới hết, gửi lại"
 export PROJECT DUONG REGION VM ZONE SA_EMAIL VAI API API2 API_KIA KIEM GOI_THU HOST CAP_NGUOI
+# ⭐ orchestrator 24/11: biến VẮNG ⇒ mã agent đi đường KHOÁ API (KQ-357 khoá) ⇒ shell chạy agent PHẢI đặt RÕ đường.
+export R_NCC="${FLS_NHA_CUNG_CAP:-}"
 export WS_CHE="${WS:+${WS:0:7}…(${#WS} ký tự)}"
 export R_APIS="$("${G[@]}" services list --enabled --format='value(config.name)' 2>/dev/null | tr '\n' ' ' || true)"
 export R_IAM="$("${G[@]}" projects get-iam-policy "$PROJECT" --format=json 2>/dev/null || echo '{}')"
@@ -218,6 +221,7 @@ def tach(k):
 hang = [
   ("đường · project · vùng · host · SA", f'{e["DUONG"]} · {e["PROJECT"]} · {e["REGION"]} · {e["HOST"]} · {e["SA_EMAIL"]}', None),
   ("project = GCP công ty (fp-a-project — AC-5)", e["PROJECT"], "fp-a-project"),
+  ("biến FLS_NHA_CUNG_CAP của shell = --duong (vắng ⇒ agent đi đường khoá API)", e["R_NCC"] or None, e["DUONG"]),
   (f"API {e['API']} bật", e["API"] in apis, True),
 ] + ([(f"API {e['API2']} bật (Marketplace)", e["API2"] in apis, True)] if e["API2"] else []) + [
   (f"API {e['API_KIA']} (đường kia — thông tin)", e["API_KIA"] in apis, None),

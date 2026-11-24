@@ -31,7 +31,7 @@ VAI = {"google-cloud": "roles/claude.user", "vertex": "roles/aiplatform.user"}
 API = {"google-cloud": "claude.googleapis.com", "vertex": "aiplatform.googleapis.com"}
 #: Đường google-cloud cần HAI service (trang Anthropic `anthropic-managed` 24/11: *"Enable two services"*).
 API2 = {"google-cloud": "anthropic-managed-claude.cloudpartnerservices.goog", "vertex": None}
-SO_MUC = {"google-cloud": 14, "vertex": 13}
+SO_MUC = {"google-cloud": 15, "vertex": 14}       # + mục `FLS_NHA_CUNG_CAP = --duong` (orchestrator 24/11)
 MO_HINH = ("claude-opus-5-5", "claude-sonnet-5-5")
 
 
@@ -63,9 +63,12 @@ class Gcp:
         p = Path(str(self.tt) + ".log")
         return [re.sub(r" --project=\S+ --quiet", "", x) for x in p.read_text(encoding="utf-8").splitlines()] if p.exists() else []
 
-    def chay(self, *a, du_an=DU_AN, ws=WS, them_duong=True):
+    def chay(self, *a, du_an=DU_AN, ws=WS, them_duong=True, ncc="__duong__"):
         env = dict(os.environ, PATH=f"{self.d}{os.pathsep}{os.environ['PATH']}", FLS_GIA_TRANG_THAI=str(self.tt))
         env.pop("FLS_GIA_DANH_TINH", None)
+        env.pop("FLS_NHA_CUNG_CAP", None)
+        if ncc is not None:
+            env["FLS_NHA_CUNG_CAP"] = self.duong if ncc == "__duong__" else ncc
         duong = (["--duong", self.duong] if them_duong else []) + (["--workspace-id", ws] if self.duong == "google-cloud" else [])
         return subprocess.run(["bash", str(S06), "--project", du_an, *duong, *a], capture_output=True, text=True, env=env,
                               timeout=120)
@@ -114,7 +117,7 @@ def test_dung_tu_trong__DO_dung_buoc_bam_tay_roi_DAT(g):
     g.bam_tay()
     r2 = g.chay("--kiem")
     assert r2.returncode == 0, r2.stdout + r2.stderr
-    # mục có mong = AC-5 · service (1 vertex / 2 google-cloud) · IAM SA · VM-SA · VM-phạm-vi + 2 danh tính × 2 mô hình × 2 (8)
+    # mục có mong = AC-5 · biến đường · service (1 vertex / 2 google-cloud) · IAM SA · VM-SA · VM-phạm-vi + 2 × 2 × 2 (8)
     assert "KẾT: ĐẠT" in r2.stdout and len(muc(r2.stdout)) == SO_MUC[g.duong] and not do_cua(r2.stdout)
     assert "18/5 · end_turn" in r2.stdout                         # số token đọc được (⛔ nội dung)
     assert f"API {API[g.duong]} bật" in muc(r2.stdout)
@@ -265,3 +268,12 @@ def test_google_cloud__chi_bat_service_claude__thieu_Marketplace_van_DO(tmp_path
     gg.sua(lambda s: s.update(apis=["claude.googleapis.com"]))
     r = gg.chay("--kiem")
     assert do_cua(r.stdout) == {"API anthropic-managed-claude.cloudpartnerservices.goog bật (Marketplace)"}
+
+
+@pytest.mark.parametrize("ncc", [None, "", "anthropic", "khac"])
+def test_bien_FLS_NHA_CUNG_CAP_vang_hoac_lech__DO_co_ten(g, ncc):
+    """Orchestrator 24/11: biến VẮNG ⇒ mã agent đi đường khoá API ⇒ 06 phải ĐỎ (⛔ coi vắng là đúng)."""
+    g.bam_tay()
+    r = g.chay(ncc=ncc)
+    assert do_cua(r.stdout) == {"biến FLS_NHA_CUNG_CAP của shell = --duong (vắng ⇒ agent đi đường khoá API)"}, do_cua(r.stdout)
+    assert r.returncode == 1
