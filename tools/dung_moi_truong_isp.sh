@@ -422,7 +422,8 @@ MONG_HD1_CHAY=9845
 # Gộp I2 (origin/claude/bold-galileo-zukpaf @ 05d7a97, 4.887) ⊕ STG sau KQ-328 (`STG-R2-03`: sàn = thu thập THẬT cây gộp, ⛔ cộng tay): `pytest --collect-only` đo 23/11 = 4.995 (staging 04 +3 bài chuỗi/ký, ky_ty_gia +2 bài, uat +1); tests/web 690.
 # Gộp origin/claude/bold-galileo-zukpaf (main c5ea872 + AG 8a1eca4, 4.958) ⊕ STG (4.995) + vòng sửa sau R2b `KQ-344` +16 bài (test_02_chuyen_vai_gcp 8 · test_01 1 · test_03 7): `pytest --collect-only` đo 23/11 = 5.082; tests/web 690.
 # `STG-NAP` vòng sửa R1 `KQ-336`: gộp ngọn `isp/STG` `ef96a15` (5082) ⊕ STG-NAP (+bài `tests/staging/test_05`) — xung đột sàn ⇒ ĐẶT = `pytest --collect-only` cây gộp = 5124 (web 690).
-MONG_PYTEST_TOAN_BO=5124
+# `WO-352` (đo lại sàn cổng đọc-đủ, quyết chủ 23/11): +4 bài ở tests/oracle/test_doc_du.py ⇒ `pytest --collect-only` = 5128 (web 690), sàn + bài ghim cùng commit.
+MONG_PYTEST_TOAN_BO=5128
 MONG_PYTEST_WEB=690
 
 echo

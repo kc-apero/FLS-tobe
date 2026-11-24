@@ -447,3 +447,151 @@ Toàn bộ: `15 failed · 4.994 passed · 2 xfailed · 14 errors` trong 1.698 s 
 
 ### 10.2 · `--duong-nen --cong 5436` sau gộp `isp/STG` `ef96a15` + nhánh làm việc `f8c6d55` *(MỘT lần, một mình, cây `961bd0e`)* — **`KẾT: ĐẠT`**
 Toàn bộ: `12 failed · 5.096 passed · 2 xfailed · 14 errors` = **28** node id = `duong_nen_bai_do.txt` *(thêm **0** · bớt **0**; 2 bài `STG-R1-02` và bài `test_khong_ai_tro_lai_kho_that` **đã hết**)*; chạy **5.124** ≥ sàn **5.124** *(sàn = `pytest --collect-only` cây gộp)*, skipped 0, deselected 0. `tests/web` **3 = 3**, chạy 690 ✅. Môi trường: HD1 `chay 9845 / co 9967` · `lint-imports` 11 kept · `pg_verify` 27/27 — mọi phép ĐẠT. *(Thay §10.1: §10.1 là lượt trước khi gộp STG.)*
+
+## 11 · `WO-352` — đo lại sàn cổng đọc-đủ trên nguồn sống *(24/11, `fls-dev` làn DATA, cụm PG 5436; quyết chủ 23/11 ~11:25: "CDT1 đo lại sàn")*
+
+**Luật đặt sàn GIỮ NGUYÊN** *(`fls/oracle/doc_du.py`)*: sàn = làm tròn **XUỐNG hàng trăm** của số đo; ⛔ đổi luật làm tròn · ⛔ đổi cổng khác. Đo 6 cột trên nguồn SỐNG *(`Transaction Mapping L1`, **14.265** dòng đọc)*: **theo HÀNG = theo CỘT ở cả 6 cột** *(không cột nào lệch hai lần đọc)*.
+
+### 11.1 · Bảng sàn *(mỗi số đếm **ô có giá trị** của một cột; nhãn Đ4)*
+| Cột | Số đo cũ 27/08 | **Số đo mới 23–24/11** | Chênh | Sàn cũ | **Sàn mới** |
+|---|---|---|---|---|---|
+| `S · Budget Code (hd)` | 3.344 | **3.422** | +78 | 3.300 | **3.400** |
+| `H · Payment Type` | 3.344 | **3.549** | +205 | 3.300 | **3.500** |
+| `T · CDT1` | 3.339 | **3.056** | **−283** | 3.300 | **3.000** |
+| `AB · svc_start` | 2.370 | **2.525** | +155 | 2.300 | **2.500** |
+| `AC · svc_end` | 2.364 | **2.518** | +154 | 2.300 | **2.500** |
+| `Y · ID Payee` | 430 | **463** | +33 | 400 | **400** |
+
+### 11.2 · AC-2 — cột GIẢM *(⛔ im lặng)*: **đúng MỘT cột — `T · CDT1`**
+`T · CDT1`: cũ **3.339** → mới **3.056**, chênh **−283 ô có giá trị**, trong khi số dòng nguồn L1 **TĂNG** 10.100 → 14.265 *(+4.165 dòng)*. Câu chú thích cũ *"nguồn lớn dần nên số ô chỉ tăng"* **đúng 5/6 cột, sai ở CDT1** ⇒ chú thích mã đã sửa nói rõ điều này. 5 cột còn lại **tăng** *(+33 … +205)*. Sàn CDT1 hạ **3.300 → 3.000** *(−300)* là hệ quả của luật làm tròn trên số đo mới, theo quyết chủ; con số −283 này **để chủ thấy**, ⛔ che. Bài ghim `test_cot_GIAM_so_voi_27_08_la_dung_mot__CDT1_giam_283`: thêm cột giảm thứ hai ⇒ ĐỎ.
+
+### 11.3 · AC-1/AC-3 — mã + bài
+- `fls/oracle/doc_du.py` `NGUONG_SAN`: mỗi dòng chú thích `do <mới> (23/11) · cu <cũ> (27/08) · san cu <sàn cũ>`; đầu khối ghi **quyết chủ 23/11**. Nhãn báo cáo `nap_nguon_that.py:350` đổi *"sàn đã đo 27/08"* → *"sàn đo lại 23/11"* *(nhãn cũ đã sai; bài `test_05` đổi theo)*.
+- `tests/oracle/test_doc_du.py` *(11 bài; 5 bài mới/đổi)*: sàn = `(đo // 100) * 100` cả 6 cột · danh sách cột giảm = `{CDT1: −283}` · **ĐỎ hai chiều** — nguồn giả **= sàn ⇒ ĐẠT**, **sàn − 1 ⇒ ĐỎ có tên cột + `duoi nguong san <sàn>`** *(lặp cho từng cột trong 6)* · số đo sống 23/11 qua cổng.
+- **Chứng minh ĐỎ**: trước khi sửa `NGUONG_SAN`, 3 bài đỏ đúng lý do *(`cot T · CDT1: 3056 o co gia tri, duoi nguong san 3300`)*; sau sửa `11 passed`. `pytest tests/oracle tests/staging/test_05_nap_nguon_that.py` = **571 passed**.
+
+### 11.4 · AC-4 — BÁO CÁO live *(24/11, SA chỉ-đọc, `--nap` vào kho scratch `fls_stg_wo352` cụm 5436; Bank `1zJA0M…` · Quỹ = bản **GỐC** `1QSYSz…` · RAW — cả ba HTTP **200**; chỉ SỐ ĐẾM)*
+Đường xác thực `sa-env-b64` *(giá trị ⛔ in)* · checksum `sha256[:16]` của văn bản dưới = `1cbd8d09a6de71c0` · **0** mục ĐỎ · **30** mục ĐẠT · stdout toàn bộ: **0** dòng ≥ 9 chữ số liền. Số đếm nguồn **không đổi** so với §3b *(14.265 / 3.909)* — chỉ cổng đọc-đủ đổi từ ĐỎ sang ĐẠT; kho sổ/PM nay **được ghi** *(`fls_itl` 12.599 · `fls_reject` 123 · `fls_pm_line` 3.909)*, hai hàng riêng tư hết "mẫu số 0".
+```
+── 0 · THÔNG TIN
+   đường thông tin xác thực Sheets (⛔ giá trị)                                     sa-env-b64
+   chế độ                                                                          NẠP
+
+── 0b · QUYỀN ĐỌC từng workbook nguồn (HTTP; ⛔ nội dung)
+   [ĐẠT] HTTP đọc workbook RAW (sổ ITL · PM · Mapping Master)                        200  (mong 200)
+   [ĐẠT] HTTP đọc workbook BANK (các sheet `R |` ngân hàng)                          200  (mong 200)
+   [ĐẠT] HTTP đọc workbook QUỸ (các sheet `R |` quỹ — bản GỐC)                       200  (mong 200)
+
+── ① dòng chảy `R |` (Bank + Quỹ) + bản khai (nap_nguon_va_khai)
+   NGUỒN: sheet `R |` sổ Bank (đếm sheet; cũ 08/09 = 60)                           64
+   NGUỒN: sheet `R |` sổ Quỹ (đếm sheet; cũ 08/09 = 8)                             8
+   [ĐẠT] mẫu số: dòng chảy đọc được ≠ 0                                              True  (mong True)
+   [ĐẠT] NGUỒN: Σ dòng chảy = Bank + Quỹ (đếm, tính từ nguồn sống)                   72  (mong 72)
+   NGUỒN: Σ trường khai (đếm; cũ 08/09 = 408)                                      434
+   [ĐẠT] sheet THIẾU trường — ⛔ nạp (đếm)                                            0  (mong 0)
+   [ĐẠT] KHO: `fls_source` Bank+Cash (đếm) = Σ nguồn                                 72  (mong 72)
+   [ĐẠT] KHO: `fls_khai_cot` (đếm) = Σ trường khai ở nguồn                           434  (mong 434)
+
+── ② Mapping Master (nap_mapping_master)
+   NGUỒN: mã `hd` đọc được (đếm)                                                   73
+   NGUỒN: dòng bị loại (đếm, mỗi cái có lý do)                                     0
+   NGUỒN: cần phân bổ / có phương pháp (đếm)                                       23 / 21
+   [ĐẠT] mẫu số: mã đọc được ≠ 0                                                     True  (mong True)
+   [ĐẠT] KHO: `fls_mapping_master` (đếm) = Σ nguồn đọc được                          73  (mong 73)
+
+── ③ sổ ITL + PM (nap_that.chay_that)
+   NGUỒN `Transaction Mapping L1`: dòng đọc (đếm)                                  14265
+      = canon (đếm)                                                                12601
+      + loại có lý do (đếm)                                                        121
+      + rỗng (đếm)                                                                 1543
+   [ĐẠT] mẫu số: dòng đọc ≠ 0                                                        True  (mong True)
+   [ĐẠT] ba đường adapter cân (vào = canon + loại + rỗng)                            True  (mong True)
+   NGUỒN `[Importrange]PM_Unpivot`: dòng đọc (đếm)                                 3909
+      trong đó có mã tham chiếu (đếm)                                              3369
+   [ĐẠT] mẫu số PM ≠ 0                                                               True  (mong True)
+   [ĐẠT] bốn đường ghép PM cân                                                       True  (mong True)
+   [ĐẠT] cổng đọc-đủ (nguồn có đủ ô so với sàn đo lại 23/11)                         True  (mong True)
+   [ĐẠT] KẾT QUẢ nạp: bốn đường cân (kq.can())                                       True  (mong True)
+   [ĐẠT] KHO: `fls_itl` + `fls_reject` (đếm, SAU nạp) = dòng KHÔNG rỗng của nguồn (canon + loại)  12722  (mong 12722)
+      trong đó `fls_itl` (đếm, sau)                                                12599
+      trong đó `fls_reject` (đếm, sau; = loại ở adapter + loại ở tầng sổ)          123
+      lần này: `fls_itl` tăng · `fls_reject` tăng · bỏ-qua-trùng (đếm)             12599 · 123 · 0
+   [ĐẠT] KHO: `fls_pm_line` (đếm) = dòng PM đọc                                      3909  (mong 3909)
+   chạy-lại: bỏ-qua-trùng (đếm; lần đầu = 0, lần sau = canon)                      0
+
+── ⓑ NGUỒN SỬA SAU ẢNH (đếm; nguồn SỐNG là chuẩn — ⛔ ĐỎ, ⛔ chặn nạp)
+   [ĐẠT] mẫu số: dòng bank trong ảnh (đếm)                                           9992  (mong 9992)
+   dòng bank ảnh ⛔ còn ở đúng số dòng nguồn sống (đếm)                             12
+   dòng bank ảnh LỆCH `ref` ở nguồn sống (đếm)                                     7550
+   dòng bank ảnh LỆCH `cur` ở nguồn sống (đếm)                                     2975
+   dòng bank ảnh LỆCH `tien` ở nguồn sống (đếm)                                    7545
+   bộ ba (ref,cur,tien) của ảnh ⛔ còn ở nguồn sống — SO THEO NỘI DUNG, bỏ vị trí (đếm)  37
+   MỚI — dòng canon nguồn sống ⛔ có trong ảnh (đếm, nhãn riêng)                    2621
+   [ĐẠT] mẫu số: dòng PM trong ảnh (đếm)                                             3703  (mong 3703)
+   dòng PM ảnh ⛔ còn ở đúng số dòng nguồn sống (đếm)                               0
+   dòng PM ảnh LỆCH `ref` ở nguồn sống (đếm)                                       30
+   dòng PM ảnh LỆCH `slip` ở nguồn sống (đếm)                                      0
+   dòng PM ảnh LỆCH `line` ở nguồn sống (đếm)                                      0
+   dòng PM ảnh LỆCH `cur` ở nguồn sống (đếm)                                       0
+   dòng PM ảnh LỆCH `status` ở nguồn sống (đếm)                                    29
+   dòng PM ảnh LỆCH `hd` ở nguồn sống (đếm)                                        117
+   dòng PM ảnh LỆCH `cdt1` ở nguồn sống (đếm)                                      534
+   dòng PM ảnh LỆCH `tien` ở nguồn sống (đếm)                                      0
+   MỚI — dòng PM nguồn sống ⛔ có trong ảnh (đếm, nhãn riêng)                       206
+   CŨ `voi_so_luong.pm_tong.so_dong_pm` ↔ HIỆN TẠI PM đọc                          3703 ↔ 3909
+   CŨ `bank_tong.dong_bank` ↔ HIỆN TẠI canon                                       9992 ↔ 12601
+   kỳ ĐÃ CHỐT trong số cũ (đếm kỳ — mẫu số)                                        23
+      kỳ canon SỐNG = số cũ `co` (đếm kỳ)                                          13
+      kỳ canon SỐNG THẤP hơn số cũ — nguồn MẤT dòng sau chốt (đếm kỳ · Σ chênh dòng)  9 · -17
+      kỳ canon SỐNG CAO hơn số cũ — dòng thêm / kỳ còn mở ở ảnh (đếm kỳ · Σ chênh dòng)  1 · +237
+      kỳ ở số cũ mà nguồn sống ⛔ còn dòng nào (đếm kỳ)                             0
+         kỳ 2024-10: canon SỐNG ↔ số cũ `co` (dòng)                                6 ↔ 6 (Δ +0)
+         kỳ 2024-11: canon SỐNG ↔ số cũ `co` (dòng)                                3 ↔ 3 (Δ +0)
+         kỳ 2024-12: canon SỐNG ↔ số cũ `co` (dòng)                                6 ↔ 6 (Δ +0)
+         kỳ 2025-01: canon SỐNG ↔ số cũ `co` (dòng)                                748 ↔ 748 (Δ +0)
+         kỳ 2025-02: canon SỐNG ↔ số cũ `co` (dòng)                                283 ↔ 283 (Δ +0)
+         kỳ 2025-03: canon SỐNG ↔ số cũ `co` (dòng)                                297 ↔ 297 (Δ +0)
+         kỳ 2025-04: canon SỐNG ↔ số cũ `co` (dòng)                                332 ↔ 332 (Δ +0)
+         kỳ 2025-05: canon SỐNG ↔ số cũ `co` (dòng)                                408 ↔ 408 (Δ +0)
+         kỳ 2025-06: canon SỐNG ↔ số cũ `co` (dòng)                                348 ↔ 350 (Δ -2)
+         kỳ 2025-07: canon SỐNG ↔ số cũ `co` (dòng)                                546 ↔ 549 (Δ -3)
+         kỳ 2025-08: canon SỐNG ↔ số cũ `co` (dòng)                                537 ↔ 537 (Δ +0)
+         kỳ 2025-09: canon SỐNG ↔ số cũ `co` (dòng)                                501 ↔ 501 (Δ +0)
+         kỳ 2025-10: canon SỐNG ↔ số cũ `co` (dòng)                                487 ↔ 487 (Δ +0)
+         kỳ 2025-11: canon SỐNG ↔ số cũ `co` (dòng)                                475 ↔ 477 (Δ -2)
+         kỳ 2025-12: canon SỐNG ↔ số cũ `co` (dòng)                                566 ↔ 566 (Δ +0)
+         kỳ 2026-01: canon SỐNG ↔ số cũ `co` (dòng)                                471 ↔ 471 (Δ +0)
+         kỳ 2026-02: canon SỐNG ↔ số cũ `co` (dòng)                                438 ↔ 439 (Δ -1)
+         kỳ 2026-03: canon SỐNG ↔ số cũ `co` (dòng)                                582 ↔ 584 (Δ -2)
+         kỳ 2026-04: canon SỐNG ↔ số cũ `co` (dòng)                                599 ↔ 600 (Δ -1)
+         kỳ 2026-05: canon SỐNG ↔ số cũ `co` (dòng)                                536 ↔ 537 (Δ -1)
+         kỳ 2026-06: canon SỐNG ↔ số cũ `co` (dòng)                                611 ↔ 613 (Δ -2)
+         kỳ 2026-07: canon SỐNG ↔ số cũ `co` (dòng)                                683 ↔ 686 (Δ -3)
+         kỳ 2026-08: canon SỐNG ↔ số cũ `co` (dòng)                                724 ↔ 487 (Δ +237)
+   HIỆN TẠI canon thuộc kỳ MỚI sau số cũ (đếm, nhãn riêng)                         2414
+   HIỆN TẠI canon ⛔ đọc được ngày (đếm)                                            0
+
+── ④ ảnh chụp các sheet `R |` của sổ Bank (chup_sao_ke)
+   NGUỒN: sheet `R |` của sổ Bank (đếm; cũ 08/09 = 60)                             64
+   [ĐẠT] mẫu số: sheet ≠ 0                                                           True  (mong True)
+   NGUỒN: Σ dòng vùng CHUẨN (đếm)                                                  10586
+   NGUỒN: sheet ra 0 dòng (đếm — VẪN phải có mặt ở kho)                            10
+   [ĐẠT] KHO: ảnh chụp — nguồn (đếm) = sheet đọc                                     64  (mong 64)
+   [ĐẠT] KHO: ảnh chụp — dòng (đếm) = Σ nguồn                                        10586  (mong 10586)
+   [ĐẠT] KHO: nguồn ra 0 dòng VẪN có mặt (đếm)                                       10  (mong 10)
+   [ĐẠT] KHO: nguồn ở lần chụp mới nhất (đếm; mẫu số ≠ 0)                            64  (mong 64)
+   [ĐẠT] KHO ↔ NGUỒN: sheet mà dòng kho ≠ dòng nguồn sống (đếm, từng nguồn)          0  (mong 0)
+   [ĐẠT] KHO: nguồn có ở kho mà sheet nguồn sống ⛔ còn (đếm)                         0  (mong 0)
+
+── ⑤ RIÊNG TƯ (đếm; ⛔ in nội dung)
+   MẪU SỐ — cột của kho (đếm)                                                      208
+   [ĐẠT] cột tên có 'email' (đếm, ⛔ vào kho)                                         0  (mong 0)
+   [ĐẠT] dòng PM mang khoá `Email Address` (đếm)                                     0  (mong 0)
+   mẫu số PM trong kho (đếm; 0 ⇒ phép trên ⛔ chứng minh gì — Đ3)                   3909
+   [ĐẠT] mẫu số PM trong kho ≠ 0 (⛔ 0 ⇒ phép `Email Address = 0` ⛔ chứng minh gì)    True  (mong True)
+
+── Z · THỜI GIAN
+   giây (đo)                                                                       29.3
+
+══ KẾT: ĐẠT
+```

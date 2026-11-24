@@ -421,7 +421,7 @@ def test_S0_R2_03_hang_mau_so_khai_MOT_cho():
         Gộp `isp/STG-NAP` (vòng sửa R1 `KQ-336`) ⊕ ngọn `isp/STG` `ef96a15` ⇒ thu thập thật cây gộp **5124** (web giữ 690).
     """
     van = SCRIPT.read_text(encoding="utf-8")
-    assert re.findall(r"^MONG_PYTEST_TOAN_BO=(\d+)$", van, re.M) == ["5124"]
+    assert re.findall(r"^MONG_PYTEST_TOAN_BO=(\d+)$", van, re.M) == ["5128"]
     assert re.findall(r"^MONG_PYTEST_WEB=(\d+)$", van, re.M) == ["690"]
     goi = [d.strip() for d in van.splitlines() if d.strip().startswith("chay_pytest ")]
     assert len(goi) == 2 and '"$MONG_PYTEST_TOAN_BO"' in goi[0] and '"$MONG_PYTEST_WEB"' in goi[1], goi

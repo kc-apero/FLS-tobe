@@ -296,13 +296,13 @@ def test_DO_dong_MOI_sau_anh_dem_RIENG_khong_do(monkeypatch, moi_truong, san_0, 
 
 
 def test_DO_cong_doc_du_do_thi_KHONG_ghi_mot_dong_nhung_van_do(monkeypatch, moi_truong, kho, tmp_path, capsys):
-    """Sàn thật (3.300…) trên nguồn tổng hợp ⇒ cổng đọc-đủ ĐỎ: ⛔ ghi `fls_itl`, VẪN đếm nguồn (như nguồn sống 23/11)."""
+    """Sàn thật (3.400 · CDT1 3.000 …) trên nguồn tổng hợp ⇒ cổng đọc-đủ ĐỎ: ⛔ ghi `fls_itl`, VẪN đếm nguồn (như nguồn sống 23/11)."""
     j = tmp_path / "bc.json"
     rc = _chay(monkeypatch, kho, "--nap", "--nguoi-nap", "khanh.thu", "--bo-buoc", "khai,mapping,chup", tep_json=j)
     out = capsys.readouterr().out
     so = json.loads(j.read_text(encoding="utf-8"))["so"]
     assert rc == 1, out
-    assert re.search(r"\[ĐỎ\] cổng đọc-đủ \(nguồn có đủ ô so với sàn đã đo 27/08\)\s+False", out), out
+    assert re.search(r"\[ĐỎ\] cổng đọc-đủ \(nguồn có đủ ô so với sàn đo lại 23/11\)\s+False", out), out
     assert "[ĐỎ] KHO: sổ ĐÃ ghi" in out
     assert _dem(kho, "SELECT count(*) FROM fls_itl") == 0                  # ⛔ ghi
     assert so["so_vao"] == 9992                                            # …nhưng ĐÃ đo nguồn
@@ -483,7 +483,7 @@ def test_05_sh_kiem_chi_doc_khong_ghi_mot_dong(kho_05, nguon):
 
 
 def test_05_sh_nap_that_bang_fls_ghi_qua_proxy_cong_doc_du_do_chan_so_con_lai_vao_va_chay_lai_khong_nhan_doi(kho_05, nguon):
-    """Nguồn tổng hợp ⛔ đạt sàn đọc-đủ (3.300…) ⇒ sổ ⛔ ghi + ĐỎ có tên; ba bước kia vào kho bằng vai `fls_ghi` THẬT qua proxy GIẢ.
+    """Nguồn tổng hợp ⛔ đạt sàn đọc-đủ (3.400 · CDT1 3.000 …) ⇒ sổ ⛔ ghi + ĐỎ có tên; ba bước kia vào kho bằng vai `fls_ghi` THẬT qua proxy GIẢ.
     Chạy lại ⇒ số dòng ⛔ đổi (mapping thay trọn; nguồn/khai `đã có`)."""
     g, goc = nguon
     mt = kho_05

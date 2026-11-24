@@ -347,7 +347,7 @@ def buoc_so_pm(bao: Bao, tok: str, dsn: str, ghi: bool, anh: dict, doi: bool = F
     for n in r["doc_du"]["dem"]:
         bao.do(N, f"cổng đọc-đủ · {n.ten}: theo HÀNG / theo CỘT / sàn", f"{n.lan_lat} / {n.lan_cot} / {n.toi_thieu}")
     # Đ5: phép chặn ghi ĐỎ có tên — mong = đạt
-    bao.do(N, "cổng đọc-đủ (nguồn có đủ ô so với sàn đã đo 27/08)", r["doc_du"]["dat"], True)
+    bao.do(N, "cổng đọc-đủ (nguồn có đủ ô so với sàn đo lại 23/11)", r["doc_du"]["dat"], True)
     for ly in r["doc_du"]["ly_do"]:
         bao.do(N, "   ⛔ lý do cổng: " + re.sub(r"\s+", " ", ly)[:150], "ĐỎ")
     if ghi and r["da_ghi"]:
