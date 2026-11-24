@@ -10,6 +10,7 @@ Chay:  python tools/nap_that.py [--that]
 from __future__ import annotations
 
 import json
+import re
 import subprocess
 import sys
 import time
@@ -28,12 +29,18 @@ from fls.adapters.pm_join import (PM_DONG_DAU, PM_DONG_TIEU_DE,   # noqa: E402
 from fls.ledger.build import NgucCanh                             # noqa: E402
 from fls.oracle.doc_du import NGUONG_SAN, DemCot, danh_gia        # noqa: E402
 from fls.oracle.nguon import BAN_SAO_RAW                          # noqa: E402
+from tools.staging.cred_sheets import api_goc as _api_goc         # noqa: E402
 
 SA = "claude-code-access@fpa-t-494007.iam.gserviceaccount.com"
 LO = 2500          # dong moi lat — do duoc ~2,2s/lat, ⛔ khong dat 300s timeout
 
 
 def _token() -> str:
+    from tools.staging.cred_sheets import lay_token       # ⭐ WO-334: một chỗ lấy token (tương thích khi ⛔ khai gì)
+    return lay_token()
+
+
+def _token_cu() -> str:
     r = subprocess.run(
         ["gcloud", "auth", "print-access-token", "--account", SA, "--scopes",
          "https://www.googleapis.com/auth/spreadsheets.readonly"],
@@ -71,8 +78,7 @@ def _lat(tok: str, rng: str, lan: int = 3,
 
     ⚠ `cho` — xem `CHO_PM`: gia thiet *"vuot 45s mot lan"* da bi phep do lat.
     """
-    url = (f"https://sheets.googleapis.com/v4/spreadsheets/"
-           f"{BAN_SAO_RAW.spreadsheet_id}/values/" + urllib.parse.quote(rng)
+    url = (_api_goc() + f"{BAN_SAO_RAW.spreadsheet_id}/values/" + urllib.parse.quote(rng)
            + "?valueRenderOption=UNFORMATTED_VALUE&majorDimension=ROWS")
     q = urllib.request.Request(url, headers={"Authorization": f"Bearer {tok}"})
     for i in range(1, lan + 1):
@@ -119,8 +125,7 @@ COT_THEN_CHOT = (
 def _cot_rieng(tok: str, chu: str, tu: int, den: int) -> int:
     """Doc MOT cot bang mot cau rieng, dem o co gia tri. ⛔ Lan doc DOC LAP."""
     rng = f"'{BAN_SAO_RAW.sheet}'!{chu}{tu}:{chu}{den}"
-    url = (f"https://sheets.googleapis.com/v4/spreadsheets/"
-           f"{BAN_SAO_RAW.spreadsheet_id}/values/" + urllib.parse.quote(rng)
+    url = (_api_goc() + f"{BAN_SAO_RAW.spreadsheet_id}/values/" + urllib.parse.quote(rng)
            + "?valueRenderOption=UNFORMATTED_VALUE&majorDimension=COLUMNS")
     q = urllib.request.Request(url, headers={"Authorization": f"Bearer {tok}"})
     v = json.load(urllib.request.urlopen(q, timeout=45)).get("values", [[]])
@@ -128,7 +133,16 @@ def _cot_rieng(tok: str, chu: str, tu: int, den: int) -> int:
     return sum(1 for x in o if x not in (None, "") and not la_o_loi(x))
 
 
-def cong_doc_du(tok: str, hang: list[list]) -> None:
+class CongDocDuDo(SystemExit):
+    """⭐ WO-334: vẫn là `SystemExit` *(`main` cũ nổ y như trước)*, nhưng MANG bằng chứng *(`px` · `dem`)* để bộ điều phối
+    báo ĐỎ **có tên cột** thay vì chỉ thấy một dòng chữ."""
+
+    def __init__(self, msg, px, dem):
+        super().__init__(msg)
+        self.px, self.dem = px, dem
+
+
+def cong_doc_du(tok: str, hang: list[list]):
     """⛔ CHAN truoc khi ghi. Mot lat HOP LE van co the THIEU GIA TRI.
 
     Lan nap 27/08 ghi **257 gia tri `svc_start` it hon** chinh du lieu do, va
@@ -149,7 +163,8 @@ def cong_doc_du(tok: str, hang: list[list]) -> None:
     px = danh_gia(dem, dong_doc=len(hang), dong_toi_thieu=9_000)
     print(px.bao())
     if not px.dat:
-        raise SystemExit("⛔ cong doc-du KHONG DAT — ⛔ khong ghi mot dong nao")
+        raise CongDocDuDo("⛔ cong doc-du KHONG DAT — ⛔ khong ghi mot dong nao", px, dem)
+    return px
 
 
 def doc_pm(tok: str) -> list[DongPM]:
@@ -235,34 +250,52 @@ def doc_pm(tok: str) -> list[DongPM]:
     return ra
 
 
-def main() -> int:
-    that = "--that" in sys.argv
-    tok = _token()
+def dem_ly_do_loai(loai) -> dict[str, int]:
+    """`NAP-R1-04`: lý do loại có dạng `cot goc X ('ten') la o loi: <Ô THÔ>` — Ô THÔ có thể mang số TK/tên tệp. Chỉ giữ phần TRƯỚC
+    dấu `:` đầu tiên (tên cột canon) và che chuỗi ≥ 6 chữ số. → `{lý do đã che: số dòng}`."""
+    c: dict[str, int] = {}
+    for _dong, ly in loai:
+        for x in ly:
+            k = re.sub(r"\d{6,}", "#", str(x).split(":", 1)[0])[:80]
+            c[k] = c.get(k, 0) + 1
+    return c
+
+
+def chay_that(tok: str, *, ghi: bool, dsn: str | None = None, run_id: str | None = None, chi_tiet_loai: bool = True) -> dict:
+    """⭐ WO-334: thân của `main` cũ, TÁCH RA để bộ điều phối `tools/staging/nap_nguon_that.py` gọi — ⛔ viết lại đường đọc.
+    → dict số đếm: `header` · `hang` (dòng sheet đọc) · `tk` (ba đường adapter) · `ra` · `loai` · `pm` · `bank` · `tkg` ·
+    `doc_du` · `kq` (KetQuaNap, khi đã ghi) · `da_ghi`. ⛔ Cổng đọc-đủ ĐỎ ⇒ VẪN đo (chỉ-đọc) nhưng ⛔ ghi một dòng —
+    `doc_du['dat'] = False`."""
     print(f"doc {BAN_SAO_RAW.ma} · {BAN_SAO_RAW.sheet} (live)")
     header, hang = doc_nguon(tok)
-
     kiem_header(header)                       # ④ nguon doi hinh dang => NO TO
     print(f"cong hinh dang nguon: XANH ({len(header)} cot khop ITL-CANON)")
 
     print("\ncong DOC-DU (mot lat hop le van co the thieu gia tri):")
-    cong_doc_du(tok, hang)
+    doc_du = {"dat": True, "ly_do": (), "dem": ()}
+    try:
+        cong_doc_du(tok, hang)
+    except CongDocDuDo as e:
+        doc_du = {"dat": False, "ly_do": tuple(e.px.ly_do), "dem": tuple(e.dem)}
 
     ra, loai, tk = nap(hang, header=header)
     print(f"ba duong cua adapter: vao {tk.vao} = canon {tk.ra} + loai {tk.loai}"
           f" + rong {tk.rong}  ·  can={tk.can()}")
-    if not tk.can():
-        print("⛔ ba duong khong can — DUNG")
-        return 2
-    for dong, ly in loai[:5]:
-        print(f"   loai dong {dong}: {' | '.join(ly)[:100]}")
+    if chi_tiet_loai:
+        for dong, ly in loai[:5]:
+            print(f"   loai dong {dong}: {' | '.join(ly)[:100]}")
+    else:   # `NAP-R1-04`: bộ điều phối 05 ⛔ in ô nguồn thô — chỉ ĐẾM theo lý do đã che
+        for ly, n in sorted(dem_ly_do_loai(loai).items()):
+            print(f"   loai theo ly do (dem) {n:6d}: {ly}")
 
     print()
     pm = doc_pm(tok)
     from fls.adapters.pm_join import GHEP_DUOC, TEN_HINH, xep_ca_lat
-    from fls.repo.chay_nap import _bank_tu_canon
     from fls.ledger.build import NgucCanh as _NC
+    from fls.repo.chay_nap import _bank_tu_canon
     _nc0 = _NC("do", "v1.0", "v1.0", "v1.0", BAN_SAO_RAW.ma, BAN_SAO_RAW.sheet)
-    _nhom, tkg = xep_ca_lat(_bank_tu_canon(ra, _nc0), pm)
+    bank = _bank_tu_canon(ra, _nc0)
+    _nhom, tkg = xep_ca_lat(bank, pm)
     print("\nBAC THANG GHEP PM (do that):")
     for h in sorted(tkg.dong_theo_hinh):
         d = tkg.dong_theo_hinh[h]
@@ -272,26 +305,45 @@ def main() -> int:
     print(f"  ---   khong thay ma PM     {tkg.khong_thay_ma_PM:6d} dong")
     print(f"  bon duong can = {tkg.can()}")
 
-    if not that:
+    kq = None
+    da_ghi = False
+    if ghi and not tk.can():
+        print("⛔ ba duong khong can — DUNG")
+    elif ghi and not doc_du["dat"]:
+        print("⛔ cong doc-du KHONG DAT — ⛔ khong ghi mot dong nao (da DO xong, chi doc)")
+    elif ghi:
+        import os
+
+        import psycopg
+
+        from fls.repo.chay_nap import chay
+        dsn = dsn or os.environ.get("PG_DSN", "postgresql://fls:fls@localhost:5433/fls")
+        run_id = run_id or f"NAP-{date.today().isoformat()}-{BAN_SAO_RAW.ma}"
+        nc = NgucCanh(run_id, "v1.0", "v1.0", "v1.0", BAN_SAO_RAW.ma, BAN_SAO_RAW.sheet)
+        t = time.time()
+        with psycopg.connect(dsn, autocommit=True) as conn:
+            kq = chay(conn, hang, nc, header=header, pm=pm)
+        da_ghi = True
+        print(f"\n{kq.bao()}    ({time.time() - t:.1f}s)")
+        print(f"can() = {kq.can()}")
+        for k, v in sorted(kq.ly_do_loai.items(), key=lambda x: -x[1]):
+            print(f"   loai vi {k}: {v}")
+    else:
         print("\n(CHI DO — them --that de ghi vao DB)")
-        return 0
+    return {"header": header, "hang": hang, "tk": tk, "ra": ra, "loai": loai, "pm": pm, "bank": bank,
+            "tkg": tkg, "doc_du": doc_du, "kq": kq, "da_ghi": da_ghi}
 
-    import os
 
-    import psycopg
-
-    from fls.repo.chay_nap import chay
-    dsn = os.environ.get("PG_DSN", "postgresql://fls:fls@localhost:5433/fls")
-    run_id = f"NAP-{date.today().isoformat()}-{BAN_SAO_RAW.ma}"
-    nc = NgucCanh(run_id, "v1.0", "v1.0", "v1.0", BAN_SAO_RAW.ma, BAN_SAO_RAW.sheet)
-    t = time.time()
-    with psycopg.connect(dsn, autocommit=True) as conn:
-        kq = chay(conn, hang, nc, header=header, pm=pm)
-    print(f"\n{kq.bao()}    ({time.time() - t:.1f}s)")
-    print(f"can() = {kq.can()}")
-    for k, v in sorted(kq.ly_do_loai.items(), key=lambda x: -x[1]):
-        print(f"   loai vi {k}: {v}")
-    return 0 if kq.can() else 3
+def main() -> int:
+    that = "--that" in sys.argv
+    r = chay_that(_token(), ghi=that)
+    if not r["tk"].can():
+        return 2
+    if not r["doc_du"]["dat"]:
+        raise SystemExit("⛔ cong doc-du KHONG DAT — ⛔ khong ghi mot dong nao")
+    if r["kq"] is not None:
+        return 0 if r["kq"].can() else 3
+    return 0
 
 
 if __name__ == "__main__":

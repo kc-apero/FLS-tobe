@@ -4,6 +4,7 @@
 |---|---|
 | **Phiên bản** | v0.4 · 2026-11-23 · (v0.1: `WO-325` AC-4) · do `fls-dev` làn HẠ TẦNG soạn, **BA/PO duyệt** trước khi phát cho người test |
 | **Căn cứ ký** | O6 — ThuongCT, 23/11/2026: *"Cho phép lên staging và bắt đầu test full luồng e2e bằng human."* (sổ I2 v0.4 §O6 · `TIEN_DO` 2026-11-23) |
+| **Số mong khi kho có DỮ LIỆU THẬT** | §1b *(bước 05 `WO-334` — thêm 23/11)* |
 | **Cây mã mà bảng SỐ dưới đây mô tả** | nhánh `claude/bold-galileo-zukpaf-isp/STG`, đã GỘP `origin/claude/bold-galileo-zukpaf` **có H14 VÀ I2** (gói `WP-C5c` — 11 gói; đo 23/11: `GOI_BIET` ở `tools/do_hd2.py` = 11 · I2: `grep -rln "FxKho\|kiem_fx_thang" fls tools` = 1 tệp `tools/do_hd2.py`) ⇒ **D1 có hiệu lực: gói HD2 đọc tỷ giá TỪ KHO, tháng chưa ký ⇒ `FX_CHAN`** (bước U7–U9 dưới đây); mọi số HD2 lấy từ `hd2_cong.json` **ở ngọn đã gộp** (`STG-R1-05`). **Dựng lại ảnh (bước 03)** sau khi gộp |
 | **Nguồn của MỌI con số HD2** | `docs/ITL/_tools/hd2_cong.json` (tệp cổng HD2 theo gói). Bài `tests/staging/test_uat_doc.py` đối chiếu từng con số có thẻ `<!--hd2:…-->` với tệp ấy — **lệch ⇒ bài đỏ** (Đ2: so hai nguồn) |
 | **Ai test · khi nào** | ⛔ chưa chỉ định — là **câu chủ** (BG-326 §Câu chủ). Điền ở cột "Người test" từng bước |
@@ -30,6 +31,25 @@
 | **Sổ rỗng** | F01 hàng chờ 0 · F02 lưới 0 dòng · cổng `KHO_SACH` ĐỎ ("`fls_itl` chỉ có 0 dòng < ngưỡng 1000") · `HD1_THANG` ĐỎ | kho staging chưa nạp sổ (câu chủ dữ liệu); ⛔ "sạch" mà là "chưa đo được gì" |
 | **Lệch CÓ TÊN trong HD2** | "khớp" < "tổng ô" ở WP-C3 · C4c · C5 (xem bảng U3) | mỗi lệch có nhãn + lý do (`lech_co_chu_dich`); **lệch NGOÀI tên phải = 0** — số khác 0 mới là lỗi |
 | **D1 · tỷ giá chưa ký** | chạy chuỗi **khi chưa ký tháng nào**: <!--goi:truoc_n-->11 gói ĐỎ, mỗi gói in `FX_CHAN <tháng>: tháng CHƯA ký (D1: owner ký mỗi tháng)`; sau khi ký (U8) ⇒ 11/11 ĐẠT | luật D1 (I2, `KQ-318`): gói HD2 đọc tỷ giá TỪ KHO qua `fx_cua`, tháng chưa ký bị CHẶN có tên — ⛔ rơi về ảnh tĩnh. Bước 04 chỉ nạp config, ⛔ ký thay người (`STG-R2-01`) |
+
+## 1b · Khi kho đã nạp DỮ LIỆU NGUỒN THẬT (bước 05) — số mong *(`WO-334`, đo 23/11)*
+
+⚠ Chỉ áp dụng SAU khi chủ chạy `05_nap_nguon_that.sh` và gửi BÁO CÁO. Trước đó §0.4 + §1 "Sổ rỗng" đúng nguyên văn. **Số mong của mỗi lần nạp = chính các dòng `Σ nguồn` trong BÁO CÁO 05 của lần đó** (nguồn lớn dần, ⛔ số cố định); bảng dưới là hai mốc đã đo để đối chiếu — nhãn nói rõ nó ĐẾM GÌ *(Đ4)*.
+
+| Số (đếm gì) | CŨ — ảnh đóng băng 26–27/08 | NGUỒN SỐNG đo 23/11 *(đọc bằng SA chỉ-đọc, ⛔ ghi)* |
+|---|---|---|
+| dòng sổ `ITL Ledge` / kỳ đã chốt | 9.967 dòng · 23 kỳ *(`voi_so_luong.tong.co`)* | ⛔ không đọc trực tiếp — sổ ITL Ledge nằm ở workbook ADJUSTED, công cụ nạp đọc **`Transaction Mapping L1`** ở RAW |
+| dòng đọc từ `Transaction Mapping L1` (A…AL, từ dòng 5) | 10.100 *(lần nạp 26/08 = sổ 9.973 + loại 19 + rỗng 108)* · ảnh `pm_join.bank` 9.992 dòng canon | **14.265** = canon 12.601 + loại 121 + rỗng 1.543 |
+| dòng `[Importrange]PM_Unpivot` · có mã tham chiếu | 3.703 · 3.173 | 3.909 · 3.369 |
+| bậc thang ghép PM `A·B·C·D·E·F` (dòng) | 2.272·29·400·27·199·428 + 105 không mã + 6.532 không thấy mã PM | 2.438·30·404·27·201·438 + 100 + 8.963 |
+| `Mapping Master` mã `hd` | — | 73 *(cần phân bổ 23 · có phương pháp 21)* |
+| sheet `R \|` Bank · Quỹ *(bản GỐC)* · Σ dòng chảy · Σ trường khai · dòng chụp · nguồn 0 dòng | 60 · 8 · 68 · 408 · **8.368** · 10 — 08/09 | **64 · 8 · 72 · 434 · 10.586 · 10** *(đo 23/11 sau vòng sửa `KQ-336`; Quỹ gốc `1QSYSzCC…`, bản copy `1RmmkOSC…` vẫn 403)* |
+| `fls_nguon_dai` *(bản khai THỨ HAI `Range_*`, công cụ `tools/nap_nguon_dai.py`)* | — | **0 dòng — NGOÀI phạm vi bước 05** *(BG-335 §1 · backlog `NAP-BL-01`)*: tuyến `bang_tuyen` đọc nó sẽ ra rỗng, đúng |
+| cổng đọc-đủ (cột `T · CDT1`) | 3.339 ô có giá trị (27/08), sàn 3.300 | **3.056** < sàn ⇒ **ĐỎ**: sổ ⛔ được ghi cho tới khi BA/chủ xử lý (BG-335 §Phát hiện 2) |
+
+⭐ **Nguồn SỐNG là chuẩn cho mọi kỳ** *(chủ quyết 23/11 ~07:25)*: khối `ⓑ NGUỒN SỬA SAU ẢNH` của BÁO CÁO chỉ ĐẾM *(ảnh cũ khác nguồn sống ⇒ nhãn, ⛔ ĐỎ)*; ĐỎ chỉ còn: 403 · cổng đọc-đủ · Σ nguồn ≠ Σ kho *(`--doi-chieu` đo lại kho đã nạp với nguồn bây giờ, hai chiều)*.
+
+⇒ Nếu BÁO CÁO 05 của chủ có `fls_itl` = 0: kho **vẫn ở trạng thái §0.4** (F01/F02 trống ĐÚNG). Nếu `fls_itl` > 0 thì §1 dòng "Sổ rỗng" **hết hiệu lực** và cổng `KHO_SACH` đổi theo; người test điền các số THẤY cạnh BÁO CÁO.
 
 ## 2 · Các bước kiểm
 
@@ -79,6 +99,7 @@ Cột **Mong** là số/chữ phải THẤY. Số có nhãn đếm gì (Đ4): "�
 - ⛔ Tự chạy lệnh GHI vào kho; ⛔ tự nạp tệp dữ liệu thật; ⛔ chia sẻ ảnh chụp màn hình có số tài khoản/tên người ra ngoài nhóm test.
 
 ## Changelog
+- v0.2 (2026-11-23, `WO-334`): thêm §1b — số mong khi kho có DỮ LIỆU THẬT (hai mốc: ảnh cũ · nguồn sống 23/11); §0.4/§1 giữ nguyên cho trường hợp kho chưa nạp sổ.
 - v0.1 (2026-11-23): bản đầu — 13 bước, 13 hàng số từ `hd2_cong.json`; chờ BA/PO duyệt + câu chủ "ai test".
 - v0.2 (2026-11-23, vòng sửa sau `KQ-327` · `STG-R1-05/06`): gộp H14 ⇒ thêm hàng `WP-C5c`, thẻ cha `WP-C5` = a+b+c; §1·615 sửa 12.380→13.760 và 6.753→5.258 (có thẻ `hd2x`, bài canh từ `hd2_cong.json`); U7/U8 11 gói · ~45 s · ~800 MB và ghi **chỉ CHỦ chạy** (`sudo`); bỏ nhãn chờ H14.
 - v0.3 (2026-11-23, vòng sửa sau R2 `KQ-328` · `STG-R2-02`): **I2 đã gộp** ⇒ bỏ nhãn `[CHỜ I2]`; §0.3–0.4 + dòng 7 + §1 (hàng D1) theo hành vi I2; **thêm bước ký tỷ giá (U7 chạy chuỗi trước ký ⇒ 11/11 ĐỎ `FX_CHAN`; U8 người ký ký 36 tháng qua `ky_ty_gia.py`; U9 chạy chuỗi sau ký ⇒ 11/11 ĐẠT)** — chủ quyết C4 (một ký một soát) · C5 (`doc` suốt UAT, `ghi` chỉ lúc ký). **Đánh số lại:** U7→U9 · U8→U10 · U9→U11 · U10→(gộp vào U7/U8) · U11→U12 · U12→U13 · U13→U14 *(các tài liệu cũ `KQ-327/328`, `BG-326` §9 nói U7/U8 theo v0.2)*. U9 cũ: staging vẫn ⛔ đường tạo bản (0 nơi gọi `dua_ban_ky`).
