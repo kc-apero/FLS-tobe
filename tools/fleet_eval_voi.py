@@ -65,13 +65,15 @@ def _cham_mu(ra: dict, dap_an: dict, hat: int = 23) -> tuple[list[dict], dict]:
     return cham, gnd.tong_hop(cham)
 
 
-def chay_vong(ma: str, luat, che_do: str, ca: dict, dap_an: dict, hat: int = 23) -> dict:
+def chay_vong(ma: str, luat, che_do: str, ca: dict, dap_an: dict, hat: int = 23, ncc=None) -> dict:
     """MỘT vòng QUA `chay_skill` (cổng skill + chốt + bộ che theo `che_do`). ⭐ `HELD-R1-06`: bản R0 có nhánh
     `khong_che` đọc thẳng `luat(cav.o_ca(ca))` ⇒ BỎ cổng skill — vòng ấy đo LUẬT, ⛔ đo đường ống. Chế độ
-    chính theo chủ 23/11 ~06:00 ("agent đọc TOÀN BỘ nội dung + số TK") nay là `che_do="mo"` — đi ĐÚNG đường ống."""
+    chính theo chủ 23/11 ~06:00 ("agent đọc TOÀN BỘ nội dung + số TK") nay là `che_do="mo"` — đi ĐÚNG đường ống.
+    ⭐ `WO-355`: `ncc` tiêm được (adapter THẬT `claude-opus-5-5`) — CÙNG `chay_skill`, CÙNG bộ chấm mù; `None` ⇒ GIẢ(`luat`)."""
     s = [x for x in nap_bo("A2_PR_MAP") if x.loai == "bong"][0]
     dn = [a for a in ch.AGENT if a.ma == "A2_PR_MAP"][0]
-    ks = ch.chay_skill(dn, he_thong(dn.ma), s, mh.GiaLap({"ung_vien_ghep": luat}),
+    that = ncc is not None
+    ks = ch.chay_skill(dn, he_thong(dn.ma), s, ncc if that else mh.GiaLap({"ung_vien_ghep": luat}),
                        {"ung_vien_ghep": lambda: cav.o_ca(ca)}, che_do=che_do)
     if ks.loi and ks.loi.startswith("CamGui") and che_do != CHE_CHINH:
         # Lớp 2 của bộ che TỪ CHỐI gửi (số dài còn sót sau che) — chế độ che là TUỲ CHỌN, nên đây là KẾT QUẢ ĐO của che
@@ -80,7 +82,7 @@ def chay_vong(ma: str, luat, che_do: str, ca: dict, dap_an: dict, hat: int = 23)
     if ks.loi or ks.ra is None:
         return {"phien_ban": ma, "loi": ks.loi or "⛔ đầu ra"}
     cham, th = _cham_mu(ks.ra, dap_an, hat)
-    return {"phien_ban": ma, "mo_hinh": f"GIẢ ({luat.__name__}) thay {dn.mo_hinh.ma}",
+    return {"phien_ban": ma, "mo_hinh": (f"THẬT {dn.mo_hinh.ma}" if that else f"GIẢ ({luat.__name__}) thay {dn.mo_hinh.ma}"),
             "checksum_prompt": checksum_prompt("A2_PR_MAP"), "che_do": che_do,
             "cong_skill": {"dat": ks.dat_cong, "ly_do": ks.ly_do}, "the_noi_dung_che": ks.the_noi_dung,
             "tong_hop": th, "theo_nhom": {n: gnd.tong_hop([x for x in cham if x["nhom"] == n])

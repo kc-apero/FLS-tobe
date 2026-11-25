@@ -1,3 +1,6 @@
 psycopg[binary]>=3.2.0
 pytest>=8.0.0
 import-linter>=2.0
+anthropic[google_cloud,vertex]>=2.12  # WO-355: adapter THẬT `fls/agent/mo_hinh.py` (nhập muộn) · WO-359: `AnthropicGoogleCloud` (chính) + `AnthropicVertex` (dự phòng), cả hai kéo `google-auth`
+google-auth>=2.0  # AG2-R1-01 (KQ-357): `tools/dung_be_giu_rieng.py` đọc sheet (`google.auth` · `google.oauth2`) + ADC của 2 đường GCP
+requests>=2.0     # AG2-R1-01: `google.auth.transport.requests.AuthorizedSession` cần gói `requests`

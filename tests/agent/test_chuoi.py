@@ -121,10 +121,14 @@ def test_AC5_xoa_dau_vao_mot_lop__DO_khong_do_duoc(tmp_path):
     assert kc.dat is False
 
 
-def test_luat_hai_ho__A4_cung_ho__LoiChuoi():
+def test_WO355_luat_hai_mo_hinh__A4_trung_mo_hinh__LoiChuoi():
+    """WO-355: một hãng ⇒ luật hai HỌ thay bằng luật hai MÔ HÌNH. A4 = Opus như A1–A3 ⇒ ⛔ chạy; mặc định (Sonnet) ⇒ qua."""
     ag = tuple(ch.DinhNghiaAgent(a.ma, a.ten, mh.OPUS_5_5) for a in ch.AGENT)
-    with pytest.raises(ch.LoiChuoi, match="hai họ"):
-        ch.kiem_hai_ho(ag)
+    with pytest.raises(ch.LoiChuoi, match="hai mô hình"):
+        ch.kiem_a4_khac_mo_hinh(ag)
+    ch.kiem_a4_khac_mo_hinh()
+    assert [a.mo_hinh.ma for a in ch.AGENT] == ["claude-opus-5-5"] * 3 + ["claude-sonnet-5-5"]
+    assert {a.mo_hinh.ho for a in ch.AGENT} == {"anthropic"}
 
 
 def test_phat_lai_cu__DO_co_ten(tmp_path, monkeypatch):
@@ -208,9 +212,9 @@ def test_AG_R1_06_A4_ma_thuan__KHONG_dung_nha_cung_cap(monkeypatch, phat_lai):
     from fls.agent.skill import nap_bo
     assert {s.loai for s in nap_bo("A4_AUDITOR")} == {"ma"} and not ch.can_mo_hinh("A4_AUDITOR")
     goi: list[str] = []
-    monkeypatch.setattr(cav.mh, "tao_that", lambda m, co, che_do="mo": goi.append(m.ma) or object())
+    monkeypatch.setattr(cav.mh, "tao_that", lambda m, co, che_do="mo", **kw: goi.append(m.ma) or object())
     ncc = cav.ncc_cho("that", True)
-    assert sorted(ncc) == ["A1_RI", "A2_PR_MAP", "A3_SI_ITL"] and mh.GEMINI_FLASH.ma not in goi
+    assert sorted(ncc) == ["A1_RI", "A2_PR_MAP", "A3_SI_ITL"] and goi == ["claude-opus-5-5"] * 3   # ⛔ Sonnet cho A4 hôm nay
     a4 = phat_lai[0].agents[3]
     assert [k.so_luot for k in a4.skills] == [0, 0, 0, 0] and a4.dat_a4
     assert {o.ma.split(":")[0] for o in a4.o} == {"cong", "voi"}               # ô A4 vẫn qua cửa ②

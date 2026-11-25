@@ -5,7 +5,13 @@
     python tools/chay_agent_voi.py --ghi-report        # + ghi docs/ITL/06_Agent/report.html
     python tools/chay_agent_voi.py --gia --ghi-phat-lai  # mô hình GIẢ tất định ⇒ ghi lại bản phát lại
     python tools/chay_agent_voi.py --che che_het       # che lại (mặc định `mo` — chủ 23/11: agent đọc toàn bộ)
-    python tools/chay_agent_voi.py --that              # ⛔ WO-329. Chỉ chạy khi thêm FLS_CHO_GOI_API=1 + khoá
+    python tools/chay_agent_voi.py --that --tran-usd 2 # API THẬT (WO-355) — cần FLS_CHO_GOI_API=1 + ANTHROPIC_API_KEY
+                                                       #   + FLS_ZDR_DA_BAT=1 (chế độ `mo`); in token + USD ước;
+                                                       #   ghi nhật ký vòng (CHỈ số đếm + vân tay) docs/ITL/06_Agent/nhat_ky/
+    FLS_NHA_CUNG_CAP=google-cloud FLS_GCP_PROJECT=fp-a-project FLS_CLAUDE_WORKSPACE_ID=wrkspc_… \
+      FLS_GC_DU_LIEU_XAC_NHAN=1 FLS_CHO_GOI_API=1 python tools/chay_agent_voi.py --that
+                                                       # ⭐ WO-359: đường CHÍNH claude.googleapis.com (ADC/SA, ⛔ khoá)
+                                                       #   dự phòng: FLS_NHA_CUNG_CAP=vertex | anthropic (= khi vắng)
 
 ⭐ Công cụ agent gọi = CHỈ hàm FLS có sẵn, tiêm vào chuỗi từ đây (gói `fls.agent` ⛔ biết kho/tuyến):
    nguon_bank · nguon_fps · nguon_h1000 · nguon_plt   đếm ảnh đóng băng 4 nguồn raw (`tests/fixture/…`)
@@ -47,6 +53,8 @@ TEP_HD2 = GOC / "docs" / "ITL" / "_tools" / "hd2_cong.json"
 TM_AGENT = GOC / "docs" / "ITL" / "06_Agent"
 TM_PHAT_LAI = TM_AGENT / "phat_lai"
 TEP_REPORT = TM_AGENT / "report.html"
+TM_NHAT_KY = TM_AGENT / "nhat_ky"          # nhật ký vòng THẬT: số đếm + vân tay, ⛔ nội dung (WO-355 AC-2/AC-4)
+TRAN_USD_MAC_DINH = 2.0                   # trần chi phí MỘT vòng thật — chạy tập nhỏ trước, xem chi phí
 CA_DUNG = FX / "agent" / "ca_noi_dung_dung.json"
 DAP_AN_DUNG = FX / "agent" / "dap_an_noi_dung_dung.json"
 BIEN_HELDOUT = "FLS_HELDOUT_NOI_DUNG"     # thư mục GIỮ RIÊNG (ca.json + dap_an.json) — ngoài repo
@@ -123,10 +131,19 @@ def dung_may(tep_voi: Path = TEP_VOI, tep_hd2: Path = TEP_HD2, fx: Path = FX) ->
 
 
 def bo_ca(cho_heldout: bool = True) -> tuple[dict, dict, str]:
-    """(ca, đáp án, nhãn bể). Có `FLS_HELDOUT_NOI_DUNG` ⇒ bể GIỮ RIÊNG; ⛔ thì bể DỰNG trong repo."""
+    """(ca, đáp án, nhãn bể). Có `FLS_HELDOUT_NOI_DUNG` ⇒ bể GIỮ RIÊNG; ⛔ thì bể DỰNG trong repo.
+
+    ⭐ `AG2-R1-02` (KQ-357): `dung_be_giu_rieng.py` ghi bố cục `$DIR/a/` · `$DIR/b/` (BG-356/360 đặt biến cho
+    `vong_that_voi.py`) còn bản cũ đọc `$DIR/ca.json` ⇒ `FileNotFoundError`. Nay nhận CẢ HAI: phẳng (`$DIR/ca.json`) ·
+    hai bể ⇒ bể **B** (dữ liệu THẬT hiện tại). Cả hai vắng ⇒ `FileNotFoundError` có tên (⛔ rơi về bể dựng im lặng)."""
     tm = os.environ.get(BIEN_HELDOUT)
     if cho_heldout and tm:
-        return _nap(Path(tm) / "ca.json"), _nap(Path(tm) / "dap_an.json"), "giữ riêng (ngoài repo)"
+        if (Path(tm) / "ca.json").exists():
+            return _nap(Path(tm) / "ca.json"), _nap(Path(tm) / "dap_an.json"), "giữ riêng (ngoài repo)"
+        if (Path(tm) / "b" / "ca.json").exists():
+            return (_nap(Path(tm) / "b" / "ca.json"), _nap(Path(tm) / "b" / "dap_an.json"),
+                    "giữ riêng — bể B (ngoài repo)")
+        raise FileNotFoundError(f"${BIEN_HELDOUT} ⛔ có `ca.json` lẫn `b/ca.json`")
     return _nap(CA_DUNG), _nap(DAP_AN_DUNG), "ca DỰNG trong repo (⛔ dữ liệu thật)"
 
 
@@ -206,22 +223,70 @@ def as_is_co_ten(may: dict) -> list[tuple[str, str, Any]]:
     return ra
 
 
-def ncc_cho(che_do: str, co_that: bool = False, luat: dict | None = None, che: str | None = None) -> dict[str, Any]:
+def ncc_cho(che_do: str, co_that: bool = False, luat: dict | None = None, che: str | None = None,
+            tran_usd: float | None = TRAN_USD_MAC_DINH, nhat_ky: list | None = None) -> dict[str, Any]:
     """Nhà cung cấp theo agent — CHỈ cho agent có skill gọi mô hình (`ch.can_mo_hinh`).
 
     ⚠ Bia `AG-R1-06`: bản đầu dựng cho cả 4 agent ⇒ `--that` dựng Google cho A4 ⇒ `GoogleChuaDung` chặn luôn A1–A3.
+    ⭐ `WO-355`: chế độ `that` ⇒ MỌI adapter dùng CHUNG một `nhat_ky` (trần USD tính trên cả vòng).
     """
     ra: dict[str, Any] = {}
+    nk: list = nhat_ky if nhat_ky is not None else []
     for dn in ch.AGENT:
         if not ch.can_mo_hinh(dn.ma):
             continue
         if che_do == "that":
-            ra[dn.ma] = mh.tao_that(dn.mo_hinh, co_that, che or ch.che_mod.CHE_DO_MAC_DINH)
+            ra[dn.ma] = mh.tao_that(dn.mo_hinh, co_that, che or ch.che_mod.CHE_DO_MAC_DINH,
+                                    tran_usd=tran_usd, nhat_ky=nk)
         elif che_do == "gia":
             ra[dn.ma] = mh.GiaLap(luat if luat is not None else {"ung_vien_ghep": gnd.luat_gia_v1})
         else:
             ra[dn.ma] = mh.PhatLai(TM_PHAT_LAI / f"{dn.ma}.json")
     return ra
+
+
+def nhat_ky_cua(ncc: dict[str, Any]) -> list:
+    """Nhật ký lời gọi THẬT của vòng (danh sách chung) — ⛔ adapter thật ⇒ `[]`."""
+    for n in ncc.values():
+        nk = getattr(n, "nhat_ky", None)
+        if isinstance(nk, list):
+            return nk
+    return []
+
+
+def nhan_usd(t: dict[str, Any]) -> str:
+    """`~X USD ƯỚC (…)` — ⭐ `AG3-R1-03` (KQ-361): MỌI số USD in ra mang nhãn ƯỚC + nguồn giá theo ĐƯỜNG. Đường
+    `google-cloud` nói rõ CHƯA có bảng giá (giá Claude API dùng để giữ trần); số thật ở hoá đơn GCP."""
+    duong = t.get("duong") or []
+    if duong == [mh.DUONG_GOOGLE_CLOUD]:
+        nguon = "giá Claude API — nền claude.googleapis.com CHƯA có bảng giá; số thật ở hoá đơn GCP"
+    elif duong == [mh.DUONG_VERTEX]:
+        nguon = "Vertex: global = giá Claude API (giả định chưa kiểm), us/eu +10%; số thật ở Billing GCP"
+    else:
+        nguon = "giá Claude API"
+    return f"~{t['chi_phi_usd']} USD ƯỚC ({nguon}; tra {t['ngay_tra_gia']})"
+
+
+def ghi_nhat_ky(ncc: dict[str, Any], nhan: str, tm: Path | None = None, loi: str | None = None) -> Path | None:
+    """Ghi nhật ký vòng: mỗi lời gọi = mô hình · token · giây · USD ước · stop_reason · VÂN TAY yêu cầu/đáp.
+    ⛔ nội dung yêu cầu, ⛔ phản hồi thô, ⛔ khoá (luật cứng WO-355). 0 lời gọi ⇒ ⛔ ghi (Đ3: ⛔ tệp rỗng giả vờ có số).
+
+    `tm` vắng ⇒ đọc `TM_NHAT_KY` LÚC GỌI (⛔ lúc định nghĩa) ⇒ bài thử đổi hướng được bằng `monkeypatch` (`AG3-R1-02`).
+    `loi` (`AG3-R1-01`): lượt DỪNG giữa chừng ⇒ thêm MỘT dòng `loi` = TÊN lỗi (⛔ nội dung) cạnh các lời đã tính tiền."""
+    nk = nhat_ky_cua(ncc)
+    if not nk:
+        return None
+    tm = TM_NHAT_KY if tm is None else tm
+    from datetime import datetime, timezone
+    tm.mkdir(parents=True, exist_ok=True)
+    p = tm / f"{datetime.now(timezone.utc).strftime('%Y-%m-%dT%H%M%SZ')}_{nhan}.json"
+    d = {"_vi_sao": "Nhật ký vòng API THẬT — CHỈ số đếm + vân tay (WO-355 AC-2/AC-4 · WO-359).",
+         "tong": mh.tong_nhat_ky(nk), "goi": [x.dict() for x in nk]}
+    if loi:
+        d["loi"] = loi
+    p.write_text(json.dumps(d,
+                            ensure_ascii=False, indent=1, sort_keys=True) + "\n", encoding="utf-8")
+    return p
 
 
 def ghi_phat_lai(ncc: dict[str, mh.GhiLai]) -> None:
@@ -288,7 +353,10 @@ def chay(che_do: str = "phat_lai", che: str | None = None, co_that: bool = False
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(prog="chay_agent_voi.py")
     p.add_argument("--gia", action="store_true", help="mô hình GIẢ tất định (thay phát lại)")
-    p.add_argument("--that", action="store_true", help="gọi API THẬT — ⛔ trong WO-329; cần FLS_CHO_GOI_API=1 + khoá")
+    p.add_argument("--that", action="store_true",
+                   help="gọi API THẬT — FLS_CHO_GOI_API=1 + đường (FLS_NHA_CUNG_CAP=google-cloud: "
+                        "FLS_GCP_PROJECT · FLS_CLAUDE_WORKSPACE_ID · FLS_GC_DU_LIEU_XAC_NHAN=1 ở `mo`) | vertex | anthropic (vắng ⇒ anthropic)")
+    p.add_argument("--tran-usd", type=float, default=TRAN_USD_MAC_DINH, help="trần USD ƯỚC của cả vòng — chặn lời gọi KẾ khi tổng đã tiêu ≥ trần; ⛔ cắt lời gọi ĐANG chạy (một lời có thể vượt trần — AG2-R1-03)")
     p.add_argument("--ghi-phat-lai", action="store_true", help="(với --gia) ghi docs/ITL/06_Agent/phat_lai/*.json")
     p.add_argument("--ghi-report", action="store_true", help="ghi docs/ITL/06_Agent/report.html")
     p.add_argument("--che", choices=("mo", "che_noi_dung", "che_het"), default=None,
@@ -296,7 +364,7 @@ def main(argv: list[str] | None = None) -> int:
     a = p.parse_args(argv)
     che_do = "that" if a.that else ("gia" if a.gia else "phat_lai")
     try:
-        ncc = ncc_cho(che_do, a.that, che=a.che)
+        ncc = ncc_cho(che_do, a.that, che=a.che, tran_usd=a.tran_usd)
     except (mh.CamGoiThat, mh.ChuaDung, mh.KhongCoBanGhi) as e:
         print(f"⛔ {type(e).__name__}: {e}")
         return 2
@@ -315,6 +383,14 @@ def main(argv: list[str] | None = None) -> int:
             tt = "⛔ " + ks.loi if ks.loi else ("chưa chạy" if ks.dat_cong is None else
                                                 ("ĐẠT" if ks.dat_cong else "ĐỎ") + " · " + ks.ly_do)
             print(f"  {ks.skill.nhan:32s} {tt}")
+    if che_do == "that":
+        t = mh.tong_nhat_ky(nhat_ky_cua(ncc))
+        print(f"  API THẬT: {t['so_goi']} lời gọi · token vào {t['token_vao']} · ra {t['token_ra']} · cache đọc "
+              f"{t['cache_doc']} · ghi {t['cache_ghi']} · {t['giay']} s · {nhan_usd(t)}"
+              f" · đường {'/'.join(t['duong']) or '—'}{' · vùng ' + '/'.join(t['vung']) if t['vung'] else ''}")
+        p_ = ghi_nhat_ky(ncc, f"chuoi_{a.che or ch.che_mod.CHE_DO_MAC_DINH}")
+        if p_:
+            print(f"  đã ghi nhật ký {p_.relative_to(GOC) if p_.is_relative_to(GOC) else p_}")
     if a.ghi_phat_lai:
         ghi_phat_lai(ncc)
         print(f"  đã ghi bản phát lại: {TM_PHAT_LAI.relative_to(GOC)}/")

@@ -12,6 +12,10 @@
    công cụ, vẫn qua cổng ① và cửa ② — ⛔ nhà cung cấp nào được dựng cho nó.
    ⚠ Bia `AG-R1-06` (KQ-331): bản đầu để A4.02/03 `loai: lam` ⇒ gọi `gemini-3.8-flash` CHƯA ghim, ngược quyết chủ
    C2 *"A4 MÃ THUẦN tới G1"* — và `--that` phải dựng nhà cung cấp Google ⇒ chạy thật A1–A3 cũng ⛔ được.
+⭐ `WO-355` (chủ 23/11 ~12:45): MỘT nhà cung cấp Anthropic — A1–A3 (agent LÀM) = `claude-opus-5-5`; A4 (phần KIỂM
+   dùng mô hình, mở ở G1) = `claude-sonnet-5-5`; phán cuối của A4 vẫn là MÃ `doi_chieu`. "Luật hai HỌ" (Voi phase 1)
+   ⛔ còn thoả được với một hãng ⇒ thay bằng luật HAI MÔ HÌNH (`kiem_a4_khac_mo_hinh`): mô hình A4 ≠ mô hình agent làm.
+   Mô hình theo TỪNG skill: `mo_hinh_skill` — `lam`/`bong` ⇒ mô hình agent; `ma` ⇒ `None` (⛔ lượt API).
 
 Vòng một skill `lam`/`bong` (khuôn Messages, xem `mo_hinh.py`): user = prompt skill · mô hình gọi ĐÚNG công cụ
 của skill (tên khác ⇒ dừng) · kết quả công cụ (phía máy) đi vào `tool_result` · MỌI yêu cầu qua `che.che_yeu_cau` (chế độ mặc định `mo` — chủ 23/11)
@@ -26,7 +30,7 @@ from typing import Any, Callable
 from fls.agent import che as che_mod
 from fls.agent import doi_chieu as dc
 from fls.agent.cong_skill import chay_cong
-from fls.agent.mo_hinh import GEMINI_FLASH, OPUS_5_5, MoHinh, NhaCungCap
+from fls.agent.mo_hinh import OPUS_5_5, SONNET_5_5, MoHinh, NhaCungCap
 from fls.agent.skill import Skill, checksum_prompt, he_thong, nap_bo
 
 SO_LUOT_TOI_DA = 4
@@ -40,14 +44,14 @@ class DinhNghiaAgent:
     mo_hinh: MoHinh
 
 
-#: Thứ tự chuỗi. Phương án A (Voi phase 1 §F0b — PROPOSED): A1–A3 Claude Opus 5.5 · A4 họ khác (Gemini 3.8 Flash).
-#: ⭐ Quyết chủ C2 (23/11): A4 là MÃ THUẦN tới G1 — `mo_hinh` của A4 chỉ là mô hình DỰ KIẾN cho G1 (giữ để canh
-#:    luật hai họ); hôm nay A4 ⛔ có skill `lam`/`bong` nên ⛔ được dựng nhà cung cấp (`can_mo_hinh`).
+#: Thứ tự chuỗi. ⭐ `WO-355` (THAY phương án A): A1–A3 `claude-opus-5-5` · A4 `claude-sonnet-5-5` (cùng hãng, KHÁC mô hình).
+#: ⭐ Quyết chủ C2 (23/11): A4 là MÃ THUẦN tới G1 — `mo_hinh` của A4 chỉ là mô hình DỰ KIẾN cho phần KIỂM ở G1 (giữ để
+#:    canh luật hai mô hình); hôm nay A4 ⛔ có skill `lam`/`bong` nên ⛔ được dựng nhà cung cấp (`can_mo_hinh`).
 AGENT = (
     DinhNghiaAgent("A1_RI", "A1 · Collect_raw_data (4 nguồn raw)", OPUS_5_5),
     DinhNghiaAgent("A2_PR_MAP", "A2 · Generate Group Ledger + Mapping", OPUS_5_5),
     DinhNghiaAgent("A3_SI_ITL", "A3 · SI.ITL — Adjust + Allocate", OPUS_5_5),
-    DinhNghiaAgent("A4_AUDITOR", "A4 · Auditor", GEMINI_FLASH),
+    DinhNghiaAgent("A4_AUDITOR", "A4 · Auditor", SONNET_5_5),
 )
 
 
@@ -63,12 +67,30 @@ def can_mo_hinh(ma_agent: str) -> bool:
     return any(s.loai in LOAI_GOI_MO_HINH for s in nap_bo(ma_agent))
 
 
-def kiem_hai_ho(agent: tuple[DinhNghiaAgent, ...] = AGENT) -> None:
-    """Luật hai họ (Voi phase 1): họ A4 ≠ họ mọi agent làm. Vi phạm ⇒ ⛔ chạy."""
-    ho_lam = {a.mo_hinh.ho for a in agent if a.ma != "A4_AUDITOR"}
+def kiem_a4_khac_mo_hinh(agent: tuple[DinhNghiaAgent, ...] = AGENT) -> None:
+    """Luật HAI MÔ HÌNH (`WO-355`, thay luật hai họ): mã mô hình A4 ≠ mã mô hình MỌI agent làm. Vi phạm ⇒ ⛔ chạy.
+
+    ⚠ Một hãng ⇒ A4 ⛔ còn độc lập về HỌ với A1–A3; độc lập còn lại = mô hình khác + phán cuối là MÃ."""
+    ma_lam = {a.mo_hinh.ma for a in agent if a.ma != "A4_AUDITOR"}
     a4 = [a for a in agent if a.ma == "A4_AUDITOR"]
-    if not a4 or a4[0].mo_hinh.ho in ho_lam:
-        raise LoiChuoi(f"luật hai họ: A4 họ `{a4[0].mo_hinh.ho if a4 else '—'}` trùng họ agent làm {sorted(ho_lam)}")
+    if not a4 or a4[0].mo_hinh.ma in ma_lam:
+        raise LoiChuoi(f"luật hai mô hình: A4 `{a4[0].mo_hinh.ma if a4 else '—'}` trùng mô hình agent làm {sorted(ma_lam)}")
+
+
+def mo_hinh_skill(dn: DinhNghiaAgent, s: Skill) -> MoHinh | None:
+    """Mô hình MỘT skill thật sự gọi: `lam`/`bong` ⇒ mô hình agent; `ma` ⇒ `None` (MÃ, ⛔ lượt API)."""
+    return dn.mo_hinh if s.loai in LOAI_GOI_MO_HINH else None
+
+
+def doc_json_tra_loi(van: str) -> Any:
+    """Câu trả lời cuối của mô hình ⇒ JSON. Chịu MỘT rào ```json … ``` bao ngoài (mô hình thật hay bọc);
+    ⛔ cắt chữ thừa khác — chữ ngoài JSON ⇒ `JSONDecodeError` ⇒ skill ĐỎ có tên (⛔ đoán)."""
+    t = van.strip()
+    if t.startswith("```") and t.endswith("```") and t.count("```") == 2:
+        t = t[3:-3]
+        dau, _, than = t.partition("\n")
+        t = than if dau.strip().lower() in ("", "json") else t
+    return json.loads(t)
 
 
 @dataclass
@@ -142,7 +164,7 @@ def chay_skill(dn: DinhNghiaAgent, he: str, s: Skill, ncc: NhaCungCap,
                 continue
             if dung == "end_turn":
                 van = "".join(k.get("text", "") for k in tl.get("content", []) if k.get("type") == "text")
-                ra = json.loads(van)
+                ra = doc_json_tra_loi(van)
                 if not isinstance(ra, dict):
                     raise LoiChuoi("câu trả lời ⛔ phải một đối tượng JSON")
                 kq.ra = ra
@@ -174,7 +196,7 @@ def chay_chuoi(ncc_theo_agent: dict[str, NhaCungCap], cong_cu: dict[str, Callabl
                may: dict[str, Any], dap_an: dict[str, Any] | None = None, che_do: str | None = None,
                agent: tuple[DinhNghiaAgent, ...] = AGENT) -> KqChuoi:
     """Chạy chuỗi. `may` = số máy đã đo theo nguồn ô (`voi` · `hd2` · `nguon` · `cong`); `dap_an` = `{"noi": …}`."""
-    kiem_hai_ho(agent)
+    kiem_a4_khac_mo_hinh(agent)
     kc = KqChuoi()
     for dn in agent:
         bo = nap_bo(dn.ma)

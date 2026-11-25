@@ -83,12 +83,33 @@ NHOM_CUA = {"A": "phai_noi", "B": "phai_noi", "C": "phai_noi", "D": "phai_nguoi"
 
 
 # ───────────────────────────── đọc nguồn (SA chỉ-đọc) ─────────────────────────────
+PHAM_VI_DOC = ["https://www.googleapis.com/auth/spreadsheets.readonly"]   # ⛔ chỉ đọc (QĐ-ITL-34)
+
+
+def cach_xac_thuc(mt: dict[str, str] | None = None) -> str:
+    """TÊN cách lấy quyền đọc sheet (⛔ giá trị). `WO-359` AC-4: chạy được ở Cloud Shell của chủ — thứ tự dừng ở cái đầu:
+    ① `FLS_SHEETS_TOKEN` (access token đưa sẵn) ② `FLS_SHEETS_SA_JSON_TEP` (ĐƯỜNG DẪN tệp khoá SA, chmod 600 — ⛔ nội dung
+    khoá qua biến) ③ `FLS_GSHEETS_SA_JSON(_B64)` (environment secrets của phiên cloud — đường cũ WO-338). Khuôn theo
+    `tools/staging/cred_sheets.py` (nhánh STG-NAP) nhưng ⛔ phụ thuộc nó (nhánh này ⛔ có tệp ấy)."""
+    mt = os.environ if mt is None else mt
+    for k in ("FLS_SHEETS_TOKEN", "FLS_SHEETS_SA_JSON_TEP", "FLS_GSHEETS_SA_JSON", "FLS_GSHEETS_SA_JSON_B64"):
+        if mt.get(k):
+            return k
+    raise RuntimeError("⛔ thiếu quyền đọc sheet: đặt FLS_SHEETS_TOKEN · FLS_SHEETS_SA_JSON_TEP · FLS_GSHEETS_SA_JSON(_B64)")
+
+
 def _phien():
     from google.auth.transport.requests import AuthorizedSession
     from google.oauth2 import service_account
+    cach = cach_xac_thuc()
+    if cach == "FLS_SHEETS_TOKEN":
+        from google.oauth2.credentials import Credentials
+        return AuthorizedSession(Credentials(token=os.environ["FLS_SHEETS_TOKEN"]))
+    if cach == "FLS_SHEETS_SA_JSON_TEP":
+        return AuthorizedSession(service_account.Credentials.from_service_account_file(
+            os.environ["FLS_SHEETS_SA_JSON_TEP"], scopes=PHAM_VI_DOC))
     raw = os.environ.get("FLS_GSHEETS_SA_JSON") or base64.b64decode(os.environ["FLS_GSHEETS_SA_JSON_B64"]).decode()
-    return AuthorizedSession(service_account.Credentials.from_service_account_info(
-        json.loads(raw), scopes=["https://www.googleapis.com/auth/spreadsheets.readonly"]))   # ⛔ chỉ đọc
+    return AuthorizedSession(service_account.Credentials.from_service_account_info(json.loads(raw), scopes=PHAM_VI_DOC))
 
 
 def _lay(s, sid: str, vung: str, lan: int = 4) -> list[list]:
@@ -428,10 +449,27 @@ def thu_muc_be(goc: Path, ten: str) -> Path:
     return goc / ten
 
 
+def tao_thu_muc_rieng(d: Path) -> list[Path]:
+    """Tạo `d` (và cha thiếu) với quyền 700 — ⭐ `AG3-R1-05` (KQ-361): CHỈ `chmod` thư mục do CHÍNH hàm này tạo; thư mục
+    CÓ SẴN (vd `/tmp`, `$HOME`) ⛔ bị đổi quyền — rộng hơn 700 thì IN cảnh báo (tên + quyền, ⛔ nội dung). Trả danh
+    sách thư mục đã tạo."""
+    thieu = []
+    p = Path(d)
+    while not p.exists():
+        thieu.append(p)
+        p = p.parent
+    for t in reversed(thieu):
+        t.mkdir(mode=0o700)
+        os.chmod(t, 0o700)                    # mkdir chịu umask ⇒ đặt lại cho chắc
+    for c in [Path(d), *Path(d).parents][len(thieu):len(thieu) + 1]:   # thư mục có sẵn gần nhất
+        if c.exists() and c.stat().st_mode & 0o077:
+            print(f"  ⚠ thư mục có sẵn `{c}` quyền {oct(c.stat().st_mode & 0o777)} (rộng hơn 700) — ⛔ đổi; tự kiểm")
+    return thieu
+
+
 def ghi_be(goc: Path, be: dict) -> Path:
     d = thu_muc_be(goc, be["ten"])
-    d.mkdir(parents=True, exist_ok=True)
-    os.chmod(d, 0o700)
+    tao_thu_muc_rieng(d)                      # bản cũ `chmod 700` cả `goc` có sẵn (`AG3-R1-05`)
     for ten_tep, du in (("ca.json", be["ca"]), ("dap_an.json", be["dap_an"]), ("meta.json", be["meta"])):
         p = d / ten_tep
         p.write_text(json.dumps(du, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
@@ -515,8 +553,7 @@ def main(argv: list[str] | None = None) -> int:
     if a.tu_tep:
         nguon = json.loads(a.tu_tep.read_text(encoding="utf-8"))
     else:
-        a.tho.parent.mkdir(parents=True, exist_ok=True)
-        os.chmod(a.tho.parent, 0o700)
+        tao_thu_muc_rieng(a.tho.parent)       # ⛔ `chmod` thư mục có sẵn (vd `--tho /tmp/x.json` từng làm `/tmp` thành 700)
 
         def luu(n: dict) -> None:
             a.tho.write_text(json.dumps(n, ensure_ascii=False), encoding="utf-8")
@@ -552,7 +589,12 @@ def main(argv: list[str] | None = None) -> int:
                              "ket": "KHỚP" if ket_ky else (f"ĐỎ — ⛔ đo được: Ledge sống ⛔ đọc hết giờ (ô ngày giải mã {dc['mau_so_o_ngay_song']}, lát hỏng {len(dc['lat_ledge_hong'])})" if not do_duoc
                                                 else "ĐỎ — kỳ đã chốt lệch (nguồn đã sửa sau chốt?)")}}
     TEP_DEM.parent.mkdir(parents=True, exist_ok=True)
-    TEP_DEM.write_text(json.dumps(out, ensure_ascii=False, indent=1, sort_keys=True) + "\n", encoding="utf-8")
+    # ⭐ `AG2-R1-06` (KQ-357): chỉ khác `ngay_doc` ⇒ ⛔ ghi (dựng lại đúng làm cây repo bẩn 1 dòng ngày, dễ lỡ commit).
+    cu = json.loads(TEP_DEM.read_text(encoding="utf-8")) if TEP_DEM.exists() else None
+    if cu is not None and {**cu, "ngay_doc": None} == {**out, "ngay_doc": None}:
+        print(f"  {TEP_DEM.relative_to(GOC)}: mọi số đếm KHÔNG đổi (chỉ ngày đọc) ⇒ ⛔ ghi")
+    else:
+        TEP_DEM.write_text(json.dumps(out, ensure_ascii=False, indent=1, sort_keys=True) + "\n", encoding="utf-8")
     for k, v in out["be"].items():
         print(f"bể {k}: {v['tong_ca']}/{v['mong_tong']} ca · thiếu {v['thieu'] or 'không'} · "
               f"trùng ca dựng {v['doc_lap']['trung_ca_dung_wo329']} · trùng prompt {v['doc_lap']['trung_prompt_agent']}")
