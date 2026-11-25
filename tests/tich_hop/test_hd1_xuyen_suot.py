@@ -37,9 +37,12 @@ SO_LY_DO_THAT = GOC / "docs" / "ITL" / "_tools" / "so_ly_do_hd1.json"
 TEP_THAT = GOC / "docs" / "ITL" / "_tools" / "voi_so_luong.json"
 
 # ══ MONG — khai TRƯỚC (Đ5), mỗi số kèm NHÃN nó đếm gì (Đ4) ═══════════════════════════════════════
-# Mốc sổ HAI LỚP (Đ4): 25 kỳ đọc 20/11 · ảnh 2026-03 mốc CŨ (`DT12-R1-05` chờ chủ).
-NHAN_MOC_MOI = "20/11 (sổ hiện tại)"
-NHAN_MOC_CU = "mốc CŨ (ảnh chụp sổ cũ — chủ chưa quyết đóng băng lại)"
+# Mốc sổ HAI LỚP (Đ4) — WO-345 (chủ 23/11: nguồn sống là chuẩn; `DT12-R1-05` đã quyết): 3 kỳ ảnh sống 23/11
+# (2025-10 · 2026-03 · 2026-11 — nội dung đổi) · 23 kỳ đóng băng lại ra checksum ≡ ảnh 20/11.
+# CŨ (trước WO-345): 25 kỳ "20/11 (sổ hiện tại)" · 2026-03 "mốc CŨ (ảnh chụp sổ cũ — chủ chưa quyết đóng băng lại)".
+NHAN_MOC_MOI = "23/11 (nguồn sống — ảnh _20261123; chủ quyết nguồn sống là chuẩn)"
+NHAN_MOC_CU = "23/11 ≡ 20/11 (đóng băng lại ra checksum BẰNG ảnh 20/11 — đọc ảnh 20/11)"
+MONG_KY_MOC_MOI = ("2025-10", "2026-03", "2026-11")
 MONG_SO_KY_CONG = 23            # kỳ của ẢNH sổ 26/08 — mẫu số `HD1_THANG` (khối `dat_hd1`)
 MONG_SO_KY_TU_SINH = 26         # kỳ của manifest DT12 — khối `tu_sinh` (H15)
 MONG_KY_CHI_O_TU_SINH = ("2026-09", "2026-10", "2026-11")
@@ -52,8 +55,9 @@ MONG_KY_DO = (                                                              # k�
 )
 MONG_NGAY_ANH = "2026-08-26"
 # `tu_sinh` (H15, BG-288/KQ-290): ô Final khớp/tổng trên 26 kỳ · HD khớp/tổng · 8 kỳ lệch (92 ô)
-MONG_TU_SINH_O = [88339, 88431]
-MONG_TU_SINH_HD = [12633, 12633]
+# WO-345 (ảnh sống 23/11: 2026-11 659 → 748 dòng) — CŨ: O [88339, 88431] · HD [12633, 12633]
+MONG_TU_SINH_O = [88962, 89054]
+MONG_TU_SINH_HD = [12722, 12722]
 MONG_TU_SINH_KY_LECH = ("2025-02", "2025-03", "2025-05", "2025-10", "2025-11", "2025-12", "2026-01", "2026-07")
 # Chữ ký GIẢ — ⛔ chữ ký thật (O8 = chủ). Kỳ ký giả = 2026-07 (nhiều dòng thiếu nhất, 23/686).
 KY_GIA = "2026-07"
@@ -143,8 +147,9 @@ def test_B1_nhan_ly_do_ngay_anh_va_nhan_moc_so_o_tang_cong_va_tang_tu_sinh(chuoi
     assert "H15" in g["ly_do"], g["ly_do"]          # cổng NÓI nó ⛔ đo chế độ tự sinh
     moc = d["tu_sinh"]["moc_so"]
     assert len(moc) == MONG_SO_KY_TU_SINH
-    assert [k for k, v in moc.items() if v == NHAN_MOC_CU] == ["2026-03"]
-    assert sum(v == NHAN_MOC_MOI for v in moc.values()) == 25
+    assert tuple(k for k, v in moc.items() if v == NHAN_MOC_MOI) == MONG_KY_MOC_MOI
+    assert sum(1 for v in moc.values() if v == NHAN_MOC_CU) == MONG_SO_KY_TU_SINH - len(MONG_KY_MOC_MOI)
+    assert sum(v == NHAN_MOC_MOI for v in moc.values()) == 3          # WO-345 · CŨ: 25 kỳ "20/11 (sổ hiện tại)"
 
 
 # ═══ I1-R1-01 — cổng phán 26 kỳ có ảnh; 3 kỳ ⛔ đo được vế dòng có TÊN ═══════════════════════════
