@@ -32,3 +32,4 @@
 | 24/11 | `fls-dev` | Bổ sung theo orchestrator (lời chủ ~03:45 "tạo 1 tài khoản để đăng nhập chung"): màn `/login` FLS sau IAP, tài khoản `HondurasGesha`, băm scrypt ở Secret Manager `fls-staging-login` (`08_dat_dang_nhap.sh`); +26 bài; sàn 5168; `BG-364` cập nhật (AC-6) |
 | 24/11 | `fls-dev` | `--duong-nen` @ `86a5003`: **KẾT: ĐẠT** (28 = 28 · web 3 = 3 · chạy 5168) — ghi vào `BG-364` §1.1 |
 | 25/11 | `fls-dev` | Vòng sửa sau R1 `KQ-365` (0 CHẶN · 3 NÊN SỬA · 5 GHI NHẬN): sửa `-01…-07`, đính chính `-08`; +14 bài; sàn 5182; `BG-364` §12 |
+| 25/11 | `fls-dev` | `--duong-nen --cong 5434` @ `ffc2d3a`: **KẾT: ĐẠT** (28 = 28 · web 3 = 3 · chạy 5182) — `BG-364` §12.3 |

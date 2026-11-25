@@ -204,7 +204,8 @@ bash tools/staging/07_link_web.sh --project fp-a-project --kiem   # mong: KẾT:
 |---|---|
 | `pytest tests/staging` | **219 passed** in 335 s *(205 + 14)* |
 | `pytest --collect-only` | **5182** · web **690** — sàn `MONG_PYTEST_TOAN_BO` 5168 → **5182** *(bài ghim cùng commit)* |
-| `--duong-nen --cong 5434` | *(điền sau khi chạy)* |
+| `--duong-nen --cong 5434` *(MỘT lần, một mình)* | **`KẾT: ĐẠT`** @ `ffc2d3a` — toàn bộ `12 failed, 5154 passed, 2 xfailed, 14 errors in 1654.48s` ⇒ tập đỏ + XFAIL **28 = 28** *(XFAIL 2 = 2 · thêm 0 · bớt 0)* · chạy **5182** *(mong ≥ 5182)* · skipped 0 · deselected 0; web `3 failed, 687 passed` ⇒ **3 = 3** · chạy **690**; 7 phép kiểm môi trường ĐẠT |
+| `kiem_tai_lieu` · `lint-imports` · `quet_pii_repo` · `test_uat_doc` | ĐẠT *(519 file)* · 11 kept 0 broken · 0 chỗ · 6 passed |
 
 ### 12.4 · Dev tự thấy còn yếu
 - **Ghi Secret Manager từ cổng** là hành vi GCP CHƯA đo: REST `:addVersion` / `:destroy` bằng token metadata của SA, vai `secretVersionManager` đủ cho cả hai *(theo tài liệu vai; ⛔ đo)*. Sai ⇒ nhật ký `⛔ DANG_NHAP_GHI_LOI` và đăng xuất/khoá tạm chỉ còn hiệu lực trong instance (= hành vi trước vòng sửa) — ⛔ mở cửa. **Giả định G-9** — thêm vào README.
