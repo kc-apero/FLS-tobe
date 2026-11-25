@@ -38,6 +38,8 @@ def _gcloud(thu_muc, hong_n, *, sa_co_san=(), go_hong=False, them_bm_hong=False,
 echo "$*" >> "{thu_muc}/log"
 case "$*" in
   *"projects add-iam-policy-binding"*)
+      # `STG-WEB-R1-03`: chính sách dự án CÓ điều kiện (đo THẬT 24/11) ⇒ thiếu `--condition` ⇒ gcloud từ chối, ⛔ tính là lần thử
+      case "$*" in *"--condition"*) ;; *) echo "ERROR: (gcloud.projects.add-iam-policy-binding) Adding a binding without specifying a condition to a policy containing conditions is prohibited in non-interactive mode. Run the command again with --condition=None" >&2; exit 1 ;; esac
       n=$(cat "{cnt}"); echo $((n+1)) > "{cnt}"
       if [ "$n" -lt {hong_n} ]; then echo "ERROR: INVALID_ARGUMENT: Service account {SA} does not exist." >&2; exit 1; fi
       touch "{thu_muc}/da_gan"; exit 0 ;;

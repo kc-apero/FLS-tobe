@@ -19,13 +19,17 @@
 #   ① bật API secretmanager
 #   ② hỏi mật khẩu 2 lần (ẩn) · ≥ 12 ký tự · ⛔ trùng tên · băm scrypt
 #   ③ bí mật chưa có ⇒ `secrets create … --data-file=-`; có ⇒ `secrets versions add … --data-file=-`
-#   ④ SA `fls-staging-app` được `secretAccessor` trên ĐÚNG bí mật này (cổng IAP đọc nó lúc chạy)
-#   ⑤ BÁO CÁO (⛔ mật khẩu, ⛔ băm): bí mật có · SA đọc được · bản ghi mới nhất ĐÚNG HÌNH (tên mong · `scrypt$…`)
-#  Có hiệu lực ≤ 1 phút (cổng đọc lại bí mật mỗi 60 giây) — ⛔ cần dựng lại service. Đổi mật khẩu ⇒ mọi phiên cũ mất.
+#   ③b TRẠNG THÁI PHIÊN `fls-staging-phien` (`STG-WEB-R1-02` · `-06`): MỖI lần đặt mật khẩu ⇒ một phiên bản MỚI có
+#      khoá HMAC 32 byte NGẪU NHIÊN (sinh trong python, ⛔ in) + bộ đếm sạch ⇒ mọi phiên cũ mất, mọi khoá tạm gỡ.
+#      Cổng GHI vào đây khi đăng xuất / sai mật khẩu ⇒ thu hồi + khoá tạm BỀN qua khởi động lại instance.
+#   ④ SA `fls-staging-app`: `secretAccessor` trên `fls-staging-login` · `secretAccessor` + `secretVersionManager`
+#      (thêm + huỷ phiên bản) trên `fls-staging-phien` — ⛔ bí mật nào khác
+#   ⑤ BÁO CÁO (⛔ mật khẩu, ⛔ băm, ⛔ khoá): 2 bí mật có · SA đủ quyền · bản ghi ĐÚNG HÌNH
+#  Có hiệu lực ≤ 1 phút (cổng đọc lại tài khoản mỗi 60 giây, trạng thái mỗi 30 giây) — ⛔ cần dựng lại service.
 # ══════════════════════════════════════════════════════════════════════════════════════════
 set -euo pipefail
 
-PROJECT="" ; TEN="HondurasGesha" ; BI_MAT="fls-staging-login" ; KIEM=0
+PROJECT="" ; TEN="HondurasGesha" ; BI_MAT="fls-staging-login" ; BI_MAT_TT="fls-staging-phien" ; KIEM=0
 while [ $# -gt 0 ]; do
   case "$1" in
     --project) PROJECT="$2"; shift 2 ;;
@@ -72,17 +76,41 @@ if [ "$KIEM" -eq 0 ]; then
   fi
   unset BAN_GHI
 
-  buoc "④ SA fls-staging-app đọc được $BI_MAT"
+  buoc "③b trạng thái phiên $BI_MAT_TT (khoá ngẫu nhiên MỚI ⇒ mọi phiên cũ mất)"
+  if co secrets describe "$BI_MAT_TT"; then
+    python3 "$GOC/tools/staging/app/dang_nhap.py" --trang-thai-moi | "${G[@]}" secrets versions add "$BI_MAT_TT" --data-file=- >/dev/null
+    echo "   có rồi ⇒ phiên bản MỚI"
+  else
+    python3 "$GOC/tools/staging/app/dang_nhap.py" --trang-thai-moi | "${G[@]}" secrets create "$BI_MAT_TT" \
+        --replication-policy=automatic --labels=app=fls,moi-truong=staging --data-file=- >/dev/null
+    echo "   đã tạo"
+  fi
+
+  buoc "④ SA fls-staging-app: đọc $BI_MAT · đọc + ghi phiên bản $BI_MAT_TT"
   "${G[@]}" secrets add-iam-policy-binding "$BI_MAT" --member="serviceAccount:$SA_EMAIL" \
       --role=roles/secretmanager.secretAccessor >/dev/null
-  echo "   $SA_EMAIL: secretAccessor (chỉ trên $BI_MAT)"
+  for vai in roles/secretmanager.secretAccessor roles/secretmanager.secretVersionManager; do
+    "${G[@]}" secrets add-iam-policy-binding "$BI_MAT_TT" --member="serviceAccount:$SA_EMAIL" --role="$vai" >/dev/null
+  done
+  echo "   $SA_EMAIL: secretAccessor ($BI_MAT) · secretAccessor + secretVersionManager ($BI_MAT_TT)"
 fi
 
 # ══════════════════════════════ BÁO CÁO — gửi lại phần này ══════════════════════════════
 buoc "BÁO CÁO (KHÔNG chứa mật khẩu/băm) — chép từ dòng này tới hết, gửi lại"
-export PROJECT TEN BI_MAT SA_EMAIL KIEM
+export PROJECT TEN BI_MAT BI_MAT_TT SA_EMAIL KIEM
 export R_CO="$(co secrets describe "$BI_MAT" && echo co || echo khong)"
 export R_IAM="$("${G[@]}" secrets get-iam-policy "$BI_MAT" --format=json 2>/dev/null || echo '')"
+export R_TT_CO="$(co secrets describe "$BI_MAT_TT" && echo co || echo khong)"
+export R_TT_IAM="$("${G[@]}" secrets get-iam-policy "$BI_MAT_TT" --format=json 2>/dev/null || echo '')"
+# Trạng thái phiên: CHỈ đếm hình dạng trong python con (⛔ khoá ra ngoài) — một dòng "dung_hinh=…"
+export R_TT_HINH="$("${G[@]}" secrets versions access latest --secret="$BI_MAT_TT" 2>/dev/null | python3 -c '
+import json, sys, base64
+try:
+    o = json.loads(sys.stdin.read())
+    k = base64.urlsafe_b64decode(o["khoa"] + "=" * (-len(o["khoa"]) % 4))
+    print("dung" if len(k) >= 32 and all(isinstance(o.get(x), dict) for x in ("the_he", "sai", "khoa_toi")) else "sai")
+except Exception:
+    print("khong_doc")' 2>/dev/null || echo khong_doc)"
 # Bản ghi mới nhất đi THẲNG vào python qua ống — ⛔ vào biến môi trường, ⛔ in.
 PYP="$(mktemp)" ; trap 'rm -f "$PYP"' EXIT
 cat > "$PYP" <<'PY'
@@ -95,14 +123,20 @@ rec = js(sys.stdin.read())
 rec = rec if isinstance(rec, dict) else None
 iam = js(e['R_IAM'])
 sa = 'serviceAccount:' + e['SA_EMAIL']
-doc = None if iam is None else any(b.get('role') == 'roles/secretmanager.secretAccessor' and sa in b.get('members', [])
-                                   for b in iam.get('bindings', []))
+def co_vai(pol, vai):
+    return None if pol is None else any(b.get('role') == vai and sa in b.get('members', []) for b in pol.get('bindings', []))
+doc = co_vai(iam, 'roles/secretmanager.secretAccessor')
+tt_iam = js(e['R_TT_IAM'])
 hang = [
   ('project · bí mật · tên đăng nhập', '%s · %s · %s' % (e['PROJECT'], e['BI_MAT'], e['TEN']), None),
   ('bí mật đăng nhập có', e['R_CO'], 'co'),
   ('SA fls-staging-app đọc được bí mật đăng nhập', doc, True),
   ('bản ghi mới nhất: tên đăng nhập = mong', None if rec is None else rec.get('ten') == e['TEN'], True),
   ('bản ghi mới nhất: băm scrypt (⛔ mật khẩu thô)', None if rec is None else str(rec.get('bam', '')).startswith('scrypt$'), True),
+  ('trạng thái phiên fls-staging-phien có', e['R_TT_CO'], 'co'),
+  ('SA đọc được trạng thái phiên', co_vai(tt_iam, 'roles/secretmanager.secretAccessor'), True),
+  ('SA ghi được trạng thái phiên (secretVersionManager)', co_vai(tt_iam, 'roles/secretmanager.secretVersionManager'), True),
+  ('trạng thái phiên đúng hình (khoá ≥ 32 byte · 3 bảng đếm)', e['R_TT_HINH'], 'dung'),
 ]
 do = 0
 for ten, gt, mong in hang:

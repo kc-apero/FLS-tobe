@@ -33,7 +33,12 @@ DOC = ("config get-value", "projects describe", "services list", "artifacts dock
        "secrets describe", "secrets get-iam-policy")
 SA_APP = "serviceAccount:fls-staging-app@du-an-gia.iam.gserviceaccount.com"
 DN_DA_DAT = {"fls-staging-login": {"versions": ['{"ten": "HondurasGesha", "bam": "scrypt$16384$8$1$gia$gia"}'],
-                                   "iam": [{"role": "roles/secretmanager.secretAccessor", "members": [SA_APP]}]}}
+                                   "iam": [{"role": "roles/secretmanager.secretAccessor", "members": [SA_APP]}]},
+             "fls-staging-phien": {"versions": ['{"khoa": "gia", "the_he": {}, "sai": {}, "khoa_toi": {}}'],
+                                   "iam": [{"role": "roles/secretmanager.secretAccessor", "members": [SA_APP]},
+                                           {"role": "roles/secretmanager.secretVersionManager", "members": [SA_APP]}]}}
+AUD = "/projects/123456789012/locations/asia-southeast1/services/fls-staging-web"
+DA_VAO = [f"IAP_AUD {AUD}"]          # dòng nhật ký cổng in khi có người vào qua IAP (aud khớp)
 
 
 class Gcp:
@@ -47,7 +52,8 @@ class Gcp:
             (thu_muc / ten).chmod(0o755)
         s = {"apis": [], "conn": "du-an-gia:asia-southeast1:fls-staging", "repo": True, "repo_iam": [], "anh_tags": [TAG],
              "builds": [], "vm": None, "quyen": [], "ssh_ra": "", "fw": [], "tai_khoan": CHU,
-             "secrets": json.loads(json.dumps(DN_DA_DAT))}      # như chủ đã chạy 08 trước 07
+             "secrets": json.loads(json.dumps(DN_DA_DAT)),      # như chủ đã chạy 08 trước 07
+             "nhat_ky": list(DA_VAO)}                            # và đã có người mở link một lần (aud đo được)
         s.update(them)
         self.dat(s)
 
@@ -89,7 +95,9 @@ def test_dung_tu_trong_ra_DAT_va_in_LINK(gcp):
     assert "KẾT: ĐẠT" in r.stdout and not H.muc_do(r.stdout)
     assert "⭐ LINK: https://fls-staging-web-gia123-as.a.run.app" in r.stdout
     n_dat = len([k for k, v in H.dong_bao_cao(r.stdout).items() if v == "ĐẠT"])
-    assert n_dat == 29, f"số mục có `mong` = {n_dat} (mong 29: 28 mục + `run deploy (exit)`) — đổi thì ghi lại bản khai"
+    assert n_dat == 35, f"số mục có `mong` = {n_dat} (mong 35: 34 mục + `run deploy (exit)`) — đổi thì ghi lại bản khai"
+    dep = next(l for l in gcp.lenh() if l.startswith("run deploy"))
+    assert f"FLS_IAP_AUD={AUD}" in dep, "aud phải được GHIM lúc deploy (`STG-WEB-R1-01`)"
     s = gcp.doc()
     vao = {m for b in s["iap_iam"] if b["role"] == "roles/iap.httpsResourceAccessor" for m in b["members"]}
     assert vao == {f"user:{CHU}", "user:nguoi1@vi-du.vn", "user:nguoi2@vi-du.vn"}
@@ -194,21 +202,22 @@ PHA = [
      {"IAP bật trên service (chú thích run.googleapis.com/iap-enabled)", "thành viên allUsers/allAuthenticatedUsers (đếm)",
       "NGOÀI · GET / ⛔ cookie ⇒ HTTP", "NGOÀI · GET / ⛔ cookie ⇒ chuyển tới trang Google", "NGOÀI · GET API ⛔ cookie ⇒ HTTP",
       "đường vào ⛔ qua IAP (đếm: IAP tắt · công khai · 200 khi ⛔ cookie)"}),
-    ("cửa nghe ra ngoài", lambda s: s.update(nhat_ky=[s["nhat_ky"][-1].replace("nghe_cua=127.0.0.1:8088", "nghe_cua=0.0.0.0:8088")]),
+    ("cửa nghe ra ngoài", lambda s: s.update(nhat_ky=DA_VAO + [s["nhat_ky"][-1].replace("nghe_cua=127.0.0.1:8088", "nghe_cua=0.0.0.0:8088")]),
      {"TRONG · cửa CHỈ nghe 127.0.0.1"}),
-    ("cổng nhận JWT giả", lambda s: s.update(nhat_ky=[s["nhat_ky"][-1].replace("cong_iap_gia=403", "cong_iap_gia=200")]),
+    ("cổng nhận JWT giả", lambda s: s.update(nhat_ky=DA_VAO + [s["nhat_ky"][-1].replace("cong_iap_gia=403", "cong_iap_gia=200")]),
      {"TRONG · cổng: JWT IAP chữ ký GIẢ ⇒ HTTP"}),
-    ("cổng cho qua khi ⛔ JWT", lambda s: s.update(nhat_ky=[s["nhat_ky"][-1].replace("cong_khong_iap=403", "cong_khong_iap=200")]),
+    ("cổng cho qua khi ⛔ JWT", lambda s: s.update(nhat_ky=DA_VAO + [s["nhat_ky"][-1].replace("cong_khong_iap=403", "cong_khong_iap=200")]),
      {"TRONG · cổng: yêu cầu ⛔ JWT IAP ⇒ HTTP"}),
-    ("API mở ⛔ thẻ", lambda s: s.update(nhat_ky=[s["nhat_ky"][-1].replace("api_khong_the=401", "api_khong_the=200")]),
+    ("API mở ⛔ thẻ", lambda s: s.update(nhat_ky=DA_VAO + [s["nhat_ky"][-1].replace("api_khong_the=401", "api_khong_the=200")]),
      {"TRONG · API ⛔ thẻ ⇒ HTTP"}),
-    ("⛔ lấy được khoá IAP", lambda s: s.update(nhat_ky=[s["nhat_ky"][-1].replace("jwks=3", "jwks=0")]),
+    ("⛔ lấy được khoá IAP", lambda s: s.update(nhat_ky=DA_VAO + [s["nhat_ky"][-1].replace("jwks=3", "jwks=0")]),
      {"TRONG · khoá công khai IAP lấy được (đếm ≥ 1)"}),
     ("dòng TU_DO của revision CŨ", lambda s: s["run"]["status"].update(latestReadyRevisionName="fls-staging-web-00099-moi"),
      {"TRONG container · dòng TU_DO của revision đang chạy"}),
-    ("⛔ có dòng TU_DO", lambda s: s.update(nhat_ky=[]),
+    ("⛔ có dòng TU_DO", lambda s: s.update(nhat_ky=[d for d in s["nhat_ky"] if not d.startswith("TU_DO ")]),
      {"TRONG container · dòng TU_DO của revision đang chạy", "TRONG · màn hình / qua cửa ⇒ HTTP", "TRONG · API ⛔ thẻ ⇒ HTTP",
-      "TRONG · tài khoản đăng nhập FLS lúc khởi động",
+      "TRONG · tài khoản đăng nhập FLS lúc khởi động", "TRONG · trạng thái phiên đọc được lúc khởi động",
+      "TRONG · cổng chạy với aud ghim",
       "TRONG · cửa CHỈ nghe 127.0.0.1", "TRONG · cổng: yêu cầu ⛔ JWT IAP ⇒ HTTP", "TRONG · cổng: JWT IAP chữ ký GIẢ ⇒ HTTP",
       "TRONG · khoá công khai IAP lấy được (đếm ≥ 1)"}),
     ("trang lạ ⛔ phải Google", lambda s: s.update(http_ngoai={"GET /": "302 https://dang-nhap-gia.vi-du.vn/x"}),
@@ -221,10 +230,17 @@ PHA = [
      {"cho vào qua IAP: tài khoản mong có quyền (đếm)"}),
     ("ảnh khác tag", lambda s: s["run"]["spec"]["template"]["spec"]["containers"][0].update(image=IMAGE + "x"),
      {"service chạy đúng ảnh mong"}),
-    ("bí mật đăng nhập bị xoá", lambda s: s.update(secrets={}),
+    ("bí mật đăng nhập bị xoá", lambda s: s["secrets"].pop("fls-staging-login"),
      {"ĐĂNG NHẬP · bí mật fls-staging-login có (chạy 08 trước)", "ĐĂNG NHẬP · SA đọc được bí mật đăng nhập"}),
     ("SA mất quyền đọc bí mật đăng nhập", lambda s: s["secrets"]["fls-staging-login"].update(iam=[]),
      {"ĐĂNG NHẬP · SA đọc được bí mật đăng nhập"}),
+    ("SA mất quyền GHI trạng thái phiên", lambda s: s["secrets"]["fls-staging-phien"]["iam"].pop(),
+     {"ĐĂNG NHẬP · SA đọc + ghi phiên bản trạng thái phiên"}),
+    ("aud KHÔNG ghim", lambda s: (s["run"]["spec"]["template"]["spec"]["containers"][0]["env"].pop(),
+                                  s.update(nhat_ky=DA_VAO + [s["nhat_ky"][-1].replace("aud=ghim", "aud=chua_ghim")])),
+     {"aud ghim trong service (FLS_IAP_AUD = khuôn Cloud Run)", "TRONG · cổng chạy với aud ghim"}),
+    ("aud đo LỆCH aud ghim (khuôn sai)", lambda s: s["nhat_ky"].append(f"IAP_AUD {AUD.replace('fls-staging-web', 'khac')} lech"),
+     {"aud IAP ĐO trong nhật ký = aud ghim (mở link 1 lần rồi --kiem)"}),
     ("chạy 2 instance", lambda s: s["run"]["spec"]["template"]["metadata"]["annotations"].update(
         {"autoscaling.knative.dev/maxScale": "2"}), {"số instance tối đa (MỘT thẻ chung)"}),
 ]
@@ -240,11 +256,11 @@ def test_pha_mot_thu_thi_DUNG_muc_do__kiem(gcp, ten, pha, mong_do):
 
 
 def test_project_TRONG_thi_kiem_DO_het_khong_muc_nao_xanh_suong__D3_D5(tmp_path):
-    g = Gcp(tmp_path, anh_tags=[], tai_khoan="", secrets={})
+    g = Gcp(tmp_path, anh_tags=[], tai_khoan="", secrets={}, nhat_ky=[])
     r = g.chay("--kiem")
     assert r.returncode == 1
     assert [k for k, v in H.dong_bao_cao(r.stdout).items() if v == "ĐẠT"] == []
-    assert len(H.muc_do(r.stdout)) == 28
+    assert len(H.muc_do(r.stdout)) == 34
 
 
 def test_che_do_ghi_dat_actor_NGUOI_KY(gcp):
@@ -288,4 +304,18 @@ def test_CHUA_chay_08_truoc_07_thi_DO_dung_3_muc_dang_nhap_co_ten(tmp_path):
     assert r.returncode == 1
     assert H.muc_do(r.stdout) == {"ĐĂNG NHẬP · bí mật fls-staging-login có (chạy 08 trước)",
                                   "ĐĂNG NHẬP · SA đọc được bí mật đăng nhập",
-                                  "TRONG · tài khoản đăng nhập FLS lúc khởi động"}
+                                  "TRONG · tài khoản đăng nhập FLS lúc khởi động",
+                                  "ĐĂNG NHẬP · trạng thái phiên fls-staging-phien có (08)",
+                                  "ĐĂNG NHẬP · SA đọc + ghi phiên bản trạng thái phiên",
+                                  "TRONG · trạng thái phiên đọc được lúc khởi động"}
+
+
+def test_dung_lan_DAU_chua_ai_vao_thi_DO_DUNG_1_muc_aud_do__mo_link_roi_kiem_DAT(tmp_path):
+    """`STG-WEB-R1-01`: aud ghim theo KHUÔN tài liệu; aud ĐO được chỉ có sau lượt vào đầu ⇒ ĐỎ có tên, ⛔ xanh giả."""
+    g = Gcp(tmp_path, nhat_ky=[])
+    r = g.chay()
+    assert r.returncode == 1 and H.muc_do(r.stdout) == {"aud IAP ĐO trong nhật ký = aud ghim (mở link 1 lần rồi --kiem)"}
+    assert "chưa đo (chưa ai vào link)" in r.stdout
+    g.sua(lambda s: s["nhat_ky"].append(f"IAP_AUD {AUD}"))      # chủ mở link, cổng in aud khớp
+    r2 = g.chay("--kiem")
+    assert r2.returncode == 0 and not H.muc_do(r2.stdout), r2.stdout[-1500:]

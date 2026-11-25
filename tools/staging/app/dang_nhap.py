@@ -11,12 +11,19 @@ thẻ `ke_toan`) chỉ ra được SAU đăng nhập — cổng chặn MỌI đ�
    ② tốn BỘ NHỚ (N=2^14, r=8 ⇒ 16 MiB/lần) nên đoán mật khẩu bằng GPU đắt — cùng nhóm với argon2, hơn bcrypt;
    ③ OWASP Password Storage Cheat Sheet liệt kê scrypt là lựa chọn hợp lệ khi ⛔ có argon2id. Muối 16 byte ngẫu nhiên.
 ⭐ So khớp THỜI GIAN HẰNG: `hmac.compare_digest` cho cả tên lẫn băm; tên SAI vẫn chạy scrypt (⛔ lộ "tên đúng" qua thời gian).
-⭐ Khoá tạm: `SAI_TOI_DA` lần sai trong `CUA_SO_GIAY` ⇒ khoá `KHOA_GIAY` — đếm theo EMAIL IAP (mỗi người test một
-   tài khoản Google; một người gõ sai ⛔ khoá người khác). Đang khoá ⇒ ⛔ chạy so khớp (429).
-⭐ Phiên: cookie `__Host-fls_phien` = `v1.<hết hạn>.<email b64>.<HMAC-SHA256>` — HttpOnly · Secure · SameSite=Strict ·
-   Path=/ · Max-Age = `PHIEN_GIAY` (8 giờ = tuổi thẻ cửa phát). Gắn với EMAIL IAP (đem cookie sang tài khoản Google
-   khác ⇒ vô hiệu). Khoá HMAC suy từ BẢN GHI băm ⇒ đổi mật khẩu = mọi phiên cũ mất. `/logout` thu hồi phiên (bộ
-   nhớ của instance) + xoá cookie. Phiên ⛔ lưu ở máy chủ ⇒ Cloud Run scale-về-0 rồi dậy lại vẫn giữ.
+⭐ Khoá tạm: `SAI_TOI_DA` lần sai trong `CUA_SO_GIAY` ⇒ khoá `KHOA_GIAY` — đếm theo EMAIL IAP (một người gõ sai ⛔ khoá
+   người khác) **VÀ** toàn cục `SAI_TOAN_CUC` lần sai của MỌI email ⇒ khoá chung (`STG-WEB-R1-07`: nhiều tài khoản
+   Google ⛔ nhân hạn mức đoán). Đang khoá ⇒ ⛔ chạy so khớp (429).
+⭐ Phiên: cookie `__Host-fls_phien` = `v2.<thế hệ>.<hết hạn>.<email b64>.<HMAC-SHA256>` — HttpOnly · Secure ·
+   SameSite=Strict · Path=/ · Max-Age = `PHIEN_GIAY` (8 giờ = tuổi thẻ cửa phát). Gắn với EMAIL IAP.
+⭐⭐ TRẠNG THÁI BỀN (`STG-WEB-R1-02` · `-06`, R1 `KQ-365`): bản đầu giữ thu hồi + bộ đếm sai trong BỘ NHỚ instance ⇒ Cloud
+   Run scale-về-0 / dựng lại thì cookie đã `/logout` HỢP LỆ LẠI và khoá tạm về 0; và khoá HMAC suy từ bản ghi băm ⇒ ai
+   đọc được `fls-staging-login` rèn được cookie. Nay trạng thái nằm ở bí mật RIÊNG `fls-staging-phien` (JSON
+   `{"khoa", "the_he", "sai", "khoa_toi"}`): khoá HMAC = 32 byte NGẪU NHIÊN (08 sinh, đổi mật khẩu ⇒ khoá mới ⇒ mọi
+   phiên cũ mất); `the_he[email]` = thế hệ phiên — `/logout` TĂNG nó ⇒ mọi cookie cũ của email ấy mất, KỂ CẢ sau khởi
+   động lại; bộ đếm sai + mốc khoá cũng ghi vào đó. Mỗi lần ghi = MỘT phiên bản bí mật mới, phiên bản vừa đọc bị huỷ.
+   Đọc giữ `GIU_TRANG_THAI` giây; ghi thì đọc MỚI rồi mới ghi (⛔ đè lần xoay khoá của 08). Đọc hỏng ⇒ ⛔ ai vào (ĐÓNG);
+   ghi hỏng ⇒ vẫn áp ở bộ nhớ instance + nhật ký `⛔ DANG_NHAP_GHI_LOI`.
 ⛔ Mật khẩu ⛔ in · ⛔ ghi nhật ký · ⛔ argv · ⛔ trong bản ghi (chỉ băm). Nhật ký chỉ: `DANG_NHAP email=… dung|sai n/5|khoa`.
 """
 from __future__ import annotations
@@ -68,15 +75,21 @@ def khop(mk: str, ban_ghi: str) -> bool:
     return hmac.compare_digest(tinh, h)
 
 
-_BAM_MOI = None
+_BAM_MOI = bam(_b64(os.urandom(24)))   # tính SẴN lúc nạp: tên SAI cũng đúng MỘT lần scrypt (⛔ thêm lần đầu)
+SAI_TOAN_CUC = 20
+GIU_TRANG_THAI = 30
 
 
 def _bam_moi() -> str:
-    """Bản ghi băm của một chuỗi ngẫu nhiên — để tên SAI vẫn tốn đúng một lần scrypt (thời gian hằng)."""
-    global _BAM_MOI
-    if _BAM_MOI is None:
-        _BAM_MOI = bam(_b64(os.urandom(24)))
     return _BAM_MOI
+
+
+def kiem_dang_nhap(ten: str, mk: str, tk: dict) -> bool:
+    """So tên + mật khẩu THỜI GIAN HẰNG: luôn đúng MỘT lần scrypt (tên sai ⇒ so với bản ghi mồi), cả hai so bằng
+    `hmac.compare_digest` (`STG-WEB-R1-04`: bài đếm số lần scrypt + cấm `==`)."""
+    ten_dung = hmac.compare_digest(ten.encode("utf-8"), str(tk["ten"]).encode("utf-8"))
+    mk_dung = khop(mk, tk["bam"] if ten_dung else _BAM_MOI)
+    return ten_dung & mk_dung
 
 
 # ══ tài khoản (đọc từ Secret Manager qua hàm truyền vào; giữ 60 giây) ═════════════════════════════════════
@@ -98,63 +111,104 @@ class TaiKhoan:
             return self.gt
 
 
-class KhoaSai:
-    def __init__(self, dong_ho=time.time):
-        self.t, self.sai, self.khoa_toi, self._kh = dong_ho, {}, {}, threading.Lock()
-
-    def con_khoa(self, ai: str) -> int:
-        with self._kh:
-            return max(0, int(self.khoa_toi.get(ai, 0) - self.t() + 0.999))
-
-    def ghi_sai(self, ai: str) -> int:
-        """Ghi một lần sai; trả số lần sai trong cửa sổ (đạt `SAI_TOI_DA` ⇒ khoá)."""
-        with self._kh:
-            now = self.t()
-            ds = [x for x in self.sai.get(ai, []) if now - x < CUA_SO_GIAY] + [now]
-            self.sai[ai] = ds
-            if len(ds) >= SAI_TOI_DA:
-                self.khoa_toi[ai] = now + KHOA_GIAY
-                self.sai[ai] = []
-            return len(ds)
-
-    def xoa(self, ai: str) -> None:
-        with self._kh:
-            self.sai.pop(ai, None)
+# ══ trạng thái phiên BỀN (bí mật `fls-staging-phien`) ════════════════════════════════════════════════════
+def trang_thai_moi() -> dict:
+    return {"khoa": _b64(os.urandom(32)), "the_he": {}, "sai": {}, "khoa_toi": {}}
 
 
-class Phien:
-    def __init__(self, dong_ho=time.time):
-        self.t, self.thu_hoi, self._kh = dong_ho, {}, threading.Lock()
+def _dung_hinh(o) -> bool:
+    try:
+        return (isinstance(o, dict) and len(_unb64(o["khoa"])) >= 32
+                and all(isinstance(o.get(k), dict) for k in ("the_he", "sai", "khoa_toi")))
+    except (KeyError, TypeError, ValueError):
+        return False
 
-    @staticmethod
-    def _khoa(ban_ghi_bam: str) -> bytes:
-        return hashlib.sha256(b"fls-phien-v1|" + ban_ghi_bam.encode()).digest()
 
-    def tao(self, email: str, ban_ghi_bam: str) -> str:
-        than = f"v1.{int(self.t()) + PHIEN_GIAY}.{_b64(email.encode())}"
-        return than + "." + _b64(hmac.new(self._khoa(ban_ghi_bam), than.encode(), hashlib.sha256).digest())
+class TrangThai:
+    """`doc()` ⇒ chuỗi JSON (hỏng ⇒ ngoại lệ/rỗng) · `ghi(chuỗi)` ⇒ ghi phiên bản mới (hỏng ⇒ ngoại lệ)."""
 
-    def hop_le(self, the: str | None, email: str, ban_ghi_bam: str) -> bool:
-        if not the or the.count(".") != 3:
-            return False
-        than, ky = the.rsplit(".", 1)
+    def __init__(self, doc, ghi, giu_giay: float = GIU_TRANG_THAI, dong_ho=time.time):
+        self.doc, self.ghi, self.giu, self.t = doc, ghi, giu_giay, dong_ho
+        self.gt, self.luc, self._kh = None, -1e18, threading.RLock()
+
+    def _doc_moi(self):
         try:
-            dung = hmac.compare_digest(_unb64(ky), hmac.new(self._khoa(ban_ghi_bam), than.encode(), hashlib.sha256).digest())
-            _, het, em = than.split(".")
-            het, em = int(het), _unb64(em).decode()
-        except (ValueError, TypeError, UnicodeDecodeError):
-            return False
-        with self._kh:
-            thu_hoi = the in self.thu_hoi
-        return dung and het > self.t() and hmac.compare_digest(em.encode(), email.encode()) and not thu_hoi
+            o = json.loads(self.doc() or "")
+        except (ValueError, TypeError, SystemExit, OSError):
+            return None
+        return o if _dung_hinh(o) else None
 
-    def thu_hoi_the(self, the: str | None) -> None:
-        if not the:
-            return
+    def lay(self) -> dict | None:
         with self._kh:
-            now = self.t()
-            self.thu_hoi = {k: v for k, v in self.thu_hoi.items() if v > now}
-            self.thu_hoi[the] = now + PHIEN_GIAY
+            if self.gt is None or self.t() - self.luc > self.giu:
+                self.gt, self.luc = self._doc_moi(), self.t()
+            return self.gt
+
+    def sua(self, f) -> bool:
+        """Đọc MỚI → `f(st)` → ghi. Trả False nếu ghi hỏng (đã áp vào bản trong bộ nhớ — vẫn có hiệu lực ở instance này)."""
+        with self._kh:
+            st = self._doc_moi() or self.gt
+            if st is None:
+                return False
+            f(st)
+            self.gt, self.luc = st, self.t()
+            try:
+                self.ghi(json.dumps(st, separators=(",", ":"), sort_keys=True))
+                return True
+            except (OSError, ValueError, SystemExit) as e:
+                print(f"⛔ DANG_NHAP_GHI_LOI {type(e).__name__}", file=sys.stderr, flush=True)
+                return False
+
+
+def con_khoa(st: dict, ai: str, now: float) -> int:
+    toi = max(float(st["khoa_toi"].get(ai, 0)), float(st["khoa_toi"].get("*", 0)))
+    return max(0, int(toi - now + 0.999))
+
+
+def ghi_sai(st: dict, ai: str, now: float) -> int:
+    """Một lần sai cho `ai` và cho bộ đếm toàn cục `*`; trả số lần sai của `ai` trong cửa sổ."""
+    n = 0
+    for k, tran in ((ai, SAI_TOI_DA), ("*", SAI_TOAN_CUC)):
+        ds = [x for x in st["sai"].get(k, []) if now - x < CUA_SO_GIAY] + [now]
+        if len(ds) >= tran:
+            st["khoa_toi"][k] = now + KHOA_GIAY
+            ds = []
+        st["sai"][k] = ds
+        if k == ai:
+            n = len(ds) or tran
+    st["khoa_toi"] = {k: v for k, v in st["khoa_toi"].items() if v > now}
+    return n
+
+
+def xoa_sai(st: dict, ai: str) -> None:
+    st["sai"].pop(ai, None)
+
+
+def dang_xuat(st: dict, email: str) -> None:
+    st["the_he"][email] = int(st["the_he"].get(email, 0)) + 1
+
+
+def _ky(st: dict, than: str) -> bytes:
+    return hmac.new(_unb64(st["khoa"]), than.encode(), hashlib.sha256).digest()
+
+
+def tao_phien(st: dict, email: str, now: float) -> str:
+    than = f"v2.{int(st['the_he'].get(email, 0))}.{int(now) + PHIEN_GIAY}.{_b64(email.encode())}"
+    return than + "." + _b64(_ky(st, than))
+
+
+def phien_hop_le(the: str | None, email: str, st: dict | None, now: float) -> bool:
+    if not the or st is None or the.count(".") != 4:
+        return False
+    than, ky = the.rsplit(".", 1)
+    try:
+        dung = hmac.compare_digest(_unb64(ky), _ky(st, than))
+        _, the_he, het, em = than.split(".")
+        the_he, het, em = int(the_he), int(het), _unb64(em).decode()
+    except (ValueError, TypeError, UnicodeDecodeError):
+        return False
+    return (dung and het > now and hmac.compare_digest(em.encode(), email.encode())
+            and the_he == int(st["the_he"].get(email, 0)))
 
 
 def doc_cookie(chuoi: str | None) -> str | None:
@@ -201,9 +255,17 @@ button{{margin-top:18px;width:100%;padding:10px;border:0;border-radius:6px;backg
 
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description="In BẢN GHI băm (JSON) từ mật khẩu ở stdin — ⛔ nhận mật khẩu qua argv.")
-    ap.add_argument("--bam", action="store_true", required=True)
-    ap.add_argument("--ten", required=True)
+    g = ap.add_mutually_exclusive_group(required=True)
+    g.add_argument("--bam", action="store_true")
+    g.add_argument("--trang-thai-moi", action="store_true", help="in trạng thái phiên MỚI (khoá ngẫu nhiên) — 08 dùng")
+    ap.add_argument("--ten")
     a = ap.parse_args(argv)
+    if a.trang_thai_moi:
+        print(json.dumps(trang_thai_moi()))
+        return 0
+    if not a.ten:
+        print("⛔ --bam đòi --ten", file=sys.stderr)
+        return 2
     mk = sys.stdin.read()
     if mk.endswith("\n"):
         mk = mk[:-1]

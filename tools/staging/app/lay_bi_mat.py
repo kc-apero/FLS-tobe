@@ -46,6 +46,57 @@ def lay_bi_mat(ten: str, project: str, metadata: str = MAC_DINH_METADATA, sm: st
         raise SystemExit(f"⛔ bí mật {ten}: phản hồi thiếu payload")
 
 
+# ══ ĐƯỜNG GHI — chỉ cho trạng thái phiên đăng nhập `fls-staging-phien` (WO-363 · `STG-WEB-R1-02`) ══════════════════
+#  SA `fls-staging-app` được `secretVersionManager` + `secretAccessor` trên ĐÚNG bí mật ấy (08 cấp) — ⛔ bí mật nào khác.
+def _token(metadata: str) -> str:
+    try:
+        return _lay(metadata + TOKEN_URL, {"Metadata-Flavor": "Google"})["access_token"]
+    except (urllib.error.URLError, KeyError, ValueError) as e:
+        raise SystemExit(f"⛔ không lấy được token SA từ metadata server ({type(e).__name__})")
+
+
+def _post(url: str, tok: str, than: dict) -> dict:
+    req = urllib.request.Request(url, data=json.dumps(than).encode(), method="POST",
+                                 headers={"Authorization": f"Bearer {tok}", "Content-Type": "application/json"})
+    with urllib.request.urlopen(req, timeout=20) as r:       # noqa: S310 — URL do mã/bài thử đặt
+        return json.loads(r.read().decode("utf-8") or "{}")
+
+
+def lay_kem_ten(ten: str, project: str, metadata: str = MAC_DINH_METADATA, sm: str = MAC_DINH_SM) -> tuple[str, str]:
+    """(giá trị, tên đầy đủ phiên bản `projects/…/secrets/…/versions/N`) của phiên bản mới nhất."""
+    tok = _token(metadata)
+    try:
+        data = _lay(f"{sm}/v1/projects/{project}/secrets/{ten}/versions/latest:access", {"Authorization": f"Bearer {tok}"})
+        return base64.b64decode(data["payload"]["data"]).decode("utf-8"), str(data.get("name", ""))
+    except urllib.error.HTTPError as e:
+        raise SystemExit(f"⛔ không đọc được bí mật {ten}: HTTP {e.code}")
+    except (urllib.error.URLError, KeyError, ValueError) as e:
+        raise SystemExit(f"⛔ không đọc được bí mật {ten}: {type(e).__name__}")
+
+
+def them_phien_ban(ten: str, project: str, gia_tri: str, metadata: str = MAC_DINH_METADATA, sm: str = MAC_DINH_SM) -> str:
+    """`secrets/<ten>:addVersion` — trả tên phiên bản mới. Hỏng ⇒ SystemExit (⛔ in giá trị)."""
+    tok = _token(metadata)
+    try:
+        o = _post(f"{sm}/v1/projects/{project}/secrets/{ten}:addVersion", tok,
+                  {"payload": {"data": base64.b64encode(gia_tri.encode("utf-8")).decode()}})
+        return str(o.get("name", ""))
+    except urllib.error.HTTPError as e:
+        raise SystemExit(f"⛔ không ghi được bí mật {ten}: HTTP {e.code} (SA có secretVersionManager chưa?)")
+    except (urllib.error.URLError, ValueError) as e:
+        raise SystemExit(f"⛔ không ghi được bí mật {ten}: {type(e).__name__}")
+
+
+def huy_phien_ban(ten_day_du: str, metadata: str = MAC_DINH_METADATA, sm: str = MAC_DINH_SM) -> None:
+    """`…/versions/N:destroy` — phiên bản CŨ của trạng thái (⛔ để phiên bản dồn lại). Hỏng ⇒ SystemExit."""
+    if not ten_day_du.startswith("projects/") or "/versions/" not in ten_day_du:
+        raise SystemExit("⛔ tên phiên bản lạ")
+    try:
+        _post(f"{sm}/v1/{ten_day_du}:destroy", _token(metadata), {})
+    except (urllib.error.URLError, ValueError) as e:
+        raise SystemExit(f"⛔ không huỷ được phiên bản cũ: {type(e).__name__}")
+
+
 def main(argv: list[str]) -> int:
     if len(argv) != 2 or not argv[1].replace("-", "").replace("_", "").isalnum():
         print("cách dùng: lay_bi_mat.py <TÊN_BÍ_MẬT>", file=sys.stderr)

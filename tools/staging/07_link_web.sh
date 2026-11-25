@@ -91,6 +91,10 @@ co() { "${G[@]}" "$@" >/dev/null 2>&1; }
 TAI_KHOAN="$("${G[@]}" config get-value account 2>/dev/null | tr -d '[:space:]' || true)"
 SO_PROJECT="$("${G[@]}" projects describe "$PROJECT" --format='value(projectNumber)' 2>/dev/null | tr -d '[:space:]' || true)"
 TAC_TU_IAP="service-${SO_PROJECT}@gcp-sa-iap.iam.gserviceaccount.com"
+# ⭐ `STG-WEB-R1-01`: ghim `aud` của JWT IAP — khuôn Cloud Run theo tài liệu "Securing your app with signed headers":
+#   `/projects/PROJECT_NUMBER/locations/REGION/services/SERVICE_NAME`. Cổng TỪ CHỐI JWT IAP của app khác (aud khác)
+#   và ghi dòng `IAP_AUD <aud> lech` ⇒ BÁO CÁO đối chiếu aud ĐO ĐƯỢC với aud đã ghim (khuôn sai ⇒ ĐỎ có tên).
+AUD_MONG="/projects/${SO_PROJECT}/locations/${REGION}/services/${SVC}"
 
 if [ "$KIEM" -eq 0 ]; then
   [ -n "$TAI_KHOAN" ] || { echo "⛔ gcloud chưa đăng nhập (config get-value account rỗng)" >&2; exit 2; }
@@ -132,7 +136,7 @@ if [ "$KIEM" -eq 0 ] && [ "${R_BUILD_RC:-0}" -eq 0 ]; then
          --no-allow-unauthenticated --iap --ingress=all --port="$CONG_RUN"
          --cpu=1 --memory=1Gi --min-instances=0 --max-instances=1 --cpu-boost --timeout=300
          --command=bash --args="$DIEM_VAO"
-         --set-env-vars="FLS_STG_PROJECT=$PROJECT,FLS_STG_CONN=$CONN,FLS_STG_CHE_DO=$CHE_DO,FLS_STG_ACTOR=$NGUOI_KY")
+         --set-env-vars="FLS_STG_PROJECT=$PROJECT,FLS_STG_CONN=$CONN,FLS_STG_CHE_DO=$CHE_DO,FLS_STG_ACTOR=$NGUOI_KY,FLS_IAP_AUD=$AUD_MONG")
   DLOG="$(mktemp)"
   R_DEPLOY_RC=0
   "${G[@]}" "${TRIEN[@]}" 2>&1 | tee "$DLOG" || R_DEPLOY_RC=$?
@@ -177,7 +181,7 @@ fi
 
 # ══════════════════════════════ BÁO CÁO — gửi lại phần này ══════════════════════════════
 buoc "BÁO CÁO (KHÔNG chứa mật khẩu/khoá/email) — chép từ dòng này tới hết, gửi lại"
-export PROJECT REGION SVC IMAGE TAG SA_EMAIL CHE_DO KIEM NGUOI_KY CONG_RUN DIEM_VAO TAI_KHOAN TAC_TU_IAP CHO_VAO
+export PROJECT REGION SVC IMAGE TAG SA_EMAIL CHE_DO KIEM NGUOI_KY CONG_RUN DIEM_VAO TAI_KHOAN TAC_TU_IAP CHO_VAO AUD_MONG
 export R_CTX_N="${R_CTX_N:-}" R_TAI_N="${R_TAI_N:-}" R_BUILD_RC="${R_BUILD_RC:-}" R_DEPLOY_RC="${R_DEPLOY_RC:-}"
 export R_APIS="$("${G[@]}" services list --enabled --format='value(config.name)' 2>/dev/null | tr '\n' ' ' || true)"
 export R_SVC="$("${G[@]}" run services describe "$SVC" --region="$REGION" --format=json 2>/dev/null || echo '{}')"
@@ -185,6 +189,10 @@ export R_RUN_IAM="$("${G[@]}" run services get-iam-policy "$SVC" --region="$REGI
 export R_IAP_IAM="$("${G[@]}" iap web get-iam-policy --resource-type=cloud-run --service="$SVC" --region="$REGION" --format=json 2>/dev/null || echo '')"
 export R_DN_CO="$("${G[@]}" secrets describe fls-staging-login --format='value(name)' >/dev/null 2>&1 && echo co || echo khong)"
 export R_DN_IAM="$("${G[@]}" secrets get-iam-policy fls-staging-login --format=json 2>/dev/null || echo '')"
+export R_TT_CO="$("${G[@]}" secrets describe fls-staging-phien --format='value(name)' >/dev/null 2>&1 && echo co || echo khong)"
+export R_TT_IAM="$("${G[@]}" secrets get-iam-policy fls-staging-phien --format=json 2>/dev/null || echo '')"
+export R_IAP_AUD="$("${G[@]}" logging read "resource.type=\"cloud_run_revision\" AND resource.labels.service_name=\"$SVC\" AND textPayload:\"IAP_AUD \"" \
+    --limit=1 --freshness=7d --format='value(textPayload)' 2>/dev/null | head -1 || true)"
 export R_TU_DO="$("${G[@]}" logging read "resource.type=\"cloud_run_revision\" AND resource.labels.service_name=\"$SVC\" AND textPayload:\"TU_DO \"" \
     --limit=1 --freshness=7d --format='value(textPayload)' 2>/dev/null | head -1 || true)"
 URL="$(printf '%s' "$R_SVC" | python3 -c 'import json,sys
@@ -224,6 +232,12 @@ cong_khai = None if run_iam is None else sum(m in ("allUsers", "allAuthenticated
                                               for b in run_iam.get("bindings", []) or [] for m in b.get("members", []))
 vao = thanh_vien(iap_iam, "roles/iap.httpsResourceAccessor")
 dn_doc = thanh_vien(js("R_DN_IAM"), "roles/secretmanager.secretAccessor")
+sa_m = f'serviceAccount:{e["SA_EMAIL"]}'
+tt_iam = js("R_TT_IAM")
+tt_quyen = None if tt_iam is None else (sa_m in (thanh_vien(tt_iam, "roles/secretmanager.secretAccessor") or set())
+                                        and sa_m in (thanh_vien(tt_iam, "roles/secretmanager.secretVersionManager") or set()))
+aud_do = e["R_IAP_AUD"].split()                       # ["IAP_AUD", "<aud>"] hoặc [..., "lech"]
+aud_khop = (aud_do[1] == e["AUD_MONG"] and len(aud_do) == 2) if len(aud_do) >= 2 and aud_do[0] == "IAP_AUD" else "chưa đo (chưa ai vào link)"
 can_vao = ["user:" + x for x in ([e["TAI_KHOAN"]] if e["TAI_KHOAN"] else []) + [y for y in e["CHO_VAO"].split(",") if y]]
 iap_bat = ann.get("run.googleapis.com/iap-enabled")           # ⚠ giả định G-3 (BG-364): khoá chú thích này
 def http(k):
@@ -269,6 +283,13 @@ hang = [
   ("ĐĂNG NHẬP · bí mật fls-staging-login có (chạy 08 trước)", e["R_DN_CO"],                            "co"),
   ("ĐĂNG NHẬP · SA đọc được bí mật đăng nhập",       None if dn_doc is None else f'serviceAccount:{e["SA_EMAIL"]}' in dn_doc, True),
   ("TRONG · tài khoản đăng nhập FLS lúc khởi động",  tu.get("dang_nhap"),                                  "san_sang"),
+  ("ĐĂNG NHẬP · trạng thái phiên fls-staging-phien có (08)", e["R_TT_CO"],                                "co"),
+  ("ĐĂNG NHẬP · SA đọc + ghi phiên bản trạng thái phiên", tt_quyen,                                         True),
+  ("TRONG · trạng thái phiên đọc được lúc khởi động", tu.get("trang_thai"),                                 "san_sang"),
+  ("aud ghim trong service (FLS_IAP_AUD = khuôn Cloud Run)", env.get("FLS_IAP_AUD"),                        e["AUD_MONG"]),
+  ("TRONG · cổng chạy với aud ghim",                  tu.get("aud"),                                        "ghim"),
+  ("aud IAP ĐO trong nhật ký = aud ghim (mở link 1 lần rồi --kiem)", aud_khop,                             True),
+  ("aud IAP đo trong nhật ký (thông tin)",            " ".join(aud_do[1:]) or "—",                          None),
   ("TRONG · khoá công khai IAP lấy được (đếm ≥ 1)",    (tu.get("jwks", "0").isdigit() and int(tu["jwks"]) >= 1) if tu else None, True),
 ]
 if e["KIEM"] != "1":

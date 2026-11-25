@@ -179,6 +179,13 @@ elif lenh("compute", "instances", "add-metadata"):
 elif lenh("compute", "instances", "reset"):
     S["vm"]["status"] = "RUNNING"
     luu()
+elif lenh("projects", "add-iam-policy-binding") and S.get("policy_co_dieu_kien", True) and co("--condition") is None:
+    # ⭐ `STG-WEB-R1-03` (lỗi THẬT 24/11, `fp-a-project` có 2 binding điều kiện): gcloud ở chế độ ⛔ tương tác
+    #   từ chối thêm binding KHÔNG nói điều kiện vào chính sách CÓ điều kiện. Mặc định BẬT — giống project thật.
+    print("ERROR: (gcloud.projects.add-iam-policy-binding) Adding a binding without specifying a condition to a policy "
+          "containing conditions is prohibited in non-interactive mode. Run the command again with `--condition=None`",
+          file=sys.stderr)
+    sys.exit(1)
 elif lenh("compute", "instances", "add-iam-policy-binding") or lenh("projects", "add-iam-policy-binding"):
     S["quyen"].append({"lenh": " ".join(a[:3]), "member": co("--member"), "role": co("--role")})
     luu()
@@ -236,13 +243,19 @@ elif lenh("run", "deploy") or lenh("beta", "run", "deploy"):
     S.setdefault("run_iam", [])
     if "--allow-unauthenticated" in a:
         S["run_iam"].append({"role": "roles/run.invoker", "members": ["allUsers"]})
-    dn = S.get("secrets", {}).get("fls-staging-login")
     sa = "serviceAccount:" + co("--service-account")
-    san_sang = bool(dn and dn["versions"] and any(sa in b["members"] for b in dn["iam"]))
+
+    def _sa_co(ten, *vai):
+        bm = S.get("secrets", {}).get(ten)
+        return bool(bm and bm["versions"]) and all(any(b["role"] == v and sa in b["members"] for b in bm["iam"]) for v in vai)
+    san_sang = _sa_co("fls-staging-login", "roles/secretmanager.secretAccessor")
+    tt_san = _sa_co("fls-staging-phien", "roles/secretmanager.secretAccessor", "roles/secretmanager.secretVersionManager")
+    aud_ghim = bool(kv(co("--set-env-vars")).get("FLS_IAP_AUD"))
     S.setdefault("nhat_ky", []).append(S.get("tu_do", "TU_DO revision={rev} man_hinh=200 api_khong_the=401 "
                                                      "nghe_cua=127.0.0.1:8088 cong_khong_iap=403 cong_iap_gia=403 jwks=3 "
-                                                     "dang_nhap={dn}")
-                                       .format(rev=rev, dn="san_sang" if san_sang else "chua_dat"))
+                                                     "dang_nhap={dn} trang_thai={tt} aud={aud}")
+                                       .format(rev=rev, dn="san_sang" if san_sang else "chua_dat",
+                                               tt="san_sang" if tt_san else "chua_dat", aud="ghim" if aud_ghim else "chua_ghim"))
     luu()
 elif lenh("run", "services", "describe"):
     if not S.get("run"):
@@ -308,8 +321,9 @@ elif lenh("secrets", "get-iam-policy"):
         sys.exit(1)
     xuat_json({"bindings": S["secrets"][a[2]]["iam"]})
 elif lenh("logging", "read"):
+    m = re.search(r'textPayload:"([^"]+)"', a[2])
     for d in reversed(S.get("nhat_ky", [])):
-        if "TU_DO " in a[2] and d.startswith("TU_DO "):
+        if m and d.startswith(m.group(1)):
             print(d)
             break
 else:

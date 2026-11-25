@@ -10,6 +10,8 @@
 
 ## ⭐ Chủ làm gì, theo thứ tự *(Cloud Shell · `fp-a-project` · ~10 phút)*
 
+> ⚠ **Sau R1 `KQ-365` (25/11): khối lệnh mới nhất ở §12.1** — số mục BÁO CÁO đổi (08: 8 mục · 07: 35/34 mục) và lần dựng đầu của 07 ĐỎ đúng 1 mục `aud ĐO` cho tới khi có người mở link. Khối dưới đây là bản 24/11, giữ làm biên bản.
+
 ```bash
 cd ~/fls
 git fetch origin claude/bold-galileo-zukpaf-isp/STG-WEB
@@ -165,3 +167,48 @@ bash tools/staging/07_link_web.sh --project fp-a-project --cho-vao a@apero.vn,b@
 
 ## Đường nền
 Xem §1.1 — `KẾT: ĐẠT` @ `86a5003`.
+
+## 12 · Vòng sửa sau R1 (`KQ-365`) — 3 NÊN SỬA + 4/5 GHI NHẬN
+
+*(Dev · 2026-11-25 · cụm PG **5434** · nhánh `claude/bold-galileo-zukpaf-isp/STG-WEB` từ ngọn `78424fa` (KQ-365); ⛔ GCP · ⛔ gcloud thật · ⛔ mật khẩu/băm/khoá thật. Mỗi sửa được chứng minh ĐỎ bằng đột biến — §12.2.)*
+
+| Phát hiện | Mức | Sửa | Bằng chứng *(ĐỎ khi phá → ĐẠT)* |
+|---|---|---|---|
+| `STG-WEB-R1-01` `aud` ⛔ ghim | NÊN SỬA | Tra tài liệu ["Securing your app with signed headers"](https://docs.cloud.google.com/iap/docs/signed-headers-howto): `aud` Cloud Run = **`/projects/PROJECT_NUMBER/locations/REGION/services/SERVICE_NAME`** ⇒ `07` TÍNH và ghim `FLS_IAP_AUD` ngay ở `run deploy` *(⛔ chờ nhật ký — ⛔ vòng gà-trứng)*. Cổng in `IAP_AUD <aud>` khi khớp và **`IAP_AUD <aud> lech`** khi bị từ chối vì khác aud ghim *(mỗi aud một lần)* ⇒ khuôn sai lộ ra trong nhật ký dù mọi yêu cầu 403. `TU_DO` thêm `aud=ghim\|chua_ghim`. BÁO CÁO 07 +3 mục `mong`: *aud ghim trong service = khuôn* · *TRONG · cổng chạy với aud ghim* · *aud IAP ĐO trong nhật ký = aud ghim* *(chưa ai vào ⇒ giá trị "chưa đo" ⇒ **ĐỎ có tên** — Đ5)*. | `test_aud_GHIM_thieu_aud_cung_403_va_aud_LECH_duoc_ghi_nhat_ky` *(JWT IAP **thiếu** aud ⇒ 403 · aud **app khác** ⇒ 403 · aud đúng ⇒ 200 · nhật ký có dòng `lech`)* · `test_dung_lan_DAU_chua_ai_vao_thi_DO_DUNG_1_muc_aud_do__mo_link_roi_kiem_DAT` · 2 phép phá 07 *(aud ⛔ ghim ⇒ ĐỎ đúng 2 mục · aud đo lệch ⇒ ĐỎ đúng 1 mục)* · deploy có `FLS_IAP_AUD=/projects/…/services/fls-staging-web`. Đột biến: bỏ `FLS_IAP_AUD` khỏi deploy ⇒ **30** ĐỎ; mục "aud ĐO" luôn True ⇒ 1 ĐỎ. |
+| `STG-WEB-R1-02` thu hồi + khoá tạm chỉ ở bộ nhớ | NÊN SỬA | **Giải pháp thật** *(⛔ đường lùi `PHIEN_GIAY ≤ 1h + min-instances=1`)*: bí mật RIÊNG **`fls-staging-phien`** = JSON `{khoa, the_he, sai, khoa_toi}`. Cookie `v2.<thế hệ>.<hết hạn>.<email>.<HMAC>`; `/logout` ⇒ `the_he[email] += 1` ⇒ **mọi** cookie cũ của email ấy mất, **kể cả sau khi Cloud Run dựng lại instance**; bộ đếm sai + mốc khoá cũng ghi ở đó. Ghi = `secrets/…:addVersion` (REST, SA) rồi **huỷ** phiên bản vừa đọc *(⛔ dồn phiên bản)*; ghi luôn đọc MỚI trước *(⛔ đè lần xoay khoá của 08)*; đọc giữ 30 s. Đọc hỏng ⇒ ⛔ ai vào (503 · ĐÓNG); ghi hỏng ⇒ vẫn áp trong instance + `⛔ DANG_NHAP_GHI_LOI`. `08` tạo/xoay bí mật này mỗi lần đặt mật khẩu *(khoá mới ⇒ mọi phiên cũ mất, mọi khoá tạm gỡ)* + cấp SA `secretAccessor` + **`secretVersionManager` CHỈ trên bí mật này**. `lay_bi_mat.py` thêm `lay_kem_ten` · `them_phien_ban` · `huy_phien_ban`. | `test_dang_xuat_va_khoa_tam_BEN_qua_KHOI_DONG_LAI__STG_WEB_R1_02` *(Secret Manager GIẢ có ghi, sống ngoài tiến trình cổng: đăng xuất → **giết cổng** → cổng mới ⇒ cookie cũ **401**, cookie "máy thứ hai" cùng email **401**, email đang khoá vẫn **429**, đăng nhập lại **303**; sau 6 lần ghi còn đúng **1** phiên bản chưa huỷ; bí mật ⛔ chứa mật khẩu/băm)* · `test_ghi_trang_thai_HONG…` · `test_CHUA_co_trang_thai_phien_thi_KHONG_ai_vao__DONG` · 08: khoá đổi giữa hai lần đặt, khoá ⛔ trong đầu ra/argv. Đột biến: `dang_xuat` ⛔ tăng thế hệ ⇒ 3 ĐỎ · đăng xuất ⛔ ghi ⇒ 2 · khoá tạm chỉ ghi bộ nhớ ⇒ 1 · ⛔ huỷ phiên bản cũ ⇒ 1 · 08 ⛔ xoay khoá ⇒ 1 · 08 ⛔ cấp `secretVersionManager` ⇒ 4. |
+| `STG-WEB-R1-03` `--condition=None` ⛔ bài canh | NÊN SỬA | `gcloud_gia.py`: **mặc định** mô phỏng chính sách dự án CÓ điều kiện *(như `fp-a-project` đo 24/11)* — `projects add-iam-policy-binding` thiếu `--condition` ⇒ exit 1 với lời gcloud *"…policy containing conditions is prohibited in non-interactive mode. Run the command again with `--condition=None`"*. Đồ giả bash của `test_01` cùng hành vi *(⛔ tính là lần thử lan truyền)*. Bài mới `test_iam_dieu_kien.py`: TĨNH — mọi `projects add/remove-iam-policy-binding` trong `tools/staging/*.sh` *(gộp dòng `\`)* có `--condition=None`, tập ≠ rỗng *(đếm **2**: 01 · 03)*, ⛔ script nào khác; ĐỘNG — giả cắn đúng lời, có cờ thì cho qua. | Đột biến R1 từng SÓT: bỏ cờ ở **03** ⇒ **1** ĐỎ *(trước: 49/49 xanh)* · ở **01** ⇒ **4** ĐỎ *(trước: 9/9 xanh)*. |
+| `STG-WEB-R1-04` 3 đột biến sót | GHI NHẬN → **sửa** | Tách `DN.kiem_dang_nhap(ten, mk, tk)`: luôn đúng **1** lần scrypt *(bản ghi mồi tính SẴN lúc nạp)*, so cả hai bằng `compare_digest`. Bài đếm lần gọi `hashlib.scrypt` = 1 cho 4 ca *(đúng · sai mật khẩu · sai tên · rỗng)* + AST cấm `==`/`!=` giữa dữ liệu bí mật trong `kiem_dang_nhap` · `khop` · `phien_hop_le`; bài nhật ký ⛔ chứa nửa băm. | (a) `ten == …` ⇒ 1 ĐỎ · (b) in băm vào nhật ký ⇒ 1 ĐỎ · (c) tên sai bỏ scrypt ⇒ 1 ĐỎ *(cả ba từng 81/81 xanh)*. |
+| `STG-WEB-R1-05` đọc thân trước JWT | GHI NHẬN → **sửa** | Thứ tự mới: JWT → `Transfer-Encoding: chunked` ⇒ **411** → `Content-Length` > 1 MiB ⇒ **413** → mới đọc thân; từ chối trước khi đọc ⇒ đóng kết nối. `/login` vẫn > 4 KiB ⇒ 413. | `test_than_KHONG_LO_khong_JWT_bi_tu_choi_NGAY…` *(`Content-Length: 50000000`, gửi 3 byte: ⛔ JWT ⇒ **403 < 1 s** · có JWT ⇒ **413 < 1 s** · chunked ⇒ **411**; cửa chạm 0)*. Đột biến đọc thân trước ⇒ 1 ĐỎ. |
+| `STG-WEB-R1-06` khoá HMAC suy từ băm | GHI NHẬN → **sửa** | Khoá = 32 byte ngẫu nhiên ở `fls-staging-phien` *(§ `-02`)*. Giới hạn CÒN LẠI *(ghi rõ)*: ai **đọc được `fls-staging-phien`** vẫn rèn được cookie — nhưng đọc `fls-staging-login` (băm) thì ⛔ còn đủ. | `test_khoa_HMAC_KHONG_suy_tu_ban_ghi_bam__STG_WEB_R1_06` *(cookie ký bằng `sha256("fls-phien-v1\|"+băm)` hay bằng băm ⇒ ⛔ hợp lệ)*. Đột biến khoá cố định ⇒ 1 ĐỎ. |
+| `STG-WEB-R1-07` khoá chỉ theo email | GHI NHẬN → **sửa** | Thêm bộ đếm toàn cục `*`: **20** lần sai / 15 phút bất kể email ⇒ khoá CHUNG 15 phút. | bài đơn vị: 19 email × 1 lần ⇒ chưa khoá; lần 20 ⇒ email MỚI cũng bị khoá. Đột biến bỏ bộ đếm toàn cục ⇒ 1 ĐỎ. |
+| `STG-WEB-R1-08` W4 gọi tên là "mật khẩu" | GHI NHẬN | **Đính chính W4** *(⛔ sửa dòng cũ — biên bản)*: `HondurasGesha` là **TÊN TÀI KHOẢN**. Câu đúng: *"Tên tài khoản chung `HondurasGesha` + mật khẩu chủ đặt ở 08 — báo người test qua kênh nào?"* — khuyến nghị giữ: kênh riêng từng người. | — |
+
+### 12.1 · Khối lệnh CHỦ *(thay khối đầu phiếu)*
+```bash
+cd ~/fls && git fetch origin claude/bold-galileo-zukpaf-isp/STG-WEB
+git switch -C stg-web origin/claude/bold-galileo-zukpaf-isp/STG-WEB && git log --oneline -1   # mong: commit "BG-364 §12"
+
+bash tools/staging/07_link_web.sh --project fp-a-project --kiem   # mong: KẾT: ĐỎ — 34 mục (chưa có gì) — gửi dòng KẾT
+bash tools/staging/08_dat_dang_nhap.sh --project fp-a-project      # HỎI mật khẩu MỚI 2 lần, ẩn · mong: KẾT: ĐẠT (8 mục) — gửi BÁO CÁO
+bash tools/staging/07_link_web.sh --project fp-a-project           # mong: KẾT: ĐỎ — ĐÚNG 1 mục "aud IAP ĐO … (mở link 1 lần rồi --kiem)"
+#   ⇒ mở ⭐ LINK bằng trình duyệt: Google → /login (HondurasGesha + mật khẩu) → F03 hiện SỐ   (phép đo G-1)
+bash tools/staging/07_link_web.sh --project fp-a-project --kiem   # mong: KẾT: ĐẠT (34 mục) — gửi BÁO CÁO
+#   nếu mục "aud IAP ĐO" ĐỎ với dòng thông tin "… lech": khuôn aud khác tài liệu ⇒ gửi dòng "aud IAP đo trong nhật ký"
+```
+
+### 12.2 · Đột biến *(phá → chạy → trả nguyên; `git status` sạch sau mỗi lượt)*
+**14/14 bị bắt**: bỏ `FLS_IAP_AUD` ở deploy ⇒ 30 · mục aud ĐO luôn True ⇒ 1 · `dang_xuat` ⛔ tăng thế hệ ⇒ 3 · khoá tạm chỉ ghi bộ nhớ ⇒ 1 · đăng xuất ⛔ ghi ⇒ 2 · tên sai bỏ scrypt ⇒ 1 · `ten ==` ⇒ 1 · in băm vào nhật ký ⇒ 1 *(lượt đầu đột biến hỏng cú pháp ⇒ lỗi import, ⛔ tính; chạy lại đúng ⇒ 1 ĐỎ)* · đọc thân trước JWT ⇒ 1 · bỏ bộ đếm toàn cục ⇒ 1 · khoá HMAC cố định ⇒ 1 · 08 ⛔ cấp `secretVersionManager` ⇒ 4 · 08 ⛔ xoay trạng thái ⇒ 1 · ⛔ huỷ phiên bản cũ ⇒ 1. **Cộng 2 đột biến `--condition=None`** *(03 ⇒ 1 · 01 ⇒ 4)* ⇒ **16/16**.
+
+### 12.3 · Cổng *(cụm 5434 — ⛔ 5433)*
+| Lệnh | Kết quả |
+|---|---|
+| `pytest tests/staging` | **219 passed** in 335 s *(205 + 14)* |
+| `pytest --collect-only` | **5182** · web **690** — sàn `MONG_PYTEST_TOAN_BO` 5168 → **5182** *(bài ghim cùng commit)* |
+| `--duong-nen --cong 5434` | *(điền sau khi chạy)* |
+
+### 12.4 · Dev tự thấy còn yếu
+- **Ghi Secret Manager từ cổng** là hành vi GCP CHƯA đo: REST `:addVersion` / `:destroy` bằng token metadata của SA, vai `secretVersionManager` đủ cho cả hai *(theo tài liệu vai; ⛔ đo)*. Sai ⇒ nhật ký `⛔ DANG_NHAP_GHI_LOI` và đăng xuất/khoá tạm chỉ còn hiệu lực trong instance (= hành vi trước vòng sửa) — ⛔ mở cửa. **Giả định G-9** — thêm vào README.
+- Mỗi lần sai mật khẩu = 1 lần ghi bí mật *(+1 phiên bản rồi huỷ bản cũ)* — vài chục lần/ngày, chi phí Secret Manager ≈ 0; nhưng kẻ đã qua IAP gõ sai liên tục bị chặn ở lần 5 (email) / 20 (toàn cục) nên số lần ghi bị chặn trên.
+- Trạng thái đọc giữ 30 s: đổi mật khẩu bằng 08 thì phiên cũ còn sống tối đa 30 s (khoá cũ còn trong bộ nhớ cổng).
+- Đọc được `fls-staging-phien` = rèn được cookie *(giới hạn còn lại của `-06`)*; IAM của bí mật này chỉ SA app + chủ.
+

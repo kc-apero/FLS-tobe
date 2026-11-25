@@ -43,11 +43,17 @@ def _ghi(g):
 def test_dat_lan_dau_DAT_chi_BAN_GHI_BAM_len_bi_mat_va_SA_doc_duoc(g):
     r = _chay(g)
     assert r.returncode == 0, r.stdout[-2000:] + r.stderr[-1000:]
-    assert "KẾT: ĐẠT" in r.stdout and len(H.dong_bao_cao(r.stdout)) == 4
+    assert "KẾT: ĐẠT" in r.stdout and len(H.dong_bao_cao(r.stdout)) == 8
     bm = g.doc()["secrets"]["fls-staging-login"]
     rec = json.loads(bm["versions"][-1])
     assert rec["ten"] == "HondurasGesha" and DN.khop(MK, rec["bam"]) and MK not in bm["versions"][-1]
     assert bm["iam"] == [{"role": "roles/secretmanager.secretAccessor", "members": [SA_APP]}]
+    tt = g.doc()["secrets"]["fls-staging-phien"]
+    st = json.loads(tt["versions"][-1])
+    assert DN._dung_hinh(st) and len(DN._unb64(st["khoa"])) == 32 and st["the_he"] == {}
+    assert sorted(b["role"] for b in tt["iam"]) == ["roles/secretmanager.secretAccessor", "roles/secretmanager.secretVersionManager"]
+    assert all(b["members"] == [SA_APP] for b in tt["iam"])
+    assert st["khoa"] not in r.stdout + r.stderr and st["khoa"] not in g.log.read_text(encoding="utf-8"), "khoá ⛔ in, ⛔ argv"
     assert MK not in r.stdout + r.stderr, "mật khẩu ⛔ in"
     assert MK not in g.log.read_text(encoding="utf-8"), "mật khẩu ⛔ trong argv của gcloud"
     assert rec["bam"] not in r.stdout + r.stderr, "băm ⛔ in"
@@ -62,6 +68,8 @@ def test_chay_lai_them_PHIEN_BAN_moi_va_mat_khau_moi_khop(g):
     assert r.returncode == 0, r.stdout[-1500:]
     v = g.doc()["secrets"]["fls-staging-login"]["versions"]
     assert len(v) == 2 and DN.khop(moi, json.loads(v[-1])["bam"]) and not DN.khop(MK, json.loads(v[-1])["bam"])
+    k = [json.loads(x)["khoa"] for x in g.doc()["secrets"]["fls-staging-phien"]["versions"]]
+    assert len(k) == 2 and k[0] != k[1], "đổi mật khẩu ⇒ khoá phiên MỚI ⇒ mọi phiên cũ mất"
     assert not [l for l in g.lenh() if "destroy" in l or "delete" in l], "⛔ xoá phiên bản cũ"
 
 
@@ -87,7 +95,10 @@ def test_kiem_chi_doc__truoc_khi_dat_DO_co_ten__sau_DAT(g):
     r = _chay(g, "--kiem", nhap="")
     assert r.returncode == 1 and _ghi(g) == []
     assert H.muc_do(r.stdout) == {"bí mật đăng nhập có", "SA fls-staging-app đọc được bí mật đăng nhập",
-                                  "bản ghi mới nhất: tên đăng nhập = mong", "bản ghi mới nhất: băm scrypt (⛔ mật khẩu thô)"}
+                                  "bản ghi mới nhất: tên đăng nhập = mong", "bản ghi mới nhất: băm scrypt (⛔ mật khẩu thô)",
+                                  "trạng thái phiên fls-staging-phien có", "SA đọc được trạng thái phiên",
+                                  "SA ghi được trạng thái phiên (secretVersionManager)",
+                                  "trạng thái phiên đúng hình (khoá ≥ 32 byte · 3 bảng đếm)"}
     _chay(g)
     n = len(_ghi(g))
     r2 = _chay(g, "--kiem", nhap="")
