@@ -229,5 +229,6 @@ bash tools/staging/07_link_web.sh --project fp-a-project --kiem   # mong: KẾT:
 ### 13.1 · Cổng
 | Lệnh | Kết quả |
 |---|---|
-| `--duong-nen --cong 5434` *(MỘT lần, một mình; ⛔ 5433)* | *(điền sau khi chạy)* |
+| `--duong-nen --cong 5434` *(MỘT lần, một mình; ⛔ 5433)* | **`KẾT: ĐẠT`** @ `4018560` *(bản gộp: cha `bcb01d0` + `6f996cf`)* — toàn bộ `12 failed, 5457 passed, 2 xfailed, 14 errors in 2033.35s` ⇒ tập đỏ + XFAIL **28 = 28** *(XFAIL 2 = 2 · thêm 0 · bớt 0)* · chạy **5485** *(mong ≥ 5485)* · skipped 0 · deselected 0; web `3 failed, 687 passed` ⇒ **3 = 3** · chạy **690**; 7 phép kiểm môi trường ĐẠT |
+| `pytest tests/staging` · `kiem_tai_lieu` · `lint-imports` · `quet_pii_repo` | **262 passed** · ĐẠT *(547 file)* · 11 kept 0 broken · 0 chỗ |
 
