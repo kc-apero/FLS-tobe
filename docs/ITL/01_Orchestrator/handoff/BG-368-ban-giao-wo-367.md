@@ -93,7 +93,7 @@ unset OPENROUTER_API_KEY
 | **AC-4** fleet eval tự động | ma trận ứng viên × bể; chấm ⛔ bằng mô hình; report 1 trang + so ngược; trần tổng + mô hình; nhật ký mọi lối thoát | **ĐẠT** | `fleet_eval_voi.py --ma-tran` · `tests/agent/test_fleet_ma_tran_openrouter.py` (10 bài): lượt GIẢ **trọn** 3 ứng viên × bể A/B = **6/6** ô chạy, 12 lời gọi, KẾT ĐẠT · phá luật của MỘT mô hình ⇒ CHỈ hàng ấy đổi, yêu cầu gửi đi giống nhau trừ `model` (chấm = MÃ `_cham_mu`) · trần TỔNG ⇒ ô sau `bo_qua` có tên (1 lời lọt) · trần MÔ HÌNH ⇒ chỉ mô hình ấy dừng · 402 ở một ô ⇒ ô khác vẫn chạy · thiếu chốt ⇒ mọi ô ĐỎ, **0** lời · nhật ký **3/3** lối thoát (trả về · ô lỗi · `KeyError` chưa lường). Lượt CLI GIẢ thật (bể vắng ⇒ `dung`): `KẾT: ĐẠT`, 4 lời |
 | **AC-5** script chủ | Secret Manager + binding mức bí mật; `--kiem` có `mong`, ĐỎ hai chiều, 402/429 có TÊN | **ĐẠT** | `tools/staging/09_openrouter_agent.sh` · `tests/agent/test_09_openrouter_agent.py` (18 bài, gcloud+curl GIẢ có trạng thái): dựng từ trống ⇒ **14/14** · khoá qua STDIN (`read -s` ⇒ `printf \| gcloud … --data-file=-`), argv mọi lệnh chứa **0** lần khoá · binding MỨC BÍ MẬT (0 lệnh `projects add-iam-policy-binding`) · chạy lại ⛔ nhân đôi · `--kiem` 0 lệnh ghi · 6 phép phá ⇒ ĐÚNG tập mục ĐỎ (accessor · 402 + "HẾT CREDIT" · 429 + "GIỚI HẠN TỐC ĐỘ" · mô hình ≠ ghim · vượt trần · slug mất khỏi `/models`) + khoá sai ⇒ `/key` 401 có tên · biến NCC vắng · `--khong-goi-thu`. **Chọn tệp MỚI** (⛔ mở rộng 06): lý do ở đầu script |
 | **AC-6** cổng | `--duong-nen` ĐẠT · `kiem_tai_lieu` · `lint-imports` 11 · `quet_pii_repo` 0 · `requirements.txt` đủ | xem §F | `requests` đã có (dòng 6, ghi thêm WO-367); `test_phu_thuoc_agent.py` xanh |
-| **AC-7** cổng MCP (dự phòng) | CHỈ khi AC-4 ⛔ tự động được | **⛔ LÀM — có lý do** | AC-4 chạy trọn ma trận TỰ ĐỘNG bằng CLI (một lệnh §B(c)) — điều kiện kích hoạt AC-7 ⛔ xảy ra |
+| **AC-7** cổng MCP | — | **BỎ** (orchestrator 27/11, lời chủ *"dựng MCP trước, cho phép kết nối tài khoản claude vào FLS"* ⇒ tách sang **`WO-371`**, nhánh `isp/MCP`; tin trước đòi AC-7 bắt buộc đã THU HỒI) | ⛔ `tools/mcp_openrouter/` · ⛔ `.mcp.json`. Lõi nhập được cho WO-371: §I |
 
 ## D · Bảng đột biến (phá → chạy bài canh → cắn → trả nguyên; sha tệp trước = sau)
 
@@ -170,3 +170,18 @@ Ngoài bảng (có trong `/models`, ⛔ vào danh mục): bản cũ `anthropic/c
 | 3 | `OR-03` | GHI NHẬN | `tools/staging/09_openrouter_agent.sh` (bản nháp) | tệp đáp `-o dap_<slug>` — slug có `/` ⇒ curl ⛔ ghi được ⇒ `000` | bài 09 dựng-từ-trống: 4 mục gọi thử ĐỎ `000` | slug `hãng/tên` | tên tệp theo chỉ số | `test_dung_tu_trong…` | ĐÃ SỬA (trước commit) |
 | 4 | `OR-04` | GHI NHẬN | `tests/agent/test_mo_hinh_openrouter.py` (bản nháp) | bài grep tiền tố khoá cắn **câu biên bản** của `WO-367` (Đ2); lần 2 xanh trên **tập rỗng** vì tệp chưa track (Đ3) | 1 tệp WO · 0 tệp tests | đếm chữ trần · `git grep` bỏ tệp chưa track | mẫu HÌNH KHOÁ + `--untracked` + bằng chứng dương | chính bài ấy | ĐÃ SỬA (trước commit) |
 | 5 | `OR-05` | GHI NHẬN | `fls/agent/openrouter_mo_hinh.json` | `anthropic/claude-fable-5.2` **0** điểm cuối ZDR | `/endpoints/zdr` 27/11 | nhà cung cấp chưa ZDR | ⛔ vào `ung_vien`; ghi ở C1 | `test_AC3_cau_hinh_MOT_cho…` (ứng viên phải có ≥ 1 ZDR) | MỞ (chủ C1) |
+
+## I · API lõi nhập được (cho `WO-371` bọc thành công cụ MCP — ⛔ nhân đôi logic)
+
+Mọi logic nằm ở hàm/lớp thuần; `argparse` chỉ ở `main*`. Đo: bài `tests/agent/` gọi thẳng các hàm này (⛔ qua CLI) — `test_fleet_ma_tran_openrouter.py` gọi `chay_ma_tran` · `ket_ma_tran`; `test_mo_hinh_openrouter.py` gọi `OpenRouterChat` · `tao_that` · `loi_slug_openrouter`.
+
+| công cụ MCP dự kiến | gọi | ở đâu |
+|---|---|---|
+| liệt kê mô hình | `ma_tran_openrouter()` ⇒ `{vai, ung_vien, mo_hinh: {slug: {canonical, ngu_canh, gia_usd_1m, diem_cuoi_zdr}}}` · `bang_gia_openrouter()` · `loi_slug_openrouter(slug)` (None = hợp lệ; ⛔ `google/*`, bí danh, biến thể, ngoài danh mục) | `fls/agent/mo_hinh.py` |
+| gọi một mô hình | `OpenRouterChat(mo_hinh_openrouter(slug), co_that=True, tran_usd=…, tran_usd_mo_hinh=…, nhat_ky=nk, moi_truong=None, goc_api=GOC_API_OPENROUTER, thay_cho=None).goi(yeu_cau_khuon_Messages)` — chốt chạy TRONG `__init__` (thiếu ⇒ `CamGoiThat` có tên, 0 byte); lỗi ⇒ `LoiApi`/`VuotTran` có tên; `nk` = list `NhatKyGoi` (CHỈ số + vân tay); `tong_nhat_ky(nk)` | `fls/agent/mo_hinh.py` |
+| chạy + chấm một ô (ca × mô hình) | `chay_vong(ten, luat, "mo", ca, dap_an, ncc=adapter)` ⇒ đi qua `chuoi.chay_skill` (cổng skill + che) + `_cham_mu` (MÃ ↔ đáp án; ⛔ mô hình chấm). Bể: `be_ma_tran(Path|None)` ⇒ `({bể: (ca, dap_an)}, nhãn)` | `tools/fleet_eval_voi.py` (nhập: `sys.path` thêm `tools/`, như bài thử) |
+| chạy vòng fleet | `chay_ma_tran(ung_vien, be_ds, dung_ncc(slug, nk) -> adapter, nk)` ⇒ `{slug: {bể: ô}}` · `ket_ma_tran(o)` ⇒ `(ĐẠT?, lý do)` (Đ5) | `tools/fleet_eval_voi.py` |
+| báo cáo vòng | `md_ma_tran(kq, truoc)` (một trang, CHỈ số) · tệp `docs/ITL/05_FleetEval/vong/MA_TRAN_OPENROUTER.{md,json}` | `tools/fleet_eval_voi.py` |
+| nhật ký tiền thật | `chay_agent_voi.ghi_nhat_ky({"_": vỏ có .nhat_ky}, nhãn, loi=…)` — ⛔ ghi đè cùng giây (`OR-02`) | `tools/chay_agent_voi.py` |
+
+⚠ Cho WO-371: ô ma trận (`chay_ma_tran`) hôm nay trả CHỈ số đếm/điểm/USD — ⛔ nội dung ca; `cham` chi tiết theo ca có trong `chay_vong(...)["cham"]` (mã ca + điểm, ⛔ nội dung giao dịch). Máy chủ GIẢ `tools/openrouter_gia.py::may_chu_gia()` dùng lại được cho bài MCP (⛔ khoá thật).
