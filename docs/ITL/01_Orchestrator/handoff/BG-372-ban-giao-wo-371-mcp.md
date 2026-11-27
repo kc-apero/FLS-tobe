@@ -163,4 +163,5 @@ Dựng ĐẠT *(cần `--build-arg HTTPS_PROXY` ở container phiên — `MCP-D-
 - **C2** — Xác nhận: mọi dữ liệu Claude đọc qua MCP (tên người · tiền · số TK — dữ liệu THẬT staging) **vào ngữ cảnh hội thoại** của tài khoản Claude đó *(và theo chính sách lưu hội thoại của gói Claude bạn dùng)*.
 
 ## 12 · `--duong-nen` *(MỘT lần, một mình, cổng 5437)*
-*(điền sau lượt chạy)*
+- **Lượt 1** @ `a6c5787` — **ĐỎ**: 28 + **1 THÊM** `tests/db/test_khong_ai_tro_lai_kho_that.py::test_khong_file_test_nao_ghi_cung_dia_chi_kho_that` — bài mới `tests/staging/test_10_mcp.py` gõ chuỗi DSN giả có tên kho `fls` *(bài canh làm ĐÚNG việc)*. Sửa @ `e0077a6`: bài dùng `FLS_STG_KHO=kho_thu` (biến sẵn có của `vao_mcp.sh`).
+- **Lượt 2** @ `e0077a6` — **`KẾT: ĐẠT`**: toàn bộ `12 failed, 5507 passed, 2 xfailed, 14 errors` ⇒ tập đỏ + XFAIL **28 = 28** *(thêm 0 · bớt 0)* · chạy **5535** (mong ≥ 5535) · skipped 0 · deselected 0; `tests/web` **3 = 3** · chạy **690**; `lint-imports` 11 kept; di trú 27/27 · `pg_verify` 0 lệch; HD1 `9845 / 9967`. `git status --porcelain` sau = **0**.
