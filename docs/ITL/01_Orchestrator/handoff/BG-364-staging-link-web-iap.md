@@ -213,3 +213,21 @@ bash tools/staging/07_link_web.sh --project fp-a-project --kiem   # mong: KẾT:
 - Trạng thái đọc giữ 30 s: đổi mật khẩu bằng 08 thì phiên cũ còn sống tối đa 30 s (khoá cũ còn trong bộ nhớ cổng).
 - Đọc được `fls-staging-phien` = rèn được cookie *(giới hạn còn lại của `-06`)*; IAM của bí mật này chỉ SA app + chủ.
 
+## 13 · Vòng sửa tích hợp sau gộp thử (orchestrator 27/11)
+
+*(Dev · 2026-11-27 · cụm PG **5434** · nhánh `claude/bold-galileo-zukpaf-isp/STG-WEB` từ ngọn `bcb01d0` (`KQ-366` R2 cuối ĐẠT).)*
+
+**Vì sao.** Orchestrator gộp thử `isp/STG-WEB` @ `e821562` (+`KQ-366`) vào nhánh làm việc @ `6f996cf` *(đã có AG3: `tools/staging/06_vertex_agent.sh` — 2 binding mức dự án, cả hai `--condition=None`, `KQ-361/362` đã soát)* ⇒ `--duong-nen` **ĐỎ**: tập đỏ 29 = 28 + **1 THÊM** `test_iam_dieu_kien.py::test_tinh_MOI_binding_muc_du_an_co_condition_None` — bài ghim CỨNG tập `{01, 03}` trong câu assert, nên một script ĐÚNG luật (06) cũng làm nó đỏ. Lỗi của BÀI, ⛔ của 06.
+
+| Việc | Làm | Bằng chứng |
+|---|---|---|
+| ① gộp | `git merge origin/claude/bold-galileo-zukpaf` (@ `6f996cf`) vào `isp/STG-WEB`. 6 xung đột, giải **y cách orchestrator**: sàn ⇒ thu thập thật · `WO-363` ⇒ bản nhánh này · changelog ⇒ giữ CẢ HAI · UAT đầu bảng ⇒ v0.5 của nhánh này · `tools/staging/README.md` ⇒ tiêu đề `01 → 02 → 03 → 04 → 05 → 08 → 07 → UAT` + giữ dòng **05** VÀ dòng **08/07**. Giải từng khối *(⛔ lấy nguyên tệp một bên)* | `grep '<<<<<<<'` = 0 |
+| ② sửa bài ĐÚNG ý | Ý bài = *mọi binding mức dự án có `--condition=None`* + *danh sách script có binding mức dự án KHAI ở MỘT chỗ*. Nay: hằng **`KHAI_BINDING_DU_AN`** (kèm lý do từng dòng) = `01` *(cloudsql.client)* · `03` *(iap.tunnelResourceAccessor)* · **`06_vertex_agent.sh`** *(AG3 · `WO-359`, `KQ-361/362`: `roles/aiplatform.user` / `roles/claude.user`)*. Bài kiểm 3 chiều: thiếu cờ · script CHƯA khai · khai THỪA (script ⛔ còn binding). Thêm bài **`test_script_MOI_co_binding_ma_CHUA_khai_thi_DO`** — chứng minh ĐỎ THƯỜNG TRỰC trên bản chép `tools/staging/*.sh` + một script mới *(chưa khai ⇒ cắn; thiếu cờ ⇒ cắn)*. | Chứng minh ĐỎ trên cây THẬT: thêm `tools/staging/99_tam_pha.sh` có binding `--condition=None` mà chưa khai ⇒ **2 ĐỎ** đúng lý do (`CHƯA khai …: ['99_tam_pha.sh']` · `nền phải sạch trước khi phá`); xoá tệp ⇒ **3 passed**; `git status` ⛔ còn tệp tạm |
+| ③ môi trường | `pip install -r requirements.txt` *(venv có `anthropic` 2.14.0 cho AG3)*; cụm 5434 bật lại *(container khởi động lại)*; `pg_migrate` ⇒ `khong co gi de ap` · `pg_verify: khop` | — |
+| ④ sàn | thu thập cây gộp **5485** = 5484 *(số gộp thử của orchestrator)* + 1 bài mới · web **690**; `MONG_PYTEST_TOAN_BO` = **5485**, bài ghim cùng commit | `tests/test_dung_moi_truong_isp.py` 60 passed |
+
+### 13.1 · Cổng
+| Lệnh | Kết quả |
+|---|---|
+| `--duong-nen --cong 5434` *(MỘT lần, một mình; ⛔ 5433)* | *(điền sau khi chạy)* |
+

@@ -38,8 +38,8 @@ sys.path.insert(0, __file__.rsplit("tools", 1)[0])
 
 from tools.do_hinh_dang import API, _goi, token, ty_le  # noqa: E402
 
-BANK = "1zJA0MyS8u4_EC6HimREQT6RM3-DDGnBZSRa3HQsfOn8"
-QUY = "1RmmkOSCTYVp1DSmNIQLvE9VlWIqhQegqN7lVazWkF7U"
+# ⭐ `NAP-R1-13`: ID khai MỘT chỗ ở `tools/staging/cred_sheets.py` (QUỸ = bản GỐC, bản copy `1RmmkOSC…` 403).
+from tools.staging.cred_sheets import ID_BANK as BANK, ID_QUY as QUY  # noqa: E402
 GOC = datetime.date(1899, 12, 30)
 
 

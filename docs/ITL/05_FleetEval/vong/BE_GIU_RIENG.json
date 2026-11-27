@@ -1,0 +1,980 @@
+{
+ "ngay": "2026-11-23",
+ "doi_chieu_A_B": "KHỚP",
+ "kq": {
+  "a": {
+   "vong": [
+    {
+     "phien_ban": "v0-ma-tat-dinh",
+     "mo_hinh": "GIẢ (luat_v0) thay claude-opus-5-5",
+     "checksum_prompt": "e9d149e87fff5474",
+     "che_do": "che_het",
+     "cong_skill": {
+      "dat": true,
+      "ly_do": "65 ca: 0 vi phạm luật cứng"
+     },
+     "the_noi_dung_che": 0,
+     "tong_hop": {
+      "so_ca": 65,
+      "so_noi": 0,
+      "noi_sai": 0,
+      "ti_le_noi_sai": null,
+      "recall_phai_noi": 0.0,
+      "phai_nguoi_bi_noi": 0,
+      "diem_tb": 1.5538
+     },
+     "theo_nhom": {
+      "phai_noi": {
+       "so_ca": 29,
+       "so_noi": 0,
+       "noi_sai": 0,
+       "ti_le_noi_sai": null,
+       "recall_phai_noi": 0.0,
+       "phai_nguoi_bi_noi": 0,
+       "diem_tb": 1.0
+      },
+      "phai_nguoi": {
+       "so_ca": 25,
+       "so_noi": 0,
+       "noi_sai": 0,
+       "ti_le_noi_sai": null,
+       "recall_phai_noi": null,
+       "phai_nguoi_bi_noi": 0,
+       "diem_tb": 2.0
+      }
+     },
+     "be": {
+      "so_ca": 65,
+      "so_noi": 0,
+      "noi_sai": 0,
+      "ti_le_noi_sai": null,
+      "recall_phai_noi": 0.0,
+      "phai_nguoi_bi_noi": 0,
+      "diem_tb": 1.5538,
+      "l3_bi_noi": 0,
+      "mau_so_chinh": 65,
+      "so_phai_noi": 29,
+      "chua_chot": {
+       "so_ca": 0,
+       "agent_noi": 0
+      }
+     },
+     "theo_nhom_be": {
+      "phai_noi": {
+       "so_ca": 29,
+       "so_noi": 0,
+       "noi_sai": 0,
+       "ti_le_noi_sai": null,
+       "recall_phai_noi": 0.0,
+       "phai_nguoi_bi_noi": 0,
+       "diem_tb": 1.0
+      },
+      "phai_nguoi": {
+       "so_ca": 25,
+       "so_noi": 0,
+       "noi_sai": 0,
+       "ti_le_noi_sai": null,
+       "recall_phai_noi": null,
+       "phai_nguoi_bi_noi": 0,
+       "diem_tb": 2.0
+      },
+      "l3": {
+       "so_ca": 11,
+       "so_noi": 0,
+       "noi_sai": 0,
+       "ti_le_noi_sai": null,
+       "recall_phai_noi": null,
+       "phai_nguoi_bi_noi": 0,
+       "diem_tb": 2.0
+      }
+     }
+    },
+    {
+     "phien_ban": "v1-gia-che-het",
+     "mo_hinh": "GIẢ (luat_gia_v1) thay claude-opus-5-5",
+     "checksum_prompt": "e9d149e87fff5474",
+     "che_do": "che_het",
+     "cong_skill": {
+      "dat": true,
+      "ly_do": "65 ca: 0 vi phạm luật cứng"
+     },
+     "the_noi_dung_che": 0,
+     "tong_hop": {
+      "so_ca": 65,
+      "so_noi": 2,
+      "noi_sai": 2,
+      "ti_le_noi_sai": 1.0,
+      "recall_phai_noi": 0.0,
+      "phai_nguoi_bi_noi": 2,
+      "diem_tb": 1.4923
+     },
+     "theo_nhom": {
+      "phai_noi": {
+       "so_ca": 29,
+       "so_noi": 0,
+       "noi_sai": 0,
+       "ti_le_noi_sai": null,
+       "recall_phai_noi": 0.0,
+       "phai_nguoi_bi_noi": 0,
+       "diem_tb": 1.0
+      },
+      "phai_nguoi": {
+       "so_ca": 25,
+       "so_noi": 2,
+       "noi_sai": 2,
+       "ti_le_noi_sai": 1.0,
+       "recall_phai_noi": null,
+       "phai_nguoi_bi_noi": 2,
+       "diem_tb": 1.84
+      }
+     },
+     "be": {
+      "so_ca": 65,
+      "so_noi": 2,
+      "noi_sai": 2,
+      "ti_le_noi_sai": 1.0,
+      "recall_phai_noi": 0.0,
+      "phai_nguoi_bi_noi": 2,
+      "diem_tb": 1.4923,
+      "l3_bi_noi": 0,
+      "mau_so_chinh": 65,
+      "so_phai_noi": 29,
+      "chua_chot": {
+       "so_ca": 0,
+       "agent_noi": 0
+      }
+     },
+     "theo_nhom_be": {
+      "phai_noi": {
+       "so_ca": 29,
+       "so_noi": 0,
+       "noi_sai": 0,
+       "ti_le_noi_sai": null,
+       "recall_phai_noi": 0.0,
+       "phai_nguoi_bi_noi": 0,
+       "diem_tb": 1.0
+      },
+      "phai_nguoi": {
+       "so_ca": 25,
+       "so_noi": 2,
+       "noi_sai": 2,
+       "ti_le_noi_sai": 1.0,
+       "recall_phai_noi": null,
+       "phai_nguoi_bi_noi": 2,
+       "diem_tb": 1.84
+      },
+      "l3": {
+       "so_ca": 11,
+       "so_noi": 0,
+       "noi_sai": 0,
+       "ti_le_noi_sai": null,
+       "recall_phai_noi": null,
+       "phai_nguoi_bi_noi": 0,
+       "diem_tb": 2.0
+      }
+     }
+    },
+    {
+     "phien_ban": "v1-gia-che-noi-dung",
+     "che_do": "che_noi_dung",
+     "bi_cam_gui": "CamGui: ⛔ dữ liệu cấm còn trong yêu cầu SAU khi che — từ chối gửi: dãy ≥ 9 chữ số trong chuỗi (số TK?): 10 chỗ",
+     "be": null,
+     "theo_nhom_be": null
+    },
+    {
+     "phien_ban": "v1-gia-mo",
+     "mo_hinh": "GIẢ (luat_gia_v1) thay claude-opus-5-5",
+     "checksum_prompt": "e9d149e87fff5474",
+     "che_do": "mo",
+     "cong_skill": {
+      "dat": true,
+      "ly_do": "65 ca: 0 vi phạm luật cứng"
+     },
+     "the_noi_dung_che": 0,
+     "tong_hop": {
+      "so_ca": 65,
+      "so_noi": 2,
+      "noi_sai": 2,
+      "ti_le_noi_sai": 1.0,
+      "recall_phai_noi": 0.0,
+      "phai_nguoi_bi_noi": 2,
+      "diem_tb": 1.4923
+     },
+     "theo_nhom": {
+      "phai_noi": {
+       "so_ca": 29,
+       "so_noi": 0,
+       "noi_sai": 0,
+       "ti_le_noi_sai": null,
+       "recall_phai_noi": 0.0,
+       "phai_nguoi_bi_noi": 0,
+       "diem_tb": 1.0
+      },
+      "phai_nguoi": {
+       "so_ca": 25,
+       "so_noi": 2,
+       "noi_sai": 2,
+       "ti_le_noi_sai": 1.0,
+       "recall_phai_noi": null,
+       "phai_nguoi_bi_noi": 2,
+       "diem_tb": 1.84
+      }
+     },
+     "be": {
+      "so_ca": 65,
+      "so_noi": 2,
+      "noi_sai": 2,
+      "ti_le_noi_sai": 1.0,
+      "recall_phai_noi": 0.0,
+      "phai_nguoi_bi_noi": 2,
+      "diem_tb": 1.4923,
+      "l3_bi_noi": 0,
+      "mau_so_chinh": 65,
+      "so_phai_noi": 29,
+      "chua_chot": {
+       "so_ca": 0,
+       "agent_noi": 0
+      }
+     },
+     "theo_nhom_be": {
+      "phai_noi": {
+       "so_ca": 29,
+       "so_noi": 0,
+       "noi_sai": 0,
+       "ti_le_noi_sai": null,
+       "recall_phai_noi": 0.0,
+       "phai_nguoi_bi_noi": 0,
+       "diem_tb": 1.0
+      },
+      "phai_nguoi": {
+       "so_ca": 25,
+       "so_noi": 2,
+       "noi_sai": 2,
+       "ti_le_noi_sai": 1.0,
+       "recall_phai_noi": null,
+       "phai_nguoi_bi_noi": 2,
+       "diem_tb": 1.84
+      },
+      "l3": {
+       "so_ca": 11,
+       "so_noi": 0,
+       "noi_sai": 0,
+       "ti_le_noi_sai": null,
+       "recall_phai_noi": null,
+       "phai_nguoi_bi_noi": 0,
+       "diem_tb": 2.0
+      }
+     }
+    }
+   ],
+   "chuoi": {
+    "mo": {
+     "mau_so": 631,
+     "khop": 631,
+     "lech": 0,
+     "khong_do_duoc": 0,
+     "doc_lap": {
+      "mau_so": 557,
+      "khop": 557
+     },
+     "vong_tron": {
+      "mau_so": 74,
+      "khop": 74
+     },
+     "agent_dat": "4/4",
+     "dung_o": [],
+     "g0": {
+      "be": "giữ riêng (ngoài repo)",
+      "so_ca": 65,
+      "so_noi": 2,
+      "noi_sai": 2,
+      "ti_le_noi_sai": 1.0,
+      "recall_phai_noi": 0.0,
+      "phai_nguoi_bi_noi": 2,
+      "diem_tb": 1.4923
+     }
+    },
+    "che_noi_dung": {
+     "mau_so": 631,
+     "khop": 195,
+     "lech": 0,
+     "khong_do_duoc": 0,
+     "doc_lap": {
+      "mau_so": 557,
+      "khop": 167
+     },
+     "vong_tron": {
+      "mau_so": 74,
+      "khop": 28
+     },
+     "agent_dat": "1/4",
+     "dung_o": [
+      "D",
+      "Ừ",
+      "N",
+      "G",
+      " ",
+      "ở",
+      " ",
+      "A",
+      "2",
+      "_",
+      "P",
+      "R",
+      "_",
+      "M",
+      "A",
+      "P",
+      "/",
+      "0",
+      "4",
+      "_",
+      "g",
+      "h",
+      "e",
+      "p",
+      "_",
+      "n",
+      "o",
+      "i",
+      "_",
+      "d",
+      "u",
+      "n",
+      "g",
+      " ",
+      "—",
+      " ",
+      "C",
+      "a",
+      "m",
+      "G",
+      "u",
+      "i",
+      ":",
+      " ",
+      "⛔",
+      " ",
+      "d",
+      "ữ",
+      " ",
+      "l",
+      "i",
+      "ệ",
+      "u",
+      " ",
+      "c",
+      "ấ",
+      "m",
+      " ",
+      "c",
+      "ò",
+      "n",
+      " ",
+      "t",
+      "r",
+      "o",
+      "n",
+      "g",
+      " ",
+      "y",
+      "ê",
+      "u",
+      " ",
+      "c",
+      "ầ",
+      "u",
+      " ",
+      "S",
+      "A",
+      "U",
+      " ",
+      "k",
+      "h",
+      "i",
+      " ",
+      "c",
+      "h",
+      "e",
+      " ",
+      "—",
+      " ",
+      "t",
+      "ừ",
+      " ",
+      "c",
+      "h",
+      "ố",
+      "i",
+      " ",
+      "g",
+      "ử",
+      "i",
+      ":",
+      " ",
+      "d",
+      "ã",
+      "y",
+      " ",
+      "≥",
+      " ",
+      "9",
+      " ",
+      "c",
+      "h",
+      "ữ",
+      " ",
+      "s",
+      "ố",
+      " ",
+      "t",
+      "r",
+      "o",
+      "n",
+      "g",
+      " ",
+      "c",
+      "h",
+      "u",
+      "ỗ",
+      "i",
+      " ",
+      "(",
+      "s",
+      "ố",
+      " ",
+      "T",
+      "K",
+      "?",
+      ")",
+      ":",
+      " ",
+      "1",
+      "0",
+      " ",
+      "c",
+      "h",
+      "ỗ"
+     ],
+     "g0": {
+      "be": "giữ riêng (ngoài repo)",
+      "trang_thai": "chưa chạy"
+     }
+    },
+    "che_het": {
+     "mau_so": 631,
+     "khop": 631,
+     "lech": 0,
+     "khong_do_duoc": 0,
+     "doc_lap": {
+      "mau_so": 557,
+      "khop": 557
+     },
+     "vong_tron": {
+      "mau_so": 74,
+      "khop": 74
+     },
+     "agent_dat": "4/4",
+     "dung_o": [],
+     "g0": {
+      "be": "giữ riêng (ngoài repo)",
+      "so_ca": 65,
+      "so_noi": 2,
+      "noi_sai": 2,
+      "ti_le_noi_sai": 1.0,
+      "recall_phai_noi": 0.0,
+      "phai_nguoi_bi_noi": 2,
+      "diem_tb": 1.4923
+     }
+    }
+   }
+  },
+  "b": {
+   "vong": [
+    {
+     "phien_ban": "v0-ma-tat-dinh",
+     "mo_hinh": "GIẢ (luat_v0) thay claude-opus-5-5",
+     "checksum_prompt": "e9d149e87fff5474",
+     "che_do": "che_het",
+     "cong_skill": {
+      "dat": true,
+      "ly_do": "70 ca: 0 vi phạm luật cứng"
+     },
+     "the_noi_dung_che": 0,
+     "tong_hop": {
+      "so_ca": 70,
+      "so_noi": 0,
+      "noi_sai": 0,
+      "ti_le_noi_sai": null,
+      "recall_phai_noi": 0.0,
+      "phai_nguoi_bi_noi": 0,
+      "diem_tb": 1.5714
+     },
+     "theo_nhom": {
+      "phai_noi": {
+       "so_ca": 30,
+       "so_noi": 0,
+       "noi_sai": 0,
+       "ti_le_noi_sai": null,
+       "recall_phai_noi": 0.0,
+       "phai_nguoi_bi_noi": 0,
+       "diem_tb": 1.0
+      },
+      "phai_nguoi": {
+       "so_ca": 25,
+       "so_noi": 0,
+       "noi_sai": 0,
+       "ti_le_noi_sai": null,
+       "recall_phai_noi": null,
+       "phai_nguoi_bi_noi": 0,
+       "diem_tb": 2.0
+      }
+     },
+     "be": {
+      "so_ca": 65,
+      "so_noi": 0,
+      "noi_sai": 0,
+      "ti_le_noi_sai": null,
+      "recall_phai_noi": 0.0,
+      "phai_nguoi_bi_noi": 0,
+      "diem_tb": 1.5385,
+      "l3_bi_noi": 0,
+      "mau_so_chinh": 65,
+      "so_phai_noi": 30,
+      "chua_chot": {
+       "so_ca": 5,
+       "agent_noi": 0
+      }
+     },
+     "theo_nhom_be": {
+      "phai_noi": {
+       "so_ca": 30,
+       "so_noi": 0,
+       "noi_sai": 0,
+       "ti_le_noi_sai": null,
+       "recall_phai_noi": 0.0,
+       "phai_nguoi_bi_noi": 0,
+       "diem_tb": 1.0
+      },
+      "phai_nguoi": {
+       "so_ca": 25,
+       "so_noi": 0,
+       "noi_sai": 0,
+       "ti_le_noi_sai": null,
+       "recall_phai_noi": null,
+       "phai_nguoi_bi_noi": 0,
+       "diem_tb": 2.0
+      },
+      "l3": {
+       "so_ca": 10,
+       "so_noi": 0,
+       "noi_sai": 0,
+       "ti_le_noi_sai": null,
+       "recall_phai_noi": null,
+       "phai_nguoi_bi_noi": 0,
+       "diem_tb": 2.0
+      }
+     }
+    },
+    {
+     "phien_ban": "v1-gia-che-het",
+     "mo_hinh": "GIẢ (luat_gia_v1) thay claude-opus-5-5",
+     "checksum_prompt": "e9d149e87fff5474",
+     "che_do": "che_het",
+     "cong_skill": {
+      "dat": true,
+      "ly_do": "70 ca: 0 vi phạm luật cứng"
+     },
+     "the_noi_dung_che": 0,
+     "tong_hop": {
+      "so_ca": 70,
+      "so_noi": 2,
+      "noi_sai": 1,
+      "ti_le_noi_sai": 0.5,
+      "recall_phai_noi": 0.0333,
+      "phai_nguoi_bi_noi": 1,
+      "diem_tb": 1.5571
+     },
+     "theo_nhom": {
+      "phai_noi": {
+       "so_ca": 30,
+       "so_noi": 1,
+       "noi_sai": 0,
+       "ti_le_noi_sai": 0.0,
+       "recall_phai_noi": 0.0333,
+       "phai_nguoi_bi_noi": 0,
+       "diem_tb": 1.0333
+      },
+      "phai_nguoi": {
+       "so_ca": 25,
+       "so_noi": 1,
+       "noi_sai": 1,
+       "ti_le_noi_sai": 1.0,
+       "recall_phai_noi": null,
+       "phai_nguoi_bi_noi": 1,
+       "diem_tb": 1.92
+      }
+     },
+     "be": {
+      "so_ca": 65,
+      "so_noi": 2,
+      "noi_sai": 1,
+      "ti_le_noi_sai": 0.5,
+      "recall_phai_noi": 0.0333,
+      "phai_nguoi_bi_noi": 1,
+      "diem_tb": 1.5231,
+      "l3_bi_noi": 0,
+      "mau_so_chinh": 65,
+      "so_phai_noi": 30,
+      "chua_chot": {
+       "so_ca": 5,
+       "agent_noi": 0
+      }
+     },
+     "theo_nhom_be": {
+      "phai_noi": {
+       "so_ca": 30,
+       "so_noi": 1,
+       "noi_sai": 0,
+       "ti_le_noi_sai": 0.0,
+       "recall_phai_noi": 0.0333,
+       "phai_nguoi_bi_noi": 0,
+       "diem_tb": 1.0333
+      },
+      "phai_nguoi": {
+       "so_ca": 25,
+       "so_noi": 1,
+       "noi_sai": 1,
+       "ti_le_noi_sai": 1.0,
+       "recall_phai_noi": null,
+       "phai_nguoi_bi_noi": 1,
+       "diem_tb": 1.92
+      },
+      "l3": {
+       "so_ca": 10,
+       "so_noi": 0,
+       "noi_sai": 0,
+       "ti_le_noi_sai": null,
+       "recall_phai_noi": null,
+       "phai_nguoi_bi_noi": 0,
+       "diem_tb": 2.0
+      }
+     }
+    },
+    {
+     "phien_ban": "v1-gia-che-noi-dung",
+     "che_do": "che_noi_dung",
+     "bi_cam_gui": "CamGui: ⛔ dữ liệu cấm còn trong yêu cầu SAU khi che — từ chối gửi: dãy ≥ 9 chữ số trong chuỗi (số TK?): 14 chỗ",
+     "be": null,
+     "theo_nhom_be": null
+    },
+    {
+     "phien_ban": "v1-gia-mo",
+     "mo_hinh": "GIẢ (luat_gia_v1) thay claude-opus-5-5",
+     "checksum_prompt": "e9d149e87fff5474",
+     "che_do": "mo",
+     "cong_skill": {
+      "dat": true,
+      "ly_do": "70 ca: 0 vi phạm luật cứng"
+     },
+     "the_noi_dung_che": 0,
+     "tong_hop": {
+      "so_ca": 70,
+      "so_noi": 2,
+      "noi_sai": 1,
+      "ti_le_noi_sai": 0.5,
+      "recall_phai_noi": 0.0333,
+      "phai_nguoi_bi_noi": 1,
+      "diem_tb": 1.5571
+     },
+     "theo_nhom": {
+      "phai_noi": {
+       "so_ca": 30,
+       "so_noi": 1,
+       "noi_sai": 0,
+       "ti_le_noi_sai": 0.0,
+       "recall_phai_noi": 0.0333,
+       "phai_nguoi_bi_noi": 0,
+       "diem_tb": 1.0333
+      },
+      "phai_nguoi": {
+       "so_ca": 25,
+       "so_noi": 1,
+       "noi_sai": 1,
+       "ti_le_noi_sai": 1.0,
+       "recall_phai_noi": null,
+       "phai_nguoi_bi_noi": 1,
+       "diem_tb": 1.92
+      }
+     },
+     "be": {
+      "so_ca": 65,
+      "so_noi": 2,
+      "noi_sai": 1,
+      "ti_le_noi_sai": 0.5,
+      "recall_phai_noi": 0.0333,
+      "phai_nguoi_bi_noi": 1,
+      "diem_tb": 1.5231,
+      "l3_bi_noi": 0,
+      "mau_so_chinh": 65,
+      "so_phai_noi": 30,
+      "chua_chot": {
+       "so_ca": 5,
+       "agent_noi": 0
+      }
+     },
+     "theo_nhom_be": {
+      "phai_noi": {
+       "so_ca": 30,
+       "so_noi": 1,
+       "noi_sai": 0,
+       "ti_le_noi_sai": 0.0,
+       "recall_phai_noi": 0.0333,
+       "phai_nguoi_bi_noi": 0,
+       "diem_tb": 1.0333
+      },
+      "phai_nguoi": {
+       "so_ca": 25,
+       "so_noi": 1,
+       "noi_sai": 1,
+       "ti_le_noi_sai": 1.0,
+       "recall_phai_noi": null,
+       "phai_nguoi_bi_noi": 1,
+       "diem_tb": 1.92
+      },
+      "l3": {
+       "so_ca": 10,
+       "so_noi": 0,
+       "noi_sai": 0,
+       "ti_le_noi_sai": null,
+       "recall_phai_noi": null,
+       "phai_nguoi_bi_noi": 0,
+       "diem_tb": 2.0
+      }
+     }
+    }
+   ],
+   "chuoi": {
+    "mo": {
+     "mau_so": 631,
+     "khop": 631,
+     "lech": 0,
+     "khong_do_duoc": 0,
+     "doc_lap": {
+      "mau_so": 557,
+      "khop": 557
+     },
+     "vong_tron": {
+      "mau_so": 74,
+      "khop": 74
+     },
+     "agent_dat": "4/4",
+     "dung_o": [],
+     "g0": {
+      "be": "giữ riêng (ngoài repo)",
+      "so_ca": 70,
+      "so_noi": 2,
+      "noi_sai": 1,
+      "ti_le_noi_sai": 0.5,
+      "recall_phai_noi": 0.0333,
+      "phai_nguoi_bi_noi": 1,
+      "diem_tb": 1.5571
+     }
+    },
+    "che_noi_dung": {
+     "mau_so": 631,
+     "khop": 195,
+     "lech": 0,
+     "khong_do_duoc": 0,
+     "doc_lap": {
+      "mau_so": 557,
+      "khop": 167
+     },
+     "vong_tron": {
+      "mau_so": 74,
+      "khop": 28
+     },
+     "agent_dat": "1/4",
+     "dung_o": [
+      "D",
+      "Ừ",
+      "N",
+      "G",
+      " ",
+      "ở",
+      " ",
+      "A",
+      "2",
+      "_",
+      "P",
+      "R",
+      "_",
+      "M",
+      "A",
+      "P",
+      "/",
+      "0",
+      "4",
+      "_",
+      "g",
+      "h",
+      "e",
+      "p",
+      "_",
+      "n",
+      "o",
+      "i",
+      "_",
+      "d",
+      "u",
+      "n",
+      "g",
+      " ",
+      "—",
+      " ",
+      "C",
+      "a",
+      "m",
+      "G",
+      "u",
+      "i",
+      ":",
+      " ",
+      "⛔",
+      " ",
+      "d",
+      "ữ",
+      " ",
+      "l",
+      "i",
+      "ệ",
+      "u",
+      " ",
+      "c",
+      "ấ",
+      "m",
+      " ",
+      "c",
+      "ò",
+      "n",
+      " ",
+      "t",
+      "r",
+      "o",
+      "n",
+      "g",
+      " ",
+      "y",
+      "ê",
+      "u",
+      " ",
+      "c",
+      "ầ",
+      "u",
+      " ",
+      "S",
+      "A",
+      "U",
+      " ",
+      "k",
+      "h",
+      "i",
+      " ",
+      "c",
+      "h",
+      "e",
+      " ",
+      "—",
+      " ",
+      "t",
+      "ừ",
+      " ",
+      "c",
+      "h",
+      "ố",
+      "i",
+      " ",
+      "g",
+      "ử",
+      "i",
+      ":",
+      " ",
+      "d",
+      "ã",
+      "y",
+      " ",
+      "≥",
+      " ",
+      "9",
+      " ",
+      "c",
+      "h",
+      "ữ",
+      " ",
+      "s",
+      "ố",
+      " ",
+      "t",
+      "r",
+      "o",
+      "n",
+      "g",
+      " ",
+      "c",
+      "h",
+      "u",
+      "ỗ",
+      "i",
+      " ",
+      "(",
+      "s",
+      "ố",
+      " ",
+      "T",
+      "K",
+      "?",
+      ")",
+      ":",
+      " ",
+      "1",
+      "4",
+      " ",
+      "c",
+      "h",
+      "ỗ"
+     ],
+     "g0": {
+      "be": "giữ riêng (ngoài repo)",
+      "trang_thai": "chưa chạy"
+     }
+    },
+    "che_het": {
+     "mau_so": 631,
+     "khop": 631,
+     "lech": 0,
+     "khong_do_duoc": 0,
+     "doc_lap": {
+      "mau_so": 557,
+      "khop": 557
+     },
+     "vong_tron": {
+      "mau_so": 74,
+      "khop": 74
+     },
+     "agent_dat": "4/4",
+     "dung_o": [],
+     "g0": {
+      "be": "giữ riêng (ngoài repo)",
+      "so_ca": 70,
+      "so_noi": 2,
+      "noi_sai": 1,
+      "ti_le_noi_sai": 0.5,
+      "recall_phai_noi": 0.0333,
+      "phai_nguoi_bi_noi": 1,
+      "diem_tb": 1.5571
+     }
+    }
+   }
+  }
+ }
+}

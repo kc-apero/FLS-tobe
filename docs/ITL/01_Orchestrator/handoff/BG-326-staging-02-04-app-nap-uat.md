@@ -227,12 +227,12 @@ Hoặc chạy lại `bash tools/staging/01_dung_staging_gcp.sh --project fp-a-pr
 ### 11.1 · Khối lệnh CHỦ chạy lại *(Cloud Shell · `fp-a-project`)*
 
 ```bash
-cd ~/fls                                   # repo trong Cloud Shell
-# ⓪ lấy mã sửa — nhánh MỚI từ origin (commit vá tạm cục bộ ở nhánh cũ được GIỮ, ⛔ xoá):
-git fetch origin claude/bold-galileo-zukpaf-isp/STG
-git switch -C stg-r2b origin/claude/bold-galileo-zukpaf-isp/STG
-git log --oneline -1                       # mong: ngọn nhánh STG (commit BG-326 §11)
-test ! -e .gcloudignore && ! grep -n -- '--mount' Dockerfile && echo "cây đúng"   # mong: in "cây đúng"
+# ⓪ (orchestrator sửa 24/11 — `STG-R2b2-01`: Cloud Shell là bản `git init` từ tarball, ⛔ có `origin`;
+#    dòng "cây đúng" cũ grep cả chú thích `Dockerfile:23,25`). ĐÃ CHẠY THẬT 24/11 theo khối này:
+#    trên máy có repo: git fetch origin claude/bold-galileo-zukpaf-isp/STG
+#                      git archive --format=tar.gz -o fls-stg.tar.gz FETCH_HEAD   → Upload lên Cloud Shell
+rm -rf ~/fls2 && mkdir ~/fls2 && tar -xzf ~/fls-stg.tar.gz -C ~/fls2 && cd ~/fls2 && git init -q && git add -A && git -c user.email=x -c user.name=x commit -qm snap
+test ! -e .gcloudignore && ! grep -nE '^[[:space:]]*RUN[[:space:]]+--' Dockerfile && echo "cây đúng"   # mong: in "cây đúng"
 
 # ① 02 — ĐƯỜNG CHUYỂN VAI (vai gcloud tạo ⇒ thu quyền → xoá → tạo lại bằng SQL → cấp lại 02b)
 bash tools/staging/02_di_tru_phan_quyen.sh --project fp-a-project --kiem   # TRƯỚC: mong ĐỎ đúng 1 mục "siêu quyền … = 2"

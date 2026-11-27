@@ -33,3 +33,4 @@
 | 24/11 | `fls-dev` | `--duong-nen` @ `86a5003`: **KẾT: ĐẠT** (28 = 28 · web 3 = 3 · chạy 5168) — ghi vào `BG-364` §1.1 |
 | 25/11 | `fls-dev` | Vòng sửa sau R1 `KQ-365` (0 CHẶN · 3 NÊN SỬA · 5 GHI NHẬN): sửa `-01…-07`, đính chính `-08`; +14 bài; sàn 5182; `BG-364` §12 |
 | 25/11 | `fls-dev` | `--duong-nen --cong 5434` @ `ffc2d3a`: **KẾT: ĐẠT** (28 = 28 · web 3 = 3 · chạy 5182) — `BG-364` §12.3 |
+| 27/11 | `fls-dev` | Sửa tích hợp sau gộp thử (orchestrator): gộp nhánh làm việc @ `6f996cf` (AG3 · SONG · WO-367) vào STG-WEB; bài `test_iam_dieu_kien` khai danh sách script có binding mức dự án ở MỘT chỗ (+ `06_vertex_agent.sh`) + bài chứng minh ĐỎ thường trực; sàn 5485; `BG-364` §13 |

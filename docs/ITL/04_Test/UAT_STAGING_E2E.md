@@ -4,6 +4,7 @@
 |---|---|
 | **Phiên bản** | v0.5 · 2026-11-24 · (v0.1: `WO-325` AC-4 · v0.5: `WO-363` link web sau IAP) · do `fls-dev` làn HẠ TẦNG soạn, **BA/PO duyệt** trước khi phát cho người test |
 | **Căn cứ ký** | O6 — ThuongCT, 23/11/2026: *"Cho phép lên staging và bắt đầu test full luồng e2e bằng human."* (sổ I2 v0.4 §O6 · `TIEN_DO` 2026-11-23) |
+| **Số mong khi kho có DỮ LIỆU THẬT** | §1b *(bước 05 `WO-334` — thêm 23/11)* |
 | **Cây mã mà bảng SỐ dưới đây mô tả** | nhánh `claude/bold-galileo-zukpaf-isp/STG`, đã GỘP `origin/claude/bold-galileo-zukpaf` **có H14 VÀ I2** (gói `WP-C5c` — 11 gói; đo 23/11: `GOI_BIET` ở `tools/do_hd2.py` = 11 · I2: `grep -rln "FxKho\|kiem_fx_thang" fls tools` = 1 tệp `tools/do_hd2.py`) ⇒ **D1 có hiệu lực: gói HD2 đọc tỷ giá TỪ KHO, tháng chưa ký ⇒ `FX_CHAN`** (bước U7–U9 dưới đây); mọi số HD2 lấy từ `hd2_cong.json` **ở ngọn đã gộp** (`STG-R1-05`). **Dựng lại ảnh (bước 03)** sau khi gộp |
 | **Nguồn của MỌI con số HD2** | `docs/ITL/_tools/hd2_cong.json` (tệp cổng HD2 theo gói). Bài `tests/staging/test_uat_doc.py` đối chiếu từng con số có thẻ `<!--hd2:…-->` với tệp ấy — **lệch ⇒ bài đỏ** (Đ2: so hai nguồn) |
 | **Ai test · khi nào** | ⛔ chưa chỉ định — là **câu chủ** (BG-326 §Câu chủ). Điền ở cột "Người test" từng bước |
@@ -29,12 +30,31 @@
 | Giới hạn | Bạn sẽ thấy gì | Vì sao là ĐÚNG (nguồn) |
 |---|---|---|
 | **605** (DR3 Sign off) | gói WP-C5c · 605: **ô so = 0** — "DỪNG có tên" | tab nguồn `[FS1][PLA5]` đã xoá khỏi sổ (0 ứng viên); tái lập từ `sign_off_dau_vao` là vòng tròn (đã có rào). Chủ ký "605 DỪNG có tên" 23/11 (`TIEN_DO` lượt 03:21; `BG-320` §605). Thấy ở gói `WP-C5c` (H14 đã gộp) |
-| **615** (A-CCR, bản chính thức) | ô so <!--hd2x:615.o_so-->13.760 / <!--hd2x:615.o_dap_an_so-->48.021; <!--hd2x:615.chua_co_dau_vao-->5.258 ô `chua_co_dau_vao` (Σ `chua_co_dau_vao:*` = hr + raw_data_management + tien_dau_bao_cao); lệch lớp `lech_ban_ccr_vs_cf` 671 + `ite_alias` 35 | `TIEN_DO` lượt 18:00 22/11 (sửa H14) — các lớp lệch CÓ TÊN, lệch FLS = 0 |
+| **615** (A-CCR, bản chính thức) | ô so <!--hd2x:615.o_so-->13.760 / <!--hd2x:615.o_dap_an_so-->48.021; <!--hd2x:615.chua_co_dau_vao-->5.258 ô `chua_co_dau_vao` (Σ `chua_co_dau_vao:*` = hr + raw_data_management + tien_dau_bao_cao); lệch lớp `lech_ban_ccr_vs_cf` 680 + `ite_alias` 35 | `TIEN_DO` lượt 18:00 22/11 (sửa H14) — các lớp lệch CÓ TÊN, lệch FLS = 0 |
 | **D3** | WP-C5a: **`lech_D3` 3.099 ô** — By GI dùng driver `PE` khác AS-IS (tỉ lệ GI của MID3) | quyết D3: giữ driver PE, khai lệch có tên (`TIEN_DO` lượt 11:41 22/11); chờ chủ nếu muốn đổi |
 | **CHECK IX.PL** | các dòng CHECK của PL (607 · 608 · 609 · 610) **đỏ**, **0 "đạt có số"** | IX.PL chưa có bằng chứng dương nào (`DT11` AC `-03`: `dat_co_so` = 0, `dat_0_0` 14/262) — đỏ ở đây là cổng trung thực, ⛔ lỗi hệ thống |
 | **Sổ rỗng** | F01 hàng chờ 0 · F02 lưới 0 dòng · cổng `KHO_SACH` ĐỎ ("`fls_itl` chỉ có 0 dòng < ngưỡng 1000") · `HD1_THANG` ĐỎ | kho staging chưa nạp sổ (câu chủ dữ liệu); ⛔ "sạch" mà là "chưa đo được gì" |
 | **Lệch CÓ TÊN trong HD2** | "khớp" < "tổng ô" ở WP-C3 · C4c · C5 (xem bảng U3) | mỗi lệch có nhãn + lý do (`lech_co_chu_dich`); **lệch NGOÀI tên phải = 0** — số khác 0 mới là lỗi |
 | **D1 · tỷ giá chưa ký** | chạy chuỗi **khi chưa ký tháng nào**: <!--goi:truoc_n-->11 gói ĐỎ, mỗi gói in `FX_CHAN <tháng>: tháng CHƯA ký (D1: owner ký mỗi tháng)`; sau khi ký (U8) ⇒ 11/11 ĐẠT | luật D1 (I2, `KQ-318`): gói HD2 đọc tỷ giá TỪ KHO qua `fx_cua`, tháng chưa ký bị CHẶN có tên — ⛔ rơi về ảnh tĩnh. Bước 04 chỉ nạp config, ⛔ ký thay người (`STG-R2-01`) |
+
+## 1b · Khi kho đã nạp DỮ LIỆU NGUỒN THẬT (bước 05) — số mong *(`WO-334`, đo 23/11)*
+
+⚠ Chỉ áp dụng SAU khi chủ chạy `05_nap_nguon_that.sh` và gửi BÁO CÁO. Trước đó §0.4 + §1 "Sổ rỗng" đúng nguyên văn. **Số mong của mỗi lần nạp = chính các dòng `Σ nguồn` trong BÁO CÁO 05 của lần đó** (nguồn lớn dần, ⛔ số cố định); bảng dưới là hai mốc đã đo để đối chiếu — nhãn nói rõ nó ĐẾM GÌ *(Đ4)*.
+
+| Số (đếm gì) | CŨ — ảnh đóng băng 26–27/08 | NGUỒN SỐNG đo 23/11 *(đọc bằng SA chỉ-đọc, ⛔ ghi)* |
+|---|---|---|
+| dòng sổ `ITL Ledge` / kỳ đã chốt | 9.967 dòng · 23 kỳ *(`voi_so_luong.tong.co`)* | ⛔ không đọc trực tiếp — sổ ITL Ledge nằm ở workbook ADJUSTED, công cụ nạp đọc **`Transaction Mapping L1`** ở RAW |
+| dòng đọc từ `Transaction Mapping L1` (A…AL, từ dòng 5) | 10.100 *(lần nạp 26/08 = sổ 9.973 + loại 19 + rỗng 108)* · ảnh `pm_join.bank` 9.992 dòng canon | **14.265** = canon 12.601 + loại 121 + rỗng 1.543 |
+| dòng `[Importrange]PM_Unpivot` · có mã tham chiếu | 3.703 · 3.173 | 3.909 · 3.369 |
+| bậc thang ghép PM `A·B·C·D·E·F` (dòng) | 2.272·29·400·27·199·428 + 105 không mã + 6.532 không thấy mã PM | 2.438·30·404·27·201·438 + 100 + 8.963 |
+| `Mapping Master` mã `hd` | — | 73 *(cần phân bổ 23 · có phương pháp 21)* |
+| sheet `R \|` Bank · Quỹ *(bản GỐC)* · Σ dòng chảy · Σ trường khai · dòng chụp · nguồn 0 dòng | 60 · 8 · 68 · 408 · **8.368** · 10 — 08/09 | **64 · 8 · 72 · 434 · 10.586 · 10** *(đo 23/11 sau vòng sửa `KQ-336`; Quỹ gốc `1QSYSzCC…`, bản copy `1RmmkOSC…` vẫn 403)* |
+| `fls_nguon_dai` *(bản khai THỨ HAI `Range_*`, công cụ `tools/nap_nguon_dai.py`)* | — | **0 dòng — NGOÀI phạm vi bước 05** *(BG-335 §1 · backlog `NAP-BL-01`)*: tuyến `bang_tuyen` đọc nó sẽ ra rỗng, đúng |
+| cổng đọc-đủ (cột `T · CDT1`) | 3.339 ô có giá trị (27/08), sàn 3.300 | **3.056** < sàn ⇒ **ĐỎ**: sổ ⛔ được ghi cho tới khi BA/chủ xử lý (BG-335 §Phát hiện 2) |
+
+⭐ **Nguồn SỐNG là chuẩn cho mọi kỳ** *(chủ quyết 23/11 ~07:25)*: khối `ⓑ NGUỒN SỬA SAU ẢNH` của BÁO CÁO chỉ ĐẾM *(ảnh cũ khác nguồn sống ⇒ nhãn, ⛔ ĐỎ)*; ĐỎ chỉ còn: 403 · cổng đọc-đủ · Σ nguồn ≠ Σ kho *(`--doi-chieu` đo lại kho đã nạp với nguồn bây giờ, hai chiều)*.
+
+⇒ Nếu BÁO CÁO 05 của chủ có `fls_itl` = 0: kho **vẫn ở trạng thái §0.4** (F01/F02 trống ĐÚNG). Nếu `fls_itl` > 0 thì §1 dòng "Sổ rỗng" **hết hiệu lực** và cổng `KHO_SACH` đổi theo; người test điền các số THẤY cạnh BÁO CÁO.
 
 ## 2 · Các bước kiểm
 
@@ -75,8 +95,8 @@ Cột **Mong** là số/chữ phải THẤY. Số có nhãn đếm gì (Đ4): "�
 | **WP-C4** (thẻ cha = C4a+C4b+C4c) | <!--hd2:WP-C4.tong_o-->22.295 | <!--hd2:WP-C4.khop-->21.992 | <!--hd2:WP-C4.lech-->303 |
 | WP-C5a — AL.KEY cờ IX.ALR BẬT 2025 ↔ ATL 606 | <!--hd2:WP-C5a.tong_o-->45.674 | <!--hd2:WP-C5a.khop-->40.556 | <!--hd2:WP-C5a.lech-->5.118 |
 | WP-C5b — SO.PLA3-ATL (PL2…PL8 từ IX.PL) | <!--hd2:WP-C5b.tong_o-->4.102 | <!--hd2:WP-C5b.khop-->3.179 | <!--hd2:WP-C5b.lech-->923 |
-| WP-C5c — RP.PL · RP.CF Daily Report 2·3 ↔ 607 · 608 · 609 · 610 · 615 (605 DỪNG có tên) | <!--hd2:WP-C5c.tong_o-->86.150 | <!--hd2:WP-C5c.khop-->77.672 | <!--hd2:WP-C5c.lech-->8.478 |
-| **WP-C5** (thẻ cha = C5a+C5b+C5c) | <!--hd2:WP-C5.tong_o-->135.926 | <!--hd2:WP-C5.khop-->121.407 | <!--hd2:WP-C5.lech-->14.519 |
+| WP-C5c — RP.PL · RP.CF Daily Report 2·3 ↔ 607 · 608 · 609 · 610 · 615 (605 DỪNG có tên) | <!--hd2:WP-C5c.tong_o-->86.150 | <!--hd2:WP-C5c.khop-->77.663 | <!--hd2:WP-C5c.lech-->8.487 |
+| **WP-C5** (thẻ cha = C5a+C5b+C5c) | <!--hd2:WP-C5.tong_o-->135.926 | <!--hd2:WP-C5.khop-->121.398 | <!--hd2:WP-C5.lech-->14.528 |
 
 ## 3 · Khi nào dừng và gọi chủ
 
@@ -84,8 +104,10 @@ Cột **Mong** là số/chữ phải THẤY. Số có nhãn đếm gì (Đ4): "�
 - ⛔ Tự chạy lệnh GHI vào kho; ⛔ tự nạp tệp dữ liệu thật; ⛔ chia sẻ ảnh chụp màn hình có số tài khoản/tên người ra ngoài nhóm test.
 
 ## Changelog
+- v0.2 (2026-11-23, `WO-334`): thêm §1b — số mong khi kho có DỮ LIỆU THẬT (hai mốc: ảnh cũ · nguồn sống 23/11); §0.4/§1 giữ nguyên cho trường hợp kho chưa nạp sổ.
 - v0.1 (2026-11-23): bản đầu — 13 bước, 13 hàng số từ `hd2_cong.json`; chờ BA/PO duyệt + câu chủ "ai test".
 - v0.2 (2026-11-23, vòng sửa sau `KQ-327` · `STG-R1-05/06`): gộp H14 ⇒ thêm hàng `WP-C5c`, thẻ cha `WP-C5` = a+b+c; §1·615 sửa 12.380→13.760 và 6.753→5.258 (có thẻ `hd2x`, bài canh từ `hd2_cong.json`); U7/U8 11 gói · ~45 s · ~800 MB và ghi **chỉ CHỦ chạy** (`sudo`); bỏ nhãn chờ H14.
 - v0.3 (2026-11-23, vòng sửa sau R2 `KQ-328` · `STG-R2-02`): **I2 đã gộp** ⇒ bỏ nhãn `[CHỜ I2]`; §0.3–0.4 + dòng 7 + §1 (hàng D1) theo hành vi I2; **thêm bước ký tỷ giá (U7 chạy chuỗi trước ký ⇒ 11/11 ĐỎ `FX_CHAN`; U8 người ký ký 36 tháng qua `ky_ty_gia.py`; U9 chạy chuỗi sau ký ⇒ 11/11 ĐẠT)** — chủ quyết C4 (một ký một soát) · C5 (`doc` suốt UAT, `ghi` chỉ lúc ký). **Đánh số lại:** U7→U9 · U8→U10 · U9→U11 · U10→(gộp vào U7/U8) · U11→U12 · U12→U13 · U13→U14 *(các tài liệu cũ `KQ-327/328`, `BG-326` §9 nói U7/U8 theo v0.2)*. U9 cũ: staging vẫn ⛔ đường tạo bản (0 nơi gọi `dua_ban_ky`).
 - v0.5 (2026-11-24, `WO-363`): §0.1 + U1 — **link web `https://…run.app` sau Google IAP** là đường chính (đăng nhập Google → màn `/login` FLS với tài khoản chung `HondurasGesha`, ⛔ gcloud); tunnel SSH thành dự phòng; U1 là phép đo đầu tiên của giả định G-1 (thẻ FLS ở `Authorization` qua được IAP khi có cookie) — ĐỎ ⇒ dừng, gửi chủ.
 - v0.4 (2026-11-23, vòng sửa sau R2b `KQ-344`, orchestrator báo đo của chủ ~10:50): §0.1 + U1 — tunnel chạy từ máy người test, ⛔ Cloud Shell Web Preview (`Failed to fetch` mọi API; `curl` trong Cloud Shell ⇒ 401 — app đúng).
+- v0.5 (2026-11-24, vòng sửa tích hợp SONG × nhánh làm việc — `BG-346`, orchestrator 24/11): SONG `WO-345` đóng băng LẠI ảnh từ NGUỒN SỐNG ⇒ `hd2_cong.json` đổi `WP-C5c` (đáp án 615 `ccr_daily_report_20261123.json`). Đồng bộ bằng máy từ `hd2_cong.json` *(⛔ gõ tay)*: **4 số có thẻ** — `WP-C5c.khop` 77.672→77.663 · `WP-C5c.lech` 8.478→8.487 · `WP-C5.khop` 121.407→121.398 · `WP-C5.lech` 14.519→14.528; **1 số KHÔNG thẻ** — §1 hàng 615 `lech_ban_ccr_vs_cf` 671→680 (`theo_dap_an.615.lop`). Không đổi: 35 thẻ còn lại · 3 thẻ `hd2x:615` (13.760 · 48.021 · 5.258) · `ite_alias` 35 · `lech_D3` 3.099. Số cũ trong các dòng changelog trên là BIÊN BẢN (Đ2) — giữ.

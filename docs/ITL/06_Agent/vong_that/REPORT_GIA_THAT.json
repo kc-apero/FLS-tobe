@@ -1,0 +1,66 @@
+{
+ "be": "VẮNG",
+ "che": "mo",
+ "duong": "anthropic",
+ "gia": {
+  "chuoi": {
+   "agent": 4,
+   "agent_dat": 4,
+   "doc_lap": {
+    "khop": 557,
+    "mau_so": 557
+   },
+   "dung_o": null,
+   "g0": {
+    "be": "tập nhỏ",
+    "diem_tb": 1.9167,
+    "noi_sai": 0,
+    "phai_nguoi_bi_noi": 0,
+    "recall_phai_noi": 0.8571,
+    "so_ca": 12,
+    "so_noi": 6,
+    "ti_le_noi_sai": 0.0
+   },
+   "khong_do_duoc": 0,
+   "lech": 0,
+   "mo_hinh_that": 0,
+   "vong_tron": {
+    "khop": 74,
+    "mau_so": 74
+   }
+  }
+ },
+ "mo_hinh": {
+  "A1_RI": "claude-opus-5-5",
+  "A2_PR_MAP": "claude-opus-5-5",
+  "A3_SI_ITL": "claude-opus-5-5",
+  "A4_AUDITOR": "claude-sonnet-5-5"
+ },
+ "ngay": "2026-11-24",
+ "nhat_ky": {
+  "cache_doc": 0,
+  "cache_ghi": 0,
+  "chi_phi_usd": 0.0,
+  "duong": [],
+  "giay": 0.0,
+  "ngay_tra_gia": "2026-11-23",
+  "so_goi": 0,
+  "theo_mo_hinh": {},
+  "token_ra": 0,
+  "token_vao": 0,
+  "vung": []
+ },
+ "tap_nho": {
+  "be_b": "VẮNG (⛔ $FLS_HELDOUT_NOI_DUNG/b)",
+  "ca_be_b": 0,
+  "ca_dung": 12,
+  "theo_nhom": {
+   "phai_nguoi": 5,
+   "phai_noi": 7
+  },
+  "van_tay_tap": "0669118e3590e44b"
+ },
+ "that": {
+  "do": "thiếu ANTHROPIC_API_KEY · CamGoiThat: ⛔ gọi API thật: cờ `--that` vắng · `FLS_CHO_GOI_API` ≠ 1 · khoá `ANTHROPIC_API_KEY` vắng trong biến môi trường · chế độ che `mo` gửi nguyên văn tên · số TK ⇒ đòi `FLS_ZDR_DA_BAT=1` (ZDR — quyết chủ 23/11)"
+ }
+}

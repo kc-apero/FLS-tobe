@@ -33,14 +33,19 @@ import urllib.parse
 import urllib.request
 
 SA = "claude-code-access@fpa-t-494007.iam.gserviceaccount.com"
-API = "https://sheets.googleapis.com/v4/spreadsheets/"
+try:                      # ⭐ WO-334: gốc API + token qua MỘT chỗ (`tools/staging/cred_sheets.py`) — tương thích khi ⛔ khai gì
+    from tools.staging.cred_sheets import api_goc as _api_goc, lay_token as _lay_token, ID_QUY as _ID_QUY
+except ImportError:       # chạy tệp trực tiếp, `tools` ⛔ trên đường dẫn
+    _api_goc = _lay_token = None
+    _ID_QUY = "1QSYSzCC0_ZjDmLgEOb2Nre8lp0CXfsAYqmw_Mgs8e9Y"   # ⛔ phải = `cred_sheets.ID_QUY` (bài `test_id_nguon_khai_mot_cho` canh)
+API = _api_goc() if _api_goc else "https://sheets.googleapis.com/v4/spreadsheets/"
 
 # ── Nguon trong pham vi `Đ2` (owner chot 2026-09-07: 6 sheet + archetype `R |`)
 NGUON = {
     "P100-BANK": ("1zJA0MyS8u4_EC6HimREQT6RM3-DDGnBZSRa3HQsfOn8",
                   "P100 | Bank Transactions"),
-    "P100-CASH": ("1RmmkOSCTYVp1DSmNIQLvE9VlWIqhQegqN7lVazWkF7U",
-                  "Copy of P100 | Cash Ledger"),
+    "P100-CASH": (_ID_QUY,                      # `NAP-R1-13`: bản GỐC (bản copy `1RmmkOSC…` 403)
+                  "P100 | Cash Ledger"),
     "ITL-RAW":   ("1md85t5too5drScNYlqsLALqFkWjwYZm7tE8H1p91_4E",
                   "Copy of ITL … 1/2 (RAW)"),
     "ITL-ADJ":   ("1r4WemIbazqYQLtin6FbUn3VghIi3WiskjhAtMGk1yXA",
@@ -51,6 +56,8 @@ NGUON = {
 
 
 def token() -> str:
+    if _lay_token is not None:
+        return _lay_token()
     r = subprocess.run(
         ["gcloud", "auth", "print-access-token", "--account", SA, "--scopes",
          "https://www.googleapis.com/auth/spreadsheets.readonly"],

@@ -73,6 +73,18 @@ NHAN_CB = "CB I Cash Balance by LE I Legal Entity by Currency"
 #: ảnh ĐẦU VÀO của phần `cb` *(DT13 `BG-320` §2)* — tên khuôn ↔ tab A-CCR
 ANH_SO_DU = {"ccr_so_du_ccr": "2. CCR", "ccr_so_du_cash": "2. CCR Cash"}
 DV = GOC / "tests" / "fixture" / "dau_vao"
+#: ⭐⭐ `WO-353` C3 = ⓐ *(chủ 23/11)* — đáp án 615 + 2 ảnh số dư đọc từ bộ ảnh chụp CÙNG MỘT LƯỢT *(`tools/doc_bo_ba_hd1.py`,
+#:    A-CCR 2026-11-23 12:11:45–12:11:50Z: `5. Daily Report` · `5. Daily Report 2` · `2. CCR` · `2. CCR Cash`)*. Trước: 615 chụp 22/11
+#:    + số dư 22/11 *(cùng thời điểm — G3 của WO-345)*; đọc số dư 23/11 với 615 22/11 ⇒ 79 ô `cb` lệch FLS = lệch THỜI ĐIỂM ẢNH.
+#:    Cùng lượt ⇒ `cb` 1.380/1.380 khớp, `lech_FLS` 0 *(đo 23/11)*. Ảnh 22/11 GIỮ làm biên bản *(Đ2)*. Số dư lượt này ≡ TỪNG BYTE ảnh
+#:    `_20261123` sáng 23/11 *(sha256 `f7a826fe…` · `59030e93…`)* ⇒ một tệp *(G1)*.
+TEP_LUOT_C5C = {"ccr_daily_report": "ccr_daily_report_20261123", "ccr_so_du_ccr": "ccr_so_du_ccr_20261123",
+                "ccr_so_du_cash": "ccr_so_du_cash_20261123"}
+
+
+def _tep(ten: str) -> str:
+    """Tên tệp ảnh cổng đọc *(⛔ đổi tên khuôn/ảnh — `kiem_dau_vao_hop_le` vẫn theo tên khuôn)*."""
+    return TEP_LUOT_C5C.get(ten, ten)
 
 #: đáp án → (tệp, loại, FS, kỳ) *(kỳ = tháng của trục ngày `From`/`To` — đo ở `BG-270`)*
 DAP_AN: dict[str, dict[str, Any]] = {
@@ -341,7 +353,7 @@ def nap_so_du(pd: str = "615") -> dict[str, dict[int, dict[str, Decimal | None]]
     ra: dict[str, dict[int, dict[str, Decimal | None]]] = {}
     for ten, tab in ANH_SO_DU.items():
         rao.kiem_dau_vao_hop_le(ten, pd)
-        anh = nap_anh(DV / f"{ten}.json")
+        anh = nap_anh(DV / f"{_tep(ten)}.json")
         cot = {c: datetime.date(int(c[1:5]), int(c[5:7]), int(c[7:9])).isoformat()
                for c in anh["cot"] if re.fullmatch(r"d\d{8}", c)}
         ra[tab] = {int(r["dong_sheet"]): {iso: _so(r.get(c)) for c, iso in cot.items()} for r in anh["dong"]}
@@ -707,9 +719,9 @@ def so_sanh_c5c(ne: NguonEngine, dap_an: Mapping[str, Mapping[str, Any]], mong: 
         "nguon_dau_vao": ["WP-C3a lưới cfa1_daily (tests/fixture/dap_an/gl_cf_dau_vao.json)", "WP-C3b lưới cfa1_yhqm",
                           "WP-C3d lưới pla3_pm_hr_daily (gl_pl_dau_vao.json + hr_pl_dau_vao.json)",
                           "WP-C5a + WP-C5b lưới ATL của FLS (IX.ALR kho cờ 2025 BẬT ký · IX.PL kho)",
-                          "DT13 ảnh đầu vào số dư 615: tests/fixture/dau_vao/ccr_so_du_ccr.json + ccr_so_du_cash.json "
-                          "(qua rào kiem_dau_vao_hop_le)"],
-        "dap_an": [f"tests/fixture/dap_an/{c['anh']}.json" for c in DAP_AN.values()],
+                          "DT13 ảnh đầu vào số dư 615: tests/fixture/dau_vao/ccr_so_du_ccr_20261123.json + "
+                          "ccr_so_du_cash_20261123.json — CÙNG lượt với đáp án 615 (WO-353) (qua rào kiem_dau_vao_hop_le)"],
+        "dap_an": [f"tests/fixture/dap_an/{_tep(c['anh'])}.json" for c in DAP_AN.values()],
         "dap_an_dung": dung,
         "khoa": "đáp án × phần (ngay · luy_ke[:FS]) × khối × mã × cột (ngày ISO | kỳ); ô đáp án là số, cột thuộc trục, "
                 "phần có đầu vào, engine có ô",
@@ -767,7 +779,7 @@ def nap_nen_kho(conn, *, actor: str = "bai-h14") -> None:
 
 
 def nap_dap_an() -> dict[str, dict[str, Any]]:
-    ra = {m: nap_anh(DA / f"{c['anh']}.json") for m, c in DAP_AN.items()}
+    ra = {m: nap_anh(DA / f"{_tep(c['anh'])}.json") for m, c in DAP_AN.items()}
     ra.update({m: nap_anh(DA / f"{c['anh']}.json") for m, c in DUNG.items()})
     return ra
 

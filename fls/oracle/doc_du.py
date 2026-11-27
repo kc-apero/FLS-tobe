@@ -93,14 +93,18 @@ def danh_gia(dem: list[DemCot], dong_doc: int, dong_toi_thieu: int
     return PhanXuDocDu(not ly_do, tuple(ly_do), tuple(da_do))
 
 
-# Nguong san cho cac cot then chot, do 2026-08-27 tren nguon that.
-# ⚠ Day la SAN, khong phai gia tri dung: nguon lon dan nen so o chi tang.
-# ⛔ Ai ha con so nay xuong de "cho qua" thi dang tat cong.
+# Nguong san cho cac cot then chot — DO LAI 2026-11-23/24 tren nguon SONG (WO-352).
+# ⭐ QUYET CUA CHU 23/11 ~11:25: "CDT1 do lai san". LUAT DAT SAN GIU NGUYEN nhu 27/08:
+#    san = lam tron XUONG hang tram cua so do (theo HANG = theo COT o ca 6 cot).
+# ⚠ Day la SAN, khong phai gia tri dung. Ban 27/08 ghi "nguon lon dan nen so o chi tang":
+#    DUNG voi 5/6 cot, SAI voi CDT1: 3.339 -> 3.056 (-283 o) trong khi dong nguon TANG
+#    10.100 -> 14.265 — chu da thay con so giam nay (BG-335 muc "WO-352") va quyet do lai.
+# ⛔ Ai ha con so nay xuong de "cho qua" ma khong co do moi + quyet chu thi dang tat cong.
 NGUONG_SAN: dict[str, int] = {
-    "S · Budget Code (hd)":   3_300,     # do 3.344
-    "H · Payment Type":       3_300,     # do 3.344
-    "T · CDT1":               3_300,     # do 3.339
-    "AB · svc_start":         2_300,     # do 2.370  <- cot da mat 257 o im lang
-    "AC · svc_end":           2_300,     # do 2.364  <- cot da mat 257 o im lang
-    "Y · ID Payee":             400,     # do 430
+    "S · Budget Code (hd)":   3_400,     # do 3.422 (23/11) · cu 3.344 (27/08) · san cu 3.300
+    "H · Payment Type":       3_500,     # do 3.549 (23/11) · cu 3.344 (27/08) · san cu 3.300
+    "T · CDT1":               3_000,     # do 3.056 (23/11) · cu 3.339 (27/08) · san cu 3.300  <- GIAM 283 o
+    "AB · svc_start":         2_500,     # do 2.525 (23/11) · cu 2.370 (27/08) · san cu 2.300
+    "AC · svc_end":           2_500,     # do 2.518 (23/11) · cu 2.364 (27/08) · san cu 2.300
+    "Y · ID Payee":             400,     # do   463 (23/11) · cu   430 (27/08) · san cu   400
 }

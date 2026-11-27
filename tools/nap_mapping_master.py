@@ -35,6 +35,11 @@ HET_DONG = 4464          # so dong that cua tab, do 2026-08-28
 
 
 def _token() -> str:
+    from tools.staging.cred_sheets import lay_token       # ⭐ WO-334: một chỗ lấy token (tương thích khi ⛔ khai gì)
+    return lay_token()
+
+
+def _token_cu() -> str:
     r = subprocess.run(
         ["gcloud", "auth", "print-access-token", "--account", SA, "--scopes",
          "https://www.googleapis.com/auth/spreadsheets.readonly"],
@@ -47,8 +52,8 @@ def _token() -> str:
 
 def _cot(tok: str, ch: str) -> list:
     """Mot cot THO, tinh tu DONG 1 — de `doc_cot` tu cat theo `DONG_DAU`."""
-    url = (f"https://sheets.googleapis.com/v4/spreadsheets/"
-           f"{BAN_SAO_RAW.spreadsheet_id}/values/"
+    from tools.staging.cred_sheets import api_goc
+    url = (api_goc() + f"{BAN_SAO_RAW.spreadsheet_id}/values/"
            + urllib.parse.quote(f"{TAB}!{ch}1:{ch}{HET_DONG}")
            + "?valueRenderOption=UNFORMATTED_VALUE&majorDimension=COLUMNS")
     q = urllib.request.Request(url, headers={"Authorization": f"Bearer {tok}"})
