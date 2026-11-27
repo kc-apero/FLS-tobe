@@ -8,6 +8,8 @@ include_external_packages = True
 # Cac tang khac se duoc THEM vao source_modules ngay khi chung ton tai:
 #   fls.agent them 23/11 (WO-329) — them vao hop dong NAY, ⛔ hop dong moi: giu 11 hop dong;
 #   cam fls.db/repo/api/web cua fls.agent canh bang tests/agent/test_skill_tang.py (AST)
+#   fls.mcp them 27/11 (WO-371) — cung khuon fls.agent: hop dong NAY + AST tests/mcp/test_mcp_tang.py
+#   (cam fls.db/repo/web; DUOC fls.api — goi_tuyen dung lai HAM cua cua). Ket noi TRUYEN VAO tu tools/chay_mcp.py
 #   (het — fls.api da them 28/08 o P4)
 # import-linter bao loi neu source_modules tro toi module chua ton tai, nen danh
 # sach nay lon dan theo pha thay vi khai truoc mot loat package rong.
@@ -22,6 +24,7 @@ source_modules =
     fls.adapters
     fls.api
     fls.agent
+    fls.mcp
 forbidden_modules =
     psycopg
 

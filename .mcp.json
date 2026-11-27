@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "fls": {
+      "type": "stdio",
+      "command": "python",
+      "args": ["tools/chay_mcp.py"],
+      "env": {
+        "PG_DSN": "${PG_DSN:-postgresql://fls:fls@localhost:5433/fls}",
+        "PYTHONUTF8": "1"
+      }
+    }
+  }
+}

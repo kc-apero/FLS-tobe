@@ -30,10 +30,12 @@ FROM ${PROXY_IMAGE} AS proxy
 FROM ${PYTHON_IMAGE} AS goi
 ARG PIP_CA_PEM=""
 ENV PIP_NO_CACHE_DIR=1 PIP_DISABLE_PIP_VERSION_CHECK=1
-# Chỉ gói chạy cần: `psycopg` (⛔ pytest/import-linter — chúng thuộc CI). Lấy dòng từ `requirements.txt` để MỘT nguồn phiên bản.
+# Chỉ gói chạy cần: `psycopg` + `mcp` (⛔ pytest/import-linter — chúng thuộc CI). Lấy dòng từ `requirements.txt` để MỘT nguồn
+# phiên bản. ⭐ `mcp` (WO-371): cổng MCP `fls-staging-mcp` chạy CÙNG ảnh, khác điểm vào (`tools/staging/app/vao_mcp.sh`) —
+#   ⛔ ảnh thứ hai để giữ một đường dựng. Cửa API (`vao.sh`) ⛔ import `mcp`. `sed 's/ *#.*//'` bỏ chú thích cuối dòng.
 COPY requirements.txt /tmp/requirements.txt
 RUN if [ -n "$PIP_CA_PEM" ]; then printf '%s\n' "$PIP_CA_PEM" > /tmp/pipca.pem; export PIP_CERT=/tmp/pipca.pem; fi; \
-    grep -i "^psycopg" /tmp/requirements.txt | xargs pip install --prefix=/goi
+    grep -iE "^(psycopg|mcp)\b" /tmp/requirements.txt | sed 's/ *#.*//' | xargs pip install --prefix=/goi
 
 # ── tầng CHẠY ─────────────────────────────────────────────────────────────────────────────────────────
 FROM ${PYTHON_IMAGE}
