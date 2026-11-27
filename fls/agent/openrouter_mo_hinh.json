@@ -1,0 +1,50 @@
+{
+ "_vi_sao": "WO-367 AC-3 — MỘT chỗ cấu hình mô hình OpenRouter: vai (3 agent làm · 1 Auditor) + danh mục có giá + ứng viên fleet eval. Slug/giá/điểm cuối ZDR CHÉP từ API công khai (⛔ đoán). Sửa = sửa tệp này (có review) + bài tests/agent/test_mo_hinh_openrouter.py.",
+ "ngay_tra": "2026-11-27",
+ "nguon": {
+  "mo_hinh": "GET https://openrouter.ai/api/v1/models (công khai, ⛔ khoá) — tra 2026-11-27: 477 mô hình",
+  "zdr": "GET https://openrouter.ai/api/v1/endpoints/zdr (công khai) — tra 2026-11-27: 953 điểm cuối",
+  "gia": "trường `pricing` của /models (USD/token) × 1e6 ⇒ USD/1M token"
+ },
+ "vai": {
+  "lam": "anthropic/claude-opus-5.5",
+  "auditor": "anthropic/claude-sonnet-5.5"
+ },
+ "noi_bo": {
+  "claude-opus-5-5": "lam",
+  "claude-sonnet-5-5": "auditor"
+ },
+ "ung_vien": [
+  "anthropic/claude-opus-5.5",
+  "anthropic/claude-sonnet-5.5"
+ ],
+ "mo_hinh": {
+  "anthropic/claude-opus-5.5": {"canonical": "anthropic/claude-opus-5.5-20260921", "ngu_canh": 1000000,
+   "gia_usd_1m": {"vao": 4.0, "ra": 20.0, "cache_doc": 0.2, "cache_ghi": 5.0},
+   "diem_cuoi_zdr": ["amazon-bedrock", "google-vertex/global"]},
+  "anthropic/claude-sonnet-5.5": {"canonical": "anthropic/claude-sonnet-5.5-20260928", "ngu_canh": 1000000,
+   "gia_usd_1m": {"vao": 2.0, "ra": 10.0, "cache_doc": 0.1, "cache_ghi": 2.5},
+   "diem_cuoi_zdr": ["amazon-bedrock", "google-vertex/global"]},
+  "anthropic/claude-haiku-5.5": {"canonical": "anthropic/claude-haiku-5.5-20261007", "ngu_canh": 1000000,
+   "gia_usd_1m": {"vao": 0.1, "ra": 0.5, "cache_doc": 0.01, "cache_ghi": 0.125},
+   "diem_cuoi_zdr": ["amazon-bedrock", "google-vertex/global"]},
+  "anthropic/claude-fable-5.2": {"canonical": "anthropic/claude-fable-5.2-20261109", "ngu_canh": 1000000,
+   "gia_usd_1m": {"vao": 8.0, "ra": 40.0, "cache_doc": 0.2, "cache_ghi": 10.0},
+   "diem_cuoi_zdr": []},
+  "openai/gpt-6.2-sol": {"canonical": "openai/gpt-6.2-sol-20261117", "ngu_canh": 1050000,
+   "gia_usd_1m": {"vao": 2.0, "ra": 10.0, "cache_doc": 0.1, "cache_ghi": 2.5},
+   "diem_cuoi_zdr": ["azure"]},
+  "openai/gpt-6.2-sol-pro": {"canonical": "openai/gpt-6.2-sol-pro-20261117", "ngu_canh": 1050000,
+   "gia_usd_1m": {"vao": 2.0, "ra": 10.0, "cache_doc": 0.1, "cache_ghi": 2.5},
+   "diem_cuoi_zdr": ["azure"]},
+  "openai/gpt-6.2-astra": {"canonical": "openai/gpt-6.2-astra-20261117", "ngu_canh": 1050000,
+   "gia_usd_1m": {"vao": 8.0, "ra": 40.0, "cache_doc": 0.4, "cache_ghi": 10.0},
+   "diem_cuoi_zdr": ["azure"]},
+  "openai/gpt-6.1-terra": {"canonical": "openai/gpt-6.1-terra-20261026", "ngu_canh": 1050000,
+   "gia_usd_1m": {"vao": 1.0, "ra": 5.0, "cache_doc": 0.05, "cache_ghi": 1.25},
+   "diem_cuoi_zdr": ["azure"]},
+  "openai/gpt-6-luna": {"canonical": "openai/gpt-6-luna-20260922", "ngu_canh": 1050000,
+   "gia_usd_1m": {"vao": 0.1, "ra": 0.5, "cache_doc": 0.01, "cache_ghi": 0.125},
+   "diem_cuoi_zdr": ["azure"]}
+ }
+}

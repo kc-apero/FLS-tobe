@@ -69,7 +69,10 @@ details{margin:2px 0} summary{cursor:pointer}
 
 #: Nguồn trả lời ⇒ có phải lượt API THẬT không. Khác danh sách này (giả · phát lại của giả · ⛔ rõ) ⇒ ⛔ thật.
 #: ⭐ `WO-355`: chỉ họ có adapter (`mo_hinh.HO_CO_ADAPTER`) — `google` đã bỏ (chủ 23/11: ⛔ Gemini).
-NGUON_THAT = ("anthropic",)
+#: ⚠ Bia `OR-01` (WO-367, đo 27/11): bản cũ chỉ `("anthropic",)` ⇒ adapter `anthropic-vertex` · `anthropic-google-cloud`
+#:    (WO-359) gọi THẬT mà report in "bản phát lại sinh bằng mô hình GIẢ — 0 lượt API thật" (so `ten` adapter ↔ danh sách: 1/3
+#:    đường khớp). Nay = TÊN mọi adapter thật; bài `test_mo_hinh_openrouter.py::test_OR01_…` canh từ chính các lớp.
+NGUON_THAT = ("anthropic", "anthropic-vertex", "anthropic-google-cloud", "openrouter")
 
 
 def _la_that(pb: dict[str, Any] | None) -> bool:

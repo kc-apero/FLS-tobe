@@ -73,7 +73,7 @@ def test_WO355_khong_con_ho_google__chi_anthropic_ghim():
     from fls.agent import report as rp
     assert not hasattr(mh, "GEMINI_FLASH") and not hasattr(mh, "GoogleChuaDung")
     assert set(mh.ADAPTER) == set(mh.HO_CO_ADAPTER) == {"anthropic"} and mh.HO_DE_DANH == ("openai",)
-    assert rp.NGUON_THAT == ("anthropic",)
+    assert rp.NGUON_THAT[0] == "anthropic" and "google" not in rp.NGUON_THAT     # OR-01: + tên adapter Vertex/GC/OpenRouter
     assert (mh.OPUS_5_5.ma, mh.SONNET_5_5.ma) == ("claude-opus-5-5", "claude-sonnet-5-5")
     for m in (mh.OPUS_5_5, mh.SONNET_5_5):
         assert m.ghim and m.loi_ghim() is None and m.ma in mh.BANG_GIA

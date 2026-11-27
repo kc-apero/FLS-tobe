@@ -262,6 +262,13 @@ def nhan_usd(t: dict[str, Any]) -> str:
         nguon = "giá Claude API — nền claude.googleapis.com CHƯA có bảng giá; số thật ở hoá đơn GCP"
     elif duong == [mh.DUONG_VERTEX]:
         nguon = "Vertex: global = giá Claude API (giả định chưa kiểm), us/eu +10%; số thật ở Billing GCP"
+    elif duong == [mh.DUONG_OPENROUTER]:
+        # `WO-367` AC-2: nhãn theo NGUỒN từng lời — `usage.cost` OpenRouter TRẢ (THẬT) hay bảng giá × token (ƯỚC)
+        n = t.get("nguon_usd") or {}
+        if not n.get(mh.NGUON_USD_UOC):
+            return f"~{t['chi_phi_usd']} USD THẬT (usage.cost OpenRouter trả, {n.get(mh.NGUON_USD_THAT, 0)} lời)"
+        nguon = (f"OpenRouter: {n.get(mh.NGUON_USD_THAT, 0)} lời THẬT (usage.cost) + {n[mh.NGUON_USD_UOC]} lời ƯỚC theo bảng giá "
+                 "/api/v1/models")
     else:
         nguon = "giá Claude API"
     return f"~{t['chi_phi_usd']} USD ƯỚC ({nguon}; tra {t['ngay_tra_gia']})"
@@ -279,7 +286,14 @@ def ghi_nhat_ky(ncc: dict[str, Any], nhan: str, tm: Path | None = None, loi: str
     tm = TM_NHAT_KY if tm is None else tm
     from datetime import datetime, timezone
     tm.mkdir(parents=True, exist_ok=True)
-    p = tm / f"{datetime.now(timezone.utc).strftime('%Y-%m-%dT%H%M%SZ')}_{nhan}.json"
+    dau = datetime.now(timezone.utc).strftime('%Y-%m-%dT%H%M%SZ')
+    p = tm / f"{dau}_{nhan}.json"
+    # ⚠ Bia `OR-02` (WO-367, đo 27/11): tên tệp theo GIÂY ⇒ hai lượt trong cùng giây GHI ĐÈ nhật ký lượt trước (bài ma trận:
+    #   3 lượt ⇒ 1 tệp) — mất dấu vết tiền đã tiêu. Nay thêm hậu tố `-2`, `-3`… (⛔ ghi đè).
+    so = 2
+    while p.exists():
+        p = tm / f"{dau}-{so}_{nhan}.json"
+        so += 1
     d = {"_vi_sao": "Nhật ký vòng API THẬT — CHỈ số đếm + vân tay (WO-355 AC-2/AC-4 · WO-359).",
          "tong": mh.tong_nhat_ky(nk), "goi": [x.dict() for x in nk]}
     if loi:

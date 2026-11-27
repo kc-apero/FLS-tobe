@@ -10,6 +10,9 @@
    — đặt `FLS_NHA_CUNG_CAP=google-cloud` · `FLS_GCP_PROJECT=fp-a-project` · `FLS_CLAUDE_WORKSPACE_ID=wrkspc_…` · `FLS_GC_DU_LIEU_XAC_NHAN=1` (+
    `FLS_CHO_GOI_API=1`, `--that`); xác thực = ADC của GCP. Dự phòng: `FLS_NHA_CUNG_CAP=vertex` (Vertex AI) ·
    `FLS_NHA_CUNG_CAP=anthropic` (khoá, WO-355 — cũng là đường khi biến VẮNG). Khối lệnh cho chủ: BG-360 §B.
+⭐ `WO-367` (chủ 27/11 *"Chuyển việc dùng Vertex sang dùng OpenRouter"*): `FLS_NHA_CUNG_CAP=openrouter` · `OPENROUTER_API_KEY` ·
+   `FLS_OPENROUTER_DU_LIEU_XAC_NHAN=1` (+ `FLS_CHO_GOI_API=1`, `--that`). Slug theo vai ở `fls/agent/openrouter_mo_hinh.json`.
+   Khối lệnh cho chủ: BG-368 §B. Fleet eval đa mô hình: `tools/fleet_eval_voi.py --ma-tran`.
 
 ⭐ (a) CHUỖI 4 agent trên TẬP NHỎ có đáp án = 12 ca DỰNG (`tests/fixture/agent/`) + mẫu ≤ `--mau` ca (mặc định 20) của
    bể B giữ riêng (`$FLS_HELDOUT_NOI_DUNG/b`, hạt 355). Bể vắng ⇒ chỉ 12 ca dựng, report KHAI rõ (⛔ im lặng).
@@ -121,6 +124,8 @@ def nhan_do(ly: str) -> str:
     """Tên ĐỎ khi ⛔ chạy được thật — chốt THIẾU QUAN TRỌNG NHẤT của đường đứng ĐẦU (WO-355: khoá; WO-359: project)."""
     if "ANTHROPIC_API_KEY" in ly and "vắng" in ly:
         return "thiếu ANTHROPIC_API_KEY · " + ly
+    if f"`{mh.BIEN_OPENROUTER_KHOA}` vắng" in ly:
+        return f"thiếu {mh.BIEN_OPENROUTER_KHOA} (đường openrouter) · " + ly
     for b in (mh.BIEN_GCP_PROJECT, mh.BIEN_CLAUDE_WORKSPACE):
         if f"`{b}` vắng" in ly:
             return f"thiếu {b} (đường {mh.duong_goi()}) · " + ly
@@ -198,7 +203,8 @@ def md(kq: dict[str, Any]) -> str:
     dat, ly = ket(kq)
     g, t = kq["gia"], kq["that"]
     # ô bảng ghi nhãn NGẮN; lý do đầy đủ (tên mọi chốt thiếu) chỉ ở dòng KẾT
-    tc = None if "do" not in t else next((n for n in ("thiếu ANTHROPIC_API_KEY", f"thiếu {mh.BIEN_GCP_PROJECT}",
+    tc = None if "do" not in t else next((n for n in ("thiếu ANTHROPIC_API_KEY", f"thiếu {mh.BIEN_OPENROUTER_KHOA}",
+                                                      f"thiếu {mh.BIEN_GCP_PROJECT}",
                                                       f"thiếu {mh.BIEN_CLAUDE_WORKSPACE}")
                                           if t["do"].startswith(n)), "ĐỎ — xem KẾT")
     L = [f"# Vòng 1 test THẬT — GIẢ ↔ THẬT · {kq['ngay']}", "",
@@ -213,7 +219,8 @@ def md(kq: dict[str, Any]) -> str:
          f"| bể A/B | {kq['be']} |", f"| che | `{kq['che']}` (chủ 23/11: đọc toàn bộ) |",
          f"| đường gọi thật | `{_x(kq.get('duong'))}` " + {
              mh.DUONG_GOOGLE_CLOUD: "(claude.googleapis.com, Anthropic managed — CHÍNH, WO-359)",
-             mh.DUONG_VERTEX: "(Claude trên Vertex AI — dự phòng, WO-359)"}.get(
+             mh.DUONG_VERTEX: "(Claude trên Vertex AI — dự phòng, WO-359)",
+             mh.DUONG_OPENROUTER: "(OpenRouter — bên thứ ba, ZDR + data_collection=deny mỗi lời, WO-367)"}.get(
              kq.get("duong"), "(Claude API, khoá — dự phòng WO-355)") + " |", "",
          "## (a) Chuỗi 4 agent trên tập nhỏ", "", "| chỉ số | GIẢ | THẬT |", "|---|---|---|"]
     gc, tcz = g["chuoi"], (t.get("chuoi") or {})
@@ -253,7 +260,9 @@ def md(kq: dict[str, Any]) -> str:
           + (" · Vertex: global = giá Claude API, `us`/`eu` +10% — giả định chưa kiểm, số thật ở Billing GCP"
              if n.get("duong") == [mh.DUONG_VERTEX] else "")
           + (" · google-cloud: CHƯA có bảng giá chính thức — ƯỚC theo giá Claude API để giữ trần; số thật ở hoá đơn "
-             "Marketplace GCP" if n.get("duong") == [mh.DUONG_GOOGLE_CLOUD] else "") + f") · đường {_x('/'.join(n.get('duong') or []) or '—')}"
+             "Marketplace GCP" if n.get("duong") == [mh.DUONG_GOOGLE_CLOUD] else "")
+          + (" · openrouter: USD = usage.cost OpenRouter TRẢ (THẬT) khi có, thiếu thì ƯỚC theo /api/v1/models — đếm "
+             f"{n.get('nguon_usd')}" if n.get("duong") == [mh.DUONG_OPENROUTER] else "") + f") · đường {_x('/'.join(n.get('duong') or []) or '—')}"
           + (f" · vùng {_x('/'.join(n['vung']))}" if n.get("vung") else "") + " — USD là ƯỚC.", "",
           "| lời gọi | token vào | token ra | cache đọc | cache ghi | giây | USD ước |", "|---|---|---|---|---|---|---|",
           f"| {n['so_goi']} | {n['token_vao']} | {n['token_ra']} | {n['cache_doc']} | {n['cache_ghi']} | {n['giay']} | {n['chi_phi_usd']} |"]
@@ -268,7 +277,8 @@ def md(kq: dict[str, Any]) -> str:
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(prog="vong_that_voi.py")
     p.add_argument("--that", action="store_true",
-                   help="gọi THẬT — FLS_CHO_GOI_API=1 + đường FLS_NHA_CUNG_CAP=google-cloud (FLS_GCP_PROJECT · "
+                   help="gọi THẬT — FLS_CHO_GOI_API=1 + đường FLS_NHA_CUNG_CAP=openrouter (OPENROUTER_API_KEY · "
+                        "FLS_OPENROUTER_DU_LIEU_XAC_NHAN=1 — WO-367) | google-cloud (FLS_GCP_PROJECT · "
                         "FLS_CLAUDE_WORKSPACE_ID · FLS_GC_DU_LIEU_XAC_NHAN=1) | vertex | anthropic (vắng ⇒ anthropic)")
     p.add_argument("--be", action="store_true", help="(b) fleet eval A2.04 trên bể A/B — chạy SAU khi xem chi phí (a)")
     p.add_argument("--tran-usd", type=float, default=cav.TRAN_USD_MAC_DINH,

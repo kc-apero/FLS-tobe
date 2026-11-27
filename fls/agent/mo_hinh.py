@@ -48,6 +48,13 @@
    `claude-opus-5-5` / `claude-sonnet-5-5` (⛔ tiền tố, ⛔ `@ngày`) · vùng: `global` (khuyên) · `us`/`eu` (đa vùng, +10%)
    · vùng ĐƠN (vd `asia-southeast1`) **chỉ phục vụ Sonnet 4.6 trở về trước** ⇒ ⛔ nhận · `fallbacks` phía máy chủ ⛔ có
    trên Vertex (ta vốn ⛔ dùng).
+
+⭐ `WO-367` (lời chủ 27/11 *"Chuyển việc dùng Vertex sang dùng OpenRouter"* — Vertex: hạn mức Opus/Sonnet = 0, 6 yêu cầu tăng
+   bị từ chối tự động; `claude.googleapis.com` chặn ở Subscribe Marketplace ⇒ 0 đường GCP gọi được, đo 25/11): đường THỨ TƯ
+   `openrouter` — `OpenRouterChat` (`POST https://openrouter.ai/api/v1/chat/completions`, khuôn OpenAI, DỊCH sang khuôn trên).
+   Đặt RÕ `FLS_NHA_CUNG_CAP=openrouter`; biến VẮNG vẫn `anthropic` (KQ-357). Slug theo VAI ở `openrouter_mo_hinh.json` (MỘT chỗ):
+   agent làm `anthropic/claude-opus-5.5` · Auditor `anthropic/claude-sonnet-5.5` (tra `GET /api/v1/models` 2026-11-27). Họ
+   `openai` (`HO_DE_DANH`) có adapter CHỈ qua đường này. Mọi hằng của đường ghi NGUỒN (trang tài liệu) + NGÀY TRA cạnh nó.
 """
 from __future__ import annotations
 
@@ -72,7 +79,8 @@ BIEN_NHA_CUNG_CAP = "FLS_NHA_CUNG_CAP"
 DUONG_API = "anthropic"          # dự phòng: Claude API trực tiếp, khoá `ANTHROPIC_API_KEY`
 DUONG_VERTEX = "vertex"          # dự phòng: Claude trên Vertex AI của project công ty
 DUONG_GOOGLE_CLOUD = "google-cloud"   # ⭐ CHÍNH (chủ 24/11 ~03:50): `claude.googleapis.com` (Anthropic managed)
-DUONG_HOP_LE = (DUONG_GOOGLE_CLOUD, DUONG_VERTEX, DUONG_API)
+DUONG_OPENROUTER = "openrouter"   # ⭐ `WO-367` (chủ 27/11 *"Chuyển việc dùng Vertex sang dùng OpenRouter"*) — xem `OpenRouterChat`
+DUONG_HOP_LE = (DUONG_GOOGLE_CLOUD, DUONG_VERTEX, DUONG_API, DUONG_OPENROUTER)
 DUONG_MAC_DINH = DUONG_API          # biến vắng ⇒ hành vi WO-355 (bài nghiệm thu KQ-357 khoá) — xem docstring
 #: Đường của project GCP (đòi `FLS_GCP_PROJECT` ∈ `DU_AN_CONG_TY`, ⛔ khoá).
 DUONG_GCP = (DUONG_GOOGLE_CLOUD, DUONG_VERTEX)
@@ -102,6 +110,47 @@ VUNG_VERTEX: dict[str, float] = {"global": 1.00, "us": 1.10, "eu": 1.10}
 #:    Claude). ⇒ Người vận hành xác nhận BA điều (BG-360 §câu chủ): ① project = `fp-a-project` của công ty · ② request-
 #:    response logging cho mô hình Claude ĐANG TẮT · ③ đã đọc trạng thái ZDR (đã xin / chấp nhận giữ theo điều khoản GCP).
 BIEN_VERTEX_DU_LIEU = "FLS_VERTEX_DU_LIEU_XAC_NHAN"
+
+# ── Đường `openrouter` (`WO-367`) — mọi hằng dưới đây TRA tài liệu OpenRouter NGÀY 2026-11-27 ─────────────────────────────
+#: Khoá: `Authorization: Bearer <khoá>` (trang `openrouter.ai/docs/api_reference/authentication.md`, tra 2026-11-27). Khoá CHỈ đọc
+#:    từ biến này LÚC GỌI ⇒ ⛔ thuộc tính đối tượng, ⛔ argv, ⛔ nhật ký/report (bài `test_mo_hinh_openrouter.py`).
+BIEN_OPENROUTER_KHOA = "OPENROUTER_API_KEY"
+#: ⭐ AC-2 · chốt MỚI: OpenRouter là BÊN THỨ BA chuyển tiếp tới nhà cung cấp gốc ⇒ người vận hành xác nhận (BG-368 C2).
+BIEN_OPENROUTER_DU_LIEU = "FLS_OPENROUTER_DU_LIEU_XAC_NHAN"
+#: Gốc API: `https://openrouter.ai/api/v1` + `POST /chat/completions` (trang `api_reference/overview.md`, tra 2026-11-27 — ví dụ
+#:    `fetch('https://openrouter.ai/api/v1/chat/completions', …)`). ⛔ đổi qua biến môi trường (dữ liệu thật ⛔ được lái đi nơi
+#:    khác); bài thử truyền `goc_api` tới máy chủ GIẢ `127.0.0.1` bằng THAM SỐ.
+GOC_API_OPENROUTER = "https://openrouter.ai/api/v1"
+#: Tuỳ chọn định tuyến GỬI KÈM MỌI lời gọi (trang `guides/routing/provider-selection.md` §Requiring Providers to Comply with
+#:    Data Policies + §Zero Data Retention Enforcement, và `guides/features/zdr.md`, tra 2026-11-27):
+#:    `data_collection: "deny"` — *"use only providers which do not collect user data"* (mặc định `allow` = *"may train on it"*);
+#:    `zdr: true` — *"Restrict routing to only ZDR (Zero Data Retention) endpoints"* (cộng điểm cuối *Safety Retention* nếu cài đặt
+#:    tài khoản cho phép — chọn "ZDR only" ở `settings/privacy`, BG-368 C2). Tra `GET /api/v1/endpoints/zdr` 2026-11-27: Opus 5.5 +
+#:    Sonnet 5.5 có điểm cuối ZDR `amazon-bedrock` · `google-vertex/global` (⛔ `anthropic` gốc) ⇒ gọi được với chốt này.
+#:    ⛔ gửi `models` (rơi sang MÔ HÌNH khác = đổi phiên bản agent trong im lặng — cùng lý do ⛔ `fallbacks` ở WO-355).
+DINH_TUYEN_OPENROUTER: dict[str, Any] = {"data_collection": "deny", "zdr": True}
+#: `HTTP-Referer` / `X-OpenRouter-Title` (`X-Title` cũng nhận) — TUỲ CHỌN, chỉ để xếp hạng app (trang `api_reference/overview.md`,
+#:    tra 2026-11-27) ⇒ ⛔ gửi: ⛔ lộ tên dự án ra bên thứ ba khi ⛔ cần.
+#: Tệp cấu hình MỘT chỗ (AC-3): vai · danh mục slug có giá · ứng viên fleet eval.
+TEP_MA_TRAN = Path(__file__).with_name("openrouter_mo_hinh.json")
+#: Họ đi được QUA OpenRouter khi `FLS_NHA_CUNG_CAP=openrouter` (`openai` vẫn ở `HO_DE_DANH` cho các đường khác — KQ-357 khoá).
+HO_QUA_OPENROUTER = ("openai",)
+#: ⛔ Gemini / `google/*` (quyết chủ 23/11 *"không dùng gemini nữa"*). Tiền tố slug CẤM ở mọi chỗ của đường này.
+TIEN_TO_CAM = ("google/",)
+#: Mã lỗi HTTP ⇒ TÊN nguyên nhân (trang `api_reference/errors-and-debugging.md` §Error codes, tra 2026-11-27). ⛔ câu chung
+#:    (bài học `AG3-GOP-01`): 402 = hết credit · 429 = giới hạn tốc độ · 503 = ⛔ nhà cung cấp nào thoả định tuyến (ở đây: ZDR).
+TEN_LOI_OPENROUTER: dict[int, str] = {
+    400: "yêu cầu sai (tham số thiếu/sai)",
+    401: "khoá OpenRouter sai / đã thu hồi / hết hạn",
+    402: "HẾT CREDIT OpenRouter (nạp thêm ở openrouter.ai/settings/credits)",
+    403: "bị CHẶN: guardrail · kiểm duyệt · hạn mức chi của khoá/workspace",
+    408: "hết giờ phía OpenRouter",
+    429: "GIỚI HẠN TỐC ĐỘ (rate limit)",
+    502: "mô hình/nhà cung cấp gốc đang hỏng hoặc trả đáp lỗi",
+    503: "⛔ nhà cung cấp nào thoả yêu cầu định tuyến (ZDR + data_collection=deny) cho mô hình này",
+}
+#: Mã thử lại (cùng trang §Retry-After: 429 · 503 · 402 *in-flight budget* có `Retry-After`). 402 thường ⛔ thử lại.
+MA_THU_LAI = (408, 429, 502, 503)
 
 
 def duong_goi(moi_truong: dict[str, str] | None = None) -> str:
@@ -159,8 +208,11 @@ BANG_GIA_VERTEX: dict[str, dict[str, float]] = {k: dict(v) for k, v in BANG_GIA.
 #:    để GIỮ trần USD (chốt WO-355) — ⛔ là giá đã xác minh; số thật = hoá đơn Marketplace GCP (BG-360 §D).
 NGAY_TRA_GIA_GOOGLE_CLOUD = "2026-11-24"
 BANG_GIA_GOOGLE_CLOUD: dict[str, dict[str, float]] = {k: dict(v) for k, v in BANG_GIA.items()}
+#: ⭐ Đường `openrouter` (`WO-367`): giá ƯU TIÊN là `usage.cost` OpenRouter TRẢ trong mỗi đáp (nhãn `THẬT`); bảng dưới (trong
+#:    `openrouter_mo_hinh.json`, chép từ `GET /api/v1/models` NGÀY `NGAY_TRA_GIA_OPENROUTER`) chỉ dùng khi đáp THIẾU `cost` (nhãn `ƯỚC`).
+NGAY_TRA_GIA_OPENROUTER = "2026-11-27"
 NGAY_TRA_GIA_THEO_DUONG = {DUONG_API: NGAY_TRA_GIA, "vertex": NGAY_TRA_GIA_VERTEX,
-                           "google-cloud": NGAY_TRA_GIA_GOOGLE_CLOUD}
+                           "google-cloud": NGAY_TRA_GIA_GOOGLE_CLOUD, DUONG_OPENROUTER: NGAY_TRA_GIA_OPENROUTER}
 
 
 class CamGoiThat(RuntimeError):
@@ -181,6 +233,11 @@ class LoiApi(RuntimeError):
     Là `RuntimeError` ⇒ `chuoi.chay_skill` bắt và DỪNG chuỗi có tên (`KqChuoi.dung_o`). ⛔ bao giờ đổi sang GIẢ."""
 
 
+#: Nhãn nguồn USD (`WO-367` AC-2): `THẬT` = số OpenRouter TÍNH TIỀN trả trong `usage.cost`; `ƯỚC` = bảng giá × token.
+NGUON_USD_THAT = "THẬT"
+NGUON_USD_UOC = "ƯỚC"
+
+
 @dataclass(frozen=True)
 class NhatKyGoi:
     """MỘT lời gọi thật — chỉ SỐ ĐẾM + VÂN TAY (luật cứng WO-355: ⛔ nội dung/phản hồi thô trong repo)."""
@@ -195,8 +252,10 @@ class NhatKyGoi:
     van_tay_yeu_cau: str
     van_tay_dap: str
     request_id: str = ""
-    duong: str = DUONG_API      # `WO-359`: đường đã gọi — `google-cloud` | `vertex` | `anthropic`
+    duong: str = DUONG_API      # `WO-359`: đường đã gọi — `google-cloud` | `vertex` | `anthropic` | `openrouter`
     vung: str = ""              # vùng (`global`/`us`/`eu`); "" ở đường API
+    nguon_usd: str = NGUON_USD_UOC  # `WO-367`: `THẬT` (= `usage.cost` OpenRouter trả) | `ƯỚC` (bảng giá × token)
+    nha_cung_cap: str = ""      # `WO-367`: nhà cung cấp gốc OpenRouter định tuyến tới (trường `provider` của đáp)
 
     def dict(self) -> dict[str, Any]:
         d = {"mo_hinh": self.mo_hinh, "token_vao": self.token_vao, "token_ra": self.token_ra,
@@ -207,6 +266,8 @@ class NhatKyGoi:
         # `WO-359`: đường GCP ghi thêm `duong` · `vung`; đường API GIỮ đúng 12 khoá (bài nghiệm thu KQ-357 ghim tập khoá)
         if self.duong != DUONG_API:
             d.update(duong=self.duong, vung=self.vung)
+        if self.duong == DUONG_OPENROUTER:
+            d.update(nguon_usd=self.nguon_usd, nha_cung_cap=self.nha_cung_cap)
         return d
 
 
@@ -217,6 +278,8 @@ def chi_phi(ma: str, vao: int, ra: int, cache_doc: int = 0, cache_ghi: int = 0, 
         g, he_so = BANG_GIA_VERTEX[ma], VUNG_VERTEX[vung]
     elif duong == DUONG_GOOGLE_CLOUD:
         g, he_so = BANG_GIA_GOOGLE_CLOUD[ma], 1.0
+    elif duong == DUONG_OPENROUTER:
+        g, he_so = bang_gia_openrouter()[ma], 1.0
     else:
         g, he_so = BANG_GIA[ma], 1.0
     return he_so * (vao * g["vao"] + ra * g["ra"] + cache_doc * g["cache_doc"] + cache_ghi * g["cache_ghi"]) / 1_000_000
@@ -230,6 +293,8 @@ def tong_nhat_ky(ds: list[NhatKyGoi]) -> dict[str, Any]:
                           "vung": sorted({x.vung for x in ds if x.vung}),
                           "ngay_tra_gia": (NGAY_TRA_GIA_THEO_DUONG.get(duong[0], NGAY_TRA_GIA) if len(duong) == 1
                                            else NGAY_TRA_GIA)}
+    if DUONG_OPENROUTER in duong:            # `WO-367` AC-2: đếm lời gọi theo NGUỒN USD (THẬT/ƯỚC) — nhãn in ra đọc từ đây
+        ra["nguon_usd"] = {n: sum(1 for x in ds if x.nguon_usd == n) for n in (NGUON_USD_THAT, NGUON_USD_UOC)}
     for x in ds:
         for k in ("token_vao", "token_ra", "cache_doc", "cache_ghi", "giay", "chi_phi_usd"):
             ra[k] += getattr(x, k)
@@ -334,8 +399,14 @@ def kiem_chot_that(mo_hinh: MoHinh, co_that: bool, moi_truong: dict[str, str] | 
         thieu.append("cờ `--that` vắng")
     if mt.get(BIEN_CHO_GOI) != "1":
         thieu.append(f"`{BIEN_CHO_GOI}` ≠ 1")
-    # Đường chỉ áp cho họ `anthropic`; họ khác (vd `openai` chừa chỗ) giữ chốt khoá của nó.
-    duong = duong_goi(mt) if mo_hinh.ho == "anthropic" else DUONG_API
+    # Đường chỉ áp cho họ `anthropic`; họ khác (vd `openai` chừa chỗ) giữ chốt khoá của nó — TRỪ khi đường = `openrouter`
+    # (`WO-367`: họ `openai` CHỈ có adapter qua OpenRouter; ngoài đường ấy vẫn chốt khoá rồi `ChuaDung` như WO-355).
+    if mo_hinh.ho == "anthropic":
+        duong = duong_goi(mt)
+    elif mo_hinh.ho in HO_QUA_OPENROUTER and duong_goi(mt) == DUONG_OPENROUTER:
+        duong = DUONG_OPENROUTER
+    else:
+        duong = DUONG_API
     if duong in DUONG_GCP:
         du_an = mt.get(BIEN_GCP_PROJECT) or ""
         if not du_an:
@@ -358,6 +429,17 @@ def kiem_chot_that(mo_hinh: MoHinh, co_that: bool, moi_truong: dict[str, str] | 
     elif duong == DUONG_API:
         if not mt.get(mo_hinh.bien_khoa):
             thieu.append(f"khoá `{mo_hinh.bien_khoa}` vắng trong biến môi trường")
+    elif duong == DUONG_OPENROUTER:
+        if not mt.get(BIEN_OPENROUTER_KHOA):
+            thieu.append(f"khoá `{BIEN_OPENROUTER_KHOA}` vắng trong biến môi trường")
+        slug = slug_openrouter(mo_hinh)
+        ls = loi_slug_openrouter(slug) if slug else f"mô hình `{mo_hinh.ma}` ⛔ có slug OpenRouter trong `{TEP_MA_TRAN.name}`"
+        if ls:
+            thieu.append(ls)
+        # ⭐ AC-2: OpenRouter là BÊN THỨ BA — đòi xác nhận ở MỌI chế độ che (⛔ chỉ `mo`): kể cả bản che vẫn mang cấu trúc sổ.
+        if mt.get(BIEN_OPENROUTER_DU_LIEU) != "1":
+            thieu.append(f"`{BIEN_OPENROUTER_DU_LIEU}` ≠ 1 — OpenRouter là BÊN THỨ BA chuyển tiếp dữ liệu sổ (số TK · tên "
+                         "người · tiền) tới nhà cung cấp gốc; người vận hành xác nhận + bật cài đặt riêng tư tài khoản (BG-368 C2)")
     else:
         thieu.append(f"`{BIEN_NHA_CUNG_CAP}={duong}` lạ — chỉ nhận {'/'.join(DUONG_HOP_LE)}")
     lg = mo_hinh.loi_ghim()
@@ -525,12 +607,266 @@ class AnthropicGoogleCloudMessages(AnthropicMessages):
         return any(k.__module__.startswith("google.auth") for k in type(e).__mro__)
 
 
+# ── Đường `openrouter` (`WO-367`) ─────────────────────────────────────────────────────────────────────────────────────
+def ma_tran_openrouter(tep: Path | None = None) -> dict[str, Any]:
+    """Cấu hình MỘT chỗ (AC-3). Đọc mỗi lần gọi (rẻ; ⛔ bộ nhớ đệm ⇒ bài thử đổi tệp được)."""
+    return json.loads((tep or TEP_MA_TRAN).read_text(encoding="utf-8"))
+
+
+def bang_gia_openrouter(tep: Path | None = None) -> dict[str, dict[str, float]]:
+    """{slug: {vao, ra, cache_doc, cache_ghi}} USD/1M token — chỉ dùng khi đáp THIẾU `usage.cost` (nhãn ƯỚC)."""
+    return {k: dict(v["gia_usd_1m"]) for k, v in ma_tran_openrouter(tep)["mo_hinh"].items()}
+
+
+def slug_openrouter(mo_hinh: MoHinh, tep: Path | None = None) -> str | None:
+    """Slug OpenRouter của một mô hình. Mã đã là slug (`hãng/tên`) ⇒ nguyên; mã NỘI BỘ (`claude-opus-5-5`) ⇒ theo VAI
+    (`noi_bo` → `vai`) — ⭐ đổi mô hình của agent = sửa `openrouter_mo_hinh.json`, ⛔ sửa mã. ⛔ có ⇒ None (chốt báo ĐỎ)."""
+    if "/" in mo_hinh.ma:
+        return mo_hinh.ma
+    mt = ma_tran_openrouter(tep)
+    vai = mt.get("noi_bo", {}).get(mo_hinh.ma)
+    return mt.get("vai", {}).get(vai) if vai else None
+
+
+def loi_slug_openrouter(slug: str, tep: Path | None = None) -> str | None:
+    """Slug GHIM được? ⛔ bí danh `~…`/`…latest` · ⛔ biến thể `:free`/`:nitro`/`:floor`/`:batch`… (đổi định tuyến/giá — trang
+    `guides/routing/model-variants/overview.md`) · ⛔ `google/*` (chủ 23/11) · phải có trong danh mục có giá của tệp cấu hình."""
+    if any(slug.startswith(t) for t in TIEN_TO_CAM):
+        return f"slug `{slug}` thuộc họ CẤM {list(TIEN_TO_CAM)} (quyết chủ 23/11: ⛔ Gemini)"
+    if slug.startswith("~") or any(d in slug.lower() for d in DAU_BI_DANH):
+        return f"slug `{slug}` là BÍ DANH (trỏ mô hình mới nhất) — ⛔ ghim được"
+    if ":" in slug:
+        return f"slug `{slug}` mang BIẾN THỂ định tuyến `:{slug.split(':', 1)[1]}` — ⛔ ghim (đổi nhà cung cấp/giá)"
+    if slug not in ma_tran_openrouter(tep)["mo_hinh"]:
+        return f"slug `{slug}` ⛔ có trong danh mục `{TEP_MA_TRAN.name}` (⛔ giá, ⛔ điểm cuối ZDR đã tra) ⇒ ⛔ gọi"
+    return None
+
+
+def mo_hinh_openrouter(slug: str) -> MoHinh:
+    """MoHinh cho MỘT ô fleet eval: mã = slug (`hãng/tên`), họ = tiền tố slug, khoá = `OPENROUTER_API_KEY`."""
+    return MoHinh(ho=slug.split("/", 1)[0], ma=slug, ghim=True, bien_khoa=BIEN_OPENROUTER_KHOA)
+
+
+def _doi_yeu_cau_openrouter(yeu_cau: dict, slug: str, effort: str) -> dict[str, Any]:
+    """Khuôn Messages NỘI BỘ ⇒ thân `POST /chat/completions` (khuôn OpenAI — trang `guides/features/tool-calling.md` +
+    `api_reference/parameters.md`, tra 2026-11-27):
+      · `system` ⇒ tin `{"role": "system"}` đầu · khối `text` ⇒ `content` chữ;
+      · khối `tool_use` của trợ lý ⇒ `tool_calls[{id, type: "function", function: {name, arguments: <JSON chữ>}}]`;
+      · khối `tool_result` ⇒ tin `{"role": "tool", "tool_call_id", "content"}` (mỗi khối MỘT tin, đúng thứ tự);
+      · khối `openrouter_reasoning` (do adapter này sinh) ⇒ `reasoning_details` NGUYÊN VẸN — trang `reasoning-tokens.md`
+        §Preserving Reasoning: *"Send the assistant turn back unmodified (including reasoning_details) plus the tool results"*;
+      · công cụ `{name, description, input_schema}` ⇒ `{"type": "function", "function": {name, description, parameters}}`;
+      · `reasoning: {"effort": …}` đặt RÕ (Opus/Sonnet 5.5 qua OpenRouter: *reasoning mandatory*, mặc định `high` — /models
+        2026-11-27) · `provider` = `DINH_TUYEN_OPENROUTER` · ⛔ `tool_choice` (mặc định auto) · ⛔ `models`/`stream`."""
+    msgs: list[dict[str, Any]] = []
+    if yeu_cau.get("system"):
+        msgs.append({"role": "system", "content": yeu_cau["system"]})
+    for m in yeu_cau["messages"]:
+        noi = m.get("content")
+        if isinstance(noi, str):
+            msgs.append({"role": m["role"], "content": noi})
+            continue
+        if m["role"] == "assistant":
+            tn: dict[str, Any] = {"role": "assistant", "content": "".join(k.get("text", "") for k in noi
+                                                                          if k.get("type") == "text") or None}
+            goi = [{"id": k["id"], "type": "function",
+                    "function": {"name": k["name"], "arguments": json.dumps(k.get("input") or {}, ensure_ascii=False)}}
+                   for k in noi if k.get("type") == "tool_use"]
+            if goi:
+                tn["tool_calls"] = goi
+            rd = [d for k in noi if k.get("type") == "openrouter_reasoning" for d in k.get("reasoning_details", [])]
+            if rd:
+                tn["reasoning_details"] = rd
+            msgs.append(tn)
+            continue
+        chu = [k.get("text", "") for k in noi if k.get("type") == "text"]
+        for k in noi:
+            if k.get("type") == "tool_result":
+                c = k.get("content")
+                msgs.append({"role": "tool", "tool_call_id": k["tool_use_id"],
+                             "content": c if isinstance(c, str) else json.dumps(c, ensure_ascii=False)})
+        if chu:
+            msgs.append({"role": m["role"], "content": "".join(chu)})
+    than: dict[str, Any] = {"model": slug, "messages": msgs, "max_tokens": yeu_cau.get("max_tokens", 16000),
+                            "reasoning": {"effort": effort}, "provider": dict(DINH_TUYEN_OPENROUTER)}
+    if yeu_cau.get("tools"):
+        than["tools"] = [{"type": "function", "function": {"name": t["name"], "description": t.get("description", ""),
+                                                           "parameters": t.get("input_schema") or {"type": "object"}}}
+                         for t in yeu_cau["tools"]]
+    return than
+
+
+#: `finish_reason` CHUẨN HOÁ của OpenRouter (trang `api_reference/overview.md`: *"tool_calls, stop, length, content_filter,
+#:    error"*, tra 2026-11-27) ⇒ `stop_reason` nội bộ. Giá trị lạ ⇒ trả NGUYÊN ⇒ `chay_skill` DỪNG có tên (⛔ đoán).
+DOI_FINISH = {"tool_calls": "tool_use", "stop": "end_turn", "length": "max_tokens", "content_filter": "refusal"}
+
+
+class OpenRouterChat:
+    """⭐ `WO-367` AC-1 — mô hình qua **OpenRouter** `POST /api/v1/chat/completions` (khuôn OpenAI), DỊCH sang khuôn Messages
+    nội bộ ⇒ `chuoi.chay_skill` · bộ che · cổng skill · chấm mù ⛔ đổi một dòng. Gọi bằng `requests` (đã có trong
+    `requirements.txt`; tài liệu OpenRouter ví dụ Python bằng `requests`), nhập MUỘN (chỉ sau khi đủ chốt).
+
+    · Chốt: `kiem_chot_that` (cờ `--that` · `FLS_CHO_GOI_API=1` · `OPENROUTER_API_KEY` · slug GHIM trong danh mục · ⛔ `google/*`
+      · `FLS_OPENROUTER_DU_LIEU_XAC_NHAN=1`) — thiếu một ⇒ `CamGoiThat` TRƯỚC khi dựng phiên HTTP (0 byte gửi đi).
+    · MỖI lời gọi mang `provider = {"data_collection": "deny", "zdr": true}` — ⛔ tắt được qua tham số.
+    · USD: `usage.cost` OpenRouter trả (*"The total amount charged to your account"* — `usage-accounting.md`, tra 2026-11-27) ⇒
+      nhãn `THẬT`; đáp thiếu `cost` ⇒ bảng giá × token, nhãn `ƯỚC`. Token: `prompt_tokens` (GỒM cache) − `cached_tokens` = vào
+      chưa cache · `cached_tokens` = đọc cache · `cache_write_tokens` = ghi cache (cùng trang).
+    · Trần: tổng CẢ lượt (`nhat_ky` dùng chung) + trần RIÊNG mô hình (`tran_usd_mo_hinh`) — kiểm TRƯỚC mỗi lời (chặn lời KẾ).
+    · Lỗi: HTTP ≠ 200 ⇒ `LoiApi` mang mã + TÊN nguyên nhân (`TEN_LOI_OPENROUTER`) + `error.code`/`metadata.limit_source` nếu có
+      — ⛔ `message` (có thể chép lại nội dung), ⛔ khoá. 200 mà thân có `error` (lỗi GIỮA lúc sinh — trang errors §*errors during
+      generation can still appear in the body of a 200 response*) ⇒ `LoiApi`. Mô hình trả về ≠ slug ghim/canonical ⇒ `LoiApi`
+      (SAU khi đã ghi nhật ký — tiền đã tiêu).
+    · `phien` tiêm được (đối tượng có `.post(url, headers=, json=, timeout=)`) cho bài thử; mặc định `requests.Session()`.
+    """
+    ten = "openrouter"
+    duong = DUONG_OPENROUTER
+    vung = ""
+
+    def __init__(self, mo_hinh: MoHinh, co_that: bool = False, effort: str = "medium", che_do: str = "mo",
+                 client: Any = None, tran_usd: float | None = None, max_retries: int = 2,
+                 nhat_ky: list[NhatKyGoi] | None = None, moi_truong: dict[str, str] | None = None,
+                 tran_usd_mo_hinh: float | None = None, goc_api: str = GOC_API_OPENROUTER, het_gio: float = 600.0,
+                 ngu: Any = None, thay_cho: str | None = None):
+        """`thay_cho` (ma trận fleet eval, AC-4): mã mô hình NỘI BỘ mà skill gửi trong yêu cầu (vd `claude-opus-5-5` của
+        A2) — ô ma trận trả lời NÓ bằng slug ứng viên. Vắng ⇒ chỉ nhận mã của chính `mo_hinh` (⛔ đổi mô hình ngầm)."""
+        mt = os.environ if moi_truong is None else moi_truong
+        if duong_goi(mt) != self.duong:
+            # chốt chạy TRƯỚC để mọi chốt thiếu khác cũng có tên
+            kiem_chot_that(mo_hinh, co_that, mt, che_do=che_do)
+            raise CamGoiThat(f"`{BIEN_NHA_CUNG_CAP}={duong_goi(mt)}` ≠ đường của adapter `{self.duong}` — dựng qua `tao_that`")
+        kiem_chot_that(mo_hinh, co_that, mt, che_do=che_do)
+        self.slug = slug_openrouter(mo_hinh) or ""
+        thong = ma_tran_openrouter()["mo_hinh"][self.slug]
+        self.canonical = thong.get("canonical") or ""
+        self._mt = mt                       # giữ ÁNH XẠ (⛔ giá trị khoá) — khoá đọc lúc gọi
+        import requests  # noqa: PLC0415 — chỉ tới đây khi đủ chốt
+        self._requests = requests
+        self.mo_hinh, self.effort, self.tran_usd, self.tran_usd_mo_hinh = mo_hinh, effort, tran_usd, tran_usd_mo_hinh
+        self.thay_cho = thay_cho
+        self.goc_api, self.het_gio, self.max_retries = goc_api.rstrip("/"), het_gio, max_retries
+        self.client = client if client is not None else requests.Session()
+        self.nhat_ky: list[NhatKyGoi] = nhat_ky if nhat_ky is not None else []
+        import time  # noqa: PLC0415
+        self._ngu = ngu if ngu is not None else time.sleep
+
+    def __repr__(self) -> str:                # ⛔ bao giờ lộ ánh xạ môi trường (chứa khoá) qua repr
+        return f"OpenRouterChat(slug={self.slug!r})"
+
+    def _kiem_tran(self) -> None:
+        da_tieu = sum(x.chi_phi_usd for x in self.nhat_ky)
+        if self.tran_usd is not None and da_tieu >= self.tran_usd:
+            raise VuotTran(f"đã tiêu ~{da_tieu:.4f} USD ≥ trần TỔNG {self.tran_usd} USD ({len(self.nhat_ky)} lời gọi) — DỪNG")
+        rieng = [x for x in self.nhat_ky if x.mo_hinh in (self.slug, self.canonical)]
+        da_mh = sum(x.chi_phi_usd for x in rieng)
+        if self.tran_usd_mo_hinh is not None and da_mh >= self.tran_usd_mo_hinh:
+            raise VuotTran(f"mô hình `{self.slug}` đã tiêu ~{da_mh:.4f} USD ≥ trần MÔ HÌNH {self.tran_usd_mo_hinh} USD "
+                           f"({len(rieng)} lời gọi) — DỪNG mô hình này")
+
+    def _ten_loi(self, ma: int, d: Any) -> str:
+        e = d.get("error") if isinstance(d, dict) else None
+        e = e if isinstance(e, dict) else {}
+        md = e.get("metadata") if isinstance(e.get("metadata"), dict) else {}
+        them = [f"error.code {e['code']}"] if e.get("code") not in (None, ma) else []
+        if md.get("limit_source"):
+            them.append(f"limit_source {md['limit_source']}")
+        if md.get("provider_name"):
+            them.append(f"nhà cung cấp {md['provider_name']}")
+        return (f"HTTP {ma} — {TEN_LOI_OPENROUTER.get(ma, 'lỗi HTTP chưa có tên')}" + (" · " + " · ".join(map(str, them)) if them else "")
+                + f" · mô hình `{self.slug}`")
+
+    def goi(self, yeu_cau: dict) -> dict:
+        import time  # noqa: PLC0415
+        if yeu_cau.get("model") not in (self.mo_hinh.ma, self.slug) and (self.thay_cho is None or
+                                                                       yeu_cau.get("model") != self.thay_cho):
+            raise CamGoiThat(f"yêu cầu mang mô hình `{yeu_cau.get('model')}` ≠ ghim `{self.mo_hinh.ma}`")
+        self._kiem_tran()
+        than = _doi_yeu_cau_openrouter(yeu_cau, self.slug, self.effort)
+        khoa = self._mt.get(BIEN_OPENROUTER_KHOA) or ""
+        if not khoa:                          # biến bị gỡ GIỮA lượt ⇒ ⛔ gửi (⛔ để OpenRouter trả 401 kèm thân đã gửi)
+            raise CamGoiThat(f"khoá `{BIEN_OPENROUTER_KHOA}` vắng lúc gọi")
+        t0 = time.monotonic()
+        lan = 0
+        while True:
+            try:
+                r = self.client.post(f"{self.goc_api}/chat/completions", json=than, timeout=self.het_gio,
+                                     headers={"Authorization": f"Bearer {khoa}", "Content-Type": "application/json"})
+            except self._requests.RequestException as e:      # mạng / hết giờ — CÓ TÊN, ⛔ nội dung
+                if lan < self.max_retries:
+                    lan += 1
+                    self._ngu(min(2 ** lan, 30))
+                    continue
+                raise LoiApi(f"{type(e).__name__} (mạng/hết giờ) · mô hình `{self.slug}`") from None
+            try:
+                d = r.json()
+            except ValueError:
+                d = {}
+            if r.status_code in MA_THU_LAI and lan < self.max_retries:
+                lan += 1
+                try:
+                    cho = float(r.headers.get("Retry-After") or 2 ** lan)
+                except (TypeError, ValueError):
+                    cho = 2 ** lan
+                self._ngu(min(cho, 30))
+                continue
+            break
+        khoa = ""
+        if r.status_code != 200:
+            raise LoiApi(self._ten_loi(r.status_code, d))
+        if not isinstance(d, dict) or not d.get("choices"):
+            raise LoiApi(f"HTTP 200 nhưng thân ⛔ có `choices` (⛔ đọc được đáp) · mô hình `{self.slug}`")
+        c0 = d["choices"][0]
+        loi_giua = d.get("error") or c0.get("error")
+        giay = time.monotonic() - t0
+        u = d.get("usage") or {}
+        pt = int(u.get("prompt_tokens") or 0)
+        ct = int(u.get("completion_tokens") or 0)
+        ptd = u.get("prompt_tokens_details") or {}
+        cd, cg = int(ptd.get("cached_tokens") or 0), int(ptd.get("cache_write_tokens") or 0)
+        vao = max(pt - cd - cg, 0)
+        if isinstance(u.get("cost"), (int, float)) and not isinstance(u.get("cost"), bool):
+            usd, nguon = float(u["cost"]), NGUON_USD_THAT
+        else:
+            usd, nguon = chi_phi(self.slug, vao, ct, cd, cg, self.duong), NGUON_USD_UOC
+        dung = DOI_FINISH.get(str(c0.get("finish_reason")), str(c0.get("finish_reason")))
+        self.nhat_ky.append(NhatKyGoi(
+            mo_hinh=str(d.get("model") or self.slug), token_vao=vao, token_ra=ct, cache_doc=cd, cache_ghi=cg, giay=giay,
+            chi_phi_usd=usd, stop_reason=dung, van_tay_yeu_cau=van_tay(yeu_cau), van_tay_dap=van_tay(d),
+            request_id=str(d.get("id") or ""), duong=self.duong, vung="", nguon_usd=nguon,
+            nha_cung_cap=str(d.get("provider") or "")))
+        if loi_giua:
+            ma = loi_giua.get("code") if isinstance(loi_giua, dict) else None
+            raise LoiApi(f"lỗi GIỮA lúc sinh (HTTP 200, thân có `error`) — "
+                         f"{TEN_LOI_OPENROUTER.get(ma, 'mã ' + str(ma)) if isinstance(ma, int) else 'mã ' + str(ma)}"
+                         f" · mô hình `{self.slug}`")
+        if d.get("model") and d["model"] not in (self.slug, self.canonical):
+            raise LoiApi(f"OpenRouter trả bằng mô hình `{d['model']}` ≠ ghim `{self.slug}`")
+        if dung == "error":
+            raise LoiApi(f"finish_reason `error` · mô hình `{self.slug}`")
+        tin = c0.get("message") or {}
+        noi: list[dict[str, Any]] = []
+        if tin.get("reasoning_details"):
+            noi.append({"type": "openrouter_reasoning", "reasoning_details": tin["reasoning_details"]})
+        if isinstance(tin.get("content"), str) and tin["content"]:
+            noi.append({"type": "text", "text": tin["content"]})
+        for g in tin.get("tool_calls") or []:
+            f = g.get("function") or {}
+            try:
+                inp = json.loads(f.get("arguments") or "{}")
+            except (TypeError, json.JSONDecodeError):
+                raise LoiApi(f"tool_calls `{f.get('name')}`: `arguments` ⛔ phải JSON · mô hình `{self.slug}`") from None
+            noi.append({"type": "tool_use", "id": g.get("id"), "name": f.get("name"), "input": inp})
+        return {"stop_reason": dung, "content": noi}
+
+
 #: Họ → lớp adapter. Thêm họ (vd. `openai` giai đoạn sau) = thêm MỘT dòng + bỏ họ ấy khỏi `HO_DE_DANH`.
 ADAPTER: dict[str, Any] = {"anthropic": AnthropicMessages}
 #: `WO-359`: họ `anthropic` có BA đường — chọn theo `FLS_NHA_CUNG_CAP` (`duong_goi`; vắng ⇒ `anthropic`).
 ADAPTER_DUONG: dict[tuple[str, str], Any] = {("anthropic", DUONG_GOOGLE_CLOUD): AnthropicGoogleCloudMessages,
                                              ("anthropic", DUONG_VERTEX): AnthropicVertexMessages,
-                                             ("anthropic", DUONG_API): AnthropicMessages}
+                                             ("anthropic", DUONG_API): AnthropicMessages,
+                                             ("anthropic", DUONG_OPENROUTER): OpenRouterChat,
+                                             ("openai", DUONG_OPENROUTER): OpenRouterChat}
 
 
 def tao_that(mo_hinh: MoHinh, co_that: bool, che_do: str = "mo", **kw: Any) -> Any:
@@ -546,6 +882,10 @@ def tao_that(mo_hinh: MoHinh, co_that: bool, che_do: str = "mo", **kw: Any) -> A
             raise CamGoiThat(f"đường `{duong_goi(mt)}` ⛔ có adapter")
         return lop(mo_hinh, co_that, che_do=che_do, **kw)
     if mo_hinh.ho in HO_DE_DANH:
-        kiem_chot_that(mo_hinh, co_that, che_do=che_do)
-        raise ChuaDung(f"họ `{mo_hinh.ho}` CHỪA CHỖ cho giai đoạn sau (quyết chủ 23/11) — ⛔ adapter hôm nay")
+        mt = kw.get("moi_truong")
+        if mo_hinh.ho in HO_QUA_OPENROUTER and duong_goi(mt) == DUONG_OPENROUTER:      # `WO-367`: adapter qua OpenRouter
+            return OpenRouterChat(mo_hinh, co_that, che_do=che_do, **kw)
+        kiem_chot_that(mo_hinh, co_that, mt, che_do=che_do)
+        raise ChuaDung(f"họ `{mo_hinh.ho}` CHỪA CHỖ cho giai đoạn sau (quyết chủ 23/11) — adapter CHỈ qua "
+                       f"`{BIEN_NHA_CUNG_CAP}={DUONG_OPENROUTER}` (WO-367)")
     raise ChuaDung(f"họ `{mo_hinh.ho}` chưa có adapter")

@@ -4,6 +4,8 @@
     python tools/fleet_eval_voi.py                 # chạy các vòng khai ở VONG (giả), in bảng, ⛔ ghi
     python tools/fleet_eval_voi.py --ghi           # + ghi docs/ITL/05_FleetEval/vong/*.json + TONG_HOP.md
     python tools/fleet_eval_voi.py --be-giu-rieng [--ghi]   # WO-338: bể A (dữ liệu CŨ) ↔ bể B (THẬT hiện tại), GIẢ/phát lại
+    python tools/fleet_eval_voi.py --ma-tran [--ghi]        # WO-367: ma trận ứng viên OpenRouter × bể — GIẢ (127.0.0.1)
+    python tools/fleet_eval_voi.py --ma-tran --that --tran-usd 2 [--tran-usd-mo-hinh 1] [--ung-vien a/x,b/y] [--ghi]
 
 ⭐ Một VÒNG = một PHIÊN BẢN đóng băng (mã mô hình ghim + checksum prompt A2 + checksum bể ca + cờ nội dung)
    chạy trên CÙNG bể ca, chấm MÙ (bộ chấm thấy mã ca xáo, ⛔ tên agent/phiên bản), so với vòng trước và `v0`.
@@ -272,11 +274,228 @@ def main_be(ghi: bool) -> int:
     return 1 if đỏ else 0
 
 
+# ───────────────────────── WO-367 · MA TRẬN ứng viên OpenRouter × bể (A2.04) ─────────────────────────
+#: ⭐ Mỗi Ô = CÙNG bộ ca, CÙNG skill A2.04 (`bong`), CÙNG bộ che `mo`, CÙNG chấm MÙ bằng MÃ (`_cham_mu` so với ĐÁP ÁN giữ riêng
+#:    — số máy đã đo) — CHỈ đổi mô hình. ⛔ mô hình nào chấm câu trả lời của mình hay của mô hình khác.
+#: ⭐ Trần: TỔNG cả lượt (`--tran-usd`) + RIÊNG mỗi mô hình (`--tran-usd-mo-hinh`) — kiểm TRƯỚC mỗi lời gọi (`VuotTran` chặn
+#:    lời KẾ). Chạm trần TỔNG ⇒ mọi ô còn lại `bo_qua` có tên; chạm trần MÔ HÌNH ⇒ chỉ các ô còn lại của mô hình ấy.
+#: ⭐ `AG3-R1-01`: chế độ THẬT ghi nhật ký trên MỌI lối thoát (trả về · `LoiApi`/`VuotTran` trong ô · ngoại lệ chưa lường).
+TEP_MT_MD = TM_VONG / "MA_TRAN_OPENROUTER.md"
+TEP_MT_JSON = TM_VONG / "MA_TRAN_OPENROUTER.json"
+HAT_MA_TRAN = 367
+
+
+class _GiuNhatKy:
+    """Vỏ cho `cav.ghi_nhat_ky` (đọc `nhat_ky` từ nhà cung cấp) — ma trận dùng MỘT danh sách chung cho mọi ô."""
+    def __init__(self, nk: list):
+        self.nhat_ky = nk
+
+
+def be_ma_tran(be: Path | None) -> tuple[dict[str, tuple[dict, dict]], str]:
+    """Bể của ma trận: `a`/`b` giữ riêng nếu có; VẮNG ⇒ MỘT bể `dung` = 12 ca DỰNG, report KHAI rõ (⛔ im lặng)."""
+    if be is not None and all((be / c / "ca.json").exists() for c in ("a", "b")):
+        return ({c: (json.loads((be / c / "ca.json").read_text(encoding="utf-8")),
+                     json.loads((be / c / "dap_an.json").read_text(encoding="utf-8"))) for c in ("a", "b")},
+                "bể giữ riêng A (dữ liệu CŨ) · B (THẬT hiện tại) — ngoài repo")
+    ca, dap, nhan = cav.bo_ca(cho_heldout=False)
+    return {"dung": (ca, dap)}, f"⚠ bể giữ riêng A/B VẮNG (${BIEN_BE}/a · /b) ⇒ chỉ bể `dung` = {nhan} — ⛔ thay được bể A/B"
+
+
+def _o_tu_nhat_ky(ds: list) -> dict:
+    t = mh.tong_nhat_ky(ds)
+    return {"so_goi": t["so_goi"], "token_vao": t["token_vao"], "token_ra": t["token_ra"], "cache_doc": t["cache_doc"],
+            "usd": t["chi_phi_usd"], "nguon_usd": t.get("nguon_usd") or {}, "giay_api": t["giay"]}
+
+
+def chay_ma_tran(ung_vien: list[str], be_ds: dict[str, tuple[dict, dict]], dung_ncc, nk: list) -> dict:
+    """`dung_ncc(slug, nk)` ⇒ adapter (thật hoặc tới máy chủ GIẢ). Lỗi dựng (thiếu chốt) ⇒ ô `do` CÓ TÊN, ⛔ gọi."""
+    import time
+    o: dict[str, dict[str, dict]] = {}
+    dung_tong = ""
+    for slug in ung_vien:
+        o[slug] = {}
+        try:
+            ncc = dung_ncc(slug, nk)
+        except (mh.CamGoiThat, mh.ChuaDung) as e:
+            for b in be_ds:
+                o[slug][b] = {"do": f"{type(e).__name__}: {e}"}
+            continue
+        dung_mh = ""
+        for b, (ca, dap) in be_ds.items():
+            if dung_tong or dung_mh:
+                o[slug][b] = {"bo_qua": dung_tong or dung_mh}
+                continue
+            n0, t0 = len(nk), time.monotonic()
+            v = chay_vong(f"or:{slug}", gnd.luat_gia_v1, CHE_CHINH, ca, dap, ncc=ncc)
+            o_b: dict = {"giay": round(time.monotonic() - t0, 3), **_o_tu_nhat_ky(nk[n0:])}
+            loi = v.get("loi") or v.get("bi_cam_gui")
+            if loi:
+                o_b["loi"] = loi[:240]
+                if loi.startswith("VuotTran"):
+                    if "trần TỔNG" in loi:
+                        dung_tong = "trần TỔNG đã chạm — " + loi[:160]
+                    else:
+                        dung_mh = "trần MÔ HÌNH đã chạm — " + loi[:160]
+            else:
+                th = tong_hop_be(v["cham"])
+                o_b.update({k: th[k] for k in ("mau_so_chinh", "so_noi", "noi_sai", "recall_phai_noi", "phai_nguoi_bi_noi",
+                                               "l3_bi_noi", "diem_tb", "ti_le_noi_sai")})
+                o_b["noi_dung"] = th["so_noi"] - th["noi_sai"]
+            o[slug][b] = o_b
+    return o
+
+
+def ket_ma_tran(o: dict) -> tuple[bool, list[str]]:
+    """Đ5 — mong khai trước: MỌI ô CHẠY (⛔ thiếu chốt · lỗi · vượt trần · bỏ qua) và 0 ca phải-để-người bị nối ở mọi ô."""
+    do = []
+    for slug, cot in o.items():
+        for b, x in cot.items():
+            for k in ("do", "loi", "bo_qua"):
+                if k in x:
+                    do.append(f"`{slug}` × `{b}`: {k} — {x[k][:120]}")
+            if (x.get("phai_nguoi_bi_noi") or 0) > BAR_PHAI_NGUOI_BI_NOI:
+                do.append(f"`{slug}` × `{b}`: {x['phai_nguoi_bi_noi']} ca phải-để-người bị nối (bar 0)")
+    if not o:
+        do.append("0 ứng viên (Đ3: ma trận RỖNG ⛔ là ĐẠT)")
+    return not do, do
+
+
+def nhan_usd_ma_tran(x: dict, che_do: str = "that") -> str:
+    n = x.get("nguon_usd") or {}
+    if not x.get("so_goi"):
+        return "—"
+    if che_do != "that":                       # số do máy chủ GIẢ trả ⇒ ⛔ được mang nhãn THẬT
+        return f"{x['usd']} · GIẢ (máy chủ 127.0.0.1 — ⛔ tiền)"
+    nhan = "THẬT (usage.cost OpenRouter trả)" if not n.get(mh.NGUON_USD_UOC) else (
+        "ƯỚC (bảng giá × token)" if not n.get(mh.NGUON_USD_THAT) else
+        f"{n[mh.NGUON_USD_THAT]} lời THẬT + {n[mh.NGUON_USD_UOC]} lời ƯỚC")
+    return f"{x['usd']} · {nhan}"
+
+
+def md_ma_tran(kq: dict, truoc: dict | None) -> str:
+    dat, ly = ket_ma_tran(kq["o"])
+    be = list(next(iter(kq["o"].values()), {}).keys())
+    L = [f"# Fleet eval ĐA MÔ HÌNH qua OpenRouter — A2.04 · {kq['ngay']}", "",
+         f"> Sinh bởi `python tools/fleet_eval_voi.py --ma-tran {'--that ' if kq['che_do'] == 'that' else ''}--ghi` "
+         "(`WO-367` AC-4) — ⛔ sửa tay. CHỈ số đếm; ⛔ nội dung giao dịch, ⛔ phản hồi mô hình.", "",
+         f"**Chế độ: {'THẬT — API OpenRouter' if kq['che_do'] == 'that' else 'GIẢ — adapter THẬT ↔ máy chủ OpenRouter GIẢ 127.0.0.1 (luat_gia_v1 đứng thay MỌI mô hình) ⇒ số đo ĐƯỜNG ỐNG, ⛔ chất lượng mô hình'}**", "",
+         f"**KẾT: {'ĐẠT' if dat else 'ĐỎ'}**" + ("" if dat else " — " + " · ".join(x.replace('|', '\\|') for x in ly)), "",
+         "Mong (khai trước, Đ5): MỌI ô chạy (⛔ thiếu chốt · lỗi · vượt trần · bỏ qua) · 0 ca phải-để-người bị nối ở mọi ô.", "",
+         "| | |", "|---|---|",
+         f"| bể | {kq['be']} |", f"| ứng viên | {' · '.join(f'`{s}`' for s in kq['o'])} |",
+         f"| chấm | MÃ `_cham_mu` ↔ đáp án giữ riêng (⛔ mô hình chấm) · che `{CHE_CHINH}` · skill A2.04 checksum `{kq['checksum_prompt']}` |",
+         f"| trần USD | tổng {kq['tran_usd']} · mỗi mô hình {kq['tran_usd_mo_hinh']} — chặn lời KẾ (⛔ cắt lời đang chạy) |",
+         f"| định tuyến mỗi lời | `provider = {json.dumps(mh.DINH_TUYEN_OPENROUTER)}` |", "",
+         "## Ma trận mô hình × bể", "",
+         "| mô hình | bể | ca (mẫu số chính) | nối ĐÚNG | nối SAI | phải-để-người bị nối | recall phải-nối | điểm TB 0–2 | lỗi / bỏ qua | lời gọi | token vào/ra | USD + nguồn | giây |",
+         "|---|---|---|---|---|---|---|---|---|---|---|---|---|"]
+    for slug, cot in kq["o"].items():
+        for b, x in cot.items():
+            loi = x.get("do") or x.get("loi") or x.get("bo_qua")
+            L.append(f"| `{slug}` | `{b}` | " + " | ".join(_x(x.get(k)) for k in ("mau_so_chinh", "noi_dung", "noi_sai",
+                                                                                     "phai_nguoi_bi_noi", "recall_phai_noi", "diem_tb"))
+                     + f" | {('⛔ ' + loi[:90].replace('|', '/')) if loi else '—'} | {_x(x.get('so_goi'))} | "
+                     f"{_x(x.get('token_vao'))}/{_x(x.get('token_ra'))} | {nhan_usd_ma_tran(x, kq['che_do'])} | {_x(x.get('giay'))} |")
+    t = kq["nhat_ky"]
+    L += ["", f"Tổng: **{t['so_goi']}** lời gọi · token vào {t['token_vao']} / ra {t['token_ra']} · "
+          + (f"USD {t['chi_phi_usd']} (nguồn {t.get('nguon_usd') or '—'}; bảng giá dự phòng tra {mh.NGAY_TRA_GIA_OPENROUTER})."
+           if kq["che_do"] == "that" else f"USD {t['chi_phi_usd']} GIẢ (máy chủ cục bộ — ⛔ tiền, ⛔ giá thật)."), "",
+          "## So ngược bản trước", ""]
+    if not truoc:
+        L.append("⛔ có bản trước (`MA_TRAN_OPENROUTER.json` vắng) — lượt đầu.")
+    else:
+        L += [f"Bản trước: {truoc.get('ngay')} · chế độ {truoc.get('che_do')}.", "",
+              "| mô hình | bể | điểm TB trước → nay | nối SAI trước → nay | USD trước → nay |", "|---|---|---|---|---|"]
+        for slug, cot in kq["o"].items():
+            for b, x in cot.items():
+                y = ((truoc.get("o") or {}).get(slug) or {}).get(b)
+                if y is None:
+                    L.append(f"| `{slug}` | `{b}` | MỚI | MỚI | MỚI |")
+                    continue
+                L.append(f"| `{slug}` | `{b}` | {_x(y.get('diem_tb'))} → {_x(x.get('diem_tb'))} | "
+                         f"{_x(y.get('noi_sai'))} → {_x(x.get('noi_sai'))} | {_x(y.get('usd'))} → {_x(x.get('usd'))} |")
+        bo = [s for s in (truoc.get("o") or {}) if s not in kq["o"]]
+        if bo:
+            L.append(f"\nCó ở bản trước, VẮNG bản này: {', '.join(f'`{s}`' for s in bo)}.")
+    return "\n".join(L) + "\n"
+
+
+def main_ma_tran(a, goc_api: str | None = None) -> int:
+    """`goc_api` (CHỈ bài thử, ⛔ CLI): lái chế độ THẬT tới máy chủ GIẢ để đo lối thoát + nhật ký mà ⛔ tiền."""
+    from contextlib import ExitStack
+    import openrouter_gia as og
+    mt = mh.ma_tran_openrouter()
+    ung_vien = [s.strip() for s in a.ung_vien.split(",")] if a.ung_vien else list(mt["ung_vien"])
+    sai = {s: mh.loi_slug_openrouter(s) for s in ung_vien if mh.loi_slug_openrouter(s)}
+    if sai:
+        print("⛔ ĐỎ: ứng viên ⛔ hợp lệ —", sai)
+        return 2
+    be_ds, nhan_be = be_ma_tran(Path(os.environ[BIEN_BE]) if os.environ.get(BIEN_BE) else None)
+    nk: list = []
+    tran_mh = a.tran_usd_mo_hinh if a.tran_usd_mo_hinh is not None else a.tran_usd
+    with ExitStack() as st:
+        if a.that:
+            moi, goc = None, (goc_api or mh.GOC_API_OPENROUTER)
+            if mh.duong_goi() != mh.DUONG_OPENROUTER:
+                print(f"⛔ ĐỎ (⛔ gọi): `--that` cần {mh.BIEN_NHA_CUNG_CAP}=openrouter (hiện `{mh.duong_goi()}`)")
+                return 2
+        else:   # GIẢ: adapter THẬT ↔ máy chủ GIẢ cục bộ; chốt thoả bằng môi trường RIÊNG (⛔ đụng os.environ, ⛔ khoá thật)
+            goc, _tt = st.enter_context(og.may_chu_gia())
+            moi = {mh.BIEN_CHO_GOI: "1", mh.BIEN_NHA_CUNG_CAP: mh.DUONG_OPENROUTER, mh.BIEN_OPENROUTER_KHOA: "gia-khong-phai-khoa",
+                   mh.BIEN_OPENROUTER_DU_LIEU: "1"}
+
+        def dung_ncc(slug: str, ds: list):
+            return mh.OpenRouterChat(mh.mo_hinh_openrouter(slug), co_that=True, che_do=CHE_CHINH, tran_usd=a.tran_usd,
+                                     tran_usd_mo_hinh=tran_mh, nhat_ky=ds, moi_truong=moi, goc_api=goc,
+                                     thay_cho=[d for d in ch.AGENT if d.ma == "A2_PR_MAP"][0].mo_hinh.ma)
+        loi_ngoai = None
+        try:
+            o = chay_ma_tran(ung_vien, be_ds, dung_ncc, nk)
+        except BaseException as e:                  # `AG3-R1-01`: ngoại lệ CHƯA lường — tiền đã tiêu vẫn để lại nhật ký
+            loi_ngoai = f"{type(e).__name__} (lượt dừng ngoài dự kiến)"
+            raise
+        finally:
+            if a.that:
+                loi_o = loi_ngoai or "; ".join(x for x in ket_ma_tran(locals().get("o") or {})[1] if "lỗi" in x or "loi" in x
+                                               or "bo_qua" in x)[:400] or None
+                pn = cav.ghi_nhat_ky({"_": _GiuNhatKy(nk)}, "fleet_ma_tran_openrouter", loi=loi_o)
+                if pn:
+                    print(f"  đã ghi nhật ký {_tuong_doi(pn)}")
+    kq = {"ngay": date.today().isoformat(), "che_do": "that" if a.that else "gia", "be": nhan_be,
+          "checksum_prompt": checksum_prompt("A2_PR_MAP"), "tran_usd": a.tran_usd, "tran_usd_mo_hinh": tran_mh,
+          "o": o, "nhat_ky": mh.tong_nhat_ky(nk)}
+    truoc = json.loads(TEP_MT_JSON.read_text(encoding="utf-8")) if TEP_MT_JSON.exists() else None
+    trang = md_ma_tran(kq, truoc)
+    print(trang)
+    if a.ghi:
+        TM_VONG.mkdir(parents=True, exist_ok=True)
+        TEP_MT_MD.write_text(trang, encoding="utf-8")
+        TEP_MT_JSON.write_text(json.dumps(kq, ensure_ascii=False, indent=1, sort_keys=True) + "\n", encoding="utf-8")
+        print(f"  đã ghi {_tuong_doi(TEP_MT_MD)} · {_tuong_doi(TEP_MT_JSON)}")
+    return 0 if ket_ma_tran(o)[0] else 1
+
+
+def _tuong_doi(p: Path) -> Path:
+    return p.relative_to(GOC) if p.is_relative_to(GOC) else p
+
+
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(prog="fleet_eval_voi.py")
     p.add_argument("--ghi", action="store_true")
     p.add_argument("--be-giu-rieng", action="store_true", help="WO-338: bể A ↔ bể B (GIẢ/phát lại, ⛔ API thật)")
+    p.add_argument("--ma-tran", action="store_true",
+                   help="WO-367: ma trận ứng viên OpenRouter × bể A/B (vắng bể ⇒ 12 ca dựng, KHAI rõ). Mặc định GIẢ (máy chủ 127.0.0.1)")
+    p.add_argument("--that", action="store_true", help="(--ma-tran) gọi OpenRouter THẬT — đủ chốt: FLS_NHA_CUNG_CAP=openrouter · "
+                   "FLS_CHO_GOI_API=1 · OPENROUTER_API_KEY · FLS_OPENROUTER_DU_LIEU_XAC_NHAN=1")
+    p.add_argument("--ung-vien", default="", help="(--ma-tran) slug cách nhau dấu phẩy — phải có trong fls/agent/openrouter_mo_hinh.json; "
+                   "vắng ⇒ `ung_vien` của tệp ấy")
+    p.add_argument("--tran-usd", type=float, default=cav.TRAN_USD_MAC_DINH, help="(--ma-tran) trần USD TỔNG cả lượt — chặn lời KẾ")
+    p.add_argument("--tran-usd-mo-hinh", type=float, default=None, help="(--ma-tran) trần USD RIÊNG mỗi mô hình (vắng ⇒ = trần tổng)")
     a = p.parse_args(argv)
+    if a.ma_tran:
+        return main_ma_tran(a)
+    if a.that:
+        p.error("--that chỉ đi với --ma-tran")
     if a.be_giu_rieng:
         return main_be(a.ghi)
     ca, dap_an, nhan_be = cav.bo_ca()
