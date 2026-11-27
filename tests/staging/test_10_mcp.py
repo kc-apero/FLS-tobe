@@ -171,13 +171,13 @@ python3 -c 'import json,os,sys; json.dump({{"argv":sys.argv[1:],"env":{{k:v for 
 """, encoding="utf-8")
     py.chmod(0o755)
     env = dict(os.environ, FLS_STG_PROJECT=P, FLS_STG_CONN=f"{P}:asia-southeast1:fls-staging", FLS_MCP_URL=URL,
-               FLS_STG_PYTHON=str(py), PORT="8080")
+               FLS_STG_PYTHON=str(py), PORT="8080", FLS_STG_KHO="kho_thu")
     r = subprocess.run(["bash", str(VAO)], capture_output=True, text=True, env=env, timeout=30)
     assert r.returncode == 0, r.stderr
     d = json.loads(chup.read_text())
     assert d["argv"] == ["tools/chay_mcp.py", "--http", "--dia-chi", "0.0.0.0", "--cong", "8080"]
     e = d["env"]
-    assert (e["PG_DSN"], e["PGPASSWORD"]) == (f"postgresql://fls_doc@/fls?host=/cloudsql/{P}:asia-southeast1:fls-staging",
+    assert (e["PG_DSN"], e["PGPASSWORD"]) == (f"postgresql://fls_doc@/kho_thu?host=/cloudsql/{P}:asia-southeast1:fls-staging",
                                               "MKGIA-doc")
     assert (e["FLS_MCP_GOOGLE_ID"], e["FLS_MCP_GOOGLE_SECRET"], e["FLS_MCP_CHO_PHEP"], e["FLS_MCP_URL"]) == (GID, GSEC, CHU, URL)
     assert len(e["FLS_MCP_KHOA"]) == 128
