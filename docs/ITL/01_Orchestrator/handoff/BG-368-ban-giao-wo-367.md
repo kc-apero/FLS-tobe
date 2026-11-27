@@ -5,7 +5,7 @@
 | **Thuộc** | `WO-367` |
 | **Phát bởi** | `fls-dev` · 2026-11-27 |
 | **Nhận** | `fls-test` (R1 → `KQ-369`) · CHỦ (Cloud Shell — §A/§B) |
-| **Nhánh** | `claude/bold-galileo-zukpaf-isp/OR` · nền `6f996cf` · SHA đo: xem §F |
+| **Nhánh** | `claude/bold-galileo-zukpaf-isp/OR` · nền `6f996cf` · mã đo **`78abf77`** (+ 1 commit tài liệu §F) |
 | **Kho thật** | `KHONG_CHAM` (G0 BÓNG) · **0** lời gọi API thật từ phiên này (luật WO: CHỦ chạy) · **0** lệnh GCP |
 
 **Một câu:** đường thứ tư `FLS_NHA_CUNG_CAP=openrouter` (`OpenRouterChat`, `POST https://openrouter.ai/api/v1/chat/completions` bằng `requests`, DỊCH sang khuôn Messages nội bộ) + chốt MỚI `FLS_OPENROUTER_DU_LIEU_XAC_NHAN=1` + định tuyến `{"data_collection": "deny", "zdr": true}` ở MỌI lời gọi + USD lấy từ `usage.cost` OpenRouter trả (nhãn **THẬT**; thiếu ⇒ **ƯỚC**) + cấu hình mô hình MỘT chỗ `fls/agent/openrouter_mo_hinh.json` + `fleet_eval_voi.py --ma-tran` (ứng viên × bể A/B, chấm bằng MÃ) + script chủ `tools/staging/09_openrouter_agent.sh`. **AC-7 (cổng MCP) ⛔ làm** — AC-4 chứng minh fleet eval TỰ ĐỘNG được (§C).
@@ -140,7 +140,19 @@ Ngoài bảng (có trong `/models`, ⛔ vào danh mục): bản cũ `anthropic/c
 
 ## F · Cổng (dán thật — container cloud, cụm PG 16 cổng **5436**)
 
-<!-- CONG -->
+Đo trên commit mã **`78abf77`** (commit sau chỉ thêm §F này — tài liệu).
+
+| cổng | kết | dán |
+|---|---|---|
+| `--duong-nen --cong 5436` (MỘT lần, một mình) | **ĐẠT** | toàn bộ `12 failed, 5426 passed, 2 xfailed, 14 errors in 1471.97s` · `[ĐẠT] … tập đỏ + XFAIL = đường nền: 28 = 28 node id (trong đó XFAIL 2 = 2 · thêm 0 · bớt 0) · chạy 5454 bài (mong ≥ 5454) · skipped 0 · deselected 0` · web `3 failed, 687 passed` · `[ĐẠT] … 3 = 3 node id … chạy 690 bài (mong ≥ 690)` · `══ KẾT: ĐẠT — mọi phép kiểm khớp mong` |
+| sàn | **5454** (toàn bộ) · **690** (web) | `pytest --collect-only` ⇒ `5454 tests collected` · `tests/web` ⇒ `690`; = 5389 + **65** bài mới (36 + 10 + 19). Ghim ở `tools/dung_moi_truong_isp.sh` + `tests/test_dung_moi_truong_isp.py` CÙNG commit |
+| `git status --porcelain` NGAY sau đường nền | **0** dòng | bộ bài ⛔ để lại tệp (nhật ký GIẢ đi `tmp_path` — conftest `AG3-R1-02`) |
+| `kiem_tai_lieu.py` | **ĐẠT** | `✅ cong tai lieu DAT — va no da do duoc that (544 file, 3186 bang, 1000 o ngay, 104 ma QD)` |
+| `lint-imports` | **ĐẠT** | `Contracts: 11 kept, 0 broken.` |
+| `quet_pii_repo.py` | **ĐẠT** | `[ĐẠT] 0 chỗ số TK cá nhân · 0 tệp` |
+| grep HÌNH KHOÁ OpenRouter ngoài `tests/` | **0** tệp | mẫu tiền tố + ≥ 16 ký tự; bằng chứng dương: mẫu thấy khoá GIẢ trong `tests/agent/test_mo_hinh_openrouter.py` |
+| `tests/agent` + `tests/nghiem_thu` (trước đường nền) | 3 ĐỎ **có sẵn** | `3 failed, 461 passed, 2 xfailed` — cả 3 (`kq019 … SO_THAT …` · `kq021 … SO_THAT …` · `kq041 … so_that …`) đều trong `docs/ITL/03_Dev/isp-3.1/DUONG_NEN.md` (kho 5436 rỗng); `test_kq357_…` (19/27 khoá biến vắng ⇒ `anthropic`) **xanh trọn** |
+| lượt CLI GIẢ `fleet_eval_voi.py --ma-tran` (bể vắng) | **ĐẠT** | `**KẾT: ĐẠT**` · 2 ứng viên × bể `dung` · 4 lời tới máy chủ 127.0.0.1 · cột USD nhãn `GIẢ` |
 
 ## G · Giả định CHƯA kiểm (cần lời gọi THẬT — chủ chạy §A3)
 
